@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
   const search = (query.search as string) || ''
   const tierIdsParam = (query.tierIds as string) || ''
   const tierIds = tierIdsParam ? tierIdsParam.split(',').map((id) => parseInt(id)) : []
+  const entryStatus = (query.entryStatus as string) || 'all'
 
   try {
     // Construire la condition de recherche
@@ -62,12 +63,35 @@ export default defineEventHandler(async (event) => {
           }
         : {}
 
+    // Construire la condition de filtre par statut d'entrée
+    const entryStatusCondition =
+      entryStatus === 'validated'
+        ? {
+            items: {
+              some: {
+                entryValidated: true,
+              },
+            },
+          }
+        : entryStatus === 'not_validated'
+          ? {
+              items: {
+                some: {
+                  entryValidated: {
+                    not: true,
+                  },
+                },
+              },
+            }
+          : {}
+
     // Compter le nombre total de commandes (toutes les commandes de l'édition)
     const total = await prisma.ticketingOrder.count({
       where: {
         editionId,
         ...searchCondition,
         ...tierCondition,
+        ...entryStatusCondition,
       },
     })
 
@@ -77,6 +101,7 @@ export default defineEventHandler(async (event) => {
         editionId,
         ...searchCondition,
         ...tierCondition,
+        ...entryStatusCondition,
       },
       include: {
         externalTicketing: {

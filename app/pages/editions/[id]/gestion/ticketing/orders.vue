@@ -158,52 +158,72 @@
               >
                 Filtres
                 <UBadge
-                  v-if="selectedTierIds.length > 0"
+                  v-if="activeFiltersCount > 0"
                   color="primary"
                   variant="solid"
                   size="xs"
                   class="ml-2"
                 >
-                  {{ selectedTierIds.length }}
+                  {{ activeFiltersCount }}
                 </UBadge>
               </UButton>
             </div>
 
             <!-- Section des filtres (cachée par défaut) -->
             <div v-if="isFiltersOpen" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Filtrer par tarifs
-                </label>
-                <USelect
-                  v-model="selectedTierIds"
-                  :items="tierSelectItems"
-                  multiple
-                  placeholder="Sélectionner des tarifs"
-                  value-key="value"
-                  size="md"
-                  class="w-full"
-                >
-                  <template #item-label="{ item }">
-                    <div class="flex items-center justify-between w-full">
-                      <span>{{ item.label }}</span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ (item.price / 100).toFixed(2) }}€
-                      </span>
-                    </div>
-                  </template>
-                </USelect>
-                <div v-if="selectedTierIds.length > 0" class="mt-2">
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-heroicons-x-mark"
-                    @click="selectedTierIds = []"
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Filtre par tarifs -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Filtrer par tarifs
+                  </label>
+                  <USelect
+                    v-model="selectedTierIds"
+                    :items="tierSelectItems"
+                    multiple
+                    placeholder="Sélectionner des tarifs"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
                   >
-                    Réinitialiser les filtres
-                  </UButton>
+                    <template #item-label="{ item }">
+                      <div class="flex items-center justify-between w-full">
+                        <span>{{ item.label }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          {{ (item.price / 100).toFixed(2) }}€
+                        </span>
+                      </div>
+                    </template>
+                  </USelect>
                 </div>
+
+                <!-- Filtre par statut d'entrée -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Statut d'entrée
+                  </label>
+                  <USelect
+                    v-model="entryStatusFilter"
+                    :items="entryStatusOptions"
+                    placeholder="Tous les billets"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+
+              <!-- Bouton de réinitialisation -->
+              <div v-if="selectedTierIds.length > 0 || entryStatusFilter !== 'all'" class="pt-2">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  size="xs"
+                  icon="i-heroicons-x-mark"
+                  @click="resetFilters"
+                >
+                  Réinitialiser tous les filtres
+                </UButton>
               </div>
             </div>
           </div>
@@ -218,9 +238,9 @@
         <div v-else-if="orders.length === 0" class="text-center py-12">
           <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
           <p class="text-sm text-gray-500">
-            {{ searchQuery ? 'Aucun résultat trouvé' : 'Aucune commande trouvée' }}
+            {{ searchQuery || entryStatusFilter !== 'all' ? 'Aucun résultat trouvé' : 'Aucune commande trouvée' }}
           </p>
-          <p class="text-xs text-gray-400 mt-1">
+          <p v-if="!searchQuery && entryStatusFilter === 'all'" class="text-xs text-gray-400 mt-1">
             Importez les commandes depuis votre billeterie externe
           </p>
         </div>
@@ -582,10 +602,18 @@ const pageSize = ref(20)
 const totalPages = ref(0)
 const totalOrders = ref(0)
 
-// Filtre par tarifs
+// Filtres
 const tiers = ref<TicketingTier[]>([])
 const selectedTierIds = ref<number[]>([])
+const entryStatusFilter = ref<'all' | 'validated' | 'not_validated'>('all')
 const isFiltersOpen = ref(false)
+
+// Options pour le filtre de statut d'entrée
+const entryStatusOptions = [
+  { label: 'Tous les billets', value: 'all' },
+  { label: 'Entrée validée', value: 'validated' },
+  { label: 'Entrée non validée', value: 'not_validated' },
+]
 
 // Modal QR Code
 const isQrModalOpen = ref(false)
@@ -686,6 +714,7 @@ const loadOrders = async () => {
       limit: pageSize.value,
       search: searchQuery.value,
       tierIds: selectedTierIds.value.length > 0 ? selectedTierIds.value : undefined,
+      entryStatus: entryStatusFilter.value,
     })
 
     orders.value = response.orders
@@ -712,8 +741,22 @@ const tierSelectItems = computed(() => {
   }))
 })
 
+// Compter le nombre de filtres actifs
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (selectedTierIds.value.length > 0) count += selectedTierIds.value.length
+  if (entryStatusFilter.value !== 'all') count += 1
+  return count
+})
+
+// Fonction pour réinitialiser tous les filtres
+const resetFilters = () => {
+  selectedTierIds.value = []
+  entryStatusFilter.value = 'all'
+}
+
 // Réinitialiser à la page 1 quand on effectue une recherche ou change les filtres
-watch([searchQuery, selectedTierIds], () => {
+watch([searchQuery, selectedTierIds, entryStatusFilter], () => {
   currentPage.value = 1
   loadOrders()
 })

@@ -58,7 +58,13 @@ export interface OrdersResponse {
 
 export async function fetchOrders(
   editionId: number,
-  options?: { page?: number; limit?: number; search?: string; tierIds?: number[] }
+  options?: {
+    page?: number
+    limit?: number
+    search?: string
+    tierIds?: number[]
+    entryStatus?: 'all' | 'validated' | 'not_validated'
+  }
 ): Promise<OrdersResponse> {
   const params = new URLSearchParams()
   if (options?.page) params.append('page', options.page.toString())
@@ -66,6 +72,9 @@ export async function fetchOrders(
   if (options?.search) params.append('search', options.search)
   if (options?.tierIds && options.tierIds.length > 0) {
     params.append('tierIds', options.tierIds.join(','))
+  }
+  if (options?.entryStatus && options.entryStatus !== 'all') {
+    params.append('entryStatus', options.entryStatus)
   }
 
   const url = `/api/editions/${editionId}/ticketing/orders${params.toString() ? `?${params.toString()}` : ''}`
