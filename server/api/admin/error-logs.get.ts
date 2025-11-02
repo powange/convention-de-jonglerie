@@ -10,7 +10,9 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
 
   // Paramètres de pagination
-  const page = Math.max(1, parseInt((query.page as string) || '1'))
+  // Support pour pagination par curseur (plus performant) ET pagination classique (rétrocompatibilité)
+  const cursor = (query.cursor as string) || undefined // ID du dernier log de la page précédente
+  const page = cursor ? undefined : Math.max(1, parseInt((query.page as string) || '1'))
   const pageSize = Math.min(
     100,
     Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
@@ -112,21 +114,20 @@ export default defineEventHandler(async (event) => {
     orderBy.push({ createdAt: 'desc' })
   }
 
-  // Limiter le skip pour éviter les problèmes de performance
-  // MySQL a du mal à skip de grandes quantités de lignes
-  const maxSkip = 1000
-  const safeSkip = Math.min((page - 1) * pageSize, maxSkip)
-
-  // Récupération des logs avec pagination
-  const errorLogs = await prisma.apiErrorLog.findMany({
-    where,
-    orderBy,
-    skip: safeSkip,
-    take: pageSize,
-    select: {
-      id: true,
-      message: true,
-      statusCode: true,
+  // Pagination par curseur (performant) ou offset (rétrocompatibilité)
+  let errorLogs
+  if (cursor) {
+    // Pagination par curseur : beaucoup plus performant, pas de SKIP
+    errorLogs = await prisma.apiErrorLog.findMany({
+      where,
+      orderBy,
+      cursor: { id: cursor },
+      skip: 1, // Skip le curseur lui-même
+      take: pageSize,
+      select: {
+        id: true,
+        message: true,
+        statusCode: true,
       errorType: true,
       method: true,
       path: true,
@@ -152,10 +153,53 @@ export default defineEventHandler(async (event) => {
       queryParams: true,
       body: true, // Inclure le body (sanitisé) pour le debug
       prismaDetails: true, // Inclure les détails SQL/Prisma pour les erreurs de base de données
-      headers: false, // Pas dans la liste par défaut (trop verbeux)
-      stack: false, // Pas dans la liste par défaut (très verbeux)
-    },
-  })
+        headers: false, // Pas dans la liste par défaut (trop verbeux)
+        stack: false, // Pas dans la liste par défaut (très verbeux)
+      },
+    })
+  } else {
+    // Pagination classique par offset (rétrocompatibilité)
+    // Limiter le skip pour éviter les problèmes de performance
+    const maxSkip = 1000
+    const safeSkip = Math.min(((page || 1) - 1) * pageSize, maxSkip)
+
+    errorLogs = await prisma.apiErrorLog.findMany({
+      where,
+      orderBy,
+      skip: safeSkip,
+      take: pageSize,
+      select: {
+        id: true,
+        message: true,
+        statusCode: true,
+        errorType: true,
+        method: true,
+        path: true,
+        userAgent: true,
+        ip: true,
+        referer: true,
+        origin: true,
+        resolved: true,
+        resolvedBy: true,
+        resolvedAt: true,
+        adminNotes: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+          },
+        },
+        queryParams: true,
+        body: true,
+        prismaDetails: true,
+        headers: false,
+        stack: false,
+      },
+    })
+  }
 
   // Statistiques rapides pour le dashboard
   const stats = await prisma.apiErrorLog.aggregate({
@@ -211,14 +255,27 @@ export default defineEventHandler(async (event) => {
     take: 10,
   })
 
+  // Calculer le curseur pour la page suivante (si pagination par curseur)
+  const nextCursor = errorLogs.length > 0 ? errorLogs[errorLogs.length - 1].id : null
+  const hasMore = errorLogs.length === pageSize // Il y a potentiellement plus de résultats
+
   return {
     logs: errorLogs,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      totalPages: Math.max(1, Math.ceil(total / pageSize)),
-    },
+    pagination: cursor
+      ? {
+          // Pagination par curseur
+          cursor: nextCursor,
+          hasMore,
+          pageSize,
+          total, // Le total peut être approximatif avec le curseur
+        }
+      : {
+          // Pagination classique
+          page,
+          pageSize,
+          total,
+          totalPages: Math.max(1, Math.ceil(total / pageSize)),
+        },
     stats: {
       totalLast24h: stats._count.id,
       unresolvedCount,
