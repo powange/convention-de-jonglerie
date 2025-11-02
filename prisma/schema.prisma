@@ -594,6 +594,9 @@ model ApiErrorLog {
   body        Json? // Corps de la requête (sans données sensibles)
   queryParams Json? // Paramètres de requête
 
+  // Détails d'erreur SQL/Prisma (pour erreurs base de données)
+  prismaDetails Json? // Code d'erreur Prisma, détails MySQL, etc.
+
   // Informations utilisateur
   userId Int?
   user   User? @relation(fields: [userId], references: [id])

@@ -29,6 +29,7 @@ export default defineEventHandler(async (event) => {
       headers: true,
       body: true,
       queryParams: true,
+      prismaDetails: true,
       resolved: true,
       resolvedBy: true,
       resolvedAt: true,

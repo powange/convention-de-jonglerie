@@ -84,15 +84,72 @@ function sanitizeBody(body: any): any {
 }
 
 /**
+ * Extrait les détails SQL d'une erreur Prisma
+ */
+function extractPrismaDetails(error: any): {
+  code?: string
+  meta?: any
+  sqlMessage?: string
+  sqlState?: string
+} | null {
+  // Pour les erreurs Prisma connues
+  if (error.name === 'PrismaClientKnownRequestError') {
+    return {
+      code: error.code,
+      meta: error.meta,
+    }
+  }
+
+  // Pour les erreurs Prisma inconnues, extraire les détails MySQL/SQL si disponibles
+  if (
+    error.name === 'PrismaClientUnknownRequestError' ||
+    error.name === 'PrismaClientInitializationError'
+  ) {
+    const details: any = {}
+
+    // Extraire le code MySQL si présent
+    if (error.cause?.kind?.QueryError?.Server?.MysqlError) {
+      const mysqlError = error.cause.kind.QueryError.Server.MysqlError
+      details.code = mysqlError.code
+      details.sqlMessage = mysqlError.message
+      details.sqlState = mysqlError.state
+    }
+
+    // Extraire les métadonnées si présentes
+    if (error.meta) {
+      details.meta = error.meta
+    }
+
+    return Object.keys(details).length > 0 ? details : null
+  }
+
+  return null
+}
+
+/**
  * Détermine le type d'erreur pour classification
  */
 function getErrorType(error: Error): string {
   // Types d'erreur Zod
   if (error.name === 'ZodError') return 'ValidationError'
 
-  // Types d'erreur Prisma
-  if (error.name === 'PrismaClientKnownRequestError') return 'DatabaseError'
-  if (error.name === 'PrismaClientUnknownRequestError') return 'DatabaseError'
+  // Types d'erreur Prisma - classification plus fine
+  if (error.name === 'PrismaClientKnownRequestError') {
+    const prismaError = error as any
+    // Classifier par code Prisma
+    if (prismaError.code === 'P2002') return 'DatabaseUniqueConstraintError'
+    if (prismaError.code === 'P2003') return 'DatabaseForeignKeyError'
+    if (prismaError.code === 'P2025') return 'DatabaseRecordNotFoundError'
+    return 'DatabaseError'
+  }
+  if (error.name === 'PrismaClientUnknownRequestError') {
+    // Vérifier si c'est une erreur MySQL spécifique
+    const errorStr = error.toString()
+    if (errorStr.includes('Out of sort memory')) return 'DatabaseSortMemoryError'
+    if (errorStr.includes('Deadlock')) return 'DatabaseDeadlockError'
+    if (errorStr.includes('Lock wait timeout')) return 'DatabaseLockTimeoutError'
+    return 'DatabaseError'
+  }
   if (error.name === 'PrismaClientInitializationError') return 'DatabaseConnectionError'
   if (error.name === 'PrismaClientValidationError') return 'DatabaseValidationError'
 
@@ -207,6 +264,9 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
       // Ignorer les erreurs de lecture du body
     }
 
+    // Extraire les détails Prisma/SQL si c'est une erreur de base de données
+    const prismaDetails = extractPrismaDetails(error)
+
     // Créer l'enregistrement de log
     await prisma.apiErrorLog.create({
       data: {
@@ -224,6 +284,7 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
         headers: sanitizeHeaders(getHeaders(event)),
         body: body ? sanitizeBody(body) : null,
         queryParams: Object.fromEntries(urlObj.searchParams.entries()),
+        prismaDetails: prismaDetails || undefined,
         userId,
       },
     })
