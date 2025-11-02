@@ -48,12 +48,25 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      orderBy: [{ user: { nom: 'asc' } }, { user: { prenom: 'asc' } }],
+      orderBy: { id: 'desc' },
+    })
+
+    // Trier manuellement par nom et prénom côté serveur
+    const sortedArtists = artists.sort((a, b) => {
+      const nomA = a.user.nom || ''
+      const nomB = b.user.nom || ''
+      const prenomA = a.user.prenom || ''
+      const prenomB = b.user.prenom || ''
+
+      if (nomA !== nomB) {
+        return nomA.localeCompare(nomB)
+      }
+      return prenomA.localeCompare(prenomB)
     })
 
     return {
       success: true,
-      artists: artists.map((artist) => ({
+      artists: sortedArtists.map((artist) => ({
         id: artist.id,
         user: {
           id: artist.user.id,
@@ -66,7 +79,7 @@ export default defineEventHandler(async (event) => {
         },
         shows: artist.shows.map((showArtist) => showArtist.show),
       })),
-      total: artists.length,
+      total: sortedArtists.length,
     }
   } catch (error: unknown) {
     console.error('Failed to fetch artists not validated:', error)

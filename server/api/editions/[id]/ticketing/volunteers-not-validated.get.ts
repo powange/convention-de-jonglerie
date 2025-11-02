@@ -49,12 +49,25 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      orderBy: [{ user: { nom: 'asc' } }, { user: { prenom: 'asc' } }],
+      orderBy: { id: 'desc' },
+    })
+
+    // Trier manuellement par nom et prénom côté serveur
+    const sortedVolunteers = volunteers.sort((a, b) => {
+      const nomA = a.user.nom || ''
+      const nomB = b.user.nom || ''
+      const prenomA = a.user.prenom || ''
+      const prenomB = b.user.prenom || ''
+
+      if (nomA !== nomB) {
+        return nomA.localeCompare(nomB)
+      }
+      return prenomA.localeCompare(prenomB)
     })
 
     return {
       success: true,
-      volunteers: volunteers.map((volunteer) => ({
+      volunteers: sortedVolunteers.map((volunteer) => ({
         id: volunteer.id,
         user: {
           id: volunteer.user.id,
@@ -67,7 +80,7 @@ export default defineEventHandler(async (event) => {
         },
         teams: volunteer.teamAssignments.map((assignment) => assignment.team),
       })),
-      total: volunteers.length,
+      total: sortedVolunteers.length,
     }
   } catch (error: unknown) {
     console.error('Failed to fetch volunteers not validated:', error)
