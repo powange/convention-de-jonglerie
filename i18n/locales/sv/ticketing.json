@@ -15,20 +15,6 @@
       "how_to_use_title": "Så här använder du denna QR-kod",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Avbryt beställning",
-      "cancel_order_confirm": "Är du säker på att du vill avbeställa den här ordern?",
-      "cancel_order_confirm_message": "Denna åtgärd kommer att annullera ordern och blockera alla tillhörande biljetter. Biljetterna kan inte längre användas.",
-      "canceling_order": "Avbeställning pågår...",
-      "cancel_order_error": "Fel vid annullering av order",
-      "order_canceled": "Beställningen avbruten",
-      "delete_order": "Ta bort kommando",
-      "delete_order_confirm": "Är du säker på att du vill ta bort det här kommandot?",
-      "delete_order_confirm_message": "Denna åtgärd raderar ordern och alla tillhörande biljetter permanent från databasen. Denna åtgärd kan inte ångras.",
-      "deleting_order": "Radering pågår...",
-      "delete_order_error": "Fel vid borttagning av order",
-      "order_deleted": "Order borttagen"
-    },
     "options": {
       "list": {
         "loading": "Laddar...",
@@ -52,16 +38,30 @@
         "type_label": "Typ av option"
       }
     },
+    "orders": {
+      "cancel_order": "Avbryt beställning",
+      "cancel_order_confirm": "Är du säker på att du vill avbeställa den här ordern?",
+      "cancel_order_confirm_message": "Denna åtgärd kommer att annullera ordern och blockera alla tillhörande biljetter. Biljetterna kan inte längre användas.",
+      "cancel_order_error": "Fel vid annullering av order",
+      "canceling_order": "Avbeställning pågår...",
+      "delete_order": "Ta bort kommando",
+      "delete_order_confirm": "Är du säker på att du vill ta bort det här kommandot?",
+      "delete_order_confirm_message": "Denna åtgärd raderar ordern och alla tillhörande biljetter permanent från databasen. Denna åtgärd kan inte ångras.",
+      "delete_order_error": "Fel vid borttagning av order",
+      "deleting_order": "Radering pågår...",
+      "order_canceled": "Beställningen avbruten",
+      "order_deleted": "Order borttagen"
+    },
     "participant": {
       "entry_validated": "Posten är redan validerad",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Ingen slot tilldelad",
-      "ticket_type": "Typ av biljett",
-      "type": "Typ",
-      "volunteer_validated": "Volontären har validerat sin post",
       "first_name": "Förnamn",
       "last_name": "Efternamn",
-      "phone": "Telefon"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Ingen slot tilldelad",
+      "phone": "Telefon",
+      "ticket_type": "Typ av biljett",
+      "type": "Typ",
+      "volunteer_validated": "Volontären har validerat sin post"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Hantering av kvoter"
       },
       "stats": {
+        "exceeded": "ÖVERRIDA",
         "title": "Kvotstatistik",
         "used": "Begagnad",
-        "validated": "Validerad",
-        "exceeded": "ÖVERRIDA"
+        "validated": "Validerad"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Artister",
       "participants": "Deltagare",
-      "volunteers": "Volontärer",
-      "artists": "Artister"
+      "volunteers": "Volontärer"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Fri entré",
         "max_amount_label": "Högsta belopp (€)",
         "max_amount_placeholder": "0.00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Lägsta belopp (€)",
         "min_amount_placeholder": "0.00",
         "name_label": "Tulltaxans namn",
         "name_placeholder": "Ex: 3-dagars pass",
-        "no_quota_selected": "Ingen kvot vald",
         "no_item_selected": "Inga artiklar valda",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Ingen kvot vald",
         "position_label": "Displayens position",
         "position_placeholder": "0",
         "price_label": "Pris (€)",

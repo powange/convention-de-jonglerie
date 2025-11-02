@@ -15,20 +15,6 @@
       "how_to_use_title": "So verwenden Sie diesen QR-Code",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Bestellung abbrechen",
-      "cancel_order_confirm": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
-      "cancel_order_confirm_message": "Dadurch wird die Bestellung storniert und alle zugehörigen Tickets werden gesperrt. Die Tickets können nicht mehr verwendet werden.",
-      "canceling_order": "Abbruch im Gange...",
-      "cancel_order_error": "Fehler bei der Stornierung der Bestellung",
-      "order_canceled": "Bestellung storniert",
-      "delete_order": "Bestellung löschen",
-      "delete_order_confirm": "Sind Sie sicher, dass Sie diesen Befehl löschen möchten?",
-      "delete_order_confirm_message": "Diese Aktion wird die Bestellung und alle zugehörigen Tickets dauerhaft aus der Datenbank löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
-      "deleting_order": "Löschen im Gange...",
-      "delete_order_error": "Fehler beim Löschen der Bestellung",
-      "order_deleted": "Gelöschte Bestellung"
-    },
     "options": {
       "list": {
         "loading": "Lädt...",
@@ -52,16 +38,30 @@
         "type_label": "Optionstyp"
       }
     },
+    "orders": {
+      "cancel_order": "Bestellung abbrechen",
+      "cancel_order_confirm": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
+      "cancel_order_confirm_message": "Dadurch wird die Bestellung storniert und alle zugehörigen Tickets werden gesperrt. Die Tickets können nicht mehr verwendet werden.",
+      "cancel_order_error": "Fehler bei der Stornierung der Bestellung",
+      "canceling_order": "Abbruch im Gange...",
+      "delete_order": "Bestellung löschen",
+      "delete_order_confirm": "Sind Sie sicher, dass Sie diesen Befehl löschen möchten?",
+      "delete_order_confirm_message": "Diese Aktion wird die Bestellung und alle zugehörigen Tickets dauerhaft aus der Datenbank löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "delete_order_error": "Fehler beim Löschen der Bestellung",
+      "deleting_order": "Löschen im Gange...",
+      "order_canceled": "Bestellung storniert",
+      "order_deleted": "Gelöschte Bestellung"
+    },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Kein Zeitfenster zugewiesen",
-      "ticket_type": "Ticketart",
-      "type": "Typ",
-      "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert",
       "first_name": "Vorname",
       "last_name": "Nachname",
-      "phone": "Telefon"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Kein Zeitfenster zugewiesen",
+      "phone": "Telefon",
+      "ticket_type": "Ticketart",
+      "type": "Typ",
+      "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Kontingentverwaltung"
       },
       "stats": {
+        "exceeded": "ÜBERSCHREITUNG",
         "title": "Kontingentstatistiken",
         "used": "Verwendet",
-        "validated": "Validiert",
-        "exceeded": "ÜBERSCHREITUNG"
+        "validated": "Validiert"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Künstler",
       "participants": "Teilnehmer",
-      "volunteers": "Freiwillige",
-      "artists": "Künstler"
+      "volunteers": "Freiwillige"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Freier Preis",
         "max_amount_label": "Höchstbetrag (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Mindestbetrag (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Name des Tarifs",
         "name_placeholder": "Z.B.: 3-Tages-Pass",
-        "no_quota_selected": "Kein Kontingent ausgewählt",
         "no_item_selected": "Kein Artikel ausgewählt",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Kein Kontingent ausgewählt",
         "position_label": "Anzeigeposition",
         "position_placeholder": "0",
         "price_label": "Preis (€)",

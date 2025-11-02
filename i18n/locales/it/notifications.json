@@ -1,23 +1,13 @@
 {
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Ricevi notifiche per prenotazioni e messaggi di carpooling",
-        "important": "Non perdere informazioni importanti che ti riguardano",
-        "reminders": "Ricevi promemoria per le tue convention preferite",
-        "volunteer": "Ricevi aggiornamenti sulle tue candidature come volontario"
-      },
-      "description": "Abilita le notifiche push per rimanere informato sui tuoi carpooling, candidature come volontario e convention preferite.",
-      "enable": "Abilita notifiche",
-      "not_now": "Non ora",
-      "privacy": {
-        "description": "Puoi disabilitare le notifiche in qualsiasi momento nelle tue impostazioni.",
-        "title": "Rispettoso della privacy"
-      },
-      "title": "Rimani informato in tempo reale"
-    }
-  },
   "notifications": {
+    "artist": {
+      "arrival": {
+        "action": "[TODO] Voir les artistes",
+        "message": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.",
+        "message_with_shows": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
+        "title": "[TODO] Arrivée d'un artiste 🎭"
+      }
+    },
     "carpool": {
       "booking_accepted": {
         "action": "Vedi dettagli",
@@ -106,6 +96,24 @@
       "action": "Vedi convention",
       "message": "Il tuo account è stato creato con successo. Scopri le convention di giocoleria vicino a te!",
       "title": "Benvenuto! 🎉"
+    }
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Ricevi notifiche per prenotazioni e messaggi di carpooling",
+        "important": "Non perdere informazioni importanti che ti riguardano",
+        "reminders": "Ricevi promemoria per le tue convention preferite",
+        "volunteer": "Ricevi aggiornamenti sulle tue candidature come volontario"
+      },
+      "description": "Abilita le notifiche push per rimanere informato sui tuoi carpooling, candidature come volontario e convention preferite.",
+      "enable": "Abilita notifiche",
+      "not_now": "Non ora",
+      "privacy": {
+        "description": "Puoi disabilitare le notifiche in qualsiasi momento nelle tue impostazioni.",
+        "title": "Rispettoso della privacy"
+      },
+      "title": "Rimani informato in tempo reale"
     }
   }
 }

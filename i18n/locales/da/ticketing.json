@@ -15,20 +15,6 @@
       "how_to_use_title": "Sådan bruges denne QR-kode",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Annuller ordre",
-      "cancel_order_confirm": "Er du sikker på, at du vil annullere denne ordre?",
-      "cancel_order_confirm_message": "Denne handling annullerer ordren og blokerer alle tilknyttede billetter. Billetterne kan ikke længere bruges.",
-      "canceling_order": "Aflysning i gang...",
-      "cancel_order_error": "Fejl ved annullering af ordre",
-      "order_canceled": "Ordre annulleret",
-      "delete_order": "Slet kommando",
-      "delete_order_confirm": "Er du sikker på, at du vil slette denne kommando?",
-      "delete_order_confirm_message": "Denne handling vil permanent slette ordren og alle tilknyttede billetter fra databasen. Denne handling kan ikke fortrydes.",
-      "deleting_order": "Sletning i gang...",
-      "delete_order_error": "Fejl ved sletning af ordre",
-      "order_deleted": "Ordre slettet"
-    },
     "options": {
       "list": {
         "loading": "Indlæser...",
@@ -52,16 +38,30 @@
         "type_label": "Type mulighed"
       }
     },
+    "orders": {
+      "cancel_order": "Annuller ordre",
+      "cancel_order_confirm": "Er du sikker på, at du vil annullere denne ordre?",
+      "cancel_order_confirm_message": "Denne handling annullerer ordren og blokerer alle tilknyttede billetter. Billetterne kan ikke længere bruges.",
+      "cancel_order_error": "Fejl ved annullering af ordre",
+      "canceling_order": "Aflysning i gang...",
+      "delete_order": "Slet kommando",
+      "delete_order_confirm": "Er du sikker på, at du vil slette denne kommando?",
+      "delete_order_confirm_message": "Denne handling vil permanent slette ordren og alle tilknyttede billetter fra databasen. Denne handling kan ikke fortrydes.",
+      "delete_order_error": "Fejl ved sletning af ordre",
+      "deleting_order": "Sletning i gang...",
+      "order_canceled": "Ordre annulleret",
+      "order_deleted": "Ordre slettet"
+    },
     "participant": {
       "entry_validated": "Adgang allerede valideret",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Ingen tidsrum tildelt",
-      "ticket_type": "Billettype",
-      "type": "Type",
-      "volunteer_validated": "Frivillig har valideret sin adgang",
       "first_name": "Fornavn",
       "last_name": "Efternavn",
-      "phone": "Telefon"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Ingen tidsrum tildelt",
+      "phone": "Telefon",
+      "ticket_type": "Billettype",
+      "type": "Type",
+      "volunteer_validated": "Frivillig har valideret sin adgang"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Kvoterstyring"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Kvotestatistik",
         "used": "Brugt",
-        "validated": "Valideret",
-        "exceeded": "OVERRIDE"
+        "validated": "Valideret"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Kunstnere",
       "participants": "Deltagere",
-      "volunteers": "Frivillige",
-      "artists": "Kunstnere"
+      "volunteers": "Frivillige"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Fri pris",
         "max_amount_label": "Maksimumbeløb (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Minimumsbeløb (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Navn på pris",
         "name_placeholder": "F.eks: 3-dages pas",
-        "no_quota_selected": "Ingen kvote valgt",
         "no_item_selected": "Ingen vare valgt",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Ingen kvote valgt",
         "position_label": "Visningsposition",
         "position_placeholder": "0",
         "price_label": "Pris (€)",

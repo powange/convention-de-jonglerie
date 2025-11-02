@@ -28,6 +28,8 @@ export default defineEventHandler(async (event) => {
   const search = (query.search as string)?.trim()
   const phaseFilter = query.phase as string | undefined
   const typeFilter = query.type as string | undefined
+  const mealTypeFilter = query.mealType as string | undefined
+  const dateFilter = query.date as string | undefined
 
   // Récupérer tous les repas activés avec les sélections
   const meals = await prisma.volunteerMeal.findMany({
@@ -76,18 +78,35 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
+      tiers: {
+        include: {
+          tier: {
+            include: {
+              orderItems: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  customFields: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
   })
 
   // Construire la liste plate de tous les participants avec leurs repas
   let participants: Array<{
-    userId: number
+    userId: number | null
     nom: string
     prenom: string
     email: string
     phone: string | null
-    type: 'volunteer' | 'artist'
+    type: 'volunteer' | 'artist' | 'participant'
     mealId: number
     mealDate: Date
     mealType: string
@@ -138,6 +157,29 @@ export default defineEventHandler(async (event) => {
         afterShow: selection.afterShow,
       })
     })
+
+    // Ajouter les participants avec billets (via les tiers)
+    meal.tiers.forEach((tierMeal) => {
+      tierMeal.tier.orderItems.forEach((orderItem) => {
+        const customFields = orderItem.customFields as any
+        participants.push({
+          userId: null,
+          nom: orderItem.lastName || '',
+          prenom: orderItem.firstName || '',
+          email: orderItem.email || '',
+          phone: null,
+          type: 'participant',
+          mealId: meal.id,
+          mealDate: meal.date,
+          mealType: meal.mealType,
+          mealPhases: meal.phases,
+          dietaryPreference: customFields?.dietaryPreference || null,
+          allergies: customFields?.allergies || null,
+          allergySeverity: customFields?.allergySeverity || null,
+          afterShow: false,
+        })
+      })
+    })
   })
 
   // Appliquer les filtres
@@ -152,11 +194,22 @@ export default defineEventHandler(async (event) => {
   }
 
   if (phaseFilter) {
-    participants = participants.filter((p) => p.mealPhase === phaseFilter)
+    participants = participants.filter((p) => p.mealPhases.includes(phaseFilter))
   }
 
   if (typeFilter) {
     participants = participants.filter((p) => p.type === typeFilter)
+  }
+
+  if (mealTypeFilter) {
+    participants = participants.filter((p) => p.mealType === mealTypeFilter)
+  }
+
+  if (dateFilter) {
+    participants = participants.filter((p) => {
+      const participantDate = new Date(p.mealDate).toISOString().split('T')[0]
+      return participantDate === dateFilter
+    })
   }
 
   // Trier par nom puis prénom
@@ -172,6 +225,31 @@ export default defineEventHandler(async (event) => {
   const skip = (page - 1) * pageSize
   const paginatedParticipants = participants.slice(skip, skip + pageSize)
 
+  // Extraire les dates uniques disponibles pour le filtre
+  const uniqueDates = Array.from(
+    new Set(meals.map((meal) => new Date(meal.date).toISOString().split('T')[0]))
+  ).sort()
+
+  // Calculer les statistiques sur les participants filtrés
+  const stats = {
+    total: participants.length,
+    volunteers: participants.filter((p) => p.type === 'volunteer').length,
+    artists: participants.filter((p) => p.type === 'artist').length,
+    ticketingParticipants: participants.filter((p) => p.type === 'participant').length,
+    byMealType: {
+      BREAKFAST: participants.filter((p) => p.mealType === 'BREAKFAST').length,
+      LUNCH: participants.filter((p) => p.mealType === 'LUNCH').length,
+      DINNER: participants.filter((p) => p.mealType === 'DINNER').length,
+    },
+    byDiet: {
+      VEGETARIAN: participants.filter((p) => p.dietaryPreference === 'VEGETARIAN').length,
+      VEGAN: participants.filter((p) => p.dietaryPreference === 'VEGAN').length,
+      standard: participants.filter((p) => !p.dietaryPreference).length,
+    },
+    withAllergies: participants.filter((p) => p.allergies && p.allergies.trim() !== '').length,
+    afterShow: participants.filter((p) => p.afterShow).length,
+  }
+
   return {
     success: true,
     participants: paginatedParticipants,
@@ -181,5 +259,7 @@ export default defineEventHandler(async (event) => {
       total,
       totalPages,
     },
+    availableDates: uniqueDates,
+    stats,
   }
 })

@@ -1,23 +1,13 @@
 {
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Ontvang meldingen van carpool-boekingen en berichten",
-        "important": "Mis geen belangrijke informatie die jou betreft",
-        "reminders": "Ontvang herinneringen voor je favoriete conventies",
-        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen"
-      },
-      "description": "Schakel push-notificaties in om op de hoogte te blijven van je carpools, vrijwilligersaanmeldingen en favoriete conventies.",
-      "enable": "Notificaties inschakelen",
-      "not_now": "Niet nu",
-      "privacy": {
-        "description": "Je kunt notificaties altijd uitschakelen in je instellingen.",
-        "title": "Privacyvriendelijk"
-      },
-      "title": "Blijf real-time geïnformeerd"
-    }
-  },
   "notifications": {
+    "artist": {
+      "arrival": {
+        "action": "[TODO] Voir les artistes",
+        "message": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.",
+        "message_with_shows": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
+        "title": "[TODO] Arrivée d'un artiste 🎭"
+      }
+    },
     "carpool": {
       "booking_accepted": {
         "action": "Bekijk details",
@@ -106,6 +96,24 @@
       "action": "Bekijk conventies",
       "message": "Je account is succesvol aangemaakt. Ontdek jongleerconventies bij jou in de buurt!",
       "title": "Welkom! 🎉"
+    }
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Ontvang meldingen van carpool-boekingen en berichten",
+        "important": "Mis geen belangrijke informatie die jou betreft",
+        "reminders": "Ontvang herinneringen voor je favoriete conventies",
+        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen"
+      },
+      "description": "Schakel push-notificaties in om op de hoogte te blijven van je carpools, vrijwilligersaanmeldingen en favoriete conventies.",
+      "enable": "Notificaties inschakelen",
+      "not_now": "Niet nu",
+      "privacy": {
+        "description": "Je kunt notificaties altijd uitschakelen in je instellingen.",
+        "title": "Privacyvriendelijk"
+      },
+      "title": "Blijf real-time geïnformeerd"
     }
   }
 }

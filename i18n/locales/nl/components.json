@@ -47,6 +47,8 @@
       "requests_short": "Verzoeken",
       "seats_available": "{count} plaats beschikbaar | {count} plaatsen beschikbaar",
       "seats_needed": "{count} plaats nodig | {count} plaatsen nodig",
+      "show_active_only": "[TODO] Actifs seulement",
+      "show_all": "[TODO] Afficher tout",
       "status": {
         "accepted": "Geaccepteerd",
         "cancelled": "Geannuleerd",

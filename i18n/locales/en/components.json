@@ -47,6 +47,8 @@
       "requests_short": "Requests",
       "seats_available": "{count} seat available | {count} seats available",
       "seats_needed": "{count} seat needed | {count} seats needed",
+      "show_active_only": "[TODO] Actifs seulement",
+      "show_all": "[TODO] Afficher tout",
       "status": {
         "accepted": "Accepted",
         "cancelled": "Cancelled",

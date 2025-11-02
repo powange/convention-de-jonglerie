@@ -15,20 +15,6 @@
       "how_to_use_title": "Cómo usar este código QR",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Cancelar pedido",
-      "cancel_order_confirm": "¿Está seguro de que desea cancelar este pedido?",
-      "cancel_order_confirm_message": "Esta acción cancelará el pedido y bloqueará todos los tickets asociados. Los tickets ya no se podrán utilizar.",
-      "canceling_order": "Cancelación en curso...",
-      "cancel_order_error": "Error al cancelar la orden",
-      "order_canceled": "Pedido anulado",
-      "delete_order": "Eliminar comando",
-      "delete_order_confirm": "¿Estás seguro de que quieres borrar este comando?",
-      "delete_order_confirm_message": "Esta acción borrará permanentemente el pedido y todos los tickets asociados de la base de datos. Esta acción no se puede deshacer.",
-      "deleting_order": "Supresión en curso...",
-      "delete_order_error": "Error al borrar la orden",
-      "order_deleted": "Pedido suprimido"
-    },
     "options": {
       "list": {
         "loading": "Cargando...",
@@ -52,16 +38,30 @@
         "type_label": "Tipo de opción"
       }
     },
+    "orders": {
+      "cancel_order": "Cancelar pedido",
+      "cancel_order_confirm": "¿Está seguro de que desea cancelar este pedido?",
+      "cancel_order_confirm_message": "Esta acción cancelará el pedido y bloqueará todos los tickets asociados. Los tickets ya no se podrán utilizar.",
+      "cancel_order_error": "Error al cancelar la orden",
+      "canceling_order": "Cancelación en curso...",
+      "delete_order": "Eliminar comando",
+      "delete_order_confirm": "¿Estás seguro de que quieres borrar este comando?",
+      "delete_order_confirm_message": "Esta acción borrará permanentemente el pedido y todos los tickets asociados de la base de datos. Esta acción no se puede deshacer.",
+      "delete_order_error": "Error al borrar la orden",
+      "deleting_order": "Supresión en curso...",
+      "order_canceled": "Pedido anulado",
+      "order_deleted": "Pedido suprimido"
+    },
     "participant": {
       "entry_validated": "Entrada ya validada",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "No se ha asignado ninguna franja",
-      "ticket_type": "Tipo de entrada",
-      "type": "Tipo",
-      "volunteer_validated": "El voluntario ha validado su entrada",
       "first_name": "Nombre",
       "last_name": "Apellido",
-      "phone": "Teléfono"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "No se ha asignado ninguna franja",
+      "phone": "Teléfono",
+      "ticket_type": "Tipo de entrada",
+      "type": "Tipo",
+      "volunteer_validated": "El voluntario ha validado su entrada"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Gestión de cuotas"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Estadísticas de cuotas",
         "used": "Utilizado",
-        "validated": "Validado",
-        "exceeded": "OVERRIDE"
+        "validated": "Validado"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Artistas",
       "participants": "Participantes",
-      "volunteers": "Voluntarios",
-      "artists": "Artistas"
+      "volunteers": "Voluntarios"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Precio libre",
         "max_amount_label": "Monto máximo (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Monto mínimo (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Nombre de la tarifa",
         "name_placeholder": "Ej: Pase de 3 días",
-        "no_quota_selected": "No se ha seleccionado ninguna cuota",
         "no_item_selected": "No se ha seleccionado ningún artículo",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "No se ha seleccionado ninguna cuota",
         "position_label": "Posición de visualización",
         "position_placeholder": "0",
         "price_label": "Precio (€)",

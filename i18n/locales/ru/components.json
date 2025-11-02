@@ -47,6 +47,8 @@
       "requests_short": "Запросы",
       "seats_available": "{count} место доступно | {count} мест доступно",
       "seats_needed": "{count} место нужно | {count} мест нужно",
+      "show_active_only": "[TODO] Actifs seulement",
+      "show_all": "[TODO] Afficher tout",
       "status": {
         "accepted": "Принята",
         "cancelled": "Отменена",

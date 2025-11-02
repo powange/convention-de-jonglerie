@@ -15,20 +15,6 @@
       "how_to_use_title": "How to use this QR code",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Cancel order",
-      "cancel_order_confirm": "Are you sure you want to cancel this order?",
-      "cancel_order_confirm_message": "This action will permanently delete the order and all associated tickets. This action cannot be undone.",
-      "canceling_order": "Canceling...",
-      "cancel_order_error": "Error when cancelling order",
-      "order_canceled": "Order cancelled",
-      "delete_order": "Delete command",
-      "delete_order_confirm": "Are you sure you want to delete this command?",
-      "delete_order_confirm_message": "This action will permanently delete the order and all associated tickets from the database. This action cannot be undone.",
-      "deleting_order": "Deletion in progress...",
-      "delete_order_error": "Error when deleting order",
-      "order_deleted": "Order deleted"
-    },
     "options": {
       "list": {
         "loading": "Loading...",
@@ -52,16 +38,30 @@
         "type_label": "Option type"
       }
     },
+    "orders": {
+      "cancel_order": "Cancel order",
+      "cancel_order_confirm": "Are you sure you want to cancel this order?",
+      "cancel_order_confirm_message": "This action will permanently delete the order and all associated tickets. This action cannot be undone.",
+      "cancel_order_error": "Error when cancelling order",
+      "canceling_order": "Canceling...",
+      "delete_order": "Delete command",
+      "delete_order_confirm": "Are you sure you want to delete this command?",
+      "delete_order_confirm_message": "This action will permanently delete the order and all associated tickets from the database. This action cannot be undone.",
+      "delete_order_error": "Error when deleting order",
+      "deleting_order": "Deletion in progress...",
+      "order_canceled": "Order cancelled",
+      "order_deleted": "Order deleted"
+    },
     "participant": {
       "entry_validated": "Entry already validated",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "No slot assigned",
-      "ticket_type": "Ticket type",
-      "type": "Type",
-      "volunteer_validated": "The volunteer has validated their entry",
       "first_name": "First Name",
       "last_name": "Last Name",
-      "phone": "Phone"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "No slot assigned",
+      "phone": "Phone",
+      "ticket_type": "Ticket type",
+      "type": "Type",
+      "volunteer_validated": "The volunteer has validated their entry"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Quota management"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Quota statistics",
         "used": "Used",
-        "validated": "Validated",
-        "exceeded": "OVERRIDE"
+        "validated": "Validated"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Artists",
       "participants": "Participants",
-      "volunteers": "Volunteers",
-      "artists": "Artists"
+      "volunteers": "Volunteers"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Pay what you want",
         "max_amount_label": "Maximum amount (€)",
         "max_amount_placeholder": "0.00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Minimum amount (€)",
         "min_amount_placeholder": "0.00",
         "name_label": "Tier name",
         "name_placeholder": "E.g: 3-day pass",
-        "no_quota_selected": "No quota selected",
         "no_item_selected": "No item selected",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "No quota selected",
         "position_label": "Display position",
         "position_placeholder": "0",
         "price_label": "Price (€)",

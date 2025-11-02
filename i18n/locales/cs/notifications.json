@@ -1,23 +1,13 @@
 {
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Upozorňování na rezervace a zprávy o spolujízdě",
-        "important": "Nepropásněte důležité informace o sobě.",
-        "reminders": "Dostávejte upomínky na své oblíbené konference",
-        "volunteer": "Dostávejte aktuální informace o svých žádostech o dobrovolnictví"
-      },
-      "description": "Aktivujte si push oznámení, abyste měli aktuální informace o spolujízdách, dobrovolnických přihláškách a oblíbených sjezdech.",
-      "enable": "Aktivace oznámení",
-      "not_now": "Teď ne",
-      "privacy": {
-        "description": "Oznámení můžete kdykoli deaktivovat v nastavení.",
-        "title": "Respektování vašeho soukromí"
-      },
-      "title": "Zůstaňte informováni v reálném čase"
-    }
-  },
   "notifications": {
+    "artist": {
+      "arrival": {
+        "action": "[TODO] Voir les artistes",
+        "message": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.",
+        "message_with_shows": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
+        "title": "[TODO] Arrivée d'un artiste 🎭"
+      }
+    },
     "carpool": {
       "booking_accepted": {
         "action": "Viz podrobnosti",
@@ -106,6 +96,24 @@
       "action": "Viz dohody",
       "message": "Váš účet byl úspěšně vytvořen. Zjistěte informace o žonglérských sjezdech ve vašem okolí!",
       "title": "Vítejte! 🎉"
+    }
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Upozorňování na rezervace a zprávy o spolujízdě",
+        "important": "Nepropásněte důležité informace o sobě.",
+        "reminders": "Dostávejte upomínky na své oblíbené konference",
+        "volunteer": "Dostávejte aktuální informace o svých žádostech o dobrovolnictví"
+      },
+      "description": "Aktivujte si push oznámení, abyste měli aktuální informace o spolujízdách, dobrovolnických přihláškách a oblíbených sjezdech.",
+      "enable": "Aktivace oznámení",
+      "not_now": "Teď ne",
+      "privacy": {
+        "description": "Oznámení můžete kdykoli deaktivovat v nastavení.",
+        "title": "Respektování vašeho soukromí"
+      },
+      "title": "Zůstaňte informováni v reálném čase"
     }
   }
 }

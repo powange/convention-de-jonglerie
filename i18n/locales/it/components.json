@@ -47,6 +47,8 @@
       "requests_short": "Richieste",
       "seats_available": "{count} posto disponibile | {count} posti disponibili",
       "seats_needed": "{count} posto cercato | {count} posti cercati",
+      "show_active_only": "[TODO] Actifs seulement",
+      "show_all": "[TODO] Afficher tout",
       "status": {
         "accepted": "Accettata",
         "cancelled": "Annullata",

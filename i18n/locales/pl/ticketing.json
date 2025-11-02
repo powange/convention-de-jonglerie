@@ -15,20 +15,6 @@
       "how_to_use_title": "Jak używać tego kodu QR",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Anuluj zamówienie",
-      "cancel_order_confirm": "Czy na pewno chcesz anulować to zamówienie?",
-      "cancel_order_confirm_message": "Ta akcja spowoduje anulowanie zamówienia i zablokowanie wszystkich powiązanych biletów. Bilety nie mogą być już używane.",
-      "canceling_order": "Anulowanie w toku...",
-      "cancel_order_error": "Błąd podczas anulowania zamówienia",
-      "order_canceled": "Zamówienie anulowane",
-      "delete_order": "Usuń polecenie",
-      "delete_order_confirm": "Czy na pewno chcesz usunąć to polecenie?",
-      "delete_order_confirm_message": "Ta czynność spowoduje trwałe usunięcie zamówienia i wszystkich powiązanych biletów z bazy danych. Czynności tej nie można cofnąć.",
-      "deleting_order": "Usuwanie w toku...",
-      "delete_order_error": "Błąd podczas usuwania zamówienia",
-      "order_deleted": "Zamówienie usunięte"
-    },
     "options": {
       "list": {
         "loading": "Ładowanie...",
@@ -52,16 +38,30 @@
         "type_label": "Typ opcji"
       }
     },
+    "orders": {
+      "cancel_order": "Anuluj zamówienie",
+      "cancel_order_confirm": "Czy na pewno chcesz anulować to zamówienie?",
+      "cancel_order_confirm_message": "Ta akcja spowoduje anulowanie zamówienia i zablokowanie wszystkich powiązanych biletów. Bilety nie mogą być już używane.",
+      "cancel_order_error": "Błąd podczas anulowania zamówienia",
+      "canceling_order": "Anulowanie w toku...",
+      "delete_order": "Usuń polecenie",
+      "delete_order_confirm": "Czy na pewno chcesz usunąć to polecenie?",
+      "delete_order_confirm_message": "Ta czynność spowoduje trwałe usunięcie zamówienia i wszystkich powiązanych biletów z bazy danych. Czynności tej nie można cofnąć.",
+      "delete_order_error": "Błąd podczas usuwania zamówienia",
+      "deleting_order": "Usuwanie w toku...",
+      "order_canceled": "Zamówienie anulowane",
+      "order_deleted": "Zamówienie usunięte"
+    },
     "participant": {
       "entry_validated": "Wejście już zwalidowane",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Nie przypisano przedziału czasowego",
-      "ticket_type": "Typ biletu",
-      "type": "Typ",
-      "volunteer_validated": "Wolontariusz zwalidował swoje wejście",
       "first_name": "Imię",
       "last_name": "Nazwisko",
-      "phone": "Telefon"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Nie przypisano przedziału czasowego",
+      "phone": "Telefon",
+      "ticket_type": "Typ biletu",
+      "type": "Typ",
+      "volunteer_validated": "Wolontariusz zwalidował swoje wejście"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Zarządzanie kwotami"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Statystyki kwot",
         "used": "Używany",
-        "validated": "Zwalidowany",
-        "exceeded": "OVERRIDE"
+        "validated": "Zwalidowany"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Artyści",
       "participants": "Uczestnicy",
-      "volunteers": "Wolontariusze",
-      "artists": "Artyści"
+      "volunteers": "Wolontariusze"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Cena dowolna",
         "max_amount_label": "Maksymalna kwota (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Minimalna kwota (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Nazwa taryfy",
         "name_placeholder": "Np: Karnet 3-dniowy",
-        "no_quota_selected": "Nie wybrano kwoty",
         "no_item_selected": "Nie wybrano przedmiotu",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Nie wybrano kwoty",
         "position_label": "Pozycja wyświetlania",
         "position_placeholder": "0",
         "price_label": "Cena (€)",

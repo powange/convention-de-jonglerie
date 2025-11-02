@@ -15,20 +15,6 @@
       "how_to_use_title": "Jak používat tento QR kód",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Zrušit objednávku",
-      "cancel_order_confirm": "Opravdu chcete tuto objednávku zrušit?",
-      "cancel_order_confirm_message": "Tato akce zruší objednávku a zablokuje všechny související tipy. Tyto tipy již nelze použít.",
-      "canceling_order": "Probíhá zrušení...",
-      "cancel_order_error": "Chyba při zrušení objednávky",
-      "order_canceled": "Objednávka zrušena",
-      "delete_order": "Příkaz k odstranění",
-      "delete_order_confirm": "Opravdu chcete tento příkaz odstranit?",
-      "delete_order_confirm_message": "Tato akce trvale odstraní objednávku a všechny související tipy z databáze. Tuto akci nelze vrátit zpět.",
-      "deleting_order": "Probíhá mazání...",
-      "delete_order_error": "Chyba při mazání objednávky",
-      "order_deleted": "Objednávka vymazána"
-    },
     "options": {
       "list": {
         "loading": "Načítání...",
@@ -52,16 +38,30 @@
         "type_label": "Typ možnosti"
       }
     },
+    "orders": {
+      "cancel_order": "Zrušit objednávku",
+      "cancel_order_confirm": "Opravdu chcete tuto objednávku zrušit?",
+      "cancel_order_confirm_message": "Tato akce zruší objednávku a zablokuje všechny související tipy. Tyto tipy již nelze použít.",
+      "cancel_order_error": "Chyba při zrušení objednávky",
+      "canceling_order": "Probíhá zrušení...",
+      "delete_order": "Příkaz k odstranění",
+      "delete_order_confirm": "Opravdu chcete tento příkaz odstranit?",
+      "delete_order_confirm_message": "Tato akce trvale odstraní objednávku a všechny související tipy z databáze. Tuto akci nelze vrátit zpět.",
+      "delete_order_error": "Chyba při mazání objednávky",
+      "deleting_order": "Probíhá mazání...",
+      "order_canceled": "Objednávka zrušena",
+      "order_deleted": "Objednávka vymazána"
+    },
     "participant": {
       "entry_validated": "Položka již byla ověřena",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Žádný přidělený slot",
-      "ticket_type": "Typ letenky",
-      "type": "Typ",
-      "volunteer_validated": "Dobrovolník potvrdil svůj vstup",
       "first_name": "Jméno",
       "last_name": "Příjmení",
-      "phone": "Telefon"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Žádný přidělený slot",
+      "phone": "Telefon",
+      "ticket_type": "Typ letenky",
+      "type": "Typ",
+      "volunteer_validated": "Dobrovolník potvrdil svůj vstup"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Správa kvót"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Statistiky kvót",
         "used": "Použité",
-        "validated": "Ověřeno",
-        "exceeded": "OVERRIDE"
+        "validated": "Ověřeno"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Umělci",
       "participants": "Účastníci",
-      "volunteers": "Dobrovolníci",
-      "artists": "Umělci"
+      "volunteers": "Dobrovolníci"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Vstup zdarma",
         "max_amount_label": "Maximální částka (€)",
         "max_amount_placeholder": "0.00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Minimální částka (€)",
         "min_amount_placeholder": "0.00",
         "name_label": "Název tarifu",
         "name_placeholder": "Například: 3denní průkaz",
-        "no_quota_selected": "Nebyla vybrána žádná kvóta",
         "no_item_selected": "Žádné vybrané položky",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Nebyla vybrána žádná kvóta",
         "position_label": "Pozice displeje",
         "position_placeholder": "0",
         "price_label": "Cena (€)",

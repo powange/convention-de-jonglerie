@@ -15,20 +15,6 @@
       "how_to_use_title": "Hoe gebruik je deze QR-code",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Bestelling annuleren",
-      "cancel_order_confirm": "Weet je zeker dat je deze bestelling wilt annuleren?",
-      "cancel_order_confirm_message": "Deze actie annuleert de bestelling en blokkeert alle bijbehorende tickets. De tickets kunnen niet langer worden gebruikt.",
-      "canceling_order": "Annulering aan de gang...",
-      "cancel_order_error": "Fout bij annuleren bestelling",
-      "order_canceled": "Bestelling geannuleerd",
-      "delete_order": "Opdracht verwijderen",
-      "delete_order_confirm": "Weet je zeker dat je deze opdracht wilt verwijderen?",
-      "delete_order_confirm_message": "Deze actie verwijdert de bestelling en alle bijbehorende tickets permanent uit de database. Deze actie kan niet ongedaan worden gemaakt.",
-      "deleting_order": "Verwijdering bezig...",
-      "delete_order_error": "Fout bij verwijderen bestelling",
-      "order_deleted": "Bestelling verwijderd"
-    },
     "options": {
       "list": {
         "loading": "Laden...",
@@ -52,16 +38,30 @@
         "type_label": "Type optie"
       }
     },
+    "orders": {
+      "cancel_order": "Bestelling annuleren",
+      "cancel_order_confirm": "Weet je zeker dat je deze bestelling wilt annuleren?",
+      "cancel_order_confirm_message": "Deze actie annuleert de bestelling en blokkeert alle bijbehorende tickets. De tickets kunnen niet langer worden gebruikt.",
+      "cancel_order_error": "Fout bij annuleren bestelling",
+      "canceling_order": "Annulering aan de gang...",
+      "delete_order": "Opdracht verwijderen",
+      "delete_order_confirm": "Weet je zeker dat je deze opdracht wilt verwijderen?",
+      "delete_order_confirm_message": "Deze actie verwijdert de bestelling en alle bijbehorende tickets permanent uit de database. Deze actie kan niet ongedaan worden gemaakt.",
+      "delete_order_error": "Fout bij verwijderen bestelling",
+      "deleting_order": "Verwijdering bezig...",
+      "order_canceled": "Bestelling geannuleerd",
+      "order_deleted": "Bestelling verwijderd"
+    },
     "participant": {
       "entry_validated": "Toegang al gevalideerd",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Geen tijdslot toegewezen",
-      "ticket_type": "Tickettype",
-      "type": "Type",
-      "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd",
       "first_name": "Voornaam",
       "last_name": "Achternaam",
-      "phone": "Telefoon"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Geen tijdslot toegewezen",
+      "phone": "Telefoon",
+      "ticket_type": "Tickettype",
+      "type": "Type",
+      "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Quotumbeheer"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Quotumstatistieken",
         "used": "Gebruikt",
-        "validated": "Gevalideerd",
-        "exceeded": "OVERRIDE"
+        "validated": "Gevalideerd"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Kunstenaars",
       "participants": "Deelnemers",
-      "volunteers": "Vrijwilligers",
-      "artists": "Kunstenaars"
+      "volunteers": "Vrijwilligers"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Vrije prijs",
         "max_amount_label": "Maximumbedrag (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Minimumbedrag (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Naam van het tarief",
         "name_placeholder": "Bijv: 3-dagen pas",
-        "no_quota_selected": "Geen quotum geselecteerd",
         "no_item_selected": "Geen artikel geselecteerd",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Geen quotum geselecteerd",
         "position_label": "Weergavepositie",
         "position_placeholder": "0",
         "price_label": "Prijs (€)",

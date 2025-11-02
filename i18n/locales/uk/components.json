@@ -47,6 +47,8 @@
       "requests_short": "Запити",
       "seats_available": "{count} доступне місце | {count} доступних місць",
       "seats_needed": "{count} потрібне місце | {count} потрібних місць",
+      "show_active_only": "[TODO] Actifs seulement",
+      "show_all": "[TODO] Afficher tout",
       "status": {
         "accepted": "Прийнято",
         "cancelled": "Скасовано",

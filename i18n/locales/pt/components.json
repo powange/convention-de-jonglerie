@@ -47,6 +47,8 @@
       "requests_short": "Pedidos",
       "seats_available": "{count} lugar disponível | {count} lugares disponíveis",
       "seats_needed": "{count} lugar procurado | {count} lugares procurados",
+      "show_active_only": "[TODO] Actifs seulement",
+      "show_all": "[TODO] Afficher tout",
       "status": {
         "accepted": "Aceite",
         "cancelled": "Cancelada",

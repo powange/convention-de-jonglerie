@@ -104,7 +104,10 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     })
 
     expect(prismaMock.carpoolRequest.findMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({ editionId: 1, tripDate: expect.objectContaining({ gte: expect.any(Date) }) }),
+      where: expect.objectContaining({
+        editionId: 1,
+        tripDate: expect.objectContaining({ gte: expect.any(Date) }),
+      }),
       include: {
         user: true,
         comments: {
@@ -176,7 +179,10 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.carpoolRequest.findMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({ editionId: 1, tripDate: expect.objectContaining({ gte: expect.any(Date) }) }),
+      where: expect.objectContaining({
+        editionId: 1,
+        tripDate: expect.objectContaining({ gte: expect.any(Date) }),
+      }),
       include: {
         user: true,
         comments: {
@@ -260,7 +266,10 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.carpoolRequest.findMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({ editionId: 1, tripDate: expect.objectContaining({ gte: expect.any(Date) }) }),
+      where: expect.objectContaining({
+        editionId: 1,
+        tripDate: expect.objectContaining({ gte: expect.any(Date) }),
+      }),
       include: {
         user: true,
         comments: {
@@ -344,7 +353,10 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     await handler(eventWithStringId as any)
 
     expect(prismaMock.carpoolRequest.findMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({ editionId: 123, tripDate: expect.objectContaining({ gte: expect.any(Date) }) }), // Converti en nombre
+      where: expect.objectContaining({
+        editionId: 123,
+        tripDate: expect.objectContaining({ gte: expect.any(Date) }),
+      }), // Converti en nombre
       include: {
         user: true,
         comments: {

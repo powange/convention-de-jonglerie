@@ -15,20 +15,6 @@
       "how_to_use_title": "Как использовать этот QR-код",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Отменить заказ",
-      "cancel_order_confirm": "Вы уверены, что хотите отменить этот заказ?",
-      "cancel_order_confirm_message": "Это действие отменит заказ и заблокирует все связанные с ним билеты. Билеты больше не могут быть использованы.",
-      "canceling_order": "Отмена в процессе...",
-      "cancel_order_error": "Ошибка при отмене ордера",
-      "order_canceled": "Заказ отменен",
-      "delete_order": "Удалить команду",
-      "delete_order_confirm": "Вы уверены, что хотите удалить эту команду?",
-      "delete_order_confirm_message": "Это действие приведет к окончательному удалению заказа и всех связанных с ним билетов из базы данных. Это действие нельзя отменить.",
-      "deleting_order": "Удаление в процессе...",
-      "delete_order_error": "Ошибка при удалении заказа",
-      "order_deleted": "Заказ удален"
-    },
     "options": {
       "list": {
         "loading": "Загрузка...",
@@ -52,16 +38,30 @@
         "type_label": "Тип параметра"
       }
     },
+    "orders": {
+      "cancel_order": "Отменить заказ",
+      "cancel_order_confirm": "Вы уверены, что хотите отменить этот заказ?",
+      "cancel_order_confirm_message": "Это действие отменит заказ и заблокирует все связанные с ним билеты. Билеты больше не могут быть использованы.",
+      "cancel_order_error": "Ошибка при отмене ордера",
+      "canceling_order": "Отмена в процессе...",
+      "delete_order": "Удалить команду",
+      "delete_order_confirm": "Вы уверены, что хотите удалить эту команду?",
+      "delete_order_confirm_message": "Это действие приведет к окончательному удалению заказа и всех связанных с ним билетов из базы данных. Это действие нельзя отменить.",
+      "delete_order_error": "Ошибка при удалении заказа",
+      "deleting_order": "Удаление в процессе...",
+      "order_canceled": "Заказ отменен",
+      "order_deleted": "Заказ удален"
+    },
     "participant": {
       "entry_validated": "Вход уже подтвержден",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Временной интервал не назначен",
-      "ticket_type": "Тип билета",
-      "type": "Тип",
-      "volunteer_validated": "Волонтёр подтвердил свой вход",
       "first_name": "Имя",
       "last_name": "Фамилия",
-      "phone": "Телефон"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Временной интервал не назначен",
+      "phone": "Телефон",
+      "ticket_type": "Тип билета",
+      "type": "Тип",
+      "volunteer_validated": "Волонтёр подтвердил свой вход"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Управление квотами"
       },
       "stats": {
+        "exceeded": "OVERRIDE",
         "title": "Статистика квот",
         "used": "Использовано",
-        "validated": "Подтверждено",
-        "exceeded": "OVERRIDE"
+        "validated": "Подтверждено"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Художники",
       "participants": "Участники",
-      "volunteers": "Волонтёры",
-      "artists": "Художники"
+      "volunteers": "Волонтёры"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Свободная цена",
         "max_amount_label": "Максимальная сумма (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Минимальная сумма (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Название тарифа",
         "name_placeholder": "Напр: 3-дневный пропуск",
-        "no_quota_selected": "Квота не выбрана",
         "no_item_selected": "Предмет не выбран",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Квота не выбрана",
         "position_label": "Позиция отображения",
         "position_placeholder": "0",
         "price_label": "Цена (€)",

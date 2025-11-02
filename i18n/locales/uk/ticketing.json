@@ -15,20 +15,6 @@
       "how_to_use_title": "Як використовувати цей QR-код",
       "logo_alt": "HelloAsso"
     },
-    "orders": {
-      "cancel_order": "Скасувати замовлення",
-      "cancel_order_confirm": "Ви впевнені, що хочете скасувати це замовлення?",
-      "cancel_order_confirm_message": "Ця дія скасує замовлення і заблокує всі пов'язані з ним квитки. Квитки більше не можна буде використати.",
-      "canceling_order": "Відбувається скасування...",
-      "cancel_order_error": "Помилка при скасуванні замовлення",
-      "order_canceled": "Замовлення скасовано",
-      "delete_order": "Команда видалення",
-      "delete_order_confirm": "Ви впевнені, що хочете видалити цю команду?",
-      "delete_order_confirm_message": "Ця дія назавжди видалить замовлення і всі пов'язані з ним квитки з бази даних. Ця дія не може бути скасована.",
-      "deleting_order": "Виконується видалення...",
-      "delete_order_error": "Помилка при видаленні замовлення",
-      "order_deleted": "Замовлення видалено"
-    },
     "options": {
       "list": {
         "loading": "Завантаження...",
@@ -52,16 +38,30 @@
         "type_label": "Тип параметра"
       }
     },
+    "orders": {
+      "cancel_order": "Скасувати замовлення",
+      "cancel_order_confirm": "Ви впевнені, що хочете скасувати це замовлення?",
+      "cancel_order_confirm_message": "Ця дія скасує замовлення і заблокує всі пов'язані з ним квитки. Квитки більше не можна буде використати.",
+      "cancel_order_error": "Помилка при скасуванні замовлення",
+      "canceling_order": "Відбувається скасування...",
+      "delete_order": "Команда видалення",
+      "delete_order_confirm": "Ви впевнені, що хочете видалити цю команду?",
+      "delete_order_confirm_message": "Ця дія назавжди видалить замовлення і всі пов'язані з ним квитки з бази даних. Ця дія не може бути скасована.",
+      "delete_order_error": "Помилка при видаленні замовлення",
+      "deleting_order": "Виконується видалення...",
+      "order_canceled": "Замовлення скасовано",
+      "order_deleted": "Замовлення видалено"
+    },
     "participant": {
       "entry_validated": "Вхід вже підтверджено",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Часовий проміжок не призначено",
-      "ticket_type": "Тип квитка",
-      "type": "Тип",
-      "volunteer_validated": "Волонтер підтвердив свій вхід",
       "first_name": "Ім'я",
       "last_name": "Прізвище",
-      "phone": "Телефон"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Часовий проміжок не призначено",
+      "phone": "Телефон",
+      "ticket_type": "Тип квитка",
+      "type": "Тип",
+      "volunteer_validated": "Волонтер підтвердив свій вхід"
     },
     "quotas": {
       "list": {
@@ -72,10 +72,10 @@
         "title": "Управління квотами"
       },
       "stats": {
+        "exceeded": "ЗАМІНИТИ",
         "title": "Статистика квот",
         "used": "Використано",
-        "validated": "Підтверджено",
-        "exceeded": "ЗАМІНИТИ"
+        "validated": "Підтверджено"
       }
     },
     "returnable_items": {
@@ -95,9 +95,9 @@
       }
     },
     "stats": {
+      "artists": "Художники",
       "participants": "Учасники",
-      "volunteers": "Волонтери",
-      "artists": "Художники"
+      "volunteers": "Волонтери"
     },
     "tiers": {
       "list": {
@@ -112,12 +112,15 @@
         "free_price_label": "Вільна ціна",
         "max_amount_label": "Максимальна сума (€)",
         "max_amount_placeholder": "0,00",
+        "meals_label": "[TODO] Repas inclus",
+        "meals_placeholder": "[TODO] Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Мінімальна сума (€)",
         "min_amount_placeholder": "0,00",
         "name_label": "Назва тарифу",
         "name_placeholder": "Напр: 3-денний пропуск",
-        "no_quota_selected": "Квоту не вибрано",
         "no_item_selected": "Предмет не вибрано",
+        "no_meal_selected": "[TODO] Aucun repas sélectionné",
+        "no_quota_selected": "Квоту не вибрано",
         "position_label": "Позиція відображення",
         "position_placeholder": "0",
         "price_label": "Ціна (€)",

@@ -14,10 +14,7 @@ describe('i18n lost&found new keys parity', () => {
   })
 
   const requiredKeys = ['edition.lost_found_before_start', 'edition.items_appear_when_started']
-  const deprecatedKeys = [
-    'edition.lost_found_after_edition',
-    'edition.items_appear_after_edition',
-  ]
+  const deprecatedKeys = ['edition.lost_found_after_edition', 'edition.items_appear_after_edition']
 
   /**
    * Charge tous les fichiers JSON d'un dossier de langue et les fusionne

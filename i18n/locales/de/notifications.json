@@ -1,23 +1,13 @@
 {
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Erhalten Sie Benachrichtigungen über Mitfahrgelegenheit-Buchungen und Nachrichten",
-        "important": "Verpassen Sie keine wichtigen Informationen, die Sie betreffen",
-        "reminders": "Erhalten Sie Erinnerungen für Ihre Lieblings-Conventions",
-        "volunteer": "Erhalten Sie Updates zu Ihren Freiwilligen-Bewerbungen"
-      },
-      "description": "Aktivieren Sie Push-Benachrichtigungen, um über Ihre Fahrgemeinschaften, Freiwilligen-Bewerbungen und Lieblings-Conventions informiert zu bleiben.",
-      "enable": "Benachrichtigungen aktivieren",
-      "not_now": "Nicht jetzt",
-      "privacy": {
-        "description": "Sie können Benachrichtigungen jederzeit in Ihren Einstellungen deaktivieren.",
-        "title": "Respektiert Ihre Privatsphäre"
-      },
-      "title": "Bleiben Sie in Echtzeit informiert"
-    }
-  },
   "notifications": {
+    "artist": {
+      "arrival": {
+        "action": "[TODO] Voir les artistes",
+        "message": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.",
+        "message_with_shows": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
+        "title": "[TODO] Arrivée d'un artiste 🎭"
+      }
+    },
     "carpool": {
       "booking_accepted": {
         "action": "Details ansehen",
@@ -106,6 +96,24 @@
       "action": "Conventions ansehen",
       "message": "Ihr Konto wurde erfolgreich erstellt. Entdecken Sie Jonglier-Conventions in Ihrer Nähe!",
       "title": "Willkommen! 🎉"
+    }
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Erhalten Sie Benachrichtigungen über Mitfahrgelegenheit-Buchungen und Nachrichten",
+        "important": "Verpassen Sie keine wichtigen Informationen, die Sie betreffen",
+        "reminders": "Erhalten Sie Erinnerungen für Ihre Lieblings-Conventions",
+        "volunteer": "Erhalten Sie Updates zu Ihren Freiwilligen-Bewerbungen"
+      },
+      "description": "Aktivieren Sie Push-Benachrichtigungen, um über Ihre Fahrgemeinschaften, Freiwilligen-Bewerbungen und Lieblings-Conventions informiert zu bleiben.",
+      "enable": "Benachrichtigungen aktivieren",
+      "not_now": "Nicht jetzt",
+      "privacy": {
+        "description": "Sie können Benachrichtigungen jederzeit in Ihren Einstellungen deaktivieren.",
+        "title": "Respektiert Ihre Privatsphäre"
+      },
+      "title": "Bleiben Sie in Echtzeit informiert"
     }
   }
 }
