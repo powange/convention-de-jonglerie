@@ -1,4 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -34,7 +35,6 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             email: true,
-            emailHash: true,
             profilePicture: true,
           },
         },
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
           prenom: volunteer.user.prenom,
           nom: volunteer.user.nom,
           email: volunteer.user.email,
-          emailHash: volunteer.user.emailHash,
+          emailHash: getEmailHash(volunteer.user.email),
           profilePicture: volunteer.user.profilePicture,
         },
         teams: volunteer.teamAssignments.map((assignment) => assignment.team),

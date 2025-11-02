@@ -1,4 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -33,7 +34,6 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             email: true,
-            emailHash: true,
             profilePicture: true,
           },
         },
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
           prenom: artist.user.prenom,
           nom: artist.user.nom,
           email: artist.user.email,
-          emailHash: artist.user.emailHash,
+          emailHash: getEmailHash(artist.user.email),
           profilePicture: artist.user.profilePicture,
         },
         shows: artist.shows.map((showArtist) => showArtist.show),
