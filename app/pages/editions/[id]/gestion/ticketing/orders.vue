@@ -420,7 +420,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="text-right flex-shrink-0">
+                <div class="text-right flex-shrink-0 flex flex-col items-end gap-2">
                   <div class="font-semibold text-sm text-primary-600 dark:text-primary-400">
                     {{ (item.amount / 100).toFixed(2) }}€
                   </div>
@@ -428,10 +428,28 @@
                     :color="item.state === 'Processed' ? 'success' : 'neutral'"
                     variant="subtle"
                     size="xs"
-                    class="mt-1"
                   >
                     {{ item.state }}
                   </UBadge>
+                  <!-- Bouton de validation/invalidation -->
+                  <UButton
+                    v-if="
+                      item.type !== 'Donation' &&
+                      item.type !== 'Membership' &&
+                      item.type !== 'Payment'
+                    "
+                    :color="item.entryValidated ? 'warning' : 'success'"
+                    variant="soft"
+                    size="xs"
+                    :icon="
+                      item.entryValidated
+                        ? 'i-heroicons-x-circle'
+                        : 'i-heroicons-check-circle'
+                    "
+                    @click="showValidateModal(item)"
+                  >
+                    {{ item.entryValidated ? 'Invalider' : 'Valider' }}
+                  </UButton>
                 </div>
               </div>
             </div>
@@ -564,6 +582,96 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal de validation/invalidation d'entrée -->
+    <UModal
+      v-model:open="isValidateModalOpen"
+      :title="
+        itemToValidate?.entryValidated
+          ? 'Invalider l\'entrée'
+          : 'Valider l\'entrée'
+      "
+    >
+      <template #body>
+        <div v-if="itemToValidate" class="space-y-4">
+          <UAlert
+            :icon="
+              itemToValidate.entryValidated
+                ? 'i-heroicons-exclamation-triangle'
+                : 'i-heroicons-information-circle'
+            "
+            :color="itemToValidate.entryValidated ? 'warning' : 'info'"
+            variant="soft"
+          >
+            <template #description>
+              {{
+                itemToValidate.entryValidated
+                  ? 'Cette action marquera le billet comme non validé. Le participant pourra à nouveau scanner son billet au contrôle d\'accès.'
+                  : 'Cette action marquera le billet comme validé sans vérifier les objets à restituer. Le participant ne pourra plus scanner son billet au contrôle d\'accès.'
+              }}
+            </template>
+          </UAlert>
+
+          <!-- Informations du billet -->
+          <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Billet :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ itemToValidate.name || itemToValidate.type }}
+              </span>
+            </div>
+            <div v-if="itemToValidate.firstName || itemToValidate.lastName" class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Participant :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ itemToValidate.firstName }} {{ itemToValidate.lastName }}
+              </span>
+            </div>
+            <div v-if="itemToValidate.email" class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Email :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ itemToValidate.email }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Montant :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ (itemToValidate.amount / 100).toFixed(2) }}€
+              </span>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="soft"
+            :disabled="isValidating"
+            @click="isValidateModalOpen = false"
+          >
+            Annuler
+          </UButton>
+          <UButton
+            :color="itemToValidate?.entryValidated ? 'warning' : 'success'"
+            variant="solid"
+            :loading="isValidating"
+            :disabled="isValidating"
+            @click="validateEntry"
+          >
+            {{
+              isValidating
+                ? itemToValidate?.entryValidated
+                  ? 'Invalidation...'
+                  : 'Validation...'
+                : itemToValidate?.entryValidated
+                  ? 'Invalider l\'entrée'
+                  : 'Valider l\'entrée'
+            }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -677,6 +785,75 @@ const cancelOrder = async () => {
     })
   } finally {
     isCanceling.value = false
+  }
+}
+
+// Modal et logique de validation/invalidation d'entrée
+const isValidateModalOpen = ref(false)
+const itemToValidate = ref<any>(null)
+const isValidating = ref(false)
+
+const showValidateModal = (item: any) => {
+  itemToValidate.value = item
+  isValidateModalOpen.value = true
+}
+
+const validateEntry = async () => {
+  if (!itemToValidate.value) return
+
+  const isInvalidating = itemToValidate.value.entryValidated
+  isValidating.value = true
+  try {
+    if (isInvalidating) {
+      // Invalider l'entrée
+      await $fetch(`/api/editions/${editionId}/ticketing/invalidate-entry`, {
+        method: 'POST',
+        body: {
+          participantId: itemToValidate.value.id,
+          type: 'ticket',
+        },
+      })
+    } else {
+      // Valider l'entrée
+      await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
+        method: 'POST',
+        body: {
+          participantIds: [itemToValidate.value.id],
+          type: 'ticket',
+        },
+      })
+    }
+
+    // Fermer la modal
+    isValidateModalOpen.value = false
+    itemToValidate.value = null
+
+    // Recharger les commandes
+    await loadOrders()
+
+    // Message de succès
+    useToast().add({
+      title: isInvalidating ? 'Entrée invalidée' : 'Entrée validée',
+      description: isInvalidating
+        ? 'Le billet a été marqué comme non validé'
+        : 'Le billet a été validé avec succès',
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (error: any) {
+    console.error('Failed to validate/invalidate entry:', error)
+    useToast().add({
+      title: 'Erreur',
+      description:
+        error.data?.message ||
+        (isInvalidating
+          ? 'Erreur lors de l\'invalidation de l\'entrée'
+          : 'Erreur lors de la validation de l\'entrée'),
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle',
+    })
+  } finally {
+    isValidating.value = false
   }
 }
 
