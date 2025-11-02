@@ -616,6 +616,7 @@ model ApiErrorLog {
   @@index([path])
   @@index([userId])
   @@index([resolved])
+  @@index([resolved, createdAt]) // Index composite pour filtrer par resolved + tri par date
 }
 
 // ========== NOTIFICATIONS ==========

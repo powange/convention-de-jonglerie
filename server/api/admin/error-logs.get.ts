@@ -25,8 +25,10 @@ export default defineEventHandler(async (event) => {
 
   // Filtre de période (pour limiter la charge mémoire)
   // Par défaut, ne montrer que les 7 derniers jours pour éviter les problèmes de mémoire MySQL
+  // Si on filtre par "unresolved", réduire à 1 jour par défaut car il y a généralement beaucoup de logs non résolus
   const timeRangeFilter = query.timeRange as string | undefined // '1d' | '7d' | '30d' | '90d' | 'all'
-  const timeRange = timeRangeFilter || '7d'
+  const defaultTimeRange = statusFilter === 'unresolved' ? '1d' : '7d'
+  const timeRange = timeRangeFilter || defaultTimeRange
 
   // Paramètres de tri
   const sortField = (query.sortField as string) || 'createdAt'
