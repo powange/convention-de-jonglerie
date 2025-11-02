@@ -1,0 +1,80 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
+import { prisma } from '@@/server/utils/prisma'
+
+export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
+
+  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+
+  // Vérifier les permissions (gestionnaires OU bénévoles en créneau actif de contrôle d'accès)
+  const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
+  if (!allowed)
+    throw createError({
+      statusCode: 403,
+      message:
+        "Droits insuffisants pour accéder à cette fonctionnalité - vous devez être gestionnaire ou en créneau actif de contrôle d'accès",
+    })
+
+  try {
+    // Récupérer tous les artistes qui n'ont pas validé leur billet
+    const artists = await prisma.editionArtist.findMany({
+      where: {
+        editionId,
+        entryValidated: {
+          not: true,
+        },
+      },
+      select: {
+        id: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            prenom: true,
+            nom: true,
+            email: true,
+            emailHash: true,
+            profilePicture: true,
+          },
+        },
+        shows: {
+          select: {
+            show: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [{ user: { nom: 'asc' } }, { user: { prenom: 'asc' } }],
+    })
+
+    return {
+      success: true,
+      artists: artists.map((artist) => ({
+        id: artist.id,
+        user: {
+          id: artist.user.id,
+          pseudo: artist.user.pseudo,
+          prenom: artist.user.prenom,
+          nom: artist.user.nom,
+          email: artist.user.email,
+          emailHash: artist.user.emailHash,
+          profilePicture: artist.user.profilePicture,
+        },
+        shows: artist.shows.map((showArtist) => showArtist.show),
+      })),
+      total: artists.length,
+    }
+  } catch (error: unknown) {
+    console.error('Failed to fetch artists not validated:', error)
+    throw createError({
+      statusCode: 500,
+      message: 'Erreur lors de la récupération des artistes non validés',
+    })
+  }
+})

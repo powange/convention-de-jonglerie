@@ -318,6 +318,7 @@
         <TicketingStatsEntryStatsCard
           :stats="stats"
           @show-volunteers-not-validated="showVolunteersNotValidatedModal"
+          @show-artists-not-validated="showArtistsNotValidatedModal"
         />
 
         <!-- Statistiques des quotas -->
@@ -501,6 +502,78 @@
           </div>
         </template>
       </UModal>
+
+      <!-- Modal liste des artistes non validés -->
+      <UModal v-model:open="artistsNotValidatedModalOpen" title="Artistes n'ayant pas validé leur billet">
+        <template #body>
+          <div class="space-y-4">
+            <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
+              <template #description>
+                Liste des artistes qui n'ont pas encore scanné leur billet au contrôle d'accès.
+              </template>
+            </UAlert>
+
+            <div v-if="loadingArtistsNotValidated" class="text-center py-8">
+              <p class="text-sm text-gray-500">Chargement...</p>
+            </div>
+
+            <div
+              v-else-if="artistsNotValidated.length === 0"
+              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <UIcon name="i-heroicons-check-circle" class="mx-auto h-12 w-12 text-green-400 mb-2" />
+              <p class="text-sm text-gray-500">Tous les artistes ont validé leur billet !</p>
+            </div>
+
+            <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
+              <div
+                v-for="artist in artistsNotValidated"
+                :key="artist.id"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <div class="flex items-start gap-3">
+                  <UiUserDisplay
+                    :user="{
+                      ...artist.user,
+                      pseudo: artist.user.pseudo || artist.user.prenom,
+                    }"
+                    size="md"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium text-gray-900 dark:text-white">
+                      {{ artist.user.prenom }} {{ artist.user.nom }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ artist.user.email }}
+                    </div>
+                    <div
+                      v-if="artist.shows.length > 0"
+                      class="text-xs text-gray-500 dark:text-gray-500 mt-1"
+                    >
+                      Spectacle{{ artist.shows.length > 1 ? 's' : '' }}:
+                      {{ artist.shows.map((s) => s.title).join(', ') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ artistsNotValidated.length }} artiste{{
+                artistsNotValidated.length > 1 ? 's' : ''
+              }}
+              non validé{{ artistsNotValidated.length > 1 ? 's' : '' }}
+            </p>
+            <UButton color="neutral" variant="soft" @click="artistsNotValidatedModalOpen = false">
+              Fermer
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </div>
   </div>
 </template>
@@ -558,6 +631,9 @@ const syncingHelloAsso = ref(false)
 const volunteersNotValidatedModalOpen = ref(false)
 const volunteersNotValidated = ref<any[]>([])
 const loadingVolunteersNotValidated = ref(false)
+const artistsNotValidatedModalOpen = ref(false)
+const artistsNotValidated = ref<any[]>([])
+const loadingArtistsNotValidated = ref(false)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -987,6 +1063,36 @@ const showVolunteersNotValidatedModal = async () => {
   await loadVolunteersNotValidated()
 }
 
+// Charger les artistes non validés
+const loadArtistsNotValidated = async () => {
+  loadingArtistsNotValidated.value = true
+
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/artists-not-validated`)
+
+    if (result.success) {
+      artistsNotValidated.value = result.artists
+    }
+  } catch (error: any) {
+    console.error('Failed to load artists not validated:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de charger les artistes non validés',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingArtistsNotValidated.value = false
+  }
+}
+
+// Afficher la modal des artistes non validés
+const showArtistsNotValidatedModal = async () => {
+  artistsNotValidatedModalOpen.value = true
+  // Charger les données à chaque fois que la modal s'ouvre
+  await loadArtistsNotValidated()
+}
+
 // Rafraîchir automatiquement quand une mise à jour SSE arrive
 watch(lastUpdate, () => {
   if (lastUpdate.value) {
@@ -996,6 +1102,11 @@ watch(lastUpdate, () => {
     // Recharger la liste des bénévoles non validés si la modal est ouverte
     if (volunteersNotValidatedModalOpen.value) {
       loadVolunteersNotValidated()
+    }
+
+    // Recharger la liste des artistes non validés si la modal est ouverte
+    if (artistsNotValidatedModalOpen.value) {
+      loadArtistsNotValidated()
     }
   }
 })

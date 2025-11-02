@@ -62,7 +62,10 @@
           </div>
         </button>
 
-        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+        <button
+          class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer text-left w-full"
+          @click="$emit('show-artists-not-validated')"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -77,7 +80,7 @@
             </div>
             <UIcon name="i-heroicons-star" class="text-green-500" size="32" />
           </div>
-        </div>
+        </button>
       </div>
     </div>
   </UCard>
@@ -104,5 +107,6 @@ defineProps<{
 
 defineEmits<{
   'show-volunteers-not-validated': []
+  'show-artists-not-validated': []
 }>()
 </script>
