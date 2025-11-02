@@ -315,7 +315,10 @@
         </div>
 
         <!-- Statistiques -->
-        <TicketingStatsEntryStatsCard :stats="stats" />
+        <TicketingStatsEntryStatsCard
+          :stats="stats"
+          @show-volunteers-not-validated="showVolunteersNotValidatedModal"
+        />
 
         <!-- Statistiques des quotas -->
         <TicketingStatsQuotaStatsCard :edition-id="editionId" />
@@ -413,6 +416,91 @@
         :edition-id="editionId"
         @order-created="handleOrderCreated"
       />
+
+      <!-- Modal liste des bénévoles non validés -->
+      <UModal
+        v-model:open="volunteersNotValidatedModalOpen"
+        title="Bénévoles n'ayant pas validé leur billet"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <UAlert
+              icon="i-heroicons-information-circle"
+              color="info"
+              variant="soft"
+            >
+              <template #description>
+                Liste des bénévoles acceptés qui n'ont pas encore scanné leur billet au contrôle
+                d'accès.
+              </template>
+            </UAlert>
+
+            <div v-if="loadingVolunteersNotValidated" class="text-center py-8">
+              <p class="text-sm text-gray-500">Chargement...</p>
+            </div>
+
+            <div
+              v-else-if="volunteersNotValidated.length === 0"
+              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="mx-auto h-12 w-12 text-green-400 mb-2"
+              />
+              <p class="text-sm text-gray-500">
+                Tous les bénévoles ont validé leur billet !
+              </p>
+            </div>
+
+            <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
+              <div
+                v-for="volunteer in volunteersNotValidated"
+                :key="volunteer.id"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <div class="flex items-start gap-3">
+                  <UiUserDisplay
+                    :user="{
+                      ...volunteer.user,
+                      pseudo: volunteer.user.pseudo || volunteer.user.prenom,
+                    }"
+                    size="md"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium text-gray-900 dark:text-white">
+                      {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ volunteer.user.email }}
+                    </div>
+                    <div
+                      v-if="volunteer.teams.length > 0"
+                      class="text-xs text-gray-500 dark:text-gray-500 mt-1"
+                    >
+                      Équipe{{ volunteer.teams.length > 1 ? 's' : '' }}:
+                      {{ volunteer.teams.map((t) => t.name).join(', ') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ volunteersNotValidated.length }} bénévole{{
+                volunteersNotValidated.length > 1 ? 's' : ''
+              }}
+              non validé{{ volunteersNotValidated.length > 1 ? 's' : '' }}
+            </p>
+            <UButton color="neutral" variant="soft" @click="volunteersNotValidatedModalOpen = false">
+              Fermer
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </div>
   </div>
 </template>
@@ -467,6 +555,9 @@ const stats = ref({
 })
 const hasHelloAssoConfig = ref(false)
 const syncingHelloAsso = ref(false)
+const volunteersNotValidatedModalOpen = ref(false)
+const volunteersNotValidated = ref<any[]>([])
+const loadingVolunteersNotValidated = ref(false)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -864,11 +955,48 @@ const syncHelloAsso = async () => {
   }
 }
 
+// Charger les bénévoles non validés
+const loadVolunteersNotValidated = async () => {
+  loadingVolunteersNotValidated.value = true
+
+  try {
+    const result: any = await $fetch(
+      `/api/editions/${editionId}/ticketing/volunteers-not-validated`
+    )
+
+    if (result.success) {
+      volunteersNotValidated.value = result.volunteers
+    }
+  } catch (error: any) {
+    console.error('Failed to load volunteers not validated:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de charger les bénévoles non validés',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingVolunteersNotValidated.value = false
+  }
+}
+
+// Afficher la modal des bénévoles non validés
+const showVolunteersNotValidatedModal = async () => {
+  volunteersNotValidatedModalOpen.value = true
+  // Charger les données à chaque fois que la modal s'ouvre
+  await loadVolunteersNotValidated()
+}
+
 // Rafraîchir automatiquement quand une mise à jour SSE arrive
 watch(lastUpdate, () => {
   if (lastUpdate.value) {
     // Rafraîchir les stats et les validations récentes
     Promise.all([loadStats(), loadRecentValidations()])
+
+    // Recharger la liste des bénévoles non validés si la modal est ouverte
+    if (volunteersNotValidatedModalOpen.value) {
+      loadVolunteersNotValidated()
+    }
   }
 })
 </script>

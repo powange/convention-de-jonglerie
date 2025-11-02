@@ -42,7 +42,10 @@
           </div>
         </div>
 
-        <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+        <button
+          class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors cursor-pointer text-left w-full"
+          @click="$emit('show-volunteers-not-validated')"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -57,7 +60,7 @@
             </div>
             <UIcon name="i-heroicons-user-group" class="text-purple-500" size="32" />
           </div>
-        </div>
+        </button>
 
         <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
           <div class="flex items-center justify-between">
@@ -97,5 +100,9 @@ interface EntryStats {
 
 defineProps<{
   stats: EntryStats
+}>()
+
+defineEmits<{
+  'show-volunteers-not-validated': []
 }>()
 </script>
