@@ -23,9 +23,7 @@ export default defineEventHandler(async (event) => {
       where: {
         editionId,
         status: 'ACCEPTED',
-        entryValidated: {
-          not: true,
-        },
+        entryValidated: false,
       },
       select: {
         id: true,

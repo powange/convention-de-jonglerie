@@ -22,9 +22,7 @@ export default defineEventHandler(async (event) => {
     const artists = await prisma.editionArtist.findMany({
       where: {
         editionId,
-        entryValidated: {
-          not: true,
-        },
+        entryValidated: false,
       },
       select: {
         id: true,
