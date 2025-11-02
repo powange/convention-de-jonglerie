@@ -25,6 +25,14 @@ export default defineEventHandler(async (event) => {
         editionId,
         status: 'ACCEPTED',
         entryValidated: false,
+        OR: [
+          {
+            eventAvailability: true,
+          },
+          {
+            eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
+          },
+        ],
       },
       select: {
         id: true,
