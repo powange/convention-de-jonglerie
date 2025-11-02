@@ -152,7 +152,7 @@ export default defineEventHandler(async (event) => {
       // Inclure certaines métadonnées utiles sans exposer les données sensibles
       queryParams: true,
       body: true, // Inclure le body (sanitisé) pour le debug
-      prismaDetails: true, // Inclure les détails SQL/Prisma pour les erreurs de base de données
+      // prismaDetails: true, // TODO: Activer après migration en production
         headers: false, // Pas dans la liste par défaut (trop verbeux)
         stack: false, // Pas dans la liste par défaut (très verbeux)
       },
@@ -194,7 +194,7 @@ export default defineEventHandler(async (event) => {
         },
         queryParams: true,
         body: true,
-        prismaDetails: true,
+        // prismaDetails: true, // TODO: Activer après migration en production
         headers: false,
         stack: false,
       },
