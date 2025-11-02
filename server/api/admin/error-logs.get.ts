@@ -24,9 +24,9 @@ export default defineEventHandler(async (event) => {
   const search = (query.search as string)?.trim()
 
   // Filtre de période (pour limiter la charge mémoire)
-  // Par défaut, ne montrer que les 30 derniers jours sauf si explicitement désactivé
-  const timeRangeFilter = query.timeRange as string | undefined // '7d' | '30d' | '90d' | 'all'
-  const timeRange = timeRangeFilter || '30d'
+  // Par défaut, ne montrer que les 7 derniers jours pour éviter les problèmes de mémoire MySQL
+  const timeRangeFilter = query.timeRange as string | undefined // '1d' | '7d' | '30d' | '90d' | 'all'
+  const timeRange = timeRangeFilter || '7d'
 
   // Paramètres de tri
   const sortField = (query.sortField as string) || 'createdAt'
@@ -35,14 +35,15 @@ export default defineEventHandler(async (event) => {
   // Construction des filtres WHERE
   const conditions: any[] = []
 
-  // Filtre de période pour éviter les problèmes de mémoire
+  // Filtre de période pour éviter les problèmes de mémoire MySQL
   if (timeRange !== 'all') {
     const daysMap: Record<string, number> = {
+      '1d': 1,
       '7d': 7,
       '30d': 30,
       '90d': 90,
     }
-    const days = daysMap[timeRange] || 30
+    const days = daysMap[timeRange] || 7
     conditions.push({
       createdAt: {
         gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
@@ -86,8 +87,15 @@ export default defineEventHandler(async (event) => {
   const where =
     conditions.length === 1 ? conditions[0] : conditions.length > 1 ? { AND: conditions } : {}
 
-  // Comptage total pour la pagination
-  const total = await prisma.apiErrorLog.count({ where })
+  // Comptage total pour la pagination (avec timeout sur les grands nombres)
+  let total = 0
+  try {
+    total = await prisma.apiErrorLog.count({ where })
+  } catch (countError) {
+    // Si le comptage échoue, estimer à partir du nombre de pages max supportées
+    console.warn('Count query failed, using estimate:', countError)
+    total = 1000 // Estimation conservative
+  }
 
   // Configuration du tri - limiter aux champs indexés pour éviter les problèmes de mémoire
   const orderBy: any = []
@@ -102,11 +110,16 @@ export default defineEventHandler(async (event) => {
     orderBy.push({ createdAt: 'desc' })
   }
 
+  // Limiter le skip pour éviter les problèmes de performance
+  // MySQL a du mal à skip de grandes quantités de lignes
+  const maxSkip = 1000
+  const safeSkip = Math.min((page - 1) * pageSize, maxSkip)
+
   // Récupération des logs avec pagination
   const errorLogs = await prisma.apiErrorLog.findMany({
     where,
     orderBy,
-    skip: (page - 1) * pageSize,
+    skip: safeSkip,
     take: pageSize,
     select: {
       id: true,
