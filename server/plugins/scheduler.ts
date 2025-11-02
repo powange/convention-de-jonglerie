@@ -33,8 +33,8 @@ export default defineNitroPlugin(async (_nitroApp) => {
       }
     })
 
-    // Nettoyage des logs d'erreur résolus (mensuel, 1er du mois à 3h)
-    cron.schedule('0 3 1 * *', async () => {
+    // Nettoyage des logs d'erreur résolus (quotidien à 3h du matin)
+    cron.schedule('0 3 * * *', async () => {
       try {
         await runTask('cleanup-resolved-error-logs')
       } catch (error) {

@@ -36,19 +36,18 @@ export default defineTask({
 
       console.log(`🗑️ Supprimé ${deletedLogs.count} logs d'erreur résolus`)
 
-      // Optionnel : Nettoyer aussi les très anciens logs non résolus (plus de 6 mois)
-      const sixMonthsAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000)
-
+      // Nettoyer aussi les anciens logs non résolus (plus de 1 mois)
+      // Garder 6 mois crée trop d'accumulation et des problèmes de performance
       const veryOldLogsToDelete = await prisma.apiErrorLog.count({
         where: {
           resolved: false,
           createdAt: {
-            lt: sixMonthsAgo,
+            lt: oneMonthAgo, // Utiliser la même période qu'avant (1 mois)
           },
         },
       })
 
-      console.log(`🔍 Trouvé ${veryOldLogsToDelete} logs d'erreur non résolus de plus de 6 mois`)
+      console.log(`🔍 Trouvé ${veryOldLogsToDelete} logs d'erreur non résolus de plus de 1 mois`)
 
       let deletedVeryOldLogs = { count: 0 }
       if (veryOldLogsToDelete > 0) {
@@ -56,13 +55,11 @@ export default defineTask({
           where: {
             resolved: false,
             createdAt: {
-              lt: sixMonthsAgo,
+              lt: oneMonthAgo,
             },
           },
         })
-        console.log(
-          `🗑️ Supprimé ${deletedVeryOldLogs.count} très anciens logs d'erreur non résolus`
-        )
+        console.log(`🗑️ Supprimé ${deletedVeryOldLogs.count} anciens logs d'erreur non résolus`)
       }
 
       // Statistiques finales
@@ -71,7 +68,7 @@ export default defineTask({
       if (totalDeleted > 0) {
         console.log(`✅ Tâche terminée: ${totalDeleted} logs d'erreur supprimés au total`)
         console.log(`   - ${deletedLogs.count} logs résolus (> 1 mois)`)
-        console.log(`   - ${deletedVeryOldLogs.count} logs non résolus (> 6 mois)`)
+        console.log(`   - ${deletedVeryOldLogs.count} logs non résolus (> 1 mois)`)
       } else {
         console.log("✅ Tâche terminée: aucun log d'erreur à nettoyer")
       }
