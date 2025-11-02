@@ -148,11 +148,16 @@
       "mcp__nuxt-ui__search_components_by_category",
       "mcp__nuxt-ui__get_component_metadata",
       "Read(//proc/98900/fd/**)",
-      "Bash(wait)"
+      "Bash(wait)",
+      "Bash(1 mois\" sur la page admin des error-logs\npermettant de supprimer manuellement tous les logs de plus d''un mois.\n\nFonctionnalités:\n- Bouton rouge avec confirmation avant suppression\n- Supprime logs résolus ET non résolus > 1 mois\n- Affiche le nombre de logs supprimés\n- Recharge automatiquement la liste après nettoyage\n- API endpoint: POST /api/admin/error-logs/cleanup-old\n\nUtile pour nettoyer rapidement en cas d''accumulation excessive\nen complément du nettoyage automatique quotidien.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner"
+  ]
 }

@@ -37,6 +37,15 @@
         </div>
         <div class="flex gap-3">
           <UButton
+            icon="i-heroicons-trash"
+            color="red"
+            variant="outline"
+            :loading="cleaningOldLogs"
+            @click="cleanupOldLogs"
+          >
+            Nettoyer logs > 1 mois
+          </UButton>
+          <UButton
             icon="i-heroicons-arrow-path"
             variant="outline"
             :loading="loading"
@@ -538,6 +547,8 @@ const filters = ref({
   path: '',
 })
 
+const cleaningOldLogs = ref(false)
+
 // Modal de détails
 const showLogDetails = ref(false)
 const selectedLog = ref<any>(null)
@@ -650,6 +661,45 @@ const debouncedSearch = useDebounceFn(() => {
 // Actions
 const refreshLogs = () => {
   loadLogs()
+}
+
+const cleanupOldLogs = async () => {
+  const confirmed = confirm(
+    'Êtes-vous sûr de vouloir supprimer TOUS les logs de plus d\'un mois (résolus et non résolus) ?\n\nCette action ne peut pas être annulée.'
+  )
+
+  if (!confirmed) return
+
+  cleaningOldLogs.value = true
+  try {
+    const response: any = await $fetch('/api/admin/error-logs/cleanup-old', {
+      method: 'POST',
+    })
+
+    toast.add({
+      color: 'success',
+      title: 'Nettoyage effectué',
+      description: response.message,
+    })
+
+    // Afficher les détails de la suppression
+    if (response.deleted.total > 0) {
+      console.log('Logs supprimés:', response.deleted)
+      console.log('Logs restants:', response.remaining)
+    }
+
+    // Recharger les logs pour mettre à jour l'interface
+    loadLogs()
+  } catch (error: any) {
+    console.error('Erreur lors du nettoyage:', error)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de nettoyer les logs',
+    })
+  } finally {
+    cleaningOldLogs.value = false
+  }
 }
 
 const applyFilters = () => {
