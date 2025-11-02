@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -238,7 +238,11 @@
         <div v-else-if="orders.length === 0" class="text-center py-12">
           <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
           <p class="text-sm text-gray-500">
-            {{ searchQuery || entryStatusFilter !== 'all' ? 'Aucun résultat trouvé' : 'Aucune commande trouvée' }}
+            {{
+              searchQuery || entryStatusFilter !== 'all'
+                ? 'Aucun résultat trouvé'
+                : 'Aucune commande trouvée'
+            }}
           </p>
           <p v-if="!searchQuery && entryStatusFilter === 'all'" class="text-xs text-gray-400 mt-1">
             Importez les commandes depuis votre billeterie externe
@@ -442,9 +446,7 @@
                     variant="soft"
                     size="xs"
                     :icon="
-                      item.entryValidated
-                        ? 'i-heroicons-x-circle'
-                        : 'i-heroicons-check-circle'
+                      item.entryValidated ? 'i-heroicons-x-circle' : 'i-heroicons-check-circle'
                     "
                     @click="showValidateModal(item)"
                   >
@@ -586,11 +588,7 @@
     <!-- Modal de validation/invalidation d'entrée -->
     <UModal
       v-model:open="isValidateModalOpen"
-      :title="
-        itemToValidate?.entryValidated
-          ? 'Invalider l\'entrée'
-          : 'Valider l\'entrée'
-      "
+      :title="itemToValidate?.entryValidated ? 'Invalider l\'entrée' : 'Valider l\'entrée'"
     >
       <template #body>
         <div v-if="itemToValidate" class="space-y-4">
@@ -606,8 +604,8 @@
             <template #description>
               {{
                 itemToValidate.entryValidated
-                  ? 'Cette action marquera le billet comme non validé. Le participant pourra à nouveau scanner son billet au contrôle d\'accès.'
-                  : 'Cette action marquera le billet comme validé sans vérifier les objets à restituer. Le participant ne pourra plus scanner son billet au contrôle d\'accès.'
+                  ? "Cette action marquera le billet comme non validé. Le participant pourra à nouveau scanner son billet au contrôle d'accès."
+                  : "Cette action marquera le billet comme validé sans vérifier les objets à restituer. Le participant ne pourra plus scanner son billet au contrôle d'accès."
               }}
             </template>
           </UAlert>
@@ -620,7 +618,10 @@
                 {{ itemToValidate.name || itemToValidate.type }}
               </span>
             </div>
-            <div v-if="itemToValidate.firstName || itemToValidate.lastName" class="flex items-center justify-between">
+            <div
+              v-if="itemToValidate.firstName || itemToValidate.lastName"
+              class="flex items-center justify-between"
+            >
               <span class="text-sm text-gray-600 dark:text-gray-400">Participant :</span>
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ itemToValidate.firstName }} {{ itemToValidate.lastName }}
@@ -665,8 +666,8 @@
                   ? 'Invalidation...'
                   : 'Validation...'
                 : itemToValidate?.entryValidated
-                  ? 'Invalider l\'entrée'
-                  : 'Valider l\'entrée'
+                  ? "Invalider l'entrée"
+                  : "Valider l'entrée"
             }}
           </UButton>
         </div>
@@ -847,8 +848,8 @@ const validateEntry = async () => {
       description:
         error.data?.message ||
         (isInvalidating
-          ? 'Erreur lors de l\'invalidation de l\'entrée'
-          : 'Erreur lors de la validation de l\'entrée'),
+          ? "Erreur lors de l'invalidation de l'entrée"
+          : "Erreur lors de la validation de l'entrée"),
       color: 'error',
       icon: 'i-heroicons-exclamation-circle',
     })

@@ -103,7 +103,10 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     const result = await handler(mockEvent)
 
     expect(mockFindMany).toHaveBeenCalledWith({
-      where: { editionId: 1 },
+      where: expect.objectContaining({
+        editionId: 1,
+        tripDate: expect.objectContaining({ gte: expect.any(Date) }),
+      }),
       include: {
         user: true,
         bookings: {
@@ -309,7 +312,10 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
 
     expect(mockFindMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { editionId: 123 },
+        where: expect.objectContaining({
+          editionId: 123,
+          tripDate: expect.objectContaining({ gte: expect.any(Date) }),
+        }),
       })
     )
   })

@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Úprava práv zaměstnanců",
     "edit_permissions": "Úprava oprávnění",
     "edit_permissions_desc": "Upravte konvence podle svých oprávnění",
-    "editions": "Vydal",
+    "edition": "Vydal",
     "features_card_subtitle": "Zjistěte, co všechno můžete udělat, když vytvoříte nebo spolupracujete na konvencích",
     "features_card_title": "Co můžete udělat?",
     "granular_rights": "Granulární práva",
@@ -157,7 +157,7 @@
     "vegan": "Vegan",
     "vegetarian": "Vegetariánské"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "O tomto vydání",
     "add_comment_placeholder": "Přidat komentář...",
     "add_lost_item": "Přidání nalezeného objektu",

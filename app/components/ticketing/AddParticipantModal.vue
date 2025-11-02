@@ -59,7 +59,7 @@
         <div v-if="currentStep === 0" class="space-y-4">
           <!-- Email en premier -->
           <UFormField
-            :label="$t('editions.ticketing.payer_email')"
+            :label="$t('edition.ticketing.payer_email')"
             required
             :error="errors.payerEmail"
           >
@@ -67,7 +67,7 @@
               <UInput
                 v-model="form.payerEmail"
                 type="email"
-                :placeholder="$t('editions.ticketing.email_placeholder')"
+                :placeholder="$t('edition.ticketing.email_placeholder')"
                 class="w-full"
                 @keydown.enter="searchUserByEmail"
               />
@@ -96,13 +96,13 @@
           <!-- Prénom -->
           <UFormField
             v-if="showNameFields"
-            :label="$t('editions.ticketing.payer_first_name')"
+            :label="$t('edition.ticketing.payer_first_name')"
             required
             :error="errors.payerFirstName"
           >
             <UInput
               v-model="form.payerFirstName"
-              :placeholder="$t('editions.ticketing.first_name_placeholder')"
+              :placeholder="$t('edition.ticketing.first_name_placeholder')"
               class="w-full"
             />
           </UFormField>
@@ -110,13 +110,13 @@
           <!-- Nom -->
           <UFormField
             v-if="showNameFields"
-            :label="$t('editions.ticketing.payer_last_name')"
+            :label="$t('edition.ticketing.payer_last_name')"
             required
             :error="errors.payerLastName"
           >
             <UInput
               v-model="form.payerLastName"
-              :placeholder="$t('editions.ticketing.last_name_placeholder')"
+              :placeholder="$t('edition.ticketing.last_name_placeholder')"
               class="w-full"
             />
           </UFormField>
@@ -125,7 +125,7 @@
         <!-- Étape 2 : Sélection des tarifs -->
         <div v-if="currentStep === 1" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ $t('editions.ticketing.select_tiers_description') }}
+            {{ $t('edition.ticketing.select_tiers_description') }}
           </p>
 
           <div v-if="loadingTiers" class="flex justify-center py-8">
@@ -133,7 +133,7 @@
           </div>
 
           <div v-else-if="availableTiers.length === 0" class="text-center py-8">
-            <p class="text-gray-500">{{ $t('editions.ticketing.no_tiers_available') }}</p>
+            <p class="text-gray-500">{{ $t('edition.ticketing.no_tiers_available') }}</p>
           </div>
 
           <div v-else class="space-y-3">
@@ -397,7 +397,7 @@
         <!-- Étape 3 : Récapitulatif et personnalisation -->
         <div v-if="currentStep === summaryStepIndex" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ $t('editions.ticketing.customize_participants_description') }}
+            {{ $t('edition.ticketing.customize_participants_description') }}
           </p>
 
           <div class="space-y-4">
@@ -447,34 +447,34 @@
 
                 <UCheckbox
                   v-model="item.isDifferentParticipant"
-                  :label="$t('editions.ticketing.different_participant')"
+                  :label="$t('edition.ticketing.different_participant')"
                 />
 
                 <div
                   v-if="item.isDifferentParticipant"
                   class="space-y-3 pl-6 border-l-2 border-primary-200"
                 >
-                  <UFormField :label="$t('editions.ticketing.participant_first_name')" required>
+                  <UFormField :label="$t('edition.ticketing.participant_first_name')" required>
                     <UInput
                       v-model="item.firstName"
-                      :placeholder="$t('editions.ticketing.first_name_placeholder')"
+                      :placeholder="$t('edition.ticketing.first_name_placeholder')"
                       class="w-full"
                     />
                   </UFormField>
 
-                  <UFormField :label="$t('editions.ticketing.participant_last_name')" required>
+                  <UFormField :label="$t('edition.ticketing.participant_last_name')" required>
                     <UInput
                       v-model="item.lastName"
-                      :placeholder="$t('editions.ticketing.last_name_placeholder')"
+                      :placeholder="$t('edition.ticketing.last_name_placeholder')"
                       class="w-full"
                     />
                   </UFormField>
 
-                  <UFormField :label="$t('editions.ticketing.participant_email')" required>
+                  <UFormField :label="$t('edition.ticketing.participant_email')" required>
                     <UInput
                       v-model="item.email"
                       type="email"
-                      :placeholder="$t('editions.ticketing.email_placeholder')"
+                      :placeholder="$t('edition.ticketing.email_placeholder')"
                       class="w-full"
                     />
                   </UFormField>
@@ -751,7 +751,7 @@
             :loading="loading"
             @click="submitOrder"
           >
-            {{ $t('editions.ticketing.create_order') }}
+            {{ $t('edition.ticketing.create_order') }}
           </UButton>
         </div>
       </div>
@@ -891,17 +891,17 @@ const stepperItems = computed(() => {
 
   // Ne pas afficher l'étape "Informations acheteur" pour les anonymes
   if (participantType.value === 'identified') {
-    steps.push({ title: t('editions.ticketing.buyer_info') })
+    steps.push({ title: t('edition.ticketing.buyer_info') })
   }
 
-  steps.push({ title: t('editions.ticketing.select_tiers') })
+  steps.push({ title: t('edition.ticketing.select_tiers') })
 
   // N'ajouter l'étape "Options" que s'il y a des options disponibles
   if (editionOptions.value && editionOptions.value.length > 0) {
     steps.push({ title: 'Options' })
   }
 
-  steps.push({ title: t('editions.ticketing.summary') })
+  steps.push({ title: t('edition.ticketing.summary') })
   steps.push({ title: 'Paiement' })
 
   return steps
@@ -918,11 +918,11 @@ const paymentStepIndex = computed(() => (hasOptions.value ? 4 : 3))
 
 const currentStepTitle = computed(() => {
   if (currentStep.value === -1) return 'Type de participant'
-  if (currentStep.value === 0) return t('editions.ticketing.add_participant_title')
-  if (currentStep.value === 1) return t('editions.ticketing.select_tiers')
+  if (currentStep.value === 0) return t('edition.ticketing.add_participant_title')
+  if (currentStep.value === 1) return t('edition.ticketing.select_tiers')
   if (hasOptions.value && currentStep.value === optionsStepIndex) return 'Sélection des options'
   if (currentStep.value === summaryStepIndex.value)
-    return t('editions.ticketing.summary_and_customize')
+    return t('edition.ticketing.summary_and_customize')
   return 'Confirmation du paiement'
 })
 
@@ -1215,7 +1215,7 @@ const fetchTiers = async () => {
     )
   } catch (err: any) {
     console.error('Error fetching tiers:', err)
-    error.value = t('editions.ticketing.error_loading_tiers')
+    error.value = t('edition.ticketing.error_loading_tiers')
   } finally {
     loadingTiers.value = false
   }
@@ -1355,7 +1355,7 @@ const submitOrder = async () => {
     closeModal()
   } catch (err: any) {
     console.error('Error creating order:', err)
-    error.value = err.data?.message || t('editions.ticketing.add_error')
+    error.value = err.data?.message || t('edition.ticketing.add_error')
   } finally {
     loading.value = false
   }

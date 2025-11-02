@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -80,7 +80,7 @@
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('editions.ticketing.phone') }}
+                  {{ $t('edition.ticketing.phone') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"

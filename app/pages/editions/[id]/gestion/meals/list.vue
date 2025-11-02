@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert

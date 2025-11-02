@@ -298,7 +298,7 @@
                             {{ edition.name || convention.name }}
                           </h6>
                           <UBadge v-if="edition.isOnline" color="success" variant="soft" size="xs">
-                            {{ $t('editions.online_status') }}
+                            {{ $t('edition.online_status') }}
                           </UBadge>
                         </div>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -559,10 +559,10 @@
                           {{ edition.name || convention.name }}
                         </h5>
                         <UBadge v-if="edition.isOnline" color="success" variant="soft" size="xs">
-                          {{ $t('editions.online_status') }}
+                          {{ $t('edition.online_status') }}
                         </UBadge>
                         <UBadge v-else color="neutral" variant="soft" size="xs">
-                          {{ $t('editions.offline_edition') }}
+                          {{ $t('edition.offline_edition') }}
                         </UBadge>
                       </div>
 

@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center gap-2">
         <UIcon name="i-heroicons-users" class="text-primary-500" />
-        <span class="font-semibold">{{ t('editions.volunteers.notification_confirmations') }}</span>
+        <span class="font-semibold">{{ t('edition.volunteers.notification_confirmations') }}</span>
       </div>
     </template>
 
@@ -23,7 +23,7 @@
             {{ data.notification.message }}
           </p>
           <div class="flex items-center gap-4 text-sm text-gray-500">
-            <span>{{ t('editions.volunteers.sent_by') }}: {{ data.notification.senderName }}</span>
+            <span>{{ t('edition.volunteers.sent_by') }}: {{ data.notification.senderName }}</span>
             <span>{{ formatDate(data.notification.sentAt) }}</span>
           </div>
         </div>
@@ -35,7 +35,7 @@
               {{ data.stats.totalRecipients }}
             </div>
             <div class="text-sm text-blue-600 dark:text-blue-400">
-              {{ t('editions.volunteers.total_recipients') }}
+              {{ t('edition.volunteers.total_recipients') }}
             </div>
           </div>
           <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -43,7 +43,7 @@
               {{ data.stats.confirmationsCount }}
             </div>
             <div class="text-sm text-green-600 dark:text-green-400">
-              {{ t('editions.volunteers.confirmed') }}
+              {{ t('edition.volunteers.confirmed') }}
             </div>
           </div>
           <div class="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
@@ -51,7 +51,7 @@
               {{ data.stats.pendingCount }}
             </div>
             <div class="text-sm text-orange-600 dark:text-orange-400">
-              {{ t('editions.volunteers.pending') }}
+              {{ t('edition.volunteers.pending') }}
             </div>
           </div>
         </div>
@@ -61,7 +61,7 @@
           <template #confirmed>
             <div class="max-h-96 overflow-y-auto">
               <div v-if="data.confirmed.length === 0" class="text-center py-8 text-gray-500">
-                {{ t('editions.volunteers.no_confirmations_yet') }}
+                {{ t('edition.volunteers.no_confirmations_yet') }}
               </div>
               <div v-else class="space-y-3">
                 <div
@@ -84,7 +84,7 @@
                         </span>
                       </div>
                       <div class="text-sm text-green-600 dark:text-green-400">
-                        {{ t('editions.volunteers.confirmed_at') }}:
+                        {{ t('edition.volunteers.confirmed_at') }}:
                         {{ volunteer.confirmedAt ? formatDate(volunteer.confirmedAt) : '' }}
                       </div>
                     </div>
@@ -111,7 +111,7 @@
               >
                 <p class="text-sm text-orange-800 dark:text-orange-200 mb-3">
                   {{
-                    t('editions.volunteers.pending_with_phone_count', {
+                    t('edition.volunteers.pending_with_phone_count', {
                       count: pendingWithPhone.length,
                     })
                   }}
@@ -125,7 +125,7 @@
                     icon="i-heroicons-chat-bubble-left-right"
                     @click="sendGroupSMS"
                   >
-                    {{ t('editions.volunteers.send_group_sms') }}
+                    {{ t('edition.volunteers.send_group_sms') }}
                   </UButton>
                   <UButton
                     size="sm"
@@ -134,14 +134,14 @@
                     icon="i-heroicons-clipboard-document"
                     @click="copyPhoneNumbers"
                   >
-                    {{ t('editions.volunteers.copy_phone_numbers') }}
+                    {{ t('edition.volunteers.copy_phone_numbers') }}
                   </UButton>
                 </div>
               </div>
 
               <div class="max-h-96 overflow-y-auto">
                 <div v-if="data.pending.length === 0" class="text-center py-8 text-gray-500">
-                  {{ t('editions.volunteers.all_confirmed') }}
+                  {{ t('edition.volunteers.all_confirmed') }}
                 </div>
                 <div v-else class="space-y-3">
                   <div
@@ -176,7 +176,7 @@
                         📞 {{ volunteer.user.phone }}
                       </div>
                       <div v-else class="text-gray-500 italic text-xs">
-                        {{ t('editions.volunteers.no_phone') }}
+                        {{ t('edition.volunteers.no_phone') }}
                       </div>
                     </div>
                   </div>
@@ -327,13 +327,13 @@ const tabs = computed(() => [
   {
     key: 'confirmed',
     slot: 'confirmed',
-    label: `${t('editions.volunteers.confirmed')} (${data.value?.stats.confirmationsCount || 0})`,
+    label: `${t('edition.volunteers.confirmed')} (${data.value?.stats.confirmationsCount || 0})`,
     icon: 'i-heroicons-check-circle',
   },
   {
     key: 'pending',
     slot: 'pending',
-    label: `${t('editions.volunteers.pending')} (${data.value?.stats.pendingCount || 0})`,
+    label: `${t('edition.volunteers.pending')} (${data.value?.stats.pendingCount || 0})`,
     icon: 'i-heroicons-clock',
   },
 ])
@@ -374,8 +374,8 @@ const sendGroupSMS = () => {
   window.location.href = smsLink
 
   toast.add({
-    title: t('editions.volunteers.sms_app_opened'),
-    description: t('editions.volunteers.sms_app_opened_desc'),
+    title: t('edition.volunteers.sms_app_opened'),
+    description: t('edition.volunteers.sms_app_opened_desc'),
     color: 'primary',
   })
 }
@@ -395,8 +395,8 @@ const copyPhoneNumbers = async () => {
   try {
     await navigator.clipboard.writeText(phoneList)
     toast.add({
-      title: t('editions.volunteers.phone_numbers_copied'),
-      description: t('editions.volunteers.phone_numbers_copied_desc', {
+      title: t('edition.volunteers.phone_numbers_copied'),
+      description: t('edition.volunteers.phone_numbers_copied_desc', {
         count: pendingWithPhone.value.length,
       }),
       color: 'success',
@@ -405,7 +405,7 @@ const copyPhoneNumbers = async () => {
     console.error('Erreur lors de la copie:', error)
     toast.add({
       title: t('common.error'),
-      description: t('editions.volunteers.copy_error'),
+      description: t('edition.volunteers.copy_error'),
       color: 'error',
     })
   }

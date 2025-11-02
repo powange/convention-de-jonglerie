@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -16,7 +16,7 @@
       />
     </div>
     <div v-else-if="loadingSettings">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
@@ -26,10 +26,10 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-megaphone" class="text-blue-600 dark:text-blue-400" />
-          {{ $t('editions.volunteers.volunteer_form') }}
+          {{ $t('edition.volunteers.volunteer_form') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('editions.volunteers.form_description') }}
+          {{ $t('edition.volunteers.form_description') }}
         </p>
       </div>
 
@@ -41,7 +41,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-cog-6-tooth" class="text-blue-500" />
               <h2 class="text-lg font-semibold">
-                {{ $t('editions.volunteers.internal_mode_options') }}
+                {{ $t('edition.volunteers.internal_mode_options') }}
               </h2>
             </div>
 
@@ -49,7 +49,7 @@
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
-              :description="$t('editions.volunteers.internal_mode_description')"
+              :description="$t('edition.volunteers.internal_mode_description')"
             />
 
             <EditionVolunteerInternalModeOptions
@@ -75,13 +75,13 @@
           <div class="text-center py-12">
             <UIcon name="i-heroicons-megaphone" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 class="text-xl font-semibold mb-2">
-              {{ $t('editions.volunteers.volunteer_form') }}
+              {{ $t('edition.volunteers.volunteer_form') }}
             </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('editions.volunteers.internal_mode_only') }}
+              {{ $t('edition.volunteers.internal_mode_only') }}
             </p>
             <p class="text-sm text-gray-500 mt-2">
-              {{ $t('editions.volunteers.change_mode_hint') }}
+              {{ $t('edition.volunteers.change_mode_hint') }}
             </p>
           </div>
         </UCard>

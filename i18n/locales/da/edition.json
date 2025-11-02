@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Rediger medarbejderrettigheder",
     "edit_permissions": "Redigeringsrettigheder",
     "edit_permissions_desc": "Modificer konventioner i henhold til dine tilladelser",
-    "editions": "Udgaver",
+    "edition": "Udgaver",
     "features_card_subtitle": "Opdag alt, hvad du kan gøre ved at oprette eller samarbejde om konventioner",
     "features_card_title": "Hvad kan du gøre?",
     "granular_rights": "Granulære rettigheder",
@@ -157,7 +157,7 @@
     "vegan": "Vegansk",
     "vegetarian": "Vegetarisk"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "Om denne udgave",
     "add_comment_placeholder": "Tilføj en kommentar...",
     "add_lost_item": "Tilføj hittegods",

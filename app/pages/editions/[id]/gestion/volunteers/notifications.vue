@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -23,7 +23,7 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-bell" class="text-yellow-600 dark:text-yellow-400" />
-          {{ t('editions.volunteers.notifications') }}
+          {{ t('edition.volunteers.notifications') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
           Envoi et gestion des notifications aux bénévoles
@@ -67,10 +67,10 @@
           <div class="text-center py-12">
             <UIcon name="i-heroicons-lock-closed" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 class="text-xl font-semibold mb-2">
-              {{ $t('editions.volunteers.restricted_access') }}
+              {{ $t('edition.volunteers.restricted_access') }}
             </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('editions.volunteers.restricted_access_description') }}
+              {{ $t('edition.volunteers.restricted_access_description') }}
             </p>
           </div>
         </UCard>

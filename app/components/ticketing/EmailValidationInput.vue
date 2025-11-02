@@ -1,12 +1,12 @@
 <template>
   <div>
     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-      {{ $t('editions.ticketing.email') }}
+      {{ $t('edition.ticketing.email') }}
     </p>
     <UInput
       :model-value="modelValue"
       type="email"
-      :placeholder="$t('editions.ticketing.email')"
+      :placeholder="$t('edition.ticketing.email')"
       icon="i-heroicons-envelope"
       size="sm"
       :color="emailValidation.isValid ? undefined : 'error'"

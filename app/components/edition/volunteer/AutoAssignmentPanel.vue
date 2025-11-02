@@ -1,7 +1,7 @@
 <template>
   <UCollapsible class="flex flex-col gap-2 w-full">
     <UButton
-      :label="t('editions.volunteers.auto_assignment.title')"
+      :label="t('edition.volunteers.auto_assignment.title')"
       color="neutral"
       variant="subtle"
       trailing-icon="i-heroicons-sparkles"
@@ -13,10 +13,10 @@
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold flex items-center gap-2">
               <UIcon name="i-heroicons-sparkles" class="text-primary-500" />
-              {{ t('editions.volunteers.auto_assignment.title') }}
+              {{ t('edition.volunteers.auto_assignment.title') }}
             </h3>
             <UBadge color="warning" variant="soft" size="sm">
-              {{ t('editions.volunteers.auto_assignment.beta_badge') }}
+              {{ t('edition.volunteers.auto_assignment.beta_badge') }}
             </UBadge>
           </div>
         </template>
@@ -25,19 +25,19 @@
           <!-- Description -->
           <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
             <p class="text-sm text-blue-800 dark:text-blue-200">
-              {{ t('editions.volunteers.auto_assignment.description') }}
+              {{ t('edition.volunteers.auto_assignment.description') }}
             </p>
           </div>
 
           <!-- Contraintes -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.hours_per_volunteer')"
-              :help="t('editions.volunteers.auto_assignment.hours_per_volunteer_help')"
+              :label="t('edition.volunteers.auto_assignment.hours_per_volunteer')"
+              :help="t('edition.volunteers.auto_assignment.hours_per_volunteer_help')"
             >
               <UFieldGroup>
                 <UButton
-                  :label="t('editions.volunteers.auto_assignment.minimum')"
+                  :label="t('edition.volunteers.auto_assignment.minimum')"
                   disabled
                   variant="soft"
                   color="neutral"
@@ -47,10 +47,10 @@
                   type="number"
                   min="0"
                   max="12"
-                  :placeholder="t('editions.volunteers.auto_assignment.min_placeholder')"
+                  :placeholder="t('edition.volunteers.auto_assignment.min_placeholder')"
                 />
                 <UButton
-                  :label="t('editions.volunteers.auto_assignment.maximum')"
+                  :label="t('edition.volunteers.auto_assignment.maximum')"
                   disabled
                   variant="soft"
                   color="neutral"
@@ -60,18 +60,18 @@
                   type="number"
                   min="1"
                   max="24"
-                  :placeholder="t('editions.volunteers.auto_assignment.max_placeholder')"
+                  :placeholder="t('edition.volunteers.auto_assignment.max_placeholder')"
                 />
               </UFieldGroup>
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.hours_per_day')"
-              :help="t('editions.volunteers.auto_assignment.hours_per_day_help')"
+              :label="t('edition.volunteers.auto_assignment.hours_per_day')"
+              :help="t('edition.volunteers.auto_assignment.hours_per_day_help')"
             >
               <UFieldGroup>
                 <UButton
-                  :label="t('editions.volunteers.auto_assignment.minimum')"
+                  :label="t('edition.volunteers.auto_assignment.minimum')"
                   disabled
                   variant="soft"
                   color="neutral"
@@ -81,10 +81,10 @@
                   type="number"
                   min="0"
                   max="8"
-                  :placeholder="t('editions.volunteers.auto_assignment.min_placeholder')"
+                  :placeholder="t('edition.volunteers.auto_assignment.min_placeholder')"
                 />
                 <UButton
-                  :label="t('editions.volunteers.auto_assignment.maximum')"
+                  :label="t('edition.volunteers.auto_assignment.maximum')"
                   disabled
                   variant="soft"
                   color="neutral"
@@ -94,56 +94,56 @@
                   type="number"
                   min="1"
                   max="12"
-                  :placeholder="t('editions.volunteers.auto_assignment.max_placeholder')"
+                  :placeholder="t('edition.volunteers.auto_assignment.max_placeholder')"
                 />
               </UFieldGroup>
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.balance_teams')"
-              :help="t('editions.volunteers.auto_assignment.balance_teams_help')"
+              :label="t('edition.volunteers.auto_assignment.balance_teams')"
+              :help="t('edition.volunteers.auto_assignment.balance_teams_help')"
             >
               <USwitch v-model="constraints.balanceTeams" />
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.prioritize_experience')"
-              :help="t('editions.volunteers.auto_assignment.prioritize_experience_help')"
+              :label="t('edition.volunteers.auto_assignment.prioritize_experience')"
+              :help="t('edition.volunteers.auto_assignment.prioritize_experience_help')"
             >
               <USwitch v-model="constraints.prioritizeExperience" />
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.respect_availability')"
-              :help="t('editions.volunteers.auto_assignment.respect_availability_help')"
+              :label="t('edition.volunteers.auto_assignment.respect_availability')"
+              :help="t('edition.volunteers.auto_assignment.respect_availability_help')"
             >
               <USwitch v-model="constraints.respectStrictAvailability" />
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.respect_team_preferences')"
-              :help="t('editions.volunteers.auto_assignment.respect_team_preferences_help')"
+              :label="t('edition.volunteers.auto_assignment.respect_team_preferences')"
+              :help="t('edition.volunteers.auto_assignment.respect_team_preferences_help')"
             >
               <USwitch v-model="constraints.respectStrictTeamPreferences" />
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.respect_time_preferences')"
-              :help="t('editions.volunteers.auto_assignment.respect_time_preferences_help')"
+              :label="t('edition.volunteers.auto_assignment.respect_time_preferences')"
+              :help="t('edition.volunteers.auto_assignment.respect_time_preferences_help')"
             >
               <USwitch v-model="constraints.respectStrictTimePreferences" />
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.allow_overtime')"
-              :help="t('editions.volunteers.auto_assignment.allow_overtime_help')"
+              :label="t('edition.volunteers.auto_assignment.allow_overtime')"
+              :help="t('edition.volunteers.auto_assignment.allow_overtime_help')"
             >
               <USwitch v-model="constraints.allowOvertime" />
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.keep_existing')"
-              :help="t('editions.volunteers.auto_assignment.keep_existing_help')"
+              :label="t('edition.volunteers.auto_assignment.keep_existing')"
+              :help="t('edition.volunteers.auto_assignment.keep_existing_help')"
             >
               <USwitch v-model="constraints.keepExistingAssignments" />
             </UFormField>
@@ -152,15 +152,15 @@
           <!-- Heures supplémentaires maximum (si activées) -->
           <UFormField
             v-if="constraints.allowOvertime"
-            :label="t('editions.volunteers.auto_assignment.max_overtime_hours')"
-            :help="t('editions.volunteers.auto_assignment.max_overtime_help_detailed')"
+            :label="t('edition.volunteers.auto_assignment.max_overtime_hours')"
+            :help="t('edition.volunteers.auto_assignment.max_overtime_help_detailed')"
           >
             <UInput
               v-model="constraints.maxOvertimeHours"
               type="number"
               min="0"
               max="6"
-              :placeholder="t('editions.volunteers.auto_assignment.max_overtime_placeholder')"
+              :placeholder="t('edition.volunteers.auto_assignment.max_overtime_placeholder')"
             />
           </UFormField>
 
@@ -173,7 +173,7 @@
               :loading="previewLoading"
               @click="generatePreview"
             >
-              {{ t('editions.volunteers.auto_assignment.preview') }}
+              {{ t('edition.volunteers.auto_assignment.preview') }}
             </UButton>
 
             <UButton
@@ -183,7 +183,7 @@
               :loading="applyLoading"
               @click="applyAssignments"
             >
-              {{ t('editions.volunteers.auto_assignment.apply') }}
+              {{ t('edition.volunteers.auto_assignment.apply') }}
             </UButton>
 
             <UButton
@@ -199,7 +199,7 @@
 
           <!-- Résultats de l'aperçu -->
           <div v-if="previewResult" class="space-y-4">
-            <USeparator :label="t('editions.volunteers.auto_assignment.preview_results')" />
+            <USeparator :label="t('edition.volunteers.auto_assignment.preview_results')" />
 
             <!-- Statistiques -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -208,7 +208,7 @@
                   {{ previewResult.result.assignments.length }}
                 </div>
                 <div class="text-sm text-green-700 dark:text-green-300">
-                  {{ t('editions.volunteers.auto_assignment.total_assignments') }}
+                  {{ t('edition.volunteers.auto_assignment.total_assignments') }}
                 </div>
               </div>
 
@@ -217,7 +217,7 @@
                   {{ previewResult.result.stats.averageHoursPerVolunteer.toFixed(1) }}h
                 </div>
                 <div class="text-sm text-blue-700 dark:text-blue-300">
-                  {{ t('editions.volunteers.auto_assignment.average_hours') }}
+                  {{ t('edition.volunteers.auto_assignment.average_hours') }}
                 </div>
               </div>
 
@@ -226,7 +226,7 @@
                   {{ Math.round(previewResult.result.stats.satisfactionRate * 100) }}%
                 </div>
                 <div class="text-sm text-purple-700 dark:text-purple-300">
-                  {{ t('editions.volunteers.auto_assignment.satisfaction_rate') }}
+                  {{ t('edition.volunteers.auto_assignment.satisfaction_rate') }}
                 </div>
               </div>
 
@@ -235,7 +235,7 @@
                   {{ Math.round(previewResult.result.stats.balanceScore * 100) }}%
                 </div>
                 <div class="text-sm text-orange-700 dark:text-orange-300">
-                  {{ t('editions.volunteers.auto_assignment.balance_score') }}
+                  {{ t('edition.volunteers.auto_assignment.balance_score') }}
                 </div>
               </div>
             </div>
@@ -245,7 +245,7 @@
               <UAlert
                 color="warning"
                 variant="soft"
-                :title="t('editions.volunteers.auto_assignment.warnings')"
+                :title="t('edition.volunteers.auto_assignment.warnings')"
               >
                 <ul class="list-disc list-inside space-y-1">
                   <li v-for="warning in previewResult.result.warnings" :key="warning">
@@ -260,7 +260,7 @@
               <UAlert
                 color="info"
                 variant="soft"
-                :title="t('editions.volunteers.auto_assignment.recommendations')"
+                :title="t('edition.volunteers.auto_assignment.recommendations')"
               >
                 <ul class="list-disc list-inside space-y-1">
                   <li
@@ -277,7 +277,7 @@
             <UCard>
               <template #header>
                 <h4 class="font-medium">
-                  {{ t('editions.volunteers.auto_assignment.assignment_details') }}
+                  {{ t('edition.volunteers.auto_assignment.assignment_details') }}
                 </h4>
               </template>
 
@@ -339,14 +339,14 @@
               <UCard>
                 <template #header>
                   <h4 class="font-medium text-orange-600">
-                    {{ t('editions.volunteers.auto_assignment.unassigned') }}
+                    {{ t('edition.volunteers.auto_assignment.unassigned') }}
                   </h4>
                 </template>
 
                 <div class="space-y-4">
                   <div v-if="previewResult.result.unassigned.volunteers.length > 0">
                     <h5 class="text-sm font-medium mb-2">
-                      {{ t('editions.volunteers.auto_assignment.unassigned_volunteers') }}
+                      {{ t('edition.volunteers.auto_assignment.unassigned_volunteers') }}
                     </h5>
                     <div class="flex flex-wrap gap-2">
                       <UBadge
@@ -362,7 +362,7 @@
 
                   <div v-if="previewResult.result.unassigned.slots.length > 0">
                     <h5 class="text-sm font-medium mb-2">
-                      {{ t('editions.volunteers.auto_assignment.unassigned_slots') }}
+                      {{ t('edition.volunteers.auto_assignment.unassigned_slots') }}
                     </h5>
                     <div class="flex flex-wrap gap-2">
                       <UBadge
@@ -538,7 +538,7 @@ const generatePreview = async () => {
     previewResult.value = response
 
     toast.add({
-      title: t('editions.volunteers.auto_assignment.preview_generated'),
+      title: t('edition.volunteers.auto_assignment.preview_generated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -563,9 +563,9 @@ const applyAssignments = async () => {
   const confirmed = await new Promise<boolean>((resolve) => {
     const assignmentsCount = previewResult.value?.result.assignments.length || 0
     const confirmKey = constraints.value.keepExistingAssignments
-      ? 'editions.volunteers.auto_assignment.confirm_apply_keep_existing'
-      : 'editions.volunteers.auto_assignment.confirm_apply'
-    const message = `${t(confirmKey)}\n\n${t('editions.volunteers.auto_assignment.confirm_details', { count: assignmentsCount })}`
+      ? 'edition.volunteers.auto_assignment.confirm_apply_keep_existing'
+      : 'edition.volunteers.auto_assignment.confirm_apply'
+    const message = `${t(confirmKey)}\n\n${t('edition.volunteers.auto_assignment.confirm_details', { count: assignmentsCount })}`
 
     resolve(confirm(message))
   })
@@ -583,8 +583,8 @@ const applyAssignments = async () => {
     })
 
     toast.add({
-      title: t('editions.volunteers.auto_assignment.assignments_applied'),
-      description: t('editions.volunteers.auto_assignment.assignments_applied_description'),
+      title: t('edition.volunteers.auto_assignment.assignments_applied'),
+      description: t('edition.volunteers.auto_assignment.assignments_applied_description'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })

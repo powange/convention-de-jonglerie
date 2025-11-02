@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Editar derechos del colaborador",
     "edit_permissions": "Permisos de edición",
     "edit_permissions_desc": "Edita convenciones según tus permisos",
-    "editions": "Ediciones",
+    "edition": "Ediciones",
     "features_card_subtitle": "Descubre todo lo que puedes hacer creando o colaborando en convenciones",
     "features_card_title": "¿Qué puedes hacer?",
     "granular_rights": "Derechos granulares",
@@ -157,7 +157,7 @@
     "vegan": "Vegano",
     "vegetarian": "Vegetariano"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "Acerca de esta edición",
     "add_comment_placeholder": "Agregar un comentario...",
     "add_lost_item": "Agregar objeto perdido",

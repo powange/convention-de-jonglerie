@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -219,7 +219,7 @@ const handleSlotUpdate = async (data: {
       maxVolunteers: data.maxVolunteers,
     })
     toast.add({
-      title: t('editions.volunteers.slot_updated'),
+      title: t('edition.volunteers.slot_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -239,11 +239,11 @@ const handleSlotUpdate = async (data: {
 }
 
 const handleSlotDelete = async (slotId: string) => {
-  if (confirm(t('editions.volunteers.confirm_delete_slot'))) {
+  if (confirm(t('edition.volunteers.confirm_delete_slot'))) {
     try {
       await deleteTimeSlot(slotId)
       toast.add({
-        title: t('editions.volunteers.slot_deleted'),
+        title: t('edition.volunteers.slot_deleted'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -277,7 +277,7 @@ const handleSlotSave = async (slotData: any) => {
         maxVolunteers: slotData.maxVolunteers,
       })
       toast.add({
-        title: t('editions.volunteers.slot_updated'),
+        title: t('edition.volunteers.slot_updated'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -292,7 +292,7 @@ const handleSlotSave = async (slotData: any) => {
         maxVolunteers: slotData.maxVolunteers,
       })
       toast.add({
-        title: t('editions.volunteers.slot_created'),
+        title: t('edition.volunteers.slot_created'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })

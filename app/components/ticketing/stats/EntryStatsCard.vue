@@ -3,7 +3,7 @@
     <div class="space-y-4">
       <div class="flex items-center gap-2">
         <UIcon name="i-heroicons-chart-bar" class="text-purple-500" />
-        <h2 class="text-lg font-semibold">{{ $t('editions.ticketing.entry_stats') }}</h2>
+        <h2 class="text-lg font-semibold">{{ $t('edition.ticketing.entry_stats') }}</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -11,14 +11,14 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ $t('editions.ticketing.total_entries') }}
+                {{ $t('edition.ticketing.total_entries') }}
               </p>
               <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {{ stats.totalValidated }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
                 {{ stats.validatedToday }}
-                {{ $t('editions.ticketing.validated_today').toLowerCase() }}
+                {{ $t('edition.ticketing.validated_today').toLowerCase() }}
               </p>
             </div>
             <UIcon name="i-heroicons-users" class="text-blue-500" size="32" />

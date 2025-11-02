@@ -1,7 +1,7 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="$t('editions.ticketing.qr_modal_title')"
+    :title="$t('edition.ticketing.qr_modal_title')"
     :ui="{ width: 'sm:max-w-md' }"
   >
     <template #body>
@@ -16,9 +16,9 @@
               class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
             />
             <div class="text-sm text-blue-700 dark:text-blue-300">
-              <p class="font-medium mb-1">{{ $t('editions.ticketing.qr_how_to_use') }}</p>
+              <p class="font-medium mb-1">{{ $t('edition.ticketing.qr_how_to_use') }}</p>
               <p>
-                {{ $t('editions.ticketing.qr_instructions') }}
+                {{ $t('edition.ticketing.qr_instructions') }}
               </p>
             </div>
           </div>
@@ -35,7 +35,7 @@
         <!-- Informations de l'application -->
         <div v-if="application" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
           <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-            {{ $t('editions.ticketing.qr_details') }}
+            {{ $t('edition.ticketing.qr_details') }}
           </h4>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">

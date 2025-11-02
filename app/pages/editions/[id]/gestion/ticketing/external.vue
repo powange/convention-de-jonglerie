@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -152,7 +152,7 @@
                     1
                   </div>
                   <h3 class="font-semibold text-base">
-                    {{ $t('editions.ticketing.api_credentials') }}
+                    {{ $t('edition.ticketing.api_credentials') }}
                   </h3>
                 </div>
 
@@ -186,13 +186,13 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <UFormField
-                    :label="$t('editions.ticketing.client_id_label')"
+                    :label="$t('edition.ticketing.client_id_label')"
                     hint="Identifiant public de votre client API"
                     required
                   >
                     <UInput
                       v-model="helloAssoClientId"
-                      :placeholder="$t('editions.ticketing.client_id_placeholder')"
+                      :placeholder="$t('edition.ticketing.client_id_placeholder')"
                       icon="i-heroicons-key"
                       type="text"
                       size="lg"
@@ -201,13 +201,13 @@
                   </UFormField>
 
                   <UFormField
-                    :label="$t('editions.ticketing.client_secret_label')"
+                    :label="$t('edition.ticketing.client_secret_label')"
                     hint="Clé secrète (chiffrée après enregistrement)"
                     required
                   >
                     <UInput
                       v-model="helloAssoClientSecret"
-                      :placeholder="$t('editions.ticketing.client_secret_placeholder')"
+                      :placeholder="$t('edition.ticketing.client_secret_placeholder')"
                       icon="i-heroicons-lock-closed"
                       type="password"
                       size="lg"
@@ -226,7 +226,7 @@
                     2
                   </div>
                   <h3 class="font-semibold text-base">
-                    {{ $t('editions.ticketing.identify_form') }}
+                    {{ $t('edition.ticketing.identify_form') }}
                   </h3>
                 </div>
 
@@ -235,7 +235,7 @@
                 >
                   <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <span class="font-medium">{{
-                      $t('editions.ticketing.helloasso_url_example')
+                      $t('edition.ticketing.helloasso_url_example')
                     }}</span>
                   </p>
                   <code
@@ -244,46 +244,46 @@
                     https://www.helloasso.com/associations/<span
                       class="text-primary-600 font-semibold"
                       >slug-organisation</span
-                    >{{ $t('editions.ticketing.helloasso_url_path')
+                    >{{ $t('edition.ticketing.helloasso_url_path')
                     }}<span class="text-primary-600 font-semibold">slug-formulaire</span>
                   </code>
                 </div>
 
                 <div class="space-y-4">
                   <UFormField
-                    :label="$t('editions.ticketing.organization_slug_label')"
+                    :label="$t('edition.ticketing.organization_slug_label')"
                     hint="Le nom de votre association dans l'URL"
                     required
                   >
                     <UInput
                       v-model="helloAssoOrganizationSlug"
-                      :placeholder="$t('editions.ticketing.organization_slug_placeholder')"
+                      :placeholder="$t('edition.ticketing.organization_slug_placeholder')"
                       icon="i-heroicons-building-office"
                       size="lg"
                     />
                   </UFormField>
 
                   <UFormField
-                    :label="$t('editions.ticketing.form_type_label')"
+                    :label="$t('edition.ticketing.form_type_label')"
                     hint="Le type visible dans l'URL HelloAsso"
                     required
                   >
                     <USelect
                       v-model="helloAssoFormType"
                       :items="formTypeOptions"
-                      :placeholder="$t('editions.ticketing.form_type_placeholder')"
+                      :placeholder="$t('edition.ticketing.form_type_placeholder')"
                       size="lg"
                     />
                   </UFormField>
 
                   <UFormField
-                    :label="$t('editions.ticketing.form_slug_label')"
+                    :label="$t('edition.ticketing.form_slug_label')"
                     hint="Le nom de votre formulaire dans l'URL"
                     required
                   >
                     <UInput
                       v-model="helloAssoFormSlug"
-                      :placeholder="$t('editions.ticketing.form_slug_placeholder')"
+                      :placeholder="$t('edition.ticketing.form_slug_placeholder')"
                       icon="i-heroicons-document-text"
                       size="lg"
                     />
@@ -325,10 +325,10 @@
                 <div class="flex items-center gap-2">
                   <div>
                     <h3 class="font-semibold text-base">
-                      {{ $t('editions.ticketing.tiers_options_participants') }}
+                      {{ $t('edition.ticketing.tiers_options_participants') }}
                     </h3>
                     <p class="text-xs text-gray-500">
-                      {{ $t('editions.ticketing.load_data_from_helloasso') }}
+                      {{ $t('edition.ticketing.load_data_from_helloasso') }}
                     </p>
                   </div>
                 </div>

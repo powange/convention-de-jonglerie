@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Edytuj uprawnienia współpracownika",
     "edit_permissions": "Uprawnienia edycyjne",
     "edit_permissions_desc": "Modyfikuj konwencje zgodnie z twoimi uprawnieniami",
-    "editions": "Edycje",
+    "edition": "Edycje",
     "features_card_subtitle": "Odkryj wszystko, co możesz robić, tworząc lub współpracując przy konwencjach",
     "features_card_title": "Co możesz zrobić?",
     "granular_rights": "Szczegółowe uprawnienia",
@@ -157,7 +157,7 @@
     "vegan": "Wegański",
     "vegetarian": "Wegetariański"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "O tej edycji",
     "add_comment_placeholder": "Dodaj komentarz...",
     "add_lost_item": "Dodaj znalezioną rzecz",

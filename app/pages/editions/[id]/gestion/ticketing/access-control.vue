@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -36,7 +36,7 @@
           class="sm:flex-shrink-0"
           @click="showAddParticipantModal = true"
         >
-          {{ $t('editions.ticketing.add_participant') }}
+          {{ $t('edition.ticketing.add_participant') }}
         </UButton>
       </div>
 
@@ -59,7 +59,7 @@
                 </div>
                 <div>
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ $t('editions.ticketing.scan_ticket') }}
+                    {{ $t('edition.ticketing.scan_ticket') }}
                   </h2>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     Scannez ou saisissez le code
@@ -90,13 +90,13 @@
                   <UFieldGroup class="w-full">
                     <UInput
                       v-model="ticketCode"
-                      :placeholder="$t('editions.ticketing.ticket_code_placeholder')"
+                      :placeholder="$t('edition.ticketing.ticket_code_placeholder')"
                       icon="i-heroicons-ticket"
                       class="w-full"
                       @keydown.enter="validateTicket"
                     />
                     <UButton
-                      :label="$t('editions.ticketing.validate_ticket')"
+                      :label="$t('edition.ticketing.validate_ticket')"
                       icon="i-heroicons-check-circle"
                       color="success"
                       :disabled="!ticketCode"
@@ -330,7 +330,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="text-orange-500" />
               <h2 class="text-lg font-semibold">
-                {{ $t('editions.ticketing.recent_validations') }}
+                {{ $t('edition.ticketing.recent_validations') }}
               </h2>
             </div>
 
@@ -343,7 +343,7 @@
               class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
             >
               <UIcon name="i-heroicons-ticket" class="mx-auto h-12 w-12 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">{{ $t('editions.ticketing.no_validation_yet') }}</p>
+              <p class="text-sm text-gray-500">{{ $t('edition.ticketing.no_validation_yet') }}</p>
             </div>
 
             <div v-else class="space-y-2">
@@ -425,11 +425,7 @@
       >
         <template #body>
           <div class="space-y-4">
-            <UAlert
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-            >
+            <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
               <template #description>
                 Liste des bénévoles acceptés qui n'ont pas encore scanné leur billet au contrôle
                 d'accès.
@@ -448,9 +444,7 @@
                 name="i-heroicons-check-circle"
                 class="mx-auto h-12 w-12 text-green-400 mb-2"
               />
-              <p class="text-sm text-gray-500">
-                Tous les bénévoles ont validé leur billet !
-              </p>
+              <p class="text-sm text-gray-500">Tous les bénévoles ont validé leur billet !</p>
             </div>
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -496,7 +490,11 @@
               }}
               non validé{{ volunteersNotValidated.length > 1 ? 's' : '' }}
             </p>
-            <UButton color="neutral" variant="soft" @click="volunteersNotValidatedModalOpen = false">
+            <UButton
+              color="neutral"
+              variant="soft"
+              @click="volunteersNotValidatedModalOpen = false"
+            >
               Fermer
             </UButton>
           </div>
@@ -504,7 +502,10 @@
       </UModal>
 
       <!-- Modal liste des artistes non validés -->
-      <UModal v-model:open="artistsNotValidatedModalOpen" title="Artistes n'ayant pas validé leur billet">
+      <UModal
+        v-model:open="artistsNotValidatedModalOpen"
+        title="Artistes n'ayant pas validé leur billet"
+      >
         <template #body>
           <div class="space-y-4">
             <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
@@ -521,7 +522,10 @@
               v-else-if="artistsNotValidated.length === 0"
               class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
             >
-              <UIcon name="i-heroicons-check-circle" class="mx-auto h-12 w-12 text-green-400 mb-2" />
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="mx-auto h-12 w-12 text-green-400 mb-2"
+              />
               <p class="text-sm text-gray-500">Tous les artistes ont validé leur billet !</p>
             </div>
 

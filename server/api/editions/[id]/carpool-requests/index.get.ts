@@ -1,8 +1,11 @@
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { createError, getQuery } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(event.context.params?.id as string)
+  const query = getQuery(event) || {}
+  const includeArchived = query.includeArchived === 'true'
 
   if (!editionId) {
     throw createError({
@@ -12,9 +15,13 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    const now = new Date()
+
     const carpoolRequests = await prisma.carpoolRequest.findMany({
       where: {
         editionId,
+        // Filtrer les covoiturages passés si includeArchived est false
+        ...(includeArchived ? {} : { tripDate: { gte: now } }),
       },
       include: {
         user: true,

@@ -7,14 +7,14 @@
       <!-- Actions et message d'information -->
       <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
-          <h1 class="text-3xl font-bold">{{ $t('editions.lost_found') }}</h1>
+          <h1 class="text-3xl font-bold">{{ $t('edition.lost_found') }}</h1>
           <UButton
             v-if="canAddLostFound"
             icon="i-heroicons-plus"
             color="primary"
             @click="showAddModal = true"
           >
-            {{ $t('editions.add_lost_item') }}
+            {{ $t('edition.add_lost_item') }}
           </UButton>
         </div>
 
@@ -27,15 +27,13 @@
             :icon="showReturned ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
             @click="toggleShowReturned"
           >
-            {{
-              showReturned ? t('editions.hide_returned_items') : t('editions.show_returned_items')
-            }}
+            {{ showReturned ? t('edition.hide_returned_items') : t('edition.show_returned_items') }}
           </UButton>
         </div>
 
         <!-- Message d'information -->
         <UAlert v-if="!hasEditionStarted" icon="i-heroicons-information-circle" color="info">
-          {{ $t('editions.lost_found_before_start') }}
+          {{ $t('edition.lost_found_before_start') }}
         </UAlert>
       </div>
 
@@ -64,7 +62,7 @@
                   :color="item.status === 'RETURNED' ? 'success' : 'warning'"
                   :variant="item.status === 'RETURNED' ? 'soft' : 'solid'"
                 >
-                  {{ item.status === 'RETURNED' ? t('editions.returned') : t('editions.lost') }}
+                  {{ item.status === 'RETURNED' ? t('edition.returned') : t('edition.lost') }}
                 </UBadge>
                 <UButton
                   v-if="canEditLostFound"
@@ -78,16 +76,16 @@
                   "
                   :aria-label="
                     item.status === 'RETURNED'
-                      ? t('editions.mark_as_lost')
-                      : t('editions.mark_as_returned')
+                      ? t('edition.mark_as_lost')
+                      : t('edition.mark_as_returned')
                   "
                   class="flex items-center gap-1"
                   @click="toggleStatus(item.id)"
                 >
                   {{
                     item.status === 'RETURNED'
-                      ? t('editions.mark_as_lost')
-                      : t('editions.mark_as_returned')
+                      ? t('edition.mark_as_lost')
+                      : t('edition.mark_as_returned')
                   }}
                 </UButton>
               </div>
@@ -133,7 +131,7 @@
               <div v-if="authStore.isAuthenticated" class="flex gap-3">
                 <UInput
                   v-model="commentContents[item.id]"
-                  :placeholder="t('editions.add_comment_placeholder')"
+                  :placeholder="t('edition.add_comment_placeholder')"
                   class="flex-1"
                   @keyup.enter="postComment(item.id)"
                 />
@@ -157,15 +155,15 @@
         <UIcon name="i-heroicons-magnifying-glass" class="w-14 h-14 text-gray-400" />
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ $t('editions.no_lost_items') }}
+            {{ $t('edition.no_lost_items') }}
           </h3>
           <p class="text-gray-500 max-w-prose">
             {{
               !hasEditionStarted
-                ? t('editions.items_appear_when_started')
+                ? t('edition.items_appear_when_started')
                 : lostFoundItems.length > 0
-                  ? t('editions.no_items_reported')
-                  : t('editions.no_items_reported')
+                  ? t('edition.no_items_reported')
+                  : t('edition.no_items_reported')
             }}
           </p>
         </div>
@@ -175,7 +173,7 @@
       <!-- Modal d'ajout d'objet trouvé -->
       <UModal v-model:open="showAddModal">
         <template #header>
-          <h3 class="text-lg font-semibold">{{ $t('editions.add_lost_item') }}</h3>
+          <h3 class="text-lg font-semibold">{{ $t('edition.add_lost_item') }}</h3>
         </template>
 
         <template #body>
@@ -183,14 +181,14 @@
             <UFormField :label="t('common.description')" required class="w-full">
               <UTextarea
                 v-model="newItem.description"
-                :placeholder="t('editions.describe_lost_item')"
+                :placeholder="t('edition.describe_lost_item')"
                 :rows="4"
                 class="w-full"
                 autoresize
               />
             </UFormField>
 
-            <UFormField :label="t('editions.photo_optional')">
+            <UFormField :label="t('edition.photo_optional')">
               <UiImageUpload
                 v-model="newItem.imageUrl"
                 :endpoint="{ type: 'lost-found', id: editionId }"
@@ -203,7 +201,7 @@
                   resetAfterUpload: false,
                 }"
                 :alt="$t('pages.objets_trouves.photo_alt')"
-                :placeholder="t('editions.choose_photo')"
+                :placeholder="t('edition.choose_photo')"
                 :allow-delete="false"
                 @uploaded="onImageUploaded"
                 @error="onImageError"
@@ -232,7 +230,7 @@
       <!-- Modal d'affichage d'image -->
       <UModal v-model:open="showImageModalState" size="xl">
         <template #body>
-          <img :src="currentImageUrl" :alt="t('editions.enlarged_image')" class="w-full" />
+          <img :src="currentImageUrl" :alt="t('edition.enlarged_image')" class="w-full" />
         </template>
       </UModal>
     </div>
@@ -317,7 +315,7 @@ const fetchLostFoundItems = async () => {
     toast.add({
       color: 'error',
       title: t('common.error'),
-      description: t('editions.cannot_load_lost_items'),
+      description: t('edition.cannot_load_lost_items'),
     })
   } finally {
     loading.value = false
@@ -355,13 +353,13 @@ const postComment = async (itemId: number) => {
 
     toast.add({
       color: 'success',
-      title: t('editions.comment_added'),
+      title: t('edition.comment_added'),
     })
   } catch {
     toast.add({
       color: 'error',
       title: t('common.error'),
-      description: t('editions.cannot_add_comment'),
+      description: t('edition.cannot_add_comment'),
     })
   }
 }
@@ -385,14 +383,14 @@ const toggleStatus = async (itemId: number) => {
       color: 'success',
       title:
         updatedItem.status === 'RETURNED'
-          ? t('editions.item_marked_returned')
-          : t('editions.item_marked_lost'),
+          ? t('edition.item_marked_returned')
+          : t('edition.item_marked_lost'),
     })
   } catch {
     toast.add({
       color: 'error',
       title: t('common.error'),
-      description: t('editions.cannot_change_status'),
+      description: t('edition.cannot_change_status'),
     })
   }
 }
@@ -403,7 +401,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
     newItem.value.imageUrl = result.imageUrl
     toast.add({
       color: 'success',
-      title: t('editions.photo_uploaded'),
+      title: t('edition.photo_uploaded'),
     })
   }
 }
@@ -412,7 +410,7 @@ const onImageError = (error: string) => {
   toast.add({
     color: 'error',
     title: t('common.error'),
-    description: error || t('editions.cannot_upload_photo'),
+    description: error || t('edition.cannot_upload_photo'),
   })
 }
 
@@ -438,14 +436,14 @@ const submitNewItem = async () => {
 
     toast.add({
       color: 'success',
-      title: t('editions.lost_item_added'),
+      title: t('edition.lost_item_added'),
     })
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } } | undefined
     toast.add({
       color: 'error',
       title: t('common.error'),
-      description: err?.data?.message || t('editions.cannot_add_item'),
+      description: err?.data?.message || t('edition.cannot_add_item'),
     })
   } finally {
     submittingItem.value = false

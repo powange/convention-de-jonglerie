@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Редактировать права сотрудника",
     "edit_permissions": "Права редактирования",
     "edit_permissions_desc": "Изменяйте конвенции согласно вашим разрешениям",
-    "editions": "Издания",
+    "edition": "Издания",
     "features_card_subtitle": "Откройте для себя все, что вы можете делать, создавая или участвуя в конвенциях",
     "features_card_title": "Что вы можете делать?",
     "granular_rights": "Детальные права",
@@ -157,7 +157,7 @@
     "vegan": "Веганский",
     "vegetarian": "Вегетарианский"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "Об этом издании",
     "add_comment_placeholder": "Добавить комментарий...",
     "add_lost_item": "Добавить потерянную вещь",

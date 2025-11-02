@@ -58,7 +58,7 @@
                     v-if="!meal.eligible"
                     class="text-xs text-orange-600 dark:text-orange-400 mt-1"
                   >
-                    {{ $t('editions.volunteers.meals.not_eligible_reason') }}
+                    {{ $t('edition.volunteers.meals.not_eligible_reason') }}
                   </p>
                 </div>
               </div>

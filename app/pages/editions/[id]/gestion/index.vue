@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -41,7 +41,7 @@
                 variant="soft"
                 @click="toggleOnlineStatus(false)"
               >
-                {{ $t('editions.set_offline') }}
+                {{ $t('edition.set_offline') }}
               </UButton>
               <UButton
                 v-else-if="canEdit && !edition.isOnline"
@@ -49,7 +49,7 @@
                 color="primary"
                 @click="toggleOnlineStatus(true)"
               >
-                {{ $t('editions.set_online') }}
+                {{ $t('edition.set_online') }}
               </UButton>
               <UButton
                 v-if="canDelete"
@@ -124,7 +124,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
               <h2 class="text-lg font-semibold">
-                {{ $t('editions.ticketing.volunteer_management') }}
+                {{ $t('edition.ticketing.volunteer_management') }}
               </h2>
             </div>
 
@@ -230,8 +230,8 @@
                 >
                   {{
                     volunteersOpenLocal
-                      ? $t('editions.volunteers.open')
-                      : $t('editions.volunteers.closed_message')
+                      ? $t('edition.volunteers.open')
+                      : $t('edition.volunteers.closed_message')
                   }}
                 </span>
               </div>
@@ -243,8 +243,8 @@
                 v-if="canEdit || canManageVolunteers"
                 :to="`/editions/${edition.id}/gestion/volunteers/page`"
                 icon="i-heroicons-clipboard-document-list"
-                :title="$t('editions.volunteers.volunteer_page')"
-                :description="$t('editions.volunteers.page_description')"
+                :title="$t('edition.volunteers.volunteer_page')"
+                :description="$t('edition.volunteers.page_description')"
                 color="indigo"
               />
 
@@ -255,8 +255,8 @@
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/form`"
                   icon="i-heroicons-megaphone"
-                  :title="$t('editions.volunteers.volunteer_form')"
-                  :description="$t('editions.volunteers.form_description')"
+                  :title="$t('edition.volunteers.volunteer_form')"
+                  :description="$t('edition.volunteers.form_description')"
                   color="blue"
                 />
 
@@ -265,7 +265,7 @@
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/applications`"
                   icon="i-heroicons-document-text"
-                  :title="$t('editions.volunteers.application_management')"
+                  :title="$t('edition.volunteers.application_management')"
                   :description="$t('gestion.volunteers.applications_description')"
                   color="green"
                 />
@@ -275,7 +275,7 @@
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/teams`"
                   icon="i-heroicons-user-group"
-                  :title="$t('editions.volunteers.teams')"
+                  :title="$t('edition.volunteers.teams')"
                   :description="$t('gestion.volunteers.teams_description')"
                   color="purple"
                 />
@@ -285,7 +285,7 @@
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/planning`"
                   icon="i-heroicons-calendar-days"
-                  :title="$t('editions.volunteers.planning')"
+                  :title="$t('edition.volunteers.planning')"
                   :description="$t('gestion.volunteers.planning_description')"
                   color="orange"
                 />
@@ -295,7 +295,7 @@
                   v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
                   :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
                   icon="i-heroicons-bell"
-                  :title="$t('editions.volunteers.volunteer_notifications')"
+                  :title="$t('edition.volunteers.volunteer_notifications')"
                   :description="$t('gestion.volunteers.notifications_description')"
                   color="yellow"
                 />
@@ -305,7 +305,7 @@
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/tools`"
                   icon="i-heroicons-wrench-screwdriver"
-                  :title="$t('editions.volunteers.management_tools')"
+                  :title="$t('edition.volunteers.management_tools')"
                   :description="$t('gestion.volunteers.tools_description')"
                   color="gray"
                 />
@@ -609,7 +609,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
-                <h2 class="text-lg font-semibold">{{ $t('editions.lost_found') }}</h2>
+                <h2 class="text-lg font-semibold">{{ $t('edition.lost_found') }}</h2>
               </div>
               <UButton
                 v-if="hasEditionStarted"
@@ -625,8 +625,8 @@
 
             <div v-if="!hasEditionStarted">
               <UAlert
-                :title="t('editions.lost_found_before_start')"
-                :description="t('editions.items_appear_when_started')"
+                :title="t('edition.lost_found_before_start')"
+                :description="t('edition.items_appear_when_started')"
                 icon="i-heroicons-clock"
                 color="warning"
                 variant="subtle"
@@ -1428,7 +1428,7 @@ const toggleOnlineStatus = async (isOnline: boolean) => {
     // Also update in store
     await editionStore.fetchEditionById(editionId, { force: true })
 
-    const message = isOnline ? t('editions.edition_published') : t('editions.edition_set_offline')
+    const message = isOnline ? t('edition.edition_published') : t('edition.edition_set_offline')
     toast.add({
       title: message,
       icon: 'i-heroicons-check-circle',

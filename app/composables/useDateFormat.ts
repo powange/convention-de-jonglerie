@@ -105,10 +105,10 @@ export const useDateFormat = () => {
 
       // Traduction des granularités
       const timeTranslations: Record<string, string> = {
-        morning: t('editions.volunteers.time_granularity.morning'),
-        noon: t('editions.volunteers.time_granularity.noon'),
-        afternoon: t('editions.volunteers.time_granularity.afternoon'),
-        evening: t('editions.volunteers.time_granularity.evening'),
+        morning: t('edition.volunteers.time_granularity.morning'),
+        noon: t('edition.volunteers.time_granularity.noon'),
+        afternoon: t('edition.volunteers.time_granularity.afternoon'),
+        evening: t('edition.volunteers.time_granularity.evening'),
       }
 
       const timeFormatted = timeTranslations[timePart] || timePart

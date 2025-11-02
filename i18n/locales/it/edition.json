@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Modifica diritti del collaboratore",
     "edit_permissions": "Permessi di modifica",
     "edit_permissions_desc": "Modifica i convegni secondo i tuoi permessi",
-    "editions": "Edizioni",
+    "edition": "Edizioni",
     "features_card_subtitle": "Scopri tutto quello che puoi fare creando o collaborando ai convegni",
     "features_card_title": "Cosa puoi fare?",
     "granular_rights": "Diritti granulari",
@@ -157,7 +157,7 @@
     "vegan": "Vegano",
     "vegetarian": "Vegetariano"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "A proposito di questa edizione",
     "add_comment_placeholder": "Aggiungi un commento...",
     "add_lost_item": "Aggiungi oggetto smarrito",

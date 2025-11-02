@@ -1,8 +1,8 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="$t('editions.ticketing.participant_modal_title')"
-    :description="$t('editions.ticketing.participant_modal_description')"
+    :title="$t('edition.ticketing.participant_modal_title')"
+    :description="$t('edition.ticketing.participant_modal_description')"
     :ui="{ width: 'sm:max-w-2xl' }"
   >
     <template #body>
@@ -29,7 +29,7 @@
                 class="text-purple-600 dark:text-purple-400"
               />
               <h4 class="font-semibold text-gray-900 dark:text-white">
-                {{ $t('editions.ticketing.order') }}
+                {{ $t('edition.ticketing.order') }}
               </h4>
             </div>
             <!-- Logo HelloAsso si c'est une commande HelloAsso -->
@@ -44,7 +44,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.buyer') }}
+                {{ $t('edition.ticketing.buyer') }}
               </p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
                 {{ participant.ticket.order.payer.firstName }}
@@ -53,7 +53,7 @@
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.buyer_email') }}
+                {{ $t('edition.ticketing.buyer_email') }}
               </p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
                 {{ participant.ticket.order.payer.email }}
@@ -64,7 +64,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-if="participant.ticket.order.id">
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.order_id') }}
+                {{ $t('edition.ticketing.order_id') }}
               </p>
               <p class="text-sm font-mono font-medium text-gray-900 dark:text-white">
                 #{{ participant.ticket.order.id }}
@@ -108,7 +108,7 @@
             <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
             <h4 class="font-semibold text-gray-900 dark:text-white">
               {{
-                participantItems.length > 1 ? 'Participants' : $t('editions.ticketing.participant')
+                participantItems.length > 1 ? 'Participants' : $t('edition.ticketing.participant')
               }}
             </h4>
           </div>
@@ -167,7 +167,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('editions.ticketing.full_name') }}
+                        {{ $t('edition.ticketing.full_name') }}
                       </p>
                       <p
                         class="text-sm font-medium"
@@ -182,7 +182,7 @@
                     </div>
                     <div>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('editions.ticketing.email') }}
+                        {{ $t('edition.ticketing.email') }}
                       </p>
                       <p
                         class="text-sm font-medium"
@@ -215,7 +215,7 @@
                       </div>
                       <div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                          {{ $t('editions.ticketing.amount') }}
+                          {{ $t('edition.ticketing.amount') }}
                         </p>
                         <p
                           class="text-sm font-medium"
@@ -350,7 +350,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('editions.ticketing.full_name') }}
+                      {{ $t('edition.ticketing.full_name') }}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ item.firstName || '-' }} {{ item.lastName || '-' }}
@@ -358,7 +358,7 @@
                   </div>
                   <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('editions.ticketing.email') }}
+                      {{ $t('edition.ticketing.email') }}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ item.email || '-' }}
@@ -377,7 +377,7 @@
                     </div>
                     <div>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('editions.ticketing.amount') }}
+                        {{ $t('edition.ticketing.amount') }}
                       </p>
                       <p class="text-sm font-medium text-pink-600 dark:text-pink-400">
                         {{ (item.amount / 100).toFixed(2) }} €
@@ -409,7 +409,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('editions.ticketing.full_name') }}
+                      {{ $t('edition.ticketing.full_name') }}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ item.firstName || '-' }} {{ item.lastName || '-' }}
@@ -417,7 +417,7 @@
                   </div>
                   <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('editions.ticketing.email') }}
+                      {{ $t('edition.ticketing.email') }}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ item.email || '-' }}
@@ -436,7 +436,7 @@
                     </div>
                     <div>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('editions.ticketing.amount') }}
+                        {{ $t('edition.ticketing.amount') }}
                       </p>
                       <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
                         {{ (item.amount / 100).toFixed(2) }} €
@@ -468,7 +468,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('editions.ticketing.full_name') }}
+                      {{ $t('edition.ticketing.full_name') }}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ item.firstName || '-' }} {{ item.lastName || '-' }}
@@ -476,7 +476,7 @@
                   </div>
                   <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {{ $t('editions.ticketing.email') }}
+                      {{ $t('edition.ticketing.email') }}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ item.email || '-' }}
@@ -495,7 +495,7 @@
                     </div>
                     <div>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {{ $t('editions.ticketing.amount') }}
+                        {{ $t('edition.ticketing.amount') }}
                       </p>
                       <p class="text-sm font-medium text-purple-600 dark:text-purple-400">
                         {{ (item.amount / 100).toFixed(2) }} €
@@ -546,7 +546,7 @@
       <!-- Message si aucun participant -->
       <div v-else class="py-8 text-center">
         <UIcon name="i-heroicons-user-circle" class="mx-auto h-16 w-16 text-gray-400 mb-3" />
-        <p class="text-gray-500">{{ $t('editions.ticketing.no_info_available') }}</p>
+        <p class="text-gray-500">{{ $t('edition.ticketing.no_info_available') }}</p>
       </div>
     </template>
 

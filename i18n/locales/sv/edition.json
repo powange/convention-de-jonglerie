@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Ändring av anställdas rättigheter",
     "edit_permissions": "Ändra behörigheter",
     "edit_permissions_desc": "Ändra konventioner enligt dina behörigheter",
-    "editions": "Publicerad av",
+    "edition": "Publicerad av",
     "features_card_subtitle": "Upptäck allt du kan göra genom att skapa eller samarbeta kring konventioner",
     "features_card_title": "Vad kan du göra?",
     "granular_rights": "Granulära rättigheter",
@@ -157,7 +157,7 @@
     "vegan": "Vegansk",
     "vegetarian": "Vegetarisk"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "Om denna utgåva",
     "add_comment_placeholder": "Lägg till en kommentar...",
     "add_lost_item": "Lägg till ett upphittat objekt",

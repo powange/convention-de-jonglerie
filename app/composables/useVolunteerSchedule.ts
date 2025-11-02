@@ -98,7 +98,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     return [
       {
         id: 'unassigned',
-        title: t('editions.volunteers.unassigned_slots'),
+        title: t('edition.volunteers.unassigned_slots'),
         eventColor: '#6b7280', // gris
       },
       ...teamResources,
@@ -108,7 +108,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   // Conversion des créneaux en événements FullCalendar
   const events = computed((): EventInput[] => {
     return unref(timeSlots).map((slot) => {
-      const slotTitle = slot.title || t('editions.volunteers.untitled_slot')
+      const slotTitle = slot.title || t('edition.volunteers.untitled_slot')
       const counterInfo = `(${slot.assignedVolunteers}/${slot.maxVolunteers})`
 
       return {
@@ -186,7 +186,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     resourceAreaWidth: '15%', // Largeur de la colonne des équipes
 
     // Personnalisation de l'en-tête de la zone des ressources
-    resourceAreaHeaderContent: t('editions.volunteers.teams'),
+    resourceAreaHeaderContent: t('edition.volunteers.teams'),
 
     // Hauteur du calendrier
     height: 'auto',
@@ -211,8 +211,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       today: t('calendar.today'),
       day: t('common.day'),
       week: t('common.week'),
-      resourceTimelineDay: t('editions.volunteers.day_view'),
-      resourceTimelineWeek: t('editions.volunteers.week_view'),
+      resourceTimelineDay: t('edition.volunteers.day_view'),
+      resourceTimelineWeek: t('edition.volunteers.week_view'),
     },
 
     // Format des en-têtes de jour avec nom du jour
@@ -358,7 +358,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
         const slot: VolunteerTimeSlot = {
           id: event.id,
-          title: rawTitle === t('editions.volunteers.untitled_slot') ? null : rawTitle,
+          title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
           start: event.startStr,
           end: event.endStr,
           teamId: event.extendedProps.teamId,
@@ -379,7 +379,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
       const updatedSlot: VolunteerTimeSlot = {
         id: event.id,
-        title: rawTitle === t('editions.volunteers.untitled_slot') ? null : rawTitle,
+        title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
         start: event.startStr,
         end: event.endStr,
         teamId:
@@ -403,7 +403,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
       const updatedSlot: VolunteerTimeSlot = {
         id: event.id,
-        title: rawTitle === t('editions.volunteers.untitled_slot') ? null : rawTitle,
+        title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
         start: event.startStr,
         end: event.endStr,
         teamId:

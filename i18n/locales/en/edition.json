@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Edit collaborator rights",
     "edit_permissions": "Edit permissions",
     "edit_permissions_desc": "Edit conventions according to your permissions",
-    "editions": "Editions",
+    "edition": "Editions",
     "features_card_subtitle": "Discover everything you can do by creating or collaborating on conventions",
     "features_card_title": "What can you do?",
     "granular_rights": "Granular rights",
@@ -157,7 +157,7 @@
     "vegan": "Vegan",
     "vegetarian": "Vegetarian"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "About this edition",
     "add_comment_placeholder": "Add a comment...",
     "add_lost_item": "Add lost item",

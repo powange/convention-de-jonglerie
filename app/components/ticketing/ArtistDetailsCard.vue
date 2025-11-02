@@ -6,7 +6,7 @@
     >
       <div>
         <p class="text-sm text-yellow-600 dark:text-yellow-400">
-          {{ $t('editions.ticketing.access_type') }}
+          {{ $t('edition.ticketing.access_type') }}
         </p>
         <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
       </div>

@@ -157,7 +157,7 @@
     "vegan": "Végan",
     "vegetarian": "Végétarien"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "À propos de cette édition",
     "add_comment_placeholder": "Ajouter un commentaire...",
     "add_lost_item": "Ajouter un objet trouvé",
@@ -658,16 +658,16 @@
       "table_arrival": "Arrivée",
       "table_departure": "Départ",
       "meals": {
-        "title": "TODO: Repas",
-        "no_meals": "TODO: Aucun repas disponible",
-        "description": "TODO: Description",
-        "not_eligible": "TODO: Non éligible",
+        "title": "Choix de vos repas",
+        "description": "Sélectionnez les repas que vous souhaitez prendre pendant votre bénévolat",
+        "no_meals": "Aucun repas disponible",
+        "not_eligible": "Vous n'êtes pas éligible aux repas pour ce créneau",
         "not_eligible_reason": "Hors période de présence",
-        "unsaved_changes": "TODO: Modifications non enregistrées",
-        "error_loading": "TODO: Erreur lors du chargement",
-        "saved_success": "TODO: Enregistrement réussi",
-        "error_saving": "TODO: Erreur lors de l'enregistrement",
-        "confirm_close_unsaved": "TODO: Confirmer la fermeture avec modifications non enregistrées"
+        "unsaved_changes": "Modifications non sauvegardées",
+        "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?",
+        "error_loading": "Erreur lors du chargement des repas",
+        "saved_success": "Vos choix de repas ont été sauvegardés",
+        "error_saving": "Erreur lors de la sauvegarde des repas"
       },
       "targeted_teams": "Équipes ciblées",
       "team_assignment": "Assignation d'équipe",

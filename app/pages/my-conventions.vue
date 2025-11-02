@@ -553,7 +553,7 @@ const getEditionsColumns = () => [
   },
   {
     accessorKey: 'volunteers',
-    header: t('editions.volunteers.title'),
+    header: t('edition.volunteers.title'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
       const count = (edition as any)._count?.volunteerApplications || 0
@@ -577,7 +577,7 @@ const getEditionsColumns = () => [
   },
   {
     accessorKey: 'online',
-    header: t('editions.online_status'),
+    header: t('edition.online_status'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
       const convention = myConventions.value.find((conv) =>
@@ -975,7 +975,7 @@ const toggleEditionOnlineStatus = async (editionId: number, isOnline: boolean) =
       body: { isOnline },
     })
 
-    const message = isOnline ? t('editions.edition_published') : t('editions.edition_set_offline')
+    const message = isOnline ? t('edition.edition_published') : t('edition.edition_set_offline')
     toast.add({
       title: message,
       icon: 'i-heroicons-check-circle',

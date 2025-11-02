@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Medewerkerrechten bewerken",
     "edit_permissions": "Bewerkingsrechten",
     "edit_permissions_desc": "Bewerk conventies volgens je rechten",
-    "editions": "Edities",
+    "edition": "Edities",
     "features_card_subtitle": "Ontdek alles wat je kunt doen door conventies te maken of eraan mee te werken",
     "features_card_title": "Wat kun je doen?",
     "granular_rights": "Gedetailleerde rechten",
@@ -157,7 +157,7 @@
     "vegan": "Vegan",
     "vegetarian": "Vegetarisch"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "Over deze editie",
     "add_comment_placeholder": "Voeg een opmerking toe...",
     "add_lost_item": "Verloren voorwerp toevoegen",

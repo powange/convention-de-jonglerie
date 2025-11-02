@@ -83,11 +83,11 @@
             />
           </UFormField>
 
-          <UFormField :label="$t('editions.ticketing.phone')">
+          <UFormField :label="$t('edition.ticketing.phone')">
             <UInput
               v-model="formData.phone"
               type="tel"
-              :placeholder="$t('editions.ticketing.phone')"
+              :placeholder="$t('edition.ticketing.phone')"
               :disabled="!isManualUser"
             />
           </UFormField>

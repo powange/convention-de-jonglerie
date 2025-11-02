@@ -1,17 +1,17 @@
 <template>
-  <UModal v-model:open="isOpen" :title="$t('editions.volunteers.add_volunteer_title')">
+  <UModal v-model:open="isOpen" :title="$t('edition.volunteers.add_volunteer_title')">
     <template #body>
       <div class="space-y-4">
         <!-- Mode sélection : Recherche ou Création -->
         <div v-if="!creationMode" class="space-y-4">
           <UFormField
-            :label="$t('editions.volunteers.search_by_email')"
-            :description="$t('editions.volunteers.search_by_email_description')"
+            :label="$t('edition.volunteers.search_by_email')"
+            :description="$t('edition.volunteers.search_by_email_description')"
           >
             <UInput
               v-model="searchEmail"
               type="email"
-              :placeholder="$t('editions.volunteers.email_placeholder')"
+              :placeholder="$t('edition.volunteers.email_placeholder')"
               icon="i-heroicons-magnifying-glass"
             />
           </UFormField>
@@ -27,7 +27,7 @@
 
           <div v-else-if="searchResults.length > 0" class="space-y-2">
             <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('editions.volunteers.users_found') }}
+              {{ $t('edition.volunteers.users_found') }}
             </p>
             <div class="space-y-2">
               <div
@@ -64,7 +64,7 @@
 
           <div v-else-if="searchEmail && !searching" class="text-center py-4">
             <UIcon name="i-heroicons-user-minus" class="h-12 w-12 text-gray-300 mx-auto mb-2" />
-            <p class="text-sm text-gray-500">{{ $t('editions.volunteers.no_user_found') }}</p>
+            <p class="text-sm text-gray-500">{{ $t('edition.volunteers.no_user_found') }}</p>
           </div>
 
           <!-- Lien pour créer un utilisateur -->
@@ -74,14 +74,14 @@
               class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
               @click="switchToCreationMode"
             >
-              {{ $t('editions.volunteers.no_account_link') }}
+              {{ $t('edition.volunteers.no_account_link') }}
             </button>
           </div>
 
           <!-- Utilisateur sélectionné -->
           <div v-if="selectedUser" class="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
             <p class="text-sm font-medium text-primary-900 dark:text-primary-100 mb-2">
-              {{ $t('editions.volunteers.selected_user') }}
+              {{ $t('edition.volunteers.selected_user') }}
             </p>
             <div class="flex items-center gap-3">
               <UiUserAvatar
@@ -105,14 +105,14 @@
           <UAlert
             color="info"
             variant="soft"
-            :title="$t('editions.volunteers.create_account_info')"
+            :title="$t('edition.volunteers.create_account_info')"
           />
 
           <UFormField :label="$t('common.email')" required>
             <UInput
               v-model="newUser.email"
               type="email"
-              :placeholder="$t('editions.volunteers.email_placeholder')"
+              :placeholder="$t('edition.volunteers.email_placeholder')"
               icon="i-heroicons-envelope"
             />
           </UFormField>
@@ -141,7 +141,7 @@
               class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
               @click="switchToSearchMode"
             >
-              {{ $t('editions.volunteers.back_to_search') }}
+              {{ $t('edition.volunteers.back_to_search') }}
             </button>
           </div>
         </div>
@@ -163,7 +163,7 @@
           :loading="loading"
           @click="addVolunteer"
         >
-          {{ $t('editions.volunteers.add_volunteer') }}
+          {{ $t('edition.volunteers.add_volunteer') }}
         </UButton>
         <UButton
           v-else
@@ -172,7 +172,7 @@
           :loading="loading"
           @click="createUserAndAdd"
         >
-          {{ $t('editions.volunteers.create_and_add') }}
+          {{ $t('edition.volunteers.create_and_add') }}
         </UButton>
       </div>
     </template>
@@ -257,7 +257,7 @@ const performSearch = async (email: string) => {
     searchResults.value = response.users || []
   } catch (err: any) {
     console.error('User search error:', err)
-    error.value = t('editions.volunteers.search_error')
+    error.value = t('edition.volunteers.search_error')
   } finally {
     searching.value = false
   }
@@ -309,7 +309,7 @@ const addVolunteer = async () => {
     closeModal()
   } catch (err: any) {
     console.error('Add volunteer error:', err)
-    error.value = err.data?.message || t('editions.volunteers.add_error')
+    error.value = err.data?.message || t('edition.volunteers.add_error')
   } finally {
     loading.value = false
   }
@@ -338,9 +338,9 @@ const createUserAndAdd = async () => {
 
     // Gestion des erreurs spécifiques
     if (err.statusCode === 409) {
-      error.value = t('editions.volunteers.email_already_exists_suggest_search')
+      error.value = t('edition.volunteers.email_already_exists_suggest_search')
     } else {
-      error.value = err.data?.message || t('editions.volunteers.create_error')
+      error.value = err.data?.message || t('edition.volunteers.create_error')
     }
   } finally {
     loading.value = false

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -39,7 +39,7 @@
               <div class="space-y-2 flex-1">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
                   <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
-                  {{ t('editions.volunteers.management_title') }}
+                  {{ t('edition.volunteers.management_title') }}
                 </h3>
                 <p
                   v-if="volunteersMode === 'INTERNAL'"
@@ -48,8 +48,8 @@
                   <UIcon name="i-heroicons-information-circle" class="text-blue-500" size="16" />
                   {{
                     canManageVolunteers
-                      ? t('editions.volunteers.admin_only_note')
-                      : t('editions.volunteers.view_only_note')
+                      ? t('edition.volunteers.admin_only_note')
+                      : t('edition.volunteers.view_only_note')
                   }}
                 </p>
               </div>
@@ -59,7 +59,7 @@
                 icon="i-heroicons-user-plus"
                 @click="showAddVolunteerModal = true"
               >
-                {{ t('editions.volunteers.add_volunteer') }}
+                {{ t('edition.volunteers.add_volunteer') }}
               </UButton>
             </div>
           </template>
@@ -72,15 +72,15 @@
                 >{{ t('common.total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
               >
               <UBadge color="warning" variant="soft"
-                >{{ t('editions.volunteers.status_pending') }}:
+                >{{ t('edition.volunteers.status_pending') }}:
                 {{ volunteersInfo.counts.PENDING || 0 }}</UBadge
               >
               <UBadge color="success" variant="soft"
-                >{{ t('editions.volunteers.status_accepted') }}:
+                >{{ t('edition.volunteers.status_accepted') }}:
                 {{ volunteersInfo.counts.ACCEPTED || 0 }}</UBadge
               >
               <UBadge color="error" variant="soft"
-                >{{ t('editions.volunteers.status_rejected') }}:
+                >{{ t('edition.volunteers.status_rejected') }}:
                 {{ volunteersInfo.counts.REJECTED || 0 }}</UBadge
               >
             </div>
@@ -110,7 +110,7 @@
               <div class="text-center py-8">
                 <UIcon name="i-heroicons-link" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                  {{ t('editions.volunteers.external_mode_note') }}
+                  {{ t('edition.volunteers.external_mode_note') }}
                 </p>
               </div>
             </template>
@@ -1184,7 +1184,7 @@ const directAssign = async (teamId: string) => {
 // Fonction pour traiter les actions de déplacer/ajouter depuis la modal
 const handleVolunteerAdded = async () => {
   toast.add({
-    title: t('editions.volunteers.volunteer_added_success'),
+    title: t('edition.volunteers.volunteer_added_success'),
     color: 'success',
   })
   // Recharger les données

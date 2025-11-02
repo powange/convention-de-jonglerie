@@ -13,10 +13,10 @@ describe('i18n lost&found new keys parity', () => {
     return fs.statSync(itemPath).isDirectory()
   })
 
-  const requiredKeys = ['editions.lost_found_before_start', 'editions.items_appear_when_started']
+  const requiredKeys = ['edition.lost_found_before_start', 'edition.items_appear_when_started']
   const deprecatedKeys = [
-    'editions.lost_found_after_edition',
-    'editions.items_appear_after_edition',
+    'edition.lost_found_after_edition',
+    'edition.items_appear_after_edition',
   ]
 
   /**

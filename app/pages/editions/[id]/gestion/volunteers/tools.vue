@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -40,7 +40,7 @@
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-bell" class="text-orange-500" />
                 <h2 class="text-lg font-semibold">
-                  {{ $t('editions.volunteers.notify_volunteers_slots') }}
+                  {{ $t('edition.volunteers.notify_volunteers_slots') }}
                 </h2>
               </div>
             </template>
@@ -69,7 +69,7 @@
             <template #header>
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-document-text" class="text-blue-500" />
-                <h2 class="text-lg font-semibold">{{ t('editions.volunteers.catering_info') }}</h2>
+                <h2 class="text-lg font-semibold">{{ t('edition.volunteers.catering_info') }}</h2>
               </div>
             </template>
 
@@ -87,7 +87,7 @@
                   :items="cateringDateOptions"
                   value-attribute="value"
                   option-attribute="label"
-                  :placeholder="t('editions.volunteers.select_date')"
+                  :placeholder="t('edition.volunteers.select_date')"
                   :ui="{ content: 'min-w-fit' }"
                   class="min-w-[200px]"
                 />
@@ -97,7 +97,7 @@
                   :loading="generatingCateringPdf"
                   @click="generateCateringPdf"
                 >
-                  {{ t('editions.volunteers.generate') }}
+                  {{ t('edition.volunteers.generate') }}
                 </UButton>
               </UFieldGroup>
             </div>

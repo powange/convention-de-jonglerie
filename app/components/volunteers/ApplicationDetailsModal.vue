@@ -81,7 +81,7 @@
               variant="soft"
               size="sm"
             >
-              {{ $t(`editions.volunteers.time_slots_options.${timeSlot}`) }}
+              {{ $t(`edition.volunteers.time_slots_options.${timeSlot}`) }}
             </UBadge>
           </div>
         </div>

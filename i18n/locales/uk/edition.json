@@ -130,7 +130,7 @@
     "edit_collaborator_rights": "Редагувати права співробітника",
     "edit_permissions": "Права редагування",
     "edit_permissions_desc": "Змінюйте конвенції відповідно до ваших дозволів",
-    "editions": "Видання",
+    "edition": "Видання",
     "features_card_subtitle": "Відкрийте для себе все, що ви можете робити, створюючи або співпрацюючи над конвенціями",
     "features_card_title": "Що ви можете робити?",
     "granular_rights": "Деталізовані права",
@@ -157,7 +157,7 @@
     "vegan": "Веганський",
     "vegetarian": "Вегетаріанський"
   },
-  "editions": {
+  "edition": {
     "about_this_edition": "Про це видання",
     "add_comment_placeholder": "Додати коментар...",
     "add_lost_item": "Додати загублений предмет",

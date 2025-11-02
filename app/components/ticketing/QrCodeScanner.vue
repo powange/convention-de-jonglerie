@@ -17,7 +17,7 @@
               class="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"
             ></div>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('editions.ticketing.scanner_activating') }}
+              {{ $t('edition.ticketing.scanner_activating') }}
             </p>
           </div>
         </div>

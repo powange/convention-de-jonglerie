@@ -40,7 +40,7 @@
                     color="info"
                     @click="showConventionModal = true"
                   >
-                    {{ $t('editions.learn_more_about_convention') }}
+                    {{ $t('edition.learn_more_about_convention') }}
                   </UButton>
 
                   <UDropdownMenu :items="calendarOptions">
@@ -115,7 +115,7 @@
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('editions.about_this_edition')"
+          :title="t('edition.about_this_edition')"
         >
           <UIcon
             name="i-heroicons-information-circle"
@@ -123,7 +123,7 @@
             size="24"
             class="sm:!w-4 sm:!h-4"
           />
-          <span class="hidden sm:inline">{{ t('editions.about_this_edition') }}</span>
+          <span class="hidden sm:inline">{{ t('edition.about_this_edition') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -134,7 +134,7 @@
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('editions.posts')"
+          :title="t('edition.posts')"
         >
           <UIcon
             name="i-heroicons-chat-bubble-left-right"
@@ -142,7 +142,7 @@
             size="24"
             class="sm:!w-4 sm:!h-4"
           />
-          <span class="hidden sm:inline">{{ t('editions.posts') }}</span>
+          <span class="hidden sm:inline">{{ t('edition.posts') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -153,10 +153,10 @@
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('editions.carpool')"
+          :title="t('edition.carpool')"
         >
           <UIcon name="i-heroicons-truck" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">{{ t('editions.carpool') }}</span>
+          <span class="hidden sm:inline">{{ t('edition.carpool') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -168,7 +168,7 @@
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('editions.volunteers.title')"
+          :title="t('edition.volunteers.title')"
         >
           <UIcon
             name="i-heroicons-hand-raised"
@@ -176,7 +176,7 @@
             size="24"
             class="sm:!w-4 sm:!h-4"
           />
-          <span class="hidden sm:inline">{{ t('editions.volunteers.title') }}</span>
+          <span class="hidden sm:inline">{{ t('edition.volunteers.title') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -208,7 +208,7 @@
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('editions.lost_found')"
+          :title="t('edition.lost_found')"
         >
           <UIcon
             name="i-heroicons-magnifying-glass"
@@ -216,7 +216,7 @@
             size="24"
             class="sm:!w-4 sm:!h-4"
           />
-          <span class="hidden sm:inline">{{ t('editions.lost_found') }}</span>
+          <span class="hidden sm:inline">{{ t('edition.lost_found') }}</span>
         </NuxtLink>
 
         <ClientOnly>
@@ -229,10 +229,10 @@
                 ? 'border-primary-500 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
             ]"
-            :title="t('editions.management')"
+            :title="t('edition.management')"
           >
             <UIcon name="i-heroicons-cog" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-            <span class="hidden sm:inline">{{ t('editions.management') }}</span>
+            <span class="hidden sm:inline">{{ t('edition.management') }}</span>
           </NuxtLink>
         </ClientOnly>
       </nav>
@@ -529,15 +529,15 @@ const formatDateRange = (start: string, end: string) => {
 // Obtenir le titre de la page selon la page courante
 const getPageTitle = (page: string) => {
   const titles: Record<string, string> = {
-    details: t('editions.about_this_edition'),
-    commentaires: t('editions.posts'),
-    carpool: t('editions.carpool'),
-    'objets-trouves': t('editions.lost_found'),
-    volunteers: t('editions.volunteers.title'),
+    details: t('edition.about_this_edition'),
+    commentaires: t('edition.posts'),
+    carpool: t('edition.carpool'),
+    'objets-trouves': t('edition.lost_found'),
+    volunteers: t('edition.volunteers.title'),
     workshops: 'Workshops',
-    gestion: t('editions.management'),
+    gestion: t('edition.management'),
   }
-  return titles[page] || t('editions.about_this_edition')
+  return titles[page] || t('edition.about_this_edition')
 }
 
 // Données de l'événement pour le calendrier

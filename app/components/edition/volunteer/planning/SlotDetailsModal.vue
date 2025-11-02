@@ -10,7 +10,7 @@
         </div>
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ timeSlot?.title || t('editions.volunteers.untitled_slot') }}
+            {{ timeSlot?.title || t('edition.volunteers.untitled_slot') }}
           </h3>
           <div class="flex items-center gap-2 mt-1">
             <div
@@ -19,7 +19,7 @@
               :style="{ backgroundColor: teamColor }"
             ></div>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ teamName || t('editions.volunteers.no_team') }}
+              {{ teamName || t('edition.volunteers.no_team') }}
             </p>
           </div>
         </div>
@@ -47,7 +47,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="w-4 h-4 text-green-600" />
               <h4 class="text-sm font-medium text-green-800 dark:text-green-200">
-                {{ t('editions.volunteers.schedule_info') }}
+                {{ t('edition.volunteers.schedule_info') }}
               </h4>
             </div>
             <div v-if="duration" class="text-xs text-green-600 dark:text-green-400 font-medium">
@@ -77,7 +77,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-users" class="w-4 h-4 text-purple-500" />
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ t('editions.volunteers.assigned_volunteers') }}
+                {{ t('edition.volunteers.assigned_volunteers') }}
               </h4>
             </div>
             <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -122,7 +122,7 @@
             class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm text-gray-500 dark:text-gray-400 pl-6"
           >
             <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
-            <span>{{ t('editions.volunteers.no_volunteers_assigned') }}</span>
+            <span>{{ t('edition.volunteers.no_volunteers_assigned') }}</span>
           </div>
         </div>
       </div>
@@ -202,11 +202,11 @@ const duration = computed(() => {
   const mins = diffMins % 60
 
   if (hours > 0 && mins > 0) {
-    return t('editions.volunteers.duration_hours_minutes', { hours, minutes: mins })
+    return t('edition.volunteers.duration_hours_minutes', { hours, minutes: mins })
   } else if (hours > 0) {
-    return t('editions.volunteers.duration_hours', { hours })
+    return t('edition.volunteers.duration_hours', { hours })
   } else {
-    return t('editions.volunteers.duration_minutes', { minutes: mins })
+    return t('edition.volunteers.duration_minutes', { minutes: mins })
   }
 })
 

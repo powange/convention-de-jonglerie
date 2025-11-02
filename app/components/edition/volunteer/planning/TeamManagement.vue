@@ -4,10 +4,10 @@
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold flex items-center gap-2">
           <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-          {{ t('editions.volunteers.team_management') }}
+          {{ t('edition.volunteers.team_management') }}
         </h3>
         <UButton size="sm" color="primary" icon="i-heroicons-plus" @click="openCreateTeamModal">
-          {{ t('editions.volunteers.create_team') }}
+          {{ t('edition.volunteers.create_team') }}
         </UButton>
       </div>
     </template>
@@ -16,7 +16,7 @@
       <!-- Liste des équipes -->
       <div v-if="teams.length === 0" class="text-center py-8 text-gray-500">
         <UIcon name="i-heroicons-user-group" size="48" class="mx-auto mb-4 opacity-50" />
-        <p>{{ t('editions.volunteers.no_teams') }}</p>
+        <p>{{ t('edition.volunteers.no_teams') }}</p>
       </div>
 
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -89,10 +89,10 @@
 
           <div class="flex items-center justify-between text-xs text-gray-500">
             <span v-if="team.maxVolunteers">
-              {{ t('editions.volunteers.max_volunteers') }}: {{ team.maxVolunteers }}
+              {{ t('edition.volunteers.max_volunteers') }}: {{ team.maxVolunteers }}
             </span>
             <span v-if="team._count">
-              {{ team._count.timeSlots }} {{ t('editions.volunteers.time_slots') }}
+              {{ team._count.timeSlots }} {{ t('edition.volunteers.time_slots') }}
             </span>
           </div>
         </div>
@@ -111,7 +111,7 @@
                 :style="{ backgroundColor: teamFormState.color }"
               />
               <h3 class="font-medium text-lg">
-                {{ teamFormState.name || t('editions.volunteers.team_preview') }}
+                {{ teamFormState.name || t('edition.volunteers.team_preview') }}
               </h3>
             </div>
             <p
@@ -121,11 +121,11 @@
               {{ teamFormState.description }}
             </p>
             <p v-else class="text-sm text-gray-500 italic">
-              {{ t('editions.volunteers.no_description_preview') }}
+              {{ t('edition.volunteers.no_description_preview') }}
             </p>
             <div v-if="teamFormState.maxVolunteers" class="mt-2 text-xs text-gray-500">
               <UIcon name="i-heroicons-users" class="w-3 h-3 inline mr-1" />
-              {{ t('editions.volunteers.max_volunteers') }}: {{ teamFormState.maxVolunteers }}
+              {{ t('edition.volunteers.max_volunteers') }}: {{ teamFormState.maxVolunteers }}
             </div>
           </div>
 
@@ -136,7 +136,7 @@
             @submit="onTeamSubmit"
           >
             <!-- Nom de l'équipe -->
-            <UFormField name="name" :label="t('editions.volunteers.team_name')" required>
+            <UFormField name="name" :label="t('edition.volunteers.team_name')" required>
               <UInput
                 v-model="teamFormState.name"
                 placeholder="Ex: Accueil, Sécurité, Logistique..."
@@ -145,7 +145,7 @@
               />
               <template #hint>
                 <span class="text-xs text-gray-500">{{
-                  t('editions.volunteers.team_name_hint')
+                  t('edition.volunteers.team_name_hint')
                 }}</span>
               </template>
             </UFormField>
@@ -154,19 +154,19 @@
             <UFormField name="description" :label="t('common.description')">
               <UTextarea
                 v-model="teamFormState.description"
-                :placeholder="t('editions.volunteers.team_description_placeholder')"
+                :placeholder="t('edition.volunteers.team_description_placeholder')"
                 :rows="3"
                 class="w-full"
               />
               <template #hint>
                 <span class="text-xs text-gray-500">{{
-                  t('editions.volunteers.team_description_hint')
+                  t('edition.volunteers.team_description_hint')
                 }}</span>
               </template>
             </UFormField>
 
             <!-- Couleur avec palette -->
-            <UFormField name="color" :label="t('editions.volunteers.team_color')" required>
+            <UFormField name="color" :label="t('edition.volunteers.team_color')" required>
               <!-- Palette de couleurs prédéfinies -->
               <div class="space-y-3">
                 <div class="grid grid-cols-8 gap-2 mb-3">
@@ -188,7 +188,7 @@
                 <!-- Sélecteur de couleur personnalisé -->
                 <div class="flex items-center gap-3">
                   <label class="block">
-                    <span class="sr-only">{{ t('editions.volunteers.custom_color') }}</span>
+                    <span class="sr-only">{{ t('edition.volunteers.custom_color') }}</span>
                     <input
                       v-model="teamFormState.color"
                       type="color"
@@ -205,7 +205,7 @@
               </div>
               <template #hint>
                 <span class="text-xs text-gray-500">{{
-                  t('editions.volunteers.team_color_hint')
+                  t('edition.volunteers.team_color_hint')
                 }}</span>
               </template>
             </UFormField>
@@ -213,7 +213,7 @@
             <!-- Nombre max de bénévoles -->
             <UFormField
               name="maxVolunteers"
-              :label="t('editions.volunteers.max_volunteers_optional')"
+              :label="t('edition.volunteers.max_volunteers_optional')"
             >
               <UInput
                 v-model.number="teamFormState.maxVolunteers"
@@ -226,17 +226,17 @@
               />
               <template #hint>
                 <span class="text-xs text-gray-500">{{
-                  t('editions.volunteers.max_volunteers_hint')
+                  t('edition.volunteers.max_volunteers_hint')
                 }}</span>
               </template>
             </UFormField>
 
             <!-- Équipe obligatoire -->
-            <UFormField name="isRequired" :label="t('editions.volunteers.required_team')">
+            <UFormField name="isRequired" :label="t('edition.volunteers.required_team')">
               <USwitch v-model="teamFormState.isRequired">
                 <template #label>
                   <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('editions.volunteers.required_team_hint') }}
+                    {{ t('edition.volunteers.required_team_hint') }}
                   </span>
                 </template>
               </USwitch>
@@ -245,12 +245,12 @@
             <!-- Équipe de contrôle d'accès -->
             <UFormField
               name="isAccessControlTeam"
-              :label="t('editions.volunteers.access_control_team')"
+              :label="t('edition.volunteers.access_control_team')"
             >
               <USwitch v-model="teamFormState.isAccessControlTeam">
                 <template #label>
                   <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('editions.volunteers.access_control_team_hint') }}
+                    {{ t('edition.volunteers.access_control_team_hint') }}
                   </span>
                 </template>
               </USwitch>
@@ -259,12 +259,12 @@
             <!-- Équipe de validation des repas -->
             <UFormField
               name="isMealValidationTeam"
-              :label="t('editions.volunteers.meal_validation_team')"
+              :label="t('edition.volunteers.meal_validation_team')"
             >
               <USwitch v-model="teamFormState.isMealValidationTeam">
                 <template #label>
                   <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('editions.volunteers.meal_validation_team_hint') }}
+                    {{ t('edition.volunteers.meal_validation_team_hint') }}
                   </span>
                 </template>
               </USwitch>
@@ -311,11 +311,9 @@
     <!-- Modal de confirmation pour suppression -->
     <UiConfirmModal
       v-model="showDeleteModal"
-      :title="t('editions.volunteers.confirm_delete')"
+      :title="t('edition.volunteers.confirm_delete')"
       :description="
-        teamToDelete
-          ? t('editions.volunteers.confirm_delete_team', { name: teamToDelete.name })
-          : ''
+        teamToDelete ? t('edition.volunteers.confirm_delete_team', { name: teamToDelete.name }) : ''
       "
       :confirm-label="t('common.delete')"
       :cancel-label="t('common.cancel')"
@@ -399,7 +397,7 @@ const predefinedColors = [
 
 // Computed
 const teamModalTitle = computed(() =>
-  editingTeam.value ? t('editions.volunteers.edit_team') : t('editions.volunteers.create_team')
+  editingTeam.value ? t('edition.volunteers.edit_team') : t('edition.volunteers.create_team')
 )
 
 // Actions
@@ -468,14 +466,14 @@ const onTeamSubmit = async () => {
     if (editingTeam.value) {
       await updateTeam(editingTeam.value.id, teamData)
       toast.add({
-        title: t('editions.volunteers.team_updated'),
+        title: t('edition.volunteers.team_updated'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
     } else {
       await createTeam(teamData)
       toast.add({
-        title: t('editions.volunteers.team_created'),
+        title: t('edition.volunteers.team_created'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -510,7 +508,7 @@ const executeDeleteTeam = async () => {
     loading.value = true
     await deleteTeam(teamToDelete.value.id)
     toast.add({
-      title: t('editions.volunteers.team_deleted'),
+      title: t('edition.volunteers.team_deleted'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })

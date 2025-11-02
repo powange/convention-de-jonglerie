@@ -4,14 +4,14 @@
     <div class="flex items-center justify-between">
       <div>
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-          {{ $t('editions.ticketing.access_type') }}
+          {{ $t('edition.ticketing.access_type') }}
         </p>
         <p class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ $t('editions.ticketing.volunteer') }}
+          {{ $t('edition.ticketing.volunteer') }}
         </p>
       </div>
       <UBadge color="primary" variant="soft" size="lg">
-        {{ $t('editions.ticketing.volunteer_accepted') }}
+        {{ $t('edition.ticketing.volunteer_accepted') }}
       </UBadge>
     </div>
 
@@ -54,7 +54,7 @@
     <!-- Informations du bénévole -->
     <TicketingUserInfoSection
       ref="userInfoSection"
-      :title="$t('editions.ticketing.volunteer')"
+      :title="$t('edition.ticketing.volunteer')"
       :first-name="editableFirstName"
       :last-name="editableLastName"
       :email="editableEmail"
@@ -72,7 +72,7 @@
       <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
         <UIcon name="i-heroicons-user-group" class="text-blue-600 dark:text-blue-400" />
         <h4 class="font-semibold text-gray-900 dark:text-white">
-          {{ $t('editions.ticketing.teams') }}
+          {{ $t('edition.ticketing.teams') }}
         </h4>
       </div>
 
@@ -100,7 +100,7 @@
       <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
         <UIcon name="i-heroicons-clock" class="text-orange-600 dark:text-orange-400" />
         <h4 class="font-semibold text-gray-900 dark:text-white">
-          {{ $t('editions.ticketing.time_slots') }}
+          {{ $t('edition.ticketing.time_slots') }}
         </h4>
       </div>
 

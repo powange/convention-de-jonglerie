@@ -665,7 +665,7 @@ const refreshLogs = () => {
 
 const cleanupOldLogs = async () => {
   const confirmed = confirm(
-    'Êtes-vous sûr de vouloir supprimer TOUS les logs de plus d\'un mois (résolus et non résolus) ?\n\nCette action ne peut pas être annulée.'
+    "Êtes-vous sûr de vouloir supprimer TOUS les logs de plus d'un mois (résolus et non résolus) ?\n\nCette action ne peut pas être annulée."
   )
 
   if (!confirmed) return

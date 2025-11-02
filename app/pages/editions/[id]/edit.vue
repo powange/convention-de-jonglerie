@@ -2,13 +2,13 @@
   <div class="max-w-6xl mx-auto">
     <UCard>
       <template #header>
-        <h1 class="text-2xl font-bold">{{ $t('editions.edit') }}</h1>
+        <h1 class="text-2xl font-bold">{{ $t('edition.edit') }}</h1>
       </template>
       <div v-if="editionStore.loading">
-        <p>{{ $t('editions.loading_details') }}</p>
+        <p>{{ $t('edition.loading_details') }}</p>
       </div>
       <div v-else-if="!edition">
-        <p>{{ $t('editions.not_found') }}</p>
+        <p>{{ $t('edition.not_found') }}</p>
       </div>
       <EditionForm
         v-else
@@ -65,7 +65,7 @@ onMounted(async () => {
   } catch {
     toast.add({
       title: t('common.error'),
-      description: t('editions.not_found'),
+      description: t('edition.not_found'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error',
     })

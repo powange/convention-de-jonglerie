@@ -27,6 +27,22 @@
       />
     </div>
 
+    <!-- Bouton toggle pour afficher/masquer les archives -->
+    <div class="flex justify-center">
+      <UButton
+        :label="
+          includeArchived
+            ? $t('components.carpool.show_active_only')
+            : $t('components.carpool.show_all')
+        "
+        :icon="includeArchived ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+        color="neutral"
+        variant="outline"
+        size="sm"
+        @click="toggleArchived"
+      />
+    </div>
+
     <!-- Modal pour proposer un covoiturage -->
     <UModal
       v-model:open="showOfferModal"
@@ -171,6 +187,9 @@ const showEditRequestModal = ref(false)
 const editingOffer = ref(null)
 const editingRequest = ref(null)
 
+// État pour le toggle archives (par défaut false = actifs seulement)
+const includeArchived = ref(false)
+
 const { t } = useI18n()
 
 const tabs = computed(() => [
@@ -188,14 +207,20 @@ const tabs = computed(() => [
   },
 ])
 
-// Charger les offres de covoiturage
+// Charger les offres de covoiturage avec paramètre includeArchived
 const { data: carpoolOffers, refresh: refreshOffers } = await useFetch(
-  `/api/editions/${props.editionId}/carpool-offers`
+  `/api/editions/${props.editionId}/carpool-offers`,
+  {
+    query: computed(() => ({ includeArchived: includeArchived.value })),
+  }
 )
 
-// Charger les demandes de covoiturage
+// Charger les demandes de covoiturage avec paramètre includeArchived
 const { data: carpoolRequests, refresh: refreshRequests } = await useFetch(
-  `/api/editions/${props.editionId}/carpool-requests`
+  `/api/editions/${props.editionId}/carpool-requests`,
+  {
+    query: computed(() => ({ includeArchived: includeArchived.value })),
+  }
 )
 
 // Computed pour s'assurer que les données sont des tableaux
@@ -260,5 +285,11 @@ const onRequestUpdated = () => {
   refreshRequests()
   showEditRequestModal.value = false
   editingRequest.value = null
+}
+
+// Fonction pour toggle l'affichage des archives
+const toggleArchived = () => {
+  includeArchived.value = !includeArchived.value
+  // Les useFetch vont automatiquement se rafraîchir grâce au computed dans query
 }
 </script>

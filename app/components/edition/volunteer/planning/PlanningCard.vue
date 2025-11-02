@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold flex items-center gap-2">
           <UIcon name="i-heroicons-calendar-days" class="text-primary-500" />
-          {{ t('editions.volunteers.schedule_management') }}
+          {{ t('edition.volunteers.schedule_management') }}
         </h3>
       </div>
     </template>
@@ -20,7 +20,7 @@
             icon="i-heroicons-plus"
             @click="openCreateSlotModal"
           >
-            {{ t('editions.volunteers.create_time_slot') }}
+            {{ t('edition.volunteers.create_time_slot') }}
           </UButton>
           <UButton
             size="sm"
@@ -40,7 +40,7 @@
             :loading="exportingPdf"
             @click="exportToPdf"
           >
-            {{ t('editions.volunteers.export_pdf') }}
+            {{ t('edition.volunteers.export_pdf') }}
           </UButton>
         </div>
         <div class="flex items-center gap-4">
@@ -55,7 +55,7 @@
               multiple
               size="sm"
               class="min-w-[200px]"
-              :placeholder="t('editions.volunteers.all_teams')"
+              :placeholder="t('edition.volunteers.all_teams')"
             />
           </div>
           <!-- Sélecteur de granularité -->
@@ -71,7 +71,7 @@
             />
           </div>
           <span v-if="canManageVolunteers" class="text-xs text-gray-500">
-            {{ t('editions.volunteers.planning_tip') }}
+            {{ t('edition.volunteers.planning_tip') }}
           </span>
         </div>
       </div>
@@ -589,8 +589,8 @@ const exportToPdf = async () => {
     doc.save(fileName)
 
     toast.add({
-      title: t('editions.volunteers.pdf_exported'),
-      description: t('editions.volunteers.pdf_downloaded'),
+      title: t('edition.volunteers.pdf_exported'),
+      description: t('edition.volunteers.pdf_downloaded'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })

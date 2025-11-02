@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert
@@ -26,10 +26,10 @@
             name="i-heroicons-clipboard-document-list"
             class="text-indigo-600 dark:text-indigo-400"
           />
-          {{ $t('editions.volunteers.volunteer_page') }}
+          {{ $t('edition.volunteers.volunteer_page') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('editions.volunteers.page_description') }}
+          {{ $t('edition.volunteers.page_description') }}
         </p>
       </div>
 
@@ -41,7 +41,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-document-text" class="text-blue-500" />
               <h2 class="text-lg font-semibold">
-                {{ $t('editions.volunteers.volunteer_description_title') }}
+                {{ $t('edition.volunteers.volunteer_description_title') }}
               </h2>
             </div>
 
@@ -49,7 +49,7 @@
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
-              :description="$t('editions.volunteers.volunteer_description_help')"
+              :description="$t('edition.volunteers.volunteer_description_help')"
             />
 
             <!-- Description des bénévoles (Markdown) -->
@@ -73,7 +73,7 @@
                     <div v-html="volunteersDescriptionHtml" />
                   </template>
                   <template v-else>
-                    <p class="text-gray-500">{{ $t('editions.volunteers.no_description') }}</p>
+                    <p class="text-gray-500">{{ $t('edition.volunteers.no_description') }}</p>
                   </template>
                 </div>
               </UFormField>

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="loading" role="status" aria-live="polite">
-      <p>{{ $t('editions.loading_details') }}</p>
+      <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition" role="alert">
-      <p>{{ $t('editions.not_found') }}</p>
+      <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else>
       <!-- Message si l'édition est hors ligne -->
@@ -16,13 +16,13 @@
         class="mb-4"
       >
         <template #title>
-          {{ $t('editions.offline_edition') }}
+          {{ $t('edition.offline_edition') }}
         </template>
         <template #description>
           <div class="flex items-center justify-between">
-            <span>{{ $t('editions.offline_edition_message') }}</span>
+            <span>{{ $t('edition.offline_edition_message') }}</span>
             <UButton color="primary" size="sm" icon="i-heroicons-globe-alt" @click="publishEdition">
-              {{ $t('editions.publish_edition') }}
+              {{ $t('edition.publish_edition') }}
             </UButton>
           </div>
         </template>
@@ -41,10 +41,10 @@
               <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
                 <img
                   :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
-                  :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
+                  :alt="t('edition.poster_of', { name: getEditionDisplayName(edition) })"
                   role="button"
                   tabindex="0"
-                  :aria-label="`${$t('editions.click_to_enlarge_poster')} ${getEditionDisplayName(edition)}`"
+                  :aria-label="`${$t('edition.click_to_enlarge_poster')} ${getEditionDisplayName(edition)}`"
                   class="w-full sm:w-48 h-auto max-w-xs object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-500"
                   @click="showImageOverlay = true"
                   @keydown.enter="showImageOverlay = true"
@@ -53,7 +53,7 @@
               </div>
               <div class="flex-1">
                 <h3 id="about-heading" class="text-lg font-semibold mb-2">
-                  {{ $t('editions.about_this_edition') }}
+                  {{ $t('edition.about_this_edition') }}
                 </h3>
                 <div
                   v-if="edition.description && descriptionHtml"
@@ -65,7 +65,7 @@
                   <div v-html="descriptionHtml" />
                 </div>
                 <p v-else class="text-gray-700 dark:text-gray-300">
-                  {{ t('editions.no_description_available') }}
+                  {{ t('edition.no_description_available') }}
                 </p>
               </div>
             </div>
@@ -74,7 +74,7 @@
           <!-- Programme de l'édition -->
           <UCard v-if="edition.program && programHtml" variant="subtle">
             <div class="space-y-4">
-              <h3 class="text-lg font-semibold">{{ $t('editions.program') }}</h3>
+              <h3 class="text-lg font-semibold">{{ $t('edition.program') }}</h3>
               <div
                 class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
                 aria-labelledby="program-heading"
@@ -90,13 +90,13 @@
             <!-- Services -->
             <section class="space-y-4" aria-labelledby="services-heading">
               <h3 id="services-heading" class="text-lg font-semibold">
-                {{ $t('editions.services_offered') }}
+                {{ $t('edition.services_offered') }}
               </h3>
               <div
                 v-if="getActiveServicesByCategory(edition).length === 0"
                 class="text-gray-500 text-sm"
               >
-                {{ $t('editions.no_services') }}
+                {{ $t('edition.no_services') }}
               </div>
               <div v-else class="space-y-4">
                 <div
@@ -141,7 +141,7 @@
           <UCard variant="subtle">
             <section class="space-y-3" aria-labelledby="practical-info-heading">
               <h3 id="practical-info-heading" class="text-lg font-semibold">
-                {{ $t('editions.practical_info') }}
+                {{ $t('edition.practical_info') }}
               </h3>
               <p class="text-sm text-gray-600">
                 <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
@@ -149,7 +149,7 @@
                   :href="getGoogleMapsUrl(edition)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  :aria-label="`${$t('editions.view_on_map')} - ${edition.city} (${$t('common.opens_in_new_tab')})`"
+                  :aria-label="`${$t('edition.view_on_map')} - ${edition.city} (${$t('common.opens_in_new_tab')})`"
                   class="text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   {{ edition.addressLine1
@@ -181,7 +181,7 @@
                 <div class="flex items-center gap-2 mb-2">
                   <UIcon name="i-heroicons-users" class="text-gray-400" />
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
-                    $t('editions.organizing_team')
+                    $t('edition.organizing_team')
                   }}</span>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -218,7 +218,7 @@
               "
               class="space-y-2"
             >
-              <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
+              <h3 class="text-lg font-semibold">{{ $t('edition.useful_links') }}</h3>
               <div class="flex flex-wrap gap-2">
                 <UButton
                   v-if="edition.officialWebsiteUrl"
@@ -227,7 +227,7 @@
                   target="_blank"
                   size="sm"
                   color="primary"
-                  >{{ $t('editions.official_website') }}</UButton
+                  >{{ $t('edition.official_website') }}</UButton
                 >
                 <UButton
                   v-if="edition.ticketingUrl"
@@ -235,7 +235,7 @@
                   :to="edition.ticketingUrl"
                   target="_blank"
                   size="sm"
-                  >{{ $t('editions.ticketing_title') }}</UButton
+                  >{{ $t('edition.ticketing_title') }}</UButton
                 >
                 <UButton
                   v-if="edition.facebookUrl"
@@ -287,7 +287,7 @@
             v-if="showImageOverlay && edition?.imageUrl"
             role="dialog"
             aria-modal="true"
-            :aria-label="$t('editions.poster_modal')"
+            :aria-label="$t('edition.poster_modal')"
             class="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
             @click="showImageOverlay = false"
             @keydown.escape="showImageOverlay = false"
@@ -295,7 +295,7 @@
             <div class="relative max-w-6xl max-h-[90vh]">
               <img
                 :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
-                :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
+                :alt="t('edition.poster_of', { name: getEditionDisplayName(edition) })"
                 class="max-w-full max-h-[90vh] object-contain rounded-lg"
                 @click.stop
               />
@@ -557,7 +557,7 @@ const publishEdition = async () => {
     await refreshEdition()
 
     toast.add({
-      title: t('editions.edition_published'),
+      title: t('edition.edition_published'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })

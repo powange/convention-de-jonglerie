@@ -128,31 +128,31 @@ export default defineEventHandler(async (event) => {
         id: true,
         message: true,
         statusCode: true,
-      errorType: true,
-      method: true,
-      path: true,
-      userAgent: true,
-      ip: true,
-      referer: true, // Page d'origine
-      origin: true, // Domaine d'origine
-      resolved: true,
-      resolvedBy: true,
-      resolvedAt: true,
-      adminNotes: true,
-      createdAt: true,
-      updatedAt: true,
-      // Données utilisateur si disponible
-      user: {
-        select: {
-          id: true,
-          pseudo: true,
-          email: true,
+        errorType: true,
+        method: true,
+        path: true,
+        userAgent: true,
+        ip: true,
+        referer: true, // Page d'origine
+        origin: true, // Domaine d'origine
+        resolved: true,
+        resolvedBy: true,
+        resolvedAt: true,
+        adminNotes: true,
+        createdAt: true,
+        updatedAt: true,
+        // Données utilisateur si disponible
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+          },
         },
-      },
-      // Inclure certaines métadonnées utiles sans exposer les données sensibles
-      queryParams: true,
-      body: true, // Inclure le body (sanitisé) pour le debug
-      // prismaDetails: true, // TODO: Activer après migration en production
+        // Inclure certaines métadonnées utiles sans exposer les données sensibles
+        queryParams: true,
+        body: true, // Inclure le body (sanitisé) pour le debug
+        // prismaDetails: true, // TODO: Activer après migration en production
         headers: false, // Pas dans la liste par défaut (trop verbeux)
         stack: false, // Pas dans la liste par défaut (très verbeux)
       },
