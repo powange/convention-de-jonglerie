@@ -23,12 +23,32 @@ export default defineEventHandler(async (event) => {
   const userIdFilter = query.userId ? parseInt(query.userId as string) : undefined
   const search = (query.search as string)?.trim()
 
+  // Filtre de période (pour limiter la charge mémoire)
+  // Par défaut, ne montrer que les 30 derniers jours sauf si explicitement désactivé
+  const timeRangeFilter = query.timeRange as string | undefined // '7d' | '30d' | '90d' | 'all'
+  const timeRange = timeRangeFilter || '30d'
+
   // Paramètres de tri
   const sortField = (query.sortField as string) || 'createdAt'
   const sortDir = (query.sortDir as string) === 'asc' ? 'asc' : 'desc'
 
   // Construction des filtres WHERE
   const conditions: any[] = []
+
+  // Filtre de période pour éviter les problèmes de mémoire
+  if (timeRange !== 'all') {
+    const daysMap: Record<string, number> = {
+      '7d': 7,
+      '30d': 30,
+      '90d': 90,
+    }
+    const days = daysMap[timeRange] || 30
+    conditions.push({
+      createdAt: {
+        gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
+      },
+    })
+  }
 
   // Filtre par statut de résolution
   if (statusFilter === 'resolved') {
@@ -69,18 +89,17 @@ export default defineEventHandler(async (event) => {
   // Comptage total pour la pagination
   const total = await prisma.apiErrorLog.count({ where })
 
-  // Configuration du tri
-  const orderBy: any = {}
+  // Configuration du tri - limiter aux champs indexés pour éviter les problèmes de mémoire
+  const orderBy: any = []
   if (sortField === 'createdAt') {
-    orderBy.createdAt = sortDir
+    orderBy.push({ createdAt: sortDir })
   } else if (sortField === 'statusCode') {
-    orderBy.statusCode = sortDir
-  } else if (sortField === 'errorType') {
-    orderBy.errorType = sortDir
+    orderBy.push({ statusCode: sortDir })
   } else if (sortField === 'path') {
-    orderBy.path = sortDir
+    orderBy.push({ path: sortDir })
   } else {
-    orderBy.createdAt = 'desc' // Par défaut
+    // Par défaut, tri par createdAt descendant (plus récent en premier) - champ indexé
+    orderBy.push({ createdAt: 'desc' })
   }
 
   // Récupération des logs avec pagination
