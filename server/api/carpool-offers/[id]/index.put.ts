@@ -1,5 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail, buildUpdateData } from '@@/server/utils/prisma-helpers'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const updateCarpoolOfferSchema = z.object({
@@ -19,39 +22,25 @@ const updateCarpoolOfferSchema = z.object({
   musicAllowed: z.boolean().optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const offerId = parseInt(getRouterParam(event, 'id') as string)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const offerId = validateResourceId(event, 'id', 'offre')
 
-  if (isNaN(offerId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'offre invalide",
-    })
-  }
-
-  try {
     const body = await readBody(event)
 
     // Valider les données
     const validatedData = updateCarpoolOfferSchema.parse(body)
 
-    // Vérifier que l'offre existe et que l'utilisateur en est le créateur
-    const existingOffer = await prisma.carpoolOffer.findUnique({
-      where: { id: offerId },
+    // Vérifier que l'offre existe
+    const existingOffer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
       include: {
         user: {
           select: { id: true, pseudo: true },
         },
       },
+      errorMessage: 'Offre de covoiturage introuvable',
     })
-
-    if (!existingOffer) {
-      throw createError({
-        statusCode: 404,
-        message: 'Offre de covoiturage introuvable',
-      })
-    }
 
     // Seul le créateur peut modifier son offre
     if (existingOffer.userId !== user.id) {
@@ -61,36 +50,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Préparer les données à mettre à jour
-    const updateData: any = {}
-
-    if (validatedData.tripDate) {
-      updateData.tripDate = new Date(validatedData.tripDate)
-    }
-    if (validatedData.locationCity) {
-      updateData.locationCity = validatedData.locationCity.trim()
-    }
-    if (validatedData.locationAddress) {
-      updateData.locationAddress = validatedData.locationAddress.trim()
-    }
-    if (validatedData.availableSeats !== undefined) {
-      updateData.availableSeats = validatedData.availableSeats
-    }
-    if (validatedData.description !== undefined) {
-      updateData.description = validatedData.description?.trim() || null
-    }
-    if (validatedData.phoneNumber !== undefined) {
-      updateData.phoneNumber = validatedData.phoneNumber?.trim() || null
-    }
-    if (validatedData.smokingAllowed !== undefined) {
-      updateData.smokingAllowed = validatedData.smokingAllowed
-    }
-    if (validatedData.petsAllowed !== undefined) {
-      updateData.petsAllowed = validatedData.petsAllowed
-    }
-    if (validatedData.musicAllowed !== undefined) {
-      updateData.musicAllowed = validatedData.musicAllowed
-    }
+    // Construire les données de mise à jour
+    const updateData = buildUpdateData(validatedData, {
+      trimStrings: true,
+      transform: {
+        tripDate: (val) => new Date(val),
+      },
+    })
 
     // Mettre à jour l'offre
     const updatedOffer = await prisma.carpoolOffer.update({
@@ -108,24 +74,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return updatedOffer
-  } catch (error: unknown) {
-    console.error("Erreur lors de la mise à jour de l'offre de covoiturage:", error)
-
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la mise à jour de l'offre",
-    })
-  }
-})
+  },
+  { operationName: 'UpdateCarpoolOffer' }
+)

@@ -1,0 +1,181 @@
+import { z } from 'zod'
+
+import type { H3Event, EventHandlerRequest } from 'h3'
+
+/**
+ * Options pour le wrapper d'API
+ */
+export interface ApiHandlerOptions {
+  /**
+   * Nom de l'opération pour les logs (optionnel)
+   */
+  operationName?: string
+
+  /**
+   * Désactiver les logs d'erreur (pour les erreurs attendues)
+   */
+  silentErrors?: boolean
+
+  /**
+   * Message d'erreur par défaut pour les erreurs 500
+   */
+  defaultErrorMessage?: string
+}
+
+/**
+ * Vérifie si une erreur est une erreur HTTP (avec statusCode)
+ */
+export function isHttpError(error: unknown): error is { statusCode: number; message: string } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'statusCode' in error &&
+    typeof (error as any).statusCode === 'number'
+  )
+}
+
+/**
+ * Wrapper standardisé pour les handlers d'API
+ * Gère automatiquement les erreurs HTTP, Zod et génériques
+ *
+ * @example
+ * export default wrapApiHandler(async (event) => {
+ *   const user = requireAuth(event)
+ *   return { success: true }
+ * })
+ */
+export function wrapApiHandler<T = any>(
+  handler: (event: H3Event<EventHandlerRequest>) => Promise<T> | T,
+  options: ApiHandlerOptions = {}
+) {
+  const {
+    operationName,
+    silentErrors = false,
+    defaultErrorMessage = 'Erreur serveur interne',
+  } = options
+
+  return defineEventHandler<EventHandlerRequest>(async (event) => {
+    try {
+      return await handler(event)
+    } catch (error: unknown) {
+      // 1. Erreurs HTTP - les relancer directement
+      if (isHttpError(error)) {
+        throw error
+      }
+
+      // 2. Erreurs Zod - transformer en erreur 400
+      if (error instanceof z.ZodError) {
+        return handleValidationError(error)
+      }
+
+      // 3. Erreurs génériques - logger et transformer en 500
+      const isUserError = isHttpError(error)
+      const shouldLog =
+        !silentErrors && (!isUserError || (isHttpError(error) && error.statusCode >= 500))
+
+      if (shouldLog) {
+        console.error(
+          operationName ? `[${operationName}] Erreur inattendue:` : 'Erreur inattendue:',
+          error
+        )
+      }
+
+      throw createError({
+        statusCode: 500,
+        message: defaultErrorMessage,
+      })
+    }
+  })
+}
+
+/**
+ * Gère les erreurs de validation Zod de manière standardisée
+ */
+export function handleValidationError(error: z.ZodError): never {
+  const errors = error.issues
+  const firstError = errors[0]
+  const message = firstError?.message || 'Données invalides'
+
+  throw createError({
+    statusCode: 400,
+    message,
+    data: errors,
+  })
+}
+
+/**
+ * Gère les erreurs Prisma courantes (notamment P2002 - contrainte unique)
+ */
+export function handlePrismaError(error: unknown, context?: string): never {
+  if (error && typeof error === 'object' && 'code' in error) {
+    const prismaError = error as { code: string; meta?: any }
+
+    switch (prismaError.code) {
+      case 'P2002': {
+        // Contrainte unique violée
+        const target = prismaError.meta?.target
+        const field = Array.isArray(target) ? target[0] : 'champ'
+        throw createError({
+          statusCode: 409,
+          message: `Ce ${field} est déjà utilisé`,
+        })
+      }
+
+      case 'P2025': {
+        // Enregistrement non trouvé
+        throw createError({
+          statusCode: 404,
+          message: context ? `${context} introuvable` : 'Ressource introuvable',
+        })
+      }
+
+      case 'P2003': {
+        // Contrainte de clé étrangère violée
+        throw createError({
+          statusCode: 400,
+          message: 'Référence invalide',
+        })
+      }
+
+      default:
+        // Erreur Prisma inconnue - logger et relancer comme 500
+        console.error('Erreur Prisma non gérée:', prismaError.code, prismaError)
+        throw createError({
+          statusCode: 500,
+          message: 'Erreur de base de données',
+        })
+    }
+  }
+
+  // Si ce n'est pas une erreur Prisma reconnue, la relancer
+  throw error
+}
+
+/**
+ * Crée une réponse de succès standardisée
+ */
+export function createSuccessResponse<T>(data: T, message?: string) {
+  return {
+    success: true,
+    ...(message && { message }),
+    data,
+  }
+}
+
+/**
+ * Crée une réponse paginée standardisée
+ */
+export function createPaginatedResponse<T>(items: T[], total: number, page: number, limit: number) {
+  return {
+    success: true,
+    data: items,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
+  }
+}
