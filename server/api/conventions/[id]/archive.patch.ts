@@ -11,7 +11,7 @@ import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'
 const schema = z.object({ archived: z.boolean() })
 
 export default defineEventHandler(async (event) => {
-  const conventionId = validateConventionId(getRouterParam(event, 'id'))
+  const conventionId = validateConventionId(event)
   const user = requireAuth(event)
 
   const body = await readBody(event).catch(() => ({}))

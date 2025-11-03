@@ -307,22 +307,6 @@ export async function canAccessEditionData(
 }
 
 /**
- * Utilitaire pour valider un ID d'édition
- */
-export function validateEditionId(id: string | undefined): number {
-  const editionId = parseInt(id as string)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'Invalid Edition ID',
-    })
-  }
-
-  return editionId
-}
-
-/**
  * Vérifie si un utilisateur peut accéder aux données d'une édition
  * en tant que gestionnaire OU en tant que bénévole en créneau de contrôle d'accès actif
  */

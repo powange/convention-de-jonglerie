@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { handleValidationError } from './validation-schemas'
+
 import type { H3Event, EventHandlerRequest } from 'h3'
 
 /**
@@ -85,21 +87,6 @@ export function wrapApiHandler<T = any>(
         message: defaultErrorMessage,
       })
     }
-  })
-}
-
-/**
- * Gère les erreurs de validation Zod de manière standardisée
- */
-export function handleValidationError(error: z.ZodError): never {
-  const errors = error.issues
-  const firstError = errors[0]
-  const message = firstError?.message || 'Données invalides'
-
-  throw createError({
-    statusCode: 400,
-    message,
-    data: errors,
   })
 }
 

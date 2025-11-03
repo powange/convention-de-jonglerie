@@ -1,6 +1,6 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et droits admin
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const conventionId = validateConventionId(getRouterParam(event, 'id'))
+    const conventionId = validateConventionId(event)
 
     // Récupérer la convention pour logging
     const convention = await prisma.convention.findUnique({

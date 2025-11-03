@@ -3,9 +3,9 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getConventionForDelete,
   shouldArchiveInsteadOfDelete,
-  validateConventionId,
 } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'
 
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
 
   try {
-    const conventionId = validateConventionId(getRouterParam(event, 'id'))
+    const conventionId = validateConventionId(event)
 
     // Récupère la convention et vérifie les permissions de suppression
     const convention = await getConventionForDelete(conventionId, user)

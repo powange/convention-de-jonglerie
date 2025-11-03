@@ -5,10 +5,7 @@ import {
   moveTempImageToEdition,
   moveTempImageFromPlaceholder,
 } from '@@/server/utils/move-temp-image'
-import {
-  getConventionForEditionCreation,
-  validateConventionId,
-} from '@@/server/utils/permissions/convention-permissions'
+import { getConventionForEditionCreation } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import {
   editionSchema,
@@ -75,9 +72,8 @@ export default defineEventHandler(async (event) => {
     hasAfjTokenPayment,
   } = validatedData
 
-  // Valider l'ID de convention et vérifier les permissions
-  const validConventionId = validateConventionId(conventionId)
-  await getConventionForEditionCreation(validConventionId, user)
+  // Vérifier les permissions pour créer une édition
+  await getConventionForEditionCreation(conventionId, user)
 
   try {
     // Géocoder l'adresse pour obtenir les coordonnées

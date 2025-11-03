@@ -3,7 +3,7 @@ import { canManageEditionVolunteers } from '@@/server/utils/collaborator-managem
 import {
   volunteerApplicationPatchSchema,
   validateAllergiesUpdate,
-  buildUpdateData,
+  buildVolunteerApplicationUpdateData,
   getUserUpdateData,
 } from '@@/server/utils/editions/volunteers/applications'
 import { NotificationService } from '@@/server/utils/notification-service'
@@ -123,7 +123,7 @@ export default defineEventHandler(async (event) => {
     const { changes } = applicationChanges
 
     // Construire les données de mise à jour
-    const updateData = buildUpdateData(parsed, user || undefined)
+    const updateData = buildVolunteerApplicationUpdateData(parsed, user || undefined)
 
     // Mettre à jour le profil utilisateur si le téléphone a changé
     if (parsed.phone !== undefined && user) {

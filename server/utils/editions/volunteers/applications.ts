@@ -289,7 +289,7 @@ export function validateAllergiesUpdate(parsed: VolunteerApplicationPatch): stri
  * @param user - Données utilisateur (optionnel, pour la gestion du téléphone)
  * @returns Objet de mise à jour pour Prisma
  */
-export function buildUpdateData(
+export function buildVolunteerApplicationUpdateData(
   parsed: VolunteerApplicationPatch,
   user?: { phone: string | null }
 ): Record<string, any> {

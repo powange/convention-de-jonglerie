@@ -40,27 +40,6 @@ export const isValidDateString = (dateString: string): boolean => {
 }
 
 /**
- * Valide qu'une date de fin est postérieure à une date de début
- * @param startDate - Date de début (string)
- * @param endDate - Date de fin (string)
- * @returns true si la plage est valide
- */
-export const validateDateRange = (startDate: string, endDate: string): boolean => {
-  if (!startDate || !endDate) return true // Laisser la validation Zod gérer les champs requis
-
-  try {
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) return false
-
-    return end > start
-  } catch {
-    return false
-  }
-}
-
-/**
  * Formate une date pour l'affichage (côté serveur, pour les logs par exemple)
  * @param date - Date à formater
  * @param locale - Locale (défaut: 'fr-FR')

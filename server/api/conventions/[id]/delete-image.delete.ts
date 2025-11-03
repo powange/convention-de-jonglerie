@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
 
   try {
-    const conventionId = validateConventionId(getRouterParam(event, 'id'))
+    const conventionId = validateConventionId(event)
 
     // Utiliser l'utilitaire de suppression avec l'objet user complet
     const result = await deleteConventionImage(conventionId, user)

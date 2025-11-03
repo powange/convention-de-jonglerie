@@ -249,22 +249,6 @@ export async function getConventionForCollaboratorManagement(
 }
 
 /**
- * Utilitaire pour valider un ID de convention
- */
-export function validateConventionId(id: string | undefined): number {
-  const conventionId = parseInt(id as string)
-
-  if (isNaN(conventionId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID de convention invalide',
-    })
-  }
-
-  return conventionId
-}
-
-/**
  * Vérifie si une convention peut être supprimée (pas d'éditions) ou doit être archivée
  */
 export function shouldArchiveInsteadOfDelete(convention: ConventionWithEditions): boolean {

@@ -5,7 +5,7 @@ import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
-    const conventionId = validateConventionId(getRouterParam(event, 'id'))
+    const conventionId = validateConventionId(event)
     const user = requireAuth(event)
 
     // Vérifier les permissions de l'utilisateur sur la convention

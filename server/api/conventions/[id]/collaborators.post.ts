@@ -42,7 +42,7 @@ const addCollaboratorSchema = z
 
 export default defineEventHandler(async (event) => {
   try {
-    const conventionId = validateConventionId(getRouterParam(event, 'id'))
+    const conventionId = validateConventionId(event)
     const user = requireAuth(event)
 
     const body = await readBody(event)
