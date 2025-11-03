@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -16,13 +17,13 @@ const notificationPreferencesSchema = z.object({
   emailCarpoolUpdates: z.boolean(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const body = await readBody(event)
-  const preferences = notificationPreferencesSchema.parse(body)
+    const body = await readBody(event)
+    const preferences = notificationPreferencesSchema.parse(body)
 
-  try {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
@@ -38,11 +39,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       preferences: updatedUser.notificationPreferences,
     }
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde des préférences de notifications:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la sauvegarde des préférences',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateNotificationPreferences' }
+)

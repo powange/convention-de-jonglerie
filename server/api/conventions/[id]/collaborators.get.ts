@@ -1,7 +1,7 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { checkUserConventionPermission } from '@@/server/utils/collaborator-management'
-import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default defineEventHandler(async (event) => {
   try {

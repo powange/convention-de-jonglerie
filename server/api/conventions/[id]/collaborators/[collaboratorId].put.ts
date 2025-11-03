@@ -1,7 +1,8 @@
-import { isHttpError } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { updateCollaboratorRights } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import type {
@@ -35,11 +36,11 @@ const updateRightsSchema = z.object({
     .optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const user = requireAuth(event)
-    const conventionId = parseInt(getRouterParam(event, 'id') as string)
-    const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') as string)
+    const conventionId = validateConventionId(event)
+    const collaboratorId = validateResourceId(event, 'collaboratorId', 'collaborateur')
     const body = await readBody(event)
 
     // Valider les données
@@ -152,14 +153,6 @@ export default defineEventHandler(async (event) => {
         user: updatedCollaborator.user,
       },
     }
-  } catch (error: unknown) {
-    if (isHttpError(error)) {
-      throw error
-    }
-    console.error('Erreur lors de la mise à jour du rôle:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateCollaboratorRights' }
+)

@@ -1,10 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { deleteProfilePicture } from '@@/server/utils/image-deletion'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  try {
     // Utiliser l'utilitaire de suppression
     const result = await deleteProfilePicture(user.id)
 
@@ -12,16 +13,6 @@ export default defineEventHandler(async (event) => {
       success: result.success,
       user: result.entity,
     }
-  } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string }
-    if (httpError.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la suppression de la photo de profil:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la suppression de la photo de profil',
-    })
-  }
-})
+  },
+  { operationName: 'DeleteProfilePicture' }
+)
