@@ -1,26 +1,18 @@
-import { isHttpError } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Cette route est publique pour permettre la consultation des conventions
-  // L'authentification et les droits d'édition sont vérifiés côté client
+export default wrapApiHandler(
+  async (event) => {
+    // Cette route est publique pour permettre la consultation des conventions
+    // L'authentification et les droits d'édition sont vérifiés côté client
 
-  try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string)
-
-    if (isNaN(conventionId)) {
-      throw createError({
-        statusCode: 400,
-        message: 'ID de convention invalide',
-      })
-    }
+    const conventionId = validateConventionId(event)
 
     // Récupérer la convention
-    const convention = await prisma.convention.findUnique({
-      where: {
-        id: conventionId,
-      },
+    const convention = await fetchResourceOrFail(prisma.convention, conventionId, {
       include: {
         author: {
           select: {
@@ -41,14 +33,8 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
+      errorMessage: 'Convention introuvable',
     })
-
-    if (!convention) {
-      throw createError({
-        statusCode: 404,
-        message: 'Convention introuvable',
-      })
-    }
 
     // Transformer auteur (emailHash) et collaborateurs avec nouveaux droits
     const transformed = {
@@ -79,16 +65,6 @@ export default defineEventHandler(async (event) => {
     }
 
     return transformed
-  } catch (error: unknown) {
-    // Si c'est déjà une erreur HTTP, la relancer
-    if (isHttpError(error)) {
-      throw error
-    }
-
-    console.error('Erreur lors de la récupération de la convention:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetConvention' }
+)

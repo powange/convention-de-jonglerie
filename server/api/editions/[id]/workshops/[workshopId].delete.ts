@@ -1,23 +1,15 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permissions'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@@/server/utils/prisma'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 
-const prisma = new PrismaClient()
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateResourceId(event, 'id', 'édition')
+    const workshopId = validateResourceId(event, 'workshopId', 'atelier')
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-  const workshopId = parseInt(getRouterParam(event, 'workshopId')!)
-
-  if (isNaN(editionId) || isNaN(workshopId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID invalide',
-    })
-  }
-
-  try {
     // Vérifier que le workshop existe et appartient à l'édition
     const workshop = await prisma.workshop.findFirst({
       where: {
@@ -49,15 +41,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return { success: true, message: 'Workshop supprimé avec succès' }
-  } catch (error: unknown) {
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la suppression du workshop:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'DeleteWorkshop' }
+)

@@ -1,6 +1,9 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
-import { validateAndSanitize, handleValidationError } from '@@/server/utils/validation-schemas'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
+import { validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
 
 const resolveSchema = z.object({
@@ -11,46 +14,19 @@ const resolveSchema = z.object({
     .optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    await requireGlobalAdminWithDbCheck(event)
+    const feedbackId = validateResourceId(event, 'id', 'feedback')
 
-  const feedbackId = parseInt(event.context.params?.id as string)
+    const body = await readBody(event)
+    const validatedData = validateAndSanitize(resolveSchema, body)
+    const { resolved, adminNotes } = validatedData
 
-  if (isNaN(feedbackId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID de feedback invalide',
-    })
-  }
-
-  const body = await readBody(event)
-
-  // Validation des données
-  let validatedData
-  try {
-    validatedData = validateAndSanitize(resolveSchema, body)
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-    throw error
-  }
-
-  const { resolved, adminNotes } = validatedData
-
-  try {
     // Vérifier que le feedback existe
-    const existingFeedback = await prisma.feedback.findUnique({
-      where: { id: feedbackId },
+    await fetchResourceOrFail(prisma.feedback, feedbackId, {
+      errorMessage: 'Feedback introuvable',
     })
-
-    if (!existingFeedback) {
-      throw createError({
-        statusCode: 404,
-        message: 'Feedback introuvable',
-      })
-    }
 
     // Mettre à jour le feedback
     const updatedFeedback = await prisma.feedback.update({
@@ -76,16 +52,6 @@ export default defineEventHandler(async (event) => {
       message: resolved ? 'Feedback marqué comme résolu' : 'Feedback marqué comme non résolu',
       feedback: updatedFeedback,
     }
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour du feedback:', error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour du feedback',
-    })
-  }
-})
+  },
+  { operationName: 'ResolveFeedback' }
+)

@@ -1,49 +1,34 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateUserId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const promoteUserSchema = z.object({
   isGlobalAdmin: z.boolean(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  const adminUser = await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
+    const userId = validateUserId(event)
 
-  const userId = parseInt(getRouterParam(event, 'id') as string)
+    // Empêcher l'auto-modification
+    if (userId === adminUser.id) {
+      throw createError({
+        statusCode: 403,
+        message: 'Vous ne pouvez pas modifier vos propres droits administrateur',
+      })
+    }
 
-  if (isNaN(userId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID utilisateur invalide',
-    })
-  }
-
-  // Empêcher l'auto-modification
-  if (userId === adminUser.id) {
-    throw createError({
-      statusCode: 403,
-      message: 'Vous ne pouvez pas modifier vos propres droits administrateur',
-    })
-  }
-
-  try {
     const body = await readBody(event)
-
-    // Valider les données d'entrée
     const validatedData = promoteUserSchema.parse(body)
 
     // Vérifier que l'utilisateur à modifier existe
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
+    await fetchResourceOrFail(prisma.user, userId, {
+      errorMessage: 'Utilisateur introuvable',
     })
-
-    if (!existingUser) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur introuvable',
-      })
-    }
 
     // Mettre à jour le statut administrateur
     const updatedUser = await prisma.user.update({
@@ -75,26 +60,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return updatedUser
-  } catch (error) {
-    console.error("Erreur lors de la promotion/rétrogradation de l'utilisateur:", error)
-
-    // Si c'est une erreur de validation Zod
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    // Si c'est déjà une erreur HTTP, la relancer
-    if ((error as any)?.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur serveur lors de la promotion/rétrogradation de l'utilisateur",
-    })
-  }
-})
+  },
+  { operationName: 'PromoteUser' }
+)
