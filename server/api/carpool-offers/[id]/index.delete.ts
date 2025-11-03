@@ -1,31 +1,18 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const offerId = validateResourceId(event, 'id', 'offre')
 
-  const offerId = parseInt(getRouterParam(event, 'id') as string)
-
-  if (isNaN(offerId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'offre invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'offre existe et que l'utilisateur en est le créateur
-    const existingOffer = await prisma.carpoolOffer.findUnique({
-      where: { id: offerId },
+    const existingOffer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
+      errorMessage: 'Offre de covoiturage introuvable',
     })
-
-    if (!existingOffer) {
-      throw createError({
-        statusCode: 404,
-        message: 'Offre de covoiturage introuvable',
-      })
-    }
 
     // Seul le créateur peut supprimer son offre
     if (existingOffer.userId !== user.id) {
@@ -41,16 +28,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return { message: 'Offre de covoiturage supprimée avec succès' }
-  } catch (error: unknown) {
-    console.error("Erreur lors de la suppression de l'offre de covoiturage:", error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la suppression de l'offre",
-    })
-  }
-})
+  },
+  { operationName: 'DeleteCarpoolOffer' }
+)
