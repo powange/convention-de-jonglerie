@@ -684,3 +684,322 @@ grep -r "select: {" server/api/ | grep "email: true"
 - Exemples refactorisés :
   - `server/api/admin/users/[id].put.ts`
   - `server/api/carpool-offers/[id]/index.put.ts`
+
+---
+
+## 🎯 TODO List - Migration des endpoints restants
+
+### 📊 Progrès global
+
+| Catégorie | Migrés | Restants | Total | Progression |
+|-----------|--------|----------|-------|-------------|
+| **User** | 4 | 0 | 4 | ✅ 100% |
+| **Conventions** | 27 | 0 | 27 | ✅ 100% |
+| **Carpool** | 10 | 0 | 10 | ✅ 100% |
+| **Auth** | 8 | 0 | 8 | ✅ 100% |
+| **Admin** | 32 | 0 | 32 | ✅ 100% |
+| **Notifications** | 10 | 0 | 10 | ✅ 100% |
+| **Feedback** | 0 | 1 | 1 | 🔴 0% |
+| **Racine** | 0 | 2 | 2 | 🔴 0% |
+| **Editions** | 0 | 149 | 149 | 🔴 0% |
+| **TOTAL** | **91** | **152** | **243** | 🟡 **37%** |
+
+---
+
+### Phase 5A : Notifications (10 endpoints) ✅ COMPLÉTÉ
+
+**Priorité : HAUTE** - Système critique pour l'expérience utilisateur
+
+- [x] `server/api/notifications/index.get.ts` - Liste des notifications utilisateur
+- [x] `server/api/notifications/[id]/read.patch.ts` - Marquer comme lue
+- [x] `server/api/notifications/[id]/unread.patch.ts` - Marquer comme non lue
+- [x] `server/api/notifications/[id]/delete.delete.ts` - Supprimer une notification
+- [x] `server/api/notifications/mark-all-read.patch.ts` - Tout marquer comme lu
+- [x] `server/api/notifications/stats.get.ts` - Statistiques des notifications
+- [x] `server/api/notifications/stream.get.ts` - Stream SSE des notifications
+- [x] `server/api/notifications/push/subscribe.post.ts` - Abonnement aux push
+- [x] `server/api/notifications/push/unsubscribe.post.ts` - Désabonnement push
+- [x] `server/api/notifications/push/check.post.ts` - Vérification de l'abonnement
+
+---
+
+### Phase 5B : Feedback & Racine (3 endpoints)
+
+**Priorité : MOYENNE** - Endpoints simples et isolés
+
+#### Feedback (1)
+- [ ] `server/api/feedback/index.post.ts` - Soumettre un feedback
+
+#### Racine (2)
+- [ ] `server/api/countries.get.ts` - Liste des pays
+- [ ] `server/api/site.webmanifest.get.ts` - Manifest PWA
+
+---
+
+### Phase 5C : Editions - Racine (3 endpoints)
+
+**Priorité : HAUTE** - CRUD principal des éditions
+
+- [ ] `server/api/editions/favorites.get.ts` - Liste des favoris utilisateur
+- [ ] `server/api/editions/index.post.ts` - Créer une édition
+- [ ] `server/api/editions/[id]/index.put.ts` - Modifier une édition
+- [ ] `server/api/editions/[id]/index.delete.ts` - Supprimer une édition
+
+---
+
+### Phase 5D : Editions - Artists (6 endpoints)
+
+- [ ] `server/api/editions/[id]/artists/index.get.ts`
+- [ ] `server/api/editions/[id]/artists/index.post.ts`
+- [ ] `server/api/editions/[id]/artists/[artistId]/index.get.ts`
+- [ ] `server/api/editions/[id]/artists/[artistId]/index.put.ts`
+- [ ] `server/api/editions/[id]/artists/[artistId]/index.delete.ts`
+- [ ] `server/api/editions/[id]/artists/[artistId]/image.put.ts`
+
+---
+
+### Phase 5E : Editions - Carpool (4 endpoints)
+
+- [ ] `server/api/editions/[id]/carpool-offers/index.get.ts`
+- [ ] `server/api/editions/[id]/carpool-offers/index.post.ts`
+- [ ] `server/api/editions/[id]/carpool-requests/index.get.ts`
+- [ ] `server/api/editions/[id]/carpool-requests/index.post.ts`
+
+---
+
+### Phase 5F : Editions - Lost & Found (4 endpoints)
+
+- [ ] `server/api/editions/[id]/lost-found/index.get.ts`
+- [ ] `server/api/editions/[id]/lost-found/index.post.ts`
+- [ ] `server/api/editions/[id]/lost-found/[itemId]/index.put.ts`
+- [ ] `server/api/editions/[id]/lost-found/[itemId]/index.delete.ts`
+
+---
+
+### Phase 5G : Editions - Meals (7 endpoints)
+
+**Attention : Système complexe de validation de repas**
+
+- [ ] `server/api/editions/[id]/meals/index.get.ts`
+- [ ] `server/api/editions/[id]/meals/participants.get.ts`
+- [ ] `server/api/editions/[id]/meals/[mealId]/search.get.ts`
+- [ ] `server/api/editions/[id]/meals/[mealId]/stats.get.ts`
+- [ ] `server/api/editions/[id]/meals/[mealId]/pending.get.ts`
+- [ ] `server/api/editions/[id]/meals/[mealId]/validate.post.ts`
+- [ ] `server/api/editions/[id]/meals/[mealId]/cancel.post.ts`
+
+---
+
+### Phase 5H : Editions - Posts & Comments (10 endpoints)
+
+- [ ] `server/api/editions/[id]/posts/index.get.ts`
+- [ ] `server/api/editions/[id]/posts/index.post.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/index.get.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/index.put.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/index.delete.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/comments/index.get.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/comments/index.post.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/comments/[commentId]/index.get.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/comments/[commentId]/index.put.ts`
+- [ ] `server/api/editions/[id]/posts/[postId]/comments/[commentId]/index.delete.ts`
+
+---
+
+### Phase 5I : Editions - Shows (1 endpoint)
+
+- [ ] `server/api/editions/[id]/shows/index.get.ts`
+
+---
+
+### Phase 5J : Editions - Workshops (7 endpoints)
+
+- [ ] `server/api/editions/[id]/workshops/index.get.ts`
+- [ ] `server/api/editions/[id]/workshops/index.post.ts`
+- [ ] `server/api/editions/[id]/workshops/locations/index.get.ts`
+- [ ] `server/api/editions/[id]/workshops/[workshopId]/index.get.ts`
+- [ ] `server/api/editions/[id]/workshops/[workshopId]/index.put.ts`
+- [ ] `server/api/editions/[id]/workshops/[workshopId]/index.delete.ts`
+- [ ] `server/api/editions/[id]/workshops/[workshopId]/register.post.ts`
+
+---
+
+### Phase 5K : Editions - Ticketing (40+ endpoints)
+
+**Attention : Système le plus complexe, à traiter en dernier**
+
+#### Tiers (6 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/tiers/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/tiers/index.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/tiers/[tierId].get.ts`
+- [ ] `server/api/editions/[id]/ticketing/tiers/[tierId].put.ts`
+- [ ] `server/api/editions/[id]/ticketing/tiers/[tierId].delete.ts`
+- [ ] `server/api/editions/[id]/ticketing/tiers/reorder.post.ts`
+
+#### Options (6 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/options/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/options/index.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/options/[optionId].get.ts`
+- [ ] `server/api/editions/[id]/ticketing/options/[optionId].put.ts`
+- [ ] `server/api/editions/[id]/ticketing/options/[optionId].delete.ts`
+- [ ] `server/api/editions/[id]/ticketing/options/reorder.post.ts`
+
+#### Custom Fields (5 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/custom-fields/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/custom-fields/index.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/custom-fields/[customFieldId].put.ts`
+- [ ] `server/api/editions/[id]/ticketing/custom-fields/[customFieldId].delete.ts`
+- [ ] `server/api/editions/[id]/ticketing/custom-fields/reorder.post.ts`
+
+#### Returnable Items (8 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/index.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/[itemId].put.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/[itemId].delete.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/[itemId]/assign.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/[itemId]/return.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/[itemId]/force-return.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/returnable-items/assignments.get.ts`
+
+#### Quotas (3 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/quotas/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/quotas/index.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/quotas/[quotaId].delete.ts`
+
+#### Orders (5 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/orders/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/orders/[orderId].get.ts`
+- [ ] `server/api/editions/[id]/ticketing/orders/[orderId]/cancel.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/orders/[orderId]/refund.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/orders/stats.get.ts`
+
+#### External & HelloAsso (5 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/external/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/external/sync.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/helloasso/config.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/helloasso/config.put.ts`
+- [ ] `server/api/editions/[id]/ticketing/helloasso/sync.post.ts`
+
+#### Volunteers Ticketing (6 endpoints)
+- [ ] `server/api/editions/[id]/ticketing/volunteers/index.get.ts`
+- [ ] `server/api/editions/[id]/ticketing/volunteers/[volunteerId].get.ts`
+- [ ] `server/api/editions/[id]/ticketing/volunteers/returnable-items/assign.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/volunteers/returnable-items/return.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/volunteers/returnable-items/force-return.post.ts`
+- [ ] `server/api/editions/[id]/ticketing/volunteers/returnable-items/assignments.get.ts`
+
+---
+
+### Phase 5L : Editions - Volunteers (29 endpoints)
+
+**Attention : Système complexe de gestion des bénévoles**
+
+#### Applications (8 endpoints)
+- [ ] `server/api/editions/[id]/volunteers/applications/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/index.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/index.put.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/accept.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/reject.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/teams/index.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/teams/[teamId].delete.ts`
+
+#### Teams (6 endpoints)
+- [ ] `server/api/editions/[id]/volunteers/teams/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/teams/index.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/teams/[teamId].get.ts`
+- [ ] `server/api/editions/[id]/volunteers/teams/[teamId].put.ts`
+- [ ] `server/api/editions/[id]/volunteers/teams/[teamId].delete.ts`
+- [ ] `server/api/editions/[id]/volunteers/teams/[teamId]/members.post.ts`
+
+#### Access Control (3 endpoints)
+- [ ] `server/api/editions/[id]/volunteers/access-control/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/access-control/check.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/access-control/grant.post.ts`
+
+#### Catering (1 endpoint)
+- [ ] `server/api/editions/[id]/volunteers/catering/index.get.ts`
+
+#### Notifications (3 endpoints)
+- [ ] `server/api/editions/[id]/volunteers/notification/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/notification/index.post.ts`
+- [ ] `server/api/editions/[id]/volunteers/notification/[groupId].delete.ts`
+
+#### Gestion (4 endpoints)
+- [ ] `server/api/editions/[id]/volunteers/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/[volunteerId]/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteers/[volunteerId]/index.put.ts`
+- [ ] `server/api/editions/[id]/volunteers/[volunteerId]/index.delete.ts`
+
+#### Time Slots (4 endpoints)
+- [ ] `server/api/editions/[id]/volunteer-time-slots/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteer-time-slots/index.post.ts`
+- [ ] `server/api/editions/[id]/volunteer-time-slots/[slotId].delete.ts`
+- [ ] `server/api/editions/[id]/volunteer-time-slots/[slotId]/assignments/index.post.ts`
+
+#### Teams (Legacy - 4 endpoints)
+- [ ] `server/api/editions/[id]/volunteer-teams/index.get.ts`
+- [ ] `server/api/editions/[id]/volunteer-teams/index.post.ts`
+- [ ] `server/api/editions/[id]/volunteer-teams/[teamId].put.ts`
+- [ ] `server/api/editions/[id]/volunteer-teams/[teamId].delete.ts`
+
+---
+
+### Phase 5M : Editions - Permissions & Autres (3 endpoints)
+
+- [ ] `server/api/editions/[id]/permissions/can-access-meal-validation.get.ts`
+- [ ] `server/api/editions/[id]/attendance.post.ts`
+
+---
+
+## 🎯 Stratégie de migration recommandée
+
+### Ordre suggéré
+
+1. **Phase 5A** - Notifications (10) - Système critique, isolé
+2. **Phase 5B** - Feedback & Racine (3) - Simples et rapides
+3. **Phase 5C** - Editions racine (4) - CRUD principal
+4. **Phase 5D** - Artists (6) - CRUD simple
+5. **Phase 5E** - Carpool (4) - Déjà familier
+6. **Phase 5F** - Lost & Found (4) - CRUD simple
+7. **Phase 5I** - Shows (1) - Lecture seule
+8. **Phase 5J** - Workshops (7) - CRUD modéré
+9. **Phase 5H** - Posts & Comments (10) - CRUD imbriqué
+10. **Phase 5G** - Meals (7) - Logique métier complexe
+11. **Phase 5M** - Permissions & Autres (3) - Divers
+12. **Phase 5L** - Volunteers (29) - Système complexe
+13. **Phase 5K** - Ticketing (40+) - **LE PLUS COMPLEXE** - À faire en dernier
+
+### Critères de priorisation
+
+- ✅ **Isolement** : Moins de dépendances = migration plus facile
+- ✅ **Simplicité** : CRUD simple avant logique métier complexe
+- ✅ **Volume** : Petits groupes avant gros groupes
+- ✅ **Criticité** : Fonctionnalités critiques en priorité
+
+---
+
+## 📝 Notes de migration
+
+### Patterns récurrents identifiés
+
+1. **Validation d'ID édition** : `validateEditionId(event)` sera massivement utilisé
+2. **Permissions édition** : Beaucoup d'endpoints nécessitent `canManageEdition()` ou `canManageConvention()`
+3. **Validation de ressources imbriquées** : Ex. workshop appartient à édition
+4. **Pagination** : Beaucoup de listes (posts, comments, applications, orders)
+
+### Helpers spécifiques à créer (si nécessaire)
+
+- `validateWorkshopId()` - Validateur spécifique pour workshops
+- `validatePostId()` / `validateCommentId()` - Pour les posts/comments
+- `fetchEditionOrFail()` - Fetch édition avec vérification 404 (très utilisé)
+- `requireEditionManagementAccess()` - Vérifier droits gestion édition
+
+---
+
+## ✅ Checklist de validation après chaque phase
+
+- [ ] Tous les tests passent (unit + Nuxt)
+- [ ] Lint sans erreurs
+- [ ] Pas de régression fonctionnelle
+- [ ] Commit avec message descriptif
+- [ ] Mise à jour de cette TODO list (cocher les cases)
