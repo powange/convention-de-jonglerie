@@ -2,7 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const cancelMealSchema = z.object({
@@ -14,11 +14,7 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
-    const mealId = parseInt(getRouterParam(event, 'mealId') || '0')
-
-    if (!mealId) {
-      throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-    }
+    const mealId = validateResourceId(event, 'mealId', 'repas')
 
     const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
     if (!allowed) {

@@ -20,6 +20,8 @@ export type ResourceType =
   | 'option'
   | 'commande'
   | 'participant'
+  | 'repas'
+  | 'objet'
 
 /**
  * Messages d'erreur pour les ressources
@@ -41,6 +43,8 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   option: "ID d'option invalide",
   commande: 'ID de commande invalide',
   participant: 'ID de participant invalide',
+  repas: 'ID de repas invalide',
+  objet: "ID d'objet invalide",
 }
 
 /**

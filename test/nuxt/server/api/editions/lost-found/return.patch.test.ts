@@ -118,7 +118,7 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   it("devrait rejeter si ID d'objet invalide", async () => {
     global.getRouterParam = vi.fn().mockReturnValueOnce('1').mockReturnValueOnce('invalid')
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('ID invalide')
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'objet invalide")
   })
 
   it('devrait rejeter si non authentifié (pas de session)', async () => {

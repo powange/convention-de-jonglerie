@@ -2,20 +2,13 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
-    const itemId = parseInt(getRouterParam(event, 'itemId') as string)
+    const itemId = validateResourceId(event, 'itemId', 'objet')
     const body = await readBody(event)
-
-    if (!itemId || isNaN(itemId)) {
-      throw createError({
-        statusCode: 400,
-        message: 'ID invalide',
-      })
-    }
 
     const user = requireAuth(event)
     const userId = user.id
