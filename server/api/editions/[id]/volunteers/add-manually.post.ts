@@ -25,7 +25,7 @@ export default wrapApiHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   // Vérifier que l'utilisateur existe
-  const user = await prisma.user.findUnique({
+  const targetUser = await prisma.user.findUnique({
     where: { id: body.userId },
     select: {
       id: true,
@@ -36,7 +36,7 @@ export default wrapApiHandler(async (event) => {
     },
   })
 
-  if (!user) {
+  if (!targetUser) {
     throw createError({
       statusCode: 404,
       message: 'Utilisateur introuvable',
@@ -89,7 +89,7 @@ export default wrapApiHandler(async (event) => {
       userId: body.userId,
       status: 'ACCEPTED',
       motivation: 'Ajouté manuellement par un organisateur',
-      userSnapshotPhone: user.phone || null,
+      userSnapshotPhone: targetUser.phone || null,
       dietaryPreference: 'NONE',
       setupAvailability: null,
       teardownAvailability: null,
