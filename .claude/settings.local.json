@@ -29,15 +29,26 @@
       "Bash(else echo \"❌ $file\")",
       "Bash(fi)",
       "Bash(for file in server/api/conventions/**/**/*.ts)",
-      "Bash(for file in server/api/conventions/*.ts)"
+      "Bash(for file in server/api/conventions/*.ts)",
+      "Bash(for file in server/api/auth/*.ts)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(wc:*)",
+      "Bash(for file in server/api/admin/**/*.ts)",
+      "Bash(then echo \"✅ $file\" else echo \"❌ $file\" fi done)",
+      "Bash(do if ! grep -q \"wrapApiHandler\" \"$file\")",
+      "Bash(for file in server/api/admin/users/[id].get.ts server/api/admin/users/[id].put.ts server/api/admin/notifications/index.get.ts server/api/admin/users/index.get.ts server/api/admin/error-logs/index.get.ts server/api/admin/error-logs/[id].patch.ts server/api/admin/backup/restore.post.ts server/api/admin/users/[id].delete.ts server/api/admin/feedback/[id].patch.ts server/api/admin/notifications/push-subscribe.post.ts server/api/admin/notifications/push-unsubscribe.delete.ts server/api/admin/editions/[id]/statistics.get.ts server/api/admin/error-logs/deduplicate-all.post.ts)",
+      "Bash(then echo \"$file\")",
+      "Bash(for file in server/api/admin/activity.get.ts server/api/admin/assign-meals-volunteers.post.ts server/api/admin/backup/restore.post.ts server/api/admin/error-logs.get.ts \"server/api/admin/error-logs/[id]/resolve.patch.ts\" server/api/admin/import-edition.post.ts server/api/admin/notifications/stats.get.ts server/api/admin/notifications/test.post.ts \"server/api/admin/users/[id].delete.ts\" \"server/api/admin/users/[id]/profile-picture.put.ts\" server/api/admin/users/index.get.ts)",
+      "Bash(do wc -l \"$file\")",
+      "Bash(for dir in server/api/*/)",
+      "Bash(/dev/null -exec sh -c \"grep -q wrapApiHandler \"\"$1\"\" || echo \"\"$1\"\"\" _ {})",
+      "Bash(then echo \"$file\" fi done)",
+      "Bash(for file in server/api/notifications/stats.get.ts server/api/notifications/mark-all-read.patch.ts server/api/notifications/[id]/unread.patch.ts server/api/notifications/[id]/delete.delete.ts)",
+      "Bash(while IFS= read -r file)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": [
-    "nuxt",
-    "nuxt-ui",
-    "vitest-runner"
-  ]
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
 }

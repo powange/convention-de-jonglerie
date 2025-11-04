@@ -1,10 +1,9 @@
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
-
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
 import { passwordSchema } from '@@/server/utils/validation-schemas'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
 
 const setPasswordSchema = z.object({
   email: z.string().email('Adresse email invalide'),

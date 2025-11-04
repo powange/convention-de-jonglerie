@@ -92,7 +92,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
 
     global.readBody.mockResolvedValue({ content: 'Test' })
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('ID d\'offre invalide')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow("ID d'offre invalide")
   })
 
   it("devrait valider que le contenu n'est pas vide", async () => {

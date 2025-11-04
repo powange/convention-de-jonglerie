@@ -1,5 +1,5 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -21,35 +21,35 @@ export default wrapApiHandler(
     const body = await readBody(event).catch(() => ({}))
     const parsed = bodySchema.parse(body)
 
-  // Vérifier que le log existe
-  const existingLog = await prisma.apiErrorLog.findUnique({
-    where: { id: logId },
-    select: { id: true, resolved: true },
-  })
+    // Vérifier que le log existe
+    const existingLog = await prisma.apiErrorLog.findUnique({
+      where: { id: logId },
+      select: { id: true, resolved: true },
+    })
 
-  if (!existingLog) {
-    throw createError({ statusCode: 404, message: "Log d'erreur introuvable" })
-  }
+    if (!existingLog) {
+      throw createError({ statusCode: 404, message: "Log d'erreur introuvable" })
+    }
 
-  // Mettre à jour le statut de résolution
-  const updatedLog = await prisma.apiErrorLog.update({
-    where: { id: logId },
-    data: {
-      resolved: parsed.resolved,
-      resolvedBy: parsed.resolved ? adminUser.id : null,
-      resolvedAt: parsed.resolved ? new Date() : null,
-      adminNotes: parsed.adminNotes || null,
-      updatedAt: new Date(),
-    },
-    select: {
-      id: true,
-      resolved: true,
-      resolvedBy: true,
-      resolvedAt: true,
-      adminNotes: true,
-      updatedAt: true,
-    },
-  })
+    // Mettre à jour le statut de résolution
+    const updatedLog = await prisma.apiErrorLog.update({
+      where: { id: logId },
+      data: {
+        resolved: parsed.resolved,
+        resolvedBy: parsed.resolved ? adminUser.id : null,
+        resolvedAt: parsed.resolved ? new Date() : null,
+        adminNotes: parsed.adminNotes || null,
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        resolved: true,
+        resolvedBy: true,
+        resolvedAt: true,
+        adminNotes: true,
+        updatedAt: true,
+      },
+    })
 
     return {
       success: true,

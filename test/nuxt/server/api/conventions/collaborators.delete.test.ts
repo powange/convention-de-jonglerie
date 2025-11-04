@@ -67,7 +67,9 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
       context: { ...mockEvent.context, params: { id: '1', collaboratorId: 'invalid' } },
     }
 
-    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('ID de collaborateur invalide')
+    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow(
+      'ID de collaborateur invalide'
+    )
   })
 
   it('devrait gérer les erreurs de deleteConventionCollaborator', async () => {

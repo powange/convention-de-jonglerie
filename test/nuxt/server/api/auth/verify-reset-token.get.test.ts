@@ -207,9 +207,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     prismaMock.passwordResetToken.findUnique.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Erreur serveur interne'
-    )
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait relancer les erreurs HTTP existantes', async () => {

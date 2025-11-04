@@ -108,7 +108,9 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
 
     global.readBody.mockResolvedValue(requestBody)
 
-    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('ID de collaborateur invalide')
+    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow(
+      'ID de collaborateur invalide'
+    )
   })
 
   it('devrait valider le schéma de droits avec zod', async () => {

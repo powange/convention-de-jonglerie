@@ -1,9 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { sendEmail, generateAccountDeletionEmailHtml } from '@@/server/utils/emailService'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { readBody } from 'h3'
 
 // Raisons prédéfinies pour la suppression de comptes

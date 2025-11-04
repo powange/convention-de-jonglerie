@@ -1,5 +1,6 @@
-import { clearUserSession } from '#imports'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+
+import { clearUserSession } from '#imports'
 
 export default wrapApiHandler(
   async (event) => {

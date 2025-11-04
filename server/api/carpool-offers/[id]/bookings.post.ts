@@ -9,74 +9,74 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const offerId = validateResourceId(event, 'id', 'offre')
 
-  const body = await readBody(event)
-  const seats = Number(body?.seats)
-  const message = typeof body?.message === 'string' ? body.message.trim() : undefined
-  const requestId = body?.requestId ? Number(body.requestId) : undefined
+    const body = await readBody(event)
+    const seats = Number(body?.seats)
+    const message = typeof body?.message === 'string' ? body.message.trim() : undefined
+    const requestId = body?.requestId ? Number(body.requestId) : undefined
 
-  if (!seats || seats < 1 || seats > 8) {
-    throw createError({ statusCode: 400, message: 'Nombre de places invalide' })
-  }
-
-  // Récupérer l'offre et vérifier droits/capacité
-  const offer = await prisma.carpoolOffer.findUnique({
-    where: { id: offerId },
-    include: {
-      user: true,
-      bookings: true,
-    },
-  })
-
-  if (!offer) {
-    throw createError({ statusCode: 404, message: 'Offre de covoiturage introuvable' })
-  }
-
-  // Le créateur ne peut pas réserver sur sa propre offre
-  if (offer.userId === user.id) {
-    throw createError({
-      statusCode: 400,
-      message: 'Impossible de réserver votre propre offre',
-    })
-  }
-
-  // Si requestId fourni, vérifier l'existence et l'appartenance à l'utilisateur courant
-  if (requestId) {
-    const req = await prisma.carpoolRequest.findUnique({ where: { id: requestId } })
-    if (!req || req.userId !== user.id || req.editionId !== offer.editionId) {
-      throw createError({ statusCode: 400, message: 'Demande invalide' })
+    if (!seats || seats < 1 || seats > 8) {
+      throw createError({ statusCode: 400, message: 'Nombre de places invalide' })
     }
-  }
 
-  // Calculer les places déjà acceptées
-  const acceptedSeats = offer.bookings
-    .filter((b) => b.status === 'ACCEPTED')
-    .reduce((sum, b) => sum + (b.seats || 0), 0)
+    // Récupérer l'offre et vérifier droits/capacité
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      include: {
+        user: true,
+        bookings: true,
+      },
+    })
 
-  if (acceptedSeats + seats > offer.availableSeats) {
-    throw createError({ statusCode: 400, message: 'Plus assez de places disponibles' })
-  }
+    if (!offer) {
+      throw createError({ statusCode: 404, message: 'Offre de covoiturage introuvable' })
+    }
 
-  // Option: éviter multi-PENDING du même utilisateur sur la même offre
-  const existingPending = await prisma.carpoolBooking.findFirst({
-    where: { carpoolOfferId: offerId, requesterId: user.id, status: 'PENDING' },
-  })
-  if (existingPending) {
-    throw createError({ statusCode: 400, message: 'Une réservation en attente existe déjà' })
-  }
+    // Le créateur ne peut pas réserver sur sa propre offre
+    if (offer.userId === user.id) {
+      throw createError({
+        statusCode: 400,
+        message: 'Impossible de réserver votre propre offre',
+      })
+    }
 
-  const booking = await prisma.carpoolBooking.create({
-    data: {
-      carpoolOfferId: offerId,
-      requesterId: user.id,
-      seats,
-      message,
-      requestId,
-      status: 'PENDING',
-    },
-    include: {
-      requester: { select: { id: true, pseudo: true, profilePicture: true } },
-    },
-  })
+    // Si requestId fourni, vérifier l'existence et l'appartenance à l'utilisateur courant
+    if (requestId) {
+      const req = await prisma.carpoolRequest.findUnique({ where: { id: requestId } })
+      if (!req || req.userId !== user.id || req.editionId !== offer.editionId) {
+        throw createError({ statusCode: 400, message: 'Demande invalide' })
+      }
+    }
+
+    // Calculer les places déjà acceptées
+    const acceptedSeats = offer.bookings
+      .filter((b) => b.status === 'ACCEPTED')
+      .reduce((sum, b) => sum + (b.seats || 0), 0)
+
+    if (acceptedSeats + seats > offer.availableSeats) {
+      throw createError({ statusCode: 400, message: 'Plus assez de places disponibles' })
+    }
+
+    // Option: éviter multi-PENDING du même utilisateur sur la même offre
+    const existingPending = await prisma.carpoolBooking.findFirst({
+      where: { carpoolOfferId: offerId, requesterId: user.id, status: 'PENDING' },
+    })
+    if (existingPending) {
+      throw createError({ statusCode: 400, message: 'Une réservation en attente existe déjà' })
+    }
+
+    const booking = await prisma.carpoolBooking.create({
+      data: {
+        carpoolOfferId: offerId,
+        requesterId: user.id,
+        seats,
+        message,
+        requestId,
+        status: 'PENDING',
+      },
+      include: {
+        requester: { select: { id: true, pseudo: true, profilePicture: true } },
+      },
+    })
 
     // Envoyer une notification au propriétaire de l'offre
     try {

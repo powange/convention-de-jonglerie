@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const updateProfilePictureSchema = z.object({

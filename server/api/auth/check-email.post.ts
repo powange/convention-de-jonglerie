@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { z } from 'zod'
 
 const checkEmailSchema = z.object({
   email: z.string().email(),

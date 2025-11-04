@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs'
-
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import {
@@ -11,6 +9,7 @@ import {
 import { prisma } from '@@/server/utils/prisma'
 import { registerRateLimiter } from '@@/server/utils/rate-limiter'
 import { registerSchema } from '@@/server/utils/validation-schemas'
+import bcrypt from 'bcryptjs'
 
 export default wrapApiHandler(
   async (event) => {

@@ -1,8 +1,7 @@
-import { z } from 'zod'
-
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { z } from 'zod'
 
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),

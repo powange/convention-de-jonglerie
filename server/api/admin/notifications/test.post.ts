@@ -1,5 +1,5 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationService, NotificationHelpers } from '@@/server/utils/notification-service'
 import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
 import { prisma } from '@@/server/utils/prisma'
@@ -27,25 +27,25 @@ export default wrapApiHandler(
     const body = await readBody(event).catch(() => ({}))
     const parsed = bodySchema.parse(body)
 
-  // Déterminer l'utilisateur cible
-  let targetUserId = parsed.targetUserId || adminUser.id
+    // Déterminer l'utilisateur cible
+    let targetUserId = parsed.targetUserId || adminUser.id
 
-  // Si un email est fourni, chercher l'utilisateur correspondant
-  if (parsed.targetUserEmail) {
-    const targetUser = await prisma.user.findUnique({
-      where: { email: parsed.targetUserEmail },
-      select: { id: true },
-    })
-
-    if (!targetUser) {
-      throw createError({
-        statusCode: 404,
-        message: `Utilisateur avec l'email ${parsed.targetUserEmail} introuvable`,
+    // Si un email est fourni, chercher l'utilisateur correspondant
+    if (parsed.targetUserEmail) {
+      const targetUser = await prisma.user.findUnique({
+        where: { email: parsed.targetUserEmail },
+        select: { id: true },
       })
-    }
 
-    targetUserId = targetUser.id
-  }
+      if (!targetUser) {
+        throw createError({
+          statusCode: 404,
+          message: `Utilisateur avec l'email ${parsed.targetUserEmail} introuvable`,
+        })
+      }
+
+      targetUserId = targetUser.id
+    }
 
     let notification
 

@@ -1,5 +1,5 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -17,7 +17,8 @@ export default wrapApiHandler(
       },
       {
         name: 'convention-favorites-reminders',
-        description: 'Notifie les utilisateurs des conventions favorites qui commencent dans 3 jours',
+        description:
+          'Notifie les utilisateurs des conventions favorites qui commencent dans 3 jours',
         schedule: 'Quotidien à 10h',
         cronExpression: '0 10 * * *',
         category: 'Notifications',

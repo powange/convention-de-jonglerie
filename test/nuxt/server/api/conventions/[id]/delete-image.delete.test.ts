@@ -101,7 +101,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
       expect(mockDeleteConventionImage).not.toHaveBeenCalled()
     })
 
-    it('devrait rejeter l\'ID 0', async () => {
+    it("devrait rejeter l'ID 0", async () => {
       mockEvent.context.params = { id: '0' }
 
       await expect(handler(mockEvent as any)).rejects.toThrow('ID de convention invalide')

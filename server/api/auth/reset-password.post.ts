@@ -1,9 +1,8 @@
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
-
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { passwordSchema } from '@@/server/utils/validation-schemas'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
 
 const resetPasswordSchema = z.object({
   token: z.string(),
