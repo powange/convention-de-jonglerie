@@ -701,8 +701,8 @@ grep -r "select: {" server/api/ | grep "email: true"
 | **Notifications** | 10     | 0        | 10      | ✅ 100%     |
 | **Feedback**      | 1      | 0        | 1       | ✅ 100%     |
 | **Racine**        | 2      | 0        | 2       | ✅ 100%     |
-| **Editions**      | 6      | 143      | 149     | 🟡 4%       |
-| **TOTAL**         | **100** | **143**  | **243** | 🟡 **41%**  |
+| **Editions**      | 13      | 136      | 149     | 🟡 9%       |
+| **TOTAL**         | **107** | **136**  | **243** | 🟡 **44%**  |
 
 ---
 
@@ -751,14 +751,17 @@ grep -r "select: {" server/api/ | grep "email: true"
 
 ---
 
-### Phase 5D : Editions - Artists (6 endpoints)
+### Phase 5D : Editions - Artists (7 endpoints) ✅ COMPLÉTÉ
 
-- [ ] `server/api/editions/[id]/artists/index.get.ts`
-- [ ] `server/api/editions/[id]/artists/index.post.ts`
-- [ ] `server/api/editions/[id]/artists/[artistId]/index.get.ts`
-- [ ] `server/api/editions/[id]/artists/[artistId]/index.put.ts`
-- [ ] `server/api/editions/[id]/artists/[artistId]/index.delete.ts`
-- [ ] `server/api/editions/[id]/artists/[artistId]/image.put.ts`
+**Note :** La structure réelle diffère de la documentation initiale (7 fichiers au lieu de 6)
+
+- [x] `server/api/editions/[id]/artists/index.get.ts` - Liste des artistes (107→102 lignes)
+- [x] `server/api/editions/[id]/artists/index.post.ts` - Créer un artiste (196→179 lignes)
+- [x] `server/api/editions/[id]/artists/[artistId].put.ts` - Modifier un artiste (217→200 lignes)
+- [x] `server/api/editions/[id]/artists/[artistId].delete.ts` - Supprimer un artiste (83→74 lignes)
+- [x] `server/api/editions/[id]/artists/[artistId]/meals.get.ts` - Récupérer les repas (209→197 lignes)
+- [x] `server/api/editions/[id]/artists/[artistId]/meals.put.ts` - Mettre à jour les repas (132→120 lignes)
+- [x] `server/api/editions/[id]/artists/[artistId]/notes.patch.ts` - Modifier les notes (69→64 lignes)
 
 ---
 

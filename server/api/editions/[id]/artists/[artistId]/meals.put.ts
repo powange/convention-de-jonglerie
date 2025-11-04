@@ -1,28 +1,28 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const artistId = parseInt(getRouterParam(event, 'artistId') || '0')
+    const editionId = parseInt(getRouterParam(event, 'id') || '0')
+    const artistId = parseInt(getRouterParam(event, 'artistId') || '0')
 
-  if (!editionId || !artistId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
+    if (!editionId || !artistId) {
+      throw createError({ statusCode: 400, message: 'Paramètres invalides' })
+    }
 
-  const body = await readBody(event)
+    const body = await readBody(event)
 
-  // Valider le body
-  if (!body.selections || !Array.isArray(body.selections)) {
-    throw createError({
-      statusCode: 400,
-      message: 'Format de données invalide',
-    })
-  }
-
-  try {
+    // Valider le body
+    if (!body.selections || !Array.isArray(body.selections)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Format de données invalide',
+      })
+    }
     // Vérifier que l'utilisateur a les permissions pour éditer cette édition
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -115,17 +115,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       meals: mealsWithSelections,
     }
-  } catch (error: unknown) {
-    console.error('Failed to update artist meal selections:', error)
-
-    // Propager les erreurs HTTP existantes
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour des repas',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateArtistMeals' }
+)

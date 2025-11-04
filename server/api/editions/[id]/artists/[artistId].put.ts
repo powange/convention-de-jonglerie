@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
@@ -33,48 +34,48 @@ const updateArtistSchema = z.object({
   userPhone: z.string().optional().nullable(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const artistId = parseInt(getRouterParam(event, 'artistId') || '0')
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = parseInt(getRouterParam(event, 'id') || '0')
+    const artistId = parseInt(getRouterParam(event, 'artistId') || '0')
 
-  if (!editionId || !artistId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
+    if (!editionId || !artistId) {
+      throw createError({ statusCode: 400, message: 'Paramètres invalides' })
+    }
 
-  // Vérifier les permissions
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    include: {
-      convention: {
-        include: {
-          collaborators: true,
+    // Vérifier les permissions
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      include: {
+        convention: {
+          include: {
+            collaborators: true,
+          },
+        },
+        collaboratorPermissions: {
+          include: {
+            collaborator: true,
+          },
         },
       },
-      collaboratorPermissions: {
-        include: {
-          collaborator: true,
-        },
-      },
-    },
-  })
-
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      message: 'Édition non trouvée',
     })
-  }
 
-  const hasPermission = canEditEdition(edition, user)
-  if (!hasPermission) {
-    throw createError({
-      statusCode: 403,
-      message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
-    })
-  }
+    if (!edition) {
+      throw createError({
+        statusCode: 404,
+        message: 'Édition non trouvée',
+      })
+    }
 
-  try {
+    const hasPermission = canEditEdition(edition, user)
+    if (!hasPermission) {
+      throw createError({
+        statusCode: 403,
+        message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
+      })
+    }
+
     // Vérifier que l'artiste existe et appartient à cette édition
     const existingArtist = await prisma.editionArtist.findFirst({
       where: {
@@ -194,23 +195,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       artist: updatedArtist,
     }
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error("Erreur lors de la modification de l'artiste:", error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la modification de l'artiste",
-    })
-  }
-})
+  },
+  { operationName: 'UpdateArtist' }
+)
