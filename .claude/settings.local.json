@@ -12,7 +12,15 @@
       "Bash(npm run test:nuxt:run:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git log:*)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(ls:*)",
+      "Bash(awk:*)",
+      "Bash(find:*)",
+      "Bash(while read file)",
+      "Bash(do sed -i \"/from ''''@@\\/server\\/utils\\/permissions\\/convention-permissions''''/a import { validateConventionId } from ''''@@/server/utils/validation-helpers''''\" \"$file\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": [],

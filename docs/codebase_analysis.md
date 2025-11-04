@@ -17,10 +17,13 @@
 ## 1. Vue d'Ensemble du Projet
 
 ### Type de Projet
+
 **Application Web Full-Stack** - Plateforme collaborative de gestion et découverte de conventions de jonglerie.
 
 ### Description
+
 Convention de Jonglerie est une application web moderne permettant aux organisateurs de créer et gérer des conventions de jonglerie, et aux participants de découvrir, s'inscrire et interagir avec ces événements. L'application offre un système complet de gestion incluant :
+
 - Gestion des conventions et éditions
 - Système de collaboration avec permissions granulaires
 - Gestion des bénévoles et planning
@@ -31,6 +34,7 @@ Convention de Jonglerie est une application web moderne permettant aux organisat
 - Système de notifications temps réel
 
 ### Pattern d'Architecture
+
 - **Frontend** : Architecture Nuxt 4 (Vue 3 + TypeScript)
 - **Backend** : API RESTful avec Nitro (serveur Nuxt intégré)
 - **Base de données** : MySQL avec Prisma ORM
@@ -38,6 +42,7 @@ Convention de Jonglerie est une application web moderne permettant aux organisat
 - **Authentification** : Sessions scellées (nuxt-auth-utils)
 
 ### Langages et Versions
+
 - **TypeScript** : v5.8.3 (langage principal)
 - **Vue.js** : v3.5.17
 - **Nuxt.js** : v4.2.0
@@ -52,9 +57,11 @@ Convention de Jonglerie est une application web moderne permettant aux organisat
 ### `/app` - Application Frontend Nuxt
 
 #### `/app/pages` - Routage et Pages
+
 Structure basée sur le file-system routing de Nuxt :
 
 **Pages Publiques :**
+
 - `index.vue` - Page d'accueil avec liste des éditions
 - `login.vue`, `register.vue`, `logout.vue` - Authentification
 - `auth/forgot-password.vue`, `auth/reset-password.vue` - Récupération mot de passe
@@ -62,6 +69,7 @@ Structure basée sur le file-system routing de Nuxt :
 - `privacy-policy.vue` - Politique de confidentialité
 
 **Pages Authentifiées :**
+
 - `profile.vue` - Profil utilisateur
 - `favorites.vue` - Éditions favorites
 - `my-conventions.vue` - Conventions de l'utilisateur
@@ -69,11 +77,13 @@ Structure basée sur le file-system routing de Nuxt :
 - `notifications.vue` - Centre de notifications
 
 **Pages Conventions :**
+
 - `conventions/add.vue` - Création de convention
 - `conventions/[id]/edit.vue` - Édition de convention
 - `conventions/[id]/editions/add.vue` - Ajout d'édition
 
 **Pages Éditions :**
+
 - `editions/add.vue` - Ajout édition standalone
 - `editions/[id]/index.vue` - Page détail édition
 - `editions/[id]/edit.vue` - Édition d'édition
@@ -84,6 +94,7 @@ Structure basée sur le file-system routing de Nuxt :
 - `editions/[id]/volunteers/index.vue` - Portail bénévoles
 
 **Pages Gestion (Organisateurs) :**
+
 - `editions/[id]/gestion/index.vue` - Dashboard gestion
 - `editions/[id]/gestion/volunteers/*` - Gestion bénévoles
 - `editions/[id]/gestion/ticketing/*` - Billetterie
@@ -91,6 +102,7 @@ Structure basée sur le file-system routing de Nuxt :
 - `editions/[id]/gestion/meals/*` - Gestion repas
 
 **Pages Administration :**
+
 - `admin/index.vue` - Dashboard admin
 - `admin/users/index.vue`, `admin/users/[id].vue` - Gestion utilisateurs
 - `admin/conventions.vue` - Gestion conventions
@@ -102,9 +114,11 @@ Structure basée sur le file-system routing de Nuxt :
 - `admin/import-edition.vue` - Import d'éditions
 
 #### `/app/components` - Composants Vue
+
 Organisation modulaire par fonctionnalité :
 
 **Composants Globaux :**
+
 - `AppHeader.vue`, `AppFooter.vue` - Layout
 - `EditionCard.vue` - Carte d'édition (réutilisée partout)
 - `HomeMap.vue`, `FavoritesMap.vue` - Cartes Leaflet
@@ -115,6 +129,7 @@ Organisation modulaire par fonctionnalité :
 - `MinimalMarkdownEditor.vue` - Éditeur Markdown
 
 **Composants UI (`/ui`) :**
+
 - `UserAvatar.vue`, `UserDisplay.vue` - Affichage utilisateurs
 - `UserDisplayForAdmin.vue` - Affichage admin
 - `DateTimePicker.vue` - Sélection date/heure
@@ -126,6 +141,7 @@ Organisation modulaire par fonctionnalité :
 - `ImpersonationBanner.vue` - Bannière d'usurpation d'identité
 
 **Composants Edition (`/edition`) :**
+
 - `Form.vue` - Formulaire d'édition
 - `Header.vue` - En-tête d'édition
 - `ParticipantsCard.vue` - Liste participants
@@ -133,6 +149,7 @@ Organisation modulaire par fonctionnalité :
 - `MyArtistCard.vue` - Carte artiste utilisateur
 
 **Composants Carpool (`/edition/carpool`) :**
+
 - `Section.vue` - Section covoiturage
 - `OfferForm.vue`, `OfferCard.vue` - Offres
 - `RequestForm.vue`, `RequestCard.vue` - Demandes
@@ -141,6 +158,7 @@ Organisation modulaire par fonctionnalité :
 - `CommentsModal.vue` - Modal commentaires
 
 **Composants Volunteers (`/edition/volunteer`) :**
+
 - `ApplicationModal.vue` - Modal candidature
 - `InternalModeOptions.vue` - Options mode interne
 - `AutoAssignmentPanel.vue` - Affectation automatique
@@ -149,12 +167,14 @@ Organisation modulaire par fonctionnalité :
 - `Table.vue` - Tableau bénévoles
 
 **Composants Planning (`/edition/volunteer/planning`) :**
+
 - `PlanningCard.vue` - Carte planning
 - `SlotDetailsModal.vue` - Détails créneau
 - `VolunteersSummary.vue` - Résumé bénévoles
 - `OverlapWarningsAlert.vue` - Alertes chevauchements
 
 **Composants Notifications (`/edition/volunteer/notifications`) :**
+
 - `Manager.vue` - Gestionnaire notifications
 - `Index.vue` - Liste notifications
 - `History.vue` - Historique
@@ -162,6 +182,7 @@ Organisation modulaire par fonctionnalité :
 - `ConfirmationsModal.vue` - Confirmations
 
 **Composants Ticketing (`/ticketing`) :**
+
 - `TiersList.vue`, `TierModal.vue` - Tarifs
 - `OptionsList.vue`, `OptionModal.vue` - Options
 - `QuotasList.vue` - Quotas
@@ -176,10 +197,12 @@ Organisation modulaire par fonctionnalité :
 - `VolunteerDetailsCard.vue`, `ArtistDetailsCard.vue` - Cartes détails
 
 **Composants Stats (`/ticketing/stats`) :**
+
 - `EntryStatsCard.vue` - Stats entrées
 - `QuotaStatsCard.vue` - Stats quotas
 
 **Composants Volunteers globaux (`/volunteers`) :**
+
 - `VolunteerCard.vue` - Carte bénévole
 - `ApplicationDetailsModal.vue` - Détails candidature
 - `TimeSlotCard.vue` - Carte créneau
@@ -188,57 +211,70 @@ Organisation modulaire par fonctionnalité :
 - `QrCodeModal.vue` - QR code bénévole
 
 **Composants Artists (`/artists`) :**
+
 - `ArtistModal.vue` - Modal artiste
 - `AccommodationModal.vue` - Hébergement
 - `MealsModal.vue` - Repas artiste
 - `OrganizerNotesModal.vue` - Notes organisateurs
 
 **Composants Shows (`/shows`) :**
+
 - `ShowModal.vue` - Modal spectacle
 
 **Composants Workshops (`/workshops`) :**
+
 - `ImportFromImageModal.vue` - Import depuis image (IA)
 
 **Composants Convention (`/convention`) :**
+
 - `Form.vue` - Formulaire convention
 - `ClaimModal.vue` - Modal réclamation
 
 **Composants Collaborator (`/collaborator`) :**
+
 - `RightsFields.vue` - Champs de droits
 
 **Composants Admin (`/admin`) :**
+
 - `UserDeletionModal.vue` - Suppression utilisateur
 - `ProfilePictureUpload.vue` - Upload photo admin
 - `ConfigModal.vue` - Configuration système
 
 **Composants Notifications (`/notifications`) :**
+
 - `Center.vue` - Centre de notifications
 - `PushNotificationToggle.vue` - Toggle notifications push
 - `PushPromoModal.vue` - Promo notifications push
 
 **Composants Management (`/management`) :**
+
 - `NavigationCard.vue` - Navigation gestion
 
 **Composants Feedback (`/feedback`) :**
+
 - `FeedbackModal.vue` - Modal feedback
 
 **Autres :**
+
 - `PWAInstallBanner.vue` - Bannière installation PWA
 - `FlagIcon.vue` - Icône de drapeau pays
 
 #### `/app/composables` - Hooks Vue Réutilisables
 
 **Authentification & Autorisation :**
+
 - `useAccessControlPermissions.ts` - Permissions contrôle d'accès
 - `useCollaboratorTitle.ts` - Titres collaborateurs
 
 **Dates & Formatage :**
+
 - `useDateFormat.ts` - Formatage dates
 - `useDatetime.ts` - Manipulation dates
 - `useDateTimePicker.ts` - Picker date/heure
 - `useEditionStatus.ts` - Statut édition (passé/en cours/futur)
 
 **Formulaires & UI :**
+
 - `useDebounce.ts` - Debouncing
 - `useModal.ts` - Gestion modales
 - `useImageUrl.ts` - URLs images
@@ -247,28 +283,34 @@ Organisation modulaire par fonctionnalité :
 - `usePasswordStrength.ts` - Force mot de passe
 
 **Bénévoles :**
+
 - `useVolunteerSettings.ts` - Paramètres bénévoles
 - `useVolunteerTeams.ts` - Équipes
 - `useVolunteerTimeSlots.ts` - Créneaux horaires
 - `useVolunteerSchedule.ts` - Planning
 
 **Cartes & Calendrier :**
+
 - `useLeafletMap.ts` - Intégration Leaflet
 - `useCalendar.ts` - Intégration FullCalendar
 
 **Repas :**
+
 - `useMeals.ts` - Gestion repas
 
 **Notifications :**
+
 - `usePushNotifications.ts` - Notifications push
 - `usePushNotificationPromo.ts` - Promotion notifications
 - `useNotificationStream.ts` - Stream SSE
 
 **Statistiques :**
+
 - `useProfileStats.ts` - Stats profil
 - `useRealtimeStats.ts` - Stats temps réel
 
 **Divers :**
+
 - `useReturnTo.ts` - Retour après login
 - `useUserDeletion.ts` - Suppression utilisateur
 - `useConventionServices.ts` - Services conventions
@@ -320,6 +362,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 **Structure organisée par domaine :**
 
 **`/auth` - Authentification :**
+
 - `register.post.ts` - Inscription
 - `login.post.ts` - Connexion
 - `logout.post.ts` - Déconnexion
@@ -331,6 +374,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `set-password-and-verify.post.ts` - Définir mot de passe + vérifier
 
 **`/profile` - Profil Utilisateur :**
+
 - `update.put.ts` - Mise à jour profil
 - `stats.get.ts` - Statistiques profil
 - `change-password.post.ts` - Changement mot de passe
@@ -340,12 +384,15 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `notification-preferences.get.ts`, `notification-preferences.put.ts` - Préférences notifs
 
 **`/user` - Informations Utilisateur :**
+
 - `volunteer-applications.get.ts` - Candidatures bénévole de l'utilisateur
 
 **`/users` - Recherche Utilisateurs :**
+
 - `search.get.ts` - Recherche utilisateurs (pour collaborateurs)
 
 **`/conventions` - Gestion Conventions :**
+
 - `index.post.ts` - Créer convention
 - `my-conventions.get.ts` - Mes conventions
 - `[id]/index.get.ts` - Détails convention
@@ -356,6 +403,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `[id]/editions.get.ts` - Éditions d'une convention
 
 **`/conventions/[id]/collaborators` - Collaborateurs :**
+
 - `collaborators.get.ts` - Liste collaborateurs
 - `collaborators.post.ts` - Ajouter collaborateur
 - `[collaboratorId].put.ts` - Modifier collaborateur
@@ -365,30 +413,36 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `history.get.ts` - Historique permissions
 
 **`/conventions/[id]/claim` - Réclamation :**
+
 - `claim.post.ts` - Réclamer convention
 - `verify.post.ts` - Vérifier code réclamation
 
 **`/editions` - Gestion Éditions :**
+
 - `add.vue` - Ajouter édition
 - `[id]/index.vue` - Détails édition
 - `[id]/edit.vue` - Modifier édition
 
 **`/editions/[id]` - Fonctionnalités Édition :**
 
-*Covoiturage :*
+_Covoiturage :_
+
 - `carpool-offers/*.ts` - Offres covoiturage
 - `carpool-requests/*.ts` - Demandes covoiturage
 
-*Objets trouvés :*
+_Objets trouvés :_
+
 - `lost-found/*.ts` - Objets trouvés
 - `lost-found/[itemId]/*.ts` - Gestion item
 
-*Posts/Commentaires :*
+_Posts/Commentaires :_
+
 - `posts/*.ts` - Posts édition
 - `posts/[postId]/*.ts` - Gestion post
 - `posts/[postId]/comments/*.ts` - Commentaires
 
-*Bénévoles :*
+_Bénévoles :_
+
 - `volunteers/*.ts` - Gestion bénévoles
 - `volunteers/applications/*.ts` - Candidatures
 - `volunteers/applications/[applicationId]/*.ts` - Gestion candidature
@@ -399,13 +453,15 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `volunteers/catering/*.ts` - Restauration bénévoles
 - `volunteers/access-control/*.ts` - Contrôle accès
 
-*Planning Bénévoles :*
+_Planning Bénévoles :_
+
 - `volunteer-teams/*.ts` - Équipes
 - `volunteer-time-slots/*.ts` - Créneaux
 - `volunteer-time-slots/[slotId]/*.ts` - Gestion créneau
 - `volunteer-time-slots/[slotId]/assignments/*.ts` - Affectations
 
-*Billetterie :*
+_Billetterie :_
+
 - `ticketing/*.ts` - Configuration billetterie
 - `ticketing/tiers/*.ts` - Tarifs
 - `ticketing/options/*.ts` - Options
@@ -419,41 +475,50 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `ticketing/helloasso/*.ts` - HelloAsso
 - `ticketing/access-control/*.ts` - Contrôle accès
 
-*Ateliers :*
+_Ateliers :_
+
 - `workshops/*.ts` - Ateliers
 - `workshops/[workshopId]/*.ts` - Gestion atelier
 - `workshops/locations/*.ts` - Lieux ateliers
 
-*Artistes :*
+_Artistes :_
+
 - `artists/*.ts` - Artistes
 - `artists/[artistId]/*.ts` - Gestion artiste
 
-*Spectacles :*
+_Spectacles :_
+
 - `shows/*.ts` - Spectacles
 - `shows/[showId]/*.ts` - Gestion spectacle
 
-*Repas :*
+_Repas :_
+
 - `meals/*.ts` - Repas
 
 **`/carpool-offers` - Offres Covoiturage (global) :**
+
 - `[id]/*.ts` - CRUD offre
 - `[id]/bookings/*.ts` - Réservations
 - `[id]/passengers/*.ts` - Passagers
 - `[id]/comments/*.ts` - Commentaires
 
 **`/carpool-requests` - Demandes Covoiturage (global) :**
+
 - `[id]/*.ts` - CRUD demande
 - `[id]/comments/*.ts` - Commentaires
 
 **`/notifications` - Notifications :**
+
 - `index.ts` - Liste notifications
 - `[id]/*.ts` - Gestion notification
 - `push/*.ts` - Notifications push
 
 **`/feedback` - Feedback :**
+
 - `index.post.ts` - Envoyer feedback
 
 **`/files` - Upload Fichiers :**
+
 - `profile.post.ts` - Photo profil
 - `convention.post.ts` - Image convention
 - `edition.post.ts` - Image édition
@@ -462,19 +527,22 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 
 **`/admin` - Administration :**
 
-*Utilisateurs :*
+_Utilisateurs :_
+
 - `users/index.get.ts` - Liste utilisateurs
 - `users/[id].get.ts`, `.put.ts`, `.delete.ts` - CRUD utilisateur
 - `users/[id]/promote.put.ts` - Promouvoir admin
 - `users/[id]/impersonate.post.ts` - Usurper identité
 - `users/[id]/profile-picture.put.ts` - Photo admin
 
-*Conventions & Éditions :*
+_Conventions & Éditions :_
+
 - `conventions.get.ts` - Liste conventions
 - `conventions/[id].delete.ts` - Supprimer convention (admin)
 - `editions/[id]/export.get.ts` - Exporter édition
 
-*Feedback & Logs :*
+_Feedback & Logs :_
+
 - `feedback/index.get.ts` - Liste feedbacks
 - `feedback/[id]/resolve.put.ts` - Résoudre feedback
 - `error-logs/*.ts` - Gestion logs erreurs
@@ -482,28 +550,33 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `error-logs/resolve-similar.post.ts` - Résoudre similaires
 - `error-logs/cleanup-old.post.ts` - Nettoyer anciens logs
 
-*Notifications :*
+_Notifications :_
+
 - `notifications/create.post.ts` - Créer notification
 - `notifications/send-reminders.post.ts` - Envoyer rappels
 - `notifications/test.post.ts`, `test-simple.get.ts` - Tests
 - `notifications/stats.get.ts`, `recent.get.ts` - Statistiques
 - `notifications/push-test.post.ts`, `push-stats.get.ts` - Push
 
-*Tâches :*
+_Tâches :_
+
 - `tasks/index.get.ts` - Liste tâches cron
 - `tasks/[taskName].post.ts` - Exécuter tâche
 
-*Sauvegardes :*
+_Sauvegardes :_
+
 - `backup/create.post.ts` - Créer sauvegarde
 - `backup/list.get.ts` - Liste sauvegardes
 - `backup/download.get.ts` - Télécharger sauvegarde
 - `backup/restore.post.ts` - Restaurer sauvegarde
 - `backup/delete.delete.ts` - Supprimer sauvegarde
 
-*Usurpation :*
+_Usurpation :_
+
 - `impersonate/stop.post.ts` - Arrêter usurpation
 
-*Divers :*
+_Divers :_
+
 - `stats.get.ts` - Statistiques globales
 - `activity.get.ts` - Activité récente
 - `config.get.ts` - Configuration système
@@ -513,11 +586,13 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `fix-session.post.ts` - Corriger session
 
 **`/__sitemap__` - Génération Sitemap :**
+
 - `editions.get.ts` - Éditions pour sitemap
 - `carpool.get.ts` - Covoiturage pour sitemap
 - `volunteers.get.ts` - Bénévoles pour sitemap
 
 **Autres :**
+
 - `session/me.ts` - Session utilisateur courante
 - `countries.get.ts` - Liste pays
 - `uploads/[...path].get.ts` - Servir fichiers uploadés
@@ -526,6 +601,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 #### `/server/utils` - Utilitaires Backend
 
 **Authentification & Sécurité :**
+
 - `admin-auth.ts` - Vérifications admin
 - `auth-utils.ts` - Utilitaires auth
 - `jwt.ts` - Gestion JWT
@@ -535,6 +611,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `rate-limiter.ts` - Rate limiting général
 
 **Permissions :**
+
 - `permissions/permissions.ts` - Système permissions principal
 - `permissions/convention-permissions.ts` - Permissions conventions
 - `permissions/edition-permissions.ts` - Permissions éditions
@@ -544,13 +621,16 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `permissions/workshop-permissions.ts` - Permissions ateliers
 
 **Base de données :**
+
 - `prisma.ts` - Client Prisma singleton
 
 **Email :**
+
 - `emailService.ts` - Service d'envoi d'emails
 - `server-i18n.ts` - i18n côté serveur
 
 **Notifications :**
+
 - `notification-service.ts` - Service notifications
 - `notification-stream-manager.ts` - Gestionnaire streams SSE
 - `notification-preferences.ts` - Préférences notifications
@@ -558,6 +638,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `sse-manager.ts` - Server-Sent Events
 
 **Bénévoles :**
+
 - `volunteer-application-diff.ts` - Diff candidatures
 - `volunteer-scheduler.ts` - Planification automatique
 - `volunteer-meals.ts` - Repas bénévoles
@@ -565,6 +646,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `editions/volunteers/teams.ts` - Utilitaires équipes
 
 **Billetterie :**
+
 - `editions/ticketing/helloasso.ts` - Intégration HelloAsso
 - `editions/ticketing/tiers.ts` - Utilitaires tarifs
 - `editions/ticketing/options.ts` - Utilitaires options
@@ -574,13 +656,16 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `ticketing/returnable-items.ts` - Items consignés (général)
 
 **Gestion Collaborateurs :**
+
 - `collaborator-management.ts` - Gestion collaborateurs
 
 **IA :**
+
 - `anthropic.ts` - Intégration Claude (Anthropic)
 - `ai-providers.ts` - Providers IA multiples (Anthropic, Ollama, LMStudio)
 
 **Divers :**
+
 - `validation-schemas.ts` - Schémas validation Zod
 - `geocoding.ts` - Géocodage adresses
 - `date-utils.ts`, `date-helpers.ts` - Manipulation dates
@@ -616,6 +701,7 @@ Tâches planifiées (nettoyage, notifications, etc.)
 **Modèles principaux :**
 
 **User** - Utilisateurs
+
 - Authentification (email, pseudo, password, authProvider)
 - Profil (nom, prenom, phone, profilePicture, preferredLanguage)
 - Vérification email (emailVerificationCode, isEmailVerified)
@@ -623,38 +709,44 @@ Tâches planifiées (nettoyage, notifications, etc.)
 - Relations : conventions, collaborations, éditions, feedbacks, notifications, etc.
 
 **Convention** - Conventions de Jonglerie
+
 - Informations de base (name, description, imageUrl)
 - Créateur (creatorId → User)
 - Relations : éditions, collaborateurs
 - Archivage (archivedAt)
 
 **Edition** - Éditions de Conventions
+
 - Informations générales (name, description, program)
 - Dates (startDate, endDate, volunteersSetupStartDate, volunteersTeardownEndDate)
 - Adresse complète + coordonnées GPS (latitude, longitude)
 - Services (nombreux champs boolean : hasCamping, hasKidsZone, etc.)
 - Paiements (hasCashPayment, hasCreditCardPayment, hasAfjTokenPayment, hasATM)
-- Bénévolat (volunteersMode, volunteersDescription, volunteersOpen, nombreux champs volunteersAsk*)
+- Bénévolat (volunteersMode, volunteersDescription, volunteersOpen, nombreux champs volunteersAsk\*)
 - Billetterie (relations tiers, options, quotas, orders)
 - Relations : convention, créateur, posts, bénévoles, covoiturage, objets trouvés, ateliers, artistes, spectacles
 
 **ConventionCollaborator** - Collaborateurs
-- Système de permissions granulaires (can*)
+
+- Système de permissions granulaires (can\*)
 - Convention + Utilisateur + Ajouté par
 - Titre personnalisé (title)
 - Relations : permissions par édition
 
 **EditionCollaboratorPermission** - Permissions par Édition
+
 - canEdit, canDelete pour une édition spécifique
 - Permet override des permissions globales
 
 **CollaboratorPermissionHistory** - Historique Permissions
+
 - Traçabilité des changements de permissions
 - actorId (qui a fait le changement)
 - targetUserId (utilisateur modifié)
 - action, details
 
 **Volunteer Models** - Système Bénévoles Complet
+
 - **EditionVolunteerApplication** - Candidatures bénévoles
 - **VolunteerTeam** - Équipes de bénévoles
 - **VolunteerTimeSlot** - Créneaux horaires
@@ -665,6 +757,7 @@ Tâches planifiées (nettoyage, notifications, etc.)
 - **VolunteerMeal** - Repas bénévoles
 
 **Ticketing Models** - Système de Billetterie
+
 - **TicketingTier** - Tarifs/Catégories
 - **TicketingOption** - Options additionnelles
 - **TicketingQuota** - Quotas (limites entrées)
@@ -677,6 +770,7 @@ Tâches planifiées (nettoyage, notifications, etc.)
 - **ExternalTicketing** - Billetterie externe (HelloAsso)
 
 **Carpool Models** - Covoiturage
+
 - **CarpoolOffer** - Offres covoiturage
 - **CarpoolRequest** - Demandes covoiturage
 - **CarpoolBooking** - Réservations
@@ -685,35 +779,43 @@ Tâches planifiées (nettoyage, notifications, etc.)
 - **CarpoolRequestComment** - Commentaires demandes
 
 **Lost & Found** - Objets Trouvés
+
 - **LostFoundItem** - Items objets trouvés
 - **LostFoundComment** - Commentaires
 
 **Posts & Comments** - Forum Édition
+
 - **EditionPost** - Posts
 - **EditionPostComment** - Commentaires
 
 **Workshop Models** - Ateliers
+
 - **Workshop** - Ateliers
 - **WorkshopLocation** - Lieux ateliers
 - **WorkshopFavorite** - Favoris ateliers
 
 **Artist Models** - Artistes
+
 - **EditionArtist** - Artistes par édition
 - **ArtistMeal** - Repas artistes
 
 **Show Models** - Spectacles
+
 - **Show** - Spectacles
 
 **Notification Models** - Notifications
+
 - **Notification** - Notifications système
 - **PushSubscription** - Abonnements push
 
 **Admin & System** - Administration
+
 - **Feedback** - Feedbacks utilisateurs
 - **ApiErrorLog** - Logs erreurs API
 - **PasswordResetToken** - Tokens réinitialisation
 
 **Convention Claim** - Réclamation Conventions
+
 - **ConventionClaimRequest** - Demandes de réclamation
 
 #### `/migrations` - Migrations Prisma
@@ -721,6 +823,7 @@ Tâches planifiées (nettoyage, notifications, etc.)
 Historique des migrations de schéma (40+ migrations)
 
 Migrations récentes notables :
+
 - `20251027115031_add_volunteer_meal_selection` - Sélection repas bénévoles
 - `20251028033046_add_meal_returnable_items` - Objets consignés repas
 - `20251030080823_add_meal_validation` - Validation repas
@@ -736,6 +839,7 @@ Migrations récentes notables :
 Organisation modulaire par domaine et langue :
 
 **13 Langues Supportées :**
+
 - 🇬🇧 English (en) - Défaut
 - 🇫🇷 Français (fr)
 - 🇩🇪 Deutsch (de)
@@ -751,6 +855,7 @@ Organisation modulaire par domaine et langue :
 - 🇺🇦 Українська (uk)
 
 **Domaines de Traduction :**
+
 - `common.json` - Commun (navigation, erreurs, boutons)
 - `app.json` - Application (pages générales)
 - `public.json` - Pages publiques
@@ -784,6 +889,7 @@ Organisation modulaire par domaine et langue :
 **Documentation complète du projet :**
 
 **Systèmes Principaux :**
+
 - `AUTH_SESSIONS.md` - Système d'authentification par sessions
 - `COLLABORATOR_PERMISSIONS.md` - Système de permissions collaborateurs
 - `NOTIFICATION_SYSTEM.md` - Système de notifications
@@ -792,6 +898,7 @@ Organisation modulaire par domaine et langue :
 - `backup-system.md` - Système de sauvegardes
 
 **Billetterie (`/ticketing`) :**
+
 - `README.md` - Vue d'ensemble
 - `tiers.md` - Tarifs
 - `options.md` - Options
@@ -802,6 +909,7 @@ Organisation modulaire par domaine et langue :
 - `access-control.md` - Contrôle d'accès
 
 **Bénévoles (`/volunteers`) :**
+
 - `teams-utils.md` - Utilitaires équipes
 - `volunteer-application-api-utility.md` - API candidatures
 - `volunteer-application-diff-utility.md` - Diff candidatures
@@ -810,6 +918,7 @@ Organisation modulaire par domaine et langue :
 - `volunteer-returnable-items-by-team.md` - Items par équipe
 
 **Intégrations & IA :**
+
 - `helloasso-integration.md` - HelloAsso
 - `anthropic-integration.md` - Claude (Anthropic)
 - `ai-providers-ollama.md` - Ollama
@@ -817,6 +926,7 @@ Organisation modulaire par domaine et langue :
 - `ai-providers-lmstudio-logs.md` - Logs LM Studio
 
 **i18n :**
+
 - `i18n-lazy-loading.md` - Lazy loading traductions
 - `i18n-component-lazy-loading.md` - Lazy loading composants
 - `notification-i18n.md` - Notifications i18n
@@ -825,11 +935,13 @@ Organisation modulaire par domaine et langue :
 - `ajout-langues-sv-cs.md` - Ajout langues
 
 **Performance :**
+
 - `image-loading-cache.md` - Cache images
 - `cache-http-assets.md` - Cache assets HTTP
 - `lazy-loading-libraries.md` - Lazy loading bibliothèques
 
 **Autres :**
+
 - `allergy-severity-utility.md` - Utilitaire gravité allergies
 - `API_PROFILE_STATS.md` - API stats profil
 - `ADMIN_AUTH_MIGRATION.md` - Migration auth admin
@@ -843,6 +955,7 @@ Organisation modulaire par domaine et langue :
 #### Structure Multi-Projets Vitest
 
 **`/test/unit`** - Tests Unitaires
+
 - Tests isolés (composables, utilitaires, stores)
 - Environnement : happy-dom
 - Exemples :
@@ -852,6 +965,7 @@ Organisation modulaire par domaine et langue :
   - `stores/auth.test.ts` (potentiel)
 
 **`/test/nuxt`** - Tests Nuxt
+
 - Tests avec environnement Nuxt complet
 - Environnement : nuxt (@nuxt/test-utils)
 - Sous-dossiers :
@@ -862,6 +976,7 @@ Organisation modulaire par domaine et langue :
   - `/features` - Tests fonctionnalités complètes
 
 **`/test/integration`** - Tests Intégration
+
 - Tests avec base de données réelle
 - Environnement : node
 - Fichiers `.db.test.ts`
@@ -872,10 +987,12 @@ Organisation modulaire par domaine et langue :
   - `access-control-permissions.db.test.ts`
 
 **`/test/e2e`** - Tests E2E (potentiel)
+
 - Tests end-to-end avec serveur démarré
 - Non encore implémentés
 
 **Configuration :**
+
 - `vitest.config.ts` - Configuration multi-projets
 - `setup.ts`, `setup-common.ts`, `setup-db.ts` - Setup tests
 - `__mocks__/` - Mocks
@@ -885,10 +1002,12 @@ Organisation modulaire par domaine et langue :
 ### `/scripts` - Scripts Utilitaires
 
 **Administration :**
+
 - `manage-admin.ts` - Gestion admins (add/remove/list)
 - `clean-expired-tokens.ts` - Nettoyage tokens expirés
 
 **i18n :**
+
 - `check-i18n.js` - Vérification clés i18n
 - `check-i18n-translations.js` - Vérification traductions
 - `check-i18n-variables.cjs` - Vérification variables
@@ -896,12 +1015,14 @@ Organisation modulaire par domaine et langue :
 - `translate-with-deepl.js` - Traduction automatique DeepL
 
 **Base de données :**
+
 - `seed-dev.ts` - Peupler BDD développement
 - `list-seed-accounts.ts` - Lister comptes seeds
 - `assign-meals-to-accepted-volunteers.ts` - Affecter repas
 - `test-db-run.js` - Lancer tests BDD
 
 **Divers :**
+
 - `run-geocoding.mjs` - Géocodage adresses
 - `show-help.mjs` - Aide
 - `kill-servers.js` - Tuer serveurs
@@ -909,6 +1030,7 @@ Organisation modulaire par domaine et langue :
 - `reset-deps.sh` - Reset dépendances
 
 **Traduction :**
+
 - `/translation` - Scripts traduction avancés
 
 ---
@@ -916,6 +1038,7 @@ Organisation modulaire par domaine et langue :
 ### `/public` - Assets Statiques
 
 **Fichiers servis directement :**
+
 - `/uploads/` - Uploads utilisateurs (images, etc.)
 - `/logos/` - Logos
 - `/favicons/` - Favicons
@@ -927,6 +1050,7 @@ Organisation modulaire par domaine et langue :
 ### `.nuxt` - Dossier Généré Nuxt
 
 **Contenu généré automatiquement :**
+
 - Types TypeScript auto-générés
 - Configuration runtime
 - Routes auto-générées
@@ -961,25 +1085,27 @@ Organisation modulaire par domaine et langue :
 **Configuration exhaustive de l'application :**
 
 **Modules Principaux :**
+
 ```typescript
 modules: [
-  '@nuxt/eslint',          // Linting
-  '@nuxt/image',           // Optimisation images
-  '@nuxt/scripts',         // Scripts tiers
+  '@nuxt/eslint', // Linting
+  '@nuxt/image', // Optimisation images
+  '@nuxt/scripts', // Scripts tiers
   '@nuxt/test-utils/module', // Tests
-  '@nuxt/ui',              // Composants UI
-  '@pinia/nuxt',           // State management
-  '@prisma/nuxt',          // ORM
-  'nuxt-auth-utils',       // Auth sessions
-  '@nuxtjs/i18n',          // i18n
-  '@vueuse/nuxt',          // Composables VueUse
-  'nuxt-file-storage',     // Stockage fichiers
-  '@nuxtjs/seo',           // SEO
-  'nuxt-qrcode',           // QR Codes
+  '@nuxt/ui', // Composants UI
+  '@pinia/nuxt', // State management
+  '@prisma/nuxt', // ORM
+  'nuxt-auth-utils', // Auth sessions
+  '@nuxtjs/i18n', // i18n
+  '@vueuse/nuxt', // Composables VueUse
+  'nuxt-file-storage', // Stockage fichiers
+  '@nuxtjs/seo', // SEO
+  'nuxt-qrcode', // QR Codes
 ]
 ```
 
 **Configuration i18n Avancée :**
+
 - 13 langues avec lazy loading
 - Structure par domaine (common, app, auth, admin, etc.)
 - Détection automatique langue navigateur
@@ -987,6 +1113,7 @@ modules: [
 - Compilation optimisée pour bundles légers
 
 **Configuration SEO :**
+
 - Site : `juggling-convention.com`
 - Sitemap automatique avec routes dynamiques
 - OpenGraph images
@@ -994,6 +1121,7 @@ modules: [
 - Robots.txt dynamique
 
 **Configuration Nitro (Serveur) :**
+
 - Compression Gzip + Brotli
 - Cache assets statiques (30 jours)
 - Tâches expérimentales (cron)
@@ -1001,6 +1129,7 @@ modules: [
 - External : node-cron
 
 **Configuration Vite :**
+
 - Sourcemaps en dev
 - Hot reload Docker (polling Windows)
 - Optimisations dynamicImportVarsOptions
@@ -1008,6 +1137,7 @@ modules: [
 - Alias Prisma
 
 **Runtime Config :**
+
 ```typescript
 runtimeConfig: {
   // Privé (serveur uniquement)
@@ -1028,6 +1158,7 @@ runtimeConfig: {
 ```
 
 **Expérimental :**
+
 - `lazyHydration: true` - Performances
 - `emitRouteChunkError: 'automatic'` - Gestion erreurs chunks
 
@@ -1060,12 +1191,14 @@ runtimeConfig: {
    - Tests séquentiels (sequence: { concurrent: false })
 
 **Alias Complexes :**
+
 - Alias `#app`, `#build`, `#app-manifest` pour imports Nuxt
 - Plugin `tsconfigPaths` pour résolution alias
 
 #### `prisma/schema.prisma`
 
 **Configuration Prisma :**
+
 ```prisma
 generator client {
   provider      = "prisma-client-js"
@@ -1082,6 +1215,7 @@ datasource db {
 **Modèles Clés (67 au total) :**
 
 **User** (Utilisateur)
+
 - 67 colonnes
 - 24 relations (conventions, collaborations, éditions, feedbacks, etc.)
 - Auth multi-provider (email, Google, Facebook potentiel)
@@ -1090,18 +1224,21 @@ datasource db {
 - Langue préférée (preferredLanguage)
 
 **Convention** (Convention de Jonglerie)
+
 - Informations de base
 - Relations : éditions, collaborateurs, demandes réclamation
 
 **Edition** (Édition de Convention)
+
 - 167 colonnes !
 - 20+ relations
 - Adresse complète + GPS
 - 40+ champs boolean pour services
-- Système bénévoles complet (10+ champs volunteersAsk*)
+- Système bénévoles complet (10+ champs volunteersAsk\*)
 - Billetterie intégrée
 
 **ConventionCollaborator** (Collaborateur)
+
 - Système permissions granulaires :
   - `canEditConvention`
   - `canDeleteConvention`
@@ -1115,6 +1252,7 @@ datasource db {
 - Historique traçable
 
 **EditionVolunteerApplication** (Candidature Bénévole)
+
 - 30+ champs pour candidature complète
 - Statut (status : PENDING, APPROVED, REJECTED, CANCELLED)
 - Informations personnelles (diet, allergies, emergencyContact)
@@ -1124,6 +1262,7 @@ datasource db {
 - Relations : équipes, créneaux assignés, repas
 
 **Ticketing** (Billetterie)
+
 - **TicketingTier** : Tarifs avec quotas
 - **TicketingOption** : Options additionnelles
 - **TicketingQuota** : Quotas journaliers
@@ -1133,6 +1272,7 @@ datasource db {
 - **ExternalTicketing** : HelloAsso integration
 
 **Enums :**
+
 - `AuthProvider` : EMAIL, GOOGLE, FACEBOOK
 - `VolunteerMode` : INTERNAL, EXTERNAL, DISABLED
 - `VolunteerApplicationStatus` : PENDING, APPROVED, REJECTED, CANCELLED
@@ -1148,6 +1288,7 @@ datasource db {
 **Scripts Principaux :**
 
 **Développement :**
+
 - `dev` : Lancer serveur dev
 - `build` : Build production (4096 MB heap)
 - `preview` : Preview production
@@ -1155,6 +1296,7 @@ datasource db {
 - `format`, `format:check` : Prettier
 
 **Base de données :**
+
 - `db:clean-tokens` : Nettoyer tokens expirés
 - `db:seed:dev` : Peupler BDD dev
 - `db:seed:password` : Lister mots de passe seeds
@@ -1162,9 +1304,11 @@ datasource db {
 - `db:assign-meals` : Affecter repas auto
 
 **Admin :**
+
 - `admin:add`, `admin:remove`, `admin:list` : Gestion admins
 
 **i18n :**
+
 - `check-i18n` : Vérifier clés
 - `check-translations` : Vérifier traductions
 - `check-i18n-vars` : Vérifier variables
@@ -1173,6 +1317,7 @@ datasource db {
 - `i18n:translate:force` : Force traduction
 
 **Tests :**
+
 - `test` : Tous tests (unit par défaut)
 - `test:unit`, `test:unit:run` : Tests unitaires
 - `test:nuxt`, `test:nuxt:run` : Tests Nuxt
@@ -1183,12 +1328,14 @@ datasource db {
 - `test:setup`, `test:teardown` : Setup/teardown containers
 
 **Docker :**
+
 - `docker:dev`, `docker:dev:detached` : Dev Docker
 - `docker:dev:down`, `docker:dev:logs`, `docker:dev:exec` : Gestion dev
 - `docker:test*` : Tests Docker
 - `docker:release:up`, `docker:release:down` : Release
 
 **Divers :**
+
 - `geocode` : Géocoder adresses
 - `help` : Aide
 - `kill-servers` : Tuer serveurs
@@ -1196,6 +1343,7 @@ datasource db {
 - `deps:reset` : Reset dépendances
 
 **Dépendances Principales :**
+
 ```json
 {
   "@nuxt/ui": "^4.0.0",
@@ -1215,6 +1363,7 @@ datasource db {
 ```
 
 **DevDependencies :**
+
 ```json
 {
   "vitest": "^3.2.4",
@@ -1235,16 +1384,19 @@ datasource db {
 **Store Pinia d'Authentification :**
 
 **State :**
+
 - `user: User | null` - Utilisateur courant
 - `rememberMe: boolean` - Se souvenir de moi
 - `adminMode: boolean` - Mode admin activé
 
 **Getters :**
+
 - `isAuthenticated` - Est authentifié
 - `isGlobalAdmin` - Est admin global
 - `isAdminModeActive` - Mode admin actif
 
 **Actions :**
+
 - `register()` - Inscription
 - `login()` - Connexion (stocke user en localStorage/sessionStorage)
 - `logout()` - Déconnexion (nettoie session serveur + stores)
@@ -1253,6 +1405,7 @@ datasource db {
 - `enableAdminMode()`, `disableAdminMode()` - Mode admin
 
 **Architecture :**
+
 - Session côté serveur (via nuxt-auth-utils)
 - localStorage/sessionStorage côté client (UX uniquement)
 - Double nettoyage logout (serveur puis client)
@@ -1260,6 +1413,7 @@ datasource db {
 #### `app/middleware/authenticated.ts`
 
 Middleware protégeant les routes authentifiées :
+
 - Vérifie session serveur (`getUserSession()`)
 - Redirige vers `/login` si non authentifié
 - Stocke `returnTo` pour redirection post-login
@@ -1269,6 +1423,7 @@ Middleware protégeant les routes authentifiées :
 **Système de Permissions Centralisé :**
 
 **Fonctions Principales :**
+
 - `getUserConventionPermissions()` - Permissions convention utilisateur
 - `checkConventionPermission()` - Vérifier permission convention
 - `getUserEditionPermissions()` - Permissions édition utilisateur
@@ -1277,17 +1432,20 @@ Middleware protégeant les routes authentifiées :
 - `ensureEditionPermission()` - Assurer permission édition
 
 **Types de Permissions Convention :**
+
 - `editConvention`, `deleteConvention`
 - `manageCollaborators`
 - `addEdition`, `editAllEditions`, `deleteAllEditions`
 - `manageVolunteers`, `manageArtists`
 
 **Types de Permissions Édition :**
+
 - `edit`, `delete`
 - `manageVolunteers`, `manageArtists`
 - Héritées des permissions convention
 
 **Logique :**
+
 1. Admin global = toutes permissions
 2. Créateur convention = toutes permissions
 3. Collaborateur = permissions définies
@@ -1306,19 +1464,20 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/auth`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/register` | Inscription (email, password, pseudo, nom, prenom) |
-| POST | `/login` | Connexion (identifier, password, rememberMe) |
-| POST | `/logout` | Déconnexion (clear session) |
-| POST | `/verify-email` | Vérification email (code 6 chiffres) |
-| POST | `/resend-verification` | Renvoyer code vérification |
-| POST | `/check-email` | Vérifier si email existe |
-| POST | `/reset-password` | Demander reset mot de passe |
-| GET | `/verify-reset-token` | Vérifier token reset |
-| POST | `/set-password-and-verify` | Définir mot de passe + vérifier email |
+| Méthode | Endpoint                   | Description                                        |
+| ------- | -------------------------- | -------------------------------------------------- |
+| POST    | `/register`                | Inscription (email, password, pseudo, nom, prenom) |
+| POST    | `/login`                   | Connexion (identifier, password, rememberMe)       |
+| POST    | `/logout`                  | Déconnexion (clear session)                        |
+| POST    | `/verify-email`            | Vérification email (code 6 chiffres)               |
+| POST    | `/resend-verification`     | Renvoyer code vérification                         |
+| POST    | `/check-email`             | Vérifier si email existe                           |
+| POST    | `/reset-password`          | Demander reset mot de passe                        |
+| GET     | `/verify-reset-token`      | Vérifier token reset                               |
+| POST    | `/set-password-and-verify` | Définir mot de passe + vérifier email              |
 
 **Authentification :**
+
 - Sessions scellées via `nuxt-auth-utils`
 - Code vérification email 6 chiffres (expire 15 minutes)
 - Token reset mot de passe (expire 1 heure)
@@ -1328,45 +1487,46 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/profile`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| PUT | `/update` | Mettre à jour profil (pseudo, nom, prenom, phone, language) |
-| GET | `/stats` | Statistiques profil (éditions, conventions, bénévoles) |
-| POST | `/change-password` | Changer mot de passe |
-| GET | `/has-password` | Vérifier si mot de passe défini |
-| DELETE | `/delete-picture` | Supprimer photo profil |
-| GET | `/auth-info` | Infos authentification (provider) |
-| GET | `/notification-preferences` | Préférences notifications |
-| PUT | `/notification-preferences` | MAJ préférences notifications |
+| Méthode | Endpoint                    | Description                                                 |
+| ------- | --------------------------- | ----------------------------------------------------------- |
+| PUT     | `/update`                   | Mettre à jour profil (pseudo, nom, prenom, phone, language) |
+| GET     | `/stats`                    | Statistiques profil (éditions, conventions, bénévoles)      |
+| POST    | `/change-password`          | Changer mot de passe                                        |
+| GET     | `/has-password`             | Vérifier si mot de passe défini                             |
+| DELETE  | `/delete-picture`           | Supprimer photo profil                                      |
+| GET     | `/auth-info`                | Infos authentification (provider)                           |
+| GET     | `/notification-preferences` | Préférences notifications                                   |
+| PUT     | `/notification-preferences` | MAJ préférences notifications                               |
 
 **Base : `/api/user`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/volunteer-applications` | Candidatures bénévole utilisateur |
+| Méthode | Endpoint                  | Description                       |
+| ------- | ------------------------- | --------------------------------- |
+| GET     | `/volunteer-applications` | Candidatures bénévole utilisateur |
 
 **Base : `/api/session`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/me` | Session utilisateur courante |
+| Méthode | Endpoint | Description                  |
+| ------- | -------- | ---------------------------- |
+| GET     | `/me`    | Session utilisateur courante |
 
 ### Endpoints Conventions
 
 **Base : `/api/conventions`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/` | Créer convention |
-| GET | `/my-conventions` | Conventions de l'utilisateur (créateur ou collaborateur) |
-| GET | `/[id]` | Détails convention |
-| PUT | `/[id]` | Modifier convention |
-| DELETE | `/[id]` | Supprimer convention |
-| DELETE | `/[id]/delete-image` | Supprimer image convention |
-| PATCH | `/[id]/archive` | Archiver/désarchiver convention |
-| GET | `/[id]/editions` | Éditions d'une convention |
+| Méthode | Endpoint             | Description                                              |
+| ------- | -------------------- | -------------------------------------------------------- |
+| POST    | `/`                  | Créer convention                                         |
+| GET     | `/my-conventions`    | Conventions de l'utilisateur (créateur ou collaborateur) |
+| GET     | `/[id]`              | Détails convention                                       |
+| PUT     | `/[id]`              | Modifier convention                                      |
+| DELETE  | `/[id]`              | Supprimer convention                                     |
+| DELETE  | `/[id]/delete-image` | Supprimer image convention                               |
+| PATCH   | `/[id]/archive`      | Archiver/désarchiver convention                          |
+| GET     | `/[id]/editions`     | Éditions d'une convention                                |
 
 **Permissions :**
+
 - Lecture : Publique (ou créateur/collaborateur pour archives)
 - Création : Authentifié
 - Modification/Suppression : Créateur ou collaborateur avec droits
@@ -1375,24 +1535,26 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/conventions/[id]/collaborators`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste collaborateurs convention |
-| POST | `/` | Ajouter collaborateur (userIdentifier ou userId, rights, title) |
-| GET | `/[collaboratorId]` | Détails collaborateur |
-| PUT | `/[collaboratorId]` | Modifier collaborateur (rights, title) |
-| PATCH | `/[collaboratorId]` | Modifier collaborateur (PATCH) |
-| DELETE | `/[collaboratorId]` | Retirer collaborateur |
-| PATCH | `/[collaboratorId]/rights` | Modifier uniquement droits |
-| GET | `/history` | Historique permissions |
+| Méthode | Endpoint                   | Description                                                     |
+| ------- | -------------------------- | --------------------------------------------------------------- |
+| GET     | `/`                        | Liste collaborateurs convention                                 |
+| POST    | `/`                        | Ajouter collaborateur (userIdentifier ou userId, rights, title) |
+| GET     | `/[collaboratorId]`        | Détails collaborateur                                           |
+| PUT     | `/[collaboratorId]`        | Modifier collaborateur (rights, title)                          |
+| PATCH   | `/[collaboratorId]`        | Modifier collaborateur (PATCH)                                  |
+| DELETE  | `/[collaboratorId]`        | Retirer collaborateur                                           |
+| PATCH   | `/[collaboratorId]/rights` | Modifier uniquement droits                                      |
+| GET     | `/history`                 | Historique permissions                                          |
 
 **Système de Permissions :**
+
 - Droits granulaires (8 permissions : editConvention, deleteConvention, manageCollaborators, addEdition, editAllEditions, deleteAllEditions, manageVolunteers, manageArtists)
 - Titre personnalisé (ex: "Créateur", "Gestionnaire", etc.)
 - Historique traçable des changements
 - Permissions par édition via `EditionCollaboratorPermission`
 
 **Format Collaborateur :**
+
 ```json
 {
   "id": 12,
@@ -1417,12 +1579,13 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/conventions/[id]/claim`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/` | Réclamer convention (générer code vérification email) |
-| POST | `/verify` | Vérifier code réclamation (ajouter comme collaborateur) |
+| Méthode | Endpoint  | Description                                             |
+| ------- | --------- | ------------------------------------------------------- |
+| POST    | `/`       | Réclamer convention (générer code vérification email)   |
+| POST    | `/verify` | Vérifier code réclamation (ajouter comme collaborateur) |
 
 **Workflow :**
+
 1. Utilisateur demande réclamation
 2. Code envoyé par email (6 chiffres, expire 15 min)
 3. Vérification code → Ajout comme collaborateur avec tous droits
@@ -1431,56 +1594,58 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/` | Créer édition (standalone ou sous convention) |
-| GET | `/[id]` | Détails édition |
-| PUT | `/[id]` | Modifier édition |
-| DELETE | `/[id]` | Supprimer édition |
+| Méthode | Endpoint | Description                                   |
+| ------- | -------- | --------------------------------------------- |
+| POST    | `/`      | Créer édition (standalone ou sous convention) |
+| GET     | `/[id]`  | Détails édition                               |
+| PUT     | `/[id]`  | Modifier édition                              |
+| DELETE  | `/[id]`  | Supprimer édition                             |
 
 **Données Édition :**
+
 - Informations générales (name, description, program)
 - Dates (startDate, endDate, setup/teardown)
 - Adresse + GPS
 - 40+ services (hasCamping, hasKidsZone, etc.)
-- Configuration bénévolat (10+ champs volunteersAsk*)
+- Configuration bénévolat (10+ champs volunteersAsk\*)
 - Liens externes (facebookUrl, instagramUrl, ticketingUrl, officialWebsiteUrl)
 
 ### Endpoints Covoiturage
 
 **Base : `/api/editions/[id]/carpool-offers` (Offres)**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste offres édition |
-| POST | `/` | Créer offre |
+| Méthode | Endpoint | Description          |
+| ------- | -------- | -------------------- |
+| GET     | `/`      | Liste offres édition |
+| POST    | `/`      | Créer offre          |
 
 **Base : `/api/carpool-offers/[id]` (Gestion Offre)**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Détails offre |
-| PUT | `/` | Modifier offre |
-| DELETE | `/` | Supprimer offre |
-| GET | `/bookings` | Réservations offre |
-| POST | `/bookings` | Créer réservation |
-| PUT | `/bookings/[bookingId]` | MAJ statut réservation |
-| POST | `/passengers` | Ajouter passager (conducteur) |
-| DELETE | `/passengers/[userId]` | Retirer passager |
-| GET | `/comments` | Commentaires offre |
-| POST | `/comments` | Ajouter commentaire |
+| Méthode | Endpoint                | Description                   |
+| ------- | ----------------------- | ----------------------------- |
+| GET     | `/`                     | Détails offre                 |
+| PUT     | `/`                     | Modifier offre                |
+| DELETE  | `/`                     | Supprimer offre               |
+| GET     | `/bookings`             | Réservations offre            |
+| POST    | `/bookings`             | Créer réservation             |
+| PUT     | `/bookings/[bookingId]` | MAJ statut réservation        |
+| POST    | `/passengers`           | Ajouter passager (conducteur) |
+| DELETE  | `/passengers/[userId]`  | Retirer passager              |
+| GET     | `/comments`             | Commentaires offre            |
+| POST    | `/comments`             | Ajouter commentaire           |
 
 **Base : `/api/carpool-requests` (Demandes)**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/[id]` | Détails demande |
-| PUT | `/[id]` | Modifier demande |
-| DELETE | `/[id]` | Supprimer demande |
-| GET | `/[id]/comments` | Commentaires demande |
-| POST | `/[id]/comments` | Ajouter commentaire |
+| Méthode | Endpoint         | Description          |
+| ------- | ---------------- | -------------------- |
+| GET     | `/[id]`          | Détails demande      |
+| PUT     | `/[id]`          | Modifier demande     |
+| DELETE  | `/[id]`          | Supprimer demande    |
+| GET     | `/[id]/comments` | Commentaires demande |
+| POST    | `/[id]/comments` | Ajouter commentaire  |
 
 **Fonctionnalités :**
+
 - Direction (aller/retour)
 - Places disponibles
 - Prix suggéré
@@ -1492,16 +1657,16 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions/[id]/lost-found`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste objets trouvés |
-| POST | `/` | Déclarer objet trouvé |
-| GET | `/[itemId]` | Détails objet |
-| PUT | `/[itemId]` | Modifier objet |
-| DELETE | `/[itemId]` | Supprimer objet |
-| PATCH | `/[itemId]/status` | MAJ statut (trouvé/récupéré) |
-| GET | `/[itemId]/comments` | Commentaires |
-| POST | `/[itemId]/comments` | Ajouter commentaire |
+| Méthode | Endpoint             | Description                  |
+| ------- | -------------------- | ---------------------------- |
+| GET     | `/`                  | Liste objets trouvés         |
+| POST    | `/`                  | Déclarer objet trouvé        |
+| GET     | `/[itemId]`          | Détails objet                |
+| PUT     | `/[itemId]`          | Modifier objet               |
+| DELETE  | `/[itemId]`          | Supprimer objet              |
+| PATCH   | `/[itemId]/status`   | MAJ statut (trouvé/récupéré) |
+| GET     | `/[itemId]/comments` | Commentaires                 |
+| POST    | `/[itemId]/comments` | Ajouter commentaire          |
 
 ### Endpoints Bénévoles
 
@@ -1509,65 +1674,66 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Candidatures :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/applications` | Liste candidatures |
-| POST | `/applications` | Soumettre candidature |
-| GET | `/applications/[applicationId]` | Détails candidature |
-| PUT | `/applications/[applicationId]` | Modifier candidature |
-| DELETE | `/applications/[applicationId]` | Annuler candidature |
-| PATCH | `/applications/[applicationId]/status` | Changer statut (approuver/rejeter) |
+| Méthode | Endpoint                               | Description                        |
+| ------- | -------------------------------------- | ---------------------------------- |
+| GET     | `/applications`                        | Liste candidatures                 |
+| POST    | `/applications`                        | Soumettre candidature              |
+| GET     | `/applications/[applicationId]`        | Détails candidature                |
+| PUT     | `/applications/[applicationId]`        | Modifier candidature               |
+| DELETE  | `/applications/[applicationId]`        | Annuler candidature                |
+| PATCH   | `/applications/[applicationId]/status` | Changer statut (approuver/rejeter) |
 
 **Équipes :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/teams` | Liste équipes |
-| POST | `/teams` | Créer équipe |
-| GET | `/teams/[teamId]` | Détails équipe |
-| PUT | `/teams/[teamId]` | Modifier équipe |
-| DELETE | `/teams/[teamId]` | Supprimer équipe |
-| POST | `/applications/[applicationId]/teams` | Affecter bénévole à équipe |
-| DELETE | `/applications/[applicationId]/teams/[teamId]` | Retirer bénévole d'équipe |
+| Méthode | Endpoint                                       | Description                |
+| ------- | ---------------------------------------------- | -------------------------- |
+| GET     | `/teams`                                       | Liste équipes              |
+| POST    | `/teams`                                       | Créer équipe               |
+| GET     | `/teams/[teamId]`                              | Détails équipe             |
+| PUT     | `/teams/[teamId]`                              | Modifier équipe            |
+| DELETE  | `/teams/[teamId]`                              | Supprimer équipe           |
+| POST    | `/applications/[applicationId]/teams`          | Affecter bénévole à équipe |
+| DELETE  | `/applications/[applicationId]/teams/[teamId]` | Retirer bénévole d'équipe  |
 
 **Planning :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/time-slots` (via `/volunteer-time-slots`) | Liste créneaux |
-| POST | `/time-slots` | Créer créneau |
-| GET | `/time-slots/[slotId]` | Détails créneau |
-| PUT | `/time-slots/[slotId]` | Modifier créneau |
-| DELETE | `/time-slots/[slotId]` | Supprimer créneau |
-| GET | `/time-slots/[slotId]/assignments` | Affectations créneau |
-| POST | `/time-slots/[slotId]/assignments` | Affecter bénévole |
-| DELETE | `/time-slots/[slotId]/assignments/[assignmentId]` | Retirer affectation |
+| Méthode | Endpoint                                          | Description          |
+| ------- | ------------------------------------------------- | -------------------- |
+| GET     | `/time-slots` (via `/volunteer-time-slots`)       | Liste créneaux       |
+| POST    | `/time-slots`                                     | Créer créneau        |
+| GET     | `/time-slots/[slotId]`                            | Détails créneau      |
+| PUT     | `/time-slots/[slotId]`                            | Modifier créneau     |
+| DELETE  | `/time-slots/[slotId]`                            | Supprimer créneau    |
+| GET     | `/time-slots/[slotId]/assignments`                | Affectations créneau |
+| POST    | `/time-slots/[slotId]/assignments`                | Affecter bénévole    |
+| DELETE  | `/time-slots/[slotId]/assignments/[assignmentId]` | Retirer affectation  |
 
 **Notifications :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/notification` | Groupes de notifications |
-| POST | `/notification` | Créer groupe notification |
-| GET | `/notification/[groupId]` | Détails groupe |
-| POST | `/notification/[groupId]/send` | Envoyer notification |
-| GET | `/notification/[groupId]/confirmations` | Confirmations |
+| Méthode | Endpoint                                | Description               |
+| ------- | --------------------------------------- | ------------------------- |
+| GET     | `/notification`                         | Groupes de notifications  |
+| POST    | `/notification`                         | Créer groupe notification |
+| GET     | `/notification/[groupId]`               | Détails groupe            |
+| POST    | `/notification/[groupId]/send`          | Envoyer notification      |
+| GET     | `/notification/[groupId]/confirmations` | Confirmations             |
 
 **Restauration :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/catering` | Infos restauration bénévoles |
-| POST | `/catering/assign` | Affecter repas |
+| Méthode | Endpoint           | Description                  |
+| ------- | ------------------ | ---------------------------- |
+| GET     | `/catering`        | Infos restauration bénévoles |
+| POST    | `/catering/assign` | Affecter repas               |
 
 **Contrôle Accès :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/access-control` | Infos contrôle accès |
-| POST | `/access-control/entry` | Enregistrer entrée/sortie |
+| Méthode | Endpoint                | Description               |
+| ------- | ----------------------- | ------------------------- |
+| GET     | `/access-control`       | Infos contrôle accès      |
+| POST    | `/access-control/entry` | Enregistrer entrée/sortie |
 
 **Système Bénévoles Complet :**
+
 - Candidatures avec statut (pending/approved/rejected/cancelled)
 - 30+ champs candidature (diet, allergies, préférences, compétences)
 - Équipes multiples
@@ -1583,93 +1749,94 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Configuration :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Configuration billetterie |
-| PUT | `/` | MAJ configuration |
+| Méthode | Endpoint | Description               |
+| ------- | -------- | ------------------------- |
+| GET     | `/`      | Configuration billetterie |
+| PUT     | `/`      | MAJ configuration         |
 
 **Tarifs :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/tiers` | Liste tarifs |
-| POST | `/tiers` | Créer tarif |
-| PUT | `/tiers/[tierId]` | Modifier tarif |
-| DELETE | `/tiers/[tierId]` | Supprimer tarif |
+| Méthode | Endpoint          | Description     |
+| ------- | ----------------- | --------------- |
+| GET     | `/tiers`          | Liste tarifs    |
+| POST    | `/tiers`          | Créer tarif     |
+| PUT     | `/tiers/[tierId]` | Modifier tarif  |
+| DELETE  | `/tiers/[tierId]` | Supprimer tarif |
 
 **Options :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/options` | Liste options |
-| POST | `/options` | Créer option |
-| PUT | `/options/[optionId]` | Modifier option |
-| DELETE | `/options/[optionId]` | Supprimer option |
+| Méthode | Endpoint              | Description      |
+| ------- | --------------------- | ---------------- |
+| GET     | `/options`            | Liste options    |
+| POST    | `/options`            | Créer option     |
+| PUT     | `/options/[optionId]` | Modifier option  |
+| DELETE  | `/options/[optionId]` | Supprimer option |
 
 **Quotas :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/quotas` | Liste quotas |
-| POST | `/quotas` | Créer quota |
-| PUT | `/quotas/[quotaId]` | Modifier quota |
-| DELETE | `/quotas/[quotaId]` | Supprimer quota |
-| GET | `/quotas/stats` | Statistiques quotas |
+| Méthode | Endpoint            | Description         |
+| ------- | ------------------- | ------------------- |
+| GET     | `/quotas`           | Liste quotas        |
+| POST    | `/quotas`           | Créer quota         |
+| PUT     | `/quotas/[quotaId]` | Modifier quota      |
+| DELETE  | `/quotas/[quotaId]` | Supprimer quota     |
+| GET     | `/quotas/stats`     | Statistiques quotas |
 
 **Objets Consignés :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/returnable-items` | Liste objets consignés |
-| POST | `/returnable-items` | Créer objet consigné |
-| PUT | `/returnable-items/[itemId]` | Modifier objet |
-| DELETE | `/returnable-items/[itemId]` | Supprimer objet |
+| Méthode | Endpoint                     | Description            |
+| ------- | ---------------------------- | ---------------------- |
+| GET     | `/returnable-items`          | Liste objets consignés |
+| POST    | `/returnable-items`          | Créer objet consigné   |
+| PUT     | `/returnable-items/[itemId]` | Modifier objet         |
+| DELETE  | `/returnable-items/[itemId]` | Supprimer objet        |
 
 **Champs Personnalisés :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/custom-fields` | Liste champs perso |
-| POST | `/custom-fields` | Créer champ |
-| PUT | `/custom-fields/[fieldId]` | Modifier champ |
-| DELETE | `/custom-fields/[fieldId]` | Supprimer champ |
+| Méthode | Endpoint                   | Description        |
+| ------- | -------------------------- | ------------------ |
+| GET     | `/custom-fields`           | Liste champs perso |
+| POST    | `/custom-fields`           | Créer champ        |
+| PUT     | `/custom-fields/[fieldId]` | Modifier champ     |
+| DELETE  | `/custom-fields/[fieldId]` | Supprimer champ    |
 
 **Commandes :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/orders` | Liste commandes |
-| POST | `/orders` | Créer commande (interne) |
-| GET | `/orders/[orderId]` | Détails commande |
-| PUT | `/orders/[orderId]` | MAJ commande |
-| PATCH | `/orders/[orderId]/status` | Changer statut |
+| Méthode | Endpoint                   | Description              |
+| ------- | -------------------------- | ------------------------ |
+| GET     | `/orders`                  | Liste commandes          |
+| POST    | `/orders`                  | Créer commande (interne) |
+| GET     | `/orders/[orderId]`        | Détails commande         |
+| PUT     | `/orders/[orderId]`        | MAJ commande             |
+| PATCH   | `/orders/[orderId]/status` | Changer statut           |
 
 **HelloAsso :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/helloasso` | Config HelloAsso |
-| PUT | `/helloasso` | MAJ config HelloAsso |
-| POST | `/helloasso/sync` | Synchroniser commandes |
-| POST | `/helloasso/webhook` | Webhook HelloAsso |
+| Méthode | Endpoint             | Description            |
+| ------- | -------------------- | ---------------------- |
+| GET     | `/helloasso`         | Config HelloAsso       |
+| PUT     | `/helloasso`         | MAJ config HelloAsso   |
+| POST    | `/helloasso/sync`    | Synchroniser commandes |
+| POST    | `/helloasso/webhook` | Webhook HelloAsso      |
 
 **Billetterie Externe :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/external` | Config billetterie externe |
-| PUT | `/external` | MAJ config externe |
+| Méthode | Endpoint    | Description                |
+| ------- | ----------- | -------------------------- |
+| GET     | `/external` | Config billetterie externe |
+| PUT     | `/external` | MAJ config externe         |
 
 **Contrôle Accès :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/access-control` | Infos contrôle accès |
-| POST | `/access-control/scan` | Scanner QR code |
-| POST | `/access-control/entry` | Enregistrer entrée/sortie |
-| GET | `/access-control/stats` | Stats entrées/sorties |
+| Méthode | Endpoint                | Description               |
+| ------- | ----------------------- | ------------------------- |
+| GET     | `/access-control`       | Infos contrôle accès      |
+| POST    | `/access-control/scan`  | Scanner QR code           |
+| POST    | `/access-control/entry` | Enregistrer entrée/sortie |
+| GET     | `/access-control/stats` | Stats entrées/sorties     |
 
 **Système Billetterie Complet :**
+
 - Tarifs multiples avec quotas
 - Options additionnelles
 - Objets consignés (gobelets, etc.)
@@ -1683,19 +1850,20 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions/[id]/workshops`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste ateliers |
-| POST | `/` | Créer atelier |
-| GET | `/[workshopId]` | Détails atelier |
-| PUT | `/[workshopId]` | Modifier atelier |
-| DELETE | `/[workshopId]` | Supprimer atelier |
-| POST | `/[workshopId]/favorite` | Favori atelier |
-| DELETE | `/[workshopId]/favorite` | Retirer favori |
-| GET | `/locations` | Lieux ateliers |
-| POST | `/locations` | Créer lieu |
+| Méthode | Endpoint                 | Description       |
+| ------- | ------------------------ | ----------------- |
+| GET     | `/`                      | Liste ateliers    |
+| POST    | `/`                      | Créer atelier     |
+| GET     | `/[workshopId]`          | Détails atelier   |
+| PUT     | `/[workshopId]`          | Modifier atelier  |
+| DELETE  | `/[workshopId]`          | Supprimer atelier |
+| POST    | `/[workshopId]/favorite` | Favori atelier    |
+| DELETE  | `/[workshopId]/favorite` | Retirer favori    |
+| GET     | `/locations`             | Lieux ateliers    |
+| POST    | `/locations`             | Créer lieu        |
 
 **Fonctionnalités :**
+
 - Planning ateliers avec FullCalendar
 - Lieux prédéfinis ou saisie libre
 - Import depuis image (IA Anthropic)
@@ -1705,18 +1873,19 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions/[id]/artists`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste artistes |
-| POST | `/` | Ajouter artiste |
-| GET | `/[artistId]` | Détails artiste |
-| PUT | `/[artistId]` | Modifier artiste |
-| DELETE | `/[artistId]` | Supprimer artiste |
-| PATCH | `/[artistId]/validation` | Valider entrée artiste |
-| POST | `/[artistId]/accommodation` | Ajouter hébergement |
-| POST | `/[artistId]/meals` | Gérer repas |
+| Méthode | Endpoint                    | Description            |
+| ------- | --------------------------- | ---------------------- |
+| GET     | `/`                         | Liste artistes         |
+| POST    | `/`                         | Ajouter artiste        |
+| GET     | `/[artistId]`               | Détails artiste        |
+| PUT     | `/[artistId]`               | Modifier artiste       |
+| DELETE  | `/[artistId]`               | Supprimer artiste      |
+| PATCH   | `/[artistId]/validation`    | Valider entrée artiste |
+| POST    | `/[artistId]/accommodation` | Ajouter hébergement    |
+| POST    | `/[artistId]/meals`         | Gérer repas            |
 
 **Système Artistes :**
+
 - Profil artiste (nom, compagnie, pays, bio)
 - Hébergement (période, adresse, notes)
 - Repas avec sélection
@@ -1728,15 +1897,16 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions/[id]/shows`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste spectacles |
-| POST | `/` | Créer spectacle |
-| GET | `/[showId]` | Détails spectacle |
-| PUT | `/[showId]` | Modifier spectacle |
-| DELETE | `/[showId]` | Supprimer spectacle |
+| Méthode | Endpoint    | Description         |
+| ------- | ----------- | ------------------- |
+| GET     | `/`         | Liste spectacles    |
+| POST    | `/`         | Créer spectacle     |
+| GET     | `/[showId]` | Détails spectacle   |
+| PUT     | `/[showId]` | Modifier spectacle  |
+| DELETE  | `/[showId]` | Supprimer spectacle |
 
 **Données Spectacle :**
+
 - Titre, description
 - Date/heure
 - Lieu
@@ -1747,14 +1917,15 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions/[id]/meals`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste repas |
-| POST | `/` | Créer repas |
-| PUT | `/[mealId]` | Modifier repas |
-| DELETE | `/[mealId]` | Supprimer repas |
+| Méthode | Endpoint    | Description     |
+| ------- | ----------- | --------------- |
+| GET     | `/`         | Liste repas     |
+| POST    | `/`         | Créer repas     |
+| PUT     | `/[mealId]` | Modifier repas  |
+| DELETE  | `/[mealId]` | Supprimer repas |
 
 **Gestion Repas :**
+
 - Repas par jour/période
 - Sélection par bénévoles
 - Sélection par artistes
@@ -1765,31 +1936,32 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/editions/[id]/posts`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste posts |
-| POST | `/` | Créer post |
-| GET | `/[postId]` | Détails post |
-| PUT | `/[postId]` | Modifier post |
-| DELETE | `/[postId]` | Supprimer post |
-| GET | `/[postId]/comments` | Commentaires post |
-| POST | `/[postId]/comments` | Ajouter commentaire |
-| DELETE | `/[postId]/comments/[commentId]` | Supprimer commentaire |
+| Méthode | Endpoint                         | Description           |
+| ------- | -------------------------------- | --------------------- |
+| GET     | `/`                              | Liste posts           |
+| POST    | `/`                              | Créer post            |
+| GET     | `/[postId]`                      | Détails post          |
+| PUT     | `/[postId]`                      | Modifier post         |
+| DELETE  | `/[postId]`                      | Supprimer post        |
+| GET     | `/[postId]/comments`             | Commentaires post     |
+| POST    | `/[postId]/comments`             | Ajouter commentaire   |
+| DELETE  | `/[postId]/comments/[commentId]` | Supprimer commentaire |
 
 ### Endpoints Notifications
 
 **Base : `/api/notifications`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/` | Liste notifications utilisateur |
-| GET | `/[id]` | Détails notification |
-| PATCH | `/[id]/read` | Marquer comme lu |
-| POST | `/push/subscribe` | Abonnement push |
-| DELETE | `/push/unsubscribe` | Désabonnement push |
-| GET | `/stream` | Stream SSE notifications |
+| Méthode | Endpoint            | Description                     |
+| ------- | ------------------- | ------------------------------- |
+| GET     | `/`                 | Liste notifications utilisateur |
+| GET     | `/[id]`             | Détails notification            |
+| PATCH   | `/[id]/read`        | Marquer comme lu                |
+| POST    | `/push/subscribe`   | Abonnement push                 |
+| DELETE  | `/push/unsubscribe` | Désabonnement push              |
+| GET     | `/stream`           | Stream SSE notifications        |
 
 **Système Notifications :**
+
 - Notifications in-app avec badge
 - Push notifications (Web Push API)
 - Stream temps réel (SSE)
@@ -1800,27 +1972,27 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/feedback`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/` | Envoyer feedback |
+| Méthode | Endpoint | Description      |
+| ------- | -------- | ---------------- |
+| POST    | `/`      | Envoyer feedback |
 
 ### Endpoints Fichiers
 
 **Base : `/api/files`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/profile` | Upload photo profil |
-| POST | `/convention` | Upload image convention |
-| POST | `/edition` | Upload image édition |
-| POST | `/lost-found` | Upload image objet trouvé |
-| POST | `/generic` | Upload générique |
+| Méthode | Endpoint      | Description               |
+| ------- | ------------- | ------------------------- |
+| POST    | `/profile`    | Upload photo profil       |
+| POST    | `/convention` | Upload image convention   |
+| POST    | `/edition`    | Upload image édition      |
+| POST    | `/lost-found` | Upload image objet trouvé |
+| POST    | `/generic`    | Upload générique          |
 
 **Base : `/api/uploads`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/[...path]` | Servir fichier uploadé |
+| Méthode | Endpoint     | Description            |
+| ------- | ------------ | ---------------------- |
+| GET     | `/[...path]` | Servir fichier uploadé |
 
 ### Endpoints Administration
 
@@ -1828,115 +2000,116 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Statistiques & Monitoring :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/stats` | Stats globales système |
-| GET | `/activity` | Activité récente |
-| GET | `/config` | Configuration système |
+| Méthode | Endpoint    | Description            |
+| ------- | ----------- | ---------------------- |
+| GET     | `/stats`    | Stats globales système |
+| GET     | `/activity` | Activité récente       |
+| GET     | `/config`   | Configuration système  |
 
 **Utilisateurs :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/users` | Liste utilisateurs (pagination, filtres) |
-| GET | `/users/[id]` | Détails utilisateur |
-| PUT | `/users/[id]` | Modifier utilisateur |
-| DELETE | `/users/[id]` | Supprimer utilisateur |
-| PUT | `/users/[id]/promote` | Promouvoir admin |
-| POST | `/users/[id]/impersonate` | Usurper identité |
-| PUT | `/users/[id]/profile-picture` | Changer photo admin |
+| Méthode | Endpoint                      | Description                              |
+| ------- | ----------------------------- | ---------------------------------------- |
+| GET     | `/users`                      | Liste utilisateurs (pagination, filtres) |
+| GET     | `/users/[id]`                 | Détails utilisateur                      |
+| PUT     | `/users/[id]`                 | Modifier utilisateur                     |
+| DELETE  | `/users/[id]`                 | Supprimer utilisateur                    |
+| PUT     | `/users/[id]/promote`         | Promouvoir admin                         |
+| POST    | `/users/[id]/impersonate`     | Usurper identité                         |
+| PUT     | `/users/[id]/profile-picture` | Changer photo admin                      |
 
 **Conventions & Éditions :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/conventions` | Liste toutes conventions |
-| DELETE | `/conventions/[id]` | Supprimer convention (admin) |
-| POST | `/import-edition` | Importer édition |
-| GET | `/editions/[id]/export` | Exporter édition (JSON) |
+| Méthode | Endpoint                | Description                  |
+| ------- | ----------------------- | ---------------------------- |
+| GET     | `/conventions`          | Liste toutes conventions     |
+| DELETE  | `/conventions/[id]`     | Supprimer convention (admin) |
+| POST    | `/import-edition`       | Importer édition             |
+| GET     | `/editions/[id]/export` | Exporter édition (JSON)      |
 
 **Feedback :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/feedback` | Liste feedbacks |
-| PUT | `/feedback/[id]/resolve` | Résoudre feedback |
+| Méthode | Endpoint                 | Description       |
+| ------- | ------------------------ | ----------------- |
+| GET     | `/feedback`              | Liste feedbacks   |
+| PUT     | `/feedback/[id]/resolve` | Résoudre feedback |
 
 **Logs Erreurs :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/error-logs` | Liste logs erreurs |
-| GET | `/error-logs/[id]` | Détails log |
-| PATCH | `/error-logs/[id]/resolve` | Résoudre erreur |
-| POST | `/error-logs/resolve-similar` | Résoudre similaires |
-| POST | `/error-logs/cleanup-old` | Nettoyer anciens (>1 mois) |
+| Méthode | Endpoint                      | Description                |
+| ------- | ----------------------------- | -------------------------- |
+| GET     | `/error-logs`                 | Liste logs erreurs         |
+| GET     | `/error-logs/[id]`            | Détails log                |
+| PATCH   | `/error-logs/[id]/resolve`    | Résoudre erreur            |
+| POST    | `/error-logs/resolve-similar` | Résoudre similaires        |
+| POST    | `/error-logs/cleanup-old`     | Nettoyer anciens (>1 mois) |
 
 **Notifications :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/notifications/create` | Créer notification globale |
-| POST | `/notifications/send-reminders` | Envoyer rappels éditions |
-| POST | `/notifications/test` | Test notification |
-| GET | `/notifications/test-simple` | Test simple |
-| GET | `/notifications/stats` | Stats notifications |
-| GET | `/notifications/recent` | Notifications récentes |
-| POST | `/notifications/push-test` | Test push |
-| GET | `/notifications/push-stats` | Stats push |
+| Méthode | Endpoint                        | Description                |
+| ------- | ------------------------------- | -------------------------- |
+| POST    | `/notifications/create`         | Créer notification globale |
+| POST    | `/notifications/send-reminders` | Envoyer rappels éditions   |
+| POST    | `/notifications/test`           | Test notification          |
+| GET     | `/notifications/test-simple`    | Test simple                |
+| GET     | `/notifications/stats`          | Stats notifications        |
+| GET     | `/notifications/recent`         | Notifications récentes     |
+| POST    | `/notifications/push-test`      | Test push                  |
+| GET     | `/notifications/push-stats`     | Stats push                 |
 
 **Tâches Cron :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/tasks` | Liste tâches disponibles |
-| POST | `/tasks/[taskName]` | Exécuter tâche manuellement |
+| Méthode | Endpoint            | Description                 |
+| ------- | ------------------- | --------------------------- |
+| GET     | `/tasks`            | Liste tâches disponibles    |
+| POST    | `/tasks/[taskName]` | Exécuter tâche manuellement |
 
 **Sauvegardes :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/backup/create` | Créer sauvegarde BDD |
-| GET | `/backup/list` | Liste sauvegardes |
-| GET | `/backup/download` | Télécharger sauvegarde |
-| POST | `/backup/restore` | Restaurer sauvegarde |
-| DELETE | `/backup/delete` | Supprimer sauvegarde |
+| Méthode | Endpoint           | Description            |
+| ------- | ------------------ | ---------------------- |
+| POST    | `/backup/create`   | Créer sauvegarde BDD   |
+| GET     | `/backup/list`     | Liste sauvegardes      |
+| GET     | `/backup/download` | Télécharger sauvegarde |
+| POST    | `/backup/restore`  | Restaurer sauvegarde   |
+| DELETE  | `/backup/delete`   | Supprimer sauvegarde   |
 
 **Usurpation :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/impersonate/stop` | Arrêter usurpation |
+| Méthode | Endpoint            | Description        |
+| ------- | ------------------- | ------------------ |
+| POST    | `/impersonate/stop` | Arrêter usurpation |
 
 **Divers :**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/assign-meals-volunteers` | Affecter repas auto |
-| GET | `/debug-auth` | Debug authentification |
-| POST | `/fix-session` | Corriger session utilisateur |
+| Méthode | Endpoint                   | Description                  |
+| ------- | -------------------------- | ---------------------------- |
+| POST    | `/assign-meals-volunteers` | Affecter repas auto          |
+| GET     | `/debug-auth`              | Debug authentification       |
+| POST    | `/fix-session`             | Corriger session utilisateur |
 
 ### Endpoints Sitemap & SEO
 
 **Base : `/api/__sitemap__`**
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/editions` | Éditions pour sitemap |
-| GET | `/carpool` | Covoiturage pour sitemap |
-| GET | `/volunteers` | Bénévoles pour sitemap |
+| Méthode | Endpoint      | Description              |
+| ------- | ------------- | ------------------------ |
+| GET     | `/editions`   | Éditions pour sitemap    |
+| GET     | `/carpool`    | Covoiturage pour sitemap |
+| GET     | `/volunteers` | Bénévoles pour sitemap   |
 
 ### Endpoints Divers
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/countries` | Liste pays avec drapeaux |
-| GET | `/users/search` | Rechercher utilisateurs |
-| GET | `/site.webmanifest` | Manifest PWA |
+| Méthode | Endpoint            | Description              |
+| ------- | ------------------- | ------------------------ |
+| GET     | `/countries`        | Liste pays avec drapeaux |
+| GET     | `/users/search`     | Rechercher utilisateurs  |
+| GET     | `/site.webmanifest` | Manifest PWA             |
 
 ### Stratégie d'API
 
 **Principes :**
+
 - RESTful avec verbes HTTP standards
 - Authentification par session (cookies scellés)
 - Permissions granulaires vérifiées côté serveur
@@ -1947,6 +2120,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 - Réponses structurées (data, error, message)
 
 **Sécurité :**
+
 - CORS configuré
 - CSRF protection via sessions
 - Input validation (Zod)
@@ -2166,6 +2340,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 ```
 
 **Relations Clés :**
+
 - User → Convention (1:N, créateur)
 - User → ConventionCollaborator (1:N)
 - Convention → Edition (1:N)
@@ -2202,6 +2377,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
    - Permet granularité fine
 
 **Workflow Vérification :**
+
 ```typescript
 function checkPermission(user, convention, edition, action) {
   // 1. Admin global → ALLOW
@@ -2215,8 +2391,7 @@ function checkPermission(user, convention, edition, action) {
   if (collab && collab[action]) return true
 
   // 4. Créateur édition (edit/delete uniquement)
-  if (edition && edition.creatorId === user.id &&
-      ['edit', 'delete'].includes(action)) return true
+  if (edition && edition.creatorId === user.id && ['edit', 'delete'].includes(action)) return true
 
   // 5. Permission spécifique édition
   if (edition) {
@@ -2316,6 +2491,7 @@ function checkPermission(user, convention, edition, action) {
 ```
 
 **Avantages :**
+
 - Bundles légers (seules traductions nécessaires)
 - Temps de chargement réduit
 - Scalabilité (facile d'ajouter domaines/langues)
@@ -2472,19 +2648,23 @@ function checkPermission(user, convention, edition, action) {
 **Fichier : `.env` (non versionné)**
 
 **Base de données :**
+
 ```env
 DATABASE_URL="mysql://user:password@host:port/database_name"
 ```
 
 **Authentification :**
+
 ```env
 NUXT_SESSION_PASSWORD="change_me_very_secret_32_chars_min"
 ```
+
 - Obligatoire en production
 - Minimum 32 caractères
 - Utilisé pour sceller sessions cookies
 
 **Emails :**
+
 ```env
 SEND_EMAILS=false                    # true pour envoi réel, false simulation
 SMTP_USER="votre.email@gmail.com"   # Si SEND_EMAILS=true
@@ -2492,6 +2672,7 @@ SMTP_PASS="mot_de_passe_application" # Mot de passe application Gmail
 ```
 
 **IA (Anthropic / Ollama / LM Studio) :**
+
 ```env
 # Anthropic (défaut)
 ANTHROPIC_API_KEY="sk-ant-..."
@@ -2507,6 +2688,7 @@ LMSTUDIO_MODEL="auto"
 ```
 
 **reCAPTCHA (protection formulaires) :**
+
 ```env
 NUXT_RECAPTCHA_SITE_KEY="6Lc..."           # Public
 NUXT_RECAPTCHA_SECRET_KEY="6Lc..."         # Privé
@@ -2516,17 +2698,20 @@ NUXT_RECAPTCHA_DEV_BYPASS="true"           # Bypass dev
 ```
 
 **Push Notifications (VAPID) :**
+
 ```env
 NUXT_PUBLIC_VAPID_PUBLIC_KEY="BM..."       # Public
 VAPID_PRIVATE_KEY="..."                    # Privé (ne pas exposer)
 ```
 
 **Site :**
+
 ```env
 NUXT_PUBLIC_SITE_URL="https://juggling-convention.com"
 ```
 
 **Docker (optionnelles) :**
+
 ```env
 MYSQL_ROOT_PASSWORD="rootpassword"
 MYSQL_DATABASE="convention_db"
@@ -2537,6 +2722,7 @@ MYSQL_PASSWORD="convention_password"
 ### Installation et Setup
 
 **Prérequis :**
+
 - Node.js >= 22 < 23 (strictement)
 - npm/pnpm/yarn/bun
 - MySQL 8.x
@@ -2586,6 +2772,7 @@ npm run docker:dev:down
 ```
 
 **Environnements Docker :**
+
 - **dev** : Développement avec hot reload
 - **release** : Preview production
 - **test** : Tests automatisés
@@ -2617,6 +2804,7 @@ npm run check-translations
 ```
 
 **Workflow Git :**
+
 1. Créer branche feature
 2. Développer + tests
 3. Lint + format (`npm run lint:fix && npm run format`)
@@ -2664,6 +2852,7 @@ npm run docker:release:down
 ```
 
 **Checklist Déploiement :**
+
 - [ ] Variables `.env` production configurées
 - [ ] `NUXT_SESSION_PASSWORD` robuste (32+ chars)
 - [ ] `SEND_EMAILS=true` avec SMTP valide
@@ -2676,6 +2865,7 @@ npm run docker:release:down
 - [ ] Tests E2E passés
 
 **Stratégies Déploiement :**
+
 - **Serverless** : Vercel, Netlify (limites BDD)
 - **VPS** : DigitalOcean, Hetzner, OVH
 - **Docker** : Docker Swarm, Kubernetes
@@ -2688,10 +2878,12 @@ npm run docker:release:down
 ### Runtime & Framework
 
 **Node.js >= 22 < 23**
+
 - Runtime JavaScript serveur
 - Requirement strict pour compatibilité dépendances
 
 **Nuxt 4.2.0**
+
 - Framework Vue.js full-stack
 - SSR (Server-Side Rendering)
 - File-based routing
@@ -2700,12 +2892,14 @@ npm run docker:release:down
 - Module ecosystem riche
 
 **Vue.js 3.5.17**
+
 - Framework JavaScript réactif
 - Composition API
 - Script setup
 - TypeScript support natif
 
 **TypeScript 5.8.3**
+
 - Langage typé (superset JavaScript)
 - Sécurité type compile-time
 - IntelliSense amélioré
@@ -2714,6 +2908,7 @@ npm run docker:release:down
 ### UI & Styling
 
 **Nuxt UI 4.0.0**
+
 - Bibliothèque composants UI
 - Basée sur Tailwind CSS + Headless UI
 - Composants préconstruits (UButton, UModal, etc.)
@@ -2721,23 +2916,27 @@ npm run docker:release:down
 - Dark mode support
 
 **Tailwind CSS**
+
 - Framework CSS utility-first
 - Intégré via Nuxt UI
 - Classes utilitaires (flex, grid, p-4, etc.)
 - Responsive design facile
 
 **Icônes**
+
 - **@iconify/vue** - Iconify (100k+ icônes)
-- **@iconify-json/*** - Collections (heroicons, lucide, mdi, etc.)
+- **@iconify-json/\*** - Collections (heroicons, lucide, mdi, etc.)
 - **nuxt-icon** - Module Nuxt icônes
 - Mode serveur : `remote` (optimisation bundle)
 
 **Flag Icons**
+
 - **flag-icons** - Drapeaux pays (CSS)
 
 ### State Management & Stores
 
 **Pinia 3.0.3**
+
 - Store officiel Vue 3
 - Remplacement Vuex
 - Type-safe
@@ -2745,12 +2944,14 @@ npm run docker:release:down
 - Composition API friendly
 
 **VueUse 13.6.0**
+
 - Collection composables Vue
 - Utilitaires réactifs (useDebounce, useIntersectionObserver, etc.)
 
 ### Base de Données & ORM
 
 **MySQL 8.x**
+
 - SGBD relationnel
 - Performance élevée
 - Transactions ACID
@@ -2758,6 +2959,7 @@ npm run docker:release:down
 - Full-text search
 
 **Prisma 6.18.0**
+
 - ORM moderne TypeScript
 - Schema-first
 - Type-safe queries
@@ -2765,6 +2967,7 @@ npm run docker:release:down
 - Prisma Studio (GUI)
 
 **Prisma Client**
+
 - Client auto-généré
 - IntelliSense complet
 - Relations auto-résolues
@@ -2773,6 +2976,7 @@ npm run docker:release:down
 ### Authentification
 
 **nuxt-auth-utils 0.5.23**
+
 - Module auth Nuxt
 - Sessions scellées (sealed cookies)
 - Pas de JWT (plus sécurisé)
@@ -2780,6 +2984,7 @@ npm run docker:release:down
 - OAuth support potentiel
 
 **bcryptjs 3.0.2**
+
 - Hachage mots de passe
 - Salt automatique
 - Résistant brute-force
@@ -2787,6 +2992,7 @@ npm run docker:release:down
 ### Internationalisation
 
 **@nuxtjs/i18n 10.0.3**
+
 - Module i18n Nuxt
 - Vue I18n intégré
 - 13 langues supportées
@@ -2794,17 +3000,19 @@ npm run docker:release:down
 - Détection langue navigateur
 - SEO support
 
-**@intlify/*** - Core i18n Vue
+**@intlify/\*** - Core i18n Vue
 
 ### Email
 
 **nodemailer 7.0.5**
+
 - Envoi emails Node.js
 - SMTP support (Gmail, etc.)
 - Attachments
 - HTML templates
 
-**@vue-email/*** - Templates email Vue
+**@vue-email/\*** - Templates email Vue
+
 - Composants Vue pour emails
 - Rendu HTML/texte
 - Responsive
@@ -2812,12 +3020,14 @@ npm run docker:release:down
 ### Notifications
 
 **web-push 3.6.7**
+
 - Web Push API Node.js
 - Notifications push
 - VAPID support
 - Service Worker
 
 **Server-Sent Events (SSE)**
+
 - Implémentation custom
 - Stream temps réel
 - Notifications instantanées
@@ -2825,6 +3035,7 @@ npm run docker:release:down
 ### IA & Intégrations
 
 **@anthropic-ai/sdk 0.67.0**
+
 - SDK Claude (Anthropic)
 - Import ateliers depuis image
 - Support streaming
@@ -2833,6 +3044,7 @@ npm run docker:release:down
 ### Validation
 
 **zod 4.1.9**
+
 - Validation schema TypeScript-first
 - Type inference
 - Validation runtime
@@ -2841,12 +3053,14 @@ npm run docker:release:down
 ### Dates & Temps
 
 **luxon 3.5.0**
+
 - Manipulation dates moderne
 - Remplacement Moment.js
 - i18n support
 - Timezones
 
 **@internationalized/date 3.8.2**
+
 - Dates internationalisées
 - Calendriers non-grégoriens
 - Intégration React Aria
@@ -2854,12 +3068,14 @@ npm run docker:release:down
 ### Cartes & Calendrier
 
 **Leaflet** (via composable)
+
 - Bibliothèque cartes interactives
 - OpenStreetMap
 - Markers, popups, layers
 - Léger
 
 **FullCalendar 6.1.15**
+
 - Calendrier événements
 - Vue 3 support
 - Resource timeline
@@ -2869,11 +3085,13 @@ npm run docker:release:down
 ### QR Codes
 
 **nuxt-qrcode 0.4.8**
+
 - Génération QR codes
 - Module Nuxt
 - Billetterie, bénévoles
 
 **html5-qrcode 2.3.8**
+
 - Scanner QR codes
 - WebRTC (caméra)
 - Contrôle d'accès
@@ -2881,20 +3099,24 @@ npm run docker:release:down
 ### PDF & Export
 
 **jspdf 3.0.3**
+
 - Génération PDF client-side
 - Export listes, badges
 
 **jspdf-autotable 5.0.2**
+
 - Tableaux PDF
 - Auto-layout
 
 **html2canvas 1.4.1**
+
 - Capture HTML → Canvas
 - Screenshots
 
 ### Markdown
 
-**unified, remark-*, rehype-***
+**unified, remark-_, rehype-_**
+
 - Pipeline Markdown → HTML
 - remark-parse : Parser Markdown
 - remark-gfm : GitHub Flavored Markdown
@@ -2905,12 +3127,14 @@ npm run docker:release:down
 ### Images
 
 **@nuxt/image 1.10.0**
+
 - Optimisation images
 - Lazy loading
 - Placeholder
 - Formats modernes (WebP, AVIF)
 
 **sharp 0.33.5**
+
 - Processing images Node.js
 - Resize, crop, format conversion
 - Performance
@@ -2918,6 +3142,7 @@ npm run docker:release:down
 ### Fichiers
 
 **nuxt-file-storage 0.3.0**
+
 - Upload fichiers
 - Stockage local
 - Gestion uploads utilisateurs
@@ -2925,40 +3150,48 @@ npm run docker:release:down
 ### Testing
 
 **Vitest 3.2.4**
+
 - Test runner moderne
 - Vite-powered
 - Jest-compatible
 - Fast
 
 **@nuxt/test-utils 3.19.2**
+
 - Utilitaires tests Nuxt
 - mountSuspended, renderSuspended
 - Mock nuxt context
 
 **@vue/test-utils 2.4.6**
+
 - Utilitaires tests Vue
 - mount, shallowMount
 
 **@testing-library/vue 8.1.0**
+
 - Testing Library Vue
 - User-centric testing
 
 **happy-dom 18.0.1**
+
 - DOM implementation léger
 - Alternative jsdom
 - Fast
 
 **@vitest/ui 3.2.4**
+
 - Interface web Vitest
 - Debug tests
 
 ### Linting & Formatting
 
 **ESLint 9.32.0**
+
 - Linter JavaScript/TypeScript
 - @nuxt/eslint - Config Nuxt
 
 **Prettier 3.3.3**
+
 - Formatteur code
 - Opinionated
 - Config : singleQuote, semi: false, printWidth: 100
@@ -2966,6 +3199,7 @@ npm run docker:release:down
 ### SEO & Meta
 
 **@nuxtjs/seo 3.2.2**
+
 - Module SEO Nuxt
 - Sitemap automatique
 - OpenGraph images
@@ -2973,12 +3207,14 @@ npm run docker:release:down
 - Robots.txt
 
 **@unhead/vue 2.0.12**
+
 - Gestion tags <head>
 - SSR-safe
 
 ### Scripts & Performance
 
 **@nuxt/scripts 0.11.10**
+
 - Chargement scripts tiers optimisé
 - Lazy loading
 - Analytics, widgets, etc.
@@ -2986,54 +3222,68 @@ npm run docker:release:down
 ### Utilitaires
 
 **md5 2.3.0**
+
 - Hash MD5
 - Gravatar
 
 **@babel/parser**
+
 - Parser JavaScript/TypeScript
 
 **cross-env 10.0.0**
+
 - Variables env cross-platform
 
 ### DevDeps & Tooling
 
 **tsx 4.19.1**
+
 - Exécuter TypeScript direct (scripts)
 
 **vite-tsconfig-paths 5.1.4**
+
 - Support paths tsconfig dans Vite
 
 **deepl-node 1.20.0**
+
 - API DeepL traduction
 
 **dotenv 17.2.3**
+
 - Chargement .env
 
 **glob 11.0.3**
+
 - Pattern matching fichiers
 
 **wait-on 8.0.4**
+
 - Attendre ressource (tests)
 
 ### Dépendances Spécifiques
 
 **@adonisjs/hash**
+
 - Hachage (Prisma custom)
 
 **@phc/format**
+
 - Format PHC hashing
 
 **node-cron 3.0.3**
+
 - Tâches planifiées
 - Cron syntax
 
 **vue3-json-viewer 2.4.1**
+
 - Visualisation JSON
 - Debug
 
 ### Docker
 
 **Images de base :**
+
 - `node:22-alpine` - Production
 - `mysql:8` - Base de données
 
@@ -3474,6 +3724,7 @@ convention-de-jonglerie/
 ### 9.1 Points Forts de l'Architecture
 
 **Architecture Moderne et Robuste :**
+
 - ✅ **Nuxt 4** : Framework full-stack moderne avec SSR
 - ✅ **TypeScript** : Type-safety complète
 - ✅ **Prisma** : ORM moderne avec migrations
@@ -3481,6 +3732,7 @@ convention-de-jonglerie/
 - ✅ **File-based routing** : Organisation intuitive
 
 **Système de Permissions Sophistiqué :**
+
 - ✅ **8 permissions granulaires** au niveau convention
 - ✅ **Permissions par édition** pour granularité fine
 - ✅ **Historique traçable** des changements
@@ -3488,6 +3740,7 @@ convention-de-jonglerie/
 - ✅ **Flexible** : Titres personnalisés collaborateurs
 
 **Système Bénévoles Complet :**
+
 - ✅ **Candidatures détaillées** (30+ champs)
 - ✅ **Équipes multiples** avec affectations
 - ✅ **Planning automatisé** avec détection chevauchements
@@ -3496,6 +3749,7 @@ convention-de-jonglerie/
 - ✅ **Contrôle d'accès** QR code
 
 **Billetterie Flexible :**
+
 - ✅ **Mode interne** complet (tiers, options, quotas)
 - ✅ **Intégration HelloAsso** avec sync automatique
 - ✅ **Objets consignés** (gobelets, etc.)
@@ -3504,6 +3758,7 @@ convention-de-jonglerie/
 - ✅ **Statistiques** en temps réel
 
 **i18n Avancé :**
+
 - ✅ **13 langues** supportées
 - ✅ **Lazy loading** par domaine (optimisation bundles)
 - ✅ **Structure modulaire** (14 domaines)
@@ -3511,17 +3766,20 @@ convention-de-jonglerie/
 - ✅ **Scripts de vérification** complets
 
 **Notifications Multi-Canaux :**
+
 - ✅ **In-app** avec badge
 - ✅ **Server-Sent Events** (temps réel)
 - ✅ **Push notifications** (Web Push API)
 - ✅ **Préférences utilisateur**
 
 **Tests Complets :**
+
 - ✅ **Multi-projets Vitest** (unit, nuxt, integration, e2e)
 - ✅ **Coverage** bon (voir CI/CD)
 - ✅ **Tests intégration** avec BDD réelle
 
 **DevOps & Tooling :**
+
 - ✅ **Docker** multi-environnements (dev, test, prod)
 - ✅ **CI/CD** GitHub Actions
 - ✅ **Scripts admin** (manage-admin, geocoding, etc.)
@@ -3531,6 +3789,7 @@ convention-de-jonglerie/
 ### 9.2 Qualité du Code
 
 **Code bien structuré :**
+
 - ✅ **Séparation des préoccupations** claire (frontend/backend)
 - ✅ **Composants modulaires** réutilisables
 - ✅ **Composables** bien nommés et documentés
@@ -3538,12 +3797,14 @@ convention-de-jonglerie/
 - ✅ **Validation** Zod côté serveur
 
 **Conventions :**
+
 - ✅ **Naming** cohérent (camelCase, PascalCase)
 - ✅ **File structure** conventionnelle Nuxt
 - ✅ **ESLint + Prettier** configurés
 - ✅ **TypeScript strict** (type-safety)
 
 **Documentation :**
+
 - ✅ **README** complet
 - ✅ **40+ docs** dans `/docs`
 - ✅ **CLAUDE.md** pour instructions IA
@@ -3554,6 +3815,7 @@ convention-de-jonglerie/
 #### Sécurité
 
 **1. Rate Limiting**
+
 - ⚠️ **Actuel** : `rate-limiter.ts` et `api-rate-limiter.ts` existent mais utilisation limitée
 - 💡 **Recommandation** : Implémenter rate limiting sur tous endpoints sensibles :
   - Auth (login, register, verify-email) : 5 requêtes/min
@@ -3562,6 +3824,7 @@ convention-de-jonglerie/
 - 🛠️ **Outil** : `@nuxt/server-rate-limit` ou Redis-based
 
 **2. Input Sanitization**
+
 - ⚠️ **Actuel** : Validation Zod côté serveur, `rehype-sanitize` pour Markdown
 - 💡 **Recommandation** : Ajouter sanitization explicite pour :
   - HTML injecté dans descriptions
@@ -3570,10 +3833,12 @@ convention-de-jonglerie/
 - 🛠️ **Outil** : `dompurify` côté client, `validator.js`
 
 **3. CSRF Protection**
+
 - ✅ **Actuel** : Sessions scellées (nuxt-auth-utils) offrent protection
 - 💡 **Recommandation** : Vérifier si protection CSRF explicite (tokens) nécessaire pour formulaires critiques
 
 **4. Content Security Policy (CSP)**
+
 - ⚠️ **Actuel** : Non configuré explicitement
 - 💡 **Recommandation** : Ajouter headers CSP dans `nuxt.config.ts` :
   ```typescript
@@ -3585,6 +3850,7 @@ convention-de-jonglerie/
   ```
 
 **5. Secrets Management**
+
 - ⚠️ **Actuel** : `.env` non versionné (✅) mais pas de rotation
 - 💡 **Recommandation** :
   - Utiliser vault (HashiCorp Vault, AWS Secrets Manager)
@@ -3594,6 +3860,7 @@ convention-de-jonglerie/
 #### Performance
 
 **1. Caching Stratégie**
+
 - ⚠️ **Actuel** : Cache assets statiques (30 jours), pas de cache API
 - 💡 **Recommandation** :
   - **Cache Redis** : Données fréquemment lues (conventions, éditions publiques)
@@ -3603,6 +3870,7 @@ convention-de-jonglerie/
 - 🛠️ **Outil** : `ioredis`, `@nuxtjs/redis`
 
 **2. Database Indexing**
+
 - ⚠️ **Actuel** : Indexes Prisma basiques (@@index sur foreign keys)
 - 💡 **Recommandation** :
   - Analyser requêtes lentes (`EXPLAIN` MySQL)
@@ -3614,6 +3882,7 @@ convention-de-jonglerie/
   - Full-text search index pour recherche conventions/éditions
 
 **3. Lazy Loading Images**
+
 - ✅ **Actuel** : `@nuxt/image` avec lazy loading
 - 💡 **Recommandation** :
   - Vérifier placeholder LQIP (Low-Quality Image Placeholder)
@@ -3621,6 +3890,7 @@ convention-de-jonglerie/
   - `srcset` responsive
 
 **4. Code Splitting**
+
 - ✅ **Actuel** : Nuxt 4 fait code splitting automatique
 - 💡 **Recommandation** :
   - Analyser bundles (`npx nuxi analyze`)
@@ -3628,6 +3898,7 @@ convention-de-jonglerie/
   - Dynamic imports pour routes admin
 
 **5. SSR vs SSG**
+
 - ⚠️ **Actuel** : SSR pour toutes pages
 - 💡 **Recommandation** :
   - **SSG** pages statiques (privacy-policy, landing)
@@ -3637,6 +3908,7 @@ convention-de-jonglerie/
 #### Scalabilité
 
 **1. Architecture Microservices (Long terme)**
+
 - ⚠️ **Actuel** : Monolithe (acceptable pour taille actuelle)
 - 💡 **Recommandation** (si croissance forte) :
   - Séparer services :
@@ -3646,6 +3918,7 @@ convention-de-jonglerie/
   - Communication : API Gateway + Message Queue (RabbitMQ, Kafka)
 
 **2. Database Scaling**
+
 - ⚠️ **Actuel** : MySQL single instance
 - 💡 **Recommandation** :
   - **Réplication** : Master-slave (read replicas)
@@ -3653,6 +3926,7 @@ convention-de-jonglerie/
   - **Pooling** : Connection pooling Prisma configuré
 
 **3. Horizontal Scaling**
+
 - ⚠️ **Actuel** : Single server
 - 💡 **Recommandation** :
   - Load balancer (Nginx, HAProxy)
@@ -3660,6 +3934,7 @@ convention-de-jonglerie/
   - Stateless API (déjà le cas)
 
 **4. CDN & Edge Computing**
+
 - 💡 **Recommandation** :
   - CDN pour assets statiques (images, JS, CSS)
   - Edge functions pour géolocalisation (proche utilisateurs)
@@ -3668,6 +3943,7 @@ convention-de-jonglerie/
 #### Monitoring & Observabilité
 
 **1. APM (Application Performance Monitoring)**
+
 - ⚠️ **Actuel** : Logs erreurs API en BDD
 - 💡 **Recommandation** :
   - **Sentry** : Tracking erreurs frontend + backend
@@ -3675,17 +3951,20 @@ convention-de-jonglerie/
   - **LogRocket** : Session replay
 
 **2. Metrics & Dashboards**
+
 - 💡 **Recommandation** :
   - **Prometheus + Grafana** : Métriques serveur
   - **Custom metrics** : Candidatures bénévoles/jour, commandes/heure, etc.
   - **Alerting** : Slack, email si anomalies
 
 **3. Distributed Tracing**
+
 - 💡 **Recommandation** (si microservices) :
   - **OpenTelemetry** : Traçage requêtes cross-services
   - **Jaeger** : Visualisation traces
 
 **4. Logs Centralisés**
+
 - ⚠️ **Actuel** : Logs BDD + console
 - 💡 **Recommandation** :
   - **ELK Stack** (Elasticsearch, Logstash, Kibana)
@@ -3695,6 +3974,7 @@ convention-de-jonglerie/
 #### Fonctionnalités
 
 **1. Recherche Full-Text**
+
 - ⚠️ **Actuel** : Filtres basiques (SQL LIKE)
 - 💡 **Recommandation** :
   - **Elasticsearch** : Recherche avancée conventions/éditions
@@ -3702,6 +3982,7 @@ convention-de-jonglerie/
   - Facettes (filtres pays, dates, services)
 
 **2. Analytics Utilisateur**
+
 - ⚠️ **Actuel** : Stats basiques (nombre éditions, bénévoles)
 - 💡 **Recommandation** :
   - **Google Analytics 4** : Tracking comportement
@@ -3709,12 +3990,14 @@ convention-de-jonglerie/
   - **Custom analytics** : Tunnels conversions (inscription → candidature bénévole)
 
 **3. Webhooks**
+
 - 💡 **Recommandation** :
   - Permettre organisateurs configurer webhooks
   - Events : nouvelle candidature, nouvelle commande, etc.
   - Intégrations tierces (Slack, Discord, Zapier)
 
 **4. API Publique**
+
 - 💡 **Recommandation** (long terme) :
   - API REST publique documentée (OpenAPI/Swagger)
   - Rate limiting + API keys
@@ -3723,6 +4006,7 @@ convention-de-jonglerie/
 #### Tests
 
 **1. Coverage**
+
 - ⚠️ **Actuel** : Tests existent mais coverage partiel
 - 💡 **Recommandation** :
   - Target : 80% coverage minimum
@@ -3732,6 +4016,7 @@ convention-de-jonglerie/
     - Bénévoles (affectations)
 
 **2. Tests E2E**
+
 - ⚠️ **Actuel** : Projet e2e défini mais vide
 - 💡 **Recommandation** :
   - **Playwright** : Tests E2E navigateur
@@ -3741,12 +4026,14 @@ convention-de-jonglerie/
     - Achat billet (interne) → Contrôle accès
 
 **3. Tests Charge**
+
 - 💡 **Recommandation** :
   - **k6**, **Apache JMeter** : Tests de charge
   - Simuler 1000+ utilisateurs simultanés
   - Identifier bottlenecks
 
 **4. Tests Mutation**
+
 - 💡 **Recommandation** :
   - **Stryker Mutator** : Vérifier qualité tests
   - Detect code non testé
@@ -3754,6 +4041,7 @@ convention-de-jonglerie/
 #### DevOps
 
 **1. CI/CD Avancé**
+
 - ✅ **Actuel** : GitHub Actions tests
 - 💡 **Recommandation** :
   - **Déploiement automatique** : Staging + Production
@@ -3761,18 +4049,21 @@ convention-de-jonglerie/
   - **Rollback automatique** si tests échouent
 
 **2. Infrastructure as Code**
+
 - 💡 **Recommandation** :
   - **Terraform** : Provisionning infrastructure
   - **Ansible** : Configuration serveurs
   - Versioning infrastructure
 
 **3. Container Orchestration**
+
 - ⚠️ **Actuel** : Docker Compose (dev/prod)
 - 💡 **Recommandation** (si scale) :
   - **Kubernetes** : Orchestration containers
   - **Docker Swarm** : Alternative plus simple
 
 **4. Backups**
+
 - ✅ **Actuel** : Système backup manuel (`/api/admin/backup`)
 - 💡 **Recommandation** :
   - Backups automatisés (cron quotidien)
@@ -3783,6 +4074,7 @@ convention-de-jonglerie/
 ### 9.4 Maintenabilité
 
 **Points Positifs :**
+
 - ✅ Documentation complète (40+ docs)
 - ✅ Code TypeScript (maintenabilité)
 - ✅ Conventions cohérentes
@@ -3792,21 +4084,25 @@ convention-de-jonglerie/
 **Recommandations :**
 
 **1. Refactoring**
+
 - 💡 Audit code duplications (DRY)
 - 💡 Simplifier composants complexes (>300 lignes)
 - 💡 Extraire logique métier dans utils
 
 **2. Documentation Code**
+
 - 💡 JSDoc pour fonctions publiques complexes
 - 💡 README par répertoire majeur
 - 💡 ADR (Architecture Decision Records) pour décisions importantes
 
 **3. Dependency Management**
+
 - 💡 Audits sécurité réguliers (`npm audit`)
 - 💡 Updates dépendances (`npm outdated`)
 - 💡 Renovate Bot : Updates automatiques PRs
 
 **4. Code Reviews**
+
 - 💡 Reviews obligatoires avant merge
 - 💡 Checklist review (tests, docs, sécurité)
 - 💡 Pair programming pour fonctionnalités critiques
@@ -3814,6 +4110,7 @@ convention-de-jonglerie/
 ### 9.5 Considérations Sécurité Spécifiques
 
 **1. Upload Fichiers**
+
 - ✅ Stockage local (`/uploads`)
 - ⚠️ Validation MIME types basique
 - 💡 **Recommandation** :
@@ -3823,6 +4120,7 @@ convention-de-jonglerie/
   - Stockage S3 (hors serveur)
 
 **2. Permissions Collaborateurs**
+
 - ✅ Système granulaire sophistiqué
 - ✅ Historique traçable
 - 💡 **Recommandation** :
@@ -3830,6 +4128,7 @@ convention-de-jonglerie/
   - Alertes tentatives accès non autorisés
 
 **3. Data Privacy (RGPD)**
+
 - ⚠️ **Actuel** : Privacy policy basique
 - 💡 **Recommandation** :
   - **Consentement cookies** (banner)
@@ -3838,6 +4137,7 @@ convention-de-jonglerie/
   - **Anonymisation données** après suppression
 
 **4. XSS Protection**
+
 - ✅ `rehype-sanitize` pour Markdown
 - 💡 **Recommandation** :
   - Vérifier tous points injection HTML
@@ -3845,6 +4145,7 @@ convention-de-jonglerie/
   - `v-html` limité et sanitized
 
 **5. Authentification Multi-Facteurs (2FA)**
+
 - ⚠️ **Actuel** : Password uniquement
 - 💡 **Recommandation** (optionnel pour admins) :
   - TOTP (Google Authenticator, Authy)
@@ -3854,6 +4155,7 @@ convention-de-jonglerie/
 ### 9.6 Performances Mesurables
 
 **Métriques Actuelles (à mesurer) :**
+
 - ⏱️ **Time to First Byte (TTFB)** : ?
 - ⏱️ **First Contentful Paint (FCP)** : ?
 - ⏱️ **Largest Contentful Paint (LCP)** : ?
@@ -3861,12 +4163,14 @@ convention-de-jonglerie/
 - ⏱️ **Total Blocking Time (TBT)** : ?
 
 **Outils Recommandés :**
+
 - Lighthouse (Chrome DevTools)
 - WebPageTest
 - GTmetrix
 - Google PageSpeed Insights
 
 **Objectifs :**
+
 - LCP < 2.5s
 - FCP < 1.8s
 - CLS < 0.1
@@ -3905,6 +4209,7 @@ convention-de-jonglerie/
 **Convention de Jonglerie** est une application full-stack moderne, robuste et bien architecturée. Le code est de qualité, la structure est claire, et la documentation est complète. Les systèmes de permissions, bénévoles et billetterie sont particulièrement sophistiqués.
 
 **Forces Principales :**
+
 - Architecture moderne (Nuxt 4, TypeScript, Prisma)
 - Système de permissions granulaire
 - Internationalisation avancée (13 langues, lazy loading)
@@ -3914,6 +4219,7 @@ convention-de-jonglerie/
 - Tests automatisés
 
 **Axes d'Amélioration Prioritaires :**
+
 1. Sécurité (rate limiting, CSP, 2FA optionnel)
 2. Performance (caching, indexes BDD)
 3. Monitoring (Sentry, métriques)
@@ -3926,4 +4232,3 @@ Le projet est **prêt pour la production** avec quelques améliorations sécurit
 **Dernière mise à jour** : 2025-11-03
 **Version** : 1.0
 **Auteur** : Analyse automatisée Claude Code
-
