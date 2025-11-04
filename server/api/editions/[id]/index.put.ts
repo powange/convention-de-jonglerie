@@ -1,38 +1,26 @@
-import { isHttpError } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
 import { getEditionForEdit } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import {
-  updateEditionSchema,
-  validateAndSanitize,
-  handleValidationError,
-} from '@@/server/utils/validation-schemas'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+import { updateEditionSchema } from '@@/server/utils/validation-schemas'
 
 import type { Prisma } from '@prisma/client'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const editionId = validateEditionId(event)
+    const editionId = validateEditionId(event)
 
-  const body = await readBody(event)
+    const body = await readBody(event)
 
-  // Validation et sanitisation des données avec Zod
-  let validatedData
-  try {
-    validatedData = validateAndSanitize(updateEditionSchema, body)
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-    throw error
-  }
+    // Validation et sanitisation des données avec Zod (gérée automatiquement par wrapApiHandler)
+    const validatedData = updateEditionSchema.parse(body)
 
-  const {
+    const {
     conventionId,
     name,
     description,
@@ -76,7 +64,6 @@ export default defineEventHandler(async (event) => {
     hasAfjTokenPayment,
   } = validatedData
 
-  try {
     // Récupère l'édition et vérifie les permissions d'édition
     const edition = await getEditionForEdit(editionId, user)
 
@@ -326,16 +313,6 @@ export default defineEventHandler(async (event) => {
       },
     })
     return updatedEdition
-  } catch (error: unknown) {
-    console.error("Erreur lors de la mise à jour de l'édition:", error)
-
-    if (isHttpError(error)) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la mise à jour de l'édition",
-    })
-  }
-})
+  },
+  { operationName: 'UpdateEdition' }
+)

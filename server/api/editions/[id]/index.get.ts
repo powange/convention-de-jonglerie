@@ -1,10 +1,10 @@
-import { isHttpError } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { optionalAuth } from '@@/server/utils/auth-utils'
 import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const editionId = parseInt(event.context.params?.id as string)
 
   if (isNaN(editionId)) {
@@ -14,8 +14,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  try {
-    const edition = await prisma.edition.findUnique({
+  const edition = await prisma.edition.findUnique({
       where: {
         id: editionId,
       },
@@ -179,26 +178,15 @@ export default defineEventHandler(async (event) => {
       ...editionWithoutVolunteersAskFields
     } = edition
 
-    return {
-      ...editionWithoutVolunteersAskFields,
-      // Garder seulement les champs volunteers encore utilisés côté client
-      volunteersOpen: edition.volunteersOpen,
-      volunteersDescription: edition.volunteersDescription,
-      volunteersMode: edition.volunteersMode,
-      volunteersExternalUrl: edition.volunteersExternalUrl,
-      volunteersUpdatedAt: edition.volunteersUpdatedAt,
-      volunteersSetupStartDate: edition.volunteersSetupStartDate,
-      volunteersTeardownEndDate: edition.volunteersTeardownEndDate,
-    }
-  } catch (error: unknown) {
-    // If the handler already threw an HTTP error (createError), rethrow it to preserve status
-    if (isHttpError(error)) {
-      throw error
-    }
-    console.error('Erreur API edition:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Internal Server Error',
-    })
+  return {
+    ...editionWithoutVolunteersAskFields,
+    // Garder seulement les champs volunteers encore utilisés côté client
+    volunteersOpen: edition.volunteersOpen,
+    volunteersDescription: edition.volunteersDescription,
+    volunteersMode: edition.volunteersMode,
+    volunteersExternalUrl: edition.volunteersExternalUrl,
+    volunteersUpdatedAt: edition.volunteersUpdatedAt,
+    volunteersSetupStartDate: edition.volunteersSetupStartDate,
+    volunteersTeardownEndDate: edition.volunteersTeardownEndDate,
   }
-})
+}, { operationName: 'GetEdition' })

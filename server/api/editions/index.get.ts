@@ -1,11 +1,11 @@
 // import { getEmailHash } from '@@/server/utils/email-hash'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
 // import type { Edition } from '~/types';
 
-export default defineEventHandler(async (event) => {
-  try {
-    const query = getQuery(event)
+export default wrapApiHandler(async (event) => {
+  const query = getQuery(event)
     const {
       name,
       startDate,
@@ -333,22 +333,14 @@ export default defineEventHandler(async (event) => {
     // dans cette requête (contrairement à l'API individuelle)
     const transformedEditions = editions
 
-    // Retourner les résultats avec les métadonnées de pagination
-    return {
-      data: transformedEditions,
-      pagination: {
-        total: totalCount,
-        page: pageNumber,
-        limit: limitNumber,
-        totalPages: Math.ceil(totalCount / limitNumber),
-      },
-    }
-  } catch (error: unknown) {
-    console.error('Erreur API editions:', error)
-    console.error('Query params:', getQuery(event))
-    throw createError({
-      statusCode: 500,
-      message: `Erreur lors de la récupération des éditions: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
-    })
+  // Retourner les résultats avec les métadonnées de pagination
+  return {
+    data: transformedEditions,
+    pagination: {
+      total: totalCount,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: Math.ceil(totalCount / limitNumber),
+    },
   }
-})
+}, { operationName: 'GetEditions' })

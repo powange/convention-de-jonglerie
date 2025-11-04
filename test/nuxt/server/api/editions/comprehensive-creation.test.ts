@@ -479,7 +479,7 @@ describe('/api/editions POST - Tests complets', () => {
 
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('DB Connection failed')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
 
     it('devrait gérer les erreurs de géocodage gracieusement', async () => {
@@ -502,7 +502,7 @@ describe('/api/editions POST - Tests complets', () => {
 
       // L'API gère l'erreur de géocodage et retourne null pour les coordonnées
       await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur lors de la création de l'édition"
+        "Erreur serveur interne"
       )
     })
 
@@ -528,7 +528,7 @@ describe('/api/editions POST - Tests complets', () => {
 
       // L'upload d'image échoue et l'API lance une erreur globale
       await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur lors de la création de l'édition"
+        "Erreur serveur interne"
       )
     })
   })

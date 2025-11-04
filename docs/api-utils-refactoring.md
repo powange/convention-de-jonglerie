@@ -701,8 +701,8 @@ grep -r "select: {" server/api/ | grep "email: true"
 | **Notifications** | 10     | 0        | 10      | ✅ 100%     |
 | **Feedback**      | 1      | 0        | 1       | ✅ 100%     |
 | **Racine**        | 2      | 0        | 2       | ✅ 100%     |
-| **Editions**      | 0      | 149      | 149     | 🔴 0%       |
-| **TOTAL**         | **94** | **149**  | **243** | 🟡 **39%**  |
+| **Editions**      | 6      | 143      | 149     | 🟡 4%       |
+| **TOTAL**         | **100** | **143**  | **243** | 🟡 **41%**  |
 
 ---
 
@@ -738,14 +738,16 @@ grep -r "select: {" server/api/ | grep "email: true"
 
 ---
 
-### Phase 5C : Editions - Racine (3 endpoints)
+### Phase 5C : Editions - Racine (6 endpoints) ✅ COMPLÉTÉ
 
 **Priorité : HAUTE** - CRUD principal des éditions
 
-- [ ] `server/api/editions/favorites.get.ts` - Liste des favoris utilisateur
-- [ ] `server/api/editions/index.post.ts` - Créer une édition
-- [ ] `server/api/editions/[id]/index.put.ts` - Modifier une édition
-- [ ] `server/api/editions/[id]/index.delete.ts` - Supprimer une édition
+- [x] `server/api/editions/index.get.ts` - Liste des éditions (354→346 lignes)
+- [x] `server/api/editions/favorites.get.ts` - Liste des favoris utilisateur (37→33 lignes)
+- [x] `server/api/editions/index.post.ts` - Créer une édition (183→167 lignes)
+- [x] `server/api/editions/[id]/index.get.ts` - Détails d'une édition (204→192 lignes)
+- [x] `server/api/editions/[id]/index.put.ts` - Modifier une édition (341→319 lignes)
+- [x] `server/api/editions/[id]/index.delete.ts` - Supprimer une édition (32→24 lignes)
 
 ---
 

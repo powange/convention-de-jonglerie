@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
@@ -7,30 +8,18 @@ import {
 } from '@@/server/utils/move-temp-image'
 import { getConventionForEditionCreation } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import {
-  editionSchema,
-  validateAndSanitize,
-  handleValidationError,
-} from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
+import { editionSchema } from '@@/server/utils/validation-schemas'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const body = await readBody(event)
+    const body = await readBody(event)
 
-  // Validation et sanitisation des données avec Zod
-  let validatedData
-  try {
-    validatedData = validateAndSanitize(editionSchema, body)
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-    throw error
-  }
+    // Validation et sanitisation des données avec Zod (gérée automatiquement par wrapApiHandler)
+    const validatedData = editionSchema.parse(body)
 
-  const {
+    const {
     conventionId,
     name,
     description,
@@ -72,10 +61,9 @@ export default defineEventHandler(async (event) => {
     hasAfjTokenPayment,
   } = validatedData
 
-  // Vérifier les permissions pour créer une édition
-  await getConventionForEditionCreation(conventionId, user)
+    // Vérifier les permissions pour créer une édition
+    await getConventionForEditionCreation(conventionId, user)
 
-  try {
     // Géocoder l'adresse pour obtenir les coordonnées
     const geoCoords = await geocodeEdition({
       addressLine1,
@@ -173,11 +161,6 @@ export default defineEventHandler(async (event) => {
     }
 
     return edition
-  } catch (error: unknown) {
-    console.error("Erreur lors de la création de l'édition:", error)
-    if (typeof error === 'object' && error && 'statusCode' in error) {
-      throw error as any
-    }
-    throw createError({ statusCode: 500, message: "Erreur lors de la création de l'édition" })
-  }
-})
+  },
+  { operationName: 'CreateEdition' }
+)

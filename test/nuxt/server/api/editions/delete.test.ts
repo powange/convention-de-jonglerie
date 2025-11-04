@@ -236,7 +236,7 @@ describe('/api/editions/[id] DELETE', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     prismaMock.edition.findUnique.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait gérer les erreurs de suppression', async () => {
@@ -253,7 +253,7 @@ describe('/api/editions/[id] DELETE', () => {
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.edition.delete.mockRejectedValue(new Error('Delete failed'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it("devrait traiter correctement l'ID numérique", async () => {
