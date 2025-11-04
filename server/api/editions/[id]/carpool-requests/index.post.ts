@@ -1,21 +1,15 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { carpoolRequestSchema } from '@@/server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
 
-    const editionId = parseInt(event.context.params?.id as string)
+    const editionId = validateEditionId(event)
     const body = await readBody(event)
-
-    if (!editionId) {
-      throw createError({
-        statusCode: 400,
-        message: 'Edition ID invalide',
-      })
-    }
 
     // Validation des données avec Zod
     const validatedData = carpoolRequestSchema.parse(body)

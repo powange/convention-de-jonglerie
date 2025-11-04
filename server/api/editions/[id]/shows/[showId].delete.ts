@@ -3,12 +3,12 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
-    const editionId = validateResourceId(event, 'id', 'édition')
+    const editionId = validateEditionId(event)
     const showId = validateResourceId(event, 'showId', 'spectacle')
 
     // Vérifier les permissions

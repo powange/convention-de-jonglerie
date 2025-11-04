@@ -3,17 +3,11 @@ import { optionalAuth } from '@@/server/utils/auth-utils'
 import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    const editionId = parseInt(event.context.params?.id as string)
-
-    if (isNaN(editionId)) {
-      throw createError({
-        statusCode: 400,
-        message: 'Invalid Edition ID',
-      })
-    }
+    const editionId = validateEditionId(event)
 
     const edition = await prisma.edition.findUnique({
       where: {

@@ -185,7 +185,7 @@ describe('/api/editions/[id] GET', () => {
       context: { params: { id: 'invalid' } },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Invalid Edition ID')
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait retourner 404 si édition non trouvée', async () => {

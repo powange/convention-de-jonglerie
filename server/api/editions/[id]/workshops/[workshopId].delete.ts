@@ -2,12 +2,12 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
-    const editionId = validateResourceId(event, 'id', 'édition')
+    const editionId = validateEditionId(event)
     const workshopId = validateResourceId(event, 'workshopId', 'atelier')
 
     // Vérifier que le workshop existe et appartient à l'édition

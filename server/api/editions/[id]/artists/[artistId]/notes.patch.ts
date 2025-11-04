@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -12,10 +13,10 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
 
-    const editionId = parseInt(getRouterParam(event, 'id') || '0')
+    const editionId = validateEditionId(event)
     const artistId = parseInt(getRouterParam(event, 'artistId') || '0')
 
-    if (!editionId || !artistId) {
+    if (!artistId) {
       throw createError({ statusCode: 400, message: 'Paramètres invalides' })
     }
 

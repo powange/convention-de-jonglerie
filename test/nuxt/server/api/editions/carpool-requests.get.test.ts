@@ -131,7 +131,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       },
     }
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Edition ID invalide')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait gérer les erreurs de base de données', async () => {

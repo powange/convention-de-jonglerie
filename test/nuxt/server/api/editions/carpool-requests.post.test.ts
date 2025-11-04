@@ -110,7 +110,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
     global.readBody.mockResolvedValue({})
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Edition ID invalide')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait valider les données obligatoires - tripDate manquante', async () => {

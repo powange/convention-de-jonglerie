@@ -121,7 +121,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     }
 
-    await expect(handler(eventWithInvalidId)).rejects.toThrow('Edition ID invalide')
+    await expect(handler(eventWithInvalidId)).rejects.toThrow("ID d'édition invalide")
   })
 
   it("devrait échouer sans ID d'édition", async () => {
@@ -133,7 +133,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     }
 
-    await expect(handler(eventWithoutId)).rejects.toThrow('Edition ID invalide')
+    await expect(handler(eventWithoutId)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait gérer les erreurs de base de données', async () => {

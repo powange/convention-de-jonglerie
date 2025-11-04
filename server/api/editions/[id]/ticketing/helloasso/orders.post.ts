@@ -1,5 +1,6 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { fetchOrdersFromHelloAsso } from '@@/server/utils/editions/ticketing/helloasso'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -15,6 +16,7 @@ const bodySchema = z.object({
 export default wrapApiHandler(
   async (event) => {
     requireAuth(event)
+    validateEditionId(event)
 
     const body = bodySchema.parse(await readBody(event))
 

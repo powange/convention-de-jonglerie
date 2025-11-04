@@ -1,17 +1,11 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    const editionId = parseInt(getRouterParam(event, 'id') as string)
-
-    if (!editionId || isNaN(editionId)) {
-      throw createError({
-        statusCode: 400,
-        message: "ID d'édition invalide",
-      })
-    }
+    const editionId = validateEditionId(event)
 
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
