@@ -126,7 +126,7 @@ describe('/api/conventions/[id] DELETE', () => {
   it('devrait gérer les erreurs de base de données lors de la recherche', async () => {
     prismaMock.convention.findUnique.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('suppression/archivage')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait gérer les erreurs de base de données lors de la suppression', async () => {
@@ -141,7 +141,7 @@ describe('/api/conventions/[id] DELETE', () => {
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention as any)
     prismaMock.convention.delete.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('suppression/archivage')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait gérer les erreurs HTTP spécifiques', async () => {

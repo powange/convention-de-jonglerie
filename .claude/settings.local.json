@@ -22,7 +22,14 @@
       "Bash(do sed -i \"/from ''''@@\\/server\\/utils\\/permissions\\/convention-permissions''''/a import { validateConventionId } from ''''@@/server/utils/validation-helpers''''\" \"$file\")",
       "Bash(done)",
       "Bash(npm run build:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(for file in server/api/conventions/**/*.ts)",
+      "Bash(do if grep -q \"wrapApiHandler\" \"$file\")",
+      "Bash(then echo \"✅ $file\")",
+      "Bash(else echo \"❌ $file\")",
+      "Bash(fi)",
+      "Bash(for file in server/api/conventions/**/**/*.ts)",
+      "Bash(for file in server/api/conventions/*.ts)"
     ],
     "deny": [],
     "ask": [],

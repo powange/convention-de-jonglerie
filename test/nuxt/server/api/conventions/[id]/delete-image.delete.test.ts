@@ -182,9 +182,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       mockDeleteConventionImage.mockRejectedValue(new Error('Database error'))
 
-      await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur serveur lors de la suppression de l'image"
-      )
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
 
     it('devrait relancer les erreurs HTTP existantes', async () => {
@@ -209,7 +207,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow()
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        "Erreur lors de la suppression de l'image:",
+        '[DeleteConventionImage] Erreur inattendue:',
         expect.any(Error)
       )
 
@@ -221,9 +219,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
         throw new Error('Router param error')
       })
 
-      await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur serveur lors de la suppression de l'image"
-      )
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
   })
 

@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
@@ -5,11 +6,9 @@ import { prisma } from '@@/server/utils/prisma'
 
 import type { Prisma } from '@prisma/client'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
     // Editions must include isOnline (non-nullable boolean with default false)
     const editionsSelect: Prisma.EditionSelect = {
       id: true,
@@ -130,11 +129,6 @@ export default defineEventHandler(async (event) => {
     }))
 
     return transformedConventions
-  } catch (error) {
-    console.error('Erreur lors de la récupération des conventions:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetMyConventions' }
+)

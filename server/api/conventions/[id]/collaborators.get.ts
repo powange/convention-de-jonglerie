@@ -1,10 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { checkUserConventionPermission } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const conventionId = validateConventionId(event)
     const user = requireAuth(event)
 
@@ -51,15 +52,6 @@ export default defineEventHandler(async (event) => {
         canManageVolunteers: p.canManageVolunteers,
       })),
     }))
-  } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string }
-    if (httpError.statusCode) {
-      throw error
-    }
-    console.error('Erreur lors de la récupération des collaborateurs:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetConventionCollaborators' }
+)
