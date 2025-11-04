@@ -1,15 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  if (!editionId) {
-    throw createError({ statusCode: 400, message: 'Edition invalide' })
-  }
-
-  try {
     // Récupérer l'artiste de l'utilisateur pour cette édition
     const artist = await prisma.editionArtist.findUnique({
       where: {
@@ -98,11 +96,6 @@ export default defineEventHandler(async (event) => {
         })),
       },
     }
-  } catch (error: unknown) {
-    console.error("Erreur lors de la récupération des informations de l'artiste:", error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la récupération des informations de l'artiste",
-    })
-  }
-})
+  },
+  { operationName: 'GetMyArtistInfo' }
+)

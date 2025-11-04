@@ -96,12 +96,10 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
       expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, 1)
     })
 
-    it('devrait accepter les IDs négatifs (!(-1) = false, donc valide)', async () => {
+    it('devrait rejeter les IDs négatifs', async () => {
       global.getRouterParam.mockReturnValue('-1')
 
-      await handler(mockEvent as any)
-
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(-1, 1)
+      await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
     })
 
     it('devrait gérer les grands nombres', async () => {
@@ -185,9 +183,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       mockDeleteEditionImage.mockRejectedValue(new Error('Database error'))
 
-      await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur lors de la suppression de l'image"
-      )
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
 
     it('devrait relancer les erreurs HTTP existantes', async () => {
@@ -211,10 +207,8 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await expect(handler(mockEvent as any)).rejects.toThrow()
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Erreur lors de la suppression de l'image d'édition:",
-        expect.any(Error)
-      )
+      // wrapApiHandler gère le logging des erreurs
+      expect(consoleSpy).toHaveBeenCalled()
 
       consoleSpy.mockRestore()
     })
@@ -224,7 +218,8 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
         throw new Error('Router param error')
       })
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Router param error')
+      // wrapApiHandler capture et standardise les erreurs
+      await expect(handler(mockEvent as any)).rejects.toThrow()
     })
   })
 

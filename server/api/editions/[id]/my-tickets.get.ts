@@ -1,15 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) {
-    throw createError({ statusCode: 400, message: 'Edition invalide' })
-  }
-
-  try {
     const allTickets: any[] = []
 
     // Récupérer tous les billets de l'utilisateur pour cette édition
@@ -106,11 +104,6 @@ export default defineEventHandler(async (event) => {
     return {
       tickets: allTickets,
     }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des billets:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des billets',
-    })
-  }
-})
+  },
+  { operationName: 'GetMyTickets' }
+)

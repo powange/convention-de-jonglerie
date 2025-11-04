@@ -1,19 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(event.context.params?.id as string)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'Invalid Edition ID',
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -65,10 +59,6 @@ export default defineEventHandler(async (event) => {
       })
       return { message: 'Edition added to favorites', isFavorited: true }
     }
-  } catch {
-    throw createError({
-      statusCode: 500,
-      message: 'Internal Server Error',
-    })
-  }
-})
+  },
+  { operationName: 'ToggleEditionFavorite' }
+)
