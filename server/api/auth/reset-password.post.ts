@@ -1,15 +1,17 @@
-import { prisma } from '@@/server/utils/prisma'
-import { passwordSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { prisma } from '@@/server/utils/prisma'
+import { passwordSchema } from '@@/server/utils/validation-schemas'
 
 const resetPasswordSchema = z.object({
   token: z.string(),
   newPassword: passwordSchema,
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const body = await readBody(event)
     const { token, newPassword } = resetPasswordSchema.parse(body)
 
@@ -64,22 +66,6 @@ export default defineEventHandler(async (event) => {
     return {
       message: 'Votre mot de passe a été réinitialisé avec succès',
     }
-  } catch (error) {
-    // Ne log que les vraies erreurs serveur, pas les erreurs utilisateur
-    // Les erreurs ZodError et createError avec statusCode < 500 sont des erreurs utilisateur
-    const isUserError = error.statusCode || error.name === 'ZodError'
-
-    if (!isUserError || (error.statusCode && error.statusCode >= 500)) {
-      console.error('Erreur lors de la réinitialisation du mot de passe:', error)
-    }
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 400,
-      message: 'Erreur lors de la réinitialisation du mot de passe',
-    })
-  }
-})
+  },
+  { operationName: 'ResetPassword' }
+)

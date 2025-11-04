@@ -1,7 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const query = getQuery(event)
     const token = query.token as string
 
@@ -47,16 +48,6 @@ export default defineEventHandler(async (event) => {
     return {
       valid: true,
     }
-  } catch (error) {
-    console.error('Erreur lors de la vérification du token:', error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 400,
-      message: 'Erreur lors de la vérification du token',
-    })
-  }
-})
+  },
+  { operationName: 'VerifyResetToken' }
+)

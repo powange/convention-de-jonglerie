@@ -1,10 +1,10 @@
-import { prisma } from '@@/server/utils/prisma'
-import { authRateLimiter } from '@@/server/utils/rate-limiter'
-import { handleValidationError } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
 import { setUserSession } from '#imports'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { prisma } from '@@/server/utils/prisma'
+import { authRateLimiter } from '@@/server/utils/rate-limiter'
 
 // Schéma de validation pour le login
 const loginSchema = z.object({
@@ -13,8 +13,8 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional().default(false),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Appliquer le rate limiting
     await authRateLimiter(event)
 
@@ -131,13 +131,6 @@ export default defineEventHandler(async (event) => {
         isEmailVerified: user.isEmailVerified,
       },
     }
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
-
-    // Re-lancer les autres erreurs
-    throw error
-  }
-})
+  },
+  { operationName: 'Login' }
+)

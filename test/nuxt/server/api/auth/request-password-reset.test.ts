@@ -180,7 +180,7 @@ describe('API Request Password Reset', () => {
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow(
-      'Erreur lors de la demande de réinitialisation'
+      'Erreur serveur interne'
     )
   })
 })

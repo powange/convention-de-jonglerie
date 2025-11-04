@@ -1,7 +1,8 @@
+import { z } from 'zod'
+
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
-import { handleValidationError } from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
 
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),
@@ -11,8 +12,8 @@ const verifyEmailSchema = z.object({
     .regex(/^\d{6}$/, 'Le code doit contenir uniquement des chiffres'),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const body = await readBody(event)
 
     // Validation des données
@@ -109,21 +110,6 @@ export default defineEventHandler(async (event) => {
         prenom: user.prenom,
       },
     }
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
-
-    // Re-lancer les erreurs déjà formatées
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    console.error('Erreur lors de la vérification email:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur interne',
-    })
-  }
-})
+  },
+  { operationName: 'VerifyEmail' }
+)

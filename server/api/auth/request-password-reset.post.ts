@@ -1,16 +1,17 @@
 import { randomBytes } from 'node:crypto'
+import { z } from 'zod'
 
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail, generatePasswordResetEmailHtml } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
-import { z } from 'zod'
 
 const requestPasswordResetSchema = z.object({
   email: z.string().email(),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const body = await readBody(event)
     const { email } = requestPasswordResetSchema.parse(body)
 
@@ -57,11 +58,6 @@ export default defineEventHandler(async (event) => {
     return {
       message: genericMessage,
     }
-  } catch (error) {
-    console.error('Erreur lors de la demande de réinitialisation:', error)
-    throw createError({
-      statusCode: 400,
-      message: 'Erreur lors de la demande de réinitialisation',
-    })
-  }
-})
+  },
+  { operationName: 'RequestPasswordReset' }
+)

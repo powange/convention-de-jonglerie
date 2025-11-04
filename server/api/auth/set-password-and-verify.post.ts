@@ -1,8 +1,10 @@
-import { NotificationHelpers } from '@@/server/utils/notification-service'
-import { prisma } from '@@/server/utils/prisma'
-import { handleValidationError, passwordSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
+import { passwordSchema } from '@@/server/utils/validation-schemas'
 
 const setPasswordSchema = z.object({
   email: z.string().email('Adresse email invalide'),
@@ -13,8 +15,8 @@ const setPasswordSchema = z.object({
   password: passwordSchema,
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const body = await readBody(event)
 
     // Validation des données
@@ -95,21 +97,6 @@ export default defineEventHandler(async (event) => {
         isEmailVerified: updatedUser.isEmailVerified,
       },
     }
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
-
-    // Re-lancer les erreurs déjà formatées
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    console.error('Erreur lors de la création du mot de passe:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur interne',
-    })
-  }
-})
+  },
+  { operationName: 'SetPasswordAndVerify' }
+)

@@ -1,3 +1,6 @@
+import { z } from 'zod'
+
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import {
   sendEmail,
   generateVerificationCode,
@@ -7,14 +10,13 @@ import {
 import { prisma } from '@@/server/utils/prisma'
 import { emailRateLimiter } from '@@/server/utils/rate-limiter'
 import { handleValidationError } from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
 
 const resendVerificationSchema = z.object({
   email: z.string().email('Adresse email invalide'),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const body = await readBody(event)
 
     // Stocker l'email dans le contexte pour le rate limiter
@@ -78,21 +80,6 @@ export default defineEventHandler(async (event) => {
     return {
       message: 'Nouveau code de vérification envoyé avec succès',
     }
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
-
-    // Re-lancer les erreurs déjà formatées
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    console.error('Erreur lors du renvoi du code:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur interne',
-    })
-  }
-})
+  },
+  { operationName: 'ResendVerification' }
+)

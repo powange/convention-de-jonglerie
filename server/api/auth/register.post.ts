@@ -1,3 +1,6 @@
+import bcrypt from 'bcryptjs'
+
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import {
   sendEmail,
@@ -7,12 +10,10 @@ import {
 } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
 import { registerRateLimiter } from '@@/server/utils/rate-limiter'
-import { registerSchema, handleValidationError } from '@@/server/utils/validation-schemas'
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
+import { registerSchema } from '@@/server/utils/validation-schemas'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Appliquer le rate limiting
     await registerRateLimiter(event)
 
@@ -42,20 +43,32 @@ export default defineEventHandler(async (event) => {
       ? preferredLanguage
       : 'fr'
 
-    await prisma.user.create({
-      data: {
-        email: cleanEmail,
-        password: hashedPassword,
-        pseudo: cleanPseudo,
-        nom: cleanNom,
-        prenom: cleanPrenom,
-        authProvider: 'email',
-        isEmailVerified: false,
-        emailVerificationCode: verificationCode,
-        verificationCodeExpiry: verificationExpiry,
-        preferredLanguage: userLanguage,
-      },
-    })
+    try {
+      await prisma.user.create({
+        data: {
+          email: cleanEmail,
+          password: hashedPassword,
+          pseudo: cleanPseudo,
+          nom: cleanNom,
+          prenom: cleanPrenom,
+          authProvider: 'email',
+          isEmailVerified: false,
+          emailVerificationCode: verificationCode,
+          verificationCodeExpiry: verificationExpiry,
+          preferredLanguage: userLanguage,
+        },
+      })
+    } catch (error) {
+      // Gestion des erreurs Prisma
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+        // Unique constraint failed
+        throw createError({
+          statusCode: 409,
+          message: 'Email ou pseudo déjà utilisé',
+        })
+      }
+      throw error
+    }
 
     const siteUrl = getSiteUrl()
 
@@ -77,27 +90,6 @@ export default defineEventHandler(async (event) => {
       requiresVerification: true,
       email: cleanEmail,
     }
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
-
-    // Gestion des erreurs Prisma
-    if (error && typeof error === 'object' && 'code' in error) {
-      if (error.code === 'P2002') {
-        // Unique constraint failed
-        throw createError({
-          statusCode: 409,
-          message: 'Email ou pseudo déjà utilisé',
-        })
-      }
-    }
-
-    console.error("Erreur lors de l'inscription:", error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur interne',
-    })
-  }
-})
+  },
+  { operationName: 'Register' }
+)
