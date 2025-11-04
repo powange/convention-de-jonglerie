@@ -701,8 +701,8 @@ grep -r "select: {" server/api/ | grep "email: true"
 | **Notifications** | 10     | 0        | 10      | ✅ 100%     |
 | **Feedback**      | 1      | 0        | 1       | ✅ 100%     |
 | **Racine**        | 2      | 0        | 2       | ✅ 100%     |
-| **Editions**      | 21      | 128      | 149     | 🟡 14%      |
-| **TOTAL**         | **115** | **128**  | **243** | 🟡 **47%**  |
+| **Editions**      | 28      | 121      | 149     | 🟡 19%      |
+| **TOTAL**         | **122** | **121**  | **243** | 🟡 **50%**  |
 
 ---
 
@@ -791,17 +791,19 @@ grep -r "select: {" server/api/ | grep "email: true"
 
 ---
 
-### Phase 5G : Editions - Meals (7 endpoints)
+### Phase 5G : Editions - Meals (7 endpoints) ✅ COMPLÉTÉ
 
-**Attention : Système complexe de validation de repas**
+**Note :** Système complexe de validation de repas migré avec succès
 
-- [ ] `server/api/editions/[id]/meals/index.get.ts`
-- [ ] `server/api/editions/[id]/meals/participants.get.ts`
-- [ ] `server/api/editions/[id]/meals/[mealId]/search.get.ts`
-- [ ] `server/api/editions/[id]/meals/[mealId]/stats.get.ts`
-- [ ] `server/api/editions/[id]/meals/[mealId]/pending.get.ts`
-- [ ] `server/api/editions/[id]/meals/[mealId]/validate.post.ts`
-- [ ] `server/api/editions/[id]/meals/[mealId]/cancel.post.ts`
+- [x] `server/api/editions/[id]/meals/index.get.ts` - Liste des repas (38→34 lignes)
+- [x] `server/api/editions/[id]/meals/participants.get.ts` - Liste participants avec filtres (265→269 lignes)
+- [x] `server/api/editions/[id]/meals/[mealId]/search.get.ts` - Recherche participants (213→205 lignes)
+- [x] `server/api/editions/[id]/meals/[mealId]/stats.get.ts` - Statistiques validations (158→150 lignes)
+- [x] `server/api/editions/[id]/meals/[mealId]/pending.get.ts` - Validations en attente (197→189 lignes)
+- [x] `server/api/editions/[id]/meals/[mealId]/validate.post.ts` - Valider un repas (172→156 lignes)
+- [x] `server/api/editions/[id]/meals/[mealId]/cancel.post.ts` - Annuler une validation (141→125 lignes)
+
+**Total Phase 5G :** 1184→1128 lignes (-56 lignes, -5%)
 
 ---
 

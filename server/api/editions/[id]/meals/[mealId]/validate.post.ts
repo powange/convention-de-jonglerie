@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
@@ -8,24 +9,24 @@ const validateMealSchema = z.object({
   id: z.number().int().positive(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const mealId = parseInt(getRouterParam(event, 'mealId') || '0')
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = parseInt(getRouterParam(event, 'id') || '0')
+    const mealId = parseInt(getRouterParam(event, 'mealId') || '0')
 
-  if (!editionId || !mealId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
+    if (!editionId || !mealId) {
+      throw createError({ statusCode: 400, message: 'Paramètres invalides' })
+    }
 
-  const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
-  if (!allowed) {
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour effectuer cette action',
-    })
-  }
+    const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
+    if (!allowed) {
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour effectuer cette action',
+      })
+    }
 
-  try {
     const body = await readBody(event)
     const validatedData = validateMealSchema.parse(body)
 
@@ -150,23 +151,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       consumedAt: now,
     }
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la validation du repas:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la validation du repas',
-    })
-  }
-})
+  },
+  { operationName: 'ValidateMeal' }
+)

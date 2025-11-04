@@ -1,25 +1,26 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const mealId = parseInt(getRouterParam(event, 'mealId') || '0')
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = parseInt(getRouterParam(event, 'id') || '0')
+    const mealId = parseInt(getRouterParam(event, 'mealId') || '0')
 
-  if (!editionId || !mealId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
+    if (!editionId || !mealId) {
+      throw createError({ statusCode: 400, message: 'Paramètres invalides' })
+    }
 
-  const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
-  if (!allowed) {
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
-  }
+    const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
+    if (!allowed) {
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
+    }
 
-  try {
     // Récupérer le type demandé
     const query = getQuery(event)
     const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'all'
@@ -183,15 +184,6 @@ export default defineEventHandler(async (event) => {
       pending,
       count: pending.length,
     }
-  } catch (error: unknown) {
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la récupération des personnes non validées:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des personnes non validées',
-    })
-  }
-})
+  },
+  { operationName: 'GetPendingMealValidations' }
+)

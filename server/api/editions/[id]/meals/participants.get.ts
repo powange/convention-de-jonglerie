@@ -1,35 +1,37 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
 const DEFAULT_PAGE_SIZE = 20
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    const editionId = parseInt(getRouterParam(event, 'id') || '0')
+    if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed) {
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
-  }
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed) {
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
+    }
 
-  // Paramètres de pagination et filtres
-  const query = getQuery(event)
-  const page = Math.max(1, parseInt((query.page as string) || '1'))
-  const pageSize = Math.min(
-    100,
-    Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
-  )
-  const search = (query.search as string)?.trim()
-  const phaseFilter = query.phase as string | undefined
-  const typeFilter = query.type as string | undefined
-  const mealTypeFilter = query.mealType as string | undefined
-  const dateFilter = query.date as string | undefined
+    // Paramètres de pagination et filtres
+    const query = getQuery(event)
+    const page = Math.max(1, parseInt((query.page as string) || '1'))
+    const pageSize = Math.min(
+      100,
+      Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
+    )
+    const search = (query.search as string)?.trim()
+    const phaseFilter = query.phase as string | undefined
+    const typeFilter = query.type as string | undefined
+    const mealTypeFilter = query.mealType as string | undefined
+    const dateFilter = query.date as string | undefined
 
   // Récupérer tous les repas activés avec les sélections
   const meals = await prisma.volunteerMeal.findMany({
@@ -250,16 +252,18 @@ export default defineEventHandler(async (event) => {
     afterShow: participants.filter((p) => p.afterShow).length,
   }
 
-  return {
-    success: true,
-    participants: paginatedParticipants,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      totalPages,
-    },
-    availableDates: uniqueDates,
-    stats,
-  }
-})
+    return {
+      success: true,
+      participants: paginatedParticipants,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+      },
+      availableDates: uniqueDates,
+      stats,
+    }
+  },
+  { operationName: 'GetMealParticipants' }
+)
