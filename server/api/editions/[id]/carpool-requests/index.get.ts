@@ -1,20 +1,20 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
-import { createError, getQuery } from 'h3'
 
-export default defineEventHandler(async (event) => {
-  const editionId = parseInt(event.context.params?.id as string)
-  const query = getQuery(event) || {}
-  const includeArchived = query.includeArchived === 'true'
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = parseInt(event.context.params?.id as string)
+    const query = getQuery(event) || {}
+    const includeArchived = query.includeArchived === 'true'
 
-  if (!editionId) {
-    throw createError({
-      statusCode: 400,
-      message: 'Edition ID invalide',
-    })
-  }
+    if (!editionId) {
+      throw createError({
+        statusCode: 400,
+        message: 'Edition ID invalide',
+      })
+    }
 
-  try {
     const now = new Date()
 
     const carpoolRequests = await prisma.carpoolRequest.findMany({
@@ -62,11 +62,6 @@ export default defineEventHandler(async (event) => {
     }))
 
     return transformedRequests
-  } catch (error) {
-    console.error('Erreur lors de la récupération des demandes:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetCarpoolRequests' }
+)

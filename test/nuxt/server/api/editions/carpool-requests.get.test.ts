@@ -14,6 +14,8 @@ const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 const mockEvent = {
   context: {
     params: { id: '1' },
+    query: {},
+    user: undefined,
   },
 }
 
@@ -123,6 +125,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     const eventWithBadId = {
       context: {
         params: { id: 'invalid' },
+        query: {},
+        user: undefined,
       },
     }
 
@@ -132,7 +136,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     prismaMock.carpoolRequest.findMany.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it("devrait retourner un tableau vide s'il n'y a pas de demandes", async () => {
@@ -345,6 +349,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     const eventWithStringId = {
       context: {
         params: { id: '123' },
+        query: {},
+        user: undefined,
       },
     }
 

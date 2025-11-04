@@ -1,33 +1,25 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { carpoolRequestSchema } from '@@/server/utils/validation-schemas'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const editionId = parseInt(event.context.params?.id as string)
-  const body = await readBody(event)
+    const editionId = parseInt(event.context.params?.id as string)
+    const body = await readBody(event)
 
-  if (!editionId) {
-    throw createError({
-      statusCode: 400,
-      message: 'Edition ID invalide',
-    })
-  }
+    if (!editionId) {
+      throw createError({
+        statusCode: 400,
+        message: 'Edition ID invalide',
+      })
+    }
 
-  // Validation des données avec Zod
-  const validationResult = carpoolRequestSchema.safeParse(body)
-  if (!validationResult.success) {
-    throw createError({
-      statusCode: 400,
-      message: 'Données invalides',
-      data: validationResult.error.flatten(),
-    })
-  }
+    // Validation des données avec Zod
+    const validatedData = carpoolRequestSchema.parse(body)
 
-  const validatedData = validationResult.data
-
-  try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -65,11 +57,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return carpoolRequest
-  } catch (error) {
-    console.error('Erreur lors de la création de la demande:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'CreateCarpoolRequest' }
+)

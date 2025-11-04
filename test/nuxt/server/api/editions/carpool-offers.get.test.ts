@@ -5,30 +5,11 @@ vi.mock('../../../../../server/utils/email-hash', () => ({
   getEmailHash: vi.fn(),
 }))
 
-vi.mock('../../../../../server/utils/prisma', () => ({
-  prisma: {
-    carpoolOffer: {
-      findMany: vi.fn(),
-    },
-  },
-}))
-
-// Mock des fonctions Nuxt
-vi.mock('#imports', () => ({
-  createError: vi.fn(),
-  defineEventHandler: vi.fn(),
-}))
-
 import { getEmailHash } from '../../../../../server/utils/email-hash'
-import { prisma } from '../../../../../server/utils/prisma'
+import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/editions/[id]/carpool-offers/index.get'
 
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
-const mockFindMany = prisma.carpoolOffer.findMany as ReturnType<typeof vi.fn>
-
-// Cast des mocks globaux
-const mockCreateError = global.createError as ReturnType<typeof vi.fn>
-const mockDefineEventHandler = global.defineEventHandler as ReturnType<typeof vi.fn>
 
 describe('GET /api/editions/[id]/carpool-offers', () => {
   const mockEvent = {
@@ -36,18 +17,14 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       params: {
         id: '1',
       },
+      query: {},
+      user: undefined,
     },
   }
 
   beforeEach(() => {
-    vi.clearAllMocks()
-    mockDefineEventHandler.mockImplementation((fn) => fn)
-    mockGetEmailHash.mockReturnValue('test-hash')
-    mockCreateError.mockImplementation(({ statusCode, statusMessage }) => {
-      const error = new Error(statusMessage)
-      error.statusCode = statusCode
-      throw error
-    })
+    prismaMock.carpoolOffer.findMany.mockReset()
+    mockGetEmailHash.mockReset()
   })
 
   it('devrait récupérer les offres de covoiturage avec succès', async () => {
@@ -98,7 +75,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockFindMany.mockResolvedValue(mockOffers)
+    prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
 
     const result = await handler(mockEvent)
 
@@ -137,6 +114,8 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         params: {
           id: 'invalid',
         },
+        query: {},
+        user: undefined,
       },
     }
 
@@ -147,22 +126,18 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     const eventWithoutId = {
       context: {
         params: {},
+        query: {},
+        user: undefined,
       },
     }
-
-    mockCreateError.mockImplementation(({ statusCode, statusMessage }) => {
-      const error = new Error(statusMessage)
-      error.statusCode = statusCode
-      throw error
-    })
 
     await expect(handler(eventWithoutId)).rejects.toThrow('Edition ID invalide')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    mockFindMany.mockRejectedValue(new Error('DB Error'))
+    prismaMock.carpoolOffer.findMany.mockRejectedValue(new Error('DB Error'))
 
-    await expect(handler(mockEvent)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait retourner un tableau vide si aucune offre', async () => {
@@ -193,7 +168,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockFindMany.mockResolvedValue(mockOffers)
+    prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
 
     await handler(mockEvent)
 
@@ -246,7 +221,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockFindMany.mockResolvedValue(mockOffers)
+    prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
 
     const result = await handler(mockEvent)
 
@@ -284,7 +259,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockFindMany.mockResolvedValue(mockOffers)
+    prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
 
     const result = await handler(mockEvent)
 
@@ -303,14 +278,16 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         params: {
           id: '123',
         },
+        query: {},
+        user: undefined,
       },
     }
 
-    mockFindMany.mockResolvedValue([])
+    prismaMock.carpoolOffer.findMany.mockResolvedValue([])
 
     await handler(eventWithStringId)
 
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(prismaMock.carpoolOffer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 123,

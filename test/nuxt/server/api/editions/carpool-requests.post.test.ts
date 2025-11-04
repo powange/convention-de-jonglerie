@@ -145,7 +145,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.edition.findUnique.mockResolvedValue(null)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Edition non trouvée')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
@@ -158,7 +158,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.edition.findUnique.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait créer une demande avec seatsNeeded par défaut à 1', async () => {

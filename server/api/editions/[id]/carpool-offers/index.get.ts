@@ -1,21 +1,21 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
-import { createError, getQuery } from 'h3'
 
-export default defineEventHandler(async (event) => {
-  const editionId = parseInt(event.context.params?.id as string)
-  const viewerId = event.context.user?.id as number | undefined
-  const query = getQuery(event) || {}
-  const includeArchived = query.includeArchived === 'true'
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = parseInt(event.context.params?.id as string)
+    const viewerId = event.context.user?.id as number | undefined
+    const query = getQuery(event) || {}
+    const includeArchived = query.includeArchived === 'true'
 
-  if (!editionId) {
-    throw createError({
-      statusCode: 400,
-      message: 'Edition ID invalide',
-    })
-  }
+    if (!editionId) {
+      throw createError({
+        statusCode: 400,
+        message: 'Edition ID invalide',
+      })
+    }
 
-  try {
     const now = new Date()
 
     const carpoolOffers = await prisma.carpoolOffer.findMany({
@@ -148,11 +148,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return transformedOffers
-  } catch (error) {
-    console.error('Erreur lors de la récupération des covoiturages:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetCarpoolOffers' }
+)
