@@ -1,5 +1,5 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
-import { validateAndSanitize, handleValidationError } from '@@/server/utils/validation-schemas'
 import { getRequestIP } from 'h3'
 import { z } from 'zod'
 
@@ -25,21 +25,14 @@ const feedbackSchema = z.object({
   captchaToken: z.string().optional(), // Pour les utilisateurs non connectés
 })
 
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+export default wrapApiHandler(
+  async (event) => {
+    const body = await readBody(event)
 
-  // Validation des données
-  let validatedData
-  try {
-    validatedData = validateAndSanitize(feedbackSchema, body)
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-    throw error
-  }
+    // Validation des données (wrapApiHandler gère automatiquement les erreurs Zod)
+    const validatedData = feedbackSchema.parse(body)
 
-  const { type, subject, message, email, name, url, captchaToken } = validatedData
+    const { type, subject, message, email, name, url, captchaToken } = validatedData
   const user = event.context.user
   const isAuthenticated = !!user
 
@@ -138,7 +131,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  try {
     // Mapper les types du frontend vers les types de la DB
     const typeMapping: Record<string, FeedbackType> = {
       bug: 'BUG',
@@ -173,11 +165,6 @@ export default defineEventHandler(async (event) => {
       message: 'Votre feedback a été envoyé avec succès. Merci pour votre contribution !',
       feedbackId: feedback.id,
     }
-  } catch (error) {
-    console.error('Erreur lors de la création du feedback:', error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'envoi du feedback",
-    })
-  }
-})
+  },
+  { operationName: 'SubmitFeedback' }
+)

@@ -691,18 +691,18 @@ grep -r "select: {" server/api/ | grep "email: true"
 
 ### 📊 Progrès global
 
-| Catégorie | Migrés | Restants | Total | Progression |
-|-----------|--------|----------|-------|-------------|
-| **User** | 4 | 0 | 4 | ✅ 100% |
-| **Conventions** | 27 | 0 | 27 | ✅ 100% |
-| **Carpool** | 10 | 0 | 10 | ✅ 100% |
-| **Auth** | 8 | 0 | 8 | ✅ 100% |
-| **Admin** | 32 | 0 | 32 | ✅ 100% |
-| **Notifications** | 10 | 0 | 10 | ✅ 100% |
-| **Feedback** | 0 | 1 | 1 | 🔴 0% |
-| **Racine** | 0 | 2 | 2 | 🔴 0% |
-| **Editions** | 0 | 149 | 149 | 🔴 0% |
-| **TOTAL** | **91** | **152** | **243** | 🟡 **37%** |
+| Catégorie         | Migrés | Restants | Total   | Progression |
+| ----------------- | ------ | -------- | ------- | ----------- |
+| **User**          | 4      | 0        | 4       | ✅ 100%     |
+| **Conventions**   | 27     | 0        | 27      | ✅ 100%     |
+| **Carpool**       | 10     | 0        | 10      | ✅ 100%     |
+| **Auth**          | 8      | 0        | 8       | ✅ 100%     |
+| **Admin**         | 32     | 0        | 32      | ✅ 100%     |
+| **Notifications** | 10     | 0        | 10      | ✅ 100%     |
+| **Feedback**      | 1      | 0        | 1       | ✅ 100%     |
+| **Racine**        | 2      | 0        | 2       | ✅ 100%     |
+| **Editions**      | 0      | 149      | 149     | 🔴 0%       |
+| **TOTAL**         | **94** | **149**  | **243** | 🟡 **39%**  |
 
 ---
 
@@ -723,16 +723,18 @@ grep -r "select: {" server/api/ | grep "email: true"
 
 ---
 
-### Phase 5B : Feedback & Racine (3 endpoints)
+### Phase 5B : Feedback & Racine (3 endpoints) ✅ COMPLÉTÉ
 
 **Priorité : MOYENNE** - Endpoints simples et isolés
 
 #### Feedback (1)
-- [ ] `server/api/feedback/index.post.ts` - Soumettre un feedback
+
+- [x] `server/api/feedback/index.post.ts` - Soumettre un feedback (183→170 lignes)
 
 #### Racine (2)
-- [ ] `server/api/countries.get.ts` - Liste des pays
-- [ ] `server/api/site.webmanifest.get.ts` - Manifest PWA
+
+- [x] `server/api/countries.get.ts` - Liste des pays (34→30 lignes)
+- [x] `server/api/site.webmanifest.get.ts` - Manifest PWA (53→58 lignes)
 
 ---
 
@@ -828,6 +830,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 **Attention : Système le plus complexe, à traiter en dernier**
 
 #### Tiers (6 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/tiers/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/tiers/index.post.ts`
 - [ ] `server/api/editions/[id]/ticketing/tiers/[tierId].get.ts`
@@ -836,6 +839,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/ticketing/tiers/reorder.post.ts`
 
 #### Options (6 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/options/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/options/index.post.ts`
 - [ ] `server/api/editions/[id]/ticketing/options/[optionId].get.ts`
@@ -844,6 +848,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/ticketing/options/reorder.post.ts`
 
 #### Custom Fields (5 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/custom-fields/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/custom-fields/index.post.ts`
 - [ ] `server/api/editions/[id]/ticketing/custom-fields/[customFieldId].put.ts`
@@ -851,6 +856,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/ticketing/custom-fields/reorder.post.ts`
 
 #### Returnable Items (8 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/returnable-items/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/returnable-items/index.post.ts`
 - [ ] `server/api/editions/[id]/ticketing/returnable-items/[itemId].put.ts`
@@ -861,11 +867,13 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/ticketing/returnable-items/assignments.get.ts`
 
 #### Quotas (3 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/quotas/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/quotas/index.post.ts`
 - [ ] `server/api/editions/[id]/ticketing/quotas/[quotaId].delete.ts`
 
 #### Orders (5 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/orders/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/orders/[orderId].get.ts`
 - [ ] `server/api/editions/[id]/ticketing/orders/[orderId]/cancel.post.ts`
@@ -873,6 +881,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/ticketing/orders/stats.get.ts`
 
 #### External & HelloAsso (5 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/external/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/external/sync.post.ts`
 - [ ] `server/api/editions/[id]/ticketing/helloasso/config.get.ts`
@@ -880,6 +889,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/ticketing/helloasso/sync.post.ts`
 
 #### Volunteers Ticketing (6 endpoints)
+
 - [ ] `server/api/editions/[id]/ticketing/volunteers/index.get.ts`
 - [ ] `server/api/editions/[id]/ticketing/volunteers/[volunteerId].get.ts`
 - [ ] `server/api/editions/[id]/ticketing/volunteers/returnable-items/assign.post.ts`
@@ -894,6 +904,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 **Attention : Système complexe de gestion des bénévoles**
 
 #### Applications (8 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteers/applications/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteers/applications/index.post.ts`
 - [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/index.get.ts`
@@ -904,6 +915,7 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/volunteers/applications/[applicationId]/teams/[teamId].delete.ts`
 
 #### Teams (6 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteers/teams/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteers/teams/index.post.ts`
 - [ ] `server/api/editions/[id]/volunteers/teams/[teamId].get.ts`
@@ -912,31 +924,37 @@ grep -r "select: {" server/api/ | grep "email: true"
 - [ ] `server/api/editions/[id]/volunteers/teams/[teamId]/members.post.ts`
 
 #### Access Control (3 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteers/access-control/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteers/access-control/check.post.ts`
 - [ ] `server/api/editions/[id]/volunteers/access-control/grant.post.ts`
 
 #### Catering (1 endpoint)
+
 - [ ] `server/api/editions/[id]/volunteers/catering/index.get.ts`
 
 #### Notifications (3 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteers/notification/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteers/notification/index.post.ts`
 - [ ] `server/api/editions/[id]/volunteers/notification/[groupId].delete.ts`
 
 #### Gestion (4 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteers/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteers/[volunteerId]/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteers/[volunteerId]/index.put.ts`
 - [ ] `server/api/editions/[id]/volunteers/[volunteerId]/index.delete.ts`
 
 #### Time Slots (4 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteer-time-slots/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteer-time-slots/index.post.ts`
 - [ ] `server/api/editions/[id]/volunteer-time-slots/[slotId].delete.ts`
 - [ ] `server/api/editions/[id]/volunteer-time-slots/[slotId]/assignments/index.post.ts`
 
 #### Teams (Legacy - 4 endpoints)
+
 - [ ] `server/api/editions/[id]/volunteer-teams/index.get.ts`
 - [ ] `server/api/editions/[id]/volunteer-teams/index.post.ts`
 - [ ] `server/api/editions/[id]/volunteer-teams/[teamId].put.ts`

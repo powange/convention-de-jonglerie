@@ -1,9 +1,10 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (_event) => {
-  // Cette API est publique, pas besoin d'authentification
+export default wrapApiHandler(
+  async (_event) => {
+    // Cette API est publique, pas besoin d'authentification
 
-  try {
     const now = new Date()
 
     // Récupérer tous les pays des éditions non expirées
@@ -24,11 +25,6 @@ export default defineEventHandler(async (_event) => {
 
     // Retourner seulement les noms de pays uniques
     return countries.map((c) => c.country).filter(Boolean)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des pays:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetCountries' }
+)
