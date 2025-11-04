@@ -25,6 +25,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
   beforeEach(() => {
     prismaMock.carpoolOffer.findMany.mockReset()
     mockGetEmailHash.mockReset()
+    global.getQuery = vi.fn().mockReturnValue({})
   })
 
   it('devrait récupérer les offres de covoiturage avec succès', async () => {
@@ -76,10 +77,11 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockGetEmailHash.mockReturnValue('test-hash')
 
     const result = await handler(mockEvent)
 
-    expect(mockFindMany).toHaveBeenCalledWith({
+    expect(prismaMock.carpoolOffer.findMany).toHaveBeenCalledWith({
       where: expect.objectContaining({
         editionId: 1,
         tripDate: expect.objectContaining({ gte: expect.any(Date) }),
@@ -141,7 +143,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
   })
 
   it('devrait retourner un tableau vide si aucune offre', async () => {
-    mockFindMany.mockResolvedValue([])
+    prismaMock.carpoolOffer.findMany.mockResolvedValue([])
 
     const result = await handler(mockEvent)
 
@@ -169,10 +171,11 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockGetEmailHash.mockReturnValue('test-hash')
 
     await handler(mockEvent)
 
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(prismaMock.carpoolOffer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         orderBy: { tripDate: 'asc' },
       })
@@ -222,6 +225,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockGetEmailHash.mockReturnValue('test-hash')
 
     const result = await handler(mockEvent)
 
@@ -260,6 +264,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockGetEmailHash.mockReturnValue('test-hash')
 
     const result = await handler(mockEvent)
 

@@ -23,6 +23,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
   beforeEach(() => {
     prismaMock.carpoolRequest.findMany.mockReset()
     mockGetEmailHash.mockReset()
+    global.getQuery = vi.fn().mockReturnValue({})
   })
 
   it('devrait retourner les demandes de covoiturage avec emails masqués', async () => {
