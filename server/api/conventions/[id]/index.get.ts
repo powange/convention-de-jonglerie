@@ -1,8 +1,8 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
-import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

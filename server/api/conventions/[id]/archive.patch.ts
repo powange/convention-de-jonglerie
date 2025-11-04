@@ -1,9 +1,7 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import {
-  getConventionForArchive,
-  validateConventionId,
-} from '@@/server/utils/permissions/convention-permissions'
+import { getConventionForArchive } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'

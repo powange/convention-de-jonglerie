@@ -2,16 +2,14 @@ import { isHttpError } from '@@/server/types/prisma-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
-import {
-  getEditionForEdit,
-  validateEditionId,
-} from '@@/server/utils/permissions/edition-permissions'
+import { getEditionForEdit } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import {
   updateEditionSchema,
   validateAndSanitize,
   handleValidationError,
 } from '@@/server/utils/validation-schemas'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import type { Prisma } from '@prisma/client'

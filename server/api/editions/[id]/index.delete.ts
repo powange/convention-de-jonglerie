@@ -1,9 +1,7 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import {
-  getEditionForDelete,
-  validateEditionId,
-} from '@@/server/utils/permissions/edition-permissions'
+import { getEditionForDelete } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

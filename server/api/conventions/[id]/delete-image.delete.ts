@@ -1,6 +1,6 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { deleteConventionImage } from '@@/server/utils/image-deletion'
-import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification

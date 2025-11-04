@@ -4,7 +4,7 @@ import {
   checkAdminMode,
   findUserByPseudoOrEmail,
 } from '@@/server/utils/collaborator-management'
-import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const addCollaboratorSchema = z
