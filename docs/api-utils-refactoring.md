@@ -701,8 +701,8 @@ grep -r "select: {" server/api/ | grep "email: true"
 | **Notifications** | 10     | 0        | 10      | ✅ 100%     |
 | **Feedback**      | 1      | 0        | 1       | ✅ 100%     |
 | **Racine**        | 2      | 0        | 2       | ✅ 100%     |
-| **Editions**      | 13      | 136      | 149     | 🟡 9%       |
-| **TOTAL**         | **107** | **136**  | **243** | 🟡 **44%**  |
+| **Editions**      | 21      | 128      | 149     | 🟡 14%      |
+| **TOTAL**         | **115** | **128**  | **243** | 🟡 **47%**  |
 
 ---
 
@@ -778,12 +778,16 @@ grep -r "select: {" server/api/ | grep "email: true"
 
 ---
 
-### Phase 5F : Editions - Lost & Found (4 endpoints)
+### Phase 5F : Editions - Lost & Found (4 endpoints) ✅ COMPLÉTÉ
 
-- [ ] `server/api/editions/[id]/lost-found/index.get.ts`
-- [ ] `server/api/editions/[id]/lost-found/index.post.ts`
-- [ ] `server/api/editions/[id]/lost-found/[itemId]/index.put.ts`
-- [ ] `server/api/editions/[id]/lost-found/[itemId]/index.delete.ts`
+**Note :** Les fichiers réels diffèrent de la documentation initiale
+
+- [x] `server/api/editions/[id]/lost-found/index.get.ts` - Liste des objets trouvés (97→86 lignes)
+- [x] `server/api/editions/[id]/lost-found/index.post.ts` - Créer un objet trouvé (125→116 lignes)
+- [x] `server/api/editions/[id]/lost-found/[itemId]/comments.post.ts` - Ajouter un commentaire (88→78 lignes)
+- [x] `server/api/editions/[id]/lost-found/[itemId]/return.patch.ts` - Toggle statut RETURNED/LOST (114→103 lignes)
+
+**Total Phase 5F :** 424→383 lignes (-41 lignes, -10%)
 
 ---
 

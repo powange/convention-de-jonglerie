@@ -1,11 +1,11 @@
-import { isHttpError } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const editionId = parseInt(getRouterParam(event, 'id') as string)
     const itemId = parseInt(getRouterParam(event, 'itemId') as string)
 
@@ -98,16 +98,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return { ...rawItem, user: itemUser, comments }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la mise à jour du statut:', error)
-
-    if (isHttpError(error)) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'ToggleLostFoundItemStatus' }
+)

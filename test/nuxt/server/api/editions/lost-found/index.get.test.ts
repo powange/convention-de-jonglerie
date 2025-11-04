@@ -206,7 +206,7 @@ describe('/api/editions/[id]/lost-found GET', () => {
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockRejectedValue(new Error('DB Error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur interne du serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait relancer les erreurs HTTP', async () => {

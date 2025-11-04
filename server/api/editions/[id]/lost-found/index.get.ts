@@ -1,9 +1,9 @@
-import { isHttpError } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const editionId = parseInt(getRouterParam(event, 'id') as string)
 
     if (!editionId || isNaN(editionId)) {
@@ -81,16 +81,6 @@ export default defineEventHandler(async (event) => {
       return { ...item, user, comments }
     })
     return items
-  } catch (error: unknown) {
-    console.error('Erreur lors de la récupération des objets trouvés:', error)
-
-    if (isHttpError(error)) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetLostFoundItems' }
+)

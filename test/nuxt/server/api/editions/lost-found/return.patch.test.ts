@@ -202,7 +202,7 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.update.mockRejectedValue(new Error('DB Error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur interne du serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait relancer les erreurs HTTP', async () => {
