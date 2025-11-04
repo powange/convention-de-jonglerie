@@ -1,14 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-
-  const offerId = parseInt(event.context.params?.id as string)
-  if (!offerId) {
-    throw createError({ statusCode: 400, message: "ID de l'offre invalide" })
-  }
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const offerId = validateResourceId(event, 'id', 'offre')
 
   const body = await readBody(event)
   const seats = Number(body?.seats)
@@ -79,20 +78,22 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Envoyer une notification au propriétaire de l'offre
-  try {
-    const requesterName = booking.requester.pseudo || `Utilisateur ${booking.requester.id}`
-    await NotificationHelpers.carpoolBookingReceived(
-      offer.userId,
-      requesterName,
-      offerId,
-      seats,
-      message
-    )
-  } catch (error) {
-    console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
-    // On ne fait pas échouer la création du booking si la notification échoue
-  }
+    // Envoyer une notification au propriétaire de l'offre
+    try {
+      const requesterName = booking.requester.pseudo || `Utilisateur ${booking.requester.id}`
+      await NotificationHelpers.carpoolBookingReceived(
+        offer.userId,
+        requesterName,
+        offerId,
+        seats,
+        message
+      )
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
+      // On ne fait pas échouer la création du booking si la notification échoue
+    }
 
-  return booking
-})
+    return booking
+  },
+  { operationName: 'CreateCarpoolOfferBooking' }
+)
