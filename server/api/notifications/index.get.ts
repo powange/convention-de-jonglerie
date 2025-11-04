@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { NotificationService } from '@@/server/utils/notification-service'
@@ -19,14 +20,12 @@ const querySchema = z.object({
     .transform((val) => (val ? parseInt(val, 10) : undefined)),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const query = getQuery(event)
+    const parsed = querySchema.parse(query)
 
-  const query = getQuery(event)
-  const parsed = querySchema.parse(query)
-
-  try {
     const notifications = await NotificationService.getForUser({
       userId: user.id,
       isRead: parsed.isRead,
@@ -58,10 +57,6 @@ export default defineEventHandler(async (event) => {
         hasMore: notifications.length === (parsed.limit || 50),
       },
     }
-  } catch {
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des notifications',
-    })
-  }
-})
+  },
+  { operationName: 'GetUserNotifications' }
+)

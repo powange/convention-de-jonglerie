@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -11,13 +12,11 @@ const subscriptionSchema = z.object({
   }),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
-    // Vérifier l'authentification
+export default wrapApiHandler(
+  async (event) => {
     const session = await requireUserSession(event)
     const userId = session.user.id
 
-    // Valider les données
     const body = await readBody(event)
     const { subscription } = subscriptionSchema.parse(body)
 
@@ -43,7 +42,7 @@ export default defineEventHandler(async (event) => {
         data: {
           p256dh: subscription.keys.p256dh,
           auth: subscription.keys.auth,
-          isActive: true, // Réactiver la subscription
+          isActive: true,
           updatedAt: new Date(),
         },
       })
@@ -53,48 +52,35 @@ export default defineEventHandler(async (event) => {
         message: 'Subscription mise à jour',
         subscriptionId: updated.id,
       }
-    } else {
-      console.log("[Push Subscribe] Création d'une nouvelle souscription")
-      // Créer une nouvelle subscription
-      const created = await prisma.pushSubscription.create({
-        data: {
-          userId,
-          endpoint: subscription.endpoint,
-          p256dh: subscription.keys.p256dh,
-          auth: subscription.keys.auth,
-        },
-      })
-
-      // Créer une notification de bienvenue
-      await prisma.notification.create({
-        data: {
-          userId,
-          title: 'Notifications activées',
-          message: 'Vous recevrez maintenant des notifications push sur cet appareil',
-          type: 'SUCCESS',
-          category: 'SYSTEM',
-        },
-      })
-
-      return {
-        success: true,
-        message: 'Subscription créée',
-        subscriptionId: created.id,
-      }
-    }
-  } catch (error: unknown) {
-    console.error('[Push Subscribe] Erreur:', error)
-
-    if (error.name === 'ZodError') {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-      })
     }
 
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'enregistrement de la subscription",
+    console.log("[Push Subscribe] Création d'une nouvelle souscription")
+    // Créer une nouvelle subscription
+    const created = await prisma.pushSubscription.create({
+      data: {
+        userId,
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+      },
     })
-  }
-})
+
+    // Créer une notification de bienvenue
+    await prisma.notification.create({
+      data: {
+        userId,
+        title: 'Notifications activées',
+        message: 'Vous recevrez maintenant des notifications push sur cet appareil',
+        type: 'SUCCESS',
+        category: 'SYSTEM',
+      },
+    })
+
+    return {
+      success: true,
+      message: 'Subscription créée',
+      subscriptionId: created.id,
+    }
+  },
+  { operationName: 'SubscribeToPushNotifications' }
+)

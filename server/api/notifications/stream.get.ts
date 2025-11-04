@@ -1,8 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
 
-export default defineEventHandler(async (event) => {
-  // Vérification de l'authentification
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
 
   console.log(`[SSE] Nouvelle connexion de streaming pour user ${user.id}`)
@@ -102,4 +102,4 @@ export default defineEventHandler(async (event) => {
   })
 
   return stream
-})
+}, { operationName: 'StreamNotifications' })

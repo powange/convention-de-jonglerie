@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { z } from 'zod'
@@ -6,14 +7,11 @@ const bodySchema = z.object({
   category: z.string().optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
-
-  const body = await readBody(event).catch(() => ({}))
-  const parsed = bodySchema.parse(body)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const body = await readBody(event).catch(() => ({}))
+    const parsed = bodySchema.parse(body)
     const result = await NotificationService.markAllAsRead(user.id, parsed.category)
 
     return {
@@ -21,10 +19,6 @@ export default defineEventHandler(async (event) => {
       message: `${result.count} notification${result.count > 1 ? 's' : ''} marquée${result.count > 1 ? 's' : ''} comme lue${result.count > 1 ? 's' : ''}`,
       updatedCount: result.count,
     }
-  } catch {
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour des notifications',
-    })
-  }
-})
+  },
+  { operationName: 'MarkAllNotificationsAsRead' }
+)
