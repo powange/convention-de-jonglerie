@@ -11,7 +11,8 @@ const bodySchema = z.object({
   qrCode: z.string().min(1),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   requireAuth(event)
 
   const body = bodySchema.parse(await readBody(event))
@@ -48,4 +49,6 @@ export default defineEventHandler(async (event) => {
     console.error('HelloAsso verify QR code error:', error)
     throw error
   }
-})
+  },
+  { operationName: 'POST ticketing verify-qrcode' }
+)

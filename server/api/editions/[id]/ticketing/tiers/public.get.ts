@@ -5,11 +5,10 @@ import { prisma } from '@@/server/utils/prisma'
  * Route publique pour récupérer les tarifs actifs d'une édition
  * Utilisée pour le SEO (Schema.org)
  */
-export default defineEventHandler(async (event) => {
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = validateEditionId(event)
 
-  try {
     const tiers = await prisma.ticketingTier.findMany({
       where: {
         editionId,
@@ -28,11 +27,6 @@ export default defineEventHandler(async (event) => {
 
     // Appliquer le nom personnalisé
     return tiers.map(applyCustomName)
-  } catch (error: unknown) {
-    console.error('Failed to fetch public tiers from DB:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des tarifs',
-    })
-  }
-})
+  },
+  { operationName: 'GET public ticketing tiers' }
+)

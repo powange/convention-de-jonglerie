@@ -2,11 +2,11 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions (même logique que gestion bénévoles)
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
@@ -42,4 +42,6 @@ export default defineEventHandler(async (event) => {
     success: true,
     message: 'Configuration de billeterie supprimée',
   }
-})
+  },
+  { operationName: 'DELETE ticketing external index' }
+)

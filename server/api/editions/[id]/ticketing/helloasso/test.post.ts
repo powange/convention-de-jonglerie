@@ -10,7 +10,8 @@ const bodySchema = z.object({
   formSlug: z.string().min(1),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   requireAuth(event)
 
   const body = bodySchema.parse(await readBody(event))
@@ -38,4 +39,6 @@ export default defineEventHandler(async (event) => {
     // L'utilitaire gère déjà les erreurs, on les relance simplement
     throw error
   }
-})
+  },
+  { operationName: 'POST ticketing helloasso test' }
+)

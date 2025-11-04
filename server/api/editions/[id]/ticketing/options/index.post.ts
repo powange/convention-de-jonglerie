@@ -15,35 +15,26 @@ const bodySchema = z.object({
   returnableItemIds: z.array(z.number().int()).optional().default([]),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      })
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à cette fonctionnalité',
-    })
-
-  const body = bodySchema.parse(await readBody(event))
-
-  try {
+    const body = bodySchema.parse(await readBody(event))
     const option = await createOption(editionId, body)
 
     return {
       success: true,
       option,
     }
-  } catch (error: unknown) {
-    console.error('Create option error:', error)
-    if (error.statusCode) throw error
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la création de l'option",
-    })
-  }
-})
+  },
+  { operationName: 'POST ticketing option' }
+)

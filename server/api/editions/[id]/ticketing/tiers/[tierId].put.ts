@@ -20,38 +20,27 @@ const bodySchema = z.object({
   mealIds: z.array(z.number().int()).optional().default([]),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const tierId = validateResourceId(event, 'tierId', 'tier')
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const tierId = parseInt(getRouterParam(event, 'tierId') || '0')
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      })
 
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
-  if (!tierId) throw createError({ statusCode: 400, message: 'Tarif invalide' })
-
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à cette fonctionnalité',
-    })
-
-  const body = bodySchema.parse(await readBody(event))
-
-  try {
+    const body = bodySchema.parse(await readBody(event))
     const tier = await updateTier(tierId, editionId, body)
 
     return {
       success: true,
       tier,
     }
-  } catch (error: unknown) {
-    console.error('Update tier error:', error)
-    if (error.statusCode) throw error
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la modification du tarif',
-    })
-  }
-})
+  },
+  { operationName: 'PUT ticketing tier' }
+)

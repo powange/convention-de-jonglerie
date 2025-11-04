@@ -8,11 +8,11 @@ const bodySchema = z.object({
   teamId: z.string().nullable().optional(), // NULL ou undefined = global, string = équipe spécifique
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -115,4 +115,6 @@ export default defineEventHandler(async (event) => {
       message: "Erreur lors de l'ajout de l'article",
     })
   }
-})
+  },
+  { operationName: 'POST ticketing volunteers returnable-items index' }
+)

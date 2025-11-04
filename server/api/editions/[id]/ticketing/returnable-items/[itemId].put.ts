@@ -7,42 +7,31 @@ const updateItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const itemId = validateResourceId(event, 'itemId', 'item')
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const itemId = parseInt(getRouterParam(event, 'itemId') || '0')
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour modifier ces données',
+      })
 
-  if (!editionId || !itemId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
+    const body = await readBody(event)
+    const validation = updateItemSchema.safeParse(body)
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour modifier ces données',
-    })
+    if (!validation.success) {
+      throw createError({
+        statusCode: 400,
+        message: validation.error.errors[0].message,
+      })
+    }
 
-  const body = await readBody(event)
-  const validation = updateItemSchema.safeParse(body)
-
-  if (!validation.success) {
-    throw createError({
-      statusCode: 400,
-      message: validation.error.errors[0].message,
-    })
-  }
-
-  try {
     return await updateReturnableItem(itemId, editionId, validation.data)
-  } catch (error: unknown) {
-    console.error('Failed to update returnable item:', error)
-    if (error.statusCode) throw error
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la modification de l'item à restituer",
-    })
-  }
-})
+  },
+  { operationName: 'PUT ticketing returnable item' }
+)

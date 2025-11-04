@@ -8,11 +8,11 @@ const bodySchema = z.object({
   type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('volunteer'),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions (gestionnaires OU bénévoles en créneau actif de contrôle d'accès)
   const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
@@ -165,4 +165,6 @@ export default defineEventHandler(async (event) => {
       message: "Erreur lors de la dévalidation de l'entrée",
     })
   }
-})
+  },
+  { operationName: 'POST ticketing invalidate-entry' }
+)

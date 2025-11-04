@@ -2,27 +2,20 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEditionOptions } from '@@/server/utils/editions/ticketing/options'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
-
-  try {
     return await getEditionOptions(editionId)
-  } catch (error: unknown) {
-    console.error('Failed to fetch options from DB:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des options',
-    })
-  }
-})
+  },
+  { operationName: 'GET ticketing options' }
+)

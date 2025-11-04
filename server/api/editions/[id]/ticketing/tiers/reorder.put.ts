@@ -12,23 +12,21 @@ const bodySchema = z.object({
   ),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour modifier ces données',
+      })
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour modifier ces données',
-    })
+    const body = bodySchema.parse(await readBody(event))
 
-  const body = bodySchema.parse(await readBody(event))
-
-  try {
     // Mettre à jour les positions en utilisant une transaction
     await prisma.$transaction(
       body.positions.map((item) =>
@@ -44,15 +42,7 @@ export default defineEventHandler(async (event) => {
       )
     )
 
-    return {
-      success: true,
-      message: 'Positions mises à jour avec succès',
-    }
-  } catch (error: unknown) {
-    console.error('Failed to update tiers positions:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour des positions',
-    })
-  }
-})
+    return createSuccessResponse(null, 'Positions mises à jour avec succès')
+  },
+  { operationName: 'PUT reorder ticketing tiers' }
+)

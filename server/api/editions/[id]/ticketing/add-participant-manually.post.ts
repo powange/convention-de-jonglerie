@@ -41,11 +41,11 @@ const bodySchema = z.object({
   isPaid: z.boolean().default(true),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -195,4 +195,6 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de l'ajout manuel du participant:", error)
     throw error
   }
-})
+  },
+  { operationName: 'POST ticketing add-participant-manually' }
+)

@@ -27,23 +27,21 @@ const bodySchema = z.object({
     .optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      })
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à cette fonctionnalité',
-    })
+    const body = bodySchema.parse(await readBody(event))
 
-  const body = bodySchema.parse(await readBody(event))
-
-  try {
     // Créer le custom field dans une transaction
     const customField = await prisma.$transaction(async (tx) => {
       // Créer le custom field
@@ -128,11 +126,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return customField
-  } catch (error: unknown) {
-    console.error('Erreur lors de la création du custom field:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la création du custom field',
-    })
-  }
-})
+  },
+  { operationName: 'POST ticketing custom field' }
+)

@@ -17,11 +17,11 @@ const bodySchema = z.object({
     .optional(),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions (même logique que gestion bénévoles)
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
@@ -150,4 +150,6 @@ export default defineEventHandler(async (event) => {
     statusCode: 400,
     message: 'Provider non supporté pour le moment',
   })
-})
+  },
+  { operationName: 'POST ticketing external index' }
+)

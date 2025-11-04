@@ -2,21 +2,19 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEditionTiers } from '@@/server/utils/editions/ticketing/tiers'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      })
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à cette fonctionnalité',
-    })
-
-  try {
     // Récupérer le paramètre de query pour afficher tous les tarifs ou seulement les valides
     const query = getQuery(event)
     const showAll = query.showAll === 'true'
@@ -51,11 +49,6 @@ export default defineEventHandler(async (event) => {
     return {
       tiers: formattedTiers,
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la récupération des tarifs:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des tarifs',
-    })
-  }
-})
+  },
+  { operationName: 'GET available ticketing tiers' }
+)

@@ -27,26 +27,22 @@ const bodySchema = z.object({
     .optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const customFieldId = validateResourceId(event, 'customFieldId', 'custom field')
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const customFieldId = parseInt(getRouterParam(event, 'customFieldId') || '0')
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      })
 
-  if (!editionId || !customFieldId)
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
+    const body = bodySchema.parse(await readBody(event))
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à cette fonctionnalité',
-    })
-
-  const body = bodySchema.parse(await readBody(event))
-
-  try {
     // Vérifier que le custom field existe et appartient à l'édition
     const existingCustomField = await prisma.ticketingTierCustomField.findFirst({
       where: {
@@ -169,14 +165,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return customField
-  } catch (error: unknown) {
-    console.error('Erreur lors de la modification du custom field:', error)
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la modification du custom field',
-    })
-  }
-})
+  },
+  { operationName: 'PUT ticketing custom field' }
+)

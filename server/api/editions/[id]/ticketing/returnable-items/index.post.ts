@@ -7,11 +7,11 @@ const createItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -40,4 +40,6 @@ export default defineEventHandler(async (event) => {
       message: "Erreur lors de la création de l'item à restituer",
     })
   }
-})
+  },
+  { operationName: 'POST ticketing returnable-items index' }
+)

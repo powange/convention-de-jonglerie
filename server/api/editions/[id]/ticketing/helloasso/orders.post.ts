@@ -12,7 +12,8 @@ const bodySchema = z.object({
   pageSize: z.number().optional(),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   requireAuth(event)
 
   const body = bodySchema.parse(await readBody(event))
@@ -44,4 +45,6 @@ export default defineEventHandler(async (event) => {
     console.error('HelloAsso orders error:', error)
     throw error
   }
-})
+  },
+  { operationName: 'POST ticketing helloasso orders' }
+)

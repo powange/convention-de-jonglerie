@@ -4,11 +4,11 @@ import { decrypt } from '@@/server/utils/encryption'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -219,4 +219,6 @@ export default defineEventHandler(async (event) => {
     console.error('HelloAsso orders fetch error:', error)
     throw error
   }
-})
+  },
+  { operationName: 'GET ticketing helloasso orders' }
+)

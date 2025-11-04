@@ -2,14 +2,12 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(
+  async (event) => {
   const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const orderId = parseInt(getRouterParam(event, 'orderId') || '0')
-
-  if (!editionId || !orderId)
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
+  const editionId = validateEditionId(event)
+  const orderId = validateResourceId(event, 'orderId', 'commande')
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -84,4 +82,6 @@ export default defineEventHandler(async (event) => {
       message: "Erreur lors de l'annulation ou de la suppression de la commande",
     })
   }
-})
+  },
+  { operationName: 'DELETE ticketing orders resource' }
+)
