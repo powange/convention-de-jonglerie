@@ -1,45 +1,28 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canCreateWorkshop } from '@@/server/utils/permissions/workshop-permissions'
-import {
-  workshopSchema,
-  validateAndSanitize,
-  handleValidationError,
-} from '@@/server/utils/validation-schemas'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { workshopSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { PrismaClient } from '@prisma/client'
-import { z } from 'zod'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       select: {
         workshopsEnabled: true,
         workshopLocationsFreeInput: true,
         startDate: true,
         endDate: true,
       },
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     if (!edition.workshopsEnabled) {
       throw createError({
@@ -125,19 +108,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return newWorkshop
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la création du workshop:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'CreateWorkshop' }
+)

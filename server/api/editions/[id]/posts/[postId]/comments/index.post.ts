@@ -1,30 +1,22 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
-import { z } from 'zod'
 
 import {
   editionPostCommentSchema,
   validateAndSanitize,
-  handleValidationError,
 } from '../../../../../../../server/utils/validation-schemas'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const postId = validateResourceId(event, 'postId', 'post')
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-  const postId = parseInt(getRouterParam(event, 'postId')!)
-
-  if (isNaN(editionId) || isNaN(postId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID invalide',
-    })
-  }
-
-  try {
     // Vérifier que le post existe
     const post = await prisma.editionPost.findFirst({
       where: {
@@ -72,19 +64,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return newComment
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la création du commentaire:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'CreatePostComment' }
+)

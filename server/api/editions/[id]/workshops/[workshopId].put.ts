@@ -1,29 +1,19 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permissions'
-import {
-  updateWorkshopSchema,
-  validateAndSanitize,
-  handleValidationError,
-} from '@@/server/utils/validation-schemas'
+import { buildUpdateData } from '@@/server/utils/prisma-helpers'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { updateWorkshopSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { PrismaClient } from '@prisma/client'
-import { z } from 'zod'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const workshopId = validateResourceId(event, 'workshopId', 'atelier')
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-  const workshopId = parseInt(getRouterParam(event, 'workshopId')!)
-
-  if (isNaN(editionId) || isNaN(workshopId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID invalide',
-    })
-  }
-
-  try {
     // Vérifier que le workshop existe et appartient à l'édition
     const workshop = await prisma.workshop.findFirst({
       where: {
@@ -67,28 +57,17 @@ export default defineEventHandler(async (event) => {
     })
 
     // Préparer les données de mise à jour
-    const updateData: any = {}
-
-    if (validatedData.title !== undefined) {
-      updateData.title = validatedData.title
-    }
-    if (validatedData.description !== undefined) {
-      updateData.description = validatedData.description
-    }
-    if (validatedData.startDateTime !== undefined) {
-      updateData.startDateTime = new Date(validatedData.startDateTime)
-    }
-    if (validatedData.endDateTime !== undefined) {
-      updateData.endDateTime = new Date(validatedData.endDateTime)
-    }
-    if (validatedData.maxParticipants !== undefined) {
-      updateData.maxParticipants = validatedData.maxParticipants
-    }
+    const updateData = buildUpdateData(validatedData, {
+      trimStrings: true,
+      transform: {
+        startDateTime: (val) => new Date(val),
+        endDateTime: (val) => new Date(val),
+      },
+      exclude: ['locationName'], // Géré séparément
+    })
 
     // Gérer le lieu du workshop
-    if (validatedData.locationId !== undefined) {
-      updateData.locationId = validatedData.locationId
-    } else if (validatedData.locationName && workshop.edition.workshopLocationsFreeInput) {
+    if (validatedData.locationName && workshop.edition.workshopLocationsFreeInput) {
       // Si un nom de lieu est fourni (mode libre), créer ou récupérer le lieu
       const locationName = validatedData.locationName.trim()
 
@@ -136,19 +115,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return updatedWorkshop
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la modification du workshop:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateWorkshop' }
+)

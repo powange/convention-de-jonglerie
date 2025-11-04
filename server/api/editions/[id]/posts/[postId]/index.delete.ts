@@ -1,22 +1,16 @@
+import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const postId = validateResourceId(event, 'postId', 'post')
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-  const postId = parseInt(getRouterParam(event, 'postId')!)
-
-  if (isNaN(editionId) || isNaN(postId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID invalide',
-    })
-  }
-
-  try {
     // Vérifier que le post existe et appartient à l'utilisateur
     const post = await prisma.editionPost.findFirst({
       where: {
@@ -38,16 +32,7 @@ export default defineEventHandler(async (event) => {
       where: { id: postId },
     })
 
-    return { success: true, message: 'Post supprimé avec succès' }
-  } catch (error: unknown) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la suppression du post:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+    return createSuccessResponse(null, 'Post supprimé avec succès')
+  },
+  { operationName: 'DeleteEditionPost' }
+)

@@ -4,17 +4,18 @@ import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
-export default wrapApiHandler(async (event) => {
-  const editionId = parseInt(event.context.params?.id as string)
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = parseInt(event.context.params?.id as string)
 
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'Invalid Edition ID',
-    })
-  }
+    if (isNaN(editionId)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid Edition ID',
+      })
+    }
 
-  const edition = await prisma.edition.findUnique({
+    const edition = await prisma.edition.findUnique({
       where: {
         id: editionId,
       },
@@ -178,15 +179,17 @@ export default wrapApiHandler(async (event) => {
       ...editionWithoutVolunteersAskFields
     } = edition
 
-  return {
-    ...editionWithoutVolunteersAskFields,
-    // Garder seulement les champs volunteers encore utilisés côté client
-    volunteersOpen: edition.volunteersOpen,
-    volunteersDescription: edition.volunteersDescription,
-    volunteersMode: edition.volunteersMode,
-    volunteersExternalUrl: edition.volunteersExternalUrl,
-    volunteersUpdatedAt: edition.volunteersUpdatedAt,
-    volunteersSetupStartDate: edition.volunteersSetupStartDate,
-    volunteersTeardownEndDate: edition.volunteersTeardownEndDate,
-  }
-}, { operationName: 'GetEdition' })
+    return {
+      ...editionWithoutVolunteersAskFields,
+      // Garder seulement les champs volunteers encore utilisés côté client
+      volunteersOpen: edition.volunteersOpen,
+      volunteersDescription: edition.volunteersDescription,
+      volunteersMode: edition.volunteersMode,
+      volunteersExternalUrl: edition.volunteersExternalUrl,
+      volunteersUpdatedAt: edition.volunteersUpdatedAt,
+      volunteersSetupStartDate: edition.volunteersSetupStartDate,
+      volunteersTeardownEndDate: edition.volunteersTeardownEndDate,
+    }
+  },
+  { operationName: 'GetEdition' }
+)

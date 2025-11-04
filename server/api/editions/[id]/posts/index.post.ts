@@ -1,39 +1,22 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
-import {
-  editionPostSchema,
-  validateAndSanitize,
-  handleValidationError,
-} from '@@/server/utils/validation-schemas'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { editionPostSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { PrismaClient } from '@prisma/client'
-import { z } from 'zod'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     // Vérifier les permissions pour poster sur cette édition
     const hasPermission = await hasEditionEditPermission(user.id, editionId)
@@ -79,19 +62,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return newPost
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la création du post:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'CreateEditionPost' }
+)

@@ -28,9 +28,6 @@
       "Bash(then echo \"✅ $file\")",
       "Bash(else echo \"❌ $file\")",
       "Bash(fi)",
-      "Bash(for file in server/api/conventions/**/**/*.ts)",
-      "Bash(for file in server/api/conventions/*.ts)",
-      "Bash(for file in server/api/auth/*.ts)",
       "Bash(do echo \"=== $file ===\")",
       "Bash(wc:*)",
       "Bash(for file in server/api/admin/**/*.ts)",
@@ -44,11 +41,25 @@
       "Bash(/dev/null -exec sh -c \"grep -q wrapApiHandler \"\"$1\"\" || echo \"\"$1\"\"\" _ {})",
       "Bash(then echo \"$file\" fi done)",
       "Bash(for file in server/api/notifications/stats.get.ts server/api/notifications/mark-all-read.patch.ts server/api/notifications/[id]/unread.patch.ts server/api/notifications/[id]/delete.delete.ts)",
-      "Bash(while IFS= read -r file)"
+      "Bash(while IFS= read -r file)",
+      "Bash(while read f)",
+      "Bash(find)",
+      "Bash(bash:*)",
+      "Bash(do original=\"$file%.bak\" mv \"$file\" \"$original\" done echo \"Fichiers restaurés depuis les backups\")",
+      "Bash(node /tmp/migrate-endpoints.mjs:*)",
+      "Bash(node /tmp/generate-report.mjs:*)",
+      "Bash(node /tmp/fix-broken-files.mjs:*)",
+      "SlashCommand(/lint-fix)",
+      "SlashCommand(/run-tests)",
+      "SlashCommand(/commit-push)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner"
+  ]
 }

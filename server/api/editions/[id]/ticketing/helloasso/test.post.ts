@@ -12,33 +12,33 @@ const bodySchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-  requireAuth(event)
+    requireAuth(event)
 
-  const body = bodySchema.parse(await readBody(event))
+    const body = bodySchema.parse(await readBody(event))
 
-  try {
-    const result = await testHelloAssoConnection(
-      {
-        clientId: body.clientId,
-        clientSecret: body.clientSecret,
-      },
-      {
-        organizationSlug: body.organizationSlug,
-        formType: body.formType,
-        formSlug: body.formSlug,
+    try {
+      const result = await testHelloAssoConnection(
+        {
+          clientId: body.clientId,
+          clientSecret: body.clientSecret,
+        },
+        {
+          organizationSlug: body.organizationSlug,
+          formType: body.formType,
+          formSlug: body.formSlug,
+        }
+      )
+
+      return {
+        ...result,
+        message: 'Connexion réussie',
       }
-    )
+    } catch (error: unknown) {
+      console.error('HelloAsso test error:', error)
 
-    return {
-      ...result,
-      message: 'Connexion réussie',
+      // L'utilitaire gère déjà les erreurs, on les relance simplement
+      throw error
     }
-  } catch (error: unknown) {
-    console.error('HelloAsso test error:', error)
-
-    // L'utilitaire gère déjà les erreurs, on les relance simplement
-    throw error
-  }
   },
   { operationName: 'POST ticketing helloasso test' }
 )

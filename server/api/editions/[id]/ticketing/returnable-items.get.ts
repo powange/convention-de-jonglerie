@@ -4,35 +4,35 @@ import { prisma } from '@@/server/utils/prisma'
 
 export default wrapApiHandler(
   async (event) => {
-  const user = requireAuth(event)
+    const user = requireAuth(event)
 
-  const editionId = validateEditionId(event)
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
 
-  try {
-    const returnableItems = await prisma.ticketingReturnableItem.findMany({
-      where: { editionId },
-      orderBy: { name: 'asc' },
-    })
+    try {
+      const returnableItems = await prisma.ticketingReturnableItem.findMany({
+        where: { editionId },
+        orderBy: { name: 'asc' },
+      })
 
-    return {
-      success: true,
-      returnableItems,
+      return {
+        success: true,
+        returnableItems,
+      }
+    } catch (error: unknown) {
+      console.error('Failed to fetch returnable items:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Erreur lors de la récupération des articles à restituer',
+      })
     }
-  } catch (error: unknown) {
-    console.error('Failed to fetch returnable items:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des articles à restituer',
-    })
-  }
   },
   { operationName: 'GET ticketing returnable-items' }
 )

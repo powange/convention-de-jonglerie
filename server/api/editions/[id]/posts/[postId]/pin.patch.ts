@@ -1,37 +1,31 @@
+import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getEditionWithPermissions,
   canEditEdition,
 } from '@@/server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const postId = validateResourceId(event, 'postId', 'post')
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-  const postId = parseInt(getRouterParam(event, 'postId')!)
+    // Lire le body pour savoir si on épingle ou désépingle
+    const body = await readBody(event)
+    const { pinned } = body
 
-  if (isNaN(editionId) || isNaN(postId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID invalide',
-    })
-  }
+    if (typeof pinned !== 'boolean') {
+      throw createError({
+        statusCode: 400,
+        message: 'Le champ "pinned" est requis et doit être un booléen',
+      })
+    }
 
-  // Lire le body pour savoir si on épingle ou désépingle
-  const body = await readBody(event)
-  const { pinned } = body
-
-  if (typeof pinned !== 'boolean') {
-    throw createError({
-      statusCode: 400,
-      message: 'Le champ "pinned" est requis et doit être un booléen',
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe et que l'utilisateur a les droits d'édition
     const edition = await getEditionWithPermissions(editionId, {
       userId: user.id,
@@ -73,20 +67,10 @@ export default defineEventHandler(async (event) => {
       data: { pinned },
     })
 
-    return {
-      success: true,
-      message: pinned ? 'Publication épinglée avec succès' : 'Publication désépinglée avec succès',
-      post: updatedPost,
-    }
-  } catch (error: unknown) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    console.error("Erreur lors de la modification de l'épinglage:", error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+    return createSuccessResponse(
+      { post: updatedPost },
+      pinned ? 'Publication épinglée avec succès' : 'Publication désépinglée avec succès'
+    )
+  },
+  { operationName: 'PinEditionPost' }
+)

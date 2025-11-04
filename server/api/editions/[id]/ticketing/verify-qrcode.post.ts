@@ -13,42 +13,42 @@ const bodySchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-  requireAuth(event)
+    requireAuth(event)
 
-  const body = bodySchema.parse(await readBody(event))
+    const body = bodySchema.parse(await readBody(event))
 
-  try {
-    const result = await findTicketByQRCode(
-      {
-        clientId: body.clientId,
-        clientSecret: body.clientSecret,
-      },
-      {
-        organizationSlug: body.organizationSlug,
-        formType: body.formType,
-        formSlug: body.formSlug,
-      },
-      body.qrCode
-    )
+    try {
+      const result = await findTicketByQRCode(
+        {
+          clientId: body.clientId,
+          clientSecret: body.clientSecret,
+        },
+        {
+          organizationSlug: body.organizationSlug,
+          formType: body.formType,
+          formSlug: body.formSlug,
+        },
+        body.qrCode
+      )
 
-    if (result.found) {
-      return {
-        success: true,
-        found: true,
-        ticket: result.ticket,
-        message: `Billet trouvé pour ${result.ticket?.user.firstName} ${result.ticket?.user.lastName}`,
+      if (result.found) {
+        return {
+          success: true,
+          found: true,
+          ticket: result.ticket,
+          message: `Billet trouvé pour ${result.ticket?.user.firstName} ${result.ticket?.user.lastName}`,
+        }
+      } else {
+        return {
+          success: true,
+          found: false,
+          message: 'Aucun billet trouvé avec ce QR code',
+        }
       }
-    } else {
-      return {
-        success: true,
-        found: false,
-        message: 'Aucun billet trouvé avec ce QR code',
-      }
+    } catch (error: unknown) {
+      console.error('HelloAsso verify QR code error:', error)
+      throw error
     }
-  } catch (error: unknown) {
-    console.error('HelloAsso verify QR code error:', error)
-    throw error
-  }
   },
   { operationName: 'POST ticketing verify-qrcode' }
 )

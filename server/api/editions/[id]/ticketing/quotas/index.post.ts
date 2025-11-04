@@ -11,46 +11,46 @@ const createQuotaSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-  const user = requireAuth(event)
+    const user = requireAuth(event)
 
-  const editionId = validateEditionId(event)
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour modifier ces données',
-    })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour modifier ces données',
+      })
 
-  const body = await readBody(event)
-  const validation = createQuotaSchema.safeParse(body)
+    const body = await readBody(event)
+    const validation = createQuotaSchema.safeParse(body)
 
-  if (!validation.success) {
-    throw createError({
-      statusCode: 400,
-      message: validation.error.errors[0].message,
-    })
-  }
+    if (!validation.success) {
+      throw createError({
+        statusCode: 400,
+        message: validation.error.errors[0].message,
+      })
+    }
 
-  try {
-    const quota = await prisma.ticketingQuota.create({
-      data: {
-        editionId,
-        title: validation.data.title,
-        description: validation.data.description || null,
-        quantity: validation.data.quantity,
-      },
-    })
+    try {
+      const quota = await prisma.ticketingQuota.create({
+        data: {
+          editionId,
+          title: validation.data.title,
+          description: validation.data.description || null,
+          quantity: validation.data.quantity,
+        },
+      })
 
-    return quota
-  } catch (error: unknown) {
-    console.error('Failed to create quota:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la création du quota',
-    })
-  }
+      return quota
+    } catch (error: unknown) {
+      console.error('Failed to create quota:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Erreur lors de la création du quota',
+      })
+    }
   },
   { operationName: 'POST ticketing quotas index' }
 )

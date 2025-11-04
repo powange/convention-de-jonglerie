@@ -4,8 +4,9 @@ import { prisma } from '@@/server/utils/prisma'
 
 // import type { Edition } from '~/types';
 
-export default wrapApiHandler(async (event) => {
-  const query = getQuery(event)
+export default wrapApiHandler(
+  async (event) => {
+    const query = getQuery(event)
     const {
       name,
       startDate,
@@ -333,14 +334,16 @@ export default wrapApiHandler(async (event) => {
     // dans cette requête (contrairement à l'API individuelle)
     const transformedEditions = editions
 
-  // Retourner les résultats avec les métadonnées de pagination
-  return {
-    data: transformedEditions,
-    pagination: {
-      total: totalCount,
-      page: pageNumber,
-      limit: limitNumber,
-      totalPages: Math.ceil(totalCount / limitNumber),
-    },
-  }
-}, { operationName: 'GetEditions' })
+    // Retourner les résultats avec les métadonnées de pagination
+    return {
+      data: transformedEditions,
+      pagination: {
+        total: totalCount,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(totalCount / limitNumber),
+      },
+    }
+  },
+  { operationName: 'GetEditions' }
+)

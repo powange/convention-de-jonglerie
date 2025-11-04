@@ -4,32 +4,32 @@ import { prisma } from '@@/server/utils/prisma'
 
 export default wrapApiHandler(
   async (event) => {
-  const user = requireAuth(event)
+    const user = requireAuth(event)
 
-  const editionId = validateEditionId(event)
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
 
-  try {
-    const quotas = await prisma.ticketingQuota.findMany({
-      where: { editionId },
-      orderBy: { position: 'asc' },
-    })
+    try {
+      const quotas = await prisma.ticketingQuota.findMany({
+        where: { editionId },
+        orderBy: { position: 'asc' },
+      })
 
-    return quotas
-  } catch (error: unknown) {
-    console.error('Failed to fetch quotas:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des quotas',
-    })
-  }
+      return quotas
+    } catch (error: unknown) {
+      console.error('Failed to fetch quotas:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Erreur lors de la récupération des quotas',
+      })
+    }
   },
   { operationName: 'GET ticketing quotas index' }
 )

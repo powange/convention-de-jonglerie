@@ -1,20 +1,17 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { canCreateWorkshop } from '@@/server/utils/permissions/workshop-permissions'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = await requireUserSession(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = await requireUserSession(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
+    const hasPermission = await canCreateWorkshop(user.user.id, editionId)
 
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  const hasPermission = await canCreateWorkshop(user.user.id, editionId)
-
-  return {
-    canCreate: hasPermission,
-  }
-})
+    return {
+      canCreate: hasPermission,
+    }
+  },
+  { operationName: 'CheckCanCreateWorkshop' }
+)

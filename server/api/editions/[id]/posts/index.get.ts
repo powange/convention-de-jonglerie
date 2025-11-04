@@ -1,30 +1,19 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const editionId = parseInt(getRouterParam(event, 'id')!)
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = validateEditionId(event)
 
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     // Récupérer les posts avec leurs commentaires et auteurs
     const posts = await prisma.editionPost.findMany({
@@ -81,15 +70,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return transformedPosts
-  } catch (error: unknown) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la récupération des posts:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetEditionPosts' }
+)

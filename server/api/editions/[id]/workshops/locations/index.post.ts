@@ -1,5 +1,9 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 
@@ -9,22 +13,13 @@ const locationSchema = z.object({
   name: z.string().min(1).max(100),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       include: {
         convention: {
           include: {
@@ -37,14 +32,8 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     // Vérifier les permissions (organisateur uniquement)
     const hasPermission = canEditEdition(edition, user)
@@ -57,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
     // Valider les données
     const body = await readBody(event)
-    const validatedData = locationSchema.parse(body)
+    const validatedData = validateAndSanitize(locationSchema, body)
 
     // Créer le lieu
     const location = await prisma.workshopLocation.create({
@@ -68,23 +57,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return location
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la création du lieu:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'CreateWorkshopLocation' }
+)

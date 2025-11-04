@@ -11,63 +11,63 @@ const updateQuotaSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-  const user = requireAuth(event)
+    const user = requireAuth(event)
 
-  const editionId = validateEditionId(event)
-  const quotaId = validateResourceId(event, 'quotaId', 'quota')
+    const editionId = validateEditionId(event)
+    const quotaId = validateResourceId(event, 'quotaId', 'quota')
 
-// Vérifier les permissions
-const allowed = await canAccessEditionData(editionId, user.id, event)
-if (!allowed)
-  throw createError({
-    statusCode: 403,
-    message: 'Droits insuffisants pour modifier ces données',
-  })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour modifier ces données',
+      })
 
-// Vérifier que le quota existe et appartient à cette édition
-const existingQuota = await prisma.ticketingQuota.findUnique({
-  where: { id: quotaId },
-})
+    // Vérifier que le quota existe et appartient à cette édition
+    const existingQuota = await prisma.ticketingQuota.findUnique({
+      where: { id: quotaId },
+    })
 
-if (!existingQuota) {
-  throw createError({ statusCode: 404, message: 'Quota introuvable' })
-}
+    if (!existingQuota) {
+      throw createError({ statusCode: 404, message: 'Quota introuvable' })
+    }
 
-if (existingQuota.editionId !== editionId) {
-  throw createError({
-    statusCode: 403,
-    message: "Ce quota n'appartient pas à cette édition",
-  })
-}
+    if (existingQuota.editionId !== editionId) {
+      throw createError({
+        statusCode: 403,
+        message: "Ce quota n'appartient pas à cette édition",
+      })
+    }
 
-const body = await readBody(event)
-const validation = updateQuotaSchema.safeParse(body)
+    const body = await readBody(event)
+    const validation = updateQuotaSchema.safeParse(body)
 
-if (!validation.success) {
-  throw createError({
-    statusCode: 400,
-    message: validation.error.errors[0].message,
-  })
-}
+    if (!validation.success) {
+      throw createError({
+        statusCode: 400,
+        message: validation.error.errors[0].message,
+      })
+    }
 
-try {
-  const quota = await prisma.ticketingQuota.update({
-    where: { id: quotaId },
-    data: {
-      title: validation.data.title,
-      description: validation.data.description || null,
-      quantity: validation.data.quantity,
-    },
-  })
+    try {
+      const quota = await prisma.ticketingQuota.update({
+        where: { id: quotaId },
+        data: {
+          title: validation.data.title,
+          description: validation.data.description || null,
+          quantity: validation.data.quantity,
+        },
+      })
 
-  return quota
-} catch (error: unknown) {
-  console.error('Failed to update quota:', error)
-  throw createError({
-    statusCode: 500,
-    message: 'Erreur lors de la modification du quota',
-  })
-}
+      return quota
+    } catch (error: unknown) {
+      console.error('Failed to update quota:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Erreur lors de la modification du quota',
+      })
+    }
   },
-  { operationName: 'PUT ticketing quotas resource'  }
+  { operationName: 'PUT ticketing quotas resource' }
 )

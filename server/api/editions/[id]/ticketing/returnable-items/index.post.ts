@@ -9,37 +9,37 @@ const createItemSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-  const user = requireAuth(event)
+    const user = requireAuth(event)
 
-  const editionId = validateEditionId(event)
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour modifier ces données',
-    })
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour modifier ces données',
+      })
 
-  const body = await readBody(event)
-  const validation = createItemSchema.safeParse(body)
+    const body = await readBody(event)
+    const validation = createItemSchema.safeParse(body)
 
-  if (!validation.success) {
-    throw createError({
-      statusCode: 400,
-      message: validation.error.errors[0].message,
-    })
-  }
+    if (!validation.success) {
+      throw createError({
+        statusCode: 400,
+        message: validation.error.errors[0].message,
+      })
+    }
 
-  try {
-    return await createReturnableItem(editionId, validation.data)
-  } catch (error: unknown) {
-    console.error('Failed to create returnable item:', error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la création de l'item à restituer",
-    })
-  }
+    try {
+      return await createReturnableItem(editionId, validation.data)
+    } catch (error: unknown) {
+      console.error('Failed to create returnable item:', error)
+      throw createError({
+        statusCode: 500,
+        message: "Erreur lors de la création de l'item à restituer",
+      })
+    }
   },
   { operationName: 'POST ticketing returnable-items index' }
 )

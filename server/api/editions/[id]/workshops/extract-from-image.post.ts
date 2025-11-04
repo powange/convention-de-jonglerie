@@ -1,25 +1,19 @@
 import { createAIProvider, type ExtractedWorkshop } from '@@/server/utils/ai-providers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       select: {
         id: true,
         name: true,
@@ -37,14 +31,8 @@ export default defineEventHandler(async (event) => {
         },
         creatorId: true,
       },
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     if (!edition.workshopsEnabled) {
       throw createError({
@@ -192,15 +180,6 @@ Exemple de réponse attendue :
     return {
       workshops: validatedWorkshops,
     }
-  } catch (error: unknown) {
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error("Erreur lors de l'extraction des workshops:", error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'extraction des workshops depuis l'image",
-    })
-  }
-})
+  },
+  { operationName: 'ExtractWorkshopsFromImage' }
+)

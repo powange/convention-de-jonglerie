@@ -501,9 +501,7 @@ describe('/api/editions POST - Tests complets', () => {
       const mockEvent = { context: { user: mockUser } }
 
       // L'API gère l'erreur de géocodage et retourne null pour les coordonnées
-      await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur serveur interne"
-      )
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
 
     it("devrait gérer les erreurs d'upload d'image", async () => {
@@ -527,9 +525,7 @@ describe('/api/editions POST - Tests complets', () => {
       const mockEvent = { context: { user: mockUser } }
 
       // L'upload d'image échoue et l'API lance une erreur globale
-      await expect(handler(mockEvent as any)).rejects.toThrow(
-        "Erreur serveur interne"
-      )
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
   })
 

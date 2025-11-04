@@ -1,30 +1,16 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { assertResourceExists } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const editionId = parseInt(getRouterParam(event, 'id')!)
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = validateEditionId(event)
 
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
-
-  try {
     // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { id: true },
-    })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
+    await assertResourceExists(prisma.edition, editionId, 'Édition non trouvée')
 
     // Récupérer les lieux
     const locations = await prisma.workshopLocation.findMany({
@@ -33,15 +19,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return locations
-  } catch (error: unknown) {
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la récupération des lieux:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetWorkshopLocations' }
+)

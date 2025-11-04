@@ -14,37 +14,37 @@ const bodySchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-  requireAuth(event)
+    requireAuth(event)
 
-  const body = bodySchema.parse(await readBody(event))
+    const body = bodySchema.parse(await readBody(event))
 
-  try {
-    const result = await fetchOrdersFromHelloAsso(
-      {
-        clientId: body.clientId,
-        clientSecret: body.clientSecret,
-      },
-      {
-        organizationSlug: body.organizationSlug,
-        formType: body.formType,
-        formSlug: body.formSlug,
-      },
-      {
-        withDetails: true,
-        pageIndex: body.pageIndex,
-        pageSize: body.pageSize,
+    try {
+      const result = await fetchOrdersFromHelloAsso(
+        {
+          clientId: body.clientId,
+          clientSecret: body.clientSecret,
+        },
+        {
+          organizationSlug: body.organizationSlug,
+          formType: body.formType,
+          formSlug: body.formSlug,
+        },
+        {
+          withDetails: true,
+          pageIndex: body.pageIndex,
+          pageSize: body.pageSize,
+        }
+      )
+
+      return {
+        success: true,
+        orders: result.data,
+        pagination: result.pagination,
       }
-    )
-
-    return {
-      success: true,
-      orders: result.data,
-      pagination: result.pagination,
+    } catch (error: unknown) {
+      console.error('HelloAsso orders error:', error)
+      throw error
     }
-  } catch (error: unknown) {
-    console.error('HelloAsso orders error:', error)
-    throw error
-  }
   },
   { operationName: 'POST ticketing helloasso orders' }
 )

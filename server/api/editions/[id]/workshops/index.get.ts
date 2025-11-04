@@ -1,35 +1,24 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const editionId = parseInt(getRouterParam(event, 'id')!)
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = validateEditionId(event)
 
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Récupérer l'utilisateur connecté (optionnel)
+    const session = await getUserSession(event)
+    const userId = session?.user?.id
 
-  // Récupérer l'utilisateur connecté (optionnel)
-  const session = await getUserSession(event)
-  const userId = session?.user?.id
-
-  try {
     // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       select: { workshopsEnabled: true },
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     if (!edition.workshopsEnabled) {
       throw createError({
@@ -81,15 +70,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return transformedWorkshops
-  } catch (error: unknown) {
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la récupération des workshops:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetEditionWorkshops' }
+)

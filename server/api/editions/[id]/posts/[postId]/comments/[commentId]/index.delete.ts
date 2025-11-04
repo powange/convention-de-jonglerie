@@ -1,23 +1,17 @@
+import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const postId = validateResourceId(event, 'postId', 'post')
+    const commentId = validateResourceId(event, 'commentId', 'commentaire')
 
-  const editionId = parseInt(getRouterParam(event, 'id')!)
-  const postId = parseInt(getRouterParam(event, 'postId')!)
-  const commentId = parseInt(getRouterParam(event, 'commentId')!)
-
-  if (isNaN(editionId) || isNaN(postId) || isNaN(commentId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID invalide',
-    })
-  }
-
-  try {
     // Vérifier que le commentaire existe et appartient à l'utilisateur
     const comment = await prisma.editionPostComment.findFirst({
       where: {
@@ -44,16 +38,7 @@ export default defineEventHandler(async (event) => {
       where: { id: commentId },
     })
 
-    return { success: true, message: 'Commentaire supprimé avec succès' }
-  } catch (error: unknown) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la suppression du commentaire:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+    return createSuccessResponse(null, 'Commentaire supprimé avec succès')
+  },
+  { operationName: 'DeletePostComment' }
+)
