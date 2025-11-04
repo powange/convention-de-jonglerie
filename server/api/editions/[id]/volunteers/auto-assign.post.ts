@@ -73,130 +73,130 @@ export default wrapApiHandler(async (event) => {
   }
 
   // Lecture et validation du body
-    const body = await readBody(event)
-    const constraints = constraintsSchema.parse(body.constraints || {})
+  const body = await readBody(event)
+  const constraints = constraintsSchema.parse(body.constraints || {})
 
-    // Récupération des données nécessaires
-    const [volunteers, timeSlots, teams] = await Promise.all([
-      // Bénévoles acceptés
-      prisma.editionVolunteerApplication.findMany({
-        where: {
-          editionId,
-          status: 'ACCEPTED',
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              pseudo: true,
-              nom: true,
-              prenom: true,
-            },
-          },
-          teamAssignments: {
-            include: {
-              team: true,
-            },
-          },
-        },
-      }),
-
-      // Créneaux horaires
-      prisma.volunteerTimeSlot.findMany({
-        where: { editionId },
-        include: {
-          assignments: {
-            include: {
-              user: true,
-            },
-          },
-        },
-      }),
-
-      // Équipes
-      prisma.volunteerTeam.findMany({
-        where: { editionId },
-      }),
-    ])
-
-    // Si on garde les assignations existantes, filtrer les bénévoles déjà assignés
-    let availableVolunteers = volunteers
-    if (constraints.keepExistingAssignments) {
-      // Récupérer les IDs des bénévoles déjà assignés
-      const assignedVolunteerIds = new Set(
-        timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
-          slot.assignments.map((assignment) => assignment.user.id)
-        )
-      )
-      // Filtrer uniquement les bénévoles non assignés
-      availableVolunteers = volunteers.filter(
-        (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
-      )
-    }
-
-    // Conversion des données pour l'algorithme
-    const schedulerVolunteers = availableVolunteers.map(
-      (volunteer: VolunteerWithTeamAssignments) => ({
-        id: volunteer.id,
-        user: volunteer.user,
-        availability: JSON.stringify({
-          setup: volunteer.setupAvailability || false,
-          teardown: volunteer.teardownAvailability || false,
-          event: volunteer.eventAvailability || false,
-          timePreferences: volunteer.timePreferences || null,
-        }),
-        experience: volunteer.hasExperience
-          ? volunteer.experienceDetails || 'Expérience confirmée'
-          : '',
-        motivation: volunteer.motivation || '',
-        phone: volunteer.userSnapshotPhone,
-        teamPreferences: volunteer.teamPreferences
-          ? Array.isArray(volunteer.teamPreferences)
-            ? volunteer.teamPreferences
-            : []
-          : [],
-      })
-    )
-
-    const schedulerTimeSlots = timeSlots.map((slot: TimeSlotWithAssignments) => ({
-      id: slot.id.toString(),
-      title: slot.title || 'Créneau sans titre',
-      start: slot.startDateTime.toISOString(),
-      end: slot.endDateTime.toISOString(),
-      teamId: slot.teamId?.toString() || undefined,
-      maxVolunteers: slot.maxVolunteers,
-      // Si on garde les existantes, les comptabiliser dans les places déjà prises
-      assignedVolunteers: constraints.keepExistingAssignments ? slot.assignments.length : 0,
-      description: slot.description || undefined,
-      requiredSkills: [], // TODO: Ajouter si nécessaire
-      priority: 3, // TODO: Calculer selon critères
-    }))
-
-    const schedulerTeams = teams.map((team: Team) => ({
-      id: team.id,
-      name: team.name,
-      color: team.color,
-    }))
-
-    // Exécution de l'algorithme
-    const scheduler = new VolunteerScheduler(
-      schedulerVolunteers,
-      schedulerTimeSlots,
-      schedulerTeams,
-      constraints
-    )
-
-    const result = scheduler.assignVolunteers()
-
-    // Application des assignations en base de données si demandé
-    if (body.applyAssignments === true) {
-      await applyAssignments(
+  // Récupération des données nécessaires
+  const [volunteers, timeSlots, teams] = await Promise.all([
+    // Bénévoles acceptés
+    prisma.editionVolunteerApplication.findMany({
+      where: {
         editionId,
-        result.assignments,
-        user.id,
-        constraints.keepExistingAssignments
+        status: 'ACCEPTED',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            nom: true,
+            prenom: true,
+          },
+        },
+        teamAssignments: {
+          include: {
+            team: true,
+          },
+        },
+      },
+    }),
+
+    // Créneaux horaires
+    prisma.volunteerTimeSlot.findMany({
+      where: { editionId },
+      include: {
+        assignments: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    }),
+
+    // Équipes
+    prisma.volunteerTeam.findMany({
+      where: { editionId },
+    }),
+  ])
+
+  // Si on garde les assignations existantes, filtrer les bénévoles déjà assignés
+  let availableVolunteers = volunteers
+  if (constraints.keepExistingAssignments) {
+    // Récupérer les IDs des bénévoles déjà assignés
+    const assignedVolunteerIds = new Set(
+      timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
+        slot.assignments.map((assignment) => assignment.user.id)
       )
-    }
+    )
+    // Filtrer uniquement les bénévoles non assignés
+    availableVolunteers = volunteers.filter(
+      (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
+    )
+  }
+
+  // Conversion des données pour l'algorithme
+  const schedulerVolunteers = availableVolunteers.map(
+    (volunteer: VolunteerWithTeamAssignments) => ({
+      id: volunteer.id,
+      user: volunteer.user,
+      availability: JSON.stringify({
+        setup: volunteer.setupAvailability || false,
+        teardown: volunteer.teardownAvailability || false,
+        event: volunteer.eventAvailability || false,
+        timePreferences: volunteer.timePreferences || null,
+      }),
+      experience: volunteer.hasExperience
+        ? volunteer.experienceDetails || 'Expérience confirmée'
+        : '',
+      motivation: volunteer.motivation || '',
+      phone: volunteer.userSnapshotPhone,
+      teamPreferences: volunteer.teamPreferences
+        ? Array.isArray(volunteer.teamPreferences)
+          ? volunteer.teamPreferences
+          : []
+        : [],
+    })
+  )
+
+  const schedulerTimeSlots = timeSlots.map((slot: TimeSlotWithAssignments) => ({
+    id: slot.id.toString(),
+    title: slot.title || 'Créneau sans titre',
+    start: slot.startDateTime.toISOString(),
+    end: slot.endDateTime.toISOString(),
+    teamId: slot.teamId?.toString() || undefined,
+    maxVolunteers: slot.maxVolunteers,
+    // Si on garde les existantes, les comptabiliser dans les places déjà prises
+    assignedVolunteers: constraints.keepExistingAssignments ? slot.assignments.length : 0,
+    description: slot.description || undefined,
+    requiredSkills: [], // TODO: Ajouter si nécessaire
+    priority: 3, // TODO: Calculer selon critères
+  }))
+
+  const schedulerTeams = teams.map((team: Team) => ({
+    id: team.id,
+    name: team.name,
+    color: team.color,
+  }))
+
+  // Exécution de l'algorithme
+  const scheduler = new VolunteerScheduler(
+    schedulerVolunteers,
+    schedulerTimeSlots,
+    schedulerTeams,
+    constraints
+  )
+
+  const result = scheduler.assignVolunteers()
+
+  // Application des assignations en base de données si demandé
+  if (body.applyAssignments === true) {
+    await applyAssignments(
+      editionId,
+      result.assignments,
+      user.id,
+      constraints.keepExistingAssignments
+    )
+  }
 
   return {
     success: true,

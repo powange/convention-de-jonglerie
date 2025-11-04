@@ -1,14 +1,16 @@
-import { hasIssues, isHttpError, type UserWhereInput } from '@@/server/types/prisma-helpers'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
 
+import type { UserWhereInput } from '@@/server/types/prisma-helpers'
+
 // GET /api/users/search?q=term ou ?email=term
 // Auth requis. Retourne jusqu'à 10 utilisateurs (id, pseudo, profilePicture?, emailHash)
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     await requireUserSession(event)
     const query = getQuery(event)
     const schema = z.object({
@@ -53,12 +55,6 @@ export default defineEventHandler(async (event) => {
         emailHash: getEmailHash(u.email),
       })),
     }
-  } catch (error: unknown) {
-    if (hasIssues(error)) {
-      throw createError({ statusCode: 400, message: 'Requête invalide' })
-    }
-    if (isHttpError(error)) throw error
-    console.error('Erreur recherche utilisateurs:', error)
-    throw createError({ statusCode: 500, message: 'Erreur serveur' })
-  }
-})
+  },
+  { operationName: 'SearchUsers' }
+)

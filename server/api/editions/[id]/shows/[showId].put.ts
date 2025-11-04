@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const updateShowSchema = z.object({
@@ -13,48 +15,44 @@ const updateShowSchema = z.object({
   returnableItemIds: z.array(z.number().int().positive()).optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const showId = parseInt(getRouterParam(event, 'showId') || '0')
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const showId = validateResourceId(event, 'showId', 'spectacle')
 
-  if (!editionId || !showId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
-
-  // Vérifier les permissions
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    include: {
-      convention: {
-        include: {
-          collaborators: true,
+    // Vérifier les permissions
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      include: {
+        convention: {
+          include: {
+            collaborators: true,
+          },
+        },
+        collaboratorPermissions: {
+          include: {
+            collaborator: true,
+          },
         },
       },
-      collaboratorPermissions: {
-        include: {
-          collaborator: true,
-        },
-      },
-    },
-  })
-
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      message: 'Édition non trouvée',
     })
-  }
 
-  const hasPermission = canEditEdition(edition, user)
-  if (!hasPermission) {
-    throw createError({
-      statusCode: 403,
-      message: "Vous n'êtes pas autorisé à gérer les spectacles de cette édition",
-    })
-  }
+    if (!edition) {
+      throw createError({
+        statusCode: 404,
+        message: 'Édition non trouvée',
+      })
+    }
 
-  try {
+    const hasPermission = canEditEdition(edition, user)
+    if (!hasPermission) {
+      throw createError({
+        statusCode: 403,
+        message: "Vous n'êtes pas autorisé à gérer les spectacles de cette édition",
+      })
+    }
+
     // Vérifier que le spectacle existe et appartient à cette édition
     const existingShow = await prisma.show.findFirst({
       where: {
@@ -155,23 +153,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       show: updatedShow,
     }
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    if ((error as any).statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la modification du spectacle:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la modification du spectacle',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateShow' }
+)

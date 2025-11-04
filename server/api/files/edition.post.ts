@@ -1,10 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  try {
     const body = await readBody(event)
 
     // Validation basique
@@ -139,17 +140,6 @@ export default defineEventHandler(async (event) => {
         message: "Échec de l'upload de tous les fichiers",
       })
     }
-  } catch (error) {
-    console.error("Erreur dans l'upload d'édition:", error)
-
-    // Si c'est déjà une erreur HTTP, la relancer
-    if ((error as any)?.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur serveur lors de l'upload",
-    })
-  }
-})
+  },
+  { operationName: 'UploadEditionFile' }
+)

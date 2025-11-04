@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdmin } from '@@/server/utils/auth-utils'
 
 import type { ServerFile } from 'nuxt-file-storage'
@@ -10,11 +11,11 @@ interface RequestBody {
   }
 }
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et que l'utilisateur est admin global
-  requireGlobalAdmin(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et que l'utilisateur est admin global
+    requireGlobalAdmin(event)
 
-  try {
     const { files, metadata } = await readBody<RequestBody>(event)
 
     if (!files || files.length === 0) {
@@ -47,16 +48,6 @@ export default defineEventHandler(async (event) => {
       filename,
       temporary: !entityId,
     }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'upload générique:", error)
-
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'upload de l'image",
-    })
-  }
-})
+  },
+  { operationName: 'UploadGenericFile' }
+)

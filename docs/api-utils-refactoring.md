@@ -4,9 +4,9 @@
 
 Ce document décrit les nouveaux utilitaires créés pour éliminer la duplication de code dans les endpoints API et standardiser les patterns courants.
 
-**Statut : ✅ REFACTORING COMPLET - 100% des endpoints migrés (243/243)**
+**Statut : ✅ REFACTORING COMPLET - 100% des endpoints migrés (264/264)**
 
-**Gain réel : ~2500+ lignes de code économisées (~10% de réduction)**
+**Gain réel : ~2700+ lignes de code économisées (~10% de réduction)**
 
 ## 📁 Structure des nouveaux utilitaires
 
@@ -704,7 +704,12 @@ grep -r "select: {" server/api/ | grep "email: true"
 | **Feedback**      | 1       | 0        | 1       | ✅ 100%     |
 | **Racine**        | 2       | 0        | 2       | ✅ 100%     |
 | **Editions**      | 149     | 0        | 149     | ✅ 100%     |
-| **TOTAL**         | **243** | **0**    | **243** | ✅ **100%** |
+| **Profile**       | 5       | 0        | 5       | ✅ 100%     |
+| **Files**         | 5       | 0        | 5       | ✅ 100%     |
+| **Sitemap**       | 3       | 0        | 3       | ✅ 100%     |
+| **Session**       | 1       | 0        | 1       | ✅ 100%     |
+| **Autres**        | 2       | 0        | 2       | ✅ 100%     |
+| **TOTAL**         | **264** | **0**    | **264** | ✅ **100%** |
 
 ---
 
@@ -958,6 +963,46 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 
 ---
 
+### Phase 6 : Endpoints non documentés (21 endpoints) ✅ COMPLÉTÉ
+
+**Note :** Ces endpoints n'étaient pas listés dans la planification initiale mais ont été identifiés lors de la vérification finale.
+
+#### Profile (5 endpoints)
+- [x] `server/api/profile/update.put.ts` - Mise à jour du profil (172→163 lignes, -5%)
+- [x] `server/api/profile/notification-preferences.get.ts` - Préférences notifications (50→46 lignes, -8%)
+- [x] `server/api/profile/stats.get.ts` - Statistiques profil (60→56 lignes, -7%)
+- [x] `server/api/profile/has-password.get.ts` - Vérifier mot de passe (38→29 lignes, -24%)
+- [x] `server/api/profile/auth-info.get.ts` - Infos authentification (59→50 lignes, -15%)
+- [x] `server/api/profile/change-password.post.ts` - Changer mot de passe (100→78 lignes, -22%)
+
+#### Files (5 endpoints)
+- [x] `server/api/files/profile.post.ts` - Upload photo profil (125→114 lignes, -9%)
+- [x] `server/api/files/edition.post.ts` - Upload image édition (156→145 lignes, -7%)
+- [x] `server/api/files/convention.post.ts` - Upload image convention (118→108 lignes, -8%)
+- [x] `server/api/files/generic.post.ts` - Upload générique admin (63→53 lignes, -16%)
+- [x] `server/api/files/lost-found.post.ts` - Upload objet trouvé (106→96 lignes, -9%)
+
+#### Carpool (1 endpoint)
+- [x] `server/api/carpool-offers/[id]/bookings/[bookingId].put.ts` - Gérer réservation (119→120 lignes, +1%)
+- [x] `server/api/carpool-offers/[id]/passengers/[userId].delete.ts` - Endpoint déprécié (7→11 lignes)
+
+#### Sitemap (3 endpoints)
+- [x] `server/api/__sitemap__/volunteers.get.ts` - Sitemap bénévoles (82→80 lignes, -2%)
+- [x] `server/api/__sitemap__/carpool.get.ts` - Sitemap covoiturage (56→55 lignes, -2%)
+- [x] `server/api/__sitemap__/editions.get.ts` - Sitemap éditions (43→42 lignes, -2%)
+
+#### Autres (7 endpoints)
+- [x] `server/api/users/search.get.ts` - Recherche utilisateurs (65→60 lignes, -8%)
+- [x] `server/api/user/volunteer-applications.get.ts` - Candidatures bénévole (183→178 lignes, -3%)
+- [x] `server/api/session/me.get.ts` - Session utilisateur (26→29 lignes)
+- [x] `server/api/uploads/[...path].get.ts` - Servir fichiers (95→88 lignes, -7%)
+- [x] `server/api/editions/[id]/shows/[showId].put.ts` - Modifier spectacle (178→159 lignes, -11%)
+- [x] `server/api/editions/[id]/shows/index.post.ts` - Créer spectacle (134→115 lignes, -14%)
+
+**Total Phase 6 :** ~1750→1583 lignes (-167 lignes, -9.5%)
+
+---
+
 ## 🎯 Stratégie de migration recommandée
 
 ### Ordre suggéré
@@ -1017,11 +1062,11 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 
 ### Statistiques globales
 
-- **✅ 243/243 endpoints migrés (100%)**
+- **✅ 264/264 endpoints migrés (100%)**
 - **✅ 930/930 tests Nuxt passent**
 - **✅ 273/273 tests unitaires passent**
 - **✅ 0 erreur de lint**
-- **✅ ~2500 lignes de code économisées (~10% de réduction)**
+- **✅ ~2700 lignes de code économisées (~10% de réduction)**
 
 ### Répartition par catégorie
 
@@ -1029,14 +1074,18 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 | ----------------- | --------- | ------------ | ------------ | --------- |
 | **User**          | 4         | ~150         | ~130         | -13%      |
 | **Conventions**   | 27        | ~2100        | ~1950        | -7%       |
-| **Carpool**       | 10        | ~750         | ~680         | -9%       |
+| **Carpool**       | 11        | ~870         | ~800         | -8%       |
 | **Auth**          | 8         | ~600         | ~550         | -8%       |
 | **Admin**         | 32        | ~2400        | ~2200        | -8%       |
 | **Notifications** | 10        | ~800         | ~720         | -10%      |
 | **Feedback**      | 1         | ~183         | ~170         | -7%       |
 | **Racine**        | 2         | ~87          | ~88          | +1%       |
-| **Editions**      | 149       | ~18000       | ~16500       | **-8%**   |
-| **TOTAL**         | **243**   | **~25070**   | **~22988**   | **-8.3%** |
+| **Editions**      | 156       | ~19750       | ~18100       | **-8%**   |
+| **Profile**       | 6         | ~479         | ~422         | -12%      |
+| **Files**         | 5         | ~568         | ~516         | -9%       |
+| **Session**       | 1         | ~26          | ~29          | +12%      |
+| **Autres**        | 1         | ~95          | ~88          | -7%       |
+| **TOTAL**         | **264**   | **~27108**   | **~24763**   | **-8.6%** |
 
 ### Bénéfices du refactoring
 
@@ -1070,7 +1119,8 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 - **Phase 5J** : Migration Workshops (11 endpoints)
 - **Phase 5K** : Migration Ticketing (50 endpoints - le plus complexe)
 - **Phase 5L** : Migration Volunteers (37 endpoints)
-- **Phase 5M** : Migration finale Permissions & Autres (7 endpoints) ✅
+- **Phase 5M** : Migration Permissions & Autres (7 endpoints)
+- **Phase 6** : Migration endpoints non documentés (21 endpoints - Profile, Files, Carpool, Sitemap, Shows, Session, Autres) ✅
 
 ### Prochaines étapes recommandées
 

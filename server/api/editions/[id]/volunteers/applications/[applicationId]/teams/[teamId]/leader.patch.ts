@@ -18,41 +18,41 @@ export default wrapApiHandler(
     const teamId = validateResourceId(event, 'teamId', 'équipe')
     const parsed = bodySchema.parse(await readBody(event))
 
-  // Vérifier les permissions
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour gérer les bénévoles',
-    })
+    // Vérifier les permissions
+    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
+      })
 
-  // Vérifier que l'application existe et appartient à cette édition
-  const application = await prisma.editionVolunteerApplication.findUnique({
-    where: { id: applicationId },
-    select: {
-      id: true,
-      editionId: true,
-      status: true,
-      user: {
-        select: { id: true, pseudo: true, prenom: true, nom: true },
+    // Vérifier que l'application existe et appartient à cette édition
+    const application = await prisma.editionVolunteerApplication.findUnique({
+      where: { id: applicationId },
+      select: {
+        id: true,
+        editionId: true,
+        status: true,
+        user: {
+          select: { id: true, pseudo: true, prenom: true, nom: true },
+        },
       },
-    },
-  })
-
-  if (!application || application.editionId !== editionId)
-    throw createError({ statusCode: 404, message: 'Candidature introuvable' })
-
-  if (application.status !== 'ACCEPTED')
-    throw createError({
-      statusCode: 400,
-      message: 'Seuls les bénévoles acceptés peuvent être responsables',
     })
 
-  // Vérifier que l'équipe existe et appartient à cette édition
-  const team = await getVolunteerTeamById(teamId)
+    if (!application || application.editionId !== editionId)
+      throw createError({ statusCode: 404, message: 'Candidature introuvable' })
 
-  if (!team || team.editionId !== editionId)
-    throw createError({ statusCode: 404, message: 'Équipe introuvable' })
+    if (application.status !== 'ACCEPTED')
+      throw createError({
+        statusCode: 400,
+        message: 'Seuls les bénévoles acceptés peuvent être responsables',
+      })
+
+    // Vérifier que l'équipe existe et appartient à cette édition
+    const team = await getVolunteerTeamById(teamId)
+
+    if (!team || team.editionId !== editionId)
+      throw createError({ statusCode: 404, message: 'Équipe introuvable' })
 
     try {
       // Mettre à jour le statut de leader

@@ -2,10 +2,12 @@ import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
 import { join } from 'path'
 
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { sendStream } from 'h3'
 
-export default defineEventHandler(async (event) => {
-  try {
+
+export default wrapApiHandler(
+  async (event) => {
     // Récupérer le chemin depuis l'URL
     const path = getRouterParam(event, 'path')
 
@@ -81,15 +83,6 @@ export default defineEventHandler(async (event) => {
     // Créer un stream et l'envoyer
     const stream = createReadStream(filePath)
     return sendStream(event, stream)
-  } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string }
-    if (httpError.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Internal server error',
-    })
-  }
-})
+  },
+  { operationName: 'ServeUploadedFile' }
+)

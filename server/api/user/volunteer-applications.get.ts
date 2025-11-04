@@ -1,10 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  try {
     const applications = await prisma.editionVolunteerApplication.findMany({
       where: {
         userId: user.id,
@@ -171,12 +172,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return applicationsWithTeamNames
-  } catch (error) {
-    console.error('Erreur lors de la récupération des candidatures:', error)
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur lors de la récupération des candidatures',
-    })
-  }
-})
+  },
+  { operationName: 'GetUserVolunteerApplications' }
+)

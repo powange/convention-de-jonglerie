@@ -1,7 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async () => {
-  try {
+export default wrapApiHandler(
+  async () => {
     // Récupérer toutes les éditions publiques avec candidatures bénévoles ouvertes
     const editions = await prisma.edition.findMany({
       where: {
@@ -74,8 +75,6 @@ export default defineEventHandler(async () => {
         priority,
       }
     })
-  } catch (error) {
-    console.error('Erreur lors de la génération du sitemap bénévolat:', error)
-    return []
-  }
-})
+  },
+  { operationName: 'GenerateVolunteersSitemap' }
+)

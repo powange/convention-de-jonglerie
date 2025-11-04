@@ -113,7 +113,7 @@ describe('/api/profile/has-password', () => {
     const dbError = new Error('Database connection error')
     prismaMock.user.findUnique.mockRejectedValue(dbError)
 
-    await expect(hasPasswordHandler(mockEvent)).rejects.toThrow('Erreur lors de la vérification')
+    await expect(hasPasswordHandler(mockEvent)).rejects.toThrow('Erreur serveur interne')
   })
 
   it('devrait retourner hasPassword: false pour un mot de passe vide (edge case)', async () => {

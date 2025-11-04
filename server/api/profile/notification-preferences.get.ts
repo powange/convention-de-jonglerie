@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -16,10 +17,10 @@ const defaultPreferences = {
   emailCarpoolUpdates: true,
 }
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  try {
     const userWithPrefs = await prisma.user.findUnique({
       where: { id: user.id },
       select: {
@@ -39,11 +40,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       preferences,
     }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des préférences de notifications:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des préférences',
-    })
-  }
-})
+  },
+  { operationName: 'GetNotificationPreferences' }
+)

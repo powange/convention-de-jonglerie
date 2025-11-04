@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -10,10 +11,10 @@ interface RequestBody {
   }
 }
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  try {
     const { files, metadata } = await readBody<RequestBody>(event)
 
     console.log('Received files:', files)
@@ -102,16 +103,6 @@ export default defineEventHandler(async (event) => {
         temporary: true,
       }
     }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'upload de convention:", error)
-
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'upload de l'image",
-    })
-  }
-})
+  },
+  { operationName: 'UploadConventionFile' }
+)

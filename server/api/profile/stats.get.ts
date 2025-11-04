@@ -1,11 +1,12 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification
+    const user = requireAuth(event)
 
-  try {
     // Récupérer toutes les statistiques en parallèle pour optimiser les performances
     const [conventionsCreated, editionsFavorited, favoritesReceived] = await Promise.all([
       // Nombre de conventions créées par l'utilisateur
@@ -49,11 +50,6 @@ export default defineEventHandler(async (event) => {
       editionsFavorited: editionsFavorited?._count.favoriteEditions || 0,
       favoritesReceived: totalFavoritesReceived,
     }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des statistiques du profil:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur serveur lors de la récupération des statistiques',
-    })
-  }
-})
+  },
+  { operationName: 'GetProfileStats' }
+)

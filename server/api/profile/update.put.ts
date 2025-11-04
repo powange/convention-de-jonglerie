@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import {
@@ -7,25 +8,26 @@ import {
 } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const body = await readBody(event)
+    const body = await readBody(event)
 
-  // Validation et sanitisation des données avec Zod
-  let validatedData
-  try {
-    validatedData = validateAndSanitize(updateProfileSchema, body)
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
+    // Validation et sanitisation des données avec Zod
+    let validatedData
+    try {
+      validatedData = validateAndSanitize(updateProfileSchema, body)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        handleValidationError(error)
+      }
+      throw error
     }
-    throw error
-  }
 
-  const { email, pseudo, nom, prenom, telephone, profilePicture, preferredLanguage } = validatedData
+    const { email, pseudo, nom, prenom, telephone, profilePicture, preferredLanguage } =
+      validatedData
 
-  try {
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
     if (email !== user.email) {
       const existingUser = await prisma.user.findUnique({
@@ -156,16 +158,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return updatedUser
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour du profil:', error)
-    const e: any = error
-    if (e?.statusCode) {
-      throw e
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour du profil',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateProfile' }
+)

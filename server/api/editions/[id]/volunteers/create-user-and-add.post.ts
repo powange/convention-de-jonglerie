@@ -183,139 +183,139 @@ export default wrapApiHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   // Sanitisation des données
-    const cleanEmail = body.email.toLowerCase().trim()
-    const cleanPrenom = body.prenom.trim()
-    const cleanNom = body.nom.trim()
+  const cleanEmail = body.email.toLowerCase().trim()
+  const cleanPrenom = body.prenom.trim()
+  const cleanNom = body.nom.trim()
 
-    // Vérifier que l'email n'existe pas déjà
-    const existingUser = await prisma.user.findUnique({
-      where: { email: cleanEmail },
+  // Vérifier que l'email n'existe pas déjà
+  const existingUser = await prisma.user.findUnique({
+    where: { email: cleanEmail },
+  })
+
+  if (existingUser) {
+    throw createError({
+      statusCode: 409,
+      message:
+        "Cet email est déjà utilisé. Veuillez rechercher l'utilisateur existant dans la liste.",
     })
+  }
 
-    if (existingUser) {
-      throw createError({
-        statusCode: 409,
-        message:
-          "Cet email est déjà utilisé. Veuillez rechercher l'utilisateur existant dans la liste.",
-      })
-    }
-
-    // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: {
-        id: true,
-        name: true,
-        conventionId: true,
-        convention: {
-          select: {
-            name: true,
-          },
+  // Vérifier que l'édition existe
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      id: true,
+      name: true,
+      conventionId: true,
+      convention: {
+        select: {
+          name: true,
         },
       },
+    },
+  })
+
+  if (!edition) {
+    throw createError({
+      statusCode: 404,
+      message: 'Edition introuvable',
+    })
+  }
+
+  // Générer un pseudo unique
+  const pseudo = await generateUniquePseudo(cleanEmail)
+
+  // Générer le code de vérification
+  const verificationCode = generateVerificationCode()
+  const verificationExpiry = createFutureDate(TOKEN_DURATIONS.EMAIL_VERIFICATION)
+
+  // Détecter la langue préférée de l'utilisateur depuis l'en-tête Accept-Language
+  const acceptLanguage = getHeader(event, 'accept-language') || 'fr'
+  const preferredLanguage = acceptLanguage.split(',')[0].split('-')[0].toLowerCase()
+  // Langues supportées
+  const { getSupportedLocalesCodes } = await import('~/utils/locales')
+  const userLanguage = getSupportedLocalesCodes().includes(preferredLanguage)
+    ? preferredLanguage
+    : 'fr'
+
+  // Créer l'utilisateur sans mot de passe
+  const newUser = await prisma.user.create({
+    data: {
+      email: cleanEmail,
+      password: null, // Sera défini lors de la vérification
+      pseudo,
+      nom: cleanNom,
+      prenom: cleanPrenom,
+      authProvider: 'MANUAL', // Utilisateur créé manuellement
+      isEmailVerified: false,
+      emailVerificationCode: verificationCode,
+      verificationCodeExpiry: verificationExpiry,
+      preferredLanguage: userLanguage,
+    },
+    select: {
+      id: true,
+      email: true,
+      pseudo: true,
+      prenom: true,
+      nom: true,
+    },
+  })
+
+  // Créer la candidature de bénévole avec le statut ACCEPTED
+  const application = await prisma.editionVolunteerApplication.create({
+    data: {
+      editionId,
+      userId: newUser.id,
+      status: 'ACCEPTED',
+      motivation: 'Ajouté manuellement par un organisateur',
+      userSnapshotPhone: null,
+      dietaryPreference: 'NONE',
+      setupAvailability: null,
+      teardownAvailability: null,
+      eventAvailability: null,
+      source: 'MANUAL',
+      addedById: user.id,
+      addedAt: new Date(),
+    },
+    select: {
+      id: true,
+      status: true,
+    },
+  })
+
+  // Créer automatiquement les sélections de repas
+  try {
+    await createVolunteerMealSelections(application.id, editionId)
+  } catch (mealError) {
+    console.error('Erreur lors de la création des repas du bénévole:', mealError)
+    // Ne pas faire échouer l'ajout si la création des repas échoue
+  }
+
+  // Envoyer l'email d'invitation personnalisé
+  try {
+    const emailHtml = await generateVolunteerInvitationEmailHtml(
+      verificationCode,
+      cleanPrenom,
+      cleanEmail,
+      edition.name || '',
+      edition.convention.name,
+      editionId
+    )
+
+    const siteUrl = getSiteUrl()
+    const emailSent = await sendEmail({
+      to: cleanEmail,
+      subject: `🤹 Invitation bénévole - ${edition.convention.name}`,
+      html: emailHtml,
+      text: `Bonjour ${cleanPrenom}, un organisateur de ${edition.convention.name}${edition.name ? ' - ' + edition.name : ''} vous a ajouté comme bénévole. Votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier votre email et créer votre mot de passe : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Edition introuvable',
-      })
+    if (!emailSent) {
+      console.warn(`Échec de l'envoi d'email d'invitation pour ${cleanEmail}`)
     }
-
-    // Générer un pseudo unique
-    const pseudo = await generateUniquePseudo(cleanEmail)
-
-    // Générer le code de vérification
-    const verificationCode = generateVerificationCode()
-    const verificationExpiry = createFutureDate(TOKEN_DURATIONS.EMAIL_VERIFICATION)
-
-    // Détecter la langue préférée de l'utilisateur depuis l'en-tête Accept-Language
-    const acceptLanguage = getHeader(event, 'accept-language') || 'fr'
-    const preferredLanguage = acceptLanguage.split(',')[0].split('-')[0].toLowerCase()
-    // Langues supportées
-    const { getSupportedLocalesCodes } = await import('~/utils/locales')
-    const userLanguage = getSupportedLocalesCodes().includes(preferredLanguage)
-      ? preferredLanguage
-      : 'fr'
-
-    // Créer l'utilisateur sans mot de passe
-    const newUser = await prisma.user.create({
-      data: {
-        email: cleanEmail,
-        password: null, // Sera défini lors de la vérification
-        pseudo,
-        nom: cleanNom,
-        prenom: cleanPrenom,
-        authProvider: 'MANUAL', // Utilisateur créé manuellement
-        isEmailVerified: false,
-        emailVerificationCode: verificationCode,
-        verificationCodeExpiry: verificationExpiry,
-        preferredLanguage: userLanguage,
-      },
-      select: {
-        id: true,
-        email: true,
-        pseudo: true,
-        prenom: true,
-        nom: true,
-      },
-    })
-
-    // Créer la candidature de bénévole avec le statut ACCEPTED
-    const application = await prisma.editionVolunteerApplication.create({
-      data: {
-        editionId,
-        userId: newUser.id,
-        status: 'ACCEPTED',
-        motivation: 'Ajouté manuellement par un organisateur',
-        userSnapshotPhone: null,
-        dietaryPreference: 'NONE',
-        setupAvailability: null,
-        teardownAvailability: null,
-        eventAvailability: null,
-        source: 'MANUAL',
-        addedById: user.id,
-        addedAt: new Date(),
-      },
-      select: {
-        id: true,
-        status: true,
-      },
-    })
-
-    // Créer automatiquement les sélections de repas
-    try {
-      await createVolunteerMealSelections(application.id, editionId)
-    } catch (mealError) {
-      console.error('Erreur lors de la création des repas du bénévole:', mealError)
-      // Ne pas faire échouer l'ajout si la création des repas échoue
-    }
-
-    // Envoyer l'email d'invitation personnalisé
-    try {
-      const emailHtml = await generateVolunteerInvitationEmailHtml(
-        verificationCode,
-        cleanPrenom,
-        cleanEmail,
-        edition.name || '',
-        edition.convention.name,
-        editionId
-      )
-
-      const siteUrl = getSiteUrl()
-      const emailSent = await sendEmail({
-        to: cleanEmail,
-        subject: `🤹 Invitation bénévole - ${edition.convention.name}`,
-        html: emailHtml,
-        text: `Bonjour ${cleanPrenom}, un organisateur de ${edition.convention.name}${edition.name ? ' - ' + edition.name : ''} vous a ajouté comme bénévole. Votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier votre email et créer votre mot de passe : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
-      })
-
-      if (!emailSent) {
-        console.warn(`Échec de l'envoi d'email d'invitation pour ${cleanEmail}`)
-      }
-    } catch (emailError) {
-      console.error("Erreur lors de l'envoi de l'email d'invitation:", emailError)
-    }
+  } catch (emailError) {
+    console.error("Erreur lors de l'envoi de l'email d'invitation:", emailError)
+  }
 
   return {
     success: true,

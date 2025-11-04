@@ -20,31 +20,31 @@ export default wrapApiHandler(
     const applicationId = validateResourceId(event, 'applicationId', 'candidature')
     const parsed = bodySchema.parse(await readBody(event))
 
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour gérer les bénévoles',
-    })
+    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
+      })
 
-  const application = await prisma.editionVolunteerApplication.findUnique({
-    where: { id: applicationId },
-    select: {
-      id: true,
-      editionId: true,
-      status: true,
-      userId: true,
-    },
-  })
-  if (!application || application.editionId !== editionId)
-    throw createError({ statusCode: 404, message: 'Candidature introuvable' })
-
-  // Vérifier que le bénévole est en attente ou accepté (pas rejeté)
-  if (application.status === 'REJECTED')
-    throw createError({
-      statusCode: 400,
-      message: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
+    const application = await prisma.editionVolunteerApplication.findUnique({
+      where: { id: applicationId },
+      select: {
+        id: true,
+        editionId: true,
+        status: true,
+        userId: true,
+      },
     })
+    if (!application || application.editionId !== editionId)
+      throw createError({ statusCode: 404, message: 'Candidature introuvable' })
+
+    // Vérifier que le bénévole est en attente ou accepté (pas rejeté)
+    if (application.status === 'REJECTED')
+      throw createError({
+        statusCode: 400,
+        message: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
+      })
 
     try {
       // Résoudre les identifiants (IDs ou noms) en IDs d'équipes

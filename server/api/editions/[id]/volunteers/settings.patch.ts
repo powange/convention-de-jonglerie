@@ -118,99 +118,99 @@ export default wrapApiHandler(
 
     const body = await readBody(event).catch(() => ({}))
 
-  // Validation avec gestion d'erreur appropriée
-  let parsed
-  try {
-    parsed = bodySchema.parse(body || {})
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
+    // Validation avec gestion d'erreur appropriée
+    let parsed
+    try {
+      parsed = bodySchema.parse(body || {})
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        handleValidationError(error)
+      }
+      throw error
     }
-    throw error
-  }
 
-  // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    select: { conventionId: true, volunteersMode: true },
-  })
-  if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour gérer les bénévoles',
+    // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      select: { conventionId: true, volunteersMode: true },
     })
-
-  const data: EditionUpdateInput = {}
-  if (parsed.open !== undefined) data.volunteersOpen = parsed.open
-  if (parsed.description !== undefined) data.volunteersDescription = parsed.description || null
-  if (parsed.mode !== undefined) data.volunteersMode = parsed.mode
-  if (parsed.externalUrl !== undefined) {
-    // Si mode externe requis mais pas d'URL -> erreur explicite
-    if (
-      (parsed.mode === 'EXTERNAL' || edition?.volunteersMode === 'EXTERNAL') &&
-      !parsed.externalUrl
-    ) {
+    if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
+    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    if (!allowed)
       throw createError({
-        statusCode: 400,
-        message: 'URL externe requise pour le mode EXTERNAL',
+        statusCode: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
       })
-    }
-    data.volunteersExternalUrl = parsed.externalUrl || null
-  }
-  if (parsed.askDiet !== undefined) data.volunteersAskDiet = parsed.askDiet
-  if (parsed.askAllergies !== undefined) data.volunteersAskAllergies = parsed.askAllergies
-  if (parsed.askTimePreferences !== undefined)
-    data.volunteersAskTimePreferences = parsed.askTimePreferences
-  if (parsed.askTeamPreferences !== undefined)
-    data.volunteersAskTeamPreferences = parsed.askTeamPreferences
-  if (parsed.askPets !== undefined) data.volunteersAskPets = parsed.askPets
-  if (parsed.askMinors !== undefined) data.volunteersAskMinors = parsed.askMinors
-  if (parsed.askVehicle !== undefined) data.volunteersAskVehicle = parsed.askVehicle
-  if (parsed.askCompanion !== undefined) data.volunteersAskCompanion = parsed.askCompanion
-  if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
-  if (parsed.askSkills !== undefined) data.volunteersAskSkills = parsed.askSkills
-  if (parsed.askExperience !== undefined) data.volunteersAskExperience = parsed.askExperience
-  if (parsed.askEmergencyContact !== undefined)
-    data.volunteersAskEmergencyContact = parsed.askEmergencyContact
-  if (parsed.setupStartDate !== undefined)
-    data.volunteersSetupStartDate = parsed.setupStartDate ? new Date(parsed.setupStartDate) : null
-  if (parsed.setupEndDate !== undefined)
-    data.volunteersTeardownEndDate = parsed.setupEndDate ? new Date(parsed.setupEndDate) : null
-  if (parsed.askSetup !== undefined) data.volunteersAskSetup = parsed.askSetup
-  if (parsed.askTeardown !== undefined) data.volunteersAskTeardown = parsed.askTeardown
-  if (Object.keys(data).length === 0) return { success: true, unchanged: true }
-  data.volunteersUpdatedAt = new Date()
 
-  const updated = await prisma.edition.update({
-    where: { id: editionId },
-    data,
-    select: {
-      volunteersOpen: true,
-      volunteersDescription: true,
-      volunteersMode: true,
-      volunteersExternalUrl: true,
-      volunteersAskDiet: true,
-      volunteersAskAllergies: true,
-      volunteersAskTimePreferences: true,
-      volunteersAskTeamPreferences: true,
-      volunteersAskPets: true,
-      volunteersAskMinors: true,
-      volunteersAskVehicle: true,
-      volunteersAskCompanion: true,
-      volunteersAskAvoidList: true,
-      volunteersAskSkills: true,
-      volunteersAskExperience: true,
-      volunteersAskEmergencyContact: true,
-      volunteersSetupStartDate: true,
-      volunteersTeardownEndDate: true,
-      volunteersAskSetup: true,
-      volunteersAskTeardown: true,
-      volunteersUpdatedAt: true,
-    },
-  })
-  return { success: true, settings: updated }
+    const data: EditionUpdateInput = {}
+    if (parsed.open !== undefined) data.volunteersOpen = parsed.open
+    if (parsed.description !== undefined) data.volunteersDescription = parsed.description || null
+    if (parsed.mode !== undefined) data.volunteersMode = parsed.mode
+    if (parsed.externalUrl !== undefined) {
+      // Si mode externe requis mais pas d'URL -> erreur explicite
+      if (
+        (parsed.mode === 'EXTERNAL' || edition?.volunteersMode === 'EXTERNAL') &&
+        !parsed.externalUrl
+      ) {
+        throw createError({
+          statusCode: 400,
+          message: 'URL externe requise pour le mode EXTERNAL',
+        })
+      }
+      data.volunteersExternalUrl = parsed.externalUrl || null
+    }
+    if (parsed.askDiet !== undefined) data.volunteersAskDiet = parsed.askDiet
+    if (parsed.askAllergies !== undefined) data.volunteersAskAllergies = parsed.askAllergies
+    if (parsed.askTimePreferences !== undefined)
+      data.volunteersAskTimePreferences = parsed.askTimePreferences
+    if (parsed.askTeamPreferences !== undefined)
+      data.volunteersAskTeamPreferences = parsed.askTeamPreferences
+    if (parsed.askPets !== undefined) data.volunteersAskPets = parsed.askPets
+    if (parsed.askMinors !== undefined) data.volunteersAskMinors = parsed.askMinors
+    if (parsed.askVehicle !== undefined) data.volunteersAskVehicle = parsed.askVehicle
+    if (parsed.askCompanion !== undefined) data.volunteersAskCompanion = parsed.askCompanion
+    if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
+    if (parsed.askSkills !== undefined) data.volunteersAskSkills = parsed.askSkills
+    if (parsed.askExperience !== undefined) data.volunteersAskExperience = parsed.askExperience
+    if (parsed.askEmergencyContact !== undefined)
+      data.volunteersAskEmergencyContact = parsed.askEmergencyContact
+    if (parsed.setupStartDate !== undefined)
+      data.volunteersSetupStartDate = parsed.setupStartDate ? new Date(parsed.setupStartDate) : null
+    if (parsed.setupEndDate !== undefined)
+      data.volunteersTeardownEndDate = parsed.setupEndDate ? new Date(parsed.setupEndDate) : null
+    if (parsed.askSetup !== undefined) data.volunteersAskSetup = parsed.askSetup
+    if (parsed.askTeardown !== undefined) data.volunteersAskTeardown = parsed.askTeardown
+    if (Object.keys(data).length === 0) return { success: true, unchanged: true }
+    data.volunteersUpdatedAt = new Date()
+
+    const updated = await prisma.edition.update({
+      where: { id: editionId },
+      data,
+      select: {
+        volunteersOpen: true,
+        volunteersDescription: true,
+        volunteersMode: true,
+        volunteersExternalUrl: true,
+        volunteersAskDiet: true,
+        volunteersAskAllergies: true,
+        volunteersAskTimePreferences: true,
+        volunteersAskTeamPreferences: true,
+        volunteersAskPets: true,
+        volunteersAskMinors: true,
+        volunteersAskVehicle: true,
+        volunteersAskCompanion: true,
+        volunteersAskAvoidList: true,
+        volunteersAskSkills: true,
+        volunteersAskExperience: true,
+        volunteersAskEmergencyContact: true,
+        volunteersSetupStartDate: true,
+        volunteersTeardownEndDate: true,
+        volunteersAskSetup: true,
+        volunteersAskTeardown: true,
+        volunteersUpdatedAt: true,
+      },
+    })
+    return { success: true, settings: updated }
   },
   { operationName: 'UpdateVolunteerSettings' }
 )

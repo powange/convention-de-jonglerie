@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -14,10 +15,10 @@ function getAuthProviderLabel(provider: string): string {
   }
 }
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  try {
     // Récupérer les informations de l'utilisateur
     const userInfo = await prisma.user.findUnique({
       where: { id: user.id },
@@ -43,16 +44,6 @@ export default defineEventHandler(async (event) => {
       hasPassword: userInfo.password !== null,
       isOAuth: userInfo.password === null,
     }
-  } catch (error: unknown) {
-    console.error("Erreur lors de la récupération des infos d'auth:", error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la récupération des informations d'authentification",
-    })
-  }
-})
+  },
+  { operationName: 'GetAuthInfo' }
+)

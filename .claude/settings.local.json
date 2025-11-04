@@ -58,15 +58,12 @@
       "Bash(then)",
       "Bash(echo:*)",
       "Bash(if grep -q \"wrapApiHandler\" \"$file\")",
-      "Bash(else)"
+      "Bash(else)",
+      "Bash(for:*)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": [
-    "nuxt",
-    "nuxt-ui",
-    "vitest-runner"
-  ]
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
 }
