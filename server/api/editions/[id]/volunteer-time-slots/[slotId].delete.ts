@@ -1,40 +1,26 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Authentification requise
-  await requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Authentification requise
+    await requireAuth(event)
 
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
-  const slotId = getRouterParam(event, 'slotId') as string
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
+    const slotId = validateResourceId(event, 'slotId', 'créneau')
 
-  console.log(
-    `[DELETE SLOT] Tentative de suppression - Edition ID: ${editionId}, Slot ID: ${slotId}`
-  )
+    console.log(
+      `[DELETE SLOT] Tentative de suppression - Edition ID: ${editionId}, Slot ID: ${slotId}`
+    )
 
-  if (!editionId || isNaN(editionId)) {
-    console.log(`[DELETE SLOT ERROR] ID d'édition invalide: ${editionId}`)
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier les permissions de gestion des bénévoles
+    console.log(`[DELETE SLOT] Vérification des permissions pour l'édition ${editionId}`)
+    await requireVolunteerManagementAccess(event, editionId)
 
-  if (!slotId) {
-    console.log(`[DELETE SLOT ERROR] ID de créneau invalide: ${slotId}`)
-    throw createError({
-      statusCode: 400,
-      message: 'ID de créneau invalide',
-    })
-  }
-
-  // Vérifier les permissions de gestion des bénévoles
-  console.log(`[DELETE SLOT] Vérification des permissions pour l'édition ${editionId}`)
-  await requireVolunteerManagementAccess(event, editionId)
-
-  try {
     console.log(`[DELETE SLOT] Recherche du créneau ${slotId} pour l'édition ${editionId}`)
 
     // Vérifier que le créneau existe et appartient à cette édition
@@ -85,22 +71,6 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 204)
     return null
-  } catch (error: unknown) {
-    console.error(`[DELETE SLOT ERROR] Erreur détaillée:`, {
-      message: error.message,
-      statusCode: error.statusCode,
-      stack: error.stack,
-      code: error.code,
-      meta: error.meta,
-    })
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: `Erreur lors de la suppression du créneau: ${error.message}`,
-    })
-  }
-})
+  },
+  { operationName: 'DeleteVolunteerTimeSlot' }
+)

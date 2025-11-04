@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import {
@@ -8,6 +9,7 @@ import {
 } from '@@/server/utils/editions/volunteers/applications'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import {
   compareApplicationChanges,
   hasApplicationDataChanges,
@@ -17,13 +19,12 @@ import {
   deleteVolunteerMealSelections,
 } from '@@/server/utils/volunteer-meals'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
-  if (!editionId || !applicationId)
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  const parsed = volunteerApplicationPatchSchema.parse(await readBody(event))
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const applicationId = validateResourceId(event, 'applicationId', 'candidature')
+    const parsed = volunteerApplicationPatchSchema.parse(await readBody(event))
 
   // Validation des allergies
   const allergiesErrors = validateAllergiesUpdate(parsed)
@@ -323,5 +324,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de l'envoi de la notification:", notificationError)
   }
 
-  return { success: true, application: updated }
-})
+    return { success: true, application: updated }
+  },
+  { operationName: 'UpdateVolunteerApplication' }
+)

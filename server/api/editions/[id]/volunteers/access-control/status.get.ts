@@ -1,39 +1,24 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getActiveAccessControlSlot,
   isActiveAccessControlVolunteer,
 } from '@@/server/utils/permissions/access-control-permissions'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   // Authentification requise
   const user = requireAuth(event)
+  const editionId = validateEditionId(event)
 
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
+  // Vérifier si l'utilisateur est actuellement en créneau de contrôle d'accès
+  const isActive = await isActiveAccessControlVolunteer(user.id, editionId)
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
+  // Récupérer les détails du créneau actif si applicable
+  const activeSlot = isActive ? await getActiveAccessControlSlot(user.id, editionId) : null
+
+  return {
+    isActive,
+    activeSlot,
   }
-
-  try {
-    // Vérifier si l'utilisateur est actuellement en créneau de contrôle d'accès
-    const isActive = await isActiveAccessControlVolunteer(user.id, editionId)
-
-    // Récupérer les détails du créneau actif si applicable
-    const activeSlot = isActive ? await getActiveAccessControlSlot(user.id, editionId) : null
-
-    return {
-      isActive,
-      activeSlot,
-    }
-  } catch (error) {
-    console.error("Erreur lors de la vérification du statut de contrôle d'accès:", error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la vérification du statut',
-    })
-  }
-})
+}, 'GetVolunteerAccessControlStatus')

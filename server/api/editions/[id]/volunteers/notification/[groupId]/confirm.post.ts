@@ -1,9 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  const editionId = validateEditionId(event)
   const groupId = getRouterParam(event, 'groupId')
 
   if (!groupId) {
@@ -96,4 +98,4 @@ export default defineEventHandler(async (event) => {
     alreadyConfirmed: false,
     confirmedAt: confirmation.confirmedAt,
   }
-})
+}, 'ConfirmVolunteerNotification')

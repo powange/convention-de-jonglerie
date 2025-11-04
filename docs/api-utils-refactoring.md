@@ -701,8 +701,8 @@ grep -r "select: {" server/api/ | grep "email: true"
 | **Notifications** | 10      | 0        | 10      | ✅ 100%     |
 | **Feedback**      | 1       | 0        | 1       | ✅ 100%     |
 | **Racine**        | 2       | 0        | 2       | ✅ 100%     |
-| **Editions**      | 96      | 53       | 149     | 🟢 **64%**  |
-| **TOTAL**         | **190** | **53**   | **243** | 🟢 **78%**  |
+| **Editions**      | 133     | 16       | 149     | 🟢 **89%**  |
+| **TOTAL**         | **227** | **16**   | **243** | 🟢 **93%**  |
 
 ---
 
@@ -875,9 +875,11 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 
 ---
 
-### Phase 5L : Editions - Volunteers (29 endpoints)
+### Phase 5L : Editions - Volunteers (37 endpoints) ✅ COMPLÉTÉ
 
-**Attention : Système complexe de gestion des bénévoles**
+**Note :** La structure réelle contient 37 fichiers (8 applications + 29 autres), différente de la planification initiale
+
+**Total Phase 5L :** ~3769 lignes migrées avec succès
 
 #### Applications (8 endpoints)
 

@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import {
@@ -7,28 +8,21 @@ import {
 } from '@@/server/utils/emailService'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  try {
-    // Vérifier l'authentification
-    const user = requireAuth(event)
+export default wrapApiHandler(async (event) => {
+  // Vérifier l'authentification
+  const user = requireAuth(event)
+  const editionId = validateEditionId(event)
 
-    const editionId = parseInt(getRouterParam(event, 'id') || '0')
-    if (!editionId || isNaN(editionId)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "ID d'édition invalide",
-      })
-    }
-
-    // Vérifier les permissions
-    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
-    if (!allowed) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Droits insuffisants pour gérer les bénévoles',
-      })
-    }
+  // Vérifier les permissions
+  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+  if (!allowed) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+    })
+  }
 
     // Récupérer l'édition avec les informations nécessaires
     const edition = await prisma.edition.findUnique({
@@ -196,24 +190,11 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    return {
-      success: true,
-      message: `Notifications envoyées à ${successCount} bénévole(s)`,
-      count: successCount,
-      errors: errorCount,
-      total: acceptedVolunteers.length,
-    }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'envoi des notifications:", error)
-
-    // Re-lancer les erreurs déjà formatées
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur serveur interne',
-    })
+  return {
+    success: true,
+    message: `Notifications envoyées à ${successCount} bénévole(s)`,
+    count: successCount,
+    errors: errorCount,
+    total: acceptedVolunteers.length,
   }
-})
+}, 'NotifyVolunteerSchedules')

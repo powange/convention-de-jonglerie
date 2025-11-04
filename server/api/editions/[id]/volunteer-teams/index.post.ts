@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const createTeamSchema = z.object({
@@ -16,27 +18,20 @@ const createTeamSchema = z.object({
   isVisibleToVolunteers: z.boolean().optional().default(true),
 })
 
-export default defineEventHandler(async (event) => {
-  // Authentification requise
-  await requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Authentification requise
+    await requireAuth(event)
 
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier les permissions de gestion des bénévoles
+    await requireVolunteerManagementAccess(event, editionId)
 
-  // Vérifier les permissions de gestion des bénévoles
-  await requireVolunteerManagementAccess(event, editionId)
+    // Validation du body
+    const body = await readValidatedBody(event, createTeamSchema.parse)
 
-  // Validation du body
-  const body = await readValidatedBody(event, createTeamSchema.parse)
-
-  try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -87,14 +82,6 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 201)
     return team
-  } catch (error) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la création de l'équipe",
-    })
-  }
-})
+  },
+  { operationName: 'CreateVolunteerTeam' }
+)

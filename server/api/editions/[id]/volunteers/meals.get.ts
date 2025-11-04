@@ -1,22 +1,22 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
-
-  try {
+    // Vérifier les permissions
+    const allowed = await canAccessEditionData(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
     // Récupérer l'édition pour obtenir les dates
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -136,11 +136,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       meals: createdMeals,
     }
-  } catch (error: unknown) {
-    console.error('Failed to fetch volunteer meals:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des repas bénévoles',
-    })
-  }
-})
+  },
+  { operationName: 'GetVolunteerMeals' }
+)

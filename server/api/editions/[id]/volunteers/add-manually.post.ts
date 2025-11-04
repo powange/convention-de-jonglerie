@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 import { z } from 'zod'
 
@@ -8,11 +10,9 @@ const bodySchema = z.object({
   userId: z.number(),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
@@ -24,8 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const body = bodySchema.parse(await readBody(event))
 
-  try {
-    // Vérifier que l'utilisateur existe
+  // Vérifier que l'utilisateur existe
     const user = await prisma.user.findUnique({
       where: { id: body.userId },
       select: {
@@ -141,12 +140,8 @@ export default defineEventHandler(async (event) => {
       console.error("Erreur lors de l'envoi de la notification:", notificationError)
     }
 
-    return {
-      success: true,
-      application,
-    }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'ajout manuel du bénévole:", error)
-    throw error
+  return {
+    success: true,
+    application,
   }
-})
+}, 'AddVolunteerManually')

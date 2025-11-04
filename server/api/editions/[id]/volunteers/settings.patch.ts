@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
 
@@ -109,12 +111,12 @@ const bodySchema = z
     }
   )
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  const body = await readBody(event).catch(() => ({}))
+    const body = await readBody(event).catch(() => ({}))
 
   // Validation avec gestion d'erreur appropriée
   let parsed
@@ -209,4 +211,6 @@ export default defineEventHandler(async (event) => {
     },
   })
   return { success: true, settings: updated }
-})
+  },
+  { operationName: 'UpdateVolunteerSettings' }
+)

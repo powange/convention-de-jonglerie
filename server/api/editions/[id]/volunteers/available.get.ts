@@ -1,27 +1,19 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   // Authentification requise
   await requireAuth(event)
-
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
-
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions de gestion des bénévoles
   await requireVolunteerManagementAccess(event, editionId)
 
-  try {
-    // Récupérer tous les bénévoles avec candidature acceptée pour cette édition
+  // Récupérer tous les bénévoles avec candidature acceptée pour cette édition
     const availableVolunteers = await prisma.editionVolunteerApplication.findMany({
       where: {
         editionId,
@@ -102,15 +94,5 @@ export default defineEventHandler(async (event) => {
       assignmentsCount: application.user.volunteerAssignments.length,
     }))
 
-    return formattedVolunteers
-  } catch (error) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des bénévoles disponibles',
-    })
-  }
-})
+  return formattedVolunteers
+}, 'GetAvailableVolunteers')

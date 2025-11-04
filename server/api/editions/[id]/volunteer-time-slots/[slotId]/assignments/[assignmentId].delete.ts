@@ -1,41 +1,22 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Authentification requise
-  await requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Authentification requise
+    await requireAuth(event)
 
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
-  const slotId = getRouterParam(event, 'slotId') as string
-  const assignmentId = getRouterParam(event, 'assignmentId') as string
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
+    const slotId = validateResourceId(event, 'slotId', 'créneau')
+    const assignmentId = validateResourceId(event, 'assignmentId', 'assignation')
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier les permissions de gestion des bénévoles
+    await requireVolunteerManagementAccess(event, editionId)
 
-  if (!slotId) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID de créneau invalide',
-    })
-  }
-
-  if (!assignmentId) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'assignation invalide",
-    })
-  }
-
-  // Vérifier les permissions de gestion des bénévoles
-  await requireVolunteerManagementAccess(event, editionId)
-
-  try {
     // Vérifier que l'assignation existe et appartient à ce créneau/édition
     const assignment = await prisma.volunteerAssignment.findFirst({
       where: {
@@ -73,14 +54,6 @@ export default defineEventHandler(async (event) => {
       message: 'Assignation supprimée avec succès',
       unassignedUser: assignment.user,
     }
-  } catch (error) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la suppression de l'assignation",
-    })
-  }
-})
+  },
+  { operationName: 'DeleteVolunteerTimeSlotAssignment' }
+)

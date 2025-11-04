@@ -1,33 +1,21 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Authentification requise
-  await requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Authentification requise
+    await requireAuth(event)
 
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
-  const teamId = getRouterParam(event, 'teamId') as string
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
+    const teamId = validateResourceId(event, 'teamId', 'équipe')
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier les permissions de gestion des bénévoles
+    await requireVolunteerManagementAccess(event, editionId)
 
-  if (!teamId) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'équipe invalide",
-    })
-  }
-
-  // Vérifier les permissions de gestion des bénévoles
-  await requireVolunteerManagementAccess(event, editionId)
-
-  try {
     // Vérifier que l'équipe existe et appartient à cette édition
     const existingTeam = await prisma.volunteerTeam.findFirst({
       where: {
@@ -65,14 +53,6 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 204)
     return null
-  } catch (error) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de la suppression de l'équipe",
-    })
-  }
-})
+  },
+  { operationName: 'DeleteVolunteerTeam' }
+)

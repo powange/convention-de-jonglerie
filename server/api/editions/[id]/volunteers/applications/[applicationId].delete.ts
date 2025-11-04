@@ -1,27 +1,24 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const applicationId = validateResourceId(event, 'applicationId', 'candidature')
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
+    // Vérifier les permissions
+    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    if (!allowed) {
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
+      })
+    }
 
-  if (!editionId || !applicationId) {
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  }
-
-  // Vérifier les permissions
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
-  if (!allowed) {
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour gérer les bénévoles',
-    })
-  }
-
-  try {
     // Récupérer la candidature pour vérifier qu'elle existe et qu'elle est bien liée à cette édition
     const application = await prisma.editionVolunteerApplication.findUnique({
       where: { id: applicationId },
@@ -72,8 +69,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Candidature supprimée avec succès',
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la suppression de la candidature:', error)
-    throw error
-  }
-})
+  },
+  { operationName: 'DeleteManualVolunteerApplication' }
+)

@@ -1,28 +1,23 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
 } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
+export default wrapApiHandler(
+  async (event) => {
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier l'accès au planning (bénévoles acceptés + gestionnaires)
+    const user = await requireVolunteerPlanningAccess(event, editionId)
 
-  // Vérifier l'accès au planning (bénévoles acceptés + gestionnaires)
-  const user = await requireVolunteerPlanningAccess(event, editionId)
+    // Vérifier si l'utilisateur est un bénévole accepté (pas un gestionnaire)
+    const isVolunteer = await isAcceptedVolunteer(user.id, editionId)
 
-  // Vérifier si l'utilisateur est un bénévole accepté (pas un gestionnaire)
-  const isVolunteer = await isAcceptedVolunteer(user.id, editionId)
-
-  try {
     // Récupérer les créneaux de bénévoles pour cette édition
     const timeSlots = await prisma.volunteerTimeSlot.findMany({
       where: {
@@ -92,10 +87,6 @@ export default defineEventHandler(async (event) => {
     }))
 
     return formattedTimeSlots
-  } catch {
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des créneaux de bénévoles',
-    })
-  }
-})
+  },
+  { operationName: 'GetVolunteerTimeSlots' }
+)

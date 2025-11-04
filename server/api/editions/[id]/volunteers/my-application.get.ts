@@ -1,20 +1,15 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 /**
  * Récupère la candidature de bénévolat de l'utilisateur connecté pour une édition
  */
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   // Vérifier l'authentification
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) {
-    throw createError({
-      statusCode: 400,
-      message: 'Edition invalide',
-    })
-  }
+  const editionId = validateEditionId(event)
 
   // Récupérer la candidature de l'utilisateur pour cette édition
   const application = await prisma.editionVolunteerApplication.findUnique({
@@ -133,4 +128,4 @@ export default defineEventHandler(async (event) => {
     ...application,
     assignedTimeSlots,
   }
-})
+}, 'GetMyVolunteerApplication')

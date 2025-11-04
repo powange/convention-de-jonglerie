@@ -1,18 +1,17 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import {
   getAvailableMealsOnArrival,
   getAvailableMealsOnDeparture,
 } from '@@/server/utils/volunteer-meals'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
+  const editionId = validateEditionId(event)
 
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
-
-  try {
-    // Récupérer le bénévole
+  // Récupérer le bénévole
     const volunteer = await prisma.editionVolunteerApplication.findUnique({
       where: {
         editionId_userId: {
@@ -160,21 +159,8 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    return {
-      success: true,
-      meals: mealsWithSelections,
-    }
-  } catch (error: unknown) {
-    console.error('Failed to fetch volunteer meals:', error)
-
-    // Propager les erreurs HTTP existantes
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération de vos repas',
-    })
+  return {
+    success: true,
+    meals: mealsWithSelections,
   }
-})
+}, 'GetMyVolunteerMeals')

@@ -1,21 +1,15 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 /**
  * Récupère les équipes dont l'utilisateur connecté est responsable
  * Retourne uniquement les équipes où l'utilisateur a au moins une assignation avec isLeader=true
  */
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-
-  if (!editionId) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+  const editionId = validateEditionId(event)
 
   // Récupérer toutes les équipes dont l'utilisateur est leader
   const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
@@ -70,4 +64,4 @@ export default defineEventHandler(async (event) => {
   }
 
   return Array.from(uniqueTeams.values())
-})
+}, 'GetMyLeaderTeams')

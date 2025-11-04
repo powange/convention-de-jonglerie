@@ -1,15 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const volunteerId = parseInt(getRouterParam(event, 'volunteerId') || '0')
-
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
-  if (!volunteerId) throw createError({ statusCode: 400, message: 'Bénévole invalide' })
+  const editionId = validateEditionId(event)
+  const volunteerId = validateResourceId(event, 'volunteerId')
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -28,8 +26,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  try {
-    // Vérifier que le bénévole appartient à cette édition
+  // Vérifier que le bénévole appartient à cette édition
     const volunteer = await prisma.editionVolunteerApplication.findUnique({
       where: { id: volunteerId },
       select: { editionId: true },
@@ -140,21 +137,8 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    return {
-      success: true,
-      meals: formattedMeals,
-    }
-  } catch (error: unknown) {
-    console.error('Failed to update volunteer meals:', error)
-
-    // Si c'est déjà une erreur HTTP, la relancer
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour des repas du bénévole',
-    })
+  return {
+    success: true,
+    meals: formattedMeals,
   }
-})
+}, 'UpdateVolunteerMealsByVolunteerId')

@@ -1,22 +1,17 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { optionalAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
+export default wrapApiHandler(
+  async (event) => {
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier le paramètre leaderOnly
+    const query = getQuery(event)
+    const leaderOnly = query.leaderOnly === 'true'
 
-  // Vérifier le paramètre leaderOnly
-  const query = getQuery(event)
-  const leaderOnly = query.leaderOnly === 'true'
-
-  try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -129,15 +124,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return teams
-  } catch (error) {
-    // Si c'est déjà une erreur HTTP, la relancer
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des équipes de bénévoles',
-    })
-  }
-})
+  },
+  { operationName: 'GetVolunteerTeams' }
+)

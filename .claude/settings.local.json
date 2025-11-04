@@ -51,7 +51,14 @@
       "Bash(node /tmp/fix-broken-files.mjs:*)",
       "SlashCommand(/lint-fix)",
       "SlashCommand(/run-tests)",
-      "SlashCommand(/commit-push)"
+      "SlashCommand(/commit-push)",
+      "Bash(for file in server/api/editions/[id]/volunteers/applications/*.ts server/api/editions/[id]/volunteers/applications/[applicationId]/*.ts server/api/editions/[id]/volunteers/applications/[applicationId]/teams/[teamId]/*.ts)",
+      "Bash(do)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(if grep -q \"wrapApiHandler\" \"$file\")",
+      "Bash(else)"
     ],
     "deny": [],
     "ask": [],

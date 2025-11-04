@@ -1,4 +1,5 @@
 import { requiresEmergencyContact } from '@@/server/utils/allergy-severity'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   volunteerApplicationBodySchema,
@@ -9,14 +10,12 @@ import {
   validateTeamPreferences,
 } from '@@/server/utils/editions/volunteers/applications'
 import { prisma } from '@@/server/utils/prisma'
-import { handleValidationError } from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const authenticatedUser = requireAuth(event)
-    const editionId = parseInt(getRouterParam(event, 'id') || '0')
-    if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+    const editionId = validateEditionId(event)
     const body = await readBody(event).catch(() => ({}))
     const parsed = volunteerApplicationBodySchema.parse(body || {})
 
@@ -225,40 +224,6 @@ export default defineEventHandler(async (event) => {
     }
 
     return { success: true, application }
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
-
-    // Re-lancer les erreurs déjà formatées de createError
-    // Vérifier si c'est une erreur avec un statusCode ou un message d'erreur métier
-    if (
-      error &&
-      typeof error === 'object' &&
-      'message' in error &&
-      typeof error.message === 'string'
-    ) {
-      const errorMsg = error.message.toLowerCase()
-      // Si c'est une erreur métier connue, la relancer
-      if (
-        'statusCode' in error ||
-        'status' in error ||
-        errorMsg.includes('déjà candidat') ||
-        errorMsg.includes('recrutement fermé') ||
-        errorMsg.includes('edition introuvable') ||
-        errorMsg.includes('non authentifié') ||
-        errorMsg.includes("contact d'urgence") ||
-        errorMsg.includes('requis')
-      ) {
-        throw error
-      }
-    }
-
-    console.error('Erreur lors de la candidature bénévole:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur interne',
-    })
-  }
-})
+  },
+  { operationName: 'CreateVolunteerApplication' }
+)

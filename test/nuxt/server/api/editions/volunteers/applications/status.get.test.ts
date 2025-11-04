@@ -131,7 +131,7 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
 
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Edition invalide')
+      await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide')
     })
 
     it("devrait échouer si l'ID de l'édition est 0", async () => {
@@ -139,7 +139,7 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
 
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Edition invalide')
+      await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide')
     })
 
     it("devrait échouer si l'ID de l'édition est manquant", async () => {
@@ -147,7 +147,7 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
 
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Edition invalide')
+      await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide')
     })
 
     it("devrait accepter un ID d'édition valide sous forme de string", async () => {
@@ -215,7 +215,7 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
 
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Database connection failed')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
 
     it('devrait gérer les timeouts de base de données', async () => {
@@ -225,7 +225,7 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
 
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Query timeout')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
   })
 

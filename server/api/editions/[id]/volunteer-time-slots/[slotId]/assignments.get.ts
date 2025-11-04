@@ -1,34 +1,22 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Authentification requise
-  await requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Authentification requise
+    await requireAuth(event)
 
-  // Validation des paramètres
-  const editionId = parseInt(getRouterParam(event, 'id') as string)
-  const slotId = getRouterParam(event, 'slotId') as string
+    // Validation des paramètres
+    const editionId = validateEditionId(event)
+    const slotId = validateResourceId(event, 'slotId', 'créneau')
 
-  if (!editionId || isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      message: "ID d'édition invalide",
-    })
-  }
+    // Vérifier les permissions de gestion des bénévoles
+    await requireVolunteerManagementAccess(event, editionId)
 
-  if (!slotId) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID de créneau invalide',
-    })
-  }
-
-  // Vérifier les permissions de gestion des bénévoles
-  await requireVolunteerManagementAccess(event, editionId)
-
-  try {
     // Vérifier que le créneau existe et appartient à cette édition
     const timeSlot = await prisma.volunteerTimeSlot.findFirst({
       where: {
@@ -89,14 +77,6 @@ export default defineEventHandler(async (event) => {
     }))
 
     return formattedAssignments
-  } catch (error) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des assignations',
-    })
-  }
-})
+  },
+  { operationName: 'GetVolunteerTimeSlotAssignments' }
+)

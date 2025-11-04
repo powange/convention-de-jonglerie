@@ -1,7 +1,9 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const notificationSchema = z.object({
@@ -13,9 +15,9 @@ const notificationSchema = z.object({
     .max(500, 'Le message ne peut pas dépasser 500 caractères'),
 })
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, user.id, event)
@@ -181,4 +183,4 @@ export default defineEventHandler(async (event) => {
     notificationGroupId: notificationGroup.id,
     confirmationUrl,
   }
-})
+}, 'CreateVolunteerNotification')

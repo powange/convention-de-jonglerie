@@ -1,17 +1,17 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 /**
  * Route dédiée pour récupérer tous les bénévoles acceptés avec leurs assignations d'équipes
  * Cette route n'est pas paginée car elle est utilisée pour afficher la répartition par équipes
  */
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   const allowed = await canAccessEditionData(editionId, user.id, event)
 
@@ -109,4 +109,4 @@ export default defineEventHandler(async (event) => {
   }))
 
   return applicationsWithEmailHash
-})
+}, 'GetVolunteerTeamAssignments')

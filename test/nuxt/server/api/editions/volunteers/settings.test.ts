@@ -364,7 +364,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
 
       const mockEvent = { context: { user: null } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Edition invalide')
+      await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide')
     })
 
     it('devrait gérer les erreurs de base de données', async () => {
@@ -372,7 +372,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
 
       const mockEvent = { context: { user: null } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Database connection failed')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
 
     it('devrait fonctionner même avec des utilisateurs connectés', async () => {

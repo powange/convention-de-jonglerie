@@ -1,11 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, user.id, event)
@@ -205,4 +207,4 @@ export default defineEventHandler(async (event) => {
   )
 
   return notificationsWithVolunteers
-})
+}, 'GetVolunteerNotifications')

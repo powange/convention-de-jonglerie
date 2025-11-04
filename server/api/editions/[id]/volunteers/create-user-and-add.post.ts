@@ -1,8 +1,10 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 import { z } from 'zod'
 
@@ -166,11 +168,9 @@ async function generateVolunteerInvitationEmailHtml(
   return html
 }
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
@@ -182,8 +182,7 @@ export default defineEventHandler(async (event) => {
 
   const body = bodySchema.parse(await readBody(event))
 
-  try {
-    // Sanitisation des données
+  // Sanitisation des données
     const cleanEmail = body.email.toLowerCase().trim()
     const cleanPrenom = body.prenom.trim()
     const cleanNom = body.nom.trim()
@@ -318,16 +317,9 @@ export default defineEventHandler(async (event) => {
       console.error("Erreur lors de l'envoi de l'email d'invitation:", emailError)
     }
 
-    return {
-      success: true,
-      user: newUser,
-      application,
-    }
-  } catch (error: unknown) {
-    console.error(
-      "Erreur lors de la création de l'utilisateur et de l'ajout comme bénévole:",
-      error
-    )
-    throw error
+  return {
+    success: true,
+    user: newUser,
+    application,
   }
-})
+}, 'CreateUserAndAddVolunteer')

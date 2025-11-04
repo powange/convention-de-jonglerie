@@ -1,16 +1,16 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import {
   isVolunteerEligibleForMeal,
   isArtistEligibleForMeal,
 } from '@@/server/utils/volunteer-meals'
 
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  const editionId = validateEditionId(event)
 
   // Vérifier les permissions
   const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -40,8 +40,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  try {
-    // Récupérer l'état actuel des repas avant mise à jour
+  // Récupérer l'état actuel des repas avant mise à jour
     const mealIds = body.meals.map((meal: any) => meal.id).filter(Boolean)
     const currentMeals = await prisma.volunteerMeal.findMany({
       where: {
@@ -276,15 +275,8 @@ export default defineEventHandler(async (event) => {
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    return {
-      success: true,
-      meals: updatedMeals,
-    }
-  } catch (error: unknown) {
-    console.error('Failed to update volunteer meals:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour des repas bénévoles',
-    })
+  return {
+    success: true,
+    meals: updatedMeals,
   }
-})
+}, 'UpdateVolunteerMeals')

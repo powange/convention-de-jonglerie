@@ -1,23 +1,24 @@
 import { createHash } from 'node:crypto'
 
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 /**
  * Récupère les membres d'une équipe de bénévoles avec leurs coordonnées
  * Vérifie que l'utilisateur connecté est leader de cette équipe
  * Renvoie l'email et le téléphone des membres pour permettre au leader de les contacter
  */
-export default defineEventHandler(async (event) => {
+export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
-
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  const editionId = validateEditionId(event)
   const teamId = getRouterParam(event, 'teamId')
 
-  if (!editionId || !teamId) {
+  if (!teamId) {
     throw createError({
       statusCode: 400,
-      message: 'Edition ou équipe invalide',
+      message: 'Equipe invalide',
     })
   }
 
@@ -90,4 +91,4 @@ export default defineEventHandler(async (event) => {
     isLeader: assignment.isLeader,
     assignedAt: assignment.assignedAt,
   }))
-})
+}, 'GetVolunteerTeamMembers')

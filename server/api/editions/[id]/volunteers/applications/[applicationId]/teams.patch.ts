@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import {
@@ -5,19 +6,19 @@ import {
   resolveTeamIdentifiers,
 } from '@@/server/utils/editions/volunteers/teams'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
   teams: z.array(z.string()), // Noms ou IDs des équipes pour l'assignation
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
-  if (!editionId || !applicationId)
-    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
-  const parsed = bodySchema.parse(await readBody(event))
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const applicationId = validateResourceId(event, 'applicationId', 'candidature')
+    const parsed = bodySchema.parse(await readBody(event))
 
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
   if (!allowed)
@@ -45,36 +46,38 @@ export default defineEventHandler(async (event) => {
       message: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
     })
 
-  try {
-    // Résoudre les identifiants (IDs ou noms) en IDs d'équipes
-    const teamIds = await resolveTeamIdentifiers(editionId, parsed.teams)
+    try {
+      // Résoudre les identifiants (IDs ou noms) en IDs d'équipes
+      const teamIds = await resolveTeamIdentifiers(editionId, parsed.teams)
 
-    // Assigner le bénévole aux équipes
-    const assignments = await assignVolunteerToTeams(applicationId, teamIds)
+      // Assigner le bénévole aux équipes
+      const assignments = await assignVolunteerToTeams(applicationId, teamIds)
 
-    return {
-      success: true,
-      application: {
-        id: applicationId,
-        assignedTeams: teamIds,
-        teamAssignments: assignments.map((a) => ({
-          teamId: a.teamId,
-          isLeader: a.isLeader,
-          assignedAt: a.assignedAt,
-          team: a.team,
-        })),
-      },
-      teams: parsed.teams,
-      message: `Assigné à ${parsed.teams.length} équipe(s)`,
+      return {
+        success: true,
+        application: {
+          id: applicationId,
+          assignedTeams: teamIds,
+          teamAssignments: assignments.map((a) => ({
+            teamId: a.teamId,
+            isLeader: a.isLeader,
+            assignedAt: a.assignedAt,
+            team: a.team,
+          })),
+        },
+        teams: parsed.teams,
+        message: `Assigné à ${parsed.teams.length} équipe(s)`,
+      }
+    } catch (error: unknown) {
+      // Si c'est une erreur de notre util, la propager avec le bon format
+      if (error.message?.includes('introuvable')) {
+        throw createError({
+          statusCode: 400,
+          message: error.message,
+        })
+      }
+      throw error
     }
-  } catch (error: unknown) {
-    // Si c'est une erreur de notre util, la propager avec le bon format
-    if (error.message?.includes('introuvable')) {
-      throw createError({
-        statusCode: 400,
-        message: error.message,
-      })
-    }
-    throw error
-  }
-})
+  },
+  { operationName: 'AssignVolunteerToTeams' }
+)

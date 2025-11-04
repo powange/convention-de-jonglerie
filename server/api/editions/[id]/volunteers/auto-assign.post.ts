@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { VolunteerScheduler } from '@@/server/utils/volunteer-scheduler'
 import { z } from 'zod'
 
@@ -39,46 +41,38 @@ const constraintsSchema = z.object({
   keepExistingAssignments: z.boolean().optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
-    // Vérification de l'authentification
-    const user = requireAuth(event)
-    const editionId = parseInt(getRouterParam(event, 'id') as string)
+export default wrapApiHandler(async (event) => {
+  // Vérification de l'authentification
+  const user = requireAuth(event)
+  const editionId = validateEditionId(event)
 
-    if (!editionId || isNaN(editionId)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "ID d'édition invalide",
-      })
-    }
-
-    // Vérification des permissions
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        convention: {
-          include: {
-            collaborators: true,
-          },
+  // Vérification des permissions
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    include: {
+      convention: {
+        include: {
+          collaborators: true,
         },
       },
+    },
+  })
+
+  if (!edition) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Édition non trouvée',
     })
+  }
 
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Édition non trouvée',
-      })
-    }
+  if (!(await canManageEditionVolunteers(editionId, user.id, event))) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+    })
+  }
 
-    if (!(await canManageEditionVolunteers(editionId, user.id, event))) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Droits insuffisants pour gérer les bénévoles',
-      })
-    }
-
-    // Lecture et validation du body
+  // Lecture et validation du body
     const body = await readBody(event)
     const constraints = constraintsSchema.parse(body.constraints || {})
 
@@ -204,39 +198,12 @@ export default defineEventHandler(async (event) => {
       )
     }
 
-    return {
-      success: true,
-      result,
-      preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
-    }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'auto-assignation:", error)
-
-    // Gestion des erreurs de validation Zod
-    if (
-      error &&
-      typeof error === 'object' &&
-      'issues' in error &&
-      Array.isArray((error as { issues: unknown[] }).issues)
-    ) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Contraintes invalides',
-        data: (error as { issues: unknown[] }).issues,
-      })
-    }
-
-    const errorMessage =
-      error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
-        ? error.message
-        : "Erreur lors de l'auto-assignation"
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: errorMessage,
-    })
+  return {
+    success: true,
+    result,
+    preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
   }
-})
+}, 'AutoAssignVolunteers')
 
 /**
  * Applique les assignations en base de données
