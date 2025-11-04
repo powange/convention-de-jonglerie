@@ -1,5 +1,7 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const updateCarpoolRequestSchema = z.object({
@@ -15,19 +17,11 @@ const updateCarpoolRequestSchema = z.object({
   phoneNumber: z.string().max(20, 'Numéro de téléphone trop long').optional().nullable(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const requestId = validateResourceId(event, 'id', 'demande')
 
-  const requestId = parseInt(getRouterParam(event, 'id') as string)
-
-  if (isNaN(requestId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID de demande invalide',
-    })
-  }
-
-  try {
     const body = await readBody(event)
 
     // Valider les données
@@ -93,24 +87,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return updatedRequest
-  } catch (error: unknown) {
-    console.error('Erreur lors de la mise à jour de la demande de covoiturage:', error)
-
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la mise à jour de la demande',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateCarpoolRequest' }
+)

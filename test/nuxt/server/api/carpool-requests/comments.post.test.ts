@@ -92,7 +92,7 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
 
     global.readBody.mockResolvedValue({ content: 'Test' })
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Carpool Request ID invalide')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de demande invalide')
   })
 
   it("devrait valider que le contenu n'est pas vide", async () => {
@@ -131,7 +131,7 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.carpoolRequest.findUnique.mockResolvedValue(null)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Demande de covoiturage non trouvée')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
