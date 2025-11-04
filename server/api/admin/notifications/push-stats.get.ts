@@ -1,9 +1,10 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 import { pushNotificationService } from '@@/server/utils/push-notification-service'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
@@ -56,12 +57,6 @@ export default defineEventHandler(async (event) => {
         count: day._count,
       })),
     }
-  } catch (error: unknown) {
-    console.error('[Push Stats] Erreur:', error)
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des statistiques',
-    })
-  }
-})
+  },
+  { operationName: 'GetPushNotificationStats' }
+)

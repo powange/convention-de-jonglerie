@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { sendEmail, generateAccountDeletionEmailHtml } from '@@/server/utils/emailService'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { readBody } from 'h3'
 
@@ -32,20 +34,13 @@ const DELETION_REASONS = {
   },
 } as const
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     const adminUser = await requireGlobalAdminWithDbCheck(event)
 
     // Récupérer l'ID de l'utilisateur à supprimer
-    const userIdToDelete = parseInt(event.context.params?.id as string)
-
-    if (isNaN(userIdToDelete)) {
-      throw createError({
-        statusCode: 400,
-        message: 'ID utilisateur invalide',
-      })
-    }
+    const userIdToDelete = validateResourceId(event, 'id', 'utilisateur')
 
     // Récupérer les données du body
     const body = await readBody(event)
@@ -151,20 +146,9 @@ export default defineEventHandler(async (event) => {
         emailHash: getEmailHash(deletedUser.email),
       },
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la suppression utilisateur:', error)
-    const err = error as { message?: string; stack?: string; statusCode?: number }
-
-    if (err.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: `Erreur interne du serveur: ${err.message}`,
-    })
-  }
-})
+  },
+  { operationName: 'DeleteUser' }
+)
 
 // Exporter les raisons pour utilisation dans le frontend
 export { DELETION_REASONS }

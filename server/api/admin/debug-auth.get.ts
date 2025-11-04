@@ -1,7 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     console.log('=== DEBUG AUTH ===')
 
     // Vérifier l'authentification et les droits admin (mutualisé)
@@ -17,11 +18,6 @@ export default defineEventHandler(async (event) => {
         isAdmin: adminUser.isGlobalAdmin,
       },
     }
-  } catch (error) {
-    console.error('Auth debug error:', error)
-    return {
-      error: error.message,
-      stack: error.stack?.slice(0, 500),
-    }
-  }
-})
+  },
+  { operationName: 'DebugAuth' }
+)

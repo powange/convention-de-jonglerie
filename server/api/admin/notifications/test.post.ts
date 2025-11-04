@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { NotificationService, NotificationHelpers } from '@@/server/utils/notification-service'
 import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
@@ -18,12 +19,13 @@ const bodySchema = z.object({
   targetUserEmail: z.string().email().optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  const adminUser = await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
 
-  const body = await readBody(event).catch(() => ({}))
-  const parsed = bodySchema.parse(body)
+    const body = await readBody(event).catch(() => ({}))
+    const parsed = bodySchema.parse(body)
 
   // Déterminer l'utilisateur cible
   let targetUserId = parsed.targetUserId || adminUser.id
@@ -45,7 +47,6 @@ export default defineEventHandler(async (event) => {
     targetUserId = targetUser.id
   }
 
-  try {
     let notification
 
     // Générer différents types de notifications de test
@@ -124,11 +125,6 @@ export default defineEventHandler(async (event) => {
         timestamp: new Date().toISOString(),
       },
     }
-  } catch (error) {
-    console.error("Erreur lors de l'envoi de la notification de test:", error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'envoi de la notification de test",
-    })
-  }
-})
+  },
+  { operationName: 'TestNotification' }
+)

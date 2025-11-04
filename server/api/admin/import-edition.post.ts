@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -61,8 +62,8 @@ const importSchema = z.object({
   }),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier que l'utilisateur est un admin
     await requireGlobalAdminWithDbCheck(event)
 
@@ -176,24 +177,6 @@ export default defineEventHandler(async (event) => {
       editionId: edition.id,
       message: 'Import réussi',
     }
-  } catch (error: unknown) {
-    console.error("[ADMIN IMPORT] Erreur lors de l'import:", error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    // Si c'est une erreur de validation Zod
-    if (error.errors) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides: ' + error.errors.map((e: any) => e.message).join(', '),
-      })
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'import",
-    })
-  }
-})
+  },
+  { operationName: 'ImportEdition' }
+)

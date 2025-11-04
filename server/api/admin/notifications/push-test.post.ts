@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { pushNotificationService } from '@@/server/utils/push-notification-service'
 import { z } from 'zod'
@@ -10,8 +11,8 @@ const testPushSchema = z.object({
   message: z.string(),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     const adminUser = await requireGlobalAdminWithDbCheck(event)
 
@@ -80,19 +81,6 @@ export default defineEventHandler(async (event) => {
       ...result,
       stats,
     }
-  } catch (error: unknown) {
-    console.error('[Push Test] Erreur:', error)
-
-    if (error.name === 'ZodError') {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-      })
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: error.message || "Erreur lors de l'envoi de la notification push",
-    })
-  }
-})
+  },
+  { operationName: 'TestPushNotification' }
+)

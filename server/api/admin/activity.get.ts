@@ -1,10 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 
 import type { H3Error } from 'h3'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
@@ -547,12 +548,6 @@ export default defineEventHandler(async (event) => {
       .slice(0, limit)
 
     return sortedActivities
-  } catch (error: unknown) {
-    console.error("Erreur lors de la récupération de l'activité récente:", error)
-    if ((error as H3Error)?.statusCode) throw error
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetAdminActivity' }
+)

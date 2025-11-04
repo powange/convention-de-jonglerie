@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -7,17 +8,18 @@ const bodySchema = z.object({
   adminNotes: z.string().max(1000).optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  const adminUser = await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
 
-  const logId = getRouterParam(event, 'id')
-  if (!logId) {
-    throw createError({ statusCode: 400, message: 'ID du log requis' })
-  }
+    const logId = getRouterParam(event, 'id')
+    if (!logId) {
+      throw createError({ statusCode: 400, message: 'ID du log requis' })
+    }
 
-  const body = await readBody(event).catch(() => ({}))
-  const parsed = bodySchema.parse(body)
+    const body = await readBody(event).catch(() => ({}))
+    const parsed = bodySchema.parse(body)
 
   // Vérifier que le log existe
   const existingLog = await prisma.apiErrorLog.findUnique({
@@ -49,9 +51,11 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return {
-    success: true,
-    log: updatedLog,
-    message: parsed.resolved ? 'Log marqué comme résolu' : 'Log marqué comme non résolu',
-  }
-})
+    return {
+      success: true,
+      log: updatedLog,
+      message: parsed.resolved ? 'Log marqué comme résolu' : 'Log marqué comme non résolu',
+    }
+  },
+  { operationName: 'ResolveErrorLog' }
+)

@@ -1,12 +1,12 @@
 import { execSync } from 'child_process'
 import { mkdir, writeFile, stat } from 'fs/promises'
 import path from 'path'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier les permissions super admin
-  const _user = await requireGlobalAdminWithDbCheck(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier les permissions super admin
+    const _user = await requireGlobalAdminWithDbCheck(event)
     const config = useRuntimeConfig()
     const uploadsMountPath = config.fileStorage?.mount || '/uploads'
 
@@ -117,12 +117,6 @@ export default defineEventHandler(async (event) => {
       size: archiveStats.size,
       includesUploads: hasUploads,
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la création de la sauvegarde:', error)
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors de la création de la sauvegarde: ' + error.message,
-    })
-  }
-})
+  },
+  { operationName: 'CreateBackup' }
+)

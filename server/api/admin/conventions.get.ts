@@ -1,9 +1,10 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
@@ -95,18 +96,6 @@ export default defineEventHandler(async (event) => {
       conventions: transformedConventions,
       total: transformedConventions.length,
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la récupération des conventions admin:', error)
-
-    // Si c'est déjà une erreur HTTP, la relancer
-    if (error.statusCode) {
-      throw error
-    }
-
-    // Sinon, erreur serveur générique
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur lors de la récupération des conventions',
-    })
-  }
-})
+  },
+  { operationName: 'GetAdminConventions' }
+)

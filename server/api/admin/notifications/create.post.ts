@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
@@ -15,14 +16,14 @@ const bodySchema = z.object({
   actionText: z.string().max(50).optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
 
-  const body = await readBody(event)
-  const parsed = bodySchema.parse(body)
+    const body = await readBody(event)
+    const parsed = bodySchema.parse(body)
 
-  try {
     // Vérifier que l'utilisateur cible existe
     const targetUser = await prisma.user.findUnique({
       where: { id: parsed.userId },
@@ -54,14 +55,6 @@ export default defineEventHandler(async (event) => {
       notification,
       targetUser,
     }
-  } catch (error) {
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la création de la notification',
-    })
-  }
-})
+  },
+  { operationName: 'CreateAdminNotification' }
+)

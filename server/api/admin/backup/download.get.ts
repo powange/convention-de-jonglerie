@@ -1,11 +1,12 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier les permissions super admin
-  const _user = await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier les permissions super admin
+    const _user = await requireGlobalAdminWithDbCheck(event)
 
-  try {
     const query = getQuery(event)
     const filename = query.filename as string
 
@@ -40,12 +41,6 @@ export default defineEventHandler(async (event) => {
       }
       throw fileError
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors du téléchargement:', error)
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors du téléchargement: ' + error.message,
-    })
-  }
-})
+  },
+  { operationName: 'DownloadBackup' }
+)

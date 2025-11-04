@@ -1,9 +1,10 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
@@ -137,22 +138,6 @@ export default defineEventHandler(async (event) => {
         totalActiveUsers: activeConnections.activeUsers,
       },
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la récupération des utilisateurs:', error)
-    const err = error as { message?: string; stack?: string; code?: unknown; statusCode?: number }
-    console.error('Error details:', {
-      message: err.message,
-      stack: err.stack,
-      code: err.code,
-    })
-
-    if (err.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: `Erreur interne du serveur: ${err.message}`,
-    })
-  }
-})
+  },
+  { operationName: 'GetAdminUsers' }
+)

@@ -1,11 +1,12 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin
-  await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin
+    await requireGlobalAdminWithDbCheck(event)
 
-  try {
     const now = new Date()
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
@@ -82,11 +83,6 @@ export default defineEventHandler(async (event) => {
         unresolved: remainingUnresolved,
       },
     }
-  } catch (error: unknown) {
-    console.error('Failed to cleanup old error logs:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors du nettoyage des logs',
-    })
-  }
-})
+  },
+  { operationName: 'CleanupOldErrorLogs' }
+)

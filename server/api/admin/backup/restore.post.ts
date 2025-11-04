@@ -1,13 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { execSync } from 'child_process'
 import { readFile, writeFile, mkdir, rm } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier les permissions super admin
-  const _user = await requireGlobalAdminWithDbCheck(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier les permissions super admin
+    const _user = await requireGlobalAdminWithDbCheck(event)
     const config = useRuntimeConfig()
     const uploadsMountPath = config.fileStorage?.mount || '/uploads'
     let sqlContent: string
@@ -212,12 +212,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Base de données et fichiers restaurés avec succès',
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la restauration:', error)
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors de la restauration: ' + error.message,
-    })
-  }
-})
+  },
+  { operationName: 'RestoreBackup' }
+)

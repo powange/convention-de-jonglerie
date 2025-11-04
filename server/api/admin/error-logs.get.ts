@@ -1,11 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 
 const DEFAULT_PAGE_SIZE = 20
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
 
   const query = getQuery(event)
 
@@ -289,4 +291,6 @@ export default defineEventHandler(async (event) => {
       })),
     },
   }
-})
+  },
+  { operationName: 'GetErrorLogs' }
+)

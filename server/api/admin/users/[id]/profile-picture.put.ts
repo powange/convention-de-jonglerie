@@ -1,4 +1,6 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -6,20 +8,13 @@ const updateProfilePictureSchema = z.object({
   profilePicture: z.string().min(1, 'Chemin de fichier requis').nullable(),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
 
-  const userId = parseInt(getRouterParam(event, 'id') as string)
+    const userId = validateResourceId(event, 'id', 'utilisateur')
 
-  if (isNaN(userId)) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID utilisateur invalide',
-    })
-  }
-
-  try {
     const body = await readBody(event)
 
     // Valider les données d'entrée
@@ -133,26 +128,6 @@ export default defineEventHandler(async (event) => {
       profilePicture: updatedUser.profilePicture,
       message: 'Photo de profil mise à jour avec succès',
     }
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour de la photo de profil:', error)
-
-    // Si c'est une erreur de validation Zod
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        message: 'Données invalides',
-        data: error.errors,
-      })
-    }
-
-    // Si c'est déjà une erreur HTTP, la relancer
-    if ((error as any)?.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur lors de la mise à jour de la photo de profil',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateUserProfilePicture' }
+)

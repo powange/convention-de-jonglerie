@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdmin } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
@@ -6,11 +7,10 @@ import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
  * API pour assigner automatiquement les repas aux bénévoles acceptés
  * Réservé aux administrateurs uniquement
  */
-export default defineEventHandler(async (event) => {
-  // Vérifier que l'utilisateur est administrateur
-  requireGlobalAdmin(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier que l'utilisateur est administrateur
+    requireGlobalAdmin(event)
     // Récupérer tous les bénévoles avec statut ACCEPTED
     const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
       where: {
@@ -123,11 +123,6 @@ export default defineEventHandler(async (event) => {
       },
       volunteers: results,
     }
-  } catch (error: any) {
-    console.error("Erreur lors de l'assignation des repas:", error)
-    throw createError({
-      statusCode: 500,
-      message: error.message || "Erreur lors de l'assignation des repas",
-    })
-  }
-})
+  },
+  { operationName: 'AssignMealsToVolunteers' }
+)

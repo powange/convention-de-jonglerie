@@ -1,10 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 
 /**
  * API de test simple pour vérifier la connectivité admin
  */
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     const adminUser = await requireGlobalAdminWithDbCheck(event)
 
@@ -14,11 +15,6 @@ export default defineEventHandler(async (event) => {
       isGlobalAdmin: adminUser.isGlobalAdmin,
       timestamp: new Date().toISOString(),
     }
-  } catch (error) {
-    console.error('[Test API] Erreur:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur de test API',
-    })
-  }
-})
+  },
+  { operationName: 'TestSimpleAdminApi' }
+)

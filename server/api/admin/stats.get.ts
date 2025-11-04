@@ -1,8 +1,9 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
@@ -91,16 +92,6 @@ export default defineEventHandler(async (event) => {
       unresolvedFeedbacks,
       unresolvedErrorLogs,
     }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des statistiques:', error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur interne du serveur',
-    })
-  }
-})
+  },
+  { operationName: 'GetAdminStats' }
+)

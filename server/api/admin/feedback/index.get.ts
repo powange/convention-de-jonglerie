@@ -1,11 +1,11 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
     const query = getQuery(event)
     const page = parseInt(query.page as string) || 1
     const limit = parseInt(query.limit as string) || 20
@@ -90,25 +90,6 @@ export default defineEventHandler(async (event) => {
       },
       stats: statsFormatted,
     }
-  } catch (error: unknown) {
-    console.error('Erreur lors de la récupération des feedbacks:', error?.message, error)
-    // Mode debug optionnel pour admin: ?debug=1 retourne détails (sans données sensibles majeures)
-    const query = getQuery(event)
-    const isDebug = query.debug === '1'
-    if (isDebug) {
-      return {
-        error: true,
-        message: 'Erreur lors de la récupération des feedbacks',
-        prismaError: {
-          message: error?.message,
-          code: error?.code,
-          meta: error?.meta,
-        },
-      }
-    }
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des feedbacks',
-    })
-  }
-})
+  },
+  { operationName: 'GetAdminFeedbacks' }
+)

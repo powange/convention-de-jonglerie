@@ -1,12 +1,12 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
     const now = new Date()
     const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
@@ -110,11 +110,6 @@ export default defineEventHandler(async (event) => {
       editionsProcessed: upcomingEditions.length,
       remindersSent,
     }
-  } catch (error) {
-    console.error("Erreur lors de l'envoi des rappels:", error)
-    throw createError({
-      statusCode: 500,
-      message: "Erreur lors de l'envoi des rappels",
-    })
-  }
-})
+  },
+  { operationName: 'SendEditionReminders' }
+)

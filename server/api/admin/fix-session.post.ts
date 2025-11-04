@@ -1,7 +1,8 @@
 import { clearUserSession } from '#imports'
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vider la session corrompue
     await clearUserSession(event)
 
@@ -9,10 +10,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Session cleared. Please log in again.',
     }
-  } catch (error) {
-    return {
-      success: false,
-      error: error.message,
-    }
-  }
-})
+  },
+  { operationName: 'FixSession' }
+)

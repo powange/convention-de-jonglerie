@@ -1,21 +1,22 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et droits admin
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et droits admin
+    const user = requireAuth(event)
 
-  // Vérifier que l'utilisateur est admin global
-  if (!user.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      message:
-        'Droits insuffisants - seuls les admins globaux peuvent supprimer définitivement des conventions',
-    })
-  }
+    // Vérifier que l'utilisateur est admin global
+    if (!user.isGlobalAdmin) {
+      throw createError({
+        statusCode: 403,
+        message:
+          'Droits insuffisants - seuls les admins globaux peuvent supprimer définitivement des conventions',
+      })
+    }
 
-  try {
     const conventionId = validateConventionId(event)
 
     // Récupérer la convention pour logging
@@ -62,13 +63,6 @@ export default defineEventHandler(async (event) => {
         collaboratorsCount: convention.collaborators.length,
       },
     }
-  } catch (error) {
-    if (typeof error === 'object' && error && 'statusCode' in error) throw error as any
-
-    console.error('Erreur lors de la suppression admin de la convention:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur lors de la suppression définitive',
-    })
-  }
-})
+  },
+  { operationName: 'AdminDeleteConvention' }
+)

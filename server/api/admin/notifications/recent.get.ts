@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
@@ -15,11 +16,10 @@ import { prisma } from '@@/server/utils/prisma'
  * - type: filtrer par type (INFO, SUCCESS, WARNING, ERROR)
  * - days: nombre de jours à récupérer (défaut: 30)
  */
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
-
-  try {
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
     // Récupérer les paramètres depuis la query string
     const query = getQuery(event)
     const page = Math.max(1, parseInt(query.page as string) || 1)
@@ -109,11 +109,6 @@ export default defineEventHandler(async (event) => {
         totalPages: Math.ceil(total / limit),
       },
     }
-  } catch (error) {
-    console.error('[Admin] Erreur récupération notifications récentes:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des notifications récentes',
-    })
-  }
-})
+  },
+  { operationName: 'GetRecentNotifications' }
+)

@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -7,11 +8,11 @@ import { prisma } from '@@/server/utils/prisma'
  *
  * Retourne les statistiques des notifications pour le tableau de bord admin
  */
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdminWithDbCheck(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdminWithDbCheck(event)
 
-  try {
     // Compter le total des notifications
     const totalSent = await prisma.notification.count()
 
@@ -47,11 +48,6 @@ export default defineEventHandler(async (event) => {
       thisWeekCount,
       pushSubscriptionsActive,
     }
-  } catch (error) {
-    console.error('[Admin] Erreur récupération statistiques notifications:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la récupération des statistiques',
-    })
-  }
-})
+  },
+  { operationName: 'GetNotificationStats' }
+)
