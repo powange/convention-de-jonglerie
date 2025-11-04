@@ -174,7 +174,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     global.readBody.mockResolvedValue(requestBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait rejeter si utilisateur introuvable par userId', async () => {
@@ -218,7 +218,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     global.readBody.mockResolvedValue(invalidBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait gérer les erreurs de addConventionCollaborator', async () => {

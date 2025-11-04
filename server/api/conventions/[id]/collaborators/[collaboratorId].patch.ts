@@ -1,6 +1,8 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageCollaborators } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import type {
@@ -33,12 +35,13 @@ const payloadSchema = z.object({
   perEdition: z.array(perEditionSchema).optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
-  const conventionId = parseInt(getRouterParam(event, 'id') || '0')
-  const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') || '0')
-  const body = await readBody(event).catch(() => ({}))
-  const parsed = payloadSchema.parse(body || {})
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const conventionId = validateConventionId(event)
+    const collaboratorId = validateResourceId(event, 'collaboratorId', 'collaborateur')
+    const body = await readBody(event).catch(() => ({}))
+    const parsed = payloadSchema.parse(body || {})
 
   // Pas de payload => rien à faire
   if (!parsed.rights && parsed.title === undefined && !parsed.perEdition)
@@ -151,21 +154,23 @@ export default defineEventHandler(async (event) => {
     return { updated, perEdition: afterSnapshot.perEdition }
   })
 
-  return {
-    success: true,
-    collaborator: {
-      id: collaboratorId,
-      title: result.updated.title,
-      rights: {
-        editConvention: result.updated.canEditConvention,
-        deleteConvention: result.updated.canDeleteConvention,
-        manageCollaborators: result.updated.canManageCollaborators,
-        manageVolunteers: result.updated.canManageVolunteers,
-        addEdition: result.updated.canAddEdition,
-        editAllEditions: result.updated.canEditAllEditions,
-        deleteAllEditions: result.updated.canDeleteAllEditions,
+    return {
+      success: true,
+      collaborator: {
+        id: collaboratorId,
+        title: result.updated.title,
+        rights: {
+          editConvention: result.updated.canEditConvention,
+          deleteConvention: result.updated.canDeleteConvention,
+          manageCollaborators: result.updated.canManageCollaborators,
+          manageVolunteers: result.updated.canManageVolunteers,
+          addEdition: result.updated.canAddEdition,
+          editAllEditions: result.updated.canEditAllEditions,
+          deleteAllEditions: result.updated.canDeleteAllEditions,
+        },
+        perEdition: result.perEdition,
       },
-      perEdition: result.perEdition,
-    },
-  }
-})
+    }
+  },
+  { operationName: 'UpdateCollaboratorPermissions' }
+)

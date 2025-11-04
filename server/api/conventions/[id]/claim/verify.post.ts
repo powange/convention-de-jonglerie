@@ -1,28 +1,21 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const verifyClaimSchema = z.object({
   code: z.string().min(6).max(6),
 })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     // Vérifier que l'utilisateur est connecté
     const user = await requireAuth(event)
-
-    const conventionId = getRouterParam(event, 'id')
-    if (!conventionId) {
-      throw createError({
-        statusCode: 400,
-        message: 'ID de convention manquant',
-      })
-    }
+    const conventionIdNum = validateConventionId(event)
 
     const body = await readBody(event)
     const { code } = verifyClaimSchema.parse(body)
-
-    const conventionIdNum = parseInt(conventionId)
 
     // Vérifier que la convention existe et n'a pas de créateur
     const convention = await prisma.convention.findUnique({
@@ -116,14 +109,6 @@ export default defineEventHandler(async (event) => {
         editionsCount: convention.editions.length,
       },
     }
-  } catch (error) {
-    console.error('Erreur lors de la vérification de revendication:', error)
-    if (error.statusCode) {
-      throw error
-    }
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur lors de la vérification du code',
-    })
-  }
-})
+  },
+  { operationName: 'VerifyClaimConvention' }
+)

@@ -1,13 +1,13 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
-import { conventionSchema, handleValidationError } from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
+import { conventionSchema } from '@@/server/utils/validation-schemas'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification
+    const user = requireAuth(event)
 
-  try {
     const body = await readBody(event)
 
     // Validation avec Zod
@@ -123,21 +123,6 @@ export default defineEventHandler(async (event) => {
     }
 
     return transformed
-  } catch (error) {
-    // Gestion des erreurs de validation Zod
-    if (error instanceof z.ZodError) {
-      handleValidationError(error)
-    }
-
-    // Si c'est déjà une erreur HTTP, la relancer
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
-    }
-
-    console.error('Erreur lors de la création de la convention:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur lors de la création de la convention',
-    })
-  }
-})
+  },
+  { operationName: 'CreateConvention' }
+)

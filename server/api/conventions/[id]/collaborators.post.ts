@@ -1,3 +1,4 @@
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   addConventionCollaborator,
@@ -40,8 +41,8 @@ const addCollaboratorSchema = z
     message: 'userIdentifier ou userId est requis',
   })
 
-export default defineEventHandler(async (event) => {
-  try {
+export default wrapApiHandler(
+  async (event) => {
     const conventionId = validateConventionId(event)
     const user = requireAuth(event)
 
@@ -137,15 +138,6 @@ export default defineEventHandler(async (event) => {
         user: collaborator.user,
       },
     }
-  } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string }
-    if (httpError.statusCode) {
-      throw error
-    }
-    console.error("Erreur lors de l'ajout du collaborateur:", error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur',
-    })
-  }
-})
+  },
+  { operationName: 'AddConventionCollaborator' }
+)

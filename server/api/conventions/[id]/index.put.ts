@@ -1,35 +1,23 @@
 import { readFile } from 'fs/promises'
 
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getConventionForEdit } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
-import {
-  updateConventionSchema,
-  validateAndSanitize,
-  handleValidationError,
-} from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
+import { updateConventionSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérifier l'authentification
+    const user = requireAuth(event)
 
-  try {
     const conventionId = validateConventionId(event)
 
     const body = await readBody(event)
 
     // Validation et sanitisation des données avec Zod
-    let validatedData
-    try {
-      validatedData = validateAndSanitize(updateConventionSchema, body)
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        handleValidationError(error)
-      }
-      throw error
-    }
+    const validatedData = validateAndSanitize(updateConventionSchema, body)
 
     // Récupère la convention et vérifie les permissions d'édition
     const existingConvention = await getConventionForEdit(conventionId, user)
@@ -190,16 +178,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return updatedConvention
-  } catch (error) {
-    // Si c'est déjà une erreur HTTP, la relancer
-    if ((error as any)?.statusCode) {
-      throw error
-    }
-
-    console.error('Erreur lors de la mise à jour de la convention:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erreur serveur lors de la mise à jour de la convention',
-    })
-  }
-})
+  },
+  { operationName: 'UpdateConvention' }
+)
