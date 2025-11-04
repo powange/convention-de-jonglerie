@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
     // Créer l'édition sans l'image d'abord
     const edition = await prisma.edition.create({
       data: {
-        conventionId: validConventionId,
+        conventionId,
         name: name?.trim() || null,
         description,
         program,

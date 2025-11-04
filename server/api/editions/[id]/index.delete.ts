@@ -6,7 +6,7 @@ import { validateEditionId } from '@@/server/utils/validation-helpers'
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
 
-  const editionId = validateEditionId(event.context.params?.id)
+  const editionId = validateEditionId(event)
 
   try {
     // Récupère l'édition et vérifie les permissions de suppression

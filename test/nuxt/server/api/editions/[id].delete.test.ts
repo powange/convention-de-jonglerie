@@ -87,7 +87,7 @@ describe('/api/editions/[id] DELETE', () => {
       },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Invalid Edition ID')
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait rejeter si édition non trouvée', async () => {

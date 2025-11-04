@@ -21,7 +21,8 @@
       "Bash(while read file)",
       "Bash(do sed -i \"/from ''''@@\\/server\\/utils\\/permissions\\/convention-permissions''''/a import { validateConventionId } from ''''@@/server/utils/validation-helpers''''\" \"$file\")",
       "Bash(done)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx vitest:*)"
     ],
     "deny": [],
     "ask": [],

@@ -93,26 +93,20 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
       })
     })
 
-    it('devrait accepter les IDs négatifs (parseInt les convertit)', async () => {
-      global.getRouterParam.mockReturnValue('-1')
+    it('devrait rejeter les IDs négatifs', async () => {
+      mockEvent.context.params = { id: '-1' }
 
-      await handler(mockEvent as any)
+      await expect(handler(mockEvent as any)).rejects.toThrow('ID de convention invalide')
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(-1, {
-        email: 'test@example.com',
-        id: 1,
-      })
+      expect(mockDeleteConventionImage).not.toHaveBeenCalled()
     })
 
-    it('devrait accepter l\'ID 0 (parseInt("0") = 0, pas NaN)', async () => {
-      global.getRouterParam.mockReturnValue('0')
+    it('devrait rejeter l\'ID 0', async () => {
+      mockEvent.context.params = { id: '0' }
 
-      await handler(mockEvent as any)
+      await expect(handler(mockEvent as any)).rejects.toThrow('ID de convention invalide')
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(0, {
-        email: 'test@example.com',
-        id: 1,
-      })
+      expect(mockDeleteConventionImage).not.toHaveBeenCalled()
     })
 
     it('devrait gérer les grands nombres', async () => {

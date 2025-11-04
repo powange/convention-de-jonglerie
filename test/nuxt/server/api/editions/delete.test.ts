@@ -176,7 +176,7 @@ describe('/api/editions/[id] DELETE', () => {
       context: { ...mockEvent.context, params: { id: 'invalid' } },
     }
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Invalid Edition ID')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait rejeter si édition introuvable', async () => {

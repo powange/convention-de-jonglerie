@@ -68,7 +68,7 @@ describe('/api/conventions/[id]/editions GET', () => {
 
   it('valide id invalide', async () => {
     const ev = { ...baseEvent, context: { ...baseEvent.context, params: { id: '0' } } }
-    await expect(handler(ev as any)).rejects.toThrow('ID invalide')
+    await expect(handler(ev as any)).rejects.toThrow('ID de convention invalide')
   })
 
   it('retourne tableau vide si aucune édition', async () => {

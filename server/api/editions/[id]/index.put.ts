@@ -17,7 +17,7 @@ import type { Prisma } from '@prisma/client'
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
 
-  const editionId = validateEditionId(event.context.params?.id)
+  const editionId = validateEditionId(event)
 
   const body = await readBody(event)
 

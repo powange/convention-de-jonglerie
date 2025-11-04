@@ -58,7 +58,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
       context: { ...mockEvent.context, params: { id: 'invalid', collaboratorId: '2' } },
     }
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
   it('devrait rejeter un ID de collaborateur invalide', async () => {
@@ -67,7 +67,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
       context: { ...mockEvent.context, params: { id: '1', collaboratorId: 'invalid' } },
     }
 
-    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('ID de collaborateur invalide')
   })
 
   it('devrait gérer les erreurs de deleteConventionCollaborator', async () => {

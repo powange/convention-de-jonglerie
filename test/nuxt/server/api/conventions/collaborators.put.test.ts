@@ -94,10 +94,8 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     const requestBody = { rights: { editConvention: true } }
 
     global.readBody.mockResolvedValue(requestBody)
-    // L'updateCollaboratorRole va recevoir NaN comme conventionId et rejeter
-    mockUpdateRole.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
   it('devrait rejeter un ID de collaborateur invalide', async () => {
@@ -109,10 +107,8 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     const requestBody = { rights: { editConvention: true } }
 
     global.readBody.mockResolvedValue(requestBody)
-    // L'updateCollaboratorRole va recevoir NaN comme collaboratorId et rejeter
-    mockUpdateRole.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('ID de collaborateur invalide')
   })
 
   it('devrait valider le schéma de droits avec zod', async () => {
@@ -120,7 +116,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
 
     global.readBody.mockResolvedValue(invalidBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it("devrait rejeter si aucune donnée à mettre à jour n'est fournie", async () => {
