@@ -5,6 +5,7 @@ import {
   checkAdminMode,
   findUserByPseudoOrEmail,
 } from '@@/server/utils/collaborator-management'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -57,17 +58,10 @@ export default wrapApiHandler(
     if (userId) {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
-      userToAdd = await prisma.user.findUnique({
-        where: { id: userId },
+      userToAdd = await fetchResourceOrFail(prisma.user, userId, {
+        errorMessage: 'Utilisateur introuvable',
         select: { id: true, pseudo: true },
       })
-
-      if (!userToAdd) {
-        throw createError({
-          statusCode: 404,
-          message: 'Utilisateur introuvable',
-        })
-      }
     } else if (userIdentifier) {
       // Sinon, rechercher par pseudo ou email (comportement existant)
       userToAdd = await findUserByPseudoOrEmail(userIdentifier)

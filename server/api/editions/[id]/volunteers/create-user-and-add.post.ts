@@ -4,7 +4,8 @@ import { canManageEditionVolunteers } from '@@/server/utils/collaborator-managem
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { sanitizeEmail, validateEditionId } from '@@/server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 import { z } from 'zod'
 
@@ -183,7 +184,7 @@ export default wrapApiHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   // Sanitisation des données
-  const cleanEmail = body.email.toLowerCase().trim()
+  const cleanEmail = sanitizeEmail(body.email)
   const cleanPrenom = body.prenom.trim()
   const cleanNom = body.nom.trim()
 
@@ -201,8 +202,8 @@ export default wrapApiHandler(async (event) => {
   }
 
   // Vérifier que l'édition existe
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
+  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+    errorMessage: 'Edition introuvable',
     select: {
       id: true,
       name: true,
@@ -214,13 +215,6 @@ export default wrapApiHandler(async (event) => {
       },
     },
   })
-
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      message: 'Edition introuvable',
-    })
-  }
 
   // Générer un pseudo unique
   const pseudo = await generateUniquePseudo(cleanEmail)

@@ -10,6 +10,7 @@ import {
   validateTeamPreferences,
 } from '@@/server/utils/editions/volunteers/applications'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -19,8 +20,7 @@ export default wrapApiHandler(
     const body = await readBody(event).catch(() => ({}))
     const parsed = volunteerApplicationBodySchema.parse(body || {})
 
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       select: {
         volunteersOpen: true,
         volunteersAskDiet: true,
@@ -36,8 +36,8 @@ export default wrapApiHandler(
         volunteersAskSkills: true,
         volunteersAskExperience: true,
       },
+      errorMessage: 'Edition introuvable',
     })
-    if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
     if (!edition.volunteersOpen)
       throw createError({ statusCode: 400, message: 'Recrutement fermé' })
 
@@ -223,7 +223,10 @@ export default wrapApiHandler(
       console.error("Erreur lors de l'envoi de la notification:", notificationError)
     }
 
-    return { success: true, application }
+    return {
+      success: true,
+      application,
+    }
   },
   { operationName: 'CreateVolunteerApplication' }
 )

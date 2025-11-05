@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { buildUpdateData } from '@@/server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -138,30 +139,9 @@ export default wrapApiHandler(
     // Mettre à jour l'artiste
     const updatedArtist = await prisma.editionArtist.update({
       where: { id: artistId },
-      data: {
-        arrivalDateTime: validatedData.arrivalDateTime,
-        departureDateTime: validatedData.departureDateTime,
-        dietaryPreference: validatedData.dietaryPreference,
-        allergies: validatedData.allergies,
-        allergySeverity: validatedData.allergySeverity,
-        payment: validatedData.payment,
-        paymentPaid: validatedData.paymentPaid,
-        reimbursementMax: validatedData.reimbursementMax,
-        reimbursementActual: validatedData.reimbursementActual,
-        reimbursementActualPaid: validatedData.reimbursementActualPaid,
-        accommodationAutonomous: validatedData.accommodationAutonomous,
-        accommodationProposal: validatedData.accommodationProposal,
-        invoiceRequested: validatedData.invoiceRequested,
-        invoiceProvided: validatedData.invoiceProvided,
-        feeRequested: validatedData.feeRequested,
-        feeProvided: validatedData.feeProvided,
-        pickupRequired: validatedData.pickupRequired,
-        pickupLocation: validatedData.pickupLocation,
-        pickupResponsibleId: validatedData.pickupResponsibleId,
-        dropoffRequired: validatedData.dropoffRequired,
-        dropoffLocation: validatedData.dropoffLocation,
-        dropoffResponsibleId: validatedData.dropoffResponsibleId,
-      },
+      data: buildUpdateData(validatedData, {
+        exclude: ['userEmail', 'userPrenom', 'userNom', 'userPhone'],
+      }),
       include: {
         user: {
           select: {

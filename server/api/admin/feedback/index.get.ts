@@ -1,20 +1,18 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { validatePagination } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
+    const { page, limit, skip } = validatePagination(event)
     const query = getQuery(event)
-    const page = parseInt(query.page as string) || 1
-    const limit = parseInt(query.limit as string) || 20
     const type = query.type as string
     const resolved =
       query.resolved === 'true' ? true : query.resolved === 'false' ? false : undefined
     const search = query.search as string
-
-    const offset = (page - 1) * limit
 
     // Construction des filtres
     const where: any = {}
@@ -50,7 +48,7 @@ export default wrapApiHandler(
           },
         },
         orderBy: { createdAt: 'desc' },
-        skip: offset,
+        skip,
         take: limit,
       }),
       prisma.feedback.count({ where }),
@@ -81,13 +79,7 @@ export default wrapApiHandler(
     })
 
     return {
-      feedbacks,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      ...createPaginatedResponse(feedbacks, total, page, limit),
       stats: statsFormatted,
     }
   },

@@ -1,7 +1,8 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { validatePagination } from '@@/server/utils/validation-helpers'
 
 /**
  * API Admin - Récupérer les notifications récentes
@@ -21,10 +22,8 @@ export default wrapApiHandler(
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
     // Récupérer les paramètres depuis la query string
+    const { page, limit, skip } = validatePagination(event)
     const query = getQuery(event)
-    const page = Math.max(1, parseInt(query.page as string) || 1)
-    const limit = Math.min(100, Math.max(1, parseInt(query.limit as string) || 10))
-    const skip = (page - 1) * limit
 
     // Filtres optionnels
     const category = query.category as string | undefined
@@ -100,15 +99,7 @@ export default wrapApiHandler(
       },
     }))
 
-    return {
-      notifications: formattedNotifications,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    }
+    return createPaginatedResponse(formattedNotifications, total, page, limit)
   },
   { operationName: 'GetRecentNotifications' }
 )

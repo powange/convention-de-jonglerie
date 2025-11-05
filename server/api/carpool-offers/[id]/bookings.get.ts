@@ -1,16 +1,16 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const offerId = validateResourceId(event, 'id', 'offre')
 
-    const offer = await prisma.carpoolOffer.findUnique({ where: { id: offerId } })
-    if (!offer) {
-      throw createError({ statusCode: 404, message: 'Offre de covoiturage introuvable' })
-    }
+    const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
+      errorMessage: 'Offre de covoiturage introuvable',
+    })
 
     const userId = event.context.user?.id as number | undefined
     const isOwner = !!userId && userId === offer.userId

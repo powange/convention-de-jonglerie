@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -22,17 +23,10 @@ export default wrapApiHandler(
     const { profilePicture } = validatedData
 
     // Vérifier que l'utilisateur à modifier existe
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
+    const existingUser = await fetchResourceOrFail(prisma.user, userId, {
+      errorMessage: 'Utilisateur introuvable',
       select: { id: true, profilePicture: true },
     })
-
-    if (!existingUser) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur introuvable',
-      })
-    }
 
     // Gérer la photo de profil
     let finalProfileFilename = profilePicture

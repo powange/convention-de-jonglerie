@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 import { z } from 'zod'
@@ -25,8 +26,8 @@ export default wrapApiHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   // Vérifier que l'utilisateur existe
-  const targetUser = await prisma.user.findUnique({
-    where: { id: body.userId },
+  const targetUser = await fetchResourceOrFail(prisma.user, body.userId, {
+    errorMessage: 'Utilisateur introuvable',
     select: {
       id: true,
       nom: true,
@@ -36,16 +37,9 @@ export default wrapApiHandler(async (event) => {
     },
   })
 
-  if (!targetUser) {
-    throw createError({
-      statusCode: 404,
-      message: 'Utilisateur introuvable',
-    })
-  }
-
   // Vérifier que l'édition existe
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
+  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+    errorMessage: 'Edition introuvable',
     select: {
       id: true,
       name: true,
@@ -57,13 +51,6 @@ export default wrapApiHandler(async (event) => {
       },
     },
   })
-
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      message: 'Edition introuvable',
-    })
-  }
 
   // Vérifier qu'il n'y a pas déjà une candidature
   const existing = await prisma.editionVolunteerApplication.findUnique({

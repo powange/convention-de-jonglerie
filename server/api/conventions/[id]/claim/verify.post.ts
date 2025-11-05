@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -18,19 +19,12 @@ export default wrapApiHandler(
     const { code } = verifyClaimSchema.parse(body)
 
     // Vérifier que la convention existe et n'a pas de créateur
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionIdNum },
+    const convention = await fetchResourceOrFail(prisma.convention, conventionIdNum, {
+      errorMessage: 'Convention non trouvée',
       include: {
         editions: true,
       },
     })
-
-    if (!convention) {
-      throw createError({
-        statusCode: 404,
-        message: 'Convention non trouvée',
-      })
-    }
 
     if (convention.authorId) {
       throw createError({

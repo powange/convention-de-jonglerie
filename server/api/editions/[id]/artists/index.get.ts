@@ -4,7 +4,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { sanitizeEmail, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -86,7 +86,7 @@ export default wrapApiHandler(
       ...artist,
       user: {
         ...artist.user,
-        emailHash: createHash('md5').update(artist.user.email.toLowerCase().trim()).digest('hex'),
+        emailHash: createHash('md5').update(sanitizeEmail(artist.user.email)).digest('hex'),
       },
     }))
 

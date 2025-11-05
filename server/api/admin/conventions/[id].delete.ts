@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -20,8 +21,8 @@ export default wrapApiHandler(
     const conventionId = validateConventionId(event)
 
     // Récupérer la convention pour logging
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionId },
+    const convention = await fetchResourceOrFail(prisma.convention, conventionId, {
+      errorMessage: 'Convention non trouvée',
       include: {
         editions: {
           select: { id: true, name: true },
@@ -34,13 +35,6 @@ export default wrapApiHandler(
         },
       },
     })
-
-    if (!convention) {
-      throw createError({
-        statusCode: 404,
-        message: 'Convention non trouvée',
-      })
-    }
 
     // Log de l'action admin pour audit
     console.log(

@@ -3,6 +3,7 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -12,16 +13,9 @@ export default wrapApiHandler(
     const conventionIdNum = validateConventionId(event)
 
     // Vérifier que la convention existe et n'a pas de créateur
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionIdNum },
+    const convention = await fetchResourceOrFail(prisma.convention, conventionIdNum, {
+      errorMessage: 'Convention non trouvée',
     })
-
-    if (!convention) {
-      throw createError({
-        statusCode: 404,
-        message: 'Convention non trouvée',
-      })
-    }
 
     if (convention.authorId) {
       throw createError({

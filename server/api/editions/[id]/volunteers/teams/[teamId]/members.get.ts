@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { sanitizeEmail, validateEditionId } from '@@/server/utils/validation-helpers'
 
 /**
  * Récupère les membres d'une équipe de bénévoles avec leurs coordonnées
@@ -83,9 +83,7 @@ export default wrapApiHandler(async (event) => {
     prenom: assignment.application.user.prenom,
     nom: assignment.application.user.nom,
     email: assignment.application.user.email,
-    emailHash: createHash('md5')
-      .update(assignment.application.user.email.toLowerCase().trim())
-      .digest('hex'),
+    emailHash: createHash('md5').update(sanitizeEmail(assignment.application.user.email)).digest('hex'),
     phone: assignment.application.userSnapshotPhone,
     profilePicture: assignment.application.user.profilePicture,
     isLeader: assignment.isLeader,

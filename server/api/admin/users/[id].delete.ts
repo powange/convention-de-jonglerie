@@ -3,6 +3,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { sendEmail, generateAccountDeletionEmailHtml } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { readBody } from 'h3'
 
@@ -64,8 +65,8 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'utilisateur à supprimer
-    const userToDelete = await prisma.user.findUnique({
-      where: { id: userIdToDelete },
+    const userToDelete = await fetchResourceOrFail(prisma.user, userIdToDelete, {
+      errorMessage: 'Utilisateur non trouvé',
       select: {
         id: true,
         email: true,
@@ -75,13 +76,6 @@ export default wrapApiHandler(
         isGlobalAdmin: true,
       },
     })
-
-    if (!userToDelete) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur non trouvé',
-      })
-    }
 
     // Empêcher la suppression d'autres super admins (sécurité supplémentaire)
     if (userToDelete.isGlobalAdmin) {

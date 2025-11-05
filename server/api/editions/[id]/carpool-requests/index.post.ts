@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { carpoolRequestSchema } from '@@/server/utils/validation-schemas'
 
@@ -15,16 +16,9 @@ export default wrapApiHandler(
     const validatedData = carpoolRequestSchema.parse(body)
 
     // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Edition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Edition non trouvée',
-      })
-    }
 
     // Créer la demande de covoiturage
     const carpoolRequest = await prisma.carpoolRequest.create({

@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 import { getUserSession, setUserSession } from '#imports'
@@ -25,16 +26,9 @@ export default wrapApiHandler(
     const userId = validateResourceId(event, 'id', 'utilisateur')
 
     // Récupérer l'utilisateur cible
-    const targetUser = await prisma.user.findUnique({
-      where: { id: userId },
+    const targetUser = await fetchResourceOrFail(prisma.user, userId, {
+      errorMessage: 'Utilisateur non trouvé',
     })
-
-    if (!targetUser) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur non trouvé',
-      })
-    }
 
     // Ne pas permettre l'impersonation d'un autre super admin
     if (targetUser.isGlobalAdmin) {

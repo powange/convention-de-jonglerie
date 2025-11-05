@@ -1,6 +1,8 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
+import { sanitizeEmail } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const verifyEmailSchema = z.object({
@@ -19,16 +21,11 @@ export default wrapApiHandler(
     const validatedData = verifyEmailSchema.parse(body)
 
     // Rechercher l'utilisateur
-    const user = await prisma.user.findUnique({
-      where: { email: validatedData.email.toLowerCase().trim() },
+    const user = await fetchResourceByFieldOrFail(prisma.user, {
+      email: sanitizeEmail(validatedData.email),
+    }, {
+      errorMessage: 'Utilisateur non trouvé',
     })
-
-    if (!user) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur non trouvé',
-      })
-    }
 
     if (user.isEmailVerified) {
       throw createError({

@@ -1,4 +1,4 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { NotificationService } from '@@/server/utils/notification-service'
@@ -47,15 +47,17 @@ export default wrapApiHandler(
     // Obtenir aussi le nombre total de notifications non lues
     const unreadCount = await NotificationService.getUnreadCount(user.id, parsed.category)
 
+    // Calculer la page à partir de l'offset et du limit pour createPaginatedResponse
+    const limit = parsed.limit || 50
+    const offset = parsed.offset || 0
+    const page = Math.floor(offset / limit) + 1
+
+    // Obtenir le total pour la pagination (approximatif avec hasMore)
+    const total = offset + notifications.length + (notifications.length === limit ? limit : 0)
+
     return {
-      success: true,
-      notifications: mappedNotifications,
+      ...createPaginatedResponse(mappedNotifications, total, page, limit),
       unreadCount,
-      pagination: {
-        limit: parsed.limit || 50,
-        offset: parsed.offset || 0,
-        hasMore: notifications.length === (parsed.limit || 50),
-      },
     }
   },
   { operationName: 'GetUserNotifications' }

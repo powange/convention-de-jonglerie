@@ -6,7 +6,9 @@ import {
   getSiteUrl,
 } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { emailRateLimiter } from '@@/server/utils/rate-limiter'
+import { sanitizeEmail } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const resendVerificationSchema = z.object({
@@ -25,19 +27,12 @@ export default wrapApiHandler(
 
     // Validation des données
     const validatedData = resendVerificationSchema.parse(body)
-    const cleanEmail = validatedData.email.toLowerCase().trim()
+    const cleanEmail = sanitizeEmail(validatedData.email)
 
     // Rechercher l'utilisateur
-    const user = await prisma.user.findUnique({
-      where: { email: cleanEmail },
+    const user = await fetchResourceByFieldOrFail(prisma.user, { email: cleanEmail }, {
+      errorMessage: 'Utilisateur non trouvé',
     })
-
-    if (!user) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur non trouvé',
-      })
-    }
 
     if (user.isEmailVerified) {
       throw createError({

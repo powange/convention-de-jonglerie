@@ -1,6 +1,8 @@
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { validatePagination } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -18,8 +20,7 @@ export default wrapApiHandler(
 
     // Paramètres de pagination et filtres
     const query = getQuery(event)
-    const page = parseInt(query.page as string) || 1
-    const limit = parseInt(query.limit as string) || 20
+    const { page, limit, skip, take } = validatePagination(event)
     const search = (query.search as string) || ''
     const tierIdsParam = (query.tierIds as string) || ''
     const tierIds = tierIdsParam ? tierIdsParam.split(',').map((id) => parseInt(id)) : []
@@ -125,8 +126,8 @@ export default wrapApiHandler(
           },
         },
         orderBy: { orderDate: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
+        skip,
+        take,
       })
 
       // Calculer les stats globales (seulement si pas de recherche pour optimiser)
@@ -172,13 +173,7 @@ export default wrapApiHandler(
       }
 
       return {
-        orders,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
+        ...createPaginatedResponse(orders, total, page, limit),
         stats,
       }
     } catch (error: unknown) {

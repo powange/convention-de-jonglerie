@@ -1,8 +1,8 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validatePagination } from '@@/server/utils/validation-helpers'
 
 import type { VolunteerApplicationWhereInput } from '@@/server/types/prisma-helpers'
 import type { Prisma } from '@prisma/client'
@@ -50,7 +50,7 @@ export default wrapApiHandler(async (event) => {
   const presenceFilter = query.presence as string | undefined
   const assignedTeamsFilter = query.assignedTeams as string | undefined
   const isExport = query.export === 'true'
-  const page = Math.max(1, parseInt((query.page as string) || '1'))
+  const { page } = validatePagination(event)
   const pageSize = Math.min(
     100,
     Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
@@ -446,13 +446,5 @@ export default wrapApiHandler(async (event) => {
     return csvContent
   }
 
-  return {
-    applications,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      totalPages: Math.max(1, Math.ceil(total / pageSize)),
-    },
-  }
+  return createPaginatedResponse(applications, total, page, pageSize)
 }, 'GetVolunteerApplications')

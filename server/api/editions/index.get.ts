@@ -1,5 +1,5 @@
 // import { getEmailHash } from '@@/server/utils/email-hash'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
 // import type { Edition } from '~/types';
@@ -335,15 +335,7 @@ export default wrapApiHandler(
     const transformedEditions = editions
 
     // Retourner les résultats avec les métadonnées de pagination
-    return {
-      data: transformedEditions,
-      pagination: {
-        total: totalCount,
-        page: pageNumber,
-        limit: limitNumber,
-        totalPages: Math.ceil(totalCount / limitNumber),
-      },
-    }
+    return createPaginatedResponse(transformedEditions, totalCount, pageNumber, limitNumber)
   },
   { operationName: 'GetEditions' }
 )

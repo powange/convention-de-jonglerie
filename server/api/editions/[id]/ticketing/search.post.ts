@@ -5,6 +5,7 @@ import {
   calculateReturnableItemsForTicket,
   returnableItemsIncludes,
 } from '@@/server/utils/ticketing/returnable-items'
+import { sanitizeEmail } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -26,7 +27,7 @@ export default wrapApiHandler(
       })
 
     const body = bodySchema.parse(await readBody(event))
-    const searchTerm = body.searchTerm.toLowerCase().trim()
+    const searchTerm = sanitizeEmail(body.searchTerm)
 
     try {
       // Rechercher dans tous les billets de l'édition (externes et manuels)

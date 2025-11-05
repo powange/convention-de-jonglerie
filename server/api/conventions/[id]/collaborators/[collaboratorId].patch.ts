@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageCollaborators } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -50,11 +51,11 @@ export default wrapApiHandler(
     const canManage = await canManageCollaborators(conventionId, user.id, event)
     if (!canManage) throw createError({ statusCode: 403, message: 'Permission insuffisante' })
 
-    const collaborator = await prisma.conventionCollaborator.findUnique({
-      where: { id: collaboratorId },
+    const collaborator = await fetchResourceOrFail(prisma.conventionCollaborator, collaboratorId, {
+      errorMessage: 'Collaborateur introuvable',
       include: { perEditionPermissions: true },
     })
-    if (!collaborator || collaborator.conventionId !== conventionId)
+    if (collaborator.conventionId !== conventionId)
       throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
 
     const beforeSnapshot: CollaboratorPermissionSnapshot = {

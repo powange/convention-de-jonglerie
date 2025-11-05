@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -19,17 +20,13 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'offre et vérifier droits/capacité
-    const offer = await prisma.carpoolOffer.findUnique({
-      where: { id: offerId },
+    const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
       include: {
         user: true,
         bookings: true,
       },
+      errorMessage: 'Offre de covoiturage introuvable',
     })
-
-    if (!offer) {
-      throw createError({ statusCode: 404, message: 'Offre de covoiturage introuvable' })
-    }
 
     // Le créateur ne peut pas réserver sur sa propre offre
     if (offer.userId === user.id) {
@@ -41,8 +38,10 @@ export default wrapApiHandler(
 
     // Si requestId fourni, vérifier l'existence et l'appartenance à l'utilisateur courant
     if (requestId) {
-      const req = await prisma.carpoolRequest.findUnique({ where: { id: requestId } })
-      if (!req || req.userId !== user.id || req.editionId !== offer.editionId) {
+      const req = await fetchResourceOrFail(prisma.carpoolRequest, requestId, {
+        errorMessage: 'Demande invalide',
+      })
+      if (req.userId !== user.id || req.editionId !== offer.editionId) {
         throw createError({ statusCode: 400, message: 'Demande invalide' })
       }
     }

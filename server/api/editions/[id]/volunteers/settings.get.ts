@@ -1,13 +1,14 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Edition introuvable',
       select: {
         id: true,
         volunteersOpen: true,
@@ -34,7 +35,6 @@ export default wrapApiHandler(
         volunteerApplications: { select: { id: true, status: true, userId: true } },
       },
     })
-    if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
 
     const counts = edition.volunteerApplications.reduce(
       (acc, a) => {

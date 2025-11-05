@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -22,12 +23,16 @@ export default wrapApiHandler(
     if (targetUserId !== user.id) {
       // Vérifier que l'utilisateur connecté est un admin
       const { prisma } = await import('@@/server/utils/prisma')
-      const currentUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { isGlobalAdmin: true },
-      })
+      const currentUser = await fetchResourceOrFail<{ isGlobalAdmin: boolean }>(
+        prisma.user,
+        user.id,
+        {
+          select: { isGlobalAdmin: true },
+          errorMessage: 'Utilisateur introuvable',
+        }
+      )
 
-      if (!currentUser?.isGlobalAdmin) {
+      if (!currentUser.isGlobalAdmin) {
         throw createError({
           statusCode: 403,
           message: "Accès refusé - Droits administrateur requis pour modifier d'autres profils",

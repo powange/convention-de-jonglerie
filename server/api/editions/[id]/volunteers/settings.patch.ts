@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
+import { buildUpdateData, fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
@@ -130,11 +131,10 @@ export default wrapApiHandler(
     }
 
     // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Edition introuvable',
       select: { conventionId: true, volunteersMode: true },
     })
-    if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
@@ -142,12 +142,8 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
-    const data: EditionUpdateInput = {}
-    if (parsed.open !== undefined) data.volunteersOpen = parsed.open
-    if (parsed.description !== undefined) data.volunteersDescription = parsed.description || null
-    if (parsed.mode !== undefined) data.volunteersMode = parsed.mode
+    // Validation spécifique : URL externe requise pour le mode EXTERNAL
     if (parsed.externalUrl !== undefined) {
-      // Si mode externe requis mais pas d'URL -> erreur explicite
       if (
         (parsed.mode === 'EXTERNAL' || edition?.volunteersMode === 'EXTERNAL') &&
         !parsed.externalUrl
@@ -157,29 +153,42 @@ export default wrapApiHandler(
           message: 'URL externe requise pour le mode EXTERNAL',
         })
       }
-      data.volunteersExternalUrl = parsed.externalUrl || null
     }
-    if (parsed.askDiet !== undefined) data.volunteersAskDiet = parsed.askDiet
-    if (parsed.askAllergies !== undefined) data.volunteersAskAllergies = parsed.askAllergies
-    if (parsed.askTimePreferences !== undefined)
-      data.volunteersAskTimePreferences = parsed.askTimePreferences
-    if (parsed.askTeamPreferences !== undefined)
-      data.volunteersAskTeamPreferences = parsed.askTeamPreferences
-    if (parsed.askPets !== undefined) data.volunteersAskPets = parsed.askPets
-    if (parsed.askMinors !== undefined) data.volunteersAskMinors = parsed.askMinors
-    if (parsed.askVehicle !== undefined) data.volunteersAskVehicle = parsed.askVehicle
-    if (parsed.askCompanion !== undefined) data.volunteersAskCompanion = parsed.askCompanion
-    if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
-    if (parsed.askSkills !== undefined) data.volunteersAskSkills = parsed.askSkills
-    if (parsed.askExperience !== undefined) data.volunteersAskExperience = parsed.askExperience
-    if (parsed.askEmergencyContact !== undefined)
-      data.volunteersAskEmergencyContact = parsed.askEmergencyContact
-    if (parsed.setupStartDate !== undefined)
-      data.volunteersSetupStartDate = parsed.setupStartDate ? new Date(parsed.setupStartDate) : null
-    if (parsed.setupEndDate !== undefined)
-      data.volunteersTeardownEndDate = parsed.setupEndDate ? new Date(parsed.setupEndDate) : null
-    if (parsed.askSetup !== undefined) data.volunteersAskSetup = parsed.askSetup
-    if (parsed.askTeardown !== undefined) data.volunteersAskTeardown = parsed.askTeardown
+
+    // Mapper les champs de l'API vers les champs de la BDD
+    const mappedData = {
+      volunteersOpen: parsed.open,
+      volunteersDescription: parsed.description || null,
+      volunteersMode: parsed.mode,
+      volunteersExternalUrl: parsed.externalUrl || null,
+      volunteersAskDiet: parsed.askDiet,
+      volunteersAskAllergies: parsed.askAllergies,
+      volunteersAskTimePreferences: parsed.askTimePreferences,
+      volunteersAskTeamPreferences: parsed.askTeamPreferences,
+      volunteersAskPets: parsed.askPets,
+      volunteersAskMinors: parsed.askMinors,
+      volunteersAskVehicle: parsed.askVehicle,
+      volunteersAskCompanion: parsed.askCompanion,
+      volunteersAskAvoidList: parsed.askAvoidList,
+      volunteersAskSkills: parsed.askSkills,
+      volunteersAskExperience: parsed.askExperience,
+      volunteersAskEmergencyContact: parsed.askEmergencyContact,
+      volunteersSetupStartDate: parsed.setupStartDate,
+      volunteersTeardownEndDate: parsed.setupEndDate,
+      volunteersAskSetup: parsed.askSetup,
+      volunteersAskTeardown: parsed.askTeardown,
+    }
+
+    // Construire les données de mise à jour avec buildUpdateData
+    const data = buildUpdateData(mappedData, {
+      transform: {
+        volunteersSetupStartDate: (val) => (val ? new Date(val) : null),
+        volunteersTeardownEndDate: (val) => (val ? new Date(val) : null),
+        volunteersDescription: (val) => val || null,
+        volunteersExternalUrl: (val) => val || null,
+      },
+    }) as EditionUpdateInput
+
     if (Object.keys(data).length === 0) return { success: true, unchanged: true }
     data.volunteersUpdatedAt = new Date()
 

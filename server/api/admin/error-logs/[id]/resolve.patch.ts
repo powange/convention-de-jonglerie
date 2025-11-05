@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -22,14 +23,10 @@ export default wrapApiHandler(
     const parsed = bodySchema.parse(body)
 
     // Vérifier que le log existe
-    const existingLog = await prisma.apiErrorLog.findUnique({
-      where: { id: logId },
+    await fetchResourceOrFail(prisma.apiErrorLog, logId, {
+      errorMessage: "Log d'erreur introuvable",
       select: { id: true, resolved: true },
     })
-
-    if (!existingLog) {
-      throw createError({ statusCode: 404, message: "Log d'erreur introuvable" })
-    }
 
     // Mettre à jour le statut de résolution
     const updatedLog = await prisma.apiErrorLog.update({

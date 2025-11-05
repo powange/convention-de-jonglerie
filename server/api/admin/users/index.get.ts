@@ -1,7 +1,8 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
 import { prisma } from '@@/server/utils/prisma'
+import { validatePagination } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -9,9 +10,8 @@ export default wrapApiHandler(
     await requireGlobalAdminWithDbCheck(event)
 
     // Récupérer les paramètres de requête pour la pagination et le filtrage
+    const { page, limit, skip } = validatePagination(event)
     const query = getQuery(event)
-    const page = parseInt(query.page as string) || 1
-    const limit = parseInt(query.limit as string) || 20
     const search = (query.search as string) || ''
     const sortBy = (query.sortBy as string) || 'createdAt'
     const sortOrder = (query.sortOrder as string) === 'asc' ? 'asc' : 'desc'
@@ -47,9 +47,6 @@ export default wrapApiHandler(
 
     // Filtrage par utilisateurs en ligne uniquement
     const onlineOnly = query.onlineOnly === 'true'
-
-    // Calculer l'offset pour la pagination
-    const offset = (page - 1) * limit
 
     // Récupérer les connexions actives SSE
     const activeConnections = notificationStreamManager.getStats()
@@ -99,7 +96,7 @@ export default wrapApiHandler(
                 : sortBy === 'nom'
                   ? { nom: sortOrder }
                   : { createdAt: sortOrder },
-        skip: offset,
+        skip,
         take: limit,
       }),
       prisma.user.count({
@@ -113,21 +110,8 @@ export default wrapApiHandler(
       isConnected: activeUserIds.includes(user.id),
     }))
 
-    // Calculer les métadonnées de pagination
-    const totalPages = Math.ceil(totalCount / limit)
-    const hasNextPage = page < totalPages
-    const hasPrevPage = page > 1
-
     return {
-      users: usersWithConnectionStatus,
-      pagination: {
-        page,
-        limit,
-        totalCount,
-        totalPages,
-        hasNextPage,
-        hasPrevPage,
-      },
+      ...createPaginatedResponse(usersWithConnectionStatus, totalCount, page, limit),
       filters: {
         search,
         sortBy,

@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { passwordSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
@@ -15,17 +16,11 @@ export default wrapApiHandler(
     const { token, newPassword } = resetPasswordSchema.parse(body)
 
     // Vérifier le token
-    const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
+    const resetToken = await fetchResourceByFieldOrFail(prisma.passwordResetToken, { token }, {
       include: { user: true },
+      errorMessage: 'Token de réinitialisation invalide',
+      statusCode: 400,
     })
-
-    if (!resetToken) {
-      throw createError({
-        statusCode: 400,
-        message: 'Token de réinitialisation invalide',
-      })
-    }
 
     // Vérifier si le token a expiré
     // Comparer en UTC car les dates en BDD sont en UTC

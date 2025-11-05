@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
 function getAuthProviderLabel(provider: string): string {
   switch (provider) {
@@ -20,20 +21,17 @@ export default wrapApiHandler(
     const user = requireAuth(event)
 
     // Récupérer les informations de l'utilisateur
-    const userInfo = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        authProvider: true,
-        password: true,
-      },
-    })
-
-    if (!userInfo) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur non trouvé',
-      })
-    }
+    const userInfo = await fetchResourceOrFail<{ authProvider: string | null; password: string | null }>(
+      prisma.user,
+      user.id,
+      {
+        select: {
+          authProvider: true,
+          password: true,
+        },
+        errorMessage: 'Utilisateur non trouvé',
+      }
+    )
 
     const authProvider = userInfo.authProvider || 'unknown'
     const authProviderLabel = getAuthProviderLabel(authProvider)

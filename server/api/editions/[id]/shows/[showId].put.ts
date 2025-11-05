@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -22,8 +23,7 @@ export default wrapApiHandler(
     const showId = validateResourceId(event, 'showId', 'spectacle')
 
     // Vérifier les permissions
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       include: {
         convention: {
           include: {
@@ -36,14 +36,8 @@ export default wrapApiHandler(
           },
         },
       },
+      errorMessage: 'Édition non trouvée',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition non trouvée',
-      })
-    }
 
     const hasPermission = canEditEdition(edition, user)
     if (!hasPermission) {

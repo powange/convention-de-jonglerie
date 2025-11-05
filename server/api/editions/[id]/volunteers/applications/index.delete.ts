@@ -1,4 +1,4 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -17,7 +17,7 @@ export default wrapApiHandler(
       throw createError({ statusCode: 400, message: 'Impossible de retirer cette candidature' })
 
     await prisma.editionVolunteerApplication.delete({ where: { id: app.id } })
-    return { success: true }
+    return createSuccessResponse(null)
   },
   { operationName: 'WithdrawOwnVolunteerApplication' }
 )

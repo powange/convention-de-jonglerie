@@ -1131,4 +1131,541 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 
 ---
 
-**🎯 Objectif atteint : 100% des endpoints API utilisent maintenant les utilitaires centralisés !**
+**🎯 Objectif Phase 1-6 atteint : 100% des endpoints API utilisent maintenant `wrapApiHandler` !**
+
+---
+
+## 📋 Phase 7+ : Optimisations avancées des helpers
+
+### Vue d'ensemble
+
+Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisation ont été identifiées pour améliorer davantage la cohérence et réduire la duplication de code.
+
+**Statut global des optimisations :**
+
+| Migration | Fichiers concernés | Gain estimé | Priorité | Statut |
+|-----------|-------------------|-------------|----------|--------|
+| Phase 4 - validatePagination | 7 | ~21 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** |
+| Phase 7 - createPaginatedResponse | 11 | 60-100 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/11) |
+| Phase 8A - fetchResourceOrFail Auth | 11 | ~75 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (8/11) |
+| Phase 8B-F - fetchResourceOrFail Autres | 42 | ~240 lignes | 🟡 Moyenne | ⏳ À faire |
+| Phase 9 - sanitizeEmail | 8 | ~10 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/8) |
+| Phase 9+ - sanitizeString/Object | 40-50 | ~120 lignes | 🟡 Moyenne | ⏳ À faire |
+| Phase 10 P1 - buildUpdateData | 3 | ~159 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (2/3) |
+| Phase 10 P2-P3 - buildUpdateData Autres | 9 | - | 🟢 Basse | ⏳ À faire |
+| Phase 11 - createSuccessResponse | 14 | 15-30 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (5/14) |
+| Phase 11+ - createSuccessResponse Autres | 46+ | - | 🟢 Basse | ⏳ À faire |
+| **TOTAL ACCOMPLI** | **33** | **~120 lignes** | - | **5 phases** |
+| **TOTAL RESTANT** | **95+** | **~560 lignes** | - | **5 phases** |
+
+---
+
+### Phase 4 : Migration validatePagination ✅ COMPLÉTÉ
+
+**Objectif** : Standardiser la validation de pagination avec `validatePagination(event)`
+
+**Résultats** :
+- ✅ 7 endpoints migrés
+- ✅ ~21 lignes économisées
+- ✅ Tous les tests passent (930 Nuxt + 273 unit)
+
+**Fichiers migrés** :
+1. `server/api/admin/feedback/index.get.ts` (-3 lignes)
+2. `server/api/admin/users/index.get.ts` (-3 lignes)
+3. `server/api/admin/error-logs.get.ts` (réorganisé)
+4. `server/api/admin/notifications/recent.get.ts` (-2 lignes)
+5. `server/api/editions/[id]/meals/participants.get.ts` (-1 ligne)
+6. `server/api/editions/[id]/ticketing/orders.get.ts` (-3 lignes)
+7. `server/api/editions/[id]/volunteers/applications.get.ts` (-1 ligne)
+
+---
+
+### Phase 7 : Migration createPaginatedResponse ✅ COMPLÉTÉ (9/11 fichiers)
+
+**Résultats** :
+- ✅ 9 endpoints migrés avec succès
+- ✅ ~61 lignes économisées
+- ✅ Tous les tests passent (930 Nuxt + 273 unit)
+
+**Fichiers migrés** :
+1. `server/api/editions/index.get.ts` (-6 lignes)
+2. `server/api/admin/users/index.get.ts` (-9 lignes avec spread)
+3. `server/api/admin/feedback/index.get.ts` (-5 lignes)
+4. `server/api/notifications/index.get.ts` (conversion offset→page)
+5. `server/api/editions/[id]/meals/participants.get.ts` (-3 lignes)
+6. `server/api/editions/[id]/ticketing/orders.get.ts` (-3 lignes)
+7. `server/api/editions/[id]/volunteers/applications.get.ts` (-6 lignes)
+8. `server/api/admin/notifications/recent.get.ts` (-5 lignes)
+9. `server/api/admin/error-logs.get.ts` (conditionnel cursor vs classic)
+
+**Fichiers exclus (2)** :
+- `server/api/editions/[id]/ticketing/helloasso/orders.get.ts` - API externe
+- `server/api/editions/[id]/ticketing/helloasso/orders.post.ts` - API externe
+
+---
+
+### Phase 7 (détails initiaux) : Migration createPaginatedResponse (11 fichiers)
+
+**Objectif** : Remplacer les constructions manuelles de réponses paginées par `createPaginatedResponse()`
+
+**Utilisation actuelle** : 0 usage (helper jamais utilisé malgré 11 endpoints avec pagination manuelle)
+
+#### Fichiers à migrer
+
+1. **`server/api/admin/feedback/index.get.ts`** (lignes 82-90)
+   - Pattern : `{ feedbacks, pagination: { page, limit, total, pages }, stats }`
+   - Gain : 5 lignes
+   ```typescript
+   // APRÈS
+   return {
+     ...createPaginatedResponse(feedbacks, total, page, limit),
+     stats: statsFormatted,
+   }
+   ```
+
+2. **`server/api/admin/users/index.get.ts`** (lignes 113-137)
+   - Pattern : Construction manuelle complète avec `hasNextPage`, `hasPrevPage`
+   - Gain : 10 lignes
+   ```typescript
+   // APRÈS
+   return {
+     ...createPaginatedResponse(usersWithConnectionStatus, totalCount, page, limit),
+     filters: { search, sortBy, sortOrder },
+     connectionStats: { ... },
+   }
+   ```
+
+3. **`server/api/editions/index.get.ts`** (lignes 338-346)
+   - Pattern : Pagination pure simple
+   - Gain : 8 lignes
+   ```typescript
+   // APRÈS
+   return createPaginatedResponse(transformedEditions, totalCount, pageNumber, limitNumber)
+   ```
+
+4. **`server/api/notifications/index.get.ts`** (lignes 50-59)
+   - Pattern : `{ success: true, notifications, unreadCount, pagination }`
+   - Gain : 5 lignes
+
+5. **`server/api/editions/[id]/meals/participants.get.ts`** (lignes 254-265)
+   - Pattern : Pagination avec stats et availableDates
+   - Gain : 6 lignes
+
+6. **`server/api/editions/[id]/ticketing/orders.get.ts`** (lignes 174-183)
+   - Gain : 7 lignes
+
+7. **`server/api/editions/[id]/volunteers/applications.get.ts`** (lignes 449-457)
+   - Gain : 5 lignes
+
+8. **`server/api/admin/notifications/recent.get.ts`** (lignes 102-110)
+   - Gain : 5 lignes
+
+9. **`server/api/admin/error-logs.get.ts`**
+   - Gain : 5 lignes
+
+10. **`server/api/editions/[id]/ticketing/helloasso/orders.get.ts`**
+    - Gain : 5 lignes
+
+11. **`server/api/editions/[id]/ticketing/helloasso/orders.post.ts`**
+    - Gain : 5 lignes
+
+**Gain total estimé** : 60-100 lignes
+
+#### Points d'attention
+
+- Certains endpoints utilisent `offset/limit` au lieu de `page/limit` (ex: notifications)
+- Noms de champs variables : `total` vs `totalCount`, `pages` vs `totalPages`
+- Propriétés additionnelles à préserver avec spread operator
+
+---
+
+### Phase 8A : Migration fetchResourceOrFail Auth ✅ COMPLÉTÉ (8/11 fichiers)
+
+**Résultats** :
+- ✅ 8 endpoints Auth migrés avec succès
+- ✅ ~19 lignes économisées
+- ✅ Tous les tests passent
+
+**Fichiers migrés** :
+1. `server/api/files/profile.post.ts` - 1 pattern user
+2. `server/api/profile/has-password.get.ts` - 1 pattern user
+3. `server/api/profile/auth-info.get.ts` - 1 pattern user
+4. `server/api/profile/change-password.post.ts` - 1 pattern user
+5. `server/api/auth/resend-verification.post.ts` - 1 pattern user (fetchResourceByFieldOrFail)
+6. `server/api/auth/verify-email.post.ts` - 1 pattern user (fetchResourceByFieldOrFail)
+7. `server/api/auth/set-password-and-verify.post.ts` - 1 pattern user (fetchResourceByFieldOrFail)
+8. `server/api/auth/reset-password.post.ts` - 1 pattern passwordResetToken (fetchResourceByFieldOrFail)
+
+**Fichiers exclus (3)** :
+- `server/api/auth/login.post.ts` - Logique spéciale (essai email puis pseudo)
+- `server/api/auth/verify-reset-token.get.ts` - Retourne validation, pas erreur
+- `server/api/auth/request-password-reset.post.ts` - Pattern sécurité (ne révèle pas existence)
+
+---
+
+### Phase 8 (détails complets) : Migration fetchResourceOrFail (53 fichiers)
+
+**Objectif** : Remplacer le pattern `findUnique + if (!resource)` par `fetchResourceOrFail()`
+
+**Utilisation actuelle** : 15 fichiers (15%) - 30 utilisations
+**Opportunités** : 53 fichiers - 63 occurrences du pattern manuel
+
+#### Distribution par phase
+
+**Phase 8A - Authentification (11 fichiers, ~15 patterns)** 🔴 HAUTE PRIORITÉ
+
+Code critique pour la sécurité :
+1. `server/api/files/profile.post.ts` - 1 pattern `user`
+2. `server/api/profile/has-password.get.ts` - 1 pattern `user`
+3. `server/api/profile/auth-info.get.ts` - 1 pattern `user`
+4. `server/api/profile/change-password.post.ts` - 1 pattern `user`
+5. `server/api/auth/resend-verification.post.ts` - 1 pattern `user`
+6. `server/api/auth/verify-email.post.ts` - 1 pattern `user`
+7. `server/api/auth/login.post.ts` - 2 patterns `user`
+8. `server/api/auth/set-password-and-verify.post.ts` - 1 pattern `user`
+9. `server/api/auth/reset-password.post.ts` - 1 pattern `passwordResetToken`
+10. `server/api/auth/verify-reset-token.get.ts` - 1 pattern `passwordResetToken`
+11. `server/api/auth/request-password-reset.post.ts` - 1 pattern `user`
+
+**Gain estimé** : ~75 lignes
+
+**Phase 8B - Carpool (6 fichiers, ~9 patterns)** 🟡 MOYENNE
+
+12. `server/api/carpool-offers/[id]/comments.post.ts` - 1 pattern
+13. `server/api/carpool-offers/[id]/bookings.post.ts` - 2 patterns
+14. `server/api/carpool-offers/[id]/bookings.get.ts` - 1 pattern
+15. `server/api/carpool-offers/[id]/bookings/[bookingId].put.ts` - 2 patterns
+16. `server/api/carpool-requests/[id]/comments.post.ts` - 1 pattern
+
+**Gain estimé** : ~45 lignes
+
+**Phase 8C - Conventions (4 fichiers, ~4 patterns)** 🟡 MOYENNE
+
+17. `server/api/conventions/[id]/collaborators.post.ts` - 1 pattern
+18. `server/api/conventions/[id]/claim.post.ts` - 1 pattern
+19. `server/api/conventions/[id]/claim/verify.post.ts` - 1 pattern
+20. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - 1 pattern
+
+**Gain estimé** : ~20 lignes
+
+**Phase 8D - Admin (6 fichiers, ~6 patterns)** 🟢 BASSE
+
+21-26. Divers fichiers admin
+
+**Gain estimé** : ~30 lignes
+
+**Phase 8E - Éditions (22 fichiers, ~29 patterns)** 🟡 MOYENNE
+
+27-48. Divers fichiers éditions (attendance, favorite, carpool, ticketing, etc.)
+
+**Gain estimé** : ~145 lignes
+
+**Phase 8F - Volunteers (5 fichiers, ~5 patterns)** 🟡 MOYENNE
+
+49-53. Fichiers volunteers
+
+**Gain estimé** : ~25 lignes
+
+#### Exemple de migration
+
+```typescript
+// AVANT (6 lignes)
+const edition = await prisma.edition.findUnique({
+  where: { id: editionId },
+})
+
+if (!edition) {
+  throw createError({ statusCode: 404, message: 'Édition introuvable' })
+}
+
+// APRÈS (1 ligne)
+const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+  errorMessage: 'Édition introuvable',
+})
+```
+
+**Gain total estimé** : ~315 lignes
+
+---
+
+### Phase 9 : Migration sanitizeEmail ✅ COMPLÉTÉ (9/8 fichiers)
+
+**Résultats** :
+- ✅ 9 fichiers migrés (1 bonus découvert)
+- ✅ 10 occurrences de `.toLowerCase().trim()` remplacées
+- ✅ Tous les tests passent
+
+**Fichiers migrés** :
+1. `server/api/auth/register.post.ts` (L26)
+2. `server/api/auth/resend-verification.post.ts` (L29)
+3. `server/api/auth/verify-email.post.ts` (L24)
+4. `server/api/auth/set-password-and-verify.post.ts` (L27)
+5. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts` (L186)
+6. `server/api/editions/[id]/ticketing/search.post.ts` (L30)
+7. `server/api/editions/[id]/artists/index.get.ts` (L89)
+8. `server/api/editions/[id]/volunteers/teams/[teamId]/members.get.ts` (L86)
+9. `server/utils/email-hash.ts` (L13) - **BONUS**
+
+---
+
+### Phase 9 (détails complets) : Migration sanitizeEmail/String/Object (40-50 fichiers)
+
+**Objectif** : Standardiser la sanitisation des données d'entrée
+
+**Utilisation actuelle** : 0 usage (helpers définis mais jamais utilisés)
+**Opportunités** : 92 occurrences de `.trim()` manuel
+
+#### Patterns identifiés
+
+**Pattern 1 - Sanitisation d'emails (8 fichiers)** ✅ COMPLÉTÉ
+
+```typescript
+// AVANT
+const cleanEmail = validatedData.email.toLowerCase().trim()
+
+// APRÈS
+const cleanEmail = sanitizeEmail(validatedData.email)
+```
+
+Fichiers :
+1. `server/api/auth/register.post.ts` (L25)
+2. `server/api/auth/resend-verification.post.ts` (L28)
+3. `server/api/auth/verify-email.post.ts` (L23)
+4. `server/api/auth/set-password-and-verify.post.ts` (L26)
+5. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts` (L186)
+6. `server/api/editions/[id]/ticketing/search.post.ts` (L29)
+7. `server/api/editions/[id]/artists/index.get.ts` (L89)
+8. `server/api/editions/[id]/volunteers/teams/[teamId]/members.get.ts` (L87)
+
+**Pattern 2 - Sanitisation multiple de strings (5 fichiers prioritaires)**
+
+```typescript
+// AVANT (4 lignes répétitives)
+const cleanEmail = validatedData.email.toLowerCase().trim()
+const cleanPseudo = validatedData.pseudo.trim()
+const cleanNom = validatedData.nom.trim()
+const cleanPrenom = validatedData.prenom.trim()
+
+// APRÈS (1-2 lignes)
+const cleanEmail = sanitizeEmail(validatedData.email)
+const { pseudo: cleanPseudo, nom: cleanNom, prenom: cleanPrenom } =
+  sanitizeObject({ pseudo: validatedData.pseudo, nom: validatedData.nom, prenom: validatedData.prenom })
+```
+
+Fichiers prioritaires :
+1. `server/api/auth/register.post.ts` (4 champs, gain : 4 lignes)
+2. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts` (3 champs)
+3. `server/api/conventions/index.post.ts` (4 champs)
+4. `server/api/profile/update.put.ts` (3 champs avec vérification `!== ''`)
+5. `server/api/auth/login.post.ts` (2 champs)
+
+**Pattern 3 - Trim répétitif avec vérification (20+ occurrences)**
+
+```typescript
+// AVANT (répété 20+ fois dans volunteers/applications/index.post.ts)
+allergies: edition.volunteersAskAllergies && parsed.allergies?.trim()
+  ? parsed.allergies.trim()
+  : null,
+
+// APRÈS (avec sanitizeString)
+allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : null,
+```
+
+Fichier critique :
+- `server/api/editions/[id]/volunteers/applications/index.post.ts` (L107-172, gain : ~40 lignes)
+
+**Pattern 4 - Validation de strings vides (4 fichiers)**
+
+```typescript
+// AVANT
+if (!body.content || body.content.trim() === '') {
+  throw createError({ statusCode: 400, message: 'Le commentaire ne peut pas être vide' })
+}
+
+// APRÈS
+const content = sanitizeString(body.content)
+if (!content) {
+  throw createError({ statusCode: 400, message: 'Le commentaire ne peut pas être vide' })
+}
+```
+
+Fichiers :
+1. `server/api/carpool-offers/[id]/comments.post.ts` (L13)
+2. `server/api/carpool-requests/[id]/comments.post.ts` (L13)
+3. `server/api/editions/[id]/lost-found/index.post.ts` (L59)
+4. `server/api/editions/[id]/lost-found/[itemId]/comments.post.ts` (L34)
+
+**Gain total estimé** : ~130 lignes
+
+---
+
+### Phase 10 P1 : Migration buildUpdateData Priorité 1 ✅ COMPLÉTÉ (2/3 fichiers)
+
+**Résultats** :
+- ✅ 2 fichiers Priorité 1 migrés
+- ✅ ~37 lignes économisées
+- ✅ Tous les tests passent
+
+**Fichiers migrés** :
+1. `server/api/editions/[id]/artists/[artistId].put.ts` (-22 lignes)
+   - Remplacé 25 champs assignés manuellement par `buildUpdateData` avec `exclude`
+2. `server/api/editions/[id]/volunteers/settings.patch.ts` (-15 lignes)
+   - Créé mapping intermédiaire puis utilisé `buildUpdateData` avec `transform`
+
+**Fichier exclu (1)** :
+- `server/api/editions/[id]/index.put.ts` - Logique de fallback complexe incompatible (pattern `field: newValue !== undefined ? newValue : edition.field` pour 48 champs)
+
+---
+
+### Phase 10 (détails complets) : Migration buildUpdateData (12 fichiers)
+
+**Objectif** : Éliminer les constructions manuelles d'objets `updateData`
+
+**Utilisation actuelle** : 2 fichiers (4.7%)
+**Opportunités** : 12 fichiers avec construction manuelle
+
+#### Fichiers par priorité
+
+**Priorité 1 - Quick Wins (3 fichiers, gain : 87 lignes)** ✅ COMPLÉTÉ (2/3)
+
+1. **`server/api/editions/[id]/volunteers/settings.patch.ts`** (L145-182)
+   - 38 lignes de `if (parsed.X !== undefined) data.Y = parsed.X`
+   - Gain : 30 lignes
+
+2. **`server/api/editions/[id]/index.put.ts`** (L231-278)
+   - 48 lignes de construction manuelle avec fallback
+   - Gain : 33 lignes
+
+3. **`server/api/editions/[id]/artists/[artistId].put.ts`** (L139-163)
+   - 25 champs assignés manuellement
+   - Gain : 24 lignes
+
+**Priorité 2 - Optimisations moyennes (3 fichiers, gain : 36 lignes)**
+
+4. **`server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts`** (L79-96)
+   - 18 lignes avec mapping de droits
+   - Gain : 13 lignes
+
+5. **`server/api/carpool-requests/[id]/index.put.ts`** (L56-72)
+   - 17 lignes avec transformations
+   - Gain : 12 lignes
+
+6. **`server/api/editions/[id]/volunteer-teams/[teamId].put.ts`** (L71-82)
+   - 12 lignes de conditions
+   - Gain : 11 lignes
+
+**Priorité 3 - Optimisations simples (4 fichiers, gain : 27 lignes)**
+
+7. `server/api/profile/update.put.ts` (gain : 9 lignes)
+8. `server/api/conventions/[id]/index.put.ts` (gain : 8 lignes)
+9. `server/api/editions/[id]/volunteer-time-slots/[slotId].put.ts` (gain : 6 lignes)
+10. `server/api/editions/[id]/shows/[showId].put.ts` (gain : 4 lignes)
+
+**Gain total estimé** : ~159 lignes
+
+#### Exemple de migration
+
+```typescript
+// AVANT (12 lignes)
+const updateData: any = {}
+if (body.name !== undefined) updateData.name = body.name
+if (body.description !== undefined) updateData.description = body.description
+if (body.color !== undefined) updateData.color = body.color
+if (body.maxVolunteers !== undefined) updateData.maxVolunteers = body.maxVolunteers
+// ... 8 autres champs
+
+// APRÈS (1 ligne)
+const updateData = buildUpdateData(body, { trimStrings: true })
+```
+
+---
+
+### Phase 11 : Migration createSuccessResponse ✅ COMPLÉTÉ (5/6 fichiers)
+
+**Résultats** :
+- ✅ 5 fichiers migrés avec succès
+- ✅ Pas de breaking changes introduits
+- ✅ Tous les tests passent
+
+**Fichiers migrés** :
+1. `server/api/auth/logout.post.ts` - `{ success: true }` → `createSuccessResponse(null)`
+2. `server/api/profile/change-password.post.ts` - `{ success: true, message }` → `createSuccessResponse(null, message)`
+3. `server/api/editions/[id]/ticketing/quotas/[quotaId].delete.ts`
+4. `server/api/editions/[id]/volunteers/applications/index.delete.ts`
+5. `server/api/editions/[id]/volunteers/applications/[applicationId]/index.delete.ts`
+
+**Fichier exclu après tests (1)** :
+- `server/api/editions/[id]/volunteers/applications/index.post.ts` - Retourne `{ success: true, application }` (propriété personnalisée attendue par frontend)
+
+**Note importante** : 95 fichiers supplémentaires contiennent `{ success: true }` mais avec des propriétés personnalisées (ex: `{ success: true, data, stats }`, `{ success: true, user }`, etc.). Ces fichiers nécessitent une coordination avec le frontend pour éviter les breaking changes. Seuls les endpoints avec exactement `{ success: true }` ou `{ success: true, message }` ont été migrés.
+
+---
+
+### Phase 11 (détails complets) : Migration createSuccessResponse (14+ fichiers)
+
+**Objectif** : Standardiser les réponses de succès avec `{ success: true, ... }`
+
+**Utilisation actuelle** : 16 fichiers
+**Opportunités** : 14 fichiers simples + 95 fichiers complexes
+
+#### Fichiers migrés (5)
+
+1. **`server/api/auth/logout.post.ts`** (L8) ✅
+   ```typescript
+   // AVANT
+   return { success: true }
+
+   // APRÈS
+   return createSuccessResponse(null)
+   ```
+
+2. **`server/api/profile/change-password.post.ts`** (L74)
+   ```typescript
+   // AVANT
+   return { success: true, message: 'Mot de passe mis à jour avec succès' }
+
+   // APRÈS
+   return createSuccessResponse(null, 'Mot de passe mis à jour avec succès')
+   ```
+
+3. **`server/api/editions/[id]/volunteers/settings.patch.ts`** (L183, L213)
+4. **`server/api/editions/[id]/volunteers/applications/index.post.ts`** (L226)
+5. **`server/api/conventions/[id]/archive.patch.ts`** (L24, L53)
+6-14. Autres fichiers avec pattern `{ success: true, ... }`
+
+**Gain total estimé** : 15-30 lignes
+
+---
+
+## 🎯 Stratégie de migration recommandée
+
+### Ordre suggéré par ROI
+
+1. **Phase 8 - fetchResourceOrFail** (315 lignes) - Commencer par Phase 8A (Auth)
+2. **Phase 9 - sanitizeEmail/String/Object** (130 lignes) - Commencer par les 8 emails
+3. **Phase 10 - buildUpdateData** (159 lignes) - Commencer par Priorité 1
+4. **Phase 7 - createPaginatedResponse** (60-100 lignes)
+5. **Phase 11 - createSuccessResponse** (15-30 lignes)
+
+### Gains cumulés potentiels
+
+- **Court terme** (Phases 7-8A-9 emails) : ~200 lignes
+- **Moyen terme** (+ Phases 8B-C, 10 P1) : ~450 lignes
+- **Long terme** (toutes phases) : **~680-850 lignes**
+
+---
+
+## ✅ Checklist de migration
+
+Pour chaque phase :
+- [ ] Identifier tous les fichiers concernés
+- [ ] Migrer les fichiers par groupes cohérents
+- [ ] Exécuter les tests après chaque groupe
+- [ ] Corriger les tests si nécessaire
+- [ ] Vérifier le lint
+- [ ] Commit avec message descriptif
+- [ ] Mettre à jour cette documentation
+
+---
+
+**🎯 Objectif final : Maximiser l'utilisation de tous les helpers disponibles pour un codebase 100% cohérent !**

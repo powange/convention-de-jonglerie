@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -13,8 +14,8 @@ export default wrapApiHandler(
     }
 
     // Récupération du log avec tous les détails
-    const errorLog = await prisma.apiErrorLog.findUnique({
-      where: { id: logId },
+    const errorLog = await fetchResourceOrFail(prisma.apiErrorLog, logId, {
+      errorMessage: "Log d'erreur introuvable",
       select: {
         id: true,
         message: true,
@@ -50,10 +51,6 @@ export default wrapApiHandler(
         },
       },
     })
-
-    if (!errorLog) {
-      throw createError({ statusCode: 404, message: "Log d'erreur introuvable" })
-    }
 
     return errorLog
   },

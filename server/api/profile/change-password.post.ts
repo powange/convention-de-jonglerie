@@ -1,6 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { changePasswordSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 
@@ -19,20 +20,17 @@ export default wrapApiHandler(
     const currentPassword = rawCurrentPassword === '' ? undefined : rawCurrentPassword
 
     // Récupérer l'utilisateur avec son mot de passe
-    const userWithPassword = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        id: true,
-        password: true,
-      },
-    })
-
-    if (!userWithPassword) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur non trouvé',
-      })
-    }
+    const userWithPassword = await fetchResourceOrFail<{ id: number; password: string | null }>(
+      prisma.user,
+      user.id,
+      {
+        select: {
+          id: true,
+          password: true,
+        },
+        errorMessage: 'Utilisateur non trouvé',
+      }
+    )
 
     // Vérifier le mot de passe actuel (sauf si l'utilisateur n'a pas de mot de passe - OAuth)
     if (userWithPassword.password) {
@@ -71,7 +69,7 @@ export default wrapApiHandler(
       },
     })
 
-    return { success: true, message: 'Mot de passe mis à jour avec succès' }
+    return createSuccessResponse(null, 'Mot de passe mis à jour avec succès')
   },
   { operationName: 'ChangePassword' }
 )

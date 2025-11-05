@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -28,21 +29,14 @@ export default wrapApiHandler(
     const validatedData = updateCarpoolRequestSchema.parse(body)
 
     // Vérifier que la demande existe et que l'utilisateur en est le créateur
-    const existingRequest = await prisma.carpoolRequest.findUnique({
-      where: { id: requestId },
+    const existingRequest = await fetchResourceOrFail(prisma.carpoolRequest, requestId, {
       include: {
         user: {
           select: { id: true, pseudo: true },
         },
       },
+      errorMessage: 'Demande de covoiturage introuvable',
     })
-
-    if (!existingRequest) {
-      throw createError({
-        statusCode: 404,
-        message: 'Demande de covoiturage introuvable',
-      })
-    }
 
     // Seul le créateur peut modifier sa demande
     if (existingRequest.userId !== user.id) {

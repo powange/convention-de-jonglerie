@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -9,16 +10,9 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
 
     // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Edition introuvable',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Edition introuvable',
-      })
-    }
 
     const userWithFavorites = await prisma.user.findUnique({
       where: { id: user.id },

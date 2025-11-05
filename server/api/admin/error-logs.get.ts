@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { validatePagination } from '@@/server/utils/validation-helpers'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -14,11 +15,11 @@ export default wrapApiHandler(
     // Paramètres de pagination
     // Support pour pagination par curseur (plus performant) ET pagination classique (rétrocompatibilité)
     const cursor = (query.cursor as string) || undefined // ID du dernier log de la page précédente
-    const page = cursor ? undefined : Math.max(1, parseInt((query.page as string) || '1'))
-    const pageSize = Math.min(
-      100,
-      Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
-    )
+
+    // Utiliser validatePagination seulement si on n'utilise pas le curseur
+    const pagination = cursor ? null : validatePagination(event)
+    const page = pagination?.page
+    const pageSize = pagination?.limit || DEFAULT_PAGE_SIZE
 
     // Paramètres de filtrage
     const statusFilter = query.status as string | undefined // 'resolved' | 'unresolved'
@@ -163,7 +164,7 @@ export default wrapApiHandler(
       // Pagination classique par offset (rétrocompatibilité)
       // Limiter le skip pour éviter les problèmes de performance
       const maxSkip = 1000
-      const safeSkip = Math.min(((page || 1) - 1) * pageSize, maxSkip)
+      const safeSkip = Math.min(pagination?.skip || 0, maxSkip)
 
       errorLogs = await prisma.apiErrorLog.findMany({
         where,
@@ -262,22 +263,20 @@ export default wrapApiHandler(
     const hasMore = errorLogs.length === pageSize // Il y a potentiellement plus de résultats
 
     return {
-      logs: errorLogs,
-      pagination: cursor
+      ...(cursor
         ? {
-            // Pagination par curseur
-            cursor: nextCursor,
-            hasMore,
-            pageSize,
-            total, // Le total peut être approximatif avec le curseur
+            // Pagination par curseur - structure différente
+            success: true,
+            data: errorLogs,
+            pagination: {
+              cursor: nextCursor,
+              hasMore,
+              pageSize,
+              total, // Le total peut être approximatif avec le curseur
+            },
           }
-        : {
-            // Pagination classique
-            page,
-            pageSize,
-            total,
-            totalPages: Math.max(1, Math.ceil(total / pageSize)),
-          },
+        : // Pagination classique - utiliser createPaginatedResponse
+          createPaginatedResponse(errorLogs, total, page!, pageSize)),
       stats: {
         totalLast24h: stats._count.id,
         unresolvedCount,

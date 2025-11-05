@@ -19,7 +19,7 @@ export default wrapApiHandler(
     const genericMessage =
       'Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes.'
 
-    // Vérifier si l'utilisateur existe
+    // Vérifier si l'utilisateur existe (findUnique retourne null si non trouvé)
     const user = await prisma.user.findUnique({
       where: { email },
     })

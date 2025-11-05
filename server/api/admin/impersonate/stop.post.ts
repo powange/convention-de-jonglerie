@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
 import { getUserSession, setUserSession, clearUserSession } from '#imports'
 
@@ -25,16 +26,9 @@ export default wrapApiHandler(
 
     // Récupérer l'utilisateur admin original
     const originalUserId = session.impersonation.originalUserId
-    const originalUser = await prisma.user.findUnique({
-      where: { id: originalUserId },
+    const originalUser = await fetchResourceOrFail(prisma.user, originalUserId, {
+      errorMessage: 'Utilisateur administrateur original non trouvé',
     })
-
-    if (!originalUser) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur administrateur original non trouvé',
-      })
-    }
 
     // Nettoyer complètement la session et recréer avec l'admin original
     await clearUserSession(event)

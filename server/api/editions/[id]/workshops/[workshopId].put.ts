@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permissions'
-import { buildUpdateData } from '@@/server/utils/prisma-helpers'
+import { buildUpdateData, fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { updateWorkshopSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { PrismaClient } from '@prisma/client'
@@ -15,28 +15,22 @@ export default wrapApiHandler(
     const workshopId = validateResourceId(event, 'workshopId', 'atelier')
 
     // Vérifier que le workshop existe et appartient à l'édition
-    const workshop = await prisma.workshop.findFirst({
-      where: {
-        id: workshopId,
-        editionId,
-      },
-      include: {
-        edition: {
-          select: {
-            startDate: true,
-            endDate: true,
-            workshopLocationsFreeInput: true,
+    const workshop = await fetchResourceOrFail(
+      prisma.workshop,
+      { id: workshopId, editionId },
+      {
+        include: {
+          edition: {
+            select: {
+              startDate: true,
+              endDate: true,
+              workshopLocationsFreeInput: true,
+            },
           },
         },
-      },
-    })
-
-    if (!workshop) {
-      throw createError({
-        statusCode: 404,
-        message: 'Workshop non trouvé',
-      })
-    }
+        errorMessage: 'Workshop non trouvé',
+      }
+    )
 
     // Vérifier les permissions pour modifier le workshop
     const hasPermission = await canEditWorkshop(user.id, workshopId)

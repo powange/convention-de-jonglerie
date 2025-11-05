@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -18,8 +19,8 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour accéder à ces données',
       })
     // Récupérer l'édition pour obtenir les dates
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Edition non trouvée',
       select: {
         startDate: true,
         endDate: true,
@@ -27,10 +28,6 @@ export default wrapApiHandler(
         volunteersTeardownEndDate: true,
       },
     })
-
-    if (!edition) {
-      throw createError({ statusCode: 404, message: 'Edition non trouvée' })
-    }
 
     // Déterminer la période complète (montage -> démontage)
     const startDate = edition.volunteersSetupStartDate

@@ -1,4 +1,4 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permissions'
 import { prisma } from '@@/server/utils/prisma'
@@ -40,7 +40,7 @@ export default wrapApiHandler(
       where: { id: workshopId },
     })
 
-    return { success: true, message: 'Workshop supprimé avec succès' }
+    return createSuccessResponse(null, 'Workshop supprimé avec succès')
   },
   { operationName: 'DeleteWorkshop' }
 )

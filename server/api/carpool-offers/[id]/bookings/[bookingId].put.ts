@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -18,14 +19,15 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'offre et la réservation
-    const offer = await prisma.carpoolOffer.findUnique({
-      where: { id: offerId },
+    const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
       include: { user: true, bookings: true },
+      errorMessage: 'Offre introuvable',
     })
-    if (!offer) throw createError({ statusCode: 404, message: 'Offre introuvable' })
 
-    const booking = await prisma.carpoolBooking.findUnique({ where: { id: bookingId } })
-    if (!booking || booking.carpoolOfferId !== offerId) {
+    const booking = await fetchResourceOrFail(prisma.carpoolBooking, bookingId, {
+      errorMessage: 'Réservation introuvable',
+    })
+    if (booking.carpoolOfferId !== offerId) {
       throw createError({ statusCode: 404, message: 'Réservation introuvable' })
     }
 

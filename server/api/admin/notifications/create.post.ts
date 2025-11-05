@@ -2,6 +2,7 @@ import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -25,17 +26,10 @@ export default wrapApiHandler(
     const parsed = bodySchema.parse(body)
 
     // Vérifier que l'utilisateur cible existe
-    const targetUser = await prisma.user.findUnique({
-      where: { id: parsed.userId },
+    const targetUser = await fetchResourceOrFail(prisma.user, parsed.userId, {
+      errorMessage: 'Utilisateur cible non trouvé',
       select: { id: true, pseudo: true, email: true },
     })
-
-    if (!targetUser) {
-      throw createError({
-        statusCode: 404,
-        message: 'Utilisateur cible non trouvé',
-      })
-    }
 
     const notification = await NotificationService.create({
       userId: parsed.userId,

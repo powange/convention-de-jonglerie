@@ -1,6 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -11,8 +12,8 @@ export default wrapApiHandler(
     const editionId = validateResourceId(event, 'id', 'édition')
 
     // Récupérer l'édition avec toutes les informations nécessaires
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+      errorMessage: 'Edition not found',
       include: {
         convention: {
           select: {
@@ -23,13 +24,6 @@ export default wrapApiHandler(
         },
       },
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Edition not found',
-      })
-    }
 
     // Formater les données pour l'export selon le format attendu par l'import
     const exportData = {

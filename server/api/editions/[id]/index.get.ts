@@ -3,16 +3,14 @@ import { optionalAuth } from '@@/server/utils/auth-utils'
 import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const edition = await prisma.edition.findUnique({
-      where: {
-        id: editionId,
-      },
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       include: {
         creator: {
           select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true },
@@ -54,14 +52,8 @@ export default wrapApiHandler(
           },
         },
       },
+      errorMessage: 'Edition not found',
     })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Edition not found',
-      })
-    }
 
     // Check if edition is offline and user has permission to view it
     // Only consider it offline when isOnline is explicitly false. If undefined

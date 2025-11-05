@@ -1,8 +1,8 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validatePagination } from '@@/server/utils/validation-helpers'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -21,7 +21,7 @@ export default wrapApiHandler(
 
     // Paramètres de pagination et filtres
     const query = getQuery(event)
-    const page = Math.max(1, parseInt((query.page as string) || '1'))
+    const { page } = validatePagination(event)
     const pageSize = Math.min(
       100,
       Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
@@ -222,9 +222,8 @@ export default wrapApiHandler(
 
     // Calculer la pagination
     const total = participants.length
-    const totalPages = Math.max(1, Math.ceil(total / pageSize))
-    const skip = (page - 1) * pageSize
-    const paginatedParticipants = participants.slice(skip, skip + pageSize)
+    const adjustedSkip = (page - 1) * pageSize
+    const paginatedParticipants = participants.slice(adjustedSkip, adjustedSkip + pageSize)
 
     // Extraire les dates uniques disponibles pour le filtre
     const uniqueDates = Array.from(
@@ -252,14 +251,7 @@ export default wrapApiHandler(
     }
 
     return {
-      success: true,
-      participants: paginatedParticipants,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        totalPages,
-      },
+      ...createPaginatedResponse(paginatedParticipants, total, page, pageSize),
       availableDates: uniqueDates,
       stats,
     }

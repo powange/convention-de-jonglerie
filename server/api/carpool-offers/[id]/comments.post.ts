@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -18,16 +19,9 @@ export default wrapApiHandler(
     }
 
     // Vérifier que l'offre de covoiturage existe
-    const carpoolOffer = await prisma.carpoolOffer.findUnique({
-      where: { id: carpoolOfferId },
+    await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
+      errorMessage: 'Offre de covoiturage non trouvée',
     })
-
-    if (!carpoolOffer) {
-      throw createError({
-        statusCode: 404,
-        message: 'Offre de covoiturage non trouvée',
-      })
-    }
 
     // Créer le commentaire
     const comment = await prisma.carpoolComment.create({

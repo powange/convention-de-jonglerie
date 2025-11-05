@@ -3,6 +3,7 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -78,8 +79,8 @@ export default wrapApiHandler(async (event) => {
   }
 
   // Récupérer l'édition avec les informations de la convention
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
+  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+    errorMessage: 'Édition introuvable',
     select: {
       name: true,
       convention: {
@@ -87,10 +88,6 @@ export default wrapApiHandler(async (event) => {
       },
     },
   })
-
-  if (!edition) {
-    throw createError({ statusCode: 404, message: 'Édition introuvable' })
-  }
 
   // Construire la requête pour récupérer les bénévoles
   const whereClause: any = {
