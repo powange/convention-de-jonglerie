@@ -1,45 +1,61 @@
 <template>
-  <div v-if="impersonationActive" class="fixed top-0 left-0 right-0 z-50">
-    <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-3 shadow-lg">
-      <div class="container mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5" />
-          <span class="font-medium">
-            {{
-              $t('admin.impersonating_as', {
-                pseudo: impersonationStore.targetUserInfo?.pseudo || '',
-                email: impersonationStore.targetUserInfo?.email || '',
-              })
-            }}
-          </span>
-          <UBadge color="neutral" variant="solid" size="sm" class="!text-orange-500 !bg-white">
-            {{ $t('admin.impersonation_mode') }}
-          </UBadge>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <div class="text-sm opacity-90">
-            {{ $t('admin.original_user') }}:
-            <span class="font-semibold">
-              {{ impersonationStore.originalUserInfo?.pseudo }}
-            </span>
-          </div>
-
-          <UButton
-            color="neutral"
-            variant="solid"
-            size="sm"
-            icon="i-heroicons-arrow-left-circle"
-            :loading="stopping"
-            class="!bg-white !text-orange-600"
-            @click="stopImpersonation"
-          >
-            {{ $t('admin.stop_impersonation') }}
-          </UButton>
-        </div>
+  <UBanner
+    v-if="impersonationActive"
+    id="impersonation"
+    color="warning"
+    icon="i-heroicons-exclamation-triangle"
+  >
+    <template #title>
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="font-medium truncate">
+          {{
+            $t('admin.impersonating_as', {
+              pseudo: impersonationStore.targetUserInfo?.pseudo || '',
+              email: impersonationStore.targetUserInfo?.email || '',
+            })
+          }}
+        </span>
+        <UBadge color="neutral" variant="solid" size="sm" class="shrink-0">
+          {{ $t('admin.impersonation_mode') }}
+        </UBadge>
       </div>
-    </div>
-  </div>
+    </template>
+
+    <template #actions>
+      <div class="hidden lg:flex items-center gap-4">
+        <div class="text-sm opacity-90">
+          {{ $t('admin.original_user') }}:
+          <span class="font-semibold">
+            {{ impersonationStore.originalUserInfo?.pseudo }}
+          </span>
+        </div>
+
+        <UButton
+          color="neutral"
+          variant="solid"
+          size="xs"
+          icon="i-heroicons-arrow-left-circle"
+          :loading="stopping"
+          @click="stopImpersonation"
+        >
+          {{ $t('admin.stop_impersonation') }}
+        </UButton>
+      </div>
+
+      <!-- Version mobile : seulement le bouton -->
+      <UButton
+        class="lg:hidden"
+        color="neutral"
+        variant="solid"
+        size="xs"
+        icon="i-heroicons-arrow-left-circle"
+        :loading="stopping"
+        @click="stopImpersonation"
+      >
+        {{ $t('admin.stop_impersonation') }}
+      </UButton>
+    </template>
+  </UBanner>
 </template>
 
 <script setup lang="ts">
