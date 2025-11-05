@@ -1152,11 +1152,11 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 | Phase 9 - sanitizeEmail | 8 | ~10 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/8) |
 | Phase 9+ - sanitizeString/Object | 10 | ~50 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (10/10) |
 | Phase 10 P1 - buildUpdateData | 3 | ~159 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (2/3) |
-| Phase 10 P2-P3 - buildUpdateData Autres | 9 | - | 🟢 Basse | ⏳ À faire |
+| Phase 10 P2-P3 - buildUpdateData Autres | 9 | - | 🟢 Basse | ⛔ **NON APPLICABLE** |
 | Phase 11 - createSuccessResponse | 14 | 15-30 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (5/14) |
 | Phase 11+ - createSuccessResponse Autres | 46+ | - | 🟢 Basse | ⏳ À faire |
 | **TOTAL ACCOMPLI** | **78** | **~394 lignes** | - | **7 phases** |
-| **TOTAL RESTANT** | **55+** | **~200 lignes** | - | **2 phases** |
+| **TOTAL RESTANT** | **46+** | **~140 lignes** | - | **1 phase** |
 
 ---
 
@@ -1726,6 +1726,70 @@ if (body.maxVolunteers !== undefined) updateData.maxVolunteers = body.maxVolunte
 // APRÈS (1 ligne)
 const updateData = buildUpdateData(body, { trimStrings: true })
 ```
+
+---
+
+### Phase 10 P2-P3 : buildUpdateData Autres ⛔ NON APPLICABLE
+
+**Résultats de l'analyse** :
+- ✅ 9 fichiers analysés
+- ⛔ **0 fichiers migrés** - Non applicable
+- 📊 Raison : Complexité > Bénéfice
+
+**Analyse détaillée** :
+
+Après examen approfondi des 9 fichiers restants, il s'avère que **tous** présentent des cas particuliers incompatibles avec `buildUpdateData` :
+
+**Problèmes identifiés** :
+
+1. **Transformations de données complexes** :
+   ```typescript
+   // server/api/editions/[id]/shows/[showId].put.ts (L73-74)
+   if (validatedData.startDateTime !== undefined)
+     updateData.startDateTime = new Date(validatedData.startDateTime)
+   ```
+   - Conversion `string → Date`
+   - Nécessiterait `transform: { startDateTime: (v) => new Date(v) }`
+
+2. **Mapping de champs** :
+   ```typescript
+   // server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts (L83-84)
+   if (parsed.rights.editConvention !== undefined)
+     updateData.canEditConvention = parsed.rights.editConvention
+   ```
+   - Nom source ≠ nom destination (`rights.editConvention → canEditConvention`)
+   - Nécessiterait un mapping complexe
+
+3. **Relations Prisma imbriquées** :
+   ```typescript
+   // server/api/editions/[id]/shows/[showId].put.ts (L87-91)
+   updateData.artists = {
+     create: validatedData.artistIds.map((artistId) => ({ artistId }))
+   }
+   ```
+   - Objets imbriqués pour relations many-to-many
+   - Logique métier spécifique (suppression puis création)
+
+**Décision** :
+
+Pour ces 9 fichiers, une migration vers `buildUpdateData` nécessiterait :
+- Un helper ultra-complexe avec support de transformations personnalisées par champ
+- Une configuration verbale aussi longue que le code manuel actuel
+- Une perte de lisibilité et de maintenabilité
+
+**Recommandation** : Conserver le code manuel actuel. Le pattern `if (field !== undefined) updateData.field = value` est :
+- ✅ Explicite et facile à comprendre
+- ✅ Flexible pour les transformations
+- ✅ Déjà bien testé
+
+**Fichiers analysés (9)** :
+1. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - Mapping complexe de droits
+2. `server/api/carpool-requests/[id]/index.put.ts` - Transformations métier
+3. `server/api/editions/[id]/volunteer-teams/[teamId].put.ts` - Relations
+4. `server/api/profile/update.put.ts` - Logique déjà optimisée (Phase 9+)
+5. `server/api/conventions/[id]/index.put.ts` - Transformations
+6. `server/api/editions/[id]/volunteer-time-slots/[slotId].put.ts` - Conversions Date
+7. `server/api/editions/[id]/shows/[showId].put.ts` - Relations + Date + logique métier
 
 ---
 
