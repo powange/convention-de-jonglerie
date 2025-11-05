@@ -11,7 +11,7 @@ import {
 } from '@@/server/utils/editions/volunteers/applications'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -103,12 +103,9 @@ export default wrapApiHandler(
         userSnapshotPhone: finalPhone,
         dietaryPreference:
           edition.volunteersAskDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
-        allergies:
-          edition.volunteersAskAllergies && parsed.allergies?.trim()
-            ? parsed.allergies.trim()
-            : null,
+        allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : null,
         allergySeverity:
-          edition.volunteersAskAllergies && parsed.allergies?.trim() && parsed.allergySeverity
+          edition.volunteersAskAllergies && sanitizeString(parsed.allergies) && parsed.allergySeverity
             ? parsed.allergySeverity
             : null,
         timePreferences:
@@ -121,54 +118,36 @@ export default wrapApiHandler(
             : null,
         hasPets: edition.volunteersAskPets && parsed.hasPets ? parsed.hasPets : null,
         petsDetails:
-          edition.volunteersAskPets && parsed.hasPets && parsed.petsDetails?.trim()
-            ? parsed.petsDetails.trim()
-            : null,
+          edition.volunteersAskPets && parsed.hasPets ? sanitizeString(parsed.petsDetails) : null,
         hasMinors: edition.volunteersAskMinors && parsed.hasMinors ? parsed.hasMinors : null,
         minorsDetails:
-          edition.volunteersAskMinors && parsed.hasMinors && parsed.minorsDetails?.trim()
-            ? parsed.minorsDetails.trim()
-            : null,
+          edition.volunteersAskMinors && parsed.hasMinors ? sanitizeString(parsed.minorsDetails) : null,
         hasVehicle: edition.volunteersAskVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
         vehicleDetails:
-          edition.volunteersAskVehicle && parsed.hasVehicle && parsed.vehicleDetails?.trim()
-            ? parsed.vehicleDetails.trim()
-            : null,
-        companionName:
-          edition.volunteersAskCompanion && parsed.companionName?.trim()
-            ? parsed.companionName.trim()
-            : null,
-        avoidList:
-          edition.volunteersAskAvoidList && parsed.avoidList?.trim()
-            ? parsed.avoidList.trim()
-            : null,
-        skills: edition.volunteersAskSkills && parsed.skills?.trim() ? parsed.skills.trim() : null,
+          edition.volunteersAskVehicle && parsed.hasVehicle ? sanitizeString(parsed.vehicleDetails) : null,
+        companionName: edition.volunteersAskCompanion ? sanitizeString(parsed.companionName) : null,
+        avoidList: edition.volunteersAskAvoidList ? sanitizeString(parsed.avoidList) : null,
+        skills: edition.volunteersAskSkills ? sanitizeString(parsed.skills) : null,
         hasExperience:
           edition.volunteersAskExperience && parsed.hasExperience ? parsed.hasExperience : null,
         experienceDetails:
-          edition.volunteersAskExperience &&
-          parsed.hasExperience &&
-          parsed.experienceDetails?.trim()
-            ? parsed.experienceDetails.trim()
+          edition.volunteersAskExperience && parsed.hasExperience
+            ? sanitizeString(parsed.experienceDetails)
             : null,
         setupAvailability: parsed.setupAvailability || null,
         teardownAvailability: parsed.teardownAvailability || null,
         eventAvailability: parsed.eventAvailability || null,
-        arrivalDateTime: parsed.arrivalDateTime?.trim() ? parsed.arrivalDateTime.trim() : null,
-        departureDateTime: parsed.departureDateTime?.trim()
-          ? parsed.departureDateTime.trim()
-          : null,
+        arrivalDateTime: sanitizeString(parsed.arrivalDateTime),
+        departureDateTime: sanitizeString(parsed.departureDateTime),
         emergencyContactName:
-          (edition.volunteersAskEmergencyContact ||
-            (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))) &&
-          parsed.emergencyContactName?.trim()
-            ? parsed.emergencyContactName.trim()
+          edition.volunteersAskEmergencyContact ||
+          (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
+            ? sanitizeString(parsed.emergencyContactName)
             : null,
         emergencyContactPhone:
-          (edition.volunteersAskEmergencyContact ||
-            (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))) &&
-          parsed.emergencyContactPhone?.trim()
-            ? parsed.emergencyContactPhone.trim()
+          edition.volunteersAskEmergencyContact ||
+          (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
+            ? sanitizeString(parsed.emergencyContactPhone)
             : null,
       },
       select: {

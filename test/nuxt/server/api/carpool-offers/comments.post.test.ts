@@ -164,7 +164,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
   })
 
   it('devrait accepter un commentaire long', async () => {
-    const longContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(20)
+    const longContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'.repeat(20)
     const requestBody = {
       content: longContent,
     }

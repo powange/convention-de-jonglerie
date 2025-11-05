@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { authRateLimiter } from '@@/server/utils/rate-limiter'
+import { sanitizeString } from '@@/server/utils/validation-helpers'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
@@ -24,8 +25,8 @@ export default wrapApiHandler(
     const { identifier, password, rememberMe } = loginSchema.parse(body)
 
     // Sanitisation : trim des espaces
-    const cleanIdentifier = identifier.trim()
-    const cleanPassword = password.trim()
+    const cleanIdentifier = sanitizeString(identifier)!
+    const cleanPassword = sanitizeString(password)!
 
     let user = null
 

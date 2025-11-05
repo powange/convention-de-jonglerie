@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { sanitizeString } from '@@/server/utils/validation-helpers'
 import { conventionSchema } from '@@/server/utils/validation-schemas'
 
 export default wrapApiHandler(
@@ -14,10 +15,10 @@ export default wrapApiHandler(
     const validatedData = conventionSchema.parse(body)
 
     // Sanitisation
-    const cleanName = validatedData.name.trim()
-    const cleanDescription = validatedData.description?.trim() || null
-    const cleanEmail = validatedData.email?.trim() || null
-    const cleanLogo = validatedData.logo?.trim() || null
+    const cleanName = sanitizeString(validatedData.name)!
+    const cleanDescription = sanitizeString(validatedData.description)
+    const cleanEmail = sanitizeString(validatedData.email)
+    const cleanLogo = sanitizeString(validatedData.logo)
 
     // Créer la convention
     const convention = await prisma.convention.create({

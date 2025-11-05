@@ -3,7 +3,7 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -54,9 +54,8 @@ export default wrapApiHandler(
     }
 
     // Valider les données
-    const { description, imageUrl } = body
-
-    if (!description || typeof description !== 'string' || description.trim().length === 0) {
+    const description = sanitizeString(body.description)
+    if (!description) {
       throw createError({
         statusCode: 400,
         message: 'La description est requise',
@@ -68,8 +67,8 @@ export default wrapApiHandler(
       data: {
         editionId,
         userId,
-        description: description.trim(),
-        imageUrl: imageUrl || null,
+        description,
+        imageUrl: body.imageUrl || null,
         status: 'LOST',
       },
       include: {

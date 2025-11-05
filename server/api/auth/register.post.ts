@@ -8,7 +8,7 @@ import {
 } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
 import { registerRateLimiter } from '@@/server/utils/rate-limiter'
-import { sanitizeEmail } from '@@/server/utils/validation-helpers'
+import { sanitizeEmail, sanitizeString } from '@@/server/utils/validation-helpers'
 import { registerSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 
@@ -24,9 +24,9 @@ export default wrapApiHandler(
 
     // Sanitisation supplémentaire
     const cleanEmail = sanitizeEmail(validatedData.email)
-    const cleanPseudo = validatedData.pseudo.trim()
-    const cleanNom = validatedData.nom.trim()
-    const cleanPrenom = validatedData.prenom.trim()
+    const cleanPseudo = sanitizeString(validatedData.pseudo)!
+    const cleanNom = sanitizeString(validatedData.nom)!
+    const cleanPrenom = sanitizeString(validatedData.prenom)!
 
     const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 

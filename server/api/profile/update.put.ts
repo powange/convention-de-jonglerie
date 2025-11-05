@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import { sanitizeString } from '@@/server/utils/validation-helpers'
 import {
   updateProfileSchema,
   validateAndSanitize,
@@ -135,9 +136,9 @@ export default wrapApiHandler(
       data: {
         email,
         pseudo,
-        nom: nom && nom.trim() !== '' ? nom.trim() : null,
-        prenom: prenom && prenom.trim() !== '' ? prenom.trim() : null,
-        phone: telephone && telephone.trim() !== '' ? telephone.trim() : null,
+        nom: sanitizeString(nom),
+        prenom: sanitizeString(prenom),
+        phone: sanitizeString(telephone),
         // Ne mettre à jour la photo que si explicitement fournie dans validatedData
         ...(profilePicture !== undefined && { profilePicture: finalProfileFilename }),
         // Mettre à jour la langue préférée si fournie

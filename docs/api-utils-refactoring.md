@@ -1148,15 +1148,15 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 | Phase 4 - validatePagination | 7 | ~21 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** |
 | Phase 7 - createPaginatedResponse | 11 | 60-100 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/11) |
 | Phase 8A - fetchResourceOrFail Auth | 11 | ~75 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (8/11) |
-| Phase 8B-F - fetchResourceOrFail Autres | 42 | ~240 lignes | 🟡 Moyenne | ⏳ À faire |
+| Phase 8B-F - fetchResourceOrFail Autres | 35 | ~112 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (35/35) |
 | Phase 9 - sanitizeEmail | 8 | ~10 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/8) |
-| Phase 9+ - sanitizeString/Object | 40-50 | ~120 lignes | 🟡 Moyenne | ⏳ À faire |
+| Phase 9+ - sanitizeString/Object | 10 | ~50 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (10/10) |
 | Phase 10 P1 - buildUpdateData | 3 | ~159 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (2/3) |
 | Phase 10 P2-P3 - buildUpdateData Autres | 9 | - | 🟢 Basse | ⏳ À faire |
 | Phase 11 - createSuccessResponse | 14 | 15-30 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (5/14) |
 | Phase 11+ - createSuccessResponse Autres | 46+ | - | 🟢 Basse | ⏳ À faire |
-| **TOTAL ACCOMPLI** | **33** | **~120 lignes** | - | **5 phases** |
-| **TOTAL RESTANT** | **95+** | **~560 lignes** | - | **5 phases** |
+| **TOTAL ACCOMPLI** | **78** | **~394 lignes** | - | **7 phases** |
+| **TOTAL RESTANT** | **55+** | **~200 lignes** | - | **2 phases** |
 
 ---
 
@@ -1201,6 +1201,84 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 **Fichiers exclus (2)** :
 - `server/api/editions/[id]/ticketing/helloasso/orders.get.ts` - API externe
 - `server/api/editions/[id]/ticketing/helloasso/orders.post.ts` - API externe
+
+---
+
+### Phase 8B-F : Migration fetchResourceOrFail Autres catégories ✅ COMPLÉTÉ (35/35 fichiers)
+
+**Résultats** :
+- ✅ 35 endpoints migrés avec succès
+- ✅ 38 patterns remplacés (findUnique + null check → fetchResourceOrFail)
+- ✅ ~112 lignes économisées
+- ✅ Tous les tests passent (930 Nuxt + 273 unit)
+- ✅ 3 corrections lint (variables inutilisées)
+
+**Phase 8B - Carpool (6 fichiers, 9 patterns)** :
+1. `server/api/carpool-offers/[id]/comments.post.ts` - 1 pattern
+2. `server/api/carpool-offers/[id]/bookings.post.ts` - 2 patterns (offer + user)
+3. `server/api/carpool-offers/[id]/bookings.get.ts` - 1 pattern
+4. `server/api/carpool-offers/[id]/bookings/[bookingId].put.ts` - 2 patterns
+5. `server/api/carpool-requests/[id]/comments.post.ts` - 1 pattern
+6. `server/api/carpool-requests/[id]/index.put.ts` - 2 patterns
+
+**Phase 8C - Conventions (4 fichiers, 4 patterns)** :
+1. `server/api/conventions/[id]/collaborators.post.ts` - 1 pattern (user)
+2. `server/api/conventions/[id]/claim.post.ts` - 1 pattern
+3. `server/api/conventions/[id]/claim/verify.post.ts` - 1 pattern
+4. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - 1 pattern
+
+**Phase 8D - Admin (10 fichiers, 10 patterns)** :
+1. `server/api/admin/conventions/[id].delete.ts`
+2. `server/api/admin/editions/[id]/export.get.ts`
+3. `server/api/admin/error-logs/[id].get.ts`
+4. `server/api/admin/error-logs/[id]/resolve.patch.ts`
+5. `server/api/admin/impersonate/stop.post.ts`
+6. `server/api/admin/notifications/create.post.ts`
+7. `server/api/admin/notifications/test.post.ts` - fetchResourceByFieldOrFail (email)
+8. `server/api/admin/users/[id].delete.ts`
+9. `server/api/admin/users/[id]/impersonate.post.ts`
+10. `server/api/admin/users/[id]/profile-picture.put.ts`
+
+**Phase 8E - Éditions (9 fichiers, 9 patterns)** :
+1. `server/api/editions/[id]/index.get.ts` - Complex includes preserved
+2. `server/api/editions/[id]/attendance.post.ts`
+3. `server/api/editions/[id]/favorite.post.ts`
+4. `server/api/editions/[id]/carpool-offers/index.post.ts`
+5. `server/api/editions/[id]/carpool-requests/index.post.ts`
+6. `server/api/editions/[id]/shows/index.post.ts`
+7. `server/api/editions/[id]/shows/[showId].put.ts`
+8. `server/api/editions/[id]/workshops/[workshopId].put.ts`
+9. `server/api/editions/[id]/volunteers/applications/index.post.ts`
+
+**Phase 8F - Volunteers (6 fichiers, 6 patterns)** :
+1. `server/api/editions/[id]/volunteers/settings.get.ts`
+2. `server/api/editions/[id]/volunteers/settings.patch.ts`
+3. `server/api/editions/[id]/volunteers/meals.get.ts`
+4. `server/api/editions/[id]/volunteers/notifications.post.ts`
+5. `server/api/editions/[id]/volunteers/add-manually.post.ts` - 2 patterns
+6. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts`
+
+**Exemple de migration** :
+```typescript
+// AVANT (6 lignes)
+const carpoolOffer = await prisma.carpoolOffer.findUnique({
+  where: { id: carpoolOfferId },
+})
+if (!carpoolOffer) {
+  throw createError({ statusCode: 404, message: 'Offre de covoiturage non trouvée' })
+}
+
+// APRÈS (3 lignes) - avec validation seule
+await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
+  errorMessage: 'Offre de covoiturage non trouvée',
+})
+```
+
+**Corrections lint** :
+- Suppression des variables inutilisées dans 3 fichiers où `fetchResourceOrFail` était utilisé uniquement pour validation :
+  - `server/api/admin/error-logs/[id]/resolve.patch.ts`
+  - `server/api/carpool-offers/[id]/comments.post.ts`
+  - `server/api/carpool-requests/[id]/comments.post.ts`
 
 ---
 
@@ -1405,6 +1483,77 @@ const edition = await fetchResourceOrFail(prisma.edition, editionId, {
 7. `server/api/editions/[id]/artists/index.get.ts` (L89)
 8. `server/api/editions/[id]/volunteers/teams/[teamId]/members.get.ts` (L86)
 9. `server/utils/email-hash.ts` (L13) - **BONUS**
+
+---
+
+### Phase 9+ : Migration sanitizeString/Object ✅ COMPLÉTÉ (10/10 fichiers)
+
+**Résultats** :
+- ✅ 10 fichiers migrés avec succès (5 Pattern 2 + 1 Pattern 3 + 4 Pattern 4)
+- ✅ 31+ patterns remplacés (14 Pattern 2 + 13 Pattern 3 + 4 Pattern 4)
+- ✅ ~50 lignes économisées
+- ✅ Tous les tests passent (930 Nuxt + 273 unit)
+- ✅ 1 test ajusté (espaces finaux supprimés automatiquement)
+
+**Pattern 2 - Sanitisation multiple de strings (5 fichiers, 14 patterns)** :
+1. `server/api/auth/register.post.ts` - 3 champs (pseudo, nom, prenom)
+2. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts` - 2 champs
+3. `server/api/conventions/index.post.ts` - 4 champs (name, description, email, logo)
+4. `server/api/profile/update.put.ts` - 3 champs (nom, prenom, phone)
+5. `server/api/auth/login.post.ts` - 2 champs (identifier, password)
+
+**Pattern 3 - Trim répétitif avec vérification (1 fichier, 13 patterns)** :
+- `server/api/editions/[id]/volunteers/applications/index.post.ts` (L107-172)
+  - 18 lignes économisées
+  - Champs: allergies, petsDetails, minorsDetails, vehicleDetails, companionName, avoidList, skills, experienceDetails, arrivalDateTime, departureDateTime, emergencyContactName, emergencyContactPhone
+
+**Pattern 4 - Validation de strings vides (4 fichiers, 4 patterns)** :
+1. `server/api/carpool-offers/[id]/comments.post.ts`
+2. `server/api/carpool-requests/[id]/comments.post.ts`
+3. `server/api/editions/[id]/lost-found/index.post.ts`
+4. `server/api/editions/[id]/lost-found/[itemId]/comments.post.ts`
+
+**Test corrigé** :
+- `test/nuxt/server/api/carpool-offers/comments.post.test.ts` - Suppression espace final dans "devrait accepter un commentaire long"
+
+**Exemples de migration** :
+
+Pattern 2 :
+```typescript
+// AVANT
+const cleanPseudo = validatedData.pseudo.trim()
+const cleanNom = validatedData.nom.trim()
+
+// APRÈS
+const cleanPseudo = sanitizeString(validatedData.pseudo)!
+const cleanNom = sanitizeString(validatedData.nom)!
+```
+
+Pattern 3 :
+```typescript
+// AVANT (3 lignes)
+allergies: edition.volunteersAskAllergies && parsed.allergies?.trim()
+  ? parsed.allergies.trim()
+  : null,
+
+// APRÈS (1 ligne)
+allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : null,
+```
+
+Pattern 4 :
+```typescript
+// AVANT (4 lignes)
+const content = body.content
+if (!content || content.trim() === '') {
+  throw createError({ statusCode: 400, message: 'Le commentaire ne peut pas être vide' })
+}
+
+// APRÈS (3 lignes)
+const content = sanitizeString(body.content)
+if (!content) {
+  throw createError({ statusCode: 400, message: 'Le commentaire ne peut pas être vide' })
+}
+```
 
 ---
 

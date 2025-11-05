@@ -2,7 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { sanitizeString, validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -29,9 +29,8 @@ export default wrapApiHandler(
     }
 
     // Valider le contenu
-    const { content } = body
-
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
+    const content = sanitizeString(body.content)
+    if (!content) {
       throw createError({
         statusCode: 400,
         message: 'Le contenu du commentaire est requis',
@@ -43,7 +42,7 @@ export default wrapApiHandler(
       data: {
         lostFoundItemId: itemId,
         userId,
-        content: content.trim(),
+        content,
       },
       include: {
         user: {

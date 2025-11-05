@@ -2,7 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
+import { sanitizeString, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -11,7 +11,8 @@ export default wrapApiHandler(
     const body = await readBody(event)
 
     // Validation des données
-    if (!body.content || body.content.trim() === '') {
+    const content = sanitizeString(body.content)
+    if (!content) {
       throw createError({
         statusCode: 400,
         message: 'Le commentaire ne peut pas être vide',
@@ -28,7 +29,7 @@ export default wrapApiHandler(
       data: {
         carpoolOfferId,
         userId: user.id,
-        content: body.content,
+        content,
       },
       include: {
         user: {
