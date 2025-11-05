@@ -105,7 +105,9 @@ export default wrapApiHandler(
           edition.volunteersAskDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
         allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : null,
         allergySeverity:
-          edition.volunteersAskAllergies && sanitizeString(parsed.allergies) && parsed.allergySeverity
+          edition.volunteersAskAllergies &&
+          sanitizeString(parsed.allergies) &&
+          parsed.allergySeverity
             ? parsed.allergySeverity
             : null,
         timePreferences:
@@ -121,10 +123,14 @@ export default wrapApiHandler(
           edition.volunteersAskPets && parsed.hasPets ? sanitizeString(parsed.petsDetails) : null,
         hasMinors: edition.volunteersAskMinors && parsed.hasMinors ? parsed.hasMinors : null,
         minorsDetails:
-          edition.volunteersAskMinors && parsed.hasMinors ? sanitizeString(parsed.minorsDetails) : null,
+          edition.volunteersAskMinors && parsed.hasMinors
+            ? sanitizeString(parsed.minorsDetails)
+            : null,
         hasVehicle: edition.volunteersAskVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
         vehicleDetails:
-          edition.volunteersAskVehicle && parsed.hasVehicle ? sanitizeString(parsed.vehicleDetails) : null,
+          edition.volunteersAskVehicle && parsed.hasVehicle
+            ? sanitizeString(parsed.vehicleDetails)
+            : null,
         companionName: edition.volunteersAskCompanion ? sanitizeString(parsed.companionName) : null,
         avoidList: edition.volunteersAskAvoidList ? sanitizeString(parsed.avoidList) : null,
         skills: edition.volunteersAskSkills ? sanitizeString(parsed.skills) : null,

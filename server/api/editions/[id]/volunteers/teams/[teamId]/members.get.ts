@@ -83,7 +83,9 @@ export default wrapApiHandler(async (event) => {
     prenom: assignment.application.user.prenom,
     nom: assignment.application.user.nom,
     email: assignment.application.user.email,
-    emailHash: createHash('md5').update(sanitizeEmail(assignment.application.user.email)).digest('hex'),
+    emailHash: createHash('md5')
+      .update(sanitizeEmail(assignment.application.user.email))
+      .digest('hex'),
     phone: assignment.application.userSnapshotPhone,
     profilePicture: assignment.application.user.profilePicture,
     isLeader: assignment.isLeader,

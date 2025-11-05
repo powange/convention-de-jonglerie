@@ -5,7 +5,6 @@ import { join } from 'path'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { sendStream } from 'h3'
 
-
 export default wrapApiHandler(
   async (event) => {
     // Récupérer le chemin depuis l'URL

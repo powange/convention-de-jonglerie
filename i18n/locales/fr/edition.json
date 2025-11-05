@@ -78,7 +78,11 @@
     "collaborator_updated": "Collaborateur mis à jour",
     "confirm_remove": "Êtes-vous sûr de vouloir supprimer ce collaborateur ?",
     "edit_collaborator": "Modifier le collaborateur",
+    "list": "Liste des collaborateurs",
+    "manage": "Gérer les collaborateurs",
+    "manage_description": "Gérer les collaborateurs et leurs droits pour cette édition",
     "no_collaborators": "Aucun collaborateur",
+    "page_description": "Gérer les membres de l'équipe organisatrice et leurs permissions",
     "rights": "Droits",
     "title": "Collaborateurs"
   },

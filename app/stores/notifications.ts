@@ -133,7 +133,7 @@ export const useNotificationsStore = defineStore('notifications', {
         }>(`/api/notifications?${params}`)
 
         // Normaliser les notifications pour la compatibilité
-        const normalizedNotifications = response.notifications.map(normalizeNotification)
+        const normalizedNotifications = (response.notifications || []).map(normalizeNotification)
 
         if (append) {
           this.notifications.push(...normalizedNotifications)
@@ -141,8 +141,8 @@ export const useNotificationsStore = defineStore('notifications', {
           this.notifications = normalizedNotifications
         }
 
-        this.unreadCount = response.unreadCount
-        this.hasMore = response.pagination.hasMore
+        this.unreadCount = response.unreadCount || 0
+        this.hasMore = response.pagination?.hasMore || false
         this.currentFilters = { ...filters }
         this.lastFetch = new Date()
 

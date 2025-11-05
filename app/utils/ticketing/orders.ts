@@ -40,14 +40,17 @@ export interface Order {
 }
 
 export interface OrdersResponse {
-  orders: Order[]
+  success: boolean
+  data: Order[]
   pagination: {
     page: number
     limit: number
     total: number
     totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
   }
-  stats: {
+  stats?: {
     totalOrders: number
     totalItems: number
     totalAmount: number

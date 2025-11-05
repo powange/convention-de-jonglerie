@@ -17,7 +17,6 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -423,6 +422,7 @@
 
 <script setup lang="ts">
 definePageMeta({
+  layout: 'edition-dashboard',
   middleware: ['authenticated'],
 })
 

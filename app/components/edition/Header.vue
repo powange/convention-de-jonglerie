@@ -53,6 +53,8 @@
                       {{ $t('calendar.add_to_calendar') }}
                     </UButton>
                   </UDropdownMenu>
+
+                  <EditionManageButton :edition="edition" />
                 </div>
               </div>
 
@@ -218,23 +220,6 @@
           />
           <span class="hidden sm:inline">{{ t('edition.lost_found') }}</span>
         </NuxtLink>
-
-        <ClientOnly>
-          <NuxtLink
-            v-if="canAccess"
-            :to="`/editions/${edition.id}/gestion`"
-            :class="[
-              'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
-              currentPage === 'gestion'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-            ]"
-            :title="t('edition.management')"
-          >
-            <UIcon name="i-heroicons-cog" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-            <span class="hidden sm:inline">{{ t('edition.management') }}</span>
-          </NuxtLink>
-        </ClientOnly>
       </nav>
 
       <!-- Titre de la page courante sur mobile -->
@@ -339,62 +324,6 @@ const conventionDescriptionHtml = computedAsync(async () => {
   }
   return await markdownToHtml(props.edition.convention.description)
 }, '')
-
-// Vérifier l'accès à la page gestion
-const canAccess = computed(() => {
-  if (!props.edition || !authStore.user?.id) {
-    return false
-  }
-
-  // Les admins globaux en mode admin peuvent accéder à la gestion
-  if (authStore.isAdminModeActive) {
-    return true
-  }
-
-  // Les admins peuvent accéder aux conventions orphelines (sans auteur)
-  if (authStore.user.isGlobalAdmin && !props.edition.convention?.authorId) {
-    return true
-  }
-
-  // Créateur de l'édition
-  if (authStore.user.id === props.edition.creatorId) {
-    return true
-  }
-
-  // Utilisateurs avec des droits spécifiques
-  const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id)
-  const canManageVolunteers = editionStore.canManageVolunteers(props.edition, authStore.user.id)
-  if (canEdit || canManageVolunteers) {
-    return true
-  }
-
-  // Responsables d'équipe de bénévoles
-  if (isTeamLeaderValue.value) {
-    return true
-  }
-
-  // Bénévoles avec accès à la validation des repas
-  if (canAccessMealValidation.value) {
-    return true
-  }
-
-  // Bénévoles avec créneau actif de contrôle d'accès
-  if (canAccessAccessControlPage.value) {
-    return true
-  }
-
-  // Tous les collaborateurs de la convention (même sans droits)
-  if (props.edition.convention?.collaborators) {
-    const isCollaborator = props.edition.convention.collaborators.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-    if (isCollaborator) {
-      return true
-    }
-  }
-
-  return false
-})
 
 // Vérifier si l'utilisateur peut revendiquer la convention
 const canClaimConvention = computed(() => {
@@ -535,7 +464,6 @@ const getPageTitle = (page: string) => {
     'objets-trouves': t('edition.lost_found'),
     volunteers: t('edition.volunteers.title'),
     workshops: 'Workshops',
-    gestion: t('edition.management'),
   }
   return titles[page] || t('edition.about_this_edition')
 }

@@ -24,11 +24,15 @@ export default wrapApiHandler(
     const validatedData = setPasswordSchema.parse(body)
 
     // Rechercher l'utilisateur
-    const user = await fetchResourceByFieldOrFail(prisma.user, {
-      email: sanitizeEmail(validatedData.email),
-    }, {
-      errorMessage: 'Utilisateur non trouvé',
-    })
+    const user = await fetchResourceByFieldOrFail(
+      prisma.user,
+      {
+        email: sanitizeEmail(validatedData.email),
+      },
+      {
+        errorMessage: 'Utilisateur non trouvé',
+      }
+    )
 
     if (user.isEmailVerified) {
       throw createError({

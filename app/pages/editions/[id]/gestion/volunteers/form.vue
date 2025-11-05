@@ -20,7 +20,6 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -97,6 +96,10 @@ import { useRoute } from 'vue-router'
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+definePageMeta({
+  layout: 'edition-dashboard',
+})
 
 const route = useRoute()
 const editionStore = useEditionStore()

@@ -17,7 +17,6 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -685,6 +684,10 @@ import { useEditionStore } from '~/stores/editions'
 import { fetchOrders, type Order } from '~/utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '~/utils/ticketing/tiers'
 
+definePageMeta({
+  layout: 'edition-dashboard',
+})
+
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -895,9 +898,9 @@ const loadOrders = async () => {
       entryStatus: entryStatusFilter.value,
     })
 
-    orders.value = response.orders
-    totalPages.value = response.pagination.totalPages
-    totalOrders.value = response.pagination.total
+    orders.value = response.data || []
+    totalPages.value = response.pagination?.totalPages || 1
+    totalOrders.value = response.pagination?.total || 0
 
     // Mettre à jour les stats si elles sont retournées
     if (response.stats) {
@@ -905,6 +908,7 @@ const loadOrders = async () => {
     }
   } catch (error) {
     console.error('Failed to load orders:', error)
+    orders.value = []
   } finally {
     loading.value = false
   }

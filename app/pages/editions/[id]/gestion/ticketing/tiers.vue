@@ -17,7 +17,6 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -167,6 +166,10 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { fetchOptions } from '~/utils/ticketing/options'
 import { fetchTiers } from '~/utils/ticketing/tiers'
+
+definePageMeta({
+  layout: 'edition-dashboard',
+})
 
 const route = useRoute()
 const router = useRouter()

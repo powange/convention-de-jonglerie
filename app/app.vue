@@ -16,15 +16,10 @@
       <NotificationsPushPromoModal />
     </ClientOnly>
 
-    <AppHeader />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
 
-    <UMain>
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-    </UMain>
-
-    <AppFooter />
     <UToast />
   </UApp>
 </template>

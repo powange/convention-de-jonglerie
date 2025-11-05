@@ -970,6 +970,7 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 **Note :** Ces endpoints n'étaient pas listés dans la planification initiale mais ont été identifiés lors de la vérification finale.
 
 #### Profile (5 endpoints)
+
 - [x] `server/api/profile/update.put.ts` - Mise à jour du profil (172→163 lignes, -5%)
 - [x] `server/api/profile/notification-preferences.get.ts` - Préférences notifications (50→46 lignes, -8%)
 - [x] `server/api/profile/stats.get.ts` - Statistiques profil (60→56 lignes, -7%)
@@ -978,6 +979,7 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 - [x] `server/api/profile/change-password.post.ts` - Changer mot de passe (100→78 lignes, -22%)
 
 #### Files (5 endpoints)
+
 - [x] `server/api/files/profile.post.ts` - Upload photo profil (125→114 lignes, -9%)
 - [x] `server/api/files/edition.post.ts` - Upload image édition (156→145 lignes, -7%)
 - [x] `server/api/files/convention.post.ts` - Upload image convention (118→108 lignes, -8%)
@@ -985,15 +987,18 @@ Tous les 50 fichiers endpoints ont été migrés vers `wrapApiHandler` avec succ
 - [x] `server/api/files/lost-found.post.ts` - Upload objet trouvé (106→96 lignes, -9%)
 
 #### Carpool (1 endpoint)
+
 - [x] `server/api/carpool-offers/[id]/bookings/[bookingId].put.ts` - Gérer réservation (119→120 lignes, +1%)
 - [x] `server/api/carpool-offers/[id]/passengers/[userId].delete.ts` - Endpoint déprécié (7→11 lignes)
 
 #### Sitemap (3 endpoints)
+
 - [x] `server/api/__sitemap__/volunteers.get.ts` - Sitemap bénévoles (82→80 lignes, -2%)
 - [x] `server/api/__sitemap__/carpool.get.ts` - Sitemap covoiturage (56→55 lignes, -2%)
 - [x] `server/api/__sitemap__/editions.get.ts` - Sitemap éditions (43→42 lignes, -2%)
 
 #### Autres (7 endpoints)
+
 - [x] `server/api/users/search.get.ts` - Recherche utilisateurs (65→60 lignes, -8%)
 - [x] `server/api/user/volunteer-applications.get.ts` - Candidatures bénévole (183→178 lignes, -3%)
 - [x] `server/api/session/me.get.ts` - Session utilisateur (26→29 lignes)
@@ -1145,20 +1150,20 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 
 **Statut global des optimisations :**
 
-| Migration | Fichiers concernés | Gain estimé | Priorité | Statut |
-|-----------|-------------------|-------------|----------|--------|
-| Phase 4 - validatePagination | 7 | ~21 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** |
-| Phase 7 - createPaginatedResponse | 11 | 60-100 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/11) |
-| Phase 8A - fetchResourceOrFail Auth | 11 | ~75 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (8/11) |
-| Phase 8B-F - fetchResourceOrFail Autres | 35 | ~112 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (35/35) |
-| Phase 9 - sanitizeEmail | 8 | ~10 lignes | 🔴 Haute | ✅ **COMPLÉTÉ** (9/8) |
-| Phase 9+ - sanitizeString/Object | 10 | ~50 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (10/10) |
-| Phase 10 P1 - buildUpdateData | 3 | ~159 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (2/3) |
-| Phase 10 P2-P3 - buildUpdateData Autres | 9 | - | 🟢 Basse | ⛔ **NON APPLICABLE** |
-| Phase 11 - createSuccessResponse | 14 | 15-30 lignes | 🟡 Moyenne | ✅ **COMPLÉTÉ** (5/14) |
-| Phase 11+ - createSuccessResponse Autres | 4 | - | 🟢 Basse | ⛔ **NON APPLICABLE** |
-| **TOTAL ACCOMPLI** | **78** | **~394 lignes** | - | **7 phases** |
-| **TOTAL RESTANT** | **0** | **0 lignes** | - | **0 phase** |
+| Migration                                | Fichiers concernés | Gain estimé     | Priorité   | Statut                  |
+| ---------------------------------------- | ------------------ | --------------- | ---------- | ----------------------- |
+| Phase 4 - validatePagination             | 7                  | ~21 lignes      | 🔴 Haute   | ✅ **COMPLÉTÉ**         |
+| Phase 7 - createPaginatedResponse        | 11                 | 60-100 lignes   | 🔴 Haute   | ✅ **COMPLÉTÉ** (9/11)  |
+| Phase 8A - fetchResourceOrFail Auth      | 11                 | ~75 lignes      | 🔴 Haute   | ✅ **COMPLÉTÉ** (8/11)  |
+| Phase 8B-F - fetchResourceOrFail Autres  | 35                 | ~112 lignes     | 🟡 Moyenne | ✅ **COMPLÉTÉ** (35/35) |
+| Phase 9 - sanitizeEmail                  | 8                  | ~10 lignes      | 🔴 Haute   | ✅ **COMPLÉTÉ** (9/8)   |
+| Phase 9+ - sanitizeString/Object         | 10                 | ~50 lignes      | 🟡 Moyenne | ✅ **COMPLÉTÉ** (10/10) |
+| Phase 10 P1 - buildUpdateData            | 3                  | ~159 lignes     | 🟡 Moyenne | ✅ **COMPLÉTÉ** (2/3)   |
+| Phase 10 P2-P3 - buildUpdateData Autres  | 9                  | -               | 🟢 Basse   | ⛔ **NON APPLICABLE**   |
+| Phase 11 - createSuccessResponse         | 14                 | 15-30 lignes    | 🟡 Moyenne | ✅ **COMPLÉTÉ** (5/14)  |
+| Phase 11+ - createSuccessResponse Autres | 4                  | -               | 🟢 Basse   | ⛔ **NON APPLICABLE**   |
+| **TOTAL ACCOMPLI**                       | **78**             | **~394 lignes** | -          | **7 phases**            |
+| **TOTAL RESTANT**                        | **0**              | **0 lignes**    | -          | **0 phase**             |
 
 ---
 
@@ -1167,11 +1172,13 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 **Objectif** : Standardiser la validation de pagination avec `validatePagination(event)`
 
 **Résultats** :
+
 - ✅ 7 endpoints migrés
 - ✅ ~21 lignes économisées
 - ✅ Tous les tests passent (930 Nuxt + 273 unit)
 
 **Fichiers migrés** :
+
 1. `server/api/admin/feedback/index.get.ts` (-3 lignes)
 2. `server/api/admin/users/index.get.ts` (-3 lignes)
 3. `server/api/admin/error-logs.get.ts` (réorganisé)
@@ -1185,11 +1192,13 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 ### Phase 7 : Migration createPaginatedResponse ✅ COMPLÉTÉ (9/11 fichiers)
 
 **Résultats** :
+
 - ✅ 9 endpoints migrés avec succès
 - ✅ ~61 lignes économisées
 - ✅ Tous les tests passent (930 Nuxt + 273 unit)
 
 **Fichiers migrés** :
+
 1. `server/api/editions/index.get.ts` (-6 lignes)
 2. `server/api/admin/users/index.get.ts` (-9 lignes avec spread)
 3. `server/api/admin/feedback/index.get.ts` (-5 lignes)
@@ -1201,6 +1210,7 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 9. `server/api/admin/error-logs.get.ts` (conditionnel cursor vs classic)
 
 **Fichiers exclus (2)** :
+
 - `server/api/editions/[id]/ticketing/helloasso/orders.get.ts` - API externe
 - `server/api/editions/[id]/ticketing/helloasso/orders.post.ts` - API externe
 
@@ -1209,6 +1219,7 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 ### Phase 8B-F : Migration fetchResourceOrFail Autres catégories ✅ COMPLÉTÉ (35/35 fichiers)
 
 **Résultats** :
+
 - ✅ 35 endpoints migrés avec succès
 - ✅ 38 patterns remplacés (findUnique + null check → fetchResourceOrFail)
 - ✅ ~112 lignes économisées
@@ -1216,6 +1227,7 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 - ✅ 3 corrections lint (variables inutilisées)
 
 **Phase 8B - Carpool (6 fichiers, 9 patterns)** :
+
 1. `server/api/carpool-offers/[id]/comments.post.ts` - 1 pattern
 2. `server/api/carpool-offers/[id]/bookings.post.ts` - 2 patterns (offer + user)
 3. `server/api/carpool-offers/[id]/bookings.get.ts` - 1 pattern
@@ -1224,12 +1236,14 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 6. `server/api/carpool-requests/[id]/index.put.ts` - 2 patterns
 
 **Phase 8C - Conventions (4 fichiers, 4 patterns)** :
+
 1. `server/api/conventions/[id]/collaborators.post.ts` - 1 pattern (user)
 2. `server/api/conventions/[id]/claim.post.ts` - 1 pattern
 3. `server/api/conventions/[id]/claim/verify.post.ts` - 1 pattern
 4. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - 1 pattern
 
 **Phase 8D - Admin (10 fichiers, 10 patterns)** :
+
 1. `server/api/admin/conventions/[id].delete.ts`
 2. `server/api/admin/editions/[id]/export.get.ts`
 3. `server/api/admin/error-logs/[id].get.ts`
@@ -1242,6 +1256,7 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 10. `server/api/admin/users/[id]/profile-picture.put.ts`
 
 **Phase 8E - Éditions (9 fichiers, 9 patterns)** :
+
 1. `server/api/editions/[id]/index.get.ts` - Complex includes preserved
 2. `server/api/editions/[id]/attendance.post.ts`
 3. `server/api/editions/[id]/favorite.post.ts`
@@ -1253,6 +1268,7 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 9. `server/api/editions/[id]/volunteers/applications/index.post.ts`
 
 **Phase 8F - Volunteers (6 fichiers, 6 patterns)** :
+
 1. `server/api/editions/[id]/volunteers/settings.get.ts`
 2. `server/api/editions/[id]/volunteers/settings.patch.ts`
 3. `server/api/editions/[id]/volunteers/meals.get.ts`
@@ -1261,6 +1277,7 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 6. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts`
 
 **Exemple de migration** :
+
 ```typescript
 // AVANT (6 lignes)
 const carpoolOffer = await prisma.carpoolOffer.findUnique({
@@ -1277,6 +1294,7 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 ```
 
 **Corrections lint** :
+
 - Suppression des variables inutilisées dans 3 fichiers où `fetchResourceOrFail` était utilisé uniquement pour validation :
   - `server/api/admin/error-logs/[id]/resolve.patch.ts`
   - `server/api/carpool-offers/[id]/comments.post.ts`
@@ -1295,6 +1313,7 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 1. **`server/api/admin/feedback/index.get.ts`** (lignes 82-90)
    - Pattern : `{ feedbacks, pagination: { page, limit, total, pages }, stats }`
    - Gain : 5 lignes
+
    ```typescript
    // APRÈS
    return {
@@ -1306,6 +1325,7 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 2. **`server/api/admin/users/index.get.ts`** (lignes 113-137)
    - Pattern : Construction manuelle complète avec `hasNextPage`, `hasPrevPage`
    - Gain : 10 lignes
+
    ```typescript
    // APRÈS
    return {
@@ -1318,6 +1338,7 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 3. **`server/api/editions/index.get.ts`** (lignes 338-346)
    - Pattern : Pagination pure simple
    - Gain : 8 lignes
+
    ```typescript
    // APRÈS
    return createPaginatedResponse(transformedEditions, totalCount, pageNumber, limitNumber)
@@ -1362,11 +1383,13 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 ### Phase 8A : Migration fetchResourceOrFail Auth ✅ COMPLÉTÉ (8/11 fichiers)
 
 **Résultats** :
+
 - ✅ 8 endpoints Auth migrés avec succès
 - ✅ ~19 lignes économisées
 - ✅ Tous les tests passent
 
 **Fichiers migrés** :
+
 1. `server/api/files/profile.post.ts` - 1 pattern user
 2. `server/api/profile/has-password.get.ts` - 1 pattern user
 3. `server/api/profile/auth-info.get.ts` - 1 pattern user
@@ -1377,6 +1400,7 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 8. `server/api/auth/reset-password.post.ts` - 1 pattern passwordResetToken (fetchResourceByFieldOrFail)
 
 **Fichiers exclus (3)** :
+
 - `server/api/auth/login.post.ts` - Logique spéciale (essai email puis pseudo)
 - `server/api/auth/verify-reset-token.get.ts` - Retourne validation, pas erreur
 - `server/api/auth/request-password-reset.post.ts` - Pattern sécurité (ne révèle pas existence)
@@ -1395,6 +1419,7 @@ await fetchResourceOrFail(prisma.carpoolOffer, carpoolOfferId, {
 **Phase 8A - Authentification (11 fichiers, ~15 patterns)** 🔴 HAUTE PRIORITÉ
 
 Code critique pour la sécurité :
+
 1. `server/api/files/profile.post.ts` - 1 pattern `user`
 2. `server/api/profile/has-password.get.ts` - 1 pattern `user`
 3. `server/api/profile/auth-info.get.ts` - 1 pattern `user`
@@ -1471,11 +1496,13 @@ const edition = await fetchResourceOrFail(prisma.edition, editionId, {
 ### Phase 9 : Migration sanitizeEmail ✅ COMPLÉTÉ (9/8 fichiers)
 
 **Résultats** :
+
 - ✅ 9 fichiers migrés (1 bonus découvert)
 - ✅ 10 occurrences de `.toLowerCase().trim()` remplacées
 - ✅ Tous les tests passent
 
 **Fichiers migrés** :
+
 1. `server/api/auth/register.post.ts` (L26)
 2. `server/api/auth/resend-verification.post.ts` (L29)
 3. `server/api/auth/verify-email.post.ts` (L24)
@@ -1491,6 +1518,7 @@ const edition = await fetchResourceOrFail(prisma.edition, editionId, {
 ### Phase 9+ : Migration sanitizeString/Object ✅ COMPLÉTÉ (10/10 fichiers)
 
 **Résultats** :
+
 - ✅ 10 fichiers migrés avec succès (5 Pattern 2 + 1 Pattern 3 + 4 Pattern 4)
 - ✅ 31+ patterns remplacés (14 Pattern 2 + 13 Pattern 3 + 4 Pattern 4)
 - ✅ ~50 lignes économisées
@@ -1498,6 +1526,7 @@ const edition = await fetchResourceOrFail(prisma.edition, editionId, {
 - ✅ 1 test ajusté (espaces finaux supprimés automatiquement)
 
 **Pattern 2 - Sanitisation multiple de strings (5 fichiers, 14 patterns)** :
+
 1. `server/api/auth/register.post.ts` - 3 champs (pseudo, nom, prenom)
 2. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts` - 2 champs
 3. `server/api/conventions/index.post.ts` - 4 champs (name, description, email, logo)
@@ -1505,22 +1534,26 @@ const edition = await fetchResourceOrFail(prisma.edition, editionId, {
 5. `server/api/auth/login.post.ts` - 2 champs (identifier, password)
 
 **Pattern 3 - Trim répétitif avec vérification (1 fichier, 13 patterns)** :
+
 - `server/api/editions/[id]/volunteers/applications/index.post.ts` (L107-172)
   - 18 lignes économisées
   - Champs: allergies, petsDetails, minorsDetails, vehicleDetails, companionName, avoidList, skills, experienceDetails, arrivalDateTime, departureDateTime, emergencyContactName, emergencyContactPhone
 
 **Pattern 4 - Validation de strings vides (4 fichiers, 4 patterns)** :
+
 1. `server/api/carpool-offers/[id]/comments.post.ts`
 2. `server/api/carpool-requests/[id]/comments.post.ts`
 3. `server/api/editions/[id]/lost-found/index.post.ts`
 4. `server/api/editions/[id]/lost-found/[itemId]/comments.post.ts`
 
 **Test corrigé** :
+
 - `test/nuxt/server/api/carpool-offers/comments.post.test.ts` - Suppression espace final dans "devrait accepter un commentaire long"
 
 **Exemples de migration** :
 
 Pattern 2 :
+
 ```typescript
 // AVANT
 const cleanPseudo = validatedData.pseudo.trim()
@@ -1532,6 +1565,7 @@ const cleanNom = sanitizeString(validatedData.nom)!
 ```
 
 Pattern 3 :
+
 ```typescript
 // AVANT (3 lignes)
 allergies: edition.volunteersAskAllergies && parsed.allergies?.trim()
@@ -1543,6 +1577,7 @@ allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : n
 ```
 
 Pattern 4 :
+
 ```typescript
 // AVANT (4 lignes)
 const content = body.content
@@ -1579,6 +1614,7 @@ const cleanEmail = sanitizeEmail(validatedData.email)
 ```
 
 Fichiers :
+
 1. `server/api/auth/register.post.ts` (L25)
 2. `server/api/auth/resend-verification.post.ts` (L28)
 3. `server/api/auth/verify-email.post.ts` (L23)
@@ -1599,11 +1635,19 @@ const cleanPrenom = validatedData.prenom.trim()
 
 // APRÈS (1-2 lignes)
 const cleanEmail = sanitizeEmail(validatedData.email)
-const { pseudo: cleanPseudo, nom: cleanNom, prenom: cleanPrenom } =
-  sanitizeObject({ pseudo: validatedData.pseudo, nom: validatedData.nom, prenom: validatedData.prenom })
+const {
+  pseudo: cleanPseudo,
+  nom: cleanNom,
+  prenom: cleanPrenom,
+} = sanitizeObject({
+  pseudo: validatedData.pseudo,
+  nom: validatedData.nom,
+  prenom: validatedData.prenom,
+})
 ```
 
 Fichiers prioritaires :
+
 1. `server/api/auth/register.post.ts` (4 champs, gain : 4 lignes)
 2. `server/api/editions/[id]/volunteers/create-user-and-add.post.ts` (3 champs)
 3. `server/api/conventions/index.post.ts` (4 champs)
@@ -1623,6 +1667,7 @@ allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : n
 ```
 
 Fichier critique :
+
 - `server/api/editions/[id]/volunteers/applications/index.post.ts` (L107-172, gain : ~40 lignes)
 
 **Pattern 4 - Validation de strings vides (4 fichiers)**
@@ -1641,6 +1686,7 @@ if (!content) {
 ```
 
 Fichiers :
+
 1. `server/api/carpool-offers/[id]/comments.post.ts` (L13)
 2. `server/api/carpool-requests/[id]/comments.post.ts` (L13)
 3. `server/api/editions/[id]/lost-found/index.post.ts` (L59)
@@ -1653,17 +1699,20 @@ Fichiers :
 ### Phase 10 P1 : Migration buildUpdateData Priorité 1 ✅ COMPLÉTÉ (2/3 fichiers)
 
 **Résultats** :
+
 - ✅ 2 fichiers Priorité 1 migrés
 - ✅ ~37 lignes économisées
 - ✅ Tous les tests passent
 
 **Fichiers migrés** :
+
 1. `server/api/editions/[id]/artists/[artistId].put.ts` (-22 lignes)
    - Remplacé 25 champs assignés manuellement par `buildUpdateData` avec `exclude`
 2. `server/api/editions/[id]/volunteers/settings.patch.ts` (-15 lignes)
    - Créé mapping intermédiaire puis utilisé `buildUpdateData` avec `transform`
 
 **Fichier exclu (1)** :
+
 - `server/api/editions/[id]/index.put.ts` - Logique de fallback complexe incompatible (pattern `field: newValue !== undefined ? newValue : edition.field` pour 48 champs)
 
 ---
@@ -1734,6 +1783,7 @@ const updateData = buildUpdateData(body, { trimStrings: true })
 ### Phase 10 P2-P3 : buildUpdateData Autres ⛔ NON APPLICABLE
 
 **Résultats de l'analyse** :
+
 - ✅ 9 fichiers analysés
 - ⛔ **0 fichiers migrés** - Non applicable
 - 📊 Raison : Complexité > Bénéfice
@@ -1745,46 +1795,55 @@ Après examen approfondi des 9 fichiers restants, il s'avère que **tous** prés
 **Problèmes identifiés** :
 
 1. **Transformations de données complexes** :
+
    ```typescript
    // server/api/editions/[id]/shows/[showId].put.ts (L73-74)
    if (validatedData.startDateTime !== undefined)
      updateData.startDateTime = new Date(validatedData.startDateTime)
    ```
+
    - Conversion `string → Date`
    - Nécessiterait `transform: { startDateTime: (v) => new Date(v) }`
 
 2. **Mapping de champs** :
+
    ```typescript
    // server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts (L83-84)
    if (parsed.rights.editConvention !== undefined)
      updateData.canEditConvention = parsed.rights.editConvention
    ```
+
    - Nom source ≠ nom destination (`rights.editConvention → canEditConvention`)
    - Nécessiterait un mapping complexe
 
 3. **Relations Prisma imbriquées** :
+
    ```typescript
    // server/api/editions/[id]/shows/[showId].put.ts (L87-91)
    updateData.artists = {
-     create: validatedData.artistIds.map((artistId) => ({ artistId }))
+     create: validatedData.artistIds.map((artistId) => ({ artistId })),
    }
    ```
+
    - Objets imbriqués pour relations many-to-many
    - Logique métier spécifique (suppression puis création)
 
 **Décision** :
 
 Pour ces 9 fichiers, une migration vers `buildUpdateData` nécessiterait :
+
 - Un helper ultra-complexe avec support de transformations personnalisées par champ
 - Une configuration verbale aussi longue que le code manuel actuel
 - Une perte de lisibilité et de maintenabilité
 
 **Recommandation** : Conserver le code manuel actuel. Le pattern `if (field !== undefined) updateData.field = value` est :
+
 - ✅ Explicite et facile à comprendre
 - ✅ Flexible pour les transformations
 - ✅ Déjà bien testé
 
 **Fichiers analysés (9)** :
+
 1. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - Mapping complexe de droits
 2. `server/api/carpool-requests/[id]/index.put.ts` - Transformations métier
 3. `server/api/editions/[id]/volunteer-teams/[teamId].put.ts` - Relations
@@ -1798,11 +1857,13 @@ Pour ces 9 fichiers, une migration vers `buildUpdateData` nécessiterait :
 ### Phase 11 : Migration createSuccessResponse ✅ COMPLÉTÉ (5/6 fichiers)
 
 **Résultats** :
+
 - ✅ 5 fichiers migrés avec succès
 - ✅ Pas de breaking changes introduits
 - ✅ Tous les tests passent
 
 **Fichiers migrés** :
+
 1. `server/api/auth/logout.post.ts` - `{ success: true }` → `createSuccessResponse(null)`
 2. `server/api/profile/change-password.post.ts` - `{ success: true, message }` → `createSuccessResponse(null, message)`
 3. `server/api/editions/[id]/ticketing/quotas/[quotaId].delete.ts`
@@ -1810,6 +1871,7 @@ Pour ces 9 fichiers, une migration vers `buildUpdateData` nécessiterait :
 5. `server/api/editions/[id]/volunteers/applications/[applicationId]/index.delete.ts`
 
 **Fichier exclu après tests (1)** :
+
 - `server/api/editions/[id]/volunteers/applications/index.post.ts` - Retourne `{ success: true, application }` (propriété personnalisée attendue par frontend)
 
 **Note importante** : 95 fichiers supplémentaires contiennent `{ success: true }` mais avec des propriétés personnalisées (ex: `{ success: true, data, stats }`, `{ success: true, user }`, etc.). Ces fichiers nécessitent une coordination avec le frontend pour éviter les breaking changes. Seuls les endpoints avec exactement `{ success: true }` ou `{ success: true, message }` ont été migrés.
@@ -1819,6 +1881,7 @@ Pour ces 9 fichiers, une migration vers `buildUpdateData` nécessiterait :
 ### Phase 11+ : createSuccessResponse Autres ⛔ NON APPLICABLE
 
 **Résultats de l'analyse** :
+
 - ✅ 4 fichiers analysés en détail
 - ⛔ **0 fichiers migrés** - Non applicable
 - 📊 Raison : Breaking changes frontend > Bénéfices
@@ -1830,6 +1893,7 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
 **Fichiers identifiés** :
 
 1. **`server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts`** (L49, L162-178)
+
    ```typescript
    // Cas sans changement
    return { success: true, unchanged: true }
@@ -1837,10 +1901,12 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
    // Cas normal
    return { success: true, collaborator: { id, title, rights, perEdition } }
    ```
+
    - **Frontend consommateur** : Gestion des collaborateurs (composants admin)
    - **Format attendu** : `{ success: true, collaborator }` directement
 
 2. **`server/api/editions/[id]/volunteers/settings.patch.ts`** (L192, L222)
+
    ```typescript
    // Cas sans changement
    return { success: true, unchanged: true }
@@ -1848,18 +1914,22 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
    // Cas normal
    return { success: true, settings: updated }
    ```
+
    - **Frontend consommateur** : `app/composables/useVolunteerSettings.ts` (ligne 58)
    - **Format attendu** : `{ settings: VolunteerSettings }` sans wrapper `data`
    - **Impact** : Le composable fait `response.settings` directement
 
 3. **`server/api/editions/[id]/volunteers/applications/[applicationId].patch.ts`** (L226, L331)
+
    ```typescript
    return { success: true, application: updated }
    ```
+
    - **Frontend consommateur** : Gestion des candidatures bénévoles
    - **Format attendu** : `{ success: true, application }` directement
 
 4. **`server/api/conventions/[id]/archive.patch.ts`** (L24, L53)
+
    ```typescript
    // Cas sans changement
    return { success: true, archived, unchanged: true }
@@ -1867,6 +1937,7 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
    // Cas normal
    return { success: true, archived: updated.isArchived, archivedAt: updated.archivedAt }
    ```
+
    - **Frontend consommateur** : Page admin des conventions
    - **Format attendu** : Propriétés `archived` et `archivedAt` directement accessibles
 
@@ -1898,18 +1969,21 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
 **Décision** :
 
 Pour ces 4 fichiers, une migration vers `createSuccessResponse` nécessiterait :
+
 - Une coordination complète frontend/backend
 - Des breaking changes dans l'interface publique de l'API
 - Une phase de test manuel intensive
 - Un effort disproportionné par rapport au gain (8 lignes)
 
 **Recommandation** : Conserver le format actuel `{ success: true, propriété }`. Ce pattern est :
+
 - ✅ Validé et fonctionnel en production
 - ✅ Cohérent au sein de chaque endpoint
 - ✅ Attendu explicitement par le frontend
 - ✅ Documenté dans les types TypeScript
 
 **Fichiers analysés (4)** :
+
 1. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - Gestion collaborateurs
 2. `server/api/editions/[id]/volunteers/settings.patch.ts` - Paramètres bénévoles (frontend confirmé)
 3. `server/api/editions/[id]/volunteers/applications/[applicationId].patch.ts` - Candidatures
@@ -1927,6 +2001,7 @@ Pour ces 4 fichiers, une migration vers `createSuccessResponse` nécessiterait :
 #### Fichiers migrés (5)
 
 1. **`server/api/auth/logout.post.ts`** (L8) ✅
+
    ```typescript
    // AVANT
    return { success: true }
@@ -1936,6 +2011,7 @@ Pour ces 4 fichiers, une migration vers `createSuccessResponse` nécessiterait :
    ```
 
 2. **`server/api/profile/change-password.post.ts`** (L74)
+
    ```typescript
    // AVANT
    return { success: true, message: 'Mot de passe mis à jour avec succès' }
@@ -1947,7 +2023,7 @@ Pour ces 4 fichiers, une migration vers `createSuccessResponse` nécessiterait :
 3. **`server/api/editions/[id]/volunteers/settings.patch.ts`** (L183, L213)
 4. **`server/api/editions/[id]/volunteers/applications/index.post.ts`** (L226)
 5. **`server/api/conventions/[id]/archive.patch.ts`** (L24, L53)
-6-14. Autres fichiers avec pattern `{ success: true, ... }`
+   6-14. Autres fichiers avec pattern `{ success: true, ... }`
 
 **Gain total estimé** : 15-30 lignes
 
@@ -1974,6 +2050,7 @@ Pour ces 4 fichiers, une migration vers `createSuccessResponse` nécessiterait :
 ## ✅ Checklist de migration
 
 Pour chaque phase :
+
 - [ ] Identifier tous les fichiers concernés
 - [ ] Migrer les fichiers par groupes cohérents
 - [ ] Exécuter les tests après chaque groupe

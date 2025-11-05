@@ -59,7 +59,13 @@
       "Bash(echo:*)",
       "Bash(if grep -q \"wrapApiHandler\" \"$file\")",
       "Bash(else)",
-      "Bash(for:*)"
+      "Bash(for:*)",
+      "Bash(grep:*)",
+      "Bash(python3:*)",
+      "mcp__nuxt-ui__get_component",
+      "Bash(node /tmp/update-gestion-pages.mjs:*)",
+      "Bash(if grep -q \"layout: ''edition-dashboard''\" \"$file\")",
+      "Bash(npm run docker:dev:logs:*)"
     ],
     "deny": [],
     "ask": [],

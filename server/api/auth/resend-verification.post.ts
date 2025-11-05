@@ -30,9 +30,13 @@ export default wrapApiHandler(
     const cleanEmail = sanitizeEmail(validatedData.email)
 
     // Rechercher l'utilisateur
-    const user = await fetchResourceByFieldOrFail(prisma.user, { email: cleanEmail }, {
-      errorMessage: 'Utilisateur non trouvé',
-    })
+    const user = await fetchResourceByFieldOrFail(
+      prisma.user,
+      { email: cleanEmail },
+      {
+        errorMessage: 'Utilisateur non trouvé',
+      }
+    )
 
     if (user.isEmailVerified) {
       throw createError({

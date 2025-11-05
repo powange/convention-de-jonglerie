@@ -5,7 +5,11 @@ import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { sanitizeEmail, sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'
+import {
+  sanitizeEmail,
+  sanitizeString,
+  validateEditionId,
+} from '@@/server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 import { z } from 'zod'
 

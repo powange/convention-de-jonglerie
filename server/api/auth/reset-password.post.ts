@@ -16,11 +16,15 @@ export default wrapApiHandler(
     const { token, newPassword } = resetPasswordSchema.parse(body)
 
     // Vérifier le token
-    const resetToken = await fetchResourceByFieldOrFail(prisma.passwordResetToken, { token }, {
-      include: { user: true },
-      errorMessage: 'Token de réinitialisation invalide',
-      statusCode: 400,
-    })
+    const resetToken = await fetchResourceByFieldOrFail(
+      prisma.passwordResetToken,
+      { token },
+      {
+        include: { user: true },
+        errorMessage: 'Token de réinitialisation invalide',
+        statusCode: 400,
+      }
+    )
 
     // Vérifier si le token a expiré
     // Comparer en UTC car les dates en BDD sont en UTC

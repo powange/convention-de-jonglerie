@@ -21,17 +21,16 @@ export default wrapApiHandler(
     const user = requireAuth(event)
 
     // Récupérer les informations de l'utilisateur
-    const userInfo = await fetchResourceOrFail<{ authProvider: string | null; password: string | null }>(
-      prisma.user,
-      user.id,
-      {
-        select: {
-          authProvider: true,
-          password: true,
-        },
-        errorMessage: 'Utilisateur non trouvé',
-      }
-    )
+    const userInfo = await fetchResourceOrFail<{
+      authProvider: string | null
+      password: string | null
+    }>(prisma.user, user.id, {
+      select: {
+        authProvider: true,
+        password: true,
+      },
+      errorMessage: 'Utilisateur non trouvé',
+    })
 
     const authProvider = userInfo.authProvider || 'unknown'
     const authProviderLabel = getAuthProviderLabel(authProvider)

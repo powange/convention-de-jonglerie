@@ -17,7 +17,6 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Contenu de la page -->
       <div class="space-y-6">
@@ -415,6 +414,10 @@ import { useMealTypeLabel } from '~/composables/useMeals'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDate } from '~/utils/meals'
+
+definePageMeta({
+  layout: 'edition-dashboard',
+})
 
 const route = useRoute()
 const editionStore = useEditionStore()
