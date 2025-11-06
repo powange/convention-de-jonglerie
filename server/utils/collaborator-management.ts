@@ -22,10 +22,13 @@ export async function checkAdminMode(userId: number, event?: H3Event): Promise<b
     return false
   }
 
-  // Vérifier que le mode admin est activé côté client
+  // Vérifier que le mode admin est activé côté client (header ou query param)
   if (event) {
     const adminModeHeader = event.node?.req?.headers?.['x-admin-mode']
-    return adminModeHeader === 'true'
+    const query = getQuery(event)
+    const adminModeQuery = query.adminMode
+
+    return adminModeHeader === 'true' || adminModeQuery === 'true'
   }
 
   return false

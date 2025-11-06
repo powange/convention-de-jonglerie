@@ -18,6 +18,8 @@
 </template>
 
 <script setup lang="ts">
+import { translationLoaders, getTranslationsToLoad } from '~/utils/translation-loaders'
+
 import { languageCodeToFlag } from '~~/app/utils/locales'
 
 const { locale, locales, setLocale } = useI18n()
@@ -52,68 +54,7 @@ const changeLanguage = async (newLocale: string) => {
   const path = route.path
 
   // Déterminer quelles traductions charger selon la route
-  let translationsToLoad: string[] = []
-  if (path.startsWith('/editions')) {
-    translationsToLoad = ['edition']
-  } else if (path.startsWith('/admin')) {
-    translationsToLoad = ['admin', 'auth']
-  } else if (
-    path.startsWith('/auth') ||
-    path.startsWith('/login') ||
-    path.startsWith('/register') ||
-    path.startsWith('/profile')
-  ) {
-    translationsToLoad = ['auth']
-  }
-
-  // Map des loaders (copié depuis le middleware)
-  const translationLoaders: Record<string, Record<string, () => Promise<any>>> = {
-    edition: {
-      en: () => import('~~/i18n/locales/en/edition.json'),
-      da: () => import('~~/i18n/locales/da/edition.json'),
-      de: () => import('~~/i18n/locales/de/edition.json'),
-      es: () => import('~~/i18n/locales/es/edition.json'),
-      fr: () => import('~~/i18n/locales/fr/edition.json'),
-      it: () => import('~~/i18n/locales/it/edition.json'),
-      nl: () => import('~~/i18n/locales/nl/edition.json'),
-      pl: () => import('~~/i18n/locales/pl/edition.json'),
-      pt: () => import('~~/i18n/locales/pt/edition.json'),
-      ru: () => import('~~/i18n/locales/ru/edition.json'),
-      uk: () => import('~~/i18n/locales/uk/edition.json'),
-      cs: () => import('~~/i18n/locales/cs/edition.json'),
-      sv: () => import('~~/i18n/locales/sv/edition.json'),
-    },
-    admin: {
-      en: () => import('~~/i18n/locales/en/admin.json'),
-      da: () => import('~~/i18n/locales/da/admin.json'),
-      de: () => import('~~/i18n/locales/de/admin.json'),
-      es: () => import('~~/i18n/locales/es/admin.json'),
-      fr: () => import('~~/i18n/locales/fr/admin.json'),
-      it: () => import('~~/i18n/locales/it/admin.json'),
-      nl: () => import('~~/i18n/locales/nl/admin.json'),
-      pl: () => import('~~/i18n/locales/pl/admin.json'),
-      pt: () => import('~~/i18n/locales/pt/admin.json'),
-      ru: () => import('~~/i18n/locales/ru/admin.json'),
-      uk: () => import('~~/i18n/locales/uk/admin.json'),
-      cs: () => import('~~/i18n/locales/cs/admin.json'),
-      sv: () => import('~~/i18n/locales/sv/admin.json'),
-    },
-    auth: {
-      en: () => import('~~/i18n/locales/en/auth.json'),
-      da: () => import('~~/i18n/locales/da/auth.json'),
-      de: () => import('~~/i18n/locales/de/auth.json'),
-      es: () => import('~~/i18n/locales/es/auth.json'),
-      fr: () => import('~~/i18n/locales/fr/auth.json'),
-      it: () => import('~~/i18n/locales/it/auth.json'),
-      nl: () => import('~~/i18n/locales/nl/auth.json'),
-      pl: () => import('~~/i18n/locales/pl/auth.json'),
-      pt: () => import('~~/i18n/locales/pt/auth.json'),
-      ru: () => import('~~/i18n/locales/ru/auth.json'),
-      uk: () => import('~~/i18n/locales/uk/auth.json'),
-      cs: () => import('~~/i18n/locales/cs/auth.json'),
-      sv: () => import('~~/i18n/locales/sv/auth.json'),
-    },
-  }
+  const translationsToLoad = getTranslationsToLoad(path)
 
   // Charger les traductions manuellement
   for (const translationFile of translationsToLoad) {
