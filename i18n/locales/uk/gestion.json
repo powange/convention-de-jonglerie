@@ -102,8 +102,7 @@
       "mode_internal_badge": "Внутрішній",
       "notifications_description": "Надсилайте сповіщення волонтерам",
       "planning_description": "Планування слотів і місій",
-      "teams_description": "Організація команд волонтерів",
-      "tools_description": "Розширені інструменти та генерація документів"
+      "teams_description": "Організація команд волонтерів"
     },
     "workshops": {
       "enable_workshops": "Активувати воркшопи",

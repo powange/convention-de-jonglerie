@@ -102,8 +102,7 @@
       "mode_internal_badge": "Internt",
       "notifications_description": "Send meddelelser til frivillige",
       "planning_description": "Planlægning af slots og missioner",
-      "teams_description": "Organisering af hold af frivillige",
-      "tools_description": "Avancerede værktøjer og dokumentgenerering"
+      "teams_description": "Organisering af hold af frivillige"
     },
     "workshops": {
       "enable_workshops": "Aktiver workshops",

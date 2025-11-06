@@ -246,13 +246,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       })
     }
 
-    if (canManageVolunteers.value && isVolunteersModeInternal.value) {
-      volunteersChildren.push({
-        label: t('edition.volunteers.management_tools'),
-        to: `/editions/${editionId.value}/gestion/volunteers/tools`,
-      })
-    }
-
     if (volunteersChildren.length > 0) {
       managementSection.push({
         label: t('edition.volunteers.title'),

@@ -24,8 +24,7 @@
       "applications_description": "Consulter et traiter les candidatures",
       "teams_description": "Organiser les équipes de bénévoles",
       "planning_description": "Planifier les créneaux et missions",
-      "notifications_description": "Envoyer des notifications aux bénévoles",
-      "tools_description": "Outils avancés et génération de documents"
+      "notifications_description": "Envoyer des notifications aux bénévoles"
     },
     "meals": {
       "title": "Repas",

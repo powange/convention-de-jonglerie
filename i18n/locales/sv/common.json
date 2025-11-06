@@ -515,7 +515,6 @@
       "last_name_placeholder": "Ditt namn",
       "login_prompt": "Logga in för att ansöka om att bli volontär.",
       "management_title": "Hantering av applikationer",
-      "management_tools": "Verktyg för hantering",
       "max_volunteers": "Antal volontärer som krävs",
       "max_volunteers_hint": "Maximalt antal volontärer för denna slot",
       "max_volunteers_optional": "Högsta antal volontärer (valfritt)",

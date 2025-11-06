@@ -102,8 +102,7 @@
       "mode_internal_badge": "Internt",
       "notifications_description": "Skicka meddelanden till volontärer",
       "planning_description": "Planering av slots och uppdrag",
-      "teams_description": "Organisera team av volontärer",
-      "tools_description": "Avancerade verktyg och dokumentgenerering"
+      "teams_description": "Organisera team av volontärer"
     },
     "workshops": {
       "enable_workshops": "Aktivera workshops",

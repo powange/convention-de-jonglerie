@@ -102,8 +102,7 @@
       "mode_internal_badge": "Intern",
       "notifications_description": "Benachrichtigungen an Freiwillige senden",
       "planning_description": "Zeitnischen und Missionen planen",
-      "teams_description": "Organisation von Freiwilligenteams",
-      "tools_description": "Erweiterte Tools und Dokumentengenerierung"
+      "teams_description": "Organisation von Freiwilligenteams"
     },
     "workshops": {
       "enable_workshops": "Workshops aktivieren",

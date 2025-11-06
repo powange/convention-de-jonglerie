@@ -102,8 +102,7 @@
       "mode_internal_badge": "Interno",
       "notifications_description": "Enviar notificaciones a los voluntarios",
       "planning_description": "Planificación de franjas horarias y misiones",
-      "teams_description": "Organizar equipos de voluntarios",
-      "tools_description": "Herramientas avanzadas y generación de documentos"
+      "teams_description": "Organizar equipos de voluntarios"
     },
     "workshops": {
       "enable_workshops": "Activar talleres",

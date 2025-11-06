@@ -102,8 +102,7 @@
       "mode_internal_badge": "Wewnętrzny",
       "notifications_description": "Wysyłanie powiadomień do wolontariuszy",
       "planning_description": "Planowanie przydziałów czasu i misji",
-      "teams_description": "Organizowanie zespołów wolontariuszy",
-      "tools_description": "Zaawansowane narzędzia i generowanie dokumentów"
+      "teams_description": "Organizowanie zespołów wolontariuszy"
     },
     "workshops": {
       "enable_workshops": "Warsztaty aktywizujące",

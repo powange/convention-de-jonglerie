@@ -102,8 +102,7 @@
       "mode_internal_badge": "Internal",
       "notifications_description": "Send notifications to volunteers",
       "planning_description": "Planning slots and missions",
-      "teams_description": "Organising teams of volunteers",
-      "tools_description": "Advanced tools and document generation"
+      "teams_description": "Organising teams of volunteers"
     },
     "workshops": {
       "enable_workshops": "Activate workshops",

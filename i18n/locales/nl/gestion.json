@@ -102,8 +102,7 @@
       "mode_internal_badge": "Intern",
       "notifications_description": "Meldingen naar vrijwilligers sturen",
       "planning_description": "Planningsslots en missies",
-      "teams_description": "Vrijwilligersteams organiseren",
-      "tools_description": "Geavanceerde tools en documentgeneratie"
+      "teams_description": "Vrijwilligersteams organiseren"
     },
     "workshops": {
       "enable_workshops": "Workshops activeren",

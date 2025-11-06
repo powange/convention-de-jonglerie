@@ -102,8 +102,7 @@
       "mode_internal_badge": "Interno",
       "notifications_description": "Inviare notifiche ai volontari",
       "planning_description": "Pianificazione di slot e missioni",
-      "teams_description": "Organizzare squadre di volontari",
-      "tools_description": "Strumenti avanzati e generazione di documenti"
+      "teams_description": "Organizzare squadre di volontari"
     },
     "workshops": {
       "enable_workshops": "Attivazione di laboratori",

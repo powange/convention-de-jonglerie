@@ -154,16 +154,6 @@
                   :description="$t('gestion.volunteers.notifications_description')"
                   color="yellow"
                 />
-
-                <!-- Outils de gestion (pas visible pour les team leaders seuls) -->
-                <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers"
-                  :to="`/editions/${edition.id}/gestion/volunteers/tools`"
-                  icon="i-heroicons-wrench-screwdriver"
-                  :title="$t('edition.volunteers.management_tools')"
-                  :description="$t('gestion.volunteers.tools_description')"
-                  color="gray"
-                />
               </template>
             </div>
           </div>

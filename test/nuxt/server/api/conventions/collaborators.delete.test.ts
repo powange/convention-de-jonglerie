@@ -40,7 +40,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
       success: true,
       message: 'Collaborateur supprimé avec succès',
     })
-    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1)
+    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1, expect.anything())
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -107,7 +107,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
 
     await handler(eventWithStringIds as any)
 
-    expect(mockDeleteCollaborator).toHaveBeenCalledWith(123, 456, 1)
+    expect(mockDeleteCollaborator).toHaveBeenCalledWith(123, 456, 1, expect.anything())
   })
 
   it("devrait retourner le message d'erreur spécifique", async () => {
@@ -174,6 +174,6 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
     const res = await handler(mockEvent as any)
     expect(res.success).toBe(true)
     // Vérifie paramétrage pour que l'utilitaire puisse créer l'historique avec targetUserId = user du collaborateur supprimé
-    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1)
+    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1, expect.anything())
   })
 })
