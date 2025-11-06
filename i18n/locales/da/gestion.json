@@ -77,6 +77,8 @@
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",
       "access_control_title": "Adgangskontrol",
+      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
+      "counters_title": "[TODO] Compteurs",
       "external_link_description": "Tilslut HelloAsso eller en anden platform",
       "external_link_title": "Link til en ekstern billettjeneste",
       "orders_description": "Se ordrer og deltagere",

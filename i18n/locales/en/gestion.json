@@ -77,6 +77,8 @@
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",
       "access_control_title": "Access control",
+      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
+      "counters_title": "[TODO] Compteurs",
       "external_link_description": "Connect HelloAsso or another platform",
       "external_link_title": "Linking an external ticketing service",
       "orders_description": "View orders and participants",

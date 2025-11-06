@@ -3,9 +3,16 @@ import type { TicketingCounter } from '@prisma/client'
 /**
  * Interface pour les connexions SSE des compteurs
  */
+interface EventStreamMessage {
+  event?: string
+  data: string
+  id?: string
+  retry?: number
+}
+
 interface CounterStreamConnection {
-  push: (message: { event?: string; data: string }) => void
-  onClosed: (callback: () => void) => void
+  push: (message: string | EventStreamMessage) => void
+  close: () => void
 }
 
 /**
@@ -17,12 +24,19 @@ class CounterStreamManager {
   private connections: Map<number, Map<number, Set<string>>> = new Map()
   // Map: connectionId -> connection object
   private connectionObjects: Map<string, CounterStreamConnection> = new Map()
+  // Map: sessionId -> connectionId (pour retrouver une connexion depuis le client)
+  private sessionToConnection: Map<string, string> = new Map()
   private nextConnectionId = 1
 
   /**
    * Ajoute une connexion pour un compteur spécifique
    */
-  addConnection(editionId: number, counterId: number, connection: CounterStreamConnection): string {
+  addConnection(
+    editionId: number,
+    counterId: number,
+    connection: CounterStreamConnection,
+    sessionId?: string
+  ): string {
     const connectionId = `counter-${this.nextConnectionId++}`
 
     // Initialiser la structure si nécessaire
@@ -38,15 +52,16 @@ class CounterStreamManager {
 
     this.connectionObjects.set(connectionId, connection)
 
+    // Associer le sessionId à cette connexion si fourni
+    if (sessionId) {
+      this.sessionToConnection.set(sessionId, connectionId)
+      console.log(`[Counter SSE] Session ${sessionId} -> connexion ${connectionId}`)
+    }
+
     console.log(
       `[Counter SSE] Nouvelle connexion ${connectionId} pour counter ${counterId} (edition ${editionId})`
     )
     console.log(`[Counter SSE] Total connexions actives: ${this.connectionObjects.size}`)
-
-    // Gérer la fermeture de la connexion
-    connection.onClosed(() => {
-      this.removeConnection(connectionId, editionId, counterId)
-    })
 
     return connectionId
   }
@@ -55,7 +70,21 @@ class CounterStreamManager {
    * Supprime une connexion
    */
   removeConnection(connectionId: string, editionId: number, counterId: number): void {
+    // Vérifier si la connexion existe encore
+    if (!this.connectionObjects.has(connectionId)) {
+      console.log(`[Counter SSE] Connexion ${connectionId} déjà supprimée`)
+      return
+    }
+
     this.connectionObjects.delete(connectionId)
+
+    // Nettoyer le mapping sessionId -> connectionId
+    for (const [sessionId, connId] of this.sessionToConnection.entries()) {
+      if (connId === connectionId) {
+        this.sessionToConnection.delete(sessionId)
+        break
+      }
+    }
 
     const editionCounters = this.connections.get(editionId)
     if (editionCounters) {
@@ -79,6 +108,33 @@ class CounterStreamManager {
   }
 
   /**
+   * Déconnecte une session spécifique
+   */
+  disconnectSession(sessionId: string, editionId: number, counterId: number): boolean {
+    const connectionId = this.sessionToConnection.get(sessionId)
+    if (!connectionId) {
+      console.log(`[Counter SSE] Session ${sessionId} introuvable`)
+      return false
+    }
+
+    console.log(`[Counter SSE] Déconnexion de la session ${sessionId} (connexion ${connectionId})`)
+
+    // Fermer la connexion
+    const connection = this.connectionObjects.get(connectionId)
+    if (connection) {
+      try {
+        connection.close()
+      } catch (err) {
+        console.error(`[Counter SSE] Erreur lors de la fermeture de ${connectionId}:`, err)
+      }
+    }
+
+    // Nettoyer
+    this.removeConnection(connectionId, editionId, counterId)
+    return true
+  }
+
+  /**
    * Diffuse une mise à jour de compteur à tous les clients connectés
    */
   broadcastUpdate(editionId: number, counterId: number, counter: TicketingCounter): void {
@@ -88,7 +144,7 @@ class CounterStreamManager {
     const counterConnections = editionCounters.get(counterId)
     if (!counterConnections || counterConnections.size === 0) return
 
-    const message = {
+    const message: EventStreamMessage = {
       event: 'counter-update',
       data: JSON.stringify({
         counterId: counter.id,
@@ -99,6 +155,7 @@ class CounterStreamManager {
     }
 
     let sentCount = 0
+
     counterConnections.forEach((connectionId) => {
       const connection = this.connectionObjects.get(connectionId)
       if (connection) {
@@ -138,9 +195,10 @@ export const counterStreamManager = new CounterStreamManager()
 export function addCounterConnection(
   editionId: number,
   counterId: number,
-  connection: CounterStreamConnection
+  connection: CounterStreamConnection,
+  sessionId?: string
 ): string {
-  return counterStreamManager.addConnection(editionId, counterId, connection)
+  return counterStreamManager.addConnection(editionId, counterId, connection, sessionId)
 }
 
 /**

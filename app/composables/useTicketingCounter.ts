@@ -41,7 +41,17 @@ export function useTicketingCounter(editionId: number, token: string) {
 
   let eventSource: EventSource | null = null
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
+  let isDisconnecting = false // Flag pour éviter les doubles déconnexions
   const _MAX_RECONNECT_DELAY = 30000 // 30 secondes (prévu pour usage futur)
+
+  // ID de session unique pour cette connexion SSE - généré une seule fois
+  const sessionId = ref<string>('')
+
+  // Initialiser le sessionId si ce n'est pas déjà fait
+  if (!sessionId.value) {
+    sessionId.value = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    console.log(`[Counter SSE] SessionId généré: ${sessionId.value}`)
+  }
 
   /**
    * Calcule la valeur affichée (valeur serveur + opérations en attente)
@@ -144,7 +154,8 @@ export function useTicketingCounter(editionId: number, token: string) {
       eventSource.close()
     }
 
-    const url = `/api/editions/${editionId}/ticketing/counters/token/${token}/stream`
+    const url = `/api/editions/${editionId}/ticketing/counters/token/${token}/stream?sessionId=${sessionId.value}`
+    console.log(`[Counter SSE] Connexion avec sessionId: ${sessionId.value}`)
     eventSource = new EventSource(url, { withCredentials: true })
 
     eventSource.addEventListener('connected', (event) => {
@@ -179,6 +190,12 @@ export function useTicketingCounter(editionId: number, token: string) {
       console.error('[Counter SSE] Erreur:', err)
       isConnected.value = false
 
+      // Ne pas tenter de reconnexion si on est en train de déconnecter volontairement
+      if (isDisconnecting) {
+        console.log('[Counter SSE] Erreur ignorée : déconnexion en cours')
+        return
+      }
+
       // Tentative de reconnexion
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout)
@@ -194,17 +211,39 @@ export function useTicketingCounter(editionId: number, token: string) {
   /**
    * Déconnecte le flux SSE
    */
-  const disconnectSSE = () => {
+  const disconnectSSE = async () => {
+    // Éviter les doubles déconnexions
+    if (isDisconnecting) {
+      console.log('[Counter SSE] Déconnexion déjà en cours, ignorée')
+      return
+    }
+
     if (reconnectTimeout) {
       clearTimeout(reconnectTimeout)
       reconnectTimeout = null
     }
 
     if (eventSource) {
-      console.log('[Counter SSE] Déconnexion explicite')
+      isDisconnecting = true
+      console.log(
+        `[Counter SSE] Déconnexion explicite - envoi du signal au serveur (session: ${sessionId.value})`
+      )
+
+      // Envoyer un signal de déconnexion au serveur AVANT de fermer
+      try {
+        await $fetch(`/api/editions/${editionId}/ticketing/counters/token/${token}/disconnect`, {
+          method: 'POST',
+          body: { sessionId: sessionId.value },
+        })
+        console.log(`[Counter SSE] Signal de déconnexion envoyé avec succès`)
+      } catch (err) {
+        console.error('[Counter SSE] Erreur lors de la déconnexion:', err)
+      }
+
       eventSource.close()
       eventSource = null
       isConnected.value = false
+      isDisconnecting = false
     }
   }
 

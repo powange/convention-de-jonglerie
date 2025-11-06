@@ -77,6 +77,8 @@
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",
       "access_control_title": "Controllo degli accessi",
+      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
+      "counters_title": "[TODO] Compteurs",
       "external_link_description": "Collegare HelloAsso o un'altra piattaforma",
       "external_link_title": "Collegamento a un servizio di biglietteria esterno",
       "orders_description": "Visualizza gli ordini e i partecipanti",

@@ -77,6 +77,8 @@
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",
       "access_control_title": "Control de acceso",
+      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
+      "counters_title": "[TODO] Compteurs",
       "external_link_description": "Conectar HelloAsso u otra plataforma",
       "external_link_title": "Vincular un servicio externo de venta de entradas",
       "orders_description": "Ver pedidos y participantes",

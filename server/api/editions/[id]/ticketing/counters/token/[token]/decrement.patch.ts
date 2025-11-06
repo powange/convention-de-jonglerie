@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { notifyCounterUpdate } from '@@/server/utils/ticketing-counter-sse'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -12,18 +11,11 @@ const decrementSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-    const user = requireAuth(event)
+    // Authentification requise mais pas de vérification de permissions
+    // Les compteurs partagés via QR code sont accessibles à tous les utilisateurs authentifiés
+    requireAuth(event)
     const editionId = validateEditionId(event)
     const token = z.string().min(1).parse(getRouterParam(event, 'token'))
-
-    // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
-    if (!allowed) {
-      throw createError({
-        statusCode: 403,
-        message: 'Droits insuffisants pour modifier ce compteur',
-      })
-    }
 
     const body = await readBody(event)
     const { step } = decrementSchema.parse(body)

@@ -1,29 +1,25 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import {
   addCounterConnection,
+  counterStreamManager,
   getActiveCounterConnections,
-  removeCounterConnection,
 } from '@@/server/utils/ticketing-counter-sse'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 export default wrapApiHandler(
   async (event) => {
-    const user = requireAuth(event)
+    // Authentification requise mais pas de vérification de permissions
+    // Les compteurs partagés via QR code sont accessibles à tous les utilisateurs authentifiés
+    requireAuth(event)
     const editionId = validateEditionId(event)
     const token = z.string().min(1).parse(getRouterParam(event, 'token'))
 
-    // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
-    if (!allowed) {
-      throw createError({
-        statusCode: 403,
-        message: 'Droits insuffisants pour accéder à ce compteur',
-      })
-    }
+    // Récupérer le sessionId depuis les query params
+    const query = getQuery(event)
+    const sessionId = query.sessionId as string | undefined
 
     // Vérifier que le compteur existe
     const counter = await prisma.ticketingCounter.findFirst({
@@ -50,39 +46,43 @@ export default wrapApiHandler(
 
     const eventStream = createEventStream(event)
 
-    // Ajouter cette connexion au compteur
-    addCounterConnection(editionId, counter.id, eventStream)
+    // Ajouter cette connexion au compteur et stocker l'ID avec le sessionId
+    const connectionId = addCounterConnection(editionId, counter.id, eventStream, sessionId)
 
-    // Envoyer un message de connexion initial
-    await eventStream.push(
-      JSON.stringify({
-        type: 'connected',
-        counterId: counter.id,
-        activeConnections: getActiveCounterConnections(editionId, counter.id),
-      })
-    )
+    console.log(`[Counter SSE] onClosed handler enregistré pour ${connectionId}`)
+
+    // Nettoyer lors de la déconnexion - DOIT être enregistré AVANT eventStream.send()
+    eventStream.onClosed(async () => {
+      console.log(`[Counter SSE] Connexion ${connectionId} fermée par le client`)
+      clearInterval(pingInterval)
+      counterStreamManager.removeConnection(connectionId, editionId, counter.id)
+    })
 
     // Ping périodique (toutes les 30 secondes)
-    const pingInterval = setInterval(async () => {
+    const pingInterval = setInterval(() => {
       try {
-        await eventStream.push(
-          JSON.stringify({
+        eventStream.push({
+          event: 'ping',
+          data: JSON.stringify({
             type: 'ping',
             counterId: counter.id,
             activeConnections: getActiveCounterConnections(editionId, counter.id),
-          })
-        )
+          }),
+        })
       } catch (err) {
         console.error('[Counter SSE] Erreur lors du ping:', err)
         clearInterval(pingInterval)
       }
     }, 30000)
 
-    // Nettoyer lors de la déconnexion
-    event.node.req.on('close', () => {
-      clearInterval(pingInterval)
-      removeCounterConnection(editionId, counter.id, eventStream)
-      eventStream.close()
+    // Envoyer un message de connexion initial
+    eventStream.push({
+      event: 'connected',
+      data: JSON.stringify({
+        type: 'connected',
+        counterId: counter.id,
+        activeConnections: getActiveCounterConnections(editionId, counter.id),
+      }),
     })
 
     return eventStream.send()
