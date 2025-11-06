@@ -54,7 +54,7 @@ export const conventionServices: ConventionService[] = [
   {
     key: 'hasTentCamping',
     label: 'Camping tente',
-    icon: 'i-material-symbols:camping-outline',
+    icon: 'i-mdi:tent',
     color: 'text-green-600',
   },
   {
@@ -72,22 +72,27 @@ export const conventionServices: ConventionService[] = [
   {
     key: 'hasSleepingRoom',
     label: 'Salle de couchage',
-    icon: 'i-heroicons-home',
+    icon: 'i-uil:bed',
     color: 'text-slate-600',
   },
-  { key: 'hasGym', label: 'Gymnase', icon: 'i-heroicons-trophy', color: 'text-purple-500' },
+  {
+    key: 'hasGym',
+    label: 'Gymnase',
+    icon: 'i-ph:court-basketball-light',
+    color: 'text-purple-500',
+  },
   { key: 'hasFireSpace', label: 'Fire space', icon: 'i-heroicons-fire', color: 'text-red-600' },
-  { key: 'hasGala', label: 'Gala', icon: 'i-heroicons-sparkles', color: 'text-yellow-500' },
+  { key: 'hasGala', label: 'Gala', icon: 'i-heroicons-star', color: 'text-yellow-500' },
   {
     key: 'hasOpenStage',
     label: 'Scène ouverte',
-    icon: 'i-heroicons-microphone',
+    icon: 'i-heroicons-sparkles',
     color: 'text-cyan-500',
   },
   {
     key: 'hasLongShow',
     label: 'Spectacle long',
-    icon: 'i-heroicons-play-circle',
+    icon: 'i-streamline-ultimate:show-theater-masks',
     color: 'text-purple-600',
   },
   {
@@ -96,7 +101,7 @@ export const conventionServices: ConventionService[] = [
     icon: 'i-heroicons-musical-note',
     color: 'text-violet-500',
   },
-  { key: 'hasCantine', label: 'Cantine', icon: 'i-heroicons-cake', color: 'text-amber-500' },
+  { key: 'hasCantine', label: 'Cantine', icon: 'cbi:mealie', color: 'text-amber-500' },
   {
     key: 'hasAerialSpace',
     label: 'Espace aérien',
@@ -125,7 +130,7 @@ export const conventionServices: ConventionService[] = [
   {
     key: 'hasWorkshops',
     label: 'Workshops',
-    icon: 'i-heroicons-academic-cap',
+    icon: 'i-material-symbols-light:workspaces-outline',
     color: 'text-slate-600',
   },
   {

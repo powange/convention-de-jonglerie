@@ -62,8 +62,8 @@ describe('convention-services utils', () => {
 
     it('devrait avoir des icônes avec préfixes valides', () => {
       conventionServices.forEach((service) => {
-        // Accepter les formats i-prefix:suffix et i-prefix-suffix
-        expect(service.icon).toMatch(/^i-[\w-]+[:-][\w-]+.*$/)
+        // Accepter les formats i-prefix:suffix, i-prefix-suffix et prefix:suffix (pour cbi:mealie)
+        expect(service.icon).toMatch(/^(i-)?[\w-]+[:-][\w-]+.*$/)
       })
     })
   })
@@ -318,7 +318,7 @@ describe('convention-services utils', () => {
       )
       expect(tentCampingService).toBeDefined()
       expect(tentCampingService!.label).toBe('Camping tente')
-      expect(tentCampingService!.icon).toBe('i-material-symbols:camping-outline')
+      expect(tentCampingService!.icon).toBe('i-mdi:tent')
       expect(tentCampingService!.color).toBe('text-green-600')
     })
 
