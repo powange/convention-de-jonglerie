@@ -9,8 +9,8 @@ export default wrapApiHandler(
     const conventionId = validateConventionId(event)
     const collaboratorId = validateResourceId(event, 'collaboratorId', 'collaborateur')
 
-    // Utiliser l'utilitaire de suppression
-    const result = await deleteConventionCollaborator(conventionId, collaboratorId, user.id)
+    // Utiliser l'utilitaire de suppression en passant l'event pour vérifier le mode admin
+    const result = await deleteConventionCollaborator(conventionId, collaboratorId, user.id, event)
 
     return {
       success: result.success,

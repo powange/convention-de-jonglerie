@@ -469,6 +469,9 @@ const canAccessMealValidation = ref(false)
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
 
+  // Super Admin en mode admin
+  if (authStore.isAdminModeActive) return true
+
   // Créateur de l'édition
   if (authStore.user.id === edition.value.creatorId) return true
 

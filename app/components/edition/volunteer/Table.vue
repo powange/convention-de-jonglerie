@@ -751,7 +751,7 @@ const refreshApplications = async () => {
         includeTeams: 'true', // Inclure les équipes du nouveau système
       },
     } as any)
-    applications.value = res.applications || []
+    applications.value = res.data || []
     if (res.pagination) serverPagination.value = res.pagination
   } catch (e: any) {
     toast.add({ title: e?.message || t('common.error'), color: 'error' })

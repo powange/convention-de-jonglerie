@@ -325,10 +325,11 @@ export async function findUserByPseudoOrEmail(searchTerm: string) {
 export async function deleteConventionCollaborator(
   conventionId: number,
   collaboratorId: number,
-  userId: number
+  userId: number,
+  event?: H3Event
 ): Promise<{ success: boolean; message: string }> {
   // Vérifier les permissions
-  const canManage = await canManageCollaborators(conventionId, userId)
+  const canManage = await canManageCollaborators(conventionId, userId, event)
 
   if (!canManage) {
     throw createError({
@@ -354,8 +355,9 @@ export async function deleteConventionCollaborator(
     })
   }
 
-  // Empêcher l'utilisateur de se supprimer lui-même
-  if (collaborator.userId === userId) {
+  // Empêcher l'utilisateur de se supprimer lui-même, sauf s'il est en mode super admin
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (collaborator.userId === userId && !isAdminMode) {
     throw createError({
       statusCode: 400,
       message: 'Vous ne pouvez pas vous retirer vous-même des collaborateurs',

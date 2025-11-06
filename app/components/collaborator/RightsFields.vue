@@ -23,12 +23,13 @@
         v-model="localValue.title"
         :size="inputSize"
         :placeholder="$t('components.collaborators_rights_panel.title_placeholder')"
+        class="w-full"
         @update:model-value="emitModel"
       />
     </div>
 
     <!-- Per-edition rights as headerless table -->
-    <div v-if="edition.length" class="mt-2">
+    <div v-if="editions.length" class="mt-2">
       <div class="flex items-center justify-between mb-1">
         <h6
           class="text-[11px] uppercase font-semibold tracking-wide text-gray-500 dark:text-gray-400"
