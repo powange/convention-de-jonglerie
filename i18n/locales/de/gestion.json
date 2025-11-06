@@ -77,8 +77,8 @@
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
       "access_control_title": "Zugangskontrolle",
-      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
-      "counters_title": "[TODO] Compteurs",
+      "counters_description": "Echtzeit-synchronisierte Zähler erstellen und verwalten",
+      "counters_title": "Zähler",
       "external_link_description": "HelloAsso oder andere Plattform anmelden",
       "external_link_title": "Externes Ticketing verknüpfen",
       "orders_description": "Bestellungen und Teilnehmer einsehen",

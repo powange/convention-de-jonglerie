@@ -77,8 +77,8 @@
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",
       "access_control_title": "Kontrola dostępu",
-      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
-      "counters_title": "[TODO] Compteurs",
+      "counters_description": "Twórz i zarządzaj licznikami synchronizowanymi w czasie rzeczywistym",
+      "counters_title": "Liczniki",
       "external_link_description": "Podłącz HelloAsso lub inną platformę",
       "external_link_title": "Łączenie zewnętrznej usługi sprzedaży biletów",
       "orders_description": "Wyświetlanie zamówień i uczestników",

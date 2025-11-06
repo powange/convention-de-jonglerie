@@ -77,8 +77,8 @@
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",
       "access_control_title": "Контроль доступу",
-      "counters_description": "[TODO] Créer et gérer des compteurs synchronisés en temps réel",
-      "counters_title": "[TODO] Compteurs",
+      "counters_description": "Створення та керування лічильниками з синхронізацією в реальному часі",
+      "counters_title": "Лічильники",
       "external_link_description": "Підключіть HelloAsso або іншу платформу",
       "external_link_title": "Підключення зовнішнього сервісу продажу квитків",
       "orders_description": "Перегляд замовлень та учасників",
