@@ -32,7 +32,7 @@ export const SPLIT_CONFIG = {
     'calendar',
   ],
   admin: ['admin'],
-  edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
+  edition: ['editions', 'conventions', 'organizers', 'carpool', 'diet'],
   auth: ['auth', 'profile'],
   permissions: ['permissions'], // Chargé au niveau composant via useLazyI18n('permissions')
   feedback: ['feedback'], // Chargé au niveau composant via useLazyI18n('feedback')

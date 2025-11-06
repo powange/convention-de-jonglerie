@@ -230,7 +230,7 @@ Organisation modulaire par fonctionnalité :
 - `Form.vue` - Formulaire convention
 - `ClaimModal.vue` - Modal réclamation
 
-**Composants Collaborator (`/collaborator`) :**
+**Composants Organizer (`/organizer`) :**
 
 - `RightsFields.vue` - Champs de droits
 
@@ -264,7 +264,7 @@ Organisation modulaire par fonctionnalité :
 **Authentification & Autorisation :**
 
 - `useAccessControlPermissions.ts` - Permissions contrôle d'accès
-- `useCollaboratorTitle.ts` - Titres collaborateurs
+- `useOrganizerTitle.ts` - Titres organisateurs
 
 **Dates & Formatage :**
 
@@ -389,7 +389,7 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 
 **`/users` - Recherche Utilisateurs :**
 
-- `search.get.ts` - Recherche utilisateurs (pour collaborateurs)
+- `search.get.ts` - Recherche utilisateurs (pour organisateurs)
 
 **`/conventions` - Gestion Conventions :**
 
@@ -402,14 +402,14 @@ Plugins Vue/Nuxt (i18n, auth, etc.)
 - `[id]/archive.patch.ts` - Archiver convention
 - `[id]/editions.get.ts` - Éditions d'une convention
 
-**`/conventions/[id]/collaborators` - Collaborateurs :**
+**`/conventions/[id]/organizers` - Organisateurs :**
 
-- `collaborators.get.ts` - Liste collaborateurs
-- `collaborators.post.ts` - Ajouter collaborateur
-- `[collaboratorId].put.ts` - Modifier collaborateur
-- `[collaboratorId].patch.ts` - Modifier collaborateur (PATCH)
-- `[collaboratorId].delete.ts` - Retirer collaborateur
-- `[collaboratorId].rights.patch.ts` - Modifier droits
+- `organizers.get.ts` - Liste organisateurs
+- `organizers.post.ts` - Ajouter organisateur
+- `[organizerId].put.ts` - Modifier organisateur
+- `[organizerId].patch.ts` - Modifier organisateur (PATCH)
+- `[organizerId].delete.ts` - Retirer organisateur
+- `[organizerId].rights.patch.ts` - Modifier droits
 - `history.get.ts` - Historique permissions
 
 **`/conventions/[id]/claim` - Réclamation :**
@@ -655,9 +655,9 @@ _Divers :_
 - `editions/ticketing/user-info-update.ts` - MAJ infos utilisateurs
 - `ticketing/returnable-items.ts` - Items consignés (général)
 
-**Gestion Collaborateurs :**
+**Gestion Organisateurs :**
 
-- `collaborator-management.ts` - Gestion collaborateurs
+- `organizer-management.ts` - Gestion organisateurs
 
 **IA :**
 
@@ -712,7 +712,7 @@ Tâches planifiées (nettoyage, notifications, etc.)
 
 - Informations de base (name, description, imageUrl)
 - Créateur (creatorId → User)
-- Relations : éditions, collaborateurs
+- Relations : éditions, organisateurs
 - Archivage (archivedAt)
 
 **Edition** - Éditions de Conventions
@@ -726,19 +726,19 @@ Tâches planifiées (nettoyage, notifications, etc.)
 - Billetterie (relations tiers, options, quotas, orders)
 - Relations : convention, créateur, posts, bénévoles, covoiturage, objets trouvés, ateliers, artistes, spectacles
 
-**ConventionCollaborator** - Collaborateurs
+**ConventionOrganizer** - Organisateurs
 
 - Système de permissions granulaires (can\*)
 - Convention + Utilisateur + Ajouté par
 - Titre personnalisé (title)
 - Relations : permissions par édition
 
-**EditionCollaboratorPermission** - Permissions par Édition
+**EditionOrganizerPermission** - Permissions par Édition
 
 - canEdit, canDelete pour une édition spécifique
 - Permet override des permissions globales
 
-**CollaboratorPermissionHistory** - Historique Permissions
+**OrganizerPermissionHistory** - Historique Permissions
 
 - Traçabilité des changements de permissions
 - actorId (qui a fait le changement)
@@ -890,7 +890,7 @@ Organisation modulaire par domaine et langue :
 **Systèmes Principaux :**
 
 - `AUTH_SESSIONS.md` - Système d'authentification par sessions
-- `COLLABORATOR_PERMISSIONS.md` - Système de permissions collaborateurs
+- `ORGANIZER_PERMISSIONS.md` - Système de permissions organisateurs
 - `NOTIFICATION_SYSTEM.md` - Système de notifications
 - `CRON_SYSTEM.md` - Système de tâches planifiées
 - `ERROR_LOGGING_SYSTEM.md` - Système de logs d'erreurs
@@ -1224,7 +1224,7 @@ datasource db {
 **Convention** (Convention de Jonglerie)
 
 - Informations de base
-- Relations : éditions, collaborateurs, demandes réclamation
+- Relations : éditions, organisateurs, demandes réclamation
 
 **Edition** (Édition de Convention)
 
@@ -1235,12 +1235,12 @@ datasource db {
 - Système bénévoles complet (10+ champs volunteersAsk\*)
 - Billetterie intégrée
 
-**ConventionCollaborator** (Collaborateur)
+**ConventionOrganizer** (Organisateur)
 
 - Système permissions granulaires :
   - `canEditConvention`
   - `canDeleteConvention`
-  - `canManageCollaborators`
+  - `canManageOrganizers`
   - `canAddEdition`
   - `canEditAllEditions`
   - `canDeleteAllEditions`
@@ -1429,7 +1429,7 @@ Middleware protégeant les routes authentifiées :
 **Types de Permissions Convention :**
 
 - `editConvention`, `deleteConvention`
-- `manageCollaborators`
+- `manageOrganizers`
 - `addEdition`, `editAllEditions`, `deleteAllEditions`
 - `manageVolunteers`, `manageArtists`
 
@@ -1443,9 +1443,9 @@ Middleware protégeant les routes authentifiées :
 
 1. Admin global = toutes permissions
 2. Créateur convention = toutes permissions
-3. Collaborateur = permissions définies
+3. Organisateur = permissions définies
 4. Créateur édition = edit/delete cette édition
-5. Permissions spécifiques par édition via `EditionCollaboratorPermission`
+5. Permissions spécifiques par édition via `EditionOrganizerPermission`
 
 ---
 
@@ -1509,46 +1509,46 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/conventions`**
 
-| Méthode | Endpoint             | Description                                              |
-| ------- | -------------------- | -------------------------------------------------------- |
-| POST    | `/`                  | Créer convention                                         |
-| GET     | `/my-conventions`    | Conventions de l'utilisateur (créateur ou collaborateur) |
-| GET     | `/[id]`              | Détails convention                                       |
-| PUT     | `/[id]`              | Modifier convention                                      |
-| DELETE  | `/[id]`              | Supprimer convention                                     |
-| DELETE  | `/[id]/delete-image` | Supprimer image convention                               |
-| PATCH   | `/[id]/archive`      | Archiver/désarchiver convention                          |
-| GET     | `/[id]/editions`     | Éditions d'une convention                                |
+| Méthode | Endpoint             | Description                                             |
+| ------- | -------------------- | ------------------------------------------------------- |
+| POST    | `/`                  | Créer convention                                        |
+| GET     | `/my-conventions`    | Conventions de l'utilisateur (créateur ou organisateur) |
+| GET     | `/[id]`              | Détails convention                                      |
+| PUT     | `/[id]`              | Modifier convention                                     |
+| DELETE  | `/[id]`              | Supprimer convention                                    |
+| DELETE  | `/[id]/delete-image` | Supprimer image convention                              |
+| PATCH   | `/[id]/archive`      | Archiver/désarchiver convention                         |
+| GET     | `/[id]/editions`     | Éditions d'une convention                               |
 
 **Permissions :**
 
-- Lecture : Publique (ou créateur/collaborateur pour archives)
+- Lecture : Publique (ou créateur/organisateur pour archives)
 - Création : Authentifié
-- Modification/Suppression : Créateur ou collaborateur avec droits
+- Modification/Suppression : Créateur ou organisateur avec droits
 
-### Endpoints Collaborateurs
+### Endpoints Organisateurs
 
-**Base : `/api/conventions/[id]/collaborators`**
+**Base : `/api/conventions/[id]/organizers`**
 
-| Méthode | Endpoint                   | Description                                                     |
-| ------- | -------------------------- | --------------------------------------------------------------- |
-| GET     | `/`                        | Liste collaborateurs convention                                 |
-| POST    | `/`                        | Ajouter collaborateur (userIdentifier ou userId, rights, title) |
-| GET     | `/[collaboratorId]`        | Détails collaborateur                                           |
-| PUT     | `/[collaboratorId]`        | Modifier collaborateur (rights, title)                          |
-| PATCH   | `/[collaboratorId]`        | Modifier collaborateur (PATCH)                                  |
-| DELETE  | `/[collaboratorId]`        | Retirer collaborateur                                           |
-| PATCH   | `/[collaboratorId]/rights` | Modifier uniquement droits                                      |
-| GET     | `/history`                 | Historique permissions                                          |
+| Méthode | Endpoint                | Description                                                    |
+| ------- | ----------------------- | -------------------------------------------------------------- |
+| GET     | `/`                     | Liste organisateurs convention                                 |
+| POST    | `/`                     | Ajouter organisateur (userIdentifier ou userId, rights, title) |
+| GET     | `/[organizerId]`        | Détails organisateur                                           |
+| PUT     | `/[organizerId]`        | Modifier organisateur (rights, title)                          |
+| PATCH   | `/[organizerId]`        | Modifier organisateur (PATCH)                                  |
+| DELETE  | `/[organizerId]`        | Retirer organisateur                                           |
+| PATCH   | `/[organizerId]/rights` | Modifier uniquement droits                                     |
+| GET     | `/history`              | Historique permissions                                         |
 
 **Système de Permissions :**
 
-- Droits granulaires (8 permissions : editConvention, deleteConvention, manageCollaborators, addEdition, editAllEditions, deleteAllEditions, manageVolunteers, manageArtists)
+- Droits granulaires (8 permissions : editConvention, deleteConvention, manageOrganizers, addEdition, editAllEditions, deleteAllEditions, manageVolunteers, manageArtists)
 - Titre personnalisé (ex: "Créateur", "Gestionnaire", etc.)
 - Historique traçable des changements
-- Permissions par édition via `EditionCollaboratorPermission`
+- Permissions par édition via `EditionOrganizerPermission`
 
-**Format Collaborateur :**
+**Format Organisateur :**
 
 ```json
 {
@@ -1558,7 +1558,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
   "rights": {
     "editConvention": true,
     "deleteConvention": true,
-    "manageCollaborators": true,
+    "manageOrganizers": true,
     "addEdition": true,
     "editAllEditions": true,
     "deleteAllEditions": true,
@@ -1574,16 +1574,16 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 
 **Base : `/api/conventions/[id]/claim`**
 
-| Méthode | Endpoint  | Description                                             |
-| ------- | --------- | ------------------------------------------------------- |
-| POST    | `/`       | Réclamer convention (générer code vérification email)   |
-| POST    | `/verify` | Vérifier code réclamation (ajouter comme collaborateur) |
+| Méthode | Endpoint  | Description                                            |
+| ------- | --------- | ------------------------------------------------------ |
+| POST    | `/`       | Réclamer convention (générer code vérification email)  |
+| POST    | `/verify` | Vérifier code réclamation (ajouter comme organisateur) |
 
 **Workflow :**
 
 1. Utilisateur demande réclamation
 2. Code envoyé par email (6 chiffres, expire 15 min)
-3. Vérification code → Ajout comme collaborateur avec tous droits
+3. Vérification code → Ajout comme organisateur avec tous droits
 
 ### Endpoints Éditions
 
@@ -2260,7 +2260,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 │  │  ┌──────────────────────────────────────────────┐  │ │
 │  │  │  DATA ACCESS                                 │  │ │
 │  │  │  - prisma.ts (singleton)                     │  │ │
-│  │  │  - collaborator-management.ts                │  │ │
+│  │  │  - organizer-management.ts                │  │ │
 │  │  │  - volunteer-scheduler.ts                    │  │ │
 │  │  └──────────────────────────────────────────────┘  │ │
 │  └────────────────┬───────────────────────────────────┘ │
@@ -2293,7 +2293,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
            │               │               │
            │               │               │
     ┌──────▼───────┐  ┌───▼──────┐  ┌────▼────────┐
-    │ CONVENTION   │  │ EDITION  │  │ COLLABORATOR│
+    │ CONVENTION   │  │ EDITION  │  │ ORGANIZER│
     │──────────────│  │──────────│  │─────────────│
     │ id           │  │ id       │  │ id          │
     │ name         │  │ name     │  │ conventionId│
@@ -2337,7 +2337,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
 **Relations Clés :**
 
 - User → Convention (1:N, créateur)
-- User → ConventionCollaborator (1:N)
+- User → ConventionOrganizer (1:N)
 - Convention → Edition (1:N)
 - Edition → VolunteerApplication (1:N)
 - Edition → TicketingTier/Option/Quota/Order (1:N)
@@ -2353,11 +2353,11 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
    - Gestion utilisateurs
    - Tâches admin système
 
-2. **Permissions Convention** (`ConventionCollaborator`)
+2. **Permissions Convention** (`ConventionOrganizer`)
    - 8 permissions granulaires :
      - `canEditConvention`
      - `canDeleteConvention`
-     - `canManageCollaborators`
+     - `canManageOrganizers`
      - `canAddEdition`
      - `canEditAllEditions`
      - `canDeleteAllEditions`
@@ -2366,7 +2366,7 @@ L'API suit une structure RESTful cohérente avec namespaces clairs.
    - Titre personnalisé
    - Historique traçable
 
-3. **Permissions Édition** (`EditionCollaboratorPermission`)
+3. **Permissions Édition** (`EditionOrganizerPermission`)
    - Permissions spécifiques par édition
    - Override permissions globales
    - Permet granularité fine
@@ -2381,8 +2381,8 @@ function checkPermission(user, convention, edition, action) {
   // 2. Créateur convention → ALLOW
   if (convention.creatorId === user.id) return true
 
-  // 3. Collaborateur avec permission globale
-  const collab = getCollaborator(user, convention)
+  // 3. Organisateur avec permission globale
+  const collab = getOrganizer(user, convention)
   if (collab && collab[action]) return true
 
   // 4. Créateur édition (edit/delete uniquement)
@@ -3385,7 +3385,7 @@ npm run docker:release:down
 │ │  /auth/* - Authentification                               │  │
 │ │  /profile/* - Profil utilisateur                          │  │
 │ │  /conventions/* - CRUD conventions                        │  │
-│ │  /conventions/[id]/collaborators/* - Collaborateurs       │  │
+│ │  /conventions/[id]/organizers/* - Organisateurs       │  │
 │ │  /editions/[id]/* - Éditions complètes                    │  │
 │ │    - carpool-offers/*, carpool-requests/*                 │  │
 │ │    - lost-found/*                                          │  │
@@ -3421,7 +3421,7 @@ npm run docker:release:down
 │ │  - volunteer-scheduler.ts (affectation auto)              │  │
 │ │  - volunteer-application-diff.ts (comparaison)            │  │
 │ │  - volunteer-meals.ts (gestion repas)                     │  │
-│ │  - collaborator-management.ts (collaborateurs)            │  │
+│ │  - organizer-management.ts (organisateurs)            │  │
 │ │  - editions/ticketing/* (billetterie)                     │  │
 │ │  - editions/volunteers/* (bénévoles)                      │  │
 │ └────────────────────────────────────────────────────────────┘  │
@@ -3607,7 +3607,7 @@ convention-de-jonglerie/
 │   │   │       ├── index.get.ts
 │   │   │       ├── index.put.ts
 │   │   │       ├── index.delete.ts
-│   │   │       └── collaborators/
+│   │   │       └── organizers/
 │   │   │           └── *.ts
 │   │   ├── 📁 editions/
 │   │   │   └── [id]/
@@ -3680,7 +3680,7 @@ convention-de-jonglerie/
 │
 ├── 📁 docs/                      # DOCUMENTATION
 │   ├── AUTH_SESSIONS.md
-│   ├── COLLABORATOR_PERMISSIONS.md
+│   ├── ORGANIZER_PERMISSIONS.md
 │   ├── NOTIFICATION_SYSTEM.md
 │   ├── ticketing/*.md
 │   └── ...
@@ -3727,7 +3727,7 @@ convention-de-jonglerie/
 - ✅ **Permissions par édition** pour granularité fine
 - ✅ **Historique traçable** des changements
 - ✅ **3 niveaux** : Admin global, Convention, Édition
-- ✅ **Flexible** : Titres personnalisés collaborateurs
+- ✅ **Flexible** : Titres personnalisés organisateurs
 
 **Système Bénévoles Complet :**
 
@@ -4108,7 +4108,7 @@ convention-de-jonglerie/
   - Limite taille stricte
   - Stockage S3 (hors serveur)
 
-**2. Permissions Collaborateurs**
+**2. Permissions Organisateurs**
 
 - ✅ Système granulaire sophistiqué
 - ✅ Historique traçable

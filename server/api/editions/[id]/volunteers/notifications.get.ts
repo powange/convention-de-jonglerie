@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
+import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 

@@ -25,7 +25,7 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 1, // Utilisateur connecté est l'auteur
-      collaborators: [],
+      organizers: [],
       editions: [],
       isArchived: false,
     } as any
@@ -46,12 +46,12 @@ describe('/api/conventions/[id] DELETE', () => {
     })
   })
 
-  it('devrait supprimer une convention en tant que collaborateur ADMINISTRATOR', async () => {
+  it('devrait supprimer une convention en tant que organisateur ADMINISTRATOR', async () => {
     const mockConvention = {
       id: 1,
       name: 'Convention Test',
       authorId: 2, // Utilisateur connecté n'est pas l'auteur
-      collaborators: [{ userId: 1, canDeleteConvention: true }],
+      organizers: [{ userId: 1, canDeleteConvention: true }],
       editions: [],
       isArchived: false,
     } as any
@@ -98,7 +98,7 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 2, // Utilisateur connecté n'est pas l'auteur
-      collaborators: [], // Pas de collaborateurs avec droits
+      organizers: [], // Pas de organisateurs avec droits
       editions: [],
       isArchived: false,
     } as any
@@ -108,12 +108,12 @@ describe('/api/conventions/[id] DELETE', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Droit insuffisant')
   })
 
-  it('devrait rejeter si collaborateur MODERATOR uniquement', async () => {
+  it('devrait rejeter si organisateur MODERATOR uniquement', async () => {
     const mockConvention = {
       id: 1,
       name: 'Convention Test',
       authorId: 2,
-      collaborators: [],
+      organizers: [],
       editions: [],
       isArchived: false,
     } as any
@@ -133,7 +133,7 @@ describe('/api/conventions/[id] DELETE', () => {
     const mockConvention = {
       id: 1,
       authorId: 1,
-      collaborators: [],
+      organizers: [],
       editions: [],
       isArchived: false,
     } as any
@@ -164,7 +164,7 @@ describe('/api/conventions/[id] DELETE', () => {
     const mockConvention = {
       id: 123,
       authorId: 1,
-      collaborators: [],
+      organizers: [],
       editions: [],
       isArchived: false,
     } as any
@@ -182,11 +182,11 @@ describe('/api/conventions/[id] DELETE', () => {
     })
   })
 
-  it('devrait permettre à un auteur ET collaborateur ADMIN de supprimer', async () => {
+  it('devrait permettre à un auteur ET organisateur ADMIN de supprimer', async () => {
     const mockConvention = {
       id: 1,
       authorId: 1, // Utilisateur est l'auteur
-      collaborators: [{ userId: 1, canDeleteConvention: true }],
+      organizers: [{ userId: 1, canDeleteConvention: true }],
       editions: [],
       isArchived: false,
     } as any

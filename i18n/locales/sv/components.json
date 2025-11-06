@@ -59,7 +59,7 @@
       "to_add_comment": "för att lägga till en kommentar",
       "view_comments": "Visa kommentarer ({count})"
     },
-    "collaborators_rights_panel": {
+    "organizers_rights_panel": {
       "per_edition": "Rättigheter per utgåva",
       "per_edition_hint": "Inga specifika rättigheter definierade för editioner",
       "title_placeholder": "Titel / funktion (tillval)"

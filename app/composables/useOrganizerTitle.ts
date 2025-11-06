@@ -1,10 +1,10 @@
 // Génère un titre court (badge) à partir des droits granularisés
 // Heuristique: si tous les droits globaux => "permissions.admin" (Administrateur)
-// sinon si gestion collaborateurs ou édition/suppression globales => "permissions.manager"
+// sinon si gestion organisateurs ou édition/suppression globales => "permissions.manager"
 // sinon si ajout/édition éditions => "permissions.editor"
 // sinon => "permissions.viewer"
 
-export function useCollaboratorTitle() {
+export function useOrganizerTitle() {
   const { t } = useI18n()
 
   function formatRightsTitle(collab: { rights?: Record<string, boolean>; title?: string | null }) {
@@ -19,7 +19,7 @@ export function useCollaboratorTitle() {
     const allKeys = [
       'editConvention',
       'deleteConvention',
-      'manageCollaborators',
+      'manageOrganizers',
       'manageVolunteers',
       'addEdition',
       'editAllEditions',
@@ -27,7 +27,7 @@ export function useCollaboratorTitle() {
     ]
     const allTrue = allKeys.every((k) => r[k])
     if (allTrue) return t('permissions.admin')
-    if (r.manageCollaborators || (r.editConvention && r.deleteConvention))
+    if (r.manageOrganizers || (r.editConvention && r.deleteConvention))
       return t('permissions.manager')
     if (r.addEdition || r.editAllEditions || r.deleteAllEditions || r.manageVolunteers)
       return t('permissions.editor')

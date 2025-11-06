@@ -1,13 +1,13 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { updateCollaboratorRights } from '@@/server/utils/organizer-management'
+import { updateOrganizerRights } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import type {
-  CollaboratorWithPermissions,
-  CollaboratorPermissionSnapshot,
+  OrganizerWithPermissions,
+  OrganizerPermissionSnapshot,
 } from '@@/server/types/prisma-helpers'
 
 const updateRightsSchema = z.object({
@@ -15,7 +15,7 @@ const updateRightsSchema = z.object({
     .object({
       editConvention: z.boolean().optional(),
       deleteConvention: z.boolean().optional(),
-      manageCollaborators: z.boolean().optional(),
+      manageOrganizers: z.boolean().optional(),
       manageVolunteers: z.boolean().optional(),
       addEdition: z.boolean().optional(),
       editAllEditions: z.boolean().optional(),
@@ -71,29 +71,29 @@ export default wrapApiHandler(
       },
     })
 
-    const updatedCollaborator = (await updateCollaboratorRights({
+    const updatedOrganizer = (await updateOrganizerRights({
       conventionId,
       organizerId,
       userId: user.id,
       rights,
       title: title ?? undefined,
       perEdition,
-    })) as CollaboratorWithPermissions
+    })) as OrganizerWithPermissions
 
-    if (before && updatedCollaborator) {
-      const afterSnapshot: CollaboratorPermissionSnapshot = {
-        title: updatedCollaborator.title,
+    if (before && updatedOrganizer) {
+      const afterSnapshot: OrganizerPermissionSnapshot = {
+        title: updatedOrganizer.title,
         rights: {
-          canEditConvention: updatedCollaborator.canEditConvention,
-          canDeleteConvention: updatedCollaborator.canDeleteConvention,
-          canManageOrganizers: updatedCollaborator.canManageOrganizers,
-          canManageVolunteers: updatedCollaborator.canManageVolunteers,
-          canAddEdition: updatedCollaborator.canAddEdition,
-          canEditAllEditions: updatedCollaborator.canEditAllEditions,
-          canDeleteAllEditions: updatedCollaborator.canDeleteAllEditions,
+          canEditConvention: updatedOrganizer.canEditConvention,
+          canDeleteConvention: updatedOrganizer.canDeleteConvention,
+          canManageOrganizers: updatedOrganizer.canManageOrganizers,
+          canManageVolunteers: updatedOrganizer.canManageVolunteers,
+          canAddEdition: updatedOrganizer.canAddEdition,
+          canEditAllEditions: updatedOrganizer.canEditAllEditions,
+          canDeleteAllEditions: updatedOrganizer.canDeleteAllEditions,
         },
       }
-      const beforeSnapshot: CollaboratorPermissionSnapshot = {
+      const beforeSnapshot: OrganizerPermissionSnapshot = {
         title: before.title,
         rights: {
           canEditConvention: before.canEditConvention,
@@ -123,36 +123,36 @@ export default wrapApiHandler(
       }
     }
 
-    if (!updatedCollaborator) {
+    if (!updatedOrganizer) {
       throw createError({
         statusCode: 500,
-        message: 'Échec de la mise à jour du collaborateur',
+        message: 'Échec de la mise à jour du organisateur',
       })
     }
 
     return {
       success: true,
-      collaborator: {
-        id: updatedCollaborator.id,
-        title: updatedCollaborator.title,
+      organizer: {
+        id: updatedOrganizer.id,
+        title: updatedOrganizer.title,
         rights: {
-          editConvention: updatedCollaborator.canEditConvention,
-          deleteConvention: updatedCollaborator.canDeleteConvention,
-          manageCollaborators: updatedCollaborator.canManageOrganizers,
-          manageVolunteers: updatedCollaborator.canManageVolunteers,
-          addEdition: updatedCollaborator.canAddEdition,
-          editAllEditions: updatedCollaborator.canEditAllEditions,
-          deleteAllEditions: updatedCollaborator.canDeleteAllEditions,
+          editConvention: updatedOrganizer.canEditConvention,
+          deleteConvention: updatedOrganizer.canDeleteConvention,
+          manageOrganizers: updatedOrganizer.canManageOrganizers,
+          manageVolunteers: updatedOrganizer.canManageVolunteers,
+          addEdition: updatedOrganizer.canAddEdition,
+          editAllEditions: updatedOrganizer.canEditAllEditions,
+          deleteAllEditions: updatedOrganizer.canDeleteAllEditions,
         },
-        perEdition: (updatedCollaborator.perEditionPermissions || []).map((p) => ({
+        perEdition: (updatedOrganizer.perEditionPermissions || []).map((p) => ({
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
           canManageVolunteers: p.canManageVolunteers,
         })),
-        user: updatedCollaborator.user,
+        user: updatedOrganizer.user,
       },
     }
   },
-  { operationName: 'UpdateCollaboratorRights' }
+  { operationName: 'UpdateOrganizerRights' }
 )

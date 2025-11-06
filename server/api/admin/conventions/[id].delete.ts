@@ -27,7 +27,7 @@ export default wrapApiHandler(
         editions: {
           select: { id: true, name: true },
         },
-        collaborators: {
+        organizers: {
           select: { id: true },
         },
         author: {
@@ -41,7 +41,7 @@ export default wrapApiHandler(
       `[ADMIN DELETE] Convention "${convention.name}" (ID: ${conventionId}) supprimée définitivement par l'admin ${user.pseudo} (ID: ${user.id})`
     )
     console.log(`[ADMIN DELETE] - Éditions supprimées: ${convention.editions.length}`)
-    console.log(`[ADMIN DELETE] - Collaborateurs supprimés: ${convention.collaborators.length}`)
+    console.log(`[ADMIN DELETE] - Organisateurs supprimés: ${convention.organizers.length}`)
 
     // Suppression en cascade (Prisma s'en charge avec onDelete: Cascade dans le schéma)
     await prisma.convention.delete({
@@ -54,7 +54,7 @@ export default wrapApiHandler(
         id: conventionId,
         name: convention.name,
         editionsCount: convention.editions.length,
-        collaboratorsCount: convention.collaborators.length,
+        organizersCount: convention.organizers.length,
       },
     }
   },

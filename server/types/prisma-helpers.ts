@@ -52,7 +52,7 @@ export type VolunteerNotificationConfirmationWhereInput =
 export type UserUpdateInput = Prisma.UserUpdateInput
 export type EditionUpdateInput = Prisma.EditionUpdateInput
 export type ConventionUpdateInput = Prisma.ConventionUpdateInput
-export type CollaboratorUpdateInput = Prisma.ConventionOrganizerUpdateInput
+export type OrganizerUpdateInput = Prisma.ConventionOrganizerUpdateInput
 export type CarpoolOfferUpdateInput = Prisma.CarpoolOfferUpdateInput
 export type VolunteerTeamUpdateInput = Prisma.VolunteerTeamUpdateInput
 export type TicketingQuotaUpdateInput = Prisma.TicketingQuotaUpdateInput
@@ -92,7 +92,7 @@ export function hasIssues(error: unknown): error is { issues: unknown[] } {
 /**
  * Type pour les snapshots de permissions dans l'historique
  */
-export interface CollaboratorPermissionSnapshot {
+export interface OrganizerPermissionSnapshot {
   title?: string | null
   rights: {
     canEditConvention: boolean
@@ -112,12 +112,12 @@ export interface CollaboratorPermissionSnapshot {
 }
 
 /**
- * Type pour les snapshots de suppression de collaborateur
+ * Type pour les snapshots de suppression de organisateur
  */
-export interface CollaboratorRemovalSnapshot {
+export interface OrganizerRemovalSnapshot {
   removed: boolean
   removedAt: string
-  removedCollaboratorId: number
+  removedOrganizerId: number
   removedUserId: number
 }
 
@@ -130,9 +130,9 @@ export interface ConventionArchiveSnapshot {
 }
 
 /**
- * Type pour les collaborateurs avec permissions par édition
+ * Type pour les organisateurs avec permissions par édition
  */
-export type CollaboratorWithPermissions = Prisma.ConventionOrganizerGetPayload<{
+export type OrganizerWithPermissions = Prisma.ConventionOrganizerGetPayload<{
   include: {
     user: { select: { id: true; pseudo: true } }
     perEditionPermissions: true

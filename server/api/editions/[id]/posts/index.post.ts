@@ -23,7 +23,7 @@ export default wrapApiHandler(
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
-        message: 'Vous devez être collaborateur pour poster sur cette édition',
+        message: 'Vous devez être organisateur pour poster sur cette édition',
       })
     }
 

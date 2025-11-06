@@ -17,7 +17,7 @@ export default wrapApiHandler(
       recentAdminPromotions,
       recentVolunteerApplications,
       recentClaimRequests,
-      recentCollaborators,
+      recentOrganizers,
       recentFeedback,
       recentCarpoolOffers,
       recentCarpoolRequests,
@@ -149,7 +149,7 @@ export default wrapApiHandler(
         take: Math.ceil(limit / 4),
       }),
 
-      // Nouveaux collaborateurs récents
+      // Nouveaux organisateurs récents
       prisma.conventionOrganizer.findMany({
         select: {
           id: true,
@@ -283,7 +283,7 @@ export default wrapApiHandler(
         | 'convention_claimed'
         | 'claim_approved'
         | 'claim_rejected'
-        | 'collaborator_added'
+        | 'organizer_added'
         | 'feedback_submitted'
         | 'feedback_resolved'
         | 'carpool_offer_created'
@@ -446,20 +446,20 @@ export default wrapApiHandler(
       })
     })
 
-    // Ajouter les nouveaux collaborateurs
-    recentCollaborators.forEach((collaborator) => {
-      const userName = collaborator.user
-        ? `${collaborator.user.prenom || ''} ${collaborator.user.nom || ''}`.trim() ||
-          collaborator.user.pseudo
+    // Ajouter les nouveaux organisateurs
+    recentOrganizers.forEach((organizer) => {
+      const userName = organizer.user
+        ? `${organizer.user.prenom || ''} ${organizer.user.nom || ''}`.trim() ||
+          organizer.user.pseudo
         : 'Utilisateur inconnu'
 
       activities.push({
-        id: `collaborator_${collaborator.id}`,
-        type: 'collaborator_added',
-        title: 'Nouveau collaborateur ajouté',
-        description: `${userName} a été ajouté comme collaborateur de "${collaborator.convention.name}"`,
-        createdAt: collaborator.addedAt.toISOString(),
-        relatedId: collaborator.id,
+        id: `organizer_${organizer.id}`,
+        type: 'organizer_added',
+        title: 'Nouveau organisateur ajouté',
+        description: `${userName} a été ajouté comme organisateur de "${organizer.convention.name}"`,
+        createdAt: organizer.addedAt.toISOString(),
+        relatedId: organizer.id,
         relatedType: 'convention',
       })
     })

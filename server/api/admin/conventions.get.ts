@@ -8,7 +8,7 @@ export default wrapApiHandler(
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
-    // Récupérer toutes les conventions avec leurs éditions et collaborateurs
+    // Récupérer toutes les conventions avec leurs éditions et organisateurs
     const conventions = await prisma.convention.findMany({
       include: {
         author: {
@@ -20,7 +20,7 @@ export default wrapApiHandler(
             prenom: true,
           },
         },
-        collaborators: {
+        organizers: {
           select: {
             id: true,
             title: true,
@@ -70,20 +70,20 @@ export default wrapApiHandler(
         _count: {
           select: {
             editions: true,
-            collaborators: true,
+            organizers: true,
           },
         },
       },
       orderBy: [{ createdAt: 'desc' }],
     })
 
-    // Transformer les données pour ajouter emailHash aux collaborateurs
+    // Transformer les données pour ajouter emailHash aux organisateurs
     const transformedConventions = conventions.map((convention) => ({
       ...convention,
-      collaborators: convention.collaborators.map((collaborator) => {
-        const { email, ...userWithoutEmail } = collaborator.user
+      organizers: convention.organizers.map((organizer) => {
+        const { email, ...userWithoutEmail } = organizer.user
         return {
-          ...collaborator,
+          ...organizer,
           user: {
             ...userWithoutEmail,
             emailHash: getEmailHash(email),

@@ -1,4 +1,5 @@
 import { checkAdminMode } from '@@/server/utils/organizer-management'
+
 import { prisma } from '../prisma'
 
 import type {
@@ -14,10 +15,10 @@ import type {
  */
 export type EditionWithPermissions = Edition & {
   convention: Convention & {
-    collaborators: ConventionOrganizer[]
+    organizers: ConventionOrganizer[]
   }
-  collaboratorPermissions?: (EditionOrganizerPermission & {
-    collaborator: {
+  organizerPermissions?: (EditionOrganizerPermission & {
+    organizer: {
       userId: number
     }
   })[]
@@ -28,13 +29,13 @@ export type EditionWithPermissions = Edition & {
  */
 export interface EditionPermissionOptions {
   userId: number
-  requiredRights?: CollaboratorRight[]
+  requiredRights?: OrganizerRight[]
 }
 
 /**
- * Droits de collaborateur possibles pour les éditions
+ * Droits de organisateur possibles pour les éditions
  */
-export type CollaboratorRight =
+export type OrganizerRight =
   | 'canEditAllEditions'
   | 'canDeleteAllEditions'
   | 'canEditConvention'
@@ -43,7 +44,7 @@ export type CollaboratorRight =
   | 'canAddEdition'
 
 /**
- * Récupère une édition avec les collaborateurs filtrés selon les droits requis
+ * Récupère une édition avec les organisateurs filtrés selon les droits requis
  */
 export async function getEditionWithPermissions(
   editionId: number,
@@ -51,8 +52,8 @@ export async function getEditionWithPermissions(
 ): Promise<EditionWithPermissions | null> {
   const { userId, requiredRights = [] } = options
 
-  // Si aucun droit spécifique requis, on récupère tous les collaborateurs de l'utilisateur
-  const collaboratorFilter =
+  // Si aucun droit spécifique requis, on récupère tous les organisateurs de l'utilisateur
+  const organizerFilter =
     requiredRights.length > 0
       ? {
           userId,
@@ -65,14 +66,14 @@ export async function getEditionWithPermissions(
     include: {
       convention: {
         include: {
-          collaborators: {
-            where: collaboratorFilter,
+          organizers: {
+            where: organizerFilter,
           },
         },
       },
-      collaboratorPermissions: {
+      organizerPermissions: {
         include: {
-          collaborator: {
+          organizer: {
             select: {
               userId: true,
             },
@@ -91,17 +92,17 @@ export function canEditEdition(edition: EditionWithPermissions, user: User): boo
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits d'édition au niveau convention
+  // Vérifier si l'utilisateur est organisateur avec droits d'édition au niveau convention
   const hasConventionEditRights =
-    edition.convention.collaborators?.some(
+    edition.convention.organizers?.some(
       (collab) =>
         collab.userId === user.id && (collab.canEditAllEditions || collab.canEditConvention)
     ) || false
 
   // Vérifier si l'utilisateur a des droits d'édition spécifiques à cette édition
   const hasEditionEditRights =
-    edition.collaboratorPermissions?.some(
-      (perm) => perm.collaborator.userId === user.id && perm.canEdit === true
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canEdit === true
     ) || false
 
   return (
@@ -121,9 +122,9 @@ export function canDeleteEdition(edition: EditionWithPermissions, user: User): b
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits de suppression au niveau convention
+  // Vérifier si l'utilisateur est organisateur avec droits de suppression au niveau convention
   const hasConventionDeleteRights =
-    edition.convention.collaborators?.some(
+    edition.convention.organizers?.some(
       (collab) =>
         collab.userId === user.id &&
         (collab.canDeleteAllEditions || collab.canDeleteConvention || collab.canEditAllEditions)
@@ -131,8 +132,8 @@ export function canDeleteEdition(edition: EditionWithPermissions, user: User): b
 
   // Vérifier si l'utilisateur a des droits de suppression spécifiques à cette édition
   const hasEditionDeleteRights =
-    edition.collaboratorPermissions?.some(
-      (perm) => perm.collaborator.userId === user.id && perm.canDelete === true
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canDelete === true
     ) || false
 
   return (
@@ -152,9 +153,9 @@ export function canManageEditionStatus(edition: EditionWithPermissions, user: Us
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits de gestion
+  // Vérifier si l'utilisateur est organisateur avec droits de gestion
   const hasManageRights =
-    edition.convention.collaborators?.some(
+    edition.convention.organizers?.some(
       (collab) =>
         collab.userId === user.id &&
         (collab.canEditAllEditions || collab.canEditConvention || collab.canManageOrganizers)
@@ -171,11 +172,11 @@ export function canViewEdition(edition: EditionWithPermissions, user: User): boo
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Collaborateur (avec n'importe quel droit)
-  const isCollaborator =
-    edition.convention.collaborators?.some((collab) => collab.userId === user.id) || false
+  // Organisateur (avec n'importe quel droit)
+  const isOrganizer =
+    edition.convention.organizers?.some((collab) => collab.userId === user.id) || false
 
-  return isCreator || isConventionAuthor || isCollaborator || isGlobalAdmin
+  return isCreator || isConventionAuthor || isOrganizer || isGlobalAdmin
 }
 
 /**
@@ -267,7 +268,7 @@ export async function getEditionForStatusManagement(
 
 /**
  * Vérifie si un utilisateur peut accéder aux données d'une édition (lecture seule)
- * Autorise les créateurs, auteurs, admins et tous les collaborateurs de la convention
+ * Autorise les créateurs, auteurs, admins et tous les organisateurs de la convention
  */
 export async function canAccessEditionData(
   editionId: number,
@@ -286,7 +287,7 @@ export async function canAccessEditionData(
       convention: {
         select: {
           authorId: true,
-          collaborators: { where: { userId }, select: { userId: true } },
+          organizers: { where: { userId }, select: { userId: true } },
         },
       },
     },
@@ -300,8 +301,8 @@ export async function canAccessEditionData(
   // Auteur de la convention
   if (edition.convention.authorId === userId) return true
 
-  // Collaborateur de la convention (n'importe quel collaborateur)
-  if (edition.convention.collaborators?.length > 0) return true
+  // Organisateur de la convention (n'importe quel organisateur)
+  if (edition.convention.organizers?.length > 0) return true
 
   return false
 }

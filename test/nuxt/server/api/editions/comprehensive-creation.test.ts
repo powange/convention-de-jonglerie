@@ -364,15 +364,15 @@ describe('/api/editions POST - Tests complets', () => {
       expect(result.name).toBe(editionData.name)
     })
 
-    it('devrait permettre aux collaborateurs autorisés', async () => {
-      const collaboratorUser = { ...mockUser, id: 2 }
-      const conventionWithCollaborator = {
+    it('devrait permettre aux organisateurs autorisés', async () => {
+      const organizerUser = { ...mockUser, id: 2 }
+      const conventionWithOrganizer = {
         ...mockConvention,
         authorId: 999, // Différent de l'utilisateur
-        // L'API filtre les collaborateurs par userId, donc un seul collaborateur
-        collaborators: [
+        // L'API filtre les organisateurs par userId, donc un seul organisateur
+        organizers: [
           {
-            userId: collaboratorUser.id,
+            userId: organizerUser.id,
             canAddEdition: true,
           },
         ],
@@ -380,7 +380,7 @@ describe('/api/editions POST - Tests complets', () => {
 
       const editionData = {
         conventionId: 1,
-        name: 'Edition collaborateur',
+        name: 'Edition organisateur',
         startDate: '2024-06-01',
         endDate: '2024-06-03',
         addressLine1: '123 rue Test',
@@ -389,23 +389,23 @@ describe('/api/editions POST - Tests complets', () => {
         country: 'France',
       }
 
-      prismaMock.convention.findUnique.mockResolvedValue(conventionWithCollaborator)
+      prismaMock.convention.findUnique.mockResolvedValue(conventionWithOrganizer)
       prismaMock.edition.create.mockResolvedValue({ ...mockEdition, ...editionData })
 
       global.readBody.mockResolvedValue(editionData)
-      const mockEvent = { context: { user: collaboratorUser } }
+      const mockEvent = { context: { user: organizerUser } }
 
       const result = await handler(mockEvent as any)
       expect(result.name).toBe(editionData.name)
     })
 
-    it('devrait rejeter les collaborateurs sans autorisation', async () => {
+    it('devrait rejeter les organisateurs sans autorisation', async () => {
       const unauthorizedUser = { ...mockUser, id: 3 }
       const conventionWithoutPermission = {
         ...mockConvention,
         authorId: 999,
-        // Utilisateur non autorisé : soit pas de collaborateurs, soit canAddEdition = false
-        collaborators: [
+        // Utilisateur non autorisé : soit pas de organisateurs, soit canAddEdition = false
+        organizers: [
           {
             userId: unauthorizedUser.id,
             canAddEdition: false, // Pas autorisé
@@ -438,7 +438,7 @@ describe('/api/editions POST - Tests complets', () => {
       const conventionWithoutUser = {
         ...mockConvention,
         authorId: 999,
-        collaborators: [], // Aucun collaborateur
+        organizers: [], // Aucun organisateur
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(conventionWithoutUser)

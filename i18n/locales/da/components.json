@@ -59,7 +59,7 @@
       "to_add_comment": "for at tilføje en kommentar",
       "view_comments": "Se kommentarer ({count})"
     },
-    "collaborators_rights_panel": {
+    "organizers_rights_panel": {
       "per_edition": "Rettigheder pr. udgave",
       "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
       "title_placeholder": "Titel eller rolle (valgfrit)"

@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Stažení nebo úprava profilové fotografie tohoto uživatele",
     "cleanup_expired_tokens": "Čištění žetonů s prošlou platností",
     "cleanup_resolved_error_logs": "Čištění protokolů chyb",
-    "collaborators": "Zaměstnanci",
-    "collaborators_count": "{count} zaměstnanců",
+    "organizers": "Zaměstnanci",
+    "organizers_count": "{count} zaměstnanců",
     "coming_soon": "Brzy k dispozici",
     "config": {
       "ai": "Umělá inteligence",
@@ -272,7 +272,7 @@
     "original_user": "Původní uživatel",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ POZOR: Opravdu chcete trvale odstranit konvenci \"{name}\"?\n\nTato akce odstraní :\n- {editionsCount} edice(y)\n- {collaboratorsCount} spolupracovník(y)\n- Všechna přidružená data\n\nTato akce je NERELEVANTNÍ!",
+        "confirm_delete_convention_permanently": "⚠️ POZOR: Opravdu chcete trvale odstranit konvenci \"{name}\"?\n\nTato akce odstraní :\n- {editionsCount} edice(y)\n- {organizersCount} spolupracovník(y)\n- Všechna přidružená data\n\nTato akce je NERELEVANTNÍ!",
         "convention_deleted_permanently": "Úspěšné stažení dohody",
         "delete_convention_permanently": "Trvale odstranit",
         "error_deleting_convention": "Chyba při mazání smlouvy"

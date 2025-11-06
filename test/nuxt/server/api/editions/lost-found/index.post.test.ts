@@ -31,7 +31,7 @@ const mockEdition = {
   endDate: new Date('2024-01-03'), // Édition terminée
   convention: {
     id: 1,
-    collaborators: [],
+    organizers: [],
   },
 }
 
@@ -165,12 +165,12 @@ describe('/api/editions/[id]/lost-found POST', () => {
     )
   })
 
-  it("devrait rejeter si utilisateur n'est pas collaborateur", async () => {
+  it("devrait rejeter si utilisateur n'est pas organisateur", async () => {
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(false)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Vous devez être collaborateur pour ajouter un objet trouvé'
+      'Vous devez être organisateur pour ajouter un objet trouvé'
     )
   })
 

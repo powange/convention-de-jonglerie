@@ -9,7 +9,7 @@ import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
-const addCollaboratorSchema = z
+const addOrganizerschema = z
   .object({
     userIdentifier: z.string().min(1, 'Pseudo ou email requis').optional(),
     userId: z.number().positive().optional(),
@@ -18,7 +18,7 @@ const addCollaboratorSchema = z
       .object({
         editConvention: z.boolean().optional(),
         deleteConvention: z.boolean().optional(),
-        manageCollaborators: z.boolean().optional(),
+        manageOrganizers: z.boolean().optional(),
         manageVolunteers: z.boolean().optional(),
         addEdition: z.boolean().optional(),
         editAllEditions: z.boolean().optional(),
@@ -50,7 +50,7 @@ export default wrapApiHandler(
     const body = await readBody(event)
 
     // Valider les données
-    const { userIdentifier, userId, rights, title, perEdition } = addCollaboratorSchema.parse(body)
+    const { userIdentifier, userId, rights, title, perEdition } = addOrganizerschema.parse(body)
 
     let userToAdd
 
@@ -84,12 +84,12 @@ export default wrapApiHandler(
     if (userToAdd.id === user.id && !isAdminMode) {
       throw createError({
         statusCode: 400,
-        message: 'Vous ne pouvez pas vous ajouter comme collaborateur',
+        message: 'Vous ne pouvez pas vous ajouter comme organisateur',
       })
     }
 
-    // Ajouter le collaborateur (la fonction gère les permissions et les vérifications)
-    const collaborator = await addConventionOrganizer({
+    // Ajouter le organisateur (la fonction gère les permissions et les vérifications)
+    const organizer = await addConventionOrganizer({
       conventionId,
       userId: userToAdd.id,
       addedById: user.id,
@@ -100,7 +100,7 @@ export default wrapApiHandler(
     })
 
     // Structure normalisée (avec sous‑objet rights et tableau perEdition)
-    const collabWithPermissions = collaborator as typeof collaborator & {
+    const collabWithPermissions = organizer as typeof organizer & {
       perEditionPermissions?: Array<{
         editionId: number
         canEdit: boolean
@@ -111,17 +111,17 @@ export default wrapApiHandler(
 
     return {
       success: true,
-      collaborator: {
-        id: collaborator.id,
-        title: collaborator.title,
+      organizer: {
+        id: organizer.id,
+        title: organizer.title,
         rights: {
-          editConvention: collaborator.canEditConvention,
-          deleteConvention: collaborator.canDeleteConvention,
-          manageCollaborators: collaborator.canManageOrganizers,
-          manageVolunteers: collaborator.canManageVolunteers,
-          addEdition: collaborator.canAddEdition,
-          editAllEditions: collaborator.canEditAllEditions,
-          deleteAllEditions: collaborator.canDeleteAllEditions,
+          editConvention: organizer.canEditConvention,
+          deleteConvention: organizer.canDeleteConvention,
+          manageOrganizers: organizer.canManageOrganizers,
+          manageVolunteers: organizer.canManageVolunteers,
+          addEdition: organizer.canAddEdition,
+          editAllEditions: organizer.canEditAllEditions,
+          deleteAllEditions: organizer.canDeleteAllEditions,
         },
         perEdition: (collabWithPermissions.perEditionPermissions || []).map((p) => ({
           editionId: p.editionId,
@@ -129,7 +129,7 @@ export default wrapApiHandler(
           canDelete: p.canDelete,
           canManageVolunteers: p.canManageVolunteers,
         })),
-        user: collaborator.user,
+        user: organizer.user,
       },
     }
   },

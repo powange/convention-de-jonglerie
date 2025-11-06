@@ -364,15 +364,15 @@ describe('Validation Schemas', () => {
     })
   })
 
-  describe('Schémas de collaborateurs', () => {
-    describe('addCollaboratorSchema', () => {
-      it("devrait valider l'ajout d'un collaborateur valide (userIdentifier seul)", () => {
+  describe('Schémas de organisateurs', () => {
+    describe('addOrganizerschema', () => {
+      it("devrait valider l'ajout d'un organisateur valide (userIdentifier seul)", () => {
         const validData = { userIdentifier: 'user@example.com' }
-        expect(() => schemas.addCollaboratorSchema.parse(validData)).not.toThrow()
+        expect(() => schemas.addOrganizerschema.parse(validData)).not.toThrow()
       })
 
       it('devrait rejeter un userIdentifier vide', () => {
-        expect(() => schemas.addCollaboratorSchema.parse({ userIdentifier: '' })).toThrow()
+        expect(() => schemas.addOrganizerschema.parse({ userIdentifier: '' })).toThrow()
       })
     })
   })

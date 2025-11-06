@@ -5,14 +5,14 @@ import { describe, it, expect, beforeAll } from 'vitest'
 
 import { prismaTest } from '../setup-db'
 
-// Test d'intégration de la migration des droits collaborateurs
+// Test d'intégration de la migration des droits organisateurs
 // Nécessite TEST_WITH_DB=true et une base de test prête
 
 // LEGACY: ce test vérifiait la migration depuis l'ancien champ `role` (ADMINISTRATOR / MODERATOR)
 // Le champ a été supprimé du modèle `ConventionOrganizer`. On ignore désormais ce scénario.
 // Si une migration rétro-compatible est encore nécessaire sur une base existante pré-migration,
-// exécuter manuellement `npx tsx scripts/migrate-collaborator-rights.ts --dry` puis `--yes` hors tests.
-describe.skip('Migration droits collaborateurs (script) - ignoré (champ role supprimé)', () => {
+// exécuter manuellement `npx tsx scripts/migrate-organizer-rights.ts --dry` puis `--yes` hors tests.
+describe.skip('Migration droits organisateurs (script) - ignoré (champ role supprimé)', () => {
   let adminUser: any
   let moderatorUser: any
   let convention: any
@@ -42,7 +42,7 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
     convention = await prismaTest.convention.create({
       data: { name: 'Conv Mig', authorId: adminUser.id },
     })
-    // Collaborateur ADMINISTRATOR sans droits booléens
+    // Organisateur ADMINISTRATOR sans droits booléens
     await prismaTest.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
@@ -51,7 +51,7 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
         addedById: adminUser.id,
       },
     })
-    // Collaborateur MODERATOR
+    // Organisateur MODERATOR
     await prismaTest.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
@@ -64,23 +64,23 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
 
   it('applique les droits et crée historique', async () => {
     // Dry-run: ne change rien
-    const dryOut = execSync('npx tsx scripts/migrate-collaborator-rights.ts --dry', {
+    const dryOut = execSync('npx tsx scripts/migrate-organizer-rights.ts --dry', {
       encoding: 'utf8',
     })
     expect(dryOut).toContain('Plan')
 
     // Exécution réelle (forcer confirmation avec --yes)
-    const realOut = execSync('npx tsx scripts/migrate-collaborator-rights.ts --yes', {
+    const realOut = execSync('npx tsx scripts/migrate-organizer-rights.ts --yes', {
       encoding: 'utf8',
     })
-    expect(realOut).toContain('Collaborateurs ajustés')
+    expect(realOut).toContain('Organisateurs ajustés')
 
-    const collaborators = await prismaTest.conventionOrganizer.findMany({
+    const organizers = await prismaTest.conventionOrganizer.findMany({
       where: { conventionId: convention.id },
       orderBy: { id: 'asc' },
     })
-    const admin = collaborators.find((c) => c.userId === adminUser.id)!
-    const mod = collaborators.find((c) => c.userId === moderatorUser.id)!
+    const admin = organizers.find((c) => c.userId === adminUser.id)!
+    const mod = organizers.find((c) => c.userId === moderatorUser.id)!
 
     // Admin doit avoir tous les droits
     expect(admin.canEditConvention).toBe(true)

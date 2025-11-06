@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Завантажити або змінити фото профілю цього користувача",
     "cleanup_expired_tokens": "Очищення прострочених токенів",
     "cleanup_resolved_error_logs": "Очищення журналів помилок",
-    "collaborators": "Співробітники",
-    "collaborators_count": "{count} співробітників",
+    "organizers": "Співробітники",
+    "organizers_count": "{count} співробітників",
     "coming_soon": "Скоро",
     "config": {
       "ai": "Штучний інтелект",
@@ -272,7 +272,7 @@
     "original_user": "Оригінальний користувач",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ УВАГА: Ви впевнені, що хочете назавжди видалити конвенцію \"{name}\"?\n\nЦя дія видалить:\n- {editionsCount} видання\n- {collaboratorsCount} співробітника/співробітників\n- Всі пов'язані дані\n\nЦя дія НЕЗВОРОТНА!",
+        "confirm_delete_convention_permanently": "⚠️ УВАГА: Ви впевнені, що хочете назавжди видалити конвенцію \"{name}\"?\n\nЦя дія видалить:\n- {editionsCount} видання\n- {organizersCount} співробітника/співробітників\n- Всі пов'язані дані\n\nЦя дія НЕЗВОРОТНА!",
         "convention_deleted_permanently": "Конвенцію успішно видалено назавжди",
         "delete_convention_permanently": "Видалити назавжди",
         "error_deleting_convention": "Помилка при видаленні конвенції"

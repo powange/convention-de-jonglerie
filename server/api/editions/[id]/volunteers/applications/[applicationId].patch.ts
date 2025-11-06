@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import {
   volunteerApplicationPatchSchema,
   validateAllergiesUpdate,
@@ -8,6 +7,7 @@ import {
   getUserUpdateData,
 } from '@@/server/utils/editions/volunteers/applications'
 import { NotificationService } from '@@/server/utils/notification-service'
+import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import {

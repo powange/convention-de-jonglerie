@@ -81,12 +81,12 @@ const canAccess = computed(() => {
     return true
   }
 
-  // Tous les collaborateurs de la convention (même sans droits)
-  if (props.edition.convention?.collaborators) {
-    const isCollaborator = props.edition.convention.collaborators.some(
+  // Tous les organisateurs de la convention (même sans droits)
+  if (props.edition.convention?.organizers) {
+    const isOrganizer = props.edition.convention.organizers.some(
       (collab) => collab.user.id === authStore.user?.id
     )
-    if (isCollaborator) {
+    if (isOrganizer) {
       return true
     }
   }

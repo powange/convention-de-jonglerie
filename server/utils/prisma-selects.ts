@@ -104,7 +104,7 @@ export const CONVENTION_LIST_SELECT = {
   _count: {
     select: {
       editions: true,
-      collaborators: true,
+      organizers: true,
     },
   },
 } satisfies Prisma.ConventionSelect
@@ -125,7 +125,7 @@ export const CONVENTION_DETAIL_SELECT = {
   author: {
     select: AUTHOR_SELECT,
   },
-  collaborators: {
+  organizers: {
     select: {
       id: true,
       userId: true,

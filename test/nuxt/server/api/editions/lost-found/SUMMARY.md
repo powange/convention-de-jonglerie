@@ -63,7 +63,7 @@ LostFoundComment
 
 Le système d'objets trouvés est maintenant :
 
-- 🔒 **Sécurisé** avec permissions collaborateur
+- 🔒 **Sécurisé** avec permissions organisateur
 - 📝 **Testé** avec couverture complète des interactions DB
 - 🏗️ **Intégré** dans l'architecture existante
 - 📚 **Documenté** pour maintenance future

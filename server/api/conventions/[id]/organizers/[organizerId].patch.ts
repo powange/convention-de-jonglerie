@@ -7,8 +7,8 @@ import { validateConventionId, validateResourceId } from '@@/server/utils/valida
 import { z } from 'zod'
 
 import type {
-  CollaboratorUpdateInput,
-  CollaboratorPermissionSnapshot,
+  OrganizerUpdateInput,
+  OrganizerPermissionSnapshot,
 } from '@@/server/types/prisma-helpers'
 
 // Schéma combiné (droits globaux + perEdition + title)
@@ -25,7 +25,7 @@ const payloadSchema = z.object({
     .object({
       editConvention: z.boolean().optional(),
       deleteConvention: z.boolean().optional(),
-      manageCollaborators: z.boolean().optional(),
+      manageOrganizers: z.boolean().optional(),
       manageVolunteers: z.boolean().optional(),
       addEdition: z.boolean().optional(),
       editAllEditions: z.boolean().optional(),
@@ -58,7 +58,7 @@ export default wrapApiHandler(
     if (organizer.conventionId !== conventionId)
       throw createError({ statusCode: 404, message: 'Organisateur introuvable' })
 
-    const beforeSnapshot: CollaboratorPermissionSnapshot = {
+    const beforeSnapshot: OrganizerPermissionSnapshot = {
       title: organizer.title,
       rights: {
         canEditConvention: organizer.canEditConvention,
@@ -77,15 +77,15 @@ export default wrapApiHandler(
       })),
     }
 
-    const updateData: CollaboratorUpdateInput = {}
+    const updateData: OrganizerUpdateInput = {}
     if (parsed.title !== undefined) updateData.title = parsed.title || null
     if (parsed.rights) {
       if (parsed.rights.editConvention !== undefined)
         updateData.canEditConvention = parsed.rights.editConvention
       if (parsed.rights.deleteConvention !== undefined)
         updateData.canDeleteConvention = parsed.rights.deleteConvention
-      if (parsed.rights.manageCollaborators !== undefined)
-        updateData.canManageOrganizers = parsed.rights.manageCollaborators
+      if (parsed.rights.manageOrganizers !== undefined)
+        updateData.canManageOrganizers = parsed.rights.manageOrganizers
       if (parsed.rights.manageVolunteers !== undefined)
         updateData.canManageVolunteers = parsed.rights.manageVolunteers
       if (parsed.rights.addEdition !== undefined)
@@ -125,7 +125,7 @@ export default wrapApiHandler(
         } else newPerEdition = []
       }
 
-      const afterSnapshot: CollaboratorPermissionSnapshot = {
+      const afterSnapshot: OrganizerPermissionSnapshot = {
         title: updated.title,
         rights: {
           canEditConvention: updated.canEditConvention,
@@ -161,13 +161,13 @@ export default wrapApiHandler(
 
     return {
       success: true,
-      collaborator: {
+      organizer: {
         id: organizerId,
         title: result.updated.title,
         rights: {
           editConvention: result.updated.canEditConvention,
           deleteConvention: result.updated.canDeleteConvention,
-          manageCollaborators: result.updated.canManageOrganizers,
+          manageOrganizers: result.updated.canManageOrganizers,
           manageVolunteers: result.updated.canManageVolunteers,
           addEdition: result.updated.canAddEdition,
           editAllEditions: result.updated.canEditAllEditions,
@@ -177,5 +177,5 @@ export default wrapApiHandler(
       },
     }
   },
-  { operationName: 'UpdateCollaboratorPermissions' }
+  { operationName: 'UpdateOrganizerPermissions' }
 )

@@ -6,7 +6,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 }))
 
 import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/history.get'
+import handler from '../../../../../server/api/conventions/[id]/organizers/history.get'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 const mockCheck = checkUserConventionPermission as ReturnType<typeof vi.fn>
@@ -18,7 +18,7 @@ const baseEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/history GET', () => {
+describe('/api/conventions/[id]/organizers/history GET', () => {
   beforeEach(() => {
     mockCheck.mockReset()
     prismaMock.organizerPermissionHistory.findMany.mockReset()

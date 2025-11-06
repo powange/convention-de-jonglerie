@@ -36,11 +36,11 @@ Ces fichiers sont automatiquement chargés au démarrage de l'application :
 
 Ces fichiers sont chargés uniquement lorsque l'utilisateur visite les routes correspondantes :
 
-| Fichier        | Routes                                       | Contenu                                                        |
-| -------------- | -------------------------------------------- | -------------------------------------------------------------- |
-| `admin.json`   | `/admin/*`                                   | Interface d'administration, feedback                           |
-| `edition.json` | `/editions/*`                                | Éditions, conventions, collaborateurs, calendrier, covoiturage |
-| `auth.json`    | `/auth/*`, `/login`, `/register`, `/profile` | Authentification, profil, permissions                          |
+| Fichier        | Routes                                       | Contenu                                                       |
+| -------------- | -------------------------------------------- | ------------------------------------------------------------- |
+| `admin.json`   | `/admin/*`                                   | Interface d'administration, feedback                          |
+| `edition.json` | `/editions/*`                                | Éditions, conventions, organisateurs, calendrier, covoiturage |
+| `auth.json`    | `/auth/*`, `/login`, `/register`, `/profile` | Authentification, profil, permissions                         |
 
 ## Middleware de chargement
 

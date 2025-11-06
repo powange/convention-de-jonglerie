@@ -37,25 +37,25 @@ npm run db:assign-meals
 
 Voir [scripts/README-assign-meals.md](scripts/README-assign-meals.md) pour plus de détails.
 
-### Migration droits collaborateurs
+### Migration droits organisateurs
 
 Exécuter une migration douce des anciens rôles vers les nouveaux booléens de droits.
 
 Dry-run (simulation):
 
 ```
-npx ts-node scripts/migrate-collaborator-rights.ts --dry
+npx ts-node scripts/migrate-organizer-rights.ts --dry
 ```
 
 Appliquer réellement:
 
 ```
-npx ts-node scripts/migrate-collaborator-rights.ts
+npx ts-node scripts/migrate-organizer-rights.ts
 ```
 
 Règles de mapping:
 
-- ADMINISTRATOR => active tous les droits (edit/delete convention, manageCollaborators, add/edit/delete éditions)
+- ADMINISTRATOR => active tous les droits (edit/delete convention, manageOrganizers, add/edit/delete éditions)
 - MODERATOR => addEdition + editAllEditions seulement
 - Ne réécrit pas un droit déjà à true
 - Crée une entrée history CREATED si aucune n'existe encore

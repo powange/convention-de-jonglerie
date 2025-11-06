@@ -14,11 +14,11 @@ describe('API Convention - Mise à jour', () => {
     prenom: 'Test',
   }
 
-  const mockCollaboratorUser = {
+  const mockOrganizerUser = {
     id: 2,
-    email: 'collaborator@example.com',
-    pseudo: 'collaborator',
-    nom: 'Collaborator',
+    email: 'organizer@example.com',
+    pseudo: 'organizer',
+    nom: 'Organizer',
     prenom: 'Test',
   }
 
@@ -30,7 +30,7 @@ describe('API Convention - Mise à jour', () => {
     authorId: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
-    collaborators: [],
+    organizers: [],
   }
 
   const mockUpdatedConvention = {
@@ -52,7 +52,7 @@ describe('API Convention - Mise à jour', () => {
   it("devrait permettre à l'auteur de modifier sa convention", async () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
-      collaborators: [],
+      organizers: [],
     })
     prismaMock.convention.update.mockResolvedValue(mockUpdatedConvention)
 
@@ -92,7 +92,7 @@ describe('API Convention - Mise à jour', () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
       authorId: 2, // Autre auteur
-      collaborators: [
+      organizers: [
         {
           userId: mockUser.id,
           canEditConvention: true,
@@ -133,7 +133,7 @@ describe('API Convention - Mise à jour', () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
       authorId: 2, // Autre auteur
-      collaborators: [], // Pas de collaborateur
+      organizers: [], // Pas de organisateur
     })
 
     const mockEvent = {
@@ -164,7 +164,7 @@ describe('API Convention - Mise à jour', () => {
   it("devrait valider les données d'entrée", async () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
-      collaborators: [],
+      organizers: [],
     })
 
     const requestBody = {

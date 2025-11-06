@@ -6,7 +6,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 }))
 
 import { canManageOrganizers } from '@@/server/utils/organizer-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].patch'
+import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].patch'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 const mockCanManage = canManageOrganizers as ReturnType<typeof vi.fn>
@@ -18,7 +18,7 @@ const baseEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () => {
+describe('/api/conventions/[id]/organizers/[organizerId]/rights PATCH', () => {
   beforeEach(() => {
     mockCanManage.mockReset()
     prismaMock.conventionOrganizer.findUnique.mockReset()
@@ -29,7 +29,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
     global.readBody = vi.fn()
   })
 
-  const existingCollaborator = {
+  const existingOrganizer = {
     id: 9,
     conventionId: 5,
     userId: 77,
@@ -45,9 +45,9 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
 
   it('met à jour droits globaux et crée historique', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingOrganizer)
     prismaMock.conventionOrganizer.update.mockResolvedValue({
-      ...existingCollaborator,
+      ...existingOrganizer,
       canEditConvention: true,
     })
     prismaMock.organizerPermissionHistory.create.mockResolvedValue({ id: 1 })
@@ -61,14 +61,14 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
     expect(prismaMock.organizerPermissionHistory.create).toHaveBeenCalled()
     const args = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(args.data.actorId).toBe(42)
-    expect(args.data.targetUserId).toBe(existingCollaborator.userId)
-    expect(res.collaborator.rights.editConvention).toBe(true)
+    expect(args.data.targetUserId).toBe(existingOrganizer.userId)
+    expect(res.organizer.rights.editConvention).toBe(true)
   })
 
   it('met à jour perEdition et log PER_EDITIONS_UPDATED', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
-    prismaMock.conventionOrganizer.update.mockResolvedValue(existingCollaborator) // pas de changement global
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingOrganizer)
+    prismaMock.conventionOrganizer.update.mockResolvedValue(existingOrganizer) // pas de changement global
     prismaMock.editionOrganizerPermission.deleteMany.mockResolvedValue({})
     prismaMock.editionOrganizerPermission.create.mockImplementation(({ data }: any) =>
       Promise.resolve({ ...data })
@@ -89,18 +89,18 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
     )
     const args = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(args.data.actorId).toBe(42)
-    expect(args.data.targetUserId).toBe(existingCollaborator.userId)
-    expect(res.collaborator.perEdition[0].editionId).toBe(101)
+    expect(args.data.targetUserId).toBe(existingOrganizer.userId)
+    expect(res.organizer.perEdition[0].editionId).toBe(101)
   })
 
   it('refuse sans permission', async () => {
     mockCanManage.mockResolvedValue(false)
-    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingOrganizer)
     ;(global.readBody as any).mockResolvedValue({ rights: { editConvention: true } })
     await expect(handler(baseEvent as any)).rejects.toThrow('Permission insuffisante')
   })
 
-  it('404 si collaborateur introuvable', async () => {
+  it('404 si organisateur introuvable', async () => {
     mockCanManage.mockResolvedValue(true)
     prismaMock.conventionOrganizer.findUnique.mockResolvedValue(null)
     ;(global.readBody as any).mockResolvedValue({ rights: { editConvention: true } })
@@ -109,7 +109,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
 
   it("ne crée pas d'historique si aucun changement", async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingOrganizer)
     // Pas de body (ou body vide)
     ;(global.readBody as any).mockResolvedValue({})
     prismaMock.organizerPermissionHistory.create.mockResolvedValue({ id: 99 })
@@ -124,10 +124,10 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
 
   it('met à jour droits globaux + perEdition ensemble (changeType PER_EDITIONS_UPDATED)', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingOrganizer)
     // update global + perEdition
     prismaMock.conventionOrganizer.update.mockResolvedValue({
-      ...existingCollaborator,
+      ...existingOrganizer,
       canDeleteConvention: true,
     })
     prismaMock.editionOrganizerPermission.deleteMany.mockResolvedValue({})
@@ -146,8 +146,8 @@ describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () =>
     expect(historyArgs.data.changeType).toBe('PER_EDITIONS_UPDATED') // priorité perEdition
     expect(historyArgs.data.after.rights.canDeleteConvention).toBe(true)
     expect(historyArgs.data.actorId).toBe(42)
-    expect(historyArgs.data.targetUserId).toBe(existingCollaborator.userId)
-    expect(res.collaborator.rights.deleteConvention).toBe(true)
-    expect(res.collaborator.perEdition[0].editionId).toBe(150)
+    expect(historyArgs.data.targetUserId).toBe(existingOrganizer.userId)
+    expect(res.organizer.rights.deleteConvention).toBe(true)
+    expect(res.organizer.perEdition[0].editionId).toBe(150)
   })
 })

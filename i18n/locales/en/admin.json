@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Upload or modify this user's profile picture",
     "cleanup_expired_tokens": "Cleanup expired tokens",
     "cleanup_resolved_error_logs": "Cleanup error logs",
-    "collaborators": "Collaborators",
-    "collaborators_count": "{count} collaborators",
+    "organizers": "Organizers",
+    "organizers_count": "{count} organizers",
     "coming_soon": "Coming soon",
     "config": {
       "ai": "Artificial Intelligence",
@@ -272,7 +272,7 @@
     "original_user": "Original user",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ WARNING: Are you sure you want to permanently delete the convention \"{name}\"?\n\nThis action will delete:\n- {editionsCount} edition(s)\n- {collaboratorsCount} collaborator(s)\n- All associated data\n\nThis action is IRREVERSIBLE!",
+        "confirm_delete_convention_permanently": "⚠️ WARNING: Are you sure you want to permanently delete the convention \"{name}\"?\n\nThis action will delete:\n- {editionsCount} edition(s)\n- {organizersCount} organizer(s)\n- All associated data\n\nThis action is IRREVERSIBLE!",
         "convention_deleted_permanently": "Convention permanently deleted successfully",
         "delete_convention_permanently": "Delete permanently",
         "error_deleting_convention": "Error deleting convention"

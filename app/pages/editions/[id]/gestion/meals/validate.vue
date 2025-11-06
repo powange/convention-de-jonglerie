@@ -475,12 +475,12 @@ const canAccess = computed(() => {
   // Créateur de l'édition
   if (authStore.user.id === edition.value.creatorId) return true
 
-  // Collaborateurs de la convention
-  if (edition.value.convention?.collaborators) {
-    const isCollaborator = edition.value.convention.collaborators.some(
+  // Organisateurs de la convention
+  if (edition.value.convention?.organizers) {
+    const isOrganizer = edition.value.convention.organizers.some(
       (collab) => collab.user.id === authStore.user?.id
     )
-    if (isCollaborator) return true
+    if (isOrganizer) return true
   }
 
   // Bénévoles avec accès à la validation des repas (leader ou créneau actif)

@@ -701,7 +701,7 @@ async function main() {
                 'calendar',
               ],
               admin: ['admin'],
-              edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
+              edition: ['editions', 'conventions', 'organizers', 'carpool', 'diet'],
               auth: ['auth', 'profile'],
               public: ['homepage', 'pages', 'seo'],
               components: ['components', 'forms', 'upload'],

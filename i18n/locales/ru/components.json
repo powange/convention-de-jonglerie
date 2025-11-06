@@ -59,7 +59,7 @@
       "to_add_comment": "чтобы добавить комментарий",
       "view_comments": "Просмотреть комментарии ({count})"
     },
-    "collaborators_rights_panel": {
+    "organizers_rights_panel": {
       "per_edition": "Права по изданиям",
       "per_edition_hint": "Для выпусков не определены конкретные права",
       "title_placeholder": "Заголовок или роль (необязательно)"

@@ -1,15 +1,15 @@
-# API Permissions Collaborateurs & Droits par Édition
+# API Permissions Organisateurs & Droits par Édition
 
-Cette documentation décrit le modèle de permissions granulaires appliqué aux collaborateurs d'une convention ainsi que le format **per-edition** permettant d'affiner les droits sur des éditions spécifiques.
+Cette documentation décrit le modèle de permissions granulaires appliqué aux organisateurs d'une convention ainsi que le format **per-edition** permettant d'affiner les droits sur des éditions spécifiques.
 
 ## Vue d'ensemble
 
 Deux niveaux de droits :
 
-1. Droits globaux (colonnes booléennes sur `ConventionCollaborator`) qui s'appliquent à l'ensemble des éditions de la convention.
-2. Droits ciblés par édition (table `EditionCollaboratorPermission`) qui octroient `canEdit` et/ou `canDelete` sur une édition précise lorsque les droits globaux étendus (`editAllEditions` / `deleteAllEditions`) ne sont pas accordés.
+1. Droits globaux (colonnes booléennes sur `ConventionOrganizer`) qui s'appliquent à l'ensemble des éditions de la convention.
+2. Droits ciblés par édition (table `EditionOrganizerPermission`) qui octroient `canEdit` et/ou `canDelete` sur une édition précise lorsque les droits globaux étendus (`editAllEditions` / `deleteAllEditions`) ne sont pas accordés.
 
-L'API retourne désormais un format **normalisé** pour chaque collaborateur :
+L'API retourne désormais un format **normalisé** pour chaque organisateur :
 
 ```jsonc
 {
@@ -20,7 +20,7 @@ L'API retourne désormais un format **normalisé** pour chaque collaborateur :
   "rights": {
     "editConvention": true,
     "deleteConvention": false,
-    "manageCollaborators": true,
+    "manageOrganizers": true,
     "addEdition": true,
     "editAllEditions": false,
     "deleteAllEditions": false,
@@ -35,19 +35,19 @@ L'API retourne désormais un format **normalisé** pour chaque collaborateur :
 
 ## Droits globaux disponibles
 
-| Clé `rights`        | Colonne Prisma         | Effet                                                 |
-| ------------------- | ---------------------- | ----------------------------------------------------- |
-| editConvention      | canEditConvention      | Modifier les métadonnées de la convention             |
-| deleteConvention    | canDeleteConvention    | Supprimer la convention                               |
-| manageCollaborators | canManageCollaborators | Gérer (créer / modifier / retirer) les collaborateurs |
-| addEdition          | canAddEdition          | Créer de nouvelles éditions                           |
-| editAllEditions     | canEditAllEditions     | Modifier toutes les éditions                          |
-| deleteAllEditions   | canDeleteAllEditions   | Supprimer toutes les éditions                         |
-| manageVolunteers    | canManageVolunteers    | Gérer les bénévoles de toutes les éditions            |
+| Clé `rights`      | Colonne Prisma       | Effet                                                |
+| ----------------- | -------------------- | ---------------------------------------------------- |
+| editConvention    | canEditConvention    | Modifier les métadonnées de la convention            |
+| deleteConvention  | canDeleteConvention  | Supprimer la convention                              |
+| manageOrganizers  | canManageOrganizers  | Gérer (créer / modifier / retirer) les organisateurs |
+| addEdition        | canAddEdition        | Créer de nouvelles éditions                          |
+| editAllEditions   | canEditAllEditions   | Modifier toutes les éditions                         |
+| deleteAllEditions | canDeleteAllEditions | Supprimer toutes les éditions                        |
+| manageVolunteers  | canManageVolunteers  | Gérer les bénévoles de toutes les éditions           |
 
 ## Droits par édition (`perEdition`)
 
-Chaque entrée de `perEdition` correspond à un enregistrement dans `EditionCollaboratorPermission` :
+Chaque entrée de `perEdition` correspond à un enregistrement dans `EditionOrganizerPermission` :
 
 | Champ               | Type    | Description                               |
 | ------------------- | ------- | ----------------------------------------- |
@@ -65,15 +65,15 @@ Règle de résolution effective :
 
 ## Endpoints
 
-### Lister les collaborateurs
+### Lister les organisateurs
 
-`GET /api/conventions/:id/collaborators`
+`GET /api/conventions/:id/organizers`
 
-Réponse: tableau de collaborateurs (format normalisé ci-dessus) ordonné par date d'ajout.
+Réponse: tableau de organisateurs (format normalisé ci-dessus) ordonné par date d'ajout.
 
-### Créer un collaborateur
+### Créer un organisateur
 
-`POST /api/conventions/:id/collaborators`
+`POST /api/conventions/:id/organizers`
 
 Body (exemples):
 
@@ -81,7 +81,7 @@ Body (exemples):
 {
   "userIdentifier": "alice@example.org", // ou userId
   "title": "Organisateur",
-  "rights": { "manageCollaborators": true, "addEdition": true },
+  "rights": { "manageOrganizers": true, "addEdition": true },
   "perEdition": [{ "editionId": 11, "canEdit": true, "canManageVolunteers": true }],
 }
 ```
@@ -92,9 +92,9 @@ Notes:
 - `perEdition` absent => tableau vide.
 - Les clés inconnues dans `rights` sont ignorées.
 
-### Mettre à jour (full) un collaborateur
+### Mettre à jour (full) un organisateur
 
-`PUT /api/conventions/:id/collaborators/:collaboratorId`
+`PUT /api/conventions/:id/organizers/:organizerId`
 
 Body:
 
@@ -110,7 +110,7 @@ Remplace entièrement les droits globaux et la liste perEdition (après nettoyag
 
 ### Patch droits / perEdition
 
-`PATCH /api/conventions/:id/collaborators/:collaboratorId/rights`
+`PATCH /api/conventions/:id/organizers/:organizerId/rights`
 
 Body:
 
@@ -129,7 +129,7 @@ Fusion ciblée: seules les clés présentes sont mises à jour; `perEdition` rem
 
 ### Historique des changements
 
-`GET /api/conventions/:id/collaborators/history`
+`GET /api/conventions/:id/organizers/history`
 
 Entrées possibles (`changeType`):
 
@@ -141,13 +141,13 @@ Entrées possibles (`changeType`):
 
 `GET /api/conventions/my-conventions`
 
-Chaque convention inclut désormais ses collaborateurs avec `rights` et `perEdition` prêts à consommer côté UI.
+Chaque convention inclut désormais ses organisateurs avec `rights` et `perEdition` prêts à consommer côté UI.
 
 ## Logique côté Frontend
 
 Le front doit :
 
-1. Utiliser `rights.manageCollaborators` pour afficher le panneau de gestion.
+1. Utiliser `rights.manageOrganizers` pour afficher le panneau de gestion.
 2. Vérifier `rights.editConvention` / `rights.deleteConvention` pour boutons correspondants.
 3. Pour une édition donnée:
    - Modification autorisée si `rights.editAllEditions` OU entrée `perEdition` `canEdit` sur l'`editionId`.
@@ -185,14 +185,14 @@ function canManageEditionVolunteers(collab, editionId) {
 
 ## Bonnes pratiques de consommation
 
-- Cacher les toggles per-edition si le collaborateur possède le droit global correspondant.
+- Cacher les toggles per-edition si le organisateur possède le droit global correspondant.
 - Afficher un résumé lisible: ex. `editAllEditions + deleteAllEditions` => "Gestion complète des éditions" (dérivable via un mapping i18n).
 - Toujours recharger la liste après une mise à jour pour éviter les décalages de draft.
 
 ## Évolutions futures possibles
 
 - Ajout de droits spécifiques (ex: `managePosts`, `manageLostFound`) selon la granularité désirée.
-- Pagination / recherche sur liste de collaborateurs.
+- Pagination / recherche sur liste de organisateurs.
 - Audit étendu avec diff JSON des droits.
 
 ---

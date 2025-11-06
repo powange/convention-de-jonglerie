@@ -245,12 +245,12 @@ describe("Système d'éditions", () => {
         favoritedBy: [],
         convention: {
           ...mockConvention,
-          collaborators: [],
+          organizers: [],
         },
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithDetails)
-      prismaMock.editionCollaborator.findFirst.mockResolvedValue(null)
+      prismaMock.editionOrganizer.findFirst.mockResolvedValue(null)
 
       const mockEvent = {
         context: { params: { id: '1' } },
@@ -281,7 +281,7 @@ describe("Système d'éditions", () => {
 
     it('devrait retourner 404 si édition non trouvée', async () => {
       prismaMock.edition.findUnique.mockResolvedValue(null)
-      prismaMock.editionCollaborator.findFirst.mockResolvedValue(null)
+      prismaMock.editionOrganizer.findFirst.mockResolvedValue(null)
 
       const mockEvent = {
         context: { params: { id: '999' } },
@@ -303,7 +303,7 @@ describe("Système d'éditions", () => {
         favoritedBy: [],
         convention: {
           ...mockConvention,
-          collaborators: [
+          organizers: [
             {
               user: {
                 id: 2,
@@ -318,7 +318,7 @@ describe("Système d'éditions", () => {
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithEmail)
-      prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+      prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
       const mockEvent = {
         context: { params: { id: '1' } },
@@ -329,8 +329,8 @@ describe("Système d'éditions", () => {
       // Les emails doivent être transformés en emailHash
       expect(result.creator).not.toHaveProperty('email')
       expect(result.creator.emailHash).toBeDefined()
-      expect(result.convention.collaborators[0].user).not.toHaveProperty('email')
-      expect(result.convention.collaborators[0].user.emailHash).toBeDefined()
+      expect(result.convention.organizers[0].user).not.toHaveProperty('email')
+      expect(result.convention.organizers[0].user.emailHash).toBeDefined()
     })
   })
 
@@ -347,7 +347,7 @@ describe("Système d'éditions", () => {
         creator: mockUser,
         convention: {
           ...mockConvention,
-          collaborators: [], // Ajouter le tableau collaborators requis
+          organizers: [], // Ajouter le tableau organizers requis
         },
       })
       prismaMock.edition.update.mockResolvedValue({
@@ -385,7 +385,7 @@ describe("Système d'éditions", () => {
         convention: {
           ...mockConvention,
           authorId: 2,
-          collaborators: [],
+          organizers: [],
         },
       })
 
@@ -402,7 +402,7 @@ describe("Système d'éditions", () => {
       await expect(updateEditionHandler(mockEvent as any)).rejects.toThrow()
     })
 
-    it('devrait permettre à un collaborateur admin de modifier', async () => {
+    it('devrait permettre à un organisateur admin de modifier', async () => {
       prismaMock.edition.findUnique.mockResolvedValue({
         ...mockEdition,
         creatorId: 2,
@@ -410,7 +410,7 @@ describe("Système d'éditions", () => {
         convention: {
           ...mockConvention,
           authorId: 2,
-          collaborators: [
+          organizers: [
             {
               userId: 1,
               canEditAllEditions: true,
@@ -444,7 +444,7 @@ describe("Système d'éditions", () => {
         creator: mockUser,
         convention: {
           ...mockConvention,
-          collaborators: [],
+          organizers: [],
         },
       })
       prismaMock.edition.delete.mockResolvedValue(mockEdition)
@@ -475,7 +475,7 @@ describe("Système d'éditions", () => {
         convention: {
           ...mockConvention,
           authorId: 2,
-          collaborators: [],
+          organizers: [],
         },
       })
 

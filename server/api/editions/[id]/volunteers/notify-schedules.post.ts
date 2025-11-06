@@ -1,12 +1,12 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import {
   sendEmail,
   generateVolunteerScheduleEmailHtml,
   getSiteUrl,
 } from '@@/server/utils/emailService'
 import { NotificationService } from '@@/server/utils/notification-service'
+import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 

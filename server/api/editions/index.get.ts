@@ -330,7 +330,7 @@ export default wrapApiHandler(
       take: limitNumber,
     })
 
-    // Pas de transformation des collaborators ici car ils ne sont pas inclus
+    // Pas de transformation des organizers ici car ils ne sont pas inclus
     // dans cette requête (contrairement à l'API individuelle)
     const transformedEditions = editions
 

@@ -70,15 +70,11 @@
       "Bash(node scripts/translation/list-todo-keys.js:*)",
       "Bash(node scripts/translation/apply-translations.js:*)",
       "Bash(cat:*)",
-      "Bash(if [ -f \"server/api/conventions/[id]/collaborators/[collaboratorId].delete.ts\" ])"
+      "Bash(if [ -f \"server/api/conventions/[id]/organizers/[organizerId].delete.ts\" ])"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": [
-    "nuxt",
-    "nuxt-ui",
-    "vitest-runner"
-  ]
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
 }

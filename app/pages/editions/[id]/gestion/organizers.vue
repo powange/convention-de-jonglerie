@@ -20,57 +20,53 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-          {{ $t('collaborators.title') }}
+          {{ $t('organizers.title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('collaborators.page_description') }}
+          {{ $t('organizers.page_description') }}
         </p>
       </div>
 
-      <!-- Contenu de gestion des collaborateurs -->
+      <!-- Contenu de gestion des organisateurs -->
       <div class="space-y-6">
-        <!-- Collaborateurs -->
+        <!-- Organisateurs -->
         <UCard>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-                <h2 class="text-lg font-semibold">{{ $t('collaborators.list') }}</h2>
+                <h2 class="text-lg font-semibold">{{ $t('organizers.list') }}</h2>
               </div>
               <UButton
                 size="sm"
                 color="primary"
                 variant="soft"
                 icon="i-heroicons-plus"
-                @click="openAddCollaboratorModal"
+                @click="openAddOrganizerModal"
               >
                 {{ $t('common.add') }}
               </UButton>
             </div>
 
-            <!-- Liste des collaborateurs -->
-            <div
-              v-if="
-                edition.convention?.collaborators && edition.convention.collaborators.length > 0
-              "
-            >
+            <!-- Liste des organisateurs -->
+            <div v-if="edition.convention?.organizers && edition.convention.organizers.length > 0">
               <div class="flex flex-wrap gap-2">
                 <UBadge
-                  v-for="collaborator in edition.convention?.collaborators"
-                  :key="collaborator.id"
-                  :color="getCollaboratorBadgeColor(collaborator)"
+                  v-for="organizer in edition.convention?.organizers"
+                  :key="organizer.id"
+                  :color="getOrganizerBadgeColor(organizer)"
                   variant="subtle"
                   class="flex items-center gap-2 cursor-pointer hover:bg-opacity-80 transition-colors"
-                  @click="openEditCollaboratorModal(collaborator)"
+                  @click="openEditOrganizerModal(organizer)"
                 >
                   <div class="flex items-center gap-1.5">
-                    <UiUserAvatar :user="collaborator.user" size="sm" />
-                    <span>{{ collaborator.user?.pseudo || '' }}</span>
+                    <UiUserAvatar :user="organizer.user" size="sm" />
+                    <span>{{ organizer.user?.pseudo || '' }}</span>
                     <span
-                      v-if="collaborator.title && collaborator.title.trim()"
+                      v-if="organizer.title && organizer.title.trim()"
                       class="text-xs opacity-75"
                     >
-                      ({{ collaborator.title.trim() }})
+                      ({{ organizer.title.trim() }})
                     </span>
                   </div>
                 </UBadge>
@@ -78,19 +74,15 @@
             </div>
             <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <UIcon name="i-heroicons-user-group" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">{{ $t('collaborators.no_collaborators') }}</p>
+              <p class="text-sm text-gray-500">{{ $t('organizers.no_organizers') }}</p>
             </div>
           </div>
         </UCard>
       </div>
     </div>
 
-    <!-- Modal d'ajout de collaborateur -->
-    <UModal
-      v-model:open="addCollaboratorModalOpen"
-      :title="$t('conventions.add_collaborator')"
-      size="lg"
-    >
+    <!-- Modal d'ajout de organisateur -->
+    <UModal v-model:open="addOrganizerModalOpen" :title="$t('conventions.add_organizer')" size="lg">
       <template #body>
         <div class="space-y-4">
           <div class="space-y-3">
@@ -100,8 +92,8 @@
                 $t('conventions.select_user')
               }}</label>
               <UserSelector
-                v-model="newCollaboratorUser"
-                v-model:search-term="newCollaboratorSearchTerm"
+                v-model="newOrganizerUser"
+                v-model:search-term="newOrganizersearchTerm"
                 :searched-users="searchedUsers"
                 :searching-users="searchingUsers"
                 :placeholder="$t('conventions.search_user_placeholder')"
@@ -109,10 +101,10 @@
             </div>
 
             <!-- Configuration des droits -->
-            <div v-if="newCollaboratorUser">
-              <label class="block text-sm font-medium mb-2">{{ $t('collaborators.rights') }}</label>
-              <CollaboratorRightsFields
-                v-model="newCollaboratorRights"
+            <div v-if="newOrganizerUser">
+              <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
+              <OrganizerRightsFields
+                v-model="newOrganizerRights"
                 :editions="[edition] as any[]"
                 :convention-name="edition?.convention?.name"
                 size="sm"
@@ -123,38 +115,38 @@
       </template>
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeAddCollaboratorModal">
+          <UButton variant="ghost" @click="closeAddOrganizerModal">
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton color="primary" :disabled="!newCollaboratorUser" @click="addCollaborator">
+          <UButton color="primary" :disabled="!newOrganizerUser" @click="addOrganizer">
             {{ $t('common.add') }}
           </UButton>
         </div>
       </template>
     </UModal>
 
-    <!-- Modal d'édition de collaborateur -->
+    <!-- Modal d'édition de organisateur -->
     <UModal
-      v-model:open="editCollaboratorModalOpen"
-      :title="$t('collaborators.edit_collaborator')"
+      v-model:open="editOrganizerModalOpen"
+      :title="$t('organizers.edit_organizer')"
       size="lg"
     >
       <template #body>
-        <div v-if="selectedCollaborator" class="space-y-4">
-          <!-- Info collaborateur -->
+        <div v-if="selectedOrganizer" class="space-y-4">
+          <!-- Info organisateur -->
           <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UiUserAvatar :user="selectedCollaborator.user" size="md" />
+            <UiUserAvatar :user="selectedOrganizer.user" size="md" />
             <div>
-              <div class="font-medium">{{ selectedCollaborator.user?.pseudo }}</div>
-              <div class="text-sm text-gray-500">{{ selectedCollaborator.user?.email }}</div>
+              <div class="font-medium">{{ selectedOrganizer.user?.pseudo }}</div>
+              <div class="text-sm text-gray-500">{{ selectedOrganizer.user?.email }}</div>
             </div>
           </div>
 
           <!-- Configuration des droits -->
           <div>
-            <label class="block text-sm font-medium mb-2">{{ $t('collaborators.rights') }}</label>
-            <CollaboratorRightsFields
-              v-model="editCollaboratorRights"
+            <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
+            <OrganizerRightsFields
+              v-model="editOrganizerRights"
               :editions="[edition] as any[]"
               :convention-name="edition?.convention?.name"
               size="sm"
@@ -164,14 +156,14 @@
       </template>
       <template #footer>
         <div class="flex justify-between">
-          <UButton color="error" variant="soft" @click="removeCollaborator">
+          <UButton color="error" variant="soft" @click="removeOrganizer">
             {{ $t('common.remove') }}
           </UButton>
           <div class="flex gap-3">
-            <UButton variant="ghost" @click="closeEditCollaboratorModal">
+            <UButton variant="ghost" @click="closeEditOrganizerModal">
               {{ $t('common.cancel') }}
             </UButton>
-            <UButton color="primary" :loading="savingCollaborator" @click="saveCollaboratorChanges">
+            <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
               {{ $t('common.save') }}
             </UButton>
           </div>
@@ -188,7 +180,7 @@ import { useRoute } from 'vue-router'
 import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { summarizeRights } from '~/utils/collaboratorRights'
+import { summarizeRights } from '~/utils/organizerRights'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -203,21 +195,21 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// État pour les modals de collaborateurs
-const addCollaboratorModalOpen = ref(false)
-const editCollaboratorModalOpen = ref(false)
-const selectedCollaborator = ref<any>(null)
-const newCollaboratorUser = ref<any>(null)
-const newCollaboratorSearchTerm = ref('')
+// État pour les modals de organisateurs
+const addOrganizerModalOpen = ref(false)
+const editOrganizerModalOpen = ref(false)
+const selectedOrganizer = ref<any>(null)
+const newOrganizerUser = ref<any>(null)
+const newOrganizersearchTerm = ref('')
 const searchedUsers = ref<any[]>([])
 const searchingUsers = ref(false)
-const savingCollaborator = ref(false)
+const savingOrganizer = ref(false)
 
-const newCollaboratorRights = ref({
+const newOrganizerRights = ref({
   rights: {
     editConvention: false,
     deleteConvention: false,
-    manageCollaborators: false,
+    manageOrganizers: false,
     manageVolunteers: false,
     addEdition: false,
     editAllEditions: false,
@@ -227,14 +219,14 @@ const newCollaboratorRights = ref({
   perEdition: [],
 })
 
-const editCollaboratorRights = ref({
+const editOrganizerRights = ref({
   rights: {},
   title: '',
   perEdition: [],
 })
 
 // Debounce pour la recherche d'utilisateurs
-const debouncedSearchTerm = useDebounce(newCollaboratorSearchTerm, 300)
+const debouncedSearchTerm = useDebounce(newOrganizersearchTerm, 300)
 
 // Watchers pour la recherche d'utilisateurs
 watch(debouncedSearchTerm, async (searchTerm) => {
@@ -257,20 +249,20 @@ watch(debouncedSearchTerm, async (searchTerm) => {
   }
 })
 
-// Fonctions pour gérer les collaborateurs
-const getCollaboratorBadgeColor = (collaborator: any) => {
-  const summary = summarizeRights(collaborator)
+// Fonctions pour gérer les organisateurs
+const getOrganizerBadgeColor = (organizer: any) => {
+  const summary = summarizeRights(organizer)
   return summary.color === 'warning' ? 'error' : summary.color
 }
 
-const openAddCollaboratorModal = () => {
-  newCollaboratorUser.value = null
-  newCollaboratorSearchTerm.value = ''
-  newCollaboratorRights.value = {
+const openAddOrganizerModal = () => {
+  newOrganizerUser.value = null
+  newOrganizersearchTerm.value = ''
+  newOrganizerRights.value = {
     rights: {
       editConvention: false,
       deleteConvention: false,
-      manageCollaborators: false,
+      manageOrganizers: false,
       manageVolunteers: false,
       addEdition: false,
       editAllEditions: false,
@@ -280,45 +272,45 @@ const openAddCollaboratorModal = () => {
     perEdition: [],
   }
   searchedUsers.value = []
-  addCollaboratorModalOpen.value = true
+  addOrganizerModalOpen.value = true
 }
 
-const closeAddCollaboratorModal = () => {
-  addCollaboratorModalOpen.value = false
-  newCollaboratorUser.value = null
-  newCollaboratorSearchTerm.value = ''
+const closeAddOrganizerModal = () => {
+  addOrganizerModalOpen.value = false
+  newOrganizerUser.value = null
+  newOrganizersearchTerm.value = ''
   searchedUsers.value = []
 }
 
-const addCollaborator = async () => {
-  if (!newCollaboratorUser.value || !edition.value) {
+const addOrganizer = async () => {
+  if (!newOrganizerUser.value || !edition.value) {
     return
   }
 
   try {
-    await $fetch(`/api/conventions/${edition.value.convention?.id}/collaborators`, {
+    await $fetch(`/api/conventions/${edition.value.convention?.id}/organizers`, {
       method: 'POST',
       body: {
-        userId: newCollaboratorUser.value.id,
-        rights: newCollaboratorRights.value.rights,
-        title: newCollaboratorRights.value.title,
-        perEdition: newCollaboratorRights.value.perEdition || [],
+        userId: newOrganizerUser.value.id,
+        rights: newOrganizerRights.value.rights,
+        title: newOrganizerRights.value.title,
+        perEdition: newOrganizerRights.value.perEdition || [],
       },
     })
 
     toast.add({
-      title: t('collaborators.collaborator_added'),
+      title: t('organizers.organizer_added'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
 
-    closeAddCollaboratorModal()
-    // Recharger l'édition pour mettre à jour la liste des collaborateurs
+    closeAddOrganizerModal()
+    // Recharger l'édition pour mettre à jour la liste des organisateurs
     await editionStore.fetchEditionById(editionId, { force: true })
   } catch (error: any) {
-    console.error('Error adding collaborator:', error)
+    console.error('Error adding organizer:', error)
     toast.add({
-      title: t('errors.add_collaborator_error'),
+      title: t('errors.add_organizer_error'),
       description: error.data?.message || error.message || t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
@@ -326,90 +318,90 @@ const addCollaborator = async () => {
   }
 }
 
-const openEditCollaboratorModal = (collaborator: any) => {
-  selectedCollaborator.value = collaborator
-  editCollaboratorRights.value = {
-    rights: collaborator.rights || {},
-    title: collaborator.title || '',
-    perEdition: collaborator.perEditionRights || [],
+const openEditOrganizerModal = (organizer: any) => {
+  selectedOrganizer.value = organizer
+  editOrganizerRights.value = {
+    rights: organizer.rights || {},
+    title: organizer.title || '',
+    perEdition: organizer.perEditionRights || [],
   }
-  editCollaboratorModalOpen.value = true
+  editOrganizerModalOpen.value = true
 }
 
-const closeEditCollaboratorModal = () => {
-  editCollaboratorModalOpen.value = false
-  selectedCollaborator.value = null
+const closeEditOrganizerModal = () => {
+  editOrganizerModalOpen.value = false
+  selectedOrganizer.value = null
 }
 
-const saveCollaboratorChanges = async () => {
-  if (!selectedCollaborator.value || !edition.value) {
+const saveOrganizerChanges = async () => {
+  if (!selectedOrganizer.value || !edition.value) {
     return
   }
 
-  savingCollaborator.value = true
+  savingOrganizer.value = true
   try {
     await $fetch(
-      `/api/conventions/${edition.value.convention?.id}/collaborators/${selectedCollaborator.value.id}`,
+      `/api/conventions/${edition.value.convention?.id}/organizers/${selectedOrganizer.value.id}`,
       {
         method: 'PATCH',
         body: {
-          rights: editCollaboratorRights.value.rights,
-          title: editCollaboratorRights.value.title,
-          perEdition: editCollaboratorRights.value.perEdition,
+          rights: editOrganizerRights.value.rights,
+          title: editOrganizerRights.value.title,
+          perEdition: editOrganizerRights.value.perEdition,
         },
       }
     )
 
     toast.add({
-      title: t('collaborators.collaborator_updated'),
+      title: t('organizers.organizer_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
 
-    closeEditCollaboratorModal()
+    closeEditOrganizerModal()
     await editionStore.fetchEditionById(editionId, { force: true })
   } catch (error: any) {
-    console.error('Error updating collaborator:', error)
+    console.error('Error updating organizer:', error)
     toast.add({
-      title: t('errors.update_collaborator_error'),
+      title: t('errors.update_organizer_error'),
       description: error.data?.message || error.message || t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
   } finally {
-    savingCollaborator.value = false
+    savingOrganizer.value = false
   }
 }
 
-const removeCollaborator = async () => {
-  if (!selectedCollaborator.value || !edition.value) {
+const removeOrganizer = async () => {
+  if (!selectedOrganizer.value || !edition.value) {
     return
   }
 
-  if (!confirm(t('collaborators.confirm_remove'))) {
+  if (!confirm(t('organizers.confirm_remove'))) {
     return
   }
 
   try {
     await $fetch(
-      `/api/conventions/${edition.value.convention?.id}/collaborators/${selectedCollaborator.value.id}`,
+      `/api/conventions/${edition.value.convention?.id}/organizers/${selectedOrganizer.value.id}`,
       {
         method: 'DELETE',
       }
     )
 
     toast.add({
-      title: t('collaborators.collaborator_removed'),
+      title: t('organizers.organizer_removed'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
 
-    closeEditCollaboratorModal()
+    closeEditOrganizerModal()
     await editionStore.fetchEditionById(editionId, { force: true })
   } catch (error: any) {
-    console.error('Error removing collaborator:', error)
+    console.error('Error removing organizer:', error)
     toast.add({
-      title: t('errors.remove_collaborator_error'),
+      title: t('errors.remove_organizer_error'),
       description: error.data?.message || error.message || t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
@@ -426,7 +418,7 @@ const canAccess = computed(() => {
     return true
   }
 
-  // Utilisateurs avec permission de gérer les collaborateurs
+  // Utilisateurs avec permission de gérer les organisateurs
   if (canManageOrganizers.value) {
     return true
   }
@@ -453,8 +445,8 @@ onMounted(async () => {
 
 // Métadonnées de la page
 useSeoMeta({
-  title: t('collaborators.title') + ' - ' + (edition.value?.name || 'Édition'),
-  description: t('collaborators.page_description'),
+  title: t('organizers.title') + ' - ' + (edition.value?.name || 'Édition'),
+  description: t('organizers.page_description'),
   ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

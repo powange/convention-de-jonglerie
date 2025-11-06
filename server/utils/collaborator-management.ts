@@ -3,8 +3,8 @@
 import { prisma } from './prisma'
 
 import type {
-  OrganizerPermissionSnapshot,
-  OrganizerRemovalSnapshot,
+  organizerPermissionSnapshot,
+  organizerRemovalSnapshot,
   PrismaTransaction,
 } from '../types/prisma-helpers'
 
@@ -34,10 +34,10 @@ export async function checkAdminMode(userId: number, event?: H3Event): Promise<b
   return false
 }
 
-export interface OrganizerPermissionCheck {
+export interface organizerPermissionCheck {
   hasPermission: boolean
   isOwner: boolean
-  isOrganizer: boolean
+  isorganizer: boolean
 }
 
 /**
@@ -46,7 +46,7 @@ export interface OrganizerPermissionCheck {
 export async function checkUserConventionPermission(
   conventionId: number,
   userId: number
-): Promise<OrganizerPermissionCheck> {
+): Promise<organizerPermissionCheck> {
   // Vérifier si l'utilisateur est le créateur
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
@@ -75,7 +75,7 @@ export async function checkUserConventionPermission(
   return {
     hasPermission: isOwner || !!organizer,
     isOwner,
-    isOrganizer: !!organizer,
+    isorganizer: !!organizer,
   }
 }
 
@@ -187,7 +187,7 @@ interface AddConventionOrganizerInput {
   rights?: Partial<{
     editConvention: boolean
     deleteConvention: boolean
-    manageOrganizers: boolean
+    manageorganizers: boolean
     addEdition: boolean
     editAllEditions: boolean
     deleteAllEditions: boolean
@@ -239,7 +239,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
         title: title || null,
         canEditConvention: rights?.editConvention ?? false,
         canDeleteConvention: rights?.deleteConvention ?? false,
-        canManageOrganizers: rights?.manageOrganizers ?? false,
+        canManageOrganizers: rights?.manageorganizers ?? false,
         canAddEdition: rights?.addEdition ?? false,
         canEditAllEditions: rights?.editAllEditions ?? false,
         canDeleteAllEditions: rights?.deleteAllEditions ?? false,
@@ -275,7 +275,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
 
     // Historique CREATED
     if (withPerEdition) {
-      const snapshot: OrganizerPermissionSnapshot = {
+      const snapshot: organizerPermissionSnapshot = {
         title: withPerEdition.title,
         rights: {
           canEditConvention: withPerEdition.canEditConvention,
@@ -368,7 +368,7 @@ export async function deleteConventionOrganizer(
   }
 
   // Snapshot avant suppression
-  const before: OrganizerPermissionSnapshot = {
+  const before: organizerPermissionSnapshot = {
     // On n'enregistre plus les infos user redondantes (pseudo / id) car targetUserId suffit
     title: organizer.title,
     rights: {
@@ -382,10 +382,10 @@ export async function deleteConventionOrganizer(
     },
   }
 
-  const after: OrganizerRemovalSnapshot = {
+  const after: organizerRemovalSnapshot = {
     removed: true,
     removedAt: new Date().toISOString(),
-    removedOrganizerId: organizer.id,
+    removedorganizerId: organizer.id,
     removedUserId: organizer.userId,
   }
 
@@ -438,14 +438,14 @@ export async function getConventionOrganizers(conventionId: number) {
 /**
  * Met à jour le rôle d'un organisateur
  */
-export async function updateOrganizerRights(params: {
+export async function updateorganizerRights(params: {
   conventionId: number
   organizerId: number
   userId: number
   rights?: Partial<{
     editConvention: boolean
     deleteConvention: boolean
-    manageOrganizers: boolean
+    manageorganizers: boolean
     addEdition: boolean
     editAllEditions: boolean
     deleteAllEditions: boolean
@@ -476,7 +476,7 @@ export async function updateOrganizerRights(params: {
         title: title ?? organizer.title,
         canEditConvention: rights?.editConvention ?? organizer.canEditConvention,
         canDeleteConvention: rights?.deleteConvention ?? organizer.canDeleteConvention,
-        canManageOrganizers: rights?.manageOrganizers ?? organizer.canManageOrganizers,
+        canManageOrganizers: rights?.manageorganizers ?? organizer.canManageOrganizers,
         canAddEdition: rights?.addEdition ?? organizer.canAddEdition,
         canEditAllEditions: rights?.editAllEditions ?? organizer.canEditAllEditions,
         canDeleteAllEditions: rights?.deleteAllEditions ?? organizer.canDeleteAllEditions,

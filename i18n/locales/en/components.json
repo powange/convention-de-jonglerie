@@ -59,7 +59,7 @@
       "to_add_comment": "to add a comment",
       "view_comments": "View comments ({count})"
     },
-    "collaborators_rights_panel": {
+    "organizers_rights_panel": {
       "per_edition": "Per-edition rights",
       "per_edition_hint": "No specific rights defined for editions",
       "title_placeholder": "Title or role (optional)"

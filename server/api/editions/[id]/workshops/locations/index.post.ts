@@ -23,12 +23,12 @@ export default wrapApiHandler(
       include: {
         convention: {
           include: {
-            collaborators: true,
+            organizers: true,
           },
         },
-        collaboratorPermissions: {
+        organizerPermissions: {
           include: {
-            collaborator: true,
+            organizer: true,
           },
         },
       },

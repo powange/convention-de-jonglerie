@@ -28,12 +28,12 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que l'utilisateur est un collaborateur
+    // Vérifier que l'utilisateur est un organisateur
     const hasPermission = await hasEditionEditPermission(userId, editionId)
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
-        message: "Vous devez être collaborateur pour modifier le statut d'un objet trouvé",
+        message: "Vous devez être organisateur pour modifier le statut d'un objet trouvé",
       })
     }
 

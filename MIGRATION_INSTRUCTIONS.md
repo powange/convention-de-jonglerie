@@ -63,7 +63,7 @@ Si quelque chose ne fonctionne pas :
 
 ---
 
-## Migration des droits collaborateurs (legacy `role` -> droits booléens)
+## Migration des droits organisateurs (legacy `role` -> droits booléens)
 
 Cette étape est nécessaire uniquement si la colonne `role` existe encore en production et que vous devez peupler les nouveaux champs de droits.
 
@@ -72,31 +72,31 @@ Cette étape est nécessaire uniquement si la colonne `role` existe encore en pr
 1. Sauvegarde préalable ciblée (recommandé) :
    ```bash
    mysqldump --single-transaction --quick --routines \
-     "$MYSQL_DATABASE" ConventionCollaborator CollaboratorPermissionHistory > backup_collaborators.sql
+     "$MYSQL_DATABASE" ConventionOrganizer OrganizerPermissionHistory > backup_organizers.sql
    ```
 2. Dry-run (ne modifie rien) :
    ```bash
-   npm run migrate:collaborators:legacy:dry
+   npm run migrate:organizers:legacy:dry
    ```
 3. Vérifier la sortie (compteurs, liste des premières lignes à modifier, historique manquant).
 4. Exécution réelle :
    ```bash
-   npm run migrate:collaborators:legacy
+   npm run migrate:organizers:legacy
    ```
 5. Vérifier les compteurs et quelques enregistrements :
    ```sql
-   SELECT id, canEditConvention, canManageCollaborators FROM ConventionCollaborator LIMIT 20;
-   SELECT COUNT(*) FROM CollaboratorPermissionHistory WHERE changeType='CREATED';
+   SELECT id, canEditConvention, canManageOrganizers FROM ConventionOrganizer LIMIT 20;
+   SELECT COUNT(*) FROM OrganizerPermissionHistory WHERE changeType='CREATED';
    ```
 6. Lancer ensuite la migration Prisma qui supprime la colonne `role` (ou appliquer la migration SQL correspondante).
-7. Supprimer le script `scripts/migrate-collaborator-rights-legacy-role.ts` une fois terminé pour éviter ré-exécution accidentelle.
+7. Supprimer le script `scripts/migrate-organizer-rights-legacy-role.ts` une fois terminé pour éviter ré-exécution accidentelle.
 
-> NOTE: La migration de suppression `role` est de nouveau présente (`drop_collaborator_role`). Appliquez-la uniquement après exécution réussie du script legacy et vérifications manuelles.
+> NOTE: La migration de suppression `role` est de nouveau présente (`drop_organizer_role`). Appliquez-la uniquement après exécution réussie du script legacy et vérifications manuelles.
 
 ### Scripts NPM disponibles
 
-- `npm run migrate:collaborators:legacy:dry` : prévisualisation.
-- `npm run migrate:collaborators:legacy` : applique les changements (inclut `--yes`).
+- `npm run migrate:organizers:legacy:dry` : prévisualisation.
+- `npm run migrate:organizers:legacy` : applique les changements (inclut `--yes`).
 
 ### Notes
 

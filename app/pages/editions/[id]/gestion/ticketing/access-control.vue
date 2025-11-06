@@ -679,9 +679,9 @@ const canAccess = computed(() => {
   // Bénévoles avec créneau actif de contrôle d'accès (±15 minutes)
   if (canAccessAccessControl.value) return true
 
-  // Tous les collaborateurs de la convention (même sans droits)
-  if (edition.value.convention?.collaborators) {
-    return edition.value.convention.collaborators.some(
+  // Tous les organisateurs de la convention (même sans droits)
+  if (edition.value.convention?.organizers) {
+    return edition.value.convention.organizers.some(
       (collab) => collab.user.id === authStore.user?.id
     )
   }

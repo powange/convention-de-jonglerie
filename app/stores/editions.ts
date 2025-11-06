@@ -268,52 +268,52 @@ export const useEditionStore = defineStore('editions', {
       }
     },
 
-    // Méthodes pour gérer les collaborateurs
-    async getCollaborators(editionId: number) {
+    // Méthodes pour gérer les organisateurs
+    async getOrganizers(editionId: number) {
       this.error = null
       try {
-        const collaborators = await $fetch<ConventionOrganizer[]>(
-          `/api/editions/${editionId}/collaborators`
+        const organizers = await $fetch<ConventionOrganizer[]>(
+          `/api/editions/${editionId}/organizers`
         )
-        return collaborators
+        return organizers
       } catch (e: unknown) {
         const error = e as HttpError
-        this.error = error.message || error.data?.message || 'Failed to fetch collaborators'
+        this.error = error.message || error.data?.message || 'Failed to fetch organizers'
         throw e
       }
     },
 
-    async addCollaborator(editionId: number, userEmail: string, canEdit: boolean = true) {
+    async addOrganizer(editionId: number, userEmail: string, canEdit: boolean = true) {
       this.error = null
       try {
-        const collaborator = await $fetch<ConventionOrganizer>(
-          `/api/editions/${editionId}/collaborators`,
+        const organizer = await $fetch<ConventionOrganizer>(
+          `/api/editions/${editionId}/organizers`,
           {
             method: 'POST',
             body: { userEmail, canEdit },
           }
         )
 
-        // Mettre à jour l'édition locale avec le nouveau collaborateur
+        // Mettre à jour l'édition locale avec le nouveau organisateur
         const editionIndex = this.editions.findIndex((c) => c.id === editionId)
         if (editionIndex !== -1) {
           const ed = this.editions[editionIndex]
-          ;(ed as any).collaborators = (ed as any).collaborators || []
-          ;(ed as any).collaborators.push(collaborator as any)
+          ;(ed as any).organizers = (ed as any).organizers || []
+          ;(ed as any).organizers.push(organizer as any)
         }
 
-        return collaborator
+        return organizer
       } catch (e: unknown) {
         const error = e as HttpError
-        this.error = error.message || error.data?.message || 'Failed to add collaborator'
+        this.error = error.message || error.data?.message || 'Failed to add organizer'
         throw e
       }
     },
 
-    async removeCollaborator(editionId: number, collaboratorId: number) {
+    async removeOrganizer(editionId: number, organizerId: number) {
       this.error = null
       try {
-        await $fetch(`/api/editions/${editionId}/collaborators/${collaboratorId}`, {
+        await $fetch(`/api/editions/${editionId}/organizers/${organizerId}`, {
           method: 'DELETE',
         })
 
@@ -321,13 +321,13 @@ export const useEditionStore = defineStore('editions', {
         const editionIndex = this.editions.findIndex((c) => c.id === editionId)
         if (editionIndex !== -1) {
           const ed = this.editions[editionIndex] as any
-          if (ed?.collaborators) {
-            ed.collaborators = ed.collaborators.filter((c: any) => c.id !== collaboratorId)
+          if (ed?.organizers) {
+            ed.organizers = ed.organizers.filter((c: any) => c.id !== organizerId)
           }
         }
       } catch (e: unknown) {
         const error = e as HttpError
-        this.error = error.message || error.data?.message || 'Failed to remove collaborator'
+        this.error = error.message || error.data?.message || 'Failed to remove organizer'
         throw e
       }
     },
@@ -346,8 +346,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Vérifier si la convention a des collaborateurs
-      if (!edition.convention || !edition.convention.collaborators) {
+      // Vérifier si la convention a des organisateurs
+      if (!edition.convention || !edition.convention.organizers) {
         return false
       }
 
@@ -356,8 +356,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Collaborateur avec droits explicites
-      return edition.convention.collaborators.some((collab) => {
+      // Organisateur avec droits explicites
+      return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
         // Droit global d'éditer la convention implique édition des éditions
         if (collab.rights?.editConvention || collab.rights?.editAllEditions) return true
@@ -384,8 +384,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Vérifier si la convention a des collaborateurs
-      if (!edition.convention || !edition.convention.collaborators) {
+      // Vérifier si la convention a des organisateurs
+      if (!edition.convention || !edition.convention.organizers) {
         return false
       }
 
@@ -394,8 +394,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Collaborateur avec droits explicites
-      return edition.convention.collaborators.some((collab) => {
+      // Organisateur avec droits explicites
+      return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
         if (collab.rights?.deleteConvention || collab.rights?.deleteAllEditions) return true
         if (collab.perEditionRights) {
@@ -420,8 +420,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Vérifier si la convention a des collaborateurs
-      if (!edition.convention || !edition.convention.collaborators) {
+      // Vérifier si la convention a des organisateurs
+      if (!edition.convention || !edition.convention.organizers) {
         return false
       }
 
@@ -430,8 +430,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Collaborateur avec droits explicites
-      return edition.convention.collaborators.some((collab) => {
+      // Organisateur avec droits explicites
+      return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
         // Droit global de gérer les bénévoles
         if (collab.rights?.manageVolunteers) return true
@@ -460,8 +460,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Vérifier si la convention a des collaborateurs
-      if (!edition.convention || !edition.convention.collaborators) {
+      // Vérifier si la convention a des organisateurs
+      if (!edition.convention || !edition.convention.organizers) {
         return false
       }
 
@@ -470,8 +470,8 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Collaborateur avec droits explicites
-      return edition.convention.collaborators.some((collab) => {
+      // Organisateur avec droits explicites
+      return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
         // Droit global de gérer les artistes
         if (collab.rights?.manageArtists) return true
@@ -486,7 +486,7 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
-    // Vérifier si l'utilisateur peut gérer les collaborateurs d'une convention
+    // Vérifier si l'utilisateur peut gérer les organisateurs d'une convention
     canManageOrganizers(edition: Edition, userId: number): boolean {
       const authStore = useAuthStore()
 
@@ -495,46 +495,46 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Vérifier si la convention a des collaborateurs
-      if (!edition.convention || !edition.convention.collaborators) {
-        // Si pas de collaborateurs et c'est l'auteur de la convention, il peut gérer
+      // Vérifier si la convention a des organisateurs
+      if (!edition.convention || !edition.convention.organizers) {
+        // Si pas de organisateurs et c'est l'auteur de la convention, il peut gérer
         return edition.convention?.authorId && edition.convention.authorId === userId
       }
 
-      // L'auteur de la convention peut toujours gérer les collaborateurs
+      // L'auteur de la convention peut toujours gérer les organisateurs
       if (edition.convention.authorId && edition.convention.authorId === userId) {
         return true
       }
 
-      // Collaborateur avec droit explicite de gestion des collaborateurs
-      return edition.convention.collaborators.some((collab) => {
+      // Organisateur avec droit explicite de gestion des organisateurs
+      return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
-        // Droit global de gérer les collaborateurs
-        if (collab.rights?.manageCollaborators) return true
+        // Droit global de gérer les organisateurs
+        if (collab.rights?.manageOrganizers) return true
         return false
       })
     },
 
-    // Vérifier si l'utilisateur est collaborateur d'une convention
-    isCollaborator(edition: Edition, userId: number): boolean {
+    // Vérifier si l'utilisateur est organisateur d'une convention
+    isOrganizer(edition: Edition, userId: number): boolean {
       const authStore = useAuthStore()
 
-      // Les admins globaux en mode admin sont considérés comme collaborateurs
+      // Les admins globaux en mode admin sont considérés comme organisateurs
       if (authStore.isAdminModeActive) {
         return true
       }
 
-      // L'auteur de la convention est toujours collaborateur
+      // L'auteur de la convention est toujours organisateur
       if (edition.convention?.authorId && edition.convention.authorId === userId) {
         return true
       }
 
-      // Vérifier si l'utilisateur est dans la liste des collaborateurs
-      if (!edition.convention?.collaborators) {
+      // Vérifier si l'utilisateur est dans la liste des organisateurs
+      if (!edition.convention?.organizers) {
         return false
       }
 
-      return edition.convention.collaborators.some((collab) => collab.user.id === userId)
+      return edition.convention.organizers.some((collab) => collab.user.id === userId)
     },
 
     // Vérifier si l'utilisateur est responsable d'au moins une équipe de bénévoles

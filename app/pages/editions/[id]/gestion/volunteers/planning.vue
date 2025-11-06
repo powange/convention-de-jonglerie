@@ -351,8 +351,8 @@ const canAccess = computed(() => {
     return true
   }
 
-  // Tous les collaborateurs de la convention (même sans droits)
-  if (isCollaborator.value) {
+  // Tous les organisateurs de la convention (même sans droits)
+  if (isOrganizer.value) {
     return true
   }
 
@@ -672,9 +672,9 @@ const canEdit = computed(() => {
   return editionStore.canEditEdition(edition.value, authStore.user.id)
 })
 
-const isCollaborator = computed(() => {
+const isOrganizer = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.isCollaborator(edition.value, authStore.user.id)
+  return editionStore.isOrganizer(edition.value, authStore.user.id)
 })
 
 // Charger l'édition si nécessaire

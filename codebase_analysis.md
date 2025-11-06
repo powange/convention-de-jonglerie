@@ -69,7 +69,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 2. **Modularité:** Séparation claire frontend/backend/database
 3. **Type Safety:** TypeScript strict sur tout le projet
 4. **API-first:** Endpoints RESTful bien définis
-5. **Permissions granulaires:** Système de droits collaborateur avancé
+5. **Permissions granulaires:** Système de droits organisateur avancé
 
 ---
 
@@ -82,7 +82,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 │   ├── assets/                   # Assets statiques (CSS, images)
 │   ├── components/               # Composants Vue réutilisables
 │   │   ├── admin/               # Composants admin
-│   │   ├── collaborator/        # Gestion collaborateurs
+│   │   ├── organizer/        # Gestion organisateurs
 │   │   ├── convention/          # Composants conventions
 │   │   ├── edition/             # Composants éditions
 │   │   │   ├── carpool/        # Covoiturage
@@ -224,7 +224,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```prisma
 - id, name, description, logo, email
 - authorId (créateur)
-- Relations: éditions, collaborateurs
+- Relations: éditions, organisateurs
 ```
 
 #### 3. **Edition** (Éditions d'une convention)
@@ -238,17 +238,17 @@ Plateforme permettant aux jongleurs et organisateurs de:
 - Relations: convention, créateur, posts, bénévoles, billeterie
 ```
 
-#### 4. **ConventionCollaborator** (Système de permissions)
+#### 4. **ConventionOrganizer** (Système de permissions)
 
 ```prisma
 - Droits globaux: canEditConvention, canDeleteConvention,
-  canManageCollaborators, canAddEdition, canEditAllEditions,
+  canManageOrganizers, canAddEdition, canEditAllEditions,
   canDeleteAllEditions, canManageVolunteers
 - title (titre personnalisable)
-- Relations: EditionCollaboratorPermission (droits par édition)
+- Relations: EditionOrganizerPermission (droits par édition)
 ```
 
-#### 5. **EditionCollaboratorPermission**
+#### 5. **EditionOrganizerPermission**
 
 ```prisma
 - Permissions ciblées par édition
@@ -352,15 +352,15 @@ POST   /api/conventions/:id/claim              # Revendication
 POST   /api/conventions/:id/claim/verify
 ```
 
-#### Collaborateurs (`/api/conventions/:id/collaborators`)
+#### Organisateurs (`/api/conventions/:id/organizers`)
 
 ```
-GET    /api/conventions/:id/collaborators
-POST   /api/conventions/:id/collaborators
-PUT    /api/conventions/:id/collaborators/:collaboratorId
-PATCH  /api/conventions/:id/collaborators/:collaboratorId/rights
-DELETE /api/conventions/:id/collaborators/:collaboratorId
-GET    /api/conventions/:id/collaborators/history
+GET    /api/conventions/:id/organizers
+POST   /api/conventions/:id/organizers
+PUT    /api/conventions/:id/organizers/:organizerId
+PATCH  /api/conventions/:id/organizers/:organizerId/rights
+DELETE /api/conventions/:id/organizers/:organizerId
+GET    /api/conventions/:id/organizers/history
 ```
 
 #### Éditions (`/api/editions`)
@@ -499,7 +499,7 @@ components/
 │   └── LogoJc.vue
 ├── convention/
 │   ├── ConventionForm.vue
-│   └── CollaboratorManager.vue
+│   └── OrganizerManager.vue
 ├── edition/
 │   ├── EditionCard.vue
 │   ├── EditionForm.vue
@@ -592,7 +592,7 @@ actions: {
 
 - `useReturnTo()`: Gestion redirections post-auth
 - `useDateFormat()`: Formatage dates i18n
-- `useCollaboratorTitle()`: Titres collaborateurs
+- `useOrganizerTitle()`: Titres organisateurs
 - `useNotificationStream()`: SSE notifications temps réel
 
 ### Middleware (`app/middleware/`)
@@ -646,12 +646,12 @@ actions: {
 **Système granulaire à 2 niveaux:**
 
 1. **Global admin:** `isGlobalAdmin` (accès dashboard admin)
-2. **Collaborateur:** Droits par convention + par édition
+2. **Organisateur:** Droits par convention + par édition
 
-**Droits collaborateur:**
+**Droits organisateur:**
 
 - `editConvention`, `deleteConvention`
-- `manageCollaborators`
+- `manageOrganizers`
 - `addEdition`, `editAllEditions`, `deleteAllEditions`
 - `manageVolunteers`
 
@@ -675,7 +675,7 @@ actions: {
 
 ### 2. Système collaboratif
 
-- Ajout collaborateurs par email/pseudo
+- Ajout organisateurs par email/pseudo
 - Permissions granulaires (7 droits globaux)
 - Permissions par édition (canEdit/canDelete/canManageVolunteers)
 - Historique des changements de droits
@@ -1040,18 +1040,18 @@ USER
   │                                 - Impersonation
   │                                 - Logs, backup
   │
-  └─ ConventionCollaborator
+  └─ ConventionOrganizer
        │
        ├─ DROITS GLOBAUX (sur toute la convention)
        │   ├─ canEditConvention
        │   ├─ canDeleteConvention
-       │   ├─ canManageCollaborators
+       │   ├─ canManageOrganizers
        │   ├─ canAddEdition
        │   ├─ canEditAllEditions ────────┐
        │   ├─ canDeleteAllEditions ───────┼──> S'applique à TOUTES éditions
        │   └─ canManageVolunteers ────────┘
        │
-       └─ DROITS PAR ÉDITION (EditionCollaboratorPermission)
+       └─ DROITS PAR ÉDITION (EditionOrganizerPermission)
            ├─ Edition #10: {canEdit: true}
            ├─ Edition #11: {canEdit: true, canDelete: true}
            └─ Edition #12: {canManageVolunteers: true}

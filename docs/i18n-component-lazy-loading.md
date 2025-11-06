@@ -105,12 +105,12 @@ await useLazyI18n('permissions')
   "permissions": {
     "editConvention": "Modifier la convention",
     "deleteConvention": "Supprimer la convention",
-    "manageCollaborators": "Gérer les collaborateurs"
+    "manageOrganizers": "Gérer les organisateurs"
   }
 }
 ```
 
-**Composant** - `app/components/collaborator/RightsFields.vue` :
+**Composant** - `app/components/organizer/RightsFields.vue` :
 
 ```vue
 <template>

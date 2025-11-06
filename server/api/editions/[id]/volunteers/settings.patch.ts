@@ -130,7 +130,7 @@ export default wrapApiHandler(
       throw error
     }
 
-    // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
+    // Permission: auteur convention ou organisateur avec droit gestion bénévoles
     const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       errorMessage: 'Edition introuvable',
       select: { conventionId: true, volunteersMode: true },

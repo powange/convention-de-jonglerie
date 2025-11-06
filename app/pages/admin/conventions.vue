@@ -174,8 +174,8 @@
                 {{ $t('admin.editions').toLowerCase() }}
               </UBadge>
               <UBadge color="neutral" variant="soft" size="sm">
-                {{ (convention as any)._count?.collaborators || 0 }}
-                {{ $t('admin.collaborators').toLowerCase() }}
+                {{ (convention as any)._count?.organizers || 0 }}
+                {{ $t('admin.organizers').toLowerCase() }}
               </UBadge>
               <UDropdownMenu
                 :items="[
@@ -242,26 +242,26 @@
               </p>
             </div>
 
-            <!-- Collaborateurs -->
-            <div v-if="convention.collaborators.length > 0" class="mb-4">
+            <!-- Organisateurs -->
+            <div v-if="convention.organizers.length > 0" class="mb-4">
               <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-                {{ $t('admin.collaborators') }} ({{ convention.collaborators.length }})
+                {{ $t('admin.organizers') }} ({{ convention.organizers.length }})
               </h5>
               <div class="flex flex-wrap gap-3">
                 <div
-                  v-for="collaborator in convention.collaborators"
-                  :key="collaborator.id"
+                  v-for="organizer in convention.organizers"
+                  :key="organizer.id"
                   class="bg-gray-100 dark:bg-gray-700/50 rounded-lg px-3 py-2"
                 >
                   <UiUserDisplayForAdmin
-                    :user="collaborator.user"
+                    :user="organizer.user"
                     size="xs"
                     :border="false"
                     :show-email="false"
                   >
-                    <template v-if="collaborator.title" #badge>
+                    <template v-if="organizer.title" #badge>
                       <UBadge color="neutral" variant="subtle" size="xs">
-                        {{ collaborator.title }}
+                        {{ organizer.title }}
                       </UBadge>
                     </template>
                   </UiUserDisplayForAdmin>
@@ -414,8 +414,8 @@
               </UBadge>
               <UBadge color="neutral" variant="soft">
                 {{
-                  $t('admin.collaborators_count', {
-                    count: (convention as any)._count?.collaborators || 0,
+                  $t('admin.organizers_count', {
+                    count: (convention as any)._count?.organizers || 0,
                   })
                 }}
               </UBadge>
@@ -479,33 +479,28 @@
             </p>
           </div>
 
-          <!-- Liste des collaborateurs -->
-          <div v-if="convention.collaborators.length > 0" class="mt-4">
+          <!-- Liste des organisateurs -->
+          <div v-if="convention.organizers.length > 0" class="mt-4">
             <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-              {{ $t('admin.collaborators') }} ({{ convention.collaborators.length }})
+              {{ $t('admin.organizers') }} ({{ convention.organizers.length }})
             </h5>
             <div class="flex flex-wrap gap-2">
               <div
-                v-for="collaborator in convention.collaborators"
-                :key="collaborator.id"
+                v-for="organizer in convention.organizers"
+                :key="organizer.id"
                 class="flex items-center gap-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2"
               >
-                <UiUserAvatar :user="collaborator.user" size="xs" />
+                <UiUserAvatar :user="organizer.user" size="xs" />
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {{ formatAuthorName(collaborator.user) }}
+                    {{ formatAuthorName(organizer.user) }}
                   </div>
                   <div class="flex items-center gap-1 text-xs text-gray-500">
-                    <UBadge
-                      v-if="(collaborator as any).canEdit"
-                      color="info"
-                      variant="soft"
-                      size="xs"
-                    >
+                    <UBadge v-if="(organizer as any).canEdit" color="info" variant="soft" size="xs">
                       {{ $t('admin.can_edit') }}
                     </UBadge>
                     <UBadge
-                      v-if="collaborator.canManageVolunteers"
+                      v-if="organizer.canManageVolunteers"
                       color="success"
                       variant="soft"
                       size="xs"
@@ -513,7 +508,7 @@
                       {{ $t('admin.can_manage_volunteers') }}
                     </UBadge>
                     <UBadge
-                      v-if="(collaborator as any).canManageEditions"
+                      v-if="(organizer as any).canManageEditions"
                       color="primary"
                       variant="soft"
                       size="xs"
@@ -724,7 +719,7 @@
           ? t('admin.pages.conventions.confirm_delete_convention_permanently', {
               name: conventionToDelete.name,
               editionsCount: conventionToDelete.editions?.length || 0,
-              collaboratorsCount: (conventionToDelete as any)?._count?.collaborators || 0,
+              organizersCount: (conventionToDelete as any)?._count?.organizers || 0,
             })
           : ''
       "

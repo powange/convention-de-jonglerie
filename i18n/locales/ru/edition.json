@@ -72,26 +72,26 @@
       "seats_min": "Как минимум 1 место"
     }
   },
-  "collaborators": {
-    "collaborator_added": "Организатор добавлен",
-    "collaborator_removed": "Организатор удален",
-    "collaborator_updated": "Организатор обновлен",
+  "organizers": {
+    "organizer_added": "Организатор добавлен",
+    "organizer_removed": "Организатор удален",
+    "organizer_updated": "Организатор обновлен",
     "confirm_remove": "Вы уверены, что хотите удалить этого организатора?",
-    "edit_collaborator": "Редактировать организатора",
+    "edit_organizer": "Редактировать организатора",
     "list": "Список организаторов",
     "manage": "Управление организаторами",
     "manage_description": "Управление организаторами и их правами для этого издания",
-    "no_collaborators": "Нет организаторов",
+    "no_organizers": "Нет организаторов",
     "page_description": "Управление членами организационной команды и их разрешениями",
     "rights": "Права",
     "title": "Организаторы"
   },
   "conventions": {
-    "add_collaborator": "Добавить организатора",
+    "add_organizer": "Добавить организатора",
     "add_edition": "Добавить издание",
     "analytics_access": "Доступ к аналитике",
     "analytics_access_desc": "Отслеживайте эффективность и вовлеченность ваших изданий",
-    "as_collaborator": "Как организатор",
+    "as_organizer": "Как организатор",
     "as_creator": "Как создатель",
     "cannot_load_conventions": "Невозможно загрузить ваши конвенции",
     "claim": {
@@ -118,7 +118,7 @@
       "verification_success_description": "Теперь вы владелец этой конвенции.",
       "verify": "Проверить"
     },
-    "collaborators": "Организаторы",
+    "organizers": "Организаторы",
     "confirm_delete_convention": "Вы уверены, что хотите удалить эту конвенцию?",
     "convention_deleted": "Конвенция удалена",
     "convention_deleted_success": "Конвенция успешно удалена",
@@ -131,7 +131,7 @@
     "created_at": "Создано",
     "delete": "Удалить конвенцию",
     "edit": "Редактировать конвенцию",
-    "edit_collaborator_rights": "Редактировать права организатора",
+    "edit_organizer_rights": "Редактировать права организатора",
     "edit_permissions": "Права редактирования",
     "edit_permissions_desc": "Изменяйте конвенции согласно вашим разрешениям",
     "editions": "Издания",
@@ -140,8 +140,8 @@
     "granular_rights": "Детальные права",
     "granular_rights_desc": "Специфические разрешения для каждого издания или глобальные согласно вашим потребностям",
     "logo_alt": "Логотип {name}",
-    "manage_collaborators": "Управление организаторами",
-    "manage_collaborators_desc": "Приглашайте и управляйте членами вашей организационной команды",
+    "manage_organizers": "Управление организаторами",
+    "manage_organizers_desc": "Приглашайте и управляйте членами вашей организационной команды",
     "manage_editions": "Управление изданиями",
     "manage_editions_desc": "Создавайте, редактируйте и публикуйте различные издания ваших конвенций",
     "manage_volunteers": "Управление волонтерами",

@@ -28,7 +28,7 @@ export default wrapApiHandler(
         creator: { select: { id: true, pseudo: true, email: true } },
         convention: {
           include: {
-            collaborators: {
+            organizers: {
               include: {
                 user: { select: { id: true, pseudo: true, email: true } },
               },
@@ -49,7 +49,7 @@ export default wrapApiHandler(
       },
       convention: {
         ...updatedEdition.convention,
-        collaborators: updatedEdition.convention.collaborators.map((c) => ({
+        organizers: updatedEdition.convention.organizers.map((c) => ({
           ...c,
           user: {
             id: c.user.id,
@@ -64,7 +64,7 @@ export default wrapApiHandler(
     // @ts-expect-error suppression email propriété intermédiaire
     delete sanitized.creator.email
     // @ts-expect-error suppression email propriété intermédiaire
-    sanitized.convention.collaborators.forEach((c) => delete c.user.email)
+    sanitized.convention.organizers.forEach((c) => delete c.user.email)
 
     return sanitized
   },

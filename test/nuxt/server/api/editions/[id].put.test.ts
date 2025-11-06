@@ -56,7 +56,7 @@ describe('/api/editions/[id] PUT', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 1,
-      collaborators: [],
+      organizers: [],
     },
   }
 
@@ -162,7 +162,7 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -213,15 +213,15 @@ describe('/api/editions/[id] PUT', () => {
     expect(prismaMock.edition.update).toHaveBeenCalled()
   })
 
-  it('devrait permettre à un collaborateur admin de modifier', async () => {
-    const collaboratorEdition = {
+  it('devrait permettre à un organisateur admin de modifier', async () => {
+    const organizerEdition = {
       ...mockEdition,
       creatorId: 2,
       creator: { id: 2 },
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [
+        organizers: [
           {
             userId: 1,
             canEditConvention: true,
@@ -233,8 +233,8 @@ describe('/api/editions/[id] PUT', () => {
     }
 
     global.getRouterParam.mockReturnValue('1')
-    prismaMock.edition.findUnique.mockResolvedValue(collaboratorEdition)
-    prismaMock.edition.update.mockResolvedValue(collaboratorEdition)
+    prismaMock.edition.findUnique.mockResolvedValue(organizerEdition)
+    prismaMock.edition.update.mockResolvedValue(organizerEdition)
 
     global.readBody.mockResolvedValue({ name: 'Edition Modifiée' })
 
@@ -250,7 +250,7 @@ describe('/api/editions/[id] PUT', () => {
     expect(result).toBeDefined()
   })
 
-  it('devrait permettre à un collaborateur modérateur de modifier', async () => {
+  it('devrait permettre à un organisateur modérateur de modifier', async () => {
     const moderatorEdition = {
       ...mockEdition,
       creatorId: 2,
@@ -258,7 +258,7 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [
+        organizers: [
           {
             userId: 1,
             canEditConvention: true,
@@ -285,7 +285,7 @@ describe('/api/editions/[id] PUT', () => {
     expect(result).toBeDefined()
   })
 
-  it('devrait rejeter un collaborateur viewer', async () => {
+  it('devrait rejeter un organisateur viewer', async () => {
     const viewerEdition = {
       ...mockEdition,
       creatorId: 2,
@@ -293,7 +293,7 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [], // L'API filtre les VIEWER, donc ils n'apparaissent pas dans les résultats
+        organizers: [], // L'API filtre les VIEWER, donc ils n'apparaissent pas dans les résultats
       },
     }
 

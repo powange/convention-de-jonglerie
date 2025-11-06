@@ -48,13 +48,13 @@ describe('useEditionStore', () => {
     creatorId: 1,
     conventionId: 1,
     favoritedBy: [],
-    collaborators: [],
+    organizers: [],
     creator: mockUser,
     convention: {
       id: 1,
       name: 'Test Convention',
       authorId: 1,
-      collaborators: [],
+      organizers: [],
     },
   }
 
@@ -359,8 +359,8 @@ describe('useEditionStore', () => {
     })
   })
 
-  describe('Actions collaborateurs', () => {
-    const mockCollaborator = {
+  describe('Actions organisateurs', () => {
+    const mockOrganizer = {
       id: 1,
       user: mockUser,
       role: 'MODERATOR',
@@ -369,65 +369,65 @@ describe('useEditionStore', () => {
       conventionId: 1,
     }
 
-    describe('getCollaborators', () => {
-      it('devrait récupérer les collaborateurs', async () => {
-        vi.mocked($fetch).mockResolvedValue([mockCollaborator])
+    describe('getOrganizers', () => {
+      it('devrait récupérer les organisateurs', async () => {
+        vi.mocked($fetch).mockResolvedValue([mockOrganizer])
 
-        const result = await editionStore.getCollaborators(1)
+        const result = await editionStore.getOrganizers(1)
 
-        expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators')
-        expect(result).toEqual([mockCollaborator])
+        expect($fetch).toHaveBeenCalledWith('/api/editions/1/organizers')
+        expect(result).toEqual([mockOrganizer])
       })
 
       it('devrait propager les erreurs', async () => {
         const mockError = { message: 'Unauthorized' }
         vi.mocked($fetch).mockRejectedValue(mockError)
 
-        await expect(editionStore.getCollaborators(1)).rejects.toEqual(mockError)
+        await expect(editionStore.getOrganizers(1)).rejects.toEqual(mockError)
         expect(editionStore.error).toBe('Unauthorized')
       })
     })
 
-    describe('addCollaborator', () => {
+    describe('addOrganizer', () => {
       beforeEach(() => {
-        editionStore.editions = [{ ...mockEdition, collaborators: [] }]
+        editionStore.editions = [{ ...mockEdition, organizers: [] }]
       })
 
-      it('devrait ajouter un collaborateur', async () => {
-        const collaboratorCopy = { ...mockCollaborator }
-        vi.mocked($fetch).mockResolvedValue(collaboratorCopy)
+      it('devrait ajouter un organisateur', async () => {
+        const organizerCopy = { ...mockOrganizer }
+        vi.mocked($fetch).mockResolvedValue(organizerCopy)
 
-        const result = await editionStore.addCollaborator(1, 'collab@test.com', true)
+        const result = await editionStore.addOrganizer(1, 'collab@test.com', true)
 
-        expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators', {
+        expect($fetch).toHaveBeenCalledWith('/api/editions/1/organizers', {
           method: 'POST',
           body: { userEmail: 'collab@test.com', canEdit: true },
         })
-        expect(result).toEqual(collaboratorCopy)
-        expect(editionStore.editions[0].collaborators!.length).toBe(1)
-        expect(editionStore.editions[0].collaborators![0]).toEqual(collaboratorCopy)
+        expect(result).toEqual(organizerCopy)
+        expect(editionStore.editions[0].organizers!.length).toBe(1)
+        expect(editionStore.editions[0].organizers![0]).toEqual(organizerCopy)
       })
     })
 
-    describe('removeCollaborator', () => {
+    describe('removeOrganizer', () => {
       beforeEach(() => {
         editionStore.editions = [
           {
             ...mockEdition,
-            collaborators: [mockCollaborator],
+            organizers: [mockOrganizer],
           },
         ]
       })
 
-      it('devrait supprimer un collaborateur', async () => {
+      it('devrait supprimer un organisateur', async () => {
         vi.mocked($fetch).mockResolvedValue(undefined)
 
-        await editionStore.removeCollaborator(1, 1)
+        await editionStore.removeOrganizer(1, 1)
 
-        expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators/1', {
+        expect($fetch).toHaveBeenCalledWith('/api/editions/1/organizers/1', {
           method: 'DELETE',
         })
-        expect(editionStore.editions[0].collaborators).toHaveLength(0)
+        expect(editionStore.editions[0].organizers).toHaveLength(0)
       })
     })
   })
@@ -439,7 +439,7 @@ describe('useEditionStore', () => {
         id: 1,
         name: 'Test Convention',
         authorId: 2,
-        collaborators: [
+        organizers: [
           {
             id: 1,
             user: mockUser,
@@ -471,7 +471,7 @@ describe('useEditionStore', () => {
         expect(canEdit).toBe(true)
       })
 
-      it('devrait autoriser les collaborateurs MODERATOR', () => {
+      it('devrait autoriser les organisateurs MODERATOR', () => {
         const canEdit = editionStore.canEditEdition(mockEditionWithConvention, 1)
         expect(canEdit).toBe(true)
       })

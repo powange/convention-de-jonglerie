@@ -7,7 +7,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 
 import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../../server/api/conventions/[id]/collaborators.get'
+import handler from '../../../../../server/api/conventions/[id]/organizers.get'
 
 const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>
 
@@ -22,14 +22,14 @@ const mockEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators GET', () => {
+describe('/api/conventions/[id]/organizers GET', () => {
   beforeEach(() => {
     mockCheckPermission.mockReset()
     prismaMock.conventionOrganizer.findMany.mockReset()
   })
 
-  it('devrait retourner les collaborateurs avec succès', async () => {
-    const mockCollaborators = [
+  it('devrait retourner les organisateurs avec succès', async () => {
+    const mockOrganizers = [
       {
         id: 1,
         addedAt: new Date('2024-01-01'),
@@ -37,7 +37,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
         rights: {
           editConvention: true,
           deleteConvention: true,
-          manageCollaborators: true,
+          manageOrganizers: true,
           addEdition: true,
           editAllEditions: true,
           deleteAllEditions: true,
@@ -60,7 +60,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
         rights: {
           editConvention: false,
           deleteConvention: false,
-          manageCollaborators: false,
+          manageOrganizers: false,
           addEdition: true,
           editAllEditions: true,
           deleteAllEditions: false,
@@ -82,16 +82,16 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       hasPermission: true,
       userRole: 'ADMINISTRATOR',
       isOwner: true,
-      isCollaborator: false,
+      isOrganizer: false,
     })
     // données brutes renvoyées par Prisma avant mapping
-    const raw = mockCollaborators.map((c) => ({
+    const raw = mockOrganizers.map((c) => ({
       id: c.id,
       addedAt: c.addedAt,
       title: c.title,
       canEditConvention: c.rights.editConvention,
       canDeleteConvention: c.rights.deleteConvention,
-      canManageOrganizers: c.rights.manageCollaborators,
+      canManageOrganizers: c.rights.manageOrganizers,
       canAddEdition: c.rights.addEdition,
       canEditAllEditions: c.rights.editAllEditions,
       canDeleteAllEditions: c.rights.deleteAllEditions,
@@ -103,7 +103,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockCollaborators)
+    expect(result).toEqual(mockOrganizers)
     expect(mockCheckPermission).toHaveBeenCalledWith(1, 1)
     expect(prismaMock.conventionOrganizer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { conventionId: 1 } })
@@ -124,7 +124,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       hasPermission: false,
       userRole: undefined,
       isOwner: false,
-      isCollaborator: false,
+      isOrganizer: false,
     })
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
@@ -150,8 +150,8 @@ describe('/api/conventions/[id]/collaborators GET', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
 
-  it('devrait fonctionner pour un collaborateur MODERATOR', async () => {
-    const mockCollaborators = [
+  it('devrait fonctionner pour un organisateur MODERATOR', async () => {
+    const mockOrganizers = [
       {
         id: 1,
         addedAt: new Date(),
@@ -159,7 +159,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
         rights: {
           editConvention: false,
           deleteConvention: false,
-          manageCollaborators: false,
+          manageOrganizers: false,
           addEdition: true,
           editAllEditions: true,
           deleteAllEditions: false,
@@ -174,15 +174,15 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       hasPermission: true,
       userRole: 'MODERATOR',
       isOwner: false,
-      isCollaborator: true,
+      isOrganizer: true,
     })
-    const raw = mockCollaborators.map((c) => ({
+    const raw = mockOrganizers.map((c) => ({
       id: c.id,
       addedAt: c.addedAt,
       title: c.title,
       canEditConvention: c.rights.editConvention,
       canDeleteConvention: c.rights.deleteConvention,
-      canManageOrganizers: c.rights.manageCollaborators,
+      canManageOrganizers: c.rights.manageOrganizers,
       canAddEdition: c.rights.addEdition,
       canEditAllEditions: c.rights.editAllEditions,
       canDeleteAllEditions: c.rights.deleteAllEditions,
@@ -199,16 +199,16 @@ describe('/api/conventions/[id]/collaborators GET', () => {
 
     const result = await handler(eventAsModerator as any)
 
-    expect(result).toEqual(mockCollaborators)
+    expect(result).toEqual(mockOrganizers)
     expect(mockCheckPermission).toHaveBeenCalledWith(1, 2)
   })
 
-  it("devrait retourner un tableau vide s'il n'y a pas de collaborateurs", async () => {
+  it("devrait retourner un tableau vide s'il n'y a pas de organisateurs", async () => {
     mockCheckPermission.mockResolvedValue({
       hasPermission: true,
       userRole: 'ADMINISTRATOR',
       isOwner: true,
-      isCollaborator: false,
+      isOrganizer: false,
     })
     prismaMock.conventionOrganizer.findMany.mockResolvedValue([])
 
@@ -228,7 +228,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       hasPermission: true,
       userRole: 'ADMINISTRATOR',
       isOwner: true,
-      isCollaborator: false,
+      isOrganizer: false,
     })
     prismaMock.conventionOrganizer.findMany.mockResolvedValue([])
 

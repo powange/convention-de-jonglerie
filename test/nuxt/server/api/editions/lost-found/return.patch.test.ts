@@ -148,12 +148,12 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
     })
   })
 
-  it("devrait rejeter si utilisateur n'est pas collaborateur", async () => {
+  it("devrait rejeter si utilisateur n'est pas organisateur", async () => {
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(mockLostFoundItem)
     mockHasPermission.mockResolvedValue(false)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
-      "Vous devez être collaborateur pour modifier le statut d'un objet trouvé"
+      "Vous devez être organisateur pour modifier le statut d'un objet trouvé"
     )
   })
 

@@ -29,7 +29,7 @@ describe('/api/conventions/[id]/editions GET', () => {
       hasPermission: true,
       userRole: 'ADMINISTRATOR',
       isOwner: true,
-      isCollaborator: false,
+      isOrganizer: false,
     })
     const editions = [
       {

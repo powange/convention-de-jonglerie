@@ -103,35 +103,35 @@
             {{ $t('conventions.no_description') }}
           </p>
 
-          <!-- Section collaborateurs -->
+          <!-- Section organisateurs -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ $t('conventions.collaborators') }} ({{ convention.collaborators?.length || 0 }})
+                {{ $t('conventions.organizers') }} ({{ convention.organizers?.length || 0 }})
               </h4>
               <div v-if="canManageOrganizers(convention)" class="flex gap-2">
                 <UButton
                   size="xs"
                   variant="outline"
                   icon="i-heroicons-plus"
-                  @click="openAddCollaboratorModal(convention)"
+                  @click="openAddOrganizerModal(convention)"
                 >
                   {{ $t('common.add') }}
                 </UButton>
               </div>
             </div>
-            <div v-if="convention.collaborators && convention.collaborators.length > 0">
+            <div v-if="convention.organizers && convention.organizers.length > 0">
               <div class="flex flex-wrap gap-3">
                 <div
-                  v-for="collaborator in convention.collaborators"
-                  :key="collaborator.id"
+                  v-for="organizer in convention.organizers"
+                  :key="organizer.id"
                   class="bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  @click="openEditCollaboratorModal(convention, collaborator)"
+                  @click="openEditOrganizerModal(convention, organizer)"
                 >
-                  <UiUserDisplay :user="collaborator.user" size="xs">
-                    <template v-if="collaborator.title" #datetime>
+                  <UiUserDisplay :user="organizer.user" size="xs">
+                    <template v-if="organizer.title" #datetime>
                       <span class="text-xs text-gray-600 dark:text-gray-400">
-                        {{ collaborator.title }}
+                        {{ organizer.title }}
                       </span>
                     </template>
                   </UiUserDisplay>
@@ -178,30 +178,30 @@
       </div>
     </div>
 
-    <!-- Modal d'édition de collaborateur -->
+    <!-- Modal d'édition de organisateur -->
     <UModal
-      v-model:open="editCollaboratorModalOpen"
-      :title="selectedCollaboratorForEdit ? $t('conventions.edit_collaborator_rights') : ''"
+      v-model:open="editOrganizerModalOpen"
+      :title="selectedOrganizerForEdit ? $t('conventions.edit_organizer_rights') : ''"
       size="lg"
     >
       <template #body>
-        <div v-if="selectedCollaboratorForEdit && selectedConventionForEdit" class="space-y-4">
-          <!-- Informations du collaborateur -->
+        <div v-if="selectedOrganizerForEdit && selectedConventionForEdit" class="space-y-4">
+          <!-- Informations du organisateur -->
           <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UiUserAvatar :user="selectedCollaboratorForEdit.user" size="md" />
+            <UiUserAvatar :user="selectedOrganizerForEdit.user" size="md" />
             <div>
-              <h4 class="font-medium">{{ selectedCollaboratorForEdit.user?.pseudo || '' }}</h4>
-              <p v-if="selectedCollaboratorForEdit.title" class="text-sm text-gray-500">
-                {{ selectedCollaboratorForEdit.title }}
+              <h4 class="font-medium">{{ selectedOrganizerForEdit.user?.pseudo || '' }}</h4>
+              <p v-if="selectedOrganizerForEdit.title" class="text-sm text-gray-500">
+                {{ selectedOrganizerForEdit.title }}
               </p>
             </div>
           </div>
 
           <!-- Configuration des droits -->
           <div>
-            <label class="block text-sm font-medium mb-2"> Droits du collaborateur </label>
-            <CollaboratorRightsFields
-              v-model="editCollaboratorRights"
+            <label class="block text-sm font-medium mb-2"> Droits du organisateur </label>
+            <OrganizerRightsFields
+              v-model="editOrganizerRights"
               :editions="(selectedConventionForEdit.editions || []) as any[]"
               :convention-name="selectedConventionForEdit.name"
               size="sm"
@@ -211,22 +211,18 @@
       </template>
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeEditCollaboratorModal">
+          <UButton variant="ghost" @click="closeEditOrganizerModal">
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton color="primary" :loading="savingCollaborator" @click="saveCollaboratorChanges">
+          <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
             {{ $t('common.save') }}
           </UButton>
         </div>
       </template>
     </UModal>
 
-    <!-- Modal d'ajout de collaborateur -->
-    <UModal
-      v-model:open="addCollaboratorModalOpen"
-      :title="$t('conventions.add_collaborator')"
-      size="lg"
-    >
+    <!-- Modal d'ajout de organisateur -->
+    <UModal v-model:open="addOrganizerModalOpen" :title="$t('conventions.add_organizer')" size="lg">
       <template #body>
         <div v-if="selectedConventionForAdd" class="space-y-4">
           <div class="space-y-3">
@@ -234,8 +230,8 @@
             <div>
               <label class="block text-sm font-medium mb-2"> Sélectionner un utilisateur </label>
               <UserSelector
-                v-model="newCollaboratorUser"
-                v-model:search-term="newCollaboratorSearchTerm"
+                v-model="newOrganizerUser"
+                v-model:search-term="newOrganizersearchTerm"
                 :searched-users="searchedUsers"
                 :searching-users="searchingUsers"
                 placeholder="Rechercher un utilisateur..."
@@ -243,10 +239,10 @@
             </div>
 
             <!-- Configuration des droits -->
-            <div v-if="newCollaboratorUser">
-              <label class="block text-sm font-medium mb-2"> Droits du collaborateur </label>
-              <CollaboratorRightsFields
-                v-model="newCollaboratorRights"
+            <div v-if="newOrganizerUser">
+              <label class="block text-sm font-medium mb-2"> Droits du organisateur </label>
+              <OrganizerRightsFields
+                v-model="newOrganizerRights"
                 :editions="(selectedConventionForAdd.editions || []) as any[]"
                 :convention-name="selectedConventionForAdd.name"
                 size="sm"
@@ -257,10 +253,10 @@
       </template>
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeAddCollaboratorModal">
+          <UButton variant="ghost" @click="closeAddOrganizerModal">
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton color="primary" :disabled="!newCollaboratorUser" @click="addCollaborator">
+          <UButton color="primary" :disabled="!newOrganizerUser" @click="addOrganizer">
             {{ $t('common.add') }}
           </UButton>
         </div>
@@ -338,16 +334,16 @@ const { t } = useI18n()
 const conventionsLoading = ref(true)
 const myConventions = ref<Convention[]>([])
 
-// Modal d'édition de collaborateur
-const editCollaboratorModalOpen = ref(false)
+// Modal d'édition de organisateur
+const editOrganizerModalOpen = ref(false)
 const selectedConventionForEdit = ref<Convention | null>(null)
-const selectedCollaboratorForEdit = ref<any>(null)
-const editCollaboratorRights = ref<any>({
+const selectedOrganizerForEdit = ref<any>(null)
+const editOrganizerRights = ref<any>({
   title: null,
   rights: {
     editConvention: false,
     deleteConvention: false,
-    manageCollaborators: false,
+    manageOrganizers: false,
     manageVolunteers: false,
     addEdition: false,
     editAllEditions: false,
@@ -355,19 +351,19 @@ const editCollaboratorRights = ref<any>({
   },
   perEdition: [],
 })
-const savingCollaborator = ref(false)
+const savingOrganizer = ref(false)
 
-// Modal d'ajout de collaborateur
-const addCollaboratorModalOpen = ref(false)
+// Modal d'ajout de organisateur
+const addOrganizerModalOpen = ref(false)
 const selectedConventionForAdd = ref<Convention | null>(null)
-const newCollaboratorUser = ref<any>(null)
-const newCollaboratorSearchTerm = ref('')
-const newCollaboratorRights = ref<any>({
+const newOrganizerUser = ref<any>(null)
+const newOrganizersearchTerm = ref('')
+const newOrganizerRights = ref<any>({
   title: null,
   rights: {
     editConvention: false,
     deleteConvention: false,
-    manageCollaborators: false,
+    manageOrganizers: false,
     manageVolunteers: false,
     addEdition: false,
     editAllEditions: false,
@@ -383,7 +379,7 @@ const searchingUsers = ref(false)
 // Watcher pour la recherche d'utilisateurs
 let searchTimeout: NodeJS.Timeout | null = null
 
-watch(newCollaboratorSearchTerm, (newValue) => {
+watch(newOrganizersearchTerm, (newValue) => {
   if (searchTimeout) {
     clearTimeout(searchTimeout)
   }
@@ -660,12 +656,12 @@ const formatCreatedDate = computed(() => {
   return (dateString: string) => new Date(dateString).toLocaleDateString()
 })
 
-// Fonctions pour gérer les collaborateurs
-const openEditCollaboratorModal = (convention: Convention, collaborator: any) => {
+// Fonctions pour gérer les organisateurs
+const openEditOrganizerModal = (convention: Convention, organizer: any) => {
   if (!canManageOrganizers(convention)) {
     toast.add({
       title: 'Action non autorisée',
-      description: "Vous n'avez pas les droits pour modifier ce collaborateur",
+      description: "Vous n'avez pas les droits pour modifier ce organisateur",
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -673,28 +669,28 @@ const openEditCollaboratorModal = (convention: Convention, collaborator: any) =>
   }
 
   selectedConventionForEdit.value = convention
-  selectedCollaboratorForEdit.value = collaborator
+  selectedOrganizerForEdit.value = organizer
 
-  // Charger les droits actuels du collaborateur
-  editCollaboratorRights.value = {
-    title: collaborator.title || '',
-    rights: { ...collaborator.rights },
-    perEdition: [...(collaborator.perEdition || [])],
+  // Charger les droits actuels du organisateur
+  editOrganizerRights.value = {
+    title: organizer.title || '',
+    rights: { ...organizer.rights },
+    perEdition: [...(organizer.perEdition || [])],
   }
 
-  editCollaboratorModalOpen.value = true
+  editOrganizerModalOpen.value = true
 }
 
-const closeEditCollaboratorModal = () => {
-  editCollaboratorModalOpen.value = false
+const closeEditOrganizerModal = () => {
+  editOrganizerModalOpen.value = false
   selectedConventionForEdit.value = null
-  selectedCollaboratorForEdit.value = null
-  editCollaboratorRights.value = {
+  selectedOrganizerForEdit.value = null
+  editOrganizerRights.value = {
     title: null,
     rights: {
       editConvention: false,
       deleteConvention: false,
-      manageCollaborators: false,
+      manageOrganizers: false,
       manageVolunteers: false,
       addEdition: false,
       editAllEditions: false,
@@ -704,39 +700,39 @@ const closeEditCollaboratorModal = () => {
   }
 }
 
-const saveCollaboratorChanges = async () => {
-  if (!selectedCollaboratorForEdit.value || !selectedConventionForEdit.value) {
+const saveOrganizerChanges = async () => {
+  if (!selectedOrganizerForEdit.value || !selectedConventionForEdit.value) {
     return
   }
 
   try {
-    savingCollaborator.value = true
+    savingOrganizer.value = true
 
     await $fetch(
-      `/api/conventions/${selectedConventionForEdit.value.id}/collaborators/${selectedCollaboratorForEdit.value.id}`,
+      `/api/conventions/${selectedConventionForEdit.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
       {
         method: 'PUT',
         body: {
-          rights: editCollaboratorRights.value.rights,
-          title: editCollaboratorRights.value.title,
-          perEdition: editCollaboratorRights.value.perEdition || [],
+          rights: editOrganizerRights.value.rights,
+          title: editOrganizerRights.value.title,
+          perEdition: editOrganizerRights.value.perEdition || [],
         },
       }
     )
 
     toast.add({
       title: 'Droits mis à jour',
-      description: 'Les droits du collaborateur ont été modifiés avec succès',
+      description: 'Les droits du organisateur ont été modifiés avec succès',
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
 
     // Fermer la modal et recharger les conventions
-    closeEditCollaboratorModal()
+    closeEditOrganizerModal()
     await fetchMyConventions()
   } catch (error: unknown) {
     const httpError = error as HttpError
-    console.error('Error updating collaborator rights:', error)
+    console.error('Error updating organizer rights:', error)
     toast.add({
       title: 'Erreur lors de la mise à jour',
       description: httpError.data?.message || httpError.message || t('errors.server_error'),
@@ -744,21 +740,21 @@ const saveCollaboratorChanges = async () => {
       color: 'error',
     })
   } finally {
-    savingCollaborator.value = false
+    savingOrganizer.value = false
   }
 }
 
-const openAddCollaboratorModal = (convention: Convention) => {
+const openAddOrganizerModal = (convention: Convention) => {
   selectedConventionForAdd.value = convention
   // Réinitialiser les valeurs
-  newCollaboratorUser.value = null
-  newCollaboratorSearchTerm.value = ''
-  newCollaboratorRights.value = {
+  newOrganizerUser.value = null
+  newOrganizersearchTerm.value = ''
+  newOrganizerRights.value = {
     title: null,
     rights: {
       editConvention: false,
       deleteConvention: false,
-      manageCollaborators: false,
+      manageOrganizers: false,
       manageVolunteers: false,
       addEdition: false,
       editAllEditions: false,
@@ -767,45 +763,45 @@ const openAddCollaboratorModal = (convention: Convention) => {
     perEdition: [],
   }
   searchedUsers.value = []
-  addCollaboratorModalOpen.value = true
+  addOrganizerModalOpen.value = true
 }
 
-const closeAddCollaboratorModal = () => {
-  addCollaboratorModalOpen.value = false
+const closeAddOrganizerModal = () => {
+  addOrganizerModalOpen.value = false
   selectedConventionForAdd.value = null
-  newCollaboratorUser.value = null
-  newCollaboratorSearchTerm.value = ''
+  newOrganizerUser.value = null
+  newOrganizersearchTerm.value = ''
   searchedUsers.value = []
 }
 
-const addCollaborator = async () => {
-  if (!newCollaboratorUser.value || !selectedConventionForAdd.value) {
+const addOrganizer = async () => {
+  if (!newOrganizerUser.value || !selectedConventionForAdd.value) {
     return
   }
 
   try {
-    await $fetch(`/api/conventions/${selectedConventionForAdd.value.id}/collaborators`, {
+    await $fetch(`/api/conventions/${selectedConventionForAdd.value.id}/organizers`, {
       method: 'POST',
       body: {
-        userId: newCollaboratorUser.value.id,
-        rights: newCollaboratorRights.value.rights,
-        title: newCollaboratorRights.value.title,
-        perEdition: newCollaboratorRights.value.perEdition || [],
+        userId: newOrganizerUser.value.id,
+        rights: newOrganizerRights.value.rights,
+        title: newOrganizerRights.value.title,
+        perEdition: newOrganizerRights.value.perEdition || [],
       },
     })
 
     toast.add({
-      title: 'Collaborateur ajouté',
+      title: 'Organisateur ajouté',
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
 
     // Fermer la modal et recharger les conventions
-    closeAddCollaboratorModal()
+    closeAddOrganizerModal()
     await fetchMyConventions()
   } catch (error: unknown) {
     const httpError = error as HttpError
-    console.error('Error adding collaborator:', error)
+    console.error('Error adding organizer:', error)
     toast.add({
       title: "Erreur lors de l'ajout",
       description: httpError.data?.message || httpError.message || t('errors.server_error'),
@@ -874,7 +870,7 @@ const fetchMyConventions = async () => {
     myConventions.value = data || []
 
     // Mettre à jour la convention sélectionnée si la modal est ouverte
-    if (selectedConventionForEdit.value && editCollaboratorModalOpen.value) {
+    if (selectedConventionForEdit.value && editOrganizerModalOpen.value) {
       const updatedConvention = myConventions.value.find(
         (c) => c.id === selectedConventionForEdit.value!.id
       )
@@ -932,12 +928,12 @@ function currentUserId() {
 function findCurrentCollab(convention: Convention) {
   const uid = currentUserId()
   if (!uid) return undefined
-  return convention.collaborators?.find((c: any) => c.user.id === uid)
+  return convention.organizers?.find((c: any) => c.user.id === uid)
 }
 const isAuthor = (convention: Convention) =>
   currentUserId() && convention.authorId && convention.authorId === currentUserId()
 const canManageOrganizers = (convention: Convention) =>
-  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.manageCollaborators)
+  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.manageOrganizers)
 const canAddEdition = (convention: Convention) =>
   !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.addEdition)
 const canEditConvention = (convention: Convention) =>

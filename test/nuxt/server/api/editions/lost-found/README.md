@@ -26,7 +26,7 @@ Les tests pour le système d'objets trouvés ont été créés mais nécessitent
 ### Sécurité
 
 - Authentification JWT (cookie et header)
-- Vérification des permissions collaborateur
+- Vérification des permissions organisateur
 - Validation des IDs et paramètres
 
 ### Logique métier

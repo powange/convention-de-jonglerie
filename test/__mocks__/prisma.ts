@@ -24,7 +24,7 @@ export const prismaMock = {
   conventionOrganizer: createModelMock(),
   edition: createModelMock(),
   editionOrganizerPermission: createModelMock(),
-  editionCollaborator: createModelMock(),
+  editionOrganizer: createModelMock(),
   editionPost: createModelMock(),
   editionPostComment: createModelMock(),
   organizerPermissionHistory: createModelMock(),

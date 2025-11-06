@@ -72,26 +72,26 @@
       "seats_min": "Almeno 1 posto"
     }
   },
-  "collaborators": {
-    "collaborator_added": "Organizzatore aggiunto",
-    "collaborator_removed": "Organizzatore rimosso",
-    "collaborator_updated": "Organizzatore aggiornato",
+  "organizers": {
+    "organizer_added": "Organizzatore aggiunto",
+    "organizer_removed": "Organizzatore rimosso",
+    "organizer_updated": "Organizzatore aggiornato",
     "confirm_remove": "Sei sicuro di voler rimuovere questo organizzatore?",
-    "edit_collaborator": "Modifica organizzatore",
+    "edit_organizer": "Modifica organizzatore",
     "list": "Elenco degli organizzatori",
     "manage": "Gestisci organizzatori",
     "manage_description": "Gestisci organizzatori e i loro diritti per questa edizione",
-    "no_collaborators": "Nessun organizzatore",
+    "no_organizers": "Nessun organizzatore",
     "page_description": "Gestisci membri del team organizzatore e i loro permessi",
     "rights": "Diritti",
     "title": "Organizzatori"
   },
   "conventions": {
-    "add_collaborator": "Aggiungi organizzatore",
+    "add_organizer": "Aggiungi organizzatore",
     "add_edition": "Aggiungi edizione",
     "analytics_access": "Accesso alle statistiche",
     "analytics_access_desc": "Monitora le prestazioni e il coinvolgimento delle tue edizioni",
-    "as_collaborator": "Come organizzatore",
+    "as_organizer": "Come organizzatore",
     "as_creator": "Come creatore",
     "cannot_load_conventions": "Impossibile caricare i tuoi convegni",
     "claim": {
@@ -118,7 +118,7 @@
       "verification_success_description": "Ora sei il proprietario di questa convenzione.",
       "verify": "Verifica"
     },
-    "collaborators": "Organizzatori",
+    "organizers": "Organizzatori",
     "confirm_delete_convention": "Sei sicuro di voler eliminare questo convegno?",
     "convention_deleted": "Convegno eliminato",
     "convention_deleted_success": "Il convegno è stato eliminato con successo",
@@ -131,7 +131,7 @@
     "created_at": "Creato il",
     "delete": "Elimina il convegno",
     "edit": "Modifica il convegno",
-    "edit_collaborator_rights": "Modifica diritti dell'organizzatore",
+    "edit_organizer_rights": "Modifica diritti dell'organizzatore",
     "edit_permissions": "Permessi di modifica",
     "edit_permissions_desc": "Modifica i convegni secondo i tuoi permessi",
     "editions": "Edizioni",
@@ -140,8 +140,8 @@
     "granular_rights": "Diritti granulari",
     "granular_rights_desc": "Permessi specifici per edizione o globali secondo le tue esigenze",
     "logo_alt": "Logo di {name}",
-    "manage_collaborators": "Gestire organizzatori",
-    "manage_collaborators_desc": "Invita e gestisci i membri del tuo team organizzativo",
+    "manage_organizers": "Gestire organizzatori",
+    "manage_organizers_desc": "Invita e gestisci i membri del tuo team organizzativo",
     "manage_editions": "Gestire edizioni",
     "manage_editions_desc": "Crea, modifica e pubblica diverse edizioni dei tuoi convegni",
     "manage_volunteers": "Gestire volontari",

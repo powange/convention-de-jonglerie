@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
+import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 
 import type { Prisma } from '@prisma/client'
@@ -44,9 +44,9 @@ export default wrapApiHandler(
           isArchived: false,
         }
       : {
-          // Utilisateur normal ou admin pas en mode admin : conventions où il est auteur OU collaborateur
+          // Utilisateur normal ou admin pas en mode admin : conventions où il est auteur OU organisateur
           isArchived: false,
-          OR: [{ authorId: user.id }, { collaborators: { some: { userId: user.id } } }],
+          OR: [{ authorId: user.id }, { organizers: { some: { userId: user.id } } }],
         }
 
     const conventions = await prisma.convention.findMany({
@@ -59,7 +59,7 @@ export default wrapApiHandler(
             email: true,
           },
         },
-        collaborators: {
+        organizers: {
           include: {
             user: {
               select: {
@@ -87,7 +87,7 @@ export default wrapApiHandler(
       },
     })
 
-    // Transformer les emails en emailHash pour les auteurs et collaborateurs
+    // Transformer les emails en emailHash pour les auteurs et organisateurs
     const transformedConventions = conventions.map((convention) => ({
       ...convention,
       author: convention.author
@@ -99,7 +99,7 @@ export default wrapApiHandler(
             }
           })()
         : null,
-      collaborators: convention.collaborators.map((collab) => ({
+      organizers: convention.organizers.map((collab) => ({
         id: collab.id,
         title: collab.title,
         addedAt: collab.addedAt,
@@ -113,7 +113,7 @@ export default wrapApiHandler(
         rights: {
           editConvention: collab.canEditConvention,
           deleteConvention: collab.canDeleteConvention,
-          manageCollaborators: collab.canManageOrganizers,
+          manageOrganizers: collab.canManageOrganizers,
           manageVolunteers: collab.canManageVolunteers,
           addEdition: collab.canAddEdition,
           editAllEditions: collab.canEditAllEditions,

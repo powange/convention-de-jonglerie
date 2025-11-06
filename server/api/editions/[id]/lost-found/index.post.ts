@@ -19,7 +19,7 @@ export default wrapApiHandler(
       include: {
         convention: {
           include: {
-            collaborators: {
+            organizers: {
               include: { user: true },
             },
           },
@@ -44,12 +44,12 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que l'utilisateur est un collaborateur
+    // Vérifier que l'utilisateur est un organisateur
     const hasPermission = await hasEditionEditPermission(userId, editionId)
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
-        message: 'Vous devez être collaborateur pour ajouter un objet trouvé',
+        message: 'Vous devez être organisateur pour ajouter un objet trouvé',
       })
     }
 

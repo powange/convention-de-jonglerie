@@ -56,7 +56,7 @@ describe('Permissions', () => {
         creatorId: userId, // L'utilisateur est le créateur
         convention: {
           authorId: 999,
-          collaborators: [],
+          organizers: [],
         },
       })
 
@@ -68,7 +68,7 @@ describe('Permissions', () => {
         include: {
           convention: {
             include: {
-              collaborators: true,
+              organizers: true,
             },
           },
         },
@@ -85,7 +85,7 @@ describe('Permissions', () => {
         creatorId: 999,
         convention: {
           authorId: userId, // L'utilisateur est l'auteur de la convention
-          collaborators: [],
+          organizers: [],
         },
       })
 
@@ -94,7 +94,7 @@ describe('Permissions', () => {
       expect(result).toBe(true)
     })
 
-    it("devrait retourner true si l'utilisateur est un collaborateur", async () => {
+    it("devrait retourner true si l'utilisateur est un organisateur", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
       })
@@ -104,9 +104,9 @@ describe('Permissions', () => {
         creatorId: 999,
         convention: {
           authorId: 888,
-          collaborators: [
+          organizers: [
             { userId: 777, role: 'MODERATOR' },
-            { userId: userId, role: 'ADMINISTRATOR' }, // L'utilisateur est collaborateur
+            { userId: userId, role: 'ADMINISTRATOR' }, // L'utilisateur est organisateur
             { userId: 666, role: 'MODERATOR' },
           ],
         },
@@ -127,7 +127,7 @@ describe('Permissions', () => {
         creatorId: 999,
         convention: {
           authorId: 888,
-          collaborators: [
+          organizers: [
             { userId: 777, role: 'MODERATOR' },
             { userId: 666, role: 'ADMINISTRATOR' },
           ],
@@ -161,7 +161,7 @@ describe('Permissions', () => {
         creatorId: userId,
         convention: {
           authorId: 888,
-          collaborators: [],
+          organizers: [],
         },
       })
 
@@ -170,7 +170,7 @@ describe('Permissions', () => {
       expect(result).toBe(true) // Car creatorId === userId
     })
 
-    it('devrait gérer les cas avec des collaborateurs vides', async () => {
+    it('devrait gérer les cas avec des organisateurs vides', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
       })
@@ -180,7 +180,7 @@ describe('Permissions', () => {
         creatorId: 999,
         convention: {
           authorId: 888,
-          collaborators: [], // Pas de collaborateurs
+          organizers: [], // Pas de organisateurs
         },
       })
 
@@ -201,8 +201,8 @@ describe('Permissions', () => {
         creatorId: testUser, // L'utilisateur est créateur
         convention: {
           authorId: testUser, // ET auteur
-          collaborators: [
-            { userId: testUser, role: 'ADMINISTRATOR' }, // ET collaborateur
+          organizers: [
+            { userId: testUser, role: 'ADMINISTRATOR' }, // ET organisateur
           ],
         },
       })
@@ -250,7 +250,7 @@ describe('Permissions', () => {
         creatorId: 999,
         convention: {
           authorId: 888,
-          collaborators: [],
+          organizers: [],
         },
       })
 
@@ -272,7 +272,7 @@ describe('Permissions', () => {
         creatorId: userId,
         convention: {
           authorId: 999,
-          collaborators: [],
+          organizers: [],
         },
       })
 
@@ -296,7 +296,7 @@ describe('Permissions', () => {
           user: { isGlobalAdmin: false },
           edition: {
             creatorId: 1,
-            convention: { authorId: 999, collaborators: [] },
+            convention: { authorId: 999, organizers: [] },
           },
           expected: true,
         },
@@ -305,18 +305,18 @@ describe('Permissions', () => {
           user: { isGlobalAdmin: false },
           edition: {
             creatorId: 999,
-            convention: { authorId: 1, collaborators: [] },
+            convention: { authorId: 1, organizers: [] },
           },
           expected: true,
         },
         {
-          name: 'Collaborateur',
+          name: 'Organisateur',
           user: { isGlobalAdmin: false },
           edition: {
             creatorId: 999,
             convention: {
               authorId: 888,
-              collaborators: [{ userId: 1, role: 'MODERATOR' }],
+              organizers: [{ userId: 1, role: 'MODERATOR' }],
             },
           },
           expected: true,
@@ -326,7 +326,7 @@ describe('Permissions', () => {
           user: { isGlobalAdmin: false },
           edition: {
             creatorId: 999,
-            convention: { authorId: 888, collaborators: [] },
+            convention: { authorId: 888, organizers: [] },
           },
           expected: false,
         },

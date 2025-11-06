@@ -176,8 +176,8 @@
                 </a>
               </p>
 
-              <!-- Collaborateurs -->
-              <div v-if="getAllCollaborators(edition).length > 0" class="pt-2">
+              <!-- Organisateurs -->
+              <div v-if="getAllOrganizers(edition).length > 0" class="pt-2">
                 <div class="flex items-center gap-2 mb-2">
                   <UIcon name="i-heroicons-users" class="text-gray-400" />
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
@@ -186,20 +186,20 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                   <div
-                    v-for="collaborator in getAllCollaborators(edition)"
-                    :key="collaborator.id"
+                    v-for="organizer in getAllOrganizers(edition)"
+                    :key="organizer.id"
                     class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
-                    :title="collaboratorTitleTooltip(collaborator)"
+                    :title="organizerTitleTooltip(organizer)"
                   >
-                    <UiUserAvatar :user="collaborator.user" size="xs" />
-                    <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
+                    <UiUserAvatar :user="organizer.user" size="xs" />
+                    <span class="text-gray-700 dark:text-gray-300">{{ organizer.pseudo }}</span>
                     <UBadge
-                      v-if="displayCollaboratorBadge(collaborator)"
+                      v-if="displayOrganizerBadge(organizer)"
                       size="xs"
                       color="neutral"
                       variant="soft"
                     >
-                      {{ displayCollaboratorBadge(collaborator) }}
+                      {{ displayOrganizerBadge(organizer) }}
                     </UBadge>
                   </div>
                 </div>
@@ -530,7 +530,7 @@ const isAttending = computed(() => (_editionId: number) => {
 const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false
   if (edition.value.creatorId && edition.value.creatorId === authStore.user.id) return true
-  const collab = edition.value.convention?.collaborators?.find(
+  const collab = edition.value.convention?.organizers?.find(
     (c: any) => authStore.user && c.user.id === authStore.user.id
   )
   if (!collab) return false
@@ -538,7 +538,7 @@ const canManageEdition = computed(() => {
   return !!(
     rights.editAllEditions ||
     rights.deleteAllEditions ||
-    rights.manageCollaborators ||
+    rights.manageOrganizers ||
     rights.editConvention
   )
 })
@@ -625,17 +625,17 @@ const getActiveServicesByCategory = (edition: Edition) => {
     .filter((category) => category.services.length > 0)
 }
 
-// Obtenir tous les collaborateurs en préservant éventuel titre custom
-const getAllCollaborators = (edition: Edition) => {
+// Obtenir tous les organisateurs en préservant éventuel titre custom
+const getAllOrganizers = (edition: Edition) => {
   if (!edition) return []
 
-  const collaborators: any[] = []
+  const organizers: any[] = []
 
-  // Ajouter les collaborateurs de la convention
-  if (edition.convention?.collaborators) {
-    edition.convention.collaborators.forEach((collab) => {
-      if (!collaborators.some((c) => c.id === collab.user.id)) {
-        collaborators.push({
+  // Ajouter les organisateurs de la convention
+  if (edition.convention?.organizers) {
+    edition.convention.organizers.forEach((collab) => {
+      if (!organizers.some((c) => c.id === collab.user.id)) {
+        organizers.push({
           id: collab.user.id,
           user: collab.user,
           pseudo: collab.user.pseudo,
@@ -647,18 +647,18 @@ const getAllCollaborators = (edition: Edition) => {
     })
   }
 
-  return collaborators
+  return organizers
 }
 
 // Tooltip: afficher titre custom si présent sinon rien de spécial
-const collaboratorTitleTooltip = (collaborator: any) => {
-  if (collaborator.title) return `${collaborator.pseudo} - ${collaborator.title}`
-  if (collaborator.isCreator) return `${collaborator.pseudo}`
-  return collaborator.pseudo
+const organizerTitleTooltip = (organizer: any) => {
+  if (organizer.title) return `${organizer.pseudo} - ${organizer.title}`
+  if (organizer.isCreator) return `${organizer.pseudo}`
+  return organizer.pseudo
 }
 
 // Texte du badge: titre custom uniquement
-const displayCollaboratorBadge = (collaborator: any): string | null => {
-  return collaborator.title ? collaborator.title : null
+const displayOrganizerBadge = (organizer: any): string | null => {
+  return organizer.title ? organizer.title : null
 }
 </script>

@@ -26,13 +26,13 @@ export async function canCreateWorkshop(userId: number, editionId: number): Prom
     return true
   }
 
-  // Récupérer l'édition avec la convention et les collaborateurs
+  // Récupérer l'édition avec la convention et les organisateurs
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     include: {
       convention: {
         include: {
-          collaborators: true,
+          organizers: true,
         },
       },
     },
@@ -52,10 +52,10 @@ export async function canCreateWorkshop(userId: number, editionId: number): Prom
     return true
   }
 
-  // Vérifier si l'utilisateur est un collaborateur de la convention
-  const isCollaborator = edition.convention.collaborators.some((collab) => collab.userId === userId)
+  // Vérifier si l'utilisateur est un organisateur de la convention
+  const isOrganizer = edition.convention.organizers.some((collab) => collab.userId === userId)
 
-  if (isCollaborator) {
+  if (isOrganizer) {
     return true
   }
 
@@ -116,7 +116,7 @@ export async function canEditWorkshop(userId: number, workshopId: number): Promi
         include: {
           convention: {
             include: {
-              collaborators: true,
+              organizers: true,
             },
           },
         },
@@ -143,10 +143,10 @@ export async function canEditWorkshop(userId: number, workshopId: number): Promi
     return true
   }
 
-  // Vérifier si l'utilisateur est un collaborateur de la convention
-  const isCollaborator = workshop.edition.convention.collaborators.some(
+  // Vérifier si l'utilisateur est un organisateur de la convention
+  const isOrganizer = workshop.edition.convention.organizers.some(
     (collab) => collab.userId === userId
   )
 
-  return isCollaborator
+  return isOrganizer
 }

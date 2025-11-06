@@ -870,8 +870,8 @@ const canViewVolunteersTable = computed(() => {
   // Auteur de la convention
   if (edition.value.convention?.authorId && edition.value.convention.authorId === authStore.user.id)
     return true
-  // Collaborateur
-  const collab = edition.value.convention?.collaborators?.find(
+  // Organisateur
+  const collab = edition.value.convention?.organizers?.find(
     (c: any) => c.user.id === authStore.user!.id
   )
   return !!collab

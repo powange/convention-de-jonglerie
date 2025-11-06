@@ -36,7 +36,7 @@ describe('/api/editions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 1,
-      collaborators: [],
+      organizers: [],
     },
   }
 
@@ -112,7 +112,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -177,15 +177,15 @@ describe('/api/editions/[id] DELETE', () => {
     expect(prismaMock.edition.delete).toHaveBeenCalled()
   })
 
-  it('devrait permettre à un collaborateur admin de supprimer', async () => {
-    const collaboratorEdition = {
+  it('devrait permettre à un organisateur admin de supprimer', async () => {
+    const organizerEdition = {
       ...mockEdition,
       creatorId: 2,
       creator: { id: 2 },
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [
+        organizers: [
           {
             userId: 1,
             canDeleteConvention: true,
@@ -196,8 +196,8 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     global.getRouterParam.mockReturnValue('1')
-    prismaMock.edition.findUnique.mockResolvedValue(collaboratorEdition)
-    prismaMock.edition.delete.mockResolvedValue(collaboratorEdition)
+    prismaMock.edition.findUnique.mockResolvedValue(organizerEdition)
+    prismaMock.edition.delete.mockResolvedValue(organizerEdition)
 
     const mockEvent = {
       context: {
@@ -211,7 +211,7 @@ describe('/api/editions/[id] DELETE', () => {
     expect(result.message).toBeDefined()
   })
 
-  it('devrait permettre à un collaborateur modérateur de supprimer', async () => {
+  it('devrait permettre à un organisateur modérateur de supprimer', async () => {
     const moderatorEdition = {
       ...mockEdition,
       creatorId: 2,
@@ -219,7 +219,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [
+        organizers: [
           {
             userId: 1,
             canDeleteConvention: true,
@@ -244,7 +244,7 @@ describe('/api/editions/[id] DELETE', () => {
     expect(result.message).toBeDefined()
   })
 
-  it('devrait rejeter un collaborateur viewer', async () => {
+  it('devrait rejeter un organisateur viewer', async () => {
     const viewerEdition = {
       ...mockEdition,
       creatorId: 2,
@@ -252,7 +252,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [], // Le viewer n'apparaît pas car filtré par la requête (role MODERATOR/ADMINISTRATOR seulement)
+        organizers: [], // Le viewer n'apparaît pas car filtré par la requête (role MODERATOR/ADMINISTRATOR seulement)
       },
     }
 
@@ -306,9 +306,9 @@ describe('/api/editions/[id] DELETE', () => {
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
       include: {
-        collaboratorPermissions: {
+        organizerPermissions: {
           include: {
-            collaborator: {
+            organizer: {
               select: {
                 userId: true,
               },
@@ -317,7 +317,7 @@ describe('/api/editions/[id] DELETE', () => {
         },
         convention: {
           include: {
-            collaborators: {
+            organizers: {
               where: {
                 userId: 1,
                 OR: [
@@ -363,7 +363,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [],
+        organizers: [],
       },
     }
 

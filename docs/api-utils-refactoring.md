@@ -1237,10 +1237,10 @@ Après l'analyse approfondie du codebase, 5 opportunités majeures d'optimisatio
 
 **Phase 8C - Conventions (4 fichiers, 4 patterns)** :
 
-1. `server/api/conventions/[id]/collaborators.post.ts` - 1 pattern (user)
+1. `server/api/conventions/[id]/organizers.post.ts` - 1 pattern (user)
 2. `server/api/conventions/[id]/claim.post.ts` - 1 pattern
 3. `server/api/conventions/[id]/claim/verify.post.ts` - 1 pattern
-4. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - 1 pattern
+4. `server/api/conventions/[id]/organizers/[organizerId].patch.ts` - 1 pattern
 
 **Phase 8D - Admin (10 fichiers, 10 patterns)** :
 
@@ -1446,10 +1446,10 @@ Code critique pour la sécurité :
 
 **Phase 8C - Conventions (4 fichiers, ~4 patterns)** 🟡 MOYENNE
 
-17. `server/api/conventions/[id]/collaborators.post.ts` - 1 pattern
+17. `server/api/conventions/[id]/organizers.post.ts` - 1 pattern
 18. `server/api/conventions/[id]/claim.post.ts` - 1 pattern
 19. `server/api/conventions/[id]/claim/verify.post.ts` - 1 pattern
-20. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - 1 pattern
+20. `server/api/conventions/[id]/organizers/[organizerId].patch.ts` - 1 pattern
 
 **Gain estimé** : ~20 lignes
 
@@ -1742,7 +1742,7 @@ Fichiers :
 
 **Priorité 2 - Optimisations moyennes (3 fichiers, gain : 36 lignes)**
 
-4. **`server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts`** (L79-96)
+4. **`server/api/conventions/[id]/organizers/[organizerId].patch.ts`** (L79-96)
    - 18 lignes avec mapping de droits
    - Gain : 13 lignes
 
@@ -1808,7 +1808,7 @@ Après examen approfondi des 9 fichiers restants, il s'avère que **tous** prés
 2. **Mapping de champs** :
 
    ```typescript
-   // server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts (L83-84)
+   // server/api/conventions/[id]/organizers/[organizerId].patch.ts (L83-84)
    if (parsed.rights.editConvention !== undefined)
      updateData.canEditConvention = parsed.rights.editConvention
    ```
@@ -1844,7 +1844,7 @@ Pour ces 9 fichiers, une migration vers `buildUpdateData` nécessiterait :
 
 **Fichiers analysés (9)** :
 
-1. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - Mapping complexe de droits
+1. `server/api/conventions/[id]/organizers/[organizerId].patch.ts` - Mapping complexe de droits
 2. `server/api/carpool-requests/[id]/index.put.ts` - Transformations métier
 3. `server/api/editions/[id]/volunteer-teams/[teamId].put.ts` - Relations
 4. `server/api/profile/update.put.ts` - Logique déjà optimisée (Phase 9+)
@@ -1892,18 +1892,18 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
 
 **Fichiers identifiés** :
 
-1. **`server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts`** (L49, L162-178)
+1. **`server/api/conventions/[id]/organizers/[organizerId].patch.ts`** (L49, L162-178)
 
    ```typescript
    // Cas sans changement
    return { success: true, unchanged: true }
 
    // Cas normal
-   return { success: true, collaborator: { id, title, rights, perEdition } }
+   return { success: true, organizer: { id, title, rights, perEdition } }
    ```
 
-   - **Frontend consommateur** : Gestion des collaborateurs (composants admin)
-   - **Format attendu** : `{ success: true, collaborator }` directement
+   - **Frontend consommateur** : Gestion des organisateurs (composants admin)
+   - **Format attendu** : `{ success: true, organizer }` directement
 
 2. **`server/api/editions/[id]/volunteers/settings.patch.ts`** (L192, L222)
 
@@ -1944,7 +1944,7 @@ Après recherche exhaustive dans le codebase, seulement **4 fichiers** (au lieu 
 **Problèmes identifiés** :
 
 1. **Breaking changes frontend majeurs** :
-   - Migration vers `{ success: true, data: { collaborator, settings, ... } }` nécessiterait :
+   - Migration vers `{ success: true, data: { organizer, settings, ... } }` nécessiterait :
      - Modifier 4 endpoints API
      - Modifier les composables TypeScript (`useVolunteerSettings.ts` confirmé)
      - Modifier tous les composants Vue qui consomment ces APIs
@@ -1984,7 +1984,7 @@ Pour ces 4 fichiers, une migration vers `createSuccessResponse` nécessiterait :
 
 **Fichiers analysés (4)** :
 
-1. `server/api/conventions/[id]/collaborators/[collaboratorId].patch.ts` - Gestion collaborateurs
+1. `server/api/conventions/[id]/organizers/[organizerId].patch.ts` - Gestion organisateurs
 2. `server/api/editions/[id]/volunteers/settings.patch.ts` - Paramètres bénévoles (frontend confirmé)
 3. `server/api/editions/[id]/volunteers/applications/[applicationId].patch.ts` - Candidatures
 4. `server/api/conventions/[id]/archive.patch.ts` - Archivage conventions

@@ -72,7 +72,7 @@ export default wrapApiHandler(
       const convention = await prisma.convention.findUnique({
         where: { id: conventionId },
         include: {
-          collaborators: {
+          organizers: {
             where: {
               userId: user.id,
               canManageOrganizers: true,
@@ -90,7 +90,7 @@ export default wrapApiHandler(
 
       // Seuls l'auteur, les administrateurs, ou les admins globaux peuvent changer la convention d'une édition
       const canChangeConvention =
-        convention.authorId === user.id || convention.collaborators.length > 0 || user.isGlobalAdmin
+        convention.authorId === user.id || convention.organizers.length > 0 || user.isGlobalAdmin
 
       if (!canChangeConvention) {
         throw createError({

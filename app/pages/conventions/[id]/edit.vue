@@ -74,9 +74,9 @@ onMounted(async () => {
   try {
     convention.value = await $fetch(`/api/conventions/${conventionId}`)
 
-    // Vérifier droits : admin global en mode admin, auteur ou collaborateur avec droit editConvention
+    // Vérifier droits : admin global en mode admin, auteur ou organisateur avec droit editConvention
     const isAuthor = convention.value?.authorId && convention.value.authorId === authStore.user?.id
-    const hasEditRight = convention.value?.collaborators?.some(
+    const hasEditRight = convention.value?.organizers?.some(
       (collab) => collab.user.id === authStore.user?.id && collab.rights?.editConvention
     )
     const isAdminMode = authStore.isAdminModeActive

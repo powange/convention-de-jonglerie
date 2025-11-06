@@ -50,5 +50,5 @@ export default wrapApiHandler(
       },
     }))
   },
-  { operationName: 'GetCollaboratorHistory' }
+  { operationName: 'GetOrganizerHistory' }
 )

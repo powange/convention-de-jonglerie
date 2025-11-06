@@ -12,10 +12,10 @@ import {
   checkAdminMode,
   findUserByPseudoOrEmail,
 } from '@@/server/utils/organizer-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
+import handler from '../../../../../server/api/conventions/[id]/organizers.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
-const mockAddCollaborator = addConventionOrganizer as ReturnType<typeof vi.fn>
+const mockAddOrganizer = addConventionOrganizer as ReturnType<typeof vi.fn>
 const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>
 const mockCheckAdminMode = checkAdminMode as ReturnType<typeof vi.fn>
 
@@ -39,9 +39,9 @@ const mockEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators POST', () => {
+describe('/api/conventions/[id]/organizers POST', () => {
   beforeEach(() => {
-    mockAddCollaborator.mockReset()
+    mockAddOrganizer.mockReset()
     mockFindUser.mockReset()
     mockCheckAdminMode.mockReset()
     prismaMock.user.findUnique.mockReset()
@@ -51,7 +51,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
     mockCheckAdminMode.mockResolvedValue(false)
   })
 
-  it('devrait ajouter un collaborateur par userIdentifier avec succès', async () => {
+  it('devrait ajouter un organisateur par userIdentifier avec succès', async () => {
     const requestBody = {
       userIdentifier: 'newuser@test.com',
       rights: { editConvention: true },
@@ -63,7 +63,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       email: 'newuser@test.com',
     }
 
-    const mockCollaborator = {
+    const mockOrganizer = {
       id: 1,
       conventionId: 1,
       userId: 2,
@@ -80,25 +80,25 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     global.readBody.mockResolvedValue(requestBody)
     mockFindUser.mockResolvedValue(mockUser)
-    mockAddCollaborator.mockResolvedValue(mockCollaborator)
+    mockAddOrganizer.mockResolvedValue(mockOrganizer)
 
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.collaborator).toMatchObject({
-      id: mockCollaborator.id,
+    expect(result.organizer).toMatchObject({
+      id: mockOrganizer.id,
       rights: { editConvention: true },
       perEdition: [],
       user: { id: mockUser.id, pseudo: mockUser.pseudo },
     })
     expect(mockFindUser).toHaveBeenCalledWith('newuser@test.com')
-    expect(mockAddCollaborator).toHaveBeenCalled()
+    expect(mockAddOrganizer).toHaveBeenCalled()
   })
 
-  it('devrait ajouter un collaborateur par userId avec succès', async () => {
+  it('devrait ajouter un organisateur par userId avec succès', async () => {
     const requestBody = {
       userId: 2,
-      rights: { manageCollaborators: true },
+      rights: { manageOrganizers: true },
     }
 
     const mockUser = {
@@ -106,7 +106,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       pseudo: 'newuser',
     }
 
-    const mockCollaborator = {
+    const mockOrganizer = {
       id: 1,
       conventionId: 1,
       userId: 2,
@@ -125,17 +125,17 @@ describe('/api/conventions/[id]/collaborators POST', () => {
     // Reset du mock pour s'assurer qu'il retourne la bonne valeur
     prismaMock.user.findUnique.mockReset()
     prismaMock.user.findUnique.mockResolvedValue(mockUser)
-    mockAddCollaborator.mockResolvedValue(mockCollaborator)
+    mockAddOrganizer.mockResolvedValue(mockOrganizer)
 
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.collaborator.rights.manageCollaborators).toBe(true)
+    expect(result.organizer.rights.manageOrganizers).toBe(true)
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 2 },
       select: { id: true, pseudo: true },
     })
-    expect(mockAddCollaborator).toHaveBeenCalled()
+    expect(mockAddOrganizer).toHaveBeenCalled()
   })
 
   it('devrait créer avec droits par défaut à false si pas fournis', async () => {
@@ -149,11 +149,11 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     global.readBody.mockResolvedValue(requestBody)
     mockFindUser.mockResolvedValue(mockUser)
-    mockAddCollaborator.mockResolvedValue({})
+    mockAddOrganizer.mockResolvedValue({})
 
     await handler(mockEvent as any)
 
-    expect(mockAddCollaborator).toHaveBeenCalled()
+    expect(mockAddOrganizer).toHaveBeenCalled()
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -209,7 +209,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
     prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Vous ne pouvez pas vous ajouter comme collaborateur'
+      'Vous ne pouvez pas vous ajouter comme organisateur'
     )
   })
 
@@ -232,7 +232,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     global.readBody.mockResolvedValue(requestBody)
     mockFindUser.mockResolvedValue(mockUser)
-    mockAddCollaborator.mockRejectedValue(new Error('Permission denied'))
+    mockAddOrganizer.mockRejectedValue(new Error('Permission denied'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
@@ -263,12 +263,12 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     global.readBody.mockResolvedValue(requestBody)
     mockFindUser.mockResolvedValue(mockUser)
-    mockAddCollaborator.mockResolvedValue({})
+    mockAddOrganizer.mockResolvedValue({})
 
     await handler(eventWithStringId as any)
 
     // Vérifie que la fonction est appelée avec un objet contenant conventionId et userId correctement parsés
-    expect(mockAddCollaborator).toHaveBeenCalledWith(
+    expect(mockAddOrganizer).toHaveBeenCalledWith(
       expect.objectContaining({
         conventionId: 123,
         userId: 2,
@@ -280,7 +280,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
   it("crée une entrée d'historique CREATED via addConventionOrganizer (vérification indirecte)", async () => {
     const requestBody = { userIdentifier: 'newuser@test.com' }
     const mockUser = { id: 2, pseudo: 'newuser', email: 'newuser@test.com' }
-    const mockCollaborator = {
+    const mockOrganizer = {
       id: 77,
       conventionId: 1,
       userId: 2,
@@ -297,12 +297,12 @@ describe('/api/conventions/[id]/collaborators POST', () => {
     }
     global.readBody.mockResolvedValue(requestBody)
     mockFindUser.mockResolvedValue(mockUser)
-    mockAddCollaborator.mockResolvedValue(mockCollaborator)
+    mockAddOrganizer.mockResolvedValue(mockOrganizer)
 
     const res = await handler(mockEvent as any)
     expect(res.success).toBe(true)
     // Vérifie que addConventionOrganizer a reçu les champs nécessaires (l'historique est géré là-bas)
-    const callArgs = mockAddCollaborator.mock.calls[0][0]
+    const callArgs = mockAddOrganizer.mock.calls[0][0]
     expect(callArgs.conventionId).toBe(1)
     expect(callArgs.userId).toBe(2)
   })

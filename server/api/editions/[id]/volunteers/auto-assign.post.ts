@@ -52,7 +52,7 @@ export default wrapApiHandler(async (event) => {
     include: {
       convention: {
         include: {
-          collaborators: true,
+          organizers: true,
         },
       },
     },

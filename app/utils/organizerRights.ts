@@ -1,7 +1,7 @@
-// Utilitaires pour dériver une étiquette/couleur depuis un objet de droits collaborateur
+// Utilitaires pour dériver une étiquette/couleur depuis un objet de droits organisateur
 // Heuristique: "admin" si tous les droits globaux principaux sont vrais, "moderator" (staff) si au moins un droit clé, sinon "viewer".
 
-export interface CollaboratorRightsSummary {
+export interface OrganizerRightsSummary {
   level: 'admin' | 'moderator' | 'viewer'
   labelKey: string // clé i18n
   color: 'warning' | 'info' | 'neutral'
@@ -10,7 +10,7 @@ export interface CollaboratorRightsSummary {
 const globalKeys = [
   'editConvention',
   'deleteConvention',
-  'manageCollaborators',
+  'manageOrganizers',
   'addEdition',
   'editAllEditions',
   'deleteAllEditions',
@@ -18,7 +18,7 @@ const globalKeys = [
 
 export function summarizeRights(
   rights: Record<string, any> | undefined | null
-): CollaboratorRightsSummary {
+): OrganizerRightsSummary {
   if (!rights) {
     return { level: 'viewer', labelKey: 'permissions.viewer', color: 'neutral' }
   }

@@ -22,7 +22,7 @@ export default wrapApiHandler(
         endDate: true,
         convention: {
           select: {
-            collaborators: {
+            organizers: {
               select: {
                 userId: true,
               },
@@ -41,14 +41,12 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que l'utilisateur est organisateur, collaborateur ou super admin
+    // Vérifier que l'utilisateur est organisateur, organisateur ou super admin
     const isCreator = edition.creatorId === user.id
-    const isCollaborator = edition.convention?.collaborators?.some(
-      (collab) => collab.userId === user.id
-    )
+    const isOrganizer = edition.convention?.organizers?.some((collab) => collab.userId === user.id)
     const isSuperAdmin = user.isGlobalAdmin || false
 
-    if (!isCreator && !isCollaborator && !isSuperAdmin) {
+    if (!isCreator && !isOrganizer && !isSuperAdmin) {
       throw createError({
         statusCode: 403,
         message:

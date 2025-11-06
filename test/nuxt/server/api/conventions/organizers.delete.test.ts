@@ -6,9 +6,9 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 }))
 
 import { deleteConventionOrganizer } from '@@/server/utils/organizer-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].delete'
+import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].delete'
 
-const mockDeleteCollaborator = deleteConventionOrganizer as ReturnType<typeof vi.fn>
+const mockDeleteOrganizer = deleteConventionOrganizer as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -21,26 +21,26 @@ const mockEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
+describe('/api/conventions/[id]/organizers/[organizerId] DELETE', () => {
   beforeEach(() => {
-    mockDeleteCollaborator.mockReset()
+    mockDeleteOrganizer.mockReset()
   })
 
-  it('devrait supprimer un collaborateur avec succès', async () => {
+  it('devrait supprimer un organisateur avec succès', async () => {
     const mockResult = {
       success: true,
-      message: 'Collaborateur supprimé avec succès',
+      message: 'Organisateur supprimé avec succès',
     }
 
-    mockDeleteCollaborator.mockResolvedValue(mockResult)
+    mockDeleteOrganizer.mockResolvedValue(mockResult)
 
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
       success: true,
-      message: 'Collaborateur supprimé avec succès',
+      message: 'Organisateur supprimé avec succès',
     })
-    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1, expect.anything())
+    expect(mockDeleteOrganizer).toHaveBeenCalledWith(1, 2, 1, expect.anything())
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -61,19 +61,19 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
     await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
-  it('devrait rejeter un ID d\'organisateur invalide', async () => {
+  it("devrait rejeter un ID d'organisateur invalide", async () => {
     const eventWithBadOrganizerId = {
       ...mockEvent,
       context: { ...mockEvent.context, params: { id: '1', organizerId: 'invalid' } },
     }
 
     await expect(handler(eventWithBadOrganizerId as any)).rejects.toThrow(
-      'ID d\'organisateur invalide'
+      "ID d'organisateur invalide"
     )
   })
 
   it('devrait gérer les erreurs de deleteConventionOrganizer', async () => {
-    mockDeleteCollaborator.mockRejectedValue(new Error('Permission denied'))
+    mockDeleteOrganizer.mockRejectedValue(new Error('Permission denied'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
@@ -84,7 +84,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
       statusMessage: 'Permission refusée',
     }
 
-    mockDeleteCollaborator.mockRejectedValue(httpError)
+    mockDeleteOrganizer.mockRejectedValue(httpError)
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })
@@ -100,14 +100,14 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
 
     const mockResult = {
       success: true,
-      message: 'Collaborateur supprimé',
+      message: 'Organisateur supprimé',
     }
 
-    mockDeleteCollaborator.mockResolvedValue(mockResult)
+    mockDeleteOrganizer.mockResolvedValue(mockResult)
 
     await handler(eventWithStringIds as any)
 
-    expect(mockDeleteCollaborator).toHaveBeenCalledWith(123, 456, 1, expect.anything())
+    expect(mockDeleteOrganizer).toHaveBeenCalledWith(123, 456, 1, expect.anything())
   })
 
   it("devrait retourner le message d'erreur spécifique", async () => {
@@ -116,7 +116,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
       message: 'Impossible de supprimer le dernier administrateur',
     }
 
-    mockDeleteCollaborator.mockResolvedValue(mockResult)
+    mockDeleteOrganizer.mockResolvedValue(mockResult)
 
     const result = await handler(mockEvent as any)
 
@@ -126,13 +126,13 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
     })
   })
 
-  it('devrait gérer les erreurs de collaborateur introuvable', async () => {
+  it('devrait gérer les erreurs de organisateur introuvable', async () => {
     const httpError = {
       statusCode: 404,
-      statusMessage: 'Collaborateur introuvable',
+      statusMessage: 'Organisateur introuvable',
     }
 
-    mockDeleteCollaborator.mockRejectedValue(httpError)
+    mockDeleteOrganizer.mockRejectedValue(httpError)
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })
@@ -140,16 +140,16 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
   it('devrait gérer les erreurs de permissions insuffisantes', async () => {
     const httpError = {
       statusCode: 403,
-      statusMessage: 'Permissions insuffisantes pour supprimer ce collaborateur',
+      statusMessage: 'Permissions insuffisantes pour supprimer ce organisateur',
     }
 
-    mockDeleteCollaborator.mockRejectedValue(httpError)
+    mockDeleteOrganizer.mockRejectedValue(httpError)
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    mockDeleteCollaborator.mockRejectedValue(new Error('Database connection failed'))
+    mockDeleteOrganizer.mockRejectedValue(new Error('Database connection failed'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
@@ -160,7 +160,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
       message: 'Vous ne pouvez pas vous supprimer vous-même',
     }
 
-    mockDeleteCollaborator.mockResolvedValue(mockResult)
+    mockDeleteOrganizer.mockResolvedValue(mockResult)
 
     const result = await handler(mockEvent as any)
 
@@ -170,10 +170,10 @@ describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
 
   it("déclenche une entrée d'historique REMOVED (appel utilitaire simulé)", async () => {
     // On simule simplement le retour puisque la création d'historique est interne à deleteConventionOrganizer
-    mockDeleteCollaborator.mockResolvedValue({ success: true, message: 'ok' })
+    mockDeleteOrganizer.mockResolvedValue({ success: true, message: 'ok' })
     const res = await handler(mockEvent as any)
     expect(res.success).toBe(true)
-    // Vérifie paramétrage pour que l'utilitaire puisse créer l'historique avec targetUserId = user du collaborateur supprimé
-    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1, expect.anything())
+    // Vérifie paramétrage pour que l'utilitaire puisse créer l'historique avec targetUserId = user du organisateur supprimé
+    expect(mockDeleteOrganizer).toHaveBeenCalledWith(1, 2, 1, expect.anything())
   })
 })

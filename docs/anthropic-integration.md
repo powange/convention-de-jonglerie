@@ -245,19 +245,17 @@ export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = parseInt(getRouterParam(event, 'id')!)
 
-  // Vérifier les permissions (organisateur, collaborateur ou super admin)
+  // Vérifier les permissions (organisateur, organisateur ou super admin)
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
-    include: { convention: { include: { collaborators: true } } },
+    include: { convention: { include: { organizers: true } } },
   })
 
   const isCreator = edition.creatorId === user.id
-  const isCollaborator = edition.convention?.collaborators?.some(
-    (collab) => collab.userId === user.id
-  )
+  const isOrganizer = edition.convention?.organizers?.some((collab) => collab.userId === user.id)
   const isSuperAdmin = user.isGlobalAdmin || false
 
-  if (!isCreator && !isCollaborator && !isSuperAdmin) {
+  if (!isCreator && !isOrganizer && !isSuperAdmin) {
     throw createError({ statusCode: 403, message: 'Accès non autorisé' })
   }
 
@@ -283,7 +281,7 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-**Permissions** : Organisateurs, collaborateurs et super admins uniquement.
+**Permissions** : Organisateurs, organisateurs et super admins uniquement.
 
 ### 5. Traduction contextuelle
 

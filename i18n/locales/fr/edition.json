@@ -72,26 +72,26 @@
       "seats_min": "Au moins 1 place"
     }
   },
-  "collaborators": {
-    "collaborator_added": "Organisateur ajouté",
-    "collaborator_removed": "Organisateur supprimé",
-    "collaborator_updated": "Organisateur mis à jour",
+  "organizers": {
+    "organizer_added": "Organisateur ajouté",
+    "organizer_removed": "Organisateur supprimé",
+    "organizer_updated": "Organisateur mis à jour",
     "confirm_remove": "Êtes-vous sûr de vouloir supprimer cet organisateur ?",
-    "edit_collaborator": "Modifier l'organisateur",
+    "edit_organizer": "Modifier l'organisateur",
     "list": "Liste des organisateurs",
     "manage": "Gérer les organisateurs",
     "manage_description": "Gérer les organisateurs et leurs droits pour cette édition",
-    "no_collaborators": "Aucun organisateur",
+    "no_organizers": "Aucun organisateur",
     "page_description": "Gérer les membres de l'équipe organisatrice et leurs permissions",
     "rights": "Droits",
     "title": "Organisateurs"
   },
   "conventions": {
-    "add_collaborator": "Ajouter un organisateur",
+    "add_organizer": "Ajouter un organisateur",
     "add_edition": "Ajouter une édition",
     "analytics_access": "Accès aux analyses",
     "analytics_access_desc": "Suivez les performances et l'engagement de vos éditions",
-    "as_collaborator": "En tant qu'organisateur",
+    "as_organizer": "En tant qu'organisateur",
     "as_creator": "En tant que créateur",
     "cannot_load_conventions": "Impossible de charger vos conventions",
     "claim": {
@@ -118,7 +118,7 @@
       "verification_success_description": "Vous êtes maintenant propriétaire de cette convention.",
       "verify": "Vérifier"
     },
-    "collaborators": "Organisateurs",
+    "organizers": "Organisateurs",
     "confirm_delete_convention": "Êtes-vous sûr de vouloir supprimer cette convention ?",
     "convention_deleted": "Convention supprimée",
     "convention_deleted_success": "La convention a été supprimée avec succès",
@@ -131,7 +131,7 @@
     "created_at": "Créé le",
     "delete": "Supprimer la convention",
     "edit": "Modifier la convention",
-    "edit_collaborator_rights": "Modifier les droits de l'organisateur",
+    "edit_organizer_rights": "Modifier les droits de l'organisateur",
     "edit_permissions": "Modifier les permissions",
     "edit_permissions_desc": "Modifier les conventions selon vos permissions",
     "editions": "Éditions",
@@ -140,8 +140,8 @@
     "granular_rights": "Droits granulaires",
     "granular_rights_desc": "Permissions spécifiques par édition ou globales selon vos besoins",
     "logo_alt": "Logo de {name}",
-    "manage_collaborators": "Gérer les organisateurs",
-    "manage_collaborators_desc": "Inviter et gérer les membres de votre équipe organisatrice",
+    "manage_organizers": "Gérer les organisateurs",
+    "manage_organizers_desc": "Inviter et gérer les membres de votre équipe organisatrice",
     "manage_editions": "Gérer les éditions",
     "manage_editions_desc": "Créer, modifier et publier différentes éditions de vos conventions",
     "manage_volunteers": "Gérer les bénévoles",

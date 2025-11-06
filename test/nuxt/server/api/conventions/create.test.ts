@@ -43,7 +43,7 @@ describe('API Convention - Création', () => {
         rights: {
           editConvention: true,
           deleteConvention: true,
-          manageCollaborators: true,
+          manageOrganizers: true,
           addEdition: true,
           editAllEditions: true,
           deleteAllEditions: true,

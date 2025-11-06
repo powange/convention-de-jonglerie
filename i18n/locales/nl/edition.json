@@ -72,26 +72,26 @@
       "seats_min": "Minimaal 1 plaats"
     }
   },
-  "collaborators": {
-    "collaborator_added": "Organisator toegevoegd",
-    "collaborator_removed": "Organisator verwijderd",
-    "collaborator_updated": "Organisator bijgewerkt",
+  "organizers": {
+    "organizer_added": "Organisator toegevoegd",
+    "organizer_removed": "Organisator verwijderd",
+    "organizer_updated": "Organisator bijgewerkt",
     "confirm_remove": "Weet u zeker dat u deze organisator wilt verwijderen?",
-    "edit_collaborator": "Organisator bewerken",
+    "edit_organizer": "Organisator bewerken",
     "list": "Lijst van organisatoren",
     "manage": "Organisatoren beheren",
     "manage_description": "Organisatoren en hun rechten voor deze editie beheren",
-    "no_collaborators": "Geen organisatoren",
+    "no_organizers": "Geen organisatoren",
     "page_description": "Beheer leden van het organisatieteam en hun machtigingen",
     "rights": "Rechten",
     "title": "Organisatoren"
   },
   "conventions": {
-    "add_collaborator": "Organisator toevoegen",
+    "add_organizer": "Organisator toevoegen",
     "add_edition": "Editie toevoegen",
     "analytics_access": "Toegang tot statistieken",
     "analytics_access_desc": "Volg de prestaties en betrokkenheid van je edities",
-    "as_collaborator": "Als organisator",
+    "as_organizer": "Als organisator",
     "as_creator": "Als maker",
     "cannot_load_conventions": "Kan je conventies niet laden",
     "claim": {
@@ -118,7 +118,7 @@
       "verification_success_description": "Je bent nu eigenaar van deze conventie.",
       "verify": "Verifiëren"
     },
-    "collaborators": "Organisatoren",
+    "organizers": "Organisatoren",
     "confirm_delete_convention": "Weet je zeker dat je deze conventie wilt verwijderen?",
     "convention_deleted": "Conventie verwijderd",
     "convention_deleted_success": "De conventie is succesvol verwijderd",
@@ -131,7 +131,7 @@
     "created_at": "Aangemaakt op",
     "delete": "Conventie verwijderen",
     "edit": "Conventie bewerken",
-    "edit_collaborator_rights": "Organisatorrechten bewerken",
+    "edit_organizer_rights": "Organisatorrechten bewerken",
     "edit_permissions": "Bewerkingsrechten",
     "edit_permissions_desc": "Bewerk conventies volgens je rechten",
     "editions": "Edities",
@@ -140,8 +140,8 @@
     "granular_rights": "Gedetailleerde rechten",
     "granular_rights_desc": "Specifieke rechten per editie of globaal volgens je behoeften",
     "logo_alt": "Logo van {name}",
-    "manage_collaborators": "Organisatoren beheren",
-    "manage_collaborators_desc": "Nodig teamleden uit en beheer ze",
+    "manage_organizers": "Organisatoren beheren",
+    "manage_organizers_desc": "Nodig teamleden uit en beheer ze",
     "manage_editions": "Edities beheren",
     "manage_editions_desc": "Maak, bewerk en publiceer verschillende edities van je conventies",
     "manage_volunteers": "Vrijwilligers beheren",

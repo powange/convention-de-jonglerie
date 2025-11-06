@@ -2,13 +2,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/organizer-management', () => ({
-  updateCollaboratorRights: vi.fn(),
+  updateOrganizerRights: vi.fn(),
 }))
 
-import { updateCollaboratorRights } from '@@/server/utils/organizer-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].put'
+import { updateOrganizerRights } from '@@/server/utils/organizer-management'
+import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].put'
 
-const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>
+const mockUpdateRole = updateOrganizerRights as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -21,16 +21,16 @@ const mockEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
+describe('/api/conventions/[id]/organizers/[organizerId] PUT', () => {
   beforeEach(() => {
     mockUpdateRole.mockReset()
     global.readBody = vi.fn()
   })
 
-  it("devrait mettre à jour les droits d'un collaborateur avec succès", async () => {
-    const requestBody = { rights: { manageCollaborators: true, editConvention: true } }
+  it("devrait mettre à jour les droits d'un organisateur avec succès", async () => {
+    const requestBody = { rights: { manageOrganizers: true, editConvention: true } }
 
-    const mockUpdatedCollaborator = {
+    const mockUpdatedOrganizer = {
       id: 2,
       conventionId: 1,
       userId: 3,
@@ -44,19 +44,19 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
       addedById: 1,
       user: {
         id: 3,
-        pseudo: 'collaborator',
+        pseudo: 'organizer',
         profilePicture: null,
       },
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    mockUpdateRole.mockResolvedValue(mockUpdatedCollaborator)
+    mockUpdateRole.mockResolvedValue(mockUpdatedOrganizer)
 
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.collaborator.rights).toMatchObject({
-      manageCollaborators: true,
+    expect(result.organizer.rights).toMatchObject({
+      manageOrganizers: true,
       editConvention: true,
     })
     expect(mockUpdateRole).toHaveBeenCalled()
@@ -64,9 +64,9 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
 
   it('devrait mettre à jour un sous-ensemble de droits', async () => {
     const requestBody = { rights: { editConvention: true } }
-    const mockUpdatedCollaborator = { id: 2, canEditConvention: true, perEditionPermissions: [] }
+    const mockUpdatedOrganizer = { id: 2, canEditConvention: true, perEditionPermissions: [] }
     global.readBody.mockResolvedValue(requestBody)
-    mockUpdateRole.mockResolvedValue(mockUpdatedCollaborator)
+    mockUpdateRole.mockResolvedValue(mockUpdatedOrganizer)
     const result = await handler(mockEvent as any)
     expect(result.success).toBe(true)
     expect(mockUpdateRole).toHaveBeenCalled()
@@ -98,8 +98,8 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
     await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
-  it('devrait rejeter un ID d'organisateur invalide', async () => {
-    const eventWithBadCollaboratorId = {
+  it("devrait rejeter un ID d'organisateur invalide", async () => {
+    const eventWithBadOrganizerId = {
       ...mockEvent,
       context: { ...mockEvent.context, params: { id: '1', organizerId: 'invalid' } },
     }
@@ -108,8 +108,8 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
 
     global.readBody.mockResolvedValue(requestBody)
 
-    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow(
-      'ID d'organisateur invalide'
+    await expect(handler(eventWithBadOrganizerId as any)).rejects.toThrow(
+      "ID d'organisateur invalide"
     )
   })
 
@@ -127,8 +127,8 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Aucune donnée à mettre à jour')
   })
 
-  it('devrait gérer les erreurs de updateCollaboratorRole', async () => {
-    const requestBody = { rights: { manageCollaborators: true } }
+  it('devrait gérer les erreurs de updateOrganizerRole', async () => {
+    const requestBody = { rights: { manageOrganizers: true } }
 
     global.readBody.mockResolvedValue(requestBody)
     mockUpdateRole.mockRejectedValue(new Error('Permission denied'))
@@ -137,7 +137,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
   })
 
   it('devrait gérer les erreurs HTTP spécifiques', async () => {
-    const requestBody = { rights: { manageCollaborators: true } }
+    const requestBody = { rights: { manageOrganizers: true } }
 
     const httpError = {
       statusCode: 403,
@@ -186,7 +186,7 @@ describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    const requestBody = { rights: { manageCollaborators: true } }
+    const requestBody = { rights: { manageOrganizers: true } }
     global.readBody.mockResolvedValue(requestBody)
     mockUpdateRole.mockRejectedValue(new Error('Database connection failed'))
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')

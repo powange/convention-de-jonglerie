@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { optionalAuth } from '@@/server/utils/auth-utils'
-import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
+import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -31,11 +31,11 @@ export default wrapApiHandler(
         // Champs bénévolat simples sur le modèle Edition (inclus automatiquement, rien à faire)
         // Champs bénévolat (valeurs)
         volunteerApplications: false,
-        // collaboratorPermissions: permet de gérer les droits spécifiques par édition
-        // Pour l'instant on n'inclut pas, on utilise juste convention.collaborators
+        // organizerPermissions: permet de gérer les droits spécifiques par édition
+        // Pour l'instant on n'inclut pas, on utilise juste convention.organizers
         convention: {
           include: {
-            collaborators: {
+            organizers: {
               include: {
                 user: {
                   select: {
@@ -73,18 +73,12 @@ export default wrapApiHandler(
       const isAdminMode = await checkAdminMode(userId, event)
       const isCreator = edition.creatorId === userId
       const isConventionAuthor = edition.convention.authorId === userId
-      const isCollaborator = edition.convention.collaborators?.some((c) => c.userId === userId)
+      const isOrganizer = edition.convention.organizers?.some((c) => c.userId === userId)
 
       // Les éditions orphelines (sans créateur et sans auteur de convention) sont considérées comme publiques
       const isOrphanEdition = !edition.creatorId && !edition.convention.authorId
 
-      if (
-        !isAdminMode &&
-        !isCreator &&
-        !isConventionAuthor &&
-        !isCollaborator &&
-        !isOrphanEdition
-      ) {
+      if (!isAdminMode && !isCreator && !isConventionAuthor && !isOrganizer && !isOrphanEdition) {
         throw createError({
           statusCode: 404,
           message: 'Edition not found',
@@ -103,9 +97,9 @@ export default wrapApiHandler(
         }
       }
 
-      // Transformer les collaborateurs de la convention
-      if (edition.convention?.collaborators) {
-        edition.convention.collaborators = edition.convention.collaborators.map((collab) => {
+      // Transformer les organisateurs de la convention
+      if (edition.convention?.organizers) {
+        edition.convention.organizers = edition.convention.organizers.map((collab) => {
           const { email, ...userWithoutEmail } = collab.user
           return {
             ...collab,
@@ -113,7 +107,7 @@ export default wrapApiHandler(
             rights: {
               editConvention: collab.canEditConvention ?? false,
               deleteConvention: collab.canDeleteConvention ?? false,
-              manageCollaborators: collab.canManageOrganizers ?? false,
+              manageOrganizers: collab.canManageOrganizers ?? false,
               manageVolunteers: collab.canManageVolunteers ?? false,
               addEdition: collab.canAddEdition ?? false,
               editAllEditions: collab.canEditAllEditions ?? false,

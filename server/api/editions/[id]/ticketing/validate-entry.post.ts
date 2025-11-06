@@ -258,8 +258,8 @@ export default wrapApiHandler(
 
             if (!artist) continue
 
-            // Récupérer tous les collaborateurs avec droits de gestion des artistes
-            const artistManagers = await prisma.editionCollaborator.findMany({
+            // Récupérer tous les organisateurs avec droits de gestion des artistes
+            const artistManagers = await prisma.editionOrganizer.findMany({
               where: {
                 editionId: editionId,
                 canManageArtists: true,

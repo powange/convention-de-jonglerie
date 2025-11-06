@@ -28,7 +28,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 2,
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -53,7 +53,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 1, // Mais il est l'auteur de la convention
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -67,7 +67,7 @@ describe('/api/editions/[id] DELETE', () => {
     })
   })
 
-  it('devrait supprimer une édition en tant que collaborateur MODERATOR', async () => {
+  it('devrait supprimer une édition en tant que organisateur MODERATOR', async () => {
     const mockEdition = {
       id: 1,
       name: 'Edition Test',
@@ -75,7 +75,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 3,
-        collaborators: [
+        organizers: [
           {
             userId: 1,
             canDeleteAllEditions: true,
@@ -95,7 +95,7 @@ describe('/api/editions/[id] DELETE', () => {
     })
   })
 
-  it('devrait supprimer une édition en tant que collaborateur ADMINISTRATOR', async () => {
+  it('devrait supprimer une édition en tant que organisateur ADMINISTRATOR', async () => {
     const mockEdition = {
       id: 1,
       name: 'Edition Test',
@@ -103,7 +103,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 3,
-        collaborators: [
+        organizers: [
           {
             userId: 1,
             role: 'ADMINISTRATOR',
@@ -116,7 +116,7 @@ describe('/api/editions/[id] DELETE', () => {
       ...mockEdition,
       convention: {
         ...mockEdition.convention,
-        collaborators: [{ userId: 1, canDeleteConvention: true }],
+        organizers: [{ userId: 1, canDeleteConvention: true }],
       },
     })
     prismaMock.edition.delete.mockResolvedValue(mockEdition)
@@ -136,7 +136,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 3,
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -193,7 +193,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 3, // Ni l'auteur de la convention
-        collaborators: [], // Ni un collaborateur
+        organizers: [], // Ni un organisateur
       },
     }
 
@@ -215,14 +215,14 @@ describe('/api/editions/[id] DELETE', () => {
     )
   })
 
-  it('devrait rejeter si collaborateur VIEWER uniquement', async () => {
+  it('devrait rejeter si organisateur VIEWER uniquement', async () => {
     const mockEdition = {
       id: 1,
       creatorId: 2,
       convention: {
         id: 1,
         authorId: 3,
-        collaborators: [], // VIEWER ne correspond pas aux critères de la requête (MODERATOR/ADMINISTRATOR seulement)
+        organizers: [], // VIEWER ne correspond pas aux critères de la requête (MODERATOR/ADMINISTRATOR seulement)
       },
     }
 
@@ -246,7 +246,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 1,
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -268,7 +268,7 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         id: 1,
         authorId: 1,
-        collaborators: [],
+        organizers: [],
       },
     }
 
@@ -280,9 +280,9 @@ describe('/api/editions/[id] DELETE', () => {
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 123 },
       include: {
-        collaboratorPermissions: {
+        organizerPermissions: {
           include: {
-            collaborator: {
+            organizer: {
               select: {
                 userId: true,
               },
@@ -291,7 +291,7 @@ describe('/api/editions/[id] DELETE', () => {
         },
         convention: {
           include: {
-            collaborators: {
+            organizers: {
               where: {
                 userId: 1,
                 OR: [
@@ -315,34 +315,34 @@ describe('/api/editions/[id] DELETE', () => {
     const testCases = [
       {
         name: 'créateur',
-        edition: { creatorId: 1, convention: { authorId: 2, collaborators: [] } },
+        edition: { creatorId: 1, convention: { authorId: 2, organizers: [] } },
         user: { id: 1, isGlobalAdmin: false },
         shouldPass: true,
       },
       {
         name: 'auteur convention',
-        edition: { creatorId: 2, convention: { authorId: 1, collaborators: [] } },
+        edition: { creatorId: 2, convention: { authorId: 1, organizers: [] } },
         user: { id: 1, isGlobalAdmin: false },
         shouldPass: true,
       },
       {
-        name: 'collaborateur ADMIN',
+        name: 'organisateur ADMIN',
         edition: {
           creatorId: 2,
-          convention: { authorId: 3, collaborators: [{ userId: 1, canDeleteConvention: true }] },
+          convention: { authorId: 3, organizers: [{ userId: 1, canDeleteConvention: true }] },
         },
         user: { id: 1, isGlobalAdmin: false },
         shouldPass: true,
       },
       {
         name: 'admin global',
-        edition: { creatorId: 2, convention: { authorId: 3, collaborators: [] } },
+        edition: { creatorId: 2, convention: { authorId: 3, organizers: [] } },
         user: { id: 1, isGlobalAdmin: true },
         shouldPass: true,
       },
       {
         name: 'aucun droit',
-        edition: { creatorId: 2, convention: { authorId: 3, collaborators: [] } },
+        edition: { creatorId: 2, convention: { authorId: 3, organizers: [] } },
         user: { id: 1, isGlobalAdmin: false },
         shouldPass: false,
       },

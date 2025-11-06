@@ -52,8 +52,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(convention.name).toBe('Convention de Test DB')
       expect(convention.authorId).toBe(testUser.id)
 
-      // Ajouter le créateur comme collaborateur administrateur
-      const collaborator = await prismaTest.conventionOrganizer.create({
+      // Ajouter le créateur comme organisateur administrateur
+      const organizer = await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: convention.id,
           userId: testUser.id,
@@ -68,9 +68,9 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         },
       })
 
-      expect(collaborator.canManageOrganizers).toBe(true)
-      expect(collaborator.canDeleteConvention).toBe(true)
-      expect(collaborator.userId).toBe(testUser.id)
+      expect(organizer.canManageOrganizers).toBe(true)
+      expect(organizer.canDeleteConvention).toBe(true)
+      expect(organizer.userId).toBe(testUser.id)
     })
 
     it('devrait permettre plusieurs conventions avec des noms différents', async () => {
@@ -121,14 +121,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
     })
   })
 
-  describe('Gestion des collaborateurs', () => {
+  describe('Gestion des organisateurs', () => {
     let testConvention: { id: number; name: string }
 
     beforeEach(async () => {
       testConvention = await prismaTest.convention.create({
         data: {
-          name: 'Convention Collaborateurs',
-          description: 'Pour tester les collaborateurs',
+          name: 'Convention Organisateurs',
+          description: 'Pour tester les organisateurs',
           authorId: testUser.id,
         },
       })
@@ -149,8 +149,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
     })
 
-    it('devrait ajouter un collaborateur avec différents rôles', async () => {
-      // Ajouter un collaborateur MODERATOR
+    it('devrait ajouter un organisateur avec différents rôles', async () => {
+      // Ajouter un organisateur MODERATOR
       const moderator = await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
@@ -166,8 +166,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(moderator.userId).toBe(adminUser.id)
       expect(moderator.addedById).toBe(testUser.id)
 
-      // Vérifier que les collaborateurs sont bien enregistrés
-      const collaborators = await prismaTest.conventionOrganizer.findMany({
+      // Vérifier que les organisateurs sont bien enregistrés
+      const organizers = await prismaTest.conventionOrganizer.findMany({
         where: { conventionId: testConvention.id },
         include: {
           user: {
@@ -180,9 +180,9 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         },
       })
 
-      expect(collaborators).toHaveLength(2) // Auteur + collaborateur
+      expect(organizers).toHaveLength(2) // Auteur + organisateur
       expect(
-        collaborators.some(
+        organizers.some(
           (c) =>
             c.canManageOrganizers &&
             c.canDeleteConvention &&
@@ -193,14 +193,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         )
       ).toBeTruthy()
       expect(
-        collaborators.some(
-          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageOrganizers
-        )
+        organizers.some((c) => c.canAddEdition && c.canEditAllEditions && !c.canManageOrganizers)
       ).toBeTruthy()
     })
 
-    it('devrait empêcher les collaborateurs en double', async () => {
-      // Ajouter le collaborateur une première fois
+    it('devrait empêcher les organisateurs en double', async () => {
+      // Ajouter le organisateur une première fois
       await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
@@ -229,9 +227,9 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       ).rejects.toThrow()
     })
 
-    it("devrait mettre à jour le rôle d'un collaborateur", async () => {
-      // Ajouter un collaborateur MODERATOR
-      const collaborator = await prismaTest.conventionOrganizer.create({
+    it("devrait mettre à jour le rôle d'un organisateur", async () => {
+      // Ajouter un organisateur MODERATOR
+      const organizer = await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
@@ -242,8 +240,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       // "Promotion" = activer tous les droits restants
-      const updatedCollaborator = await prismaTest.conventionOrganizer.update({
-        where: { id: collaborator.id },
+      const updatedOrganizer = await prismaTest.conventionOrganizer.update({
+        where: { id: organizer.id },
         data: {
           canEditConvention: true,
           canDeleteConvention: true,
@@ -252,24 +250,24 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         },
       })
 
-      expect(updatedCollaborator.canManageOrganizers).toBe(true)
-      expect(updatedCollaborator.canDeleteConvention).toBe(true)
-      expect(updatedCollaborator.userId).toBe(adminUser.id)
+      expect(updatedOrganizer.canManageOrganizers).toBe(true)
+      expect(updatedOrganizer.canDeleteConvention).toBe(true)
+      expect(updatedOrganizer.userId).toBe(adminUser.id)
     })
   })
 
   describe('Requêtes complexes', () => {
-    it('devrait récupérer une convention avec tous ses collaborateurs', async () => {
+    it('devrait récupérer une convention avec tous ses organisateurs', async () => {
       // Créer une convention
       const convention = await prismaTest.convention.create({
         data: {
           name: 'Convention Complète',
-          description: 'Convention avec collaborateurs',
+          description: 'Convention avec organisateurs',
           authorId: testUser.id,
         },
       })
 
-      // Ajouter plusieurs collaborateurs
+      // Ajouter plusieurs organisateurs
       await prismaTest.conventionOrganizer.createMany({
         data: [
           {
@@ -304,7 +302,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
               email: true,
             },
           },
-          collaborators: {
+          organizers: {
             include: {
               user: {
                 select: {
@@ -326,10 +324,10 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
 
       expect(fullConvention).toBeDefined()
       expect(fullConvention!.author.pseudo).toContain('testcreator')
-      expect(fullConvention!.collaborators).toHaveLength(2)
-      // Vérifier un collaborateur "admin" (tous les droits)
+      expect(fullConvention!.organizers).toHaveLength(2)
+      // Vérifier un organisateur "admin" (tous les droits)
       expect(
-        fullConvention!.collaborators.some(
+        fullConvention!.organizers.some(
           (c) =>
             c.canManageOrganizers &&
             c.canDeleteConvention &&
@@ -339,9 +337,9 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
             c.canDeleteAllEditions
         )
       ).toBeTruthy()
-      // Vérifier un collaborateur "modérateur" (droits partiels)
+      // Vérifier un organisateur "modérateur" (droits partiels)
       expect(
-        fullConvention!.collaborators.some(
+        fullConvention!.organizers.some(
           (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageOrganizers
         )
       ).toBeTruthy()
@@ -388,8 +386,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
   })
 
   describe('Suppression en cascade', () => {
-    it("devrait supprimer les collaborateurs lors de la suppression d'une convention", async () => {
-      // Créer une convention avec collaborateur
+    it("devrait supprimer les organisateurs lors de la suppression d'une convention", async () => {
+      // Créer une convention avec organisateur
       const convention = await prismaTest.convention.create({
         data: {
           name: 'Convention à Supprimer',
@@ -408,22 +406,22 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         },
       })
 
-      // Vérifier que le collaborateur existe
-      const collaboratorsBefore = await prismaTest.conventionOrganizer.count({
+      // Vérifier que le organisateur existe
+      const organizersBefore = await prismaTest.conventionOrganizer.count({
         where: { conventionId: convention.id },
       })
-      expect(collaboratorsBefore).toBe(1)
+      expect(organizersBefore).toBe(1)
 
       // Supprimer la convention
       await prismaTest.convention.delete({
         where: { id: convention.id },
       })
 
-      // Vérifier que les collaborateurs ont été supprimés automatiquement
-      const collaboratorsAfter = await prismaTest.conventionOrganizer.count({
+      // Vérifier que les organisateurs ont été supprimés automatiquement
+      const organizersAfter = await prismaTest.conventionOrganizer.count({
         where: { conventionId: convention.id },
       })
-      expect(collaboratorsAfter).toBe(0)
+      expect(organizersAfter).toBe(0)
     })
   })
 })

@@ -1,7 +1,7 @@
 {
   "errors": {
     "access_denied": "Accès non autorisé",
-    "add_collaborator_error": "Erreur lors de l'ajout du collaborateur",
+    "add_organizer_error": "Erreur lors de l'ajout du organisateur",
     "address_required": "L'adresse est requise",
     "address_too_long": "L'adresse ne peut pas dépasser {max} caractères",
     "attendance_update_failed": "Échec de la mise à jour du statut de participation",
@@ -63,13 +63,13 @@
     "people_maximum": "Maximum {max} personnes",
     "publish_edition_failed": "Échec de la publication de l'édition",
     "registration_failed": "Échec de l'inscription",
-    "remove_collaborator_error": "Erreur lors de la suppression du collaborateur",
+    "remove_organizer_error": "Erreur lors de la suppression du organisateur",
     "required_field": "Ce champ est requis",
     "seats_maximum": "Maximum {max} places",
     "seats_minimum_one": "Le nombre de places doit être au moins 1",
     "server_error": "Erreur serveur",
     "status_update_failed": "Échec de la mise à jour du statut",
-    "update_collaborator_error": "Erreur lors de la mise à jour du collaborateur",
+    "update_organizer_error": "Erreur lors de la mise à jour du organisateur",
     "update_error": "Erreur lors de la mise à jour",
     "username_min_3_chars": "Le pseudo doit contenir au moins 3 caractères"
   },
@@ -496,7 +496,7 @@
       "add_volunteer_title": "Ajouter un bénévole manuellement",
       "added_manually_tooltip": "Ajouté manuellement par {name} le {date}",
       "additional_info_title": "A rajouter",
-      "admin_only_note": "Les informations suivantes (candidatures, filtres et statistiques détaillées) sont visibles uniquement par les organisateurs et collaborateurs autorisés.",
+      "admin_only_note": "Les informations suivantes (candidatures, filtres et statistiques détaillées) sont visibles uniquement par les organisateurs et organisateurs autorisés.",
       "all_accepted_volunteers": "Tous les bénévoles acceptés",
       "all_confirmed": "Tous ont confirmé !",
       "all_teams": "Toutes les équipes",

@@ -72,26 +72,26 @@
       "seats_min": "Pelo menos 1 lugar"
     }
   },
-  "collaborators": {
-    "collaborator_added": "Organizador adicionado",
-    "collaborator_removed": "Organizador removido",
-    "collaborator_updated": "Organizador atualizado",
+  "organizers": {
+    "organizer_added": "Organizador adicionado",
+    "organizer_removed": "Organizador removido",
+    "organizer_updated": "Organizador atualizado",
     "confirm_remove": "Tem certeza de que deseja remover este organizador?",
-    "edit_collaborator": "Editar organizador",
+    "edit_organizer": "Editar organizador",
     "list": "Lista de organizadores",
     "manage": "Gerir organizadores",
     "manage_description": "Gerir organizadores e seus direitos para esta edição",
-    "no_collaborators": "Nenhum organizador",
+    "no_organizers": "Nenhum organizador",
     "page_description": "Gerir membros da equipe organizadora e suas permissões",
     "rights": "Direitos",
     "title": "Organizadores"
   },
   "conventions": {
-    "add_collaborator": "Adicionar organizador",
+    "add_organizer": "Adicionar organizador",
     "add_edition": "Adicionar uma edição",
     "analytics_access": "Acesso às estatísticas",
     "analytics_access_desc": "Acompanhe o desempenho e envolvimento das suas edições",
-    "as_collaborator": "Como organizador",
+    "as_organizer": "Como organizador",
     "as_creator": "Como criador",
     "cannot_load_conventions": "Impossível carregar as suas convenções",
     "claim": {
@@ -118,7 +118,7 @@
       "verification_success_description": "Você agora é o proprietário desta convenção.",
       "verify": "Verificar"
     },
-    "collaborators": "Organizadores",
+    "organizers": "Organizadores",
     "confirm_delete_convention": "Tem a certeza de que quer eliminar esta convenção?",
     "convention_deleted": "Convenção eliminada",
     "convention_deleted_success": "A convenção foi eliminada com sucesso",
@@ -131,7 +131,7 @@
     "created_at": "Criada em",
     "delete": "Eliminar a convenção",
     "edit": "Editar a convenção",
-    "edit_collaborator_rights": "Editar direitos do organizador",
+    "edit_organizer_rights": "Editar direitos do organizador",
     "edit_permissions": "Direitos de edição",
     "edit_permissions_desc": "Modifique as convenções de acordo com as suas permissões",
     "editions": "Edições",
@@ -140,8 +140,8 @@
     "granular_rights": "Direitos granulares",
     "granular_rights_desc": "Permissões específicas por edição ou globais segundo as suas necessidades",
     "logo_alt": "Logotipo de {name}",
-    "manage_collaborators": "Gerir organizadores",
-    "manage_collaborators_desc": "Convide e gira os membros da sua equipa organizadora",
+    "manage_organizers": "Gerir organizadores",
+    "manage_organizers_desc": "Convide e gira os membros da sua equipa organizadora",
     "manage_editions": "Gerir edições",
     "manage_editions_desc": "Crie, edite e publique as diferentes edições das suas convenções",
     "manage_volunteers": "Gerir voluntários",

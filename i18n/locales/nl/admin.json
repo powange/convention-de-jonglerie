@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Upload of wijzig de profielfoto van deze gebruiker",
     "cleanup_expired_tokens": "Opruimen verlopen tokens",
     "cleanup_resolved_error_logs": "Opruimen foutenlogboeken",
-    "collaborators": "Medewerkers",
-    "collaborators_count": "{count} medewerkers",
+    "organizers": "Medewerkers",
+    "organizers_count": "{count} medewerkers",
     "coming_soon": "Binnenkort beschikbaar",
     "config": {
       "ai": "Kunstmatige intelligentie",
@@ -272,7 +272,7 @@
     "original_user": "Oorspronkelijke gebruiker",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ WAARSCHUWING: Weet je zeker dat je de conventie \"{name}\" permanent wilt verwijderen?\n\nDeze actie zal verwijderen:\n- {editionsCount} editie(s)\n- {collaboratorsCount} medewerker(s)\n- Alle bijbehorende gegevens\n\nDeze actie is ONOMKEERBAAR!",
+        "confirm_delete_convention_permanently": "⚠️ WAARSCHUWING: Weet je zeker dat je de conventie \"{name}\" permanent wilt verwijderen?\n\nDeze actie zal verwijderen:\n- {editionsCount} editie(s)\n- {organizersCount} medewerker(s)\n- Alle bijbehorende gegevens\n\nDeze actie is ONOMKEERBAAR!",
         "convention_deleted_permanently": "Conventie succesvol permanent verwijderd",
         "delete_convention_permanently": "Permanent verwijderen",
         "error_deleting_convention": "Fout bij verwijderen van conventie"

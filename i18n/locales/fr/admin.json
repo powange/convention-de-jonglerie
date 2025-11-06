@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Téléchargez ou modifiez la photo de profil de cet utilisateur",
     "cleanup_expired_tokens": "Nettoyage tokens expirés",
     "cleanup_resolved_error_logs": "Nettoyage logs d'erreur",
-    "collaborators": "Collaborateurs",
-    "collaborators_count": "{count} collaborateurs",
+    "organizers": "Organisateurs",
+    "organizers_count": "{count} organisateurs",
     "coming_soon": "Bientôt disponible",
     "confirm_action": "Confirmer l'action",
     "confirm_archive_convention": "Êtes-vous sûr de vouloir archiver cette convention ?",
@@ -261,7 +261,7 @@
     "original_user": "Utilisateur original",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement la convention \"{name}\" ?\n\nCette action supprimera :\n- {editionsCount} édition(s)\n- {collaboratorsCount} collaborateur(s)\n- Toutes les données associées\n\nCette action est IRRÉVERSIBLE !",
+        "confirm_delete_convention_permanently": "⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement la convention \"{name}\" ?\n\nCette action supprimera :\n- {editionsCount} édition(s)\n- {organizersCount} organisateur(s)\n- Toutes les données associées\n\nCette action est IRRÉVERSIBLE !",
         "convention_deleted_permanently": "Convention supprimée définitivement avec succès",
         "delete_convention_permanently": "Supprimer définitivement",
         "error_deleting_convention": "Erreur lors de la suppression de la convention"

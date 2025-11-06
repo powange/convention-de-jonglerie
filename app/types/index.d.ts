@@ -44,9 +44,9 @@ export interface Edition {
   creatorId?: number | null // Nullable pour éditions importées
   creator?: PublicUser
   conventionId: number
-  convention?: ConventionWithCollaborators
+  convention?: ConventionWithOrganizers
   attendingUsers?: PublicUser[]
-  collaborators?: EditionCollaborator[]
+  organizers?: EditionOrganizer[]
   ticketingUrl?: string | null
   facebookUrl?: string | null
   instagramUrl?: string | null
@@ -97,7 +97,7 @@ export interface Convention {
     country: string
     imageUrl?: string | null
   }[]
-  collaborators?: ConventionOrganizerWithRights[] // ajouté pour my-conventions
+  organizers?: ConventionOrganizerWithRights[] // ajouté pour my-conventions
 }
 
 export interface ConventionOrganizer {
@@ -125,7 +125,7 @@ export interface ConventionOrganizerWithRights {
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
 
-export interface EditionCollaborator {
+export interface EditionOrganizer {
   id: number
   user: PublicUser
   rights?: Record<string, boolean>
@@ -139,8 +139,8 @@ export interface EditionCollaborator {
   title?: string | null
 }
 
-export interface ConventionWithCollaborators extends Convention {
-  collaborators?: ConventionOrganizerWithRights[]
+export interface ConventionWithOrganizers extends Convention {
+  organizers?: ConventionOrganizerWithRights[]
 }
 
 // Interface pour les objets qui ont seulement des dates (pour les composables)

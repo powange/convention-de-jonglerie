@@ -25,7 +25,7 @@ export async function requireVolunteerManagementAccess(
     include: {
       convention: {
         include: {
-          collaborators: {
+          organizers: {
             where: { userId: user.id },
             include: {
               perEditionPermissions: {
@@ -55,16 +55,16 @@ export async function requireVolunteerManagementAccess(
     return user
   }
 
-  // Collaborateur avec droit global de gérer les bénévoles
-  const collaborator = edition.convention?.collaborators?.[0]
-  if (collaborator) {
+  // Organisateur avec droit global de gérer les bénévoles
+  const organizer = edition.convention?.organizers?.[0]
+  if (organizer) {
     // Droit global sur la convention
-    if (collaborator.canManageVolunteers) {
+    if (organizer.canManageVolunteers) {
       return user
     }
 
     // Droit spécifique à cette édition
-    const perEditionPermission = collaborator.perEditionPermissions?.[0]
+    const perEditionPermission = organizer.perEditionPermissions?.[0]
     if (perEditionPermission?.canManageVolunteers) {
       return user
     }
@@ -101,7 +101,7 @@ export async function requireVolunteerReadAccess(
     include: {
       convention: {
         include: {
-          collaborators: {
+          organizers: {
             where: { userId: user.id },
             include: {
               perEditionPermissions: {
@@ -131,10 +131,10 @@ export async function requireVolunteerReadAccess(
     return user
   }
 
-  // Collaborateur avec accès à l'édition (même sans permissions spécifiques aux bénévoles)
-  const collaborator = edition.convention?.collaborators?.[0]
-  if (collaborator) {
-    // Si c'est un collaborateur de la convention, il peut au moins voir
+  // Organisateur avec accès à l'édition (même sans permissions spécifiques aux bénévoles)
+  const organizer = edition.convention?.organizers?.[0]
+  if (organizer) {
+    // Si c'est un organisateur de la convention, il peut au moins voir
     return user
   }
 
@@ -182,7 +182,7 @@ export async function requireVolunteerPlanningAccess(
     return user
   }
 
-  // Sinon, vérifier les permissions de lecture classiques (collaborateurs, etc.)
+  // Sinon, vérifier les permissions de lecture classiques (organisateurs, etc.)
   try {
     return await requireVolunteerReadAccess(event, editionId)
   } catch {

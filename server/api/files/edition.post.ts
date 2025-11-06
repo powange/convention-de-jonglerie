@@ -48,7 +48,7 @@ export default wrapApiHandler(
         include: {
           convention: {
             include: {
-              collaborators: {
+              organizers: {
                 where: {
                   userId: user.id,
                   OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
@@ -68,10 +68,10 @@ export default wrapApiHandler(
 
       const isCreator = edition.createdBy === user.id
       const isConventionAuthor = edition.convention.authorId === user.id
-      const isCollaborator = edition.convention.collaborators.length > 0
+      const isOrganizer = edition.convention.organizers.length > 0
       const isGlobalAdmin = user.isGlobalAdmin || false
 
-      if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
+      if (!isCreator && !isConventionAuthor && !isOrganizer && !isGlobalAdmin) {
         throw createError({
           statusCode: 403,
           message: "Vous n'avez pas les droits pour modifier cette édition",

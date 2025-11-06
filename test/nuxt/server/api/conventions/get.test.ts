@@ -21,7 +21,7 @@ describe('API Convention - Récupération', () => {
       pseudo: 'creator',
       email: 'creator@example.com',
     },
-    collaborators: [
+    organizers: [
       {
         id: 1,
         title: 'Admin',
@@ -56,20 +56,20 @@ describe('API Convention - Récupération', () => {
       email: undefined,
       emailHash: getEmailHash(rawConvention.author.email),
     },
-    collaborators: [
+    organizers: [
       {
-        id: rawConvention.collaborators[0].id,
-        addedAt: rawConvention.collaborators[0].addedAt,
-        title: rawConvention.collaborators[0].title,
+        id: rawConvention.organizers[0].id,
+        addedAt: rawConvention.organizers[0].addedAt,
+        title: rawConvention.organizers[0].title,
         rights: {
           editConvention: true,
           deleteConvention: true,
-          manageCollaborators: true,
+          manageOrganizers: true,
           addEdition: true,
           editAllEditions: true,
           deleteAllEditions: true,
         },
-        user: rawConvention.collaborators[0].user,
+        user: rawConvention.organizers[0].user,
       },
     ],
   })
@@ -102,7 +102,7 @@ describe('API Convention - Récupération', () => {
             email: true,
           },
         },
-        collaborators: {
+        organizers: {
           include: {
             user: {
               select: {

@@ -59,7 +59,7 @@
       "to_add_comment": "щоб додати коментар",
       "view_comments": "Переглянути коментарі ({count})"
     },
-    "collaborators_rights_panel": {
+    "organizers_rights_panel": {
       "per_edition": "Права за виданнями",
       "per_edition_hint": "Для випусків не визначено конкретних прав",
       "title_placeholder": "Назва або роль (необов'язково)"

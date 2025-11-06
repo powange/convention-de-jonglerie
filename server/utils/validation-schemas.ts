@@ -336,12 +336,12 @@ export const editionPostCommentSchema = z.object({
     .max(1000, 'Le commentaire ne peut pas dépasser 1000 caractères'),
 })
 
-// Schémas de collaborateurs (nouveau modèle droits granulaire)
-export const collaboratorRightsSchema = z
+// Schémas de organisateurs (nouveau modèle droits granulaire)
+export const organizerRightsSchema = z
   .object({
     editConvention: z.boolean().optional(),
     deleteConvention: z.boolean().optional(),
-    manageCollaborators: z.boolean().optional(),
+    manageOrganizers: z.boolean().optional(),
     manageVolunteers: z.boolean().optional(),
     addEdition: z.boolean().optional(),
     editAllEditions: z.boolean().optional(),
@@ -349,12 +349,12 @@ export const collaboratorRightsSchema = z
   })
   .partial()
 
-export const addCollaboratorSchema = z.object({
+export const addOrganizerschema = z.object({
   userIdentifier: z.string().min(1, 'Pseudo ou email requis'),
 })
 
-export const updateCollaboratorRightsSchema = z.object({
-  rights: collaboratorRightsSchema.optional(),
+export const updateOrganizerRightsSchema = z.object({
+  rights: organizerRightsSchema.optional(),
   title: z.string().max(100).optional().nullable(),
 })
 

@@ -65,7 +65,7 @@ describe('/api/editions/[id] GET', () => {
       description: 'Description convention',
       logo: null,
       authorId: 1,
-      collaborators: [
+      organizers: [
         {
           id: 1,
           userId: 3,
@@ -73,7 +73,7 @@ describe('/api/editions/[id] GET', () => {
           role: 'MODERATOR',
           user: {
             id: 3,
-            pseudo: 'collaborator',
+            pseudo: 'organizer',
             email: 'collab@example.com',
             profilePicture: null,
             updatedAt: new Date(),
@@ -93,7 +93,7 @@ describe('/api/editions/[id] GET', () => {
   it('devrait retourner une édition par ID', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
       context: { params: { id: '1' } },
@@ -118,7 +118,7 @@ describe('/api/editions/[id] GET', () => {
   it('devrait masquer les emails et retourner emailHash', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
       context: { params: { id: '1' } },
@@ -130,19 +130,19 @@ describe('/api/editions/[id] GET', () => {
     expect(result.creator).not.toHaveProperty('email')
     expect(result.creator.emailHash).toBe('hash_creator@example.com')
 
-    // Vérifier qu'il y a au moins un collaborateur
-    expect(result.convention.collaborators).toHaveLength(1)
-    expect(result.convention.collaborators[0].user).not.toHaveProperty('email')
-    // Dans certains cas, l'email du collaborateur peut être undefined, donc emailHash sera vide
-    expect(result.convention.collaborators[0].user.emailHash).toBeDefined()
+    // Vérifier qu'il y a au moins un organisateur
+    expect(result.convention.organizers).toHaveLength(1)
+    expect(result.convention.organizers[0].user).not.toHaveProperty('email')
+    // Dans certains cas, l'email du organisateur peut être undefined, donc emailHash sera vide
+    expect(result.convention.organizers[0].user.emailHash).toBeDefined()
   })
 
-  it("devrait inclure les collaborateurs d'édition si disponible", async () => {
-    const editionWithCollaborators = {
+  it("devrait inclure les organisateurs d'édition si disponible", async () => {
+    const editionWithOrganizers = {
       ...mockEdition,
       convention: {
         ...mockEdition.convention,
-        collaborators: [
+        organizers: [
           {
             id: 1,
             user: {
@@ -162,8 +162,8 @@ describe('/api/editions/[id] GET', () => {
     }
 
     global.getRouterParam.mockReturnValue('1')
-    prismaMock.edition.findUnique.mockResolvedValue(editionWithCollaborators)
-    prismaMock.editionCollaborator.findFirst.mockResolvedValue({}) // Table existe
+    prismaMock.edition.findUnique.mockResolvedValue(editionWithOrganizers)
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue({}) // Table existe
 
     const mockEvent = {
       context: { params: { id: '1' } },
@@ -171,11 +171,11 @@ describe('/api/editions/[id] GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.convention.collaborators).toBeDefined()
-    expect(result.convention.collaborators).toHaveLength(1)
-    expect(result.convention.collaborators[0].user.pseudo).toBe('edition_collab')
-    expect(result.convention.collaborators[0].user.emailHash).toBe('hash_ed_collab@example.com')
-    expect(result.convention.collaborators[0].user).not.toHaveProperty('email')
+    expect(result.convention.organizers).toBeDefined()
+    expect(result.convention.organizers).toHaveLength(1)
+    expect(result.convention.organizers[0].user.pseudo).toBe('edition_collab')
+    expect(result.convention.organizers[0].user.emailHash).toBe('hash_ed_collab@example.com')
+    expect(result.convention.organizers[0].user).not.toHaveProperty('email')
   })
 
   it('devrait rejeter pour un ID invalide', async () => {
@@ -191,7 +191,7 @@ describe('/api/editions/[id] GET', () => {
   it('devrait retourner 404 si édition non trouvée', async () => {
     global.getRouterParam.mockReturnValue('999')
     prismaMock.edition.findUnique.mockResolvedValue(null)
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
       context: { params: { id: '999' } },
@@ -211,10 +211,10 @@ describe('/api/editions/[id] GET', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow()
   })
 
-  it("devrait fonctionner même si la table EditionCollaborator n'existe pas", async () => {
+  it("devrait fonctionner même si la table EditionOrganizer n'existe pas", async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
       context: { params: { id: '1' } },
@@ -223,13 +223,13 @@ describe('/api/editions/[id] GET', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.id).toBe(1)
-    expect(result.collaborators).toBeUndefined()
+    expect(result.organizers).toBeUndefined()
   })
 
   it('devrait inclure toutes les relations nécessaires', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
       context: { params: { id: '1' } },
@@ -257,7 +257,7 @@ describe('/api/editions/[id] GET', () => {
         volunteerApplications: false,
         convention: {
           include: {
-            collaborators: {
+            organizers: {
               include: {
                 user: {
                   select: {

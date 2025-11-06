@@ -22,7 +22,7 @@
       <UInput
         v-model="localValue.title"
         :size="inputSize"
-        :placeholder="$t('components.collaborators_rights_panel.title_placeholder')"
+        :placeholder="$t('components.organizers_rights_panel.title_placeholder')"
         class="w-full"
         @update:model-value="emitModel"
       />
@@ -34,7 +34,7 @@
         <h6
           class="text-[11px] uppercase font-semibold tracking-wide text-gray-500 dark:text-gray-400"
         >
-          {{ $t('components.collaborators_rights_panel.per_edition') }}
+          {{ $t('components.organizers_rights_panel.per_edition') }}
         </h6>
         <UButton
           v-if="localValue.perEdition.length"
@@ -132,7 +132,7 @@
               </tr>
               <tr v-if="!localValue.perEdition.length">
                 <td colspan="5" class="px-2 py-2 italic text-gray-500">
-                  {{ $t('components.collaborators_rights_panel.per_edition_hint') }}
+                  {{ $t('components.organizers_rights_panel.per_edition_hint') }}
                 </td>
               </tr>
             </tbody>
@@ -184,7 +184,7 @@ const props = withDefaults(
     permissionList: () => [
       { key: 'editConvention', label: 'permissions.editConvention' },
       { key: 'deleteConvention', label: 'permissions.deleteConvention' },
-      { key: 'manageCollaborators', label: 'permissions.manageCollaborators' },
+      { key: 'manageOrganizers', label: 'permissions.manageOrganizers' },
       { key: 'addEdition', label: 'permissions.addEdition' },
       { key: 'editAllEditions', label: 'permissions.editAllEditions' },
       { key: 'deleteAllEditions', label: 'permissions.deleteAllEditions' },

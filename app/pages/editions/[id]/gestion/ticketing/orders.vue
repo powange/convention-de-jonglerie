@@ -1002,8 +1002,8 @@ const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   if (authStore.user.id === edition.value.creatorId) return true
   if (canEdit.value || canManageVolunteers.value) return true
-  if (edition.value.convention?.collaborators) {
-    return edition.value.convention.collaborators.some(
+  if (edition.value.convention?.organizers) {
+    return edition.value.convention.organizers.some(
       (collab) => collab.user.id === authStore.user?.id
     )
   }

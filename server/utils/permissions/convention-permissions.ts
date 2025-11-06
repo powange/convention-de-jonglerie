@@ -1,13 +1,14 @@
 import { canManageOrganizers } from '@@/server/utils/organizer-management'
+
 import { prisma } from '../prisma'
 
 import type { User, Convention, ConventionOrganizer } from '@prisma/client'
 
 /**
- * Type pour une convention avec ses collaborateurs
+ * Type pour une convention avec ses organisateurs
  */
-export type ConventionWithCollaborators = Convention & {
-  collaborators: ConventionOrganizer[]
+export type ConventionWithOrganizers = Convention & {
+  organizers: ConventionOrganizer[]
 }
 
 /**
@@ -15,7 +16,7 @@ export type ConventionWithCollaborators = Convention & {
  */
 export type ConventionWithEditions = Convention & {
   editions: { id: number }[]
-  collaborators: ConventionOrganizer[]
+  organizers: ConventionOrganizer[]
 }
 
 /**
@@ -28,7 +29,7 @@ export interface ConventionPermissionOptions {
 }
 
 /**
- * Droits de collaborateur possibles pour les conventions
+ * Droits de organisateur possibles pour les conventions
  */
 export type ConventionRight =
   | 'canEditConvention'
@@ -41,16 +42,16 @@ export type ConventionRight =
   | 'canDeleteAllEditions'
 
 /**
- * Récupère une convention avec les collaborateurs filtrés selon les droits requis
+ * Récupère une convention avec les organisateurs filtrés selon les droits requis
  */
 export async function getConventionWithPermissions(
   conventionId: number,
   options: ConventionPermissionOptions
-): Promise<ConventionWithCollaborators | ConventionWithEditions | null> {
+): Promise<ConventionWithOrganizers | ConventionWithEditions | null> {
   const { userId, requiredRights = [], includeEditions = false } = options
 
-  // Si aucun droit spécifique requis, on récupère tous les collaborateurs de l'utilisateur
-  const collaboratorFilter =
+  // Si aucun droit spécifique requis, on récupère tous les organisateurs de l'utilisateur
+  const organizerFilter =
     requiredRights.length > 0
       ? {
           userId,
@@ -61,8 +62,8 @@ export async function getConventionWithPermissions(
   return (await prisma.convention.findUnique({
     where: { id: conventionId },
     include: {
-      collaborators: {
-        where: collaboratorFilter,
+      organizers: {
+        where: organizerFilter,
       },
       ...(includeEditions && {
         editions: {
@@ -76,13 +77,13 @@ export async function getConventionWithPermissions(
 /**
  * Vérifie si un utilisateur peut éditer une convention
  */
-export function canEditConvention(convention: ConventionWithCollaborators, user: User): boolean {
+export function canEditConvention(convention: ConventionWithOrganizers, user: User): boolean {
   const isAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits d'édition
+  // Vérifier si l'utilisateur est organisateur avec droits d'édition
   const hasEditRights =
-    convention.collaborators?.some(
+    convention.organizers?.some(
       (collab) => collab.userId === user.id && collab.canEditConvention
     ) || false
 
@@ -92,13 +93,13 @@ export function canEditConvention(convention: ConventionWithCollaborators, user:
 /**
  * Vérifie si un utilisateur peut supprimer une convention
  */
-export function canDeleteConvention(convention: ConventionWithCollaborators, user: User): boolean {
+export function canDeleteConvention(convention: ConventionWithOrganizers, user: User): boolean {
   const isAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits de suppression
+  // Vérifier si l'utilisateur est organisateur avec droits de suppression
   const hasDeleteRights =
-    convention.collaborators?.some(
+    convention.organizers?.some(
       (collab) => collab.userId === user.id && collab.canDeleteConvention
     ) || false
 
@@ -108,7 +109,7 @@ export function canDeleteConvention(convention: ConventionWithCollaborators, use
 /**
  * Vérifie si un utilisateur peut archiver/désarchiver une convention
  */
-export function canArchiveConvention(convention: ConventionWithCollaborators, user: User): boolean {
+export function canArchiveConvention(convention: ConventionWithOrganizers, user: User): boolean {
   // Même permissions que la suppression
   return canDeleteConvention(convention, user)
 }
@@ -118,15 +119,14 @@ export function canArchiveConvention(convention: ConventionWithCollaborators, us
 /**
  * Vérifie si un utilisateur peut voir une convention (lecture seule)
  */
-export function canViewConvention(convention: ConventionWithCollaborators, user: User): boolean {
+export function canViewConvention(convention: ConventionWithOrganizers, user: User): boolean {
   const isAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Collaborateur (avec n'importe quel droit)
-  const isCollaborator =
-    convention.collaborators?.some((collab) => collab.userId === user.id) || false
+  // Organisateur (avec n'importe quel droit)
+  const isOrganizer = convention.organizers?.some((collab) => collab.userId === user.id) || false
 
-  return isAuthor || isCollaborator || isGlobalAdmin
+  return isAuthor || isOrganizer || isGlobalAdmin
 }
 
 /**
@@ -135,11 +135,11 @@ export function canViewConvention(convention: ConventionWithCollaborators, user:
 export async function getConventionForEdit(
   conventionId: number,
   user: User
-): Promise<ConventionWithCollaborators> {
+): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
     requiredRights: ['canEditConvention'],
-  })) as ConventionWithCollaborators
+  })) as ConventionWithOrganizers
 
   if (!convention) {
     throw createError({
@@ -219,16 +219,16 @@ export async function getConventionForArchive(
 }
 
 /**
- * Récupère une convention et vérifie les permissions de gestion des collaborateurs
+ * Récupère une convention et vérifie les permissions de gestion des organisateurs
  */
-export async function getConventionForCollaboratorManagement(
+export async function getConventionForOrganizerManagement(
   conventionId: number,
   user: User
-): Promise<ConventionWithCollaborators> {
+): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
     requiredRights: ['canManageOrganizers'],
-  })) as ConventionWithCollaborators
+  })) as ConventionWithOrganizers
 
   if (!convention) {
     throw createError({
@@ -241,7 +241,7 @@ export async function getConventionForCollaboratorManagement(
   if (!canManage) {
     throw createError({
       statusCode: 403,
-      message: 'Droits insuffisants pour gérer les collaborateurs',
+      message: 'Droits insuffisants pour gérer les organisateurs',
     })
   }
 
@@ -258,13 +258,13 @@ export function shouldArchiveInsteadOfDelete(convention: ConventionWithEditions)
 /**
  * Vérifie si un utilisateur peut créer une édition dans une convention
  */
-export function canCreateEdition(convention: ConventionWithCollaborators, user: User): boolean {
+export function canCreateEdition(convention: ConventionWithOrganizers, user: User): boolean {
   const isConventionAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits de création
+  // Vérifier si l'utilisateur est organisateur avec droits de création
   const hasCreateRights =
-    convention.collaborators?.some((collab) => collab.userId === user.id && collab.canAddEdition) ||
+    convention.organizers?.some((collab) => collab.userId === user.id && collab.canAddEdition) ||
     false
 
   return isConventionAuthor || hasCreateRights || isGlobalAdmin
@@ -276,11 +276,11 @@ export function canCreateEdition(convention: ConventionWithCollaborators, user: 
 export async function getConventionForEditionCreation(
   conventionId: number,
   user: User
-): Promise<ConventionWithCollaborators> {
+): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
     requiredRights: ['canAddEdition'],
-  })) as ConventionWithCollaborators
+  })) as ConventionWithOrganizers
 
   if (!convention) {
     throw createError({

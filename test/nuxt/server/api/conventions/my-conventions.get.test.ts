@@ -40,7 +40,7 @@ describe('/api/conventions/my-conventions GET', () => {
           pseudo: 'testuser',
           email: 'user@test.com',
         },
-        collaborators: [],
+        organizers: [],
         editions: [
           {
             id: 1,
@@ -74,7 +74,7 @@ describe('/api/conventions/my-conventions GET', () => {
         emailHash: 'user-hash',
         email: undefined,
       },
-      collaborators: [],
+      organizers: [],
       editions: [
         {
           id: 1,
@@ -92,7 +92,7 @@ describe('/api/conventions/my-conventions GET', () => {
     expect(prismaMock.convention.findMany).toHaveBeenCalledWith({
       where: {
         isArchived: false,
-        OR: [{ authorId: 1 }, { collaborators: { some: { userId: 1 } } }],
+        OR: [{ authorId: 1 }, { organizers: { some: { userId: 1 } } }],
       },
       include: {
         author: {
@@ -102,7 +102,7 @@ describe('/api/conventions/my-conventions GET', () => {
             email: true,
           },
         },
-        collaborators: {
+        organizers: {
           include: {
             user: {
               select: {
@@ -154,7 +154,7 @@ describe('/api/conventions/my-conventions GET', () => {
     })
   })
 
-  it("devrait retourner les conventions où l'utilisateur est collaborateur", async () => {
+  it("devrait retourner les conventions où l'utilisateur est organisateur", async () => {
     const mockConventions = [
       {
         id: 1,
@@ -165,7 +165,7 @@ describe('/api/conventions/my-conventions GET', () => {
           pseudo: 'author',
           email: 'author@test.com',
         },
-        collaborators: [
+        organizers: [
           {
             id: 1,
             userId: 1,
@@ -190,8 +190,8 @@ describe('/api/conventions/my-conventions GET', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toHaveLength(1)
-    expect(result[0].collaborators).toHaveLength(1)
-    expect(result[0].collaborators[0].user.emailHash).toBe('user-hash')
+    expect(result[0].organizers).toHaveLength(1)
+    expect(result[0].organizers[0].user.emailHash).toBe('user-hash')
     expect(result[0].author.emailHash).toBe('author-hash')
   })
 
@@ -206,7 +206,7 @@ describe('/api/conventions/my-conventions GET', () => {
           pseudo: 'author',
           email: 'author@test.com',
         },
-        collaborators: [
+        organizers: [
           {
             id: 1,
             user: {
@@ -245,13 +245,13 @@ describe('/api/conventions/my-conventions GET', () => {
     expect(mockGetEmailHash).toHaveBeenNthCalledWith(3, 'collab2@test.com')
 
     expect(result[0].author.emailHash).toBe('author-hash')
-    expect(result[0].collaborators[0].user.emailHash).toBe('collab1-hash')
-    expect(result[0].collaborators[1].user.emailHash).toBe('collab2-hash')
+    expect(result[0].organizers[0].user.emailHash).toBe('collab1-hash')
+    expect(result[0].organizers[1].user.emailHash).toBe('collab2-hash')
 
     // Vérifier que les emails originaux ne sont pas exposés
     expect(result[0].author).not.toHaveProperty('email')
-    expect(result[0].collaborators[0].user).not.toHaveProperty('email')
-    expect(result[0].collaborators[1].user).not.toHaveProperty('email')
+    expect(result[0].organizers[0].user).not.toHaveProperty('email')
+    expect(result[0].organizers[1].user).not.toHaveProperty('email')
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -277,7 +277,7 @@ describe('/api/conventions/my-conventions GET', () => {
         name: 'Convention Récente',
         createdAt: new Date('2024-02-01'),
         author: { id: 1, pseudo: 'user', email: 'user@test.com' },
-        collaborators: [],
+        organizers: [],
         editions: [],
       },
       {
@@ -285,7 +285,7 @@ describe('/api/conventions/my-conventions GET', () => {
         name: 'Convention Ancienne',
         createdAt: new Date('2024-01-01'),
         author: { id: 1, pseudo: 'user', email: 'user@test.com' },
-        collaborators: [],
+        organizers: [],
         editions: [],
       },
     ]
@@ -306,7 +306,7 @@ describe('/api/conventions/my-conventions GET', () => {
         id: 1,
         name: 'Convention Test',
         author: { id: 1, pseudo: 'user', email: 'user@test.com' },
-        collaborators: [],
+        organizers: [],
         editions: [
           {
             id: 2,
@@ -332,13 +332,13 @@ describe('/api/conventions/my-conventions GET', () => {
     expect(result[0].editions[1].name).toBe('Edition 2024')
   })
 
-  it("devrait ordonner les collaborateurs par date d'ajout croissante", async () => {
+  it("devrait ordonner les organisateurs par date d'ajout croissante", async () => {
     const mockConventions = [
       {
         id: 1,
         name: 'Convention Test',
         author: { id: 1, pseudo: 'user', email: 'user@test.com' },
-        collaborators: [
+        organizers: [
           {
             id: 2,
             addedAt: new Date('2024-01-02'),
@@ -362,7 +362,7 @@ describe('/api/conventions/my-conventions GET', () => {
     expect(prismaMock.convention.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         include: expect.objectContaining({
-          collaborators: expect.objectContaining({
+          organizers: expect.objectContaining({
             orderBy: { addedAt: 'asc' },
           }),
         }),
@@ -376,13 +376,13 @@ describe('/api/conventions/my-conventions GET', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
 
-  it('devrait gérer les collaborateurs sans profilePicture', async () => {
+  it('devrait gérer les organisateurs sans profilePicture', async () => {
     const mockConventions = [
       {
         id: 1,
         name: 'Convention Test',
         author: { id: 1, pseudo: 'user', email: 'user@test.com' },
-        collaborators: [
+        organizers: [
           {
             id: 1,
             user: {
@@ -402,6 +402,6 @@ describe('/api/conventions/my-conventions GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result[0].collaborators[0].user.profilePicture).toBeNull()
+    expect(result[0].organizers[0].user.profilePicture).toBeNull()
   })
 })

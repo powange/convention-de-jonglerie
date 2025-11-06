@@ -37,7 +37,7 @@ export default wrapApiHandler(
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
-        message: 'Vous devez être collaborateur pour commenter sur cette édition',
+        message: 'Vous devez être organisateur pour commenter sur cette édition',
       })
     }
 

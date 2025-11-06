@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Prześlij lub zmień zdjęcie profilowe tego użytkownika",
     "cleanup_expired_tokens": "Czyszczenie wygasłych tokenów",
     "cleanup_resolved_error_logs": "Czyszczenie dzienników błędów",
-    "collaborators": "Współpracownicy",
-    "collaborators_count": "{count} współpracowników",
+    "organizers": "Współpracownicy",
+    "organizers_count": "{count} współpracowników",
     "coming_soon": "Wkrótce dostępne",
     "config": {
       "ai": "Sztuczna inteligencja",
@@ -272,7 +272,7 @@
     "original_user": "Oryginalny użytkownik",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ OSTRZEŻENIE: Czy na pewno chcesz trwale usunąć konwencję \"{name}\"?\n\nTa czynność usunie:\n- {editionsCount} edycję/edycji\n- {collaboratorsCount} współpracownika/współpracowników\n- Wszystkie powiązane dane\n\nTa czynność jest NIEODWRACALNA!",
+        "confirm_delete_convention_permanently": "⚠️ OSTRZEŻENIE: Czy na pewno chcesz trwale usunąć konwencję \"{name}\"?\n\nTa czynność usunie:\n- {editionsCount} edycję/edycji\n- {organizersCount} współpracownika/współpracowników\n- Wszystkie powiązane dane\n\nTa czynność jest NIEODWRACALNA!",
         "convention_deleted_permanently": "Konwencja usunięta trwale pomyślnie",
         "delete_convention_permanently": "Usuń trwale",
         "error_deleting_convention": "Błąd podczas usuwania konwencji"

@@ -381,7 +381,7 @@ const canManageEdition = computed(() => {
   // Super Admin en mode admin
   if (authStore.isAdminModeActive) return true
   if (edition.value.creatorId && edition.value.creatorId === authStore.user.id) return true
-  const collab = edition.value.convention?.collaborators?.find(
+  const collab = edition.value.convention?.organizers?.find(
     (c: any) => c.user.id === authStore.user!.id
   )
   if (!collab) return false
@@ -389,7 +389,7 @@ const canManageEdition = computed(() => {
   return !!(
     rights.editAllEditions ||
     rights.deleteAllEditions ||
-    rights.manageCollaborators ||
+    rights.manageOrganizers ||
     rights.editConvention
   )
 })

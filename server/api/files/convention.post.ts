@@ -37,7 +37,7 @@ export default wrapApiHandler(
       const convention = await prisma.convention.findUnique({
         where: { id: targetId },
         include: {
-          collaborators: {
+          organizers: {
             where: {
               userId: user.id,
               canEditConvention: true,
@@ -54,10 +54,10 @@ export default wrapApiHandler(
       }
 
       const isAuthor = convention.authorId === user.id
-      const isCollaborator = convention.collaborators.length > 0
+      const isOrganizer = convention.organizers.length > 0
       const isGlobalAdmin = user.isGlobalAdmin || false
 
-      if (!isAuthor && !isCollaborator && !isGlobalAdmin) {
+      if (!isAuthor && !isOrganizer && !isGlobalAdmin) {
         throw createError({
           statusCode: 403,
           message: "Vous n'avez pas les droits pour modifier cette convention",

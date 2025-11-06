@@ -142,9 +142,9 @@ const canManageOrganizers = computed(() => {
   return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
-const isCollaborator = computed(() => {
+const isOrganizer = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.isCollaborator(edition.value, authStore.user.id)
+  return editionStore.isOrganizer(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est team leader
@@ -198,12 +198,12 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   // Deuxième section : Modules de gestion
   const managementSection: NavigationMenuItem[] = []
 
-  // Collaborateurs
+  // Organisateurs
   if (canManageOrganizers.value) {
     managementSection.push({
-      label: t('collaborators.title'),
+      label: t('organizers.title'),
       icon: 'i-heroicons-users',
-      to: `/editions/${editionId.value}/gestion/collaborators`,
+      to: `/editions/${editionId.value}/gestion/organizers`,
     })
   }
 
@@ -256,7 +256,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Artistes
-  if (isCollaborator.value) {
+  if (isOrganizer.value) {
     managementSection.push({
       label: t('gestion.artists.title'),
       icon: 'i-heroicons-star',
@@ -274,10 +274,10 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Repas
-  if (isCollaborator.value || canAccessMealValidation.value) {
+  if (isOrganizer.value || canAccessMealValidation.value) {
     const mealsChildren: NavigationMenuItem[] = []
 
-    if (isCollaborator.value) {
+    if (isOrganizer.value) {
       mealsChildren.push(
         {
           label: t('gestion.meals.configuration_title'),
@@ -303,7 +303,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Billeterie
-  if (isCollaborator.value) {
+  if (isOrganizer.value) {
     managementSection.push({
       label: t('gestion.ticketing.title'),
       icon: 'i-heroicons-ticket',
@@ -333,7 +333,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Workshops
-  if (isCollaborator.value && edition.value?.workshopsEnabled) {
+  if (isOrganizer.value && edition.value?.workshopsEnabled) {
     managementSection.push({
       label: t('gestion.workshops.title'),
       icon: 'i-heroicons-academic-cap',

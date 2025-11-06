@@ -242,8 +242,8 @@ async function main() {
       })
       console.log(`Convention créée: ${conv.name} (id=${conv.id})`)
 
-      // Ajouter automatiquement l'auteur comme collaborateur ADMINISTRATOR
-      await prisma.conventionCollaborator.create({
+      // Ajouter automatiquement l'auteur comme organisateur ADMINISTRATOR
+      await prisma.conventionOrganizer.create({
         data: {
           conventionId: conv.id,
           userId: convDef.authorId,
@@ -251,18 +251,18 @@ async function main() {
           title: 'Organisateur',
           canEditConvention: true,
           canDeleteConvention: true,
-          canManageCollaborators: true,
+          canManageOrganizers: true,
           canAddEdition: true,
           canEditAllEditions: true,
           canDeleteAllEditions: true,
         },
       })
-      console.log(`  → Auteur ajouté comme collaborateur ADMINISTRATOR`)
+      console.log(`  → Auteur ajouté comme organisateur ADMINISTRATOR`)
     } else {
       console.log(`Convention existante: ${conv.name} (id=${conv.id})`)
 
-      // Vérifier si l'auteur est déjà collaborateur, sinon l'ajouter
-      const existingCollab = await prisma.conventionCollaborator.findFirst({
+      // Vérifier si l'auteur est déjà organisateur, sinon l'ajouter
+      const existingCollab = await prisma.conventionOrganizer.findFirst({
         where: {
           conventionId: conv.id,
           userId: conv.authorId,
@@ -270,7 +270,7 @@ async function main() {
       })
 
       if (!existingCollab) {
-        await prisma.conventionCollaborator.create({
+        await prisma.conventionOrganizer.create({
           data: {
             conventionId: conv.id,
             userId: conv.authorId,
@@ -278,27 +278,27 @@ async function main() {
             title: 'Organisateur',
             canEditConvention: true,
             canDeleteConvention: true,
-            canManageCollaborators: true,
+            canManageOrganizers: true,
             canAddEdition: true,
             canEditAllEditions: true,
             canDeleteAllEditions: true,
           },
         })
-        console.log(`  → Auteur ajouté comme collaborateur ADMINISTRATOR`)
+        console.log(`  → Auteur ajouté comme organisateur ADMINISTRATOR`)
       }
     }
 
-    // Ajouter des collaborateurs supplémentaires pour certaines conventions
+    // Ajouter des organisateurs supplémentaires pour certaines conventions
     // Pour rendre la base de données plus réaliste
     if (Math.random() > 0.5) {
-      const numCollaborators = Math.floor(Math.random() * 3) + 1 // 1-3 collaborateurs
+      const numOrganizers = Math.floor(Math.random() * 3) + 1 // 1-3 organisateurs
       const availableUsers = createdUsers.filter((u) => u.id !== conv.authorId)
 
-      for (let j = 0; j < Math.min(numCollaborators, availableUsers.length); j++) {
+      for (let j = 0; j < Math.min(numOrganizers, availableUsers.length); j++) {
         const randomUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
 
-        // Vérifier si cet utilisateur n'est pas déjà collaborateur
-        const existingCollab = await prisma.conventionCollaborator.findFirst({
+        // Vérifier si cet utilisateur n'est pas déjà organisateur
+        const existingCollab = await prisma.conventionOrganizer.findFirst({
           where: {
             conventionId: conv.id,
             userId: randomUser.id,
@@ -307,7 +307,7 @@ async function main() {
 
         if (!existingCollab) {
           const role = Math.random() > 0.6 ? 'ADMINISTRATOR' : 'MODERATOR'
-          await prisma.conventionCollaborator.create({
+          await prisma.conventionOrganizer.create({
             data: {
               conventionId: conv.id,
               userId: randomUser.id,
@@ -317,13 +317,13 @@ async function main() {
               // NOTE: legacy mapping basé sur role (ADMINISTRATOR/MODERATOR) conservé uniquement pour seed local.
               canEditConvention: role === 'ADMINISTRATOR',
               canDeleteConvention: role === 'ADMINISTRATOR',
-              canManageCollaborators: role === 'ADMINISTRATOR',
+              canManageOrganizers: role === 'ADMINISTRATOR',
               canAddEdition: true, // MODERATOR et ADMIN peuvent ajouter
               canEditAllEditions: true, // les deux peuvent éditer toutes les éditions
               canDeleteAllEditions: true, // per spec: MODERATOR => canDeleteAllEditions true
             },
           })
-          console.log(`  → Collaborateur ajouté: ${randomUser.pseudo} (${role})`)
+          console.log(`  → Organisateur ajouté: ${randomUser.pseudo} (${role})`)
         }
       }
     }
@@ -391,23 +391,23 @@ async function main() {
       }
     }
 
-    // Exemple: ajouter quelques permissions spécifiques par édition pour le premier collaborateur non-auteur si présent
-    const extraCollaborators = await prisma.conventionCollaborator.findMany({
+    // Exemple: ajouter quelques permissions spécifiques par édition pour le premier organisateur non-auteur si présent
+    const extraOrganizers = await prisma.conventionOrganizer.findMany({
       where: { conventionId: conv.id, userId: { not: conv.authorId } },
       take: 1,
       orderBy: { addedAt: 'asc' },
     })
-    if (extraCollaborators.length && createdEditions.length) {
-      const targetCollab = extraCollaborators[0]
+    if (extraOrganizers.length && createdEditions.length) {
+      const targetCollab = extraOrganizers[0]
       // Sélectionner 1 à 2 éditions pour des droits spécifiques si pas déjà globalement admin
       const editionSample = createdEditions.filter((e) => e.conventionId === conv.id).slice(0, 2)
       for (const ed of editionSample) {
-        await prisma.editionCollaboratorPermission.upsert({
+        await prisma.editionOrganizerPermission.upsert({
           where: {
-            collaboratorId_editionId: { collaboratorId: targetCollab.id, editionId: ed.id },
+            organizerId_editionId: { organizerId: targetCollab.id, editionId: ed.id },
           },
           create: {
-            collaboratorId: targetCollab.id,
+            organizerId: targetCollab.id,
             editionId: ed.id,
             canEdit: true,
             canDelete: false,
@@ -1099,7 +1099,7 @@ async function main() {
       'Interface pas intuitive',
     ],
     QUESTION: [
-      'Comment ajouter un collaborateur ?',
+      'Comment ajouter un organisateur ?',
       'Comment fonctionne le système de bénévolat ?',
       'Puis-je supprimer mon compte ?',
     ],
@@ -1122,7 +1122,7 @@ async function main() {
       "J'attends une réponse depuis 2 semaines...",
     ],
     QUESTION: [
-      "Je ne trouve pas comment ajouter un collaborateur à ma convention. Pouvez-vous m'aider ?",
+      "Je ne trouve pas comment ajouter un organisateur à ma convention. Pouvez-vous m'aider ?",
       'Comment puis-je configurer le système de bénévolat pour mon édition ?',
     ],
     OTHER: ['Bravo pour cette application, elle est vraiment bien faite !'],

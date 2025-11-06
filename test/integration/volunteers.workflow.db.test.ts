@@ -322,50 +322,50 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
     })
 
     describe('Validation des permissions dans le workflow', () => {
-      it('devrait permettre à un collaborateur autorisé de gérer les candidatures', async () => {
+      it('devrait permettre à un organisateur autorisé de gérer les candidatures', async () => {
         const ts = Date.now()
 
-        // Créer un utilisateur collaborateur
-        const collaboratorUser = await prismaTest.user.create({
+        // Créer un utilisateur organisateur
+        const organizerUser = await prismaTest.user.create({
           data: {
-            email: `collaborator-${ts}@example.com`,
+            email: `organizer-${ts}@example.com`,
             password: await bcrypt.hash('Password123!', 10),
             pseudo: `collab-${ts}`,
-            nom: 'Collaborateur',
+            nom: 'Organisateur',
             prenom: 'Test',
             isEmailVerified: true,
           },
         })
 
-        // Créer une convention avec un collaborateur
+        // Créer une convention avec un organisateur
         const convention = await prismaTest.convention.findUnique({
           where: { id: mockEdition.conventionId },
         })
 
         expect(convention).toBeDefined()
 
-        // Ajouter le collaborateur
-        const collaborator = await prismaTest.conventionOrganizer.create({
+        // Ajouter le organisateur
+        const organizer = await prismaTest.conventionOrganizer.create({
           data: {
             conventionId: convention!.id,
-            userId: collaboratorUser.id,
+            userId: organizerUser.id,
             canManageVolunteers: true,
             addedById: mockManager.id,
           },
         })
 
-        expect(collaborator.canManageVolunteers).toBe(true)
+        expect(organizer.canManageVolunteers).toBe(true)
 
-        // Vérifier que le collaborateur est bien enregistré
-        const foundCollaborator = await prismaTest.conventionOrganizer.findFirst({
+        // Vérifier que le organisateur est bien enregistré
+        const foundOrganizer = await prismaTest.conventionOrganizer.findFirst({
           where: {
             conventionId: convention!.id,
-            userId: collaboratorUser.id,
+            userId: organizerUser.id,
           },
         })
 
-        expect(foundCollaborator).toBeDefined()
-        expect(foundCollaborator?.canManageVolunteers).toBe(true)
+        expect(foundOrganizer).toBeDefined()
+        expect(foundOrganizer?.canManageVolunteers).toBe(true)
       })
     })
 

@@ -66,7 +66,7 @@ describe('Système de conventions', () => {
       })
       prismaMock.convention.findUnique.mockResolvedValue({
         ...createdConvention,
-        collaborators: [],
+        organizers: [],
       })
 
       // Mock readBody pour retourner les données de convention
@@ -185,7 +185,7 @@ describe('Système de conventions', () => {
           pseudo: mockUser.pseudo,
           email: mockUser.email,
         },
-        collaborators: [],
+        organizers: [],
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(conventionWithDetails)
@@ -214,7 +214,7 @@ describe('Système de conventions', () => {
               email: true,
             },
           },
-          collaborators: {
+          organizers: {
             include: {
               user: {
                 select: {
@@ -260,7 +260,7 @@ describe('Système de conventions', () => {
 
       const existingConvention = {
         ...mockConvention,
-        collaborators: [],
+        organizers: [],
       }
 
       const updatedConvention = {
@@ -305,7 +305,7 @@ describe('Système de conventions', () => {
       })
     })
 
-    it('devrait permettre à un admin collaborateur de modifier', async () => {
+    it('devrait permettre à un admin organisateur de modifier', async () => {
       const updateData = {
         name: 'Convention Modifiée',
         description: 'Nouvelle description',
@@ -314,7 +314,7 @@ describe('Système de conventions', () => {
       const existingConvention = {
         ...mockConvention,
         authorId: 2, // Différent utilisateur
-        collaborators: [
+        organizers: [
           {
             userId: mockUser.id,
             canEditConvention: true,
@@ -350,7 +350,7 @@ describe('Système de conventions', () => {
       const existingConvention = {
         ...mockConvention,
         authorId: 2, // Différent utilisateur
-        collaborators: [], // Pas de collaborateurs
+        organizers: [], // Pas de organisateurs
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(existingConvention)
@@ -387,7 +387,7 @@ describe('Système de conventions', () => {
       const existingConvention = {
         ...mockConvention,
         authorId: mockUser.id,
-        collaborators: [],
+        organizers: [],
         editions: [],
         isArchived: false,
       } as any
@@ -403,7 +403,7 @@ describe('Système de conventions', () => {
       const existingConvention = {
         ...mockConvention,
         authorId: 2,
-        collaborators: [],
+        organizers: [],
         editions: [],
         isArchived: false,
       } as any
@@ -414,8 +414,8 @@ describe('Système de conventions', () => {
     })
   })
 
-  describe('Gestion des collaborateurs', () => {
-    it('devrait créer un collaborateur automatiquement lors de la création', async () => {
+  describe('Gestion des organisateurs', () => {
+    it('devrait créer un organisateur automatiquement lors de la création', async () => {
       const conventionData = {
         name: 'Ma Convention',
         description: 'Description',
@@ -453,11 +453,11 @@ describe('Système de conventions', () => {
       expect(prismaMock.conventionOrganizer.create).toHaveBeenCalled()
     })
 
-    it('devrait inclure les collaborateurs dans la réponse', async () => {
-      const conventionWithCollaborators = {
+    it('devrait inclure les organisateurs dans la réponse', async () => {
+      const conventionWithOrganizers = {
         ...mockConvention,
         author: mockUser,
-        collaborators: [
+        organizers: [
           {
             id: 1,
             userId: 1,
@@ -479,7 +479,7 @@ describe('Système de conventions', () => {
         ],
       }
 
-      prismaMock.convention.findUnique.mockResolvedValue(conventionWithCollaborators)
+      prismaMock.convention.findUnique.mockResolvedValue(conventionWithOrganizers)
 
       global.getRouterParam = vi.fn().mockReturnValue('1')
 
@@ -489,9 +489,9 @@ describe('Système de conventions', () => {
 
       const result = await getConventionHandler(mockEvent as any)
 
-      expect(result.collaborators).toHaveLength(2)
-      expect(result.collaborators[0].rights.editConvention).toBe(true)
-      expect(result.collaborators[1].rights.addEdition).toBe(true)
+      expect(result.organizers).toHaveLength(2)
+      expect(result.organizers[0].rights.editConvention).toBe(true)
+      expect(result.organizers[1].rights.addEdition).toBe(true)
     })
   })
 

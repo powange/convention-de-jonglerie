@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Subir o modificar la foto de perfil de este usuario",
     "cleanup_expired_tokens": "Limpieza de tokens expirados",
     "cleanup_resolved_error_logs": "Limpieza de registros de error",
-    "collaborators": "Colaboradores",
-    "collaborators_count": "{count} colaboradores",
+    "organizers": "Colaboradores",
+    "organizers_count": "{count} colaboradores",
     "coming_soon": "Próximamente disponible",
     "config": {
       "ai": "Inteligencia Artificial",
@@ -272,7 +272,7 @@
     "original_user": "Usuario original",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ ADVERTENCIA: ¿Está seguro de que desea eliminar permanentemente la convención \"{name}\"?\n\nEsta acción eliminará:\n- {editionsCount} edición/es\n- {collaboratorsCount} colaborador/es\n- Todos los datos asociados\n\n¡Esta acción es IRREVERSIBLE!",
+        "confirm_delete_convention_permanently": "⚠️ ADVERTENCIA: ¿Está seguro de que desea eliminar permanentemente la convención \"{name}\"?\n\nEsta acción eliminará:\n- {editionsCount} edición/es\n- {organizersCount} colaborador/es\n- Todos los datos asociados\n\n¡Esta acción es IRREVERSIBLE!",
         "convention_deleted_permanently": "Convención eliminada permanentemente con éxito",
         "delete_convention_permanently": "Eliminar permanentemente",
         "error_deleting_convention": "Error al eliminar la convención"

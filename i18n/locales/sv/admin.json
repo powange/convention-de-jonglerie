@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Ladda ner eller ändra den här användarens profilfoto",
     "cleanup_expired_tokens": "Rengöring av utgångna tokens",
     "cleanup_resolved_error_logs": "Rengöring av felloggar",
-    "collaborators": "Anställda",
-    "collaborators_count": "{count} anställda",
+    "organizers": "Anställda",
+    "organizers_count": "{count} anställda",
     "coming_soon": "Tillgänglig inom kort",
     "config": {
       "ai": "Artificiell intelligens",
@@ -272,7 +272,7 @@
     "original_user": "Ursprunglig användare",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ OBSERVERA: Är du säker att du vill ta bort \"{name}\"-konventionen permanent?\n\nDenna åtgärd kommer att radera :\n- {editionsCount} utgåva(r)\n- {collaboratorsCount} medarbetare(s)\n- Alla associerade data\n\nDenna åtgärd är IRREVERSIBEL!",
+        "confirm_delete_convention_permanently": "⚠️ OBSERVERA: Är du säker att du vill ta bort \"{name}\"-konventionen permanent?\n\nDenna åtgärd kommer att radera :\n- {editionsCount} utgåva(r)\n- {organizersCount} medarbetare(s)\n- Alla associerade data\n\nDenna åtgärd är IRREVERSIBEL!",
         "convention_deleted_permanently": "Avtal framgångsrikt återkallat",
         "delete_convention_permanently": "Ta bort permanent",
         "error_deleting_convention": "Fel vid borttagning av avtalet"

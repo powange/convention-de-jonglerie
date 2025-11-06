@@ -134,7 +134,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
       })
     })
 
-    it("devrait rejeter si utilisateur n'est pas créateur ni collaborateur", async () => {
+    it("devrait rejeter si utilisateur n'est pas créateur ni organisateur", async () => {
       global.getRouterParam.mockReturnValue('1')
 
       mockDeleteEditionImage.mockRejectedValue({
@@ -148,7 +148,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
       })
     })
 
-    it("devrait rejeter si collaborateur n'a pas les droits d'édition", async () => {
+    it("devrait rejeter si organisateur n'a pas les droits d'édition", async () => {
       global.getRouterParam.mockReturnValue('1')
 
       mockDeleteEditionImage.mockRejectedValue({
@@ -353,15 +353,15 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
       })
     })
 
-    it('devrait gérer les collaborateurs avec permissions', async () => {
+    it('devrait gérer les organisateurs avec permissions', async () => {
       global.getRouterParam.mockReturnValue('1')
 
-      const collaboratorResponse = {
+      const organizerResponse = {
         success: true,
         message: 'Image supprimée avec succès',
         entity: {
           id: 1,
-          nom: 'Convention Collaborateur',
+          nom: 'Convention Organisateur',
           imageUrl: null,
           creatorId: 2, // Créateur différent
           creator: { id: 2, pseudo: 'creator', email: 'creator@example.com' },
@@ -369,7 +369,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
         },
       }
 
-      mockDeleteEditionImage.mockResolvedValue(collaboratorResponse)
+      mockDeleteEditionImage.mockResolvedValue(organizerResponse)
 
       const result = await handler(mockEvent as any)
 
@@ -379,7 +379,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
   })
 
   describe('Sécurité spécifique aux éditions', () => {
-    it('devrait vérifier que seuls les créateurs et collaborateurs autorisés peuvent supprimer', async () => {
+    it('devrait vérifier que seuls les créateurs et organisateurs autorisés peuvent supprimer', async () => {
       global.getRouterParam.mockReturnValue('1')
 
       // Simuler une tentative de suppression par un utilisateur non autorisé
@@ -396,12 +396,12 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
       expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, 1)
     })
 
-    it("devrait permettre la suppression aux collaborateurs avec droits d'édition", async () => {
+    it("devrait permettre la suppression aux organisateurs avec droits d'édition", async () => {
       global.getRouterParam.mockReturnValue('1')
 
-      const collaboratorSuccess = {
+      const organizersuccess = {
         success: true,
-        message: 'Image supprimée avec succès par collaborateur',
+        message: 'Image supprimée avec succès par organisateur',
         entity: {
           id: 1,
           nom: 'Édition Collaborative',
@@ -412,7 +412,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
         },
       }
 
-      mockDeleteEditionImage.mockResolvedValue(collaboratorSuccess)
+      mockDeleteEditionImage.mockResolvedValue(organizersuccess)
 
       const result = await handler(mockEvent as any)
 

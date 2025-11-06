@@ -59,8 +59,8 @@
     "change_profile_picture_description": "Upload eller ændr denne brugers profilbillede",
     "cleanup_expired_tokens": "Oprydning af udløbne tokens",
     "cleanup_resolved_error_logs": "Oprydning af fejllogge",
-    "collaborators": "Samarbejdspartnere",
-    "collaborators_count": "{count} samarbejdspartnere",
+    "organizers": "Samarbejdspartnere",
+    "organizers_count": "{count} samarbejdspartnere",
     "coming_soon": "Kommer snart",
     "config": {
       "ai": "Kunstig intelligens",
@@ -272,7 +272,7 @@
     "original_user": "Oprindelig bruger",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ ADVARSEL: Er du sikker på, at du vil slette konventionen \"{name}\" permanent?\n\nDenne handling vil slette:\n- {editionsCount} udgave(r)\n- {collaboratorsCount} samarbejdspartner(e)\n- Alle tilknyttede data\n\nDenne handling kan IKKE fortrydes!",
+        "confirm_delete_convention_permanently": "⚠️ ADVARSEL: Er du sikker på, at du vil slette konventionen \"{name}\" permanent?\n\nDenne handling vil slette:\n- {editionsCount} udgave(r)\n- {organizersCount} samarbejdspartner(e)\n- Alle tilknyttede data\n\nDenne handling kan IKKE fortrydes!",
         "convention_deleted_permanently": "Konvention slettet permanent med succes",
         "delete_convention_permanently": "Slet permanent",
         "error_deleting_convention": "Fejl ved sletning af konvention"

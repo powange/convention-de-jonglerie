@@ -2,7 +2,7 @@ import { prisma } from '../prisma'
 
 /**
  * Vérifie si un utilisateur a les permissions de modification sur une édition
- * (créateur de l'édition, auteur de la convention, collaborateur, ou admin global)
+ * (créateur de l'édition, auteur de la convention, organisateur, ou admin global)
  */
 export async function hasEditionEditPermission(
   userId: number,
@@ -18,13 +18,13 @@ export async function hasEditionEditPermission(
     return true
   }
 
-  // Récupérer l'édition avec la convention et les collaborateurs
+  // Récupérer l'édition avec la convention et les organisateurs
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     include: {
       convention: {
         include: {
-          collaborators: true,
+          organizers: true,
         },
       },
     },
@@ -44,10 +44,10 @@ export async function hasEditionEditPermission(
     return true
   }
 
-  // Vérifier si l'utilisateur est un collaborateur de la convention
-  const isCollaborator = edition.convention.collaborators.some((collab) => collab.userId === userId)
+  // Vérifier si l'utilisateur est un organisateur de la convention
+  const isOrganizer = edition.convention.organizers.some((collab) => collab.userId === userId)
 
-  return isCollaborator
+  return isOrganizer
 }
 
 /**

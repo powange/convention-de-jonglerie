@@ -7,7 +7,7 @@ export type ResourceType =
   | 'convention'
   | 'édition'
   | 'utilisateur'
-  | 'collaborateur'
+  | 'organisateur'
   | 'offre'
   | 'demande'
   | 'atelier'
@@ -30,7 +30,7 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   convention: 'ID de convention invalide',
   édition: "ID d'édition invalide",
   utilisateur: 'ID utilisateur invalide',
-  collaborateur: 'ID de collaborateur invalide',
+  organisateur: "ID d'organisateur invalide",
   offre: "ID d'offre invalide",
   demande: 'ID de demande invalide',
   atelier: "ID d'atelier invalide",

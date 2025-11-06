@@ -227,11 +227,11 @@ Toutes les entrées API sont validées avec Zod pour garantir l'intégrité des 
 Système de permissions hiérarchique :
 
 1. Super admin (accès complet)
-2. Collaborateur avec `canManageEditionVolunteers` (gestion complète)
-3. Collaborateur avec `canAccessEditionData` (lecture seule)
+2. Organisateur avec `canManageEditionVolunteers` (gestion complète)
+3. Organisateur avec `canAccessEditionData` (lecture seule)
 
 ## Voir Aussi
 
 - [Documentation HelloAsso](../helloasso-integration.md) - Détails de l'intégration HelloAsso
-- [Permissions](../COLLABORATOR_PERMISSIONS.md) - Système de permissions
+- [Permissions](../ORGANIZER_PERMISSIONS.md) - Système de permissions
 - [Encryption](../../server/utils/encryption.ts) - Utilitaire de chiffrement

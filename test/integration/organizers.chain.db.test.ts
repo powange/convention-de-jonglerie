@@ -4,14 +4,14 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { prismaTest } from '../setup-db'
 
 // Ce test nécessite TEST_WITH_DB=true + base lancée (script test:db)
-// Chaîne: création convention & users -> ajout collaborateur -> patch droits -> suppression -> vérification historique
+// Chaîne: création convention & users -> ajout organisateur -> patch droits -> suppression -> vérification historique
 
-describe('Intégration collaborateurs: add -> patch -> delete -> history', () => {
+describe('Intégration organisateurs: add -> patch -> delete -> history', () => {
   let owner: any
-  let collaboratorUser: any
+  let organizerUser: any
   let actor: any
   let convention: any
-  let collaboratorRecord: any
+  let organizerRecord: any
 
   beforeAll(async () => {
     const ts = Date.now()
@@ -26,7 +26,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
       },
     })
     actor = owner // l'owner réalise les actions
-    collaboratorUser = await prismaTest.user.create({
+    organizerUser = await prismaTest.user.create({
       data: {
         email: `collab-${ts}@ex.com`,
         password: await bcrypt.hash('x', 10),
@@ -40,11 +40,11 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
       data: { name: `Conv-${ts}`, authorId: owner.id },
     })
 
-    // Ajout collaborateur (simulateur logique du endpoint / POST direct via Prisma + historique manuellement pour refléter comportement addConventionOrganizer)
-    collaboratorRecord = await prismaTest.conventionOrganizer.create({
+    // Ajout organisateur (simulateur logique du endpoint / POST direct via Prisma + historique manuellement pour refléter comportement addConventionOrganizer)
+    organizerRecord = await prismaTest.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
-        userId: collaboratorUser.id,
+        userId: organizerUser.id,
         addedById: actor.id,
         title: null,
         canEditConvention: false,
@@ -58,7 +58,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
     await prismaTest.organizerPermissionHistory.create({
       data: {
         conventionId: convention.id,
-        targetUserId: collaboratorUser.id,
+        targetUserId: organizerUser.id,
         actorId: actor.id,
         changeType: 'CREATED',
         after: {
@@ -76,15 +76,15 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
       } as any,
     })
     // Patch droits (un global + perEdition) => enregistrer PER_EDITIONS_UPDATED
-    const beforeSnapshot = { ...collaboratorRecord }
+    const beforeSnapshot = { ...organizerRecord }
     await prismaTest.conventionOrganizer.update({
-      where: { id: collaboratorRecord.id },
+      where: { id: organizerRecord.id },
       data: { canEditConvention: true },
     })
     await prismaTest.organizerPermissionHistory.create({
       data: {
         conventionId: convention.id,
-        targetUserId: collaboratorUser.id,
+        targetUserId: organizerUser.id,
         actorId: actor.id,
         changeType: 'RIGHTS_UPDATED',
         before: {
@@ -117,7 +117,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
     await prismaTest.organizerPermissionHistory.create({
       data: {
         conventionId: convention.id,
-        targetUserId: collaboratorUser.id,
+        targetUserId: organizerUser.id,
         actorId: actor.id,
         changeType: 'REMOVED',
         before: {
@@ -134,12 +134,12 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
         after: { removed: true } as any,
       } as any,
     })
-    await prismaTest.conventionOrganizer.delete({ where: { id: collaboratorRecord.id } })
+    await prismaTest.conventionOrganizer.delete({ where: { id: organizerRecord.id } })
   })
 
   it('chaîne cohérente dans history', async () => {
     const hist = await prismaTest.organizerPermissionHistory.findMany({
-      where: { conventionId: convention.id, targetUserId: collaboratorUser.id },
+      where: { conventionId: convention.id, targetUserId: organizerUser.id },
       orderBy: { createdAt: 'asc' },
     })
     expect(hist.length).toBe(3)

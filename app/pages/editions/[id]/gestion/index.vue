@@ -61,21 +61,21 @@
           </div>
         </UCard>
 
-        <!-- Collaborateurs -->
+        <!-- Organisateurs -->
         <UCard v-if="canManageOrganizers">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-              <h2 class="text-lg font-semibold">{{ $t('collaborators.title') }}</h2>
+              <h2 class="text-lg font-semibold">{{ $t('organizers.title') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Gérer les collaborateurs -->
+              <!-- Gérer les organisateurs -->
               <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/collaborators`"
+                :to="`/editions/${edition.id}/gestion/organizers`"
                 icon="i-heroicons-user-group"
-                :title="$t('collaborators.manage')"
-                :description="$t('collaborators.manage_description')"
+                :title="$t('organizers.manage')"
+                :description="$t('organizers.manage_description')"
                 color="purple"
               />
             </div>
@@ -83,7 +83,7 @@
         </UCard>
 
         <!-- Gestion bénévole -->
-        <UCard v-if="isCollaborator || isTeamLeaderValue">
+        <UCard v-if="isOrganizer || isTeamLeaderValue">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
@@ -160,7 +160,7 @@
         </UCard>
 
         <!-- Gestion des artistes -->
-        <UCard v-if="isCollaborator">
+        <UCard v-if="isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-star" class="text-yellow-500" />
@@ -196,8 +196,8 @@
           </div>
         </UCard>
 
-        <!-- Repas (accès complet pour collaborateurs) -->
-        <UCard v-if="isCollaborator">
+        <!-- Repas (accès complet pour organisateurs) -->
+        <UCard v-if="isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="cbi:mealie" class="text-orange-500" />
@@ -257,7 +257,7 @@
         </UCard>
 
         <!-- Billeterie -->
-        <UCard v-if="isCollaborator">
+        <UCard v-if="isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-ticket" class="text-blue-500" />
@@ -314,7 +314,7 @@
         </UCard>
 
         <!-- Workshops -->
-        <UCard v-if="isCollaborator">
+        <UCard v-if="isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-academic-cap" class="text-indigo-500" />
@@ -424,9 +424,9 @@ const canAccess = computed(() => {
   // Bénévoles avec accès à la validation des repas
   if (canAccessMealValidation.value) return true
 
-  // Tous les collaborateurs de la convention (même sans droits)
-  if (edition.value.convention?.collaborators) {
-    return edition.value.convention.collaborators.some(
+  // Tous les organisateurs de la convention (même sans droits)
+  if (edition.value.convention?.organizers) {
+    return edition.value.convention.organizers.some(
       (collab) => collab.user.id === authStore.user?.id
     )
   }
@@ -455,10 +455,10 @@ const canManageOrganizers = computed(() => {
   return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
-// Vérifier si l'utilisateur est collaborateur de la convention
-const isCollaborator = computed(() => {
+// Vérifier si l'utilisateur est organisateur de la convention
+const isOrganizer = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.isCollaborator(edition.value, authStore.user.id)
+  return editionStore.isOrganizer(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur peut accéder à la validation des repas

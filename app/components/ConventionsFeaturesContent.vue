@@ -41,10 +41,10 @@
           <UIcon name="i-heroicons-users" class="text-purple-500 mt-0.5 flex-shrink-0" size="16" />
           <div>
             <p class="font-medium text-sm text-gray-900 dark:text-white">
-              {{ $t('conventions.manage_collaborators') }}
+              {{ $t('conventions.manage_organizers') }}
             </p>
             <p class="text-xs text-gray-600 dark:text-gray-400">
-              {{ $t('conventions.manage_collaborators_desc') }}
+              {{ $t('conventions.manage_organizers_desc') }}
             </p>
           </div>
         </div>
@@ -66,11 +66,11 @@
       </div>
     </div>
 
-    <!-- Section Collaborateur -->
+    <!-- Section Organisateur -->
     <div>
       <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
         <UIcon name="i-heroicons-user-group" class="text-emerald-500" size="18" />
-        {{ $t('conventions.as_collaborator') }}
+        {{ $t('conventions.as_organizer') }}
       </h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div :class="itemClasses">

@@ -21,7 +21,7 @@ export default wrapApiHandler(
             email: true,
           },
         },
-        collaborators: {
+        organizers: {
           include: {
             user: {
               select: {
@@ -36,7 +36,7 @@ export default wrapApiHandler(
       errorMessage: 'Convention introuvable',
     })
 
-    // Transformer auteur (emailHash) et collaborateurs avec nouveaux droits
+    // Transformer auteur (emailHash) et organisateurs avec nouveaux droits
     const transformed = {
       ...convention,
       author: convention.author
@@ -48,14 +48,14 @@ export default wrapApiHandler(
             }
           })()
         : null,
-      collaborators: convention.collaborators.map((c) => ({
+      organizers: convention.organizers.map((c) => ({
         id: c.id,
         addedAt: c.addedAt,
         title: c.title ?? null,
         rights: {
           editConvention: c.canEditConvention,
           deleteConvention: c.canDeleteConvention,
-          manageCollaborators: c.canManageOrganizers,
+          manageOrganizers: c.canManageOrganizers,
           addEdition: c.canAddEdition,
           editAllEditions: c.canEditAllEditions,
           deleteAllEditions: c.canDeleteAllEditions,

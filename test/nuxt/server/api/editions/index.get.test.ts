@@ -72,7 +72,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(25)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     const result = await handler(mockEvent as any)
@@ -90,7 +90,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ page: '2', limit: '10', includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(50)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     const result = await handler(mockEvent as any)
@@ -112,7 +112,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ name: 'Test Convention', includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(5)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -128,7 +128,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ countries: '["France","Belgium"]', includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(10)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -146,7 +146,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ startDate, endDate, includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(3)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -168,7 +168,7 @@ describe('/api/editions GET', () => {
     })
     prismaMock.edition.count.mockResolvedValue(2)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -191,7 +191,7 @@ describe('/api/editions GET', () => {
     })
     prismaMock.edition.count.mockResolvedValue(15)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -208,18 +208,18 @@ describe('/api/editions GET', () => {
     })
   })
 
-  it("devrait gérer les collaborateurs d'édition si disponible", async () => {
+  it("devrait gérer les organisateurs d'édition si disponible", async () => {
     global.getQuery.mockReturnValue({ includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(1)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockResolvedValue({}) // Table existe
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue({}) // Table existe
 
     const mockEvent = {}
     const result = await handler(mockEvent as any)
 
     expect(result.data[0]).toBeDefined()
     expect(result.data[0].id).toBe(1)
-    // Note: Les collaborateurs ne sont pas inclus dans l'API de liste des éditions
+    // Note: Les organisateurs ne sont pas inclus dans l'API de liste des éditions
     // Cette fonctionnalité pourrait être ajoutée plus tard si nécessaire
   })
 
@@ -236,7 +236,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(1)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -258,7 +258,7 @@ describe('/api/editions GET', () => {
     })
     prismaMock.edition.count.mockResolvedValue(0)
     prismaMock.edition.findMany.mockResolvedValue([])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     const result = await handler(mockEvent as any)
@@ -273,7 +273,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(5)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)
@@ -294,7 +294,7 @@ describe('/api/editions GET', () => {
     global.getQuery.mockReturnValue({ includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(10)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
-    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {}
     await handler(mockEvent as any)

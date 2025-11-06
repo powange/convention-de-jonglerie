@@ -98,14 +98,14 @@ export default wrapApiHandler(
             }
           })()
         : null,
-      collaborators: (conventionWithOrganizers?.organizers || []).map((c: any) => ({
+      organizers: (conventionWithOrganizers?.organizers || []).map((c: any) => ({
         id: c.id,
         addedAt: c.addedAt,
         title: c.title ?? null,
         rights: {
           editConvention: c.canEditConvention,
           deleteConvention: c.canDeleteConvention,
-          manageCollaborators: c.canManageOrganizers,
+          manageOrganizers: c.canManageOrganizers,
           addEdition: c.canAddEdition,
           editAllEditions: c.canEditAllEditions,
           deleteAllEditions: c.canDeleteAllEditions,
