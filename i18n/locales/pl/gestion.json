@@ -9,6 +9,7 @@
     "delete_edition": "Usuń edycję",
     "edit_edition": "Modyfikacja edycji",
     "lost_found_active_description": "Uczestnicy mogą zgłaszać zgubione i znalezione przedmioty",
+    "lost_found_description": "[TODO] Consulter et gérer les objets trouvés ou perdus",
     "manage_lost_found": "Zarządzanie utraconym mieniem",
     "meals": {
       "all_validated": "[TODO] Tous les repas ont été validés",
@@ -42,6 +43,37 @@
       "validation_title": "[TODO] Validation des repas",
       "volunteers": "[TODO] Bénévoles"
     },
+    "overview": "[TODO] Vue d'ensemble",
+    "shows": {
+      "add_show": "[TODO] Ajouter un spectacle",
+      "artists": "[TODO] Artistes",
+      "artists_to_return": "[TODO] Artistes à restituer",
+      "delete_confirm": "[TODO] Êtes-vous sûr de vouloir supprimer ce spectacle ?",
+      "delete_show": "[TODO] Supprimer le spectacle",
+      "description": "[TODO] Description",
+      "duration": "[TODO] Durée",
+      "edit_show": "[TODO] Modifier le spectacle",
+      "error_create": "[TODO] Erreur lors de la création du spectacle",
+      "error_delete": "[TODO] Erreur lors de la suppression du spectacle",
+      "error_update": "[TODO] Erreur lors de la mise à jour du spectacle",
+      "items_to_receive": "[TODO] Articles à récupérer",
+      "list_title": "[TODO] Spectacles",
+      "location": "[TODO] Lieu",
+      "manage_shows_description": "[TODO] Gérer les spectacles de cette édition",
+      "no_artists_selected": "[TODO] Aucun artiste sélectionné",
+      "no_items_selected": "[TODO] Aucun article sélectionné",
+      "no_returnable_items": "[TODO] Aucun article à restituer",
+      "no_shows": "[TODO] Aucun spectacle",
+      "returnable_items": "[TODO] Articles à restituer",
+      "select_artists": "[TODO] Sélectionner des artistes",
+      "select_returnable_items": "[TODO] Sélectionner des articles à restituer",
+      "show_created": "[TODO] Spectacle créé avec succès",
+      "show_deleted": "[TODO] Spectacle supprimé avec succès",
+      "show_title": "[TODO] Titre du spectacle",
+      "show_updated": "[TODO] Spectacle mis à jour avec succès",
+      "start_datetime": "[TODO] Date et heure de début",
+      "title": "[TODO] Spectacles"
+    },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",
       "access_control_title": "Kontrola dostępu",
@@ -53,6 +85,7 @@
       "tiers_title": "Stawki, opcje i kwoty",
       "title": "Bilety"
     },
+    "title": "[TODO] Gestion",
     "volunteers": {
       "applications_description": "Przeglądanie i przetwarzanie aplikacji",
       "applications_open": "Otwarcie zgłoszeń",
@@ -60,6 +93,7 @@
       "external_link": "Link zewnętrzny",
       "external_url_description": "Link do formularza lub zewnętrznego narzędzia do zarządzania wolontariuszami",
       "external_url_placeholder": "https://exemple.com/benevoles",
+      "general_settings": "[TODO] Paramètres généraux",
       "management_mode": "Zarządzanie wolontariuszami",
       "management_mode_description": "Wybierz sposób zarządzania wolontariuszami w tej edycji",
       "mode_external": "Zewnętrzne",
@@ -73,6 +107,8 @@
     },
     "workshops": {
       "enable_workshops": "Warsztaty aktywizujące",
+      "manage_description": "[TODO] Consulter et modérer les workshops proposés par les participants",
+      "manage_title": "[TODO] Gérer les workshops",
       "title": "Warsztaty",
       "workshops_enabled_description": "Uczestnicy i wolontariusze mogą teraz tworzyć warsztaty dla tej edycji.",
       "workshops_enabled_notice": "Warsztaty są aktywowane"

@@ -22,8 +22,6 @@
     "favorite_added": "Workshop tilføjet til favoritter",
     "favorite_error": "Fejl ved opdatering af favoritter",
     "favorite_removed": "Workshop fjernet fra favoritter",
-    "import_complete": "Import afsluttet",
-    "import_complete_description": "Værksteder importeret med succes",
     "import_error": "Fejl under import",
     "import_from_image": "Importer fra et foto",
     "import_partial_error": "Delvist vellykket import",

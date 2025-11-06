@@ -22,8 +22,6 @@
     "favorite_added": "Workshop přidán do oblíbených",
     "favorite_error": "Chyba při úpravě oblíbených",
     "favorite_removed": "Workshop odebrán z oblíbených",
-    "import_complete": "Import dokončen",
-    "import_complete_description": "Úspěšně importované workshopy",
     "import_error": "Chyba při importu",
     "import_from_image": "Import z fotografie",
     "import_partial_error": "Částečně úspěšný import",

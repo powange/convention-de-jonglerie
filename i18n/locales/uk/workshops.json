@@ -22,8 +22,6 @@
     "favorite_added": "Майстер-клас додано до обраного",
     "favorite_error": "Помилка оновлення обраного",
     "favorite_removed": "Майстер-клас видалено з обраного",
-    "import_complete": "Імпорт завершено",
-    "import_complete_description": "Майстер-класи успішно імпортовані",
     "import_error": "Помилка під час імпорту",
     "import_from_image": "Імпорт з фотографії",
     "import_partial_error": "Частково успішний імпорт",

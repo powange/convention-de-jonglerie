@@ -9,6 +9,7 @@
     "delete_edition": "Slet redigering",
     "edit_edition": "Modificer redigering",
     "lost_found_active_description": "Deltagere kan rapportere tabte og fundne genstande",
+    "lost_found_description": "[TODO] Consulter et gérer les objets trouvés ou perdus",
     "manage_lost_found": "Håndtering af hittegods",
     "meals": {
       "all_validated": "[TODO] Tous les repas ont été validés",
@@ -42,6 +43,37 @@
       "validation_title": "[TODO] Validation des repas",
       "volunteers": "[TODO] Bénévoles"
     },
+    "overview": "[TODO] Vue d'ensemble",
+    "shows": {
+      "add_show": "[TODO] Ajouter un spectacle",
+      "artists": "[TODO] Artistes",
+      "artists_to_return": "[TODO] Artistes à restituer",
+      "delete_confirm": "[TODO] Êtes-vous sûr de vouloir supprimer ce spectacle ?",
+      "delete_show": "[TODO] Supprimer le spectacle",
+      "description": "[TODO] Description",
+      "duration": "[TODO] Durée",
+      "edit_show": "[TODO] Modifier le spectacle",
+      "error_create": "[TODO] Erreur lors de la création du spectacle",
+      "error_delete": "[TODO] Erreur lors de la suppression du spectacle",
+      "error_update": "[TODO] Erreur lors de la mise à jour du spectacle",
+      "items_to_receive": "[TODO] Articles à récupérer",
+      "list_title": "[TODO] Spectacles",
+      "location": "[TODO] Lieu",
+      "manage_shows_description": "[TODO] Gérer les spectacles de cette édition",
+      "no_artists_selected": "[TODO] Aucun artiste sélectionné",
+      "no_items_selected": "[TODO] Aucun article sélectionné",
+      "no_returnable_items": "[TODO] Aucun article à restituer",
+      "no_shows": "[TODO] Aucun spectacle",
+      "returnable_items": "[TODO] Articles à restituer",
+      "select_artists": "[TODO] Sélectionner des artistes",
+      "select_returnable_items": "[TODO] Sélectionner des articles à restituer",
+      "show_created": "[TODO] Spectacle créé avec succès",
+      "show_deleted": "[TODO] Spectacle supprimé avec succès",
+      "show_title": "[TODO] Titre du spectacle",
+      "show_updated": "[TODO] Spectacle mis à jour avec succès",
+      "start_datetime": "[TODO] Date et heure de début",
+      "title": "[TODO] Spectacles"
+    },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",
       "access_control_title": "Adgangskontrol",
@@ -53,6 +85,7 @@
       "tiers_title": "Priser, optioner og kvoter",
       "title": "Billetter"
     },
+    "title": "[TODO] Gestion",
     "volunteers": {
       "applications_description": "Visning og behandling af ansøgninger",
       "applications_open": "Åbning af ansøgninger",
@@ -60,6 +93,7 @@
       "external_link": "Eksternt link",
       "external_url_description": "Link til din formular eller et eksternt værktøj til styring af frivillige",
       "external_url_placeholder": "https://exemple.com/benevoles",
+      "general_settings": "[TODO] Paramètres généraux",
       "management_mode": "Ledelse af frivillige",
       "management_mode_description": "Vælg, hvordan du vil administrere frivillige til denne udgave",
       "mode_external": "Eksternt",
@@ -73,6 +107,8 @@
     },
     "workshops": {
       "enable_workshops": "Aktiver workshops",
+      "manage_description": "[TODO] Consulter et modérer les workshops proposés par les participants",
+      "manage_title": "[TODO] Gérer les workshops",
       "title": "Værksteder",
       "workshops_enabled_description": "Deltagere og frivillige kan nu oprette workshops til denne udgave.",
       "workshops_enabled_notice": "Workshops er aktiveret"

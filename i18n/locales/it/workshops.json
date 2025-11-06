@@ -22,8 +22,6 @@
     "favorite_added": "Workshop aggiunto ai preferiti",
     "favorite_error": "Errore nell'aggiornamento dei preferiti",
     "favorite_removed": "Workshop rimosso dai preferiti",
-    "import_complete": "Importazione completata",
-    "import_complete_description": "Laboratori importati con successo",
     "import_error": "Errore durante l'importazione",
     "import_from_image": "Importazione da una foto",
     "import_partial_error": "Importazione parzialmente riuscita",

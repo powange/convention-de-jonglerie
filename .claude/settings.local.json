@@ -65,7 +65,8 @@
       "mcp__nuxt-ui__get_component",
       "Bash(node /tmp/update-gestion-pages.mjs:*)",
       "Bash(if grep -q \"layout: ''edition-dashboard''\" \"$file\")",
-      "Bash(npm run docker:dev:logs:*)"
+      "Bash(npm run docker:dev:logs:*)",
+      "Bash(npm install)"
     ],
     "deny": [],
     "ask": [],

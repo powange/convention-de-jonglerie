@@ -142,6 +142,7 @@
     "export_success": "Export réussi",
     "favorite": "Favori",
     "filters": "Filtres",
+    "help": "Aide",
     "inactive": "Inactif",
     "item": "Article",
     "items": "Articles",
@@ -466,7 +467,7 @@
       "validated_today": "Validés aujourd'hui",
       "volunteer": "Bénévole",
       "volunteer_accepted": "Bénévole accepté",
-      "volunteer_management": "Gestion bénévole"
+      "volunteer_management": "Gestion des bénévoles"
     },
     "ticketing_title": "Billetterie",
     "useful_links": "Liens utiles",

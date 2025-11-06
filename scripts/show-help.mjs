@@ -55,9 +55,7 @@ const sections = [
   { name: 'check-translations -- -f --fill-mode empty', desc: 'Ajoute les clés manquantes avec valeur vide' },
   { name: 'check-translations -- -f --fill-mode todo --refill', desc: 'Re-marque aussi les clés déjà identiques à la référence' },
   { name: 'check-i18n-vars', desc: '🔍 Vérifie que les variables {xxx} sont cohérentes entre toutes les langues' },
-  { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' },
-  { name: 'i18n:translate', desc: '🤖 Traduction automatique DeepL (mode incrémental - nouvelles clés uniquement)' },
-  { name: 'i18n:translate:force', desc: '⚡ Traduction automatique DeepL (mode force - retraduit tout)' }
+  { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' }
   ] },
   { title: '🔄 Système de traduction avancé (scripts/translation/)', color: colors.cyan, scripts: [
     { name: 'scripts/translation/list-todo-keys.js', desc: '🔍 Diagnostic des clés [TODO] + génération template' },

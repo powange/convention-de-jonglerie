@@ -22,8 +22,6 @@
     "favorite_added": "Workshop tillagd i favoriter",
     "favorite_error": "Fel vid uppdatering av favoriter",
     "favorite_removed": "Workshop borttagen från favoriter",
-    "import_complete": "Import slutförd",
-    "import_complete_description": "Workshops framgångsrikt importerade",
     "import_error": "Fel under import",
     "import_from_image": "Importera från ett foto",
     "import_partial_error": "Delvis framgångsrik import",

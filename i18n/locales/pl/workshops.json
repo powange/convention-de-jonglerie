@@ -22,8 +22,6 @@
     "favorite_added": "Warsztat dodany do ulubionych",
     "favorite_error": "Błąd aktualizacji ulubionych",
     "favorite_removed": "Warsztat usunięty z ulubionych",
-    "import_complete": "Import zakończony",
-    "import_complete_description": "Warsztaty zostały pomyślnie zaimportowane",
     "import_error": "Błąd podczas importowania",
     "import_from_image": "Import ze zdjęcia",
     "import_partial_error": "Częściowo udany import",

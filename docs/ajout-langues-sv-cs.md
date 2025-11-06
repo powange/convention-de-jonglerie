@@ -115,9 +115,9 @@ Ils doivent être traduits en suédois et en tchèque.
 
 #### Option 2 : Traduction automatique + révision
 
-- Utiliser un service comme DeepL API
+- Utiliser un service de traduction automatique
 - Faire réviser par un natif
-- Coût : Gratuit (DeepL) + révision ~100-200€
+- Coût : révision ~100-200€
 - Délai : quelques jours
 
 #### Option 3 : Traduction communautaire
@@ -260,15 +260,11 @@ Les langues apparaissent dans l'ordre suivant dans le sélecteur :
 
 ### Services de traduction recommandés
 
-1. **DeepL** (traduction automatique de qualité)
-   - https://www.deepl.com/translator
-   - API disponible
-
-2. **Crowdin** (plateforme de traduction collaborative)
+1. **Crowdin** (plateforme de traduction collaborative)
    - https://crowdin.com/
    - Gratuit pour open source
 
-3. **Weblate** (alternative open source à Crowdin)
+2. **Weblate** (alternative open source à Crowdin)
    - https://weblate.org/
 
 ## Exemple de traduction

@@ -22,8 +22,6 @@
     "favorite_added": "Workshop toegevoegd aan favorieten",
     "favorite_error": "Fout bij bijwerken favorieten",
     "favorite_removed": "Workshop verwijderd uit favorieten",
-    "import_complete": "Importeren voltooid",
-    "import_complete_description": "Workshops succesvol geïmporteerd",
     "import_error": "Fout tijdens importeren",
     "import_from_image": "Importeren vanaf een foto",
     "import_partial_error": "Deels geslaagde import",

@@ -257,9 +257,27 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       managementSection.push({
         label: t('edition.volunteers.title'),
         icon: 'i-heroicons-user-group',
-        children: volunteersChildren
+        children: volunteersChildren,
       })
     }
+  }
+
+  // Artistes
+  if (isCollaborator.value) {
+    managementSection.push({
+      label: t('gestion.artists.title'),
+      icon: 'i-heroicons-star',
+      children: [
+        {
+          label: t('gestion.artists.list_title'),
+          to: `/editions/${editionId.value}/gestion/artists`,
+        },
+        {
+          label: t('gestion.shows.list_title'),
+          to: `/editions/${editionId.value}/gestion/artists/shows`,
+        },
+      ],
+    })
   }
 
   // Repas
@@ -312,24 +330,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         {
           label: t('gestion.ticketing.access_control_title'),
           to: `/editions/${editionId.value}/gestion/ticketing/access-control`,
-        },
-      ],
-    })
-  }
-
-  // Artistes
-  if (isCollaborator.value) {
-    managementSection.push({
-      label: t('gestion.artists.title'),
-      icon: 'i-heroicons-star',
-      children: [
-        {
-          label: t('gestion.artists.list_title'),
-          to: `/editions/${editionId.value}/gestion/artists`,
-        },
-        {
-          label: t('edition.shows.list_title'),
-          to: `/editions/${editionId.value}/gestion/artists/shows`,
         },
       ],
     })

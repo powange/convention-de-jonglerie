@@ -1,5 +1,7 @@
 {
   "gestion": {
+    "title": "Gestion",
+    "overview": "Vue d'ensemble",
     "edit_edition": "Modifier l'édition",
     "delete_edition": "Supprimer l'édition",
     "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
@@ -7,6 +9,7 @@
     "lost_found_description": "Consulter et gérer les objets trouvés ou perdus",
     "lost_found_active_description": "Les participants peuvent déclarer des objets trouvés ou perdus",
     "volunteers": {
+      "general_settings": "Paramètres généraux",
       "management_mode": "Mode de gestion des bénévoles",
       "management_mode_description": "Choisissez comment gérer les bénévoles pour cette édition",
       "mode_internal": "Interne",
@@ -68,7 +71,7 @@
       "access_control_description": "Scanner et valider les billets à l'entrée"
     },
     "artists": {
-      "title": "Gestion des artistes",
+      "title": "Artistes",
       "list_title": "Gestion des artistes",
       "manage_artists_description": "Gérez les artistes invités à cette édition"
     },
@@ -79,6 +82,36 @@
       "enable_workshops": "Activer les workshops",
       "workshops_enabled_notice": "Les workshops sont activés",
       "workshops_enabled_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition"
+    },
+    "shows": {
+      "add_show": "Ajouter un spectacle",
+      "artists": "Artistes",
+      "artists_to_return": "Artistes à restituer",
+      "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce spectacle ?",
+      "delete_show": "Supprimer le spectacle",
+      "description": "Description",
+      "duration": "Durée",
+      "edit_show": "Modifier le spectacle",
+      "error_create": "Erreur lors de la création du spectacle",
+      "error_delete": "Erreur lors de la suppression du spectacle",
+      "error_update": "Erreur lors de la mise à jour du spectacle",
+      "items_to_receive": "Articles à récupérer",
+      "list_title": "Spectacles",
+      "location": "Lieu",
+      "manage_shows_description": "Gérer les spectacles de cette édition",
+      "no_artists_selected": "Aucun artiste sélectionné",
+      "no_items_selected": "Aucun article sélectionné",
+      "no_returnable_items": "Aucun article à restituer",
+      "no_shows": "Aucun spectacle",
+      "returnable_items": "Articles à restituer",
+      "select_artists": "Sélectionner des artistes",
+      "select_returnable_items": "Sélectionner des articles à restituer",
+      "show_created": "Spectacle créé avec succès",
+      "show_deleted": "Spectacle supprimé avec succès",
+      "show_title": "Titre du spectacle",
+      "show_updated": "Spectacle mis à jour avec succès",
+      "start_datetime": "Date et heure de début",
+      "title": "Spectacles"
     }
   }
 }

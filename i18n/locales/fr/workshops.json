@@ -65,8 +65,6 @@
     "import_partial_error": "Import partiellement réussi",
     "import_partial_error_description": "{success} workshop(s) importé(s), {fail} échec(s)",
     "only_images_allowed": "Seules les images sont acceptées",
-    "max_file_size": "La taille maximale du fichier est de 10 Mo",
-    "import_complete": "Import terminé",
-    "import_complete_description": "Les workshops ont été importés avec succès"
+    "max_file_size": "La taille maximale du fichier est de 10 Mo"
   }
 }

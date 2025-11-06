@@ -22,8 +22,6 @@
     "favorite_added": "Workshop added to favorites",
     "favorite_error": "Error updating favorites",
     "favorite_removed": "Workshop removed from favorites",
-    "import_complete": "Import complete",
-    "import_complete_description": "Workshops successfully imported",
     "import_error": "Error during import",
     "import_from_image": "Import from a photo",
     "import_partial_error": "Partially successful import",

@@ -53,7 +53,7 @@
             <!-- Spectacles -->
             <div v-if="artist.shows && artist.shows.length > 0" class="space-y-1">
               <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                {{ $t('edition.shows.title') }} :
+                {{ $t('gestion.shows.title') }} :
               </p>
               <div class="flex flex-wrap gap-1">
                 <UBadge
@@ -74,7 +74,7 @@
               class="space-y-1"
             >
               <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                {{ $t('edition.shows.items_to_receive', 'Articles à récupérer') }} :
+                {{ $t('gestion.shows.items_to_receive', 'Articles à récupérer') }} :
               </p>
               <div class="flex flex-wrap gap-1">
                 <UBadge
@@ -177,7 +177,7 @@
               <UIcon name="i-heroicons-gift" class="w-4 h-4 mt-0.5" />
               <div>
                 <p class="text-xs font-medium mb-1">
-                  {{ $t('edition.shows.items_to_receive', 'Articles à récupérer') }}
+                  {{ $t('gestion.shows.items_to_receive', 'Articles à récupérer') }}
                 </p>
                 <div class="flex flex-wrap gap-1">
                   <UBadge

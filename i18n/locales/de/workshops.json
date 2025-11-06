@@ -22,8 +22,6 @@
     "favorite_added": "Workshop zu Favoriten hinzugefügt",
     "favorite_error": "Fehler beim Aktualisieren der Favoriten",
     "favorite_removed": "Workshop aus Favoriten entfernt",
-    "import_complete": "Import abgeschlossen",
-    "import_complete_description": "Workshops wurden erfolgreich importiert",
     "import_error": "Fehler beim Import",
     "import_from_image": "Aus einem Foto importieren",
     "import_partial_error": "Import teilweise erfolgreich",

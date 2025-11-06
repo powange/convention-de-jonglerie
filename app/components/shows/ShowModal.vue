@@ -4,67 +4,67 @@
       <form @submit.prevent="handleSubmit">
         <div class="space-y-4">
           <!-- Titre -->
-          <UFormField :label="$t('edition.shows.show_title')" required>
+          <UFormField :label="$t('gestion.shows.show_title')" required>
             <UInput
               v-model="formData.title"
-              :placeholder="$t('edition.shows.show_title')"
+              :placeholder="$t('gestion.shows.show_title')"
               required
               class="w-full"
             />
           </UFormField>
 
           <!-- Description -->
-          <UFormField :label="$t('edition.shows.description')">
+          <UFormField :label="$t('gestion.shows.description')">
             <UTextarea
               v-model="formData.description"
-              :placeholder="$t('edition.shows.description')"
+              :placeholder="$t('gestion.shows.description')"
               rows="3"
               class="w-full"
             />
           </UFormField>
 
           <!-- Date et heure -->
-          <UFormField :label="$t('edition.shows.start_datetime')" required>
+          <UFormField :label="$t('gestion.shows.start_datetime')" required>
             <UInput
               v-model="formData.startDateTime"
               type="datetime-local"
-              :placeholder="$t('edition.shows.start_datetime')"
+              :placeholder="$t('gestion.shows.start_datetime')"
               required
             />
           </UFormField>
 
           <!-- Durée -->
-          <UFormField :label="$t('edition.shows.duration')">
+          <UFormField :label="$t('gestion.shows.duration')">
             <UInput
               v-model.number="formData.duration"
               type="number"
               min="0"
-              :placeholder="$t('edition.shows.duration')"
+              :placeholder="$t('gestion.shows.duration')"
             />
           </UFormField>
 
           <!-- Lieu -->
-          <UFormField :label="$t('edition.shows.location')">
+          <UFormField :label="$t('gestion.shows.location')">
             <UInput
               v-model="formData.location"
-              :placeholder="$t('edition.shows.location')"
+              :placeholder="$t('gestion.shows.location')"
               class="w-full"
             />
           </UFormField>
 
           <!-- Sélection des artistes -->
-          <UFormField :label="$t('edition.shows.artists')">
+          <UFormField :label="$t('gestion.shows.artists')">
             <USelectMenu
               v-model="formData.artistIds"
               :items="artistOptions"
               value-key="value"
               multiple
-              :placeholder="$t('edition.shows.select_artists')"
+              :placeholder="$t('gestion.shows.select_artists')"
               class="w-full"
             >
               <template #label>
                 <span v-if="formData.artistIds.length === 0">
-                  {{ $t('edition.shows.no_artists_selected') }}
+                  {{ $t('gestion.shows.no_artists_selected') }}
                 </span>
                 <span v-else>{{ formData.artistIds.length }} artiste(s) sélectionné(s)</span>
               </template>
@@ -83,22 +83,22 @@
             </UBadge>
           </div>
           <p v-else class="text-sm text-gray-500">
-            {{ $t('edition.shows.no_artists_selected') }}
+            {{ $t('gestion.shows.no_artists_selected') }}
           </p>
 
           <!-- Sélection des articles à restituer -->
-          <UFormField :label="$t('edition.shows.returnable_items')">
+          <UFormField :label="$t('gestion.shows.returnable_items')">
             <USelectMenu
               v-model="formData.returnableItemIds"
               :items="returnableItemOptions"
               value-key="value"
               multiple
-              :placeholder="$t('edition.shows.select_returnable_items')"
+              :placeholder="$t('gestion.shows.select_returnable_items')"
               class="w-full"
             >
               <template #label>
                 <span v-if="formData.returnableItemIds.length === 0">
-                  {{ $t('edition.shows.no_items_selected') }}
+                  {{ $t('gestion.shows.no_items_selected') }}
                 </span>
                 <span v-else
                   >{{ formData.returnableItemIds.length }} article(s) sélectionné(s)</span
@@ -155,7 +155,7 @@ const isOpen = computed({
 })
 
 const title = computed(() =>
-  props.show ? t('edition.shows.edit_show') : t('edition.shows.add_show')
+  props.show ? t('gestion.shows.edit_show') : t('gestion.shows.add_show')
 )
 
 const loading = ref(false)
@@ -236,14 +236,14 @@ const handleSubmit = async () => {
         method: 'PUT',
         body: payload,
       })
-      toast.add({ title: t('edition.shows.show_updated'), color: 'success' })
+      toast.add({ title: t('gestion.shows.show_updated'), color: 'success' })
     } else {
       // Mode ajout
       await $fetch(`/api/editions/${props.editionId}/shows`, {
         method: 'POST',
         body: payload,
       })
-      toast.add({ title: t('edition.shows.show_created'), color: 'success' })
+      toast.add({ title: t('gestion.shows.show_created'), color: 'success' })
     }
 
     emit('show-saved')
@@ -251,7 +251,7 @@ const handleSubmit = async () => {
   } catch (error: any) {
     console.error('Error saving show:', error)
     toast.add({
-      title: props.show ? t('edition.shows.error_update') : t('edition.shows.error_create'),
+      title: props.show ? t('gestion.shows.error_update') : t('gestion.shows.error_create'),
       color: 'error',
     })
   } finally {

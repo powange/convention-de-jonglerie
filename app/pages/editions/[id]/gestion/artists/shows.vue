@@ -22,10 +22,10 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-sparkles" class="text-purple-600 dark:text-purple-400" />
-          {{ $t('edition.shows.list_title') }}
+          {{ $t('gestion.shows.list_title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('edition.shows.manage_shows_description') }}
+          {{ $t('gestion.shows.manage_shows_description') }}
         </p>
       </div>
 
@@ -33,14 +33,14 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold">{{ $t('edition.shows.title') }}</h2>
+            <h2 class="text-lg font-semibold">{{ $t('gestion.shows.title') }}</h2>
             <UButton
               v-if="canEdit"
               color="primary"
               icon="i-heroicons-plus"
               @click="openAddShowModal"
             >
-              {{ $t('edition.shows.add_show') }}
+              {{ $t('gestion.shows.add_show') }}
             </UButton>
           </div>
         </template>
@@ -59,7 +59,7 @@
 
         <div v-else-if="shows.length === 0" class="text-center py-8">
           <UIcon name="i-heroicons-sparkles" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p class="text-gray-500">{{ $t('edition.shows.no_shows') }}</p>
+          <p class="text-gray-500">{{ $t('gestion.shows.no_shows') }}</p>
         </div>
 
         <div v-else class="overflow-x-auto">
@@ -69,32 +69,32 @@
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.shows.show_title') }}
+                  {{ $t('gestion.shows.show_title') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.shows.start_datetime') }}
+                  {{ $t('gestion.shows.start_datetime') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.shows.duration') }}
+                  {{ $t('gestion.shows.duration') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.shows.location') }}
+                  {{ $t('gestion.shows.location') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.shows.artists') }}
+                  {{ $t('gestion.shows.artists') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.shows.artists_to_return') }}
+                  {{ $t('gestion.shows.artists_to_return') }}
                 </th>
                 <th
                   v-if="canEdit"
@@ -143,7 +143,7 @@
                     </UBadge>
                   </div>
                   <span v-else class="text-gray-400">{{
-                    $t('edition.shows.no_artists_selected')
+                    $t('gestion.shows.no_artists_selected')
                   }}</span>
                 </td>
                 <td class="px-4 py-3 text-sm">
@@ -162,7 +162,7 @@
                     </UBadge>
                   </div>
                   <span v-else class="text-gray-400 text-xs">
-                    {{ $t('edition.shows.no_returnable_items') }}
+                    {{ $t('gestion.shows.no_returnable_items') }}
                   </span>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
@@ -201,8 +201,8 @@
     <!-- Modal confirmation suppression -->
     <UiConfirmModal
       v-model="showDeleteConfirm"
-      :title="$t('edition.shows.delete_show')"
-      :message="$t('edition.shows.delete_confirm')"
+      :title="$t('gestion.shows.delete_show')"
+      :message="$t('gestion.shows.delete_confirm')"
       confirm-color="error"
       @confirm="deleteShow"
     />
@@ -264,7 +264,7 @@ const fetchShows = async () => {
   loading.value = true
   try {
     const response = await $fetch(`/api/editions/${editionId.value}/shows`)
-    shows.value = response.shows || []
+    shows.value = response.data?.shows || []
   } catch (error) {
     console.error('Error fetching shows:', error)
     toast.add({
@@ -309,14 +309,14 @@ const deleteShow = async () => {
       method: 'DELETE',
     })
     toast.add({
-      title: t('edition.shows.show_deleted'),
+      title: t('gestion.shows.show_deleted'),
       color: 'success',
     })
     await fetchShows()
   } catch (error) {
     console.error('Error deleting show:', error)
     toast.add({
-      title: t('edition.shows.error_delete'),
+      title: t('gestion.shows.error_delete'),
       color: 'error',
     })
   } finally {

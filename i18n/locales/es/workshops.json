@@ -22,8 +22,6 @@
     "favorite_added": "Taller añadido a favoritos",
     "favorite_error": "Error al actualizar favoritos",
     "favorite_removed": "Taller eliminado de favoritos",
-    "import_complete": "Importación completada",
-    "import_complete_description": "Talleres importados correctamente",
     "import_error": "Error durante la importación",
     "import_from_image": "Importar desde una foto",
     "import_partial_error": "Importación parcialmente correcta",

@@ -880,7 +880,6 @@ Organisation modulaire par domaine et langue :
   - `npm run check-i18n` - Analyse clés
   - `npm run check-translations` - Compare traductions
   - `npm run i18n:add` - Ajouter traduction
-  - `npm run i18n:translate` - Traduction automatique (DeepL)
 
 ---
 
@@ -1012,7 +1011,6 @@ Organisation modulaire par domaine et langue :
 - `check-i18n-translations.js` - Vérification traductions
 - `check-i18n-variables.cjs` - Vérification variables
 - `add-translation.js` - Ajout traductions
-- `translate-with-deepl.js` - Traduction automatique DeepL
 
 **Base de données :**
 
@@ -1313,8 +1311,6 @@ datasource db {
 - `check-translations` : Vérifier traductions
 - `check-i18n-vars` : Vérifier variables
 - `i18n:add` : Ajouter traduction
-- `i18n:translate` : Traduire (DeepL)
-- `i18n:translate:force` : Force traduction
 
 **Tests :**
 
@@ -1370,7 +1366,6 @@ datasource db {
   "@nuxt/test-utils": "^3.19.2",
   "prisma": "^6.18.0",
   "typescript": "^5.8.3",
-  "deepl-node": "^1.20.0",
   "prettier": "^3.3.3"
 }
 ```
@@ -3244,10 +3239,6 @@ npm run docker:release:down
 
 - Support paths tsconfig dans Vite
 
-**deepl-node 1.20.0**
-
-- API DeepL traduction
-
 **dotenv 17.2.3**
 
 - Chargement .env
@@ -3339,10 +3330,10 @@ npm run docker:release:down
          │  │  SMTP    │ │HelloAsso │ │Anthropic │  │
          │  │ (Emails) │ │(Billetterie)│   (IA)  │  │
          │  └──────────┘ └──────────┘ └──────────┘  │
-         │  ┌──────────┐ ┌──────────┐ ┌──────────┐  │
-         │  │Nominatim │ │ Web Push │ │ DeepL    │  │
-         │  │(Geocoding)│ │  (Notifs)│ │(Traduc.) │  │
-         │  └──────────┘ └──────────┘ └──────────┘  │
+         │  ┌──────────┐ ┌──────────┐               │
+         │  │Nominatim │ │ Web Push │               │
+         │  │(Geocoding)│ │  (Notifs)│               │
+         │  └──────────┘ └──────────┘               │
          └─────────────────────────────────────────┘
 ```
 
@@ -3697,7 +3688,6 @@ convention-de-jonglerie/
 ├── 📁 scripts/                   # SCRIPTS UTILITAIRES
 │   ├── manage-admin.ts
 │   ├── check-i18n.js
-│   ├── translate-with-deepl.js
 │   └── ...
 │
 ├── 📁 public/                    # ASSETS STATIQUES
@@ -3762,7 +3752,6 @@ convention-de-jonglerie/
 - ✅ **13 langues** supportées
 - ✅ **Lazy loading** par domaine (optimisation bundles)
 - ✅ **Structure modulaire** (14 domaines)
-- ✅ **Traduction automatique** (DeepL)
 - ✅ **Scripts de vérification** complets
 
 **Notifications Multi-Canaux :**
