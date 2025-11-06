@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../server/utils/organizer-management', () => ({
   addConventionOrganizer: vi.fn(),
   checkAdminMode: vi.fn(),
   findUserByPseudoOrEmail: vi.fn(),
@@ -11,7 +11,7 @@ import {
   addConventionOrganizer,
   checkAdminMode,
   findUserByPseudoOrEmail,
-} from '../../../../../server/utils/collaborator-management'
+} from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
 

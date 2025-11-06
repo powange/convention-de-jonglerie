@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../server/utils/organizer-management', () => ({
   deleteConventionOrganizer: vi.fn(),
 }))
 
-import { deleteConventionOrganizer } from '../../../../../server/utils/collaborator-management'
+import { deleteConventionOrganizer } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].delete'
 
 const mockDeleteCollaborator = deleteConventionOrganizer as ReturnType<typeof vi.fn>

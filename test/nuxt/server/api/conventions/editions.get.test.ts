@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../server/utils/organizer-management', () => ({
   checkUserConventionPermission: vi.fn(),
 }))
 
-import { checkUserConventionPermission } from '../../../../../server/utils/collaborator-management'
+import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/editions.get'
 import { prismaMock } from '../../../../__mocks__/prisma'
 

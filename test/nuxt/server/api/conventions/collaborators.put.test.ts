@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../server/utils/organizer-management', () => ({
   updateCollaboratorRights: vi.fn(),
 }))
 
-import { updateCollaboratorRights } from '../../../../../server/utils/collaborator-management'
+import { updateCollaboratorRights } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].put'
 
 const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>

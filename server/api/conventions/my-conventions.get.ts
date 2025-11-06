@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { checkAdminMode } from '@@/server/utils/collaborator-management'
+import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 

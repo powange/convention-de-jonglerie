@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
+import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'

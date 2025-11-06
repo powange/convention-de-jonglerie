@@ -4,7 +4,7 @@ import {
   addConventionOrganizer,
   checkAdminMode,
   findUserByPseudoOrEmail,
-} from '@@/server/utils/collaborator-management'
+} from '@@/server/utils/organizer-management'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'

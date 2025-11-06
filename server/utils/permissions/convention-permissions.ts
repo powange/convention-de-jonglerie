@@ -1,4 +1,4 @@
-import { canManageOrganizers } from '../collaborator-management'
+import { canManageOrganizers } from '@@/server/utils/organizer-management'
 import { prisma } from '../prisma'
 
 import type { User, Convention, ConventionOrganizer } from '@prisma/client'
@@ -113,7 +113,7 @@ export function canArchiveConvention(convention: ConventionWithCollaborators, us
   return canDeleteConvention(convention, user)
 }
 
-// canManageOrganizers importé depuis collaborator-management.ts
+// canManageOrganizers importé depuis organizer-management.ts
 
 /**
  * Vérifie si un utilisateur peut voir une convention (lecture seule)

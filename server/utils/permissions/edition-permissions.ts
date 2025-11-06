@@ -1,4 +1,4 @@
-import { checkAdminMode } from '../collaborator-management'
+import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { prisma } from '../prisma'
 
 import type {

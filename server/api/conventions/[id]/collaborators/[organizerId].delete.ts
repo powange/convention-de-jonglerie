@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { deleteConventionOrganizer } from '@@/server/utils/collaborator-management'
+import { deleteConventionOrganizer } from '@@/server/utils/organizer-management'
 import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
