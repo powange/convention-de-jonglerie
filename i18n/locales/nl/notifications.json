@@ -2,10 +2,10 @@
   "notifications": {
     "artist": {
       "arrival": {
-        "action": "[TODO] Voir les artistes",
-        "message": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.",
-        "message_with_shows": "[TODO] {artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
-        "title": "[TODO] Arrivée d'un artiste 🎭"
+        "action": "Bekijk artiesten",
+        "message": "{artistName} heeft zojuist zijn ticket gescand en is aangekomen op de conventie.",
+        "message_with_shows": "{artistName} heeft zojuist zijn ticket gescand en is aangekomen op de conventie.\n\nGekoppelde voorstellingen:\n• {shows}",
+        "title": "Aankomst van een artiest 🎭"
       }
     },
     "carpool": {

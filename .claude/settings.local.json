@@ -66,7 +66,9 @@
       "Bash(node /tmp/update-gestion-pages.mjs:*)",
       "Bash(if grep -q \"layout: ''edition-dashboard''\" \"$file\")",
       "Bash(npm run docker:dev:logs:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(node scripts/translation/list-todo-keys.js:*)",
+      "Bash(node scripts/translation/apply-translations.js:*)"
     ],
     "deny": [],
     "ask": [],

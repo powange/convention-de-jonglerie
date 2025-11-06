@@ -47,8 +47,8 @@
       "requests_short": "Förfrågningar",
       "seats_available": "{count} platser tillgängliga | {count} platser tillgängliga",
       "seats_needed": "{count} platser sökta | {count} platser sökta",
-      "show_active_only": "[TODO] Actifs seulement",
-      "show_all": "[TODO] Afficher tout",
+      "show_active_only": "Endast aktiva",
+      "show_all": "Visa alla",
       "status": {
         "accepted": "Accepterad",
         "cancelled": "Avbruten",

@@ -47,8 +47,8 @@
       "requests_short": "Anmodninger",
       "seats_available": "{count} ledig plads | {count} ledige pladser",
       "seats_needed": "{count} søgt plads | {count} søgte pladser",
-      "show_active_only": "[TODO] Actifs seulement",
-      "show_all": "[TODO] Afficher tout",
+      "show_active_only": "Kun aktive",
+      "show_all": "Vis alle",
       "status": {
         "accepted": "Accepteret",
         "cancelled": "Annulleret",

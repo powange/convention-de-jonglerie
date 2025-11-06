@@ -47,8 +47,8 @@
       "requests_short": "Žádosti",
       "seats_available": "{count} volných míst | {count} volných míst",
       "seats_needed": "{count} prohledané místo | {count} prohledaná místa",
-      "show_active_only": "[TODO] Actifs seulement",
-      "show_all": "[TODO] Afficher tout",
+      "show_active_only": "Pouze aktivní",
+      "show_all": "Zobrazit vše",
       "status": {
         "accepted": "Přijato",
         "cancelled": "Zrušeno",
