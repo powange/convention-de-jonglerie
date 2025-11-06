@@ -257,8 +257,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       managementSection.push({
         label: t('edition.volunteers.title'),
         icon: 'i-heroicons-user-group',
-        children: volunteersChildren,
-        defaultOpen: true,
+        children: volunteersChildren
       })
     }
   }

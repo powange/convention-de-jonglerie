@@ -337,10 +337,7 @@
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-3">
                 <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <UIcon
-                    name="i-heroicons-cake"
-                    class="h-6 w-6 text-orange-600 dark:text-orange-400"
-                  />
+                  <UIcon name="i-cbi:mealie" class="h-6 w-6 text-orange-600 dark:text-orange-400" />
                 </div>
                 <h3 class="font-semibold text-lg">Repas bénévoles</h3>
               </div>
