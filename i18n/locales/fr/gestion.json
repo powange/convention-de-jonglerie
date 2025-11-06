@@ -67,7 +67,9 @@
       "orders_title": "Commandes",
       "orders_description": "Consulter les commandes et participants",
       "access_control_title": "Contrôle d'accès",
-      "access_control_description": "Scanner et valider les billets à l'entrée"
+      "access_control_description": "Scanner et valider les billets à l'entrée",
+      "counters_title": "Compteurs",
+      "counters_description": "Créer et gérer des compteurs synchronisés en temps réel"
     },
     "artists": {
       "title": "Artistes",

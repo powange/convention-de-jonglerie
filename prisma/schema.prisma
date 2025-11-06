@@ -164,6 +164,7 @@ model Edition {
   artists                           EditionArtist[]
   shows                             Show[]
   volunteerMeals                    VolunteerMeal[]
+  ticketingCounters                 TicketingCounter[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -1441,4 +1442,19 @@ model TicketingOrderItemMeal {
   @@unique([orderItemId, mealId])
   @@index([orderItemId])
   @@index([mealId])
+}
+
+model TicketingCounter {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  token     String   @unique @default(cuid())
+  value     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@index([editionId])
+  @@index([token])
 }

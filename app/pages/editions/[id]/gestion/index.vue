@@ -300,6 +300,15 @@
                 :description="$t('gestion.ticketing.access_control_description')"
                 color="blue"
               />
+
+              <!-- Compteurs -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/counter`"
+                icon="i-heroicons-calculator"
+                :title="$t('gestion.ticketing.counters_title')"
+                :description="$t('gestion.ticketing.counters_description')"
+                color="teal"
+              />
             </div>
           </div>
         </UCard>
