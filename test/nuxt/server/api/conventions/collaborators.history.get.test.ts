@@ -21,7 +21,7 @@ const baseEvent = {
 describe('/api/conventions/[id]/collaborators/history GET', () => {
   beforeEach(() => {
     mockCheck.mockReset()
-    prismaMock.collaboratorPermissionHistory.findMany.mockReset()
+    prismaMock.organizerPermissionHistory.findMany.mockReset()
   })
 
   it("retourne l'historique avec actor & targetUser + avatars", async () => {
@@ -60,7 +60,7 @@ describe('/api/conventions/[id]/collaborators/history GET', () => {
         },
       },
     ] as any
-    prismaMock.collaboratorPermissionHistory.findMany.mockResolvedValue(history)
+    prismaMock.organizerPermissionHistory.findMany.mockResolvedValue(history)
     const res = await handler(baseEvent as any)
     expect(res.length).toBe(2)
     // Vérifie mapping des avatars
@@ -71,7 +71,7 @@ describe('/api/conventions/[id]/collaborators/history GET', () => {
     const second = res[1]
     expect(second.actor.avatar).toEqual({ hash: 'actor@example.tld' })
     expect(second.targetUser.avatar).toEqual({ src: '/img/u2.png', alt: 'Autre' })
-    expect(prismaMock.collaboratorPermissionHistory.findMany).toHaveBeenCalledWith({
+    expect(prismaMock.organizerPermissionHistory.findMany).toHaveBeenCalledWith({
       where: { conventionId: 7 },
       orderBy: { createdAt: 'desc' },
       take: 200,
@@ -95,7 +95,7 @@ describe('/api/conventions/[id]/collaborators/history GET', () => {
 
   it('retourne tableau vide si aucun historique', async () => {
     mockCheck.mockResolvedValue({ hasPermission: true })
-    prismaMock.collaboratorPermissionHistory.findMany.mockResolvedValue([])
+    prismaMock.organizerPermissionHistory.findMany.mockResolvedValue([])
     const res = await handler(baseEvent as any)
     expect(res).toEqual([])
   })

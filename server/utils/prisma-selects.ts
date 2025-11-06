@@ -132,7 +132,7 @@ export const CONVENTION_DETAIL_SELECT = {
       user: {
         select: USER_PUBLIC_SELECT,
       },
-      canManageCollaborators: true,
+      canManageOrganizers: true,
       canEditAllEditions: true,
       canDeleteConvention: true,
     },

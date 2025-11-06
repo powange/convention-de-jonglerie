@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import {
-  addConventionCollaborator,
+  addConventionOrganizer,
   checkAdminMode,
   findUserByPseudoOrEmail,
 } from '@@/server/utils/collaborator-management'
@@ -89,7 +89,7 @@ export default wrapApiHandler(
     }
 
     // Ajouter le collaborateur (la fonction gère les permissions et les vérifications)
-    const collaborator = await addConventionCollaborator({
+    const collaborator = await addConventionOrganizer({
       conventionId,
       userId: userToAdd.id,
       addedById: user.id,
@@ -117,7 +117,7 @@ export default wrapApiHandler(
         rights: {
           editConvention: collaborator.canEditConvention,
           deleteConvention: collaborator.canDeleteConvention,
-          manageCollaborators: collaborator.canManageCollaborators,
+          manageCollaborators: collaborator.canManageOrganizers,
           manageVolunteers: collaborator.canManageVolunteers,
           addEdition: collaborator.canAddEdition,
           editAllEditions: collaborator.canEditAllEditions,
@@ -133,5 +133,5 @@ export default wrapApiHandler(
       },
     }
   },
-  { operationName: 'AddConventionCollaborator' }
+  { operationName: 'AddConventionOrganizer' }
 )

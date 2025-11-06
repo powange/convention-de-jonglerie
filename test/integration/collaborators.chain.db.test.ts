@@ -40,8 +40,8 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
       data: { name: `Conv-${ts}`, authorId: owner.id },
     })
 
-    // Ajout collaborateur (simulateur logique du endpoint / POST direct via Prisma + historique manuellement pour refléter comportement addConventionCollaborator)
-    collaboratorRecord = await prismaTest.conventionCollaborator.create({
+    // Ajout collaborateur (simulateur logique du endpoint / POST direct via Prisma + historique manuellement pour refléter comportement addConventionOrganizer)
+    collaboratorRecord = await prismaTest.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
         userId: collaboratorUser.id,
@@ -49,13 +49,13 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
         title: null,
         canEditConvention: false,
         canDeleteConvention: false,
-        canManageCollaborators: false,
+        canManageOrganizers: false,
         canAddEdition: false,
         canEditAllEditions: false,
         canDeleteAllEditions: false,
       },
     })
-    await prismaTest.collaboratorPermissionHistory.create({
+    await prismaTest.organizerPermissionHistory.create({
       data: {
         conventionId: convention.id,
         targetUserId: collaboratorUser.id,
@@ -66,7 +66,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
           rights: {
             canEditConvention: false,
             canDeleteConvention: false,
-            canManageCollaborators: false,
+            canManageOrganizers: false,
             canAddEdition: false,
             canEditAllEditions: false,
             canDeleteAllEditions: false,
@@ -77,11 +77,11 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
     })
     // Patch droits (un global + perEdition) => enregistrer PER_EDITIONS_UPDATED
     const beforeSnapshot = { ...collaboratorRecord }
-    await prismaTest.conventionCollaborator.update({
+    await prismaTest.conventionOrganizer.update({
       where: { id: collaboratorRecord.id },
       data: { canEditConvention: true },
     })
-    await prismaTest.collaboratorPermissionHistory.create({
+    await prismaTest.organizerPermissionHistory.create({
       data: {
         conventionId: convention.id,
         targetUserId: collaboratorUser.id,
@@ -92,7 +92,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
           rights: {
             canEditConvention: beforeSnapshot.canEditConvention,
             canDeleteConvention: beforeSnapshot.canDeleteConvention,
-            canManageCollaborators: beforeSnapshot.canManageCollaborators,
+            canManageOrganizers: beforeSnapshot.canManageOrganizers,
             canAddEdition: beforeSnapshot.canAddEdition,
             canEditAllEditions: beforeSnapshot.canEditAllEditions,
             canDeleteAllEditions: beforeSnapshot.canDeleteAllEditions,
@@ -104,7 +104,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
           rights: {
             canEditConvention: true,
             canDeleteConvention: false,
-            canManageCollaborators: false,
+            canManageOrganizers: false,
             canAddEdition: false,
             canEditAllEditions: false,
             canDeleteAllEditions: false,
@@ -114,7 +114,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
       } as any,
     })
     // Suppression => entrée REMOVED
-    await prismaTest.collaboratorPermissionHistory.create({
+    await prismaTest.organizerPermissionHistory.create({
       data: {
         conventionId: convention.id,
         targetUserId: collaboratorUser.id,
@@ -125,7 +125,7 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
           rights: {
             canEditConvention: true,
             canDeleteConvention: false,
-            canManageCollaborators: false,
+            canManageOrganizers: false,
             canAddEdition: false,
             canEditAllEditions: false,
             canDeleteAllEditions: false,
@@ -134,11 +134,11 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
         after: { removed: true } as any,
       } as any,
     })
-    await prismaTest.conventionCollaborator.delete({ where: { id: collaboratorRecord.id } })
+    await prismaTest.conventionOrganizer.delete({ where: { id: collaboratorRecord.id } })
   })
 
   it('chaîne cohérente dans history', async () => {
-    const hist = await prismaTest.collaboratorPermissionHistory.findMany({
+    const hist = await prismaTest.organizerPermissionHistory.findMany({
       where: { conventionId: convention.id, targetUserId: collaboratorUser.id },
       orderBy: { createdAt: 'asc' },
     })

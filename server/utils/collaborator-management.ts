@@ -62,8 +62,8 @@ export async function checkUserConventionPermission(
 
   const isOwner = convention.authorId === userId
 
-  // Vérifier si l'utilisateur est un collaborateur
-  const collaborator = await prisma.conventionCollaborator.findUnique({
+  // Vérifier si l'utilisateur est un organisateur
+  const organizer = await prisma.conventionOrganizer.findUnique({
     where: {
       conventionId_userId: {
         conventionId,
@@ -73,16 +73,16 @@ export async function checkUserConventionPermission(
   })
 
   return {
-    hasPermission: isOwner || !!collaborator,
+    hasPermission: isOwner || !!organizer,
     isOwner,
-    isCollaborator: !!collaborator,
+    isCollaborator: !!organizer,
   }
 }
 
 /**
  * Vérifie si un utilisateur peut gérer les collaborateurs d'une convention
  */
-export async function canManageCollaborators(
+export async function canManageOrganizers(
   conventionId: number,
   userId: number,
   event?: H3Event
@@ -95,13 +95,13 @@ export async function canManageCollaborators(
     where: { id: conventionId },
     select: {
       authorId: true,
-      collaborators: { where: { userId }, select: { canManageCollaborators: true } },
+      collaborators: { where: { userId }, select: { canManageOrganizers: true } },
     },
   })
   if (!convention) return false
   if (convention.authorId === userId) return true
   const collab = convention.collaborators[0]
-  return !!(collab && collab.canManageCollaborators)
+  return !!(collab && collab.canManageOrganizers)
 }
 
 /**
@@ -165,8 +165,8 @@ export async function canManageEditionVolunteers(
   if (collab.canManageVolunteers) return true
 
   // Vérifier les permissions spécifiques à cette édition
-  const perEdition = await prisma.editionCollaboratorPermission.findUnique({
-    where: { collaboratorId_editionId: { collaboratorId: collab.id, editionId } },
+  const perEdition = await prisma.editionOrganizerPermission.findUnique({
+    where: { organizerId_editionId: { organizerId: collab.id, editionId } },
     select: { canManageVolunteers: true },
   })
   return !!perEdition?.canManageVolunteers
@@ -179,7 +179,7 @@ export async function canManageEditionVolunteers(
 /**
  * Ajoute un collaborateur à une convention
  */
-interface AddConventionCollaboratorInput {
+interface AddConventionOrganizerInput {
   conventionId: number
   userId: number
   addedById: number
@@ -204,10 +204,10 @@ interface AddConventionCollaboratorInput {
   }>
 }
 
-export async function addConventionCollaborator(input: AddConventionCollaboratorInput) {
+export async function addConventionOrganizer(input: AddConventionOrganizerInput) {
   const { conventionId, userId: userToAddId, addedById, event, rights, title, perEdition } = input
   // Vérifier les permissions
-  const canManage = await canManageCollaborators(conventionId, addedById, event)
+  const canManage = await canManageOrganizers(conventionId, addedById, event)
 
   if (!canManage) {
     throw createError({
@@ -231,7 +231,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
 
   // Créer le collaborateur
   return await prisma.$transaction(async (tx: PrismaTransaction) => {
-    const collaborator = await tx.conventionCollaborator.create({
+    const collaborator = await tx.conventionOrganizer.create({
       data: {
         conventionId,
         userId: userToAddId,
@@ -239,7 +239,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
         title: title || null,
         canEditConvention: rights?.editConvention ?? false,
         canDeleteConvention: rights?.deleteConvention ?? false,
-        canManageCollaborators: rights?.manageCollaborators ?? false,
+        canManageOrganizers: rights?.manageCollaborators ?? false,
         canAddEdition: rights?.addEdition ?? false,
         canEditAllEditions: rights?.editAllEditions ?? false,
         canDeleteAllEditions: rights?.deleteAllEditions ?? false,
@@ -254,9 +254,9 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
         (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists)
       )
       if (filtered.length) {
-        await tx.editionCollaboratorPermission.createMany({
+        await tx.editionOrganizerPermission.createMany({
           data: filtered.map((p) => ({
-            collaboratorId: collaborator.id,
+            organizerId: collaborator.id,
             editionId: p.editionId,
             canEdit: !!p.canEdit,
             canDelete: !!p.canDelete,
@@ -268,7 +268,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
       }
     }
 
-    const withPerEdition = await tx.conventionCollaborator.findUnique({
+    const withPerEdition = await tx.conventionOrganizer.findUnique({
       where: { id: collaborator.id },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
@@ -280,7 +280,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
         rights: {
           canEditConvention: withPerEdition.canEditConvention,
           canDeleteConvention: withPerEdition.canDeleteConvention,
-          canManageCollaborators: withPerEdition.canManageCollaborators,
+          canManageOrganizers: withPerEdition.canManageOrganizers,
           canAddEdition: withPerEdition.canAddEdition,
           canEditAllEditions: withPerEdition.canEditAllEditions,
           canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
@@ -293,7 +293,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
           canManageVolunteers: p.canManageVolunteers,
         })),
       }
-      await tx.collaboratorPermissionHistory.create({
+      await tx.organizerPermissionHistory.create({
         data: {
           conventionId,
           targetUserId: withPerEdition.userId,
@@ -325,14 +325,14 @@ export async function findUserByPseudoOrEmail(searchTerm: string) {
 /**
  * Supprime un collaborateur d'une convention
  */
-export async function deleteConventionCollaborator(
+export async function deleteConventionOrganizer(
   conventionId: number,
-  collaboratorId: number,
+  organizerId: number,
   userId: number,
   event?: H3Event
 ): Promise<{ success: boolean; message: string }> {
   // Vérifier les permissions
-  const canManage = await canManageCollaborators(conventionId, userId, event)
+  const canManage = await canManageOrganizers(conventionId, userId, event)
 
   if (!canManage) {
     throw createError({
@@ -342,8 +342,8 @@ export async function deleteConventionCollaborator(
   }
 
   // Vérifier que le collaborateur existe
-  const collaborator = await prisma.conventionCollaborator.findUnique({
-    where: { id: collaboratorId },
+  const collaborator = await prisma.conventionOrganizer.findUnique({
+    where: { id: organizerId },
     include: {
       user: {
         select: { pseudo: true },
@@ -374,7 +374,7 @@ export async function deleteConventionCollaborator(
     rights: {
       canEditConvention: collaborator.canEditConvention,
       canDeleteConvention: collaborator.canDeleteConvention,
-      canManageCollaborators: collaborator.canManageCollaborators,
+      canManageOrganizers: collaborator.canManageOrganizers,
       canAddEdition: collaborator.canAddEdition,
       canEditAllEditions: collaborator.canEditAllEditions,
       canDeleteAllEditions: collaborator.canDeleteAllEditions,
@@ -391,7 +391,7 @@ export async function deleteConventionCollaborator(
 
   await prisma.$transaction(async (tx: PrismaTransaction) => {
     // Historiser AVANT suppression en mettant collaboratorId à null pour conserver la ligne après delete
-    await tx.collaboratorPermissionHistory.create({
+    await tx.organizerPermissionHistory.create({
       data: {
         conventionId,
         targetUserId: collaborator.userId,
@@ -401,7 +401,7 @@ export async function deleteConventionCollaborator(
         after,
       },
     })
-    await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
+    await tx.conventionOrganizer.delete({ where: { id: organizerId } })
   })
 
   return {
@@ -413,8 +413,8 @@ export async function deleteConventionCollaborator(
 /**
  * Récupère tous les collaborateurs d'une convention
  */
-export async function getConventionCollaborators(conventionId: number) {
-  return await prisma.conventionCollaborator.findMany({
+export async function getConventionOrganizers(conventionId: number) {
+  return await prisma.conventionOrganizer.findMany({
     where: { conventionId },
     include: {
       user: {
@@ -440,7 +440,7 @@ export async function getConventionCollaborators(conventionId: number) {
  */
 export async function updateCollaboratorRights(params: {
   conventionId: number
-  collaboratorId: number
+  organizerId: number
   userId: number
   rights?: Partial<{
     editConvention: boolean
@@ -461,22 +461,22 @@ export async function updateCollaboratorRights(params: {
     canManageArtists?: boolean
   }>
 }) {
-  const { conventionId, collaboratorId, userId, rights, title, perEdition } = params
-  const canManage = await canManageCollaborators(conventionId, userId)
+  const { conventionId, organizerId, userId, rights, title, perEdition } = params
+  const canManage = await canManageOrganizers(conventionId, userId)
   if (!canManage) throw createError({ statusCode: 403, message: 'Droits insuffisants' })
-  const collaborator = await prisma.conventionCollaborator.findUnique({
-    where: { id: collaboratorId },
+  const collaborator = await prisma.conventionOrganizer.findUnique({
+    where: { id: organizerId },
   })
   if (!collaborator || collaborator.conventionId !== conventionId)
     throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
   return prisma.$transaction(async (tx: PrismaTransaction) => {
-    await tx.conventionCollaborator.update({
-      where: { id: collaboratorId },
+    await tx.conventionOrganizer.update({
+      where: { id: organizerId },
       data: {
         title: title ?? collaborator.title,
         canEditConvention: rights?.editConvention ?? collaborator.canEditConvention,
         canDeleteConvention: rights?.deleteConvention ?? collaborator.canDeleteConvention,
-        canManageCollaborators: rights?.manageCollaborators ?? collaborator.canManageCollaborators,
+        canManageOrganizers: rights?.manageCollaborators ?? collaborator.canManageOrganizers,
         canAddEdition: rights?.addEdition ?? collaborator.canAddEdition,
         canEditAllEditions: rights?.editAllEditions ?? collaborator.canEditAllEditions,
         canDeleteAllEditions: rights?.deleteAllEditions ?? collaborator.canDeleteAllEditions,
@@ -489,8 +489,8 @@ export async function updateCollaboratorRights(params: {
     // Gérer les permissions per-edition si fournies
     if (perEdition) {
       // Supprimer toutes les permissions existantes pour ce collaborateur
-      await tx.editionCollaboratorPermission.deleteMany({
-        where: { collaboratorId },
+      await tx.editionOrganizerPermission.deleteMany({
+        where: { organizerId },
       })
 
       // Ajouter les nouvelles permissions (filtrer les vides)
@@ -498,9 +498,9 @@ export async function updateCollaboratorRights(params: {
         (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists)
       )
       if (filtered.length > 0) {
-        await tx.editionCollaboratorPermission.createMany({
+        await tx.editionOrganizerPermission.createMany({
           data: filtered.map((p) => ({
-            collaboratorId,
+            organizerId,
             editionId: p.editionId,
             canEdit: !!p.canEdit,
             canDelete: !!p.canDelete,
@@ -513,8 +513,8 @@ export async function updateCollaboratorRights(params: {
     }
 
     // Récupérer le collaborateur avec les permissions mises à jour
-    return tx.conventionCollaborator.findUnique({
-      where: { id: collaboratorId },
+    return tx.conventionOrganizer.findUnique({
+      where: { id: organizerId },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
   })

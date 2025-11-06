@@ -29,7 +29,7 @@ export default wrapApiHandler(
           isArchived: true,
           archivedAt: archived.archivedAt,
         }
-        await prisma.collaboratorPermissionHistory.create({
+        await prisma.organizerPermissionHistory.create({
           data: {
             conventionId,
             actorId: user.id,

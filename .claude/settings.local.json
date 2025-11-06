@@ -69,11 +69,16 @@
       "Bash(npm install)",
       "Bash(node scripts/translation/list-todo-keys.js:*)",
       "Bash(node scripts/translation/apply-translations.js:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(if [ -f \"server/api/conventions/[id]/collaborators/[collaboratorId].delete.ts\" ])"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner"
+  ]
 }

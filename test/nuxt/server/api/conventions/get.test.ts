@@ -28,7 +28,7 @@ describe('API Convention - Récupération', () => {
         addedAt: new Date('2025-01-01'),
         canEditConvention: true,
         canDeleteConvention: true,
-        canManageCollaborators: true,
+        canManageOrganizers: true,
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,

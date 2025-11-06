@@ -2,17 +2,17 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/collaborator-management', () => ({
-  deleteConventionCollaborator: vi.fn(),
+  deleteConventionOrganizer: vi.fn(),
 }))
 
-import { deleteConventionCollaborator } from '../../../../../server/utils/collaborator-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].delete'
+import { deleteConventionOrganizer } from '../../../../../server/utils/collaborator-management'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].delete'
 
-const mockDeleteCollaborator = deleteConventionCollaborator as ReturnType<typeof vi.fn>
+const mockDeleteCollaborator = deleteConventionOrganizer as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
-    params: { id: '1', collaboratorId: '2' },
+    params: { id: '1', organizerId: '2' },
     user: {
       id: 1,
       email: 'admin@test.com',
@@ -21,7 +21,7 @@ const mockEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
+describe('/api/conventions/[id]/collaborators/[organizerId] DELETE', () => {
   beforeEach(() => {
     mockDeleteCollaborator.mockReset()
   })
@@ -55,24 +55,24 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
   it('devrait rejeter un ID de convention invalide', async () => {
     const eventWithBadId = {
       ...mockEvent,
-      context: { ...mockEvent.context, params: { id: 'invalid', collaboratorId: '2' } },
+      context: { ...mockEvent.context, params: { id: 'invalid', organizerId: '2' } },
     }
 
     await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
-  it('devrait rejeter un ID de collaborateur invalide', async () => {
-    const eventWithBadCollaboratorId = {
+  it('devrait rejeter un ID d\'organisateur invalide', async () => {
+    const eventWithBadOrganizerId = {
       ...mockEvent,
-      context: { ...mockEvent.context, params: { id: '1', collaboratorId: 'invalid' } },
+      context: { ...mockEvent.context, params: { id: '1', organizerId: 'invalid' } },
     }
 
-    await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow(
-      'ID de collaborateur invalide'
+    await expect(handler(eventWithBadOrganizerId as any)).rejects.toThrow(
+      'ID d\'organisateur invalide'
     )
   })
 
-  it('devrait gérer les erreurs de deleteConventionCollaborator', async () => {
+  it('devrait gérer les erreurs de deleteConventionOrganizer', async () => {
     mockDeleteCollaborator.mockRejectedValue(new Error('Permission denied'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
@@ -94,7 +94,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
       ...mockEvent,
       context: {
         ...mockEvent.context,
-        params: { id: '123', collaboratorId: '456' },
+        params: { id: '123', organizerId: '456' },
       },
     }
 
@@ -169,7 +169,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
   })
 
   it("déclenche une entrée d'historique REMOVED (appel utilitaire simulé)", async () => {
-    // On simule simplement le retour puisque la création d'historique est interne à deleteConventionCollaborator
+    // On simule simplement le retour puisque la création d'historique est interne à deleteConventionOrganizer
     mockDeleteCollaborator.mockResolvedValue({ success: true, message: 'ok' })
     const res = await handler(mockEvent as any)
     expect(res.success).toBe(true)

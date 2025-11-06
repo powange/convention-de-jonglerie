@@ -34,11 +34,11 @@ model User {
   carpoolPassengers                  CarpoolPassenger[]
   carpoolRequests                    CarpoolRequest[]
   carpoolRequestComments             CarpoolRequestComment[]
-  permissionHistoryActions           CollaboratorPermissionHistory[]     @relation("CollaboratorPermissionHistory_actor")
-  targetUserHistories                CollaboratorPermissionHistory[]     @relation("CollaboratorPermissionHistory_target")
+  permissionHistoryActions           OrganizerPermissionHistory[]        @relation("OrganizerPermissionHistory_actor")
+  targetUserHistories                OrganizerPermissionHistory[]        @relation("OrganizerPermissionHistory_target")
   createdConventions                 Convention[]
-  addedCollaborators                 ConventionCollaborator[]            @relation("AddedCollaborators")
-  collaborations                     ConventionCollaborator[]
+  addedOrganizers                    ConventionOrganizer[]               @relation("AddedOrganizers")
+  organizations                      ConventionOrganizer[]
   createdEditions                    Edition[]                           @relation("CreatedEditions")
   editionPosts                       EditionPost[]
   editionPostComments                EditionPostComment[]
@@ -142,7 +142,7 @@ model Edition {
   carpoolRequests                   CarpoolRequest[]
   convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   creator                           User?                            @relation("CreatedEditions", fields: [creatorId], references: [id])
-  collaboratorPermissions           EditionCollaboratorPermission[]
+  organizerPermissions              EditionOrganizerPermission[]
   editionPosts                      EditionPost[]
   volunteerApplications             EditionVolunteerApplication[]
   lostFoundItems                    LostFoundItem[]
@@ -170,29 +170,29 @@ model Edition {
   @@index([conventionId], map: "Edition_conventionId_fkey")
 }
 
-model ConventionCollaborator {
-  id                     Int                             @id @default(autoincrement())
-  conventionId           Int
-  userId                 Int
-  addedAt                DateTime                        @default(now())
-  addedById              Int
-  canAddEdition          Boolean                         @default(false)
-  canDeleteAllEditions   Boolean                         @default(false)
-  canDeleteConvention    Boolean                         @default(false)
-  canEditAllEditions     Boolean                         @default(false)
-  canEditConvention      Boolean                         @default(false)
-  canManageCollaborators Boolean                         @default(false)
-  title                  String?
-  canManageVolunteers    Boolean                         @default(false)
-  canManageArtists       Boolean                         @default(false)
-  addedBy                User                            @relation("AddedCollaborators", fields: [addedById], references: [id])
-  convention             Convention                      @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  user                   User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  perEditionPermissions  EditionCollaboratorPermission[]
+model ConventionOrganizer {
+  id                    Int                          @id @default(autoincrement())
+  conventionId          Int
+  userId                Int
+  addedAt               DateTime                     @default(now())
+  addedById             Int
+  canAddEdition         Boolean                      @default(false)
+  canDeleteAllEditions  Boolean                      @default(false)
+  canDeleteConvention   Boolean                      @default(false)
+  canEditAllEditions    Boolean                      @default(false)
+  canEditConvention     Boolean                      @default(false)
+  canManageOrganizers   Boolean                      @default(false)
+  title                 String?
+  canManageVolunteers   Boolean                      @default(false)
+  canManageArtists      Boolean                      @default(false)
+  addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
+  convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  perEditionPermissions EditionOrganizerPermission[]
 
   @@unique([conventionId, userId])
-  @@index([addedById], map: "ConventionCollaborator_addedById_fkey")
-  @@index([userId], map: "ConventionCollaborator_userId_fkey")
+  @@index([addedById], map: "ConventionOrganizer_addedById_fkey")
+  @@index([userId], map: "ConventionOrganizer_userId_fkey")
 }
 
 enum CarpoolDirection {
@@ -318,43 +318,43 @@ model Convention {
   updatedAt         DateTime                        @updatedAt
   authorId          Int? // Nullable pour conventions importées
   archivedAt        DateTime?
-  isArchived        Boolean                         @default(false)
-  permissionHistory CollaboratorPermissionHistory[]
-  author            User?                           @relation(fields: [authorId], references: [id])
-  collaborators     ConventionCollaborator[]
+  isArchived        Boolean                      @default(false)
+  permissionHistory OrganizerPermissionHistory[]
+  author            User?                        @relation(fields: [authorId], references: [id])
+  organizers        ConventionOrganizer[]
   editions          Edition[]
   claimRequests     ConventionClaimRequest[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
 }
 
-model EditionCollaboratorPermission {
-  id                  Int                    @id @default(autoincrement())
-  collaboratorId      Int
+model EditionOrganizerPermission {
+  id                  Int                 @id @default(autoincrement())
+  organizerId         Int
   editionId           Int
-  canEdit             Boolean                @default(false)
-  canDelete           Boolean                @default(false)
-  canManageVolunteers Boolean                @default(false)
-  canManageArtists    Boolean                @default(false)
-  collaborator        ConventionCollaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
-  edition             Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  canEdit             Boolean             @default(false)
+  canDelete           Boolean             @default(false)
+  canManageVolunteers Boolean             @default(false)
+  canManageArtists    Boolean             @default(false)
+  organizer           ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  edition             Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
 
-  @@unique([collaboratorId, editionId])
+  @@unique([organizerId, editionId])
   @@index([editionId])
 }
 
-model CollaboratorPermissionHistory {
-  id           Int                              @id @default(autoincrement())
+model OrganizerPermissionHistory {
+  id           Int                           @id @default(autoincrement())
   conventionId Int
   actorId      Int
-  changeType   CollaboratorPermissionChangeType
+  changeType   OrganizerPermissionChangeType
   before       Json?
   after        Json?
-  createdAt    DateTime                         @default(now())
+  createdAt    DateTime                      @default(now())
   targetUserId Int?
-  actor        User                             @relation("CollaboratorPermissionHistory_actor", fields: [actorId], references: [id], onDelete: Cascade)
-  convention   Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  targetUser   User?                            @relation("CollaboratorPermissionHistory_target", fields: [targetUserId], references: [id])
+  actor        User                          @relation("OrganizerPermissionHistory_actor", fields: [actorId], references: [id], onDelete: Cascade)
+  convention   Convention                    @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  targetUser   User?                         @relation("OrganizerPermissionHistory_target", fields: [targetUserId], references: [id])
 
   @@index([conventionId])
   @@index([actorId])
@@ -513,7 +513,7 @@ model Feedback {
   @@index([resolved])
 }
 
-enum CollaboratorPermissionChangeType {
+enum OrganizerPermissionChangeType {
   CREATED
   RIGHTS_UPDATED
   PER_EDITIONS_UPDATED

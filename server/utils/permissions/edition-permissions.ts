@@ -5,8 +5,8 @@ import type {
   User,
   Edition,
   Convention,
-  ConventionCollaborator,
-  EditionCollaboratorPermission,
+  ConventionOrganizer,
+  EditionOrganizerPermission,
 } from '@prisma/client'
 
 /**
@@ -14,9 +14,9 @@ import type {
  */
 export type EditionWithPermissions = Edition & {
   convention: Convention & {
-    collaborators: ConventionCollaborator[]
+    collaborators: ConventionOrganizer[]
   }
-  collaboratorPermissions?: (EditionCollaboratorPermission & {
+  collaboratorPermissions?: (EditionOrganizerPermission & {
     collaborator: {
       userId: number
     }
@@ -39,7 +39,7 @@ export type CollaboratorRight =
   | 'canDeleteAllEditions'
   | 'canEditConvention'
   | 'canDeleteConvention'
-  | 'canManageCollaborators'
+  | 'canManageOrganizers'
   | 'canAddEdition'
 
 /**
@@ -157,7 +157,7 @@ export function canManageEditionStatus(edition: EditionWithPermissions, user: Us
     edition.convention.collaborators?.some(
       (collab) =>
         collab.userId === user.id &&
-        (collab.canEditAllEditions || collab.canEditConvention || collab.canManageCollaborators)
+        (collab.canEditAllEditions || collab.canEditConvention || collab.canManageOrganizers)
     ) || false
 
   return isCreator || isConventionAuthor || hasManageRights || isGlobalAdmin
@@ -245,7 +245,7 @@ export async function getEditionForStatusManagement(
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
-    requiredRights: ['canEditAllEditions', 'canEditConvention', 'canManageCollaborators'],
+    requiredRights: ['canEditAllEditions', 'canEditConvention', 'canManageOrganizers'],
   })
 
   if (!edition) {

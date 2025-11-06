@@ -109,7 +109,7 @@
               <h4 class="text-sm font-medium text-gray-900 dark:text-white">
                 {{ $t('conventions.collaborators') }} ({{ convention.collaborators?.length || 0 }})
               </h4>
-              <div v-if="canManageCollaborators(convention)" class="flex gap-2">
+              <div v-if="canManageOrganizers(convention)" class="flex gap-2">
                 <UButton
                   size="xs"
                   variant="outline"
@@ -662,7 +662,7 @@ const formatCreatedDate = computed(() => {
 
 // Fonctions pour gérer les collaborateurs
 const openEditCollaboratorModal = (convention: Convention, collaborator: any) => {
-  if (!canManageCollaborators(convention)) {
+  if (!canManageOrganizers(convention)) {
     toast.add({
       title: 'Action non autorisée',
       description: "Vous n'avez pas les droits pour modifier ce collaborateur",
@@ -936,7 +936,7 @@ function findCurrentCollab(convention: Convention) {
 }
 const isAuthor = (convention: Convention) =>
   currentUserId() && convention.authorId && convention.authorId === currentUserId()
-const canManageCollaborators = (convention: Convention) =>
+const canManageOrganizers = (convention: Convention) =>
   !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.manageCollaborators)
 const canAddEdition = (convention: Convention) =>
   !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.addEdition)

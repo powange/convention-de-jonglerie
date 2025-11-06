@@ -40,7 +40,7 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const conventionId = validateConventionId(event)
-    const collaboratorId = validateResourceId(event, 'collaboratorId', 'collaborateur')
+    const organizerId = validateResourceId(event, 'organizerId', 'organisateur')
     const body = await readBody(event)
 
     // Valider les données
@@ -55,15 +55,15 @@ export default wrapApiHandler(
     }
 
     // Charger l'état avant pour snapshot si on va changer
-    const before = await prisma.conventionCollaborator.findUnique({
-      where: { id: collaboratorId },
+    const before = await prisma.conventionOrganizer.findUnique({
+      where: { id: organizerId },
       select: {
         id: true,
         conventionId: true,
         title: true,
         canEditConvention: true,
         canDeleteConvention: true,
-        canManageCollaborators: true,
+        canManageOrganizers: true,
         canManageVolunteers: true,
         canAddEdition: true,
         canEditAllEditions: true,
@@ -73,7 +73,7 @@ export default wrapApiHandler(
 
     const updatedCollaborator = (await updateCollaboratorRights({
       conventionId,
-      collaboratorId,
+      organizerId,
       userId: user.id,
       rights,
       title: title ?? undefined,
@@ -86,7 +86,7 @@ export default wrapApiHandler(
         rights: {
           canEditConvention: updatedCollaborator.canEditConvention,
           canDeleteConvention: updatedCollaborator.canDeleteConvention,
-          canManageCollaborators: updatedCollaborator.canManageCollaborators,
+          canManageOrganizers: updatedCollaborator.canManageOrganizers,
           canManageVolunteers: updatedCollaborator.canManageVolunteers,
           canAddEdition: updatedCollaborator.canAddEdition,
           canEditAllEditions: updatedCollaborator.canEditAllEditions,
@@ -98,7 +98,7 @@ export default wrapApiHandler(
         rights: {
           canEditConvention: before.canEditConvention,
           canDeleteConvention: before.canDeleteConvention,
-          canManageCollaborators: before.canManageCollaborators,
+          canManageOrganizers: before.canManageOrganizers,
           canManageVolunteers: before.canManageVolunteers,
           canAddEdition: before.canAddEdition,
           canEditAllEditions: before.canEditAllEditions,
@@ -106,11 +106,11 @@ export default wrapApiHandler(
         },
       }
       if (JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)) {
-        const target = await prisma.conventionCollaborator.findUnique({
-          where: { id: collaboratorId },
+        const target = await prisma.conventionOrganizer.findUnique({
+          where: { id: organizerId },
           select: { userId: true },
         })
-        await prisma.collaboratorPermissionHistory.create({
+        await prisma.organizerPermissionHistory.create({
           data: {
             conventionId,
             targetUserId: target?.userId ?? null,
@@ -138,7 +138,7 @@ export default wrapApiHandler(
         rights: {
           editConvention: updatedCollaborator.canEditConvention,
           deleteConvention: updatedCollaborator.canDeleteConvention,
-          manageCollaborators: updatedCollaborator.canManageCollaborators,
+          manageCollaborators: updatedCollaborator.canManageOrganizers,
           manageVolunteers: updatedCollaborator.canManageVolunteers,
           addEdition: updatedCollaborator.canAddEdition,
           editAllEditions: updatedCollaborator.canEditAllEditions,

@@ -35,7 +35,7 @@ describe('API Convention - Création', () => {
       pseudo: rawConvention.author.pseudo,
       emailHash: getEmailHash(rawConvention.author.email),
     },
-    collaborators: [
+    organizers: [
       {
         id: 1,
         addedAt: expect.any(Date),
@@ -64,7 +64,7 @@ describe('API Convention - Création', () => {
 
   it('devrait créer une nouvelle convention avec succès', async () => {
     prismaMock.convention.create.mockResolvedValue(rawConvention as any)
-    prismaMock.conventionCollaborator.create.mockResolvedValue({
+    prismaMock.conventionOrganizer.create.mockResolvedValue({
       id: 1,
       conventionId: 1,
       userId: 1,
@@ -73,14 +73,14 @@ describe('API Convention - Création', () => {
     })
     prismaMock.convention.findUnique.mockResolvedValue({
       ...rawConvention,
-      collaborators: [
+      organizers: [
         {
           id: 1,
           title: 'Créateur',
           addedAt: new Date(),
           canEditConvention: true,
           canDeleteConvention: true,
-          canManageCollaborators: true,
+          canManageOrganizers: true,
           canAddEdition: true,
           canEditAllEditions: true,
           canDeleteAllEditions: true,
@@ -121,7 +121,7 @@ describe('API Convention - Création', () => {
         },
       },
     })
-    expect(prismaMock.conventionCollaborator.create).toHaveBeenCalledWith({
+    expect(prismaMock.conventionOrganizer.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         conventionId: 1,
         userId: mockUser.id,
@@ -129,7 +129,7 @@ describe('API Convention - Création', () => {
         title: 'Créateur',
         canEditConvention: true,
         canDeleteConvention: true,
-        canManageCollaborators: true,
+        canManageOrganizers: true,
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,
@@ -166,7 +166,7 @@ describe('API Convention - Création', () => {
 
   it("devrait sanitiser les données d'entrée", async () => {
     prismaMock.convention.create.mockResolvedValue(rawConvention as any)
-    prismaMock.conventionCollaborator.create.mockResolvedValue({
+    prismaMock.conventionOrganizer.create.mockResolvedValue({
       id: 1,
       conventionId: 1,
       userId: 1,
@@ -176,7 +176,7 @@ describe('API Convention - Création', () => {
     })
     prismaMock.convention.findUnique.mockResolvedValue({
       ...rawConvention,
-      collaborators: [],
+      organizers: [],
     } as any)
 
     const requestBody = {

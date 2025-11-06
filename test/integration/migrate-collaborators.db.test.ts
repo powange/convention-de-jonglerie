@@ -9,7 +9,7 @@ import { prismaTest } from '../setup-db'
 // Nécessite TEST_WITH_DB=true et une base de test prête
 
 // LEGACY: ce test vérifiait la migration depuis l'ancien champ `role` (ADMINISTRATOR / MODERATOR)
-// Le champ a été supprimé du modèle `ConventionCollaborator`. On ignore désormais ce scénario.
+// Le champ a été supprimé du modèle `ConventionOrganizer`. On ignore désormais ce scénario.
 // Si une migration rétro-compatible est encore nécessaire sur une base existante pré-migration,
 // exécuter manuellement `npx tsx scripts/migrate-collaborator-rights.ts --dry` puis `--yes` hors tests.
 describe.skip('Migration droits collaborateurs (script) - ignoré (champ role supprimé)', () => {
@@ -43,7 +43,7 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
       data: { name: 'Conv Mig', authorId: adminUser.id },
     })
     // Collaborateur ADMINISTRATOR sans droits booléens
-    await prismaTest.conventionCollaborator.create({
+    await prismaTest.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
         userId: adminUser.id,
@@ -52,7 +52,7 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
       },
     })
     // Collaborateur MODERATOR
-    await prismaTest.conventionCollaborator.create({
+    await prismaTest.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
         userId: moderatorUser.id,
@@ -75,7 +75,7 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
     })
     expect(realOut).toContain('Collaborateurs ajustés')
 
-    const collaborators = await prismaTest.conventionCollaborator.findMany({
+    const collaborators = await prismaTest.conventionOrganizer.findMany({
       where: { conventionId: convention.id },
       orderBy: { id: 'asc' },
     })
@@ -85,7 +85,7 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
     // Admin doit avoir tous les droits
     expect(admin.canEditConvention).toBe(true)
     expect(admin.canDeleteConvention).toBe(true)
-    expect(admin.canManageCollaborators).toBe(true)
+    expect(admin.canManageOrganizers).toBe(true)
     expect(admin.canAddEdition).toBe(true)
     expect(admin.canEditAllEditions).toBe(true)
     expect(admin.canDeleteAllEditions).toBe(true)
@@ -93,11 +93,11 @@ describe.skip('Migration droits collaborateurs (script) - ignoré (champ role su
     // Moderator: addEdition + editAllEditions
     expect(mod.canAddEdition).toBe(true)
     expect(mod.canEditAllEditions).toBe(true)
-    expect(mod.canManageCollaborators).toBe(false)
+    expect(mod.canManageOrganizers).toBe(false)
     expect(mod.canDeleteConvention).toBe(false)
 
     // Historique créé
-    const history = await prismaTest.collaboratorPermissionHistory.findMany({
+    const history = await prismaTest.organizerPermissionHistory.findMany({
       where: { conventionId: convention.id },
     })
     expect(history.length).toBeGreaterThanOrEqual(2)

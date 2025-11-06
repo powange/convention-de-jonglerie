@@ -97,10 +97,10 @@ export interface Convention {
     country: string
     imageUrl?: string | null
   }[]
-  collaborators?: ConventionCollaboratorWithRights[] // ajouté pour my-conventions
+  collaborators?: ConventionOrganizerWithRights[] // ajouté pour my-conventions
 }
 
-export interface ConventionCollaborator {
+export interface ConventionOrganizer {
   id: number
   conventionId: number
   userId: number
@@ -111,7 +111,7 @@ export interface ConventionCollaborator {
   addedBy: { id: number; pseudo: string }
 }
 
-export interface ConventionCollaboratorWithRights {
+export interface ConventionOrganizerWithRights {
   id: number
   user: PublicUser
   rights?: Record<string, boolean> // ex: editConvention, deleteConvention...
@@ -140,7 +140,7 @@ export interface EditionCollaborator {
 }
 
 export interface ConventionWithCollaborators extends Convention {
-  collaborators?: ConventionCollaboratorWithRights[]
+  collaborators?: ConventionOrganizerWithRights[]
 }
 
 // Interface pour les objets qui ont seulement des dates (pour les composables)

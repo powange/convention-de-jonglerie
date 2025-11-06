@@ -6,13 +6,13 @@ vi.mock('../../../../../server/utils/collaborator-management', () => ({
 }))
 
 import { updateCollaboratorRights } from '../../../../../server/utils/collaborator-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].put'
 
 const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
-    params: { id: '1', collaboratorId: '2' },
+    params: { id: '1', organizerId: '2' },
     user: {
       id: 1,
       email: 'admin@test.com',
@@ -21,7 +21,7 @@ const mockEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
+describe('/api/conventions/[id]/collaborators/[organizerId] PUT', () => {
   beforeEach(() => {
     mockUpdateRole.mockReset()
     global.readBody = vi.fn()
@@ -34,7 +34,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
       id: 2,
       conventionId: 1,
       userId: 3,
-      canManageCollaborators: true,
+      canManageOrganizers: true,
       canEditConvention: true,
       canDeleteConvention: false,
       canAddEdition: false,
@@ -88,7 +88,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
   it('devrait rejeter un ID de convention invalide', async () => {
     const eventWithBadId = {
       ...mockEvent,
-      context: { ...mockEvent.context, params: { id: 'invalid', collaboratorId: '2' } },
+      context: { ...mockEvent.context, params: { id: 'invalid', organizerId: '2' } },
     }
 
     const requestBody = { rights: { editConvention: true } }
@@ -98,10 +98,10 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
-  it('devrait rejeter un ID de collaborateur invalide', async () => {
+  it('devrait rejeter un ID d'organisateur invalide', async () => {
     const eventWithBadCollaboratorId = {
       ...mockEvent,
-      context: { ...mockEvent.context, params: { id: '1', collaboratorId: 'invalid' } },
+      context: { ...mockEvent.context, params: { id: '1', organizerId: 'invalid' } },
     }
 
     const requestBody = { rights: { editConvention: true } }
@@ -109,7 +109,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow(
-      'ID de collaborateur invalide'
+      'ID d'organisateur invalide'
     )
   })
 
@@ -155,7 +155,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
       ...mockEvent,
       context: {
         ...mockEvent.context,
-        params: { id: '123', collaboratorId: '456' },
+        params: { id: '123', organizerId: '456' },
       },
     }
 
@@ -169,7 +169,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     expect(mockUpdateRole).toHaveBeenCalledWith(
       expect.objectContaining({
         conventionId: 123,
-        collaboratorId: 456,
+        organizerId: 456,
         userId: 1,
         rights: { editConvention: true },
       })

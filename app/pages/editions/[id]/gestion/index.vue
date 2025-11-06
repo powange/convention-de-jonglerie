@@ -62,7 +62,7 @@
         </UCard>
 
         <!-- Collaborateurs -->
-        <UCard v-if="canManageCollaborators">
+        <UCard v-if="canManageOrganizers">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-purple-500" />
@@ -450,9 +450,9 @@ const canManageVolunteers = computed(() => {
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
 
-const canManageCollaborators = computed(() => {
+const canManageOrganizers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageCollaborators(edition.value, authStore.user.id)
+  return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est collaborateur de la convention

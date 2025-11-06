@@ -75,7 +75,7 @@ export default wrapApiHandler(
           collaborators: {
             where: {
               userId: user.id,
-              canManageCollaborators: true,
+              canManageOrganizers: true,
             },
           },
         },

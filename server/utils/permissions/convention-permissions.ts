@@ -1,13 +1,13 @@
-import { canManageCollaborators } from '../collaborator-management'
+import { canManageOrganizers } from '../collaborator-management'
 import { prisma } from '../prisma'
 
-import type { User, Convention, ConventionCollaborator } from '@prisma/client'
+import type { User, Convention, ConventionOrganizer } from '@prisma/client'
 
 /**
  * Type pour une convention avec ses collaborateurs
  */
 export type ConventionWithCollaborators = Convention & {
-  collaborators: ConventionCollaborator[]
+  collaborators: ConventionOrganizer[]
 }
 
 /**
@@ -15,7 +15,7 @@ export type ConventionWithCollaborators = Convention & {
  */
 export type ConventionWithEditions = Convention & {
   editions: { id: number }[]
-  collaborators: ConventionCollaborator[]
+  collaborators: ConventionOrganizer[]
 }
 
 /**
@@ -33,7 +33,7 @@ export interface ConventionPermissionOptions {
 export type ConventionRight =
   | 'canEditConvention'
   | 'canDeleteConvention'
-  | 'canManageCollaborators'
+  | 'canManageOrganizers'
   | 'canManageVolunteers'
   | 'canManageArtists'
   | 'canAddEdition'
@@ -113,7 +113,7 @@ export function canArchiveConvention(convention: ConventionWithCollaborators, us
   return canDeleteConvention(convention, user)
 }
 
-// canManageCollaborators importé depuis collaborator-management.ts
+// canManageOrganizers importé depuis collaborator-management.ts
 
 /**
  * Vérifie si un utilisateur peut voir une convention (lecture seule)
@@ -227,7 +227,7 @@ export async function getConventionForCollaboratorManagement(
 ): Promise<ConventionWithCollaborators> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
-    requiredRights: ['canManageCollaborators'],
+    requiredRights: ['canManageOrganizers'],
   })) as ConventionWithCollaborators
 
   if (!convention) {
@@ -237,7 +237,7 @@ export async function getConventionForCollaboratorManagement(
     })
   }
 
-  const canManage = await canManageCollaborators(conventionId, user.id)
+  const canManage = await canManageOrganizers(conventionId, user.id)
   if (!canManage) {
     throw createError({
       statusCode: 403,

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import type { Edition, ConventionCollaborator, HttpError } from '~/types'
+import type { Edition, ConventionOrganizer, HttpError } from '~/types'
 
 import { useAuthStore } from '../stores/auth' // Use relative path
 
@@ -272,7 +272,7 @@ export const useEditionStore = defineStore('editions', {
     async getCollaborators(editionId: number) {
       this.error = null
       try {
-        const collaborators = await $fetch<ConventionCollaborator[]>(
+        const collaborators = await $fetch<ConventionOrganizer[]>(
           `/api/editions/${editionId}/collaborators`
         )
         return collaborators
@@ -286,7 +286,7 @@ export const useEditionStore = defineStore('editions', {
     async addCollaborator(editionId: number, userEmail: string, canEdit: boolean = true) {
       this.error = null
       try {
-        const collaborator = await $fetch<ConventionCollaborator>(
+        const collaborator = await $fetch<ConventionOrganizer>(
           `/api/editions/${editionId}/collaborators`,
           {
             method: 'POST',
@@ -487,7 +487,7 @@ export const useEditionStore = defineStore('editions', {
     },
 
     // Vérifier si l'utilisateur peut gérer les collaborateurs d'une convention
-    canManageCollaborators(edition: Edition, userId: number): boolean {
+    canManageOrganizers(edition: Edition, userId: number): boolean {
       const authStore = useAuthStore()
 
       // Les admins globaux en mode admin peuvent tout gérer

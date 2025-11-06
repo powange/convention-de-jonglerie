@@ -2,29 +2,29 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/collaborator-management', () => ({
-  canManageCollaborators: vi.fn(),
+  canManageOrganizers: vi.fn(),
 }))
 
-import { canManageCollaborators } from '../../../../../server/utils/collaborator-management'
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].patch'
+import { canManageOrganizers } from '../../../../../server/utils/collaborator-management'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[organizerId].patch'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
-const mockCanManage = canManageCollaborators as ReturnType<typeof vi.fn>
+const mockCanManage = canManageOrganizers as ReturnType<typeof vi.fn>
 
 const baseEvent = {
   context: {
-    params: { id: '5', collaboratorId: '9' },
+    params: { id: '5', organizerId: '9' },
     user: { id: 42 },
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', () => {
+describe('/api/conventions/[id]/collaborators/[organizerId]/rights PATCH', () => {
   beforeEach(() => {
     mockCanManage.mockReset()
-    prismaMock.conventionCollaborator.findUnique.mockReset()
-    prismaMock.conventionCollaborator.update.mockReset()
-    prismaMock.editionCollaboratorPermission.deleteMany.mockReset()
-    prismaMock.editionCollaboratorPermission.create.mockReset()
+    prismaMock.conventionOrganizer.findUnique.mockReset()
+    prismaMock.conventionOrganizer.update.mockReset()
+    prismaMock.editionOrganizerPermission.deleteMany.mockReset()
+    prismaMock.editionOrganizerPermission.create.mockReset()
     prismaMock.$transaction.mockImplementation(async (fn: any) => fn(prismaMock))
     global.readBody = vi.fn()
   })
@@ -36,7 +36,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
     title: 'Ancien titre',
     canEditConvention: false,
     canDeleteConvention: false,
-    canManageCollaborators: false,
+    canManageOrganizers: false,
     canAddEdition: false,
     canEditAllEditions: false,
     canDeleteAllEditions: false,
@@ -45,21 +45,21 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
 
   it('met à jour droits globaux et crée historique', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
-    prismaMock.conventionCollaborator.update.mockResolvedValue({
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.update.mockResolvedValue({
       ...existingCollaborator,
       canEditConvention: true,
     })
-    prismaMock.collaboratorPermissionHistory.create.mockResolvedValue({ id: 1 })
+    prismaMock.organizerPermissionHistory.create.mockResolvedValue({ id: 1 })
 
     const body = { rights: { editConvention: true } }
     ;(global.readBody as any).mockResolvedValue(body)
 
     const res = await handler(baseEvent as any)
     expect(res.success).toBe(true)
-    expect(prismaMock.conventionCollaborator.update).toHaveBeenCalled()
-    expect(prismaMock.collaboratorPermissionHistory.create).toHaveBeenCalled()
-    const args = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
+    expect(prismaMock.conventionOrganizer.update).toHaveBeenCalled()
+    expect(prismaMock.organizerPermissionHistory.create).toHaveBeenCalled()
+    const args = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(args.data.actorId).toBe(42)
     expect(args.data.targetUserId).toBe(existingCollaborator.userId)
     expect(res.collaborator.rights.editConvention).toBe(true)
@@ -67,27 +67,27 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
 
   it('met à jour perEdition et log PER_EDITIONS_UPDATED', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
-    prismaMock.conventionCollaborator.update.mockResolvedValue(existingCollaborator) // pas de changement global
-    prismaMock.editionCollaboratorPermission.deleteMany.mockResolvedValue({})
-    prismaMock.editionCollaboratorPermission.create.mockImplementation(({ data }: any) =>
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.update.mockResolvedValue(existingCollaborator) // pas de changement global
+    prismaMock.editionOrganizerPermission.deleteMany.mockResolvedValue({})
+    prismaMock.editionOrganizerPermission.create.mockImplementation(({ data }: any) =>
       Promise.resolve({ ...data })
     )
-    prismaMock.collaboratorPermissionHistory.create.mockResolvedValue({ id: 2 })
+    prismaMock.organizerPermissionHistory.create.mockResolvedValue({ id: 2 })
 
     const body = { perEdition: [{ editionId: 101, canEdit: true, canDelete: true }] }
     ;(global.readBody as any).mockResolvedValue(body)
 
     const res = await handler(baseEvent as any)
     expect(res.success).toBe(true)
-    expect(prismaMock.editionCollaboratorPermission.deleteMany).toHaveBeenCalledWith({
-      where: { collaboratorId: 9 },
+    expect(prismaMock.editionOrganizerPermission.deleteMany).toHaveBeenCalledWith({
+      where: { organizerId: 9 },
     })
-    expect(prismaMock.editionCollaboratorPermission.create).toHaveBeenCalled()
-    expect(prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0].data.changeType).toBe(
+    expect(prismaMock.editionOrganizerPermission.create).toHaveBeenCalled()
+    expect(prismaMock.organizerPermissionHistory.create.mock.calls[0][0].data.changeType).toBe(
       'PER_EDITIONS_UPDATED'
     )
-    const args = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
+    const args = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(args.data.actorId).toBe(42)
     expect(args.data.targetUserId).toBe(existingCollaborator.userId)
     expect(res.collaborator.perEdition[0].editionId).toBe(101)
@@ -95,46 +95,46 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
 
   it('refuse sans permission', async () => {
     mockCanManage.mockResolvedValue(false)
-    prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
     ;(global.readBody as any).mockResolvedValue({ rights: { editConvention: true } })
     await expect(handler(baseEvent as any)).rejects.toThrow('Permission insuffisante')
   })
 
   it('404 si collaborateur introuvable', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionCollaborator.findUnique.mockResolvedValue(null)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(null)
     ;(global.readBody as any).mockResolvedValue({ rights: { editConvention: true } })
-    await expect(handler(baseEvent as any)).rejects.toThrow('Collaborateur introuvable')
+    await expect(handler(baseEvent as any)).rejects.toThrow('Organisateur introuvable')
   })
 
   it("ne crée pas d'historique si aucun changement", async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
     // Pas de body (ou body vide)
     ;(global.readBody as any).mockResolvedValue({})
-    prismaMock.collaboratorPermissionHistory.create.mockResolvedValue({ id: 99 })
+    prismaMock.organizerPermissionHistory.create.mockResolvedValue({ id: 99 })
 
     const res = await handler(baseEvent as any)
     expect(res.success).toBe(true)
     // Aucune mise à jour DB car aucun champ changé
-    expect(prismaMock.conventionCollaborator.update).not.toHaveBeenCalled()
+    expect(prismaMock.conventionOrganizer.update).not.toHaveBeenCalled()
     // Pas d'historique créé
-    expect(prismaMock.collaboratorPermissionHistory.create).not.toHaveBeenCalled()
+    expect(prismaMock.organizerPermissionHistory.create).not.toHaveBeenCalled()
   })
 
   it('met à jour droits globaux + perEdition ensemble (changeType PER_EDITIONS_UPDATED)', async () => {
     mockCanManage.mockResolvedValue(true)
-    prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
+    prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
     // update global + perEdition
-    prismaMock.conventionCollaborator.update.mockResolvedValue({
+    prismaMock.conventionOrganizer.update.mockResolvedValue({
       ...existingCollaborator,
       canDeleteConvention: true,
     })
-    prismaMock.editionCollaboratorPermission.deleteMany.mockResolvedValue({})
-    prismaMock.editionCollaboratorPermission.create.mockImplementation(({ data }: any) =>
+    prismaMock.editionOrganizerPermission.deleteMany.mockResolvedValue({})
+    prismaMock.editionOrganizerPermission.create.mockImplementation(({ data }: any) =>
       Promise.resolve({ ...data })
     )
-    prismaMock.collaboratorPermissionHistory.create.mockResolvedValue({ id: 3 })
+    prismaMock.organizerPermissionHistory.create.mockResolvedValue({ id: 3 })
     ;(global.readBody as any).mockResolvedValue({
       rights: { deleteConvention: true },
       perEdition: [{ editionId: 150, canEdit: true }],
@@ -142,7 +142,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
 
     const res = await handler(baseEvent as any)
     expect(res.success).toBe(true)
-    const historyArgs = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
+    const historyArgs = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(historyArgs.data.changeType).toBe('PER_EDITIONS_UPDATED') // priorité perEdition
     expect(historyArgs.data.after.rights.canDeleteConvention).toBe(true)
     expect(historyArgs.data.actorId).toBe(42)

@@ -51,14 +51,14 @@ describe('Système de conventions', () => {
       }
 
       prismaMock.convention.create.mockResolvedValue(createdConvention)
-      prismaMock.conventionCollaborator.create.mockResolvedValue({
+      prismaMock.conventionOrganizer.create.mockResolvedValue({
         id: 1,
         conventionId: 1,
         userId: 1,
         addedById: 1,
         canEditConvention: true,
         canDeleteConvention: true,
-        canManageCollaborators: true,
+        canManageOrganizers: true,
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,
@@ -102,7 +102,7 @@ describe('Système de conventions', () => {
         },
       })
 
-      expect(prismaMock.conventionCollaborator.create).toHaveBeenCalledWith({
+      expect(prismaMock.conventionOrganizer.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           conventionId: createdConvention.id,
           userId: mockUser.id,
@@ -152,7 +152,7 @@ describe('Système de conventions', () => {
       }
 
       prismaMock.convention.create.mockResolvedValue(createdConvention)
-      prismaMock.conventionCollaborator.create.mockResolvedValue({} as any)
+      prismaMock.conventionOrganizer.create.mockResolvedValue({} as any)
       prismaMock.convention.findUnique.mockResolvedValue(createdConvention)
 
       // Mock readBody pour retourner les données avec espaces
@@ -428,7 +428,7 @@ describe('Système de conventions', () => {
       }
 
       prismaMock.convention.create.mockResolvedValue(createdConvention)
-      prismaMock.conventionCollaborator.create.mockResolvedValue({
+      prismaMock.conventionOrganizer.create.mockResolvedValue({
         id: 1,
         conventionId: 1,
         userId: 1,
@@ -436,7 +436,7 @@ describe('Système de conventions', () => {
         addedById: 1,
         canEditConvention: true,
         canDeleteConvention: true,
-        canManageCollaborators: true,
+        canManageOrganizers: true,
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,
@@ -450,7 +450,7 @@ describe('Système de conventions', () => {
 
       await createConventionHandler(mockEvent as any)
 
-      expect(prismaMock.conventionCollaborator.create).toHaveBeenCalled()
+      expect(prismaMock.conventionOrganizer.create).toHaveBeenCalled()
     })
 
     it('devrait inclure les collaborateurs dans la réponse', async () => {
@@ -463,7 +463,7 @@ describe('Système de conventions', () => {
             userId: 1,
             canEditConvention: true,
             canDeleteConvention: true,
-            canManageCollaborators: true,
+            canManageOrganizers: true,
             canAddEdition: true,
             canEditAllEditions: true,
             canDeleteAllEditions: true,

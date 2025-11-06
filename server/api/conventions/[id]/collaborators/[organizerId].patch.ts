@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageCollaborators } from '@@/server/utils/collaborator-management'
+import { canManageOrganizers } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
@@ -40,7 +40,7 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const conventionId = validateConventionId(event)
-    const collaboratorId = validateResourceId(event, 'collaboratorId', 'collaborateur')
+    const organizerId = validateResourceId(event, 'organizerId', 'organisateur')
     const body = await readBody(event).catch(() => ({}))
     const parsed = payloadSchema.parse(body || {})
 
@@ -48,28 +48,28 @@ export default wrapApiHandler(
     if (!parsed.rights && parsed.title === undefined && !parsed.perEdition)
       return { success: true, unchanged: true }
 
-    const canManage = await canManageCollaborators(conventionId, user.id, event)
+    const canManage = await canManageOrganizers(conventionId, user.id, event)
     if (!canManage) throw createError({ statusCode: 403, message: 'Permission insuffisante' })
 
-    const collaborator = await fetchResourceOrFail(prisma.conventionCollaborator, collaboratorId, {
-      errorMessage: 'Collaborateur introuvable',
+    const organizer = await fetchResourceOrFail(prisma.conventionOrganizer, organizerId, {
+      errorMessage: 'Organisateur introuvable',
       include: { perEditionPermissions: true },
     })
-    if (collaborator.conventionId !== conventionId)
-      throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
+    if (organizer.conventionId !== conventionId)
+      throw createError({ statusCode: 404, message: 'Organisateur introuvable' })
 
     const beforeSnapshot: CollaboratorPermissionSnapshot = {
-      title: collaborator.title,
+      title: organizer.title,
       rights: {
-        canEditConvention: collaborator.canEditConvention,
-        canDeleteConvention: collaborator.canDeleteConvention,
-        canManageCollaborators: collaborator.canManageCollaborators,
-        canManageVolunteers: collaborator.canManageVolunteers,
-        canAddEdition: collaborator.canAddEdition,
-        canEditAllEditions: collaborator.canEditAllEditions,
-        canDeleteAllEditions: collaborator.canDeleteAllEditions,
+        canEditConvention: organizer.canEditConvention,
+        canDeleteConvention: organizer.canDeleteConvention,
+        canManageOrganizers: organizer.canManageOrganizers,
+        canManageVolunteers: organizer.canManageVolunteers,
+        canAddEdition: organizer.canAddEdition,
+        canEditAllEditions: organizer.canEditAllEditions,
+        canDeleteAllEditions: organizer.canDeleteAllEditions,
       },
-      perEdition: collaborator.perEditionPermissions.map((p) => ({
+      perEdition: organizer.perEditionPermissions.map((p) => ({
         editionId: p.editionId,
         canEdit: p.canEdit,
         canDelete: p.canDelete,
@@ -85,7 +85,7 @@ export default wrapApiHandler(
       if (parsed.rights.deleteConvention !== undefined)
         updateData.canDeleteConvention = parsed.rights.deleteConvention
       if (parsed.rights.manageCollaborators !== undefined)
-        updateData.canManageCollaborators = parsed.rights.manageCollaborators
+        updateData.canManageOrganizers = parsed.rights.manageCollaborators
       if (parsed.rights.manageVolunteers !== undefined)
         updateData.canManageVolunteers = parsed.rights.manageVolunteers
       if (parsed.rights.addEdition !== undefined)
@@ -99,21 +99,21 @@ export default wrapApiHandler(
 
     const result = await prisma.$transaction(async (tx) => {
       const updated = Object.keys(updateData).length
-        ? await tx.conventionCollaborator.update({
-            where: { id: collaboratorId },
+        ? await tx.conventionOrganizer.update({
+            where: { id: organizerId },
             data: updateData,
           })
-        : collaborator
+        : organizer
 
-      let newPerEdition = collaborator.perEditionPermissions
+      let newPerEdition = organizer.perEditionPermissions
       if (perEditionInput) {
-        await tx.editionCollaboratorPermission.deleteMany({ where: { collaboratorId } })
+        await tx.editionOrganizerPermission.deleteMany({ where: { organizerId } })
         if (perEditionInput.length) {
           newPerEdition = await Promise.all(
             perEditionInput.map((p) =>
-              tx.editionCollaboratorPermission.create({
+              tx.editionOrganizerPermission.create({
                 data: {
-                  collaboratorId,
+                  organizerId,
                   editionId: p.editionId,
                   canEdit: !!p.canEdit,
                   canDelete: !!p.canDelete,
@@ -130,7 +130,7 @@ export default wrapApiHandler(
         rights: {
           canEditConvention: updated.canEditConvention,
           canDeleteConvention: updated.canDeleteConvention,
-          canManageCollaborators: updated.canManageCollaborators,
+          canManageOrganizers: updated.canManageOrganizers,
           canManageVolunteers: updated.canManageVolunteers,
           canAddEdition: updated.canAddEdition,
           canEditAllEditions: updated.canEditAllEditions,
@@ -145,10 +145,10 @@ export default wrapApiHandler(
       }
 
       if (JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)) {
-        await tx.collaboratorPermissionHistory.create({
+        await tx.organizerPermissionHistory.create({
           data: {
             conventionId,
-            targetUserId: collaborator.userId,
+            targetUserId: organizer.userId,
             actorId: user.id,
             changeType: perEditionInput ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
             before: beforeSnapshot,
@@ -162,12 +162,12 @@ export default wrapApiHandler(
     return {
       success: true,
       collaborator: {
-        id: collaboratorId,
+        id: organizerId,
         title: result.updated.title,
         rights: {
           editConvention: result.updated.canEditConvention,
           deleteConvention: result.updated.canDeleteConvention,
-          manageCollaborators: result.updated.canManageCollaborators,
+          manageCollaborators: result.updated.canManageOrganizers,
           manageVolunteers: result.updated.canManageVolunteers,
           addEdition: result.updated.canAddEdition,
           editAllEditions: result.updated.canEditAllEditions,

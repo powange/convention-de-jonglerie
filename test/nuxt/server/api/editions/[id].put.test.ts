@@ -226,7 +226,7 @@ describe('/api/editions/[id] PUT', () => {
             userId: 1,
             canEditConvention: true,
             canEditAllEditions: true,
-            canManageCollaborators: true,
+            canManageOrganizers: true,
           },
         ],
       },

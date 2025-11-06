@@ -12,7 +12,7 @@ export default wrapApiHandler(
     const permission = await checkUserConventionPermission(conventionId, user.id)
     if (!permission.hasPermission) throw createError({ statusCode: 403, message: 'Accès refusé' })
 
-    const history = await prisma.collaboratorPermissionHistory.findMany({
+    const history = await prisma.organizerPermissionHistory.findMany({
       where: { conventionId },
       orderBy: { createdAt: 'desc' },
       take: 200,

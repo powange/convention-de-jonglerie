@@ -2,20 +2,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/collaborator-management', () => ({
-  addConventionCollaborator: vi.fn(),
+  addConventionOrganizer: vi.fn(),
   checkAdminMode: vi.fn(),
   findUserByPseudoOrEmail: vi.fn(),
 }))
 
 import {
-  addConventionCollaborator,
+  addConventionOrganizer,
   checkAdminMode,
   findUserByPseudoOrEmail,
 } from '../../../../../server/utils/collaborator-management'
 import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
-const mockAddCollaborator = addConventionCollaborator as ReturnType<typeof vi.fn>
+const mockAddCollaborator = addConventionOrganizer as ReturnType<typeof vi.fn>
 const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>
 const mockCheckAdminMode = checkAdminMode as ReturnType<typeof vi.fn>
 
@@ -69,7 +69,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       userId: 2,
       canEditConvention: true,
       canDeleteConvention: false,
-      canManageCollaborators: false,
+      canManageOrganizers: false,
       canAddEdition: false,
       canEditAllEditions: false,
       canDeleteAllEditions: false,
@@ -110,7 +110,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       id: 1,
       conventionId: 1,
       userId: 2,
-      canManageCollaborators: true,
+      canManageOrganizers: true,
       canEditConvention: false,
       canDeleteConvention: false,
       canAddEdition: false,
@@ -221,7 +221,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
-  it('devrait gérer les erreurs de addConventionCollaborator', async () => {
+  it('devrait gérer les erreurs de addConventionOrganizer', async () => {
     const requestBody = { userIdentifier: 'newuser@test.com' }
 
     const mockUser = {
@@ -277,7 +277,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
     )
   })
 
-  it("crée une entrée d'historique CREATED via addConventionCollaborator (vérification indirecte)", async () => {
+  it("crée une entrée d'historique CREATED via addConventionOrganizer (vérification indirecte)", async () => {
     const requestBody = { userIdentifier: 'newuser@test.com' }
     const mockUser = { id: 2, pseudo: 'newuser', email: 'newuser@test.com' }
     const mockCollaborator = {
@@ -286,7 +286,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       userId: 2,
       canEditConvention: false,
       canDeleteConvention: false,
-      canManageCollaborators: false,
+      canManageOrganizers: false,
       canAddEdition: false,
       canEditAllEditions: false,
       canDeleteAllEditions: false,
@@ -301,7 +301,7 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     const res = await handler(mockEvent as any)
     expect(res.success).toBe(true)
-    // Vérifie que addConventionCollaborator a reçu les champs nécessaires (l'historique est géré là-bas)
+    // Vérifie que addConventionOrganizer a reçu les champs nécessaires (l'historique est géré là-bas)
     const callArgs = mockAddCollaborator.mock.calls[0][0]
     expect(callArgs.conventionId).toBe(1)
     expect(callArgs.userId).toBe(2)

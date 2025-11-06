@@ -25,7 +25,7 @@ const mockEvent = {
 describe('/api/conventions/[id]/collaborators GET', () => {
   beforeEach(() => {
     mockCheckPermission.mockReset()
-    prismaMock.conventionCollaborator.findMany.mockReset()
+    prismaMock.conventionOrganizer.findMany.mockReset()
   })
 
   it('devrait retourner les collaborateurs avec succès', async () => {
@@ -91,7 +91,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       title: c.title,
       canEditConvention: c.rights.editConvention,
       canDeleteConvention: c.rights.deleteConvention,
-      canManageCollaborators: c.rights.manageCollaborators,
+      canManageOrganizers: c.rights.manageCollaborators,
       canAddEdition: c.rights.addEdition,
       canEditAllEditions: c.rights.editAllEditions,
       canDeleteAllEditions: c.rights.deleteAllEditions,
@@ -99,13 +99,13 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       user: c.user,
       addedBy: c.addedBy,
     }))
-    prismaMock.conventionCollaborator.findMany.mockResolvedValue(raw as any)
+    prismaMock.conventionOrganizer.findMany.mockResolvedValue(raw as any)
 
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual(mockCollaborators)
     expect(mockCheckPermission).toHaveBeenCalledWith(1, 1)
-    expect(prismaMock.conventionCollaborator.findMany).toHaveBeenCalledWith(
+    expect(prismaMock.conventionOrganizer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { conventionId: 1 } })
     )
   })
@@ -182,7 +182,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       title: c.title,
       canEditConvention: c.rights.editConvention,
       canDeleteConvention: c.rights.deleteConvention,
-      canManageCollaborators: c.rights.manageCollaborators,
+      canManageOrganizers: c.rights.manageCollaborators,
       canAddEdition: c.rights.addEdition,
       canEditAllEditions: c.rights.editAllEditions,
       canDeleteAllEditions: c.rights.deleteAllEditions,
@@ -190,7 +190,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       user: c.user,
       addedBy: c.addedBy,
     }))
-    prismaMock.conventionCollaborator.findMany.mockResolvedValue(raw as any)
+    prismaMock.conventionOrganizer.findMany.mockResolvedValue(raw as any)
 
     const eventAsModerator = {
       ...mockEvent,
@@ -210,12 +210,12 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       isOwner: true,
       isCollaborator: false,
     })
-    prismaMock.conventionCollaborator.findMany.mockResolvedValue([])
+    prismaMock.conventionOrganizer.findMany.mockResolvedValue([])
 
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual([])
-    expect(prismaMock.conventionCollaborator.findMany).toHaveBeenCalled()
+    expect(prismaMock.conventionOrganizer.findMany).toHaveBeenCalled()
   })
 
   it("devrait traiter correctement l'ID numérique", async () => {
@@ -230,12 +230,12 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       isOwner: true,
       isCollaborator: false,
     })
-    prismaMock.conventionCollaborator.findMany.mockResolvedValue([])
+    prismaMock.conventionOrganizer.findMany.mockResolvedValue([])
 
     await handler(eventWithStringId as any)
 
     expect(mockCheckPermission).toHaveBeenCalledWith(123, 1)
-    expect(prismaMock.conventionCollaborator.findMany).toHaveBeenCalledWith(
+    expect(prismaMock.conventionOrganizer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { conventionId: 123 } })
     )
   })

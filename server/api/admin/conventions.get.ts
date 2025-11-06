@@ -29,7 +29,7 @@ export default wrapApiHandler(
             canDeleteConvention: true,
             canEditAllEditions: true,
             canEditConvention: true,
-            canManageCollaborators: true,
+            canManageOrganizers: true,
             canManageVolunteers: true,
             user: {
               select: {

@@ -113,7 +113,7 @@ export default wrapApiHandler(
             rights: {
               editConvention: collab.canEditConvention ?? false,
               deleteConvention: collab.canDeleteConvention ?? false,
-              manageCollaborators: collab.canManageCollaborators ?? false,
+              manageCollaborators: collab.canManageOrganizers ?? false,
               manageVolunteers: collab.canManageVolunteers ?? false,
               addEdition: collab.canAddEdition ?? false,
               editAllEditions: collab.canEditAllEditions ?? false,

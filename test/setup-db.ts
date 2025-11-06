@@ -94,7 +94,7 @@ async function cleanDatabase() {
     await prismaTest.editionPost.deleteMany({})
     await prismaTest.editionVolunteerApplication.deleteMany({})
     await prismaTest.volunteerTeam.deleteMany({})
-    await prismaTest.conventionCollaborator.deleteMany({})
+    await prismaTest.conventionOrganizer.deleteMany({})
     await prismaTest.edition.deleteMany({})
     await prismaTest.convention.deleteMany({})
     await prismaTest.user.deleteMany({})

@@ -53,14 +53,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(convention.authorId).toBe(testUser.id)
 
       // Ajouter le créateur comme collaborateur administrateur
-      const collaborator = await prismaTest.conventionCollaborator.create({
+      const collaborator = await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: convention.id,
           userId: testUser.id,
           // Plus d'attribut role: on simule un administrateur via booléens
           canEditConvention: true,
           canDeleteConvention: true,
-          canManageCollaborators: true,
+          canManageOrganizers: true,
           canAddEdition: true,
           canEditAllEditions: true,
           canDeleteAllEditions: true,
@@ -68,7 +68,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         },
       })
 
-      expect(collaborator.canManageCollaborators).toBe(true)
+      expect(collaborator.canManageOrganizers).toBe(true)
       expect(collaborator.canDeleteConvention).toBe(true)
       expect(collaborator.userId).toBe(testUser.id)
     })
@@ -134,13 +134,13 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       // Ajouter l'auteur comme administrateur
-      await prismaTest.conventionCollaborator.create({
+      await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
           userId: testUser.id,
           canEditConvention: true,
           canDeleteConvention: true,
-          canManageCollaborators: true,
+          canManageOrganizers: true,
           canAddEdition: true,
           canEditAllEditions: true,
           canDeleteAllEditions: true,
@@ -151,7 +151,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
 
     it('devrait ajouter un collaborateur avec différents rôles', async () => {
       // Ajouter un collaborateur MODERATOR
-      const moderator = await prismaTest.conventionCollaborator.create({
+      const moderator = await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
@@ -167,7 +167,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(moderator.addedById).toBe(testUser.id)
 
       // Vérifier que les collaborateurs sont bien enregistrés
-      const collaborators = await prismaTest.conventionCollaborator.findMany({
+      const collaborators = await prismaTest.conventionOrganizer.findMany({
         where: { conventionId: testConvention.id },
         include: {
           user: {
@@ -184,7 +184,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(
         collaborators.some(
           (c) =>
-            c.canManageCollaborators &&
+            c.canManageOrganizers &&
             c.canDeleteConvention &&
             c.canEditConvention &&
             c.canAddEdition &&
@@ -194,14 +194,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       ).toBeTruthy()
       expect(
         collaborators.some(
-          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageCollaborators
+          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageOrganizers
         )
       ).toBeTruthy()
     })
 
     it('devrait empêcher les collaborateurs en double', async () => {
       // Ajouter le collaborateur une première fois
-      await prismaTest.conventionCollaborator.create({
+      await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
@@ -213,13 +213,13 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
 
       // Tenter de l'ajouter à nouveau
       await expect(
-        prismaTest.conventionCollaborator.create({
+        prismaTest.conventionOrganizer.create({
           data: {
             conventionId: testConvention.id,
             userId: adminUser.id,
             canEditConvention: true,
             canDeleteConvention: true,
-            canManageCollaborators: true,
+            canManageOrganizers: true,
             canAddEdition: true,
             canEditAllEditions: true,
             canDeleteAllEditions: true,
@@ -231,7 +231,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
 
     it("devrait mettre à jour le rôle d'un collaborateur", async () => {
       // Ajouter un collaborateur MODERATOR
-      const collaborator = await prismaTest.conventionCollaborator.create({
+      const collaborator = await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
@@ -242,17 +242,17 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       // "Promotion" = activer tous les droits restants
-      const updatedCollaborator = await prismaTest.conventionCollaborator.update({
+      const updatedCollaborator = await prismaTest.conventionOrganizer.update({
         where: { id: collaborator.id },
         data: {
           canEditConvention: true,
           canDeleteConvention: true,
-          canManageCollaborators: true,
+          canManageOrganizers: true,
           canDeleteAllEditions: true,
         },
       })
 
-      expect(updatedCollaborator.canManageCollaborators).toBe(true)
+      expect(updatedCollaborator.canManageOrganizers).toBe(true)
       expect(updatedCollaborator.canDeleteConvention).toBe(true)
       expect(updatedCollaborator.userId).toBe(adminUser.id)
     })
@@ -270,14 +270,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       // Ajouter plusieurs collaborateurs
-      await prismaTest.conventionCollaborator.createMany({
+      await prismaTest.conventionOrganizer.createMany({
         data: [
           {
             conventionId: convention.id,
             userId: testUser.id,
             canEditConvention: true,
             canDeleteConvention: true,
-            canManageCollaborators: true,
+            canManageOrganizers: true,
             canAddEdition: true,
             canEditAllEditions: true,
             canDeleteAllEditions: true,
@@ -331,7 +331,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(
         fullConvention!.collaborators.some(
           (c) =>
-            c.canManageCollaborators &&
+            c.canManageOrganizers &&
             c.canDeleteConvention &&
             c.canEditConvention &&
             c.canAddEdition &&
@@ -342,7 +342,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       // Vérifier un collaborateur "modérateur" (droits partiels)
       expect(
         fullConvention!.collaborators.some(
-          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageCollaborators
+          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageOrganizers
         )
       ).toBeTruthy()
     })
@@ -398,7 +398,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         },
       })
 
-      await prismaTest.conventionCollaborator.create({
+      await prismaTest.conventionOrganizer.create({
         data: {
           conventionId: convention.id,
           userId: adminUser.id,
@@ -409,7 +409,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       // Vérifier que le collaborateur existe
-      const collaboratorsBefore = await prismaTest.conventionCollaborator.count({
+      const collaboratorsBefore = await prismaTest.conventionOrganizer.count({
         where: { conventionId: convention.id },
       })
       expect(collaboratorsBefore).toBe(1)
@@ -420,7 +420,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       // Vérifier que les collaborateurs ont été supprimés automatiquement
-      const collaboratorsAfter = await prismaTest.conventionCollaborator.count({
+      const collaboratorsAfter = await prismaTest.conventionOrganizer.count({
         where: { conventionId: convention.id },
       })
       expect(collaboratorsAfter).toBe(0)

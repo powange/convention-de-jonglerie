@@ -55,7 +55,7 @@ export default wrapApiHandler(
         rights: {
           editConvention: c.canEditConvention,
           deleteConvention: c.canDeleteConvention,
-          manageCollaborators: c.canManageCollaborators,
+          manageCollaborators: c.canManageOrganizers,
           addEdition: c.canAddEdition,
           editAllEditions: c.canEditAllEditions,
           deleteAllEditions: c.canDeleteAllEditions,

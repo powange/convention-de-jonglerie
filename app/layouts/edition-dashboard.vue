@@ -137,9 +137,9 @@ const canManageVolunteers = computed(() => {
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
 
-const canManageCollaborators = computed(() => {
+const canManageOrganizers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageCollaborators(edition.value, authStore.user.id)
+  return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
 const isCollaborator = computed(() => {
@@ -199,7 +199,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   const managementSection: NavigationMenuItem[] = []
 
   // Collaborateurs
-  if (canManageCollaborators.value) {
+  if (canManageOrganizers.value) {
     managementSection.push({
       label: t('collaborators.title'),
       icon: 'i-heroicons-users',

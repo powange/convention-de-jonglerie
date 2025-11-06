@@ -150,7 +150,7 @@ export default wrapApiHandler(
       }),
 
       // Nouveaux collaborateurs récents
-      prisma.conventionCollaborator.findMany({
+      prisma.conventionOrganizer.findMany({
         select: {
           id: true,
           addedAt: true,

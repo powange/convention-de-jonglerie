@@ -20,7 +20,7 @@ export default wrapApiHandler(
     }
 
     // Récupérer avec nouvelles permissions
-    const collaborators = await prisma.conventionCollaborator.findMany({
+    const collaborators = await prisma.conventionOrganizer.findMany({
       where: { conventionId },
       include: {
         user: { select: { id: true, pseudo: true } },
@@ -39,7 +39,7 @@ export default wrapApiHandler(
       rights: {
         editConvention: c.canEditConvention,
         deleteConvention: c.canDeleteConvention,
-        manageCollaborators: c.canManageCollaborators,
+        manageCollaborators: c.canManageOrganizers,
         manageVolunteers: c.canManageVolunteers,
         addEdition: c.canAddEdition,
         editAllEditions: c.canEditAllEditions,
@@ -53,5 +53,5 @@ export default wrapApiHandler(
       })),
     }))
   },
-  { operationName: 'GetConventionCollaborators' }
+  { operationName: 'GetConventionOrganizers' }
 )

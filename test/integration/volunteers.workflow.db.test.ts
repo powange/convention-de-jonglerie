@@ -345,7 +345,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         expect(convention).toBeDefined()
 
         // Ajouter le collaborateur
-        const collaborator = await prismaTest.conventionCollaborator.create({
+        const collaborator = await prismaTest.conventionOrganizer.create({
           data: {
             conventionId: convention!.id,
             userId: collaboratorUser.id,
@@ -357,7 +357,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         expect(collaborator.canManageVolunteers).toBe(true)
 
         // Vérifier que le collaborateur est bien enregistré
-        const foundCollaborator = await prismaTest.conventionCollaborator.findFirst({
+        const foundCollaborator = await prismaTest.conventionOrganizer.findFirst({
           where: {
             conventionId: convention!.id,
             userId: collaboratorUser.id,

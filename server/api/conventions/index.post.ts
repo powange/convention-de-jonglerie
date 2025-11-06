@@ -40,8 +40,8 @@ export default wrapApiHandler(
       },
     })
 
-    // Ajouter automatiquement le créateur comme collaborateur avec tous les droits
-    await prisma.conventionCollaborator.create({
+    // Ajouter automatiquement le créateur comme organisateur avec tous les droits
+    await prisma.conventionOrganizer.create({
       data: {
         conventionId: convention.id,
         userId: user.id,
@@ -49,7 +49,7 @@ export default wrapApiHandler(
         title: 'Créateur',
         canEditConvention: true,
         canDeleteConvention: true,
-        canManageCollaborators: true,
+        canManageOrganizers: true,
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,
@@ -57,7 +57,7 @@ export default wrapApiHandler(
     })
 
     // Retourner la convention transformée (pas d'exposition d'email)
-    const conventionWithCollaborators = await prisma.convention.findUnique({
+    const conventionWithOrganizers = await prisma.convention.findUnique({
       where: { id: convention.id },
       include: {
         author: {
@@ -67,7 +67,7 @@ export default wrapApiHandler(
             email: true,
           },
         },
-        collaborators: {
+        organizers: {
           include: {
             user: {
               select: {
@@ -88,24 +88,24 @@ export default wrapApiHandler(
     })
     const { getEmailHash } = await import('@@/server/utils/email-hash')
     const transformed = {
-      ...conventionWithCollaborators,
-      author: conventionWithCollaborators?.author
+      ...conventionWithOrganizers,
+      author: conventionWithOrganizers?.author
         ? (() => {
-            const { email, ...authorWithoutEmail } = conventionWithCollaborators.author
+            const { email, ...authorWithoutEmail } = conventionWithOrganizers.author
             return {
               ...authorWithoutEmail,
               emailHash: email ? getEmailHash(email) : undefined,
             }
           })()
         : null,
-      collaborators: (conventionWithCollaborators?.collaborators || []).map((c: any) => ({
+      collaborators: (conventionWithOrganizers?.organizers || []).map((c: any) => ({
         id: c.id,
         addedAt: c.addedAt,
         title: c.title ?? null,
         rights: {
           editConvention: c.canEditConvention,
           deleteConvention: c.canDeleteConvention,
-          manageCollaborators: c.canManageCollaborators,
+          manageCollaborators: c.canManageOrganizers,
           addEdition: c.canAddEdition,
           editAllEditions: c.canEditAllEditions,
           deleteAllEditions: c.canDeleteAllEditions,

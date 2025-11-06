@@ -427,7 +427,7 @@ const canAccess = computed(() => {
   }
 
   // Utilisateurs avec permission de gérer les collaborateurs
-  if (canManageCollaborators.value) {
+  if (canManageOrganizers.value) {
     return true
   }
 
@@ -435,9 +435,9 @@ const canAccess = computed(() => {
 })
 
 // Permissions calculées
-const canManageCollaborators = computed(() => {
+const canManageOrganizers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageCollaborators(edition.value, authStore.user.id)
+  return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
 // Charger l'édition si nécessaire

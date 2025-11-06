@@ -56,7 +56,7 @@ describe('Collaborateurs de convention', () => {
         collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
       prismaMock.user.findUnique.mockResolvedValue(existingUser)
-      prismaMock.conventionCollaborator.create.mockResolvedValue(createdCollaborator)
+      prismaMock.conventionOrganizer.create.mockResolvedValue(createdCollaborator)
 
       // Simuler l'appel API d'ajout de collaborateur
       const addCollaborator = async (
@@ -91,7 +91,7 @@ describe('Collaborateurs de convention', () => {
         }
 
         // Créer le collaborateur
-        return await prismaMock.conventionCollaborator.create({
+        return await prismaMock.conventionOrganizer.create({
           data: {
             conventionId,
             userId: user.id,
@@ -106,7 +106,7 @@ describe('Collaborateurs de convention', () => {
 
       expect(result.role).toBe('MODERATOR')
       expect(result.user.email).toBe('new@example.com')
-      expect(prismaMock.conventionCollaborator.create).toHaveBeenCalledWith({
+      expect(prismaMock.conventionOrganizer.create).toHaveBeenCalledWith({
         data: {
           conventionId: 1,
           userId: 3,
@@ -191,7 +191,7 @@ describe('Collaborateurs de convention', () => {
         ],
       })
       prismaMock.user.findUnique.mockResolvedValue(mockCollaborator)
-      prismaMock.conventionCollaborator.findFirst.mockResolvedValue({
+      prismaMock.conventionOrganizer.findFirst.mockResolvedValue({
         id: 1,
         userId: 2,
         conventionId: 1,
@@ -202,7 +202,7 @@ describe('Collaborateurs de convention', () => {
           where: { email: data.email },
         })
 
-        const existing = await prismaMock.conventionCollaborator.findFirst({
+        const existing = await prismaMock.conventionOrganizer.findFirst({
           where: {
             conventionId,
             userId: user!.id,
@@ -236,19 +236,19 @@ describe('Collaborateurs de convention', () => {
         role: 'ADMINISTRATOR',
       }
 
-      prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
+      prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
         collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
-      prismaMock.conventionCollaborator.update.mockResolvedValue(updatedCollaborator)
+      prismaMock.conventionOrganizer.update.mockResolvedValue(updatedCollaborator)
 
       const updateCollaborator = async (
         collaboratorId: number,
         newRole: string,
         userId: number
       ) => {
-        const collaborator = await prismaMock.conventionCollaborator.findUnique({
+        const collaborator = await prismaMock.conventionOrganizer.findUnique({
           where: { id: collaboratorId },
         })
 
@@ -272,7 +272,7 @@ describe('Collaborateurs de convention', () => {
           throw new Error('Unauthorized')
         }
 
-        return await prismaMock.conventionCollaborator.update({
+        return await prismaMock.conventionOrganizer.update({
           where: { id: collaboratorId },
           data: { role: newRole },
         })
@@ -281,7 +281,7 @@ describe('Collaborateurs de convention', () => {
       const result = await updateCollaborator(1, 'ADMINISTRATOR', 1)
 
       expect(result.role).toBe('ADMINISTRATOR')
-      expect(prismaMock.conventionCollaborator.update).toHaveBeenCalledWith({
+      expect(prismaMock.conventionOrganizer.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: { role: 'ADMINISTRATOR' },
       })
@@ -295,16 +295,16 @@ describe('Collaborateurs de convention', () => {
         role: 'ADMINISTRATOR',
       }
 
-      prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
-      prismaMock.conventionCollaborator.count.mockResolvedValue(1) // Seul admin
+      prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+      prismaMock.conventionOrganizer.count.mockResolvedValue(1) // Seul admin
 
       const updateCollaborator = async (collaboratorId: number, newRole: string) => {
-        const collaborator = await prismaMock.conventionCollaborator.findUnique({
+        const collaborator = await prismaMock.conventionOrganizer.findUnique({
           where: { id: collaboratorId },
         })
 
         if (collaborator!.role === 'ADMINISTRATOR' && newRole !== 'ADMINISTRATOR') {
-          const adminCount = await prismaMock.conventionCollaborator.count({
+          const adminCount = await prismaMock.conventionOrganizer.count({
             where: {
               conventionId: collaborator!.conventionId,
               role: 'ADMINISTRATOR',
@@ -334,15 +334,15 @@ describe('Collaborateurs de convention', () => {
         role: 'MODERATOR',
       }
 
-      prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
+      prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
         collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
-      prismaMock.conventionCollaborator.delete.mockResolvedValue(existingCollaborator)
+      prismaMock.conventionOrganizer.delete.mockResolvedValue(existingCollaborator)
 
       const removeCollaborator = async (collaboratorId: number, userId: number) => {
-        const collaborator = await prismaMock.conventionCollaborator.findUnique({
+        const collaborator = await prismaMock.conventionOrganizer.findUnique({
           where: { id: collaboratorId },
         })
 
@@ -366,7 +366,7 @@ describe('Collaborateurs de convention', () => {
           throw new Error('Unauthorized')
         }
 
-        return await prismaMock.conventionCollaborator.delete({
+        return await prismaMock.conventionOrganizer.delete({
           where: { id: collaboratorId },
         })
       }
@@ -374,7 +374,7 @@ describe('Collaborateurs de convention', () => {
       const result = await removeCollaborator(1, 1)
 
       expect(result.id).toBe(1)
-      expect(prismaMock.conventionCollaborator.delete).toHaveBeenCalledWith({
+      expect(prismaMock.conventionOrganizer.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       })
     })
@@ -387,10 +387,10 @@ describe('Collaborateurs de convention', () => {
         role: 'MODERATOR',
       }
 
-      prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
+      prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
 
       const removeCollaborator = async (collaboratorId: number, userId: number) => {
-        const collaborator = await prismaMock.conventionCollaborator.findUnique({
+        const collaborator = await prismaMock.conventionOrganizer.findUnique({
           where: { id: collaboratorId },
         })
 
@@ -412,16 +412,16 @@ describe('Collaborateurs de convention', () => {
         role: 'ADMINISTRATOR',
       }
 
-      prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
-      prismaMock.conventionCollaborator.count.mockResolvedValue(1)
+      prismaMock.conventionOrganizer.findUnique.mockResolvedValue(existingCollaborator)
+      prismaMock.conventionOrganizer.count.mockResolvedValue(1)
 
       const removeCollaborator = async (collaboratorId: number, userId: number) => {
-        const collaborator = await prismaMock.conventionCollaborator.findUnique({
+        const collaborator = await prismaMock.conventionOrganizer.findUnique({
           where: { id: collaboratorId },
         })
 
         if (collaborator!.role === 'ADMINISTRATOR') {
-          const adminCount = await prismaMock.conventionCollaborator.count({
+          const adminCount = await prismaMock.conventionOrganizer.count({
             where: {
               conventionId: collaborator!.conventionId,
               role: 'ADMINISTRATOR',
@@ -477,10 +477,10 @@ describe('Collaborateurs de convention', () => {
         },
       ]
 
-      prismaMock.conventionCollaborator.findMany.mockResolvedValue(collaborators)
+      prismaMock.conventionOrganizer.findMany.mockResolvedValue(collaborators)
 
       const getCollaborators = async (conventionId: number) => {
-        return await prismaMock.conventionCollaborator.findMany({
+        return await prismaMock.conventionOrganizer.findMany({
           where: { conventionId },
           include: {
             user: {
@@ -554,11 +554,11 @@ describe('Collaborateurs de convention', () => {
     it('devrait vérifier les permissions avant les actions', () => {
       const userRole = 'MODERATOR'
 
-      const canManageCollaborators = userRole === 'ADMINISTRATOR'
+      const canManageOrganizers = userRole === 'ADMINISTRATOR'
       const canEditConvention = ['ADMINISTRATOR', 'MODERATOR'].includes(userRole)
       const canViewConvention = ['ADMINISTRATOR', 'MODERATOR', 'VIEWER'].includes(userRole)
 
-      expect(canManageCollaborators).toBe(false)
+      expect(canManageOrganizers).toBe(false)
       expect(canEditConvention).toBe(true)
       expect(canViewConvention).toBe(true)
     })
