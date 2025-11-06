@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- En-tête avec navigation -->
-    <EditionHeader v-if="edition" :edition="edition" current-page="objets-trouves" />
+    <EditionHeader v-if="edition" :edition="edition" current-page="lost-found" />
 
     <div class="max-w-6xl mx-auto px-4 py-8">
       <!-- Actions et message d'information -->

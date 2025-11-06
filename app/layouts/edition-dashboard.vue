@@ -345,25 +345,23 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  if (managementSection.length > 0) {
-    items.push(managementSection)
-  }
-
-  // Troisième section : Objets trouvés
+  // Objets trouvés
   if (!isTeamLeader.value || canEdit.value || canManageVolunteers.value) {
     const hasEditionStarted = edition.value
       ? new Date() >= new Date(edition.value.startDate)
       : false
 
     if (hasEditionStarted) {
-      items.push([
-        {
-          label: t('edition.lost_found'),
-          icon: 'i-heroicons-magnifying-glass',
-          to: `/editions/${editionId.value}/objets-trouves`,
-        },
-      ])
+      managementSection.push({
+        label: t('edition.lost_found'),
+        icon: 'i-heroicons-magnifying-glass',
+        to: `/editions/${editionId.value}/gestion/lost-found`,
+      })
     }
+  }
+
+  if (managementSection.length > 0) {
+    items.push(managementSection)
   }
 
   return items

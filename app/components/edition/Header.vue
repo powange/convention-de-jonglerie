@@ -203,10 +203,10 @@
 
         <NuxtLink
           v-if="hasEditionStarted"
-          :to="`/editions/${edition.id}/objets-trouves`"
+          :to="`/editions/${edition.id}/lost-found`"
           :class="[
             'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'objets-trouves'
+            currentPage === 'lost-found'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
@@ -290,7 +290,7 @@ interface Props {
     | 'commentaires'
     | 'carpool'
     | 'gestion'
-    | 'objets-trouves'
+    | 'lost-found'
     | 'volunteers'
     | 'workshops'
 }
@@ -461,7 +461,7 @@ const getPageTitle = (page: string) => {
     details: t('edition.about_this_edition'),
     commentaires: t('edition.posts'),
     carpool: t('edition.carpool'),
-    'objets-trouves': t('edition.lost_found'),
+    'lost-found': t('edition.lost_found'),
     volunteers: t('edition.volunteers.title'),
     workshops: 'Workshops',
   }

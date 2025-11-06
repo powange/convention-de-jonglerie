@@ -59,7 +59,7 @@ export async function renderRawPage(routePath: string) {
     // Routes dynamiques principales (définies avant toute route spécifique pour capter les params)
     { path: '/editions/:id/gestion', component: Comp },
     { path: '/editions/:id/edit', component: Comp },
-    { path: '/editions/:id/objets-trouves', component: Comp },
+    { path: '/editions/:id/lost-found', component: Comp },
     { path: '/editions/:id/commentaires', component: Comp },
     { path: '/editions/:id/carpool', component: Comp },
     // Route demandée en dernier (si non couverte par dynamique) afin de ne pas masquer les params

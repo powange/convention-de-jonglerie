@@ -4,6 +4,7 @@
     "delete_edition": "Supprimer l'édition",
     "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
     "manage_lost_found": "Gérer les objets trouvés",
+    "lost_found_description": "Consulter et gérer les objets trouvés ou perdus",
     "lost_found_active_description": "Les participants peuvent déclarer des objets trouvés ou perdus",
     "volunteers": {
       "management_mode": "Mode de gestion des bénévoles",
@@ -73,6 +74,8 @@
     },
     "workshops": {
       "title": "Workshops",
+      "manage_title": "Gérer les workshops",
+      "manage_description": "Consulter et modérer les workshops proposés par les participants",
       "enable_workshops": "Activer les workshops",
       "workshops_enabled_notice": "Les workshops sont activés",
       "workshops_enabled_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition"

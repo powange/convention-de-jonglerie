@@ -314,43 +314,43 @@
           </div>
         </UCard>
 
+        <!-- Workshops -->
+        <UCard v-if="isCollaborator">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-academic-cap" class="text-indigo-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.workshops.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Gestion des workshops -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/workshops`"
+                icon="i-heroicons-academic-cap"
+                :title="$t('gestion.workshops.manage_title')"
+                :description="$t('gestion.workshops.manage_description')"
+                color="indigo"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
         <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
           <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
-                <h2 class="text-lg font-semibold">{{ $t('edition.lost_found') }}</h2>
-              </div>
-              <UButton
-                v-if="hasEditionStarted"
-                size="sm"
-                color="primary"
-                variant="soft"
-                icon="i-heroicons-arrow-right"
-                :to="`/editions/${edition.id}/objets-trouves`"
-              >
-                {{ $t('common.manage') }}
-              </UButton>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
+              <h2 class="text-lg font-semibold">{{ $t('edition.lost_found') }}</h2>
             </div>
 
-            <div v-if="!hasEditionStarted">
-              <UAlert
-                :title="t('edition.lost_found_before_start')"
-                :description="t('edition.items_appear_when_started')"
-                icon="i-heroicons-clock"
-                color="warning"
-                variant="subtle"
-              />
-            </div>
-
-            <div v-else>
-              <UAlert
-                :title="t('gestion.manage_lost_found')"
-                :description="t('gestion.lost_found_active_description')"
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Gestion des objets trouvés -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/lost-found`"
                 icon="i-heroicons-magnifying-glass"
-                color="info"
-                variant="subtle"
+                :title="$t('gestion.manage_lost_found')"
+                :description="$t('gestion.lost_found_description')"
+                color="yellow"
               />
             </div>
           </div>
@@ -472,12 +472,6 @@ const isTeamLeaderValue = ref(false)
 // Vérifier s'il y a des actions de gestion disponibles
 const hasManagementActions = computed(() => {
   return canEdit.value || canDelete.value
-})
-
-// Début d'édition
-const hasEditionStarted = computed(() => {
-  if (!edition.value) return false
-  return new Date() >= new Date(edition.value.startDate)
 })
 
 const deleteEdition = async (id: number) => {

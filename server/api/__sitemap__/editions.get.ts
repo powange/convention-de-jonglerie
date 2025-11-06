@@ -19,7 +19,14 @@ export default wrapApiHandler(
       },
     })
 
-    return editions.map((edition) => {
+    const urls: Array<{
+      loc: string
+      lastmod: string
+      changefreq: 'weekly' | 'monthly'
+      priority: number
+    }> = []
+
+    editions.forEach((edition) => {
       // Priorité plus élevée pour les éditions futures et récentes
       const now = new Date()
       const isUpcoming = new Date(edition.startDate) > now
@@ -30,13 +37,46 @@ export default wrapApiHandler(
       if (isUpcoming) priority = 0.9
       else if (isRecent) priority = 0.7
 
-      return {
+      const changefreq = isUpcoming ? ('weekly' as const) : ('monthly' as const)
+      const lastmod = edition.updatedAt.toISOString()
+
+      // Page principale de l'édition
+      urls.push({
         loc: `/editions/${edition.id}`,
-        lastmod: edition.updatedAt.toISOString(),
-        changefreq: isUpcoming ? ('weekly' as const) : ('monthly' as const),
+        lastmod,
+        changefreq,
         priority,
+      })
+
+      // Page des commentaires
+      urls.push({
+        loc: `/editions/${edition.id}/commentaires`,
+        lastmod,
+        changefreq,
+        priority: priority * 0.8,
+      })
+
+      // Page du covoiturage
+      urls.push({
+        loc: `/editions/${edition.id}/carpool`,
+        lastmod,
+        changefreq,
+        priority: priority * 0.7,
+      })
+
+      // Page des objets trouvés (seulement si l'édition a commencé)
+      const hasStarted = new Date(edition.startDate) <= now
+      if (hasStarted) {
+        urls.push({
+          loc: `/editions/${edition.id}/lost-found`,
+          lastmod,
+          changefreq,
+          priority: priority * 0.6,
+        })
       }
     })
+
+    return urls
   },
   { operationName: 'GenerateEditionsSitemap' }
 )
