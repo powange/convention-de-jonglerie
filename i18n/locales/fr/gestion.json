@@ -73,7 +73,21 @@
       "stats_title": "Statistiques",
       "stats_description": "Consulter les statistiques de ventes et de participation",
       "stats_coming_soon": "Statistiques à venir",
-      "stats_coming_soon_description": "Les statistiques de billeterie seront bientôt disponibles"
+      "stats_coming_soon_description": "Les statistiques de billeterie seront bientôt disponibles",
+      "stats_participants": "Participants",
+      "stats_volunteers": "Bénévoles",
+      "stats_artists": "Artistes",
+      "stats_validations": "validations",
+      "stats_validation": "validation",
+      "stats_validations_count": "Nombre de validations",
+      "stats_filter_type": "Filtrer par type",
+      "stats_filter_period": "Filtrer par période",
+      "stats_period_setup": "Montage",
+      "stats_period_event": "Événement",
+      "stats_period_teardown": "Démontage",
+      "stats_loading": "Chargement des statistiques...",
+      "stats_error": "Erreur lors du chargement des statistiques",
+      "stats_no_data": "Aucune donnée de validation disponible"
     },
     "artists": {
       "title": "Artistes",
