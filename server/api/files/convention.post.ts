@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { canEditConvention } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
 interface RequestBody {
@@ -37,12 +38,7 @@ export default wrapApiHandler(
       const convention = await prisma.convention.findUnique({
         where: { id: targetId },
         include: {
-          organizers: {
-            where: {
-              userId: user.id,
-              canEditConvention: true,
-            },
-          },
+          organizers: true,
         },
       })
 
@@ -53,11 +49,7 @@ export default wrapApiHandler(
         })
       }
 
-      const isAuthor = convention.authorId === user.id
-      const isOrganizer = convention.organizers.length > 0
-      const isGlobalAdmin = user.isGlobalAdmin || false
-
-      if (!isAuthor && !isOrganizer && !isGlobalAdmin) {
+      if (!canEditConvention(convention, user)) {
         throw createError({
           statusCode: 403,
           message: "Vous n'avez pas les droits pour modifier cette convention",

@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
 import type { ServerFile } from 'nuxt-file-storage'
@@ -43,12 +44,7 @@ export default wrapApiHandler(
       include: {
         convention: {
           include: {
-            organizers: {
-              where: {
-                userId: user.id,
-                OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
-              },
-            },
+            organizers: true,
           },
         },
       },
@@ -62,12 +58,7 @@ export default wrapApiHandler(
     }
 
     // Vérifier les permissions pour modifier cette édition
-    const isCreator = edition.createdBy === user.id
-    const isConventionAuthor = edition.convention.authorId === user.id
-    const isOrganizer = edition.convention.organizers.length > 0
-    const isGlobalAdmin = user.isGlobalAdmin || false
-
-    if (!isCreator && !isConventionAuthor && !isOrganizer && !isGlobalAdmin) {
+    if (!canEditEdition(edition, user)) {
       throw createError({
         statusCode: 403,
         message: "Vous n'avez pas les droits pour ajouter des objets trouvés à cette édition",

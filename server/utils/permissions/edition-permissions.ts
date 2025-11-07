@@ -2,6 +2,7 @@ import { checkAdminMode } from '@@/server/utils/organizer-management'
 
 import { prisma } from '../prisma'
 
+import type { UserForPermissions } from './types'
 import type {
   User,
   Edition,
@@ -87,7 +88,7 @@ export async function getEditionWithPermissions(
 /**
  * Vérifie si un utilisateur peut éditer une édition
  */
-export function canEditEdition(edition: EditionWithPermissions, user: User): boolean {
+export function canEditEdition(edition: EditionWithPermissions, user: UserForPermissions): boolean {
   const isCreator = edition.creatorId === user.id
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
@@ -117,7 +118,10 @@ export function canEditEdition(edition: EditionWithPermissions, user: User): boo
 /**
  * Vérifie si un utilisateur peut supprimer une édition
  */
-export function canDeleteEdition(edition: EditionWithPermissions, user: User): boolean {
+export function canDeleteEdition(
+  edition: EditionWithPermissions,
+  user: UserForPermissions
+): boolean {
   const isCreator = edition.creatorId === user.id
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
@@ -148,7 +152,10 @@ export function canDeleteEdition(edition: EditionWithPermissions, user: User): b
 /**
  * Vérifie si un utilisateur peut gérer le statut d'une édition
  */
-export function canManageEditionStatus(edition: EditionWithPermissions, user: User): boolean {
+export function canManageEditionStatus(
+  edition: EditionWithPermissions,
+  user: UserForPermissions
+): boolean {
   const isCreator = edition.creatorId === user.id
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
@@ -167,7 +174,7 @@ export function canManageEditionStatus(edition: EditionWithPermissions, user: Us
 /**
  * Vérifie si un utilisateur peut voir une édition (lecture seule)
  */
-export function canViewEdition(edition: EditionWithPermissions, user: User): boolean {
+export function canViewEdition(edition: EditionWithPermissions, user: UserForPermissions): boolean {
   const isCreator = edition.creatorId === user.id
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
@@ -345,4 +352,97 @@ export async function canAccessEditionDataOrMealValidation(
   const hasMealValidationAccess = await canAccessMealValidation(userId, editionId)
 
   return hasMealValidationAccess
+}
+
+/**
+ * Vérifie si un utilisateur peut gérer les artistes d'une édition
+ */
+export function canManageArtists(
+  edition: EditionWithPermissions,
+  user: UserForPermissions
+): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  // Vérifier si l'utilisateur est organisateur avec droits de gestion des artistes au niveau convention
+  const hasConventionArtistsRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageArtists
+    ) || false
+
+  // Vérifier si l'utilisateur a des droits de gestion des artistes spécifiques à cette édition
+  const hasEditionArtistsRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageArtists === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionArtistsRights ||
+    hasEditionArtistsRights ||
+    isGlobalAdmin
+  )
+}
+
+/**
+ * Vérifie si un utilisateur peut gérer les repas d'une édition
+ */
+export function canManageMeals(edition: EditionWithPermissions, user: UserForPermissions): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  // Vérifier si l'utilisateur est organisateur avec droits de gestion des repas au niveau convention
+  const hasConventionMealsRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageMeals
+    ) || false
+
+  // Vérifier si l'utilisateur a des droits de gestion des repas spécifiques à cette édition
+  const hasEditionMealsRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageMeals === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionMealsRights ||
+    hasEditionMealsRights ||
+    isGlobalAdmin
+  )
+}
+
+/**
+ * Vérifie si un utilisateur peut gérer la billeterie d'une édition
+ */
+export function canManageTicketing(
+  edition: EditionWithPermissions,
+  user: UserForPermissions
+): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  // Vérifier si l'utilisateur est organisateur avec droits de gestion de la billeterie au niveau convention
+  const hasConventionTicketingRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageTicketing
+    ) || false
+
+  // Vérifier si l'utilisateur a des droits de gestion de la billeterie spécifiques à cette édition
+  const hasEditionTicketingRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageTicketing === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionTicketingRights ||
+    hasEditionTicketingRights ||
+    isGlobalAdmin
+  )
 }

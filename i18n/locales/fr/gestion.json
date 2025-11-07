@@ -69,7 +69,11 @@
       "access_control_title": "Contrôle d'accès",
       "access_control_description": "Scanner et valider les billets à l'entrée",
       "counters_title": "Compteurs",
-      "counters_description": "Créer et gérer des compteurs synchronisés en temps réel"
+      "counters_description": "Créer et gérer des compteurs synchronisés en temps réel",
+      "stats_title": "Statistiques",
+      "stats_description": "Consulter les statistiques de ventes et de participation",
+      "stats_coming_soon": "Statistiques à venir",
+      "stats_coming_soon_description": "Les statistiques de billeterie seront bientôt disponibles"
     },
     "artists": {
       "title": "Artistes",

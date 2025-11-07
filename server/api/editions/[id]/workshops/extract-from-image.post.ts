@@ -1,6 +1,7 @@
 import { createAIProvider, type ExtractedWorkshop } from '@@/server/utils/ai-providers'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
@@ -14,22 +15,12 @@ export default wrapApiHandler(
 
     // Vérifier que l'édition existe et que les workshops sont activés
     const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      select: {
-        id: true,
-        name: true,
-        workshopsEnabled: true,
-        startDate: true,
-        endDate: true,
+      include: {
         convention: {
-          select: {
-            organizers: {
-              select: {
-                userId: true,
-              },
-            },
+          include: {
+            organizers: true,
           },
         },
-        creatorId: true,
       },
       errorMessage: 'Édition non trouvée',
     })
@@ -41,12 +32,8 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que l'utilisateur est organisateur, organisateur ou super admin
-    const isCreator = edition.creatorId === user.id
-    const isOrganizer = edition.convention?.organizers?.some((collab) => collab.userId === user.id)
-    const isSuperAdmin = user.isGlobalAdmin || false
-
-    if (!isCreator && !isOrganizer && !isSuperAdmin) {
+    // Vérifier que l'utilisateur peut éditer cette édition
+    if (!canEditEdition(edition, user)) {
       throw createError({
         statusCode: 403,
         message:

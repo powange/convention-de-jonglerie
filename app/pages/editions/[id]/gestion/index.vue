@@ -309,6 +309,15 @@
                 :description="$t('gestion.ticketing.counters_description')"
                 color="teal"
               />
+
+              <!-- Statistiques -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/stats`"
+                icon="i-heroicons-chart-bar"
+                :title="$t('gestion.ticketing.stats_title')"
+                :description="$t('gestion.ticketing.stats_description')"
+                color="indigo"
+              />
             </div>
           </div>
         </UCard>

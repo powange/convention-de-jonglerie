@@ -328,6 +328,10 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('gestion.ticketing.counters_title'),
           to: `/editions/${editionId.value}/gestion/ticketing/counter`,
         },
+        {
+          label: t('gestion.ticketing.stats_title'),
+          to: `/editions/${editionId.value}/gestion/ticketing/stats`,
+        },
       ],
     })
   }

@@ -2,6 +2,7 @@ import { canManageOrganizers } from '@@/server/utils/organizer-management'
 
 import { prisma } from '../prisma'
 
+import type { UserForPermissions } from './types'
 import type { User, Convention, ConventionOrganizer } from '@prisma/client'
 
 /**
@@ -77,7 +78,10 @@ export async function getConventionWithPermissions(
 /**
  * Vérifie si un utilisateur peut éditer une convention
  */
-export function canEditConvention(convention: ConventionWithOrganizers, user: User): boolean {
+export function canEditConvention(
+  convention: ConventionWithOrganizers,
+  user: UserForPermissions
+): boolean {
   const isAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
@@ -93,7 +97,10 @@ export function canEditConvention(convention: ConventionWithOrganizers, user: Us
 /**
  * Vérifie si un utilisateur peut supprimer une convention
  */
-export function canDeleteConvention(convention: ConventionWithOrganizers, user: User): boolean {
+export function canDeleteConvention(
+  convention: ConventionWithOrganizers,
+  user: UserForPermissions
+): boolean {
   const isAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
@@ -109,7 +116,10 @@ export function canDeleteConvention(convention: ConventionWithOrganizers, user: 
 /**
  * Vérifie si un utilisateur peut archiver/désarchiver une convention
  */
-export function canArchiveConvention(convention: ConventionWithOrganizers, user: User): boolean {
+export function canArchiveConvention(
+  convention: ConventionWithOrganizers,
+  user: UserForPermissions
+): boolean {
   // Même permissions que la suppression
   return canDeleteConvention(convention, user)
 }
@@ -119,7 +129,10 @@ export function canArchiveConvention(convention: ConventionWithOrganizers, user:
 /**
  * Vérifie si un utilisateur peut voir une convention (lecture seule)
  */
-export function canViewConvention(convention: ConventionWithOrganizers, user: User): boolean {
+export function canViewConvention(
+  convention: ConventionWithOrganizers,
+  user: UserForPermissions
+): boolean {
   const isAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
