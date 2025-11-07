@@ -87,7 +87,18 @@
       "stats_period_teardown": "Démontage",
       "stats_loading": "Chargement des statistiques...",
       "stats_error": "Erreur lors du chargement des statistiques",
-      "stats_no_data": "Aucune donnée de validation disponible"
+      "stats_no_data": "Aucune donnée de validation disponible",
+      "stats_chart_title": "Graphique des validations d'entrée",
+      "stats_order_sources_title": "Sources des commandes",
+      "stats_source_manual": "Manuel",
+      "stats_source_external": "Externe (HelloAsso)",
+      "stats_total": "Total",
+      "stats_view_items": "Par participants",
+      "stats_view_orders": "Par commandes",
+      "stats_items": "participants",
+      "stats_item": "participant",
+      "stats_orders": "commandes",
+      "stats_order": "commande"
     },
     "artists": {
       "title": "Artistes",

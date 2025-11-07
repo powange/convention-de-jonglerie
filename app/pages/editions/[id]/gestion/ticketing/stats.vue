@@ -27,72 +27,6 @@
         </p>
       </div>
 
-      <!-- Filtres -->
-      <div class="mb-6 space-y-4">
-        <!-- Filtres de type -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ $t('gestion.ticketing.stats_filter_type') }}
-          </label>
-          <UFieldGroup>
-            <UButton
-              :variant="filters.showParticipants ? 'solid' : 'outline'"
-              color="blue"
-              @click="filters.showParticipants = !filters.showParticipants"
-            >
-              <UIcon v-if="filters.showParticipants" name="i-heroicons-check" class="mr-1" />
-              {{ $t('gestion.ticketing.stats_participants') }}
-            </UButton>
-            <UButton
-              :variant="filters.showVolunteers ? 'solid' : 'outline'"
-              color="green"
-              @click="filters.showVolunteers = !filters.showVolunteers"
-            >
-              <UIcon v-if="filters.showVolunteers" name="i-heroicons-check" class="mr-1" />
-              {{ $t('gestion.ticketing.stats_volunteers') }}
-            </UButton>
-            <UButton
-              :variant="filters.showArtists ? 'solid' : 'outline'"
-              color="amber"
-              @click="filters.showArtists = !filters.showArtists"
-            >
-              <UIcon v-if="filters.showArtists" name="i-heroicons-check" class="mr-1" />
-              {{ $t('gestion.ticketing.stats_artists') }}
-            </UButton>
-          </UFieldGroup>
-        </div>
-
-        <!-- Filtres de période -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ $t('gestion.ticketing.stats_filter_period') }}
-          </label>
-          <UFieldGroup>
-            <UButton
-              :variant="filters.showSetup ? 'solid' : 'outline'"
-              @click="filters.showSetup = !filters.showSetup"
-            >
-              <UIcon v-if="filters.showSetup" name="i-heroicons-check" class="mr-1" />
-              {{ $t('gestion.ticketing.stats_period_setup') }}
-            </UButton>
-            <UButton
-              :variant="filters.showEvent ? 'solid' : 'outline'"
-              @click="filters.showEvent = !filters.showEvent"
-            >
-              <UIcon v-if="filters.showEvent" name="i-heroicons-check" class="mr-1" />
-              {{ $t('gestion.ticketing.stats_period_event') }}
-            </UButton>
-            <UButton
-              :variant="filters.showTeardown ? 'solid' : 'outline'"
-              @click="filters.showTeardown = !filters.showTeardown"
-            >
-              <UIcon v-if="filters.showTeardown" name="i-heroicons-check" class="mr-1" />
-              {{ $t('gestion.ticketing.stats_period_teardown') }}
-            </UButton>
-          </UFieldGroup>
-        </div>
-      </div>
-
       <!-- Totaux -->
       <div v-if="validationsData" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <UCard v-if="filters.showParticipants">
@@ -136,8 +70,31 @@
         </UCard>
       </div>
 
-      <!-- Graphique -->
+      <!-- Graphique avec filtres -->
       <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-chart-bar" class="text-primary-600" />
+            <h2 class="text-lg font-semibold">
+              {{ $t('gestion.ticketing.stats_chart_title') }}
+            </h2>
+          </div>
+        </template>
+
+        <!-- Filtres -->
+        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Filtres de type -->
+          <UFormField :label="$t('gestion.ticketing.stats_filter_type')">
+            <USelect v-model="selectedTypes" :items="typeItems" multiple value-key="value" />
+          </UFormField>
+
+          <!-- Filtres de période -->
+          <UFormField :label="$t('gestion.ticketing.stats_filter_period')">
+            <USelect v-model="selectedPeriods" :items="periodItems" multiple value-key="value" />
+          </UFormField>
+        </div>
+
+        <!-- Graphique -->
         <div v-if="loadingValidations" class="text-center py-12">
           <UIcon
             name="i-heroicons-arrow-path"
@@ -171,6 +128,114 @@
           </p>
         </div>
       </UCard>
+
+      <!-- Statistiques des sources de commandes -->
+      <UCard class="mt-6">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-arrow-path" class="text-primary-600" />
+            <h2 class="text-lg font-semibold">
+              {{ $t('gestion.ticketing.stats_order_sources_title') }}
+            </h2>
+          </div>
+        </template>
+
+        <div v-if="loadingOrderSources" class="text-center py-12">
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="h-8 w-8 text-gray-400 mx-auto mb-2 animate-spin"
+          />
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.stats_loading') }}
+          </p>
+        </div>
+        <div v-else-if="orderSourcesError" class="text-center py-12">
+          <UIcon
+            name="i-heroicons-exclamation-triangle"
+            class="h-8 w-8 text-red-500 mx-auto mb-2"
+          />
+          <p class="text-red-600 dark:text-red-400">
+            {{ $t('gestion.ticketing.stats_error') }}
+          </p>
+        </div>
+        <div v-else-if="orderSourcesData">
+          <!-- Toggle entre Items et Commandes -->
+          <div class="mb-6 flex justify-center">
+            <UFieldGroup>
+              <UButton
+                :variant="viewMode === 'items' ? 'solid' : 'outline'"
+                @click="viewMode = 'items'"
+              >
+                {{ $t('gestion.ticketing.stats_view_items') }}
+              </UButton>
+              <UButton
+                :variant="viewMode === 'orders' ? 'solid' : 'outline'"
+                @click="viewMode = 'orders'"
+              >
+                {{ $t('gestion.ticketing.stats_view_orders') }}
+              </UButton>
+            </UFieldGroup>
+          </div>
+
+          <!-- Statistiques numériques -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <UCard>
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_source_manual') }}
+                </p>
+                <p class="text-3xl font-bold text-green-600">
+                  {{
+                    viewMode === 'items'
+                      ? orderSourcesData.items.manual
+                      : orderSourcesData.orders.manual
+                  }}
+                </p>
+              </div>
+            </UCard>
+            <UCard>
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_source_external') }}
+                </p>
+                <p class="text-3xl font-bold text-blue-600">
+                  {{
+                    viewMode === 'items'
+                      ? orderSourcesData.items.external
+                      : orderSourcesData.orders.external
+                  }}
+                </p>
+              </div>
+            </UCard>
+            <UCard>
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_total') }}
+                </p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white">
+                  {{
+                    viewMode === 'items'
+                      ? orderSourcesData.items.total
+                      : orderSourcesData.orders.total
+                  }}
+                </p>
+              </div>
+            </UCard>
+          </div>
+
+          <!-- Graphique en donut -->
+          <OrderSourceChart
+            :data="viewMode === 'items' ? orderSourcesData.items : orderSourcesData.orders"
+            :show-orders="viewMode === 'orders'"
+          />
+        </div>
+        <div v-else class="text-center py-12">
+          <UIcon name="i-heroicons-chart-pie" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.stats_no_data') }}
+          </p>
+        </div>
+      </UCard>
     </div>
   </div>
 </template>
@@ -181,6 +246,10 @@ import { useEditionStore } from '~/stores/editions'
 
 const AccessValidationChart = defineAsyncComponent(
   () => import('~/components/ticketing/stats/AccessValidationChart.vue')
+)
+
+const OrderSourceChart = defineAsyncComponent(
+  () => import('~/components/ticketing/stats/OrderSourceChart.vue')
 )
 
 definePageMeta({
@@ -201,15 +270,53 @@ const canAccess = computed(() => {
   return editionStore.isOrganizer(edition.value, authStore.user.id)
 })
 
-// Filtres
-const filters = reactive({
-  showParticipants: true,
-  showVolunteers: true,
-  showArtists: true,
-  showSetup: true,
-  showEvent: true,
-  showTeardown: true,
-})
+// Items pour les selects
+const typeItems = computed(() => [
+  {
+    label: t('gestion.ticketing.stats_participants'),
+    value: 'participants',
+    icon: 'i-heroicons-users',
+  },
+  {
+    label: t('gestion.ticketing.stats_volunteers'),
+    value: 'volunteers',
+    icon: 'i-heroicons-hand-raised',
+  },
+  {
+    label: t('gestion.ticketing.stats_artists'),
+    value: 'artists',
+    icon: 'i-heroicons-star',
+  },
+])
+
+const periodItems = computed(() => [
+  {
+    label: t('gestion.ticketing.stats_period_setup'),
+    value: 'setup',
+  },
+  {
+    label: t('gestion.ticketing.stats_period_event'),
+    value: 'event',
+  },
+  {
+    label: t('gestion.ticketing.stats_period_teardown'),
+    value: 'teardown',
+  },
+])
+
+// Filtres sélectionnés
+const selectedTypes = ref<string[]>(['participants', 'volunteers', 'artists'])
+const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
+
+// Filtres calculés pour compatibilité avec le code existant
+const filters = computed(() => ({
+  showParticipants: selectedTypes.value.includes('participants'),
+  showVolunteers: selectedTypes.value.includes('volunteers'),
+  showArtists: selectedTypes.value.includes('artists'),
+  showSetup: selectedPeriods.value.includes('setup'),
+  showEvent: selectedPeriods.value.includes('event'),
+  showTeardown: selectedPeriods.value.includes('teardown'),
+}))
 
 // Données de validations
 interface ValidationData {
@@ -234,6 +341,25 @@ const validationsData = ref<ValidationData | null>(null)
 const loadingValidations = ref(false)
 const validationsError = ref(false)
 
+// Données des sources de commandes
+interface OrderSourcesData {
+  items: {
+    manual: number
+    external: number
+    total: number
+  }
+  orders: {
+    manual: number
+    external: number
+    total: number
+  }
+}
+
+const orderSourcesData = ref<OrderSourcesData | null>(null)
+const loadingOrderSources = ref(false)
+const orderSourcesError = ref(false)
+const viewMode = ref<'items' | 'orders'>('items')
+
 // Filtrer les données selon les périodes sélectionnées
 const filteredData = computed(() => {
   if (!validationsData.value) return null
@@ -253,9 +379,9 @@ const filteredData = computed(() => {
     const teardownEnd = new Date(periods.teardown.end).getTime()
 
     if (
-      (filters.showSetup && time >= setupStart && time < setupEnd) ||
-      (filters.showEvent && time >= eventStart && time < eventEnd) ||
-      (filters.showTeardown && time >= teardownStart && time <= teardownEnd)
+      (filters.value.showSetup && time >= setupStart && time < setupEnd) ||
+      (filters.value.showEvent && time >= eventStart && time < eventEnd) ||
+      (filters.value.showTeardown && time >= teardownStart && time <= teardownEnd)
     ) {
       filteredIndices.push(index)
     }
@@ -287,6 +413,24 @@ async function fetchValidations() {
   }
 }
 
+// Charger les données des sources de commandes
+async function fetchOrderSources() {
+  loadingOrderSources.value = true
+  orderSourcesError.value = false
+
+  try {
+    const data = await $fetch<OrderSourcesData>(
+      `/api/editions/${editionId}/ticketing/stats/order-sources`
+    )
+    orderSourcesData.value = data
+  } catch (error) {
+    console.error('Failed to fetch order sources:', error)
+    orderSourcesError.value = true
+  } finally {
+    loadingOrderSources.value = false
+  }
+}
+
 // Charger l'édition si nécessaire
 onMounted(async () => {
   if (!edition.value) {
@@ -297,9 +441,9 @@ onMounted(async () => {
     }
   }
 
-  // Charger les données de validations
+  // Charger les données de validations et sources
   if (canAccess.value) {
-    await fetchValidations()
+    await Promise.all([fetchValidations(), fetchOrderSources()])
   }
 })
 

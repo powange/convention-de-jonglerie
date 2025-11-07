@@ -109,13 +109,13 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => ({
   },
   scales: {
     x: {
-      stacked: false,
+      stacked: true,
       grid: {
         display: false,
       },
     },
     y: {
-      stacked: false,
+      stacked: true,
       beginAtZero: true,
       ticks: {
         stepSize: 1,
