@@ -205,19 +205,32 @@
                 </p>
               </div>
 
-              <!-- Boutons de partage -->
-              <div class="grid grid-cols-2 gap-3">
-                <UButton variant="outline" block @click="copyUrl">
+              <!-- Boutons de partage et régénération -->
+              <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <UButton variant="outline" block @click="copyUrl">
+                    <template #leading>
+                      <UIcon name="i-heroicons-clipboard-document" />
+                    </template>
+                    {{ $t('common.copy_link') }}
+                  </UButton>
+                  <UButton variant="outline" block @click="shareUrl">
+                    <template #leading>
+                      <UIcon name="i-heroicons-share" />
+                    </template>
+                    {{ $t('common.share') }}
+                  </UButton>
+                </div>
+                <UButton
+                  variant="outline"
+                  color="warning"
+                  block
+                  @click="showRegenerateModal = true"
+                >
                   <template #leading>
-                    <UIcon name="i-heroicons-clipboard-document" />
+                    <UIcon name="i-heroicons-arrow-path" />
                   </template>
-                  {{ $t('common.copy_link') }}
-                </UButton>
-                <UButton variant="outline" block @click="shareUrl">
-                  <template #leading>
-                    <UIcon name="i-heroicons-share" />
-                  </template>
-                  {{ $t('common.share') }}
+                  {{ $t('ticketing.counters.regenerate_token') }}
                 </UButton>
               </div>
             </div>
@@ -274,12 +287,27 @@
             </div>
           </template>
         </UModal>
+
+        <!-- Modal de confirmation de régénération du token -->
+        <ConfirmModal
+          v-model="showRegenerateModal"
+          :title="$t('ticketing.counters.regenerate_token')"
+          :description="$t('ticketing.counters.regenerate_token_warning')"
+          :confirm-label="$t('ticketing.counters.regenerate_token')"
+          confirm-color="warning"
+          icon-name="i-heroicons-exclamation-triangle"
+          icon-color="text-orange-500"
+          :loading="isRegenerating"
+          @confirm="handleRegenerateToken"
+          @cancel="showRegenerateModal = false"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import ConfirmModal from '~/components/ui/ConfirmModal.vue'
 import { useTicketingCounter } from '~/composables/useTicketingCounter'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -318,6 +346,8 @@ const {
 
 const step = ref(1)
 const showResetModal = ref(false)
+const showRegenerateModal = ref(false)
+const isRegenerating = ref(false)
 
 // URL du compteur pour le QR code (utilise le token pour la sécurité)
 const counterUrl = computed(() => {
@@ -403,6 +433,48 @@ const shareUrl = async () => {
     }
   } catch (err) {
     console.error('Error sharing:', err)
+  }
+}
+
+const handleRegenerateToken = async () => {
+  try {
+    isRegenerating.value = true
+
+    const response = await $fetch(
+      `/api/editions/${editionId}/ticketing/counters/${token}/regenerate-token`,
+      {
+        method: 'PATCH',
+      }
+    )
+
+    if (response.success && response.token) {
+      // Déconnecter la connexion SSE actuelle avant de changer d'URL
+      disconnect()
+
+      // Afficher le toast de succès
+      toast.add({
+        title: t('common.success'),
+        description: t('ticketing.counters.token_regenerated'),
+        color: 'success',
+      })
+
+      // Fermer la modal
+      showRegenerateModal.value = false
+
+      // Utiliser replace au lieu de push pour remplacer l'URL sans déclencher onBeforeRouteLeave
+      // On utilise nextTick pour s'assurer que la déconnexion SSE est complète
+      await nextTick()
+      window.location.href = `/editions/${editionId}/gestion/ticketing/counter/${response.token}`
+    }
+  } catch (error) {
+    console.error('Error regenerating token:', error)
+    toast.add({
+      title: t('common.error'),
+      description: t('ticketing.counters.regenerate_token_error'),
+      color: 'error',
+    })
+  } finally {
+    isRegenerating.value = false
   }
 }
 

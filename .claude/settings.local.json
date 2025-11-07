@@ -70,7 +70,8 @@
       "Bash(node scripts/translation/list-todo-keys.js:*)",
       "Bash(node scripts/translation/apply-translations.js:*)",
       "Bash(cat:*)",
-      "Bash(if [ -f \"server/api/conventions/[id]/organizers/[organizerId].delete.ts\" ])"
+      "Bash(if [ -f \"server/api/conventions/[id]/organizers/[organizerId].delete.ts\" ])",
+      "mcp__nuxt-ui__get_component_metadata"
     ],
     "deny": [],
     "ask": [],

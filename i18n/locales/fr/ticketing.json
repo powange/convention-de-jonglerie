@@ -125,7 +125,11 @@
       "share_text": "Rejoignez ce compteur pour suivre les entrées en temps réel",
       "info_title": "Informations",
       "syncing": "Synchronisation en cours...",
-      "pending_operations": "{count} opération(s) en attente | {count} opération en attente | {count} opérations en attente"
+      "pending_operations": "{count} opération(s) en attente | {count} opération en attente | {count} opérations en attente",
+      "regenerate_token": "Régénérer le token",
+      "regenerate_token_warning": "Attention : régénérer le token invalidera l'ancien lien de partage et le QR code actuel. Tous les utilisateurs devront utiliser le nouveau lien pour accéder au compteur.",
+      "token_regenerated": "Token régénéré avec succès",
+      "regenerate_token_error": "Erreur lors de la régénération du token"
     },
     "stats": {
       "participants": "Participants",

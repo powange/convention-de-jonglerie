@@ -371,7 +371,7 @@
       :items-per-page="serverPagination.pageSize"
       :disabled="applicationsLoading"
       size="xs"
-      :show-edges="false"
+      show-edges
       :sibling-count="1"
       @update:page="refreshApplications"
     />
@@ -752,7 +752,13 @@ const refreshApplications = async () => {
       },
     } as any)
     applications.value = res.data || []
-    if (res.pagination) serverPagination.value = res.pagination
+    if (res.pagination) {
+      console.log('Pagination:', res.pagination)
+      serverPagination.value.total = res.pagination.total
+      serverPagination.value.page = res.pagination.page
+      serverPagination.value.totalPages = res.pagination.totalPages
+      console.log('Updated serverPagination:', serverPagination.value)
+    }
   } catch (e: any) {
     toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
@@ -1846,11 +1852,34 @@ const columns = computed((): TableColumn<any>[] => [
     cell: ({ row }) => {
       const mot = row.original.motivation
       if (!mot) return h('span', '—')
+
+      // Si le texte est court (moins de 50 caractères), pas besoin de popover
+      if (mot.length <= 50) {
+        return h('span', { class: 'text-xs' }, mot)
+      }
+
+      // Sinon, utiliser un popover cliquable
       return h(
-        resolveComponent('UTooltip'),
-        { text: mot, openDelay: 200 },
+        resolveComponent('UPopover'),
         {
-          default: () => h('div', { class: 'max-w-xs truncate cursor-help', title: mot }, mot),
+          mode: 'click',
+          content: { side: 'top', align: 'start' },
+        },
+        {
+          default: () =>
+            h(
+              'div',
+              {
+                class:
+                  'max-w-xs truncate cursor-pointer text-xs hover:text-primary-500 transition-colors',
+                title: t('common.click_to_view_full'),
+              },
+              mot
+            ),
+          content: () =>
+            h('div', { class: 'p-4 max-w-md' }, [
+              h('p', { class: 'text-sm whitespace-pre-wrap' }, mot),
+            ]),
         }
       )
     },
