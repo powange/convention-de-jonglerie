@@ -185,6 +185,8 @@ model ConventionOrganizer {
   title                 String?
   canManageVolunteers   Boolean                      @default(false)
   canManageArtists      Boolean                      @default(false)
+  canManageMeals        Boolean                      @default(false)
+  canManageTicketing    Boolean                      @default(false)
   addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
   convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -336,6 +338,8 @@ model EditionOrganizerPermission {
   canDelete           Boolean             @default(false)
   canManageVolunteers Boolean             @default(false)
   canManageArtists    Boolean             @default(false)
+  canManageMeals      Boolean             @default(false)
+  canManageTicketing  Boolean             @default(false)
   organizer           ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   edition             Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
 

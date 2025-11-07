@@ -1,7 +1,28 @@
 <template>
   <div class="space-y-3">
+    <!-- Optional title -->
+    <div v-if="!hideTitle">
+      <label class="block text-sm font-medium mb-2">
+        {{ $t('components.organizers_rights_panel.title_label') }}
+      </label>
+      <UInput
+        v-model="localValue.title"
+        :size="inputSize"
+        :placeholder="$t('components.organizers_rights_panel.title_placeholder')"
+        class="w-full"
+        @update:model-value="emitModel"
+      />
+    </div>
+
+    <!-- Rights section title -->
+    <div>
+      <label class="block text-sm font-medium mb-2">
+        {{ $t('organizers.rights') }}
+      </label>
+    </div>
+
     <!-- Global rights (sauf ceux qui seront dans le tableau) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 -mt-1">
       <div
         v-for="p in globalRightsOutsideTable"
         :key="p.key"
@@ -15,17 +36,6 @@
           @update:model-value="(val) => updateRight(p.key, val)"
         />
       </div>
-    </div>
-
-    <!-- Optional title -->
-    <div v-if="!hideTitle" class="pt-1">
-      <UInput
-        v-model="localValue.title"
-        :size="inputSize"
-        :placeholder="$t('components.organizers_rights_panel.title_placeholder')"
-        class="w-full"
-        @update:model-value="emitModel"
-      />
     </div>
 
     <!-- Per-edition rights as headerless table -->
@@ -65,6 +75,12 @@
                 </th>
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.artists') }}
+                </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.meals_short') }}
+                </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.ticketing_short') }}
                 </th>
               </tr>
             </thead>
@@ -119,6 +135,28 @@
                       color="primary"
                       :model-value="localValue.rights.manageArtists"
                       @update:model-value="(val) => updateRight('manageArtists', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageMeals')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageMeals"
+                      @update:model-value="(val) => updateRight('manageMeals', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageTicketing')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageTicketing"
+                      @update:model-value="(val) => updateRight('manageTicketing', val)"
                     />
                   </div>
                 </td>
@@ -186,6 +224,30 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.meals_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageMeals"
+                      :model-value="hasEditionFlag(ed.id, 'canManageMeals')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageMeals', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.ticketing_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageTicketing"
+                      :model-value="hasEditionFlag(ed.id, 'canManageTicketing')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageTicketing', val)"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -209,6 +271,8 @@ interface PerEditionRight {
   canDelete?: boolean
   canManageVolunteers?: boolean
   canManageArtists?: boolean
+  canManageMeals?: boolean
+  canManageTicketing?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -242,6 +306,8 @@ const props = withDefaults(
       { key: 'deleteAllEditions', label: 'permissions.deleteAllEditions' },
       { key: 'manageVolunteers', label: 'permissions.manageVolunteers' },
       { key: 'manageArtists', label: 'permissions.manageArtists' },
+      { key: 'manageMeals', label: 'permissions.manageMeals' },
+      { key: 'manageTicketing', label: 'permissions.manageTicketing' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -290,9 +356,14 @@ const inputSize = computed(() => (props.size === 'xs' ? 'xs' : 'sm'))
 const globalRightsOutsideTable = computed(() =>
   props.permissionList.filter(
     (p) =>
-      !['editAllEditions', 'deleteAllEditions', 'manageVolunteers', 'manageArtists'].includes(
-        p.key
-      )
+      ![
+        'editAllEditions',
+        'deleteAllEditions',
+        'manageVolunteers',
+        'manageArtists',
+        'manageMeals',
+        'manageTicketing',
+      ].includes(p.key)
   )
 )
 
@@ -360,21 +431,51 @@ function updateRight(key: string, value: any) {
       if (p.canManageArtists) p.canManageArtists = false
     })
   }
+  // If enabling manageMeals we clean perEdition meals flags
+  if (key === 'manageMeals' && localValue.rights.manageMeals) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageMeals) p.canManageMeals = false
+    })
+  }
+  // If enabling manageTicketing we clean perEdition ticketing flags
+  if (key === 'manageTicketing' && localValue.rights.manageTicketing) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageTicketing) p.canManageTicketing = false
+    })
+  }
   // Clean up empty entries
   localValue.perEdition = localValue.perEdition.filter(
-    (p) => p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists
+    (p) =>
+      p.canEdit ||
+      p.canDelete ||
+      p.canManageVolunteers ||
+      p.canManageArtists ||
+      p.canManageMeals ||
+      p.canManageTicketing
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
 function hasEditionFlag(
   editionId: number,
-  field: 'canEdit' | 'canDelete' | 'canManageVolunteers' | 'canManageArtists'
+  field:
+    | 'canEdit'
+    | 'canDelete'
+    | 'canManageVolunteers'
+    | 'canManageArtists'
+    | 'canManageMeals'
+    | 'canManageTicketing'
 ) {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
 function toggleEdition(
   editionId: number,
-  field: 'canEdit' | 'canDelete' | 'canManageVolunteers' | 'canManageArtists',
+  field:
+    | 'canEdit'
+    | 'canDelete'
+    | 'canManageVolunteers'
+    | 'canManageArtists'
+    | 'canManageMeals'
+    | 'canManageTicketing',
   value: any
 ) {
   const boolVal = !!value
@@ -386,13 +487,22 @@ function toggleEdition(
       canDelete: false,
       canManageVolunteers: false,
       canManageArtists: false,
+      canManageMeals: false,
+      canManageTicketing: false,
     }
     localValue.perEdition.push(entry)
   }
   if (!entry) return
   ;(entry as any)[field] = boolVal
   // cleaning
-  if (!entry.canEdit && !entry.canDelete && !entry.canManageVolunteers && !entry.canManageArtists) {
+  if (
+    !entry.canEdit &&
+    !entry.canDelete &&
+    !entry.canManageVolunteers &&
+    !entry.canManageArtists &&
+    !entry.canManageMeals &&
+    !entry.canManageTicketing
+  ) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))

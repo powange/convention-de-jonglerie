@@ -87,10 +87,14 @@
         <UCard v-if="isAddingOrganizer || selectedOrganizer">
           <div class="space-y-4">
             <!-- En-tête -->
-            <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+            <div
+              class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700"
+            >
               <div class="flex items-center gap-2">
                 <UIcon
-                  :name="isAddingOrganizer ? 'i-heroicons-plus-circle' : 'i-heroicons-pencil-square'"
+                  :name="
+                    isAddingOrganizer ? 'i-heroicons-plus-circle' : 'i-heroicons-pencil-square'
+                  "
                   class="text-primary-500"
                 />
                 <h3 class="text-lg font-semibold">
@@ -128,7 +132,6 @@
 
               <!-- Configuration des droits -->
               <div v-if="newOrganizerUser">
-                <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
                 <OrganizerRightsFields
                   v-model="newOrganizerRights"
                   :editions="(conventionEditions || []) as any[]"
@@ -138,7 +141,9 @@
               </div>
 
               <!-- Actions -->
-              <div class="flex justify-end gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <div
+                class="flex justify-end gap-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+              >
                 <UButton variant="ghost" @click="cancelEditing">
                   {{ $t('common.cancel') }}
                 </UButton>
@@ -161,7 +166,6 @@
 
               <!-- Configuration des droits -->
               <div>
-                <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
                 <OrganizerRightsFields
                   v-model="editOrganizerRights"
                   :editions="(conventionEditions || []) as any[]"
@@ -238,6 +242,8 @@ const newOrganizerRights = ref({
     addEdition: false,
     editAllEditions: false,
     deleteAllEditions: false,
+    manageMeals: false,
+    manageTicketing: false,
   },
   title: '',
   perEdition: [],
@@ -293,6 +299,8 @@ const startAddingOrganizer = () => {
       addEdition: false,
       editAllEditions: false,
       deleteAllEditions: false,
+      manageMeals: false,
+      manageTicketing: false,
     },
     title: '',
     perEdition: [],
