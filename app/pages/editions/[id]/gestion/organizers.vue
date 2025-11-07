@@ -29,7 +29,7 @@
 
       <!-- Contenu de gestion des organisateurs -->
       <div class="space-y-6">
-        <!-- Organisateurs -->
+        <!-- Liste des organisateurs -->
         <UCard>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
@@ -42,7 +42,7 @@
                 color="primary"
                 variant="soft"
                 icon="i-heroicons-plus"
-                @click="openAddOrganizerModal"
+                @click="startAddingOrganizer"
               >
                 {{ $t('common.add') }}
               </UButton>
@@ -54,10 +54,14 @@
                 <UBadge
                   v-for="organizer in edition.convention?.organizers"
                   :key="organizer.id"
-                  :color="getOrganizerBadgeColor(organizer)"
-                  variant="subtle"
+                  :color="
+                    selectedOrganizer?.id === organizer.id
+                      ? 'primary'
+                      : getOrganizerBadgeColor(organizer)
+                  "
+                  :variant="selectedOrganizer?.id === organizer.id ? 'solid' : 'subtle'"
                   class="flex items-center gap-2 cursor-pointer hover:bg-opacity-80 transition-colors"
-                  @click="openEditOrganizerModal(organizer)"
+                  @click="selectOrganizer(organizer)"
                 >
                   <div class="flex items-center gap-1.5">
                     <UiUserAvatar :user="organizer.user" size="sm" />
@@ -78,98 +82,113 @@
             </div>
           </div>
         </UCard>
+
+        <!-- Card d'ajout ou d'édition -->
+        <UCard v-if="isAddingOrganizer || selectedOrganizer">
+          <div class="space-y-4">
+            <!-- En-tête -->
+            <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center gap-2">
+                <UIcon
+                  :name="isAddingOrganizer ? 'i-heroicons-plus-circle' : 'i-heroicons-pencil-square'"
+                  class="text-primary-500"
+                />
+                <h3 class="text-lg font-semibold">
+                  {{
+                    isAddingOrganizer
+                      ? $t('conventions.add_organizer')
+                      : $t('organizers.edit_organizer')
+                  }}
+                </h3>
+              </div>
+              <UButton
+                icon="i-heroicons-x-mark"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                @click="cancelEditing"
+              />
+            </div>
+
+            <!-- Formulaire d'ajout -->
+            <div v-if="isAddingOrganizer" class="space-y-4">
+              <!-- Recherche utilisateur -->
+              <div>
+                <label class="block text-sm font-medium mb-2">
+                  {{ $t('conventions.select_user') }}
+                </label>
+                <UserSelector
+                  v-model="newOrganizerUser"
+                  v-model:search-term="newOrganizersearchTerm"
+                  :searched-users="searchedUsers"
+                  :searching-users="searchingUsers"
+                  :placeholder="$t('conventions.search_user_placeholder')"
+                />
+              </div>
+
+              <!-- Configuration des droits -->
+              <div v-if="newOrganizerUser">
+                <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
+                <OrganizerRightsFields
+                  v-model="newOrganizerRights"
+                  :editions="(conventionEditions || []) as any[]"
+                  :convention-name="edition?.convention?.name"
+                  size="sm"
+                />
+              </div>
+
+              <!-- Actions -->
+              <div class="flex justify-end gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <UButton variant="ghost" @click="cancelEditing">
+                  {{ $t('common.cancel') }}
+                </UButton>
+                <UButton color="primary" :disabled="!newOrganizerUser" @click="addOrganizer">
+                  {{ $t('common.add') }}
+                </UButton>
+              </div>
+            </div>
+
+            <!-- Formulaire d'édition -->
+            <div v-else-if="selectedOrganizer" class="space-y-4">
+              <!-- Info organisateur -->
+              <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <UiUserAvatar :user="selectedOrganizer.user" size="md" />
+                <div>
+                  <div class="font-medium">{{ selectedOrganizer.user?.pseudo }}</div>
+                  <div class="text-sm text-gray-500">{{ selectedOrganizer.user?.email }}</div>
+                </div>
+              </div>
+
+              <!-- Configuration des droits -->
+              <div>
+                <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
+                <OrganizerRightsFields
+                  v-model="editOrganizerRights"
+                  :editions="(conventionEditions || []) as any[]"
+                  :convention-name="edition?.convention?.name"
+                  size="sm"
+                />
+              </div>
+
+              <!-- Actions -->
+              <div class="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                <UButton color="error" variant="soft" @click="removeOrganizer">
+                  {{ $t('common.remove') }}
+                </UButton>
+                <div class="flex gap-3">
+                  <UButton variant="ghost" @click="cancelEditing">
+                    {{ $t('common.cancel') }}
+                  </UButton>
+                  <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
+                    {{ $t('common.save') }}
+                  </UButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
       </div>
     </div>
-
-    <!-- Modal d'ajout de organisateur -->
-    <UModal v-model:open="addOrganizerModalOpen" :title="$t('conventions.add_organizer')" size="lg">
-      <template #body>
-        <div class="space-y-4">
-          <div class="space-y-3">
-            <!-- Recherche utilisateur -->
-            <div>
-              <label class="block text-sm font-medium mb-2">{{
-                $t('conventions.select_user')
-              }}</label>
-              <UserSelector
-                v-model="newOrganizerUser"
-                v-model:search-term="newOrganizersearchTerm"
-                :searched-users="searchedUsers"
-                :searching-users="searchingUsers"
-                :placeholder="$t('conventions.search_user_placeholder')"
-              />
-            </div>
-
-            <!-- Configuration des droits -->
-            <div v-if="newOrganizerUser">
-              <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
-              <OrganizerRightsFields
-                v-model="newOrganizerRights"
-                :editions="[edition] as any[]"
-                :convention-name="edition?.convention?.name"
-                size="sm"
-              />
-            </div>
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeAddOrganizerModal">
-            {{ $t('common.cancel') }}
-          </UButton>
-          <UButton color="primary" :disabled="!newOrganizerUser" @click="addOrganizer">
-            {{ $t('common.add') }}
-          </UButton>
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Modal d'édition de organisateur -->
-    <UModal
-      v-model:open="editOrganizerModalOpen"
-      :title="$t('organizers.edit_organizer')"
-      size="lg"
-    >
-      <template #body>
-        <div v-if="selectedOrganizer" class="space-y-4">
-          <!-- Info organisateur -->
-          <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UiUserAvatar :user="selectedOrganizer.user" size="md" />
-            <div>
-              <div class="font-medium">{{ selectedOrganizer.user?.pseudo }}</div>
-              <div class="text-sm text-gray-500">{{ selectedOrganizer.user?.email }}</div>
-            </div>
-          </div>
-
-          <!-- Configuration des droits -->
-          <div>
-            <label class="block text-sm font-medium mb-2">{{ $t('organizers.rights') }}</label>
-            <OrganizerRightsFields
-              v-model="editOrganizerRights"
-              :editions="[edition] as any[]"
-              :convention-name="edition?.convention?.name"
-              size="sm"
-            />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex justify-between">
-          <UButton color="error" variant="soft" @click="removeOrganizer">
-            {{ $t('common.remove') }}
-          </UButton>
-          <div class="flex gap-3">
-            <UButton variant="ghost" @click="closeEditOrganizerModal">
-              {{ $t('common.cancel') }}
-            </UButton>
-            <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
-              {{ $t('common.save') }}
-            </UButton>
-          </div>
-        </div>
-      </template>
-    </UModal>
   </div>
 </template>
 
@@ -195,9 +214,14 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// État pour les modals de organisateurs
-const addOrganizerModalOpen = ref(false)
-const editOrganizerModalOpen = ref(false)
+// Récupérer toutes les éditions de la convention pour la gestion des droits par édition
+const conventionEditions = computed(() => {
+  if (!edition.value?.conventionId) return []
+  return editionStore.editions.filter((e) => e.conventionId === edition.value?.conventionId)
+})
+
+// État pour la gestion des organisateurs
+const isAddingOrganizer = ref(false)
 const selectedOrganizer = ref<any>(null)
 const newOrganizerUser = ref<any>(null)
 const newOrganizersearchTerm = ref('')
@@ -255,7 +279,9 @@ const getOrganizerBadgeColor = (organizer: any) => {
   return summary.color === 'warning' ? 'error' : summary.color
 }
 
-const openAddOrganizerModal = () => {
+const startAddingOrganizer = () => {
+  selectedOrganizer.value = null
+  isAddingOrganizer.value = true
   newOrganizerUser.value = null
   newOrganizersearchTerm.value = ''
   newOrganizerRights.value = {
@@ -272,11 +298,21 @@ const openAddOrganizerModal = () => {
     perEdition: [],
   }
   searchedUsers.value = []
-  addOrganizerModalOpen.value = true
 }
 
-const closeAddOrganizerModal = () => {
-  addOrganizerModalOpen.value = false
+const selectOrganizer = (organizer: any) => {
+  isAddingOrganizer.value = false
+  selectedOrganizer.value = organizer
+  editOrganizerRights.value = {
+    rights: organizer.rights || {},
+    title: organizer.title || '',
+    perEdition: organizer.perEditionRights || [],
+  }
+}
+
+const cancelEditing = () => {
+  isAddingOrganizer.value = false
+  selectedOrganizer.value = null
   newOrganizerUser.value = null
   newOrganizersearchTerm.value = ''
   searchedUsers.value = []
@@ -304,7 +340,7 @@ const addOrganizer = async () => {
       color: 'success',
     })
 
-    closeAddOrganizerModal()
+    cancelEditing()
     // Recharger l'édition pour mettre à jour la liste des organisateurs
     await editionStore.fetchEditionById(editionId, { force: true })
   } catch (error: any) {
@@ -316,21 +352,6 @@ const addOrganizer = async () => {
       color: 'error',
     })
   }
-}
-
-const openEditOrganizerModal = (organizer: any) => {
-  selectedOrganizer.value = organizer
-  editOrganizerRights.value = {
-    rights: organizer.rights || {},
-    title: organizer.title || '',
-    perEdition: organizer.perEditionRights || [],
-  }
-  editOrganizerModalOpen.value = true
-}
-
-const closeEditOrganizerModal = () => {
-  editOrganizerModalOpen.value = false
-  selectedOrganizer.value = null
 }
 
 const saveOrganizerChanges = async () => {
@@ -358,7 +379,7 @@ const saveOrganizerChanges = async () => {
       color: 'success',
     })
 
-    closeEditOrganizerModal()
+    cancelEditing()
     await editionStore.fetchEditionById(editionId, { force: true })
   } catch (error: any) {
     console.error('Error updating organizer:', error)
@@ -396,7 +417,7 @@ const removeOrganizer = async () => {
       color: 'success',
     })
 
-    closeEditOrganizerModal()
+    cancelEditing()
     await editionStore.fetchEditionById(editionId, { force: true })
   } catch (error: any) {
     console.error('Error removing organizer:', error)

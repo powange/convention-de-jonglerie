@@ -1,9 +1,9 @@
 <template>
   <div class="space-y-3">
-    <!-- Global rights -->
+    <!-- Global rights (sauf ceux qui seront dans le tableau) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
       <div
-        v-for="p in effectivePermissionList"
+        v-for="p in globalRightsOutsideTable"
         :key="p.key"
         class="flex items-center justify-between gap-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/40"
       >
@@ -69,18 +69,74 @@
               </tr>
             </thead>
             <tbody>
+              <!-- Ligne "Toutes les éditions" -->
+              <tr
+                class="border-b border-gray-100 dark:border-gray-700 bg-primary-50/40 dark:bg-primary-900/20 hover:bg-primary-50/60 dark:hover:bg-primary-900/30"
+              >
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="font-semibold text-xs">
+                    {{ $t('components.organizers_rights_panel.all_editions') }}
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.editAllEditions')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.editAllEditions"
+                      @update:model-value="(val) => updateRight('editAllEditions', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.deleteAllEditions')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.deleteAllEditions"
+                      @update:model-value="(val) => updateRight('deleteAllEditions', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageVolunteers')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageVolunteers"
+                      @update:model-value="(val) => updateRight('manageVolunteers', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageArtists')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageArtists"
+                      @update:model-value="(val) => updateRight('manageArtists', val)"
+                    />
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Lignes pour chaque édition -->
               <tr
                 v-for="ed in editions"
                 :key="ed.id"
                 class="border-b last:border-b-0 border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-900/40 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               >
-                <td class="px-2 py-1 align-top max-w-[160px] break-words">
+                <td class="px-3 py-2 align-middle max-w-[160px] break-words">
                   <div>{{ getEditionDisplayNameWithFallback(ed) }}</div>
                   <div class="text-xs text-gray-500 mt-1">
                     {{ formatDateRange(ed.startDate, ed.endDate) }}
                   </div>
                 </td>
-                <td class="px-2 py-1 align-top">
+                <td class="px-3 py-2 align-middle">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.edit')"
@@ -92,18 +148,19 @@
                     />
                   </div>
                 </td>
-                <td class="px-2 py-1 align-top">
+                <td class="px-3 py-2 align-middle">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.delete')"
                       :size="switchSize"
                       color="primary"
+                      :disabled="localValue.rights.deleteAllEditions"
                       :model-value="hasEditionFlag(ed.id, 'canDelete')"
                       @update:model-value="(val) => toggleEdition(ed.id, 'canDelete', val)"
                     />
                   </div>
                 </td>
-                <td class="px-2 py-1 align-top">
+                <td class="px-3 py-2 align-middle">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.volunteers_short')"
@@ -117,7 +174,7 @@
                     />
                   </div>
                 </td>
-                <td class="px-2 py-1 align-top">
+                <td class="px-3 py-2 align-middle">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.artists')"
@@ -128,11 +185,6 @@
                       @update:model-value="(val) => toggleEdition(ed.id, 'canManageArtists', val)"
                     />
                   </div>
-                </td>
-              </tr>
-              <tr v-if="!localValue.perEdition.length">
-                <td colspan="5" class="px-2 py-2 italic text-gray-500">
-                  {{ $t('components.organizers_rights_panel.per_edition_hint') }}
                 </td>
               </tr>
             </tbody>
@@ -233,7 +285,16 @@ watch(
 
 const switchSize = computed(() => props.size)
 const inputSize = computed(() => (props.size === 'xs' ? 'xs' : 'sm'))
-const effectivePermissionList = computed(() => props.permissionList)
+
+// Droits globaux qui ne seront pas dans le tableau (convention et ajout d'éditions)
+const globalRightsOutsideTable = computed(() =>
+  props.permissionList.filter(
+    (p) =>
+      !['editAllEditions', 'deleteAllEditions', 'manageVolunteers', 'manageArtists'].includes(
+        p.key
+      )
+  )
+)
 
 // Helper pour afficher le nom d'édition avec fallback sur le nom de convention
 function getEditionDisplayNameWithFallback(edition: EditionLite): string {
@@ -279,6 +340,12 @@ function updateRight(key: string, value: any) {
   if (key === 'editAllEditions' && localValue.rights.editAllEditions) {
     localValue.perEdition.forEach((p) => {
       if (p.canEdit) p.canEdit = false
+    })
+  }
+  // If enabling deleteAllEditions we clean perEdition delete flags
+  if (key === 'deleteAllEditions' && localValue.rights.deleteAllEditions) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canDelete) p.canDelete = false
     })
   }
   // If enabling manageVolunteers we clean perEdition volunteer flags

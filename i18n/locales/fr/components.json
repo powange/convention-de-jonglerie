@@ -60,6 +60,7 @@
       "view_comments": "Voir les commentaires ({count})"
     },
     "organizers_rights_panel": {
+      "all_editions": "Toutes les éditions",
       "per_edition": "Droits par édition",
       "per_edition_hint": "Aucun droit spécifique défini pour les éditions",
       "title_placeholder": "Titre / fonction (optionnel)"
