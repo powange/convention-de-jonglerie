@@ -35,6 +35,7 @@
     "category": "Category",
     "city": "City",
     "clear": "Clear",
+    "click_to_view_full": "Click to view full text",
     "close": "Close",
     "confirm": "Confirm",
     "confirmation": "Confirmation",
@@ -91,6 +92,7 @@
     "logo": "Logo",
     "lunch": "Lunch",
     "manage": "Manage",
+    "meals_short": "Meals",
     "message": "Message",
     "name": "Name",
     "next": "Next",
@@ -127,6 +129,7 @@
     "status": "Status",
     "success": "Success",
     "teardown": "Dismantling",
+    "ticketing_short": "Ticketing",
     "time": "Time",
     "tip": "Tip",
     "title": "Title",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Number of seats must be at least 1",
     "server_error": "Server error",
     "status_update_failed": "Failed to update status",
-    "update_organizer_error": "Error updating organizer",
     "update_error": "Update error",
+    "update_organizer_error": "Error updating organizer",
     "username_min_3_chars": "Username must contain at least 3 characters"
   },
   "footer": {

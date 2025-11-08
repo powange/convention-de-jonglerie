@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Ladda ner eller ändra den här användarens profilfoto",
     "cleanup_expired_tokens": "Rengöring av utgångna tokens",
     "cleanup_resolved_error_logs": "Rengöring av felloggar",
-    "organizers": "Anställda",
-    "organizers_count": "{count} anställda",
     "coming_soon": "Tillgänglig inom kort",
     "config": {
       "ai": "Artificiell intelligens",
@@ -269,6 +267,8 @@
     "notification_management": "Hantering av meddelanden",
     "notifications_sent": "Meddelanden skickas",
     "oldest_first": "Äldre först",
+    "organizers": "Anställda",
+    "organizers_count": "{count} anställda",
     "original_user": "Ursprunglig användare",
     "pages": {
       "conventions": {

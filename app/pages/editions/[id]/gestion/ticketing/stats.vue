@@ -27,49 +27,6 @@
         </p>
       </div>
 
-      <!-- Totaux -->
-      <div v-if="validationsData" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <UCard v-if="filters.showParticipants">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ $t('gestion.ticketing.stats_participants') }}
-              </p>
-              <p class="text-2xl font-bold text-blue-600">
-                {{ validationsData.totals.participants }}
-              </p>
-            </div>
-            <UIcon name="i-heroicons-users" class="h-8 w-8 text-blue-600" />
-          </div>
-        </UCard>
-        <UCard v-if="filters.showVolunteers">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ $t('gestion.ticketing.stats_volunteers') }}
-              </p>
-              <p class="text-2xl font-bold text-green-600">
-                {{ validationsData.totals.volunteers }}
-              </p>
-            </div>
-            <UIcon name="i-heroicons-hand-raised" class="h-8 w-8 text-green-600" />
-          </div>
-        </UCard>
-        <UCard v-if="filters.showArtists">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ $t('gestion.ticketing.stats_artists') }}
-              </p>
-              <p class="text-2xl font-bold text-amber-600">
-                {{ validationsData.totals.artists }}
-              </p>
-            </div>
-            <UIcon name="i-heroicons-star" class="h-8 w-8 text-amber-600" />
-          </div>
-        </UCard>
-      </div>
-
       <!-- Graphique avec filtres -->
       <UCard>
         <template #header>
@@ -80,6 +37,65 @@
             </h2>
           </div>
         </template>
+
+        <!-- Totaux -->
+        <div
+          v-if="validationsData"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+        >
+          <UCard v-if="filters.showParticipants">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_participants') }}
+                </p>
+                <p class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {{ validationsData.totals.participants }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-ticket" class="h-8 w-8 text-orange-500" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showVolunteers">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_volunteers') }}
+                </p>
+                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {{ validationsData.totals.volunteers }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-user-group" class="h-8 w-8 text-purple-500" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showArtists">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_artists') }}
+                </p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {{ validationsData.totals.artists }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-star" class="h-8 w-8 text-green-500" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showOthers">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_others') }}
+                </p>
+                <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                  {{ validationsData.totals.others }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-user" class="h-8 w-8 text-gray-500" />
+            </div>
+          </UCard>
+        </div>
 
         <!-- Filtres -->
         <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -119,6 +135,7 @@
             :show-participants="filters.showParticipants"
             :show-volunteers="filters.showVolunteers"
             :show-artists="filters.showArtists"
+            :show-others="filters.showOthers"
           />
         </div>
         <div v-else class="text-center py-12">
@@ -177,6 +194,20 @@
             </UFieldGroup>
           </div>
 
+          <!-- Filtre par tarifs (uniquement en mode items) -->
+          <div v-if="viewMode === 'items' && tiers.length > 0" class="mb-6">
+            <UFormField :label="$t('gestion.ticketing.stats_filter_tiers')">
+              <USelect
+                v-model="selectedTierIds"
+                :items="tierItems"
+                multiple
+                value-key="value"
+                :placeholder="$t('gestion.ticketing.stats_filter_tiers_placeholder')"
+                :ui="{ content: 'min-w-fit' }"
+              />
+            </UFormField>
+          </div>
+
           <!-- Statistiques numériques -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <UCard>
@@ -184,7 +215,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.ticketing.stats_source_manual') }}
                 </p>
-                <p class="text-3xl font-bold text-green-600">
+                <p class="text-3xl font-bold text-blue-600">
                   {{
                     viewMode === 'items'
                       ? orderSourcesData.items.manual
@@ -198,7 +229,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.ticketing.stats_source_external') }}
                 </p>
-                <p class="text-3xl font-bold text-blue-600">
+                <p class="text-3xl font-bold text-green-600">
                   {{
                     viewMode === 'items'
                       ? orderSourcesData.items.external
@@ -287,6 +318,11 @@ const typeItems = computed(() => [
     value: 'artists',
     icon: 'i-heroicons-star',
   },
+  {
+    label: t('gestion.ticketing.stats_others'),
+    value: 'others',
+    icon: 'i-heroicons-user',
+  },
 ])
 
 const periodItems = computed(() => [
@@ -304,13 +340,21 @@ const periodItems = computed(() => [
   },
 ])
 
+const tierItems = computed(() =>
+  tiers.value.map((tier) => ({
+    label: `${tier.name} (${(tier.price / 100).toFixed(2)} €)`,
+    value: tier.id,
+  }))
+)
+
 // Filtres sélectionnés
-const selectedTypes = ref<string[]>(['participants', 'volunteers', 'artists'])
+const selectedTypes = ref<string[]>(['participants', 'volunteers', 'artists', 'others'])
 const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
 
 // Filtres calculés pour compatibilité avec le code existant
 const filters = computed(() => ({
   showParticipants: selectedTypes.value.includes('participants'),
+  showOthers: selectedTypes.value.includes('others'),
   showVolunteers: selectedTypes.value.includes('volunteers'),
   showArtists: selectedTypes.value.includes('artists'),
   showSetup: selectedPeriods.value.includes('setup'),
@@ -325,6 +369,7 @@ interface ValidationData {
   participants: number[]
   volunteers: number[]
   artists: number[]
+  others: number[]
   periods: {
     setup: { start: string; end: string }
     event: { start: string; end: string }
@@ -334,6 +379,7 @@ interface ValidationData {
     participants: number
     volunteers: number
     artists: number
+    others: number
   }
 }
 
@@ -360,11 +406,24 @@ const loadingOrderSources = ref(false)
 const orderSourcesError = ref(false)
 const viewMode = ref<'items' | 'orders'>('items')
 
+// Données des tarifs
+interface Tier {
+  id: number
+  name: string
+  price: number
+  isActive: boolean
+}
+
+const tiers = ref<Tier[]>([])
+const selectedTierIds = ref<number[]>([])
+const loadingTiers = ref(false)
+
 // Filtrer les données selon les périodes sélectionnées
 const filteredData = computed(() => {
   if (!validationsData.value) return null
 
-  const { labels, timestamps, participants, volunteers, artists, periods } = validationsData.value
+  const { labels, timestamps, participants, others, volunteers, artists, periods } =
+    validationsData.value
 
   // Filtrer par période
   const filteredIndices: number[] = []
@@ -392,6 +451,7 @@ const filteredData = computed(() => {
     participants: filteredIndices.map((i) => participants[i]),
     volunteers: filteredIndices.map((i) => volunteers[i]),
     artists: filteredIndices.map((i) => artists[i]),
+    others: filteredIndices.map((i) => others[i]),
   }
 })
 
@@ -419,9 +479,16 @@ async function fetchOrderSources() {
   orderSourcesError.value = false
 
   try {
-    const data = await $fetch<OrderSourcesData>(
-      `/api/editions/${editionId}/ticketing/stats/order-sources`
-    )
+    const params = new URLSearchParams()
+    if (selectedTierIds.value.length > 0 && viewMode.value === 'items') {
+      selectedTierIds.value.forEach((id) => params.append('tierIds', id.toString()))
+    }
+
+    const url = `/api/editions/${editionId}/ticketing/stats/order-sources${
+      params.toString() ? `?${params.toString()}` : ''
+    }`
+
+    const data = await $fetch<OrderSourcesData>(url)
     orderSourcesData.value = data
   } catch (error) {
     console.error('Failed to fetch order sources:', error)
@@ -430,6 +497,25 @@ async function fetchOrderSources() {
     loadingOrderSources.value = false
   }
 }
+
+// Charger la liste des tarifs
+async function fetchTiers() {
+  loadingTiers.value = true
+
+  try {
+    const data = await $fetch<Tier[]>(`/api/editions/${editionId}/ticketing/tiers`)
+    tiers.value = data.filter((tier) => tier.isActive)
+  } catch (error) {
+    console.error('Failed to fetch tiers:', error)
+  } finally {
+    loadingTiers.value = false
+  }
+}
+
+// Watcher pour recharger les données quand les filtres changent
+watch([selectedTierIds, viewMode], () => {
+  fetchOrderSources()
+})
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
@@ -443,7 +529,7 @@ onMounted(async () => {
 
   // Charger les données de validations et sources
   if (canAccess.value) {
-    await Promise.all([fetchValidations(), fetchOrderSources()])
+    await Promise.all([fetchValidations(), fetchTiers(), fetchOrderSources()])
   }
 })
 

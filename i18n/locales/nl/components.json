@@ -59,11 +59,6 @@
       "to_add_comment": "om een opmerking toe te voegen",
       "view_comments": "Bekijk opmerkingen ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Rechten per editie",
-      "per_edition_hint": "Geen specifieke rechten gedefinieerd voor edities",
-      "title_placeholder": "Titel of rol (optioneel)"
-    },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",
       "contact_email": "Contact e-mail",
@@ -134,6 +129,13 @@
       "upcoming": "Aankomend",
       "without_coordinates": "({count} zonder coördinaten)",
       "yellow_border_favorite": "Gele rand = Favoriet"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Alle edities",
+      "per_edition": "Rechten per editie",
+      "per_edition_hint": "Geen specifieke rechten gedefinieerd voor edities",
+      "title_label": "Titel / functie",
+      "title_placeholder": "Titel of rol (optioneel)"
     },
     "posts": {
       "comments_count": "{count} reactie | {count} reacties",

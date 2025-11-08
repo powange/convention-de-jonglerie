@@ -35,13 +35,17 @@
       "pending_operations": "{count} oczekująca(-e) operacja(-e) | {count} oczekująca operacja | {count} oczekujących operacji",
       "qr_code_description": "Udostępnij ten kod QR, aby umożliwić innym dołączenie do tego licznika",
       "qr_code_title": "Kod QR do udostępniania",
+      "regenerate_token": "Regeneruj token",
+      "regenerate_token_error": "Błąd podczas regeneracji tokenu",
+      "regenerate_token_warning": "Uwaga: regeneracja tokenu unieważni stary link udostępniania i aktualny kod QR. Wszyscy użytkownicy będą musieli użyć nowego linku, aby uzyskać dostęp do licznika.",
       "reset": "Resetuj",
       "reset_confirmation": "Czy na pewno chcesz zresetować ten licznik do 0?",
       "reset_counter": "Resetuj licznik",
       "share_text": "Dołącz do tego licznika, aby śledzić wejścia w czasie rzeczywistym",
       "step": "Przyrost",
       "syncing": "Synchronizacja...",
-      "title": "Liczniki"
+      "title": "Liczniki",
+      "token_regenerated": "Token pomyślnie zregenerowany"
     },
     "my_ticket": {
       "how_to_use_description": "Pokaż ten kod QR przy wejściu, aby zwalidować swój bilet.",

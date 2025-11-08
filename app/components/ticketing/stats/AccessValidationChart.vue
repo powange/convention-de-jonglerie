@@ -27,16 +27,19 @@ interface Props {
     participants: number[]
     volunteers: number[]
     artists: number[]
+    others: number[]
   }
   showParticipants?: boolean
   showVolunteers?: boolean
   showArtists?: boolean
+  showOthers?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showParticipants: true,
   showVolunteers: true,
   showArtists: true,
+  showOthers: true,
 })
 
 const { t } = useI18n()
@@ -49,8 +52,8 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_participants'),
       data: props.data.participants,
-      backgroundColor: 'rgba(59, 130, 246, 0.8)', // blue-500
-      borderColor: 'rgba(59, 130, 246, 1)',
+      backgroundColor: 'rgba(251, 146, 60, 0.8)', // orange-500
+      borderColor: 'rgba(251, 146, 60, 1)',
       borderWidth: 1,
     })
   }
@@ -59,8 +62,8 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_volunteers'),
       data: props.data.volunteers,
-      backgroundColor: 'rgba(16, 185, 129, 0.8)', // green-500
-      borderColor: 'rgba(16, 185, 129, 1)',
+      backgroundColor: 'rgba(168, 85, 247, 0.8)', // purple-500
+      borderColor: 'rgba(168, 85, 247, 1)',
       borderWidth: 1,
     })
   }
@@ -69,8 +72,18 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_artists'),
       data: props.data.artists,
-      backgroundColor: 'rgba(245, 158, 11, 0.8)', // amber-500
-      borderColor: 'rgba(245, 158, 11, 1)',
+      backgroundColor: 'rgba(34, 197, 94, 0.8)', // green-500
+      borderColor: 'rgba(34, 197, 94, 1)',
+      borderWidth: 1,
+    })
+  }
+
+  if (props.showOthers) {
+    datasets.push({
+      label: t('gestion.ticketing.stats_others'),
+      data: props.data.others,
+      backgroundColor: 'rgba(107, 114, 128, 0.8)', // gray-500
+      borderColor: 'rgba(107, 114, 128, 1)',
       borderWidth: 1,
     })
   }

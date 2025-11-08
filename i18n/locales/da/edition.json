@@ -72,27 +72,13 @@
       "seats_min": "Mindst 1 plads"
     }
   },
-  "organizers": {
-    "organizer_added": "Organisator tilføjet",
-    "organizer_removed": "Organisator fjernet",
-    "organizer_updated": "Organisator opdateret",
-    "confirm_remove": "Er du sikker på, at du vil fjerne denne organisator?",
-    "edit_organizer": "Rediger organisator",
-    "list": "Liste over organisatorer",
-    "manage": "Administrer organisatorer",
-    "manage_description": "Administrer organisatorer og deres rettigheder for denne udgave",
-    "no_organizers": "Ingen organisatorer",
-    "page_description": "Administrer medlemmer af organisationsteamet og deres tilladelser",
-    "rights": "Rettigheder",
-    "title": "Organisatorer"
-  },
   "conventions": {
-    "add_organizer": "Tilføj arrangør",
     "add_edition": "Tilføj en udgave",
+    "add_organizer": "Tilføj arrangør",
     "analytics_access": "Adgang til statistikker",
     "analytics_access_desc": "Følg ydeevne og engagement for dine udgaver",
-    "as_organizer": "Som arrangør",
     "as_creator": "Som skaber",
+    "as_organizer": "Som arrangør",
     "cannot_load_conventions": "Kan ikke indlæse dine konventioner",
     "claim": {
       "button_short": "Gør krav på",
@@ -118,7 +104,6 @@
       "verification_success_description": "Du er nu ejer af denne konvention.",
       "verify": "Verificer"
     },
-    "organizers": "Arrangører",
     "confirm_delete_convention": "Er du sikker på, at du vil slette denne konvention?",
     "convention_deleted": "Konvention slettet",
     "convention_deleted_success": "Konventionen blev slettet med succes",
@@ -140,10 +125,10 @@
     "granular_rights": "Granulære rettigheder",
     "granular_rights_desc": "Specifikke tilladelser per udgave eller globale efter dine behov",
     "logo_alt": "Logo for {name}",
-    "manage_organizers": "Administrer arrangører",
-    "manage_organizers_desc": "Inviter og administrer medlemmer af dit organisationsteam",
     "manage_editions": "Administrer udgaver",
     "manage_editions_desc": "Opret, rediger og publicer forskellige udgaver af dine konventioner",
+    "manage_organizers": "Administrer arrangører",
+    "manage_organizers_desc": "Inviter og administrer medlemmer af dit organisationsteam",
     "manage_volunteers": "Administrer frivillige",
     "manage_volunteers_desc": "Koordiner frivillige teams og deres ansøgninger",
     "no_conventions": "Ingen konventioner oprettet",
@@ -151,6 +136,7 @@
     "no_description": "Ingen beskrivelse",
     "no_description_available": "Ingen beskrivelse tilgængelig",
     "no_editions": "Ingen udgaver for denne konvention",
+    "organizers": "Arrangører",
     "search_user_placeholder": "Søg efter en bruger...",
     "select_user": "Vælg en bruger",
     "status_control": "Synlighedskontrol",
@@ -160,5 +146,19 @@
     "none": "Ingen",
     "vegan": "Vegansk",
     "vegetarian": "Vegetarisk"
+  },
+  "organizers": {
+    "confirm_remove": "Er du sikker på, at du vil fjerne denne organisator?",
+    "edit_organizer": "Rediger organisator",
+    "list": "Liste over organisatorer",
+    "manage": "Administrer organisatorer",
+    "manage_description": "Administrer organisatorer og deres rettigheder for denne udgave",
+    "no_organizers": "Ingen organisatorer",
+    "organizer_added": "Organisator tilføjet",
+    "organizer_removed": "Organisator fjernet",
+    "organizer_updated": "Organisator opdateret",
+    "page_description": "Administrer medlemmer af organisationsteamet og deres tilladelser",
+    "rights": "Rettigheder",
+    "title": "Organisatorer"
   }
 }

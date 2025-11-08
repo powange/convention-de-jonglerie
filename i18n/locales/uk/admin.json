@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Завантажити або змінити фото профілю цього користувача",
     "cleanup_expired_tokens": "Очищення прострочених токенів",
     "cleanup_resolved_error_logs": "Очищення журналів помилок",
-    "organizers": "Співробітники",
-    "organizers_count": "{count} співробітників",
     "coming_soon": "Скоро",
     "config": {
       "ai": "Штучний інтелект",
@@ -269,6 +267,8 @@
     "notification_management": "Керування сповіщеннями",
     "notifications_sent": "Сповіщення надіслано",
     "oldest_first": "Спочатку старі",
+    "organizers": "Співробітники",
+    "organizers_count": "{count} співробітників",
     "original_user": "Оригінальний користувач",
     "pages": {
       "conventions": {

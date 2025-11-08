@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Загрузить или изменить фото профиля этого пользователя",
     "cleanup_expired_tokens": "Очистка истекших токенов",
     "cleanup_resolved_error_logs": "Очистка журналов ошибок",
-    "organizers": "Сотрудники",
-    "organizers_count": "{count} сотрудников",
     "coming_soon": "Скоро",
     "config": {
       "ai": "Искусственный интеллект",
@@ -269,6 +267,8 @@
     "notification_management": "Управление уведомлениями",
     "notifications_sent": "Уведомления отправлены",
     "oldest_first": "Старейшие сначала",
+    "organizers": "Сотрудники",
+    "organizers_count": "{count} сотрудников",
     "original_user": "Исходный пользователь",
     "pages": {
       "conventions": {

@@ -5,6 +5,10 @@ export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const user = session.user
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  const query = getQuery(event)
+  const tierIds = query.tierIds
+    ? (Array.isArray(query.tierIds) ? query.tierIds : [query.tierIds]).map(Number)
+    : null
 
   if (!editionId || isNaN(editionId)) {
     throw createError({
@@ -67,6 +71,13 @@ export default defineEventHandler(async (event) => {
       id: true,
       helloAssoOrderId: true,
       items: {
+        where: tierIds
+          ? {
+              tierId: {
+                in: tierIds,
+              },
+            }
+          : undefined,
         select: {
           id: true,
         },

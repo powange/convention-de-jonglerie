@@ -72,27 +72,13 @@
       "seats_min": "Alespoň 1 místo"
     }
   },
-  "organizers": {
-    "organizer_added": "Organizátor přidán",
-    "organizer_removed": "Organizátor odstraněn",
-    "organizer_updated": "Organizátor aktualizován",
-    "confirm_remove": "Jste si jisti, že chcete odstranit tohoto organizátora?",
-    "edit_organizer": "Upravit organizátora",
-    "list": "Seznam organizátorů",
-    "manage": "Spravovat organizátory",
-    "manage_description": "Spravovat organizátory a jejich práva pro tuto edici",
-    "no_organizers": "Žádní organizátoři",
-    "page_description": "Spravovat členy organizačního týmu a jejich oprávnění",
-    "rights": "Práva",
-    "title": "Organizátoři"
-  },
   "conventions": {
-    "add_organizer": "Přidat organizátora",
     "add_edition": "Přidání edice",
+    "add_organizer": "Přidat organizátora",
     "analytics_access": "Přístup k analýzám",
     "analytics_access_desc": "Sledujte výkonnost a nasazení svých edic",
-    "as_organizer": "Jako organizátor",
     "as_creator": "Jako designér",
+    "as_organizer": "Jako organizátor",
     "cannot_load_conventions": "Nelze načíst vaše konvence",
     "claim": {
       "button_short": "Nárok",
@@ -118,7 +104,6 @@
       "verification_success_description": "Nyní jste vlastníkem této smlouvy.",
       "verify": "Podívejte se na stránky ."
     },
-    "organizers": "Organizátoři",
     "confirm_delete_convention": "Jste si jistí, že chcete tuto dohodu zrušit?",
     "convention_deleted": "Odvolání dohody",
     "convention_deleted_success": "Dohoda byla úspěšně ukončena",
@@ -140,10 +125,10 @@
     "granular_rights": "Granulární práva",
     "granular_rights_desc": "Oprávnění pro konkrétní edici nebo globální oprávnění podle vašich potřeb.",
     "logo_alt": "{name} logo",
-    "manage_organizers": "Spravovat organizátory",
-    "manage_organizers_desc": "Pozvat a řídit členy organizačního týmu",
     "manage_editions": "Správa edic",
     "manage_editions_desc": "Vytvářet, upravovat a publikovat různá vydání smluv",
+    "manage_organizers": "Spravovat organizátory",
+    "manage_organizers_desc": "Pozvat a řídit členy organizačního týmu",
     "manage_volunteers": "Řízení dobrovolníků",
     "manage_volunteers_desc": "Koordinace týmů dobrovolníků a jejich přihlášek",
     "no_conventions": "Žádná dohoda nebyla uzavřena",
@@ -151,6 +136,7 @@
     "no_description": "Žádný popis",
     "no_description_available": "Popis není k dispozici",
     "no_editions": "Žádné vydání pro tuto konferenci",
+    "organizers": "Organizátoři",
     "search_user_placeholder": "Vyhledání uživatele...",
     "select_user": "Výběr uživatele",
     "status_control": "Kontrola viditelnosti",
@@ -160,5 +146,19 @@
     "none": "Ne",
     "vegan": "Vegan",
     "vegetarian": "Vegetariánské"
+  },
+  "organizers": {
+    "confirm_remove": "Jste si jisti, že chcete odstranit tohoto organizátora?",
+    "edit_organizer": "Upravit organizátora",
+    "list": "Seznam organizátorů",
+    "manage": "Spravovat organizátory",
+    "manage_description": "Spravovat organizátory a jejich práva pro tuto edici",
+    "no_organizers": "Žádní organizátoři",
+    "organizer_added": "Organizátor přidán",
+    "organizer_removed": "Organizátor odstraněn",
+    "organizer_updated": "Organizátor aktualizován",
+    "page_description": "Spravovat členy organizačního týmu a jejich oprávnění",
+    "rights": "Práva",
+    "title": "Organizátoři"
   }
 }

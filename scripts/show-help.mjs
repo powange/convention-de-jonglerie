@@ -55,7 +55,9 @@ const sections = [
   { name: 'check-translations -- -f --fill-mode empty', desc: 'Ajoute les clés manquantes avec valeur vide' },
   { name: 'check-translations -- -f --fill-mode todo --refill', desc: 'Re-marque aussi les clés déjà identiques à la référence' },
   { name: 'check-i18n-vars', desc: '🔍 Vérifie que les variables {xxx} sont cohérentes entre toutes les langues' },
-  { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' }
+  { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' },
+  { name: 'i18n:mark-todo', desc: '🔖 Auto-détecte et marque les clés FR modifiées comme [TODO] dans les autres langues' },
+  { name: 'i18n:mark-todo "key1" "key2"', desc: '🔖 Marque les clés spécifiées comme [TODO] dans toutes les langues sauf FR' }
   ] },
   { title: '🔄 Système de traduction avancé (scripts/translation/)', color: colors.cyan, scripts: [
     { name: 'scripts/translation/list-todo-keys.js', desc: '🔍 Diagnostic des clés [TODO] + génération template' },
@@ -95,6 +97,7 @@ const sections = [
     { name: 'docker:dev:down', desc: 'Stoppe services dev' },
     { name: 'docker:dev:logs', desc: 'Logs application' },
     { name: 'docker:dev:exec', desc: 'Shell conteneur app' },
+    { name: 'docker:dev:get-lockfile', desc: 'Récupère package-lock.json depuis le conteneur' },
     { name: 'docker:release:up', desc: 'Env release local' },
     { name: 'docker:release:down', desc: 'Arrête env release' }
   ] },

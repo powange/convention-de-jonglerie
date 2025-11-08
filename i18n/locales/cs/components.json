@@ -59,11 +59,6 @@
       "to_add_comment": "přidat komentář",
       "view_comments": "Zobrazit komentáře ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Práva podle vydání",
-      "per_edition_hint": "Pro edice nejsou definována žádná zvláštní práva",
-      "title_placeholder": "Název / funkce (nepovinné)"
-    },
     "convention_form": {
       "click_to_select_image": "Kliknutím vyberete obrázek",
       "contact_email": "Kontaktní e-mail",
@@ -134,6 +129,13 @@
       "upcoming": "Již brzy",
       "without_coordinates": "({count} bez souřadnic)",
       "yellow_border_favorite": "Žlutý obrys = oblíbený"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Všechny edice",
+      "per_edition": "Práva podle vydání",
+      "per_edition_hint": "Pro edice nejsou definována žádná zvláštní práva",
+      "title_label": "Titul / funkce",
+      "title_placeholder": "Název / funkce (nepovinné)"
     },
     "posts": {
       "comments_count": "{count} komentář | {count} komentáře",

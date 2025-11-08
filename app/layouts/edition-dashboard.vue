@@ -20,6 +20,7 @@
               orientation="vertical"
               color="primary"
               variant="pill"
+              :collapsible="true"
             />
           </template>
 
@@ -125,6 +126,11 @@ const { getImageUrl } = useImageUrl()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
+
+// Fonction pour déterminer si un accordéon doit être ouvert basé sur la route actuelle
+const isAccordionOpen = (section: string): boolean => {
+  return route.path.includes(`/gestion/${section}`)
+}
 
 // Permissions calculées
 const canEdit = computed(() => {
@@ -251,6 +257,8 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         label: t('edition.volunteers.title'),
         icon: 'i-heroicons-user-group',
         children: volunteersChildren,
+        value: 'volunteers',
+        defaultOpen: isAccordionOpen('volunteers'),
       })
     }
   }
@@ -270,6 +278,8 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           to: `/editions/${editionId.value}/gestion/artists/shows`,
         },
       ],
+      value: 'artists',
+      defaultOpen: isAccordionOpen('artists'),
     })
   }
 
@@ -299,6 +309,8 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.meals.title'),
       icon: 'cbi:mealie',
       children: mealsChildren,
+      value: 'meals',
+      defaultOpen: isAccordionOpen('meals'),
     })
   }
 
@@ -333,6 +345,8 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           to: `/editions/${editionId.value}/gestion/ticketing/stats`,
         },
       ],
+      value: 'ticketing',
+      defaultOpen: isAccordionOpen('ticketing'),
     })
   }
 

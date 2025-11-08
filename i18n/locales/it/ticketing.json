@@ -35,13 +35,17 @@
       "pending_operations": "{count} operazione/i in attesa | {count} operazione in attesa | {count} operazioni in attesa",
       "qr_code_description": "Condividi questo codice QR per permettere ad altri di unirsi a questo contatore",
       "qr_code_title": "QR Code di condivisione",
+      "regenerate_token": "Rigenera token",
+      "regenerate_token_error": "Errore nella rigenerazione del token",
+      "regenerate_token_warning": "Attenzione: rigenerare il token invaliderà il vecchio link di condivisione e il QR code attuale. Tutti gli utenti dovranno utilizzare il nuovo link per accedere al contatore.",
       "reset": "Ripristina",
       "reset_confirmation": "Sei sicuro di voler ripristinare questo contatore a 0?",
       "reset_counter": "Ripristina contatore",
       "share_text": "Unisciti a questo contatore per tracciare gli ingressi in tempo reale",
       "step": "Incremento",
       "syncing": "Sincronizzazione in corso...",
-      "title": "Contatori"
+      "title": "Contatori",
+      "token_regenerated": "Token rigenerato con successo"
     },
     "my_ticket": {
       "how_to_use_description": "Mostra questo codice QR all'ingresso per convalidare il tuo biglietto.",

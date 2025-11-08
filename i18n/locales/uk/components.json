@@ -59,11 +59,6 @@
       "to_add_comment": "щоб додати коментар",
       "view_comments": "Переглянути коментарі ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Права за виданнями",
-      "per_edition_hint": "Для випусків не визначено конкретних прав",
-      "title_placeholder": "Назва або роль (необов'язково)"
-    },
     "convention_form": {
       "click_to_select_image": "Натисніть, щоб вибрати зображення",
       "contact_email": "Контактний email",
@@ -134,6 +129,13 @@
       "upcoming": "Майбутні",
       "without_coordinates": "({count} без координат)",
       "yellow_border_favorite": "Жовта рамка = Улюблене"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Усі видання",
+      "per_edition": "Права за виданнями",
+      "per_edition_hint": "Для випусків не визначено конкретних прав",
+      "title_label": "Посада / функція",
+      "title_placeholder": "Назва або роль (необов'язково)"
     },
     "posts": {
       "comments_count": "{count} коментар | {count} коментарі",

@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Upload of wijzig de profielfoto van deze gebruiker",
     "cleanup_expired_tokens": "Opruimen verlopen tokens",
     "cleanup_resolved_error_logs": "Opruimen foutenlogboeken",
-    "organizers": "Medewerkers",
-    "organizers_count": "{count} medewerkers",
     "coming_soon": "Binnenkort beschikbaar",
     "config": {
       "ai": "Kunstmatige intelligentie",
@@ -269,6 +267,8 @@
     "notification_management": "Meldingenbeheer",
     "notifications_sent": "Meldingen verzonden",
     "oldest_first": "Oudste eerst",
+    "organizers": "Medewerkers",
+    "organizers_count": "{count} medewerkers",
     "original_user": "Oorspronkelijke gebruiker",
     "pages": {
       "conventions": {

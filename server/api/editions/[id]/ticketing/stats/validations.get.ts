@@ -69,70 +69,97 @@ export default defineEventHandler(async (event) => {
   teardownEnd.setHours(23, 59, 59, 999)
 
   // Récupérer toutes les validations d'entrée
-  const [participantsValidations, volunteersValidations, artistsValidations] = await Promise.all([
-    // Participants (billets)
-    prisma.ticketingOrderItem.findMany({
-      where: {
-        order: {
+  const [participantsValidations, othersValidations, volunteersValidations, artistsValidations] =
+    await Promise.all([
+      // Participants (billets avec countAsParticipant = true)
+      prisma.ticketingOrderItem.findMany({
+        where: {
+          order: {
+            editionId,
+          },
+          tier: {
+            countAsParticipant: true,
+          },
+          entryValidated: true,
+          entryValidatedAt: {
+            not: null,
+            gte: setupStart,
+            lte: teardownEnd,
+          },
+        },
+        select: {
+          entryValidatedAt: true,
+        },
+      }),
+
+      // Autres (billets avec countAsParticipant = false)
+      prisma.ticketingOrderItem.findMany({
+        where: {
+          order: {
+            editionId,
+          },
+          tier: {
+            countAsParticipant: false,
+          },
+          entryValidated: true,
+          entryValidatedAt: {
+            not: null,
+            gte: setupStart,
+            lte: teardownEnd,
+          },
+        },
+        select: {
+          entryValidatedAt: true,
+        },
+      }),
+
+      // Bénévoles
+      prisma.editionVolunteerApplication.findMany({
+        where: {
           editionId,
+          entryValidated: true,
+          entryValidatedAt: {
+            not: null,
+            gte: setupStart,
+            lte: teardownEnd,
+          },
         },
-        entryValidated: true,
-        entryValidatedAt: {
-          not: null,
-          gte: setupStart,
-          lte: teardownEnd,
+        select: {
+          entryValidatedAt: true,
         },
-      },
-      select: {
-        entryValidatedAt: true,
-      },
-    }),
+      }),
 
-    // Bénévoles
-    prisma.editionVolunteerApplication.findMany({
-      where: {
-        editionId,
-        entryValidated: true,
-        entryValidatedAt: {
-          not: null,
-          gte: setupStart,
-          lte: teardownEnd,
+      // Artistes
+      prisma.editionArtist.findMany({
+        where: {
+          editionId,
+          entryValidated: true,
+          entryValidatedAt: {
+            not: null,
+            gte: setupStart,
+            lte: teardownEnd,
+          },
         },
-      },
-      select: {
-        entryValidatedAt: true,
-      },
-    }),
-
-    // Artistes
-    prisma.editionArtist.findMany({
-      where: {
-        editionId,
-        entryValidated: true,
-        entryValidatedAt: {
-          not: null,
-          gte: setupStart,
-          lte: teardownEnd,
+        select: {
+          entryValidatedAt: true,
         },
-      },
-      select: {
-        entryValidatedAt: true,
-      },
-    }),
-  ])
+      }),
+    ])
 
   // Créer des tranches horaires de 1 heure
   const startDateTime = DateTime.fromJSDate(setupStart)
   const endDateTime = DateTime.fromJSDate(teardownEnd)
 
-  const hourSlots: Map<string, { participants: number; volunteers: number; artists: number }> =
-    new Map()
+  const hourSlots: Map<
+    string,
+    { participants: number; others: number; volunteers: number; artists: number }
+  > = new Map()
 
   // Initialiser toutes les tranches horaires
   let current = startDateTime.startOf('hour')
   while (current <= endDateTime) {
     const key = current.toISO()!
-    hourSlots.set(key, { participants: 0, volunteers: 0, artists: 0 })
+    hourSlots.set(key, { participants: 0, others: 0, volunteers: 0, artists: 0 })
     current = current.plus({ hours: 1 })
   }
 
@@ -144,6 +171,17 @@ export default defineEventHandler(async (event) => {
       const slot = hourSlots.get(key)
       if (slot) {
         slot.participants++
+      }
+    }
+  })
+
+  othersValidations.forEach((v) => {
+    if (v.entryValidatedAt) {
+      const dt = DateTime.fromJSDate(v.entryValidatedAt).startOf('hour')
+      const key = dt.toISO()!
+      const slot = hourSlots.get(key)
+      if (slot) {
+        slot.others++
       }
     }
   })
@@ -174,6 +212,7 @@ export default defineEventHandler(async (event) => {
   const labels: string[] = []
   const timestamps: string[] = []
   const participants: number[] = []
+  const others: number[] = []
   const volunteers: number[] = []
   const artists: number[] = []
 
@@ -184,6 +223,7 @@ export default defineEventHandler(async (event) => {
     labels.push(label)
     timestamps.push(isoKey)
     participants.push(counts.participants)
+    others.push(counts.others)
     volunteers.push(counts.volunteers)
     artists.push(counts.artists)
   })
@@ -208,11 +248,13 @@ export default defineEventHandler(async (event) => {
     labels,
     timestamps,
     participants,
+    others,
     volunteers,
     artists,
     periods,
     totals: {
       participants: participants.reduce((a, b) => a + b, 0),
+      others: others.reduce((a, b) => a + b, 0),
       volunteers: volunteers.reduce((a, b) => a + b, 0),
       artists: artists.reduce((a, b) => a + b, 0),
     },

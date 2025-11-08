@@ -35,6 +35,7 @@
     "category": "Categoria",
     "city": "Città",
     "clear": "Cancella",
+    "click_to_view_full": "Clicca per vedere il testo completo",
     "close": "Chiudi",
     "confirm": "Conferma",
     "confirmation": "Conferma",
@@ -91,6 +92,7 @@
     "logo": "Logo",
     "lunch": "Pranzo",
     "manage": "Gestisci",
+    "meals_short": "Pasti",
     "message": "Messaggio",
     "name": "Nome",
     "next": "Successivo",
@@ -127,6 +129,7 @@
     "status": "Stato",
     "success": "Successo",
     "teardown": "Smontaggio",
+    "ticketing_short": "Biglietteria",
     "time": "Ora",
     "tip": "Consiglio",
     "title": "Titolo",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Il numero di posti deve essere almeno 1",
     "server_error": "Errore server",
     "status_update_failed": "Impossibile aggiornare lo stato",
-    "update_organizer_error": "Errore nell'aggiornamento del organizere",
     "update_error": "Errore durante l'aggiornamento",
+    "update_organizer_error": "Errore nell'aggiornamento del organizere",
     "username_min_3_chars": "Il nome utente deve contenere almeno 3 caratteri"
   },
   "footer": {

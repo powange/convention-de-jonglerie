@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Prześlij lub zmień zdjęcie profilowe tego użytkownika",
     "cleanup_expired_tokens": "Czyszczenie wygasłych tokenów",
     "cleanup_resolved_error_logs": "Czyszczenie dzienników błędów",
-    "organizers": "Współpracownicy",
-    "organizers_count": "{count} współpracowników",
     "coming_soon": "Wkrótce dostępne",
     "config": {
       "ai": "Sztuczna inteligencja",
@@ -269,6 +267,8 @@
     "notification_management": "Zarządzanie powiadomieniami",
     "notifications_sent": "Powiadomienia wysłane",
     "oldest_first": "Najstarsi jako pierwsi",
+    "organizers": "Współpracownicy",
+    "organizers_count": "{count} współpracowników",
     "original_user": "Oryginalny użytkownik",
     "pages": {
       "conventions": {

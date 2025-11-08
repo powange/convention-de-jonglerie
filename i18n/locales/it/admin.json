@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Carica o modifica la foto profilo di questo utente",
     "cleanup_expired_tokens": "Pulizia token scaduti",
     "cleanup_resolved_error_logs": "Pulizia log di errore",
-    "organizers": "Organizeri",
-    "organizers_count": "{count} organizeri",
     "coming_soon": "Presto disponibile",
     "config": {
       "ai": "Intelligenza Artificiale",
@@ -269,6 +267,8 @@
     "notification_management": "Gestione Notifiche",
     "notifications_sent": "Notifiche inviate",
     "oldest_first": "Più vecchi prima",
+    "organizers": "Organizeri",
+    "organizers_count": "{count} organizeri",
     "original_user": "Utente originale",
     "pages": {
       "conventions": {

@@ -54,10 +54,10 @@ const chartData = computed<ChartData<'doughnut'>>(() => ({
     {
       data: [props.data.manual, props.data.external],
       backgroundColor: [
-        'rgba(16, 185, 129, 0.8)', // green-500 pour manuel
-        'rgba(59, 130, 246, 0.8)', // blue-500 pour externe
+        'rgba(59, 130, 246, 0.8)', // blue-500 pour manuel
+        'rgba(16, 185, 129, 0.8)', // green-500 pour externe
       ],
-      borderColor: ['rgba(16, 185, 129, 1)', 'rgba(59, 130, 246, 1)'],
+      borderColor: ['rgba(59, 130, 246, 1)', 'rgba(16, 185, 129, 1)'],
       borderWidth: 2,
     },
   ],

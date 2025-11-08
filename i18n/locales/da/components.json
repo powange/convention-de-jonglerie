@@ -59,11 +59,6 @@
       "to_add_comment": "for at tilføje en kommentar",
       "view_comments": "Se kommentarer ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Rettigheder pr. udgave",
-      "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
-      "title_placeholder": "Titel eller rolle (valgfrit)"
-    },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",
       "contact_email": "Kontakt email",
@@ -134,6 +129,13 @@
       "upcoming": "Kommende",
       "without_coordinates": "({count} uden koordinater)",
       "yellow_border_favorite": "Gul kant = Favorit"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Alle udgaver",
+      "per_edition": "Rettigheder pr. udgave",
+      "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
+      "title_label": "Titel / funktion",
+      "title_placeholder": "Titel eller rolle (valgfrit)"
     },
     "posts": {
       "comments_count": "{count} kommentar | {count} kommentarer",

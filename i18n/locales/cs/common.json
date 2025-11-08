@@ -35,6 +35,7 @@
     "category": "Kategorie",
     "city": "Město",
     "clear": "Odstranit",
+    "click_to_view_full": "Klikněte pro zobrazení celého textu",
     "close": "Zavřít",
     "confirm": "Potvrďte",
     "confirmation": "Potvrzení",
@@ -91,6 +92,7 @@
     "logo": "Logo",
     "lunch": "Oběd",
     "manage": "Správa",
+    "meals_short": "Jídla",
     "message": "Zpráva",
     "name": "Název",
     "next": "Další",
@@ -127,6 +129,7 @@
     "status": "Stav",
     "success": "Úspěch",
     "teardown": "Demontáž",
+    "ticketing_short": "Vstupenky",
     "time": "Čas",
     "tip": "Rada",
     "title": "Název",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Počet míst musí být alespoň 1",
     "server_error": "Chyba serveru",
     "status_update_failed": "Aktualizace stavu se nezdařila",
-    "update_organizer_error": "Chyba při aktualizaci spolupracovníka",
     "update_error": "Chyba při aktualizaci",
+    "update_organizer_error": "Chyba při aktualizaci spolupracovníka",
     "username_min_3_chars": "Uživatelské jméno musí obsahovat alespoň 3 znaky."
   },
   "footer": {

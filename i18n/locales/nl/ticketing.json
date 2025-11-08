@@ -35,13 +35,17 @@
       "pending_operations": "{count} wachtende bewerking(en) | {count} wachtende bewerking | {count} wachtende bewerkingen",
       "qr_code_description": "Deel deze QR-code om anderen toe te staan zich bij deze teller aan te sluiten",
       "qr_code_title": "Deel QR-code",
+      "regenerate_token": "Token opnieuw genereren",
+      "regenerate_token_error": "Fout bij het regenereren van token",
+      "regenerate_token_warning": "Waarschuwing: het opnieuw genereren van het token maakt de oude deellink en de huidige QR-code ongeldig. Alle gebruikers moeten de nieuwe link gebruiken om toegang te krijgen tot de teller.",
       "reset": "Resetten",
       "reset_confirmation": "Weet u zeker dat u deze teller naar 0 wilt resetten?",
       "reset_counter": "Teller resetten",
       "share_text": "Sluit je aan bij deze teller om inkomsten realtime te volgen",
       "step": "Stap",
       "syncing": "Synchroniseren...",
-      "title": "Tellers"
+      "title": "Tellers",
+      "token_regenerated": "Token succesvol opnieuw gegenereerd"
     },
     "my_ticket": {
       "how_to_use_description": "Toon deze QR-code bij de ingang om je ticket te valideren.",

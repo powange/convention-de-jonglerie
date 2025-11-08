@@ -35,6 +35,7 @@
     "category": "Categorie",
     "city": "Stad",
     "clear": "Wissen",
+    "click_to_view_full": "Klik om de volledige tekst te bekijken",
     "close": "Sluiten",
     "confirm": "Bevestigen",
     "confirmation": "Bevestiging",
@@ -91,6 +92,7 @@
     "logo": "Logo",
     "lunch": "Lunch",
     "manage": "Beheren",
+    "meals_short": "Maaltijden",
     "message": "Bericht",
     "name": "Naam",
     "next": "Volgende",
@@ -127,6 +129,7 @@
     "status": "Status",
     "success": "Succes",
     "teardown": "Ontmanteling",
+    "ticketing_short": "Kaartverkoop",
     "time": "Tijd",
     "tip": "Tip",
     "title": "Titel",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Aantal plaatsen moet minimaal 1 zijn",
     "server_error": "Serverfout",
     "status_update_failed": "Status bijwerken mislukt",
-    "update_organizer_error": "Fout bij bijwerken medewerker",
     "update_error": "Bijwerkfout",
+    "update_organizer_error": "Fout bij bijwerken medewerker",
     "username_min_3_chars": "Gebruikersnaam moet minimaal 3 tekens bevatten"
   },
   "footer": {

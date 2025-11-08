@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Profilbild dieses Benutzers hochladen oder ändern",
     "cleanup_expired_tokens": "Bereinigung abgelaufener Token",
     "cleanup_resolved_error_logs": "Bereinigung von Fehlerprotokollen",
-    "organizers": "Mitarbeiter",
-    "organizers_count": "{count} Mitarbeiter",
     "coming_soon": "Demnächst verfügbar",
     "config": {
       "ai": "Künstliche Intelligenz",
@@ -269,6 +267,8 @@
     "notification_management": "Benachrichtigungsverwaltung",
     "notifications_sent": "Benachrichtigungen gesendet",
     "oldest_first": "Älteste zuerst",
+    "organizers": "Mitarbeiter",
+    "organizers_count": "{count} Mitarbeiter",
     "original_user": "Ursprünglicher Benutzer",
     "pages": {
       "conventions": {

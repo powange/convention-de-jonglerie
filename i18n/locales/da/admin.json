@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Upload eller ændr denne brugers profilbillede",
     "cleanup_expired_tokens": "Oprydning af udløbne tokens",
     "cleanup_resolved_error_logs": "Oprydning af fejllogge",
-    "organizers": "Samarbejdspartnere",
-    "organizers_count": "{count} samarbejdspartnere",
     "coming_soon": "Kommer snart",
     "config": {
       "ai": "Kunstig intelligens",
@@ -269,6 +267,8 @@
     "notification_management": "Meddelelseshåndtering",
     "notifications_sent": "Notifikationer sendt",
     "oldest_first": "Ældste først",
+    "organizers": "Samarbejdspartnere",
+    "organizers_count": "{count} samarbejdspartnere",
     "original_user": "Oprindelig bruger",
     "pages": {
       "conventions": {

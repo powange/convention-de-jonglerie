@@ -75,7 +75,12 @@
       "Bash(npm install:*)",
       "Bash(curl:*)",
       "Bash(docker exec:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(docker images:*)",
+      "Bash(chmod:*)",
+      "Bash(node scripts/translation/mark-todo.js:*)",
+      "Bash(npx nuxt prepare)",
+      "Bash(docker ps:*)"
     ],
     "deny": [],
     "ask": [],

@@ -59,11 +59,6 @@
       "to_add_comment": "para adicionar um comentário",
       "view_comments": "Ver comentários ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Direitos por edição",
-      "per_edition_hint": "Nenhum direito específico definido para as edições",
-      "title_placeholder": "Título ou função (opcional)"
-    },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",
       "contact_email": "Email de contato",
@@ -134,6 +129,13 @@
       "upcoming": "Próximas",
       "without_coordinates": "({count} sem coordenadas)",
       "yellow_border_favorite": "Contorno amarelo = Favorito"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Todas as edições",
+      "per_edition": "Direitos por edição",
+      "per_edition_hint": "Nenhum direito específico definido para as edições",
+      "title_label": "Título / função",
+      "title_placeholder": "Título ou função (opcional)"
     },
     "posts": {
       "comments_count": "{count} comentário | {count} comentários",

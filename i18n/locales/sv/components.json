@@ -59,11 +59,6 @@
       "to_add_comment": "för att lägga till en kommentar",
       "view_comments": "Visa kommentarer ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Rättigheter per utgåva",
-      "per_edition_hint": "Inga specifika rättigheter definierade för editioner",
-      "title_placeholder": "Titel / funktion (tillval)"
-    },
     "convention_form": {
       "click_to_select_image": "Klicka för att välja en bild",
       "contact_email": "Kontakta oss via e-post",
@@ -134,6 +129,13 @@
       "upcoming": "Kommer inom kort",
       "without_coordinates": "({count} utan koordinater)",
       "yellow_border_favorite": "Gul kontur = Favorit"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Alla utgåvor",
+      "per_edition": "Rättigheter per utgåva",
+      "per_edition_hint": "Inga specifika rättigheter definierade för editioner",
+      "title_label": "Titel / funktion",
+      "title_placeholder": "Titel / funktion (tillval)"
     },
     "posts": {
       "comments_count": "{count} kommentarer | {count} kommentarer",

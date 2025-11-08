@@ -59,11 +59,6 @@
       "to_add_comment": "um einen Kommentar hinzuzufügen",
       "view_comments": "Kommentare anzeigen ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Rechte pro Ausgabe",
-      "per_edition_hint": "Keine spezifischen Rechte für Editionen definiert",
-      "title_placeholder": "Titel oder Rolle (optional)"
-    },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",
       "contact_email": "Kontakt-E-Mail",
@@ -134,6 +129,13 @@
       "upcoming": "Kommende",
       "without_coordinates": "({count} ohne Koordinaten)",
       "yellow_border_favorite": "Gelber Rand = Favorit"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Alle Ausgaben",
+      "per_edition": "Rechte pro Ausgabe",
+      "per_edition_hint": "Keine spezifischen Rechte für Editionen definiert",
+      "title_label": "Titel / Funktion",
+      "title_placeholder": "Titel oder Rolle (optional)"
     },
     "posts": {
       "comments_count": "{count} Kommentar | {count} Kommentare",

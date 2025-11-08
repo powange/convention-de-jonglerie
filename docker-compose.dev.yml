@@ -23,6 +23,7 @@ services:
 
   # Application Nuxt.js (mode développement)
   app:
+    image: convention-de-jonglerie-app:dev
     build:
       context: .
       target: dev
@@ -39,6 +40,7 @@ services:
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'development'
+      NODE_OPTIONS: '--max-old-space-size=4096'
       NUXT_PUBLIC_SITE_URL: '${NUXT_PUBLIC_SITE_URL:-http://localhost:3000}'
       # Secret de session requis par nuxt-auth-utils (32+ caractères)
       # Remplacez via un fichier .env local: NUXT_SESSION_PASSWORD=...
@@ -68,6 +70,8 @@ services:
       # Force le polling pour Windows
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'
+      # Niveau de log Prisma (query,info,warn,error ou combinaisons)
+      PRISMA_LOG_LEVEL: '${PRISMA_LOG_LEVEL:-error,warn}'
       # Pour le chiffrement des données sensibles (ex: cartes bancaires)
       ENCRYPTION_SECRET: '${ENCRYPTION_SECRET:-change-this-to-a-strong-random-secret-key-min-32-chars}'
       ENCRYPTION_SALT: '${ENCRYPTION_SALT:-change-this-salt-to-random-value}'
@@ -108,8 +112,8 @@ services:
       # Note: .nuxt et .output ne sont PAS montés comme volumes pour éviter les problèmes de permissions
       # Ces dossiers restent dans le conteneur
     ports:
-      - '3000:3000'
-      - '24678:24678'
+      - '3000:3000' # Application Nuxt
+      - '24678:24678' # Vite HMR (Hot Module Replacement)
     depends_on:
       database:
         condition: service_healthy

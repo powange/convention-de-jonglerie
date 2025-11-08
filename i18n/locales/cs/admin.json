@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Stažení nebo úprava profilové fotografie tohoto uživatele",
     "cleanup_expired_tokens": "Čištění žetonů s prošlou platností",
     "cleanup_resolved_error_logs": "Čištění protokolů chyb",
-    "organizers": "Zaměstnanci",
-    "organizers_count": "{count} zaměstnanců",
     "coming_soon": "Brzy k dispozici",
     "config": {
       "ai": "Umělá inteligence",
@@ -269,6 +267,8 @@
     "notification_management": "Správa oznámení",
     "notifications_sent": "Odeslaná oznámení",
     "oldest_first": "Nejdříve starší",
+    "organizers": "Zaměstnanci",
+    "organizers_count": "{count} zaměstnanců",
     "original_user": "Původní uživatel",
     "pages": {
       "conventions": {

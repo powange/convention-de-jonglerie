@@ -9,6 +9,7 @@
 - **NE JAMAIS lancer `npm run dev`** - Le serveur de développement est déjà en cours d'exécution
 - **Pour lire les logs de l'application, utiliser `npm run docker:dev:logs`**
 - **NE JAMAIS exécuter les migrations Prisma** - L'utilisateur s'occupe toujours de créer et d'appliquer les migrations. Fournir uniquement la commande de migration sans l'exécuter.
+- **Niveau de log Prisma configurable** - Utiliser la variable d'environnement `PRISMA_LOG_LEVEL` dans `.env` pour ajuster les logs (valeurs: `error,warn` par défaut, `query,error,warn,info` pour verbose, `error` pour minimal)
 - L'url de l'application en développement est : http://localhost:3000
 - Avant de modifier un fichier, lis 3 autres fichiers pour comprendre le style de code et les conventions utilisées
 - **A chaque fois que tu utilises un composant Nuxt UI, tu DOIS OBLIGATOIREMENT consulter sa documentation via le MCP Nuxt UI** (`mcp__nuxt-ui__get_component`) pour vérifier la syntaxe exacte des props, slots et événements avant de l'utiliser. Ne jamais deviner ou supposer l'API d'un composant.
@@ -19,7 +20,8 @@
 - **Règle de traduction i18n** :
   - **De ta propre initiative** : Ne modifier QUE les fichiers français (`i18n/locales/fr/`). Ne JAMAIS remplir les autres langues spontanément.
   - **Avec la commande `/translate-todos`** : Tu DOIS traduire toutes les langues comme demandé dans la commande. Cette commande t'autorise explicitement à traduire.
-  - Les autres langues seront synchronisées automatiquement via `/check-i18n` et `/check-translations` en mode [TODO] pour traduction ultérieure.
+  - **Nouvelles clés** : Les autres langues seront synchronisées automatiquement via `/check-i18n` et `/check-translations` en mode [TODO] pour traduction ultérieure.
+  - **Modification de wording existant** : Lorsque tu modifies le libellé français d'une clé qui existe déjà dans d'autres langues, tu DOIS utiliser le script `npm run i18n:mark-todo` en mode automatique pour détecter et marquer automatiquement ces clés comme [TODO] dans toutes les autres langues. Le script détecte via `git diff` les clés modifiées. Exemple : `npm run i18n:mark-todo` (mode auto) ou `npm run i18n:mark-todo "clé1" "clé2"` (mode manuel)
 - **Structure i18n avec lazy loading** : Les traductions sont organisées par domaine dans `i18n/locales/{langue}/`. Le système utilise un mapping intelligent basé sur la structure du français.
 - **Règle de commit** : Ne commit jamais sans que la commande `/commit-push` ait été demandée
   - Exception : Si une commande slash (comme `/quality-check`) inclut explicitement `/commit-push` dans son workflow, alors le commit est autorisé
@@ -35,28 +37,38 @@
 
 **Frontend :**
 
-- **Nuxt.js** v4.0.1 - Framework Vue.js universel
+- **Nuxt.js** v4.2.0 - Framework Vue.js universel
 - **Vue.js** v3.5.17 - Framework JavaScript réactif
-- **Nuxt UI** v3.3.0 - Composants UI avec Tailwind CSS
+- **Nuxt UI** v4.0.0 - Composants UI avec Tailwind CSS
 - **Pinia** v3.0.3 - Gestion d'état pour Vue.js
 - **TypeScript** v5.8.3 - Langage typé
+- **Nuxt i18n** v10.0.3 - Internationalisation
+- **VueUse** v13.6.0 - Collection d'utilitaires Vue
 
 **Backend :**
 
 - **Nitro** (intégré à Nuxt) - Moteur serveur pour API RESTful
-- **Prisma** v6.12.0 - ORM pour base de données
+- **Prisma** v6.18.0 - ORM pour base de données
 - **MySQL** - Base de données relationnelle
 
 **Authentification & Sécurité :**
 
-- Auth par session (nuxt-auth-utils) - Cookies de session scellés
+- **nuxt-auth-utils** v0.5.23 - Auth par session avec cookies scellés
 - **bcryptjs** v3.0.2 - Hachage des mots de passe
+
+**Visualisation & UI :**
+
+- **Chart.js** v4.5.1 - Graphiques et visualisations
+- **FullCalendar** v6.1.15+ - Calendrier interactif
+- **Nuxt QRCode** v0.4.8 - Génération de QR codes
 
 **Outils de développement :**
 
 - **ESLint** v9.32.0 - Linter JavaScript/TypeScript
 - **Nuxt Test Utils** v3.19.2 - Tests
+- **Vitest** v3.2.4 - Framework de tests
 - **Nuxt Scripts** v0.11.10 & **Nuxt Image** v1.10.0 - Optimisations
+- **Prettier** v3.3.3 - Formatage de code
 
 **Architecture :**
 

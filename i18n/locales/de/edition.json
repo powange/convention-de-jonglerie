@@ -72,27 +72,13 @@
       "seats_min": "Mindestens 1 Platz"
     }
   },
-  "organizers": {
-    "organizer_added": "Organisator hinzugefügt",
-    "organizer_removed": "Organisator entfernt",
-    "organizer_updated": "Organisator aktualisiert",
-    "confirm_remove": "Sind Sie sicher, dass Sie diesen Organisator entfernen möchten?",
-    "edit_organizer": "Organisator bearbeiten",
-    "list": "Liste der Organisatoren",
-    "manage": "Organisatoren verwalten",
-    "manage_description": "Organisatoren und ihre Rechte für diese Ausgabe verwalten",
-    "no_organizers": "Keine Organisatoren",
-    "page_description": "Mitglieder des Organisationsteams und ihre Berechtigungen verwalten",
-    "rights": "Rechte",
-    "title": "Organisatoren"
-  },
   "conventions": {
-    "add_organizer": "Organisator hinzufügen",
     "add_edition": "Eine Auflage hinzufügen",
+    "add_organizer": "Organisator hinzufügen",
     "analytics_access": "Zugang zu Statistiken",
     "analytics_access_desc": "Verfolgen Sie die Leistung und das Engagement Ihrer Auflagen",
-    "as_organizer": "Als Organisator",
     "as_creator": "Als Ersteller",
+    "as_organizer": "Als Organisator",
     "cannot_load_conventions": "Deine Conventions können nicht geladen werden",
     "claim": {
       "button_short": "Beanspruchen",
@@ -118,7 +104,6 @@
       "verification_success_description": "Sie sind jetzt Eigentümer dieser Konvention.",
       "verify": "Verifizieren"
     },
-    "organizers": "Organisatoren",
     "confirm_delete_convention": "Bist du sicher, dass du diese Convention löschen möchtest?",
     "convention_deleted": "Convention gelöscht",
     "convention_deleted_success": "Die Convention wurde erfolgreich gelöscht",
@@ -140,10 +125,10 @@
     "granular_rights": "Detaillierte Rechte",
     "granular_rights_desc": "Spezifische Berechtigungen pro Auflage oder global nach Ihren Bedürfnissen",
     "logo_alt": "Logo von {name}",
-    "manage_organizers": "Organisatoren verwalten",
-    "manage_organizers_desc": "Laden Sie Ihre Organisationsteam-Mitglieder ein und verwalten Sie sie",
     "manage_editions": "Auflagen verwalten",
     "manage_editions_desc": "Erstellen, bearbeiten und veröffentlichen Sie verschiedene Auflagen Ihrer Conventions",
+    "manage_organizers": "Organisatoren verwalten",
+    "manage_organizers_desc": "Laden Sie Ihre Organisationsteam-Mitglieder ein und verwalten Sie sie",
     "manage_volunteers": "Freiwillige verwalten",
     "manage_volunteers_desc": "Koordinieren Sie Freiwilligenteams und ihre Bewerbungen",
     "no_conventions": "Keine Convention erstellt",
@@ -151,6 +136,7 @@
     "no_description": "Keine Beschreibung",
     "no_description_available": "Keine Beschreibung verfügbar",
     "no_editions": "Keine Auflage für diese Convention",
+    "organizers": "Organisatoren",
     "search_user_placeholder": "Benutzer suchen...",
     "select_user": "Benutzer auswählen",
     "status_control": "Sichtbarkeitskontrolle",
@@ -160,5 +146,19 @@
     "none": "Keine",
     "vegan": "Vegan",
     "vegetarian": "Vegetarisch"
+  },
+  "organizers": {
+    "confirm_remove": "Sind Sie sicher, dass Sie diesen Organisator entfernen möchten?",
+    "edit_organizer": "Organisator bearbeiten",
+    "list": "Liste der Organisatoren",
+    "manage": "Organisatoren verwalten",
+    "manage_description": "Organisatoren und ihre Rechte für diese Ausgabe verwalten",
+    "no_organizers": "Keine Organisatoren",
+    "organizer_added": "Organisator hinzugefügt",
+    "organizer_removed": "Organisator entfernt",
+    "organizer_updated": "Organisator aktualisiert",
+    "page_description": "Mitglieder des Organisationsteams und ihre Berechtigungen verwalten",
+    "rights": "Rechte",
+    "title": "Organisatoren"
   }
 }

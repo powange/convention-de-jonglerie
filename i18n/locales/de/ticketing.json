@@ -35,13 +35,17 @@
       "pending_operations": "{count} ausstehende Operation(en) | {count} ausstehende Operation | {count} ausstehende Operationen",
       "qr_code_description": "Teilen Sie diesen QR-Code, damit andere diesem Zähler beitreten können",
       "qr_code_title": "QR-Code zum Teilen",
+      "regenerate_token": "Token regenerieren",
+      "regenerate_token_error": "Fehler beim Regenerieren des Tokens",
+      "regenerate_token_warning": "Achtung: Das Regenerieren des Tokens macht den alten Freigabe-Link und den aktuellen QR-Code ungültig. Alle Benutzer müssen den neuen Link verwenden, um auf den Zähler zuzugreifen.",
       "reset": "Zurücksetzen",
       "reset_confirmation": "Sind Sie sicher, dass Sie diesen Zähler auf 0 zurücksetzen möchten?",
       "reset_counter": "Zähler zurücksetzen",
       "share_text": "Treten Sie diesem Zähler bei, um Eintritte in Echtzeit zu verfolgen",
       "step": "Schritt",
       "syncing": "Synchronisierung läuft...",
-      "title": "Zähler"
+      "title": "Zähler",
+      "token_regenerated": "Token erfolgreich regeneriert"
     },
     "my_ticket": {
       "how_to_use_description": "Zeigen Sie diesen QR-Code am Eingang, um Ihr Ticket zu validieren.",

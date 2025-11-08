@@ -59,8 +59,6 @@
     "change_profile_picture_description": "Upload or modify this user's profile picture",
     "cleanup_expired_tokens": "Cleanup expired tokens",
     "cleanup_resolved_error_logs": "Cleanup error logs",
-    "organizers": "Organizers",
-    "organizers_count": "{count} organizers",
     "coming_soon": "Coming soon",
     "config": {
       "ai": "Artificial Intelligence",
@@ -269,6 +267,8 @@
     "notification_management": "Notification Management",
     "notifications_sent": "Notifications sent",
     "oldest_first": "Oldest first",
+    "organizers": "Organizers",
+    "organizers_count": "{count} organizers",
     "original_user": "Original user",
     "pages": {
       "conventions": {

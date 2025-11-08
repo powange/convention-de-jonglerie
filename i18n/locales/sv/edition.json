@@ -72,27 +72,13 @@
       "seats_min": "Minst 1 plats"
     }
   },
-  "organizers": {
-    "organizer_added": "Arrangör tillagd",
-    "organizer_removed": "Arrangör borttagen",
-    "organizer_updated": "Arrangör uppdaterad",
-    "confirm_remove": "Är du säker på att du vill ta bort denna arrangör?",
-    "edit_organizer": "Redigera arrangör",
-    "list": "Lista över arrangörer",
-    "manage": "Hantera arrangörer",
-    "manage_description": "Hantera arrangörer och deras rättigheter för denna utgåva",
-    "no_organizers": "Inga arrangörer",
-    "page_description": "Hantera medlemmar i organisationsteamet och deras behörigheter",
-    "rights": "Rättigheter",
-    "title": "Arrangörer"
-  },
   "conventions": {
-    "add_organizer": "Lägg till arrangör",
     "add_edition": "Lägg till en utgåva",
+    "add_organizer": "Lägg till arrangör",
     "analytics_access": "Tillgång till analyser",
     "analytics_access_desc": "Följ upp dina utgivares prestationer och engagemang",
-    "as_organizer": "Som arrangör",
     "as_creator": "Som designer",
+    "as_organizer": "Som arrangör",
     "cannot_load_conventions": "Det går inte att ladda dina konventioner",
     "claim": {
       "button_short": "Anspråk",
@@ -118,7 +104,6 @@
       "verification_success_description": "Du är nu ägare till detta avtal.",
       "verify": "Kontrollera"
     },
-    "organizers": "Arrangörer",
     "confirm_delete_convention": "Är du säker på att du vill skrota det här avtalet?",
     "convention_deleted": "Avtalet återkallat",
     "convention_deleted_success": "Avtalet avslutades framgångsrikt",
@@ -140,10 +125,10 @@
     "granular_rights": "Granulära rättigheter",
     "granular_rights_desc": "Utgåvospecifika eller globala behörigheter för att passa dina behov",
     "logo_alt": "{name} logotyp",
-    "manage_organizers": "Hantera arrangörer",
-    "manage_organizers_desc": "Bjud in och hantera medlemmarna i ditt organisationsteam",
     "manage_editions": "Hantering av utgåvor",
     "manage_editions_desc": "Skapa, modifiera och publicera olika utgåvor av dina avtal",
+    "manage_organizers": "Hantera arrangörer",
+    "manage_organizers_desc": "Bjud in och hantera medlemmarna i ditt organisationsteam",
     "manage_volunteers": "Hantering av volontärer",
     "manage_volunteers_desc": "Samordna team av volontärer och deras ansökningar",
     "no_conventions": "Inget avtal upprättat",
@@ -151,6 +136,7 @@
     "no_description": "Ingen beskrivning",
     "no_description_available": "Ingen beskrivning tillgänglig",
     "no_editions": "Ingen utgåva för denna kongress",
+    "organizers": "Arrangörer",
     "search_user_placeholder": "Sök efter en användare...",
     "select_user": "Välj en användare",
     "status_control": "Kontroll av synlighet",
@@ -160,5 +146,19 @@
     "none": "Nej",
     "vegan": "Vegansk",
     "vegetarian": "Vegetarisk"
+  },
+  "organizers": {
+    "confirm_remove": "Är du säker på att du vill ta bort denna arrangör?",
+    "edit_organizer": "Redigera arrangör",
+    "list": "Lista över arrangörer",
+    "manage": "Hantera arrangörer",
+    "manage_description": "Hantera arrangörer och deras rättigheter för denna utgåva",
+    "no_organizers": "Inga arrangörer",
+    "organizer_added": "Arrangör tillagd",
+    "organizer_removed": "Arrangör borttagen",
+    "organizer_updated": "Arrangör uppdaterad",
+    "page_description": "Hantera medlemmar i organisationsteamet och deras behörigheter",
+    "rights": "Rättigheter",
+    "title": "Arrangörer"
   }
 }

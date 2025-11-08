@@ -72,27 +72,13 @@
       "seats_min": "Co najmniej 1 miejsce"
     }
   },
-  "organizers": {
-    "organizer_added": "Organizator dodany",
-    "organizer_removed": "Organizator usunięty",
-    "organizer_updated": "Organizator zaktualizowany",
-    "confirm_remove": "Czy na pewno chcesz usunąć tego organizatora?",
-    "edit_organizer": "Edytuj organizatora",
-    "list": "Lista organizatorów",
-    "manage": "Zarządzaj organizatorami",
-    "manage_description": "Zarządzaj organizatorami i ich uprawnieniami dla tej edycji",
-    "no_organizers": "Brak organizatorów",
-    "page_description": "Zarządzaj członkami zespołu organizacyjnego i ich uprawnieniami",
-    "rights": "Prawa",
-    "title": "Organizatorzy"
-  },
   "conventions": {
-    "add_organizer": "Dodaj organizatora",
     "add_edition": "Dodaj edycję",
+    "add_organizer": "Dodaj organizatora",
     "analytics_access": "Dostęp do analiz",
     "analytics_access_desc": "Śledź wydajność i zaangażowanie swoich edycji",
-    "as_organizer": "Jako organizator",
     "as_creator": "Jako twórca",
+    "as_organizer": "Jako organizator",
     "cannot_load_conventions": "Nie można załadować twoich konwencji",
     "claim": {
       "button_short": "Rościć",
@@ -118,7 +104,6 @@
       "verification_success_description": "Jesteś teraz właścicielem tej konwencji.",
       "verify": "Zweryfikuj"
     },
-    "organizers": "Organizatorzy",
     "confirm_delete_convention": "Czy na pewno chcesz usunąć tę konwencję?",
     "convention_deleted": "Konwencja usunięta",
     "convention_deleted_success": "Konwencja została pomyślnie usunięta",
@@ -140,10 +125,10 @@
     "granular_rights": "Szczegółowe uprawnienia",
     "granular_rights_desc": "Konkretne uprawnienia dla każdej edycji lub globalne według twoich potrzeb",
     "logo_alt": "Logo {name}",
-    "manage_organizers": "Zarządzaj organizatorami",
-    "manage_organizers_desc": "Zapraszaj i zarządzaj członkami swojego zespołu organizacyjnego",
     "manage_editions": "Zarządzanie edycjami",
     "manage_editions_desc": "Twórz, edytuj i publikuj różne edycje swoich konwencji",
+    "manage_organizers": "Zarządzaj organizatorami",
+    "manage_organizers_desc": "Zapraszaj i zarządzaj członkami swojego zespołu organizacyjnego",
     "manage_volunteers": "Zarządzanie wolontariuszami",
     "manage_volunteers_desc": "Koordynuj zespoły wolontariuszy i ich zgłoszenia",
     "no_conventions": "Brak utworzonych konwencji",
@@ -151,6 +136,7 @@
     "no_description": "Brak opisu",
     "no_description_available": "Brak opisu",
     "no_editions": "Brak edycji dla tej konwencji",
+    "organizers": "Organizatorzy",
     "search_user_placeholder": "Wyszukaj użytkownika...",
     "select_user": "Wybierz użytkownika",
     "status_control": "Kontrola widoczności",
@@ -160,5 +146,19 @@
     "none": "Brak",
     "vegan": "Wegański",
     "vegetarian": "Wegetariański"
+  },
+  "organizers": {
+    "confirm_remove": "Czy na pewno chcesz usunąć tego organizatora?",
+    "edit_organizer": "Edytuj organizatora",
+    "list": "Lista organizatorów",
+    "manage": "Zarządzaj organizatorami",
+    "manage_description": "Zarządzaj organizatorami i ich uprawnieniami dla tej edycji",
+    "no_organizers": "Brak organizatorów",
+    "organizer_added": "Organizator dodany",
+    "organizer_removed": "Organizator usunięty",
+    "organizer_updated": "Organizator zaktualizowany",
+    "page_description": "Zarządzaj członkami zespołu organizacyjnego i ich uprawnieniami",
+    "rights": "Prawa",
+    "title": "Organizatorzy"
   }
 }

@@ -35,6 +35,7 @@
     "category": "Kategoria",
     "city": "Miasto",
     "clear": "Wyczyść",
+    "click_to_view_full": "Kliknij, aby zobaczyć pełny tekst",
     "close": "Zamknij",
     "confirm": "Potwierdź",
     "confirmation": "Potwierdzenie",
@@ -91,6 +92,7 @@
     "logo": "Logo",
     "lunch": "Lunch",
     "manage": "Zarządzaj",
+    "meals_short": "Posiłki",
     "message": "Wiadomość",
     "name": "Nazwa",
     "next": "Dalej",
@@ -127,6 +129,7 @@
     "status": "Stan",
     "success": "Sukces",
     "teardown": "Demontaż",
+    "ticketing_short": "Bilety",
     "time": "Czas",
     "tip": "Porada",
     "title": "Tytuł",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Liczba miejsc musi wynosić co najmniej 1",
     "server_error": "Błąd serwera",
     "status_update_failed": "Nie udało się zaktualizować statusu",
-    "update_organizer_error": "Błąd aktualizacji współpracownika",
     "update_error": "Błąd podczas aktualizacji",
+    "update_organizer_error": "Błąd aktualizacji współpracownika",
     "username_min_3_chars": "Nazwa użytkownika musi mieć co najmniej 3 znaki"
   },
   "footer": {

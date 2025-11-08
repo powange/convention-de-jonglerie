@@ -35,6 +35,7 @@
     "category": "Kategori",
     "city": "By",
     "clear": "Ryd",
+    "click_to_view_full": "Klik for at se fuld tekst",
     "close": "Luk",
     "confirm": "Bekræft",
     "confirmation": "Bekræftelse",
@@ -91,6 +92,7 @@
     "logo": "Logo",
     "lunch": "Frokost",
     "manage": "Administrer",
+    "meals_short": "Måltider",
     "message": "Besked",
     "name": "Navn",
     "next": "Næste",
@@ -127,6 +129,7 @@
     "status": "Status",
     "success": "Succes",
     "teardown": "Afmontering",
+    "ticketing_short": "Billetsalg",
     "time": "Tid",
     "tip": "Tip",
     "title": "Titel",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Antallet af pladser skal være mindst 1",
     "server_error": "Serverfejl",
     "status_update_failed": "Kunne ikke opdatere status",
-    "update_organizer_error": "Fejl ved opdatering af samarbejdspartner",
     "update_error": "Fejl under opdatering",
+    "update_organizer_error": "Fejl ved opdatering af samarbejdspartner",
     "username_min_3_chars": "Brugernavnet skal have mindst 3 tegn"
   },
   "footer": {

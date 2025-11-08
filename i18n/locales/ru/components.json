@@ -59,11 +59,6 @@
       "to_add_comment": "чтобы добавить комментарий",
       "view_comments": "Просмотреть комментарии ({count})"
     },
-    "organizers_rights_panel": {
-      "per_edition": "Права по изданиям",
-      "per_edition_hint": "Для выпусков не определены конкретные права",
-      "title_placeholder": "Заголовок или роль (необязательно)"
-    },
     "convention_form": {
       "click_to_select_image": "Нажмите, чтобы выбрать изображение",
       "contact_email": "Контактный email",
@@ -134,6 +129,13 @@
       "upcoming": "Предстоящие",
       "without_coordinates": "({count} без координат)",
       "yellow_border_favorite": "Желтая граница = Избранное"
+    },
+    "organizers_rights_panel": {
+      "all_editions": "Все издания",
+      "per_edition": "Права по изданиям",
+      "per_edition_hint": "Для выпусков не определены конкретные права",
+      "title_label": "Должность / функция",
+      "title_placeholder": "Заголовок или роль (необязательно)"
     },
     "posts": {
       "comments_count": "{count} комментарий | {count} комментария",

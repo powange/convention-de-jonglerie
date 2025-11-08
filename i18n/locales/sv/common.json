@@ -35,6 +35,7 @@
     "category": "Kategori",
     "city": "Stad",
     "clear": "Radera",
+    "click_to_view_full": "Klicka för att se full text",
     "close": "Nära",
     "confirm": "Bekräfta",
     "confirmation": "Bekräftelse",
@@ -91,6 +92,7 @@
     "logo": "Logotyp",
     "lunch": "Lunch",
     "manage": "Hantera",
+    "meals_short": "Måltider",
     "message": "Meddelande",
     "name": "Namn",
     "next": "Nästa",
@@ -127,6 +129,7 @@
     "status": "Status",
     "success": "Framgång",
     "teardown": "Demontering",
+    "ticketing_short": "Biljetter",
     "time": "Tid",
     "tip": "Rådet",
     "title": "Titel",
@@ -832,8 +835,8 @@
     "seats_minimum_one": "Antalet platser måste vara minst 1",
     "server_error": "Fel på servern",
     "status_update_failed": "Statusuppdateringen misslyckades",
-    "update_organizer_error": "Fel vid uppdatering av medarbetaren",
     "update_error": "Fel under uppdatering",
+    "update_organizer_error": "Fel vid uppdatering av medarbetaren",
     "username_min_3_chars": "Användarnamnet måste innehålla minst 3 tecken"
   },
   "footer": {

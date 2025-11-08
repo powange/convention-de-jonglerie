@@ -35,13 +35,17 @@
       "pending_operations": "{count} operação(ões) pendente(s) | {count} operação pendente | {count} operações pendentes",
       "qr_code_description": "Partilhe este código QR para permitir que outros se juntem a este contador",
       "qr_code_title": "Código QR de partilha",
+      "regenerate_token": "Regenerar token",
+      "regenerate_token_error": "Erro ao regenerar token",
+      "regenerate_token_warning": "Atenção: regenerar o token invalidará o link de compartilhamento antigo e o código QR atual. Todos os usuários precisarão usar o novo link para acessar o contador.",
       "reset": "Reiniciar",
       "reset_confirmation": "Tem certeza de que deseja reiniciar este contador para 0?",
       "reset_counter": "Reiniciar contador",
       "share_text": "Junte-se a este contador para acompanhar as entradas em tempo real",
       "step": "Incremento",
       "syncing": "Sincronizando...",
-      "title": "Contadores"
+      "title": "Contadores",
+      "token_regenerated": "Token regenerado com sucesso"
     },
     "my_ticket": {
       "how_to_use_description": "Apresente este código QR na entrada para validar o seu bilhete.",

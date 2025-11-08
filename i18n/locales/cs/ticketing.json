@@ -35,13 +35,17 @@
       "pending_operations": "{count} operace čekající | {count} operace čekající | {count} operací čekajících",
       "qr_code_description": "Sdílejte tento QR kód, aby se k tomuto čítači mohli připojit další osoby",
       "qr_code_title": "QR kód pro sdílení",
+      "regenerate_token": "Regenerovat token",
+      "regenerate_token_error": "Chyba při regeneraci tokenu",
+      "regenerate_token_warning": "Pozor: Regenerace tokenu zneplatní starý odkaz ke sdílení a aktuální QR kód. Všichni uživatelé budou muset použít nový odkaz pro přístup k počítadlu.",
       "reset": "Resetovat",
       "reset_confirmation": "Jste si jisti, že chcete resetovat tento čítač na 0?",
       "reset_counter": "Resetovat čítač",
       "share_text": "Připojte se k tomuto čítači a sledujte vstupy v reálném čase",
       "step": "Přírůstek",
       "syncing": "Probíhá synchronizace...",
-      "title": "Čítače"
+      "title": "Čítače",
+      "token_regenerated": "Token úspěšně regenerován"
     },
     "my_ticket": {
       "how_to_use_description": "U vstupu předložte tento QR kód a ověřte si platnost vstupenky.",
