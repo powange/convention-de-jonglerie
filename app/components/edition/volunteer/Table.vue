@@ -253,6 +253,63 @@
         sticky
         @contextmenu="onContextmenu"
       >
+        <template #pseudo-cell="{ row }">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span class="font-medium">{{ row.original.user.pseudo }}</span>
+              <UPopover v-if="row.original.user.volunteerComments?.length > 0" placement="top">
+                <UIcon
+                  name="i-heroicons-exclamation-triangle"
+                  class="text-yellow-600 dark:text-yellow-400 cursor-help flex-shrink-0"
+                  size="16"
+                />
+                <template #content>
+                  <div class="p-3 max-w-sm space-y-3">
+                    <div
+                      v-for="(comment, index) in row.original.user.volunteerComments"
+                      :key="index"
+                      :class="index > 0 ? 'border-t border-gray-200 dark:border-gray-700 pt-3' : ''"
+                    >
+                      <div class="flex items-center gap-2 mb-1.5">
+                        <div class="flex flex-col gap-0.5">
+                          <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                              {{
+                                getEditionDisplayName(comment.edition) ||
+                                `Édition #${comment.editionId}`
+                              }}
+                            </span>
+                            <span
+                              v-if="comment.editionId === editionId"
+                              class="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded font-medium"
+                            >
+                              Actuelle
+                            </span>
+                          </div>
+                          <span
+                            v-if="comment.edition?.startDate && comment.edition?.endDate"
+                            class="text-xs text-gray-500 dark:text-gray-400"
+                          >
+                            {{
+                              formatDateRange(comment.edition.startDate, comment.edition.endDate)
+                            }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                        <blockquote>{{ comment.content }}</blockquote>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </UPopover>
+            </div>
+            <span class="text-xs text-gray-500">{{ row.original.user.email }}</span>
+            <span v-if="row.original.user.phone" class="text-xs text-gray-500">{{
+              row.original.user.phone
+            }}</span>
+          </div>
+        </template>
         <template #actions-cell="{ row }">
           <div v-if="props.canManageVolunteers">
             <!-- Bouton Éditer disponible pour tous les statuts -->
@@ -307,6 +364,14 @@
                 variant="solid"
                 icon="i-heroicons-user-group"
                 @click="openEditTeamsModal(row.original)"
+              />
+              <UButton
+                :label="t('gestion.volunteers.action_add_comment')"
+                size="xs"
+                color="warning"
+                variant="soft"
+                icon="i-heroicons-chat-bubble-left-right"
+                @click="openCommentModal(row.original)"
               />
               <UButton
                 :label="t('edition.volunteers.action_back_pending')"
@@ -505,6 +570,14 @@
     @confirm="executeDeleteApplication"
     @cancel="showDeleteModal = false"
   />
+
+  <!-- Modal de commentaire sur le bénévole -->
+  <VolunteersCommentModal
+    v-model:open="commentModalOpen"
+    :volunteer="currentCommentVolunteer"
+    :edition-id="props.edition?.id || 0"
+    @comment-saved="handleCommentSaved"
+  />
 </template>
 
 <script setup lang="ts">
@@ -515,6 +588,8 @@ import {
   getAllergySeverityBadgeClasses,
   requiresEmergencyContact,
 } from '~/utils/allergy-severity'
+import { formatDateRange } from '~/utils/date'
+import { getEditionDisplayName } from '~/utils/editionName'
 import {
   updateVolunteerApplication,
   updateVolunteerApplicationStatus,
@@ -572,6 +647,10 @@ const modalMode = ref<'accept' | 'edit'>('accept')
 // Variables pour la modal d'édition des candidatures
 const editModalOpen = ref(false)
 const currentEditApplication = ref<any>(null)
+
+// Variables pour la modal de commentaire
+const commentModalOpen = ref(false)
+const currentCommentVolunteer = ref<any>(null)
 
 // Référence pour le tableau
 const tableRef = ref()
@@ -753,11 +832,9 @@ const refreshApplications = async () => {
     } as any)
     applications.value = res.data || []
     if (res.pagination) {
-      console.log('Pagination:', res.pagination)
       serverPagination.value.total = res.pagination.total
       serverPagination.value.page = res.pagination.page
       serverPagination.value.totalPages = res.pagination.totalPages
-      console.log('Updated serverPagination:', serverPagination.value)
     }
   } catch (e: any) {
     toast.add({ title: e?.message || t('common.error'), color: 'error' })
@@ -946,6 +1023,18 @@ const openEditTeamsModal = (app: any) => {
       selectedTeams.value = [availableTeamsForModal.value[0].id]
     }
   })
+}
+
+// Ouvrir la modal de commentaire
+const openCommentModal = (app: any) => {
+  currentCommentVolunteer.value = app
+  commentModalOpen.value = true
+}
+
+// Rafraîchir après l'ajout d'un commentaire
+const handleCommentSaved = async () => {
+  await refreshApplications()
+  emit('refreshTeamAssignments')
 }
 
 // Fermer la modal
@@ -1189,14 +1278,6 @@ const columns = computed((): TableColumn<any>[] => [
   {
     accessorKey: 'pseudo',
     header: ({ column }) => getSortableHeader(column, t('edition.volunteers.table_user')),
-    cell: ({ row }) =>
-      h('div', { class: 'flex flex-col' }, [
-        h('span', { class: 'font-medium' }, row.original.user.pseudo),
-        h('span', { class: 'text-xs text-gray-500' }, row.original.user.email),
-        row.original.user.phone
-          ? h('span', { class: 'text-xs text-gray-500' }, row.original.user.phone)
-          : null,
-      ]),
   },
   // Colonnes Prénom et Nom
   {
@@ -2008,6 +2089,14 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
         color: 'primary',
         onSelect() {
           openEditTeamsModal(row.original)
+        },
+      })
+      items.push({
+        label: t('gestion.volunteers.action_add_comment'),
+        icon: 'i-heroicons-chat-bubble-left-right',
+        color: 'warning',
+        onSelect() {
+          openCommentModal(row.original)
         },
       })
       items.push({ type: 'separator' })

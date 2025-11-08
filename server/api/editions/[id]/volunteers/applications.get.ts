@@ -44,6 +44,21 @@ export default wrapApiHandler(async (event) => {
       message: 'Droits insuffisants pour accéder à ces données',
     })
 
+  // Récupérer le conventionId de l'édition pour charger les commentaires de toutes les éditions de la convention
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: { conventionId: true },
+  })
+
+  if (!edition) {
+    throw createError({
+      statusCode: 404,
+      message: 'Édition non trouvée',
+    })
+  }
+
+  const conventionId = edition.conventionId
+
   const query = getQuery(event)
   const statusFilter = query.status as string | undefined
   const teamsFilter = query.teams as string | undefined
@@ -252,6 +267,31 @@ export default wrapApiHandler(async (event) => {
         nom: true,
         profilePicture: true,
         updatedAt: true,
+        volunteerComments: {
+          where: {
+            edition: {
+              conventionId,
+            },
+          },
+          select: {
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+            editionId: true,
+            edition: {
+              select: {
+                name: true,
+                startDate: true,
+                endDate: true,
+                convention: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
     addedBy: {

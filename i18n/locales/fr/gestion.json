@@ -24,7 +24,18 @@
       "applications_description": "Consulter et traiter les candidatures",
       "teams_description": "Organiser les équipes de bénévoles",
       "planning_description": "Planifier les créneaux et missions",
-      "notifications_description": "Envoyer des notifications aux bénévoles"
+      "notifications_description": "Envoyer des notifications aux bénévoles",
+      "comment_label": "Commentaire",
+      "comment_hint": "Ce commentaire sera visible uniquement par les organisateurs de la convention",
+      "comment_placeholder": "Ajoutez des notes ou observations sur ce bénévole...",
+      "comment_warning": "Ce commentaire est lié au bénévole pour cette édition uniquement.",
+      "comment_modal_title": "Commentaire sur le bénévole",
+      "comment_modal_title_for": "Commentaire sur {name}",
+      "comment_saved_success": "Commentaire enregistré avec succès",
+      "comment_save_error": "Impossible d'enregistrer le commentaire",
+      "comment_deleted_success": "Commentaire supprimé avec succès",
+      "comment_delete_error": "Impossible de supprimer le commentaire",
+      "action_add_comment": "Ajouter un commentaire"
     },
     "meals": {
       "title": "Repas",
