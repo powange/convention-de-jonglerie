@@ -16,6 +16,9 @@
     "today": "Oggi",
     "week": "Settimana"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Accettato",
     "actions": "Azioni",
@@ -33,6 +36,7 @@
     "cancel": "Annulla",
     "cancelled": "Cancelled",
     "category": "Categoria",
+    "characters": "caratteri",
     "city": "Città",
     "clear": "Cancella",
     "click_to_view_full": "Clicca per vedere il testo completo",
@@ -290,7 +294,9 @@
       "qr_details": "Dettagli",
       "qr_how_to_use": "Come usarlo?",
       "qr_instructions": "Presenta questo codice QR all'ingresso della convention per accedere come volontario.",
+      "qr_instructions_organizer": "Presenta questo codice QR all'ingresso della convention per accedere come organizzatore.",
       "qr_modal_title": "Il mio codice QR volontario",
+      "qr_modal_title_organizer": "Il mio codice QR organizzatore",
       "recent_validations": "Validazioni recenti",
       "scan_ticket": "Scansiona un biglietto",
       "scanner_activating": "Attivazione della fotocamera...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",
+    "add_error": "Errore durante l'aggiunta",
     "add_organizer_error": "Errore nell'aggiungere organizere",
     "address_required": "L'indirizzo è richiesto",
     "address_too_long": "L'indirizzo non può superare {max} caratteri",
@@ -829,6 +836,7 @@
     "people_maximum": "Massimo {max} persone",
     "publish_edition_failed": "Impossibile pubblicare l'edizione",
     "registration_failed": "Registrazione fallita",
+    "remove_error": "Errore durante la rimozione",
     "remove_organizer_error": "Errore nella rimozione del organizere",
     "required_field": "Questo campo è richiesto",
     "seats_maximum": "Massimo {max} posti",

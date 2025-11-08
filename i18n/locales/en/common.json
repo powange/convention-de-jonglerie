@@ -16,6 +16,9 @@
     "today": "Today",
     "week": "Week"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Accepted",
     "actions": "Actions",
@@ -33,6 +36,7 @@
     "cancel": "Cancel",
     "cancelled": "Cancelled",
     "category": "Category",
+    "characters": "characters",
     "city": "City",
     "clear": "Clear",
     "click_to_view_full": "Click to view full text",
@@ -290,7 +294,9 @@
       "qr_details": "Details",
       "qr_how_to_use": "How to use it?",
       "qr_instructions": "Present this QR code at the convention entrance to access as a volunteer.",
+      "qr_instructions_organizer": "Present this QR code at the convention entrance to access as an organizer.",
       "qr_modal_title": "My volunteer QR code",
+      "qr_modal_title_organizer": "My organizer QR code",
       "recent_validations": "Recent validations",
       "scan_ticket": "Scan a ticket",
       "scanner_activating": "Activating camera...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Access denied",
+    "add_error": "Error while adding",
     "add_organizer_error": "Error adding organizer",
     "address_required": "Address is required",
     "address_too_long": "Address cannot exceed {max} characters",
@@ -829,6 +836,7 @@
     "people_maximum": "Maximum {max} people",
     "publish_edition_failed": "Failed to publish edition",
     "registration_failed": "Registration failed",
+    "remove_error": "Error while removing",
     "remove_organizer_error": "Error removing organizer",
     "required_field": "This field is required",
     "seats_maximum": "Maximum {max} seats",

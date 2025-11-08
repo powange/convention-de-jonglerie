@@ -16,6 +16,9 @@
     "today": "Dzisiaj",
     "week": "Tydzień"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Zaakceptowane",
     "actions": "Akcje",
@@ -33,6 +36,7 @@
     "cancel": "Anuluj",
     "cancelled": "Cancelled",
     "category": "Kategoria",
+    "characters": "znaki",
     "city": "Miasto",
     "clear": "Wyczyść",
     "click_to_view_full": "Kliknij, aby zobaczyć pełny tekst",
@@ -290,7 +294,9 @@
       "qr_details": "Szczegóły",
       "qr_how_to_use": "Jak z tego korzystać?",
       "qr_instructions": "Pokaż ten kod QR przy wejściu na konwencję, aby uzyskać dostęp jako wolontariusz.",
+      "qr_instructions_organizer": "Przedstaw ten kod QR przy wejściu na konwencję, aby uzyskać dostęp jako organizator.",
       "qr_modal_title": "Mój kod QR wolontariusza",
+      "qr_modal_title_organizer": "Mój kod QR organizatora",
       "recent_validations": "Ostatnie walidacje",
       "scan_ticket": "Skanuj bilet",
       "scanner_activating": "Aktywacja kamery...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",
+    "add_error": "Błąd podczas dodawania",
     "add_organizer_error": "Błąd dodawania współpracownika",
     "address_required": "Adres jest wymagany",
     "address_too_long": "Adres nie może przekroczyć {max} znaków",
@@ -829,6 +836,7 @@
     "people_maximum": "Maksimum {max} osób",
     "publish_edition_failed": "Nie udało się opublikować edycji",
     "registration_failed": "Rejestracja nie powiodła się",
+    "remove_error": "Błąd podczas usuwania",
     "remove_organizer_error": "Błąd usuwania współpracownika",
     "required_field": "To pole jest wymagane",
     "seats_maximum": "Maksimum {max} miejsc",

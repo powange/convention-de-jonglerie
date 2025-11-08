@@ -16,6 +16,9 @@
     "today": "I dag",
     "week": "Uge"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Accepteret",
     "actions": "Handlinger",
@@ -33,6 +36,7 @@
     "cancel": "Annuller",
     "cancelled": "Cancelled",
     "category": "Kategori",
+    "characters": "tegn",
     "city": "By",
     "clear": "Ryd",
     "click_to_view_full": "Klik for at se fuld tekst",
@@ -290,7 +294,9 @@
       "qr_details": "Detaljer",
       "qr_how_to_use": "Hvordan bruger man den?",
       "qr_instructions": "Vis denne QR-kode ved indgangen til konventionen for at få adgang som frivillig.",
+      "qr_instructions_organizer": "Vis denne QR-kode ved indgangen til konventionen for at få adgang som organisator.",
       "qr_modal_title": "Min frivillig QR-kode",
+      "qr_modal_title_organizer": "Min organisator QR-kode",
       "recent_validations": "Seneste valideringer",
       "scan_ticket": "Scan en billet",
       "scanner_activating": "Aktivering af kamera...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Adgang nægtet",
+    "add_error": "Fejl ved tilføjelse",
     "add_organizer_error": "Fejl ved tilføjelse af samarbejdspartner",
     "address_required": "Adresse påkrævet",
     "address_too_long": "Adressen må ikke overstige {max} tegn",
@@ -829,6 +836,7 @@
     "people_maximum": "Maksimum {max} personer",
     "publish_edition_failed": "Kunne ikke publicere udgave",
     "registration_failed": "Registrering mislykkedes",
+    "remove_error": "Fejl ved fjernelse",
     "remove_organizer_error": "Fejl ved fjernelse af samarbejdspartner",
     "required_field": "Dette felt er påkrævet",
     "seats_maximum": "Maksimum {max} pladser",

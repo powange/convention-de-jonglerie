@@ -73,16 +73,8 @@
     }
   },
   "organizers": {
-    "organizer_added": "Organisateur ajouté",
-    "organizer_removed": "Organisateur supprimé",
-    "organizer_updated": "Organisateur mis à jour",
-    "confirm_remove": "Êtes-vous sûr de vouloir supprimer cet organisateur ?",
-    "edit_organizer": "Modifier l'organisateur",
-    "list": "Liste des organisateurs",
     "manage": "Gérer les organisateurs",
     "manage_description": "Gérer les organisateurs et leurs droits pour cette édition",
-    "no_organizers": "Aucun organisateur",
-    "page_description": "Gérer les membres de l'équipe organisatrice et leurs permissions",
     "rights": "Droits",
     "title": "Organisateurs"
   },

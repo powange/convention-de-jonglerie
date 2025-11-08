@@ -16,6 +16,9 @@
     "today": "Сегодня",
     "week": "Неделя"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Принято",
     "actions": "Действия",
@@ -33,6 +36,7 @@
     "cancel": "Отмена",
     "cancelled": "Cancelled",
     "category": "Категория",
+    "characters": "символы",
     "city": "Город",
     "clear": "Очистить",
     "click_to_view_full": "Нажмите, чтобы увидеть полный текст",
@@ -290,7 +294,9 @@
       "qr_details": "Детали",
       "qr_how_to_use": "Как использовать?",
       "qr_instructions": "Покажите этот QR-код на входе в конвенцию, чтобы получить доступ в качестве волонтера.",
+      "qr_instructions_organizer": "Предъявите этот QR-код на входе в конференцию для доступа в качестве организатора.",
       "qr_modal_title": "Мой QR-код волонтера",
+      "qr_modal_title_organizer": "Мой QR-код организатора",
       "recent_validations": "Последние проверки",
       "scan_ticket": "Отсканировать билет",
       "scanner_activating": "Активация камеры...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Доступ запрещен",
+    "add_error": "Ошибка при добавлении",
     "add_organizer_error": "Ошибка добавления сотрудника",
     "address_required": "Адрес обязателен",
     "address_too_long": "Адрес не может превышать {max} символов",
@@ -829,6 +836,7 @@
     "people_maximum": "Максимум {max} человек",
     "publish_edition_failed": "Не удалось опубликовать издание",
     "registration_failed": "Регистрация не удалась",
+    "remove_error": "Ошибка при удалении",
     "remove_organizer_error": "Ошибка удаления сотрудника",
     "required_field": "Это поле обязательно",
     "seats_maximum": "Максимум {max} мест",

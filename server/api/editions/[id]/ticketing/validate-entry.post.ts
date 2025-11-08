@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
-  type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('ticket'),
+  type: z.enum(['ticket', 'volunteer', 'artist', 'organizer']).optional().default('ticket'),
   markAsPaid: z.boolean().optional().default(false),
   userInfo: z
     .object({
@@ -320,6 +320,63 @@ export default wrapApiHandler(
           success: true,
           validated: result.count,
           message: `${result.count} artiste${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
+        }
+      } else if (body.type === 'organizer') {
+        // Valider les organisateurs
+        // Les participantIds sont les IDs des ConventionOrganizer
+        // On valide seulement ceux qui ont une entrée dans EditionOrganizer
+        let validated = 0
+
+        for (const organizerId of body.participantIds) {
+          // Vérifier que l'organisateur a une entrée EditionOrganizer pour cette édition
+          const editionOrganizer = await prisma.editionOrganizer.findFirst({
+            where: {
+              editionId: editionId,
+              organizerId: organizerId,
+            },
+          })
+
+          if (!editionOrganizer) continue
+
+          // Mettre à jour l'EditionOrganizer
+          await prisma.editionOrganizer.update({
+            where: {
+              id: editionOrganizer.id,
+            },
+            data: {
+              entryValidated: true,
+              entryValidatedAt: new Date(),
+              entryValidatedBy: user.id,
+            },
+          })
+
+          validated++
+        }
+
+        // Notifier via SSE
+        try {
+          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          for (const participantId of body.participantIds) {
+            broadcastToEditionSSE(editionId, {
+              type: 'entry-validated',
+              editionId,
+              participantType: 'organizer',
+              participantId,
+            })
+          }
+          // Notifier aussi que les stats ont changé
+          broadcastToEditionSSE(editionId, {
+            type: 'stats-updated',
+            editionId,
+          })
+        } catch (sseError) {
+          console.error('[SSE] Failed to notify SSE clients:', sseError)
+        }
+
+        return {
+          success: true,
+          validated,
+          message: `${validated} organisateur${validated > 1 ? 's' : ''} validé${validated > 1 ? 's' : ''}`,
         }
       } else {
         // Valider les billets en utilisant l'ID de OrderItem

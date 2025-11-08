@@ -6,7 +6,7 @@
         <h2 class="text-lg font-semibold">{{ $t('edition.ticketing.entry_stats') }}</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <div class="flex items-center justify-between">
             <div>
@@ -81,6 +81,26 @@
             <UIcon name="i-heroicons-star" class="text-green-500" size="32" />
           </div>
         </button>
+
+        <button
+          class="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors cursor-pointer text-left w-full"
+          @click="$emit('show-organizers-not-validated')"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ $t('ticketing.stats.organizers') }}
+              </p>
+              <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                {{ stats.organizersValidated }} / {{ stats.totalOrganizers }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                {{ stats.organizersValidatedToday }} aujourd'hui
+              </p>
+            </div>
+            <UIcon name="i-heroicons-shield-check" class="text-indigo-500" size="32" />
+          </div>
+        </button>
       </div>
     </div>
   </UCard>
@@ -93,12 +113,15 @@ interface EntryStats {
   ticketsValidated: number
   volunteersValidated: number
   artistsValidated: number
+  organizersValidated: number
   ticketsValidatedToday: number
   volunteersValidatedToday: number
   artistsValidatedToday: number
+  organizersValidatedToday: number
   totalTickets: number
   totalVolunteers: number
   totalArtists: number
+  totalOrganizers: number
 }
 
 defineProps<{
@@ -108,5 +131,6 @@ defineProps<{
 defineEmits<{
   'show-volunteers-not-validated': []
   'show-artists-not-validated': []
+  'show-organizers-not-validated': []
 }>()
 </script>

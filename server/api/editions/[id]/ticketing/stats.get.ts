@@ -104,6 +104,24 @@ export default wrapApiHandler(
         },
       })
 
+      // Compter les validations d'organisateurs
+      const organizersValidatedToday = await prisma.editionOrganizer.count({
+        where: {
+          editionId: editionId,
+          entryValidated: true,
+          entryValidatedAt: {
+            gte: today,
+          },
+        },
+      })
+
+      const totalOrganizersValidated = await prisma.editionOrganizer.count({
+        where: {
+          editionId: editionId,
+          entryValidated: true,
+        },
+      })
+
       // Compter le nombre total de billets (uniquement les tarifs avec countAsParticipant = true)
       const totalTickets = await prisma.ticketingOrderItem.count({
         where: {
@@ -138,20 +156,38 @@ export default wrapApiHandler(
         },
       })
 
+      // Compter le nombre total d'organisateurs de l'édition
+      const totalOrganizers = await prisma.editionOrganizer.count({
+        where: {
+          editionId: editionId,
+        },
+      })
+
       return {
         success: true,
         stats: {
-          validatedToday: ticketsValidatedToday + volunteersValidatedToday + artistsValidatedToday,
-          totalValidated: totalTicketsValidated + totalVolunteersValidated + totalArtistsValidated,
+          validatedToday:
+            ticketsValidatedToday +
+            volunteersValidatedToday +
+            artistsValidatedToday +
+            organizersValidatedToday,
+          totalValidated:
+            totalTicketsValidated +
+            totalVolunteersValidated +
+            totalArtistsValidated +
+            totalOrganizersValidated,
           ticketsValidated: totalTicketsValidated,
           volunteersValidated: totalVolunteersValidated,
           artistsValidated: totalArtistsValidated,
+          organizersValidated: totalOrganizersValidated,
           ticketsValidatedToday: ticketsValidatedToday,
           volunteersValidatedToday: volunteersValidatedToday,
           artistsValidatedToday: artistsValidatedToday,
+          organizersValidatedToday: organizersValidatedToday,
           totalTickets: totalTickets,
           totalVolunteers: totalVolunteers,
           totalArtists: totalArtists,
+          totalOrganizers: totalOrganizers,
         },
       }
     } catch (error: unknown) {

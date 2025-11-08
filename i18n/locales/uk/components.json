@@ -133,7 +133,6 @@
     "organizers_rights_panel": {
       "all_editions": "Усі видання",
       "per_edition": "Права за виданнями",
-      "per_edition_hint": "Для випусків не визначено конкретних прав",
       "title_label": "Посада / функція",
       "title_placeholder": "Назва або роль (необов'язково)"
     },

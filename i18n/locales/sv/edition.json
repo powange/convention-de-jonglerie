@@ -148,16 +148,8 @@
     "vegetarian": "Vegetarisk"
   },
   "organizers": {
-    "confirm_remove": "Är du säker på att du vill ta bort denna arrangör?",
-    "edit_organizer": "Redigera arrangör",
-    "list": "Lista över arrangörer",
     "manage": "Hantera arrangörer",
     "manage_description": "Hantera arrangörer och deras rättigheter för denna utgåva",
-    "no_organizers": "Inga arrangörer",
-    "organizer_added": "Arrangör tillagd",
-    "organizer_removed": "Arrangör borttagen",
-    "organizer_updated": "Arrangör uppdaterad",
-    "page_description": "Hantera medlemmar i organisationsteamet och deras behörigheter",
     "rights": "Rättigheter",
     "title": "Arrangörer"
   }

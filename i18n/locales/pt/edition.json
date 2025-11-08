@@ -148,16 +148,8 @@
     "vegetarian": "Vegetariano"
   },
   "organizers": {
-    "confirm_remove": "Tem certeza de que deseja remover este organizador?",
-    "edit_organizer": "Editar organizador",
-    "list": "Lista de organizadores",
     "manage": "Gerir organizadores",
     "manage_description": "Gerir organizadores e seus direitos para esta edição",
-    "no_organizers": "Nenhum organizador",
-    "organizer_added": "Organizador adicionado",
-    "organizer_removed": "Organizador removido",
-    "organizer_updated": "Organizador atualizado",
-    "page_description": "Gerir membros da equipe organizadora e suas permissões",
     "rights": "Direitos",
     "title": "Organizadores"
   }

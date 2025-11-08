@@ -16,6 +16,9 @@
     "today": "Vandaag",
     "week": "Week"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Geaccepteerd",
     "actions": "Acties",
@@ -33,6 +36,7 @@
     "cancel": "Annuleren",
     "cancelled": "Cancelled",
     "category": "Categorie",
+    "characters": "tekens",
     "city": "Stad",
     "clear": "Wissen",
     "click_to_view_full": "Klik om de volledige tekst te bekijken",
@@ -290,7 +294,9 @@
       "qr_details": "Details",
       "qr_how_to_use": "Hoe te gebruiken?",
       "qr_instructions": "Toon deze QR-code bij de ingang van de convention om toegang te krijgen als vrijwilliger.",
+      "qr_instructions_organizer": "Toon deze QR-code bij de ingang van de conventie om toegang te krijgen als organisator.",
       "qr_modal_title": "Mijn vrijwilligers QR-code",
+      "qr_modal_title_organizer": "Mijn organisator QR-code",
       "recent_validations": "Recente validaties",
       "scan_ticket": "Scan een ticket",
       "scanner_activating": "Camera activeren...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Toegang geweigerd",
+    "add_error": "Fout bij toevoegen",
     "add_organizer_error": "Fout bij toevoegen medewerker",
     "address_required": "Adres is vereist",
     "address_too_long": "Adres mag niet meer dan {max} tekens bevatten",
@@ -829,6 +836,7 @@
     "people_maximum": "Maximaal {max} personen",
     "publish_edition_failed": "Publiceren van editie mislukt",
     "registration_failed": "Registratie mislukt",
+    "remove_error": "Fout bij verwijderen",
     "remove_organizer_error": "Fout bij verwijderen medewerker",
     "required_field": "Dit veld is vereist",
     "seats_maximum": "Maximaal {max} plaatsen",

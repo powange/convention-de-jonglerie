@@ -133,7 +133,6 @@
     "organizers_rights_panel": {
       "all_editions": "Alle edities",
       "per_edition": "Rechten per editie",
-      "per_edition_hint": "Geen specifieke rechten gedefinieerd voor edities",
       "title_label": "Titel / functie",
       "title_placeholder": "Titel of rol (optioneel)"
     },

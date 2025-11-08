@@ -80,7 +80,8 @@
       "Bash(chmod:*)",
       "Bash(node scripts/translation/mark-todo.js:*)",
       "Bash(npx nuxt prepare)",
-      "Bash(docker ps:*)"
+      "Bash(docker ps:*)",
+      "Bash(npm run i18n:mark-todo:*)"
     ],
     "deny": [],
     "ask": [],

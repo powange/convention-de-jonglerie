@@ -167,6 +167,7 @@ model Edition {
   volunteerMeals                    VolunteerMeal[]
   ticketingCounters                 TicketingCounter[]
   volunteerComments                 VolunteerComment[]
+  editionOrganizers                 EditionOrganizer[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -193,6 +194,7 @@ model ConventionOrganizer {
   convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   perEditionPermissions EditionOrganizerPermission[]
+  editionOrganizers     EditionOrganizer[]
 
   @@unique([conventionId, userId])
   @@index([addedById], map: "ConventionOrganizer_addedById_fkey")
@@ -347,6 +349,24 @@ model EditionOrganizerPermission {
 
   @@unique([organizerId, editionId])
   @@index([editionId])
+}
+
+model EditionOrganizer {
+  id               Int                 @id @default(autoincrement())
+  editionId        Int
+  organizerId      Int
+  entryValidated   Boolean             @default(false)
+  entryValidatedAt DateTime?
+  entryValidatedBy Int?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  edition          Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer        ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, organizerId])
+  @@index([editionId])
+  @@index([organizerId])
+  @@index([entryValidatedBy])
 }
 
 model OrganizerPermissionHistory {

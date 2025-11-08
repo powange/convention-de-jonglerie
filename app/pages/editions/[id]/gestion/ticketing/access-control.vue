@@ -318,6 +318,7 @@
           :stats="stats"
           @show-volunteers-not-validated="showVolunteersNotValidatedModal"
           @show-artists-not-validated="showArtistsNotValidatedModal"
+          @show-organizers-not-validated="showOrganizersNotValidatedModal"
         />
 
         <!-- Statistiques des quotas -->
@@ -641,6 +642,9 @@ const loadingVolunteersNotValidated = ref(false)
 const artistsNotValidatedModalOpen = ref(false)
 const artistsNotValidated = ref<any[]>([])
 const loadingArtistsNotValidated = ref(false)
+const organizersNotValidatedModalOpen = ref(false)
+const organizersNotValidated = ref<any[]>([])
+const loadingOrganizersNotValidated = ref(false)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -787,6 +791,8 @@ const handleValidateParticipants = async (
       await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
     } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
       await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
+    } else if (participantType.value === 'organizer' && selectedParticipant.value?.organizer?.id) {
+      await reloadParticipant(selectedParticipant.value.organizer.id, 'organizer')
     } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }
@@ -803,7 +809,7 @@ const handleValidateParticipants = async (
 
 const reloadParticipant = async (
   identifier: number | string,
-  type: 'ticket' | 'volunteer' | 'artist'
+  type: 'ticket' | 'volunteer' | 'artist' | 'organizer'
 ) => {
   try {
     let qrCode: string
@@ -811,6 +817,8 @@ const reloadParticipant = async (
       qrCode = `volunteer-${identifier}`
     } else if (type === 'artist') {
       qrCode = `artist-${identifier}`
+    } else if (type === 'organizer') {
+      qrCode = `organizer-${identifier}`
     } else {
       qrCode = identifier as string
     }
@@ -855,6 +863,8 @@ const handleInvalidateEntry = async (participantId: number) => {
       await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
     } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
       await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
+    } else if (participantType.value === 'organizer' && selectedParticipant.value?.organizer?.id) {
+      await reloadParticipant(selectedParticipant.value.organizer.id, 'organizer')
     } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }
@@ -1100,6 +1110,38 @@ const showArtistsNotValidatedModal = async () => {
   await loadArtistsNotValidated()
 }
 
+// Charger les organisateurs non validés
+const loadOrganizersNotValidated = async () => {
+  loadingOrganizersNotValidated.value = true
+
+  try {
+    const result: any = await $fetch(
+      `/api/editions/${editionId}/ticketing/organizers-not-validated`
+    )
+
+    if (result.success) {
+      organizersNotValidated.value = result.organizers
+    }
+  } catch (error: any) {
+    console.error('Failed to load organizers not validated:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de charger les organisateurs non validés',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingOrganizersNotValidated.value = false
+  }
+}
+
+// Afficher la modal des organisateurs non validés
+const showOrganizersNotValidatedModal = async () => {
+  organizersNotValidatedModalOpen.value = true
+  // Charger les données à chaque fois que la modal s'ouvre
+  await loadOrganizersNotValidated()
+}
+
 // Rafraîchir automatiquement quand une mise à jour SSE arrive
 watch(lastUpdate, () => {
   if (lastUpdate.value) {
@@ -1114,6 +1156,11 @@ watch(lastUpdate, () => {
     // Recharger la liste des artistes non validés si la modal est ouverte
     if (artistsNotValidatedModalOpen.value) {
       loadArtistsNotValidated()
+    }
+
+    // Recharger la liste des organisateurs non validés si la modal est ouverte
+    if (organizersNotValidatedModalOpen.value) {
+      loadOrganizersNotValidated()
     }
   }
 })

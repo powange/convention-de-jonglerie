@@ -400,6 +400,86 @@ export default wrapApiHandler(
             message: 'Aucun artiste trouvé avec ce QR code',
           }
         }
+      } else if (body.qrCode.startsWith('organizer-')) {
+        // Recherche d'un organisateur
+        const editionOrganizerId = parseInt(body.qrCode.replace('organizer-', ''))
+
+        if (isNaN(editionOrganizerId)) {
+          return {
+            success: true,
+            found: false,
+            message: 'QR code organisateur invalide',
+          }
+        }
+
+        const editionOrganizer = await prisma.editionOrganizer.findFirst({
+          where: {
+            id: editionOrganizerId,
+            editionId: editionId,
+          },
+          include: {
+            organizer: {
+              include: {
+                user: {
+                  select: {
+                    prenom: true,
+                    nom: true,
+                    email: true,
+                    phone: true,
+                  },
+                },
+              },
+            },
+          },
+        })
+
+        if (editionOrganizer) {
+          // Récupérer l'utilisateur qui a validé si applicable
+          let validatedByUser = null
+          if (editionOrganizer.entryValidatedBy) {
+            validatedByUser = await prisma.user.findUnique({
+              where: { id: editionOrganizer.entryValidatedBy },
+              select: {
+                prenom: true,
+                nom: true,
+              },
+            })
+          }
+
+          return {
+            success: true,
+            found: true,
+            type: 'organizer',
+            participant: {
+              found: true,
+              organizer: {
+                id: editionOrganizer.id,
+                user: {
+                  firstName: editionOrganizer.organizer.user.prenom,
+                  lastName: editionOrganizer.organizer.user.nom,
+                  email: editionOrganizer.organizer.user.email,
+                  phone: editionOrganizer.organizer.user.phone,
+                },
+                title: editionOrganizer.organizer.title,
+                entryValidated: editionOrganizer.entryValidated,
+                entryValidatedAt: editionOrganizer.entryValidatedAt,
+                entryValidatedBy: validatedByUser
+                  ? {
+                      firstName: validatedByUser.prenom,
+                      lastName: validatedByUser.nom,
+                    }
+                  : null,
+              },
+            },
+            message: `Organisateur trouvé : ${editionOrganizer.organizer.user.prenom} ${editionOrganizer.organizer.user.nom}`,
+          }
+        } else {
+          return {
+            success: true,
+            found: false,
+            message: 'Aucun organisateur trouvé avec ce QR code',
+          }
+        }
       } else {
         // Recherche d'un billet HelloAsso
         const config = await prisma.externalTicketing.findUnique({

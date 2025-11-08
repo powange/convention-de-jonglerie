@@ -446,3 +446,35 @@ export function canManageTicketing(
     isGlobalAdmin
   )
 }
+
+/**
+ * Vérifie si un utilisateur peut gérer les organisateurs d'une édition
+ */
+export function canManageOrganizers(
+  edition: EditionWithPermissions,
+  user: UserForPermissions
+): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  // Vérifier si l'utilisateur est organisateur avec droits de gestion des organisateurs au niveau convention
+  const hasConventionOrganizersRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageOrganizers
+    ) || false
+
+  // Vérifier si l'utilisateur a des droits de gestion des organisateurs spécifiques à cette édition
+  const hasEditionOrganizersRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageOrganizers === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionOrganizersRights ||
+    hasEditionOrganizersRights ||
+    isGlobalAdmin
+  )
+}

@@ -16,6 +16,9 @@
     "today": "Hoje",
     "week": "Semana"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Aceito",
     "actions": "Acções",
@@ -33,6 +36,7 @@
     "cancel": "Cancelar",
     "cancelled": "Cancelled",
     "category": "Categoria",
+    "characters": "caracteres",
     "city": "Cidade",
     "clear": "Limpar",
     "click_to_view_full": "Clique para ver o texto completo",
@@ -290,7 +294,9 @@
       "qr_details": "Detalhes",
       "qr_how_to_use": "Como usar?",
       "qr_instructions": "Apresente este código QR na entrada da convenção para acessar como voluntário.",
+      "qr_instructions_organizer": "Apresente este código QR na entrada da convenção para aceder como organizador.",
       "qr_modal_title": "Meu código QR de voluntário",
+      "qr_modal_title_organizer": "Meu código QR de organizador",
       "recent_validations": "Validações recentes",
       "scan_ticket": "Escanear um bilhete",
       "scanner_activating": "Ativando câmera...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Acesso negado",
+    "add_error": "Erro ao adicionar",
     "add_organizer_error": "Erro ao adicionar colaborador",
     "address_required": "Morada obrigatória",
     "address_too_long": "A morada não pode exceder {max} caracteres",
@@ -829,6 +836,7 @@
     "people_maximum": "Máximo {max} pessoas",
     "publish_edition_failed": "Falha ao publicar edição",
     "registration_failed": "Falha no registo",
+    "remove_error": "Erro ao remover",
     "remove_organizer_error": "Erro ao remover colaborador",
     "required_field": "Este campo é obrigatório",
     "seats_maximum": "Máximo {max} lugares",

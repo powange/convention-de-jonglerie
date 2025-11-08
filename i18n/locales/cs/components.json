@@ -133,7 +133,6 @@
     "organizers_rights_panel": {
       "all_editions": "Všechny edice",
       "per_edition": "Práva podle vydání",
-      "per_edition_hint": "Pro edice nejsou definována žádná zvláštní práva",
       "title_label": "Titul / funkce",
       "title_placeholder": "Název / funkce (nepovinné)"
     },

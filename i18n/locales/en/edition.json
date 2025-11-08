@@ -148,16 +148,8 @@
     "vegetarian": "Vegetarian"
   },
   "organizers": {
-    "confirm_remove": "Are you sure you want to remove this organizer?",
-    "edit_organizer": "Edit organizer",
-    "list": "List of organizers",
     "manage": "Manage organizers",
     "manage_description": "Manage organizers and their rights for this edition",
-    "no_organizers": "No organizers",
-    "organizer_added": "Organizer added",
-    "organizer_removed": "Organizer removed",
-    "organizer_updated": "Organizer updated",
-    "page_description": "Manage organizing team members and their permissions",
     "rights": "Rights",
     "title": "Organizers"
   }

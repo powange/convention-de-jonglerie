@@ -133,6 +133,7 @@
     },
     "stats": {
       "artists": "Künstler",
+      "organizers": "Organisatoren",
       "participants": "Teilnehmer",
       "volunteers": "Freiwillige"
     },

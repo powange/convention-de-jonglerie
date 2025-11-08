@@ -148,16 +148,8 @@
     "vegetarian": "Vegetarisk"
   },
   "organizers": {
-    "confirm_remove": "Er du sikker på, at du vil fjerne denne organisator?",
-    "edit_organizer": "Rediger organisator",
-    "list": "Liste over organisatorer",
     "manage": "Administrer organisatorer",
     "manage_description": "Administrer organisatorer og deres rettigheder for denne udgave",
-    "no_organizers": "Ingen organisatorer",
-    "organizer_added": "Organisator tilføjet",
-    "organizer_removed": "Organisator fjernet",
-    "organizer_updated": "Organisator opdateret",
-    "page_description": "Administrer medlemmer af organisationsteamet og deres tilladelser",
     "rights": "Rettigheder",
     "title": "Organisatorer"
   }

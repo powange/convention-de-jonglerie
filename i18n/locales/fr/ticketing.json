@@ -134,7 +134,8 @@
     "stats": {
       "participants": "Participants",
       "volunteers": "Bénévoles",
-      "artists": "Artistes"
+      "artists": "Artistes",
+      "organizers": "Organisateurs"
     },
     "tiers": {
       "list": {

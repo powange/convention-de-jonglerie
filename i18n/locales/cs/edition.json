@@ -148,16 +148,8 @@
     "vegetarian": "Vegetariánské"
   },
   "organizers": {
-    "confirm_remove": "Jste si jisti, že chcete odstranit tohoto organizátora?",
-    "edit_organizer": "Upravit organizátora",
-    "list": "Seznam organizátorů",
     "manage": "Spravovat organizátory",
     "manage_description": "Spravovat organizátory a jejich práva pro tuto edici",
-    "no_organizers": "Žádní organizátoři",
-    "organizer_added": "Organizátor přidán",
-    "organizer_removed": "Organizátor odstraněn",
-    "organizer_updated": "Organizátor aktualizován",
-    "page_description": "Spravovat členy organizačního týmu a jejich oprávnění",
     "rights": "Práva",
     "title": "Organizátoři"
   }

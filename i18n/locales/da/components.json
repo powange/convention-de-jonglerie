@@ -133,7 +133,6 @@
     "organizers_rights_panel": {
       "all_editions": "Alle udgaver",
       "per_edition": "Rettigheder pr. udgave",
-      "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
       "title_label": "Titel / funktion",
       "title_placeholder": "Titel eller rolle (valgfrit)"
     },

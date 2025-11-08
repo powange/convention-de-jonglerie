@@ -16,6 +16,9 @@
     "today": "Heute",
     "week": "Woche"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Akzeptiert",
     "actions": "Aktionen",
@@ -33,6 +36,7 @@
     "cancel": "Abbrechen",
     "cancelled": "Cancelled",
     "category": "Kategorie",
+    "characters": "Zeichen",
     "city": "Stadt",
     "clear": "Löschen",
     "click_to_view_full": "Klicken Sie, um den vollständigen Text anzuzeigen",
@@ -290,7 +294,9 @@
       "qr_details": "Details",
       "qr_how_to_use": "Wie benutzt man es?",
       "qr_instructions": "Zeigen Sie diesen QR-Code am Eingang zur Convention vor, um als Freiwilliger Zugang zu erhalten.",
+      "qr_instructions_organizer": "Zeigen Sie diesen QR-Code am Eingang zur Konferenz vor, um als Organisator Zugang zu erhalten.",
       "qr_modal_title": "Mein Freiwilligen-QR-Code",
+      "qr_modal_title_organizer": "Mein Organisator-QR-Code",
       "recent_validations": "Letzte Validierungen",
       "scan_ticket": "Ticket scannen",
       "scanner_activating": "Kamera wird aktiviert...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Zugang verweigert",
+    "add_error": "Fehler beim Hinzufügen",
     "add_organizer_error": "Fehler beim Hinzufügen des Mitarbeiters",
     "address_required": "Die Adresse ist erforderlich",
     "address_too_long": "Die Adresse darf nicht länger als {max} Zeichen sein",
@@ -829,6 +836,7 @@
     "people_maximum": "Maximum {max} Personen",
     "publish_edition_failed": "Fehler beim Veröffentlichen der Edition",
     "registration_failed": "Registrierung fehlgeschlagen",
+    "remove_error": "Fehler beim Entfernen",
     "remove_organizer_error": "Fehler beim Entfernen des Mitarbeiters",
     "required_field": "Dieses Feld ist erforderlich",
     "seats_maximum": "Maximum {max} Plätze",

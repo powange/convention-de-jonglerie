@@ -16,6 +16,9 @@
     "today": "I dag",
     "week": "Veckan"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Accepterad",
     "actions": "Åtgärder",
@@ -33,6 +36,7 @@
     "cancel": "Avbryt",
     "cancelled": "Avbruten",
     "category": "Kategori",
+    "characters": "tecken",
     "city": "Stad",
     "clear": "Radera",
     "click_to_view_full": "Klicka för att se full text",
@@ -290,7 +294,9 @@
       "qr_details": "Detaljer",
       "qr_how_to_use": "Hur använder du den?",
       "qr_instructions": "Visa upp denna QR-kod vid ingången till mässan för att få tillträde som volontär.",
+      "qr_instructions_organizer": "Visa denna QR-kod vid ingången till konventionen för att få tillgång som arrangör.",
       "qr_modal_title": "Min QR-kod för volontärarbete",
+      "qr_modal_title_organizer": "Min arrangör QR-kod",
       "recent_validations": "Senaste valideringar",
       "scan_ticket": "Skanna en biljett",
       "scanner_activating": "Aktivering av kameran...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Obehörig åtkomst",
+    "add_error": "Fel vid tillägg",
     "add_organizer_error": "Fel när du lägger till en anställd",
     "address_required": "Adressen är obligatorisk",
     "address_too_long": "Adressen får inte överstiga {max} tecken",
@@ -829,6 +836,7 @@
     "people_maximum": "Maximalt {max} antal personer",
     "publish_edition_failed": "Underlåtenhet att ge ut upplagan",
     "registration_failed": "Misslyckad registrering",
+    "remove_error": "Fel vid borttagning",
     "remove_organizer_error": "Fel vid borttagning av en anställd",
     "required_field": "Detta fält är obligatoriskt",
     "seats_maximum": "Maximala {max} platser",

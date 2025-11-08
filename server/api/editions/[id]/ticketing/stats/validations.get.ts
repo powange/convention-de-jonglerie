@@ -69,82 +69,103 @@ export default defineEventHandler(async (event) => {
   teardownEnd.setHours(23, 59, 59, 999)
 
   // Récupérer toutes les validations d'entrée
-  const [participantsValidations, othersValidations, volunteersValidations, artistsValidations] =
-    await Promise.all([
-      // Participants (billets avec countAsParticipant = true)
-      prisma.ticketingOrderItem.findMany({
-        where: {
-          order: {
-            editionId,
-          },
-          tier: {
-            countAsParticipant: true,
-          },
-          entryValidated: true,
-          entryValidatedAt: {
-            not: null,
-            gte: setupStart,
-            lte: teardownEnd,
-          },
-        },
-        select: {
-          entryValidatedAt: true,
-        },
-      }),
-
-      // Autres (billets avec countAsParticipant = false)
-      prisma.ticketingOrderItem.findMany({
-        where: {
-          order: {
-            editionId,
-          },
-          tier: {
-            countAsParticipant: false,
-          },
-          entryValidated: true,
-          entryValidatedAt: {
-            not: null,
-            gte: setupStart,
-            lte: teardownEnd,
-          },
-        },
-        select: {
-          entryValidatedAt: true,
-        },
-      }),
-
-      // Bénévoles
-      prisma.editionVolunteerApplication.findMany({
-        where: {
+  const [
+    participantsValidations,
+    othersValidations,
+    volunteersValidations,
+    artistsValidations,
+    organizersValidations,
+  ] = await Promise.all([
+    // Participants (billets avec countAsParticipant = true)
+    prisma.ticketingOrderItem.findMany({
+      where: {
+        order: {
           editionId,
-          entryValidated: true,
-          entryValidatedAt: {
-            not: null,
-            gte: setupStart,
-            lte: teardownEnd,
-          },
         },
-        select: {
-          entryValidatedAt: true,
+        tier: {
+          countAsParticipant: true,
         },
-      }),
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+          gte: setupStart,
+          lte: teardownEnd,
+        },
+      },
+      select: {
+        entryValidatedAt: true,
+      },
+    }),
 
-      // Artistes
-      prisma.editionArtist.findMany({
-        where: {
+    // Autres (billets avec countAsParticipant = false)
+    prisma.ticketingOrderItem.findMany({
+      where: {
+        order: {
           editionId,
-          entryValidated: true,
-          entryValidatedAt: {
-            not: null,
-            gte: setupStart,
-            lte: teardownEnd,
-          },
         },
-        select: {
-          entryValidatedAt: true,
+        tier: {
+          countAsParticipant: false,
         },
-      }),
-    ])
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+          gte: setupStart,
+          lte: teardownEnd,
+        },
+      },
+      select: {
+        entryValidatedAt: true,
+      },
+    }),
+
+    // Bénévoles
+    prisma.editionVolunteerApplication.findMany({
+      where: {
+        editionId,
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+          gte: setupStart,
+          lte: teardownEnd,
+        },
+      },
+      select: {
+        entryValidatedAt: true,
+      },
+    }),
+
+    // Artistes
+    prisma.editionArtist.findMany({
+      where: {
+        editionId,
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+          gte: setupStart,
+          lte: teardownEnd,
+        },
+      },
+      select: {
+        entryValidatedAt: true,
+      },
+    }),
+
+    // Organisateurs
+    prisma.editionOrganizer.findMany({
+      where: {
+        editionId,
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+          gte: setupStart,
+          lte: teardownEnd,
+        },
+      },
+      select: {
+        entryValidatedAt: true,
+      },
+    }),
+  ])
 
   // Créer des tranches horaires de 1 heure
   const startDateTime = DateTime.fromJSDate(setupStart)
@@ -152,14 +173,20 @@ export default defineEventHandler(async (event) => {
 
   const hourSlots: Map<
     string,
-    { participants: number; others: number; volunteers: number; artists: number }
+    {
+      participants: number
+      others: number
+      volunteers: number
+      artists: number
+      organizers: number
+    }
   > = new Map()
 
   // Initialiser toutes les tranches horaires
   let current = startDateTime.startOf('hour')
   while (current <= endDateTime) {
     const key = current.toISO()!
-    hourSlots.set(key, { participants: 0, others: 0, volunteers: 0, artists: 0 })
+    hourSlots.set(key, { participants: 0, others: 0, volunteers: 0, artists: 0, organizers: 0 })
     current = current.plus({ hours: 1 })
   }
 
@@ -208,6 +235,17 @@ export default defineEventHandler(async (event) => {
     }
   })
 
+  organizersValidations.forEach((v) => {
+    if (v.entryValidatedAt) {
+      const dt = DateTime.fromJSDate(v.entryValidatedAt).startOf('hour')
+      const key = dt.toISO()!
+      const slot = hourSlots.get(key)
+      if (slot) {
+        slot.organizers++
+      }
+    }
+  })
+
   // Convertir en format de réponse
   const labels: string[] = []
   const timestamps: string[] = []
@@ -215,6 +253,7 @@ export default defineEventHandler(async (event) => {
   const others: number[] = []
   const volunteers: number[] = []
   const artists: number[] = []
+  const organizers: number[] = []
 
   hourSlots.forEach((counts, isoKey) => {
     const dt = DateTime.fromISO(isoKey)
@@ -226,6 +265,7 @@ export default defineEventHandler(async (event) => {
     others.push(counts.others)
     volunteers.push(counts.volunteers)
     artists.push(counts.artists)
+    organizers.push(counts.organizers)
   })
 
   // Périodes pour les filtres
@@ -251,12 +291,14 @@ export default defineEventHandler(async (event) => {
     others,
     volunteers,
     artists,
+    organizers,
     periods,
     totals: {
       participants: participants.reduce((a, b) => a + b, 0),
       others: others.reduce((a, b) => a + b, 0),
       volunteers: volunteers.reduce((a, b) => a + b, 0),
       artists: artists.reduce((a, b) => a + b, 0),
+      organizers: organizers.reduce((a, b) => a + b, 0),
     },
   }
 })

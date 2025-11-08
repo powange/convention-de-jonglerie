@@ -20,10 +20,10 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-          {{ $t('organizers.title') }}
+          {{ $t('gestion.organizers.title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('organizers.page_description') }}
+          {{ $t('gestion.organizers.page_description') }}
         </p>
       </div>
 
@@ -35,7 +35,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-                <h2 class="text-lg font-semibold">{{ $t('organizers.list') }}</h2>
+                <h2 class="text-lg font-semibold">{{ $t('gestion.organizers.list') }}</h2>
               </div>
               <UButton
                 size="sm"
@@ -78,7 +78,103 @@
             </div>
             <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <UIcon name="i-heroicons-user-group" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">{{ $t('organizers.no_organizers') }}</p>
+              <p class="text-sm text-gray-500">{{ $t('gestion.organizers.no_organizers') }}</p>
+            </div>
+          </div>
+        </UCard>
+
+        <!-- Organisateurs présents sur l'édition -->
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-calendar-days" class="text-indigo-500" />
+                <h2 class="text-lg font-semibold">
+                  {{ $t('gestion.organizers.present_on_edition') }}
+                </h2>
+              </div>
+              <UBadge v-if="editionOrganizers.length > 0" color="indigo" variant="soft">
+                {{ editionOrganizers.length }}
+              </UBadge>
+            </div>
+
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('gestion.organizers.present_on_edition_description') }}
+            </p>
+
+            <!-- Liste des organisateurs présents -->
+            <div v-if="loadingEditionOrganizers" class="text-center py-4">
+              <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
+            </div>
+            <div
+              v-else-if="editionOrganizers.length > 0"
+              class="grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
+              <div
+                v-for="editionOrganizer in editionOrganizers"
+                :key="editionOrganizer.id"
+                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <div class="flex items-center gap-3">
+                  <UiUserAvatar :user="editionOrganizer.user" size="sm" />
+                  <div>
+                    <div class="font-medium text-sm">
+                      {{ editionOrganizer.user?.prenom }} {{ editionOrganizer.user?.nom }}
+                    </div>
+                    <div v-if="editionOrganizer.title" class="text-xs text-gray-500">
+                      {{ editionOrganizer.title }}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UBadge
+                    v-if="editionOrganizer.entryValidated"
+                    color="success"
+                    variant="soft"
+                    size="sm"
+                  >
+                    <UIcon name="i-heroicons-check-circle" class="w-3 h-3" />
+                  </UBadge>
+                  <UButton
+                    icon="i-heroicons-trash"
+                    color="error"
+                    variant="ghost"
+                    size="xs"
+                    @click="removeFromEdition(editionOrganizer.id)"
+                  />
+                </div>
+              </div>
+            </div>
+            <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <UIcon name="i-heroicons-user-group" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
+              <p class="text-sm text-gray-500">
+                {{ $t('gestion.organizers.no_organizers_on_edition') }}
+              </p>
+            </div>
+
+            <!-- Ajouter un organisateur -->
+            <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
+              <div v-if="availableOrganizers.length > 0" class="flex items-center gap-3">
+                <USelect
+                  v-model="selectedAvailableOrganizer"
+                  :items="availableOrganizersOptions"
+                  :placeholder="$t('gestion.organizers.select_to_add')"
+                  class="flex-1"
+                  size="sm"
+                />
+                <UButton
+                  color="primary"
+                  size="sm"
+                  icon="i-heroicons-plus"
+                  :disabled="!selectedAvailableOrganizer"
+                  @click="addToEdition"
+                >
+                  {{ $t('common.add') }}
+                </UButton>
+              </div>
+              <div v-else class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
+                {{ $t('gestion.organizers.all_organizers_added') }}
+              </div>
             </div>
           </div>
         </UCard>
@@ -101,7 +197,7 @@
                   {{
                     isAddingOrganizer
                       ? $t('conventions.add_organizer')
-                      : $t('organizers.edit_organizer')
+                      : $t('gestion.organizers.edit_organizer')
                   }}
                 </h3>
               </div>
@@ -233,6 +329,12 @@ const searchedUsers = ref<any[]>([])
 const searchingUsers = ref(false)
 const savingOrganizer = ref(false)
 
+// État pour la gestion des organisateurs sur l'édition
+const editionOrganizers = ref<any[]>([])
+const availableOrganizers = ref<any[]>([])
+const loadingEditionOrganizers = ref(false)
+const selectedAvailableOrganizer = ref<number | null>(null)
+
 const newOrganizerRights = ref({
   rights: {
     editConvention: false,
@@ -343,7 +445,7 @@ const addOrganizer = async () => {
     })
 
     toast.add({
-      title: t('organizers.organizer_added'),
+      title: t('gestion.organizers.organizer_added'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -382,7 +484,7 @@ const saveOrganizerChanges = async () => {
     )
 
     toast.add({
-      title: t('organizers.organizer_updated'),
+      title: t('gestion.organizers.organizer_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -407,7 +509,7 @@ const removeOrganizer = async () => {
     return
   }
 
-  if (!confirm(t('organizers.confirm_remove'))) {
+  if (!confirm(t('gestion.organizers.confirm_remove'))) {
     return
   }
 
@@ -420,7 +522,7 @@ const removeOrganizer = async () => {
     )
 
     toast.add({
-      title: t('organizers.organizer_removed'),
+      title: t('gestion.organizers.organizer_removed'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -461,6 +563,97 @@ const canManageOrganizers = computed(() => {
   return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
+// Computed pour les options du select d'organisateurs disponibles
+const availableOrganizersOptions = computed(() => {
+  return availableOrganizers.value.map((organizer) => ({
+    label:
+      `${organizer.user?.prenom || ''} ${organizer.user?.nom || ''} ${organizer.title ? `(${organizer.title})` : ''}`.trim(),
+    value: organizer.id,
+  }))
+})
+
+// Fonctions pour gérer les organisateurs d'édition
+const loadEditionOrganizers = async () => {
+  loadingEditionOrganizers.value = true
+  try {
+    const [editionOrgsResult, availableOrgsResult] = await Promise.all([
+      $fetch<{ organizers: any[] }>(`/api/editions/${editionId}/organizers/edition-organizers`),
+      $fetch<{ organizers: any[] }>(`/api/editions/${editionId}/organizers/available`),
+    ])
+
+    editionOrganizers.value = editionOrgsResult.organizers || []
+    availableOrganizers.value = availableOrgsResult.organizers || []
+  } catch (error) {
+    console.error('Failed to load edition organizers:', error)
+    toast.add({
+      title: t('errors.loading_error'),
+      description: t('gestion.organizers.load_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingEditionOrganizers.value = false
+  }
+}
+
+const addToEdition = async () => {
+  if (!selectedAvailableOrganizer.value) return
+
+  try {
+    await $fetch(`/api/editions/${editionId}/organizers/edition-organizers`, {
+      method: 'POST',
+      body: {
+        organizerId: selectedAvailableOrganizer.value,
+      },
+    })
+
+    toast.add({
+      title: t('gestion.organizers.added_to_edition'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    selectedAvailableOrganizer.value = null
+    await loadEditionOrganizers()
+  } catch (error: any) {
+    console.error('Failed to add organizer to edition:', error)
+    toast.add({
+      title: t('errors.add_error'),
+      description: error.data?.message || t('gestion.organizers.add_to_edition_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+}
+
+const removeFromEdition = async (editionOrganizerId: number) => {
+  if (!confirm(t('gestion.organizers.confirm_remove_from_edition'))) {
+    return
+  }
+
+  try {
+    await $fetch(`/api/editions/${editionId}/organizers/edition-organizers/${editionOrganizerId}`, {
+      method: 'DELETE',
+    })
+
+    toast.add({
+      title: t('gestion.organizers.removed_from_edition'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    await loadEditionOrganizers()
+  } catch (error: any) {
+    console.error('Failed to remove organizer from edition:', error)
+    toast.add({
+      title: t('errors.remove_error'),
+      description: error.data?.message || t('gestion.organizers.remove_from_edition_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+}
+
 // Charger l'édition si nécessaire
 onMounted(async () => {
   if (!edition.value) {
@@ -470,12 +663,15 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
+
+  // Charger les organisateurs de l'édition
+  await loadEditionOrganizers()
 })
 
 // Métadonnées de la page
 useSeoMeta({
-  title: t('organizers.title') + ' - ' + (edition.value?.name || 'Édition'),
-  description: t('organizers.page_description'),
+  title: t('gestion.organizers.title') + ' - ' + (edition.value?.name || 'Édition'),
+  description: t('gestion.organizers.page_description'),
   ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

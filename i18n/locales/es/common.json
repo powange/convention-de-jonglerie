@@ -16,6 +16,9 @@
     "today": "Hoy",
     "week": "Semana"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Aceptado",
     "actions": "Acciones",
@@ -33,6 +36,7 @@
     "cancel": "Cancelar",
     "cancelled": "Cancelled",
     "category": "Categoría",
+    "characters": "caracteres",
     "city": "Ciudad",
     "clear": "Limpiar",
     "click_to_view_full": "Clic para ver el texto completo",
@@ -290,7 +294,9 @@
       "qr_details": "Detalles",
       "qr_how_to_use": "¿Cómo usarlo?",
       "qr_instructions": "Presente este código QR en la entrada de la convención para acceder como voluntario.",
+      "qr_instructions_organizer": "Presente este código QR en la entrada de la convención para acceder como organizador.",
       "qr_modal_title": "Mi código QR de voluntario",
+      "qr_modal_title_organizer": "Mi código QR de organizador",
       "recent_validations": "Validaciones recientes",
       "scan_ticket": "Escanear un boleto",
       "scanner_activating": "Activando cámara...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Acceso denegado",
+    "add_error": "Error al agregar",
     "add_organizer_error": "Error al añadir colaborador",
     "address_required": "La dirección es requerida",
     "address_too_long": "La dirección no puede exceder {max} caracteres",
@@ -829,6 +836,7 @@
     "people_maximum": "Máximo {max} personas",
     "publish_edition_failed": "Error al publicar la edición",
     "registration_failed": "Error en el registro",
+    "remove_error": "Error al eliminar",
     "remove_organizer_error": "Error al eliminar colaborador",
     "required_field": "Este campo es requerido",
     "seats_maximum": "Máximo {max} asientos",

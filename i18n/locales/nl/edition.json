@@ -148,16 +148,8 @@
     "vegetarian": "Vegetarisch"
   },
   "organizers": {
-    "confirm_remove": "Weet u zeker dat u deze organisator wilt verwijderen?",
-    "edit_organizer": "Organisator bewerken",
-    "list": "Lijst van organisatoren",
     "manage": "Organisatoren beheren",
     "manage_description": "Organisatoren en hun rechten voor deze editie beheren",
-    "no_organizers": "Geen organisatoren",
-    "organizer_added": "Organisator toegevoegd",
-    "organizer_removed": "Organisator verwijderd",
-    "organizer_updated": "Organisator bijgewerkt",
-    "page_description": "Beheer leden van het organisatieteam en hun machtigingen",
     "rights": "Rechten",
     "title": "Organisatoren"
   }

@@ -71,7 +71,9 @@
     "status_update_failed": "Échec de la mise à jour du statut",
     "update_organizer_error": "Erreur lors de la mise à jour du organisateur",
     "update_error": "Erreur lors de la mise à jour",
-    "username_min_3_chars": "Le pseudo doit contenir au moins 3 caractères"
+    "username_min_3_chars": "Le pseudo doit contenir au moins 3 caractères",
+    "add_error": "Erreur lors de l'ajout",
+    "remove_error": "Erreur lors de la suppression"
   },
   "calendar": {
     "add_to_calendar": "Ajouter au calendrier",
@@ -214,7 +216,8 @@
     "participant": "Participant",
     "artists": "Artistes",
     "vegetarian": "Végétarien",
-    "vegan": "Végan"
+    "vegan": "Végan",
+    "characters": "caractères"
   },
   "countries": {
     "czech_republic": "République Tchèque"
@@ -457,7 +460,9 @@
       "qr_details": "Détails",
       "qr_how_to_use": "Comment l'utiliser ?",
       "qr_instructions": "Présentez ce QR code à l'entrée de la convention pour accéder en tant que bénévole.",
+      "qr_instructions_organizer": "Présentez ce QR code à l'entrée de la convention pour accéder en tant qu'organisateur.",
       "qr_modal_title": "Mon QR code bénévole",
+      "qr_modal_title_organizer": "Mon QR code organisateur",
       "recent_validations": "Dernières validations",
       "scan_ticket": "Scanner un billet",
       "scanner_activating": "Activation de la caméra...",
@@ -931,5 +936,8 @@
       "what_you_can_bring_title": "Ce que vous pouvez nous apporter",
       "withdraw": "Retirer ma candidature"
     }
+  },
+  "chart": {
+    "js": "Chart.js"
   }
 }

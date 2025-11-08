@@ -16,6 +16,9 @@
     "today": "Dnes",
     "week": "Týden"
   },
+  "chart": {
+    "js": "Chart.js"
+  },
   "common": {
     "accepted": "Přijato",
     "actions": "Akce",
@@ -33,6 +36,7 @@
     "cancel": "Zrušit",
     "cancelled": "Zrušeno",
     "category": "Kategorie",
+    "characters": "znaky",
     "city": "Město",
     "clear": "Odstranit",
     "click_to_view_full": "Klikněte pro zobrazení celého textu",
@@ -290,7 +294,9 @@
       "qr_details": "Podrobnosti na",
       "qr_how_to_use": "Jak ji používáte?",
       "qr_instructions": "Při vstupu na konferenci předložte tento QR kód a získejte přístup jako dobrovolník.",
+      "qr_instructions_organizer": "Předložte tento QR kód u vchodu do konference pro přístup jako organizátor.",
       "qr_modal_title": "Můj dobrovolnický QR kód",
+      "qr_modal_title_organizer": "Můj organizátorský QR kód",
       "recent_validations": "Nejnovější validace",
       "scan_ticket": "Naskenovat jízdenku",
       "scanner_activating": "Aktivace fotoaparátu...",
@@ -767,6 +773,7 @@
   },
   "errors": {
     "access_denied": "Neoprávněný přístup",
+    "add_error": "Chyba při přidávání",
     "add_organizer_error": "Chyba při přidávání zaměstnance",
     "address_required": "Adresa je povinná",
     "address_too_long": "Adresa nesmí překročit {max} znaků",
@@ -829,6 +836,7 @@
     "people_maximum": "Maximum {max} lidí",
     "publish_edition_failed": "Nezveřejnění vydání",
     "registration_failed": "Neúspěšná registrace",
+    "remove_error": "Chyba při odstraňování",
     "remove_organizer_error": "Chyba při mazání zaměstnance",
     "required_field": "Toto pole je povinné",
     "seats_maximum": "Maximální počet míst {max}",
