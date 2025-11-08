@@ -262,33 +262,41 @@ export default wrapApiHandler(
     const nextCursor = errorLogs.length > 0 ? errorLogs[errorLogs.length - 1].id : null
     const hasMore = errorLogs.length === pageSize // Il y a potentiellement plus de résultats
 
-    return {
-      ...(cursor
-        ? {
-            // Pagination par curseur - structure différente
-            success: true,
-            data: errorLogs,
-            pagination: {
-              cursor: nextCursor,
-              hasMore,
-              pageSize,
-              total, // Le total peut être approximatif avec le curseur
-            },
-          }
-        : // Pagination classique - utiliser createPaginatedResponse
-          createPaginatedResponse(errorLogs, total, page!, pageSize)),
-      stats: {
-        totalLast24h: stats._count.id,
-        unresolvedCount,
-        errorTypes: errorTypeStats.map((stat) => ({
-          type: stat.errorType || 'Unknown',
-          count: stat._count.id,
-        })),
-        statusCodes: statusCodeStats.map((stat) => ({
-          code: stat.statusCode,
-          count: stat._count.id,
-        })),
-      },
+    // Préparer les stats
+    const statsResponse = {
+      totalLast24h: stats._count.id,
+      unresolvedCount,
+      errorTypes: errorTypeStats.map((stat) => ({
+        type: stat.errorType || 'Unknown',
+        count: stat._count.id,
+      })),
+      statusCodes: statusCodeStats.map((stat) => ({
+        code: stat.statusCode,
+        count: stat._count.id,
+      })),
+    }
+
+    if (cursor) {
+      // Pagination par curseur - structure différente
+      return {
+        success: true,
+        logs: errorLogs,
+        pagination: {
+          cursor: nextCursor,
+          hasMore,
+          pageSize,
+          total, // Le total peut être approximatif avec le curseur
+        },
+        stats: statsResponse,
+      }
+    } else {
+      // Pagination classique - utiliser createPaginatedResponse
+      const paginatedResponse = createPaginatedResponse(errorLogs, total, page!, pageSize)
+      return {
+        logs: paginatedResponse.data,
+        pagination: paginatedResponse.pagination,
+        stats: statsResponse,
+      }
     }
   },
   { operationName: 'GetErrorLogs' }

@@ -110,8 +110,16 @@ export default wrapApiHandler(
       isConnected: activeUserIds.includes(user.id),
     }))
 
+    const paginatedResponse = createPaginatedResponse(
+      usersWithConnectionStatus,
+      totalCount,
+      page,
+      limit
+    )
+
     return {
-      ...createPaginatedResponse(usersWithConnectionStatus, totalCount, page, limit),
+      users: paginatedResponse.data,
+      pagination: paginatedResponse.pagination,
       filters: {
         search,
         sortBy,
