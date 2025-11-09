@@ -44,17 +44,10 @@
       <!-- Toggle switch -->
       <div class="ml-4">
         <USwitch
-          v-model="isSubscribed"
+          :model-value="isSubscribed"
           :disabled="!isSupported || isLoading || permission === 'denied'"
           :loading="isLoading"
-          @click="
-            console.log('[Push Toggle] Click detected! Current state:', {
-              isSubscribed,
-              permission,
-              isSupported,
-              isLoading,
-            })
-          "
+          @update:model-value="handleToggleChange"
         />
       </div>
     </div>
@@ -115,28 +108,14 @@ const {
 
 const isTesting = ref(false)
 
-// Watcher pour gérer les changements du switch
-watch(isSubscribed, async (newValue, oldValue) => {
-  console.log('[Push Toggle] Watch triggered:', {
-    newValue,
-    oldValue,
-    wasUndefined: oldValue === undefined,
-  })
-
-  // Éviter les appels lors de l'initialisation
-  if (oldValue !== undefined && newValue !== oldValue) {
-    console.log('[Push Toggle] Changement détecté:', newValue ? 'Subscribe' : 'Unsubscribe')
-    if (newValue) {
-      console.log('[Push Toggle] Appel subscribe()...')
-      await subscribe()
-    } else {
-      console.log('[Push Toggle] Appel unsubscribe()...')
-      await unsubscribe()
-    }
+// Gérer les changements du switch via l'événement update:model-value
+const handleToggleChange = async (newValue: boolean) => {
+  if (newValue) {
+    await subscribe()
   } else {
-    console.log('[Push Toggle] Changement ignoré (initialisation ou même valeur)')
+    await unsubscribe()
   }
-})
+}
 
 // Tester une notification
 const testNotification = async () => {
@@ -148,15 +127,13 @@ const testNotification = async () => {
 
     // Puis tester depuis le serveur (pour les admins)
     if (authStore.user?.isGlobalAdmin) {
-      console.log('[Push Test] Envoi test serveur...')
-      const result = await $fetch('/api/admin/notifications/push-test', {
+      await $fetch('/api/admin/notifications/push-test', {
         method: 'POST',
         body: {
           title: '🎯 Test depuis le serveur',
           message: 'Cette notification a été envoyée depuis le serveur !',
         },
       })
-      console.log('[Push Test] Résultat serveur:', result)
     }
   } catch (err) {
     console.error('Erreur lors du test:', err)

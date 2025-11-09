@@ -1,30 +1,23 @@
 // Service Worker pour les notifications push
-console.log('[Service Worker] Démarrage...')
 
 // Événement d'installation
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installation...')
   self.skipWaiting()
 })
 
 // Événement d'activation
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activation...')
   event.waitUntil(clients.claim())
 })
 
 // Réception des notifications push
 self.addEventListener('push', (event) => {
-  console.log('[Service Worker] Notification push reçue')
-
   if (!event.data) {
-    console.warn('[Service Worker] Notification sans données')
     return
   }
 
   try {
     const data = event.data.json()
-    console.log('[Service Worker] Données de notification:', data)
 
     // Options de notification
     const options = {
@@ -69,7 +62,6 @@ self.addEventListener('push', (event) => {
 
 // Clic sur la notification
 self.addEventListener('notificationclick', (event) => {
-  console.log('[Service Worker] Clic sur notification')
   event.notification.close()
 
   const data = event.notification.data
@@ -96,15 +88,14 @@ self.addEventListener('notificationclick', (event) => {
   )
 })
 
-// Événement de fermeture de notification
-self.addEventListener('notificationclose', (event) => {
-  console.log('[Service Worker] Notification fermée')
-})
-
 // Test de ping pour vérifier que le service worker est actif
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'PING') {
-    console.log('[Service Worker] Ping reçu')
     event.ports[0].postMessage({ type: 'PONG' })
+  }
+
+  // Force l'activation du nouveau Service Worker
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
   }
 })

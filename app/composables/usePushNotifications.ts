@@ -44,8 +44,48 @@ export const usePushNotifications = () => {
     }
 
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js')
+      const registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/',
+        updateViaCache: 'none', // Ne pas utiliser le cache pour le SW
+      })
+
+      // Si un nouveau SW est en attente, le forcer à s'activer
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+      }
+
+      // Vérifier les mises à jour
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              newWorker.postMessage({ type: 'SKIP_WAITING' })
+            }
+          })
+        }
+      })
+
+      // Attendre que le Service Worker soit prêt
       await navigator.serviceWorker.ready
+
+      // S'assurer que le SW est activé
+      if (registration.installing || registration.waiting) {
+        await new Promise<void>((resolve) => {
+          const worker = registration.installing || registration.waiting
+          if (worker) {
+            worker.addEventListener('statechange', function handler() {
+              if (worker.state === 'activated') {
+                worker.removeEventListener('statechange', handler)
+                resolve()
+              }
+            })
+          } else {
+            resolve()
+          }
+        })
+      }
+
       return registration
     } catch (error) {
       console.error("[Push] Erreur lors de l'enregistrement du Service Worker:", error)
@@ -168,35 +208,11 @@ export const usePushNotifications = () => {
       return false
     }
 
-    if (state.subscription && state.permission === 'granted') {
-      try {
-        await $fetch('/api/notifications/push/subscribe', {
-          method: 'POST',
-          body: {
-            subscription: state.subscription.toJSON(),
-          },
-        })
-
-        notificationStore.setRealTimeEnabled(true)
-        window.dispatchEvent(new CustomEvent('push-notifications-enabled'))
-        state.isSubscribed = true
-
-        toast.add({
-          color: 'success',
-          title: 'Notifications activées',
-          description: 'Vous recevrez maintenant des notifications push',
-        })
-
-        return true
-      } catch (error) {
-        console.error('[Push Subscribe] Erreur sauvegarde serveur:', error)
-      }
-    }
-
     state.isLoading = true
     state.error = null
 
     try {
+      // 1. Demander la permission si nécessaire
       if (state.permission !== 'granted') {
         const granted = await requestPermission()
         if (!granted) {
@@ -205,22 +221,33 @@ export const usePushNotifications = () => {
         }
       }
 
+      // 2. Enregistrer le Service Worker
       const registration = await registerServiceWorker()
       if (!registration) {
         state.isLoading = false
         return false
       }
 
-      const vapidPublicKey = config.public.vapidPublicKey
+      // 3. Vérifier si une subscription existe déjà
+      let subscription = await registration.pushManager.getSubscription()
 
-      if (!vapidPublicKey) {
-        throw new Error('Clé publique VAPID manquante')
+      // 4. Si pas de subscription, en créer une nouvelle
+      if (!subscription) {
+        const vapidPublicKey = config.public.vapidPublicKey
+
+        if (!vapidPublicKey) {
+          console.error('[Push] Clé VAPID manquante')
+          throw new Error('Clé publique VAPID manquante')
+        }
+
+        const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey)
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: applicationServerKey,
+        })
       }
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-      })
+      // 5. Envoyer au serveur
       await $fetch('/api/notifications/push/subscribe', {
         method: 'POST',
         body: {
@@ -228,9 +255,9 @@ export const usePushNotifications = () => {
         },
       })
 
+      // 6. Mettre à jour l'état
       state.isSubscribed = true
       state.subscription = subscription
-      // Mettre à jour la permission après l'abonnement réussi
       state.permission = Notification.permission
 
       notificationStore.setRealTimeEnabled(true)
@@ -242,9 +269,9 @@ export const usePushNotifications = () => {
         description: 'Vous recevrez maintenant des notifications push',
       })
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error("[Push] Erreur lors de l'abonnement:", error)
-      state.error = "Impossible d'activer les notifications"
+      state.error = error?.message || "Impossible d'activer les notifications"
 
       toast.add({
         color: 'error',
@@ -367,6 +394,13 @@ export const usePushNotifications = () => {
     checkSupport()
     if (state.isSupported) {
       checkSubscription()
+
+      // Écouter les changements de Service Worker
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload()
+        })
+      }
     }
   })
 
