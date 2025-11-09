@@ -1,4 +1,4 @@
-import { canManageOrganizers } from '@@/server/utils/permissions/edition-permissions'
+import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -52,7 +52,7 @@ export default wrapApiHandler(
     }
 
     // Vérifier les permissions
-    if (!canManageOrganizers(edition, user)) {
+    if (!canManageEditionOrganizers(edition, user)) {
       throw createError({
         statusCode: 403,
         message: "Vous n'avez pas les droits pour gérer les organisateurs",

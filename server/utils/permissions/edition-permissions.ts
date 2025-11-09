@@ -450,7 +450,7 @@ export function canManageTicketing(
 /**
  * Vérifie si un utilisateur peut gérer les organisateurs d'une édition
  */
-export function canManageOrganizers(
+export function canManageEditionOrganizers(
   edition: EditionWithPermissions,
   user: UserForPermissions
 ): boolean {
