@@ -77,6 +77,12 @@ export const useAuthStore = defineStore('auth', {
             const storage =
               localStorage.getItem('rememberMe') === 'true' ? localStorage : sessionStorage
             storage.setItem('authUser', JSON.stringify(res.user))
+
+            // Restaurer le mode admin s'il était activé
+            const adminModeStored = storage.getItem('adminMode')
+            if (adminModeStored === 'true' && res.user.isGlobalAdmin) {
+              this.adminMode = true
+            }
           })
           .catch(() => {
             this.user = null
