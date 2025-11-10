@@ -7,11 +7,13 @@ Les notifications push Web utilisent le protocole **VAPID (Voluntary Application
 ## Navigateurs testés et supportés
 
 ### ✅ Firefox
+
 - **Statut** : Entièrement fonctionnel
 - **Push Service** : Mozilla Push Service
 - **Particularité** : N'utilise pas Google FCM, fonctionne indépendamment
 
 ### ✅ Chrome / Chromium
+
 - **Statut** : Entièrement fonctionnel
 - **Push Service** : Google FCM (Firebase Cloud Messaging)
 - **Prérequis** :
@@ -22,6 +24,7 @@ Les notifications push Web utilisent le protocole **VAPID (Voluntary Application
     - `firebaselogging-pa.googleapis.com`
 
 ### ❌ Opera
+
 - **Statut** : Non fonctionnel (erreur code 20)
 - **Raison** : Google FCM refuse les souscriptions depuis Opera
 - **Impact** : Faible (~2-3% des utilisateurs)
@@ -41,6 +44,7 @@ VAPID_SUBJECT=mailto:powange@gmail.com
 ### Service Worker
 
 Le Service Worker est disponible dans `/public/sw.js` et gère :
+
 - Réception des notifications push
 - Affichage des notifications
 - Actions de clic sur les notifications
@@ -48,6 +52,7 @@ Le Service Worker est disponible dans `/public/sw.js` et gère :
 ### Manifest PWA
 
 Le manifest est généré dynamiquement via `/api/site.webmanifest` :
+
 - Pas de `gcm_sender_id` (utilisation VAPID pure)
 - Configuration adaptée selon l'environnement (dev/staging/prod)
 
@@ -83,6 +88,7 @@ Aucune configuration spéciale requise. Les notifications push utilisent HTTPS s
 ## Pour ajouter le support d'Opera (optionnel)
 
 Si nécessaire, il faudrait :
+
 1. Créer un projet Firebase
 2. Récupérer le Sender ID
 3. Ajouter le domaine dans Firebase Authentication > Authorized domains

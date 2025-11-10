@@ -81,7 +81,12 @@
       "Bash(node scripts/translation/mark-todo.js:*)",
       "Bash(npx nuxt prepare)",
       "Bash(docker ps:*)",
-      "Bash(npm run i18n:mark-todo:*)"
+      "Bash(npm run i18n:mark-todo:*)",
+      "Bash(node -e:*)",
+      "Bash(npx web-push generate-vapid-keys)",
+      "Bash(tee:*)",
+      "Bash(npx web-push:*)",
+      "WebFetch(domain:ui.nuxt.com)"
     ],
     "deny": [],
     "ask": [],

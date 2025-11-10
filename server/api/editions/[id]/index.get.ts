@@ -51,6 +51,23 @@ export default wrapApiHandler(
             },
           },
         },
+        editionOrganizers: {
+          include: {
+            organizer: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    pseudo: true,
+                    email: true,
+                    profilePicture: true,
+                    updatedAt: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       errorMessage: 'Edition not found',
     })
@@ -123,6 +140,23 @@ export default wrapApiHandler(
             user: {
               ...userWithoutEmail,
               emailHash: getEmailHash(email),
+            },
+          }
+        })
+      }
+
+      // Transformer les organisateurs de l'édition
+      if (edition.editionOrganizers) {
+        edition.editionOrganizers = edition.editionOrganizers.map((edOrg) => {
+          const { email, ...userWithoutEmail } = edOrg.organizer.user
+          return {
+            ...edOrg,
+            organizer: {
+              ...edOrg.organizer,
+              user: {
+                ...userWithoutEmail,
+                emailHash: getEmailHash(email),
+              },
             },
           }
         })

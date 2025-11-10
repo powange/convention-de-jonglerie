@@ -142,7 +142,8 @@
         "inactive": "Inactif",
         "loading": "Chargement...",
         "logo_alt": "HelloAsso",
-        "none_found": "Aucun tarif trouvé"
+        "none_found": "Aucun tarif trouvé",
+        "drag_to_reorder": "Glisser pour réordonner"
       },
       "modal": {
         "description_label": "Description",

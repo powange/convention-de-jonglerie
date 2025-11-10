@@ -9,6 +9,8 @@ export interface TicketingTier {
   maxAmount: number | null
   isActive: boolean
   helloAssoTierId: number | null
+  validFrom?: string | null // Date de début de validité
+  validUntil?: string | null // Date de fin de validité
   soldCount?: number // Nombre de billets vendus pour ce tarif
   quotas?: Array<{
     quota: {
@@ -22,6 +24,16 @@ export interface TicketingTier {
     returnableItem: {
       id: number
       name: string
+    }
+  }>
+  meals?: Array<{
+    meal: {
+      id: number
+      editionId: number
+      date: string
+      mealType: 'BREAKFAST' | 'LUNCH' | 'DINNER'
+      enabled: boolean
+      phases: string[]
     }
   }>
 }

@@ -83,6 +83,115 @@
           </div>
         </UCard>
 
+        <!-- Card d'ajout ou d'édition -->
+        <UCard v-if="isAddingOrganizer || selectedOrganizer">
+          <div class="space-y-4">
+            <!-- En-tête -->
+            <div
+              class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-2">
+                <UIcon
+                  :name="
+                    isAddingOrganizer ? 'i-heroicons-plus-circle' : 'i-heroicons-pencil-square'
+                  "
+                  class="text-primary-500"
+                />
+                <h3 class="text-lg font-semibold">
+                  {{
+                    isAddingOrganizer
+                      ? $t('conventions.add_organizer')
+                      : $t('gestion.organizers.edit_organizer')
+                  }}
+                </h3>
+              </div>
+              <UButton
+                icon="i-heroicons-x-mark"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                @click="cancelEditing"
+              />
+            </div>
+
+            <!-- Formulaire d'ajout -->
+            <div v-if="isAddingOrganizer" class="space-y-4">
+              <!-- Recherche utilisateur -->
+              <div>
+                <label class="block text-sm font-medium mb-2">
+                  {{ $t('conventions.select_user') }}
+                </label>
+                <UserSelector
+                  v-model="newOrganizerUser"
+                  v-model:search-term="newOrganizersearchTerm"
+                  :searched-users="searchedUsers"
+                  :searching-users="searchingUsers"
+                  :placeholder="$t('conventions.search_user_placeholder')"
+                />
+              </div>
+
+              <!-- Configuration des droits -->
+              <div v-if="newOrganizerUser">
+                <OrganizerRightsFields
+                  v-model="newOrganizerRights"
+                  :editions="(conventionEditions || []) as any[]"
+                  :convention-name="edition?.convention?.name"
+                  size="sm"
+                />
+              </div>
+
+              <!-- Actions -->
+              <div
+                class="flex justify-end gap-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+              >
+                <UButton variant="ghost" @click="cancelEditing">
+                  {{ $t('common.cancel') }}
+                </UButton>
+                <UButton color="primary" :disabled="!newOrganizerUser" @click="addOrganizer">
+                  {{ $t('common.add') }}
+                </UButton>
+              </div>
+            </div>
+
+            <!-- Formulaire d'édition -->
+            <div v-else-if="selectedOrganizer" class="space-y-4">
+              <!-- Info organisateur -->
+              <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <UiUserAvatar :user="selectedOrganizer.user" size="md" />
+                <div>
+                  <div class="font-medium">{{ selectedOrganizer.user?.pseudo }}</div>
+                  <div class="text-sm text-gray-500">{{ selectedOrganizer.user?.email }}</div>
+                </div>
+              </div>
+
+              <!-- Configuration des droits -->
+              <div>
+                <OrganizerRightsFields
+                  v-model="editOrganizerRights"
+                  :editions="(conventionEditions || []) as any[]"
+                  :convention-name="edition?.convention?.name"
+                  size="sm"
+                />
+              </div>
+
+              <!-- Actions -->
+              <div class="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                <UButton color="error" variant="soft" @click="removeOrganizer">
+                  {{ $t('common.remove') }}
+                </UButton>
+                <div class="flex gap-3">
+                  <UButton variant="ghost" @click="cancelEditing">
+                    {{ $t('common.cancel') }}
+                  </UButton>
+                  <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
+                    {{ $t('common.save') }}
+                  </UButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
+
         <!-- Organisateurs présents sur l'édition -->
         <UCard>
           <div class="space-y-4">

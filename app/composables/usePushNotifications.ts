@@ -240,7 +240,10 @@ export const usePushNotifications = () => {
           throw new Error('Clé publique VAPID manquante')
         }
 
-        console.log('[Push] Tentative de souscription avec clé VAPID:', vapidPublicKey.substring(0, 20) + '...')
+        console.log(
+          '[Push] Tentative de souscription avec clé VAPID:',
+          vapidPublicKey.substring(0, 20) + '...'
+        )
         console.log('[Push] Service Worker état:', registration.active?.state)
 
         const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey)
@@ -257,7 +260,7 @@ export const usePushNotifications = () => {
             name: subscribeError.name,
             message: subscribeError.message,
             code: subscribeError.code,
-            stack: subscribeError.stack
+            stack: subscribeError.stack,
           })
           throw subscribeError
         }

@@ -206,6 +206,8 @@
     "ticketing_short": "Billeterie",
     "week": "Semaine",
     "yes": "Oui",
+    "validated": "Validé",
+    "pending_validation": "En attente de validation",
     "lunch": "Déjeuner",
     "dinner": "Dîner",
     "setup": "Montage",

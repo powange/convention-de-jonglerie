@@ -625,23 +625,23 @@ const getActiveServicesByCategory = (edition: Edition) => {
     .filter((category) => category.services.length > 0)
 }
 
-// Obtenir tous les organisateurs en préservant éventuel titre custom
+// Obtenir uniquement les organisateurs présents sur cette édition
 const getAllOrganizers = (edition: Edition) => {
   if (!edition) return []
 
   const organizers: any[] = []
 
-  // Ajouter les organisateurs de la convention
-  if (edition.convention?.organizers) {
-    edition.convention.organizers.forEach((collab) => {
-      if (!organizers.some((c) => c.id === collab.user.id)) {
+  // Ajouter uniquement les organisateurs présents sur l'édition (via EditionOrganizer)
+  if ((edition as any).editionOrganizers) {
+    ;(edition as any).editionOrganizers.forEach((edOrg: any) => {
+      if (!organizers.some((c) => c.id === edOrg.organizer.user.id)) {
         organizers.push({
-          id: collab.user.id,
-          user: collab.user,
-          pseudo: collab.user.pseudo,
+          id: edOrg.organizer.user.id,
+          user: edOrg.organizer.user,
+          pseudo: edOrg.organizer.user.pseudo,
           isCreator: false,
-          rights: collab.rights || {},
-          title: (collab as any).title || null,
+          entryValidated: edOrg.entryValidated,
+          title: null, // Peut être étendu si on ajoute un champ titre custom sur EditionOrganizer
         } as any)
       }
     })
@@ -650,14 +650,17 @@ const getAllOrganizers = (edition: Edition) => {
   return organizers
 }
 
-// Tooltip: afficher titre custom si présent sinon rien de spécial
+// Tooltip: afficher statut de validation si applicable
 const organizerTitleTooltip = (organizer: any) => {
-  if (organizer.title) return `${organizer.pseudo} - ${organizer.title}`
-  if (organizer.isCreator) return `${organizer.pseudo}`
-  return organizer.pseudo
+  const parts = [organizer.pseudo]
+  if (organizer.title) parts.push(organizer.title)
+  if (organizer.entryValidated !== undefined) {
+    parts.push(organizer.entryValidated ? t('common.validated') : t('common.pending_validation'))
+  }
+  return parts.join(' - ')
 }
 
-// Texte du badge: titre custom uniquement
+// Texte du badge: ne rien afficher (le statut de validation peut être géré ailleurs si besoin)
 const displayOrganizerBadge = (organizer: any): string | null => {
   return organizer.title ? organizer.title : null
 }

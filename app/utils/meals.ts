@@ -97,3 +97,28 @@ export const formatPhases = (phases: string[] | undefined): string => {
 
   return phases.map((phase) => phaseMap[phase] || phase).join(' + ')
 }
+
+/**
+ * Formate le type de repas pour l'affichage
+ */
+export const formatMealType = (mealType: MealType): string => {
+  const mealTypeMap: Record<MealType, string> = {
+    BREAKFAST: 'Petit-déjeuner',
+    LUNCH: 'Déjeuner',
+    DINNER: 'Dîner',
+  }
+
+  return mealTypeMap[mealType] || mealType
+}
+
+/**
+ * Formate un repas complet pour l'affichage (type + date courte)
+ */
+export const formatMealDisplay = (meal: Meal, locale: string = 'fr-FR'): string => {
+  const date = new Date(meal.date)
+  const dateStr = date.toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+  })
+  return `${formatMealType(meal.mealType)} - ${dateStr}`
+}
