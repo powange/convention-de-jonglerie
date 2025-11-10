@@ -99,12 +99,7 @@ export default wrapApiHandler(
       },
     }))
 
-    const paginatedResponse = createPaginatedResponse(formattedNotifications, total, page, limit)
-
-    return {
-      notifications: paginatedResponse.data,
-      pagination: paginatedResponse.pagination,
-    }
+    return createPaginatedResponse(formattedNotifications, total, page, limit)
   },
   { operationName: 'GetRecentNotifications' }
 )

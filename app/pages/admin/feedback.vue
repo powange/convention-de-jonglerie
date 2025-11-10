@@ -495,7 +495,7 @@ async function fetchFeedbacks() {
 
     const response = await $fetch(`/api/admin/feedback?${query.toString()}`)
 
-    feedbacks.value = response.feedbacks
+    feedbacks.value = response.data
     pagination.value = response.pagination
     stats.value = response.stats
   } catch (error) {

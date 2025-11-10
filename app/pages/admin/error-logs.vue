@@ -637,7 +637,7 @@ const loadLogs = async () => {
 
     const response = await $fetch(`/api/admin/error-logs?${params}`)
 
-    logs.value = response.logs
+    logs.value = response.data
     stats.value = response.stats
     pagination.value = response.pagination
   } catch (error) {

@@ -78,11 +78,8 @@ export default wrapApiHandler(
       }
     })
 
-    const paginatedResponse = createPaginatedResponse(feedbacks, total, page, limit)
-
     return {
-      feedbacks: paginatedResponse.data,
-      pagination: paginatedResponse.pagination,
+      ...createPaginatedResponse(feedbacks, total, page, limit),
       stats: statsFormatted,
     }
   },

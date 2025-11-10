@@ -291,10 +291,8 @@ export default wrapApiHandler(
       }
     } else {
       // Pagination classique - utiliser createPaginatedResponse
-      const paginatedResponse = createPaginatedResponse(errorLogs, total, page!, pageSize)
       return {
-        logs: paginatedResponse.data,
-        pagination: paginatedResponse.pagination,
+        ...createPaginatedResponse(errorLogs, total, page!, pageSize),
         stats: statsResponse,
       }
     }

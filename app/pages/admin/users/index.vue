@@ -187,7 +187,7 @@ interface PaginationData {
 }
 
 interface UsersApiResponse {
-  users: AdminUserWithConnection[]
+  data: AdminUserWithConnection[]
   pagination: PaginationData
   connectionStats?: {
     totalActiveConnections: number
@@ -788,7 +788,7 @@ const fetchUsers = async () => {
       query: params,
     })
 
-    users.value = data.users
+    users.value = data.data
     pagination.value = data.pagination
     connectionStats.value = data.connectionStats || null
   } catch (error: any) {

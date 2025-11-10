@@ -1507,7 +1507,7 @@ const loadRecentNotifications = async () => {
       query,
     })
 
-    recentNotifications.value = response.notifications || []
+    recentNotifications.value = response.data || []
 
     // Mettre à jour la pagination depuis la réponse serveur
     if (response.pagination) {
