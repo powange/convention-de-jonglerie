@@ -62,7 +62,31 @@
                 >
                   <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
                   <!-- eslint-disable-next-line vue/no-v-html -->
-                  <div v-html="descriptionHtml" />
+                  <div
+                    :class="{ 'xl:line-clamp-none': true, 'line-clamp-6': !isDescriptionExpanded }"
+                    v-html="descriptionHtml"
+                  />
+                  <!-- Boutons "Voir plus" / "Voir moins" uniquement en mobile (< xl) -->
+                  <UButton
+                    v-if="!isDescriptionExpanded"
+                    variant="ghost"
+                    color="primary"
+                    size="xs"
+                    class="mt-2 xl:hidden"
+                    @click="isDescriptionExpanded = true"
+                  >
+                    {{ $t('common.see_more') }}...
+                  </UButton>
+                  <UButton
+                    v-else
+                    variant="ghost"
+                    color="primary"
+                    size="xs"
+                    class="mt-2 xl:hidden"
+                    @click="isDescriptionExpanded = false"
+                  >
+                    {{ $t('common.see_less') }}
+                  </UButton>
                 </div>
                 <p v-else class="text-gray-700 dark:text-gray-300">
                   {{ t('edition.no_description_available') }}
@@ -73,7 +97,38 @@
 
           <!-- Programme de l'édition -->
           <UCard v-if="edition.program && programHtml" variant="subtle">
-            <div class="space-y-4">
+            <!-- Version mobile/tablette (< xl) : Collapsible (replié < md, déplié md-lg) -->
+            <UCollapsible v-model:open="isProgramExpanded" class="space-y-4 xl:hidden">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                class="group w-full justify-between p-0 hover:bg-transparent"
+                :ui="{
+                  trailingIcon:
+                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
+                }"
+              >
+                <h3 class="text-lg font-semibold">{{ $t('edition.program') }}</h3>
+                <UIcon
+                  name="i-heroicons-chevron-down"
+                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
+                />
+              </UButton>
+
+              <template #content>
+                <div
+                  class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+                  aria-labelledby="program-heading"
+                >
+                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <div v-html="programHtml" />
+                </div>
+              </template>
+            </UCollapsible>
+
+            <!-- Version desktop (≥ xl) : Toujours visible -->
+            <div class="hidden xl:block space-y-4">
               <h3 class="text-lg font-semibold">{{ $t('edition.program') }}</h3>
               <div
                 class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
@@ -87,8 +142,69 @@
           </UCard>
 
           <UCard variant="subtle">
-            <!-- Services -->
-            <section class="space-y-4" aria-labelledby="services-heading">
+            <!-- Services - Version mobile/tablette (< xl) : Collapsible -->
+            <UCollapsible v-model:open="isServicesExpanded" class="space-y-4 xl:hidden">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                class="group w-full justify-between p-0 hover:bg-transparent"
+                :ui="{
+                  trailingIcon:
+                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
+                }"
+              >
+                <h3 class="text-lg font-semibold">{{ $t('edition.services_offered') }}</h3>
+                <UIcon
+                  name="i-heroicons-chevron-down"
+                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
+                />
+              </UButton>
+
+              <template #content>
+                <div
+                  v-if="getActiveServicesByCategory(edition).length === 0"
+                  class="text-gray-500 text-sm"
+                >
+                  {{ $t('edition.no_services') }}
+                </div>
+                <div v-else class="space-y-4">
+                  <div
+                    v-for="category in getActiveServicesByCategory(edition)"
+                    :key="category.category"
+                    class="space-y-3"
+                  >
+                    <h4
+                      class="text-lg font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2"
+                    >
+                      {{ category.label }}
+                    </h4>
+                    <div class="flex flex-wrap gap-3" role="list">
+                      <UBadge
+                        v-for="service in category.services"
+                        :key="service.key"
+                        color="neutral"
+                        variant="soft"
+                        size="xl"
+                        class="px-4 py-3"
+                        role="listitem"
+                      >
+                        <UIcon
+                          :name="service.icon"
+                          :class="service.color"
+                          size="24"
+                          class="mr-2"
+                          aria-hidden="true"
+                        />
+                        <span class="text-base font-medium">{{ service.label }}</span>
+                      </UBadge>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </UCollapsible>
+
+            <!-- Services - Version desktop (≥ xl) : Toujours visible -->
+            <section class="hidden xl:block space-y-4" aria-labelledby="services-heading">
               <h3 id="services-heading" class="text-lg font-semibold">
                 {{ $t('edition.services_offered') }}
               </h3>
@@ -139,7 +255,93 @@
         <div class="xl:col-span-1 2xl:col-span-1 flex flex-col space-y-6">
           <!-- Informations pratiques -->
           <UCard variant="subtle">
-            <section class="space-y-3" aria-labelledby="practical-info-heading">
+            <!-- Version mobile/tablette (< xl) : Collapsible -->
+            <UCollapsible v-model:open="isPracticalInfoExpanded" class="space-y-4 xl:hidden">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                class="group w-full justify-between p-0 hover:bg-transparent"
+                :ui="{
+                  trailingIcon:
+                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
+                }"
+              >
+                <h3 class="text-lg font-semibold">{{ $t('edition.practical_info') }}</h3>
+                <UIcon
+                  name="i-heroicons-chevron-down"
+                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
+                />
+              </UButton>
+
+              <template #content>
+                <div class="space-y-3">
+                  <p class="text-sm text-gray-600">
+                    <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
+                    <a
+                      :href="getGoogleMapsUrl(edition)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :aria-label="`${$t('edition.view_on_map')} - ${edition.city} (${$t('common.opens_in_new_tab')})`"
+                      class="text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      {{ edition.addressLine1
+                      }}<span v-if="edition.addressLine2">, {{ edition.addressLine2 }}</span
+                      >, {{ edition.postalCode }} {{ edition.city
+                      }}<span v-if="edition.region">, {{ edition.region }}</span
+                      >, {{ edition.country }}
+                    </a>
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    <UIcon name="i-heroicons-calendar" class="inline mr-1" />
+                    {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
+                  </p>
+
+                  <!-- Email de contact de la convention -->
+                  <p v-if="edition.convention?.email" class="text-sm text-gray-600">
+                    <UIcon name="i-heroicons-envelope" class="inline mr-1" />
+                    <a
+                      :href="`mailto:${edition.convention.email}`"
+                      class="text-primary-600 hover:text-primary-700 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      :aria-label="`${$t('common.contact_email')}: ${edition.convention.email}`"
+                    >
+                      {{ edition.convention.email }}
+                    </a>
+                  </p>
+
+                  <!-- Organisateurs -->
+                  <div v-if="getAllOrganizers(edition).length > 0" class="pt-2">
+                    <div class="flex items-center gap-2 mb-2">
+                      <UIcon name="i-heroicons-users" class="text-gray-400" />
+                      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
+                        $t('edition.organizing_team')
+                      }}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <div
+                        v-for="organizer in getAllOrganizers(edition)"
+                        :key="organizer.id"
+                        class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
+                        :title="organizerTitleTooltip(organizer)"
+                      >
+                        <UiUserAvatar :user="organizer.user" size="xs" />
+                        <span class="text-gray-700 dark:text-gray-300">{{ organizer.pseudo }}</span>
+                        <UBadge
+                          v-if="displayOrganizerBadge(organizer)"
+                          size="xs"
+                          color="neutral"
+                          variant="soft"
+                        >
+                          {{ displayOrganizerBadge(organizer) }}
+                        </UBadge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </UCollapsible>
+
+            <!-- Version desktop (≥ xl) : Toujours visible -->
+            <section class="hidden xl:block space-y-3" aria-labelledby="practical-info-heading">
               <h3 id="practical-info-heading" class="text-lg font-semibold">
                 {{ $t('edition.practical_info') }}
               </h3>
@@ -208,16 +410,76 @@
           </UCard>
 
           <!-- Liens externes -->
-          <UCard variant="subtle">
-            <div
-              v-if="
-                edition.officialWebsiteUrl ||
-                edition.ticketingUrl ||
-                edition.facebookUrl ||
-                edition.instagramUrl
-              "
-              class="space-y-2"
-            >
+          <UCard
+            v-if="
+              edition.officialWebsiteUrl ||
+              edition.ticketingUrl ||
+              edition.facebookUrl ||
+              edition.instagramUrl
+            "
+            variant="subtle"
+          >
+            <!-- Version mobile/tablette (< xl) : Collapsible -->
+            <UCollapsible v-model:open="isLinksExpanded" class="space-y-4 xl:hidden">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                class="group w-full justify-between p-0 hover:bg-transparent"
+                :ui="{
+                  trailingIcon:
+                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
+                }"
+              >
+                <h3 class="text-lg font-semibold">{{ $t('edition.useful_links') }}</h3>
+                <UIcon
+                  name="i-heroicons-chevron-down"
+                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
+                />
+              </UButton>
+
+              <template #content>
+                <div class="flex flex-wrap gap-2">
+                  <UButton
+                    v-if="edition.officialWebsiteUrl"
+                    icon="i-heroicons-globe-alt"
+                    :to="edition.officialWebsiteUrl"
+                    target="_blank"
+                    size="sm"
+                    color="primary"
+                    >{{ $t('edition.official_website') }}</UButton
+                  >
+                  <UButton
+                    v-if="edition.ticketingUrl"
+                    icon="i-heroicons-ticket"
+                    :to="edition.ticketingUrl"
+                    target="_blank"
+                    size="sm"
+                    >{{ $t('edition.ticketing_title') }}</UButton
+                  >
+                  <UButton
+                    v-if="edition.facebookUrl"
+                    icon="i-simple-icons-facebook"
+                    :to="edition.facebookUrl"
+                    target="_blank"
+                    size="sm"
+                    color="info"
+                    >Facebook</UButton
+                  >
+                  <UButton
+                    v-if="edition.instagramUrl"
+                    icon="i-simple-icons-instagram"
+                    :to="edition.instagramUrl"
+                    target="_blank"
+                    size="sm"
+                    color="error"
+                    >Instagram</UButton
+                  >
+                </div>
+              </template>
+            </UCollapsible>
+
+            <!-- Version desktop (≥ xl) : Toujours visible -->
+            <div class="hidden xl:block space-y-2">
               <h3 class="text-lg font-semibold">{{ $t('edition.useful_links') }}</h3>
               <div class="flex flex-wrap gap-2">
                 <UButton
@@ -338,7 +600,37 @@ const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 
 const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
+const isDescriptionExpanded = ref(false)
+const isProgramExpanded = ref(false)
+const isServicesExpanded = ref(false)
+const isPracticalInfoExpanded = ref(false)
+const isLinksExpanded = ref(false)
 const { getImageUrl } = useImageUrl()
+
+// Détection de la taille d'écran pour l'état initial des collapsibles
+if (import.meta.client) {
+  const { width } = useWindowSize()
+  watch(
+    width,
+    (newWidth) => {
+      // Si écran >= md et < xl, déplier tous les collapsibles
+      if (newWidth >= 768 && newWidth < 1280) {
+        isProgramExpanded.value = true
+        isServicesExpanded.value = true
+        isPracticalInfoExpanded.value = true
+        isLinksExpanded.value = true
+      }
+      // Si écran < md, replier tous les collapsibles
+      else if (newWidth < 768) {
+        isProgramExpanded.value = false
+        isServicesExpanded.value = false
+        isPracticalInfoExpanded.value = false
+        isLinksExpanded.value = false
+      }
+    },
+    { immediate: true }
+  )
+}
 
 const useRequestURLOrigin = useRequestURL().origin
 
