@@ -127,13 +127,13 @@ export const useNotificationsStore = defineStore('notifications', {
 
         const response = await $fetch<{
           success: boolean
-          notifications: RawNotification[]
+          data: RawNotification[]
           unreadCount: number
           pagination: { limit: number; offset: number; hasMore: boolean }
         }>(`/api/notifications?${params}`)
 
         // Normaliser les notifications pour la compatibilité
-        const normalizedNotifications = (response.notifications || []).map(normalizeNotification)
+        const normalizedNotifications = (response.data || []).map(normalizeNotification)
 
         if (append) {
           this.notifications.push(...normalizedNotifications)

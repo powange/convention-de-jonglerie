@@ -82,7 +82,7 @@ describe('notifications store', () => {
     it("charge les notifications depuis l'API", async () => {
       const mockResponse = {
         success: true,
-        notifications: mockNotifications,
+        data: mockNotifications,
         unreadCount: 1,
         pagination: { limit: 20, offset: 0, hasMore: false },
       }
@@ -100,7 +100,7 @@ describe('notifications store', () => {
     it('applique les filtres dans la requête', async () => {
       const mockResponse = {
         success: true,
-        notifications: [],
+        data: [],
         unreadCount: 0,
         pagination: { limit: 10, offset: 0, hasMore: false },
       }
@@ -123,7 +123,7 @@ describe('notifications store', () => {
 
       const mockResponse = {
         success: true,
-        notifications: [mockNotifications[1]],
+        data: [mockNotifications[1]],
         unreadCount: 1,
         pagination: { limit: 20, offset: 1, hasMore: false },
       }
@@ -151,7 +151,7 @@ describe('notifications store', () => {
 
       const mockResponse = {
         success: true,
-        notifications: [mockNotifications[1]],
+        data: [mockNotifications[1]],
         unreadCount: 1,
         pagination: { limit: 10, offset: 10, hasMore: false },
       }
