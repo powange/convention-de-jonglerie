@@ -69,8 +69,8 @@ export default wrapApiHandler(
     await prisma.notification.create({
       data: {
         userId,
-        title: 'Notifications activées',
-        message: 'Vous recevrez maintenant des notifications push sur cet appareil',
+        titleText: 'Notifications activées',
+        messageText: 'Vous recevrez maintenant des notifications push sur cet appareil',
         type: 'SUCCESS',
         category: 'SYSTEM',
       },

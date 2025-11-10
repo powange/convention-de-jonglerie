@@ -240,11 +240,27 @@ export const usePushNotifications = () => {
           throw new Error('Clé publique VAPID manquante')
         }
 
+        console.log('[Push] Tentative de souscription avec clé VAPID:', vapidPublicKey.substring(0, 20) + '...')
+        console.log('[Push] Service Worker état:', registration.active?.state)
+
         const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey)
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: applicationServerKey,
-        })
+        console.log('[Push] ApplicationServerKey converti, longueur:', applicationServerKey.length)
+
+        try {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey,
+          })
+          console.log('[Push] Souscription réussie!')
+        } catch (subscribeError: any) {
+          console.error('[Push] Erreur détaillée de souscription:', {
+            name: subscribeError.name,
+            message: subscribeError.message,
+            code: subscribeError.code,
+            stack: subscribeError.stack
+          })
+          throw subscribeError
+        }
       }
 
       // 5. Envoyer au serveur
