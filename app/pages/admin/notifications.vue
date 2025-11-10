@@ -424,10 +424,10 @@
         <template #title_message-cell="{ row }">
           <div class="min-w-0 max-w-md space-y-2 py-1">
             <p class="font-semibold text-gray-900 dark:text-white leading-tight">
-              {{ row.original.title }}
+              {{ getNotificationTitle(row.original) }}
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
-              {{ row.original.message }}
+              {{ getNotificationMessage(row.original) }}
             </p>
             <div v-if="row.original.actionUrl" class="mt-2 flex items-center gap-2">
               <UButton
@@ -440,7 +440,7 @@
                 class="inline-flex items-center gap-1"
               >
                 <UIcon name="i-heroicons-arrow-top-right-on-square" class="h-3 w-3" />
-                {{ row.original.actionText || 'Voir détails' }}
+                {{ getNotificationActionText(row.original) }}
               </UButton>
             </div>
           </div>
@@ -851,13 +851,22 @@ interface RecentNotification {
   id: string
   type: string
   category: string | null
-  title: string
-  message: string
+  // Ancien système (rétrocompatibilité)
+  title?: string
+  message?: string
+  // Système de traduction (notifications système)
+  titleKey?: string
+  messageKey?: string
+  translationParams?: Record<string, any>
+  actionTextKey?: string
+  // Texte libre (notifications custom/orgas)
+  titleText?: string
+  messageText?: string
+  actionText?: string
   isRead: boolean
   readAt: string | null
   createdAt: string
   actionUrl: string | null
-  actionText: string | null
   user: {
     id: number
     email: string
@@ -946,6 +955,36 @@ interface UserSelectItem {
   email: string
   avatar?: { src: string; alt: string }
   isRealUser?: boolean // true pour les vrais utilisateurs, false/undefined pour les utilisateurs de test
+}
+
+// Fonctions utilitaires pour afficher les notifications (gère i18n et texte libre)
+const { t } = useI18n()
+
+const getNotificationTitle = (notification: RecentNotification) => {
+  // Système de traduction - utiliser la clé
+  if ('titleKey' in notification && notification.titleKey) {
+    return t(notification.titleKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.titleText || notification.title || ''
+}
+
+const getNotificationMessage = (notification: RecentNotification) => {
+  // Système de traduction - utiliser la clé
+  if ('messageKey' in notification && notification.messageKey) {
+    return t(notification.messageKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.messageText || notification.message || ''
+}
+
+const getNotificationActionText = (notification: RecentNotification) => {
+  // Système de traduction - utiliser la clé
+  if ('actionTextKey' in notification && notification.actionTextKey) {
+    return t(notification.actionTextKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.actionText || 'Voir détails'
 }
 
 const testForm = reactive({

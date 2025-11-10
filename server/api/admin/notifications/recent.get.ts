@@ -81,13 +81,22 @@ export default wrapApiHandler(
       id: notification.id,
       type: notification.type,
       category: notification.category,
+      // Ancien système (rétrocompatibilité)
       title: notification.title,
       message: notification.message,
+      // Système de traduction (notifications système)
+      titleKey: notification.titleKey,
+      messageKey: notification.messageKey,
+      translationParams: notification.translationParams,
+      actionTextKey: notification.actionTextKey,
+      // Texte libre (notifications custom/orgas)
+      titleText: notification.titleText,
+      messageText: notification.messageText,
+      actionText: notification.actionText,
       isRead: notification.isRead,
       readAt: notification.readAt,
       createdAt: notification.createdAt,
       actionUrl: notification.actionUrl,
-      actionText: notification.actionText,
       user: {
         id: notification.user.id,
         emailHash: getEmailHash(notification.user.email),
