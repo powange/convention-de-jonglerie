@@ -143,7 +143,7 @@
               @update:model-value="updateFilter(service.key, $event)"
             >
               <template #label>
-                <div class="flex items-center gap-2">
+                <div class="flex items-start gap-2">
                   <UIcon :name="service.icon" :class="service.color" size="16" />
                   <span :class="isMobile ? 'text-sm' : ''">{{ service.label }}</span>
                 </div>
