@@ -12,7 +12,19 @@
     >
       <UButton variant="ghost" color="neutral" class="rounded-full">
         <div class="flex items-center gap-2">
-          <UiUserAvatar :user="authStore.user" size="md" border />
+          <div class="relative">
+            <UiUserAvatar :user="authStore.user" size="md" border />
+            <!-- Badge Admin en mobile (sur l'avatar) -->
+            <UBadge
+              v-if="authStore.isAdminModeActive"
+              color="warning"
+              variant="soft"
+              size="xs"
+              class="absolute -top-1 -right-1 px-1 sm:hidden bg-opacity-100 backdrop-blur-sm"
+            >
+              👑
+            </UBadge>
+          </div>
           <div class="hidden sm:flex flex-col items-start">
             <span class="text-sm font-medium">{{ displayName }}</span>
             <UBadge
@@ -57,7 +69,8 @@ const route = useRoute()
 // État réactif pour la taille d'écran
 const isMobile = ref(false)
 
-const isAdminModeActive = ref(false)
+// Synchroniser avec le store
+const isAdminModeActive = computed(() => authStore.adminMode)
 
 // Utiliser nextTick pour s'assurer que nous sommes côté client après hydration
 onMounted(async () => {
@@ -139,8 +152,6 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
 
 // Fonction pour basculer le mode admin
 const toggleAdminMode = (checked: boolean) => {
-  console.log('Toggling admin mode:', checked)
-  isAdminModeActive.value = checked
   if (checked) {
     authStore.enableAdminMode()
     toast.add({
