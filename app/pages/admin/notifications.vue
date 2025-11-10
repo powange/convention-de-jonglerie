@@ -596,272 +596,221 @@
     </UCard>
 
     <!-- Modal de création de notification -->
-    <UModal v-model:open="showCreateModal">
-      <template #content>
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/20"
-                >
-                  <UIcon name="i-heroicons-plus-circle" class="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Nouvelle notification
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Créez et envoyez une notification personnalisée
-                  </p>
-                </div>
-              </div>
-              <UButton
-                icon="i-heroicons-x-mark"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                @click="showCreateModal = false"
+    <UModal
+      v-model:open="showCreateModal"
+      title="Nouvelle notification"
+      description="Créez et envoyez une notification personnalisée"
+    >
+      <template #body>
+        <UForm
+          id="create-notification-form"
+          :schema="createNotificationSchema"
+          :state="createForm"
+          class="space-y-5"
+          @submit="createNotification"
+        >
+          <!-- Type et Catégorie -->
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField label="Type de notification" name="type" required>
+              <USelect
+                v-model="createForm.type"
+                :items="notificationTypes"
+                placeholder="Choisir le type..."
+                icon="i-heroicons-tag"
+                class="w-full"
               />
-            </div>
-          </template>
+            </UFormField>
 
-          <UForm
-            :schema="createNotificationSchema"
-            :state="createForm"
-            class="space-y-5"
-            @submit="createNotification"
+            <UFormField label="Catégorie" name="category">
+              <USelect
+                v-model="createForm.category"
+                :items="categoryOptions"
+                placeholder="Choisir une catégorie..."
+                icon="i-heroicons-folder"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+
+          <!-- Destinataire -->
+          <UFormField
+            label="Destinataire (optionnel)"
+            name="targetUser"
+            description="Laissez vide pour vous l'envoyer (test)"
           >
-            <!-- Type et Catégorie -->
-            <div class="grid grid-cols-2 gap-4">
-              <UFormField label="Type de notification" name="type" required>
-                <USelect
-                  v-model="createForm.type"
-                  :items="notificationTypes"
-                  placeholder="Choisir le type..."
-                  icon="i-heroicons-tag"
-                  class="w-full"
+            <UserSelector
+              v-model="createForm.targetUser"
+              v-model:search-term="createSearchQuery"
+              :searched-users="createSearchedUsers"
+              :searching-users="createSearchingUsers"
+              placeholder="Rechercher un utilisateur..."
+              :show-clear-button="true"
+            />
+          </UFormField>
+
+          <!-- Contenu -->
+          <UFormField label="Titre" name="title" required>
+            <UInput
+              v-model="createForm.title"
+              placeholder="Ex: Nouvelle convention disponible"
+              icon="i-heroicons-megaphone"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Message" name="message" required>
+            <UTextarea
+              v-model="createForm.message"
+              placeholder="Décrivez le contenu de votre notification..."
+              :rows="4"
+              class="w-full"
+            />
+          </UFormField>
+
+          <!-- Action optionnelle -->
+          <div class="space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+            <p class="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+              <UIcon name="i-heroicons-cursor-arrow-rays" class="h-3 w-3" />
+              Action optionnelle
+            </p>
+
+            <div class="grid grid-cols-2 gap-3">
+              <UFormField label="URL de redirection" name="actionUrl">
+                <UInput
+                  v-model="createForm.actionUrl"
+                  placeholder="https://..."
+                  icon="i-heroicons-link"
                 />
               </UFormField>
 
-              <UFormField label="Catégorie" name="category">
-                <USelect
-                  v-model="createForm.category"
-                  :items="categoryOptions"
-                  placeholder="Choisir une catégorie..."
-                  icon="i-heroicons-folder"
-                  class="w-full"
+              <UFormField label="Texte du bouton" name="actionText">
+                <UInput
+                  v-model="createForm.actionText"
+                  placeholder="Ex: Voir détails"
+                  icon="i-heroicons-arrow-right"
                 />
               </UFormField>
             </div>
+          </div>
 
-            <!-- Destinataire -->
-            <UFormField
-              label="Destinataire (optionnel)"
-              name="targetUser"
-              description="Laissez vide pour vous l'envoyer (test)"
-            >
-              <UserSelector
-                v-model="createForm.targetUser"
-                v-model:search-term="createSearchQuery"
-                :searched-users="createSearchedUsers"
-                :searching-users="createSearchingUsers"
-                placeholder="Rechercher un utilisateur..."
-                :show-clear-button="true"
-              />
-            </UFormField>
-
-            <!-- Contenu -->
-            <UFormField label="Titre" name="title" required>
-              <UInput
-                v-model="createForm.title"
-                placeholder="Ex: Nouvelle convention disponible"
-                icon="i-heroicons-megaphone"
-                class="w-full"
-              />
-            </UFormField>
-
-            <UFormField label="Message" name="message" required>
-              <UTextarea
-                v-model="createForm.message"
-                placeholder="Décrivez le contenu de votre notification..."
-                :rows="4"
-                class="w-full"
-              />
-            </UFormField>
-
-            <!-- Action optionnelle -->
-            <div class="space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <p
-                class="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1"
-              >
-                <UIcon name="i-heroicons-cursor-arrow-rays" class="h-3 w-3" />
-                Action optionnelle
+          <!-- Preview de la notification -->
+          <div
+            v-if="createForm.title || createForm.message"
+            class="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800"
+          >
+            <p class="text-xs font-medium text-blue-700 dark:text-blue-300 mb-2">Aperçu :</p>
+            <div class="space-y-1">
+              <p v-if="createForm.title" class="font-medium text-sm text-gray-900 dark:text-white">
+                {{ createForm.title }}
               </p>
-
-              <div class="grid grid-cols-2 gap-3">
-                <UFormField label="URL de redirection" name="actionUrl">
-                  <UInput
-                    v-model="createForm.actionUrl"
-                    placeholder="https://..."
-                    icon="i-heroicons-link"
-                  />
-                </UFormField>
-
-                <UFormField label="Texte du bouton" name="actionText">
-                  <UInput
-                    v-model="createForm.actionText"
-                    placeholder="Ex: Voir détails"
-                    icon="i-heroicons-arrow-right"
-                  />
-                </UFormField>
-              </div>
+              <p v-if="createForm.message" class="text-xs text-gray-600 dark:text-gray-400">
+                {{ createForm.message.substring(0, 100)
+                }}{{ createForm.message.length > 100 ? '...' : '' }}
+              </p>
             </div>
+          </div>
+        </UForm>
+      </template>
 
-            <!-- Preview de la notification -->
-            <div
-              v-if="createForm.title || createForm.message"
-              class="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800"
-            >
-              <p class="text-xs font-medium text-blue-700 dark:text-blue-300 mb-2">Aperçu :</p>
-              <div class="space-y-1">
-                <p
-                  v-if="createForm.title"
-                  class="font-medium text-sm text-gray-900 dark:text-white"
-                >
-                  {{ createForm.title }}
-                </p>
-                <p v-if="createForm.message" class="text-xs text-gray-600 dark:text-gray-400">
-                  {{ createForm.message.substring(0, 100)
-                  }}{{ createForm.message.length > 100 ? '...' : '' }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <UButton
-                variant="ghost"
-                :disabled="creatingNotification"
-                @click="showCreateModal = false"
-              >
-                Annuler
-              </UButton>
-              <UButton
-                type="submit"
-                :loading="creatingNotification"
-                color="primary"
-                :disabled="!createForm.type || !createForm.title || !createForm.message"
-              >
-                <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
-                {{ creatingNotification ? 'Envoi...' : 'Créer et envoyer' }}
-              </UButton>
-            </div>
-          </UForm>
-        </UCard>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton
+            variant="ghost"
+            :disabled="creatingNotification"
+            @click="showCreateModal = false"
+          >
+            Annuler
+          </UButton>
+          <UButton
+            type="submit"
+            form="create-notification-form"
+            :loading="creatingNotification"
+            color="primary"
+            :disabled="!createForm.type || !createForm.title || !createForm.message"
+          >
+            <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
+            {{ creatingNotification ? 'Envoi...' : 'Créer et envoyer' }}
+          </UButton>
+        </div>
       </template>
     </UModal>
 
     <!-- Modal de test -->
-    <UModal v-model:open="showTestModal">
-      <template #content>
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/20"
-                >
-                  <UIcon name="i-heroicons-bell" class="h-5 w-5 text-primary-600" />
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Test de notification
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Envoyez une notification de test personnalisée
-                  </p>
-                </div>
-              </div>
-              <UButton
-                icon="i-heroicons-x-mark"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                @click="showTestModal = false"
-              />
-            </div>
-          </template>
-
-          <UForm
-            id="test-form"
-            :schema="testNotificationSchema"
-            :state="testForm"
-            class="space-y-6"
-            @submit="testNotificationAdvanced"
+    <UModal
+      v-model:open="showTestModal"
+      title="Test de notification"
+      description="Envoyez une notification de test personnalisée"
+    >
+      <template #body>
+        <UForm
+          id="test-notification-form"
+          :schema="testNotificationSchema"
+          :state="testForm"
+          class="space-y-6"
+          @submit="testNotificationAdvanced"
+        >
+          <!-- Recherche et sélection d'utilisateur -->
+          <UFormField
+            label="Destinataire"
+            name="targetUser"
+            description="Recherchez et sélectionnez l'utilisateur qui recevra la notification"
+            required
           >
-            <!-- Recherche et sélection d'utilisateur -->
-            <UFormField
-              label="Destinataire"
-              name="targetUser"
-              description="Recherchez et sélectionnez l'utilisateur qui recevra la notification"
-              required
-            >
-              <UserSelector
-                v-model="testForm.targetUser"
-                v-model:search-term="searchQuery"
-                :searched-users="searchedUsers"
-                :searching-users="searchingUsers"
-                placeholder="Rechercher un utilisateur..."
-                :test-users="testUserItems"
-              />
-            </UFormField>
+            <UserSelector
+              v-model="testForm.targetUser"
+              v-model:search-term="searchQuery"
+              :searched-users="searchedUsers"
+              :searching-users="searchingUsers"
+              placeholder="Rechercher un utilisateur..."
+              :test-users="testUserItems"
+            />
+          </UFormField>
 
-            <!-- Type de notification -->
-            <UFormField label="Type de notification" name="type" required>
-              <USelect
-                v-model="testForm.type"
-                :items="testTypesWithLabels"
-                placeholder="Sélectionnez le type de notification..."
-                class="w-full"
-                icon="i-heroicons-tag"
-              />
-            </UFormField>
-
-            <!-- Message personnalisé (conditionnel) -->
-            <UFormField
-              v-if="testForm.type === 'custom'"
-              label="Message personnalisé"
-              name="message"
-              description="Rédigez votre message de test personnalisé"
+          <!-- Type de notification -->
+          <UFormField label="Type de notification" name="type" required>
+            <USelect
+              v-model="testForm.type"
+              :items="testTypesWithLabels"
+              placeholder="Sélectionnez le type de notification..."
               class="w-full"
-            >
-              <UTextarea
-                v-model="testForm.message"
-                placeholder="Votre message de test personnalisé..."
-                :rows="4"
-                class="w-full"
-              />
-            </UFormField>
+              icon="i-heroicons-tag"
+            />
+          </UFormField>
 
-            <!-- Actions du formulaire -->
-            <div class="flex justify-end gap-3 pt-4">
-              <UButton variant="ghost" :disabled="testingAdvanced" @click="showTestModal = false">
-                Annuler
-              </UButton>
-              <UButton
-                type="submit"
-                :loading="testingAdvanced"
-                color="primary"
-                form="test-form"
-                :disabled="!testForm.targetUser || !testForm.type"
-              >
-                <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
-                {{ testingAdvanced ? 'Envoi en cours...' : 'Envoyer le test' }}
-              </UButton>
-            </div>
-          </UForm>
-        </UCard>
+          <!-- Message personnalisé (conditionnel) -->
+          <UFormField
+            v-if="testForm.type === 'custom'"
+            label="Message personnalisé"
+            name="message"
+            description="Rédigez votre message de test personnalisé"
+            class="w-full"
+          >
+            <UTextarea
+              v-model="testForm.message"
+              placeholder="Votre message de test personnalisé..."
+              :rows="4"
+              class="w-full"
+            />
+          </UFormField>
+        </UForm>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" :disabled="testingAdvanced" @click="showTestModal = false">
+            Annuler
+          </UButton>
+          <UButton
+            type="submit"
+            form="test-notification-form"
+            :loading="testingAdvanced"
+            color="primary"
+            :disabled="!testForm.targetUser || !testForm.type"
+          >
+            <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
+            {{ testingAdvanced ? 'Envoi en cours...' : 'Envoyer le test' }}
+          </UButton>
+        </div>
       </template>
     </UModal>
   </div>
