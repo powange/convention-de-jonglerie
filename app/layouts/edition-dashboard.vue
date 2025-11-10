@@ -58,37 +58,34 @@
               </template>
 
               <template #left>
-                <div class="flex items-center gap-3">
-                  <!-- Nom de la convention + édition -->
-                  <div v-if="edition" class="flex items-center gap-2">
-                    <img
-                      v-if="edition.convention?.logo"
-                      :src="
-                        getImageUrl(edition.convention.logo, 'convention', edition.convention.id)
-                      "
-                      :alt="edition.convention.name"
-                      class="h-8 w-8 rounded object-cover"
-                    />
-                    <div class="flex flex-col">
-                      <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                        getEditionDisplayName(edition)
-                      }}</span>
-                    </div>
+                <!-- Nom de la convention + édition -->
+                <div v-if="edition" class="flex items-start gap-2">
+                  <img
+                    v-if="edition.convention?.logo"
+                    :src="getImageUrl(edition.convention.logo, 'convention', edition.convention.id)"
+                    :alt="edition.convention.name"
+                    class="h-8 w-8 rounded object-cover"
+                  />
+                  <div class="flex flex-col gap-1">
+                    <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                      getEditionDisplayName(edition)
+                    }}</span>
+                    <!-- Bouton Retour -->
+                    <UButton
+                      icon="i-heroicons-arrow-left"
+                      variant="ghost"
+                      size="sm"
+                      :to="`/editions/${editionId}`"
+                      class="-ml-2"
+                    >
+                      {{ $t('common.back') }}
+                    </UButton>
                   </div>
                 </div>
               </template>
 
               <template #right>
-                <UButton
-                  icon="i-heroicons-arrow-left"
-                  variant="ghost"
-                  size="sm"
-                  :to="`/editions/${editionId}`"
-                >
-                  {{ $t('common.back') }}
-                </UButton>
-
                 <ClientOnly>
                   <!-- Sélecteur de langue -->
                   <UiSelectLanguage />
