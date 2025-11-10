@@ -41,7 +41,7 @@
         <!-- Totaux -->
         <div
           v-if="validationsData"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6"
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6"
         >
           <UCard v-if="filters.showParticipants">
             <div class="flex items-center justify-between">
@@ -223,7 +223,7 @@
           </div>
 
           <!-- Statistiques numériques -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             <UCard>
               <div class="text-center">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
