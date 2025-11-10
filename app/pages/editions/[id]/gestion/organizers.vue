@@ -215,44 +215,58 @@
             <div v-if="loadingEditionOrganizers" class="text-center py-4">
               <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
             </div>
-            <div
-              v-else-if="editionOrganizers.length > 0"
-              class="grid grid-cols-1 md:grid-cols-2 gap-3"
-            >
-              <div
-                v-for="editionOrganizer in editionOrganizers"
-                :key="editionOrganizer.id"
-                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            <div v-else-if="editionOrganizers.length > 0">
+              <UTable
+                :data="editionOrganizers"
+                :columns="editionOrganizersColumns"
+                class="border border-accented"
               >
-                <div class="flex items-center gap-3">
-                  <UiUserAvatar :user="editionOrganizer.user" size="sm" />
-                  <div>
-                    <div class="font-medium text-sm">
-                      {{ editionOrganizer.user?.prenom }} {{ editionOrganizer.user?.nom }}
-                    </div>
-                    <div v-if="editionOrganizer.title" class="text-xs text-gray-500">
-                      {{ editionOrganizer.title }}
+                <!-- Colonne Organisateur avec avatar et nom -->
+                <template #organizer-cell="{ row }">
+                  <div class="flex items-center gap-3">
+                    <UiUserAvatar :user="row.original.user" size="sm" />
+                    <div>
+                      <div class="font-medium text-sm">
+                        {{ row.original.user?.prenom }} {{ row.original.user?.nom }}
+                      </div>
+                      <div v-if="row.original.title" class="text-xs text-gray-500">
+                        {{ row.original.title }}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="flex items-center gap-2">
+                </template>
+
+                <!-- Colonne Statut -->
+                <template #status-cell="{ row }">
                   <UBadge
-                    v-if="editionOrganizer.entryValidated"
+                    v-if="row.original.entryValidated"
                     color="success"
                     variant="soft"
                     size="sm"
                   >
-                    <UIcon name="i-heroicons-check-circle" class="w-3 h-3" />
+                    <div class="flex items-center gap-1">
+                      <UIcon name="i-heroicons-check-circle" class="w-3 h-3" />
+                      <span>{{ $t('gestion.organizers.entry_validated') }}</span>
+                    </div>
                   </UBadge>
-                  <UButton
-                    icon="i-heroicons-trash"
-                    color="error"
-                    variant="ghost"
-                    size="xs"
-                    @click="removeFromEdition(editionOrganizer.id)"
-                  />
-                </div>
-              </div>
+                  <UBadge v-else color="neutral" variant="soft" size="sm">
+                    {{ $t('gestion.organizers.entry_not_validated') }}
+                  </UBadge>
+                </template>
+
+                <!-- Colonne Actions -->
+                <template #actions-cell="{ row }">
+                  <div class="flex items-center justify-end">
+                    <UButton
+                      icon="i-heroicons-trash"
+                      color="error"
+                      variant="ghost"
+                      size="xs"
+                      @click="removeFromEdition(row.original.id)"
+                    />
+                  </div>
+                </template>
+              </UTable>
             </div>
             <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <UIcon name="i-heroicons-user-group" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
@@ -409,6 +423,8 @@ import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { summarizeRights } from '~/utils/organizerRights'
+
+import type { TableColumn } from '@nuxt/ui'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -680,6 +696,25 @@ const availableOrganizersOptions = computed(() => {
     value: organizer.id,
   }))
 })
+
+// Colonnes de la table des organisateurs d'édition
+const editionOrganizersColumns = computed((): TableColumn<any>[] => [
+  {
+    id: 'organizer',
+    header: t('gestion.organizers.organizer'),
+    size: 300,
+  },
+  {
+    id: 'status',
+    header: t('gestion.organizers.status'),
+    size: 200,
+  },
+  {
+    id: 'actions',
+    header: t('common.actions'),
+    size: 100,
+  },
+])
 
 // Fonctions pour gérer les organisateurs d'édition
 const loadEditionOrganizers = async () => {

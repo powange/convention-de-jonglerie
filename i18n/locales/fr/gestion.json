@@ -28,7 +28,11 @@
       "add_to_edition_error": "Impossible d'ajouter l'organisateur à l'édition",
       "confirm_remove_from_edition": "Êtes-vous sûr de vouloir retirer cet organisateur de l'édition ?",
       "removed_from_edition": "Organisateur retiré de l'édition avec succès",
-      "remove_from_edition_error": "Impossible de retirer l'organisateur de l'édition"
+      "remove_from_edition_error": "Impossible de retirer l'organisateur de l'édition",
+      "organizer": "Organisateur",
+      "status": "Statut",
+      "entry_validated": "Entrée validée",
+      "entry_not_validated": "Entrée non validée"
     },
     "volunteers": {
       "general_settings": "Paramètres généraux",
@@ -109,6 +113,7 @@
       "stats_others": "Autres",
       "stats_volunteers": "Bénévoles",
       "stats_artists": "Artistes",
+      "stats_organizers": "Organisateurs",
       "stats_validations": "validations",
       "stats_validation": "validation",
       "stats_validations_count": "Nombre de validations",

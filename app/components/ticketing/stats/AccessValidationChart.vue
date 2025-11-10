@@ -27,11 +27,13 @@ interface Props {
     participants: number[]
     volunteers: number[]
     artists: number[]
+    organizers: number[]
     others: number[]
   }
   showParticipants?: boolean
   showVolunteers?: boolean
   showArtists?: boolean
+  showOrganizers?: boolean
   showOthers?: boolean
 }
 
@@ -39,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
   showParticipants: true,
   showVolunteers: true,
   showArtists: true,
+  showOrganizers: true,
   showOthers: true,
 })
 
@@ -74,6 +77,16 @@ const chartData = computed<ChartData<'bar'>>(() => {
       data: props.data.artists,
       backgroundColor: 'rgba(34, 197, 94, 0.8)', // green-500
       borderColor: 'rgba(34, 197, 94, 1)',
+      borderWidth: 1,
+    })
+  }
+
+  if (props.showOrganizers) {
+    datasets.push({
+      label: t('gestion.ticketing.stats_organizers'),
+      data: props.data.organizers,
+      backgroundColor: 'rgba(59, 130, 246, 0.8)', // blue-500
+      borderColor: 'rgba(59, 130, 246, 1)',
       borderWidth: 1,
     })
   }

@@ -578,6 +578,87 @@
           </div>
         </template>
       </UModal>
+
+      <!-- Modal liste des organisateurs non validés -->
+      <UModal
+        v-model:open="organizersNotValidatedModalOpen"
+        title="Organisateurs n'ayant pas validé leur billet"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
+              <template #description>
+                Liste des organisateurs qui n'ont pas encore scanné leur billet au contrôle d'accès.
+              </template>
+            </UAlert>
+
+            <div v-if="loadingOrganizersNotValidated" class="text-center py-8">
+              <p class="text-sm text-gray-500">Chargement...</p>
+            </div>
+
+            <div
+              v-else-if="organizersNotValidated.length === 0"
+              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="mx-auto h-12 w-12 text-green-400 mb-2"
+              />
+              <p class="text-sm text-gray-500">Tous les organisateurs ont validé leur billet !</p>
+            </div>
+
+            <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
+              <div
+                v-for="organizer in organizersNotValidated"
+                :key="organizer.id"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <div class="flex items-start gap-3">
+                  <UiUserDisplay
+                    :user="{
+                      ...organizer.user,
+                      pseudo: organizer.user.pseudo || organizer.user.prenom,
+                    }"
+                    size="md"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium text-gray-900 dark:text-white">
+                      {{ organizer.user.prenom }} {{ organizer.user.nom }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ organizer.user.email }}
+                    </div>
+                    <div
+                      v-if="organizer.title"
+                      class="text-xs text-gray-500 dark:text-gray-500 mt-1"
+                    >
+                      {{ organizer.title }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ organizersNotValidated.length }} organisateur{{
+                organizersNotValidated.length > 1 ? 's' : ''
+              }}
+              non validé{{ organizersNotValidated.length > 1 ? 's' : '' }}
+            </p>
+            <UButton
+              color="neutral"
+              variant="soft"
+              @click="organizersNotValidatedModalOpen = false"
+            >
+              Fermer
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </div>
   </div>
 </template>

@@ -41,7 +41,7 @@
         <!-- Totaux -->
         <div
           v-if="validationsData"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6"
         >
           <UCard v-if="filters.showParticipants">
             <div class="flex items-center justify-between">
@@ -80,6 +80,19 @@
                 </p>
               </div>
               <UIcon name="i-heroicons-star" class="h-8 w-8 text-green-500" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showOrganizers">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_organizers') }}
+                </p>
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {{ validationsData.totals.organizers }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-blue-500" />
             </div>
           </UCard>
           <UCard v-if="filters.showOthers">
@@ -135,6 +148,7 @@
             :show-participants="filters.showParticipants"
             :show-volunteers="filters.showVolunteers"
             :show-artists="filters.showArtists"
+            :show-organizers="filters.showOrganizers"
             :show-others="filters.showOthers"
           />
         </div>
@@ -319,6 +333,11 @@ const typeItems = computed(() => [
     icon: 'i-heroicons-star',
   },
   {
+    label: t('gestion.ticketing.stats_organizers'),
+    value: 'organizers',
+    icon: 'i-heroicons-shield-check',
+  },
+  {
     label: t('gestion.ticketing.stats_others'),
     value: 'others',
     icon: 'i-heroicons-user',
@@ -348,7 +367,13 @@ const tierItems = computed(() =>
 )
 
 // Filtres sélectionnés
-const selectedTypes = ref<string[]>(['participants', 'volunteers', 'artists', 'others'])
+const selectedTypes = ref<string[]>([
+  'participants',
+  'volunteers',
+  'artists',
+  'organizers',
+  'others',
+])
 const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
 
 // Filtres calculés pour compatibilité avec le code existant
@@ -357,6 +382,7 @@ const filters = computed(() => ({
   showOthers: selectedTypes.value.includes('others'),
   showVolunteers: selectedTypes.value.includes('volunteers'),
   showArtists: selectedTypes.value.includes('artists'),
+  showOrganizers: selectedTypes.value.includes('organizers'),
   showSetup: selectedPeriods.value.includes('setup'),
   showEvent: selectedPeriods.value.includes('event'),
   showTeardown: selectedPeriods.value.includes('teardown'),
@@ -369,6 +395,7 @@ interface ValidationData {
   participants: number[]
   volunteers: number[]
   artists: number[]
+  organizers: number[]
   others: number[]
   periods: {
     setup: { start: string; end: string }
@@ -379,6 +406,7 @@ interface ValidationData {
     participants: number
     volunteers: number
     artists: number
+    organizers: number
     others: number
   }
 }
@@ -422,7 +450,7 @@ const loadingTiers = ref(false)
 const filteredData = computed(() => {
   if (!validationsData.value) return null
 
-  const { labels, timestamps, participants, others, volunteers, artists, periods } =
+  const { labels, timestamps, participants, others, volunteers, artists, organizers, periods } =
     validationsData.value
 
   // Filtrer par période
@@ -451,6 +479,7 @@ const filteredData = computed(() => {
     participants: filteredIndices.map((i) => participants[i]),
     volunteers: filteredIndices.map((i) => volunteers[i]),
     artists: filteredIndices.map((i) => artists[i]),
+    organizers: filteredIndices.map((i) => organizers[i]),
     others: filteredIndices.map((i) => others[i]),
   }
 })
