@@ -12,7 +12,7 @@
     >
       <UButton variant="ghost" color="neutral" class="rounded-full">
         <div class="flex items-center gap-2">
-          <div class="relative">
+          <div class="relative flex-shrink-0">
             <UiUserAvatar :user="authStore.user" size="md" border />
             <!-- Badge Admin en mobile (sur l'avatar) -->
             <UBadge
@@ -37,7 +37,7 @@
               👑 Admin
             </UBadge>
           </div>
-          <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
+          <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400 flex-shrink-0" />
         </div>
       </UButton>
     </UDropdownMenu>
