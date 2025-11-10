@@ -1,5 +1,33 @@
 <template>
   <UCard variant="outline">
+    <!-- Barre de contrôles mobile au-dessus du calendrier -->
+    <div
+      v-if="isMobile"
+      class="flex items-center justify-between gap-2 p-3 border-b border-gray-200 dark:border-gray-700"
+    >
+      <UButton color="neutral" variant="outline" size="sm" @click="goToToday">
+        {{ t('calendar.today') }}
+      </UButton>
+      <div class="flex gap-1">
+        <UButton
+          :color="currentView === 'dayGridMonth' ? 'primary' : 'neutral'"
+          :variant="currentView === 'dayGridMonth' ? 'solid' : 'ghost'"
+          size="sm"
+          @click="changeView('dayGridMonth')"
+        >
+          {{ t('calendar.month') }}
+        </UButton>
+        <UButton
+          :color="currentView === 'listMonth' ? 'primary' : 'neutral'"
+          :variant="currentView === 'listMonth' ? 'solid' : 'ghost'"
+          size="sm"
+          @click="changeView('listMonth')"
+        >
+          {{ t('calendar.list') }}
+        </UButton>
+      </div>
+    </div>
+
     <UiLazyFullCalendar
       v-if="ready"
       ref="calendarRef"
@@ -101,6 +129,21 @@ const { t, locale } = useI18n()
 
 const editionsRef = toRef(props, 'editions')
 
+// Détection mobile
+const isMobile = ref(false)
+const currentView = ref('dayGridMonth')
+
+if (import.meta.client) {
+  const { width } = useWindowSize()
+  watch(
+    width,
+    (newWidth) => {
+      isMobile.value = newWidth < 768
+    },
+    { immediate: true }
+  )
+}
+
 const tooltipFormatter = (event: any) => {
   const lines: string[] = []
   if (event.city) lines.push(event.city)
@@ -145,6 +188,38 @@ const { calendarRef, calendarOptions, ready } = useCalendar({
   eventTooltipFormatter: tooltipFormatter,
   onEventClick: openEdition,
 })
+
+// Fonctions de contrôle du calendrier
+const getCalendarApi = () => {
+  // L'API est exposée par le composant LazyFullCalendar
+  return calendarRef.value?.getApi?.()
+}
+
+const goToToday = () => {
+  const calendarApi = getCalendarApi()
+  if (calendarApi) {
+    calendarApi.today()
+  }
+}
+
+const changeView = (view: string) => {
+  const calendarApi = getCalendarApi()
+  if (calendarApi) {
+    calendarApi.changeView(view)
+    currentView.value = view
+  }
+}
+
+// Watcher pour suivre les changements de vue du calendrier
+watch(
+  () => calendarRef.value,
+  () => {
+    const calendarApi = getCalendarApi()
+    if (calendarApi) {
+      currentView.value = calendarApi.view.type
+    }
+  }
+)
 </script>
 
 <!-- Styles déplacés vers main.css pour éviter les problèmes de :deep() -->

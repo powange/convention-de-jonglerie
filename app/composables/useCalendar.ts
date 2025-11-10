@@ -2,6 +2,7 @@ import {
   formatEventsForCalendar,
   getCalendarLocale,
   defaultHeaderToolbar,
+  mobileHeaderToolbar,
   defaultCalendarStyle,
   getCalendarButtonText,
   type CalendarEvent,
@@ -24,15 +25,33 @@ export function useCalendar(options: UseCalendarOptions) {
   const { locale, t } = useI18n()
   const router = useRouter()
 
+  // Détection de la taille d'écran
+  const isMobile = ref(false)
+  if (import.meta.client) {
+    const { width } = useWindowSize()
+    watch(
+      width,
+      (newWidth) => {
+        isMobile.value = newWidth < 768
+      },
+      { immediate: true }
+    )
+  }
+
   const {
     events: sourceEvents,
     onEventClick,
     eventTooltipFormatter,
     initialView = 'dayGridMonth',
     height = defaultCalendarStyle.height,
-    headerToolbar = defaultHeaderToolbar,
+    headerToolbar,
     dayMaxEvents = defaultCalendarStyle.dayMaxEvents,
   } = options
+
+  // Utiliser la toolbar mobile ou desktop selon la taille d'écran
+  const computedHeaderToolbar = computed(() =>
+    headerToolbar ? headerToolbar : isMobile.value ? mobileHeaderToolbar : defaultHeaderToolbar
+  )
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
@@ -90,7 +109,7 @@ export function useCalendar(options: UseCalendarOptions) {
     height,
     firstDay: defaultCalendarStyle.firstDay,
     locale: fcLocale.value,
-    headerToolbar,
+    headerToolbar: computedHeaderToolbar.value,
     buttonText: getCalendarButtonText(t),
     dayMaxEvents,
 
@@ -139,6 +158,11 @@ export function useCalendar(options: UseCalendarOptions) {
     },
     { deep: true, immediate: true }
   )
+
+  // Watcher pour mettre à jour les toolbars selon la taille d'écran
+  watch(isMobile, (mobile) => {
+    calendarOptions.headerToolbar = mobile ? mobileHeaderToolbar : defaultHeaderToolbar
+  })
 
   // Initialisation
   onMounted(async () => {

@@ -90,12 +90,30 @@ export function getCalendarLocale(locale: string): string {
 }
 
 /**
- * Options par défaut pour la toolbar du calendrier
+ * Options par défaut pour la toolbar du calendrier (desktop)
  */
 export const defaultHeaderToolbar = {
   left: 'prev,next today',
   center: 'title',
   right: 'dayGridMonth,listMonth',
+}
+
+/**
+ * Options pour la toolbar du calendrier en mobile
+ */
+export const mobileHeaderToolbar = {
+  left: 'title',
+  center: '',
+  right: 'prev,next',
+}
+
+/**
+ * Options pour les boutons sous le header en mobile (à ajouter manuellement)
+ */
+export const mobileHeaderButtons = {
+  left: 'today dayGridMonth,listMonth',
+  center: '',
+  right: '',
 }
 
 /**

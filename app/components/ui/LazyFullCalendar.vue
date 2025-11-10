@@ -49,8 +49,9 @@ onMounted(async () => {
   }
 })
 
-// Exposer la référence pour permettre l'accès depuis le parent
+// Exposer la référence et l'API pour permettre l'accès depuis le parent
 defineExpose({
   calendarRef: computed(() => calendarRef.value),
+  getApi: () => calendarRef.value?.getApi(),
 })
 </script>
