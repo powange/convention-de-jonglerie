@@ -59,12 +59,12 @@
 
               <template #left>
                 <!-- Nom de la convention + édition -->
-                <div v-if="edition" class="flex items-start gap-2">
+                <div v-if="edition" class="flex items-center gap-2">
                   <img
                     v-if="edition.convention?.logo"
                     :src="getImageUrl(edition.convention.logo, 'convention', edition.convention.id)"
                     :alt="edition.convention.name"
-                    class="h-8 w-8 rounded object-cover"
+                    class="h-8 w-8 rounded object-cover self-center"
                   />
                   <div class="flex flex-col gap-1">
                     <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
