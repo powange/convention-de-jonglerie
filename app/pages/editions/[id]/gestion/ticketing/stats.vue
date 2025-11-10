@@ -222,52 +222,6 @@
             </UFormField>
           </div>
 
-          <!-- Statistiques numériques -->
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <UCard>
-              <div class="text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ $t('gestion.ticketing.stats_source_manual') }}
-                </p>
-                <p class="text-3xl font-bold text-blue-600">
-                  {{
-                    viewMode === 'items'
-                      ? orderSourcesData.items.manual
-                      : orderSourcesData.orders.manual
-                  }}
-                </p>
-              </div>
-            </UCard>
-            <UCard>
-              <div class="text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ $t('gestion.ticketing.stats_source_external') }}
-                </p>
-                <p class="text-3xl font-bold text-green-600">
-                  {{
-                    viewMode === 'items'
-                      ? orderSourcesData.items.external
-                      : orderSourcesData.orders.external
-                  }}
-                </p>
-              </div>
-            </UCard>
-            <UCard>
-              <div class="text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ $t('gestion.ticketing.stats_total') }}
-                </p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-white">
-                  {{
-                    viewMode === 'items'
-                      ? orderSourcesData.items.total
-                      : orderSourcesData.orders.total
-                  }}
-                </p>
-              </div>
-            </UCard>
-          </div>
-
           <!-- Graphique en donut -->
           <OrderSourceChart
             :data="viewMode === 'items' ? orderSourcesData.items : orderSourcesData.orders"

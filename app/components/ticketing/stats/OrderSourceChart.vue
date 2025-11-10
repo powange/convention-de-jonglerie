@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-96 flex items-center justify-center">
-    <Doughnut v-if="chartData" :data="chartData" :options="chartOptions" />
+    <Doughnut v-if="chartData" :data="chartData" :options="chartOptions" :plugins="chartPlugins" />
   </div>
 </template>
 
@@ -12,6 +12,7 @@ import {
   Legend,
   type ChartData,
   type ChartOptions,
+  type Plugin,
 } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
 
@@ -98,4 +99,65 @@ const chartOptions = computed<ChartOptions<'doughnut'>>(() => ({
   },
   cutout: '60%', // Taille du trou au centre (pour le style donut)
 }))
+
+// Détecter le mode sombre
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
+
+// Plugin personnalisé pour afficher le total au centre et les valeurs sur les segments
+const chartPlugins = computed<Plugin<'doughnut'>[]>(() => [
+  {
+    id: 'customLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart
+
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex)
+        if (!meta.data) return
+
+        ctx.save()
+        ctx.font = 'bold 18px sans-serif'
+        ctx.fillStyle = '#ffffff'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+
+        meta.data.forEach((element: any, index: number) => {
+          const data = dataset.data[index] as number
+          if (data === 0) return // Ne pas afficher les segments à 0
+
+          // Calculer la position au milieu de l'arc
+          const { x, y } = element.tooltipPosition()
+
+          // Dessiner le nombre
+          ctx.fillText(data.toString(), x, y)
+        })
+
+        ctx.restore()
+      })
+    },
+    beforeDraw(chart) {
+      const { ctx, chartArea } = chart
+      if (!chartArea) return
+
+      const centerX = (chartArea.left + chartArea.right) / 2
+      const centerY = (chartArea.top + chartArea.bottom) / 2
+
+      ctx.save()
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+
+      // Afficher le nombre total
+      ctx.font = 'bold 36px sans-serif'
+      ctx.fillStyle = isDark.value ? '#f9fafb' : '#111827' // gray-50 en dark, gray-900 en light
+      ctx.fillText(props.data.total.toString(), centerX, centerY - 10)
+
+      // Afficher le label "Total"
+      ctx.font = '14px sans-serif'
+      ctx.fillStyle = isDark.value ? '#9ca3af' : '#6b7280' // gray-400 en dark, gray-500 en light
+      ctx.fillText(t('gestion.ticketing.stats_total'), centerX, centerY + 25)
+
+      ctx.restore()
+    },
+  },
+])
 </script>

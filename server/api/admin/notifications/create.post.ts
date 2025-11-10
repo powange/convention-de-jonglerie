@@ -5,23 +5,25 @@ import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { z } from 'zod'
 
-const bodySchema = z.object({
-  userId: z.number().int().positive().optional(),
-  type: z.enum(['INFO', 'SUCCESS', 'WARNING', 'ERROR']),
-  // Accepter les anciens champs pour rétrocompatibilité
-  title: z.string().min(1).max(255).optional(),
-  message: z.string().min(1).max(2000).optional(),
-  // Nouveaux champs (texte libre)
-  titleText: z.string().min(1).max(255).optional(),
-  messageText: z.string().min(1).max(2000).optional(),
-  category: z.string().optional(),
-  entityType: z.string().optional(),
-  entityId: z.string().optional(),
-  actionUrl: z.string().url().optional(),
-  actionText: z.string().max(50).optional(),
-}).refine((data) => (data.title || data.titleText) && (data.message || data.messageText), {
-  message: 'Titre et message sont requis (via title/message ou titleText/messageText)',
-})
+const bodySchema = z
+  .object({
+    userId: z.number().int().positive().optional(),
+    type: z.enum(['INFO', 'SUCCESS', 'WARNING', 'ERROR']),
+    // Accepter les anciens champs pour rétrocompatibilité
+    title: z.string().min(1).max(255).optional(),
+    message: z.string().min(1).max(2000).optional(),
+    // Nouveaux champs (texte libre)
+    titleText: z.string().min(1).max(255).optional(),
+    messageText: z.string().min(1).max(2000).optional(),
+    category: z.string().optional(),
+    entityType: z.string().optional(),
+    entityId: z.string().optional(),
+    actionUrl: z.string().url().optional(),
+    actionText: z.string().max(50).optional(),
+  })
+  .refine((data) => (data.title || data.titleText) && (data.message || data.messageText), {
+    message: 'Titre et message sont requis (via title/message ou titleText/messageText)',
+  })
 
 export default wrapApiHandler(
   async (event) => {
