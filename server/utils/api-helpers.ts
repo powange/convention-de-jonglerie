@@ -159,10 +159,10 @@ export function createPaginatedResponse<T>(items: T[], total: number, page: numb
     pagination: {
       page,
       limit,
-      total,
+      totalCount: total,
       totalPages: Math.ceil(total / limit),
-      hasNext: page * limit < total,
-      hasPrev: page > 1,
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
     },
   }
 }

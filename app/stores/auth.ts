@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import { useImpersonationStore } from '~/stores/impersonation'
+import { useImpersonationStore } from './impersonation'
 import type { User } from '~/types'
 
 export const useAuthStore = defineStore('auth', {
@@ -85,11 +85,9 @@ export const useAuthStore = defineStore('auth', {
               this.adminMode = true
             }
 
-            // Initialiser le store d'impersonation si nécessaire
-            if (res.impersonation) {
-              const impersonationStore = useImpersonationStore()
-              impersonationStore.initFromSession(res)
-            }
+            // Toujours synchroniser le store d'impersonation avec la session
+            const impersonationStore = useImpersonationStore()
+            impersonationStore.initFromSession(res)
           })
           .catch(() => {
             this.user = null

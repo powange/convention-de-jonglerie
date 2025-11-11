@@ -30,7 +30,7 @@ export default wrapApiHandler(
       errorMessage: 'Utilisateur administrateur original non trouvé',
     })
 
-    // Nettoyer complètement la session et recréer avec l'admin original
+    // Effacer complètement la session puis recréer avec l'utilisateur original
     await clearUserSession(event)
     await setUserSession(event, {
       user: {
@@ -45,7 +45,6 @@ export default wrapApiHandler(
         updatedAt: originalUser.updatedAt,
         isEmailVerified: originalUser.isEmailVerified,
       },
-      // Explicitement ne pas inclure impersonation
     })
 
     return {
