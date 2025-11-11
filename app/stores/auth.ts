@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 
-import { useImpersonationStore } from './impersonation'
 import type { User } from '~/types'
+
+import { useImpersonationStore } from './impersonation'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({

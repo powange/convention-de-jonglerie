@@ -98,11 +98,9 @@ const stopImpersonation = async () => {
       color: 'success',
     })
 
-    // Rafraîchir toutes les données Nuxt
-    await refreshNuxtData()
-
-    // Naviguer vers la page des utilisateurs admin
-    await navigateTo('/admin/users')
+    // Recharger complètement la page pour que le nouveau cookie soit pris en compte
+    // On utilise navigateTo avec external: true pour forcer un rechargement complet
+    window.location.href = '/admin/users'
   } catch (error: any) {
     console.error("Erreur lors de l'arrêt de l'impersonation:", error)
 

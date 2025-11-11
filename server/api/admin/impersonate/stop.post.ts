@@ -1,23 +1,19 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import {
+  getImpersonationCookie,
+  clearImpersonationCookie,
+} from '@@/server/utils/impersonation-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
-import { getUserSession, setUserSession, clearUserSession } from '#imports'
+import { setUserSession } from '#imports'
 
 export default wrapApiHandler(
   async (event) => {
-    // Récupérer la session actuelle
-    const session = await getUserSession(event)
-
-    if (!session?.user) {
-      throw createError({
-        statusCode: 401,
-        message: 'Non authentifié',
-      })
-    }
-
     // Vérifier qu'une impersonation est active
-    if (!session.impersonation?.active) {
+    const impersonation = getImpersonationCookie(event)
+
+    if (!impersonation?.active) {
       throw createError({
         statusCode: 400,
         message: "Aucune session d'impersonation active",
@@ -25,13 +21,15 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'utilisateur admin original
-    const originalUserId = session.impersonation.originalUserId
+    const originalUserId = impersonation.originalUserId
     const originalUser = await fetchResourceOrFail(prisma.user, originalUserId, {
       errorMessage: 'Utilisateur administrateur original non trouvé',
     })
 
-    // Effacer complètement la session puis recréer avec l'utilisateur original
-    await clearUserSession(event)
+    // Supprimer le cookie d'impersonation
+    clearImpersonationCookie(event)
+
+    // Restaurer la session de l'admin original
     await setUserSession(event, {
       user: {
         id: originalUser.id,
@@ -46,6 +44,8 @@ export default wrapApiHandler(
         isEmailVerified: originalUser.isEmailVerified,
       },
     })
+
+    console.log("[IMPERSONATE] Session restaurée pour l'utilisateur:", originalUser.pseudo)
 
     return {
       success: true,

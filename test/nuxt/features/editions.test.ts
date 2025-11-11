@@ -514,7 +514,7 @@ describe("Système d'éditions", () => {
       expect(result.data).toHaveLength(2)
       expect(result.data[0].id).toBe(1)
       expect(result.data[1].name).toBe('Edition 2025')
-      expect(result.pagination.total).toBe(2)
+      expect(result.pagination.totalCount).toBe(2)
       expect(result.pagination.page).toBe(1)
       expect(result.pagination.limit).toBe(12)
     })

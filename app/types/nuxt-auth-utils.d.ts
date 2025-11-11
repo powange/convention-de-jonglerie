@@ -29,6 +29,7 @@ declare module '#auth-utils' {
     event: H3Event
   ): Promise<Partial<UserSession> & { user?: SessionUser }>
   export function setUserSession(event: H3Event, data: Partial<UserSession>): Promise<void>
+  export function replaceUserSession(event: H3Event, data: Partial<UserSession>): Promise<void>
   export function clearUserSession(event: H3Event): Promise<void>
   // Helper OAuth Google (exposé par nuxt-auth-utils via #imports)
   export function defineOAuthGoogleEventHandler(handler: {
@@ -50,6 +51,7 @@ declare module '#imports' {
   export function requireUserSession(event: H3Event): Promise<UserSession & { user: any }>
   export function getUserSession(event: H3Event): Promise<Partial<UserSession> & { user?: any }>
   export function setUserSession(event: H3Event, data: Partial<UserSession>): Promise<void>
+  export function replaceUserSession(event: H3Event, data: Partial<UserSession>): Promise<void>
   export function clearUserSession(event: H3Event): Promise<void>
   export const defineOAuthGoogleEventHandler: (handler: {
     config?: Record<string, any>

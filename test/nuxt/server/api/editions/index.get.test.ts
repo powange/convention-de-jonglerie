@@ -80,7 +80,7 @@ describe('/api/editions GET', () => {
     expect(result).toHaveProperty('data')
     expect(result).toHaveProperty('pagination')
     expect(result.data).toHaveLength(1)
-    expect(result.pagination.total).toBe(25)
+    expect(result.pagination.totalCount).toBe(25)
     expect(result.pagination.page).toBe(1)
     expect(result.pagination.limit).toBe(12)
     expect(result.pagination.totalPages).toBe(3)

@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { setImpersonationCookie } from '@@/server/utils/impersonation-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
@@ -38,8 +39,20 @@ export default wrapApiHandler(
       })
     }
 
-    // Sauvegarder les informations de l'admin original dans la session
-    // et basculer vers l'utilisateur cible
+    // Stocker les informations d'impersonation dans un cookie séparé
+    setImpersonationCookie(event, {
+      active: true,
+      originalUserId: session.user.id,
+      originalUserEmail: session.user.email,
+      originalUserPseudo: session.user.pseudo,
+      originalUserNom: session.user.nom,
+      originalUserPrenom: session.user.prenom,
+      targetUserId: targetUser.id,
+      targetUserEmail: targetUser.email,
+      startedAt: new Date().toISOString(),
+    })
+
+    // Basculer vers l'utilisateur cible dans la session
     await setUserSession(event, {
       user: {
         id: targetUser.id,
@@ -52,18 +65,6 @@ export default wrapApiHandler(
         createdAt: targetUser.createdAt,
         updatedAt: targetUser.updatedAt,
         isEmailVerified: targetUser.isEmailVerified,
-      },
-      // Stocker les informations d'impersonation
-      impersonation: {
-        active: true,
-        originalUserId: session.user.id,
-        originalUserEmail: session.user.email,
-        originalUserPseudo: session.user.pseudo,
-        originalUserNom: session.user.nom,
-        originalUserPrenom: session.user.prenom,
-        targetUserId: targetUser.id,
-        targetUserEmail: targetUser.email,
-        startedAt: new Date().toISOString(),
       },
     })
 

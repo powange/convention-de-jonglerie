@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { getImpersonationCookie } from '@@/server/utils/impersonation-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
 import { requireUserSession } from '#imports'
@@ -23,9 +24,13 @@ export default wrapApiHandler(
         updatedAt: true,
       },
     })
+
+    // Récupérer les informations d'impersonation depuis le cookie séparé
+    const impersonation = getImpersonationCookie(event)
+
     return {
       user: full || session.user,
-      impersonation: session.impersonation || null,
+      impersonation: impersonation || null,
     }
   },
   { operationName: 'GetCurrentUserSession' }
