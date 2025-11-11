@@ -139,6 +139,7 @@
     },
     "tiers": {
       "list": {
+        "drag_to_reorder": "Træk for at omorganisere",
         "inactive": "Inaktiv",
         "loading": "Indlæser...",
         "logo_alt": "HelloAsso",

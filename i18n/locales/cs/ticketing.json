@@ -139,6 +139,7 @@
     },
     "tiers": {
       "list": {
+        "drag_to_reorder": "Přetáhněte pro změnu pořadí",
         "inactive": "Neaktivní",
         "loading": "Načítání...",
         "logo_alt": "HelloAsso",

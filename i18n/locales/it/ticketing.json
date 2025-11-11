@@ -139,6 +139,7 @@
     },
     "tiers": {
       "list": {
+        "drag_to_reorder": "Trascina per riordinare",
         "inactive": "Inattivo",
         "loading": "Caricamento...",
         "logo_alt": "HelloAsso",
