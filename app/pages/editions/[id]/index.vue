@@ -61,11 +61,12 @@
                   aria-labelledby="about-heading"
                 >
                   <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <!-- eslint-disable vue/no-v-html -->
                   <div
                     :class="{ 'xl:line-clamp-none': true, 'line-clamp-6': !isDescriptionExpanded }"
                     v-html="descriptionHtml"
                   />
+                  <!-- eslint-enable vue/no-v-html -->
                   <!-- Boutons "Voir plus" / "Voir moins" uniquement en mobile (< xl) -->
                   <UButton
                     v-if="!isDescriptionExpanded"
