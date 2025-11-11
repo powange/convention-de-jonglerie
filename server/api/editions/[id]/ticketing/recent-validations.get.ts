@@ -1,4 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -99,6 +100,38 @@ export default wrapApiHandler(
         },
       })
 
+      // Récupérer les validations d'organisateurs
+      const organizerValidations = await prisma.editionOrganizer.findMany({
+        where: {
+          editionId: editionId,
+          entryValidated: true,
+          entryValidatedAt: {
+            not: null,
+          },
+        },
+        orderBy: {
+          entryValidatedAt: 'desc',
+        },
+        take: 10,
+        select: {
+          id: true,
+          entryValidatedAt: true,
+          entryValidatedBy: true,
+          organizer: {
+            select: {
+              title: true,
+              user: {
+                select: {
+                  prenom: true,
+                  nom: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      })
+
       // Fusionner et trier les validations
       const allValidations = [
         ...ticketValidations.map((v) => ({
@@ -131,6 +164,16 @@ export default wrapApiHandler(
           entryValidatedAt: v.entryValidatedAt,
           entryValidatedBy: v.entryValidatedBy,
         })),
+        ...organizerValidations.map((v) => ({
+          id: v.id,
+          type: 'organizer' as const,
+          firstName: v.organizer.user.prenom,
+          lastName: v.organizer.user.nom,
+          email: v.organizer.user.email,
+          name: v.organizer.title || 'Organisateur',
+          entryValidatedAt: v.entryValidatedAt,
+          entryValidatedBy: v.entryValidatedBy,
+        })),
       ]
         .sort((a, b) => {
           const dateA = a.entryValidatedAt ? new Date(a.entryValidatedAt).getTime() : 0
@@ -156,10 +199,22 @@ export default wrapApiHandler(
       const validatorMap = new Map(validators.map((v) => [v.id, v]))
 
       // Ajouter les infos des validateurs aux validations
-      const validationsWithValidators = allValidations.map((v) => ({
-        ...v,
-        validator: v.entryValidatedBy ? validatorMap.get(v.entryValidatedBy) : null,
-      }))
+      const validationsWithValidators = allValidations.map((v) => {
+        const validator = v.entryValidatedBy ? validatorMap.get(v.entryValidatedBy) : null
+        return {
+          ...v,
+          validator: validator
+            ? {
+                id: validator.id,
+                pseudo: validator.pseudo,
+                prenom: validator.prenom,
+                nom: validator.nom,
+                email: validator.email,
+                emailHash: getEmailHash(validator.email),
+              }
+            : null,
+        }
+      })
 
       return {
         success: true,

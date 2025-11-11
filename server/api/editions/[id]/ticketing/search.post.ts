@@ -126,6 +126,54 @@ export default wrapApiHandler(
         take: 20, // Limiter à 20 résultats
       })
 
+      // Rechercher dans les organisateurs
+      const organizers = await prisma.editionOrganizer.findMany({
+        where: {
+          editionId: editionId,
+          organizer: {
+            OR: [
+              {
+                user: {
+                  prenom: {
+                    contains: searchTerm,
+                  },
+                },
+              },
+              {
+                user: {
+                  nom: {
+                    contains: searchTerm,
+                  },
+                },
+              },
+              {
+                user: {
+                  email: {
+                    contains: searchTerm,
+                  },
+                },
+              },
+            ],
+          },
+        },
+        include: {
+          organizer: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  prenom: true,
+                  nom: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+        take: 20, // Limiter à 20 résultats
+      })
+
       // Récupérer les utilisateurs qui ont validé les artistes
       const artistValidatorIds = artists
         .filter((a) => a.entryValidatedBy)
@@ -135,6 +183,16 @@ export default wrapApiHandler(
         select: { id: true, prenom: true, nom: true },
       })
       const artistValidatorMap = new Map(artistValidatorUsers.map((u) => [u.id, u]))
+
+      // Récupérer les utilisateurs qui ont validé les organisateurs
+      const organizerValidatorIds = organizers
+        .filter((o) => o.entryValidatedBy)
+        .map((o) => o.entryValidatedBy!)
+      const organizerValidatorUsers = await prisma.user.findMany({
+        where: { id: { in: organizerValidatorIds } },
+        select: { id: true, prenom: true, nom: true },
+      })
+      const organizerValidatorMap = new Map(organizerValidatorUsers.map((u) => [u.id, u]))
 
       // Rechercher dans les bénévoles disponibles pendant l'événement
       // On exclut ceux qui sont uniquement disponibles pour le montage/démontage
@@ -579,7 +637,36 @@ export default wrapApiHandler(
             },
           }
         }),
-        total: orderItems.length + volunteers.length + artists.length,
+        organizers: organizers.map((editionOrganizer) => {
+          const validator = editionOrganizer.entryValidatedBy
+            ? organizerValidatorMap.get(editionOrganizer.entryValidatedBy)
+            : null
+          return {
+            type: 'organizer',
+            participant: {
+              found: true,
+              organizer: {
+                id: editionOrganizer.id,
+                user: {
+                  firstName: editionOrganizer.organizer.user.prenom,
+                  lastName: editionOrganizer.organizer.user.nom,
+                  email: editionOrganizer.organizer.user.email,
+                  phone: editionOrganizer.organizer.user.phone,
+                },
+                title: editionOrganizer.organizer.title,
+                entryValidated: editionOrganizer.entryValidated,
+                entryValidatedAt: editionOrganizer.entryValidatedAt,
+                entryValidatedBy: validator
+                  ? {
+                      firstName: validator.prenom,
+                      lastName: validator.nom,
+                    }
+                  : null,
+              },
+            },
+          }
+        }),
+        total: orderItems.length + volunteers.length + artists.length + organizers.length,
       }
 
       return {

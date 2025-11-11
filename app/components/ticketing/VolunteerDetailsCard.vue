@@ -1,14 +1,19 @@
 <template>
   <div class="space-y-6">
     <!-- Type d'accès -->
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-          {{ $t('edition.ticketing.access_type') }}
-        </p>
-        <p class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ $t('edition.ticketing.volunteer') }}
-        </p>
+    <div
+      class="flex items-center justify-between p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20"
+    >
+      <div class="flex items-center gap-3">
+        <UIcon name="i-heroicons-user-group" class="text-purple-500" size="32" />
+        <div>
+          <p class="text-sm text-purple-600 dark:text-purple-400">
+            {{ $t('edition.ticketing.access_type') }}
+          </p>
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ $t('edition.ticketing.volunteer') }}
+          </p>
+        </div>
       </div>
       <UBadge color="primary" variant="soft" size="lg">
         {{ $t('edition.ticketing.volunteer_accepted') }}

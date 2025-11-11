@@ -18,6 +18,26 @@
           description="Cette commande a été annulée. Les billets ne peuvent pas être validés."
         />
 
+        <!-- Type d'accès -->
+        <div
+          class="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20"
+        >
+          <div class="flex items-center gap-3">
+            <UIcon name="i-heroicons-ticket" class="text-orange-500" size="32" />
+            <div>
+              <p class="text-sm text-orange-600 dark:text-orange-400">
+                {{ $t('edition.ticketing.access_type') }}
+              </p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ $t('ticketing.stats.participants') }}
+              </p>
+            </div>
+          </div>
+          <UBadge color="warning" variant="soft" size="lg">
+            {{ $t('edition.ticketing.participant') }}
+          </UBadge>
+        </div>
+
         <!-- Informations de la commande -->
         <div class="space-y-4">
           <div
@@ -543,6 +563,23 @@
         @invalidate="showInvalidateConfirm"
       />
 
+      <!-- Affichage pour un organisateur -->
+      <OrganizerDetailsCard
+        v-else-if="isOrganizer && participant && 'organizer' in participant"
+        :organizer="participant.organizer"
+        :editable-first-name="editableFirstName"
+        :editable-last-name="editableLastName"
+        :editable-email="editableEmail"
+        :editable-phone="editablePhone"
+        :validating="validating"
+        @update:first-name="editableFirstName = $event"
+        @update:last-name="editableLastName = $event"
+        @update:email="editableEmail = $event"
+        @update:phone="editablePhone = $event"
+        @validate="showValidateConfirm"
+        @invalidate="showInvalidateConfirm"
+      />
+
       <!-- Message si aucun participant -->
       <div v-else class="py-8 text-center">
         <UIcon name="i-heroicons-user-circle" class="mx-auto h-16 w-16 text-gray-400 mb-3" />
@@ -723,6 +760,7 @@
 import { computed, ref, watch } from 'vue'
 
 import ArtistDetailsCard from './ArtistDetailsCard.vue'
+import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
 
 interface TicketData {
@@ -856,12 +894,31 @@ interface ArtistData {
   }
 }
 
-type ParticipantData = TicketData | VolunteerData | ArtistData
+interface OrganizerData {
+  organizer: {
+    id: number
+    user: {
+      firstName: string
+      lastName: string
+      email: string
+      phone?: string | null
+    }
+    title?: string | null
+    entryValidated?: boolean
+    entryValidatedAt?: Date | string
+    entryValidatedBy?: {
+      firstName: string
+      lastName: string
+    }
+  }
+}
+
+type ParticipantData = TicketData | VolunteerData | ArtistData | OrganizerData
 
 const props = defineProps<{
   open: boolean
   participant?: ParticipantData
-  type?: 'ticket' | 'volunteer' | 'artist'
+  type?: 'ticket' | 'volunteer' | 'artist' | 'organizer'
   isRefunded?: boolean // Indique si la commande est annulée
 }>()
 
@@ -887,8 +944,11 @@ const isOpen = computed({
 
 const isVolunteer = computed(() => props.type === 'volunteer')
 const isArtist = computed(() => props.type === 'artist')
+const isOrganizer = computed(() => props.type === 'organizer')
 const isTicket = computed(
-  () => props.type === 'ticket' || (!props.type && !isVolunteer.value && !isArtist.value)
+  () =>
+    props.type === 'ticket' ||
+    (!props.type && !isVolunteer.value && !isArtist.value && !isOrganizer.value)
 )
 
 // Gestion de la sélection des participants
@@ -985,7 +1045,7 @@ watch(
   (newValue) => {
     if (newValue) {
       selectedParticipants.value = []
-      // Initialiser les champs éditables pour bénévoles et artistes
+      // Initialiser les champs éditables pour bénévoles, artistes et organisateurs
       if (props.participant && 'volunteer' in props.participant) {
         editableFirstName.value = props.participant.volunteer.user.firstName || null
         editableLastName.value = props.participant.volunteer.user.lastName || null
@@ -996,6 +1056,11 @@ watch(
         editableLastName.value = props.participant.artist.user.lastName || null
         editableEmail.value = props.participant.artist.user.email || null
         editablePhone.value = props.participant.artist.user.phone || null
+      } else if (props.participant && 'organizer' in props.participant) {
+        editableFirstName.value = props.participant.organizer.user.firstName || null
+        editableLastName.value = props.participant.organizer.user.lastName || null
+        editableEmail.value = props.participant.organizer.user.email || null
+        editablePhone.value = props.participant.organizer.user.phone || null
       } else {
         editableFirstName.value = null
         editableLastName.value = null
@@ -1103,6 +1168,15 @@ const confirmValidateEntry = async () => {
         phone: editablePhone.value,
       })
     }
+    // Si c'est un organisateur
+    else if (props.participant && 'organizer' in props.participant) {
+      emit('validate', [props.participant.organizer.id], paymentConfirmedChoice.value, {
+        firstName: editableFirstName.value,
+        lastName: editableLastName.value,
+        email: editableEmail.value,
+        phone: editablePhone.value,
+      })
+    }
     // Si ce sont des tickets sélectionnés
     else if (selectedParticipants.value.length > 0) {
       emit('validate', selectedParticipants.value, paymentConfirmedChoice.value, undefined)
@@ -1142,6 +1216,10 @@ const invalidateEntry = async () => {
     // Si c'est un artiste
     else if (props.participant && 'artist' in props.participant) {
       emit('invalidate', props.participant.artist.id)
+    }
+    // Si c'est un organisateur
+    else if (props.participant && 'organizer' in props.participant) {
+      emit('invalidate', props.participant.organizer.id)
     }
     // Si c'est un ticket
     else if (ticketToInvalidate.value) {

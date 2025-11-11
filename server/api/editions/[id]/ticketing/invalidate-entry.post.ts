@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   participantId: z.number(),
-  type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('volunteer'),
+  type: z.enum(['ticket', 'volunteer', 'artist', 'organizer']).optional().default('volunteer'),
 })
 
 export default wrapApiHandler(
@@ -100,6 +100,47 @@ export default wrapApiHandler(
             type: 'entry-invalidated',
             editionId,
             participantType: 'artist',
+            participantId: body.participantId,
+          })
+          broadcastToEditionSSE(editionId, {
+            type: 'stats-updated',
+            editionId,
+          })
+        } catch (sseError) {
+          console.error('[SSE] Failed to notify SSE clients:', sseError)
+        }
+      } else if (body.type === 'organizer') {
+        // Dévalider l'entrée d'un organisateur
+        const editionOrganizer = await prisma.editionOrganizer.findFirst({
+          where: {
+            id: body.participantId,
+            editionId: editionId,
+          },
+        })
+
+        if (!editionOrganizer) {
+          throw createError({
+            statusCode: 404,
+            message: 'Organisateur introuvable',
+          })
+        }
+
+        await prisma.editionOrganizer.update({
+          where: { id: body.participantId },
+          data: {
+            entryValidated: false,
+            entryValidatedAt: null,
+            entryValidatedBy: null,
+          },
+        })
+
+        // Notifier via SSE
+        try {
+          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          broadcastToEditionSSE(editionId, {
+            type: 'entry-invalidated',
+            editionId,
+            participantType: 'organizer',
             participantId: body.participantId,
           })
           broadcastToEditionSSE(editionId, {

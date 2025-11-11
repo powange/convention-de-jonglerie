@@ -1,16 +1,17 @@
 <template>
   <div class="space-y-6">
     <!-- Badge artiste -->
-    <div
-      class="flex items-center justify-between p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20"
-    >
-      <div>
-        <p class="text-sm text-yellow-600 dark:text-yellow-400">
-          {{ $t('edition.ticketing.access_type') }}
-        </p>
-        <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
+    <div class="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+      <div class="flex items-center gap-3">
+        <UIcon name="i-heroicons-star" class="text-green-500" size="32" />
+        <div>
+          <p class="text-sm text-green-600 dark:text-green-400">
+            {{ $t('edition.ticketing.access_type') }}
+          </p>
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
+        </div>
       </div>
-      <UBadge color="warning" variant="soft" size="lg"> Artiste invité </UBadge>
+      <UBadge color="success" variant="soft" size="lg"> Artiste invité </UBadge>
     </div>
 
     <!-- Statut de validation d'entrée -->

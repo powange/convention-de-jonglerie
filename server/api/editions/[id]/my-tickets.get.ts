@@ -101,6 +101,39 @@ export default wrapApiHandler(
       })
     }
 
+    // Récupérer le statut d'organisateur de l'utilisateur pour cette édition
+    const editionOrganizer = await prisma.editionOrganizer.findFirst({
+      where: {
+        editionId,
+        organizer: {
+          userId: user.id,
+        },
+      },
+      include: {
+        organizer: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    })
+
+    if (editionOrganizer) {
+      allTickets.push({
+        id: editionOrganizer.id,
+        type: 'organizer',
+        firstName: editionOrganizer.organizer.user.prenom,
+        lastName: editionOrganizer.organizer.user.nom,
+        email: editionOrganizer.organizer.user.email,
+        qrCode: `organizer-${editionOrganizer.id}`,
+        tierName: 'Organisateur',
+        amount: 0,
+        isHelloAsso: false,
+        entryValidated: editionOrganizer.entryValidated,
+        entryValidatedAt: editionOrganizer.entryValidatedAt,
+      })
+    }
+
     return {
       tickets: allTickets,
     }

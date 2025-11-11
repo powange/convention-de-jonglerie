@@ -323,34 +323,44 @@ export default wrapApiHandler(
         }
       } else if (body.type === 'organizer') {
         // Valider les organisateurs
-        // Les participantIds sont les IDs des ConventionOrganizer
-        // On valide seulement ceux qui ont une entrée dans EditionOrganizer
-        let validated = 0
+        // Les participantIds sont les IDs des EditionOrganizer
+        const result = await prisma.editionOrganizer.updateMany({
+          where: {
+            id: {
+              in: body.participantIds,
+            },
+            editionId: editionId,
+          },
+          data: {
+            entryValidated: true,
+            entryValidatedAt: new Date(),
+            entryValidatedBy: user.id,
+          },
+        })
 
-        for (const organizerId of body.participantIds) {
-          // Vérifier que l'organisateur a une entrée EditionOrganizer pour cette édition
-          const editionOrganizer = await prisma.editionOrganizer.findFirst({
+        // Mettre à jour les informations utilisateur si fournies
+        if (body.userInfo && Object.keys(body.userInfo).length > 0) {
+          // Récupérer les organisateurs pour obtenir leurs userIds
+          const editionOrganizers = await prisma.editionOrganizer.findMany({
             where: {
+              id: {
+                in: body.participantIds,
+              },
               editionId: editionId,
-              organizerId: organizerId,
+            },
+            include: {
+              organizer: {
+                select: {
+                  userId: true,
+                },
+              },
             },
           })
 
-          if (!editionOrganizer) continue
+          const userIds = editionOrganizers.map((eo) => eo.organizer.userId)
 
-          // Mettre à jour l'EditionOrganizer
-          await prisma.editionOrganizer.update({
-            where: {
-              id: editionOrganizer.id,
-            },
-            data: {
-              entryValidated: true,
-              entryValidatedAt: new Date(),
-              entryValidatedBy: user.id,
-            },
-          })
-
-          validated++
+          // Mettre à jour les informations utilisateur
+          await updateUserInfo(userIds, body.userInfo)
         }
 
         // Notifier via SSE
@@ -375,8 +385,8 @@ export default wrapApiHandler(
 
         return {
           success: true,
-          validated,
-          message: `${validated} organisateur${validated > 1 ? 's' : ''} validé${validated > 1 ? 's' : ''}`,
+          validated: result.count,
+          message: `${result.count} organisateur${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
         }
       } else {
         // Valider les billets en utilisant l'ID de OrderItem

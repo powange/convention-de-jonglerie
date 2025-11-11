@@ -170,7 +170,10 @@
 
                   <!-- Liste des billets -->
                   <div v-if="searchResults.tickets.length > 0" class="space-y-2">
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    <div
+                      class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      <UIcon name="i-heroicons-ticket" class="text-orange-500" />
                       Billets ({{ searchResults.tickets.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
@@ -181,7 +184,7 @@
                         @click="selectSearchResult(result)"
                       >
                         <div class="flex items-center justify-between">
-                          <div>
+                          <div class="flex-1">
                             <div class="font-medium text-gray-900 dark:text-white">
                               {{ result.participant.ticket.user.firstName }}
                               {{ result.participant.ticket.user.lastName }}
@@ -193,11 +196,16 @@
                               {{ result.participant.ticket.name }}
                             </div>
                           </div>
-                          <UIcon
-                            v-if="result.participant.ticket.entryValidated"
-                            name="i-heroicons-check-circle"
-                            class="text-green-500"
-                          />
+                          <div class="flex items-center gap-2">
+                            <UBadge color="warning">{{
+                              $t('ticketing.stats.participants')
+                            }}</UBadge>
+                            <UIcon
+                              v-if="result.participant.ticket.entryValidated"
+                              name="i-heroicons-check-circle"
+                              class="text-green-500"
+                            />
+                          </div>
                         </div>
                       </button>
                     </div>
@@ -208,7 +216,10 @@
                     v-if="searchResults.artists && searchResults.artists.length > 0"
                     class="space-y-2"
                   >
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                    <div
+                      class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      <UIcon name="i-heroicons-star" class="text-green-500" />
                       Artistes ({{ searchResults.artists.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
@@ -236,7 +247,7 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge color="yellow">Artiste</UBadge>
+                            <UBadge color="success">{{ $t('ticketing.stats.artists') }}</UBadge>
                             <UIcon
                               v-if="result.participant.artist.entryValidated"
                               name="i-heroicons-check-circle"
@@ -250,10 +261,11 @@
 
                   <!-- Liste des bénévoles -->
                   <div v-if="searchResults.volunteers.length > 0" class="space-y-2">
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ $t('ticketing.access_control.volunteer_badge') }} ({{
-                        searchResults.volunteers.length
-                      }})
+                    <div
+                      class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      <UIcon name="i-heroicons-user-group" class="text-purple-500" />
+                      {{ $t('ticketing.stats.volunteers') }} ({{ searchResults.volunteers.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
                       <button
@@ -280,11 +292,56 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge color="purple">{{
-                              $t('ticketing.access_control.volunteer_badge')
-                            }}</UBadge>
+                            <UBadge color="primary">{{ $t('ticketing.stats.volunteers') }}</UBadge>
                             <UIcon
                               v-if="result.participant.volunteer.entryValidated"
+                              name="i-heroicons-check-circle"
+                              class="text-green-500"
+                            />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Liste des organisateurs -->
+                  <div
+                    v-if="searchResults.organizers && searchResults.organizers.length > 0"
+                    class="space-y-2"
+                  >
+                    <div
+                      class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      <UIcon name="i-heroicons-shield-check" class="text-indigo-500" />
+                      {{ $t('ticketing.stats.organizers') }} ({{ searchResults.organizers.length }})
+                    </div>
+                    <div class="space-y-1 max-h-60 overflow-y-auto">
+                      <button
+                        v-for="result in searchResults.organizers"
+                        :key="result.participant.organizer.id"
+                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-2 border-transparent hover:border-primary-500 rounded-lg transition-all cursor-pointer shadow-sm hover:shadow-md"
+                        @click="selectSearchResult(result)"
+                      >
+                        <div class="flex items-center justify-between">
+                          <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ result.participant.organizer.user.firstName }}
+                              {{ result.participant.organizer.user.lastName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ result.participant.organizer.user.email }}
+                            </div>
+                            <div
+                              v-if="result.participant.organizer.title"
+                              class="text-xs text-gray-500 dark:text-gray-500"
+                            >
+                              {{ result.participant.organizer.title }}
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <UBadge color="primary">{{ $t('common.organizer') }}</UBadge>
+                            <UIcon
+                              v-if="result.participant.organizer.entryValidated"
                               name="i-heroicons-check-circle"
                               class="text-green-500"
                             />
@@ -350,16 +407,51 @@
               <div
                 v-for="validation in recentValidations"
                 :key="validation.id"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                :class="[
+                  'p-3 rounded-lg',
+                  validation.type === 'ticket'
+                    ? 'bg-orange-50 dark:bg-orange-900/20'
+                    : validation.type === 'volunteer'
+                      ? 'bg-purple-50 dark:bg-purple-900/20'
+                      : validation.type === 'artist'
+                        ? 'bg-green-50 dark:bg-green-900/20'
+                        : 'bg-indigo-50 dark:bg-indigo-900/20',
+                ]"
               >
                 <div class="flex items-start justify-between gap-3">
-                  <div class="flex-1 min-w-0">
+                  <div class="flex items-start gap-3 flex-1 min-w-0">
+                    <!-- Icône du type -->
+                    <UIcon
+                      :name="
+                        validation.type === 'ticket'
+                          ? 'i-heroicons-ticket'
+                          : validation.type === 'volunteer'
+                            ? 'i-heroicons-user-group'
+                            : validation.type === 'artist'
+                              ? 'i-heroicons-star'
+                              : 'i-heroicons-shield-check'
+                      "
+                      :class="[
+                        'flex-shrink-0 mt-0.5',
+                        validation.type === 'ticket'
+                          ? 'text-orange-500'
+                          : validation.type === 'volunteer'
+                            ? 'text-purple-500'
+                            : validation.type === 'artist'
+                              ? 'text-green-500'
+                              : 'text-indigo-500',
+                      ]"
+                      size="20"
+                    />
+
                     <!-- Participant validé -->
-                    <div class="font-medium text-gray-900 dark:text-white">
-                      {{ validation.firstName }} {{ validation.lastName }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ validation.name }}
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-gray-900 dark:text-white">
+                        {{ validation.firstName }} {{ validation.lastName }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ validation.name }}
+                      </div>
                     </div>
                   </div>
 
@@ -368,17 +460,14 @@
                       {{ formatValidationTime(validation.entryValidatedAt) }}
                     </div>
                     <!-- Validé par -->
-                    <div v-if="validation.validator" class="flex flex-col items-end gap-0.5">
-                      <UiUserDisplay
-                        :user="{
-                          ...validation.validator,
-                          pseudo: validation.validator.pseudo || validation.validator.prenom,
-                        }"
+                    <div v-if="validation.validator" class="flex justify-end">
+                      <UiUserDisplayForAdmin
+                        :user="validation.validator"
                         size="sm"
+                        :show-email="false"
+                        :border="false"
+                        avatar-class=""
                       />
-                      <div class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ validation.validator.prenom }} {{ validation.validator.nom }}
-                      </div>
                     </div>
                     <div v-else class="flex items-center justify-end gap-2">
                       <span class="text-xs text-gray-500 dark:text-gray-400 italic">{{
@@ -453,29 +542,13 @@
                 :key="volunteer.id"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
               >
-                <div class="flex items-start gap-3">
-                  <UiUserDisplay
-                    :user="{
-                      ...volunteer.user,
-                      pseudo: volunteer.user.pseudo || volunteer.user.prenom,
-                    }"
-                    size="md"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <div class="font-medium text-gray-900 dark:text-white">
-                      {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ volunteer.user.email }}
-                    </div>
-                    <div
-                      v-if="volunteer.teams.length > 0"
-                      class="text-xs text-gray-500 dark:text-gray-500 mt-1"
-                    >
-                      Équipe{{ volunteer.teams.length > 1 ? 's' : '' }}:
-                      {{ volunteer.teams.map((t) => t.name).join(', ') }}
-                    </div>
-                  </div>
+                <UiUserDisplayForAdmin :user="volunteer.user" size="md" :show-email="true" />
+                <div
+                  v-if="volunteer.teams.length > 0"
+                  class="text-xs text-gray-500 dark:text-gray-500 mt-2 ml-14"
+                >
+                  Équipe{{ volunteer.teams.length > 1 ? 's' : '' }} :
+                  {{ volunteer.teams.map((t) => t.name).join(', ') }}
                 </div>
               </div>
             </div>
@@ -483,21 +556,12 @@
         </template>
 
         <template #footer>
-          <div class="flex items-center justify-between">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ volunteersNotValidated.length }} bénévole{{
-                volunteersNotValidated.length > 1 ? 's' : ''
-              }}
-              non validé{{ volunteersNotValidated.length > 1 ? 's' : '' }}
-            </p>
-            <UButton
-              color="neutral"
-              variant="soft"
-              @click="volunteersNotValidatedModalOpen = false"
-            >
-              Fermer
-            </UButton>
-          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ volunteersNotValidated.length }} bénévole{{
+              volunteersNotValidated.length > 1 ? 's' : ''
+            }}
+            non validé{{ volunteersNotValidated.length > 1 ? 's' : '' }}
+          </p>
         </template>
       </UModal>
 
@@ -535,29 +599,13 @@
                 :key="artist.id"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
               >
-                <div class="flex items-start gap-3">
-                  <UiUserDisplay
-                    :user="{
-                      ...artist.user,
-                      pseudo: artist.user.pseudo || artist.user.prenom,
-                    }"
-                    size="md"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <div class="font-medium text-gray-900 dark:text-white">
-                      {{ artist.user.prenom }} {{ artist.user.nom }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ artist.user.email }}
-                    </div>
-                    <div
-                      v-if="artist.shows.length > 0"
-                      class="text-xs text-gray-500 dark:text-gray-500 mt-1"
-                    >
-                      Spectacle{{ artist.shows.length > 1 ? 's' : '' }}:
-                      {{ artist.shows.map((s) => s.title).join(', ') }}
-                    </div>
-                  </div>
+                <UiUserDisplayForAdmin :user="artist.user" size="md" :show-email="true" />
+                <div
+                  v-if="artist.shows.length > 0"
+                  class="text-xs text-gray-500 dark:text-gray-500 mt-2 ml-14"
+                >
+                  Spectacle{{ artist.shows.length > 1 ? 's' : '' }} :
+                  {{ artist.shows.map((s) => s.title).join(', ') }}
                 </div>
               </div>
             </div>
@@ -565,17 +613,12 @@
         </template>
 
         <template #footer>
-          <div class="flex items-center justify-between">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ artistsNotValidated.length }} artiste{{
-                artistsNotValidated.length > 1 ? 's' : ''
-              }}
-              non validé{{ artistsNotValidated.length > 1 ? 's' : '' }}
-            </p>
-            <UButton color="neutral" variant="soft" @click="artistsNotValidatedModalOpen = false">
-              Fermer
-            </UButton>
-          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ artistsNotValidated.length }} artiste{{
+              artistsNotValidated.length > 1 ? 's' : ''
+            }}
+            non validé{{ artistsNotValidated.length > 1 ? 's' : '' }}
+          </p>
         </template>
       </UModal>
 
@@ -613,50 +656,25 @@
                 :key="organizer.id"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
               >
-                <div class="flex items-start gap-3">
-                  <UiUserDisplay
-                    :user="{
-                      ...organizer.user,
-                      pseudo: organizer.user.pseudo || organizer.user.prenom,
-                    }"
-                    size="md"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <div class="font-medium text-gray-900 dark:text-white">
-                      {{ organizer.user.prenom }} {{ organizer.user.nom }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ organizer.user.email }}
-                    </div>
-                    <div
-                      v-if="organizer.title"
-                      class="text-xs text-gray-500 dark:text-gray-500 mt-1"
-                    >
+                <UiUserDisplayForAdmin :user="organizer.user" size="md" :show-email="true">
+                  <template v-if="organizer.title" #badge>
+                    <UBadge color="neutral" variant="subtle" size="xs">
                       {{ organizer.title }}
-                    </div>
-                  </div>
-                </div>
+                    </UBadge>
+                  </template>
+                </UiUserDisplayForAdmin>
               </div>
             </div>
           </div>
         </template>
 
         <template #footer>
-          <div class="flex items-center justify-between">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ organizersNotValidated.length }} organisateur{{
-                organizersNotValidated.length > 1 ? 's' : ''
-              }}
-              non validé{{ organizersNotValidated.length > 1 ? 's' : '' }}
-            </p>
-            <UButton
-              color="neutral"
-              variant="soft"
-              @click="organizersNotValidatedModalOpen = false"
-            >
-              Fermer
-            </UButton>
-          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ organizersNotValidated.length }} organisateur{{
+              organizersNotValidated.length > 1 ? 's' : ''
+            }}
+            non validé{{ organizersNotValidated.length > 1 ? 's' : '' }}
+          </p>
         </template>
       </UModal>
     </div>

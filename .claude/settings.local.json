@@ -86,7 +86,8 @@
       "Bash(npx web-push generate-vapid-keys)",
       "Bash(tee:*)",
       "Bash(npx web-push:*)",
-      "WebFetch(domain:ui.nuxt.com)"
+      "WebFetch(domain:ui.nuxt.com)",
+      "mcp__nuxt-ui__list_components"
     ],
     "deny": [],
     "ask": [],
