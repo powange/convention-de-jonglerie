@@ -215,6 +215,11 @@ const { t, locale } = useI18n()
 
 const useRequestURLOrigin = useRequestURL().origin
 
+// Pour la page d'accueil, on ne veut pas le suffix "| Juggling Convention"
+useHead({
+  titleTemplate: '%s',
+})
+
 useSeoMeta({
   title: () => t('seo.homepage.title'),
   description: () => t('seo.homepage.description'),
