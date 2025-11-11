@@ -70,6 +70,9 @@ const impersonationStore = useImpersonationStore()
 // Utiliser directement le store pour vérifier l'état
 const impersonationActive = computed(() => impersonationStore.isActive)
 
+// Charger le fichier de langue admin si l'impersonation est active
+useLazyI18n('admin', impersonationActive)
+
 const stopping = ref(false)
 
 // Fonction pour arrêter l'impersonation

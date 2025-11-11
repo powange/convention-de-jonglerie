@@ -5,11 +5,11 @@ import { requireUserSession } from '#imports'
 
 export default wrapApiHandler(
   async (event) => {
-    const { user } = await requireUserSession(event)
+    const session = await requireUserSession(event)
     // Recharger les champs éventuellement manquants (telephone, profilePicture...)
     const full = await prisma.user.findUnique({
       // user peut être typé sans id dans le wrapper nuxt-auth-utils, on caste
-      where: { id: (user as any).id },
+      where: { id: (session.user as any).id },
       select: {
         id: true,
         email: true,
@@ -23,7 +23,10 @@ export default wrapApiHandler(
         updatedAt: true,
       },
     })
-    return { user: full || user }
+    return {
+      user: full || session.user,
+      impersonation: session.impersonation || null,
+    }
   },
   { operationName: 'GetCurrentUserSession' }
 )

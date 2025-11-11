@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 
+import { useImpersonationStore } from '~/stores/impersonation'
 import type { User } from '~/types'
 
 export const useAuthStore = defineStore('auth', {
@@ -71,7 +72,7 @@ export const useAuthStore = defineStore('auth', {
     initializeAuth() {
       if (import.meta.client) {
         // Hydrater depuis la session serveur
-        $fetch<{ user: User }>('/api/session/me')
+        $fetch<{ user: User; impersonation?: any }>('/api/session/me')
           .then((res) => {
             this.user = res.user
             const storage =
@@ -82,6 +83,12 @@ export const useAuthStore = defineStore('auth', {
             const adminModeStored = storage.getItem('adminMode')
             if (adminModeStored === 'true' && res.user.isGlobalAdmin) {
               this.adminMode = true
+            }
+
+            // Initialiser le store d'impersonation si nécessaire
+            if (res.impersonation) {
+              const impersonationStore = useImpersonationStore()
+              impersonationStore.initFromSession(res)
             }
           })
           .catch(() => {
