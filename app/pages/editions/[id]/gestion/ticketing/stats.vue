@@ -111,7 +111,7 @@
         </div>
 
         <!-- Filtres -->
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Filtres de type -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_type')">
             <USelect v-model="selectedTypes" :items="typeItems" multiple value-key="value" />
@@ -120,6 +120,11 @@
           <!-- Filtres de période -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_period')">
             <USelect v-model="selectedPeriods" :items="periodItems" multiple value-key="value" />
+          </UFormField>
+
+          <!-- Granularité -->
+          <UFormField :label="$t('gestion.ticketing.stats_filter_granularity')">
+            <USelect v-model="selectedGranularity" :items="granularityItems" value-key="value" />
           </UFormField>
         </div>
 
@@ -313,6 +318,25 @@ const periodItems = computed(() => [
   },
 ])
 
+const granularityItems = computed(() => [
+  {
+    label: t('gestion.ticketing.stats_granularity_30min'),
+    value: 30,
+  },
+  {
+    label: t('gestion.ticketing.stats_granularity_1h'),
+    value: 60,
+  },
+  {
+    label: t('gestion.ticketing.stats_granularity_2h'),
+    value: 120,
+  },
+  {
+    label: t('gestion.ticketing.stats_granularity_6h'),
+    value: 360,
+  },
+])
+
 const tierItems = computed(() =>
   tiers.value.map((tier) => ({
     label: `${tier.name} (${(tier.price / 100).toFixed(2)} €)`,
@@ -329,6 +353,7 @@ const selectedTypes = ref<string[]>([
   'others',
 ])
 const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
+const selectedGranularity = ref<number>(60) // Par défaut 1h
 
 // Filtres calculés pour compatibilité avec le code existant
 const filters = computed(() => ({
@@ -444,8 +469,11 @@ async function fetchValidations() {
   validationsError.value = false
 
   try {
+    const params = new URLSearchParams()
+    params.append('granularity', selectedGranularity.value.toString())
+
     const data = await $fetch<ValidationData>(
-      `/api/editions/${editionId}/ticketing/stats/validations`
+      `/api/editions/${editionId}/ticketing/stats/validations?${params.toString()}`
     )
     validationsData.value = data
   } catch (error) {
@@ -495,9 +523,13 @@ async function fetchTiers() {
   }
 }
 
-// Watcher pour recharger les données quand les filtres changent
+// Watchers pour recharger les données quand les filtres changent
 watch([selectedTierIds, viewMode], () => {
   fetchOrderSources()
+})
+
+watch(selectedGranularity, () => {
+  fetchValidations()
 })
 
 // Charger l'édition si nécessaire
