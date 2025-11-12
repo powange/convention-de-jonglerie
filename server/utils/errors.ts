@@ -81,7 +81,10 @@ export class ConflictError extends ApiError {
  * Utilisée pour les erreurs de validation métier
  */
 export class ValidationError extends ApiError {
-  constructor(message: string, public errors?: Record<string, string[]>) {
+  constructor(
+    message: string,
+    public errors?: Record<string, string[]>
+  ) {
     super(422, message)
     this.name = 'ValidationError'
   }

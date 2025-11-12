@@ -2343,6 +2343,7 @@ export default defineEventHandler(async (event) => {
 **1. ✅ Types partagés - IMPLÉMENTÉ**
 
 Les types partagés sont maintenant disponibles dans `server/types/api.ts` :
+
 - `ApiSuccessResponse<T>`
 - `ApiPaginatedResponse<T>`
 - `HttpError`
@@ -2353,6 +2354,7 @@ Documentation : `docs/system/types-constants-analysis.md`
 **2. ✅ Constants centralisées - IMPLÉMENTÉ**
 
 Les constantes sont centralisées dans `server/constants/permissions.ts` :
+
 - `ORGANIZER_RIGHTS` : Constantes pour les droits d'organisateurs
 - `OrganizerRight` : Type pour les droits
 - Helpers : `createEmptyPermissions()`, `createFullPermissions()`
@@ -2364,6 +2366,7 @@ Documentation : `docs/system/types-constants-analysis.md`
 Le système d'error handling est disponible dans `server/utils/errors.ts` :
 
 Classes d'erreur disponibles :
+
 - `ApiError` : Classe de base
 - `BadRequestError` (400)
 - `UnauthorizedError` (401)
@@ -2374,6 +2377,7 @@ Classes d'erreur disponibles :
 - `InternalServerError` (500)
 
 Fonctions utilitaires :
+
 - `isApiError()` : Vérification de type
 - `toApiError()` : Conversion d'erreur
 

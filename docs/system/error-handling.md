@@ -26,7 +26,7 @@ class ApiError extends Error {
 Utilisée pour les erreurs de validation ou de paramètres invalides.
 
 ```typescript
-throw new BadRequestError('Format d\'email invalide')
+throw new BadRequestError("Format d'email invalide")
 ```
 
 #### `UnauthorizedError` (401)
@@ -46,7 +46,7 @@ Utilisée quand l'utilisateur est authentifié mais n'a pas les permissions néc
 ```typescript
 throw new ForbiddenError() // "Action non autorisée"
 // ou avec message personnalisé
-throw new ForbiddenError('Vous n\'avez pas les droits pour supprimer cette convention')
+throw new ForbiddenError("Vous n'avez pas les droits pour supprimer cette convention")
 ```
 
 #### `NotFoundError` (404)
@@ -74,7 +74,7 @@ Utilisée pour les erreurs de validation métier avec possibilité de fournir de
 ```typescript
 throw new ValidationError('Données invalides', {
   email: ['Email invalide', 'Email déjà utilisé'],
-  password: ['Mot de passe trop court']
+  password: ['Mot de passe trop court'],
 })
 ```
 
@@ -95,24 +95,27 @@ throw new InternalServerError('Erreur lors de la connexion à la base de donnée
 ```typescript
 import { wrapApiHandler, NotFoundError, ForbiddenError } from '@@/server/utils/api-helpers'
 
-export default wrapApiHandler(async (event) => {
-  const user = requireAuth(event)
-  const conventionId = validateConventionId(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const conventionId = validateConventionId(event)
 
-  const convention = await prisma.convention.findUnique({
-    where: { id: conventionId }
-  })
+    const convention = await prisma.convention.findUnique({
+      where: { id: conventionId },
+    })
 
-  if (!convention) {
-    throw new NotFoundError('Convention')
-  }
+    if (!convention) {
+      throw new NotFoundError('Convention')
+    }
 
-  if (convention.authorId !== user.id && !user.isGlobalAdmin) {
-    throw new ForbiddenError('Vous ne pouvez modifier que vos propres conventions')
-  }
+    if (convention.authorId !== user.id && !user.isGlobalAdmin) {
+      throw new ForbiddenError('Vous ne pouvez modifier que vos propres conventions')
+    }
 
-  // ... logique métier
-}, { operationName: 'UpdateConvention' })
+    // ... logique métier
+  },
+  { operationName: 'UpdateConvention' }
+)
 ```
 
 ### Exemple avec validation métier
@@ -132,7 +135,7 @@ export default wrapApiHandler(async (event) => {
   const errors: Record<string, string[]> = {}
 
   if (!body.email.includes('@')) {
-    errors.email = ['Format d\'email invalide']
+    errors.email = ["Format d'email invalide"]
   }
 
   if (body.password.length < 8) {
@@ -156,8 +159,8 @@ export default wrapApiHandler(async (event) => {
   try {
     await sendEmail(user.email, 'Bienvenue !')
   } catch (error) {
-    console.error('Erreur lors de l\'envoi d\'email:', error)
-    throw new InternalServerError('Impossible d\'envoyer l\'email de confirmation')
+    console.error("Erreur lors de l'envoi d'email:", error)
+    throw new InternalServerError("Impossible d'envoyer l'email de confirmation")
   }
 
   try {
@@ -228,6 +231,7 @@ try {
 ```
 
 Codes Prisma gérés :
+
 - **P2002** : Contrainte unique violée → 409 Conflict
 - **P2025** : Enregistrement non trouvé → 404 Not Found
 - **P2003** : Contrainte de clé étrangère violée → 400 Bad Request
@@ -263,7 +267,7 @@ throw new BadRequestError('Email et password invalides')
 // ✅ Bon
 throw new ValidationError('Validation échouée', {
   email: ['Format invalide'],
-  password: ['Doit contenir au moins 8 caractères']
+  password: ['Doit contenir au moins 8 caractères'],
 })
 ```
 
@@ -297,7 +301,7 @@ Pour migrer progressivement vers ce système :
 // Avant
 throw createError({
   statusCode: 404,
-  message: 'Convention non trouvée'
+  message: 'Convention non trouvée',
 })
 
 // Après
@@ -314,11 +318,11 @@ Exemple de test avec les nouvelles classes d'erreur :
 import { NotFoundError, ForbiddenError } from '@@/server/utils/api-helpers'
 
 describe('API Endpoint', () => {
-  it('devrait lancer NotFoundError si la convention n\'existe pas', async () => {
+  it("devrait lancer NotFoundError si la convention n'existe pas", async () => {
     await expect(handler(event)).rejects.toThrow(NotFoundError)
   })
 
-  it('devrait lancer ForbiddenError si l\'utilisateur n\'a pas les droits', async () => {
+  it("devrait lancer ForbiddenError si l'utilisateur n'a pas les droits", async () => {
     await expect(handler(event)).rejects.toThrow(ForbiddenError)
   })
 })
