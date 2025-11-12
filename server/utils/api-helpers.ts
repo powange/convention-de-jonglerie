@@ -1,25 +1,10 @@
 import { isHttpError } from '@@/server/types/api'
 import { z } from 'zod'
-
-import { isApiError, toApiError } from './errors'
 import { handleValidationError } from './validation-schemas'
+import { isApiError, toApiError } from './errors'
 
 import type { ApiSuccessResponse, ApiPaginatedResponse } from '@@/server/types/api'
 import type { H3Event, EventHandlerRequest } from 'h3'
-
-// Réexporter les classes d'erreur pour faciliter l'usage
-export {
-  ApiError,
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-  ValidationError,
-  InternalServerError,
-  isApiError,
-  toApiError,
-} from './errors'
 
 /**
  * Options pour le wrapper d'API
