@@ -24,6 +24,7 @@ export default wrapApiHandler(
     // Paramètres de filtrage
     const statusFilter = query.status as string | undefined // 'resolved' | 'unresolved'
     const errorTypeFilter = query.errorType as string | undefined
+    const statusCodeFilter = query.statusCode ? parseInt(query.statusCode as string) : undefined
     const pathFilter = query.path as string | undefined
     const userIdFilter = query.userId ? parseInt(query.userId as string) : undefined
     const search = (query.search as string)?.trim()
@@ -68,6 +69,11 @@ export default wrapApiHandler(
     // Filtre par type d'erreur
     if (errorTypeFilter) {
       conditions.push({ errorType: errorTypeFilter })
+    }
+
+    // Filtre par code de statut HTTP
+    if (statusCodeFilter) {
+      conditions.push({ statusCode: statusCodeFilter })
     }
 
     // Filtre par chemin d'API
@@ -204,30 +210,30 @@ export default wrapApiHandler(
       })
     }
 
-    // Statistiques rapides pour le dashboard
-    const stats = await prisma.apiErrorLog.aggregate({
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Dernières 24h
-        },
+    // Statistiques basées sur les mêmes filtres que la liste
+    // Dernières 24h pour avoir une vue récente
+    const stats24hWhere = {
+      createdAt: {
+        gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
       },
+    }
+
+    const stats = await prisma.apiErrorLog.aggregate({
+      where: stats24hWhere,
       _count: {
         id: true,
       },
     })
 
+    // Compte des non résolus avec les mêmes filtres que la liste
     const unresolvedCount = await prisma.apiErrorLog.count({
-      where: { resolved: false },
+      where: { ...where, resolved: false },
     })
 
-    // Statistiques par type d'erreur (dernières 24h)
+    // Statistiques par type d'erreur (avec les mêmes filtres que la liste)
     const errorTypeStats = await prisma.apiErrorLog.groupBy({
       by: ['errorType'],
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        },
-      },
+      where,
       _count: {
         id: true,
       },
@@ -239,14 +245,10 @@ export default wrapApiHandler(
       take: 10,
     })
 
-    // Erreurs par code de statut (dernières 24h)
+    // Erreurs par code de statut (avec les mêmes filtres que la liste)
     const statusCodeStats = await prisma.apiErrorLog.groupBy({
       by: ['statusCode'],
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        },
-      },
+      where,
       _count: {
         id: true,
       },

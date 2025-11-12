@@ -138,8 +138,22 @@
         />
 
         <USelect
+          v-model="filters.timeRange"
+          :items="timeRangeOptions"
+          class="w-48"
+          @change="applyFilters"
+        />
+
+        <USelect
           v-model="filters.errorType"
           :items="errorTypeOptions"
+          class="w-48"
+          @change="applyFilters"
+        />
+
+        <USelect
+          v-model="filters.statusCode"
+          :items="statusCodeOptions"
           class="w-48"
           @change="applyFilters"
         />
@@ -516,6 +530,9 @@
 
 <script setup lang="ts">
 import { shallowRef } from 'vue'
+import { JsonViewer } from 'vue3-json-viewer'
+import 'vue3-json-viewer/dist/vue3-json-viewer.css'
+
 // Protection admin
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
@@ -544,7 +561,9 @@ const filters = ref({
   search: '',
   status: 'unresolved', // Par défaut, on cache les logs résolus
   errorType: 'all',
+  statusCode: 'all',
   path: '',
+  timeRange: '7d', // Par défaut, 7 jours
 })
 
 const cleaningOldLogs = ref(false)
@@ -573,6 +592,27 @@ const errorTypeOptions = [
   { label: 'Réseau', value: 'NetworkError' },
   { label: 'Fichier', value: 'FileError' },
   { label: 'Inconnue', value: 'UnknownError' },
+]
+
+const statusCodeOptions = [
+  { label: 'Tous les codes', value: 'all' },
+  { label: '400 - Bad Request', value: '400' },
+  { label: '401 - Unauthorized', value: '401' },
+  { label: '403 - Forbidden', value: '403' },
+  { label: '404 - Not Found', value: '404' },
+  { label: '409 - Conflict', value: '409' },
+  { label: '422 - Validation Error', value: '422' },
+  { label: '500 - Server Error', value: '500' },
+  { label: '502 - Bad Gateway', value: '502' },
+  { label: '503 - Service Unavailable', value: '503' },
+]
+
+const timeRangeOptions = [
+  { label: 'Dernières 24h', value: '1d' },
+  { label: '7 derniers jours', value: '7d' },
+  { label: '30 derniers jours', value: '30d' },
+  { label: '90 derniers jours', value: '90d' },
+  { label: 'Tous', value: 'all' },
 ]
 
 const pageSizeOptions = [
@@ -625,21 +665,38 @@ const loadLogs = async () => {
   loading.value = true
   try {
     const params = new URLSearchParams()
-    params.append('page', pagination.value.page.toString())
-    params.append('pageSize', pagination.value.pageSize.toString())
+    params.append('page', (pagination.value.page || 1).toString())
+    params.append('pageSize', (pagination.value.pageSize || 20).toString())
 
     if (filters.value.search) params.append('search', filters.value.search)
     if (filters.value.status && filters.value.status !== 'all')
       params.append('status', filters.value.status)
+    if (filters.value.timeRange) params.append('timeRange', filters.value.timeRange)
     if (filters.value.errorType && filters.value.errorType !== 'all')
       params.append('errorType', filters.value.errorType)
+    if (filters.value.statusCode && filters.value.statusCode !== 'all')
+      params.append('statusCode', filters.value.statusCode)
     if (filters.value.path) params.append('path', filters.value.path)
 
     const response = await $fetch(`/api/admin/error-logs?${params}`)
 
-    logs.value = response.data
-    stats.value = response.stats
-    pagination.value = response.pagination
+    logs.value = response.data || response.logs || []
+    stats.value = response.stats || {
+      totalLast24h: 0,
+      unresolvedCount: 0,
+      errorTypes: [],
+      statusCodes: [],
+    }
+
+    // L'API utilise createPaginatedResponse qui retourne un objet pagination
+    if (response.pagination) {
+      pagination.value = {
+        page: response.pagination.page || 1,
+        pageSize: response.pagination.limit || 20,
+        total: response.pagination.totalCount || 0,
+        totalPages: response.pagination.totalPages || 1,
+      }
+    }
   } catch (error) {
     console.error('Error loading logs:', error)
     toast.add({
@@ -712,7 +769,9 @@ const clearFilters = () => {
     search: '',
     status: 'unresolved', // Par défaut on affiche les non résolues
     errorType: 'all',
+    statusCode: 'all',
     path: '',
+    timeRange: '7d', // Par défaut, 7 jours
   }
   pagination.value.page = 1
   loadLogs()
