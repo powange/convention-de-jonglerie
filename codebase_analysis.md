@@ -2340,71 +2340,44 @@ export default defineEventHandler(async (event) => {
 
 #### Suggestions
 
-**1. Types partagés**
+**1. ✅ Types partagés - IMPLÉMENTÉ**
 
-```typescript
-// server/types/index.ts
-export interface ApiResponse<T> {
-  data?: T
-  error?: string
-  pagination?: {
-    page: number
-    limit: number
-    totalCount: number
-    totalPages: number
-  }
-}
+Les types partagés sont maintenant disponibles dans `server/types/api.ts` :
+- `ApiSuccessResponse<T>`
+- `ApiPaginatedResponse<T>`
+- `HttpError`
+- `isHttpError()`
 
-export interface ApiError {
-  statusCode: number
-  message: string
-  operationName?: string
-}
-```
+Documentation : `docs/system/types-constants-analysis.md`
 
-**2. Constants centralisées**
+**2. ✅ Constants centralisées - IMPLÉMENTÉ**
 
-```typescript
-// server/constants/permissions.ts
-export const ORGANIZER_RIGHTS = {
-  EDIT_CONVENTION: 'canEditConvention',
-  DELETE_CONVENTION: 'canDeleteConvention',
-  MANAGE_ORGANIZERS: 'canManageOrganizers',
-  ADD_EDITION: 'canAddEdition',
-  EDIT_ALL_EDITIONS: 'canEditAllEditions',
-  DELETE_ALL_EDITIONS: 'canDeleteAllEditions',
-  MANAGE_ARTISTS: 'canManageArtists',
-} as const
+Les constantes sont centralisées dans `server/constants/permissions.ts` :
+- `ORGANIZER_RIGHTS` : Constantes pour les droits d'organisateurs
+- `OrganizerRight` : Type pour les droits
+- Helpers : `createEmptyPermissions()`, `createFullPermissions()`
 
-export type OrganizerRight = (typeof ORGANIZER_RIGHTS)[keyof typeof ORGANIZER_RIGHTS]
-```
+Documentation : `docs/system/types-constants-analysis.md`
 
-**3. Error handling standardisé**
+**3. ✅ Error handling standardisé - IMPLÉMENTÉ**
 
-```typescript
-// server/utils/errors.ts
-export class ApiError extends Error {
-  constructor(
-    public statusCode: number,
-    message: string,
-    public operationName?: string
-  ) {
-    super(message)
-  }
-}
+Le système d'error handling est disponible dans `server/utils/errors.ts` :
 
-export class NotFoundError extends ApiError {
-  constructor(resource: string) {
-    super(404, `${resource} non trouvé(e)`)
-  }
-}
+Classes d'erreur disponibles :
+- `ApiError` : Classe de base
+- `BadRequestError` (400)
+- `UnauthorizedError` (401)
+- `ForbiddenError` (403)
+- `NotFoundError` (404)
+- `ConflictError` (409)
+- `ValidationError` (422)
+- `InternalServerError` (500)
 
-export class ForbiddenError extends ApiError {
-  constructor(message = 'Action non autorisée') {
-    super(403, message)
-  }
-}
-```
+Fonctions utilitaires :
+- `isApiError()` : Vérification de type
+- `toApiError()` : Conversion d'erreur
+
+Documentation : `docs/system/error-handling.md`
 
 ### Évolutions futures recommandées
 

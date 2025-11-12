@@ -1,10 +1,25 @@
 import { isHttpError } from '@@/server/types/api'
 import { z } from 'zod'
 
+import { isApiError, toApiError } from './errors'
 import { handleValidationError } from './validation-schemas'
 
 import type { ApiSuccessResponse, ApiPaginatedResponse } from '@@/server/types/api'
 import type { H3Event, EventHandlerRequest } from 'h3'
+
+// Réexporter les classes d'erreur pour faciliter l'usage
+export {
+  ApiError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  ValidationError,
+  InternalServerError,
+  isApiError,
+  toApiError,
+} from './errors'
 
 /**
  * Options pour le wrapper d'API
@@ -50,31 +65,39 @@ export function wrapApiHandler<T = any>(
     try {
       return await handler(event)
     } catch (error: unknown) {
-      // 1. Erreurs HTTP - les relancer directement
+      // 1. Erreurs HTTP (h3) - les relancer directement
       if (isHttpError(error)) {
         throw error
       }
 
-      // 2. Erreurs Zod - transformer en erreur 400
+      // 2. Erreurs ApiError (nos classes personnalisées) - convertir en erreur h3
+      if (isApiError(error)) {
+        throw createError({
+          statusCode: error.statusCode,
+          message: error.message,
+        })
+      }
+
+      // 3. Erreurs Zod - transformer en erreur 400
       if (error instanceof z.ZodError) {
         return handleValidationError(error)
       }
 
-      // 3. Erreurs génériques - logger et transformer en 500
-      const isUserError = isHttpError(error)
+      // 4. Erreurs génériques - logger et transformer en 500
+      const isUserError = isHttpError(error) || isApiError(error)
       const shouldLog =
-        !silentErrors && (!isUserError || (isHttpError(error) && error.statusCode >= 500))
+        !silentErrors && (!isUserError || (isApiError(error) && error.statusCode >= 500))
 
       if (shouldLog) {
-        console.error(
-          operationName ? `[${operationName}] Erreur inattendue:` : 'Erreur inattendue:',
-          error
-        )
+        const prefix = operationName ? `[${operationName}]` : ''
+        console.error(`${prefix} Erreur inattendue:`, error)
       }
 
+      // Convertir en ApiError puis en erreur h3
+      const apiError = toApiError(error, defaultErrorMessage)
       throw createError({
-        statusCode: 500,
-        message: defaultErrorMessage,
+        statusCode: apiError.statusCode,
+        message: apiError.message,
       })
     }
   })
@@ -82,6 +105,7 @@ export function wrapApiHandler<T = any>(
 
 /**
  * Gère les erreurs Prisma courantes (notamment P2002 - contrainte unique)
+ * Convertit les erreurs Prisma en erreurs API standardisées
  */
 export function handlePrismaError(error: unknown, context?: string): never {
   if (error && typeof error === 'object' && 'code' in error) {
@@ -92,6 +116,7 @@ export function handlePrismaError(error: unknown, context?: string): never {
         // Contrainte unique violée
         const target = prismaError.meta?.target
         const field = Array.isArray(target) ? target[0] : 'champ'
+        // Convertir en erreur h3 (pour rester compatible)
         throw createError({
           statusCode: 409,
           message: `Ce ${field} est déjà utilisé`,
