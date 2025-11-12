@@ -1,4 +1,9 @@
+import type { PartialOrganizerPermissions } from '@@/server/constants/permissions'
 import type { Prisma } from '@prisma/client'
+
+// Réexporter HttpError et isHttpError depuis api.ts pour rétrocompatibilité
+export type { HttpError } from '@@/server/types/api'
+export { isHttpError } from '@@/server/types/api'
 
 /**
  * Type pour les transactions Prisma
@@ -58,26 +63,6 @@ export type VolunteerTeamUpdateInput = Prisma.VolunteerTeamUpdateInput
 export type TicketingQuotaUpdateInput = Prisma.TicketingQuotaUpdateInput
 
 /**
- * Type pour les erreurs avec code de statut HTTP
- */
-export interface HttpError extends Error {
-  statusCode: number
-  data?: unknown
-}
-
-/**
- * Type guard pour vérifier si une erreur est une HttpError
- */
-export function isHttpError(error: unknown): error is HttpError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'statusCode' in error &&
-    typeof (error as HttpError).statusCode === 'number'
-  )
-}
-
-/**
  * Type guard pour vérifier si une erreur a une propriété issues (Zod)
  */
 export function hasIssues(error: unknown): error is { issues: unknown[] } {
@@ -91,23 +76,20 @@ export function hasIssues(error: unknown): error is { issues: unknown[] } {
 
 /**
  * Type pour les snapshots de permissions dans l'historique
+ * Utilise PartialOrganizerPermissions pour garantir la cohérence avec les constantes
  */
 export interface OrganizerPermissionSnapshot {
   title?: string | null
-  rights: {
-    canEditConvention: boolean
-    canDeleteConvention: boolean
-    canManageOrganizers: boolean
-    canAddEdition: boolean
-    canEditAllEditions: boolean
-    canDeleteAllEditions: boolean
-    canManageVolunteers: boolean
-  }
+  rights: PartialOrganizerPermissions
   perEdition?: Array<{
     editionId: number
     canEdit: boolean
     canDelete: boolean
     canManageVolunteers: boolean
+    canManageArtists?: boolean
+    canManageMeals?: boolean
+    canManageTicketing?: boolean
+    canManageOrganizers?: boolean
   }>
 }
 

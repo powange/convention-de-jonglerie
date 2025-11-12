@@ -1,8 +1,10 @@
+import { ORGANIZER_RIGHTS } from '@@/server/constants/permissions'
 import { checkAdminMode } from '@@/server/utils/organizer-management'
 
 import { prisma } from '../prisma'
 
 import type { UserForPermissions } from './types'
+import type { OrganizerRight } from '@@/server/constants/permissions'
 import type {
   User,
   Edition,
@@ -34,15 +36,10 @@ export interface EditionPermissionOptions {
 }
 
 /**
- * Droits de organisateur possibles pour les éditions
+ * @deprecated Importez OrganizerRight depuis @@/server/constants/permissions
+ * Ce type est conservé pour rétrocompatibilité mais ne devrait plus être utilisé
  */
-export type OrganizerRight =
-  | 'canEditAllEditions'
-  | 'canDeleteAllEditions'
-  | 'canEditConvention'
-  | 'canDeleteConvention'
-  | 'canManageOrganizers'
-  | 'canAddEdition'
+export type { OrganizerRight }
 
 /**
  * Récupère une édition avec les organisateurs filtrés selon les droits requis
@@ -195,7 +192,7 @@ export async function getEditionForEdit(
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
-    requiredRights: ['canEditAllEditions', 'canEditConvention'],
+    requiredRights: [ORGANIZER_RIGHTS.EDIT_ALL_EDITIONS, ORGANIZER_RIGHTS.EDIT_CONVENTION],
   })
 
   if (!edition) {
@@ -224,7 +221,11 @@ export async function getEditionForDelete(
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
-    requiredRights: ['canDeleteAllEditions', 'canDeleteConvention', 'canEditAllEditions'],
+    requiredRights: [
+      ORGANIZER_RIGHTS.DELETE_ALL_EDITIONS,
+      ORGANIZER_RIGHTS.DELETE_CONVENTION,
+      ORGANIZER_RIGHTS.EDIT_ALL_EDITIONS,
+    ],
   })
 
   if (!edition) {
@@ -253,7 +254,11 @@ export async function getEditionForStatusManagement(
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
-    requiredRights: ['canEditAllEditions', 'canEditConvention', 'canManageOrganizers'],
+    requiredRights: [
+      ORGANIZER_RIGHTS.EDIT_ALL_EDITIONS,
+      ORGANIZER_RIGHTS.EDIT_CONVENTION,
+      ORGANIZER_RIGHTS.MANAGE_ORGANIZERS,
+    ],
   })
 
   if (!edition) {

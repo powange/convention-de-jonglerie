@@ -1,7 +1,9 @@
+import { isHttpError } from '@@/server/types/api'
 import { z } from 'zod'
 
 import { handleValidationError } from './validation-schemas'
 
+import type { ApiSuccessResponse, ApiPaginatedResponse } from '@@/server/types/api'
 import type { H3Event, EventHandlerRequest } from 'h3'
 
 /**
@@ -22,18 +24,6 @@ export interface ApiHandlerOptions {
    * Message d'erreur par défaut pour les erreurs 500
    */
   defaultErrorMessage?: string
-}
-
-/**
- * Vérifie si une erreur est une erreur HTTP (avec statusCode)
- */
-export function isHttpError(error: unknown): error is { statusCode: number; message: string } {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'statusCode' in error &&
-    typeof (error as any).statusCode === 'number'
-  )
 }
 
 /**
@@ -140,8 +130,12 @@ export function handlePrismaError(error: unknown, context?: string): never {
 
 /**
  * Crée une réponse de succès standardisée
+ * @template T - Type des données retournées
+ * @param data - Données à retourner
+ * @param message - Message optionnel de succès
+ * @returns Réponse API typée
  */
-export function createSuccessResponse<T>(data: T, message?: string) {
+export function createSuccessResponse<T>(data: T, message?: string): ApiSuccessResponse<T> {
   return {
     success: true,
     ...(message && { message }),
@@ -151,8 +145,19 @@ export function createSuccessResponse<T>(data: T, message?: string) {
 
 /**
  * Crée une réponse paginée standardisée
+ * @template T - Type des items dans le tableau
+ * @param items - Tableau d'items à retourner
+ * @param total - Nombre total d'items (pour la pagination)
+ * @param page - Numéro de page actuelle
+ * @param limit - Nombre d'items par page
+ * @returns Réponse API paginée typée
  */
-export function createPaginatedResponse<T>(items: T[], total: number, page: number, limit: number) {
+export function createPaginatedResponse<T>(
+  items: T[],
+  total: number,
+  page: number,
+  limit: number
+): ApiPaginatedResponse<T> {
   return {
     success: true,
     data: items,

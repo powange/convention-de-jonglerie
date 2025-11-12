@@ -1,8 +1,10 @@
+import { ORGANIZER_RIGHTS } from '@@/server/constants/permissions'
 import { canManageOrganizers } from '@@/server/utils/organizer-management'
 
 import { prisma } from '../prisma'
 
 import type { UserForPermissions } from './types'
+import type { OrganizerRight } from '@@/server/constants/permissions'
 import type { User, Convention, ConventionOrganizer } from '@prisma/client'
 
 /**
@@ -25,22 +27,15 @@ export type ConventionWithEditions = Convention & {
  */
 export interface ConventionPermissionOptions {
   userId: number
-  requiredRights?: ConventionRight[]
+  requiredRights?: OrganizerRight[]
   includeEditions?: boolean
 }
 
 /**
- * Droits de organisateur possibles pour les conventions
+ * @deprecated Importez OrganizerRight depuis @@/server/constants/permissions
+ * Ce type est conservé pour rétrocompatibilité mais ne devrait plus être utilisé
  */
-export type ConventionRight =
-  | 'canEditConvention'
-  | 'canDeleteConvention'
-  | 'canManageOrganizers'
-  | 'canManageVolunteers'
-  | 'canManageArtists'
-  | 'canAddEdition'
-  | 'canEditAllEditions'
-  | 'canDeleteAllEditions'
+export type ConventionRight = OrganizerRight
 
 /**
  * Récupère une convention avec les organisateurs filtrés selon les droits requis
@@ -151,7 +146,7 @@ export async function getConventionForEdit(
 ): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
-    requiredRights: ['canEditConvention'],
+    requiredRights: [ORGANIZER_RIGHTS.EDIT_CONVENTION],
   })) as ConventionWithOrganizers
 
   if (!convention) {
@@ -180,7 +175,7 @@ export async function getConventionForDelete(
 ): Promise<ConventionWithEditions> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
-    requiredRights: ['canDeleteConvention'],
+    requiredRights: [ORGANIZER_RIGHTS.DELETE_CONVENTION],
     includeEditions: true,
   })) as ConventionWithEditions
 
@@ -210,7 +205,7 @@ export async function getConventionForArchive(
 ): Promise<ConventionWithEditions> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
-    requiredRights: ['canDeleteConvention'],
+    requiredRights: [ORGANIZER_RIGHTS.DELETE_CONVENTION],
     includeEditions: true,
   })) as ConventionWithEditions
 
@@ -240,7 +235,7 @@ export async function getConventionForOrganizerManagement(
 ): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
-    requiredRights: ['canManageOrganizers'],
+    requiredRights: [ORGANIZER_RIGHTS.MANAGE_ORGANIZERS],
   })) as ConventionWithOrganizers
 
   if (!convention) {
@@ -292,7 +287,7 @@ export async function getConventionForEditionCreation(
 ): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
-    requiredRights: ['canAddEdition'],
+    requiredRights: [ORGANIZER_RIGHTS.ADD_EDITION],
   })) as ConventionWithOrganizers
 
   if (!convention) {
