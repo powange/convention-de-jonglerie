@@ -87,11 +87,16 @@
       "Bash(tee:*)",
       "Bash(npx web-push:*)",
       "WebFetch(domain:ui.nuxt.com)",
-      "mcp__nuxt-ui__list_components"
+      "mcp__nuxt-ui__list_components",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner"
+  ]
 }
