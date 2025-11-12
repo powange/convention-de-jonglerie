@@ -7,6 +7,7 @@ Ce document décrit les utilitaires créés pour éliminer la duplication de cod
 **Statut : ✅ Refactoring terminé**
 
 **Résultats :**
+
 - ~2700+ lignes de code économisées (~10% de réduction)
 - 78 fichiers migrés avec succès
 - 517 utilisations de `wrapApiHandler` dans le codebase
@@ -61,6 +62,7 @@ export default wrapApiHandler(
 ```
 
 **Avantages :**
+
 - Gestion automatique des erreurs HTTP, Zod et génériques
 - Logs automatiques avec nom d'opération
 - 15-20 lignes économisées par endpoint
@@ -389,6 +391,7 @@ select: USER_ADMIN_SELECT
 ### Constantes disponibles :
 
 **User :**
+
 - `USER_PUBLIC_SELECT` - Infos publiques (id, pseudo, profilePicture)
 - `USER_PROFILE_SELECT` - Profil complet utilisateur
 - `USER_ADMIN_SELECT` - Vue admin complète
@@ -396,27 +399,33 @@ select: USER_ADMIN_SELECT
 - `AUTHOR_SELECT` - Auteur d'une ressource
 
 **Convention :**
+
 - `CONVENTION_LIST_SELECT` - Liste publique
 - `CONVENTION_DETAIL_SELECT` - Détails complets
 
 **Edition :**
+
 - `EDITION_CARD_SELECT` - Carte/liste
 - `EDITION_DETAIL_SELECT` - Détails complets
 
 **Workshop :**
+
 - `WORKSHOP_LIST_SELECT` - Liste
 - `WORKSHOP_DETAIL_SELECT` - Détails complets
 
 **Carpool :**
+
 - `CARPOOL_OFFER_SELECT` - Offre de covoiturage
 - `CARPOOL_REQUEST_SELECT` - Demande de covoiturage
 
 **Ticketing :**
+
 - `TICKET_TIER_SELECT` - Tier de billetterie
 - `TICKET_OPTION_SELECT` - Option de billetterie
 - `TICKET_ORDER_SELECT` - Commande
 
 **Autres :**
+
 - `NOTIFICATION_SELECT` - Notification
 - `VOLUNTEER_APPLICATION_SELECT` - Candidature bénévole
 
@@ -438,14 +447,10 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
 
     // Fetch avec vérification 404 automatique (remplace 6 lignes)
-    const edition = await fetchResourceOrFail(
-      prisma.edition,
-      editionId,
-      {
-        select: EDITION_DETAIL_SELECT, // Constante réutilisable
-        errorMessage: 'Édition introuvable'
-      }
-    )
+    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+      select: EDITION_DETAIL_SELECT, // Constante réutilisable
+      errorMessage: 'Édition introuvable',
+    })
 
     return edition
   },

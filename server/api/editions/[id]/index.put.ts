@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { invalidateEditionCache } from '@@/server/utils/cache-helpers'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
 import { getEditionForEdit } from '@@/server/utils/permissions/edition-permissions'
@@ -312,6 +313,10 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // Invalider le cache après mise à jour
+    await invalidateEditionCache(editionId)
+
     return updatedEdition
   },
   { operationName: 'UpdateEdition' }

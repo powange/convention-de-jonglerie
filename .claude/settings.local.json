@@ -94,9 +94,5 @@
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": [
-    "nuxt",
-    "nuxt-ui",
-    "vitest-runner"
-  ]
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
 }

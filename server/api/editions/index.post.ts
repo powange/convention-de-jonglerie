@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { invalidateEditionCache } from '@@/server/utils/cache-helpers'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
 import {
@@ -156,9 +157,15 @@ export default wrapApiHandler(
             },
           },
         })
+        // Invalider le cache après création
+        await invalidateEditionCache(updatedEdition.id)
+
         return updatedEdition
       }
     }
+
+    // Invalider le cache après création
+    await invalidateEditionCache(edition.id)
 
     return edition
   },

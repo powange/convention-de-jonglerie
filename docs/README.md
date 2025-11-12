@@ -5,7 +5,9 @@ Cette documentation technique décrit l'architecture, les systèmes et les patte
 ## 📁 Structure de la documentation
 
 ### 🔧 [system/](./system/) - Systèmes Core (8 fichiers)
+
 Documentation des systèmes fondamentaux de l'application :
+
 - **API_PROFILE_STATS.md** - Statistiques de profil utilisateur
 - **AUTH_SESSIONS.md** - Système d'authentification et sessions
 - **CRON_SYSTEM.md** - Tâches planifiées et cron jobs
@@ -16,7 +18,9 @@ Documentation des systèmes fondamentaux de l'application :
 - **feedback.md** - Système de feedback utilisateur
 
 ### 🎫 [ticketing/](./ticketing/) - Billetterie (8 fichiers)
+
 Documentation complète du système de billetterie :
+
 - **README.md** - Vue d'ensemble du système
 - **access-control.md** - Contrôle d'accès et validation
 - **external-integration.md** - Intégrations externes (HelloAsso, etc.)
@@ -27,7 +31,9 @@ Documentation complète du système de billetterie :
 - **tiers.md** - Tarifs et catégories
 
 ### 👥 [volunteers/](./volunteers/) - Bénévoles (7 fichiers)
+
 Documentation du système de gestion des bénévoles :
+
 - **allergy-severity-utility.md** - Gestion des allergies
 - **teams-utils.md** - Utilitaires pour les équipes
 - **volunteer-application-api-utility.md** - Utilitaires API candidatures
@@ -37,13 +43,17 @@ Documentation du système de gestion des bénévoles :
 - **volunteer-returnable-items-by-team.md** - Objets consignés par équipe
 
 ### 🔌 [integrations/](./integrations/) - Intégrations (3 fichiers)
+
 Documentation des intégrations avec services externes :
+
 - **anthropic-integration.md** - Intégration API Anthropic Claude
 - **backup-system.md** - Système de sauvegarde
 - **helloasso-integration.md** - Intégration HelloAsso (paiements)
 
 ### ⚡ [optimization/](./optimization/) - Optimisations (8 fichiers)
+
 Documentation des optimisations de performance :
+
 - **cache-http-assets.md** - Cache HTTP des assets statiques
 - **i18n-component-lazy-loading.md** - Lazy loading i18n composants
 - **i18n-lazy-loading.md** - Lazy loading i18n général
@@ -54,7 +64,9 @@ Documentation des optimisations de performance :
 - **push-notifications-browser-support.md** - Support des push notifications
 
 ### 📦 [archive/](./archive/) - Archives (3 fichiers)
+
 Documentation historique et guides de migration terminés :
+
 - **README.md** - Vue d'ensemble des archives
 - **logs-erreur-api-ameliorations.md** - Migration logs d'erreur (terminée)
 - **notification-i18n-migration-guide.md** - Migration notifications i18n (terminée)
@@ -62,6 +74,7 @@ Documentation historique et guides de migration terminés :
 ## 🔍 Navigation rapide
 
 ### Par thématique
+
 - **Authentification** → [system/AUTH_SESSIONS.md](./system/AUTH_SESSIONS.md)
 - **Billetterie** → [ticketing/README.md](./ticketing/README.md)
 - **Bénévoles** → [volunteers/](./volunteers/)
@@ -71,6 +84,7 @@ Documentation historique et guides de migration terminés :
 - **Intégrations** → [integrations/](./integrations/)
 
 ### Par type de documentation
+
 - **Architecture système** → [system/](./system/)
 - **Guides de migration** → [archive/](./archive/)
 - **Optimisations** → [optimization/](./optimization/)

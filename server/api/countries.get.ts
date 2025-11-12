@@ -5,14 +5,19 @@ export default wrapApiHandler(
   async (_event) => {
     // Cette API est publique, pas besoin d'authentification
 
-    const now = new Date()
+    // Clé de cache statique (données changent uniquement à la création/modification d'éditions)
+    const cacheKey = 'countries:list'
 
-    // Récupérer tous les pays des éditions non expirées
+    // Vérifier le cache
+    const cached = await useStorage('cache').getItem<string[]>(cacheKey)
+    if (cached) {
+      return cached
+    }
+
+    // Requête DB si pas en cache
     const countries = await prisma.edition.findMany({
       where: {
-        endDate: {
-          gte: now, // Conventions non expirées
-        },
+        isOnline: true, // Toutes les éditions en ligne (passées, présentes, futures)
       },
       select: {
         country: true,
@@ -23,8 +28,12 @@ export default wrapApiHandler(
       },
     })
 
-    // Retourner seulement les noms de pays uniques
-    return countries.map((c) => c.country).filter(Boolean)
+    const result = countries.map((c) => c.country).filter(Boolean)
+
+    // Mettre en cache pour 24 heures (invalidé manuellement lors des mutations)
+    await useStorage('cache').setItem(cacheKey, result, { ttl: 86400 })
+
+    return result
   },
   { operationName: 'GetCountries' }
 )
