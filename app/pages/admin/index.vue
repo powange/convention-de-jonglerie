@@ -331,7 +331,7 @@
         <!-- Assignation des repas bénévoles -->
         <UCard
           class="hover:shadow-lg transition-shadow cursor-pointer"
-          @click="assignMealsToVolunteers"
+          @click="showMealsConfirmModal = true"
         >
           <div class="flex items-start justify-between">
             <div class="flex-1">
@@ -556,6 +556,19 @@
 
     <!-- Modal de configuration -->
     <AdminConfigModal v-model:open="showConfigModal" />
+
+    <!-- Modal de confirmation pour l'assignation des repas -->
+    <UiConfirmModal
+      v-model="showMealsConfirmModal"
+      title="Assigner les repas bénévoles"
+      description="Êtes-vous sûr de vouloir assigner automatiquement les repas à tous les bénévoles acceptés sans repas ? Cette action va parcourir toutes les éditions et assigner les repas disponibles."
+      confirm-label="Assigner les repas"
+      confirm-color="primary"
+      confirm-icon="i-cbi:mealie"
+      :loading="assigningMeals"
+      @confirm="assignMealsToVolunteers"
+      @cancel="showMealsConfirmModal = false"
+    />
   </div>
 </template>
 
@@ -605,6 +618,7 @@ const adminModeToggle = ref(authStore.isAdminModeActive)
 
 // État pour l'assignation des repas
 const assigningMeals = ref(false)
+const showMealsConfirmModal = ref(false)
 
 // Fonctions utilitaires
 const { locale } = useI18n()
@@ -753,6 +767,9 @@ const assignMealsToVolunteers = async () => {
         console.log("📊 Statistiques d'assignation des repas:", result.stats)
         console.log('📋 Détails:', result.volunteers)
       }
+
+      // Fermer la modal après succès
+      showMealsConfirmModal.value = false
     }
   } catch (error: any) {
     console.error("Erreur lors de l'assignation des repas:", error)
