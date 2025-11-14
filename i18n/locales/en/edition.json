@@ -124,6 +124,17 @@
     "features_card_title": "What can you do?",
     "granular_rights": "Granular rights",
     "granular_rights_desc": "Specific permissions per edition or global according to your needs",
+    "history": {
+      "archived": "archived",
+      "created": "added",
+      "no_history": "No recorded changes",
+      "per_editions_updated": "updated per-edition rights for",
+      "removed": "removed",
+      "rights_updated": "updated rights for",
+      "title": "History",
+      "title_full": "Change History - {name}",
+      "unarchived": "unarchived"
+    },
     "logo_alt": "Logo of {name}",
     "manage_editions": "Manage editions",
     "manage_editions_desc": "Create, edit and publish different editions of your conventions",

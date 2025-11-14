@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
@@ -33,20 +34,16 @@ export default wrapApiHandler(
       actor: h.actor && {
         id: h.actor.id,
         pseudo: h.actor.pseudo,
-        avatar: h.actor.profilePicture
-          ? { src: h.actor.profilePicture, alt: h.actor.pseudo }
-          : h.actor.email
-            ? { hash: h.actor.email }
-            : null,
+        email: h.actor.email,
+        emailHash: getEmailHash(h.actor.email),
+        profilePicture: h.actor.profilePicture,
       },
       targetUser: h.targetUser && {
         id: h.targetUser.id,
         pseudo: h.targetUser.pseudo,
-        avatar: h.targetUser.profilePicture
-          ? { src: h.targetUser.profilePicture, alt: h.targetUser.pseudo }
-          : h.targetUser.email
-            ? { hash: h.targetUser.email }
-            : null,
+        email: h.targetUser.email,
+        emailHash: getEmailHash(h.targetUser.email),
+        profilePicture: h.targetUser.profilePicture,
       },
     }))
   },

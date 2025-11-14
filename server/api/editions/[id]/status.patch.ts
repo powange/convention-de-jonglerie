@@ -25,12 +25,12 @@ export default wrapApiHandler(
       where: { id: editionId },
       data: { isOnline: validatedData.isOnline },
       include: {
-        creator: { select: { id: true, pseudo: true, email: true } },
+        creator: { select: { id: true, pseudo: true, email: true, profilePicture: true } },
         convention: {
           include: {
             organizers: {
               include: {
-                user: { select: { id: true, pseudo: true, email: true } },
+                user: { select: { id: true, pseudo: true, email: true, profilePicture: true } },
               },
             },
           },
@@ -46,6 +46,7 @@ export default wrapApiHandler(
         id: updatedEdition.creator.id,
         pseudo: updatedEdition.creator.pseudo,
         emailHash: getEmailHash(updatedEdition.creator.email),
+        profilePicture: updatedEdition.creator.profilePicture,
       },
       convention: {
         ...updatedEdition.convention,
@@ -55,6 +56,7 @@ export default wrapApiHandler(
             id: c.user.id,
             pseudo: c.user.pseudo,
             emailHash: getEmailHash(c.user.email),
+            profilePicture: c.user.profilePicture,
           },
         })),
       },

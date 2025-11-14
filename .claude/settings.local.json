@@ -88,7 +88,8 @@
       "Bash(npx web-push:*)",
       "WebFetch(domain:ui.nuxt.com)",
       "mcp__nuxt-ui__list_components",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(do echo \"=== $lang ===\")"
     ],
     "deny": [],
     "ask": [],

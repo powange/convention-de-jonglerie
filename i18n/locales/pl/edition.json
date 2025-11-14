@@ -124,6 +124,17 @@
     "features_card_title": "Co możesz zrobić?",
     "granular_rights": "Szczegółowe uprawnienia",
     "granular_rights_desc": "Konkretne uprawnienia dla każdej edycji lub globalne według twoich potrzeb",
+    "history": {
+      "archived": "zarchiwizował",
+      "created": "dodał",
+      "no_history": "Brak zarejestrowanych zmian",
+      "per_editions_updated": "zmodyfikował uprawnienia według edycji dla",
+      "removed": "usunął",
+      "rights_updated": "zmodyfikował uprawnienia dla",
+      "title": "Historia",
+      "title_full": "Historia zmian - {name}",
+      "unarchived": "przywrócił z archiwum"
+    },
     "logo_alt": "Logo {name}",
     "manage_editions": "Zarządzanie edycjami",
     "manage_editions_desc": "Twórz, edytuj i publikuj różne edycje swoich konwencji",

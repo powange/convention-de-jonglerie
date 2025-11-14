@@ -37,15 +37,25 @@
                 <UIcon name="i-heroicons-user-group" class="text-purple-500" />
                 <h2 class="text-lg font-semibold">{{ $t('gestion.organizers.list') }}</h2>
               </div>
-              <UButton
-                size="sm"
-                color="primary"
-                variant="soft"
-                icon="i-heroicons-plus"
-                @click="startAddingOrganizer"
-              >
-                {{ $t('common.add') }}
-              </UButton>
+              <div class="flex items-center gap-2">
+                <UButton
+                  size="sm"
+                  variant="ghost"
+                  icon="i-heroicons-clock"
+                  @click="openHistoryModal"
+                >
+                  {{ $t('conventions.history.title') }}
+                </UButton>
+                <UButton
+                  size="sm"
+                  color="primary"
+                  variant="soft"
+                  icon="i-heroicons-plus"
+                  @click="startAddingOrganizer"
+                >
+                  {{ $t('common.add') }}
+                </UButton>
+              </div>
             </div>
 
             <!-- Liste des organisateurs -->
@@ -412,6 +422,23 @@
         </UCard>
       </div>
     </div>
+
+    <!-- Modal d'historique -->
+    <UModal
+      v-model:open="historyModalOpen"
+      :title="
+        edition?.convention?.name
+          ? $t('conventions.history.title_full', { name: edition.convention.name })
+          : $t('conventions.history.title')
+      "
+      size="lg"
+    >
+      <template #body>
+        <div v-if="edition?.convention?.id">
+          <ConventionOrganizerHistory :convention-id="edition.convention.id" />
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -459,6 +486,9 @@ const editionOrganizers = ref<any[]>([])
 const availableOrganizers = ref<any[]>([])
 const loadingEditionOrganizers = ref(false)
 const selectedAvailableOrganizer = ref<number | null>(null)
+
+// État pour la modal d'historique
+const historyModalOpen = ref(false)
 
 const newOrganizerRights = ref({
   rights: {
@@ -796,6 +826,11 @@ const removeFromEdition = async (editionOrganizerId: number) => {
       color: 'error',
     })
   }
+}
+
+// Fonction pour ouvrir la modal d'historique
+const openHistoryModal = () => {
+  historyModalOpen.value = true
 }
 
 // Charger l'édition si nécessaire

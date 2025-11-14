@@ -32,7 +32,11 @@
       "organizer": "Organisateur",
       "status": "Statut",
       "entry_validated": "Entrée validée",
-      "entry_not_validated": "Entrée non validée"
+      "entry_not_validated": "Entrée non validée",
+      "per_edition_rights": "Droits par édition",
+      "can_edit": "Modifier",
+      "can_delete": "Supprimer",
+      "can_manage_volunteers": "Gérer les bénévoles"
     },
     "volunteers": {
       "general_settings": "Paramètres généraux",

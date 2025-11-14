@@ -124,6 +124,17 @@
     "features_card_title": "Wat kun je doen?",
     "granular_rights": "Gedetailleerde rechten",
     "granular_rights_desc": "Specifieke rechten per editie of globaal volgens je behoeften",
+    "history": {
+      "archived": "heeft gearchiveerd",
+      "created": "heeft toegevoegd",
+      "no_history": "Geen geregistreerde wijzigingen",
+      "per_editions_updated": "heeft rechten per editie aangepast voor",
+      "removed": "heeft verwijderd",
+      "rights_updated": "heeft rechten aangepast voor",
+      "title": "Geschiedenis",
+      "title_full": "Wijzigingsgeschiedenis - {name}",
+      "unarchived": "heeft gedearchiveerd"
+    },
     "logo_alt": "Logo van {name}",
     "manage_editions": "Edities beheren",
     "manage_editions_desc": "Maak, bewerk en publiceer verschillende edities van je conventies",

@@ -112,6 +112,14 @@
               <div v-if="canManageOrganizers(convention)" class="flex gap-2">
                 <UButton
                   size="xs"
+                  variant="ghost"
+                  icon="i-heroicons-clock"
+                  @click="openHistoryModal(convention)"
+                >
+                  {{ $t('conventions.history.title') }}
+                </UButton>
+                <UButton
+                  size="xs"
                   variant="outline"
                   icon="i-heroicons-plus"
                   @click="openAddOrganizerModal(convention)"
@@ -265,6 +273,30 @@
 
     <!-- Modal des fonctionnalités -->
     <ConventionsFeaturesModal v-model:model-value="showFeaturesModal" />
+
+    <!-- Modal de l'historique des organisateurs -->
+    <UModal
+      v-model:open="historyModalOpen"
+      :title="
+        selectedConventionForHistory
+          ? $t('conventions.history.title_full', { name: selectedConventionForHistory.name })
+          : ''
+      "
+      size="lg"
+    >
+      <template #body>
+        <div v-if="selectedConventionForHistory">
+          <ConventionOrganizerHistory :convention-id="selectedConventionForHistory.id" />
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end">
+          <UButton variant="ghost" @click="closeHistoryModal">
+            {{ $t('common.close') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
 
     <!-- Modal de confirmation de suppression d'édition -->
     <UModal v-model:open="deleteEditionModalOpen" title="Confirmer la suppression">
@@ -435,10 +467,24 @@ const deleteEditionModalOpen = ref(false)
 const editionToDelete = ref<Edition | null>(null)
 const deletingEdition = ref(false)
 
+// Historique des organisateurs
+const historyModalOpen = ref(false)
+const selectedConventionForHistory = ref<Convention | null>(null)
+
 function openFeaturesModal() {
   console.log('Opening features modal', showFeaturesModal.value)
   showFeaturesModal.value = true
   console.log('Modal state after:', showFeaturesModal.value)
+}
+
+function openHistoryModal(convention: Convention) {
+  selectedConventionForHistory.value = convention
+  historyModalOpen.value = true
+}
+
+function closeHistoryModal() {
+  historyModalOpen.value = false
+  selectedConventionForHistory.value = null
 }
 
 // Utiliser le composable pour formater les dates

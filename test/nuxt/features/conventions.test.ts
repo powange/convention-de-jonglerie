@@ -97,6 +97,7 @@ describe('Système de conventions', () => {
               id: true,
               pseudo: true,
               email: true,
+              profilePicture: true,
             },
           },
         },

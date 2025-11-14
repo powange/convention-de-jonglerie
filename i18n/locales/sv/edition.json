@@ -124,6 +124,17 @@
     "features_card_title": "Vad kan du göra?",
     "granular_rights": "Granulära rättigheter",
     "granular_rights_desc": "Utgåvospecifika eller globala behörigheter för att passa dina behov",
+    "history": {
+      "archived": "har arkiverat",
+      "created": "har lagt till",
+      "no_history": "Inga registrerade ändringar",
+      "per_editions_updated": "har ändrat rättigheter per upplaga för",
+      "removed": "har tagit bort",
+      "rights_updated": "har ändrat rättigheter för",
+      "title": "Historik",
+      "title_full": "Ändringshistorik - {name}",
+      "unarchived": "har återställt från arkiv"
+    },
     "logo_alt": "{name} logotyp",
     "manage_editions": "Hantering av utgåvor",
     "manage_editions_desc": "Skapa, modifiera och publicera olika utgåvor av dina avtal",

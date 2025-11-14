@@ -41,6 +41,7 @@ export default wrapApiHandler(
         id: notification.user.id,
         pseudo: notification.user.pseudo,
         emailHash: getEmailHash(notification.user.email),
+        profilePicture: notification.user.profilePicture,
       },
     }))
 

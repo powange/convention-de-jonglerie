@@ -1,3 +1,4 @@
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -105,6 +106,7 @@ export default wrapApiHandler(
             prenom: eo.organizer.user.prenom,
             nom: eo.organizer.user.nom,
             email: eo.organizer.user.email,
+            emailHash: getEmailHash(eo.organizer.user.email),
             profilePicture: eo.organizer.user.profilePicture,
           },
         })),

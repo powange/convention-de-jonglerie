@@ -264,6 +264,7 @@ export const NotificationService = {
             id: true,
             pseudo: true,
             email: true,
+            profilePicture: true,
           },
         },
       },

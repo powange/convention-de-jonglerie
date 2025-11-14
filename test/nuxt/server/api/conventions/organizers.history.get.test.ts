@@ -63,14 +63,18 @@ describe('/api/conventions/[id]/organizers/history GET', () => {
     prismaMock.organizerPermissionHistory.findMany.mockResolvedValue(history)
     const res = await handler(baseEvent as any)
     expect(res.length).toBe(2)
-    // Vérifie mapping des avatars
+    // Vérifie mapping des utilisateurs
     const first = res[0]
     expect(first.actor.pseudo).toBe('Acteur')
-    expect(first.actor.avatar).toEqual({ src: '/img/a1.png', alt: 'Acteur' })
-    expect(first.targetUser.avatar).toEqual({ hash: 'target@example.tld' })
+    expect(first.actor.profilePicture).toBe('/img/a1.png')
+    expect(first.actor.emailHash).toBeDefined()
+    expect(first.targetUser.profilePicture).toBeNull()
+    expect(first.targetUser.emailHash).toBeDefined()
     const second = res[1]
-    expect(second.actor.avatar).toEqual({ hash: 'actor@example.tld' })
-    expect(second.targetUser.avatar).toEqual({ src: '/img/u2.png', alt: 'Autre' })
+    expect(second.actor.profilePicture).toBeNull()
+    expect(second.actor.emailHash).toBeDefined()
+    expect(second.targetUser.profilePicture).toBe('/img/u2.png')
+    expect(second.targetUser.emailHash).toBeDefined()
     expect(prismaMock.organizerPermissionHistory.findMany).toHaveBeenCalledWith({
       where: { conventionId: 7 },
       orderBy: { createdAt: 'desc' },

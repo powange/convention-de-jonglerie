@@ -124,6 +124,17 @@
     "features_card_title": "Cosa puoi fare?",
     "granular_rights": "Diritti granulari",
     "granular_rights_desc": "Permessi specifici per edizione o globali secondo le tue esigenze",
+    "history": {
+      "archived": "ha archiviato",
+      "created": "ha aggiunto",
+      "no_history": "Nessuna modifica registrata",
+      "per_editions_updated": "ha modificato i diritti per edizione di",
+      "removed": "ha rimosso",
+      "rights_updated": "ha modificato i diritti di",
+      "title": "Cronologia",
+      "title_full": "Cronologia delle modifiche - {name}",
+      "unarchived": "ha ripristinato dall'archivio"
+    },
     "logo_alt": "Logo di {name}",
     "manage_editions": "Gestire edizioni",
     "manage_editions_desc": "Crea, modifica e pubblica diverse edizioni dei tuoi convegni",

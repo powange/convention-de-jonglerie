@@ -194,6 +194,8 @@ export default wrapApiHandler(
           prenom: true,
           nom: true,
           email: true,
+          profilePicture: true,
+          updatedAt: true,
         },
       })
       const validatorMap = new Map(validators.map((v) => [v.id, v]))
@@ -211,6 +213,8 @@ export default wrapApiHandler(
                 nom: validator.nom,
                 email: validator.email,
                 emailHash: getEmailHash(validator.email),
+                profilePicture: validator.profilePicture,
+                updatedAt: validator.updatedAt?.toISOString(),
               }
             : null,
         }

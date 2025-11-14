@@ -117,6 +117,7 @@ describe('API Convention - Création', () => {
             id: true,
             pseudo: true,
             email: true,
+            profilePicture: true,
           },
         },
       },

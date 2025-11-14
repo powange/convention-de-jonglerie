@@ -58,7 +58,6 @@ export const useUserDeletion = () => {
         deletedUser: {
           id: number
           pseudo: string
-          emailHash: string
         }
       }>(`/api/admin/users/${userId}`, {
         method: 'DELETE',

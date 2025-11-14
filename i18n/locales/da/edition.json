@@ -124,6 +124,17 @@
     "features_card_title": "Hvad kan du gøre?",
     "granular_rights": "Granulære rettigheder",
     "granular_rights_desc": "Specifikke tilladelser per udgave eller globale efter dine behov",
+    "history": {
+      "archived": "har arkiveret",
+      "created": "har tilføjet",
+      "no_history": "Ingen registrerede ændringer",
+      "per_editions_updated": "har ændret rettigheder pr. udgave for",
+      "removed": "har fjernet",
+      "rights_updated": "har ændret rettigheder for",
+      "title": "Historik",
+      "title_full": "Ændringshistorik - {name}",
+      "unarchived": "har fjernet fra arkiv"
+    },
     "logo_alt": "Logo for {name}",
     "manage_editions": "Administrer udgaver",
     "manage_editions_desc": "Opret, rediger og publicer forskellige udgaver af dine konventioner",

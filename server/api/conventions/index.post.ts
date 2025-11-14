@@ -35,6 +35,7 @@ export default wrapApiHandler(
             id: true,
             pseudo: true,
             email: true,
+            profilePicture: true,
           },
         },
       },
@@ -65,6 +66,7 @@ export default wrapApiHandler(
             id: true,
             pseudo: true,
             email: true,
+            profilePicture: true,
           },
         },
         organizers: {
@@ -74,6 +76,7 @@ export default wrapApiHandler(
                 id: true,
                 pseudo: true,
                 email: true,
+                profilePicture: true,
               },
             },
             addedBy: {
@@ -95,6 +98,7 @@ export default wrapApiHandler(
             return {
               ...authorWithoutEmail,
               emailHash: email ? getEmailHash(email) : undefined,
+              profilePicture: conventionWithOrganizers.author.profilePicture,
             }
           })()
         : null,
@@ -116,6 +120,7 @@ export default wrapApiHandler(
               return {
                 ...userWithoutEmail,
                 emailHash: email ? getEmailHash(email) : undefined,
+                profilePicture: c.user.profilePicture,
               }
             })()
           : null,

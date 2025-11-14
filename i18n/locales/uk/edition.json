@@ -124,6 +124,17 @@
     "features_card_title": "Що ви можете робити?",
     "granular_rights": "Деталізовані права",
     "granular_rights_desc": "Специфічні дозволи для кожного видання або глобальні відповідно до ваших потреб",
+    "history": {
+      "archived": "архівував",
+      "created": "додав",
+      "no_history": "Немає записаних змін",
+      "per_editions_updated": "змінив права за виданням для",
+      "removed": "видалив",
+      "rights_updated": "змінив права для",
+      "title": "Історія",
+      "title_full": "Історія змін - {name}",
+      "unarchived": "розархівував"
+    },
     "logo_alt": "Логотип {name}",
     "manage_editions": "Керування виданнями",
     "manage_editions_desc": "Створюйте, редагуйте та публікуйте різні видання ваших конвенцій",

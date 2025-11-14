@@ -124,6 +124,17 @@
     "features_card_title": "Co můžete udělat?",
     "granular_rights": "Granulární práva",
     "granular_rights_desc": "Oprávnění pro konkrétní edici nebo globální oprávnění podle vašich potřeb.",
+    "history": {
+      "archived": "archivoval",
+      "created": "přidal",
+      "no_history": "Žádné zaznamenané změny",
+      "per_editions_updated": "upravil práva podle edice pro",
+      "removed": "odstranil",
+      "rights_updated": "upravil práva pro",
+      "title": "Historie",
+      "title_full": "Historie změn - {name}",
+      "unarchived": "obnovil z archivu"
+    },
     "logo_alt": "{name} logo",
     "manage_editions": "Správa edic",
     "manage_editions_desc": "Vytvářet, upravovat a publikovat různá vydání smluv",

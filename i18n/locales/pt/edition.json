@@ -124,6 +124,17 @@
     "features_card_title": "O que pode fazer?",
     "granular_rights": "Direitos granulares",
     "granular_rights_desc": "Permissões específicas por edição ou globais segundo as suas necessidades",
+    "history": {
+      "archived": "arquivou",
+      "created": "adicionou",
+      "no_history": "Nenhuma alteração registrada",
+      "per_editions_updated": "modificou os direitos por edição de",
+      "removed": "removeu",
+      "rights_updated": "modificou os direitos de",
+      "title": "Histórico",
+      "title_full": "Histórico de alterações - {name}",
+      "unarchived": "desarquivou"
+    },
     "logo_alt": "Logotipo de {name}",
     "manage_editions": "Gerir edições",
     "manage_editions_desc": "Crie, edite e publique as diferentes edições das suas convenções",

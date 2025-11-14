@@ -30,6 +30,7 @@ export default wrapApiHandler(
             nom: true,
             phone: true,
             authProvider: true,
+            profilePicture: true,
           },
         },
         pickupResponsible: {
@@ -87,6 +88,7 @@ export default wrapApiHandler(
       user: {
         ...artist.user,
         emailHash: createHash('md5').update(sanitizeEmail(artist.user.email)).digest('hex'),
+        profilePicture: artist.user.profilePicture,
       },
     }))
 

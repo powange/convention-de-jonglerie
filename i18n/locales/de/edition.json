@@ -124,6 +124,17 @@
     "features_card_title": "Was können Sie tun?",
     "granular_rights": "Detaillierte Rechte",
     "granular_rights_desc": "Spezifische Berechtigungen pro Auflage oder global nach Ihren Bedürfnissen",
+    "history": {
+      "archived": "hat archiviert",
+      "created": "hat hinzugefügt",
+      "no_history": "Keine aufgezeichneten Änderungen",
+      "per_editions_updated": "hat die Rechte pro Ausgabe von geändert",
+      "removed": "hat entfernt",
+      "rights_updated": "hat die Rechte von geändert",
+      "title": "Verlauf",
+      "title_full": "Änderungsverlauf - {name}",
+      "unarchived": "hat aus dem Archiv geholt"
+    },
     "logo_alt": "Logo von {name}",
     "manage_editions": "Auflagen verwalten",
     "manage_editions_desc": "Erstellen, bearbeiten und veröffentlichen Sie verschiedene Auflagen Ihrer Conventions",

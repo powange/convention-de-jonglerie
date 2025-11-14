@@ -146,7 +146,18 @@
     "search_user_placeholder": "Rechercher un utilisateur...",
     "select_user": "Sélectionner un utilisateur",
     "status_control": "Contrôle de visibilité",
-    "status_control_desc": "Publier ou dépublier vos éditions selon leur avancement"
+    "status_control_desc": "Publier ou dépublier vos éditions selon leur avancement",
+    "history": {
+      "title": "Historique",
+      "title_full": "Historique des modifications - {name}",
+      "no_history": "Aucune modification enregistrée",
+      "removed": "a retiré",
+      "created": "a ajouté",
+      "rights_updated": "a modifié les droits de",
+      "per_editions_updated": "a modifié les droits par édition de",
+      "archived": "a archivé",
+      "unarchived": "a désarchivé"
+    }
   },
   "diet": {
     "none": "Aucun",
