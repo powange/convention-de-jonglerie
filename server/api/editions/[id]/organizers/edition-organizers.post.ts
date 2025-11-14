@@ -1,5 +1,6 @@
 import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -92,11 +93,38 @@ export default wrapApiHandler(
         })
       }
 
+      // Générer un token unique
+      let qrCodeToken = generateVolunteerQrCodeToken()
+      let isUnique = false
+      let attempts = 0
+      const maxAttempts = 10
+
+      while (!isUnique && attempts < maxAttempts) {
+        const existingToken = await prisma.editionOrganizer.findUnique({
+          where: { qrCodeToken },
+        })
+
+        if (!existingToken) {
+          isUnique = true
+        } else {
+          qrCodeToken = generateVolunteerQrCodeToken()
+          attempts++
+        }
+      }
+
+      if (!isUnique) {
+        throw createError({
+          statusCode: 500,
+          message: 'Impossible de générer un token unique',
+        })
+      }
+
       // Créer l'EditionOrganizer
       const editionOrganizer = await prisma.editionOrganizer.create({
         data: {
           editionId: editionId,
           organizerId: body.organizerId,
+          qrCodeToken,
         },
         select: {
           id: true,

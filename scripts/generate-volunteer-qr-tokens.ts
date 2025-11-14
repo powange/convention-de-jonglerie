@@ -7,9 +7,14 @@
  * npx tsx scripts/generate-volunteer-qr-tokens.ts
  */
 
+import { randomBytes } from 'crypto'
+
 import { PrismaClient } from '@prisma/client'
 
-import { generateVolunteerQrCodeToken } from '../server/utils/token-generator'
+// Fonction de génération de token (copie locale pour éviter les problèmes d'imports avec tsx)
+function generateVolunteerQrCodeToken(): string {
+  return randomBytes(16).toString('hex') // 16 bytes = 32 hex chars
+}
 
 const prisma = new PrismaClient()
 

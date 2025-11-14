@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Загрузка...",
-      "manual_input_label": "Ручной ввод кода",
       "no_ticket_found": "Билет не найден",
       "search_placeholder": "Фамилия, имя или email...",
       "ticket_found": "Билет найден",

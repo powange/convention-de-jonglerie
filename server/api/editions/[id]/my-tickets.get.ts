@@ -129,13 +129,18 @@ export default wrapApiHandler(
     })
 
     if (editionOrganizer) {
+      // Format du QR code: organizer-{id}-{token} ou organizer-{id} (ancien format)
+      const qrCode = editionOrganizer.qrCodeToken
+        ? `organizer-${editionOrganizer.id}-${editionOrganizer.qrCodeToken}`
+        : `organizer-${editionOrganizer.id}`
+
       allTickets.push({
         id: editionOrganizer.id,
         type: 'organizer',
         firstName: editionOrganizer.organizer.user.prenom,
         lastName: editionOrganizer.organizer.user.nom,
         email: editionOrganizer.organizer.user.email,
-        qrCode: `organizer-${editionOrganizer.id}`,
+        qrCode,
         tierName: 'Organisateur',
         amount: 0,
         isHelloAsso: false,

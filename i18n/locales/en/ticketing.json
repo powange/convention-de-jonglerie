@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Loading...",
-      "manual_input_label": "Manual code entry",
       "no_ticket_found": "No ticket found",
       "search_placeholder": "Last name, first name or email...",
       "ticket_found": "Ticket found",

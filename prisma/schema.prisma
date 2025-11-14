@@ -357,6 +357,7 @@ model EditionOrganizer {
   id               Int                 @id @default(autoincrement())
   editionId        Int
   organizerId      Int
+  qrCodeToken      String?             @unique
   entryValidated   Boolean             @default(false)
   entryValidatedAt DateTime?
   entryValidatedBy Int?
@@ -369,6 +370,7 @@ model EditionOrganizer {
   @@index([editionId])
   @@index([organizerId])
   @@index([entryValidatedBy])
+  @@index([qrCodeToken])
 }
 
 model OrganizerPermissionHistory {

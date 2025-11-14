@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Indlæser...",
-      "manual_input_label": "Manuel kodeinput",
       "no_ticket_found": "Ingen billet fundet",
       "search_placeholder": "Navn, fornavn eller e-mail...",
       "ticket_found": "Billet fundet",

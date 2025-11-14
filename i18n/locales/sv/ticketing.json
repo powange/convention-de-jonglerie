@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Laddar...",
-      "manual_input_label": "Manuell kodinmatning",
       "no_ticket_found": "Inga biljetter hittades",
       "search_placeholder": "Efternamn, förnamn eller e-post...",
       "ticket_found": "Biljett hittades",

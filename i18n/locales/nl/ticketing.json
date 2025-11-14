@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Laden...",
-      "manual_input_label": "Handmatige code-invoer",
       "no_ticket_found": "Geen ticket gevonden",
       "search_placeholder": "Achternaam, voornaam of e-mail...",
       "ticket_found": "Ticket gevonden",

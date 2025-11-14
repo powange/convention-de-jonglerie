@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Caricamento...",
-      "manual_input_label": "Inserimento manuale del codice",
       "no_ticket_found": "Nessun biglietto trovato",
       "search_placeholder": "Cognome, nome o email...",
       "ticket_found": "Biglietto trovato",

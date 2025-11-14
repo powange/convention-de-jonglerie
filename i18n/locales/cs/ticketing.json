@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Načítání...",
-      "manual_input_label": "Ruční zadávání kódů",
       "no_ticket_found": "Nebyly nalezeny žádné vstupenky",
       "search_placeholder": "Příjmení, jméno nebo e-mail...",
       "ticket_found": "Nalezená vstupenka",

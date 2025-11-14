@@ -420,7 +420,10 @@ export default wrapApiHandler(
         }
       } else if (body.qrCode.startsWith('organizer-')) {
         // Recherche d'un organisateur
-        const editionOrganizerId = parseInt(body.qrCode.replace('organizer-', ''))
+        // Format: organizer-{id}-{token} ou organizer-{id} (ancien format)
+        const parts = body.qrCode.replace('organizer-', '').split('-')
+        const editionOrganizerId = parseInt(parts[0])
+        const token = parts[1] || null
 
         if (isNaN(editionOrganizerId)) {
           return {
@@ -434,6 +437,9 @@ export default wrapApiHandler(
           where: {
             id: editionOrganizerId,
             editionId: editionId,
+            ...(token && {
+              qrCodeToken: token,
+            }),
           },
           include: {
             organizer: {

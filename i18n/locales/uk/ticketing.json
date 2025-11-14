@@ -2,7 +2,6 @@
   "ticketing": {
     "access_control": {
       "loading": "Завантаження...",
-      "manual_input_label": "Ручне введення коду",
       "no_ticket_found": "Квиток не знайдено",
       "search_placeholder": "Прізвище, ім'я або email...",
       "ticket_found": "Квиток знайдено",
