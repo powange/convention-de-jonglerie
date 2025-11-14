@@ -42,9 +42,13 @@
                 </h3>
                 <p
                   v-if="volunteersMode === 'INTERNAL'"
-                  class="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2"
+                  :class="`text-sm ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass} flex items-center gap-2`"
                 >
-                  <UIcon name="i-heroicons-information-circle" class="text-blue-500" size="16" />
+                  <UIcon
+                    name="i-heroicons-information-circle"
+                    :class="volunteerConfig.iconColorClass"
+                    size="16"
+                  />
                   {{
                     canManageVolunteers
                       ? t('edition.volunteers.admin_only_note')
@@ -127,7 +131,7 @@
             <div class="flex items-center justify-between">
               <div class="space-y-2">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
-                  <UIcon name="i-heroicons-user-group" class="text-blue-600" />
+                  <UIcon :name="volunteerConfig.icon" :class="volunteerConfig.iconColorClass" />
                   {{ $t('pages.volunteers.team_distribution.title') }}
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -159,14 +163,22 @@
           <div v-else class="space-y-4">
             <!-- Statistiques générales -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <div
+                :class="`${volunteerConfig.bgClass} ${volunteerConfig.darkBgClass} rounded-lg p-4`"
+              >
                 <div class="flex items-center gap-3">
-                  <UIcon name="i-heroicons-user-group" class="text-blue-600" size="24" />
+                  <UIcon
+                    :name="volunteerConfig.icon"
+                    :class="volunteerConfig.iconColorClass"
+                    size="24"
+                  />
                   <div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                       {{ $t('pages.volunteers.team_distribution.stats.total_teams') }}
                     </p>
-                    <p class="text-xl font-semibold text-blue-600">{{ volunteerTeams.length }}</p>
+                    <p :class="`text-xl font-semibold ${volunteerConfig.textClass}`">
+                      {{ volunteerTeams.length }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -507,20 +519,20 @@
                 <div class="space-y-3">
                   <!-- Option Déplacer -->
                   <button
-                    class="w-full flex items-start gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 text-left group"
+                    :class="`w-full flex items-start gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 ${volunteerConfig.hoverBgClass} ${volunteerConfig.darkHoverBgClass} transition-all duration-200 text-left group`"
                     :disabled="isProcessingMove"
                     @click="processMove('move')"
                   >
                     <div class="flex-shrink-0 mt-1">
                       <UIcon
                         name="i-heroicons-arrow-right"
-                        class="text-blue-500 group-hover:text-blue-600"
+                        class="text-primary-500 group-hover:text-primary-600"
                         size="16"
                       />
                     </div>
                     <div>
                       <p
-                        class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                        class="font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400"
                       >
                         {{ $t('pages.volunteers.team_distribution.modal.move') }}
                       </p>
@@ -630,6 +642,10 @@ import { useEditionStore } from '~/stores/editions'
 definePageMeta({
   layout: 'edition-dashboard',
 })
+
+// Utiliser le composable pour obtenir la configuration des bénévoles
+const { getParticipantTypeConfig } = useParticipantTypes()
+const volunteerConfig = getParticipantTypeConfig('volunteer')
 
 const route = useRoute()
 const editionStore = useEditionStore()

@@ -46,6 +46,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
+const { getParticipantTypeConfig } = useParticipantTypes()
+
+// Récupérer les configurations de couleurs
+const ticketConfig = getParticipantTypeConfig('ticket')
+const volunteerConfig = getParticipantTypeConfig('volunteer')
+const artistConfig = getParticipantTypeConfig('artist')
+const organizerConfig = getParticipantTypeConfig('organizer')
 
 // Construire les datasets en fonction des filtres
 const chartData = computed<ChartData<'bar'>>(() => {
@@ -55,8 +62,8 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_participants'),
       data: props.data.participants,
-      backgroundColor: 'rgba(251, 146, 60, 0.8)', // orange-500
-      borderColor: 'rgba(251, 146, 60, 1)',
+      backgroundColor: ticketConfig.chartBgColor,
+      borderColor: ticketConfig.chartBorderColor,
       borderWidth: 1,
     })
   }
@@ -65,8 +72,8 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_volunteers'),
       data: props.data.volunteers,
-      backgroundColor: 'rgba(168, 85, 247, 0.8)', // purple-500
-      borderColor: 'rgba(168, 85, 247, 1)',
+      backgroundColor: volunteerConfig.chartBgColor,
+      borderColor: volunteerConfig.chartBorderColor,
       borderWidth: 1,
     })
   }
@@ -75,8 +82,8 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_artists'),
       data: props.data.artists,
-      backgroundColor: 'rgba(34, 197, 94, 0.8)', // green-500
-      borderColor: 'rgba(34, 197, 94, 1)',
+      backgroundColor: artistConfig.chartBgColor,
+      borderColor: artistConfig.chartBorderColor,
       borderWidth: 1,
     })
   }
@@ -85,8 +92,8 @@ const chartData = computed<ChartData<'bar'>>(() => {
     datasets.push({
       label: t('gestion.ticketing.stats_organizers'),
       data: props.data.organizers,
-      backgroundColor: 'rgba(59, 130, 246, 0.8)', // blue-500
-      borderColor: 'rgba(59, 130, 246, 1)',
+      backgroundColor: organizerConfig.chartBgColor,
+      borderColor: organizerConfig.chartBorderColor,
       borderWidth: 1,
     })
   }

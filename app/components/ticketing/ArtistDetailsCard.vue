@@ -1,17 +1,19 @@
 <template>
   <div class="space-y-6">
     <!-- Badge artiste -->
-    <div class="flex items-center justify-between p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+    <div
+      :class="`flex items-center justify-between p-4 rounded-lg ${artistConfig.bgClass} ${artistConfig.darkBgClass}`"
+    >
       <div class="flex items-center gap-3">
-        <UIcon name="i-heroicons-star" class="text-green-500" size="32" />
+        <UIcon :name="artistConfig.icon" :class="artistConfig.iconColorClass" size="32" />
         <div>
-          <p class="text-sm text-green-600 dark:text-green-400">
+          <p :class="`text-sm ${artistConfig.textClass} ${artistConfig.darkTextClass}`">
             {{ $t('edition.ticketing.access_type') }}
           </p>
           <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
         </div>
       </div>
-      <UBadge color="success" variant="soft" size="lg"> Artiste invité </UBadge>
+      <UBadge color="warning" variant="soft" size="lg"> Artiste invité </UBadge>
     </div>
 
     <!-- Statut de validation d'entrée -->
@@ -141,6 +143,10 @@
 
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
+
+// Utiliser le composable pour obtenir la configuration des artistes
+const { getParticipantTypeConfig } = useParticipantTypes()
+const artistConfig = getParticipantTypeConfig('artist')
 
 interface Artist {
   id: number

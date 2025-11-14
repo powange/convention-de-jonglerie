@@ -49,11 +49,13 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.ticketing.stats_participants') }}
                 </p>
-                <p class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                <p
+                  :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
+                >
                   {{ validationsData.totals.participants }}
                 </p>
               </div>
-              <UIcon name="i-heroicons-ticket" class="h-8 w-8 text-orange-500" />
+              <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
             </div>
           </UCard>
           <UCard v-if="filters.showVolunteers">
@@ -62,11 +64,16 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.ticketing.stats_volunteers') }}
                 </p>
-                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <p
+                  :class="`text-2xl font-bold ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass}`"
+                >
                   {{ validationsData.totals.volunteers }}
                 </p>
               </div>
-              <UIcon name="i-heroicons-user-group" class="h-8 w-8 text-purple-500" />
+              <UIcon
+                :name="volunteerConfig.icon"
+                :class="`h-8 w-8 ${volunteerConfig.iconColorClass}`"
+              />
             </div>
           </UCard>
           <UCard v-if="filters.showArtists">
@@ -75,11 +82,13 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.ticketing.stats_artists') }}
                 </p>
-                <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                <p
+                  :class="`text-2xl font-bold ${artistConfig.textClass} ${artistConfig.darkTextClass}`"
+                >
                   {{ validationsData.totals.artists }}
                 </p>
               </div>
-              <UIcon name="i-heroicons-star" class="h-8 w-8 text-green-500" />
+              <UIcon :name="artistConfig.icon" :class="`h-8 w-8 ${artistConfig.iconColorClass}`" />
             </div>
           </UCard>
           <UCard v-if="filters.showOrganizers">
@@ -88,11 +97,16 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.ticketing.stats_organizers') }}
                 </p>
-                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <p
+                  :class="`text-2xl font-bold ${organizerConfig.textClass} ${organizerConfig.darkTextClass}`"
+                >
                   {{ validationsData.totals.organizers }}
                 </p>
               </div>
-              <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-blue-500" />
+              <UIcon
+                :name="organizerConfig.icon"
+                :class="`h-8 w-8 ${organizerConfig.iconColorClass}`"
+              />
             </div>
           </UCard>
           <UCard v-if="filters.showOthers">
@@ -259,6 +273,13 @@ const OrderSourceChart = defineAsyncComponent(
 definePageMeta({
   layout: 'edition-dashboard',
 })
+
+// Utiliser le composable pour obtenir les configurations des types de participants
+const { getParticipantTypeConfig } = useParticipantTypes()
+const ticketConfig = getParticipantTypeConfig('ticket')
+const volunteerConfig = getParticipantTypeConfig('volunteer')
+const artistConfig = getParticipantTypeConfig('artist')
+const organizerConfig = getParticipantTypeConfig('organizer')
 
 const route = useRoute()
 const editionStore = useEditionStore()

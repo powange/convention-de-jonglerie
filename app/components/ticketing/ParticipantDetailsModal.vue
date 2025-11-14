@@ -20,12 +20,12 @@
 
         <!-- Type d'accès -->
         <div
-          class="flex items-center justify-between p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20"
+          :class="`flex items-center justify-between p-4 rounded-lg ${ticketConfig.bgClass} ${ticketConfig.darkBgClass}`"
         >
           <div class="flex items-center gap-3">
-            <UIcon name="i-heroicons-ticket" class="text-orange-500" size="32" />
+            <UIcon :name="ticketConfig.icon" :class="ticketConfig.iconColorClass" size="32" />
             <div>
-              <p class="text-sm text-orange-600 dark:text-orange-400">
+              <p :class="`text-sm ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`">
                 {{ $t('edition.ticketing.access_type') }}
               </p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -33,7 +33,7 @@
               </p>
             </div>
           </div>
-          <UBadge color="warning" variant="soft" size="lg">
+          <UBadge :color="ticketConfig.color" variant="soft" size="lg">
             {{ $t('edition.ticketing.participant') }}
           </UBadge>
         </div>
@@ -762,6 +762,9 @@ import { computed, ref, watch } from 'vue'
 import ArtistDetailsCard from './ArtistDetailsCard.vue'
 import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
+
+const { getParticipantTypeConfig } = useParticipantTypes()
+const ticketConfig = getParticipantTypeConfig('ticket')
 
 interface TicketData {
   ticket: {

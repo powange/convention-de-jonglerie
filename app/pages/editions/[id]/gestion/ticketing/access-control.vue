@@ -146,7 +146,7 @@
                     <div
                       class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      <UIcon name="i-heroicons-ticket" class="text-orange-500" />
+                      <UIcon :name="ticketConfig.icon" :class="ticketConfig.iconColorClass" />
                       Billets ({{ searchResults.tickets.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
@@ -170,7 +170,7 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge color="warning">{{
+                            <UBadge :color="ticketConfig.color">{{
                               $t('ticketing.stats.participants')
                             }}</UBadge>
                             <UIcon
@@ -192,7 +192,7 @@
                     <div
                       class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      <UIcon name="i-heroicons-star" class="text-green-500" />
+                      <UIcon :name="artistConfig.icon" :class="artistConfig.iconColorClass" />
                       Artistes ({{ searchResults.artists.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
@@ -220,7 +220,9 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge color="success">{{ $t('ticketing.stats.artists') }}</UBadge>
+                            <UBadge :color="artistConfig.color">{{
+                              $t('ticketing.stats.artists')
+                            }}</UBadge>
                             <UIcon
                               v-if="result.participant.artist.entryValidated"
                               name="i-heroicons-check-circle"
@@ -237,7 +239,7 @@
                     <div
                       class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      <UIcon name="i-heroicons-user-group" class="text-purple-500" />
+                      <UIcon :name="volunteerConfig.icon" :class="volunteerConfig.iconColorClass" />
                       {{ $t('ticketing.stats.volunteers') }} ({{ searchResults.volunteers.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
@@ -285,7 +287,7 @@
                     <div
                       class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      <UIcon name="i-heroicons-shield-check" class="text-indigo-500" />
+                      <UIcon :name="organizerConfig.icon" :class="organizerConfig.iconColorClass" />
                       {{ $t('ticketing.stats.organizers') }} ({{ searchResults.organizers.length }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
@@ -312,7 +314,9 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge color="primary">{{ $t('common.organizer') }}</UBadge>
+                            <UBadge :color="organizerConfig.color">{{
+                              $t('common.organizer')
+                            }}</UBadge>
                             <UIcon
                               v-if="result.participant.organizer.entryValidated"
                               name="i-heroicons-check-circle"
@@ -383,12 +387,12 @@
                 :class="[
                   'p-3 rounded-lg',
                   validation.type === 'ticket'
-                    ? 'bg-orange-50 dark:bg-orange-900/20'
+                    ? `${ticketConfig.bgClass} ${ticketConfig.darkBgClass}`
                     : validation.type === 'volunteer'
-                      ? 'bg-purple-50 dark:bg-purple-900/20'
+                      ? `${volunteerConfig.bgClass} ${volunteerConfig.darkBgClass}`
                       : validation.type === 'artist'
-                        ? 'bg-green-50 dark:bg-green-900/20'
-                        : 'bg-indigo-50 dark:bg-indigo-900/20',
+                        ? `${artistConfig.bgClass} ${artistConfig.darkBgClass}`
+                        : `${organizerConfig.bgClass} ${organizerConfig.darkBgClass}`,
                 ]"
               >
                 <div class="flex items-start justify-between gap-3">
@@ -397,22 +401,22 @@
                     <UIcon
                       :name="
                         validation.type === 'ticket'
-                          ? 'i-heroicons-ticket'
+                          ? ticketConfig.icon
                           : validation.type === 'volunteer'
-                            ? 'i-heroicons-user-group'
+                            ? volunteerConfig.icon
                             : validation.type === 'artist'
-                              ? 'i-heroicons-star'
-                              : 'i-heroicons-shield-check'
+                              ? artistConfig.icon
+                              : organizerConfig.icon
                       "
                       :class="[
                         'flex-shrink-0 mt-0.5',
                         validation.type === 'ticket'
-                          ? 'text-orange-500'
+                          ? ticketConfig.iconColorClass
                           : validation.type === 'volunteer'
-                            ? 'text-purple-500'
+                            ? volunteerConfig.iconColorClass
                             : validation.type === 'artist'
-                              ? 'text-green-500'
-                              : 'text-indigo-500',
+                              ? artistConfig.iconColorClass
+                              : organizerConfig.iconColorClass,
                       ]"
                       size="20"
                     />
@@ -671,6 +675,13 @@ const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
 const { t } = useI18n()
+const { getParticipantTypeConfig } = useParticipantTypes()
+
+// Récupérer les configurations de couleurs
+const ticketConfig = getParticipantTypeConfig('ticket')
+const volunteerConfig = getParticipantTypeConfig('volunteer')
+const artistConfig = getParticipantTypeConfig('artist')
+const organizerConfig = getParticipantTypeConfig('organizer')
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))

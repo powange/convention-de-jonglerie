@@ -2,12 +2,12 @@
   <div class="space-y-6">
     <!-- Type d'accès -->
     <div
-      class="flex items-center justify-between p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20"
+      :class="`flex items-center justify-between p-4 rounded-lg ${volunteerConfig.bgClass} ${volunteerConfig.darkBgClass}`"
     >
       <div class="flex items-center gap-3">
-        <UIcon name="i-heroicons-user-group" class="text-purple-500" size="32" />
+        <UIcon :name="volunteerConfig.icon" :class="volunteerConfig.iconColorClass" size="32" />
         <div>
-          <p class="text-sm text-purple-600 dark:text-purple-400">
+          <p :class="`text-sm ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass}`">
             {{ $t('edition.ticketing.access_type') }}
           </p>
           <p class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -75,7 +75,7 @@
     <!-- Équipes assignées -->
     <div v-if="volunteer.teams && volunteer.teams.length > 0" class="space-y-4">
       <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-        <UIcon name="i-heroicons-user-group" class="text-blue-600 dark:text-blue-400" />
+        <UIcon :name="volunteerConfig.icon" :class="volunteerConfig.iconColorClass" />
         <h4 class="font-semibold text-gray-900 dark:text-white">
           {{ $t('edition.ticketing.teams') }}
         </h4>
@@ -88,7 +88,10 @@
           class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
         >
           <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-user-group" class="h-4 w-4 text-blue-500" />
+            <UIcon
+              :name="volunteerConfig.icon"
+              :class="`h-4 w-4 ${volunteerConfig.iconColorClass}`"
+            />
             <span class="text-sm font-medium text-gray-900 dark:text-white">
               {{ team.name }}
             </span>
@@ -168,6 +171,10 @@
 
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
+
+// Utiliser le composable pour obtenir la configuration des bénévoles
+const { getParticipantTypeConfig } = useParticipantTypes()
+const volunteerConfig = getParticipantTypeConfig('volunteer')
 
 interface Volunteer {
   id: number

@@ -26,8 +26,8 @@
           </span>
         </div>
         <div v-else class="flex items-center gap-1">
-          <UIcon name="i-heroicons-globe-alt" class="text-blue-500" size="12" />
-          <span class="text-xs text-blue-600 dark:text-blue-400">
+          <UIcon name="i-heroicons-globe-alt" :class="volunteerConfig.iconColorClass" size="12" />
+          <span :class="`text-xs ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass}`">
             {{ $t('pages.volunteers.team_distribution.all_teams') }}
           </span>
         </div>
@@ -72,6 +72,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+
+// Utiliser le composable pour obtenir la configuration des bénévoles
+const { getParticipantTypeConfig } = useParticipantTypes()
+const volunteerConfig = getParticipantTypeConfig('volunteer')
 
 interface Props {
   volunteer: any
