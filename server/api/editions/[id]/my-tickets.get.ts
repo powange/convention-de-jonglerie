@@ -59,13 +59,18 @@ export default wrapApiHandler(
     })
 
     if (volunteerApplication) {
+      // Format du QR code: volunteer-{id}-{token} ou volunteer-{id} (ancien format)
+      const qrCode = volunteerApplication.qrCodeToken
+        ? `volunteer-${volunteerApplication.id}-${volunteerApplication.qrCodeToken}`
+        : `volunteer-${volunteerApplication.id}`
+
       allTickets.push({
         id: volunteerApplication.id,
         type: 'volunteer',
         firstName: volunteerApplication.user.prenom,
         lastName: volunteerApplication.user.nom,
         email: volunteerApplication.user.email,
-        qrCode: `volunteer-${volunteerApplication.id}`,
+        qrCode,
         tierName: 'Bénévole',
         amount: 0,
         isHelloAsso: false,
@@ -86,13 +91,18 @@ export default wrapApiHandler(
     })
 
     if (artist) {
+      // Format du QR code: artist-{id}-{token} ou artist-{id} (ancien format)
+      const qrCode = artist.qrCodeToken
+        ? `artist-${artist.id}-${artist.qrCodeToken}`
+        : `artist-${artist.id}`
+
       allTickets.push({
         id: artist.id,
         type: 'artist',
         firstName: artist.user.prenom,
         lastName: artist.user.nom,
         email: artist.user.email,
-        qrCode: `artist-${artist.id}`,
+        qrCode,
         tierName: 'Artiste',
         amount: 0,
         isHelloAsso: false,

@@ -30,6 +30,7 @@
           </p>
         </div>
         <UButton
+          v-if="allowOnsiteRegistration"
           icon="i-heroicons-user-plus"
           color="primary"
           class="sm:flex-shrink-0"
@@ -61,50 +62,22 @@
                     {{ $t('edition.ticketing.scan_ticket') }}
                   </h2>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Scannez ou saisissez le code
+                    Scanner un QR code ou saisir manuellement
                   </p>
                 </div>
               </div>
 
-              <!-- Scanner et saisie manuelle -->
-              <div class="flex flex-col xl:flex-row items-center xl:items-end gap-4">
-                <!-- Bouton Scanner -->
-                <UButton
-                  icon="i-heroicons-qr-code"
-                  color="primary"
-                  size="xl"
-                  variant="soft"
-                  class="xl:flex-1 justify-center h-[52px]"
-                  @click="startScanner"
-                >
-                  <span class="font-semibold">Scanner un QR code</span>
-                </UButton>
-
-                <!-- Saisie manuelle -->
-                <UFormField
-                  :label="$t('ticketing.access_control.manual_input_label')"
-                  :label-class="'text-center lg:text-left'"
-                  class="xl:flex-1 w-full"
-                >
-                  <UFieldGroup class="w-full">
-                    <UInput
-                      v-model="ticketCode"
-                      :placeholder="$t('edition.ticketing.ticket_code_placeholder')"
-                      icon="i-heroicons-ticket"
-                      class="w-full"
-                      @keydown.enter="validateTicket"
-                    />
-                    <UButton
-                      :label="$t('edition.ticketing.validate_ticket')"
-                      icon="i-heroicons-check-circle"
-                      color="success"
-                      :disabled="!ticketCode"
-                      :loading="validatingTicket"
-                      @click="validateTicket"
-                    />
-                  </UFieldGroup>
-                </UFormField>
-              </div>
+              <!-- Bouton Scanner -->
+              <UButton
+                icon="i-heroicons-qr-code"
+                color="primary"
+                size="xl"
+                variant="soft"
+                class="w-full justify-center h-[52px]"
+                @click="startScanner"
+              >
+                <span class="font-semibold">Scanner un QR code</span>
+              </UButton>
 
               <!-- Bouton de synchronisation HelloAsso -->
               <div
@@ -504,6 +477,7 @@
       <TicketingAddParticipantModal
         v-model:open="showAddParticipantModal"
         :edition-id="editionId"
+        :allow-anonymous-orders="allowAnonymousOrders"
         @order-created="handleOrderCreated"
       />
 
@@ -707,14 +681,21 @@ const { canAccessAccessControl } = useAccessControlPermissions(editionId)
 // SSE pour rafraîchissement automatique
 const { lastUpdate } = useRealtimeStats(editionId)
 
-const ticketCode = ref('')
+// Paramètres de billetterie
+const { settings: ticketingSettings, fetchSettings: fetchTicketingSettings } =
+  useTicketingSettings(editionId)
+
+const allowOnsiteRegistration = computed(
+  () => ticketingSettings.value?.allowOnsiteRegistration ?? true
+)
+const allowAnonymousOrders = computed(() => ticketingSettings.value?.allowAnonymousOrders ?? false)
+
 const scannerOpen = ref(false)
 const participantModalOpen = ref(false)
 const showAddParticipantModal = ref(false)
 const selectedParticipant = ref<any>(null)
 const participantType = ref<'ticket' | 'volunteer'>('ticket')
 const isRefundedOrder = ref(false)
-const validatingTicket = ref(false)
 const searchTerm = ref('')
 const searching = ref(false)
 const searchResults = ref<any>(null)
@@ -753,6 +734,9 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
+
+  // Charger les paramètres de billetterie
+  await fetchTicketingSettings()
 
   // Charger les statistiques et les dernières validations
   await Promise.all([loadStats(), loadRecentValidations(), checkHelloAssoConfig()])
@@ -796,22 +780,12 @@ const startScanner = () => {
   scannerOpen.value = true
 }
 
-const handleScan = (code: string) => {
-  ticketCode.value = code
-  // Valider automatiquement après le scan
-  validateTicket()
-}
-
-const validateTicket = async () => {
-  if (!ticketCode.value || validatingTicket.value) return
-
-  validatingTicket.value = true
-
+const handleScan = async (code: string) => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
       method: 'POST',
       body: {
-        qrCode: ticketCode.value,
+        qrCode: code,
       },
     })
 
@@ -847,9 +821,6 @@ const validateTicket = async () => {
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
-  } finally {
-    validatingTicket.value = false
-    ticketCode.value = ''
   }
 }
 

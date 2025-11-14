@@ -40,6 +40,7 @@
 
             <!-- Option 2 : Participant anonyme -->
             <button
+              v-if="allowAnonymousOrders"
               class="p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-all hover:bg-gray-50 dark:hover:bg-gray-800"
               @click="selectParticipantType('anonymous')"
             >
@@ -833,6 +834,7 @@ interface SelectedItem {
 interface Props {
   open: boolean
   editionId: number
+  allowAnonymousOrders?: boolean
 }
 
 const props = defineProps<Props>()
@@ -848,7 +850,12 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 })
 
-const currentStep = ref(-1) // Démarrer à -1 pour l'étape de choix du type
+// Utiliser une valeur par défaut pour allowAnonymousOrders
+const allowAnonymousOrders = computed(() => props.allowAnonymousOrders ?? false)
+
+// Démarrer à -1 pour l'étape de choix du type si les commandes anonymes sont autorisées, sinon à 0
+const getInitialStep = () => (allowAnonymousOrders.value ? -1 : 0)
+const currentStep = ref(getInitialStep())
 const participantType = ref<'identified' | 'anonymous'>('identified')
 const loading = ref(false)
 const loadingTiers = ref(false)
@@ -1410,7 +1417,7 @@ const searchUserByEmail = async () => {
 
 const closeModal = () => {
   isOpen.value = false
-  currentStep.value = -1 // Retour à l'étape de choix du type
+  currentStep.value = getInitialStep() // Retour à l'étape de choix du type ou directement à l'étape 0
   participantType.value = 'identified' // Réinitialiser au type par défaut
   paymentConfirmed.value = true
   form.value = {

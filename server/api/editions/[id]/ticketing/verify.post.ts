@@ -31,7 +31,9 @@ export default wrapApiHandler(
       // Détecter le type de QR code
       if (body.qrCode.startsWith('volunteer-')) {
         // Recherche d'un bénévole
-        const applicationId = parseInt(body.qrCode.replace('volunteer-', ''))
+        // Format: volunteer-{id}-{token} ou volunteer-{id} (ancien format)
+        const parts = body.qrCode.replace('volunteer-', '').split('-')
+        const applicationId = parseInt(parts[0])
 
         if (isNaN(applicationId)) {
           return {
@@ -41,11 +43,18 @@ export default wrapApiHandler(
           }
         }
 
+        // Si un token est présent, on le vérifie
+        const token = parts[1] || null
+
         const application = await prisma.editionVolunteerApplication.findFirst({
           where: {
             id: applicationId,
             editionId: editionId,
             status: 'ACCEPTED',
+            // Vérifier le token seulement s'il est présent dans le QR code ET dans la base
+            ...(token && {
+              qrCodeToken: token,
+            }),
             // Filtrer les bénévoles disponibles pendant l'événement
             OR: [
               {
@@ -251,7 +260,9 @@ export default wrapApiHandler(
         }
       } else if (body.qrCode.startsWith('artist-')) {
         // Recherche d'un artiste
-        const artistId = parseInt(body.qrCode.replace('artist-', ''))
+        // Format: artist-{id}-{token} ou artist-{id} (ancien format)
+        const parts = body.qrCode.replace('artist-', '').split('-')
+        const artistId = parseInt(parts[0])
 
         if (isNaN(artistId)) {
           return {
@@ -261,10 +272,17 @@ export default wrapApiHandler(
           }
         }
 
+        // Si un token est présent, on le vérifie
+        const token = parts[1] || null
+
         const artist = await prisma.editionArtist.findFirst({
           where: {
             id: artistId,
             editionId: editionId,
+            // Vérifier le token seulement s'il est présent dans le QR code ET dans la base
+            ...(token && {
+              qrCodeToken: token,
+            }),
           },
           include: {
             user: {

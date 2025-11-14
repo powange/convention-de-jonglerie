@@ -43,6 +43,7 @@
         </div>
 
         <button
+          v-if="stats.totalVolunteers > 0"
           class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors cursor-pointer text-left w-full"
           @click="$emit('show-volunteers-not-validated')"
         >
@@ -63,6 +64,7 @@
         </button>
 
         <button
+          v-if="stats.totalArtists > 0"
           class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer text-left w-full"
           @click="$emit('show-artists-not-validated')"
         >
@@ -83,6 +85,7 @@
         </button>
 
         <button
+          v-if="stats.totalOrganizers > 0"
           class="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors cursor-pointer text-left w-full"
           @click="$emit('show-organizers-not-validated')"
         >

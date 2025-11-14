@@ -137,6 +137,8 @@ model Edition {
   volunteersSetupStartDate          DateTime?
   volunteersAskSetup                Boolean                          @default(false)
   volunteersAskTeardown             Boolean                          @default(false)
+  ticketingAllowOnsiteRegistration  Boolean                          @default(true)
+  ticketingAllowAnonymousOrders     Boolean                          @default(false)
   workshopsEnabled                  Boolean                          @default(false)
   workshopLocationsFreeInput        Boolean                          @default(false)
   carpoolOffers                     CarpoolOffer[]
@@ -497,6 +499,7 @@ model EditionVolunteerApplication {
   departureDateTime     String?
   emergencyContactName  String?
   emergencyContactPhone String?
+  qrCodeToken           String?                     @unique
   entryValidated        Boolean                     @default(false)
   entryValidatedAt      DateTime?
   entryValidatedBy      Int?
@@ -516,6 +519,7 @@ model EditionVolunteerApplication {
   @@index([entryValidated])
   @@index([source])
   @@index([addedById])
+  @@index([qrCodeToken])
 }
 
 model Feedback {
@@ -1208,6 +1212,7 @@ model EditionArtist {
   dietaryPreference       DietaryPreference @default(NONE)
   allergies               String?           @db.Text
   allergySeverity         AllergySeverity?
+  qrCodeToken             String?           @unique
   entryValidated          Boolean           @default(false)
   entryValidatedAt        DateTime?
   entryValidatedBy        Int?
@@ -1246,6 +1251,7 @@ model EditionArtist {
   @@index([entryValidatedBy])
   @@index([pickupResponsibleId])
   @@index([dropoffResponsibleId])
+  @@index([qrCodeToken])
 }
 
 model Show {

@@ -11,6 +11,7 @@ import {
 } from '@@/server/utils/editions/volunteers/applications'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import { sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -95,12 +96,39 @@ export default wrapApiHandler(
       await prisma.user.update({ where: { id: authenticatedUser.id }, data: updateData })
     }
 
+    // Générer un token unique
+    let qrCodeToken = generateVolunteerQrCodeToken()
+    let isUnique = false
+    let attempts = 0
+    const maxAttempts = 10
+
+    while (!isUnique && attempts < maxAttempts) {
+      const existingToken = await prisma.editionVolunteerApplication.findUnique({
+        where: { qrCodeToken },
+      })
+
+      if (!existingToken) {
+        isUnique = true
+      } else {
+        qrCodeToken = generateVolunteerQrCodeToken()
+        attempts++
+      }
+    }
+
+    if (!isUnique) {
+      throw createError({
+        statusCode: 500,
+        message: 'Impossible de générer un token unique',
+      })
+    }
+
     const application = await prisma.editionVolunteerApplication.create({
       data: {
         editionId,
         userId: authenticatedUser.id,
         motivation: parsed.motivation || null,
         userSnapshotPhone: finalPhone,
+        qrCodeToken,
         dietaryPreference:
           edition.volunteersAskDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
         allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : null,

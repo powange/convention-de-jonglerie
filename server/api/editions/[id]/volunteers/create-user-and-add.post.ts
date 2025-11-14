@@ -5,6 +5,7 @@ import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import {
   sanitizeEmail,
   sanitizeString,
@@ -259,6 +260,32 @@ export default wrapApiHandler(async (event) => {
     },
   })
 
+  // Générer un token unique
+  let qrCodeToken = generateVolunteerQrCodeToken()
+  let isUnique = false
+  let attempts = 0
+  const maxAttempts = 10
+
+  while (!isUnique && attempts < maxAttempts) {
+    const existingToken = await prisma.editionVolunteerApplication.findUnique({
+      where: { qrCodeToken },
+    })
+
+    if (!existingToken) {
+      isUnique = true
+    } else {
+      qrCodeToken = generateVolunteerQrCodeToken()
+      attempts++
+    }
+  }
+
+  if (!isUnique) {
+    throw createError({
+      statusCode: 500,
+      message: 'Impossible de générer un token unique',
+    })
+  }
+
   // Créer la candidature de bénévole avec le statut ACCEPTED
   const application = await prisma.editionVolunteerApplication.create({
     data: {
@@ -274,6 +301,7 @@ export default wrapApiHandler(async (event) => {
       source: 'MANUAL',
       addedById: user.id,
       addedAt: new Date(),
+      qrCodeToken,
     },
     select: {
       id: true,

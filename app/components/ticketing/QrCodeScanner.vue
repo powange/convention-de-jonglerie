@@ -50,6 +50,28 @@
           variant="soft"
           description="Positionnez le QR code devant la caméra. La détection est automatique."
         />
+
+        <!-- Saisie manuelle du code -->
+        <div class="space-y-2">
+          <UFormField label="Saisie manuelle du code">
+            <UFieldGroup class="w-full">
+              <UInput
+                v-model="manualCode"
+                placeholder="Entrez le code du billet"
+                icon="i-heroicons-ticket"
+                class="w-full"
+                @keydown.enter="handleManualInput"
+              />
+              <UButton
+                label="Valider"
+                icon="i-heroicons-check-circle"
+                color="success"
+                :disabled="!manualCode"
+                @click="handleManualInput"
+              />
+            </UFieldGroup>
+          </UFormField>
+        </div>
       </div>
     </template>
 
@@ -101,6 +123,7 @@ const scanning = ref(false)
 const loading = ref(false)
 const error = ref('')
 const isTransitioning = ref(false)
+const manualCode = ref('')
 let html5QrCode: Html5Qrcode | null = null
 
 // Démarrer le scan
@@ -193,12 +216,22 @@ const stopScanning = async () => {
   }
 }
 
+// Gérer l'input manuel
+const handleManualInput = () => {
+  if (!manualCode.value) return
+
+  // Émettre le code saisi manuellement
+  emit('scan', manualCode.value)
+  close()
+}
+
 // Fermer la modal
 const close = () => {
   stopScanning()
   isOpen.value = false
   error.value = ''
   loading.value = false
+  manualCode.value = ''
 }
 
 // Arrêter le scan si la modal se ferme

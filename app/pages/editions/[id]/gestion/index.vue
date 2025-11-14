@@ -265,6 +265,15 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Configuration billetterie -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/config`"
+                icon="i-heroicons-cog-6-tooth"
+                :title="$t('gestion.ticketing.config_title')"
+                :description="$t('gestion.ticketing.config_description')"
+                color="blue"
+              />
+
               <!-- Lier une billeterie externe -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/external`"

@@ -318,6 +318,10 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-ticket',
       children: [
         {
+          label: t('gestion.ticketing.config_title'),
+          to: `/editions/${editionId.value}/gestion/ticketing/config`,
+        },
+        {
           label: t('gestion.ticketing.external_link_title'),
           to: `/editions/${editionId.value}/gestion/ticketing/external`,
         },

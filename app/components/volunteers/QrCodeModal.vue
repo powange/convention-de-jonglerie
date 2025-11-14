@@ -93,9 +93,18 @@ const isOpen = computed({
 })
 
 const applicationId = computed(() => props.application?.id)
+const qrCodeToken = computed(() => props.application?.qrCodeToken)
 
 const qrCodeValue = computed(() => {
-  return applicationId.value ? `volunteer-${applicationId.value}` : ''
+  if (!applicationId.value) return ''
+
+  // Nouveau format avec token si disponible
+  if (qrCodeToken.value) {
+    return `volunteer-${applicationId.value}-${qrCodeToken.value}`
+  }
+
+  // Ancien format sans token (rétrocompatibilité)
+  return `volunteer-${applicationId.value}`
 })
 
 const getEditionDisplayName = (edition: any) => {
