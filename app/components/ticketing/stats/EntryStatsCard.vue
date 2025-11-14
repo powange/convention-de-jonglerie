@@ -8,13 +8,15 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Total des entrées validées -->
-        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <div
+          class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-white dark:border-white"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ $t('edition.ticketing.total_entries') }}
               </p>
-              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
                 {{ stats.totalValidated }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
@@ -22,7 +24,7 @@
                 {{ $t('edition.ticketing.validated_today').toLowerCase() }}
               </p>
             </div>
-            <UIcon name="i-heroicons-users" class="text-blue-500" size="32" />
+            <UIcon name="i-heroicons-users" class="text-gray-600 dark:text-gray-400" size="32" />
           </div>
         </div>
 
