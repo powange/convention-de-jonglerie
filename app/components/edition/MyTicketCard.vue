@@ -130,6 +130,9 @@
 </template>
 
 <script setup lang="ts">
+// Charger les traductions ticketing pour ce composant
+await useLazyI18n('ticketing')
+
 interface Ticket {
   id: number
   firstName: string
