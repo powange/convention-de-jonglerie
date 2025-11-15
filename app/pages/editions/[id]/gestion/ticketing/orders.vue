@@ -184,7 +184,21 @@
                     value-key="value"
                     size="md"
                     class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
                   >
+                    <template #default="{ modelValue }">
+                      <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                        {{ modelValue.length }}
+                        {{
+                          modelValue.length > 1
+                            ? $t('common.items_selected')
+                            : $t('common.item_selected')
+                        }}
+                      </span>
+                      <span v-else class="text-gray-400 dark:text-gray-500">
+                        Sélectionner des tarifs
+                      </span>
+                    </template>
                     <template #item-label="{ item }">
                       <div class="flex items-center justify-between w-full">
                         <span>{{ item.label }}</span>
@@ -208,6 +222,7 @@
                     value-key="value"
                     size="md"
                     class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </div>
               </div>

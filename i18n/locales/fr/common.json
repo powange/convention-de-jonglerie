@@ -184,6 +184,8 @@
     "see_less": "Voir moins",
     "see_more": "Voir plus",
     "select": "Sélectionner",
+    "item_selected": "élément sélectionné",
+    "items_selected": "éléments sélectionnés",
     "show_less": "Afficher moins",
     "show_more": "Afficher plus",
     "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)",

@@ -128,17 +128,58 @@
         <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Filtres de type -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_type')">
-            <USelect v-model="selectedTypes" :items="typeItems" multiple value-key="value" />
+            <USelect
+              v-model="selectedTypes"
+              :items="typeItems"
+              multiple
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            >
+              <template #default="{ modelValue }">
+                <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                  {{ modelValue.length }}
+                  {{
+                    modelValue.length > 1 ? $t('common.items_selected') : $t('common.item_selected')
+                  }}
+                </span>
+                <span v-else class="text-gray-400 dark:text-gray-500">
+                  {{ $t('common.select') }}
+                </span>
+              </template>
+            </USelect>
           </UFormField>
 
           <!-- Filtres de période -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_period')">
-            <USelect v-model="selectedPeriods" :items="periodItems" multiple value-key="value" />
+            <USelect
+              v-model="selectedPeriods"
+              :items="periodItems"
+              multiple
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            >
+              <template #default="{ modelValue }">
+                <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                  {{ modelValue.length }}
+                  {{
+                    modelValue.length > 1 ? $t('common.items_selected') : $t('common.item_selected')
+                  }}
+                </span>
+                <span v-else class="text-gray-400 dark:text-gray-500">
+                  {{ $t('common.select') }}
+                </span>
+              </template>
+            </USelect>
           </UFormField>
 
           <!-- Granularité -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_granularity')">
-            <USelect v-model="selectedGranularity" :items="granularityItems" value-key="value" />
+            <USelect
+              v-model="selectedGranularity"
+              :items="granularityItems"
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            />
           </UFormField>
         </div>
 
@@ -237,7 +278,21 @@
                 value-key="value"
                 :placeholder="$t('gestion.ticketing.stats_filter_tiers_placeholder')"
                 :ui="{ content: 'min-w-fit' }"
-              />
+              >
+                <template #default="{ modelValue }">
+                  <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                    {{ modelValue.length }}
+                    {{
+                      modelValue.length > 1
+                        ? $t('common.items_selected')
+                        : $t('common.item_selected')
+                    }}
+                  </span>
+                  <span v-else class="text-gray-400 dark:text-gray-500">
+                    {{ $t('gestion.ticketing.stats_filter_tiers_placeholder') }}
+                  </span>
+                </template>
+              </USelect>
             </UFormField>
           </div>
 
@@ -271,12 +326,24 @@
           <!-- Filtres de type -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_type')">
             <USelect
-              v-model="selectedTypes"
+              v-model="selectedPurchaseTypes"
               :items="typeItemsPurchases"
               multiple
               value-key="value"
               :ui="{ content: 'min-w-fit' }"
-            />
+            >
+              <template #default="{ modelValue }">
+                <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                  {{ modelValue.length }}
+                  {{
+                    modelValue.length > 1 ? $t('common.items_selected') : $t('common.item_selected')
+                  }}
+                </span>
+                <span v-else class="text-gray-400 dark:text-gray-500">
+                  {{ $t('common.select') }}
+                </span>
+              </template>
+            </USelect>
           </UFormField>
 
           <!-- Granularité -->
@@ -540,7 +607,7 @@ const tierItems = computed(() =>
   }))
 )
 
-// Filtres sélectionnés
+// Filtres sélectionnés pour les validations d'entrée
 const selectedTypes = ref<string[]>([
   'participants',
   'volunteers',
@@ -550,12 +617,15 @@ const selectedTypes = ref<string[]>([
 ])
 const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
 const selectedGranularity = ref<number>(60) // Par défaut 1h
+
+// Filtres sélectionnés pour les achats de billets
+const selectedPurchaseTypes = ref<string[]>(['participants', 'others'])
 const selectedPurchaseGranularity = ref<number>(1440) // Par défaut 1 jour
 
 // Filtres calculés pour compatibilité avec le code existant
 const filters = computed(() => ({
-  showParticipants: selectedTypes.value.includes('participants'),
-  showOthers: selectedTypes.value.includes('others'),
+  showParticipants: selectedPurchaseTypes.value.includes('participants'),
+  showOthers: selectedPurchaseTypes.value.includes('others'),
   showVolunteers: selectedTypes.value.includes('volunteers'),
   showArtists: selectedTypes.value.includes('artists'),
   showOrganizers: selectedTypes.value.includes('organizers'),
@@ -676,12 +746,18 @@ const filteredData = computed(() => {
   })
 
   return {
-    labels: filteredIndices.map((i) => labels[i]),
-    participants: filteredIndices.map((i) => participants[i]),
-    volunteers: filteredIndices.map((i) => volunteers[i]),
-    artists: filteredIndices.map((i) => artists[i]),
-    organizers: filteredIndices.map((i) => organizers[i]),
-    others: filteredIndices.map((i) => others[i]),
+    labels: filteredIndices.map((i) => labels[i]).filter((v): v is string => v !== undefined),
+    participants: filteredIndices
+      .map((i) => participants[i])
+      .filter((v): v is number => v !== undefined),
+    volunteers: filteredIndices
+      .map((i) => volunteers[i])
+      .filter((v): v is number => v !== undefined),
+    artists: filteredIndices.map((i) => artists[i]).filter((v): v is number => v !== undefined),
+    organizers: filteredIndices
+      .map((i) => organizers[i])
+      .filter((v): v is number => v !== undefined),
+    others: filteredIndices.map((i) => others[i]).filter((v): v is number => v !== undefined),
   }
 })
 
