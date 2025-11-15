@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
-import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
@@ -10,8 +10,9 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const conventionId = validateConventionId(event)
 
-    const permission = await checkUserConventionPermission(conventionId, user.id)
-    if (!permission.hasPermission) throw createError({ statusCode: 403, message: 'Accès refusé' })
+    // Vérifier les permissions de lecture (inclut le mode admin)
+    const canAccess = await canAccessConvention(conventionId, user.id, event)
+    if (!canAccess) throw createError({ statusCode: 403, message: 'Accès refusé' })
 
     const history = await prisma.organizerPermissionHistory.findMany({
       where: { conventionId },

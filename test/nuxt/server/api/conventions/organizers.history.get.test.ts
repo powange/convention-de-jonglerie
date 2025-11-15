@@ -2,14 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/organizer-management', () => ({
-  checkUserConventionPermission: vi.fn(),
+  canAccessConvention: vi.fn(),
 }))
 
-import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers/history.get'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
-const mockCheck = checkUserConventionPermission as ReturnType<typeof vi.fn>
+const mockCanAccess = canAccessConvention as ReturnType<typeof vi.fn>
 
 const baseEvent = {
   context: {
@@ -20,12 +20,12 @@ const baseEvent = {
 
 describe('/api/conventions/[id]/organizers/history GET', () => {
   beforeEach(() => {
-    mockCheck.mockReset()
+    mockCanAccess.mockReset()
     prismaMock.organizerPermissionHistory.findMany.mockReset()
   })
 
   it("retourne l'historique avec actor & targetUser + avatars", async () => {
-    mockCheck.mockResolvedValue({ hasPermission: true })
+    mockCanAccess.mockResolvedValue(true)
     const history = [
       {
         id: 1,
@@ -93,14 +93,43 @@ describe('/api/conventions/[id]/organizers/history GET', () => {
   })
 
   it('rejette si pas permission', async () => {
-    mockCheck.mockResolvedValue({ hasPermission: false })
+    mockCanAccess.mockResolvedValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Accès refusé')
   })
 
   it('retourne tableau vide si aucun historique', async () => {
-    mockCheck.mockResolvedValue({ hasPermission: true })
+    mockCanAccess.mockResolvedValue(true)
     prismaMock.organizerPermissionHistory.findMany.mockResolvedValue([])
     const res = await handler(baseEvent as any)
     expect(res).toEqual([])
+  })
+
+  it('permet accès à un organisateur sans aucun droit spécifique', async () => {
+    // Un organisateur avec tous les droits à false peut quand même consulter l'historique
+    mockCanAccess.mockResolvedValue(true)
+    const history = [
+      {
+        id: 1,
+        changeType: 'CREATED',
+        createdAt: new Date(),
+        before: {},
+        after: {},
+        actorId: 1,
+        targetUserId: 3,
+        actor: { id: 1, pseudo: 'Admin', profilePicture: null, email: 'admin@test.com' },
+        targetUser: { id: 3, pseudo: 'Viewer', profilePicture: null, email: 'viewer@test.com' },
+      },
+    ] as any
+    prismaMock.organizerPermissionHistory.findMany.mockResolvedValue(history)
+
+    const eventAsViewer = {
+      ...baseEvent,
+      context: { ...baseEvent.context, user: { id: 3 } },
+    }
+
+    const res = await handler(eventAsViewer as any)
+    expect(res).toHaveLength(1)
+    expect(res[0].targetUser.pseudo).toBe('Viewer')
+    expect(mockCanAccess).toHaveBeenCalledWith(7, 3, eventAsViewer)
   })
 })

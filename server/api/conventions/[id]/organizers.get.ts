@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
@@ -9,10 +9,10 @@ export default wrapApiHandler(
     const conventionId = validateConventionId(event)
     const user = requireAuth(event)
 
-    // Vérifier les permissions de l'utilisateur sur la convention
-    const permission = await checkUserConventionPermission(conventionId, user.id)
+    // Vérifier les permissions de l'utilisateur sur la convention (inclut le mode admin)
+    const canAccess = await canAccessConvention(conventionId, user.id, event)
 
-    if (!permission.hasPermission) {
+    if (!canAccess) {
       throw createError({
         statusCode: 403,
         message: "Vous n'avez pas accès à cette convention",

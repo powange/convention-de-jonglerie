@@ -7,6 +7,7 @@ import type {
   OrganizerRemovalSnapshot,
   PrismaTransaction,
 } from '../types/prisma-helpers'
+import type { H3Event } from 'h3'
 
 /**
  * Vérifie si un utilisateur a les droits d'admin ET que le mode admin est activé
@@ -77,6 +78,24 @@ export async function checkUserConventionPermission(
     isOwner,
     isOrganizer: !!organizer,
   }
+}
+
+/**
+ * Vérifie si un utilisateur peut accéder à une convention (lecture seule)
+ * Prend en compte le mode admin
+ */
+export async function canAccessConvention(
+  conventionId: number,
+  userId: number,
+  event?: H3Event
+): Promise<boolean> {
+  // Vérifier le mode admin en premier
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  // Sinon, vérifier les permissions normales
+  const permission = await checkUserConventionPermission(conventionId, userId)
+  return permission.hasPermission
 }
 
 /**

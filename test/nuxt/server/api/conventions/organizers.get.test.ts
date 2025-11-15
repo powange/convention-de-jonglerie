@@ -2,14 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/organizer-management', () => ({
-  checkUserConventionPermission: vi.fn(),
+  canAccessConvention: vi.fn(),
 }))
 
-import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '@@/server/utils/organizer-management'
 import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/conventions/[id]/organizers.get'
 
-const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>
+const mockCanAccess = canAccessConvention as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -24,7 +24,7 @@ const mockEvent = {
 
 describe('/api/conventions/[id]/organizers GET', () => {
   beforeEach(() => {
-    mockCheckPermission.mockReset()
+    mockCanAccess.mockReset()
     prismaMock.conventionOrganizer.findMany.mockReset()
   })
 
@@ -78,12 +78,7 @@ describe('/api/conventions/[id]/organizers GET', () => {
       },
     ]
 
-    mockCheckPermission.mockResolvedValue({
-      hasPermission: true,
-      userRole: 'ADMINISTRATOR',
-      isOwner: true,
-      isOrganizer: false,
-    })
+    mockCanAccess.mockResolvedValue(true)
     // données brutes renvoyées par Prisma avant mapping
     const raw = mockOrganizers.map((c) => ({
       id: c.id,
@@ -104,7 +99,7 @@ describe('/api/conventions/[id]/organizers GET', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual(mockOrganizers)
-    expect(mockCheckPermission).toHaveBeenCalledWith(1, 1)
+    expect(mockCanAccess).toHaveBeenCalledWith(1, 1, mockEvent)
     expect(prismaMock.conventionOrganizer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { conventionId: 1 } })
     )
@@ -120,12 +115,7 @@ describe('/api/conventions/[id]/organizers GET', () => {
   })
 
   it('devrait rejeter si utilisateur sans permissions', async () => {
-    mockCheckPermission.mockResolvedValue({
-      hasPermission: false,
-      userRole: undefined,
-      isOwner: false,
-      isOrganizer: false,
-    })
+    mockCanAccess.mockResolvedValue(false)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
       "Vous n'avez pas accès à cette convention"
@@ -138,14 +128,14 @@ describe('/api/conventions/[id]/organizers GET', () => {
       context: { ...mockEvent.context, params: { id: 'invalid' } },
     }
 
-    // checkUserConventionPermission va lever une erreur pour un ID invalide
-    mockCheckPermission.mockRejectedValue(new Error('Convention ID invalide'))
+    // canAccessConvention va lever une erreur pour un ID invalide
+    mockCanAccess.mockRejectedValue(new Error('Convention ID invalide'))
 
     await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    mockCheckPermission.mockRejectedValue(new Error('Database error'))
+    mockCanAccess.mockRejectedValue(new Error('Database error'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
@@ -170,12 +160,7 @@ describe('/api/conventions/[id]/organizers GET', () => {
       },
     ]
 
-    mockCheckPermission.mockResolvedValue({
-      hasPermission: true,
-      userRole: 'MODERATOR',
-      isOwner: false,
-      isOrganizer: true,
-    })
+    mockCanAccess.mockResolvedValue(true)
     const raw = mockOrganizers.map((c) => ({
       id: c.id,
       addedAt: c.addedAt,
@@ -200,16 +185,11 @@ describe('/api/conventions/[id]/organizers GET', () => {
     const result = await handler(eventAsModerator as any)
 
     expect(result).toEqual(mockOrganizers)
-    expect(mockCheckPermission).toHaveBeenCalledWith(1, 2)
+    expect(mockCanAccess).toHaveBeenCalledWith(1, 2, eventAsModerator)
   })
 
   it("devrait retourner un tableau vide s'il n'y a pas de organisateurs", async () => {
-    mockCheckPermission.mockResolvedValue({
-      hasPermission: true,
-      userRole: 'ADMINISTRATOR',
-      isOwner: true,
-      isOrganizer: false,
-    })
+    mockCanAccess.mockResolvedValue(true)
     prismaMock.conventionOrganizer.findMany.mockResolvedValue([])
 
     const result = await handler(mockEvent as any)
@@ -224,17 +204,12 @@ describe('/api/conventions/[id]/organizers GET', () => {
       context: { ...mockEvent.context, params: { id: '123' } },
     }
 
-    mockCheckPermission.mockResolvedValue({
-      hasPermission: true,
-      userRole: 'ADMINISTRATOR',
-      isOwner: true,
-      isOrganizer: false,
-    })
+    mockCanAccess.mockResolvedValue(true)
     prismaMock.conventionOrganizer.findMany.mockResolvedValue([])
 
     await handler(eventWithStringId as any)
 
-    expect(mockCheckPermission).toHaveBeenCalledWith(123, 1)
+    expect(mockCanAccess).toHaveBeenCalledWith(123, 1, eventWithStringId)
     expect(prismaMock.conventionOrganizer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { conventionId: 123 } })
     )
@@ -246,8 +221,42 @@ describe('/api/conventions/[id]/organizers GET', () => {
       statusMessage: 'Convention introuvable',
     }
 
-    mockCheckPermission.mockRejectedValue(httpError)
+    mockCanAccess.mockRejectedValue(httpError)
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
+  })
+
+  it('devrait permettre accès à un organisateur sans aucun droit spécifique', async () => {
+    // Un organisateur avec tous les droits à false peut quand même consulter la liste
+    const mockOrganizers = [
+      {
+        id: 1,
+        addedAt: new Date('2024-01-01'),
+        title: 'Organisateur sans droits',
+        canEditConvention: false,
+        canDeleteConvention: false,
+        canManageOrganizers: false,
+        canAddEdition: false,
+        canEditAllEditions: false,
+        canDeleteAllEditions: false,
+        perEditionPermissions: [],
+        user: { id: 3, pseudo: 'viewer' },
+        addedBy: { id: 1, pseudo: 'creator' },
+      },
+    ]
+
+    mockCanAccess.mockResolvedValue(true)
+    prismaMock.conventionOrganizer.findMany.mockResolvedValue(mockOrganizers as any)
+
+    const eventAsViewer = {
+      ...mockEvent,
+      context: { ...mockEvent.context, user: { id: 3, pseudo: 'viewer' } },
+    }
+
+    const result = await handler(eventAsViewer as any)
+
+    expect(result).toHaveLength(1)
+    expect(result[0].title).toBe('Organisateur sans droits')
+    expect(mockCanAccess).toHaveBeenCalledWith(1, 3, eventAsViewer)
   })
 })

@@ -2,14 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../server/utils/organizer-management', () => ({
-  checkUserConventionPermission: vi.fn(),
+  canAccessConvention: vi.fn(),
 }))
 
-import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/editions.get'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
-const mockCheck = checkUserConventionPermission as ReturnType<typeof vi.fn>
+const mockCanAccess = canAccessConvention as ReturnType<typeof vi.fn>
 
 const baseEvent = {
   context: {
@@ -20,17 +20,12 @@ const baseEvent = {
 
 describe('/api/conventions/[id]/editions GET', () => {
   beforeEach(() => {
-    mockCheck.mockReset()
+    mockCanAccess.mockReset()
     prismaMock.edition.findMany.mockReset()
   })
 
   it('retourne les editions avec succès', async () => {
-    mockCheck.mockResolvedValue({
-      hasPermission: true,
-      userRole: 'ADMINISTRATOR',
-      isOwner: true,
-      isOrganizer: false,
-    })
+    mockCanAccess.mockResolvedValue(true)
     const editions = [
       {
         id: 1,
@@ -62,7 +57,7 @@ describe('/api/conventions/[id]/editions GET', () => {
   })
 
   it('rejette si pas de permission', async () => {
-    mockCheck.mockResolvedValue({ hasPermission: false })
+    mockCanAccess.mockResolvedValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Accès refusé')
   })
 
@@ -72,14 +67,14 @@ describe('/api/conventions/[id]/editions GET', () => {
   })
 
   it('retourne tableau vide si aucune édition', async () => {
-    mockCheck.mockResolvedValue({ hasPermission: true })
+    mockCanAccess.mockResolvedValue(true)
     prismaMock.edition.findMany.mockResolvedValue([])
     const res = await handler(baseEvent as any)
     expect(res).toEqual([])
   })
 
   it('accepte conversion ID numérique', async () => {
-    mockCheck.mockResolvedValue({ hasPermission: true })
+    mockCanAccess.mockResolvedValue(true)
     prismaMock.edition.findMany.mockResolvedValue([])
     const ev = { ...baseEvent, context: { ...baseEvent.context, params: { id: '42' } } }
     await handler(ev as any)
@@ -87,5 +82,23 @@ describe('/api/conventions/[id]/editions GET', () => {
       where: { conventionId: 42 },
       select: { id: true, name: true, startDate: true, endDate: true },
     })
+  })
+
+  it('permet accès à un organisateur sans aucun droit spécifique', async () => {
+    // Un organisateur avec tous les droits à false peut quand même accéder
+    mockCanAccess.mockResolvedValue(true)
+    const editions = [
+      {
+        id: 1,
+        name: 'Edition accessible',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-01-05'),
+      },
+    ]
+    prismaMock.edition.findMany.mockResolvedValue(editions)
+
+    const res = await handler(baseEvent as any)
+    expect(res).toEqual(editions)
+    expect(mockCanAccess).toHaveBeenCalledWith(1, 10, baseEvent)
   })
 })

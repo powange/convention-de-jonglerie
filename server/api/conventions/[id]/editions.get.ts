@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { checkUserConventionPermission } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
@@ -9,8 +9,8 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const conventionId = validateConventionId(event)
 
-    const perm = await checkUserConventionPermission(conventionId, user.id)
-    if (!perm.hasPermission) {
+    const canAccess = await canAccessConvention(conventionId, user.id, event)
+    if (!canAccess) {
       throw createError({ statusCode: 403, message: 'Accès refusé' })
     }
 
