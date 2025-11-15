@@ -80,6 +80,33 @@
         />
       </div>
 
+      <!-- Modal de détails du créneau (point d'entrée) -->
+      <EditionVolunteerPlanningSlotDetailsModal
+        v-model="slotDetailsModalOpen"
+        :time-slot="selectedTimeSlot"
+        :teams="[...teams]"
+        :read-only="!canManageVolunteers"
+        @edit-slot="handleEditSlotFromDetails"
+        @manage-assignments="handleManageAssignments"
+        @manage-delay="handleManageDelay"
+      />
+
+      <!-- Modal de gestion des assignations -->
+      <EditionVolunteerPlanningAssignmentsModal
+        v-model="assignmentsModalOpen"
+        :edition-id="editionId"
+        :time-slot="selectedTimeSlot"
+        @refresh="refreshData"
+      />
+
+      <!-- Modal de gestion des retards -->
+      <EditionVolunteerPlanningDelayModal
+        v-model="delayModalOpen"
+        :edition-id="editionId"
+        :time-slot="selectedTimeSlot"
+        @refresh="refreshData"
+      />
+
       <!-- Modal de création/édition de créneau -->
       <SlotModal
         v-model="slotModalOpen"
@@ -134,7 +161,11 @@ const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par d
 // Données des bénévoles
 const volunteers = ref<any[]>([]) // Applications de bénévoles
 
-// État de la modal
+// État des modals
+const slotDetailsModalOpen = ref(false)
+const selectedTimeSlot = ref<any>(null)
+const assignmentsModalOpen = ref(false)
+const delayModalOpen = ref(false)
 const slotModalOpen = ref(false)
 const slotModalData = ref<any>(null)
 
@@ -156,7 +187,9 @@ const convertedTimeSlots = computed(() => {
       assignedVolunteers: slot.assignedVolunteers,
       color: slot.color,
       description: slot.description,
+      delayMinutes: slot.delayMinutes,
       assignedVolunteersList: [...(slot.assignments || [])], // Copie directe des assignments
+      editionId, // Ajouter l'editionId au slot
     })
   )
 })
@@ -191,16 +224,33 @@ const handleCreateSlot = (data: { start: string; end: string; teamId: string }) 
 }
 
 const handleSlotClick = (slot: any) => {
-  slotModalData.value = {
-    id: slot.id,
-    title: slot.title,
-    description: slot.description || '',
-    teamId: slot.teamId || '',
-    startDateTime: toDatetimeLocal(slot.start),
-    endDateTime: toDatetimeLocal(slot.end),
-    maxVolunteers: slot.maxVolunteers,
+  // Ouvrir la modal de détails (point d'entrée)
+  selectedTimeSlot.value = slot
+  slotDetailsModalOpen.value = true
+}
+
+const handleEditSlotFromDetails = () => {
+  // Préparer les données pour la modal d'édition
+  if (selectedTimeSlot.value) {
+    slotModalData.value = {
+      id: selectedTimeSlot.value.id,
+      title: selectedTimeSlot.value.title,
+      description: selectedTimeSlot.value.description || '',
+      teamId: selectedTimeSlot.value.teamId || '',
+      startDateTime: toDatetimeLocal(selectedTimeSlot.value.start),
+      endDateTime: toDatetimeLocal(selectedTimeSlot.value.end),
+      maxVolunteers: selectedTimeSlot.value.maxVolunteers,
+    }
+    slotModalOpen.value = true
   }
-  slotModalOpen.value = true
+}
+
+const handleManageAssignments = () => {
+  assignmentsModalOpen.value = true
+}
+
+const handleManageDelay = () => {
+  delayModalOpen.value = true
 }
 
 const handleSlotUpdate = async (data: {
@@ -638,7 +688,10 @@ const mealTimeWarnings = computed(() => {
 
 // Données pour le composant d'auto-assignation
 const acceptedVolunteers = computed(() => {
-  return volunteers.value?.filter((v) => v.status === 'ACCEPTED') || []
+  if (!volunteers.value || !Array.isArray(volunteers.value)) {
+    return []
+  }
+  return volunteers.value.filter((v) => v.status === 'ACCEPTED')
 })
 
 // Fonction pour récupérer les bénévoles acceptés

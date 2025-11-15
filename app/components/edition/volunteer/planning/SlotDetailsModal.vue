@@ -1,33 +1,68 @@
 <template>
-  <UModal v-model:open="isOpen" size="lg">
-    <template #header>
-      <div class="flex items-center gap-3">
-        <div class="p-2 rounded-full bg-primary-100 dark:bg-primary-900">
-          <UIcon
-            name="i-heroicons-information-circle"
-            class="w-5 h-5 text-primary-600 dark:text-primary-400"
-          />
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ timeSlot?.title || t('edition.volunteers.untitled_slot') }}
-          </h3>
-          <div class="flex items-center gap-2 mt-1">
-            <div
-              v-if="teamColor"
-              class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-              :style="{ backgroundColor: teamColor }"
-            ></div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ teamName || t('edition.volunteers.no_team') }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </template>
-
+  <UModal v-model:open="isOpen" size="lg" :title="modalTitle" :description="modalDescription">
     <template #body>
-      <div class="space-y-6">
+      <!-- Mode édition : afficher les options -->
+      <div v-if="!readOnly" class="space-y-3">
+        <UButton
+          color="primary"
+          variant="soft"
+          block
+          size="lg"
+          class="justify-start"
+          @click="handleEditSlot"
+        >
+          <template #leading>
+            <UIcon name="i-heroicons-pencil-square" class="w-5 h-5" />
+          </template>
+          <div class="flex flex-col items-start">
+            <span class="font-semibold">{{ t('edition.volunteers.edit_slot') }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              t('edition.volunteers.edit_slot_description')
+            }}</span>
+          </div>
+        </UButton>
+
+        <UButton
+          color="primary"
+          variant="soft"
+          block
+          size="lg"
+          class="justify-start"
+          @click="handleManageAssignments"
+        >
+          <template #leading>
+            <UIcon name="i-heroicons-users" class="w-5 h-5" />
+          </template>
+          <div class="flex flex-col items-start">
+            <span class="font-semibold">{{ t('edition.volunteers.manage_assignments') }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              t('edition.volunteers.manage_assignments_description')
+            }}</span>
+          </div>
+        </UButton>
+
+        <UButton
+          color="primary"
+          variant="soft"
+          block
+          size="lg"
+          class="justify-start"
+          @click="handleManageDelay"
+        >
+          <template #leading>
+            <UIcon name="i-heroicons-clock" class="w-5 h-5" />
+          </template>
+          <div class="flex flex-col items-start">
+            <span class="font-semibold">{{ t('edition.volunteers.manage_delay') }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              t('edition.volunteers.manage_delay_description')
+            }}</span>
+          </div>
+        </UButton>
+      </div>
+
+      <!-- Mode lecture seule : afficher les détails -->
+      <div v-else class="space-y-6">
         <!-- Description -->
         <div v-if="timeSlot?.description" class="space-y-2">
           <div class="flex items-center gap-2">
@@ -127,12 +162,6 @@
         </div>
       </div>
     </template>
-
-    <template #footer>
-      <div class="flex justify-end items-center pt-4 border-t border-gray-200 dark:border-gray-700">
-        <UButton color="primary" @click="close">{{ t('common.close') }}</UButton>
-      </div>
-    </template>
   </UModal>
 </template>
 
@@ -158,12 +187,16 @@ interface Props {
   modelValue: boolean
   timeSlot: VolunteerTimeSlot | null
   teams: VolunteerTeam[]
+  readOnly?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  readOnly: true,
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
+  (e: 'edit-slot' | 'manage-assignments' | 'manage-delay'): void
 }>()
 
 const { t } = useI18n()
@@ -178,17 +211,14 @@ const isOpen = computed({
 // Assignations
 const assignments = ref<Assignment[]>([])
 
-// Équipe
-const teamName = computed(() => {
-  if (!props.timeSlot?.teamId) return null
-  const team = props.teams.find((t) => t.id === props.timeSlot?.teamId)
-  return team?.name
+// Titre et description de la modal
+const modalTitle = computed(() => {
+  return props.timeSlot?.title || t('edition.volunteers.untitled_slot')
 })
 
-const teamColor = computed(() => {
-  if (!props.timeSlot?.teamId) return null
+const modalDescription = computed(() => {
   const team = props.teams.find((t) => t.id === props.timeSlot?.teamId)
-  return team?.color
+  return team?.name || t('edition.volunteers.no_team')
 })
 
 // Durée
@@ -234,7 +264,13 @@ const fetchAssignments = async () => {
     return
   }
 
-  // Sinon, charger depuis l'API (fallback)
+  // Sinon, charger depuis l'API (fallback) - seulement si editionId est disponible
+  if (!props.timeSlot.editionId) {
+    console.warn("[SlotDetailsModal] Pas d'editionId disponible pour charger les assignations")
+    assignments.value = []
+    return
+  }
+
   try {
     const data = await $fetch<any[]>(
       `/api/editions/${props.timeSlot.editionId}/volunteer-time-slots/${props.timeSlot.id}/assignments`
@@ -249,6 +285,22 @@ const fetchAssignments = async () => {
 // Fermer la modal
 const close = () => {
   isOpen.value = false
+}
+
+// Fonctions de gestion des options
+const handleEditSlot = () => {
+  emit('edit-slot')
+  close()
+}
+
+const handleManageAssignments = () => {
+  emit('manage-assignments')
+  close()
+}
+
+const handleManageDelay = () => {
+  emit('manage-delay')
+  close()
 }
 
 // Watcher pour charger les assignations quand la modal s'ouvre

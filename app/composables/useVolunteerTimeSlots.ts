@@ -12,6 +12,7 @@ export interface VolunteerTimeSlotAPI {
   }
   maxVolunteers: number
   assignedVolunteers: number
+  delayMinutes?: number | null
   assignments: Array<{
     id: string
     user: {

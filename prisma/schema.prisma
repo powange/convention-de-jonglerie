@@ -788,6 +788,7 @@ model VolunteerTimeSlot {
   endDateTime        DateTime
   maxVolunteers      Int      @default(1)
   assignedVolunteers Int      @default(0)
+  delayMinutes       Int?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

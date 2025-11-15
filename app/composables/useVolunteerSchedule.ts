@@ -18,6 +18,8 @@ export interface VolunteerTimeSlot {
   assignedVolunteers: number
   color?: string
   description?: string
+  editionId?: number
+  delayMinutes?: number | null
   assignedVolunteersList?: Array<{
     id: string
     user: {

@@ -2,7 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const assignVolunteerSchema = z.object({
@@ -16,7 +16,7 @@ export default wrapApiHandler(
 
     // Validation des paramètres
     const editionId = validateEditionId(event)
-    const slotId = validateResourceId(event, 'slotId', 'créneau')
+    const slotId = validateStringId(event, 'slotId', 'créneau')
 
     // Vérifier les permissions de gestion des bénévoles
     await requireVolunteerManagementAccess(event, editionId)

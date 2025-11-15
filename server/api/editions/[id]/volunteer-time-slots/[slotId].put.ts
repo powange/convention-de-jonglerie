@@ -2,7 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const updateTimeSlotSchema = z
@@ -19,6 +19,7 @@ const updateTimeSlotSchema = z
       .transform((str) => new Date(str))
       .optional(),
     maxVolunteers: z.number().int().min(1).max(50).optional(),
+    delayMinutes: z.number().int().nullable().optional(),
   })
   .refine(
     (data) => {
@@ -40,7 +41,7 @@ export default wrapApiHandler(
 
     // Validation des paramètres
     const editionId = validateEditionId(event)
-    const slotId = validateResourceId(event, 'slotId', 'créneau')
+    const slotId = validateStringId(event, 'slotId', 'créneau')
 
     // Vérifier les permissions de gestion des bénévoles
     await requireVolunteerManagementAccess(event, editionId)
@@ -123,6 +124,7 @@ export default wrapApiHandler(
     if (body.startDateTime !== undefined) updateData.startDateTime = body.startDateTime
     if (body.endDateTime !== undefined) updateData.endDateTime = body.endDateTime
     if (body.maxVolunteers !== undefined) updateData.maxVolunteers = body.maxVolunteers
+    if (body.delayMinutes !== undefined) updateData.delayMinutes = body.delayMinutes
 
     const timeSlot = await prisma.volunteerTimeSlot.update({
       where: { id: slotId },

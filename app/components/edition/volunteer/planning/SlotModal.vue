@@ -205,75 +205,6 @@
             </template>
           </UFormField>
         </div>
-
-        <!-- Section assignations -->
-        <div
-          v-if="formState.id"
-          class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 space-y-4"
-        >
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-user-plus" class="w-4 h-4 text-orange-600" />
-              <h4 class="text-sm font-medium text-orange-800 dark:text-orange-200">
-                {{ t('edition.volunteers.assigned_volunteers') }}
-              </h4>
-            </div>
-            <UBadge color="warning" variant="soft" size="sm">
-              {{ assignments.length }}/{{ formState.maxVolunteers }}
-            </UBadge>
-          </div>
-
-          <!-- Bénévoles assignés -->
-          <div v-if="assignments.length > 0" class="space-y-2">
-            <div
-              v-for="assignment in assignments"
-              :key="assignment.id"
-              class="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-md border"
-            >
-              <div class="flex items-center gap-2">
-                <UiUserAvatar :user="assignment.user" size="sm" />
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ assignment.user.pseudo }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ assignment.user.prenom }} {{ assignment.user.nom }}
-                  </p>
-                </div>
-              </div>
-              <UButton
-                v-if="!readOnly"
-                color="error"
-                variant="ghost"
-                size="xs"
-                icon="i-heroicons-x-mark"
-                @click="unassignVolunteer(assignment.id)"
-              >
-                {{ t('common.remove') }}
-              </UButton>
-            </div>
-          </div>
-
-          <div v-else class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
-            {{ t('edition.volunteers.no_assigned_volunteers') }}
-          </div>
-
-          <!-- Ajouter un bénévole -->
-          <div
-            v-if="!readOnly && assignments.length < formState.maxVolunteers"
-            class="border-t pt-3"
-          >
-            <UButton
-              color="warning"
-              variant="soft"
-              size="sm"
-              icon="i-heroicons-plus"
-              @click="showVolunteerSelector = true"
-            >
-              {{ t('edition.volunteers.add_volunteer') }}
-            </UButton>
-          </div>
-        </div>
       </UForm>
     </template>
     <template #footer>
@@ -310,83 +241,6 @@
             {{ formState.id ? t('common.save') : t('common.create') }}
           </UButton>
         </div>
-      </div>
-    </template>
-  </UModal>
-
-  <!-- Modal de sélection des bénévoles -->
-  <UModal v-model:open="showVolunteerSelector" size="md">
-    <template #header>
-      <div class="flex items-center gap-3">
-        <UIcon name="i-heroicons-user-plus" class="w-5 h-5 text-primary-600" />
-        <h3 class="text-lg font-semibold">{{ t('edition.volunteers.select_volunteer') }}</h3>
-      </div>
-    </template>
-
-    <template #body>
-      <div v-if="assignmentLoading" class="flex justify-center py-8">
-        <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-primary-500" />
-      </div>
-
-      <div v-else-if="filteredAvailableVolunteers.length === 0" class="text-center py-8">
-        <UIcon name="i-heroicons-user-group" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <p class="text-gray-500 dark:text-gray-400">
-          {{
-            formState.teamId && formState.teamId !== 'unassigned'
-              ? t('edition.volunteers.no_volunteers_for_team')
-              : t('edition.volunteers.no_available_volunteers')
-          }}
-        </p>
-      </div>
-
-      <div v-else class="space-y-3 max-h-96 overflow-y-auto">
-        <div
-          v-for="volunteer in filteredAvailableVolunteers"
-          :key="volunteer.userId"
-          class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          <div class="flex items-center gap-3">
-            <UiUserAvatar
-              :user="{
-                id: volunteer.userId,
-                pseudo: volunteer.pseudo,
-                nom: volunteer.nom,
-                prenom: volunteer.prenom,
-                emailHash: volunteer.emailHash,
-                profilePicture: volunteer.profilePicture,
-                updatedAt: volunteer.updatedAt,
-              }"
-              size="sm"
-            />
-            <div>
-              <p class="font-medium text-gray-900 dark:text-white">
-                {{ volunteer.pseudo }}
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ volunteer.prenom }} {{ volunteer.nom }}
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500">
-                {{ volunteer.assignmentsCount }} {{ t('edition.volunteers.current_assignments') }}
-              </p>
-            </div>
-          </div>
-          <UButton
-            color="primary"
-            variant="soft"
-            size="sm"
-            @click="assignVolunteer(volunteer.userId)"
-          >
-            {{ t('edition.volunteers.assign') }}
-          </UButton>
-        </div>
-      </div>
-    </template>
-
-    <template #footer>
-      <div class="flex justify-end">
-        <UButton variant="ghost" @click="showVolunteerSelector = false">
-          {{ t('common.cancel') }}
-        </UButton>
       </div>
     </template>
   </UModal>
@@ -432,47 +286,6 @@ const { toDatetimeLocal, fromDatetimeLocal, toApiFormat } = useDatetime()
 // État
 const loading = ref(false)
 const titleInput = ref()
-const showVolunteerSelector = ref(false)
-interface Assignment {
-  id: string
-  user: {
-    id: number
-    pseudo: string
-    nom: string | null
-    prenom: string | null
-    emailHash: string
-    email?: string // Optionnel - présent pour les gestionnaires
-    profilePicture: string | null
-    updatedAt: string
-  }
-  assignedBy: {
-    id: number
-    pseudo: string
-  } | null
-  assignedAt: string
-}
-
-interface AvailableVolunteer {
-  applicationId: number
-  userId: number
-  pseudo: string
-  nom: string | null
-  prenom: string | null
-  emailHash: string
-  email?: string // Optionnel - présent pour les gestionnaires
-  profilePicture: string | null
-  updatedAt: string
-  teamPreferences: any[]
-  assignedTeams: string[] // Array d'IDs des équipes assignées
-  timePreferences: any[]
-  skills: string[]
-  currentAssignments: any[]
-  assignmentsCount: number
-}
-
-const assignments = ref<Assignment[]>([])
-const availableVolunteers = ref<AvailableVolunteer[]>([])
-const assignmentLoading = ref(false)
 
 // Durées rapides prédéfinies
 const quickDurations = [
@@ -551,28 +364,6 @@ const dateValidationClass = computed(() => {
     : 'border-green-300 dark:border-green-600'
 })
 
-// Bénévoles filtrés selon l'équipe du créneau et excluant ceux déjà assignés
-const filteredAvailableVolunteers = computed(() => {
-  const currentTeamId = formState.value.teamId === 'unassigned' ? null : formState.value.teamId
-  const currentAssignmentIds = assignments.value.map((a) => a.user.id)
-
-  return availableVolunteers.value.filter((volunteer) => {
-    // Exclure les bénévoles déjà assignés à ce créneau
-    if (currentAssignmentIds.includes(volunteer.userId)) {
-      return false
-    }
-
-    // Si le créneau n'a pas d'équipe spécifique, montrer tous les bénévoles disponibles
-    if (!currentTeamId) {
-      return true
-    }
-
-    // Filtrer par équipe assignée
-    const assignedTeamIds = volunteer.assignedTeams || []
-    return assignedTeamIds.includes(currentTeamId)
-  })
-})
-
 // Schéma de validation
 const slotSchema = z.object({
   title: z.string().optional(),
@@ -608,20 +399,6 @@ watch(
         endDateTime: newSlot.endDateTime || '',
         maxVolunteers: newSlot.maxVolunteers || 3,
       }
-
-      // Si les assignations sont déjà fournies (mode lecture seule), les utiliser directement
-      if (newSlot.assignedVolunteersList && Array.isArray(newSlot.assignedVolunteersList)) {
-        assignments.value = newSlot.assignedVolunteersList.map((assignment: any) => ({
-          id: assignment.id,
-          user: assignment.user,
-          assignedBy: assignment.assignedBy || null,
-          assignedAt: assignment.assignedAt,
-        }))
-        console.log(
-          '[SlotModal] Assignations chargées depuis initialSlot:',
-          assignments.value.length
-        )
-      }
     } else {
       // Réinitialiser le formulaire
       formState.value = {
@@ -633,7 +410,6 @@ watch(
         endDateTime: '',
         maxVolunteers: 3,
       }
-      assignments.value = []
     }
 
     // Si une seule équipe disponible, la sélectionner automatiquement
@@ -738,104 +514,12 @@ const onDelete = async () => {
   }
 }
 
-// Fonctions d'assignation
-const fetchAssignments = async () => {
-  if (!formState.value.id) {
-    console.log("[SlotModal] fetchAssignments: pas d'ID de créneau")
-    return
-  }
-
-  try {
-    console.log('[SlotModal] Chargement des assignations pour le créneau', formState.value.id)
-    const response = await $fetch(
-      `/api/editions/${props.editionId}/volunteer-time-slots/${formState.value.id}/assignments`
-    )
-    assignments.value = response as Assignment[]
-    console.log('[SlotModal] Assignations chargées:', assignments.value.length)
-  } catch (error) {
-    console.error('Erreur lors de la récupération des assignations:', error)
-  }
-}
-
-const fetchAvailableVolunteers = async () => {
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteers/available`)
-    availableVolunteers.value = response as unknown as AvailableVolunteer[]
-  } catch (error) {
-    console.error('Erreur lors de la récupération des bénévoles:', error)
-  }
-}
-
-const assignVolunteer = async (userId: number) => {
-  if (!formState.value.id) return
-
-  try {
-    assignmentLoading.value = true
-    await $fetch<any>(
-      `/api/editions/${props.editionId}/volunteer-time-slots/${formState.value.id}/assignments`,
-      {
-        method: 'POST',
-        body: { userId },
-      }
-    )
-
-    // Recharger les assignations
-    await fetchAssignments()
-
-    // Fermer le sélecteur
-    showVolunteerSelector.value = false
-
-    // Toast de succès
-    // TODO: Ajouter toast
-  } catch (error: any) {
-    console.error("Erreur lors de l'assignation:", error)
-    // TODO: Ajouter toast d'erreur
-  } finally {
-    assignmentLoading.value = false
-  }
-}
-
-const unassignVolunteer = async (assignmentId: string) => {
-  if (!formState.value.id) return
-
-  try {
-    assignmentLoading.value = true
-    await $fetch(
-      `/api/editions/${props.editionId}/volunteer-time-slots/${formState.value.id}/assignments/${assignmentId}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    // Recharger les assignations
-    await fetchAssignments()
-
-    // TODO: Ajouter toast de succès
-  } catch (error: any) {
-    console.error('Erreur lors de la désassignation:', error)
-    // TODO: Ajouter toast d'erreur
-  } finally {
-    assignmentLoading.value = false
-  }
-}
-
-// Charger les assignations à l'ouverture
+// Focus sur le titre à l'ouverture pour un nouveau créneau
 watch([isOpen, () => formState.value.id], ([isOpenValue, slotId]) => {
-  console.log('[SlotModal] Modal ouverte:', isOpenValue, 'readOnly:', props.readOnly, 'ID:', slotId)
-  if (isOpenValue) {
-    if (slotId) {
-      console.log('[SlotModal] Chargement des données pour le créneau', slotId)
-      fetchAssignments()
-      // Ne charger les bénévoles disponibles qu'en mode édition
-      if (!props.readOnly) {
-        fetchAvailableVolunteers()
-      }
-    }
-    if (!slotId && !props.readOnly) {
-      nextTick(() => {
-        titleInput.value?.focus()
-      })
-    }
+  if (isOpenValue && !slotId && !props.readOnly) {
+    nextTick(() => {
+      titleInput.value?.focus()
+    })
   }
 })
 </script>

@@ -2,7 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -11,7 +11,7 @@ export default wrapApiHandler(
 
     // Validation des paramètres
     const editionId = validateEditionId(event)
-    const slotId = validateResourceId(event, 'slotId', 'créneau')
+    const slotId = validateStringId(event, 'slotId', 'créneau')
 
     console.log(
       `[DELETE SLOT] Tentative de suppression - Edition ID: ${editionId}, Slot ID: ${slotId}`

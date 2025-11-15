@@ -54,7 +54,7 @@
       "item_added_success": "Article ajouté avec succès",
       "item_removed_success": "Article retiré avec succès",
       "confirm_remove_item": "Êtes-vous sûr de vouloir retirer cet article ?",
-      "global_item": "Article global (tous les organisateurs)"
+      "no_returnable_items_created": "Aucun article à restituer n'a été créé pour cette édition"
     },
     "volunteers": {
       "general_settings": "Paramètres généraux",

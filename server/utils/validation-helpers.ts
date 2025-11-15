@@ -22,6 +22,8 @@ export type ResourceType =
   | 'participant'
   | 'repas'
   | 'objet'
+  | 'créneau'
+  | 'assignation'
 
 /**
  * Messages d'erreur pour les ressources
@@ -45,6 +47,8 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   participant: 'ID de participant invalide',
   repas: 'ID de repas invalide',
   objet: "ID d'objet invalide",
+  créneau: 'ID de créneau invalide',
+  assignation: "ID d'assignation invalide",
 }
 
 /**
@@ -108,6 +112,35 @@ export function validateEditionId(event: H3Event<EventHandlerRequest>): number {
  */
 export function validateUserId(event: H3Event<EventHandlerRequest>): number {
   return validateResourceId(event, 'id', 'utilisateur')
+}
+
+/**
+ * Valide et extrait un ID de type chaîne (CUID) depuis les paramètres de route
+ *
+ * @param event - L'événement H3
+ * @param paramName - Nom du paramètre dans la route
+ * @param resourceType - Type de ressource pour le message d'erreur
+ * @returns L'ID validé (chaîne)
+ * @throws createError 400 si l'ID est invalide
+ *
+ * @example
+ * const slotId = validateStringId(event, 'slotId', 'créneau')
+ */
+export function validateStringId(
+  event: H3Event<EventHandlerRequest>,
+  paramName: string,
+  resourceType: ResourceType
+): string {
+  const id = getRouterParam(event, paramName)
+
+  if (!id || typeof id !== 'string' || id.trim() === '') {
+    throw createError({
+      statusCode: 400,
+      message: RESOURCE_MESSAGES[resourceType],
+    })
+  }
+
+  return id
 }
 
 /**

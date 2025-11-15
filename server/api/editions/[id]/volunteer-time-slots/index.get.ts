@@ -68,6 +68,7 @@ export default wrapApiHandler(
       team: slot.team,
       maxVolunteers: slot.maxVolunteers,
       assignedVolunteers: slot._count.assignments,
+      delayMinutes: slot.delayMinutes,
       assignments: slot.assignments.map((assignment) => ({
         ...assignment,
         user: {
