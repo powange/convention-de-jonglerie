@@ -93,7 +93,7 @@ export default wrapApiHandler(
                 payerEmail: order.payer.email,
                 amount: order.items.reduce((sum, item) => sum + item.amount, 0),
                 status: 'Processed', // TODO: récupérer le statut réel
-                orderDate: new Date(), // TODO: récupérer la date réelle
+                orderDate: new Date(order.date), // Date de la commande HelloAsso
               },
               update: {
                 payerFirstName: order.payer.firstName,
@@ -101,6 +101,7 @@ export default wrapApiHandler(
                 payerEmail: order.payer.email,
                 amount: order.items.reduce((sum, item) => sum + item.amount, 0),
                 status: 'Processed',
+                orderDate: new Date(order.date), // Mettre à jour la date si elle a changé
               },
             })
 

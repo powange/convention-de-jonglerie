@@ -440,6 +440,7 @@ export async function fetchOrdersFromHelloAsso(
 ): Promise<{
   data: Array<{
     id: number
+    date: string // Date de la commande au format ISO
     payer: {
       firstName: string
       lastName: string
@@ -453,6 +454,7 @@ export async function fetchOrdersFromHelloAsso(
       qrCode?: string
       type: string
       state: string
+      tierId?: number // ID du tarif HelloAsso
       user?: {
         firstName: string
         lastName: string

@@ -254,6 +254,143 @@
           </p>
         </div>
       </UCard>
+
+      <!-- Graphique des achats de billets -->
+      <UCard class="mt-6">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-shopping-cart" class="text-primary-600" />
+            <h2 class="text-lg font-semibold">
+              {{ $t('gestion.ticketing.stats_purchases_chart_title') }}
+            </h2>
+          </div>
+        </template>
+
+        <!-- Filtres -->
+        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Filtres de type -->
+          <UFormField :label="$t('gestion.ticketing.stats_filter_type')">
+            <USelect
+              v-model="selectedTypes"
+              :items="typeItemsPurchases"
+              multiple
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            />
+          </UFormField>
+
+          <!-- Granularité -->
+          <UFormField :label="$t('gestion.ticketing.stats_filter_granularity')">
+            <USelect
+              v-model="selectedPurchaseGranularity"
+              :items="purchaseGranularityItems"
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Totaux -->
+        <div v-if="purchasesData" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <UCard v-if="filters.showParticipants">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_participants') }} ({{
+                    $t('gestion.ticketing.stats_source_manual')
+                  }})
+                </p>
+                <p
+                  :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
+                >
+                  {{ purchasesData.totals.participantsManual }}
+                </p>
+              </div>
+              <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showParticipants">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_participants') }} ({{
+                    $t('gestion.ticketing.stats_source_external')
+                  }})
+                </p>
+                <p
+                  :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
+                >
+                  {{ purchasesData.totals.participantsExternal }}
+                </p>
+              </div>
+              <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showOthers">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_others') }} ({{
+                    $t('gestion.ticketing.stats_source_manual')
+                  }})
+                </p>
+                <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                  {{ purchasesData.totals.othersManual }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-user" class="h-8 w-8 text-gray-500" />
+            </div>
+          </UCard>
+          <UCard v-if="filters.showOthers">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.ticketing.stats_others') }} ({{
+                    $t('gestion.ticketing.stats_source_external')
+                  }})
+                </p>
+                <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                  {{ purchasesData.totals.othersExternal }}
+                </p>
+              </div>
+              <UIcon name="i-heroicons-user" class="h-8 w-8 text-gray-500" />
+            </div>
+          </UCard>
+        </div>
+
+        <!-- Graphique -->
+        <div v-if="loadingPurchases" class="text-center py-12">
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="h-8 w-8 text-gray-400 mx-auto mb-2 animate-spin"
+          />
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.stats_loading') }}
+          </p>
+        </div>
+        <div v-else-if="purchasesError" class="text-center py-12">
+          <UIcon
+            name="i-heroicons-exclamation-triangle"
+            class="h-8 w-8 text-red-500 mx-auto mb-2"
+          />
+          <p class="text-red-600 dark:text-red-400">
+            {{ $t('gestion.ticketing.stats_error') }}
+          </p>
+        </div>
+        <div v-else-if="purchasesData && purchasesData.labels.length > 0">
+          <PurchaseChart
+            :data="purchasesData"
+            :show-participants="filters.showParticipants"
+            :show-others="filters.showOthers"
+          />
+        </div>
+        <div v-else class="text-center py-12">
+          <UIcon name="i-heroicons-chart-bar" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.stats_no_data') }}
+          </p>
+        </div>
+      </UCard>
     </div>
   </div>
 </template>
@@ -268,6 +405,10 @@ const AccessValidationChart = defineAsyncComponent(
 
 const OrderSourceChart = defineAsyncComponent(
   () => import('~/components/ticketing/stats/OrderSourceChart.vue')
+)
+
+const PurchaseChart = defineAsyncComponent(
+  () => import('~/components/ticketing/stats/PurchaseChart.vue')
 )
 
 definePageMeta({
@@ -296,6 +437,7 @@ const canAccess = computed(() => {
 })
 
 // Items pour les selects
+// typeItems pour les validations d'entrée (incluent tous les types)
 const typeItems = computed(() => [
   {
     label: t('gestion.ticketing.stats_participants'),
@@ -316,6 +458,20 @@ const typeItems = computed(() => [
     label: t('gestion.ticketing.stats_organizers'),
     value: 'organizers',
     icon: 'i-heroicons-shield-check',
+  },
+  {
+    label: t('gestion.ticketing.stats_others'),
+    value: 'others',
+    icon: 'i-heroicons-user',
+  },
+])
+
+// typeItemsPurchases pour les achats de billets (uniquement participants et autres)
+const typeItemsPurchases = computed(() => [
+  {
+    label: t('gestion.ticketing.stats_participants'),
+    value: 'participants',
+    icon: 'i-heroicons-users',
   },
   {
     label: t('gestion.ticketing.stats_others'),
@@ -358,6 +514,25 @@ const granularityItems = computed(() => [
   },
 ])
 
+const purchaseGranularityItems = computed(() => [
+  {
+    label: t('gestion.ticketing.stats_granularity_12h'),
+    value: 720,
+  },
+  {
+    label: t('gestion.ticketing.stats_granularity_1d'),
+    value: 1440,
+  },
+  {
+    label: t('gestion.ticketing.stats_granularity_1w'),
+    value: 10080,
+  },
+  {
+    label: t('gestion.ticketing.stats_granularity_1m'),
+    value: 43200,
+  },
+])
+
 const tierItems = computed(() =>
   tiers.value.map((tier) => ({
     label: `${tier.name} (${(tier.price / 100).toFixed(2)} €)`,
@@ -375,6 +550,7 @@ const selectedTypes = ref<string[]>([
 ])
 const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
 const selectedGranularity = ref<number>(60) // Par défaut 1h
+const selectedPurchaseGranularity = ref<number>(1440) // Par défaut 1 jour
 
 // Filtres calculés pour compatibilité avec le code existant
 const filters = computed(() => ({
@@ -414,6 +590,31 @@ interface ValidationData {
 const validationsData = ref<ValidationData | null>(null)
 const loadingValidations = ref(false)
 const validationsError = ref(false)
+
+// Données d'achats
+interface PurchaseData {
+  labels: string[]
+  timestamps: string[]
+  participantsManual: number[]
+  participantsExternal: number[]
+  othersManual: number[]
+  othersExternal: number[]
+  periods: {
+    setup: { start: string; end: string }
+    event: { start: string; end: string }
+    teardown: { start: string; end: string }
+  }
+  totals: {
+    participantsManual: number
+    participantsExternal: number
+    othersManual: number
+    othersExternal: number
+  }
+}
+
+const purchasesData = ref<PurchaseData | null>(null)
+const loadingPurchases = ref(false)
+const purchasesError = ref(false)
 
 // Données des sources de commandes
 interface OrderSourcesData {
@@ -505,6 +706,27 @@ async function fetchValidations() {
   }
 }
 
+// Charger les données d'achats
+async function fetchPurchases() {
+  loadingPurchases.value = true
+  purchasesError.value = false
+
+  try {
+    const params = new URLSearchParams()
+    params.append('granularity', selectedPurchaseGranularity.value.toString())
+
+    const data = await $fetch<PurchaseData>(
+      `/api/editions/${editionId}/ticketing/stats/purchases?${params.toString()}`
+    )
+    purchasesData.value = data
+  } catch (error) {
+    console.error('Failed to fetch purchases:', error)
+    purchasesError.value = true
+  } finally {
+    loadingPurchases.value = false
+  }
+}
+
 // Charger les données des sources de commandes
 async function fetchOrderSources() {
   loadingOrderSources.value = true
@@ -553,6 +775,10 @@ watch(selectedGranularity, () => {
   fetchValidations()
 })
 
+watch(selectedPurchaseGranularity, () => {
+  fetchPurchases()
+})
+
 // Charger l'édition si nécessaire
 onMounted(async () => {
   if (!edition.value) {
@@ -563,9 +789,9 @@ onMounted(async () => {
     }
   }
 
-  // Charger les données de validations et sources
+  // Charger les données de validations, achats et sources
   if (canAccess.value) {
-    await Promise.all([fetchValidations(), fetchTiers(), fetchOrderSources()])
+    await Promise.all([fetchValidations(), fetchPurchases(), fetchTiers(), fetchOrderSources()])
   }
 })
 
