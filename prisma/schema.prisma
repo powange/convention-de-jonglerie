@@ -161,6 +161,7 @@ model Edition {
   options                           TicketingOption[]
   orders                            TicketingOrder[]
   volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
+  organizerTicketingReturnableItems EditionOrganizerReturnableItem[]
   tierCustomFields                  TicketingTierCustomField[]
   workshops                         Workshop[]
   workshopLocations                 WorkshopLocation[]
@@ -317,13 +318,13 @@ model CarpoolBooking {
 }
 
 model Convention {
-  id                Int                             @id @default(autoincrement())
+  id                Int                          @id @default(autoincrement())
   name              String
-  description       String?                         @db.Text
+  description       String?                      @db.Text
   logo              String?
   email             String? // Email pour revendication
-  createdAt         DateTime                        @default(now())
-  updatedAt         DateTime                        @updatedAt
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
   authorId          Int? // Nullable pour conventions importées
   archivedAt        DateTime?
   isArchived        Boolean                      @default(false)
@@ -354,17 +355,18 @@ model EditionOrganizerPermission {
 }
 
 model EditionOrganizer {
-  id               Int                 @id @default(autoincrement())
+  id               Int                              @id @default(autoincrement())
   editionId        Int
   organizerId      Int
-  qrCodeToken      String?             @unique
-  entryValidated   Boolean             @default(false)
+  qrCodeToken      String?                          @unique
+  entryValidated   Boolean                          @default(false)
   entryValidatedAt DateTime?
   entryValidatedBy Int?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  edition          Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  organizer        ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  createdAt        DateTime                         @default(now())
+  updatedAt        DateTime                         @updatedAt
+  edition          Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer        ConventionOrganizer              @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  returnableItems  EditionOrganizerReturnableItem[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])
@@ -1003,6 +1005,23 @@ model EditionVolunteerReturnableItem {
   @@index([teamId])
 }
 
+model EditionOrganizerReturnableItem {
+  id               Int      @id @default(autoincrement())
+  editionId        Int
+  returnableItemId Int
+  organizerId      Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  edition   Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer EditionOrganizer? @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, returnableItemId, organizerId])
+  @@index([editionId])
+  @@index([returnableItemId])
+  @@index([organizerId])
+}
+
 model TicketingTierQuota {
   id      Int @id @default(autoincrement())
   tierId  Int
@@ -1140,8 +1159,8 @@ model TicketingOrderItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order      TicketingOrder         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  tier       TicketingTier?         @relation(fields: [tierId], references: [id])
+  order      TicketingOrder           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier       TicketingTier?           @relation(fields: [tierId], references: [id])
   mealAccess TicketingOrderItemMeal[]
 
   @@index([orderId])
@@ -1373,14 +1392,14 @@ model TicketingTierCustomFieldReturnableItem {
 // ========== VOLUNTEER MEALS ==========
 
 model VolunteerMeal {
-  id        Int                @id @default(autoincrement())
+  id        Int               @id @default(autoincrement())
   editionId Int
-  date      DateTime           @db.Date
+  date      DateTime          @db.Date
   mealType  VolunteerMealType
-  enabled   Boolean            @default(true)
-  phases    Json               @default("[]")
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  enabled   Boolean           @default(true)
+  phases    Json              @default("[]")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   edition                Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
   mealSelections         VolunteerMealSelection[]
@@ -1453,8 +1472,8 @@ model TicketingTierMeal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tier TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
-  meal VolunteerMeal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  tier TicketingTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  meal VolunteerMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
 
   @@unique([tierId, mealId])
   @@index([tierId])

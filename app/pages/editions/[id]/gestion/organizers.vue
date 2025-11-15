@@ -264,6 +264,38 @@
                   </UBadge>
                 </template>
 
+                <!-- Colonne Articles -->
+                <template #articles-cell="{ row }">
+                  <div class="space-y-2">
+                    <!-- Liste des articles spécifiques assignés (sans les globaux) -->
+                    <div
+                      v-if="getOrganizerItems(row.original.id).length > 0"
+                      class="flex flex-wrap gap-1"
+                    >
+                      <UBadge
+                        v-for="item in getOrganizerItems(row.original.id)"
+                        :key="item.id"
+                        color="amber"
+                        variant="soft"
+                        size="xs"
+                      >
+                        {{ item.returnableItemName }}
+                      </UBadge>
+                    </div>
+
+                    <!-- Bouton gérer -->
+                    <UButton
+                      icon="i-heroicons-gift"
+                      color="primary"
+                      variant="ghost"
+                      size="xs"
+                      @click="openReturnableItemsModal(row.original)"
+                    >
+                      {{ $t('gestion.organizers.manage_articles') }}
+                    </UButton>
+                  </div>
+                </template>
+
                 <!-- Colonne Actions -->
                 <template #actions-cell="{ row }">
                   <div class="flex items-center justify-end">
@@ -272,7 +304,7 @@
                       color="error"
                       variant="ghost"
                       size="xs"
-                      @click="removeFromEdition(row.original.id)"
+                      @click="confirmRemoveFromEdition(row.original)"
                     />
                   </div>
                 </template>
@@ -308,6 +340,56 @@
               <div v-else class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
                 {{ $t('gestion.organizers.all_organizers_added') }}
               </div>
+            </div>
+          </div>
+        </UCard>
+
+        <!-- Articles globaux pour tous les organisateurs -->
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-gift" class="text-orange-500" />
+                <h2 class="text-lg font-semibold">
+                  {{ $t('gestion.organizers.global_returnable_items') }}
+                </h2>
+              </div>
+              <UButton
+                size="sm"
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-pencil"
+                @click="openGlobalReturnableItemsModal"
+              >
+                {{ $t('common.edit') }}
+              </UButton>
+            </div>
+
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('gestion.organizers.global_returnable_items_description') }}
+            </p>
+
+            <!-- Liste des articles globaux -->
+            <div v-if="loadingGlobalReturnableItems" class="text-center py-4">
+              <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
+            </div>
+            <div v-else-if="globalReturnableItems.length > 0">
+              <div class="flex flex-wrap gap-2">
+                <UBadge
+                  v-for="item in globalReturnableItems"
+                  :key="item.id"
+                  color="warning"
+                  variant="soft"
+                >
+                  {{ item.returnableItemName }}
+                </UBadge>
+              </div>
+            </div>
+            <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <UIcon name="i-heroicons-gift" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
+              <p class="text-sm text-gray-500">
+                {{ $t('gestion.organizers.no_global_returnable_items') }}
+              </p>
             </div>
           </div>
         </UCard>
@@ -439,6 +521,32 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal de gestion des articles à restituer -->
+    <OrganizersManageReturnableItemsModal
+      v-model:open="returnableItemsModalOpen"
+      :edition-id="editionId"
+      :organizer="selectedOrganizerForItems"
+      @items-updated="onItemsUpdated"
+    />
+
+    <!-- Modal de confirmation de suppression d'un organisateur de l'édition -->
+    <UiConfirmModal
+      v-model="removeFromEditionConfirmOpen"
+      :title="$t('common.remove')"
+      :description="
+        organizerToRemoveFromEdition
+          ? `${$t('gestion.organizers.confirm_remove_from_edition')}\n${organizerToRemoveFromEdition.name}`
+          : ''
+      "
+      :confirm-label="$t('common.remove')"
+      confirm-color="error"
+      confirm-icon="i-heroicons-trash"
+      icon-name="i-heroicons-exclamation-triangle"
+      icon-color="text-red-500"
+      @confirm="removeFromEdition"
+      @cancel="removeFromEditionConfirmOpen = false"
+    />
   </div>
 </template>
 
@@ -489,6 +597,17 @@ const selectedAvailableOrganizer = ref<number | null>(null)
 
 // État pour la modal d'historique
 const historyModalOpen = ref(false)
+
+// État pour la gestion des articles à restituer
+const globalReturnableItems = ref<any[]>([])
+const loadingGlobalReturnableItems = ref(false)
+const returnableItemsModalOpen = ref(false)
+const selectedOrganizerForItems = ref<any>(null)
+const organizerReturnableItems = ref<any[]>([]) // Tous les articles assignés (par organisateur et globaux)
+
+// État pour la confirmation de suppression d'un organisateur de l'édition
+const removeFromEditionConfirmOpen = ref(false)
+const organizerToRemoveFromEdition = ref<{ id: number; name: string } | null>(null)
 
 const newOrganizerRights = ref({
   rights: {
@@ -737,6 +856,11 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
   {
     id: 'status',
     header: t('gestion.organizers.status'),
+    size: 150,
+  },
+  {
+    id: 'articles',
+    header: t('gestion.organizers.returnable_items'),
     size: 200,
   },
   {
@@ -800,15 +924,26 @@ const addToEdition = async () => {
   }
 }
 
-const removeFromEdition = async (editionOrganizerId: number) => {
-  if (!confirm(t('gestion.organizers.confirm_remove_from_edition'))) {
-    return
+const confirmRemoveFromEdition = (organizer: any) => {
+  const user = organizer.user
+  const displayName = user?.pseudo || `${user?.prenom || ''} ${user?.nom || ''}`.trim()
+  organizerToRemoveFromEdition.value = {
+    id: organizer.id,
+    name: displayName,
   }
+  removeFromEditionConfirmOpen.value = true
+}
+
+const removeFromEdition = async () => {
+  if (!organizerToRemoveFromEdition.value) return
 
   try {
-    await $fetch(`/api/editions/${editionId}/organizers/edition-organizers/${editionOrganizerId}`, {
-      method: 'DELETE',
-    })
+    await $fetch(
+      `/api/editions/${editionId}/organizers/edition-organizers/${organizerToRemoveFromEdition.value.id}`,
+      {
+        method: 'DELETE',
+      }
+    )
 
     toast.add({
       title: t('gestion.organizers.removed_from_edition'),
@@ -816,6 +951,8 @@ const removeFromEdition = async (editionOrganizerId: number) => {
       color: 'success',
     })
 
+    removeFromEditionConfirmOpen.value = false
+    organizerToRemoveFromEdition.value = null
     await loadEditionOrganizers()
   } catch (error: any) {
     console.error('Failed to remove organizer from edition:', error)
@@ -833,6 +970,52 @@ const openHistoryModal = () => {
   historyModalOpen.value = true
 }
 
+// Fonctions pour gérer les articles à restituer
+const loadGlobalReturnableItems = async () => {
+  loadingGlobalReturnableItems.value = true
+  try {
+    const response = await $fetch(
+      `/api/editions/${editionId}/ticketing/organizers/returnable-items`
+    )
+
+    const allItems = response.items || []
+    // Stocker TOUS les articles (globaux + spécifiques)
+    organizerReturnableItems.value = allItems
+    // Filtrer pour ne garder que les articles globaux (organizerId = null)
+    globalReturnableItems.value = allItems.filter((item: any) => item.organizerId === null)
+  } catch (error) {
+    console.error('Erreur lors du chargement des articles globaux:', error)
+    toast.add({
+      title: t('common.error'),
+      description: t('gestion.organizers.error_loading_items'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingGlobalReturnableItems.value = false
+  }
+}
+
+// Obtenir les articles spécifiques d'un organisateur (sans les globaux)
+const getOrganizerItems = (organizerId: number) => {
+  return organizerReturnableItems.value.filter((item: any) => item.organizerId === organizerId)
+}
+
+const openReturnableItemsModal = (organizer: any) => {
+  selectedOrganizerForItems.value = organizer
+  returnableItemsModalOpen.value = true
+}
+
+const openGlobalReturnableItemsModal = () => {
+  selectedOrganizerForItems.value = null
+  returnableItemsModalOpen.value = true
+}
+
+const onItemsUpdated = async () => {
+  // Recharger tous les articles après modification
+  await loadGlobalReturnableItems()
+}
+
 // Charger l'édition si nécessaire
 onMounted(async () => {
   if (!edition.value) {
@@ -845,6 +1028,9 @@ onMounted(async () => {
 
   // Charger les organisateurs de l'édition
   await loadEditionOrganizers()
+
+  // Charger les articles à restituer globaux
+  await loadGlobalReturnableItems()
 })
 
 // Métadonnées de la page

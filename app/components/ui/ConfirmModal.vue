@@ -9,7 +9,7 @@
 
     <template #body>
       <div class="space-y-4">
-        <p class="text-gray-700 dark:text-gray-300">
+        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">
           {{ computedDescription }}
         </p>
 
