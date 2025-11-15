@@ -116,7 +116,6 @@ const chartPlugins = computed<Plugin<'doughnut'>[]>(() => [
         if (!meta.data) return
 
         ctx.save()
-        ctx.font = 'bold 18px sans-serif'
         ctx.fillStyle = '#ffffff'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
@@ -128,8 +127,16 @@ const chartPlugins = computed<Plugin<'doughnut'>[]>(() => [
           // Calculer la position au milieu de l'arc
           const { x, y } = element.tooltipPosition()
 
-          // Dessiner le nombre
-          ctx.fillText(data.toString(), x, y)
+          // Calculer le pourcentage
+          const percentage = index === 0 ? manualPercentage.value : externalPercentage.value
+
+          // Dessiner le nombre (valeur absolue)
+          ctx.font = 'bold 18px sans-serif'
+          ctx.fillText(data.toString(), x, y - 10)
+
+          // Dessiner le pourcentage
+          ctx.font = 'bold 14px sans-serif'
+          ctx.fillText(`(${percentage}%)`, x, y + 12)
         })
 
         ctx.restore()
