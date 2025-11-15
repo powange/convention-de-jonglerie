@@ -2,7 +2,7 @@ import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-hel
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
-import { validatePagination } from '@@/server/utils/validation-helpers'
+import { validatePagination, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -50,49 +50,52 @@ export default wrapApiHandler(
           }
         : {}
 
-      // Construire la condition de filtre par tarifs
-      const tierCondition =
-        tierIds.length > 0
+      // Construire la condition de filtre combinée pour les items
+      const itemsConditions: any[] = []
+
+      // Ajouter le filtre par tarifs si nécessaire
+      if (tierIds.length > 0) {
+        itemsConditions.push({
+          tierId: {
+            in: tierIds,
+          },
+        })
+      }
+
+      // Ajouter le filtre par statut d'entrée si nécessaire
+      if (entryStatus === 'validated') {
+        itemsConditions.push({
+          entryValidated: true,
+        })
+      } else if (entryStatus === 'not_validated') {
+        itemsConditions.push({
+          entryValidated: {
+            not: true,
+          },
+        })
+      }
+
+      // Construire la condition finale pour les items
+      const itemsCondition =
+        itemsConditions.length > 0
           ? {
               items: {
-                some: {
-                  tierId: {
-                    in: tierIds,
-                  },
-                },
+                some:
+                  itemsConditions.length === 1
+                    ? itemsConditions[0]
+                    : {
+                        AND: itemsConditions,
+                      },
               },
             }
           : {}
-
-      // Construire la condition de filtre par statut d'entrée
-      const entryStatusCondition =
-        entryStatus === 'validated'
-          ? {
-              items: {
-                some: {
-                  entryValidated: true,
-                },
-              },
-            }
-          : entryStatus === 'not_validated'
-            ? {
-                items: {
-                  some: {
-                    entryValidated: {
-                      not: true,
-                    },
-                  },
-                },
-              }
-            : {}
 
       // Compter le nombre total de commandes (toutes les commandes de l'édition)
       const total = await prisma.ticketingOrder.count({
         where: {
           editionId,
           ...searchCondition,
-          ...tierCondition,
-          ...entryStatusCondition,
+          ...itemsCondition,
         },
       })
 
@@ -101,8 +104,7 @@ export default wrapApiHandler(
         where: {
           editionId,
           ...searchCondition,
-          ...tierCondition,
-          ...entryStatusCondition,
+          ...itemsCondition,
         },
         include: {
           externalTicketing: {
@@ -130,11 +132,14 @@ export default wrapApiHandler(
         take,
       })
 
-      // Calculer les stats globales (seulement si pas de recherche pour optimiser)
+      // Calculer les stats globales en tenant compte des filtres
       let stats = null
       if (!search) {
         const allOrders = await prisma.ticketingOrder.findMany({
-          where: { editionId },
+          where: {
+            editionId,
+            ...itemsCondition,
+          },
           select: {
             amount: true,
             items: {
