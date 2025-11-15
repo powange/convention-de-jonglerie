@@ -37,7 +37,7 @@
       "can_edit": "Modifier",
       "can_delete": "Supprimer",
       "can_manage_volunteers": "Gérer les bénévoles",
-      "returnable_items": "Articles",
+      "returnable_items": "Articles à restituer",
       "manage_articles": "Gérer les articles",
       "manage_articles_for": "Articles à restituer pour {name}",
       "global_returnable_items": "Articles à restituer pour tous les organisateurs",

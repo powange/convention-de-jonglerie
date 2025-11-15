@@ -457,7 +457,7 @@ export default wrapApiHandler(
           },
         })
 
-        if (editionOrganizer) {
+        if (editionOrganizer && editionOrganizer.organizer) {
           // Récupérer l'utilisateur qui a validé si applicable
           let validatedByUser = null
           if (editionOrganizer.entryValidatedBy) {
@@ -469,6 +469,45 @@ export default wrapApiHandler(
               },
             })
           }
+
+          // Récupérer les articles à restituer pour cet organisateur
+          // Articles spécifiques à cet organisateur
+          const organizerSpecificItemIds = await prisma.editionOrganizerReturnableItem.findMany({
+            where: {
+              editionId,
+              organizerId: editionOrganizer.id,
+            },
+            select: {
+              returnableItemId: true,
+            },
+          })
+
+          const organizerSpecificItems = await prisma.ticketingReturnableItem.findMany({
+            where: {
+              id: {
+                in: organizerSpecificItemIds.map((item) => item.returnableItemId),
+              },
+            },
+          })
+
+          // Articles globaux (pour tous les organisateurs)
+          const globalItemIds = await prisma.editionOrganizerReturnableItem.findMany({
+            where: {
+              editionId,
+              organizerId: null,
+            },
+            select: {
+              returnableItemId: true,
+            },
+          })
+
+          const globalItems = await prisma.ticketingReturnableItem.findMany({
+            where: {
+              id: {
+                in: globalItemIds.map((item) => item.returnableItemId),
+              },
+            },
+          })
 
           return {
             success: true,
@@ -485,6 +524,14 @@ export default wrapApiHandler(
                   phone: editionOrganizer.organizer.user.phone,
                 },
                 title: editionOrganizer.organizer.title,
+                returnableItems: organizerSpecificItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                })),
+                globalReturnableItems: globalItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                })),
                 entryValidated: editionOrganizer.entryValidated,
                 entryValidatedAt: editionOrganizer.entryValidatedAt,
                 entryValidatedBy: validatedByUser

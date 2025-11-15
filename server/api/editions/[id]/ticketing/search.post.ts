@@ -424,6 +424,66 @@ export default wrapApiHandler(
         )
       }
 
+      // Récupérer les articles à restituer pour chaque organisateur
+      const returnableItemsByOrganizerId = new Map<
+        number,
+        {
+          specific: Array<{ id: number; name: string }>
+          global: Array<{ id: number; name: string }>
+        }
+      >()
+
+      for (const organizer of organizers) {
+        // Articles spécifiques à cet organisateur
+        const organizerSpecificItemIds = await prisma.editionOrganizerReturnableItem.findMany({
+          where: {
+            editionId,
+            organizerId: organizer.id,
+          },
+          select: {
+            returnableItemId: true,
+          },
+        })
+
+        const specificItems = await prisma.ticketingReturnableItem.findMany({
+          where: {
+            id: {
+              in: organizerSpecificItemIds.map((item) => item.returnableItemId),
+            },
+          },
+        })
+
+        // Articles globaux (pour tous les organisateurs)
+        const globalItemIds = await prisma.editionOrganizerReturnableItem.findMany({
+          where: {
+            editionId,
+            organizerId: null,
+          },
+          select: {
+            returnableItemId: true,
+          },
+        })
+
+        const globalItems = await prisma.ticketingReturnableItem.findMany({
+          where: {
+            id: {
+              in: globalItemIds.map((item) => item.returnableItemId),
+            },
+          },
+        })
+
+        returnableItemsByOrganizerId.set(organizer.id, {
+          specific: specificItems.map((item) => ({
+            id: item.id,
+            name: item.name,
+          })),
+          global: globalItems.map((item) => ({
+            id: item.id,
+            name: item.name,
+          })),
+        })
+      }
+
       // Récupérer les articles à restituer pour chaque artiste
       const returnableItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
       const mealsByArtistId = new Map<
@@ -641,6 +701,10 @@ export default wrapApiHandler(
           const validator = editionOrganizer.entryValidatedBy
             ? organizerValidatorMap.get(editionOrganizer.entryValidatedBy)
             : null
+          const returnableItems = returnableItemsByOrganizerId.get(editionOrganizer.id) || {
+            specific: [],
+            global: [],
+          }
           return {
             type: 'organizer',
             participant: {
@@ -654,6 +718,8 @@ export default wrapApiHandler(
                   phone: editionOrganizer.organizer.user.phone,
                 },
                 title: editionOrganizer.organizer.title,
+                returnableItems: returnableItems.specific,
+                globalReturnableItems: returnableItems.global,
                 entryValidated: editionOrganizer.entryValidated,
                 entryValidatedAt: editionOrganizer.entryValidatedAt,
                 entryValidatedBy: validator

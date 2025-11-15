@@ -100,6 +100,14 @@ interface Organizer {
     phone?: string | null
   }
   title?: string | null
+  returnableItems?: Array<{
+    id: number
+    name: string
+  }>
+  globalReturnableItems?: Array<{
+    id: number
+    name: string
+  }>
   entryValidated?: boolean
   entryValidatedAt?: Date | string
   entryValidatedBy?: {
