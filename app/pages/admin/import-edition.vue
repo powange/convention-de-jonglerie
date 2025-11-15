@@ -1,5 +1,28 @@
 <template>
   <div class="max-w-7xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-4" :aria-label="$t('navigation.breadcrumb')">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <NuxtLink
+            to="/admin"
+            class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+          >
+            <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4 mr-2" />
+            {{ $t('admin.dashboard') }}
+          </NuxtLink>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400" />
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+              {{ $t('admin.import.title') }}
+            </span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+
     <UCard>
       <template #header>
         <div class="flex items-center justify-between">

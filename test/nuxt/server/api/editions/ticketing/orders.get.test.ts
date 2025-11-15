@@ -119,22 +119,20 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
 
     prismaMock.ticketingOrder.count.mockResolvedValue(1)
     prismaMock.ticketingOrder.findMany
-      .mockResolvedValueOnce(
-        [
-          {
-            ...mockFilteredOrders[0],
-            externalTicketing: null,
-            items: [
-              {
-                id: 1,
-                type: 'Participant',
-                amount: 5000,
-                tier: { id: 1, name: 'Tarif normal', returnableItems: [] },
-              },
-            ],
-          },
-        ] as any
-      ) // Pour la pagination
+      .mockResolvedValueOnce([
+        {
+          ...mockFilteredOrders[0],
+          externalTicketing: null,
+          items: [
+            {
+              id: 1,
+              type: 'Participant',
+              amount: 5000,
+              tier: { id: 1, name: 'Tarif normal', returnableItems: [] },
+            },
+          ],
+        },
+      ] as any) // Pour la pagination
       .mockResolvedValueOnce(mockFilteredOrders as any) // Pour les stats
 
     const res = await handler(baseEvent as any)
@@ -174,7 +172,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     )
   })
 
-  it('applique les filtres de statut d\'entrée aux stats', async () => {
+  it("applique les filtres de statut d'entrée aux stats", async () => {
     mockCanAccess.mockResolvedValue(true)
     global.getQuery.mockReturnValue({ page: '1', limit: '20', entryStatus: 'validated' })
 
@@ -188,23 +186,21 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
 
     prismaMock.ticketingOrder.count.mockResolvedValue(1)
     prismaMock.ticketingOrder.findMany
-      .mockResolvedValueOnce(
-        [
-          {
-            ...mockFilteredOrders[0],
-            externalTicketing: null,
-            items: [
-              {
-                id: 1,
-                type: 'Participant',
-                amount: 5000,
-                entryValidated: true,
-                tier: { id: 1, name: 'Tarif normal', returnableItems: [] },
-              },
-            ],
-          },
-        ] as any
-      ) // Pour la pagination
+      .mockResolvedValueOnce([
+        {
+          ...mockFilteredOrders[0],
+          externalTicketing: null,
+          items: [
+            {
+              id: 1,
+              type: 'Participant',
+              amount: 5000,
+              entryValidated: true,
+              tier: { id: 1, name: 'Tarif normal', returnableItems: [] },
+            },
+          ],
+        },
+      ] as any) // Pour la pagination
       .mockResolvedValueOnce(mockFilteredOrders as any) // Pour les stats
 
     const res = await handler(baseEvent as any)
@@ -309,7 +305,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     const ev = { ...baseEvent, context: { ...baseEvent.context, params: { id: '0' } } }
     global.getQuery.mockReturnValue({ page: '1', limit: '20' })
 
-    await expect(handler(ev as any)).rejects.toThrow('ID d\'édition invalide')
+    await expect(handler(ev as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('combine plusieurs filtres', async () => {
