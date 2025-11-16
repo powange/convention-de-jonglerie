@@ -1,3 +1,7 @@
+import {
+  ensureVolunteerConversations,
+  removeVolunteerFromTeamConversations,
+} from '../../messenger-helpers'
 import { prisma } from '../../prisma'
 
 /**
@@ -71,10 +75,36 @@ export async function getVolunteerTeamAssignments(applicationId: number) {
  */
 export async function assignVolunteerToTeams(applicationId: number, teamIds: string[]) {
   return await prisma.$transaction(async (tx) => {
+    // Récupérer l'application pour avoir l'editionId et userId
+    const application = await tx.editionVolunteerApplication.findUnique({
+      where: { id: applicationId },
+      select: { editionId: true, userId: true },
+    })
+
+    if (!application) {
+      throw new Error('Candidature introuvable')
+    }
+
+    // Récupérer les anciennes assignations avant de les supprimer
+    const oldAssignments = await tx.applicationTeamAssignment.findMany({
+      where: { applicationId },
+      select: { teamId: true },
+    })
+
     // Supprimer toutes les assignations existantes
     await tx.applicationTeamAssignment.deleteMany({
       where: { applicationId },
     })
+
+    // Retirer le bénévole des conversations des anciennes équipes
+    for (const oldAssignment of oldAssignments) {
+      await removeVolunteerFromTeamConversations(
+        application.editionId,
+        oldAssignment.teamId,
+        application.userId,
+        tx
+      )
+    }
 
     // Dédupliquer les teamIds
     const uniqueTeamIds = [...new Set(teamIds)]
@@ -88,6 +118,11 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
           isLeader: false,
         })),
       })
+
+      // Créer les conversations pour les nouvelles équipes
+      for (const teamId of uniqueTeamIds) {
+        await ensureVolunteerConversations(application.editionId, teamId, application.userId, tx)
+      }
     }
 
     // Récupérer et retourner les assignations créées
@@ -115,6 +150,16 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
  */
 export async function addVolunteerToTeam(applicationId: number, teamId: string) {
   return await prisma.$transaction(async (tx) => {
+    // Récupérer l'application pour avoir l'editionId et userId
+    const application = await tx.editionVolunteerApplication.findUnique({
+      where: { id: applicationId },
+      select: { editionId: true, userId: true },
+    })
+
+    if (!application) {
+      throw new Error('Candidature introuvable')
+    }
+
     // Vérifier si l'assignation existe déjà
     const existingAssignment = await tx.applicationTeamAssignment.findUnique({
       where: {
@@ -148,6 +193,9 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
       },
     })
 
+    // Créer les conversations pour cette équipe
+    await ensureVolunteerConversations(application.editionId, teamId, application.userId, tx)
+
     return assignment
   })
 }
@@ -159,6 +207,16 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
  */
 export async function removeVolunteerFromTeam(applicationId: number, teamId: string) {
   return await prisma.$transaction(async (tx) => {
+    // Récupérer l'application pour avoir l'editionId et userId
+    const application = await tx.editionVolunteerApplication.findUnique({
+      where: { id: applicationId },
+      select: { editionId: true, userId: true },
+    })
+
+    if (!application) {
+      throw new Error('Candidature introuvable')
+    }
+
     // Supprimer l'assignation
     await tx.applicationTeamAssignment.delete({
       where: {
@@ -168,6 +226,14 @@ export async function removeVolunteerFromTeam(applicationId: number, teamId: str
         },
       },
     })
+
+    // Retirer le bénévole des conversations de cette équipe
+    await removeVolunteerFromTeamConversations(
+      application.editionId,
+      teamId,
+      application.userId,
+      tx
+    )
   })
 }
 

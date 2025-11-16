@@ -65,6 +65,7 @@ model User {
   artistPickupResponsibilities       EditionArtist[]                     @relation("ArtistPickupResponsible")
   artistDropoffResponsibilities      EditionArtist[]                     @relation("ArtistDropoffResponsible")
   volunteerComments                  VolunteerComment[]
+  conversationParticipants           ConversationParticipant[]
 }
 
 model Edition {
@@ -171,6 +172,7 @@ model Edition {
   ticketingCounters                 TicketingCounter[]
   volunteerComments                 VolunteerComment[]
   editionOrganizers                 EditionOrganizer[]
+  conversations                     Conversation[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -774,6 +776,7 @@ model VolunteerTeam {
   timeSlots            VolunteerTimeSlot[]
   assignedApplications ApplicationTeamAssignment[]
   returnableItems      EditionVolunteerReturnableItem[]
+  conversations        Conversation[]
 
   @@index([editionId])
 }
@@ -1527,4 +1530,64 @@ model VolunteerComment {
   @@unique([userId, editionId])
   @@index([userId])
   @@index([editionId])
+}
+
+// ========== MESSAGERIE ==========
+
+enum ConversationType {
+  TEAM_GROUP // Discussion de groupe d'équipe
+  TEAM_LEADER_PRIVATE // Conversation privée avec le responsable d'équipe
+}
+
+model Conversation {
+  id        String           @id @default(cuid())
+  editionId Int
+  teamId    String
+  type      ConversationType
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  edition      Edition                   @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  team         VolunteerTeam             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([editionId])
+  @@index([teamId])
+  @@index([type])
+}
+
+model ConversationParticipant {
+  id             String    @id @default(cuid())
+  conversationId String
+  userId         Int
+  joinedAt       DateTime  @default(now())
+  leftAt         DateTime? // NULL = toujours participant, non-NULL = a quitté
+  lastReadAt     DateTime? // Pour les badges "non lu"
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@index([leftAt])
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  participantId  String
+  content        String    @db.Text
+  createdAt      DateTime  @default(now())
+  editedAt       DateTime?
+  deletedAt      DateTime? // Soft delete
+
+  conversation Conversation            @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  participant  ConversationParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([participantId])
+  @@index([createdAt])
 }
