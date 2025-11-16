@@ -1,6 +1,21 @@
 <template>
-  <div class="w-full h-96">
-    <Bar v-if="chartData" :data="chartData" :options="chartOptions" />
+  <div>
+    <!-- Bouton d'export -->
+    <div class="flex justify-end mb-4">
+      <UButton
+        icon="i-heroicons-arrow-down-tray"
+        variant="outline"
+        :loading="exporting"
+        @click="handleExport"
+      >
+        {{ $t('gestion.ticketing.stats_export_pdf') }}
+      </UButton>
+    </div>
+
+    <!-- Graphique -->
+    <div ref="chartContainer" class="w-full h-96">
+      <Bar v-if="chartData" :data="chartData" :options="chartOptions" />
+    </div>
   </div>
 </template>
 
@@ -47,6 +62,27 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { t } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
+const { exportChartToPDF } = useChartExport()
+
+// Référence au conteneur du graphique
+const chartContainer = ref<HTMLElement | null>(null)
+const exporting = ref(false)
+
+// Fonction d'export
+const handleExport = async () => {
+  if (!chartContainer.value) return
+
+  exporting.value = true
+  try {
+    const title = t('gestion.ticketing.stats_chart_title')
+    const filename = `validations-acces-${new Date().toISOString().split('T')[0]}`
+    await exportChartToPDF(chartContainer.value, filename, title)
+  } catch (error) {
+    console.error("Erreur lors de l'export PDF:", error)
+  } finally {
+    exporting.value = false
+  }
+}
 
 // Récupérer les configurations de couleurs
 const ticketConfig = getParticipantTypeConfig('ticket')

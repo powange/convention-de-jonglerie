@@ -184,7 +184,8 @@
       "stats_orders": "commandes",
       "stats_order": "commande",
       "stats_filter_tiers": "Filtrer par tarifs",
-      "stats_filter_tiers_placeholder": "Tous les tarifs"
+      "stats_filter_tiers_placeholder": "Tous les tarifs",
+      "stats_export_pdf": "Exporter en PDF"
     },
     "artists": {
       "title": "Artistes",
