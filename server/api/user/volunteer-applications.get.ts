@@ -121,6 +121,7 @@ export default wrapApiHandler(
               title: true,
               startDateTime: true,
               endDateTime: true,
+              delayMinutes: true,
               editionId: true,
               team: {
                 select: {

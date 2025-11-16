@@ -7,11 +7,35 @@
         <p class="font-medium text-blue-900 dark:text-blue-100 text-sm mb-1">
           {{ timeSlot.title || t('pages.volunteers.unnamed_slot') }}
         </p>
-        <div class="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 mb-2">
-          <UIcon name="i-heroicons-calendar-days" class="w-3 h-3" />
-          <span>
-            {{ formatSlotDateTime(timeSlot.startDateTime, timeSlot.endDateTime) }}
-          </span>
+        <div class="mb-2">
+          <div class="flex items-center gap-2 text-xs mb-1">
+            <UIcon name="i-heroicons-calendar-days" class="w-3 h-3" />
+            <span
+              :class="
+                timeSlot.delayMinutes && timeSlot.delayMinutes > 0
+                  ? 'line-through text-gray-400 dark:text-gray-500'
+                  : 'text-blue-700 dark:text-blue-300'
+              "
+            >
+              {{ formatSlotDateTime(timeSlot.startDateTime, timeSlot.endDateTime) }}
+            </span>
+          </div>
+          <div
+            v-if="timeSlot.delayMinutes && timeSlot.delayMinutes > 0"
+            class="flex items-center gap-2 text-xs text-orange-600 dark:text-orange-400"
+          >
+            <UIcon name="i-heroicons-clock" class="w-3 h-3" />
+            <span class="font-medium">
+              {{
+                formatSlotDateTimeWithDelay(
+                  timeSlot.startDateTime,
+                  timeSlot.endDateTime,
+                  timeSlot.delayMinutes
+                )
+              }}
+              <span class="text-orange-500 text-[10px]">(+{{ timeSlot.delayMinutes }}min)</span>
+            </span>
+          </div>
         </div>
         <div v-if="timeSlot.team" class="flex items-center gap-2">
           <div
@@ -39,6 +63,7 @@ interface TimeSlot {
   title: string
   startDateTime: string
   endDateTime: string
+  delayMinutes?: number | null
   description?: string
   team?: {
     id: string
@@ -95,5 +120,37 @@ const formatSlotDuration = (startDateTime: string, endDateTime: string) => {
     return minutes > 0 ? `${hours}h${minutes}m` : `${hours}h`
   }
   return `${minutes}m`
+}
+
+// Fonction pour formater les dates et heures avec le retard appliqué
+const formatSlotDateTimeWithDelay = (
+  startDateTime: string,
+  endDateTime: string,
+  delayMinutes: number
+) => {
+  const start = new Date(startDateTime)
+  const end = new Date(endDateTime)
+
+  // Ajouter le retard
+  start.setMinutes(start.getMinutes() + delayMinutes)
+  end.setMinutes(end.getMinutes() + delayMinutes)
+
+  const dateStr = start.toLocaleDateString('fr-FR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+
+  const startTimeStr = start.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  const endTimeStr = end.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  return `${dateStr} • ${startTimeStr} - ${endTimeStr}`
 }
 </script>

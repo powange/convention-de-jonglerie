@@ -191,6 +191,7 @@ const convertedTimeSlots = computed(() => {
       assignedVolunteers: slot.assignedVolunteers,
       color: slot.color,
       description: slot.description,
+      delayMinutes: slot.delayMinutes, // Retard du créneau
       assignedVolunteersList: [...(slot.assignments || [])], // Copie directe des assignments
     })
   )

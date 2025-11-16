@@ -15,13 +15,10 @@ export default defineTask({
       const reminderStart = new Date(now.getTime() + 28 * 60 * 1000) // Dans 28 minutes
       const reminderEnd = new Date(now.getTime() + 32 * 60 * 1000) // Dans 32 minutes
 
-      // Trouver tous les créneaux qui commencent dans cette fenêtre
-      const upcomingSlots = await prisma.volunteerTimeSlot.findMany({
+      // Récupérer tous les créneaux des éditions en cours
+      // On ne peut pas filtrer directement par date car il faut prendre en compte le delayMinutes
+      const allSlots = await prisma.volunteerTimeSlot.findMany({
         where: {
-          startDateTime: {
-            gte: reminderStart,
-            lte: reminderEnd,
-          },
           // Seulement les créneaux des éditions futures
           edition: {
             endDate: {
@@ -63,6 +60,13 @@ export default defineTask({
         },
       })
 
+      // Filtrer manuellement en tenant compte du delayMinutes
+      const upcomingSlots = allSlots.filter((slot) => {
+        const delay = slot.delayMinutes || 0
+        const adjustedStart = new Date(slot.startDateTime.getTime() + delay * 60 * 1000)
+        return adjustedStart >= reminderStart && adjustedStart <= reminderEnd
+      })
+
       console.log(`📅 Trouvé ${upcomingSlots.length} créneaux dans les 30 prochaines minutes`)
 
       let totalNotificationsSent = 0
@@ -74,7 +78,11 @@ export default defineTask({
           const slotTitle = slot.title || 'Créneau bénévole'
           const teamName = slot.team?.name || 'Équipe non assignée'
 
-          const startTime = slot.startDateTime.toLocaleTimeString('fr-FR', {
+          // Calculer l'heure de début ajustée avec le retard
+          const delay = slot.delayMinutes || 0
+          const adjustedStartDateTime = new Date(slot.startDateTime.getTime() + delay * 60 * 1000)
+
+          const startTime = adjustedStartDateTime.toLocaleTimeString('fr-FR', {
             hour: '2-digit',
             minute: '2-digit',
             timeZone: 'Europe/Paris',

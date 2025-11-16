@@ -102,12 +102,21 @@ export default wrapApiHandler(async (event) => {
       // Formater les créneaux pour l'affichage
       const scheduleText = assignments
         .map((assignment) => {
-          const date = new Date(assignment.timeSlot.startDateTime).toLocaleDateString('fr-FR', {
+          // Calculer les dates ajustées avec le retard
+          const delay = assignment.timeSlot.delayMinutes || 0
+          const adjustedStart = new Date(
+            assignment.timeSlot.startDateTime.getTime() + delay * 60 * 1000
+          )
+          const adjustedEnd = new Date(
+            assignment.timeSlot.endDateTime.getTime() + delay * 60 * 1000
+          )
+
+          const date = adjustedStart.toLocaleDateString('fr-FR', {
             weekday: 'long',
             day: 'numeric',
             month: 'long',
           })
-          const timeRange = `${new Date(assignment.timeSlot.startDateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${new Date(assignment.timeSlot.endDateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+          const timeRange = `${adjustedStart.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${adjustedEnd.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
           const teamName = assignment.timeSlot.team?.name || 'Équipe non définie'
           return `📅 ${date} (${timeRange}) - ${teamName}`
         })
@@ -137,10 +146,12 @@ export default wrapApiHandler(async (event) => {
 
       // Préparer les créneaux pour l'email avec le format attendu
       const emailTimeSlots = assignments.map((assignment) => {
-        const startDate = new Date(assignment.timeSlot.startDateTime)
-        const endDate = new Date(assignment.timeSlot.endDateTime)
+        // Calculer les dates ajustées avec le retard
+        const delay = assignment.timeSlot.delayMinutes || 0
+        const startDate = new Date(assignment.timeSlot.startDateTime.getTime() + delay * 60 * 1000)
+        const endDate = new Date(assignment.timeSlot.endDateTime.getTime() + delay * 60 * 1000)
 
-        // Déterminer le moment de la journée basé sur l'heure de début
+        // Déterminer le moment de la journée basé sur l'heure de début ajustée
         const hour = startDate.getHours()
         let timeOfDay: 'MORNING' | 'AFTERNOON' | 'EVENING'
         if (hour < 12) {

@@ -113,11 +113,27 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const slotTitle = slot.title || t('edition.volunteers.untitled_slot')
       const counterInfo = `(${slot.assignedVolunteers}/${slot.maxVolunteers})`
 
+      // Calculer les heures décalées si delayMinutes est présent
+      let adjustedStart = slot.start
+      let adjustedEnd = slot.end
+
+      if (slot.delayMinutes && slot.delayMinutes > 0) {
+        const startDate = new Date(slot.start)
+        const endDate = new Date(slot.end)
+
+        // Ajouter le retard en minutes
+        startDate.setMinutes(startDate.getMinutes() + slot.delayMinutes)
+        endDate.setMinutes(endDate.getMinutes() + slot.delayMinutes)
+
+        adjustedStart = startDate.toISOString()
+        adjustedEnd = endDate.toISOString()
+      }
+
       return {
         id: slot.id,
         title: `${slotTitle} ${counterInfo}`, // Titre simple pour les cas où eventContent n'est pas utilisé
-        start: slot.start,
-        end: slot.end,
+        start: adjustedStart,
+        end: adjustedEnd,
         resourceId: slot.teamId || 'unassigned',
         color: slot.color,
         extendedProps: {
@@ -127,6 +143,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           teamId: slot.teamId,
           assignedVolunteersList: slot.assignedVolunteersList,
           slotTitle, // Titre original pour eventContent
+          delayMinutes: slot.delayMinutes, // Retard du créneau
+          originalStart: slot.start, // Heure de début originale
+          originalEnd: slot.end, // Heure de fin originale
         },
       }
     })
@@ -256,6 +275,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const slotTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
       const counterInfo = `(${event.extendedProps.assignedVolunteers}/${event.extendedProps.maxVolunteers})`
       const assignedVolunteersList = event.extendedProps.assignedVolunteersList || []
+      const delayMinutes = event.extendedProps.delayMinutes
 
       // Créer le conteneur principal
       const container = document.createElement('div')
@@ -266,6 +286,18 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       titleDiv.className = 'slot-title'
       titleDiv.textContent = `${slotTitle} ${counterInfo}`
       container.appendChild(titleDiv)
+
+      // Afficher le retard sur une ligne séparée si présent
+      if (delayMinutes && delayMinutes > 0) {
+        const delayDiv = document.createElement('div')
+        delayDiv.className = 'slot-delay'
+        delayDiv.style.fontSize = '0.7rem'
+        delayDiv.style.color = '#f59e0b' // Orange pour le retard
+        delayDiv.style.fontWeight = '500'
+        delayDiv.style.marginTop = '2px'
+        delayDiv.textContent = `⏱️ Retard: +${delayMinutes}min`
+        container.appendChild(delayDiv)
+      }
 
       // Section des avatars si il y a des bénévoles assignés
       if (assignedVolunteersList.length > 0) {

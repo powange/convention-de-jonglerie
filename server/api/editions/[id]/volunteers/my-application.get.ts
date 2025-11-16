@@ -106,6 +106,7 @@ export default wrapApiHandler(async (event) => {
             title: true,
             startDateTime: true,
             endDateTime: true,
+            delayMinutes: true,
             team: {
               select: {
                 id: true,

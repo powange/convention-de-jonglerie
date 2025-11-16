@@ -55,6 +55,7 @@ interface TimeSlotAssignment {
     title: string
     startDateTime: string
     endDateTime: string
+    delayMinutes?: number | null
     description?: string
     team?: {
       id: string
