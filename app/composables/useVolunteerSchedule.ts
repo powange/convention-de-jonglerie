@@ -61,10 +61,69 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   } = options
 
   // Computed pour les dates réactives
-  const startDate = computed(() => unref(options.editionStartDate))
-  const endDate = computed(() => unref(options.editionEndDate))
+  const editionStartDate = computed(() => unref(options.editionStartDate))
+  const editionEndDate = computed(() => unref(options.editionEndDate))
   const isReadOnly = computed(() => unref(options.readOnly) ?? false)
   const slotDurationMinutes = computed(() => unref(options.slotDuration) ?? 15)
+
+  // En mode lecture seule, calculer les dates du premier et dernier créneau
+  const startDate = computed(() => {
+    if (!isReadOnly.value) {
+      return editionStartDate.value
+    }
+
+    const slots = unref(timeSlots)
+    if (slots.length === 0) {
+      return editionStartDate.value
+    }
+
+    // Trouver le créneau avec la date de début la plus ancienne (en tenant compte du retard)
+    const earliestSlot = slots.reduce((earliest, slot) => {
+      const slotStart = new Date(slot.start)
+      const earliestStart = new Date(earliest.start)
+
+      // Appliquer le retard si présent
+      if (slot.delayMinutes) {
+        slotStart.setMinutes(slotStart.getMinutes() + slot.delayMinutes)
+      }
+      if (earliest.delayMinutes) {
+        earliestStart.setMinutes(earliestStart.getMinutes() + earliest.delayMinutes)
+      }
+
+      return slotStart < earliestStart ? slot : earliest
+    })
+
+    return earliestSlot.start
+  })
+
+  const endDate = computed(() => {
+    if (!isReadOnly.value) {
+      return editionEndDate.value
+    }
+
+    const slots = unref(timeSlots)
+    if (slots.length === 0) {
+      return editionEndDate.value
+    }
+
+    // Trouver le créneau avec la date de fin la plus tardive (en tenant compte du retard)
+    const latestSlot = slots.reduce((latest, slot) => {
+      const slotEnd = new Date(slot.end)
+      const latestEnd = new Date(latest.end)
+
+      // Appliquer le retard si présent
+      if (slot.delayMinutes) {
+        slotEnd.setMinutes(slotEnd.getMinutes() + slot.delayMinutes)
+      }
+      if (latest.delayMinutes) {
+        latestEnd.setMinutes(latestEnd.getMinutes() + latest.delayMinutes)
+      }
+
+      return slotEnd > latestEnd ? slot : latest
+    })
+
+    return latestSlot.end
+  })
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
@@ -462,9 +521,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     { deep: true, immediate: true }
   )
 
-  // Watcher pour les dates d'édition
+  // Watcher pour les dates d'édition et les créneaux (pour le mode lecture seule)
   watch(
-    [startDate, endDate],
+    [startDate, endDate, timeSlots],
     ([newStartDate, newEndDate]) => {
       if (newStartDate && newEndDate) {
         calendarOptions.initialDate = newStartDate
