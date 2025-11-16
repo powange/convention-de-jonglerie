@@ -151,19 +151,6 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     })
   })
 
-  // Calcul de l'heure de début pour l'affichage initial
-  const initialScrollTime = computed(() => {
-    const startDateValue = startDate.value
-    if (startDateValue) {
-      const date = new Date(startDateValue)
-      // Extraire l'heure et retourner au format HH:MM:SS
-      const hours = date.getHours().toString().padStart(2, '0')
-      const minutes = date.getMinutes().toString().padStart(2, '0')
-      return `${hours}:${minutes}:00`
-    }
-    return '08:00:00' // Fallback par défaut
-  })
-
   // Configuration du calendrier
   const calendarOptions = reactive<CalendarOptions>({
     plugins: plugins.value,
@@ -187,9 +174,6 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     slotMaxTime: '24:00:00',
     slotDuration: `00:${String(slotDurationMinutes.value).padStart(2, '0')}:00`, // Granularité dynamique
     slotLabelInterval: '01:00:00', // Libellés toutes les heures
-
-    // Heure de défilement initial basée sur l'heure de début de l'édition
-    scrollTime: initialScrollTime.value,
 
     // Configuration des ressources
     resources: [],
@@ -488,21 +472,6 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           start: newStartDate,
           end: newEndDate,
         }
-
-        // Mettre à jour l'heure de défilement
-        calendarOptions.scrollTime = initialScrollTime.value
-
-        // Forcer la mise à jour du calendrier si il est déjà initialisé
-        nextTick(() => {
-          if (calendarRef.value && ready.value) {
-            const calendarApi = calendarRef.value.getApi()
-            if (calendarApi) {
-              calendarApi.gotoDate(newStartDate)
-              // Forcer le scroll à la bonne heure
-              calendarApi.scrollToTime(initialScrollTime.value)
-            }
-          }
-        })
       }
     },
     { immediate: true }

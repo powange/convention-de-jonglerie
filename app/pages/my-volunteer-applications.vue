@@ -34,23 +34,6 @@
             <span class="sm:hidden">{{ $t('pages.volunteers.view_compact') }}</span>
           </UButton>
         </UFieldGroup>
-
-        <!-- Export planning -->
-        <UDropdownMenu
-          v-if="acceptedApplications.length > 0"
-          :items="exportMenuItems"
-          class="w-full sm:w-auto"
-        >
-          <UButton
-            color="primary"
-            variant="outline"
-            icon="i-heroicons-arrow-down-tray"
-            size="sm"
-            class="w-full sm:w-auto justify-center"
-          >
-            {{ $t('pages.volunteers.export') }}
-          </UButton>
-        </UDropdownMenu>
       </div>
     </div>
 
@@ -221,32 +204,17 @@
 
           <div class="space-y-4">
             <!-- Créneaux assignés -->
-            <div
+            <VolunteersTimeSlotsList
               v-if="
                 application.status === 'ACCEPTED' &&
                 application.assignedTimeSlots &&
                 application.assignedTimeSlots.length > 0
               "
-            >
-              <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <UIcon name="i-heroicons-clock" class="text-blue-600 dark:text-blue-400" />
-                {{ $t('pages.volunteers.assigned_time_slots') }}
-                <UBadge color="info" variant="soft" size="sm">
-                  {{ application.assignedTimeSlots.length }}
-                </UBadge>
-              </h4>
-              <div class="space-y-3">
-                <VolunteersTimeSlotCard
-                  v-for="assignment in application.assignedTimeSlots"
-                  :key="assignment.id"
-                  :time-slot="assignment.timeSlot"
-                />
-              </div>
-              <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                {{ $t('pages.volunteers.total_hours') }}:
-                {{ calculateTotalHours(application.assignedTimeSlots) }}h
-              </div>
-            </div>
+              :time-slots="getTimeSlotsFromAssignments(application.assignedTimeSlots)"
+              :volunteer-name="volunteerFullName"
+              show-header
+              show-stats
+            />
 
             <!-- Note d'acceptation -->
             <div
@@ -287,12 +255,12 @@
                   v-if="
                     application.status === 'ACCEPTED' && application.assignedTimeSlots?.length > 0
                   "
+                  :to="`/editions/${application.edition.id}/volunteers`"
                   size="sm"
                   color="info"
                   variant="outline"
                   icon="i-heroicons-calendar-days"
                   class="flex-1 sm:flex-none"
-                  @click="showPlanning(application)"
                 >
                   <span class="hidden sm:inline">{{ $t('pages.volunteers.view_planning') }}</span>
                   <span class="sm:hidden">Planning</span>
@@ -498,101 +466,6 @@
       v-model:open="qrCodeModalOpen"
       :application="selectedApplicationForQrCode"
     />
-
-    <!-- Modal Planning -->
-    <UModal v-model:open="planningModalOpen" :ui="{ width: 'max-w-4xl' }">
-      <template #header>
-        <div class="flex items-center gap-3">
-          <UIcon name="i-heroicons-calendar-days" class="text-blue-600" size="20" />
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $t('pages.volunteers.my_planning') }}
-            </h3>
-            <p v-if="selectedApplication" class="text-sm text-gray-600 dark:text-gray-400">
-              {{ getEditionDisplayName(selectedApplication.edition) }}
-            </p>
-          </div>
-        </div>
-      </template>
-
-      <div v-if="selectedApplication" class="space-y-4">
-        <!-- Statistiques du planning -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-            <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-clock" class="text-blue-600" size="24" />
-              <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Total heures</p>
-                <p class="text-xl font-semibold text-blue-600">
-                  {{ calculateTotalHours(selectedApplication.assignedTimeSlots || []) }}h
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-            <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-calendar-days" class="text-green-600" size="24" />
-              <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Créneaux</p>
-                <p class="text-xl font-semibold text-green-600">
-                  {{ selectedApplication.assignedTimeSlots?.length || 0 }}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-            <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-user-group" class="text-purple-600" size="24" />
-              <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Équipes</p>
-                <p class="text-xl font-semibold text-purple-600">
-                  {{ getUniqueTeamsCount(selectedApplication.assignedTimeSlots || []) }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Liste des créneaux -->
-        <div class="space-y-3">
-          <h4 class="font-medium text-gray-900 dark:text-white">
-            {{ $t('pages.volunteers.assigned_time_slots') }}
-          </h4>
-          <VolunteersTimeSlotCard
-            v-for="assignment in selectedApplication.assignedTimeSlots"
-            :key="assignment.id"
-            :time-slot="assignment.timeSlot"
-            show-duration
-          />
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="flex justify-between">
-          <UButton color="neutral" variant="ghost" @click="planningModalOpen = false">
-            {{ $t('common.close') }}
-          </UButton>
-          <div class="flex gap-2">
-            <UButton
-              color="info"
-              variant="outline"
-              icon="i-heroicons-arrow-down-tray"
-              @click="exportPlanning('pdf')"
-            >
-              {{ $t('pages.volunteers.export_pdf') }}
-            </UButton>
-            <UButton
-              color="success"
-              variant="outline"
-              icon="i-heroicons-calendar"
-              @click="exportPlanning('ical')"
-            >
-              {{ $t('pages.volunteers.export_ical') }}
-            </UButton>
-          </div>
-        </div>
-      </template>
-    </UModal>
   </div>
 </template>
 
@@ -612,6 +485,13 @@ definePageMeta({
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
 const toast = useToast()
+const { user } = useUserSession()
+
+// Nom complet du bénévole
+const volunteerFullName = computed(() => {
+  if (!user.value) return undefined
+  return `${user.value.prenom} ${user.value.nom}`
+})
 
 // Cache pour les settings des bénévoles par édition
 const volunteersSettingsCache = ref<Map<number, any>>(new Map())
@@ -636,8 +516,6 @@ const getVolunteerSettings = async (editionId: number) => {
 // États de la vue
 const viewMode = ref<'detailed' | 'compact'>('detailed')
 const activeTab = ref('all')
-const planningModalOpen = ref(false)
-const selectedApplication = ref<any>(null)
 const detailsModalOpen = ref(false)
 const selectedApplicationForDetails = ref<any>(null)
 const qrCodeModalOpen = ref(false)
@@ -710,11 +588,6 @@ const filteredApplications = computed(() => {
   }
 })
 
-// Applications acceptées pour export
-const acceptedApplications = computed(() => {
-  return applicationsWithSettings.value?.filter((app) => app.status === 'ACCEPTED') || []
-})
-
 // Configuration des onglets
 const tabs = computed(() => [
   {
@@ -759,24 +632,6 @@ const tabs = computed(() => [
     badgeColor: 'gray',
   },
 ])
-
-// Menu d'export
-const exportMenuItems = [
-  [
-    {
-      label: t('pages.volunteers.export_pdf'),
-      icon: 'i-heroicons-document-text',
-      onSelect: () => exportPlanning('pdf'),
-    },
-  ],
-  [
-    {
-      label: t('pages.volunteers.export_ical'),
-      icon: 'i-heroicons-calendar',
-      onSelect: () => exportPlanning('ical'),
-    },
-  ],
-]
 
 // Fonctions utilitaires
 const getEditionDisplayName = (edition: any) => {
@@ -850,18 +705,9 @@ const getStatusIcon = (status: string) => {
   }
 }
 
-// Fonction pour calculer le total d'heures
-const calculateTotalHours = (assignments: any[]) => {
-  let totalMs = 0
-
-  assignments.forEach((assignment) => {
-    const start = new Date(assignment.timeSlot.startDateTime)
-    const end = new Date(assignment.timeSlot.endDateTime)
-    totalMs += end.getTime() - start.getTime()
-  })
-
-  const totalHours = totalMs / (1000 * 60 * 60)
-  return totalHours.toFixed(1)
+// Fonction helper pour extraire les time slots des assignments
+const getTimeSlotsFromAssignments = (assignments: any[]) => {
+  return assignments.map((assignment) => assignment.timeSlot)
 }
 
 // Fonction pour retirer une candidature
@@ -894,44 +740,10 @@ const withdrawApplication = async (applicationId: number) => {
   }
 }
 
-// Fonction pour afficher le planning
-const showPlanning = (application: any) => {
-  selectedApplication.value = application
-  planningModalOpen.value = true
-}
-
 // Fonction pour afficher les détails de l'application
 const showApplicationDetails = (application: any) => {
   selectedApplicationForDetails.value = application
   detailsModalOpen.value = true
-}
-
-// Fonction d'export du planning
-const exportPlanning = async (format: 'pdf' | 'ical') => {
-  try {
-    const acceptedApps = acceptedApplications.value
-    if (acceptedApps.length === 0) {
-      toast.add({
-        title: 'Aucun planning à exporter',
-        description: "Vous n'avez pas de candidatures acceptées",
-        color: 'warning',
-      })
-      return
-    }
-
-    // TODO: Implémenter l'export selon le format
-    toast.add({
-      title: `Export ${format.toUpperCase()} en cours...`,
-      description: 'Cette fonctionnalité sera bientôt disponible',
-      color: 'info',
-    })
-  } catch (error: any) {
-    toast.add({
-      title: "Erreur lors de l'export",
-      description: error.message || 'Une erreur est survenue',
-      color: 'error',
-    })
-  }
 }
 
 // Fonction pour contacter l'organisateur
@@ -954,20 +766,6 @@ const showQrCode = (application: any) => {
 // const toggleDetails = (application: any) => {
 //   application.showDetails = !application.showDetails
 // }
-
-// Fonction pour compter les équipes uniques
-const getUniqueTeamsCount = (assignments: any[]) => {
-  if (!assignments || assignments.length === 0) return 0
-
-  const teamIds = new Set()
-  assignments.forEach((assignment) => {
-    if (assignment.timeSlot.team?.id) {
-      teamIds.add(assignment.timeSlot.team.id)
-    }
-  })
-
-  return teamIds.size
-}
 
 // États vides personnalisés
 const getEmptyStateIcon = () => {

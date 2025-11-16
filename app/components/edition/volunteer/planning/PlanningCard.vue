@@ -79,7 +79,7 @@
       <!-- Calendrier de planning -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <UiLazyFullCalendar
-          v-if="ready && calendarOptions && edition"
+          v-if="ready && calendarOptions && edition && internalTimeSlots.length > 0"
           ref="calendarRef"
           :options="calendarOptions"
           class="volunteer-planning-calendar"
@@ -143,7 +143,6 @@ const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
 const toast = useToast()
-const calendarRef = ref<any>()
 
 // Récupération automatique des teams et timeSlots si non fournis
 const editionId = computed(() => props.edition?.id)
@@ -326,7 +325,7 @@ const editionEndDate = computed(() => {
 })
 
 // Configuration du calendrier de planning
-const { calendarOptions, ready } = useVolunteerSchedule({
+const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   editionStartDate: editionStartDate,
   editionEndDate: editionEndDate,
   teams: filteredTeams,

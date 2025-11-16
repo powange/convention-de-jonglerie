@@ -164,3 +164,27 @@ export const addHoursToDateTimeLocal = (datetimeLocal: string, hours: number): s
   const newDate = new Date(date.getTime() + hours * 60 * 60 * 1000)
   return formatDateTimeLocal(newDate)
 }
+
+/**
+ * Formate une durée en format compact lisible
+ * @param ms - Durée en millisecondes
+ * @returns Texte formaté de manière compacte (ex: "2h30", "45min", "3h")
+ */
+export const formatDurationCompact = (ms: number): string => {
+  const totalMinutes = Math.floor(ms / (1000 * 60))
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+
+  // Si moins d'une heure, afficher en minutes
+  if (hours === 0) {
+    return `${minutes}min`
+  }
+
+  // Si pas de minutes, afficher seulement les heures
+  if (minutes === 0) {
+    return `${hours}h`
+  }
+
+  // Afficher heures et minutes
+  return `${hours}h${minutes.toString().padStart(2, '0')}`
+}
