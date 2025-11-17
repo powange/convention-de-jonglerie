@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
@@ -98,6 +99,7 @@ export default wrapApiHandler(
         const newUser = await prisma.user.create({
           data: {
             email: validatedData.email,
+            emailHash: getEmailHash(validatedData.email),
             prenom: validatedData.prenom,
             nom: validatedData.nom,
             pseudo: `${validatedData.prenom.toLowerCase()}_${validatedData.nom.toLowerCase()}_${Date.now()}`,

@@ -55,6 +55,7 @@
     "db:seed:password": "npx tsx scripts/list-seed-accounts.ts",
     "db:reset:dev": "npx prisma migrate reset --force --skip-seed",
     "db:assign-meals": "npx tsx scripts/assign-meals-to-accepted-volunteers.ts",
+    "db:add-email-hash": "npx tsx scripts/add-email-hash-to-users.ts",
     "messenger:create-conversations": "npx tsx scripts/messenger/create-conversations-for-existing-teams.ts",
     "docker:release:up": "docker compose -f docker-compose.release.yml up -d --build",
     "docker:release:down": "docker compose -f docker-compose.release.yml down",

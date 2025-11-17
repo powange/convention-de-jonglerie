@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process'
 import bcrypt from 'bcryptjs'
 import { config } from 'dotenv'
 
+import { getEmailHash } from '../server/utils/email-hash.js'
 import { prisma } from '../server/utils/prisma.js'
 
 config()
@@ -71,6 +72,7 @@ async function main() {
     user = await prisma.user.create({
       data: {
         email: adminEmail,
+        emailHash: getEmailHash(adminEmail),
         pseudo: adminPseudo,
         nom: 'Seed',
         prenom: 'Admin',
@@ -92,6 +94,7 @@ async function main() {
     superAdmin = await prisma.user.create({
       data: {
         email: superAdminEmail,
+        emailHash: getEmailHash(superAdminEmail),
         pseudo: 'SuperAdmin',
         nom: 'Powange',
         prenom: 'Admin',
@@ -118,6 +121,7 @@ async function main() {
     powangeUser = await prisma.user.create({
       data: {
         email: powangeUserEmail,
+        emailHash: getEmailHash(powangeUserEmail),
         pseudo: 'PowangeUser',
         nom: 'Comble',
         prenom: 'Pierre',
@@ -175,6 +179,7 @@ async function main() {
       testUser = await prisma.user.create({
         data: {
           ...userData,
+          emailHash: getEmailHash(userData.email),
           password: await bcrypt.hash('testpass', 10),
           isEmailVerified: true,
         },
@@ -193,6 +198,7 @@ async function main() {
       volunteerUser = await prisma.user.create({
         data: {
           ...volunteerData,
+          emailHash: getEmailHash(volunteerData.email),
           password: await bcrypt.hash('volunteer123', 10),
           isEmailVerified: true,
         },

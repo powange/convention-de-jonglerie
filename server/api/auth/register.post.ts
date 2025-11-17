@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import {
   sendEmail,
   generateVerificationCode,
@@ -47,6 +48,7 @@ export default wrapApiHandler(
       await prisma.user.create({
         data: {
           email: cleanEmail,
+          emailHash: getEmailHash(cleanEmail),
           password: hashedPassword,
           pseudo: cleanPseudo,
           nom: cleanNom,

@@ -1,6 +1,7 @@
 import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
+import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
 function slugifyPseudo(base: string) {
@@ -131,6 +132,7 @@ export default defineEventHandler(async (event) => {
     dbUser = await prisma.user.create({
       data: {
         email,
+        emailHash: getEmailHash(email),
         pseudo,
         nom,
         prenom,

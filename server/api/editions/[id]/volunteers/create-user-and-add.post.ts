@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils/emailService'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
@@ -241,6 +242,7 @@ export default wrapApiHandler(async (event) => {
   const newUser = await prisma.user.create({
     data: {
       email: cleanEmail,
+      emailHash: getEmailHash(cleanEmail),
       password: null, // Sera défini lors de la vérification
       pseudo,
       nom: cleanNom,
