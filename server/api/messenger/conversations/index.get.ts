@@ -17,13 +17,37 @@ export default wrapApiHandler(
     const query = getQuery(event)
     const { editionId } = querySchema.parse(query)
 
-    // Vérifier que l'utilisateur a accès à cette édition (via ses candidatures de bénévole)
-    const hasAccess = await prisma.editionVolunteerApplication.findFirst({
-      where: {
-        editionId,
-        userId: user.id,
-      },
-    })
+    // Vérifier que l'utilisateur a accès à cette édition
+    // Soit via une candidature de bénévole, soit en tant qu'organisateur
+    const [volunteerApplication, edition] = await Promise.all([
+      prisma.editionVolunteerApplication.findFirst({
+        where: {
+          editionId,
+          userId: user.id,
+        },
+      }),
+      prisma.edition.findUnique({
+        where: { id: editionId },
+        select: {
+          conventionId: true,
+          convention: {
+            select: {
+              organizers: {
+                where: {
+                  userId: user.id,
+                },
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ])
+
+    const isOrganizer = edition?.convention?.organizers?.length > 0
+    const hasAccess = volunteerApplication || isOrganizer
 
     if (!hasAccess) {
       throw createError({

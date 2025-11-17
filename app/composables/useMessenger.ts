@@ -30,32 +30,34 @@ export interface ConversationMessage {
   editedAt: Date | null
   participant: {
     id: string
-    userId: number
     user: {
       id: number
       pseudo: string
       profilePicture: string | null
+      emailHash: string | null
     }
   }
 }
 
 export interface Conversation {
   id: string
-  type: 'TEAM_GROUP' | 'TEAM_LEADER_PRIVATE'
+  type: 'TEAM_GROUP' | 'TEAM_LEADER_PRIVATE' | 'VOLUNTEER_TO_ORGANIZERS'
   createdAt: Date
   updatedAt: Date
   team: {
     id: string
     name: string
     color: string
-  }
+  } | null
   participants: ConversationParticipant[]
   messages: Array<{
     id: string
     content: string
     createdAt: Date
     participant: {
-      userId: number
+      user: {
+        id: number
+      }
     }
   }>
   _count: {

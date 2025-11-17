@@ -89,6 +89,34 @@ onMounted(async () => {
   )
 })
 
+// Statut de messagerie de l'utilisateur
+const messengerStatus = ref({
+  hasConversations: false,
+  unreadCount: 0,
+  conversationsCount: 0,
+})
+
+// Charger le statut de messagerie
+const loadMessengerStatus = async () => {
+  if (!authStore.isAuthenticated) return
+
+  try {
+    const status = await $fetch('/api/messenger/status')
+    messengerStatus.value = status
+  } catch {
+    messengerStatus.value = {
+      hasConversations: false,
+      unreadCount: 0,
+      conversationsCount: 0,
+    }
+  }
+}
+
+// Charger au montage
+onMounted(() => {
+  loadMessengerStatus()
+})
+
 // Configuration des items du dropdown utilisateur
 const userMenuItems = computed((): DropdownMenuItem[] => {
   const items: DropdownMenuItem[] = [
@@ -108,6 +136,16 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
       to: '/my-volunteer-applications',
     },
   ]
+
+  // Ajouter la messagerie si l'utilisateur a des conversations
+  if (messengerStatus.value.hasConversations) {
+    items.push({
+      label: t('navigation.messenger'),
+      icon: 'i-heroicons-chat-bubble-left-right',
+      to: '/messenger',
+      badge: messengerStatus.value.unreadCount > 0 ? messengerStatus.value.unreadCount : undefined,
+    })
+  }
 
   // Ajouter les favoris en mobile
   if (isMobile.value) {

@@ -46,14 +46,14 @@ describe('avatar utils', () => {
       expect(url).toContain('data:image/svg+xml;base64,')
     })
 
-    it('devrait utiliser un avatar avec initiales vides pour un utilisateur sans email ni emailHash', () => {
+    it('devrait utiliser Gravatar par défaut pour un utilisateur sans email ni emailHash ni pseudo', () => {
       const { getUserAvatar } = useAvatar()
 
       const user = { profilePicture: null }
       const url = getUserAvatar(user as any)
 
-      // Should return an SVG with empty initials
-      expect(url).toContain('data:image/svg+xml;base64,')
+      // Should return Gravatar default URL (pas d'initiales car pas de pseudo)
+      expect(url).toBe('https://www.gravatar.com/avatar/default?s=80&d=mp')
     })
 
     it("devrait utiliser profilePicture si c'est une URL absolue HTTP", () => {

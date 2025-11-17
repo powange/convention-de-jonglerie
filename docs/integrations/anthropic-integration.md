@@ -33,7 +33,7 @@ L'utilitaire `server/utils/anthropic.ts` fournit plusieurs fonctions pour intera
 ### Requête texte simple
 
 ```typescript
-import { askClaude, CLAUDE_MODELS } from '~/server/utils/anthropic'
+import { askClaude, CLAUDE_MODELS } from '@@/server/utils/anthropic'
 
 // Exemple dans un endpoint API
 export default defineEventHandler(async (event) => {
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
 ### Conversation multi-tours
 
 ```typescript
-import { conversationWithClaude, CLAUDE_MODELS } from '~/server/utils/anthropic'
+import { conversationWithClaude, CLAUDE_MODELS } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { messages } = await readBody(event)
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
 ### Analyse d'image (Vision)
 
 ```typescript
-import { analyzeImage } from '~/server/utils/anthropic'
+import { analyzeImage } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { imageBase64, mediaType } = await readBody(event)
@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
 ### Extraction de texte (OCR)
 
 ```typescript
-import { extractTextFromImage } from '~/server/utils/anthropic'
+import { extractTextFromImage } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { imageBase64 } = await readBody(event)
@@ -110,7 +110,7 @@ export default defineEventHandler(async (event) => {
 ### Analyse de plusieurs images
 
 ```typescript
-import { analyzeMultipleImages } from '~/server/utils/anthropic'
+import { analyzeMultipleImages } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { images } = await readBody(event)
@@ -132,7 +132,7 @@ export default defineEventHandler(async (event) => {
 Le module exporte les modèles Claude disponibles via `CLAUDE_MODELS` :
 
 ```typescript
-import { CLAUDE_MODELS } from '~/server/utils/anthropic'
+import { CLAUDE_MODELS } from '@@/server/utils/anthropic'
 
 // Modèles disponibles :
 CLAUDE_MODELS.SONNET_4 // 'claude-sonnet-4-20250514' (le plus récent)
@@ -150,7 +150,7 @@ Analyser un fichier Excel ou PDF de budget uploadé :
 
 ```typescript
 // server/api/editions/[id]/analyze-budget.post.ts
-import { analyzeImage } from '~/server/utils/anthropic'
+import { analyzeImage } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { imageBase64 } = await readBody(event)
@@ -176,7 +176,7 @@ Aider à la rédaction de descriptions d'éditions :
 
 ```typescript
 // server/api/editions/generate-description.post.ts
-import { askClaude, CLAUDE_MODELS } from '~/server/utils/anthropic'
+import { askClaude, CLAUDE_MODELS } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { editionData } = await readBody(event)
@@ -205,7 +205,7 @@ Détecter automatiquement le contenu inapproprié :
 
 ```typescript
 // server/api/moderate-comment.post.ts
-import { askClaude } from '~/server/utils/anthropic'
+import { askClaude } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { comment } = await readBody(event)
@@ -289,7 +289,7 @@ Traduire du contenu en tenant compte du contexte :
 
 ```typescript
 // server/api/translate.post.ts
-import { askClaude } from '~/server/utils/anthropic'
+import { askClaude } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   const { text, targetLanguage, context } = await readBody(event)
@@ -314,7 +314,7 @@ export default defineEventHandler(async (event) => {
 ## Gestion des erreurs
 
 ```typescript
-import { askClaude } from '~/server/utils/anthropic'
+import { askClaude } from '@@/server/utils/anthropic'
 
 export default defineEventHandler(async (event) => {
   try {

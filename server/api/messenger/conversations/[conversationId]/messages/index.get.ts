@@ -1,5 +1,6 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -51,12 +52,12 @@ export default wrapApiHandler(
         participant: {
           select: {
             id: true,
-            userId: true,
             user: {
               select: {
                 id: true,
                 pseudo: true,
                 profilePicture: true,
+                email: true,
               },
             },
           },
@@ -89,7 +90,22 @@ export default wrapApiHandler(
 
     const page = Math.floor(offset / limit) + 1
 
-    return createPaginatedResponse(messages.reverse(), total, page, limit)
+    // Transformer les messages pour ajouter emailHash et supprimer email
+    const transformedMessages = messages.map((message) => {
+      const { email, ...userWithoutEmail } = message.participant.user
+      return {
+        ...message,
+        participant: {
+          ...message.participant,
+          user: {
+            ...userWithoutEmail,
+            emailHash: getEmailHash(email),
+          },
+        },
+      }
+    })
+
+    return createPaginatedResponse(transformedMessages.reverse(), total, page, limit)
   },
   { operationName: 'GetConversationMessages' }
 )

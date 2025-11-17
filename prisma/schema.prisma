@@ -1537,18 +1537,19 @@ model VolunteerComment {
 enum ConversationType {
   TEAM_GROUP // Discussion de groupe d'équipe
   TEAM_LEADER_PRIVATE // Conversation privée avec le responsable d'équipe
+  VOLUNTEER_TO_ORGANIZERS // Conversation entre un bénévole et les organisateurs ayant les droits de gestion des bénévoles
 }
 
 model Conversation {
   id        String           @id @default(cuid())
   editionId Int
-  teamId    String
+  teamId    String? // Optionnel : uniquement pour les conversations liées à une équipe
   type      ConversationType
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
   edition      Edition                   @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  team         VolunteerTeam             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team         VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
   participants ConversationParticipant[]
   messages     Message[]
 

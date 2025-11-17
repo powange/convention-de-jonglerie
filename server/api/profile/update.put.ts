@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { sanitizeString } from '@@/server/utils/validation-helpers'
 import {
@@ -158,7 +159,11 @@ export default wrapApiHandler(
       },
     })
 
-    return updatedUser
+    // Ajouter emailHash pour la cohérence avec /api/session/me
+    return {
+      ...updatedUser,
+      emailHash: getEmailHash(updatedUser.email),
+    }
   },
   { operationName: 'UpdateProfile' }
 )

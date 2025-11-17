@@ -746,14 +746,29 @@ const showApplicationDetails = (application: any) => {
   detailsModalOpen.value = true
 }
 
-// Fonction pour contacter l'organisateur
-const contactOrganizer = (_application: any) => {
-  // TODO: Implémenter la logique de contact
-  toast.add({
-    title: 'Contact organisateur',
-    description: 'Cette fonctionnalité sera bientôt disponible',
-    color: 'info',
-  })
+// Fonction pour contacter les responsables bénévoles
+const contactOrganizer = async (application: any) => {
+  try {
+    // Créer ou récupérer la conversation avec les organisateurs
+    const response = await $fetch('/api/messenger/volunteer-to-organizers', {
+      method: 'POST',
+      body: {
+        editionId: application.edition.id,
+      },
+    })
+
+    // Rediriger vers la page messenger avec la conversation
+    navigateTo(`/messenger?conversation=${response.conversationId}`)
+  } catch (error: any) {
+    console.error('Erreur lors de la création de la conversation:', error)
+    toast.add({
+      title: t('common.error'),
+      description:
+        error.data?.message ||
+        'Erreur lors de la création de la conversation avec les organisateurs',
+      color: 'error',
+    })
+  }
 }
 
 // Fonction pour afficher le QR code

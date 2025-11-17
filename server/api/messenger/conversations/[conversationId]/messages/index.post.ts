@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -79,12 +80,12 @@ export default wrapApiHandler(
         participant: {
           select: {
             id: true,
-            userId: true,
             user: {
               select: {
                 id: true,
                 pseudo: true,
                 profilePicture: true,
+                email: true,
               },
             },
           },
@@ -101,13 +102,15 @@ export default wrapApiHandler(
     // Envoyer des notifications aux autres participants
     const _editionName =
       participant.conversation.edition.name || participant.conversation.edition.convention.name
-    const teamName = participant.conversation.team.name
+    const teamName = participant.conversation.team?.name
     const conversationType = participant.conversation.type
 
     const notificationTitle =
       conversationType === 'TEAM_GROUP'
         ? `Nouveau message dans ${teamName}`
-        : `Nouveau message du responsable de ${teamName}`
+        : conversationType === 'VOLUNTEER_TO_ORGANIZERS'
+          ? 'Nouveau message des responsables bénévoles'
+          : `Nouveau message du responsable de ${teamName}`
 
     const truncatedContent = content.length > 100 ? content.substring(0, 97) + '...' : content
 
@@ -135,9 +138,22 @@ export default wrapApiHandler(
       })
     )
 
+    // Transformer le message pour ajouter emailHash et supprimer email
+    const { email, ...userWithoutEmail } = message.participant.user
+    const transformedMessage = {
+      ...message,
+      participant: {
+        ...message.participant,
+        user: {
+          ...userWithoutEmail,
+          emailHash: getEmailHash(email),
+        },
+      },
+    }
+
     return {
       success: true,
-      data: message,
+      data: transformedMessage,
     }
   },
   { operationName: 'SendMessage' }

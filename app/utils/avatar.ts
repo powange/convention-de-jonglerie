@@ -92,28 +92,29 @@ export const useAvatar = () => {
       // Utiliser getImageUrl pour construire l'URL
       const imageUrl = getImageUrl(user.profilePicture, 'profile', user.id)
       if (!imageUrl) {
+        // Si échec du chargement, essayer Gravatar puis initiales
+        if (user.emailHash) {
+          return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
+        }
         return fallbackToInitials && user.pseudo
           ? generateInitialsAvatar(user.pseudo, size)
-          : 'https://www.gravatar.com/avatar/default?s=80&d=mp'
+          : `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
       }
 
       return `${imageUrl}?v=${version}`
     }
 
-    // Si on a un pseudo et qu'on veut utiliser les initiales, générer un avatar avec initiales
+    // Sinon, prioriser Gravatar si disponible
+    if (user.emailHash) {
+      return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
+    }
+
+    // En dernier recours, utiliser les initiales ou l'avatar par défaut
     if (fallbackToInitials && user.pseudo) {
       return generateInitialsAvatar(user.pseudo, size)
     }
 
-    // Sinon, utiliser Gravatar avec fallback par défaut
-    if (user.emailHash) {
-      // Utiliser directement le hash MD5 fourni (pour les autres utilisateurs)
-      return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
-    }
-
-    return fallbackToInitials
-      ? generateInitialsAvatar('?', size)
-      : `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
+    return `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
   }
 
   return {

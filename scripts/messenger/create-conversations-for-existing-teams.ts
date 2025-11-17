@@ -114,75 +114,86 @@ async function createConversationsForExistingTeams() {
 
           // 3. Trouver le(s) responsable(s) de l'équipe
           const leaders = assignments.filter((a) => a.isLeader)
+          const leaderUserIds = leaders.map((l) => l.application.userId)
 
           if (leaders.length > 0) {
             console.log(`  👑 ${leaders.length} responsable(s) trouvé(s)`)
 
-            // Créer les conversations privées avec chaque responsable
-            for (const leader of leaders) {
-              const leaderUserId = leader.application.userId
+            // Pour chaque membre qui n'est pas responsable
+            const members = assignments.filter((a) => !a.isLeader)
 
-              // Pour chaque membre qui n'est pas responsable
-              const members = assignments.filter(
-                (a) => !a.isLeader && a.application.userId !== leaderUserId
-              )
+            for (const member of members) {
+              const memberUserId = member.application.userId
 
-              for (const member of members) {
-                const memberUserId = member.application.userId
+              // Tous les participants attendus : le membre + tous les responsables
+              const expectedParticipantIds = [memberUserId, ...leaderUserIds].sort()
 
-                // Vérifier si une conversation privée existe déjà
-                let privateConversation = await tx.conversation.findFirst({
-                  where: {
+              // Chercher une conversation existante avec exactement ces participants
+              const existingConversations = await tx.conversation.findMany({
+                where: {
+                  editionId: parseInt(editionId),
+                  teamId,
+                  type: 'TEAM_LEADER_PRIVATE',
+                },
+                include: {
+                  participants: {
+                    where: {
+                      leftAt: null, // Uniquement les participants actifs
+                    },
+                    select: {
+                      userId: true,
+                    },
+                  },
+                },
+              })
+
+              // Trouver une conversation qui a exactement les bons participants
+              let privateConversation = existingConversations.find((conv) => {
+                const actualParticipantIds = conv.participants.map((p) => p.userId).sort()
+                return (
+                  actualParticipantIds.length === expectedParticipantIds.length &&
+                  actualParticipantIds.every((id, index) => id === expectedParticipantIds[index])
+                )
+              })
+
+              if (!privateConversation) {
+                // Créer une nouvelle conversation avec tous les participants
+                privateConversation = await tx.conversation.create({
+                  data: {
                     editionId: parseInt(editionId),
                     teamId,
                     type: 'TEAM_LEADER_PRIVATE',
                     participants: {
-                      every: {
-                        userId: {
-                          in: [leaderUserId, memberUserId],
-                        },
-                      },
+                      create: expectedParticipantIds.map((participantUserId) => ({
+                        userId: participantUserId,
+                      })),
                     },
                   },
                 })
+                conversationsCreated++
+                participantsAdded += expectedParticipantIds.length
+              } else {
+                // Vérifier et réactiver les participants si nécessaire
+                const allParticipants = await tx.conversationParticipant.findMany({
+                  where: {
+                    conversationId: privateConversation.id,
+                  },
+                })
 
-                if (!privateConversation) {
-                  privateConversation = await tx.conversation.create({
-                    data: {
-                      editionId: parseInt(editionId),
-                      teamId,
-                      type: 'TEAM_LEADER_PRIVATE',
-                      participants: {
-                        create: [{ userId: leaderUserId }, { userId: memberUserId }],
-                      },
-                    },
-                  })
-                  conversationsCreated++
-                  participantsAdded += 2
-                } else {
-                  // Vérifier et réactiver les participants si nécessaire
-                  const participants = await tx.conversationParticipant.findMany({
-                    where: {
-                      conversationId: privateConversation.id,
-                      userId: {
-                        in: [leaderUserId, memberUserId],
-                      },
-                    },
-                  })
-
-                  for (const participant of participants) {
-                    if (participant.leftAt) {
-                      await tx.conversationParticipant.update({
-                        where: { id: participant.id },
-                        data: { leftAt: null },
-                      })
-                    }
+                for (const participant of allParticipants) {
+                  if (participant.leftAt && expectedParticipantIds.includes(participant.userId)) {
+                    await tx.conversationParticipant.update({
+                      where: { id: participant.id },
+                      data: { leftAt: null },
+                    })
                   }
                 }
               }
-
-              console.log(`  💬 Conversations privées créées avec le responsable`)
             }
+
+            console.log(
+              `  💬 Conversations privées créées (${members.length} membres × ${leaders.length} responsable${leaders.length > 1 ? 's' : ''})`
+            )
           } else {
             console.log(`  ℹ️  Pas de responsable pour cette équipe`)
           }

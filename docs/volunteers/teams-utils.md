@@ -176,7 +176,7 @@ const teamIds = await resolveTeamIdentifiers(editionId, [
 import {
   assignVolunteerToTeams,
   resolveTeamIdentifiers,
-} from '~/server/utils/editions/volunteers/teams'
+} from '@@/server/utils/editions/volunteers/teams'
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id'))
@@ -199,7 +199,7 @@ export default defineEventHandler(async (event) => {
 ### Promouvoir un bénévole comme responsable
 
 ```typescript
-import { setTeamLeader, getTeamStats } from '~/server/utils/editions/volunteers/teams'
+import { setTeamLeader, getTeamStats } from '@@/server/utils/editions/volunteers/teams'
 
 export default defineEventHandler(async (event) => {
   const applicationId = parseInt(getRouterParam(event, 'applicationId'))
@@ -221,7 +221,7 @@ export default defineEventHandler(async (event) => {
 ### Afficher les bénévoles d'une équipe
 
 ```typescript
-import { getTeamVolunteers, getTeamStats } from '~/server/utils/editions/volunteers/teams'
+import { getTeamVolunteers, getTeamStats } from '@@/server/utils/editions/volunteers/teams'
 
 export default defineEventHandler(async (event) => {
   const teamId = getRouterParam(event, 'teamId')
@@ -248,7 +248,7 @@ export default defineEventHandler(async (event) => {
 import {
   removeVolunteerFromTeam,
   addVolunteerToTeam,
-} from '~/server/utils/editions/volunteers/teams'
+} from '@@/server/utils/editions/volunteers/teams'
 
 export default defineEventHandler(async (event) => {
   const applicationId = parseInt(getRouterParam(event, 'applicationId'))
@@ -329,7 +329,7 @@ for (const volunteer of volunteers) {
 **✅ Bon** :
 
 ```typescript
-import { assignVolunteerToTeams } from '~/server/utils/editions/volunteers/teams'
+import { assignVolunteerToTeams } from '@@/server/utils/editions/volunteers/teams'
 
 for (const volunteer of volunteers) {
   await assignVolunteerToTeams(volunteer.id, teamIds)
@@ -362,7 +362,7 @@ await assignVolunteerToTeams(applicationId, teamIds)
 Les utils peuvent être testés en isolation sans serveur HTTP :
 
 ```typescript
-import { assignVolunteerToTeams, getTeamStats } from '~/server/utils/editions/volunteers/teams'
+import { assignVolunteerToTeams, getTeamStats } from '@@/server/utils/editions/volunteers/teams'
 
 test('should assign volunteer to teams', async () => {
   const assignments = await assignVolunteerToTeams(1, ['team-1', 'team-2'])

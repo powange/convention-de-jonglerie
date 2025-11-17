@@ -6,9 +6,6 @@
         <UIcon name="i-heroicons-chat-bubble-left-right" class="text-blue-600" />
         Messagerie
       </h1>
-      <p class="text-gray-600 dark:text-gray-400 mt-2">
-        Communiquez avec votre équipe de bénévoles
-      </p>
     </div>
 
     <!-- Layout principal : 2 colonnes -->
@@ -63,15 +60,27 @@
                           :name="
                             conversation.type === 'TEAM_GROUP'
                               ? 'i-heroicons-user-group'
-                              : 'i-heroicons-user'
+                              : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                                ? 'i-heroicons-megaphone'
+                                : 'i-heroicons-user'
                           "
-                          :style="{ color: conversation.team.color }"
+                          :style="conversation.team ? { color: conversation.team.color } : {}"
                         />
-                        <p class="font-medium truncate">{{ conversation.team.name }}</p>
+                        <p class="font-medium truncate">
+                          {{
+                            conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                              ? 'Responsables bénévoles'
+                              : conversation.team?.name || 'Conversation'
+                          }}
+                        </p>
                       </div>
                       <p class="text-xs text-gray-500 mt-1">
                         {{
-                          conversation.type === 'TEAM_GROUP' ? 'Groupe' : 'Privé avec responsable'
+                          conversation.type === 'TEAM_GROUP'
+                            ? 'Groupe'
+                            : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                              ? 'Organisateurs'
+                              : 'Privé avec responsable'
                         }}
                       </p>
 
@@ -105,18 +114,28 @@
                 :name="
                   selectedConversation.type === 'TEAM_GROUP'
                     ? 'i-heroicons-user-group'
-                    : 'i-heroicons-user'
+                    : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                      ? 'i-heroicons-megaphone'
+                      : 'i-heroicons-user'
                 "
-                :style="{ color: selectedConversation.team.color }"
+                :style="selectedConversation.team ? { color: selectedConversation.team.color } : {}"
                 class="h-6 w-6"
               />
               <div>
-                <h3 class="font-semibold">{{ selectedConversation.team.name }}</h3>
+                <h3 class="font-semibold">
+                  {{
+                    selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                      ? 'Responsables bénévoles'
+                      : selectedConversation.team?.name || 'Conversation'
+                  }}
+                </h3>
                 <p class="text-xs text-gray-500">
                   {{
                     selectedConversation.type === 'TEAM_GROUP'
                       ? 'Discussion de groupe'
-                      : 'Conversation privée'
+                      : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                        ? 'Conversation avec les organisateurs'
+                        : 'Conversation privée'
                   }}
                 </p>
               </div>
@@ -155,18 +174,24 @@
                 v-else
                 :messages="formattedMessages"
                 :user="{
-                  avatar: { icon: 'i-heroicons-user' },
                   variant: 'soft',
                   side: 'right',
                 }"
                 :assistant="{
-                  avatar: { icon: 'i-heroicons-user' },
                   variant: 'soft',
                   side: 'left',
                 }"
                 :should-scroll-to-bottom="true"
                 :should-auto-scroll="true"
               >
+                <template #leading="{ message }">
+                  <UAvatar
+                    :src="message.metadata?.avatarSrc"
+                    :alt="message.metadata?.authorName"
+                    size="sm"
+                  />
+                </template>
+
                 <template #content="{ message }">
                   <div>
                     <!-- Nom de l'auteur pour les messages des autres -->
@@ -217,7 +242,7 @@ import type {
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({
-  middleware: 'authenticated',
+  middleware: 'auth-protected',
   layout: 'default',
 })
 
@@ -303,21 +328,31 @@ const allMessages = computed(() => {
 
 // Formater les messages au format AI SDK v5 pour UChatMessages
 const formattedMessages = computed(() => {
-  return allMessages.value.map((message) => ({
-    id: message.id,
-    role: message.participant.userId === authStore.user?.id ? 'user' : 'assistant',
-    parts: [
-      {
-        type: 'text',
-        text: message.content,
+  return allMessages.value.map((message) => {
+    const isCurrentUser = message.participant.user.id === authStore.user?.id
+    const avatarSrc = message.participant.user.profilePicture
+      ? message.participant.user.profilePicture
+      : message.participant.user.emailHash
+        ? `https://www.gravatar.com/avatar/${message.participant.user.emailHash}?d=mp`
+        : undefined
+
+    return {
+      id: message.id,
+      role: isCurrentUser ? 'user' : 'assistant',
+      parts: [
+        {
+          type: 'text',
+          text: message.content,
+        },
+      ],
+      metadata: {
+        authorName: message.participant.user.pseudo,
+        createdAt: message.createdAt,
+        editedAt: message.editedAt,
+        avatarSrc,
       },
-    ],
-    metadata: {
-      authorName: message.participant.user.pseudo,
-      createdAt: message.createdAt,
-      editedAt: message.editedAt,
-    },
-  }))
+    }
+  })
 })
 
 // Stream SSE

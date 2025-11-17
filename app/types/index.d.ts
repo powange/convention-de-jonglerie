@@ -1,6 +1,7 @@
 export interface User {
   id: number
   email: string
+  emailHash?: string // Hash MD5 de l'email pour Gravatar
   pseudo: string
   imageUrl?: string | null
   prenom?: string | null
