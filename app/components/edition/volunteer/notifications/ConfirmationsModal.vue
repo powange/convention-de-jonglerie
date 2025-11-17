@@ -220,7 +220,7 @@ interface NotificationData {
         email: string
         phone?: string
         profilePicture?: string | null
-        emailHash?: string
+        emailHash: string
         updatedAt?: string
       }
       confirmedAt?: string
@@ -234,7 +234,7 @@ interface NotificationData {
         email: string
         phone?: string
         profilePicture?: string | null
-        emailHash?: string
+        emailHash: string
         updatedAt?: string
       }
     }>

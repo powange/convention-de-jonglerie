@@ -11,7 +11,7 @@ import { useAvatar } from '~/utils/avatar'
 interface User {
   id?: number
   email?: string
-  emailHash?: string
+  emailHash: string
   profilePicture?: string | null
   updatedAt?: string
   pseudo?: string

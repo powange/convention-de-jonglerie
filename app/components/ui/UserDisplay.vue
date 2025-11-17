@@ -16,7 +16,7 @@
 interface User {
   id?: number
   pseudo: string
-  emailHash?: string
+  emailHash: string
   profilePicture?: string | null
   updatedAt?: string
 }

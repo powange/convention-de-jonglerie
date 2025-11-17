@@ -188,7 +188,7 @@ interface User {
   prenom: string
   nom: string
   email: string
-  emailHash?: string
+  emailHash: string
   profilePicture?: string | null
   updatedAt?: string
 }

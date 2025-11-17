@@ -34,7 +34,7 @@ export interface ConversationMessage {
       id: number
       pseudo: string
       profilePicture: string | null
-      emailHash: string | null
+      emailHash: string
     }
   }
 }

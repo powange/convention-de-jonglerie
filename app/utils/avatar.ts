@@ -64,7 +64,7 @@ export const useAvatar = () => {
   const getUserAvatar = (
     user: {
       id?: number
-      emailHash?: string
+      emailHash: string
       profilePicture?: string | null
       updatedAt?: string
       pseudo?: string
@@ -92,29 +92,15 @@ export const useAvatar = () => {
       // Utiliser getImageUrl pour construire l'URL
       const imageUrl = getImageUrl(user.profilePicture, 'profile', user.id)
       if (!imageUrl) {
-        // Si échec du chargement, essayer Gravatar puis initiales
-        if (user.emailHash) {
-          return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
-        }
-        return fallbackToInitials && user.pseudo
-          ? generateInitialsAvatar(user.pseudo, size)
-          : `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
+        // Si échec du chargement, utiliser Gravatar
+        return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
       }
 
       return `${imageUrl}?v=${version}`
     }
 
-    // Sinon, prioriser Gravatar si disponible
-    if (user.emailHash) {
-      return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
-    }
-
-    // En dernier recours, utiliser les initiales ou l'avatar par défaut
-    if (fallbackToInitials && user.pseudo) {
-      return generateInitialsAvatar(user.pseudo, size)
-    }
-
-    return `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
+    // Sinon, utiliser Gravatar
+    return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
   }
 
   return {

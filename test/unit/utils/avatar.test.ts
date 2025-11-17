@@ -46,14 +46,14 @@ describe('avatar utils', () => {
       expect(url).toContain('data:image/svg+xml;base64,')
     })
 
-    it('devrait utiliser Gravatar par défaut pour un utilisateur sans email ni emailHash ni pseudo', () => {
+    it('devrait utiliser Gravatar avec emailHash', () => {
       const { getUserAvatar } = useAvatar()
 
-      const user = { profilePicture: null }
+      const user = { profilePicture: null, emailHash: 'abc123' }
       const url = getUserAvatar(user as any)
 
-      // Should return Gravatar default URL (pas d'initiales car pas de pseudo)
-      expect(url).toBe('https://www.gravatar.com/avatar/default?s=80&d=mp')
+      // Should return Gravatar URL with emailHash
+      expect(url).toBe('https://www.gravatar.com/avatar/abc123?s=80&d=mp')
     })
 
     it("devrait utiliser profilePicture si c'est une URL absolue HTTP", () => {
@@ -61,6 +61,7 @@ describe('avatar utils', () => {
 
       const user = {
         email: 'test@example.com',
+        emailHash: 'hash123',
         profilePicture: 'http://example.com/avatar.jpg',
       }
 
@@ -74,6 +75,7 @@ describe('avatar utils', () => {
 
       const user = {
         email: 'test@example.com',
+        emailHash: 'hash123',
         profilePicture: 'https://example.com/avatar.jpg',
       }
 
@@ -90,6 +92,7 @@ describe('avatar utils', () => {
       const user = {
         id: 1,
         email: 'test@example.com',
+        emailHash: 'hash123',
         profilePicture: 'avatar.jpg',
         updatedAt: '2022-01-01T10:00:00Z',
       }
@@ -108,6 +111,7 @@ describe('avatar utils', () => {
       const user = {
         id: 2,
         email: 'test@example.com',
+        emailHash: 'hash123',
         profilePicture: 'avatar.jpg',
       }
 
@@ -125,12 +129,13 @@ describe('avatar utils', () => {
       const user = {
         id: 3,
         email: 'test@example.com',
+        emailHash: 'hash123',
         profilePicture: 'invalid.jpg',
       }
 
       const url = getUserAvatar(user)
 
-      expect(url).toBe('https://www.gravatar.com/avatar/default?s=80&d=mp')
+      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=80&d=mp')
     })
 
     it('devrait utiliser emailHash directement si fourni', () => {
@@ -147,21 +152,19 @@ describe('avatar utils', () => {
       expect(mockGetGravatarAvatar).not.toHaveBeenCalled()
     })
 
-    it('devrait générer un avatar avec initiales basées sur le pseudo', () => {
+    it('devrait utiliser Gravatar même avec un pseudo', () => {
       const { getUserAvatar } = useAvatar()
 
       const user = {
         email: 'test@example.com',
+        emailHash: 'hash123',
         pseudo: 'John Doe',
       }
 
       const url = getUserAvatar(user)
 
-      // Should return an SVG with initials
-      expect(url).toContain('data:image/svg+xml;base64,')
-      // The SVG should contain "JD" for John Doe
-      const decoded = atob(url.split(',')[1])
-      expect(decoded).toContain('JD')
+      // Devrait retourner Gravatar car emailHash est obligatoire
+      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=80&d=mp')
     })
 
     it('devrait utiliser la taille par défaut de 80px', () => {
@@ -181,17 +184,14 @@ describe('avatar utils', () => {
 
       const user = {
         email: 'test@example.com',
+        emailHash: 'hash123',
         pseudo: 'Test',
       }
 
       const url = getUserAvatar(user, 200)
 
-      // Should return an SVG
-      expect(url).toContain('data:image/svg+xml;base64,')
-      // The SVG should include the size
-      const decoded = atob(url.split(',')[1])
-      expect(decoded).toContain('width="200"')
-      expect(decoded).toContain('height="200"')
+      // Devrait retourner Gravatar avec taille personnalisée
+      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=200&d=mp')
     })
 
     it('devrait prioriser profilePicture sur email et emailHash', () => {
@@ -244,13 +244,14 @@ describe('avatar utils', () => {
           },
           expected: 'gravatar',
         },
-        // Utilisateur avec email seulement (will generate initials)
+        // Utilisateur avec email et emailHash
         {
           user: {
             email: 'user@test.com',
+            emailHash: 'hash789',
             pseudo: 'Test User',
           },
-          expected: 'initials',
+          expected: 'gravatar',
         },
       ]
 
@@ -262,9 +263,7 @@ describe('avatar utils', () => {
         if (expected === 'profile-picture') {
           expect(url).toBe('https://example.com/pic.jpg')
         } else if (expected === 'gravatar') {
-          expect(url).toBe('https://www.gravatar.com/avatar/hash456?s=80&d=mp')
-        } else if (expected === 'initials') {
-          expect(url).toContain('data:image/svg+xml;base64,')
+          expect(url).toBe(`https://www.gravatar.com/avatar/${user.emailHash}?s=80&d=mp`)
         }
       })
     })

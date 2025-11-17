@@ -172,7 +172,7 @@ interface Volunteer {
     email: string
     phone?: string
     profilePicture?: string | null
-    emailHash?: string
+    emailHash: string
     updatedAt?: string
   }
   confirmedAt?: string
@@ -194,7 +194,7 @@ interface Notification {
     prenom?: string
     nom?: string
     profilePicture?: string | null
-    emailHash?: string
+    emailHash: string
     updatedAt?: string
   }
   confirmationsCount: number

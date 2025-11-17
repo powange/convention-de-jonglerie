@@ -28,7 +28,7 @@ interface User {
   nom?: string | null
   prenom?: string | null
   email?: string
-  emailHash?: string
+  emailHash: string
   phone?: string | null
   profilePicture?: string | null
   updatedAt?: string
