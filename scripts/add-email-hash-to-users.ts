@@ -1,10 +1,25 @@
 #!/usr/bin/env tsx
+import { PrismaClient } from '@prisma/client'
 import { config } from 'dotenv'
-
-import { getEmailHash } from '../server/utils/email-hash'
-import { prisma } from '../server/utils/prisma'
+import md5 from 'md5'
 
 config()
+
+const prisma = new PrismaClient()
+
+/**
+ * Fonction de génération de hash d'email (copie locale pour éviter les problèmes d'imports avec tsx)
+ * Normalise l'email et génère un hash MD5 pour Gravatar
+ */
+function getEmailHash(email: string): string {
+  if (!email) return ''
+
+  // Normaliser l'email (minuscules et supprimer les espaces)
+  const normalizedEmail = email.trim().toLowerCase()
+
+  // Créer le hash MD5 de l'email
+  return md5(normalizedEmail) as string
+}
 
 /**
  * Script pour ajouter le hash d'email à tous les utilisateurs qui n'en ont pas
