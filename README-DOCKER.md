@@ -14,7 +14,6 @@
 
 2. **Accéder aux services**
    - Application : http://localhost:3000
-   - Adminer (BDD) : http://localhost:8080
 
 ## Configuration
 

@@ -167,7 +167,6 @@ Vérifier que ces ports sont libres :
 # Dans PowerShell
 netstat -an | findstr :3000    # App Nuxt
 netstat -an | findstr :3306    # MySQL
-netstat -an | findstr :8080    # Adminer
 netstat -an | findstr :24678   # WebSocket HMR
 ```
 
@@ -298,7 +297,6 @@ docker compose -f docker-compose.dev.yml ps
 ### 4. Accès aux services
 
 - Application : http://localhost:3000
-- Adminer : http://localhost:8080
 - Base de données : localhost:3306
 
 ## Maintenance et nettoyage
@@ -339,7 +337,6 @@ docker compose -f docker-compose.dev.yml up -d
 echo.
 echo Services démarrés :
 echo - Application : http://localhost:3000
-echo - Adminer : http://localhost:8080
 echo - MySQL : localhost:3306
 echo.
 docker compose -f docker-compose.dev.yml ps

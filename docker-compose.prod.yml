@@ -77,59 +77,6 @@ services:
       database-prod:
         condition: service_healthy
 
-  # Interface d'administration base de données
-  # adminer-prod:
-  #   image: adminer:latest
-  #   container_name: convention-adminer-prod
-  #   restart: unless-stopped
-  #   # ports:
-  #   #   - "8080:8080"
-  #   environment:
-  #     ADMINER_DEFAULT_SERVER: database
-  #   depends_on:
-  #     - database-prod
-
-  # Service de backup automatique
-  # backup:
-  #   build:
-  #     context: ./backup
-  #     dockerfile: Dockerfile
-  #   container_name: convention-backup-prod
-  #   restart: unless-stopped
-  #   environment:
-  #     # Configuration des backups
-  #     - TZ=Europe/Paris
-  #     - BACKUP_PREFIX=convention-prod
-  #     - BACKUP_DESTINATION=synology
-  #     - DB_HOST=database-prod
-  #     - DB_PORT=${MYSQL_PORT:-3306}
-  #     - DB_NAME=${MYSQL_DATABASE:-convention_db}
-  #     - DB_USER=${MYSQL_USER:-convention_user}
-  #     - DB_PASSWORD=${MYSQL_PASSWORD:-convention_password}
-  #     # Variables Synology à définir dans Portainer
-  #     - SYNOLOGY_HOST=${SYNOLOGY_HOST}
-  #     - SYNOLOGY_USER=${SYNOLOGY_USER}
-  #     - SYNOLOGY_PASSWORD=${SYNOLOGY_PASSWORD}
-  #     - SYNOLOGY_PATH=${SYNOLOGY_PATH}
-  #     - RETENTION_DAYS=${RETENTION_DAYS:-30}
-  #   volumes:
-  #     # Volumes en lecture seule pour la sécurité
-  #     - mysql_data:/mysql-data:ro
-  #     - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/data/uploads:ro
-  #     - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads:/uploads:ro
-
-  #     # Volumes de travail
-  #     - backup_logs:/backup/logs
-  #     - backup_archives:/backup/archives
-  #   depends_on:
-  #     database-prod:
-  #       condition: service_healthy
-  #   logging:
-  #     driver: 'json-file'
-  #     options:
-  #       max-size: '10m'
-  #       max-file: '3'
-
 volumes:
   mysql_data:
     driver: local

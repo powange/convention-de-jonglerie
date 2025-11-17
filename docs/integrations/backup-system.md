@@ -207,5 +207,4 @@ Il est recommandé de supprimer régulièrement les anciennes sauvegardes pour �
 ### Debugging
 
 - Vérifier les logs du conteneur : `npm run docker:dev:logs`
-- Tester la connexion MySQL : Accès via Adminer sur http://localhost:8080
 - Vérifier les permissions des fichiers dans `/app/backup/`

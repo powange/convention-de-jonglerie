@@ -14,7 +14,6 @@ Ce projet utilise Docker et Docker Compose pour simplifier le déploiement et le
 
 - **database** : MySQL 8.0 pour stocker les données
 - **app** : Application Nuxt.js (Node.js 22 Alpine)
-- **adminer** : Interface web pour administrer la base de données
 
 ### Volumes persistants
 
@@ -85,7 +84,6 @@ docker compose -f docker-compose.dev.yml up -d
 
 - **Hot reload** activé sur le code source (avec polling pour Windows)
 - **Port 3000** : Application Nuxt
-- **Port 8080** : Adminer (interface DB)
 - **Port 24678** : WebSocket pour le rechargement à chaud
 - Volumes montés pour synchronisation du code
 - **node_modules** partagés avec l'hôte
@@ -204,15 +202,6 @@ Pour l'environnement de tests (docker-compose.test.yml), MySQL est exposé sur l
 
 - **Port** : `3307`
 - **URL** : `mysql://convention_user:convention_password@localhost:3307/convention_db`
-
-### Accès via Adminer (interface web)
-
-1. Naviguer vers http://localhost:8080
-2. Connexion :
-   - Serveur : `database`
-   - Utilisateur : `convention_user` (ou celui défini dans .env)
-   - Mot de passe : depuis le .env
-   - Base de données : `convention_db`
 
 ### Migrations Prisma
 
