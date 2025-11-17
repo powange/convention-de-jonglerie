@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 import { config } from 'dotenv'
 
-import { getEmailHash } from '../server/utils/email-hash.js'
-import { prisma } from '../server/utils/prisma.js'
+import { getEmailHash } from '../server/utils/email-hash'
+import { prisma } from '../server/utils/prisma'
 
 config()
 
