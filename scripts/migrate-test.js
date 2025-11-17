@@ -5,7 +5,7 @@ import { execSync } from 'child_process'
 // Migration pour base de données de test (aligne avec docker-compose.test.yml)
 process.env.DATABASE_URL =
   process.env.DATABASE_URL ||
-  'mysql://convention_user:convention_password@localhost:3307/convention_db'
+  'mysql://convention_user:convention_password@localhost:3308/convention_db'
 
 try {
   console.log('🔄 Application des migrations sur la base de données de test...')

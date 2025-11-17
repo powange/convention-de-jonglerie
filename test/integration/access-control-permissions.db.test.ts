@@ -4,6 +4,7 @@ import {
   isActiveAccessControlVolunteer,
   getActiveAccessControlSlot,
 } from '../../server/utils/permissions/access-control-permissions'
+import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 
 // Ce fichier ne s'exécute que si TEST_WITH_DB=true
@@ -15,9 +16,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
   beforeEach(async () => {
     // Créer un utilisateur de test
+    const email = `access-control-test-${Date.now()}@test.com`
     testUser = await prismaTest.user.create({
       data: {
-        email: `access-control-test-${Date.now()}@test.com`,
+        email,
+        emailHash: getEmailHash(email),
         pseudo: `AccessControlUser${Date.now()}`,
         password: 'hashedpassword',
         isEmailVerified: true,

@@ -15,7 +15,7 @@ try {
 // En environnement Docker, utiliser l'URL fournie par l'environnement
 if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
   process.env.DATABASE_URL =
-    'mysql://convention_user:convention_password@localhost:3307/convention_db'
+    'mysql://convention_user:convention_password@localhost:3308/convention_db'
 }
 
 // Instance Prisma pour les tests
