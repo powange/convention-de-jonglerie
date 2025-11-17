@@ -90,11 +90,12 @@ export default wrapApiHandler(
 
     const page = Math.floor(offset / limit) + 1
 
-    // Transformer les messages pour ajouter emailHash et supprimer email
+    // Transformer les messages pour ajouter emailHash et supprimer email et participantId
     const transformedMessages = messages.map((message) => {
       const { email, ...userWithoutEmail } = message.participant.user
+      const { participantId: _participantId, ...messageWithoutParticipantId } = message
       return {
-        ...message,
+        ...messageWithoutParticipantId,
         participant: {
           ...message.participant,
           user: {

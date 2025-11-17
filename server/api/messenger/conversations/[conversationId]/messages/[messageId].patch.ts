@@ -78,10 +78,11 @@ export default wrapApiHandler(
       },
     })
 
-    // Transformer le message pour ajouter emailHash et supprimer email
+    // Transformer le message pour ajouter emailHash et supprimer email et participantId
     const { email, ...userWithoutEmail } = updatedMessage.participant.user
+    const { participantId: _participantId, ...messageWithoutParticipantId } = updatedMessage
     const transformedMessage = {
-      ...updatedMessage,
+      ...messageWithoutParticipantId,
       participant: {
         ...updatedMessage.participant,
         user: {

@@ -3,7 +3,11 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { getVolunteerTeamById, setTeamLeader } from '@@/server/utils/editions/volunteers/teams'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import {
+  validateEditionId,
+  validateResourceId,
+  validateStringId,
+} from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -15,7 +19,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
     const applicationId = validateResourceId(event, 'applicationId', 'candidature')
-    const teamId = validateResourceId(event, 'teamId', 'équipe')
+    const teamId = validateStringId(event, 'teamId', 'équipe')
     const parsed = bodySchema.parse(await readBody(event))
 
     // Vérifier les permissions

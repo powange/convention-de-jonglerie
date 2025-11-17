@@ -216,6 +216,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
 
     if (canManageVolunteers.value) {
       volunteersChildren.push({
+        label: t('gestion.volunteers.config_title'),
+        to: `/editions/${editionId.value}/gestion/volunteers/config`,
+      })
+
+      volunteersChildren.push({
         label: t('edition.volunteers.volunteer_page'),
         to: `/editions/${editionId.value}/gestion/volunteers/page`,
       })

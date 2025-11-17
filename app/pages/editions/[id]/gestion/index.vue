@@ -93,6 +93,16 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Configuration bénévolat -->
+              <ManagementNavigationCard
+                v-if="canEdit || canManageVolunteers"
+                :to="`/editions/${edition.id}/gestion/volunteers/config`"
+                icon="i-heroicons-cog-6-tooth"
+                :title="$t('gestion.volunteers.config_title')"
+                :description="$t('gestion.volunteers.config_description')"
+                color="gray"
+              />
+
               <!-- Page bénévoles -->
               <ManagementNavigationCard
                 v-if="canEdit || canManageVolunteers"

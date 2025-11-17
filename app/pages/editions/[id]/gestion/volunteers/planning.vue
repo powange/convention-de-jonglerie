@@ -700,8 +700,9 @@ const fetchAcceptedVolunteers = async () => {
     const response: any = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
       query: { status: 'ACCEPTED' },
     })
-    const applications = response.applications || response
-    volunteers.value = applications || []
+    // L'API retourne { success: true, data: [...], pagination: {...} }
+    const applications = response.data || response.applications || response
+    volunteers.value = Array.isArray(applications) ? applications : []
   } catch (error) {
     console.error('Failed to fetch accepted volunteers:', error)
     volunteers.value = []

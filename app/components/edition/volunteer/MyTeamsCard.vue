@@ -22,10 +22,20 @@
             />
             <h4 class="font-semibold text-sm">{{ team.team.name }}</h4>
           </div>
-          <UBadge color="warning" size="sm">
-            <UIcon name="i-heroicons-star-solid" size="12" />
-            {{ t('pages.volunteers.team_distribution.leader_badge') }}
-          </UBadge>
+          <div class="flex items-center gap-2">
+            <UButton
+              icon="i-heroicons-chat-bubble-left-right"
+              color="primary"
+              variant="soft"
+              size="sm"
+              :label="t('common.edition.volunteers.send_message_to_team')"
+              @click="sendMessageToTeam(team.teamId)"
+            />
+            <UBadge color="warning" size="sm">
+              <UIcon name="i-heroicons-star-solid" size="12" />
+              {{ t('pages.volunteers.team_distribution.leader_badge') }}
+            </UBadge>
+          </div>
         </div>
 
         <!-- Description de l'équipe -->
@@ -170,4 +180,24 @@ watch(
   },
   { immediate: true }
 )
+
+// Fonction pour envoyer un message à l'équipe
+const sendMessageToTeam = async (teamId: string) => {
+  try {
+    // Créer ou récupérer la conversation de l'équipe
+    const response = await $fetch<{ conversationId: string }>('/api/messenger/team-conversation', {
+      method: 'POST',
+      body: {
+        editionId: props.editionId,
+        teamId,
+      },
+    })
+
+    // Rediriger vers la page messenger avec la conversation
+    navigateTo(`/messenger?conversation=${response.conversationId}`)
+  } catch (error: any) {
+    console.error("Erreur lors de la création de la conversation de l'équipe:", error)
+    // On pourrait ajouter un toast ici pour informer l'utilisateur de l'erreur
+  }
+}
 </script>

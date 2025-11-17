@@ -31,6 +31,7 @@ export const prismaMock = {
   editionVolunteerApplication: createModelMock(),
   editionVolunteerTeam: createModelMock(),
   volunteerTeam: createModelMock(),
+  applicationTeamAssignment: createModelMock(),
   volunteerTimeSlot: createModelMock(),
   volunteerNotificationGroup: createModelMock(),
   volunteerNotificationConfirmation: createModelMock(),
@@ -57,6 +58,11 @@ export const prismaMock = {
   ticketingOption: createModelMock(),
   ticketingReturnableItem: createModelMock(),
   externalTicketing: createModelMock(),
+
+  // Modèles messagerie
+  conversation: createModelMock(),
+  conversationParticipant: createModelMock(),
+  message: createModelMock(),
 
   // Méthodes Prisma
   $connect: vi.fn(),
