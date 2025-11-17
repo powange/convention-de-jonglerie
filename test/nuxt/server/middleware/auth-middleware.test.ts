@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 
 import type { H3Event } from 'h3'
 
@@ -16,13 +16,12 @@ vi.mock('#imports', async () => {
 
 import authMiddleware from '../../../../server/middleware/auth'
 // Référence dynamique vers le mock pour pouvoir le reconfigurer
-let mockGetUserSession: ReturnType<typeof vi.fn> | undefined
+let mockGetUserSession: ReturnType<typeof vi.fn>
 
 // Les fonctions sont mockées globalement dans test/setup.ts, on les récupère depuis global
 const mockCreateError = global.createError as ReturnType<typeof vi.fn>
 const mockDefineEventHandler = global.defineEventHandler as ReturnType<typeof vi.fn>
 const mockUseRuntimeConfig = global.useRuntimeConfig as ReturnType<typeof vi.fn>
-// mockGetUserSession sera initialisé dans beforeEach via import('#imports')
 
 describe("Middleware d'authentification", () => {
   const mockUser = {
@@ -47,8 +46,16 @@ describe("Middleware d'authentification", () => {
     }
   }
 
-  // Initialiser une seule fois le mock getUserSession
-  beforeEach(async () => {
+  // Initialiser mockGetUserSession une seule fois avant tous les tests
+  beforeAll(async () => {
+    const importsMod: any = await import('#imports')
+    if (typeof importsMod.getUserSession !== 'function') {
+      importsMod.getUserSession = vi.fn(async () => ({ user: { id: 1 } }))
+    }
+    mockGetUserSession = importsMod.getUserSession as ReturnType<typeof vi.fn>
+  })
+
+  beforeEach(() => {
     vi.clearAllMocks()
     mockDefineEventHandler.mockImplementation((fn) => fn)
     mockUseRuntimeConfig.mockReturnValue({})
@@ -58,14 +65,6 @@ describe("Middleware d'authentification", () => {
       throw error
     })
 
-    // Initialiser mockGetUserSession une seule fois (import mis en cache)
-    if (!mockGetUserSession) {
-      const importsMod: any = await import('#imports')
-      if (typeof importsMod.getUserSession !== 'function') {
-        importsMod.getUserSession = vi.fn(async () => ({ user: { id: 1 } }))
-      }
-      mockGetUserSession = importsMod.getUserSession as ReturnType<typeof vi.fn>
-    }
     // Reset le mock sans refaire l'import
     mockGetUserSession.mockResolvedValue({ user: mockUser })
   })
