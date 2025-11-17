@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { optionalAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
@@ -13,7 +12,13 @@ export default wrapApiHandler(
     const edition = await fetchResourceOrFail(prisma.edition, editionId, {
       include: {
         creator: {
-          select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true },
+          select: {
+            id: true,
+            pseudo: true,
+            profilePicture: true,
+            updatedAt: true,
+            emailHash: true,
+          },
         },
         attendingUsers: {
           select: {
@@ -21,7 +26,7 @@ export default wrapApiHandler(
             pseudo: true,
             profilePicture: true,
             updatedAt: true,
-            email: true,
+            emailHash: true,
           },
         },
         // Champs bénévolat nécessaires pour la page de gestion
@@ -41,7 +46,7 @@ export default wrapApiHandler(
                   select: {
                     id: true,
                     pseudo: true,
-                    email: true,
+                    emailHash: true,
                     profilePicture: true,
                     updatedAt: true,
                   },
@@ -59,7 +64,7 @@ export default wrapApiHandler(
                   select: {
                     id: true,
                     pseudo: true,
-                    email: true,
+                    emailHash: true,
                     profilePicture: true,
                     updatedAt: true,
                   },
@@ -103,75 +108,29 @@ export default wrapApiHandler(
       }
     }
 
-    // Transformer les emails en emailHash
-    if (edition) {
-      // Transformer creator - ajouter emailHash et supprimer email
-      if (edition.creator && edition.creator.email) {
-        const { email, ...creatorWithoutEmail } = edition.creator
-        edition.creator = {
-          ...creatorWithoutEmail,
-          emailHash: getEmailHash(email),
-        }
-      }
-
-      // Transformer les organisateurs de la convention
-      if (edition.convention?.organizers) {
-        edition.convention.organizers = edition.convention.organizers.map((collab) => {
-          const { email, ...userWithoutEmail } = collab.user
-          return {
-            ...collab,
-            // Construire un objet rights cohérent (si les colonnes existent)
-            rights: {
-              editConvention: collab.canEditConvention ?? false,
-              deleteConvention: collab.canDeleteConvention ?? false,
-              manageOrganizers: collab.canManageOrganizers ?? false,
-              manageVolunteers: collab.canManageVolunteers ?? false,
-              addEdition: collab.canAddEdition ?? false,
-              editAllEditions: collab.canEditAllEditions ?? false,
-              deleteAllEditions: collab.canDeleteAllEditions ?? false,
-            },
-            // Transformer les droits par édition
-            perEditionRights: (collab.perEditionPermissions || []).map((per) => ({
-              editionId: per.editionId,
-              canEdit: per.canEdit ?? false,
-              canDelete: per.canDelete ?? false,
-              canManageVolunteers: per.canManageVolunteers ?? false,
-            })),
-            user: {
-              ...userWithoutEmail,
-              emailHash: getEmailHash(email),
-            },
-          }
-        })
-      }
-
-      // Transformer les organisateurs de l'édition
-      if (edition.editionOrganizers) {
-        edition.editionOrganizers = edition.editionOrganizers.map((edOrg) => {
-          const { email, ...userWithoutEmail } = edOrg.organizer.user
-          return {
-            ...edOrg,
-            organizer: {
-              ...edOrg.organizer,
-              user: {
-                ...userWithoutEmail,
-                emailHash: getEmailHash(email),
-              },
-            },
-          }
-        })
-      }
-
-      // Transformer les participants (attendingUsers)
-      if (edition.attendingUsers) {
-        edition.attendingUsers = edition.attendingUsers.map((user) => {
-          const { email, ...userWithoutEmail } = user
-          return {
-            ...userWithoutEmail,
-            emailHash: getEmailHash(email),
-          }
-        })
-      }
+    // Transformer les organisateurs de la convention pour construire l'objet rights
+    if (edition?.convention?.organizers) {
+      edition.convention.organizers = edition.convention.organizers.map((collab) => ({
+        ...collab,
+        // Construire un objet rights cohérent (si les colonnes existent)
+        rights: {
+          editConvention: collab.canEditConvention ?? false,
+          deleteConvention: collab.canDeleteConvention ?? false,
+          manageOrganizers: collab.canManageOrganizers ?? false,
+          manageVolunteers: collab.canManageVolunteers ?? false,
+          addEdition: collab.canAddEdition ?? false,
+          editAllEditions: collab.canEditAllEditions ?? false,
+          deleteAllEditions: collab.canDeleteAllEditions ?? false,
+        },
+        // Transformer les droits par édition
+        perEditionRights: (collab.perEditionPermissions || []).map((per) => ({
+          editionId: per.editionId,
+          canEdit: per.canEdit ?? false,
+          canDelete: per.canDelete ?? false,
+          canManageVolunteers: per.canManageVolunteers ?? false,
+        })),
+        user: collab.user,
+      }))
     }
 
     // Retourner l'édition en excluant les champs volunteersAsk* qui sont maintenant gérés par l'API /volunteers/settings

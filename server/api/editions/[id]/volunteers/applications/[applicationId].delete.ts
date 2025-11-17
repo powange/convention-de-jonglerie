@@ -31,7 +31,7 @@ export default wrapApiHandler(
             id: true,
             prenom: true,
             nom: true,
-            email: true,
+            emailHash: true,
           },
         },
       },

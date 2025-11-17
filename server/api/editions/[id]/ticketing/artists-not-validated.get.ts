@@ -1,5 +1,4 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -34,6 +33,7 @@ export default wrapApiHandler(
               prenom: true,
               nom: true,
               email: true,
+              emailHash: true,
               profilePicture: true,
             },
           },
@@ -74,7 +74,7 @@ export default wrapApiHandler(
             prenom: artist.user.prenom,
             nom: artist.user.nom,
             email: artist.user.email,
-            emailHash: getEmailHash(artist.user.email),
+            emailHash: artist.user.emailHash,
             profilePicture: artist.user.profilePicture,
           },
           shows: artist.shows.map((showArtist) => showArtist.show),

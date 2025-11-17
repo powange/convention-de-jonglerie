@@ -1,6 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
 export default wrapApiHandler(
@@ -35,7 +34,7 @@ export default wrapApiHandler(
               select: {
                 id: true,
                 pseudo: true,
-                email: true,
+                emailHash: true,
                 nom: true,
                 prenom: true,
                 profilePicture: true,
@@ -77,24 +76,9 @@ export default wrapApiHandler(
       orderBy: [{ createdAt: 'desc' }],
     })
 
-    // Transformer les données pour ajouter emailHash aux organisateurs
-    const transformedConventions = conventions.map((convention) => ({
-      ...convention,
-      organizers: convention.organizers.map((organizer) => {
-        const { email, ...userWithoutEmail } = organizer.user
-        return {
-          ...organizer,
-          user: {
-            ...userWithoutEmail,
-            emailHash: getEmailHash(email),
-          },
-        }
-      }),
-    }))
-
     return {
-      conventions: transformedConventions,
-      total: transformedConventions.length,
+      conventions,
+      total: conventions.length,
     }
   },
   { operationName: 'GetAdminConventions' }

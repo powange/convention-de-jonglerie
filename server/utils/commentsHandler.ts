@@ -1,6 +1,5 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
-import { getEmailHash } from './email-hash'
 import { prisma } from './prisma'
 
 import type { H3Event } from 'h3'
@@ -39,28 +38,25 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
       config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
     const model: any = (prisma as any)[modelName]
 
-    // Récupérer les commentaires (inclure l'utilisateur brut comme attendu par les tests)
+    // Récupérer les commentaires
     const comments = await model.findMany({
       where: whereClause,
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'asc' },
     })
 
-    // Transformer les données pour ajouter emailHash et masquer l'email (conserver la clé `user`)
-    const transformedComments = comments.map((comment) => ({
-      ...comment,
-      user: comment.user
-        ? {
-            id: comment.user.id,
-            pseudo: comment.user.pseudo,
-            profilePicture: comment.user.profilePicture ?? null,
-            updatedAt: comment.user.updatedAt,
-            emailHash: getEmailHash(comment.user.email),
-          }
-        : undefined,
-    }))
-
-    return transformedComments
+    // emailHash est déjà présent via le select
+    return comments
   } catch (error: any) {
     console.error(
       `Erreur lors de la récupération des commentaires pour ${config.entityType}:`,
@@ -131,7 +127,7 @@ export async function createCommentForEntity(
             pseudo: true,
             nom: true,
             prenom: true,
-            email: true,
+            emailHash: true,
             profilePicture: true,
           },
         },
@@ -148,7 +144,7 @@ export async function createCommentForEntity(
             nom: comment.user.nom,
             prenom: comment.user.prenom,
             profilePicture: comment.user.profilePicture,
-            emailHash: getEmailHash(comment.user.email),
+            emailHash: comment.user.emailHash,
           }
         : null,
       user: undefined,

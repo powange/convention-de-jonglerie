@@ -38,7 +38,7 @@ describe('Organisateurs de convention', () => {
 
       const existingUser = {
         id: 3,
-        email: 'new@example.com',
+        emailHash: 'hash_new',
         pseudo: 'newuser',
       }
 
@@ -102,7 +102,7 @@ describe('Organisateurs de convention', () => {
       const result = await addOrganizer(1, organizerData, 1)
 
       expect(result.role).toBe('MODERATOR')
-      expect(result.user.email).toBe('new@example.com')
+      expect(result.user.emailHash).toBe('hash_new')
       expect(prismaMock.conventionOrganizer.create).toHaveBeenCalledWith({
         data: {
           conventionId: 1,
@@ -435,7 +435,7 @@ describe('Organisateurs de convention', () => {
           user: {
             id: 1,
             pseudo: 'admin',
-            email: 'admin@example.com',
+            emailHash: 'hash_admin',
             profilePicture: null,
           },
           addedBy: {
@@ -451,7 +451,7 @@ describe('Organisateurs de convention', () => {
           user: {
             id: 2,
             pseudo: 'moderator',
-            email: 'moderator@example.com',
+            emailHash: 'hash_mod',
             profilePicture: null,
           },
           addedBy: {
@@ -471,7 +471,7 @@ describe('Organisateurs de convention', () => {
               select: {
                 id: true,
                 pseudo: true,
-                email: true,
+                emailHash: true,
                 profilePicture: true,
               },
             },

@@ -1,5 +1,4 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -68,6 +67,7 @@ export default wrapApiHandler(
               prenom: true,
               nom: true,
               email: true,
+              emailHash: true,
             },
           },
         },
@@ -95,6 +95,7 @@ export default wrapApiHandler(
               prenom: true,
               nom: true,
               email: true,
+              emailHash: true,
             },
           },
         },
@@ -125,6 +126,7 @@ export default wrapApiHandler(
                   prenom: true,
                   nom: true,
                   email: true,
+                  emailHash: true,
                 },
               },
             },
@@ -194,6 +196,7 @@ export default wrapApiHandler(
           prenom: true,
           nom: true,
           email: true,
+          emailHash: true,
           profilePicture: true,
           updatedAt: true,
         },
@@ -212,7 +215,7 @@ export default wrapApiHandler(
                 prenom: validator.prenom,
                 nom: validator.nom,
                 email: validator.email,
-                emailHash: getEmailHash(validator.email),
+                emailHash: validator.emailHash,
                 profilePicture: validator.profilePicture,
                 updatedAt: validator.updatedAt?.toISOString(),
               }

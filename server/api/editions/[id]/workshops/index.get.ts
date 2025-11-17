@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
@@ -36,7 +35,7 @@ export default wrapApiHandler(
             id: true,
             pseudo: true,
             profilePicture: true,
-            email: true,
+            emailHash: true,
           },
         },
         location: {
@@ -55,16 +54,11 @@ export default wrapApiHandler(
       orderBy: { startDateTime: 'asc' },
     })
 
-    // Transformer les emails en emailHash et ajouter isFavorite
+    // Transformer pour ajouter isFavorite
     const transformedWorkshops = workshops.map((workshop) => {
-      const { email: creatorEmail, ...creatorWithoutEmail } = workshop.creator
       const { favorites, ...workshopWithoutFavorites } = workshop
       return {
         ...workshopWithoutFavorites,
-        creator: {
-          ...creatorWithoutEmail,
-          emailHash: getEmailHash(creatorEmail),
-        },
         isFavorite: userId ? favorites.length > 0 : false,
       }
     })

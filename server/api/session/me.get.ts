@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { getImpersonationCookie } from '@@/server/utils/impersonation-helpers'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -15,6 +14,7 @@ export default wrapApiHandler(
       select: {
         id: true,
         email: true,
+        emailHash: true,
         pseudo: true,
         nom: true,
         prenom: true,
@@ -29,15 +29,8 @@ export default wrapApiHandler(
     // Récupérer les informations d'impersonation depuis le cookie séparé
     const impersonation = getImpersonationCookie(event)
 
-    // Transformer pour ajouter emailHash (garder email pour le formulaire de profil)
-    const user = full || session.user
-    const transformedUser = {
-      ...user,
-      emailHash: getEmailHash(user.email),
-    }
-
     return {
-      user: transformedUser,
+      user: full || session.user,
       impersonation: impersonation || null,
     }
   },

@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -51,7 +50,7 @@ export default wrapApiHandler(async (event) => {
         select: {
           id: true,
           pseudo: true,
-          email: true, // Gardé pour emailHash seulement
+          emailHash: true,
           prenom: true,
           nom: true,
           profilePicture: true,
@@ -64,6 +63,7 @@ export default wrapApiHandler(async (event) => {
             select: {
               id: true,
               pseudo: true,
+              emailHash: true,
               email: true,
               prenom: true,
               nom: true,
@@ -118,6 +118,7 @@ export default wrapApiHandler(async (event) => {
             select: {
               id: true,
               pseudo: true,
+              emailHash: true,
               email: true,
               prenom: true,
               nom: true,
@@ -150,7 +151,7 @@ export default wrapApiHandler(async (event) => {
             email: recipient.user.email,
             phone: recipient.user.phone,
             profilePicture: recipient.user.profilePicture,
-            emailHash: getEmailHash(recipient.user.email),
+            emailHash: recipient.user.emailHash,
             updatedAt: recipient.user.updatedAt,
           },
         }
@@ -187,7 +188,7 @@ export default wrapApiHandler(async (event) => {
           prenom: notification.sender.prenom,
           nom: notification.sender.nom,
           profilePicture: notification.sender.profilePicture,
-          emailHash: getEmailHash(notification.sender.email),
+          emailHash: notification.sender.emailHash,
           updatedAt: notification.sender.updatedAt,
         },
         confirmationsCount: actualConfirmationsCount,

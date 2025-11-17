@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -39,6 +38,7 @@ export default wrapApiHandler(
         nom: true,
         profilePicture: true,
         email: true,
+        emailHash: true,
       },
       take: 10,
       orderBy: { pseudo: 'asc' },
@@ -52,7 +52,7 @@ export default wrapApiHandler(
         nom: u.nom,
         profilePicture: u.profilePicture,
         email: u.email,
-        emailHash: getEmailHash(u.email),
+        emailHash: u.emailHash,
       })),
     }
   },

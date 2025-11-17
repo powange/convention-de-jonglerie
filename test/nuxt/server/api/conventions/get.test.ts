@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import getConventionHandler from '../../../../../server/api/conventions/[id]/index.get'
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import du handler après les mocks
@@ -19,7 +18,7 @@ describe('API Convention - Récupération', () => {
     author: {
       id: 1,
       pseudo: 'creator',
-      email: 'creator@example.com',
+      emailHash: 'dadbcd70e3cf287900f80aedef3f987c', // MD5 de 'creator@example.com'
     },
     organizers: [
       {
@@ -53,8 +52,7 @@ describe('API Convention - Récupération', () => {
     author: {
       id: rawConvention.author.id,
       pseudo: rawConvention.author.pseudo,
-      email: undefined,
-      emailHash: getEmailHash(rawConvention.author.email),
+      emailHash: rawConvention.author.emailHash,
     },
     organizers: [
       {
@@ -99,7 +97,7 @@ describe('API Convention - Récupération', () => {
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
           },
         },
         organizers: {

@@ -39,9 +39,9 @@ describe('/api/conventions/[id]/organizers/history GET', () => {
           id: 99,
           pseudo: 'Acteur',
           profilePicture: '/img/a1.png',
-          email: 'actor@example.tld',
+          emailHash: 'hashactor',
         },
-        targetUser: { id: 50, pseudo: 'Cible', profilePicture: null, email: 'target@example.tld' },
+        targetUser: { id: 50, pseudo: 'Cible', profilePicture: null, emailHash: 'hashtarget' },
       },
       {
         id: 2,
@@ -51,12 +51,12 @@ describe('/api/conventions/[id]/organizers/history GET', () => {
         after: {},
         actorId: 99,
         targetUserId: 51,
-        actor: { id: 99, pseudo: 'Acteur', profilePicture: null, email: 'actor@example.tld' },
+        actor: { id: 99, pseudo: 'Acteur', profilePicture: null, emailHash: 'hashactor' },
         targetUser: {
           id: 51,
           pseudo: 'Autre',
           profilePicture: '/img/u2.png',
-          email: 'other@example.tld',
+          emailHash: 'hashother',
         },
       },
     ] as any
@@ -80,8 +80,12 @@ describe('/api/conventions/[id]/organizers/history GET', () => {
       orderBy: { createdAt: 'desc' },
       take: 200,
       include: {
-        actor: { select: { id: true, pseudo: true, profilePicture: true, email: true } },
-        targetUser: { select: { id: true, pseudo: true, profilePicture: true, email: true } },
+        actor: {
+          select: { id: true, pseudo: true, profilePicture: true, email: true, emailHash: true },
+        },
+        targetUser: {
+          select: { id: true, pseudo: true, profilePicture: true, email: true, emailHash: true },
+        },
       },
     })
   })
@@ -116,8 +120,8 @@ describe('/api/conventions/[id]/organizers/history GET', () => {
         after: {},
         actorId: 1,
         targetUserId: 3,
-        actor: { id: 1, pseudo: 'Admin', profilePicture: null, email: 'admin@test.com' },
-        targetUser: { id: 3, pseudo: 'Viewer', profilePicture: null, email: 'viewer@test.com' },
+        actor: { id: 1, pseudo: 'Admin', profilePicture: null, emailHash: 'hashadmin' },
+        targetUser: { id: 3, pseudo: 'Viewer', profilePicture: null, emailHash: 'hashviewer' },
       },
     ] as any
     prismaMock.organizerPermissionHistory.findMany.mockResolvedValue(history)

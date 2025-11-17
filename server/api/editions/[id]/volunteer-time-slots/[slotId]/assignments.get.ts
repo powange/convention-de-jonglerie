@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
@@ -45,6 +44,7 @@ export default wrapApiHandler(
             nom: true,
             prenom: true,
             email: true,
+            emailHash: true,
             profilePicture: true,
             updatedAt: true,
           },
@@ -61,22 +61,7 @@ export default wrapApiHandler(
       },
     })
 
-    // Formater les assignations - gestionnaires ont emailHash pour avatars + email pour contact
-    const formattedAssignments = assignments.map((assignment) => ({
-      ...assignment,
-      user: {
-        id: assignment.user.id,
-        pseudo: assignment.user.pseudo,
-        nom: assignment.user.nom,
-        prenom: assignment.user.prenom,
-        emailHash: getEmailHash(assignment.user.email),
-        email: assignment.user.email,
-        profilePicture: assignment.user.profilePicture,
-        updatedAt: assignment.user.updatedAt,
-      },
-    }))
-
-    return formattedAssignments
+    return assignments
   },
   { operationName: 'GetVolunteerTimeSlotAssignments' }
 )

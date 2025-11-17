@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { PrismaClient } from '@prisma/client'
@@ -24,7 +23,7 @@ export default wrapApiHandler(
             id: true,
             pseudo: true,
             profilePicture: true,
-            email: true,
+            emailHash: true,
           },
         },
         comments: {
@@ -34,7 +33,7 @@ export default wrapApiHandler(
                 id: true,
                 pseudo: true,
                 profilePicture: true,
-                email: true,
+                emailHash: true,
               },
             },
           },
@@ -47,29 +46,7 @@ export default wrapApiHandler(
       ],
     })
 
-    // Transformer les emails en emailHash
-    const transformedPosts = posts.map((post) => {
-      const { email: postUserEmail, ...postUserWithoutEmail } = post.user
-      return {
-        ...post,
-        user: {
-          ...postUserWithoutEmail,
-          emailHash: getEmailHash(postUserEmail),
-        },
-        comments: post.comments.map((comment) => {
-          const { email: commentUserEmail, ...commentUserWithoutEmail } = comment.user
-          return {
-            ...comment,
-            user: {
-              ...commentUserWithoutEmail,
-              emailHash: getEmailHash(commentUserEmail),
-            },
-          }
-        }),
-      }
-    })
-
-    return transformedPosts
+    return posts
   },
   { operationName: 'GetEditionPosts' }
 )

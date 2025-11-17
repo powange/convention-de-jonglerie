@@ -1,15 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn(),
-}))
-
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/editions/[id]/carpool-offers/index.get'
-
-const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 describe('GET /api/editions/[id]/carpool-offers', () => {
   const mockEvent = {
@@ -24,7 +16,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
 
   beforeEach(() => {
     prismaMock.carpoolOffer.findMany.mockReset()
-    mockGetEmailHash.mockReset()
     global.getQuery = vi.fn().mockReturnValue({})
   })
 
@@ -40,7 +31,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         description: 'Covoiturage vers convention',
         user: {
           id: 1,
-          email: 'user@test.com',
+          emailHash: 'hash1',
           pseudo: 'testuser',
           profilePicture: null,
           updatedAt: new Date(),
@@ -52,7 +43,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
             addedAt: new Date(),
             user: {
               id: 2,
-              email: 'passenger@test.com',
+              emailHash: 'hash2',
               pseudo: 'passenger1',
               profilePicture: null,
               updatedAt: new Date(),
@@ -66,7 +57,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
             createdAt: new Date(),
             user: {
               id: 3,
-              email: 'commenter@test.com',
+              emailHash: 'hash3',
               pseudo: 'commenter',
               profilePicture: null,
               updatedAt: new Date(),
@@ -77,7 +68,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
-    mockGetEmailHash.mockReturnValue('test-hash')
 
     const result = await handler(mockEvent)
 
@@ -87,16 +77,54 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         tripDate: expect.objectContaining({ gte: expect.any(Date) }),
       }),
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         bookings: {
-          include: { requester: true },
+          include: {
+            requester: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
         },
         passengers: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
           orderBy: { addedAt: 'asc' },
         },
         comments: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
       },
@@ -104,10 +132,10 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     })
 
     expect(result).toHaveLength(1)
-    expect(result[0].user.emailHash).toBe('test-hash')
+    expect(result[0].user.emailHash).toBe('hash1')
     expect(result[0].user).not.toHaveProperty('email') // Email doit être masqué
-    expect(result[0].passengers[0].user.emailHash).toBe('test-hash')
-    expect(result[0].comments[0].user.emailHash).toBe('test-hash')
+    expect(result[0].passengers[0].user.emailHash).toBe('hash2')
+    expect(result[0].comments[0].user.emailHash).toBe('hash3')
   })
 
   it("devrait échouer avec ID d'édition invalide", async () => {
@@ -155,7 +183,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       {
         id: 1,
         tripDate: new Date('2024-06-20T10:00:00Z'),
-        user: { id: 1, email: 'user1@test.com', pseudo: 'user1' },
+        user: { id: 1, emailHash: 'hash1', pseudo: 'user1' },
         bookings: [],
         passengers: [],
         comments: [],
@@ -163,7 +191,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       {
         id: 2,
         tripDate: new Date('2024-06-15T10:00:00Z'),
-        user: { id: 2, email: 'user2@test.com', pseudo: 'user2' },
+        user: { id: 2, emailHash: 'hash2', pseudo: 'user2' },
         bookings: [],
         passengers: [],
         comments: [],
@@ -171,7 +199,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
-    mockGetEmailHash.mockReturnValue('test-hash')
 
     await handler(mockEvent)
 
@@ -188,7 +215,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         id: 1,
         user: {
           id: 1,
-          email: 'driver@test.com',
+          emailHash: 'driver-hash',
           pseudo: 'driver',
           profilePicture: 'avatar.jpg',
           updatedAt: new Date(),
@@ -200,7 +227,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
             addedAt: new Date(),
             user: {
               id: 2,
-              email: 'passenger@test.com',
+              emailHash: 'passenger-hash',
               pseudo: 'passenger',
               profilePicture: null,
               updatedAt: new Date(),
@@ -214,7 +241,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
             createdAt: new Date(),
             user: {
               id: 3,
-              email: 'commenter@test.com',
+              emailHash: 'commenter-hash',
               pseudo: 'commenter',
               profilePicture: null,
               updatedAt: new Date(),
@@ -225,25 +252,18 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
-    mockGetEmailHash.mockReturnValue('test-hash')
 
     const result = await handler(mockEvent)
 
     // Vérifier que les emails sont masqués et remplacés par des hash
     expect(result[0].user).not.toHaveProperty('email')
-    expect(result[0].user.emailHash).toBe('test-hash')
+    expect(result[0].user.emailHash).toBe('driver-hash')
 
     expect(result[0].passengers[0].user).not.toHaveProperty('email')
-    expect(result[0].passengers[0].user.emailHash).toBe('test-hash')
+    expect(result[0].passengers[0].user.emailHash).toBe('passenger-hash')
 
     expect(result[0].comments[0].user).not.toHaveProperty('email')
-    expect(result[0].comments[0].user.emailHash).toBe('test-hash')
-
-    // Vérifier que getEmailHash est appelé pour chaque utilisateur
-    expect(mockGetEmailHash).toHaveBeenCalledTimes(3)
-    expect(mockGetEmailHash).toHaveBeenCalledWith('driver@test.com')
-    expect(mockGetEmailHash).toHaveBeenCalledWith('passenger@test.com')
-    expect(mockGetEmailHash).toHaveBeenCalledWith('commenter@test.com')
+    expect(result[0].comments[0].user.emailHash).toBe('commenter-hash')
   })
 
   it('devrait préserver les autres propriétés des utilisateurs', async () => {
@@ -252,7 +272,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         id: 1,
         user: {
           id: 1,
-          email: 'user@test.com',
+          emailHash: 'test-hash',
           pseudo: 'testuser',
           profilePicture: 'avatar.jpg',
           updatedAt: new Date('2024-01-01'),
@@ -264,7 +284,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     ]
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue(mockOffers)
-    mockGetEmailHash.mockReturnValue('test-hash')
 
     const result = await handler(mockEvent)
 

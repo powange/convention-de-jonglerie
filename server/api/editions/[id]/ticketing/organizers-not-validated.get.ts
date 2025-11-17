@@ -1,5 +1,4 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -38,6 +37,7 @@ export default wrapApiHandler(
                   prenom: true,
                   nom: true,
                   email: true,
+                  emailHash: true,
                   profilePicture: true,
                 },
               },
@@ -70,7 +70,7 @@ export default wrapApiHandler(
             prenom: editionOrganizer.organizer.user.prenom,
             nom: editionOrganizer.organizer.user.nom,
             email: editionOrganizer.organizer.user.email,
-            emailHash: getEmailHash(editionOrganizer.organizer.user.email),
+            emailHash: editionOrganizer.organizer.user.emailHash,
             profilePicture: editionOrganizer.organizer.user.profilePicture,
           },
           title: editionOrganizer.organizer.title,

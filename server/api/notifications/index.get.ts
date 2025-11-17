@@ -1,6 +1,5 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { z } from 'zod'
 
@@ -34,13 +33,13 @@ export default wrapApiHandler(
       offset: parsed.offset || 0,
     })
 
-    // Mapper les notifications pour ajouter emailHash et retirer l'email
+    // Mapper les notifications pour retirer l'email (emailHash déjà présent)
     const mappedNotifications = notifications.map((notification) => ({
       ...notification,
       user: {
         id: notification.user.id,
         pseudo: notification.user.pseudo,
-        emailHash: getEmailHash(notification.user.email),
+        emailHash: notification.user.emailHash,
         profilePicture: notification.user.profilePicture,
       },
     }))

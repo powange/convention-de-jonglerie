@@ -144,10 +144,13 @@ export default wrapApiHandler(
         ...(profilePicture !== undefined && { profilePicture: finalProfileFilename }),
         // Mettre à jour la langue préférée si fournie
         ...(preferredLanguage !== undefined && { preferredLanguage }),
+        // Recalculer emailHash si l'email a changé
+        ...(email !== user.email && { emailHash: getEmailHash(email) }),
       },
       select: {
         id: true,
         email: true,
+        emailHash: true,
         pseudo: true,
         nom: true,
         prenom: true,
@@ -159,11 +162,8 @@ export default wrapApiHandler(
       },
     })
 
-    // Ajouter emailHash pour la cohérence avec /api/session/me
-    return {
-      ...updatedUser,
-      emailHash: getEmailHash(updatedUser.email),
-    }
+    // emailHash est déjà présent dans updatedUser
+    return updatedUser
   },
   { operationName: 'UpdateProfile' }
 )

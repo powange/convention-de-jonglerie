@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -28,6 +27,7 @@ export default wrapApiHandler(async (event) => {
           pseudo: true,
           nom: true,
           prenom: true,
+          emailHash: true,
           email: true,
           profilePicture: true,
           updatedAt: true,
@@ -82,7 +82,7 @@ export default wrapApiHandler(async (event) => {
     pseudo: application.user.pseudo,
     nom: application.user.nom,
     prenom: application.user.prenom,
-    emailHash: getEmailHash(application.user.email),
+    emailHash: application.user.emailHash,
     email: application.user.email,
     profilePicture: application.user.profilePicture,
     updatedAt: application.user.updatedAt,

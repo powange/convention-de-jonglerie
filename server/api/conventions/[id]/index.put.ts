@@ -171,7 +171,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
           },
         },
       },

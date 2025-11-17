@@ -59,6 +59,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
               nom: 'Doe',
               prenom: 'John',
               email: 'john@example.com',
+              emailHash: 'hash-john',
               profilePicture: null,
               updatedAt: new Date('2024-01-01'),
             },
@@ -130,6 +131,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
                 nom: true,
                 prenom: true,
                 email: true,
+                emailHash: true,
                 profilePicture: true,
                 updatedAt: true,
               },
@@ -177,6 +179,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
               nom: 'Doe',
               prenom: 'John',
               email: 'john@example.com',
+              emailHash: 'hash-john',
               profilePicture: null,
               updatedAt: new Date('2024-01-01'),
             },
@@ -197,8 +200,9 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
 
     expect(res).toHaveLength(1)
     expect(res[0].delayMinutes).toBe(10)
-    // Les gestionnaires ont accès à l'email en clair
+    // Les gestionnaires ont accès à l'email en clair ET au emailHash
     expect(res[0].assignments[0].user.email).toBe('john@example.com')
+    expect(res[0].assignments[0].user.emailHash).toBe('hash-john')
   })
 
   it('retourne les créneaux pour un bénévole sans emails en clair', async () => {
@@ -230,6 +234,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
               nom: 'Doe',
               prenom: 'John',
               email: 'john@example.com',
+              emailHash: 'hash-john',
               profilePicture: null,
               updatedAt: new Date('2024-01-01'),
             },
@@ -247,9 +252,9 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
 
     expect(res).toHaveLength(1)
     expect(res[0].delayMinutes).toBe(20)
-    // Les bénévoles n'ont pas accès à l'email en clair
+    // Les bénévoles n'ont pas accès à l'email en clair mais ont le emailHash
     expect(res[0].assignments[0].user.email).toBeUndefined()
-    expect(res[0].assignments[0].user.emailHash).toBeDefined()
+    expect(res[0].assignments[0].user.emailHash).toBe('hash-john')
   })
 
   it('rejette utilisateur non authentifié', async () => {

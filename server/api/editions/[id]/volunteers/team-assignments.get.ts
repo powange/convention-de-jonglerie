@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -71,6 +70,7 @@ export default wrapApiHandler(async (event) => {
           id: true,
           pseudo: true,
           email: true,
+          emailHash: true,
           prenom: true,
           nom: true,
           profilePicture: true,
@@ -99,14 +99,5 @@ export default wrapApiHandler(async (event) => {
     orderBy: [{ user: { prenom: 'asc' } }, { user: { nom: 'asc' } }],
   })
 
-  // Transformer les données pour ajouter le hash de l'email
-  const applicationsWithEmailHash = applications.map((application) => ({
-    ...application,
-    user: {
-      ...application.user,
-      emailHash: getEmailHash(application.user.email),
-    },
-  }))
-
-  return applicationsWithEmailHash
+  return applications
 }, 'GetVolunteerTeamAssignments')

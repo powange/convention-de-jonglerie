@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -56,7 +55,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
           },
         },
         organizers: {
@@ -66,7 +65,7 @@ export default wrapApiHandler(
                 id: true,
                 pseudo: true,
                 profilePicture: true,
-                email: true,
+                emailHash: true,
               },
             },
             perEditionPermissions: true,
@@ -87,29 +86,14 @@ export default wrapApiHandler(
       },
     })
 
-    // Transformer les emails en emailHash pour les auteurs et organisateurs
+    // Transformer les organisateurs pour construire l'objet rights
     const transformedConventions = conventions.map((convention) => ({
       ...convention,
-      author: convention.author
-        ? (() => {
-            const { email, ...authorWithoutEmail } = convention.author
-            return {
-              ...authorWithoutEmail,
-              emailHash: getEmailHash(email),
-            }
-          })()
-        : null,
       organizers: convention.organizers.map((collab) => ({
         id: collab.id,
         title: collab.title,
         addedAt: collab.addedAt,
-        user: (() => {
-          const { email, ...userWithoutEmail } = collab.user
-          return {
-            ...userWithoutEmail,
-            emailHash: getEmailHash(email),
-          }
-        })(),
+        user: collab.user,
         rights: {
           editConvention: collab.canEditConvention,
           deleteConvention: collab.canDeleteConvention,

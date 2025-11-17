@@ -46,7 +46,7 @@ describe('Système de conventions', () => {
         author: {
           id: mockUser.id,
           pseudo: mockUser.pseudo,
-          email: mockUser.email,
+          emailHash: 'hash123',
         },
       }
 
@@ -96,7 +96,7 @@ describe('Système de conventions', () => {
             select: {
               id: true,
               pseudo: true,
-              email: true,
+              emailHash: true,
               profilePicture: true,
             },
           },
@@ -184,7 +184,7 @@ describe('Système de conventions', () => {
         author: {
           id: mockUser.id,
           pseudo: mockUser.pseudo,
-          email: mockUser.email,
+          emailHash: 'hash123',
         },
         organizers: [],
       }
@@ -212,7 +212,7 @@ describe('Système de conventions', () => {
             select: {
               id: true,
               pseudo: true,
-              email: true,
+              emailHash: true,
             },
           },
           organizers: {
@@ -299,7 +299,7 @@ describe('Système de conventions', () => {
             select: {
               id: true,
               pseudo: true,
-              email: true,
+              emailHash: true,
             },
           },
         },

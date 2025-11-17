@@ -1,15 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-// Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn(),
-}))
-
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import handler from '../../../../../server/api/conventions/my-conventions.get'
 import { prismaMock } from '../../../../__mocks__/prisma'
-
-const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -24,7 +16,6 @@ const mockEvent = {
 describe('/api/conventions/my-conventions GET', () => {
   beforeEach(() => {
     prismaMock.convention.findMany.mockReset()
-    mockGetEmailHash.mockReset()
   })
 
   it("devrait retourner les conventions de l'utilisateur en tant qu'auteur", async () => {
@@ -38,7 +29,7 @@ describe('/api/conventions/my-conventions GET', () => {
         author: {
           id: 1,
           pseudo: 'testuser',
-          email: 'user@test.com',
+          emailHash: '1dfd40837dd640c912035ed9a7e88a69', // MD5 de 'user@test.com'
         },
         organizers: [],
         editions: [
@@ -56,7 +47,6 @@ describe('/api/conventions/my-conventions GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('user-hash')
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     const result = await handler(mockEvent as any)
@@ -71,8 +61,7 @@ describe('/api/conventions/my-conventions GET', () => {
       author: {
         id: 1,
         pseudo: 'testuser',
-        emailHash: 'user-hash',
-        email: undefined,
+        emailHash: '1dfd40837dd640c912035ed9a7e88a69',
       },
       organizers: [],
       editions: [
@@ -99,7 +88,7 @@ describe('/api/conventions/my-conventions GET', () => {
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
           },
         },
         organizers: {
@@ -109,7 +98,7 @@ describe('/api/conventions/my-conventions GET', () => {
                 id: true,
                 pseudo: true,
                 profilePicture: true,
-                email: true,
+                emailHash: true,
               },
             },
             perEditionPermissions: true,
@@ -163,7 +152,7 @@ describe('/api/conventions/my-conventions GET', () => {
         author: {
           id: 2,
           pseudo: 'author',
-          email: 'author@test.com',
+          emailHash: 'b48e38706543a1d0134a7766d0c135e9', // MD5 de 'author@test.com'
         },
         organizers: [
           {
@@ -175,7 +164,7 @@ describe('/api/conventions/my-conventions GET', () => {
               id: 1,
               pseudo: 'testuser',
               profilePicture: null,
-              email: 'user@test.com',
+              emailHash: '1dfd40837dd640c912035ed9a7e88a69', // MD5 de 'user@test.com'
             },
           },
         ],
@@ -183,19 +172,17 @@ describe('/api/conventions/my-conventions GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValueOnce('author-hash').mockReturnValueOnce('user-hash')
-
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     const result = await handler(mockEvent as any)
 
     expect(result).toHaveLength(1)
     expect(result[0].organizers).toHaveLength(1)
-    expect(result[0].organizers[0].user.emailHash).toBe('user-hash')
-    expect(result[0].author.emailHash).toBe('author-hash')
+    expect(result[0].organizers[0].user.emailHash).toBe('1dfd40837dd640c912035ed9a7e88a69')
+    expect(result[0].author.emailHash).toBe('b48e38706543a1d0134a7766d0c135e9')
   })
 
-  it('devrait masquer tous les emails avec getEmailHash', async () => {
+  it('devrait masquer tous les emails avec emailHash', async () => {
     const mockConventions = [
       {
         id: 1,
@@ -204,7 +191,7 @@ describe('/api/conventions/my-conventions GET', () => {
         author: {
           id: 1,
           pseudo: 'author',
-          email: 'author@test.com',
+          emailHash: 'b48e38706543a1d0134a7766d0c135e9', // MD5 de 'author@test.com'
         },
         organizers: [
           {
@@ -212,7 +199,7 @@ describe('/api/conventions/my-conventions GET', () => {
             user: {
               id: 2,
               pseudo: 'collab1',
-              email: 'collab1@test.com',
+              emailHash: '90a5b84c8c548e1aec4ea8e77ad8395a', // MD5 de 'collab1@test.com'
               profilePicture: 'avatar1.jpg',
             },
           },
@@ -221,7 +208,7 @@ describe('/api/conventions/my-conventions GET', () => {
             user: {
               id: 3,
               pseudo: 'collab2',
-              email: 'collab2@test.com',
+              emailHash: 'b1d8db4e46ad1bfef09f6b341f8c0f78', // MD5 de 'collab2@test.com'
               profilePicture: null,
             },
           },
@@ -230,23 +217,13 @@ describe('/api/conventions/my-conventions GET', () => {
       },
     ]
 
-    mockGetEmailHash
-      .mockReturnValueOnce('author-hash')
-      .mockReturnValueOnce('collab1-hash')
-      .mockReturnValueOnce('collab2-hash')
-
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     const result = await handler(mockEvent as any)
 
-    expect(mockGetEmailHash).toHaveBeenCalledTimes(3)
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(1, 'author@test.com')
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(2, 'collab1@test.com')
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(3, 'collab2@test.com')
-
-    expect(result[0].author.emailHash).toBe('author-hash')
-    expect(result[0].organizers[0].user.emailHash).toBe('collab1-hash')
-    expect(result[0].organizers[1].user.emailHash).toBe('collab2-hash')
+    expect(result[0].author.emailHash).toBe('b48e38706543a1d0134a7766d0c135e9')
+    expect(result[0].organizers[0].user.emailHash).toBe('90a5b84c8c548e1aec4ea8e77ad8395a')
+    expect(result[0].organizers[1].user.emailHash).toBe('b1d8db4e46ad1bfef09f6b341f8c0f78')
 
     // Vérifier que les emails originaux ne sont pas exposés
     expect(result[0].author).not.toHaveProperty('email')
@@ -276,7 +253,7 @@ describe('/api/conventions/my-conventions GET', () => {
         id: 2,
         name: 'Convention Récente',
         createdAt: new Date('2024-02-01'),
-        author: { id: 1, pseudo: 'user', email: 'user@test.com' },
+        author: { id: 1, pseudo: 'user', emailHash: '1dfd40837dd640c912035ed9a7e88a69' },
         organizers: [],
         editions: [],
       },
@@ -284,13 +261,12 @@ describe('/api/conventions/my-conventions GET', () => {
         id: 1,
         name: 'Convention Ancienne',
         createdAt: new Date('2024-01-01'),
-        author: { id: 1, pseudo: 'user', email: 'user@test.com' },
+        author: { id: 1, pseudo: 'user', emailHash: '1dfd40837dd640c912035ed9a7e88a69' },
         organizers: [],
         editions: [],
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     const result = await handler(mockEvent as any)
@@ -305,7 +281,7 @@ describe('/api/conventions/my-conventions GET', () => {
       {
         id: 1,
         name: 'Convention Test',
-        author: { id: 1, pseudo: 'user', email: 'user@test.com' },
+        author: { id: 1, pseudo: 'user', emailHash: '1dfd40837dd640c912035ed9a7e88a69' },
         organizers: [],
         editions: [
           {
@@ -322,7 +298,6 @@ describe('/api/conventions/my-conventions GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     const result = await handler(mockEvent as any)
@@ -337,24 +312,23 @@ describe('/api/conventions/my-conventions GET', () => {
       {
         id: 1,
         name: 'Convention Test',
-        author: { id: 1, pseudo: 'user', email: 'user@test.com' },
+        author: { id: 1, pseudo: 'user', emailHash: '1dfd40837dd640c912035ed9a7e88a69' },
         organizers: [
           {
             id: 2,
             addedAt: new Date('2024-01-02'),
-            user: { id: 3, pseudo: 'collab2', email: 'collab2@test.com' },
+            user: { id: 3, pseudo: 'collab2', emailHash: 'b1d8db4e46ad1bfef09f6b341f8c0f78' },
           },
           {
             id: 1,
             addedAt: new Date('2024-01-01'),
-            user: { id: 2, pseudo: 'collab1', email: 'collab1@test.com' },
+            user: { id: 2, pseudo: 'collab1', emailHash: '90a5b84c8c548e1aec4ea8e77ad8395a' },
           },
         ],
         editions: [],
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     await handler(mockEvent as any)
@@ -381,14 +355,14 @@ describe('/api/conventions/my-conventions GET', () => {
       {
         id: 1,
         name: 'Convention Test',
-        author: { id: 1, pseudo: 'user', email: 'user@test.com' },
+        author: { id: 1, pseudo: 'user', emailHash: '1dfd40837dd640c912035ed9a7e88a69' },
         organizers: [
           {
             id: 1,
             user: {
               id: 2,
               pseudo: 'collab',
-              email: 'collab@test.com',
+              emailHash: '90a5b84c8c548e1aec4ea8e77ad8395a', // MD5 de 'collab@test.com'
               profilePicture: null,
             },
           },
@@ -397,7 +371,6 @@ describe('/api/conventions/my-conventions GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.convention.findMany.mockResolvedValue(mockConventions)
 
     const result = await handler(mockEvent as any)

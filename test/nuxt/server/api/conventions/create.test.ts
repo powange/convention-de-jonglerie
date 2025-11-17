@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Import du handler après les mocks
 import createConventionHandler from '../../../../../server/api/conventions/index.post'
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 describe('API Convention - Création', () => {
@@ -25,7 +24,7 @@ describe('API Convention - Création', () => {
     author: {
       id: 1,
       pseudo: 'creator',
-      email: 'creator@example.com',
+      emailHash: 'dadbcd70e3cf287900f80aedef3f987c', // MD5 de 'creator@example.com'
     },
   }
   const transformedExpectation = () => ({
@@ -33,7 +32,7 @@ describe('API Convention - Création', () => {
     author: {
       id: rawConvention.author.id,
       pseudo: rawConvention.author.pseudo,
-      emailHash: getEmailHash(rawConvention.author.email),
+      emailHash: rawConvention.author.emailHash,
     },
     organizers: [
       {
@@ -51,7 +50,7 @@ describe('API Convention - Création', () => {
         user: {
           id: mockUser.id,
           pseudo: mockUser.pseudo,
-          emailHash: getEmailHash(mockUser.email),
+          emailHash: '0e0530c1430da76495955eb06eb99d95', // MD5 de 'creator@example.com'
         },
         addedBy: { id: mockUser.id, pseudo: mockUser.pseudo },
       },
@@ -84,7 +83,11 @@ describe('API Convention - Création', () => {
           canAddEdition: true,
           canEditAllEditions: true,
           canDeleteAllEditions: true,
-          user: { id: mockUser.id, pseudo: mockUser.pseudo, email: mockUser.email },
+          user: {
+            id: mockUser.id,
+            pseudo: mockUser.pseudo,
+            emailHash: '0e0530c1430da76495955eb06eb99d95',
+          },
           addedBy: { id: 1, pseudo: 'creator' },
         },
       ],
@@ -116,7 +119,7 @@ describe('API Convention - Création', () => {
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
             profilePicture: true,
           },
         },

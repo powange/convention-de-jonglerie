@@ -1,6 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { validatePagination } from '@@/server/utils/validation-helpers'
 
@@ -67,6 +66,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             email: true,
+            emailHash: true,
             pseudo: true,
             nom: true,
             prenom: true,
@@ -99,7 +99,7 @@ export default wrapApiHandler(
       actionUrl: notification.actionUrl,
       user: {
         id: notification.user.id,
-        emailHash: getEmailHash(notification.user.email),
+        emailHash: notification.user.emailHash,
         pseudo: notification.user.pseudo,
         nom: notification.user.nom,
         prenom: notification.user.prenom,

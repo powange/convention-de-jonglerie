@@ -1,15 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 
-// Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn(),
-}))
-
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/carpool-requests/[id]/comments.get'
-
-const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -20,7 +12,6 @@ const mockEvent = {
 describe('/api/carpool-requests/[id]/comments GET', () => {
   beforeEach(() => {
     prismaMock.carpoolRequestComment.findMany.mockReset()
-    mockGetEmailHash.mockReset()
   })
 
   it('devrait retourner les commentaires avec emails masqués', async () => {
@@ -34,7 +25,7 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
         user: {
           id: 1,
           pseudo: 'driver1',
-          email: 'driver1@test.com',
+          emailHash: 'hash1',
           profilePicture: null,
           updatedAt: new Date('2024-01-01'),
         },
@@ -48,14 +39,12 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
         user: {
           id: 2,
           pseudo: 'passenger1',
-          email: 'passenger1@test.com',
+          emailHash: 'hash2',
           profilePicture: 'avatar.jpg',
           updatedAt: new Date('2024-01-02'),
         },
       },
     ]
-
-    mockGetEmailHash.mockReturnValueOnce('hash1').mockReturnValueOnce('hash2')
 
     prismaMock.carpoolRequestComment.findMany.mockResolvedValue(mockComments)
 
@@ -94,13 +83,19 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
 
     expect(prismaMock.carpoolRequestComment.findMany).toHaveBeenCalledWith({
       where: { carpoolRequestId: 1 },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'asc' },
     })
-
-    expect(mockGetEmailHash).toHaveBeenCalledTimes(2)
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(1, 'driver1@test.com')
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(2, 'passenger1@test.com')
   })
 
   it('devrait rejeter un ID de demande invalide', async () => {
@@ -127,7 +122,17 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
     expect(result).toEqual([])
     expect(prismaMock.carpoolRequestComment.findMany).toHaveBeenCalledWith({
       where: { carpoolRequestId: 1 },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'asc' },
     })
   })
@@ -141,7 +146,7 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
         user: {
           id: 2,
           pseudo: 'user2',
-          email: 'user2@test.com',
+          emailHash: 'hash2',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -153,21 +158,30 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
         user: {
           id: 1,
           pseudo: 'user1',
-          email: 'user1@test.com',
+          emailHash: 'hash1',
           profilePicture: null,
           updatedAt: new Date(),
         },
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.carpoolRequestComment.findMany.mockResolvedValue(mockComments)
 
     await handler(mockEvent as any)
 
     expect(prismaMock.carpoolRequestComment.findMany).toHaveBeenCalledWith({
       where: { carpoolRequestId: 1 },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'asc' }, // Vérification du tri
     })
   })
@@ -183,14 +197,13 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
         user: {
           id: 1,
           pseudo: 'user1',
-          email: 'user1@test.com',
+          emailHash: 'hash1',
           profilePicture: null, // Pas de photo de profil
           updatedAt: new Date(),
         },
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash1')
     prismaMock.carpoolRequestComment.findMany.mockResolvedValue(mockComments)
 
     const result = await handler(mockEvent as any)
@@ -211,7 +224,17 @@ describe('/api/carpool-requests/[id]/comments GET', () => {
 
     expect(prismaMock.carpoolRequestComment.findMany).toHaveBeenCalledWith({
       where: { carpoolRequestId: 456 }, // Converti en nombre
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'asc' },
     })
   })

@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -85,7 +84,7 @@ export default wrapApiHandler(
                 id: true,
                 pseudo: true,
                 profilePicture: true,
-                email: true,
+                emailHash: true,
               },
             },
           },
@@ -138,23 +137,12 @@ export default wrapApiHandler(
       })
     )
 
-    // Transformer le message pour ajouter emailHash et supprimer email et participantId
-    const { email, ...userWithoutEmail } = message.participant.user
+    // Transformer le message pour supprimer participantId
     const { participantId: _participantId, ...messageWithoutParticipantId } = message
-    const transformedMessage = {
-      ...messageWithoutParticipantId,
-      participant: {
-        ...message.participant,
-        user: {
-          ...userWithoutEmail,
-          emailHash: getEmailHash(email),
-        },
-      },
-    }
 
     return {
       success: true,
-      data: transformedMessage,
+      data: messageWithoutParticipantId,
     }
   },
   { operationName: 'SendMessage' }

@@ -1,15 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-// Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn(),
-}))
-
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/editions/[id]/carpool-requests/index.get'
-
-const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -22,7 +14,6 @@ const mockEvent = {
 describe('/api/editions/[id]/carpool-requests GET', () => {
   beforeEach(() => {
     prismaMock.carpoolRequest.findMany.mockReset()
-    mockGetEmailHash.mockReset()
     global.getQuery = vi.fn().mockReturnValue({})
   })
 
@@ -41,7 +32,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         user: {
           id: 1,
           pseudo: 'passenger1',
-          email: 'passenger1@test.com',
+          emailHash: 'passenger-hash',
           profilePicture: null,
           updatedAt: new Date('2024-01-01'),
         },
@@ -55,7 +46,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             user: {
               id: 2,
               pseudo: 'driver1',
-              email: 'driver1@test.com',
+              emailHash: 'driver-hash',
               profilePicture: 'avatar.jpg',
               updatedAt: new Date('2024-01-02'),
             },
@@ -63,8 +54,6 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         ],
       },
     ]
-
-    mockGetEmailHash.mockReturnValueOnce('passenger-hash').mockReturnValueOnce('driver-hash')
 
     prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
 
@@ -112,9 +101,27 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         tripDate: expect.objectContaining({ gte: expect.any(Date) }),
       }),
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         comments: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
       },
@@ -157,7 +164,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         user: {
           id: 2,
           pseudo: 'user2',
-          email: 'user2@test.com',
+          emailHash: 'hash2',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -170,7 +177,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         user: {
           id: 1,
           pseudo: 'user1',
-          email: 'user1@test.com',
+          emailHash: 'hash1',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -178,7 +185,6 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
 
     await handler(mockEvent as any)
@@ -189,9 +195,27 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         tripDate: expect.objectContaining({ gte: expect.any(Date) }),
       }),
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         comments: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
       },
@@ -211,7 +235,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         user: {
           id: 1,
           pseudo: 'passenger1',
-          email: 'passenger1@test.com',
+          emailHash: 'hash1',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -219,7 +243,6 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
 
     const result = await handler(mockEvent as any)
@@ -234,7 +257,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         user: {
           id: 1,
           pseudo: 'user1',
-          email: 'user1@test.com',
+          emailHash: 'hash1',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -245,7 +268,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             user: {
               id: 2,
               pseudo: 'user2',
-              email: 'user2@test.com',
+              emailHash: 'hash2',
               profilePicture: null,
               updatedAt: new Date(),
             },
@@ -256,7 +279,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             user: {
               id: 3,
               pseudo: 'user3',
-              email: 'user3@test.com',
+              emailHash: 'hash3',
               profilePicture: null,
               updatedAt: new Date(),
             },
@@ -265,7 +288,6 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       },
     ]
 
-    mockGetEmailHash.mockReturnValue('hash')
     prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
 
     await handler(mockEvent as any)
@@ -276,9 +298,27 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         tripDate: expect.objectContaining({ gte: expect.any(Date) }),
       }),
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         comments: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' }, // Les commentaires triés par date décroissante
         },
       },
@@ -293,7 +333,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         user: {
           id: 1,
           pseudo: 'passenger1',
-          email: 'passenger1@test.com',
+          emailHash: 'passenger-hash',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -303,7 +343,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             user: {
               id: 2,
               pseudo: 'driver1',
-              email: 'driver1@test.com',
+              emailHash: 'driver1-hash',
               profilePicture: 'avatar.jpg',
               updatedAt: new Date(),
             },
@@ -313,7 +353,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             user: {
               id: 3,
               pseudo: 'driver2',
-              email: 'driver2@test.com',
+              emailHash: 'driver2-hash',
               profilePicture: null,
               updatedAt: new Date(),
             },
@@ -322,19 +362,9 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       },
     ]
 
-    mockGetEmailHash
-      .mockReturnValueOnce('passenger-hash')
-      .mockReturnValueOnce('driver1-hash')
-      .mockReturnValueOnce('driver2-hash')
-
     prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
 
     const result = await handler(mockEvent as any)
-
-    expect(mockGetEmailHash).toHaveBeenCalledTimes(3)
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(1, 'passenger1@test.com')
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(2, 'driver1@test.com')
-    expect(mockGetEmailHash).toHaveBeenNthCalledWith(3, 'driver2@test.com')
 
     expect(result[0].user.emailHash).toBe('passenger-hash')
     expect(result[0].comments[0].user.emailHash).toBe('driver1-hash')
@@ -365,9 +395,27 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         tripDate: expect.objectContaining({ gte: expect.any(Date) }),
       }), // Converti en nombre
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         comments: {
-          include: { user: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
       },

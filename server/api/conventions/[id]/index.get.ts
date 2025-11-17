@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
@@ -18,7 +17,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
           },
         },
         organizers: {
@@ -36,18 +35,9 @@ export default wrapApiHandler(
       errorMessage: 'Convention introuvable',
     })
 
-    // Transformer auteur (emailHash) et organisateurs avec nouveaux droits
+    // Transformer organisateurs avec nouveaux droits
     const transformed = {
       ...convention,
-      author: convention.author
-        ? (() => {
-            const { email, ...authorWithoutEmail } = convention.author
-            return {
-              ...authorWithoutEmail,
-              emailHash: email ? getEmailHash(email) : undefined,
-            }
-          })()
-        : null,
       organizers: convention.organizers.map((c) => ({
         id: c.id,
         addedAt: c.addedAt,

@@ -25,6 +25,7 @@ const mockLostFoundItems = [
       prenom: 'John',
       nom: 'Doe',
       profilePicture: null,
+      emailHash: 'hash-finder1',
     },
     comments: [
       {
@@ -37,6 +38,7 @@ const mockLostFoundItems = [
           prenom: 'Jane',
           nom: 'Smith',
           profilePicture: null,
+          emailHash: 'hash-owner1',
         },
       },
     ],
@@ -55,6 +57,7 @@ const mockLostFoundItems = [
       prenom: 'Alice',
       nom: 'Johnson',
       profilePicture: '/avatars/alice.jpg',
+      emailHash: 'hash-finder2',
     },
     comments: [],
   },

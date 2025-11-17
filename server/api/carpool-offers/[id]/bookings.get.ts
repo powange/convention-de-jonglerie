@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
@@ -22,7 +21,17 @@ export default wrapApiHandler(
           ? { carpoolOfferId: offerId, requesterId: userId }
           : { carpoolOfferId: -1 },
       orderBy: { createdAt: 'desc' },
-      include: { requester: true },
+      include: {
+        requester: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
+      },
     })
 
     return bookings.map((b) => ({
@@ -36,7 +45,7 @@ export default wrapApiHandler(
       requester: {
         id: b.requester.id,
         pseudo: b.requester.pseudo,
-        emailHash: getEmailHash(b.requester.email),
+        emailHash: b.requester.emailHash,
         profilePicture: b.requester.profilePicture,
         updatedAt: b.requester.updatedAt,
       },

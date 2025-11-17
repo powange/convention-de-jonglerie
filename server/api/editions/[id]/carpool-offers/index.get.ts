@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
@@ -19,15 +18,39 @@ export default wrapApiHandler(
         ...(includeArchived ? {} : { tripDate: { gte: now } }),
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         bookings: {
           include: {
-            requester: true,
+            requester: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
           },
         },
         passengers: {
           include: {
-            user: true,
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
           },
           orderBy: {
             addedAt: 'asc',
@@ -35,7 +58,15 @@ export default wrapApiHandler(
         },
         comments: {
           include: {
-            user: true,
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -84,7 +115,7 @@ export default wrapApiHandler(
           ? {
               id: offer.user.id,
               pseudo: offer.user.pseudo,
-              emailHash: getEmailHash(offer.user.email),
+              emailHash: offer.user.emailHash,
               profilePicture: offer.user.profilePicture ?? null,
               updatedAt: offer.user.updatedAt,
             }
@@ -97,7 +128,7 @@ export default wrapApiHandler(
             ? {
                 id: passenger.user.id,
                 pseudo: passenger.user.pseudo,
-                emailHash: getEmailHash(passenger.user.email),
+                emailHash: passenger.user.emailHash,
                 profilePicture: passenger.user.profilePicture ?? null,
                 updatedAt: passenger.user.updatedAt,
               }
@@ -117,7 +148,7 @@ export default wrapApiHandler(
             ? {
                 id: b.requester.id,
                 pseudo: b.requester.pseudo,
-                emailHash: getEmailHash(b.requester.email),
+                emailHash: b.requester.emailHash,
                 profilePicture: b.requester.profilePicture ?? null,
                 updatedAt: b.requester.updatedAt,
               }
@@ -132,7 +163,7 @@ export default wrapApiHandler(
             ? {
                 id: comment.user.id,
                 pseudo: comment.user.pseudo,
-                emailHash: getEmailHash(comment.user.email),
+                emailHash: comment.user.emailHash,
                 profilePicture: comment.user.profilePicture ?? null,
                 updatedAt: comment.user.updatedAt,
               }

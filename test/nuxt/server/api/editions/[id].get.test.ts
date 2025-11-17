@@ -1,15 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn(),
-}))
-
-import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/editions/[id]/index.get'
-
-const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 describe('/api/editions/[id] GET', () => {
   const mockEdition = {
@@ -55,7 +47,7 @@ describe('/api/editions/[id] GET', () => {
     creator: {
       id: 1,
       pseudo: 'testuser',
-      email: 'creator@example.com',
+      emailHash: 'hash_creator@example.com',
       profilePicture: null,
       updatedAt: new Date(),
     },
@@ -74,7 +66,7 @@ describe('/api/editions/[id] GET', () => {
           user: {
             id: 3,
             pseudo: 'organizer',
-            email: 'collab@example.com',
+            emailHash: 'hash_collab@example.com',
             profilePicture: null,
             updatedAt: new Date(),
           },
@@ -86,8 +78,6 @@ describe('/api/editions/[id] GET', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.getRouterParam = vi.fn()
-    mockGetEmailHash.mockReset()
-    mockGetEmailHash.mockImplementation((email: string) => (email ? `hash_${email}` : ''))
   })
 
   it('devrait retourner une édition par ID', async () => {
@@ -148,7 +138,7 @@ describe('/api/editions/[id] GET', () => {
             user: {
               id: 4,
               pseudo: 'edition_collab',
-              email: 'ed_collab@example.com',
+              emailHash: 'hash_ed_collab@example.com',
               profilePicture: null,
               updatedAt: new Date(),
             },
@@ -244,7 +234,7 @@ describe('/api/editions/[id] GET', () => {
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
             profilePicture: true,
             updatedAt: true,
           },
@@ -263,7 +253,7 @@ describe('/api/editions/[id] GET', () => {
                   select: {
                     id: true,
                     pseudo: true,
-                    email: true,
+                    emailHash: true,
                     profilePicture: true,
                     updatedAt: true,
                   },

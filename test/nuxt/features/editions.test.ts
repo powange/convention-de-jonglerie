@@ -238,7 +238,7 @@ describe("Système d'éditions", () => {
         creator: {
           id: 1,
           pseudo: 'testuser',
-          email: 'test@example.com',
+          emailHash: 'hash123',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -296,7 +296,7 @@ describe("Système d'éditions", () => {
         creator: {
           id: 1,
           pseudo: 'testuser',
-          email: 'test@example.com',
+          emailHash: 'hash123',
           profilePicture: null,
           updatedAt: new Date(),
         },
@@ -308,7 +308,7 @@ describe("Système d'éditions", () => {
               user: {
                 id: 2,
                 pseudo: 'collab',
-                email: 'collab@example.com',
+                emailHash: 'hash456',
                 profilePicture: null,
                 updatedAt: new Date(),
               },

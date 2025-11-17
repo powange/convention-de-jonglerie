@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
@@ -18,10 +17,26 @@ export default wrapApiHandler(
         ...(includeArchived ? {} : { tripDate: { gte: now } }),
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            emailHash: true,
+            profilePicture: true,
+            updatedAt: true,
+          },
+        },
         comments: {
           include: {
-            user: true,
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -39,7 +54,7 @@ export default wrapApiHandler(
       user: {
         id: request.user.id,
         pseudo: request.user.pseudo,
-        emailHash: getEmailHash(request.user.email),
+        emailHash: request.user.emailHash,
         profilePicture: request.user.profilePicture,
         updatedAt: request.user.updatedAt,
       },
@@ -48,7 +63,7 @@ export default wrapApiHandler(
         user: {
           id: comment.user.id,
           pseudo: comment.user.pseudo,
-          emailHash: getEmailHash(comment.user.email),
+          emailHash: comment.user.emailHash,
           profilePicture: comment.user.profilePicture,
           updatedAt: comment.user.updatedAt,
         },

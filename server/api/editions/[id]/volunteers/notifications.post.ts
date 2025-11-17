@@ -117,7 +117,7 @@ export default wrapApiHandler(async (event) => {
         select: {
           id: true,
           pseudo: true,
-          email: true,
+          emailHash: true,
         },
       },
     },

@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -45,6 +44,7 @@ export default wrapApiHandler(async (event) => {
               id: true,
               pseudo: true,
               email: true,
+              emailHash: true,
               prenom: true,
               nom: true,
               phone: true,
@@ -93,6 +93,7 @@ export default wrapApiHandler(async (event) => {
           id: true,
           pseudo: true,
           email: true,
+          emailHash: true,
           prenom: true,
           nom: true,
           phone: true,
@@ -151,7 +152,7 @@ export default wrapApiHandler(async (event) => {
           email: volunteer.user.email,
           phone: volunteer.user.phone,
           profilePicture: volunteer.user.profilePicture,
-          emailHash: getEmailHash(volunteer.user.email),
+          emailHash: volunteer.user.emailHash,
           updatedAt: volunteer.user.updatedAt,
         },
         confirmedAt: confirmation?.confirmedAt,
@@ -166,7 +167,7 @@ export default wrapApiHandler(async (event) => {
         email: volunteer.user.email,
         phone: volunteer.user.phone,
         profilePicture: volunteer.user.profilePicture,
-        emailHash: getEmailHash(volunteer.user.email),
+        emailHash: volunteer.user.emailHash,
         updatedAt: volunteer.user.updatedAt,
       },
     })),

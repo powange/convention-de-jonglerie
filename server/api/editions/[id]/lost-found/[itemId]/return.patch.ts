@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
@@ -53,7 +52,7 @@ export default wrapApiHandler(
             nom: true,
             profilePicture: true,
             updatedAt: true,
-            email: true,
+            emailHash: true,
           },
         },
         comments: {
@@ -66,7 +65,7 @@ export default wrapApiHandler(
                 nom: true,
                 profilePicture: true,
                 updatedAt: true,
-                email: true,
+                emailHash: true,
               },
             },
           },
@@ -74,24 +73,8 @@ export default wrapApiHandler(
         },
       },
     })
-    const { email, ...userWithoutEmail } = rawItem.user
-    const itemUser = {
-      ...userWithoutEmail,
-      emailHash: getEmailHash(email),
-    }
 
-    const comments = rawItem.comments.map((c) => {
-      const { email: commentEmail, ...commentUserWithoutEmail } = c.user
-      return {
-        ...c,
-        user: {
-          ...commentUserWithoutEmail,
-          emailHash: getEmailHash(commentEmail),
-        },
-      }
-    })
-
-    return { ...rawItem, user: itemUser, comments }
+    return rawItem
   },
   { operationName: 'ToggleLostFoundItemStatus' }
 )

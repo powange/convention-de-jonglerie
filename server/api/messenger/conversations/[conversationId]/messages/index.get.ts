@@ -1,6 +1,5 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -57,7 +56,7 @@ export default wrapApiHandler(
                 id: true,
                 pseudo: true,
                 profilePicture: true,
-                email: true,
+                emailHash: true,
               },
             },
           },
@@ -90,20 +89,10 @@ export default wrapApiHandler(
 
     const page = Math.floor(offset / limit) + 1
 
-    // Transformer les messages pour ajouter emailHash et supprimer email et participantId
+    // Transformer les messages pour supprimer participantId
     const transformedMessages = messages.map((message) => {
-      const { email, ...userWithoutEmail } = message.participant.user
       const { participantId: _participantId, ...messageWithoutParticipantId } = message
-      return {
-        ...messageWithoutParticipantId,
-        participant: {
-          ...message.participant,
-          user: {
-            ...userWithoutEmail,
-            emailHash: getEmailHash(email),
-          },
-        },
-      }
+      return messageWithoutParticipantId
     })
 
     return createPaginatedResponse(transformedMessages.reverse(), total, page, limit)

@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
@@ -40,6 +39,7 @@ export default wrapApiHandler(
                 nom: true,
                 prenom: true,
                 email: true,
+                emailHash: true,
                 profilePicture: true,
                 updatedAt: true,
               },
@@ -76,7 +76,7 @@ export default wrapApiHandler(
           pseudo: assignment.user.pseudo,
           nom: assignment.user.nom,
           prenom: assignment.user.prenom,
-          emailHash: getEmailHash(assignment.user.email),
+          emailHash: assignment.user.emailHash,
           // Les gestionnaires ont aussi accès à l'email en clair
           ...(isVolunteer ? {} : { email: assignment.user.email }),
           profilePicture: assignment.user.profilePicture,

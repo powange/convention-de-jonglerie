@@ -40,7 +40,7 @@ describe('API Convention - Mise à jour', () => {
     author: {
       id: 1,
       pseudo: 'creator',
-      email: 'creator@example.com',
+      emailHash: 'dadbcd70e3cf287900f80aedef3f987c', // MD5 de 'creator@example.com'
     },
   }
 
@@ -81,7 +81,7 @@ describe('API Convention - Mise à jour', () => {
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
           },
         },
       },

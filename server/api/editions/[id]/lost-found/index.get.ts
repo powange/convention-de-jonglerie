@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
@@ -31,7 +30,7 @@ export default wrapApiHandler(
             prenom: true,
             nom: true,
             profilePicture: true,
-            email: true,
+            emailHash: true,
             updatedAt: true,
           },
         },
@@ -44,7 +43,7 @@ export default wrapApiHandler(
                 prenom: true,
                 nom: true,
                 profilePicture: true,
-                email: true,
+                emailHash: true,
                 updatedAt: true,
               },
             },
@@ -54,27 +53,7 @@ export default wrapApiHandler(
       },
       orderBy: { createdAt: 'desc' },
     })
-    const items = rawItems.map((item) => {
-      const { email, ...userWithoutEmail } = item.user
-      const user = {
-        ...userWithoutEmail,
-        emailHash: getEmailHash(email),
-      }
-
-      const comments = item.comments.map((c) => {
-        const { email: commentEmail, ...commentUserWithoutEmail } = c.user
-        return {
-          ...c,
-          user: {
-            ...commentUserWithoutEmail,
-            emailHash: getEmailHash(commentEmail),
-          },
-        }
-      })
-
-      return { ...item, user, comments }
-    })
-    return items
+    return rawItems
   },
   { operationName: 'GetLostFoundItems' }
 )

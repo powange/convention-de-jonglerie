@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import {
   sanitizeString,
@@ -57,19 +56,13 @@ export default wrapApiHandler(
             nom: true,
             profilePicture: true,
             updatedAt: true,
-            email: true,
+            emailHash: true,
           },
         },
       },
     })
 
-    const { email, ...userWithoutEmail } = rawComment.user
-    const commentUser = {
-      ...userWithoutEmail,
-      emailHash: getEmailHash(email),
-    }
-
-    return { ...rawComment, user: commentUser }
+    return rawComment
   },
   { operationName: 'CreateLostFoundComment' }
 )

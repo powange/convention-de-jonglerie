@@ -34,7 +34,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
             profilePicture: true,
           },
         },
@@ -65,7 +65,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             pseudo: true,
-            email: true,
+            emailHash: true,
             profilePicture: true,
           },
         },
@@ -75,7 +75,7 @@ export default wrapApiHandler(
               select: {
                 id: true,
                 pseudo: true,
-                email: true,
+                emailHash: true,
                 profilePicture: true,
               },
             },
@@ -89,19 +89,9 @@ export default wrapApiHandler(
         },
       },
     })
-    const { getEmailHash } = await import('@@/server/utils/email-hash')
     const transformed = {
       ...conventionWithOrganizers,
-      author: conventionWithOrganizers?.author
-        ? (() => {
-            const { email, ...authorWithoutEmail } = conventionWithOrganizers.author
-            return {
-              ...authorWithoutEmail,
-              emailHash: email ? getEmailHash(email) : undefined,
-              profilePicture: conventionWithOrganizers.author.profilePicture,
-            }
-          })()
-        : null,
+      author: conventionWithOrganizers?.author ?? null,
       organizers: (conventionWithOrganizers?.organizers || []).map((c: any) => ({
         id: c.id,
         addedAt: c.addedAt,
@@ -114,16 +104,7 @@ export default wrapApiHandler(
           editAllEditions: c.canEditAllEditions,
           deleteAllEditions: c.canDeleteAllEditions,
         },
-        user: c.user
-          ? (() => {
-              const { email, ...userWithoutEmail } = c.user
-              return {
-                ...userWithoutEmail,
-                emailHash: email ? getEmailHash(email) : undefined,
-                profilePicture: c.user.profilePicture,
-              }
-            })()
-          : null,
+        user: c.user,
         addedBy: c.addedBy,
       })),
     }
