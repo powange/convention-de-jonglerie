@@ -3,6 +3,7 @@ import { execSync } from 'node:child_process'
 import bcrypt from 'bcryptjs'
 import { describe, it, expect, beforeAll } from 'vitest'
 
+import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 
 // Test d'intégration de la migration des droits organisateurs
@@ -19,9 +20,11 @@ describe.skip('Migration droits organisateurs (script) - ignoré (champ role sup
 
   beforeAll(async () => {
     const ts = Date.now()
+    const adminEmail = `admin-mig-${ts}@ex.com`
     adminUser = await prismaTest.user.create({
       data: {
-        email: `admin-mig-${ts}@ex.com`,
+        email: adminEmail,
+        emailHash: getEmailHash(adminEmail),
         password: await bcrypt.hash('X', 10),
         pseudo: `admin-mig-${ts}`,
         nom: 'A',
@@ -29,9 +32,11 @@ describe.skip('Migration droits organisateurs (script) - ignoré (champ role sup
         isEmailVerified: true,
       },
     })
+    const moderatorEmail = `mod-mig-${ts}@ex.com`
     moderatorUser = await prismaTest.user.create({
       data: {
-        email: `mod-mig-${ts}@ex.com`,
+        email: moderatorEmail,
+        emailHash: getEmailHash(moderatorEmail),
         password: await bcrypt.hash('X', 10),
         pseudo: `mod-mig-${ts}`,
         nom: 'C',

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { describe, it, expect, beforeAll } from 'vitest'
 
+import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 
 // Ce fichier ne s'exécute que si TEST_WITH_DB=true
@@ -17,9 +18,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
       const ts = Date.now()
 
       // Créer les utilisateurs de test
+      const volunteerEmail = `volunteer-${ts}@example.com`
       mockUser = await prismaTest.user.create({
         data: {
-          email: `volunteer-${ts}@example.com`,
+          email: volunteerEmail,
+          emailHash: getEmailHash(volunteerEmail),
           password: await bcrypt.hash('Password123!', 10),
           pseudo: `volunteer-${ts}`,
           nom: 'Dupont',
@@ -29,9 +32,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         },
       })
 
+      const managerEmail = `manager-${ts}@example.com`
       mockManager = await prismaTest.user.create({
         data: {
-          email: `manager-${ts}@example.com`,
+          email: managerEmail,
+          emailHash: getEmailHash(managerEmail),
           password: await bcrypt.hash('Password123!', 10),
           pseudo: `manager-${ts}`,
           nom: 'Martin',
@@ -223,9 +228,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const ts = Date.now()
 
         // Créer un nouvel utilisateur pour ce test
+        const testUserEmail = `double-app-${ts}@example.com`
         const testUser = await prismaTest.user.create({
           data: {
-            email: `double-app-${ts}@example.com`,
+            email: testUserEmail,
+            emailHash: getEmailHash(testUserEmail),
             password: await bcrypt.hash('Password123!', 10),
             pseudo: `doubleapp-${ts}`,
             nom: 'Double',
@@ -273,9 +280,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const ts = Date.now()
 
         // Créer un nouvel utilisateur pour ce test
+        const testUserEmail = `reject-test-${ts}@example.com`
         const testUser = await prismaTest.user.create({
           data: {
-            email: `reject-test-${ts}@example.com`,
+            email: testUserEmail,
+            emailHash: getEmailHash(testUserEmail),
             password: await bcrypt.hash('Password123!', 10),
             pseudo: `rejectuser-${ts}`,
             nom: 'Test',
@@ -326,9 +335,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const ts = Date.now()
 
         // Créer un utilisateur organisateur
+        const organizerEmail = `organizer-${ts}@example.com`
         const organizerUser = await prismaTest.user.create({
           data: {
-            email: `organizer-${ts}@example.com`,
+            email: organizerEmail,
+            emailHash: getEmailHash(organizerEmail),
             password: await bcrypt.hash('Password123!', 10),
             pseudo: `collab-${ts}`,
             nom: 'Organisateur',
@@ -424,9 +435,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
       it('devrait stocker correctement les allergies avec niveau de sévérité dans la DB', async () => {
         const ts = Date.now()
 
+        const allergyUserEmail = `allergy-${ts}@example.com`
         const allergyUser = await prismaTest.user.create({
           data: {
-            email: `allergy-${ts}@example.com`,
+            email: allergyUserEmail,
+            emailHash: getEmailHash(allergyUserEmail),
             password: await bcrypt.hash('Password123!', 10),
             pseudo: `allergyuser-${ts}`,
             nom: 'Allergy',
@@ -470,9 +483,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
       it("devrait accepter les allergies légères sans contact d'urgence", async () => {
         const ts = Date.now()
 
+        const lightAllergyEmail = `light-allergy-${ts}@example.com`
         const lightAllergyUser = await prismaTest.user.create({
           data: {
-            email: `light-allergy-${ts}@example.com`,
+            email: lightAllergyEmail,
+            emailHash: getEmailHash(lightAllergyEmail),
             password: await bcrypt.hash('Password123!', 10),
             pseudo: `lightallergyuser-${ts}`,
             nom: 'Light',

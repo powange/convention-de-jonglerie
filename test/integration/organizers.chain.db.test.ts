@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
+import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 
 // Ce test nécessite TEST_WITH_DB=true + base lancée (script test:db)
@@ -15,9 +16,11 @@ describe('Intégration organisateurs: add -> patch -> delete -> history', () => 
 
   beforeAll(async () => {
     const ts = Date.now()
+    const ownerEmail = `owner-${ts}@ex.com`
     owner = await prismaTest.user.create({
       data: {
-        email: `owner-${ts}@ex.com`,
+        email: ownerEmail,
+        emailHash: getEmailHash(ownerEmail),
         password: await bcrypt.hash('x', 10),
         pseudo: `owner-${ts}`,
         nom: 'Own',
@@ -26,9 +29,11 @@ describe('Intégration organisateurs: add -> patch -> delete -> history', () => 
       },
     })
     actor = owner // l'owner réalise les actions
+    const organizerEmail = `collab-${ts}@ex.com`
     organizerUser = await prismaTest.user.create({
       data: {
-        email: `collab-${ts}@ex.com`,
+        email: organizerEmail,
+        emailHash: getEmailHash(organizerEmail),
         password: await bcrypt.hash('x', 10),
         pseudo: `collab-${ts}`,
         nom: 'Col',

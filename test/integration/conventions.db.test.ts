@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { describe, it, expect, beforeEach } from 'vitest'
 
+import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 
 // Ce fichier ne s'exécute que si TEST_WITH_DB=true
@@ -14,9 +15,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
     const timestamp = Date.now()
 
     // Créer des utilisateurs de test avec IDs uniques
+    const testUserEmail = `test-creator-${timestamp}@example.com`
     testUser = await prismaTest.user.create({
       data: {
-        email: `test-creator-${timestamp}@example.com`,
+        email: testUserEmail,
+        emailHash: getEmailHash(testUserEmail),
         password: await bcrypt.hash('Password123!', 10),
         pseudo: `testcreator-${timestamp}`,
         nom: 'Test',
@@ -25,9 +28,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       },
     })
 
+    const adminUserEmail = `admin-${timestamp}@example.com`
     adminUser = await prismaTest.user.create({
       data: {
-        email: `admin-${timestamp}@example.com`,
+        email: adminUserEmail,
+        emailHash: getEmailHash(adminUserEmail),
         password: await bcrypt.hash('Password123!', 10),
         pseudo: `admin-${timestamp}`,
         nom: 'Admin',

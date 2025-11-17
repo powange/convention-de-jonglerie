@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { describe, it, expect, beforeEach } from 'vitest'
 
+import { getEmailHash } from '../../server/utils/email-hash'
 import { prismaTest } from '../setup-db'
 
 // Ce fichier ne s'exécute que si TEST_WITH_DB=true
@@ -16,9 +17,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
       const timestamp = Date.now()
 
       // Créer un utilisateur de test
+      const email = `lostfound-${timestamp}@example.com`
       testUser = await prismaTest.user.create({
         data: {
-          email: `lostfound-${timestamp}@example.com`,
+          email,
+          emailHash: getEmailHash(email),
           password: await bcrypt.hash('Password123!', 10),
           pseudo: `lostfound-${timestamp}`,
           nom: 'Lost',
