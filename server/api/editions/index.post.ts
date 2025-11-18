@@ -9,6 +9,7 @@ import {
 } from '@@/server/utils/move-temp-image'
 import { getConventionForEditionCreation } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { editionWithFavoritesInclude } from '@@/server/utils/prisma-select-helpers'
 import { editionSchema } from '@@/server/utils/validation-schemas'
 
 export default wrapApiHandler(
@@ -121,14 +122,7 @@ export default wrapApiHandler(
         creatorId: user.id,
         isOnline: false, // Nouvelle édition créée hors ligne par défaut
       },
-      include: {
-        creator: {
-          select: { id: true, pseudo: true },
-        },
-        favoritedBy: {
-          select: { id: true },
-        },
-      },
+      include: editionWithFavoritesInclude,
     })
 
     // Si une image temporaire a été fournie, la déplacer dans le bon dossier
@@ -148,14 +142,7 @@ export default wrapApiHandler(
         const updatedEdition = await prisma.edition.update({
           where: { id: edition.id },
           data: { imageUrl: newImageUrl },
-          include: {
-            creator: {
-              select: { id: true, pseudo: true },
-            },
-            favoritedBy: {
-              select: { id: true },
-            },
-          },
+          include: editionWithFavoritesInclude,
         })
         // Invalider le cache après création
         await invalidateEditionCache(updatedEdition.id)

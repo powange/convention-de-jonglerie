@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { carpoolOfferFullInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -18,56 +19,15 @@ export default wrapApiHandler(
         ...(includeArchived ? {} : { tripDate: { gte: now } }),
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            emailHash: true,
-            profilePicture: true,
-            updatedAt: true,
-          },
-        },
-        bookings: {
-          include: {
-            requester: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-        },
+        ...carpoolOfferFullInclude,
         passengers: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
+          ...carpoolOfferFullInclude.passengers,
           orderBy: {
             addedAt: 'asc',
           },
         },
         comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
+          ...carpoolOfferFullInclude.comments,
           orderBy: {
             createdAt: 'desc',
           },

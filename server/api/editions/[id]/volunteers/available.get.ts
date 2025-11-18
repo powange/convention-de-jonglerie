@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { volunteerUserDetailedSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(async (event) => {
@@ -23,14 +24,7 @@ export default wrapApiHandler(async (event) => {
       userId: true,
       user: {
         select: {
-          id: true,
-          pseudo: true,
-          nom: true,
-          prenom: true,
-          emailHash: true,
-          email: true,
-          profilePicture: true,
-          updatedAt: true,
+          ...volunteerUserDetailedSelect,
           volunteerAssignments: {
             where: {
               timeSlot: {

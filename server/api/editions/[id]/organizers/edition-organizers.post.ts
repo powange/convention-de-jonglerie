@@ -1,5 +1,6 @@
 import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import { z } from 'zod'
 
@@ -138,10 +139,7 @@ export default wrapApiHandler(
               title: true,
               user: {
                 select: {
-                  id: true,
-                  pseudo: true,
-                  prenom: true,
-                  nom: true,
+                  ...userWithNameSelect,
                   email: true,
                   profilePicture: true,
                 },

@@ -2,6 +2,7 @@ import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-hel
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId, validatePagination } from '@@/server/utils/validation-helpers'
 
 import type { VolunteerApplicationWhereInput } from '@@/server/types/prisma-helpers'
@@ -259,12 +260,9 @@ export default wrapApiHandler(async (event) => {
     addedAt: true,
     user: {
       select: {
-        id: true,
-        pseudo: true,
+        ...userWithNameSelect,
         email: true,
         phone: true,
-        prenom: true,
-        nom: true,
         profilePicture: true,
         updatedAt: true,
         volunteerComments: {
@@ -295,12 +293,7 @@ export default wrapApiHandler(async (event) => {
       },
     },
     addedBy: {
-      select: {
-        id: true,
-        pseudo: true,
-        prenom: true,
-        nom: true,
-      },
+      select: userWithNameSelect,
     },
     mealSelections: {
       select: {

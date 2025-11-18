@@ -8,6 +8,7 @@ import {
 import { NotificationService } from '@@/server/utils/notification-service'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
+import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(async (event) => {
@@ -52,10 +53,9 @@ export default wrapApiHandler(async (event) => {
     include: {
       user: {
         select: {
-          id: true,
+          ...userBasicSelect,
           email: true,
           prenom: true,
-          pseudo: true,
           preferredLanguage: true,
         },
       },

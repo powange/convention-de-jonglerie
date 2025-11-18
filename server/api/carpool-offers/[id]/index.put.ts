@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail, buildUpdateData } from '@@/server/utils/prisma-helpers'
+import { carpoolOfferInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -62,15 +63,7 @@ export default wrapApiHandler(
     const updatedOffer = await prisma.carpoolOffer.update({
       where: { id: offerId },
       data: updateData,
-      include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            profilePicture: true,
-          },
-        },
-      },
+      include: carpoolOfferInclude,
     })
 
     return updatedOffer

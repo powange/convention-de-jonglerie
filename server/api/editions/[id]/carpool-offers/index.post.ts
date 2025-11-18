@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { carpoolOfferSchema } from '@@/server/utils/validation-schemas'
 
@@ -35,12 +36,7 @@ export default wrapApiHandler(
       },
       include: {
         user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-          },
+          select: userWithNameSelect,
         },
       },
     })

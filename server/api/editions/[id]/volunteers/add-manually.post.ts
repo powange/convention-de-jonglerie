@@ -3,6 +3,7 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
@@ -118,10 +119,7 @@ export default wrapApiHandler(async (event) => {
       status: true,
       user: {
         select: {
-          id: true,
-          pseudo: true,
-          prenom: true,
-          nom: true,
+          ...userWithNameSelect,
           email: true,
         },
       },

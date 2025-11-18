@@ -6,6 +6,7 @@ import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import {
   sanitizeEmail,
@@ -254,11 +255,8 @@ export default wrapApiHandler(async (event) => {
       preferredLanguage: userLanguage,
     },
     select: {
-      id: true,
+      ...userWithNameSelect,
       email: true,
-      pseudo: true,
-      prenom: true,
-      nom: true,
     },
   })
 

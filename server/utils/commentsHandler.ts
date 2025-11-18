@@ -1,6 +1,7 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
 import { prisma } from './prisma'
+import { carpoolUserSelect, userWithNameSelect } from './prisma-select-helpers'
 
 import type { H3Event } from 'h3'
 
@@ -43,13 +44,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
       where: whereClause,
       include: {
         user: {
-          select: {
-            id: true,
-            pseudo: true,
-            emailHash: true,
-            profilePicture: true,
-            updatedAt: true,
-          },
+          select: carpoolUserSelect,
         },
       },
       orderBy: { createdAt: 'asc' },
@@ -123,10 +118,7 @@ export async function createCommentForEntity(
       include: {
         user: {
           select: {
-            id: true,
-            pseudo: true,
-            nom: true,
-            prenom: true,
+            ...userWithNameSelect,
             emailHash: true,
             profilePicture: true,
           },

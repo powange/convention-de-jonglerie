@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessConvention } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
+import { organizerWithUserInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -22,11 +23,7 @@ export default wrapApiHandler(
     // Récupérer avec nouvelles permissions
     const organizers = await prisma.conventionOrganizer.findMany({
       where: { conventionId },
-      include: {
-        user: { select: { id: true, pseudo: true } },
-        addedBy: { select: { pseudo: true } },
-        perEditionPermissions: true,
-      },
+      include: organizerWithUserInclude,
       orderBy: { addedAt: 'desc' },
     })
 

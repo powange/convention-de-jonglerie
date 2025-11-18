@@ -68,6 +68,7 @@ DevOps:    Docker + Docker Compose + GitHub Actions
 ### 1.5 Architecture Pattern
 
 **Architecture Full-Stack Nuxt** avec :
+
 - **SSR (Server-Side Rendering)** pour SEO et performances
 - **API RESTful** via Nitro server routes
 - **File-based routing** pour pages et API
@@ -80,78 +81,78 @@ DevOps:    Docker + Docker Compose + GitHub Actions
 
 ### 2.1 Frontend Core
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **Nuxt.js** | 4.2.0 | Framework Vue.js universel avec SSR |
-| **Vue.js** | 3.5.17 | Framework JavaScript réactif |
-| **TypeScript** | 5.8.3 | Typage statique pour JavaScript |
-| **Pinia** | 3.0.3 | State management (remplace Vuex) |
-| **VueUse** | 13.6.0 | Collection de composables Vue |
+| Technologie    | Version | Rôle                                |
+| -------------- | ------- | ----------------------------------- |
+| **Nuxt.js**    | 4.2.0   | Framework Vue.js universel avec SSR |
+| **Vue.js**     | 3.5.17  | Framework JavaScript réactif        |
+| **TypeScript** | 5.8.3   | Typage statique pour JavaScript     |
+| **Pinia**      | 3.0.3   | State management (remplace Vuex)    |
+| **VueUse**     | 13.6.0  | Collection de composables Vue       |
 
 ### 2.2 UI & Styling
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **Nuxt UI** | 4.0.0 | Composants UI avec Tailwind + Headless UI |
-| **Tailwind CSS** | - | Framework CSS utilitaire (via Nuxt UI) |
-| **Nuxt Icon** | - | Icônes vectorielles (Iconify) |
-| **Chart.js** | 4.5.1 | Graphiques et visualisations |
-| **FullCalendar** | 6.1.15+ | Planning et calendrier interactif |
-| **Leaflet** | - | Cartes interactives (via nuxt-leaflet) |
-| **flag-icons** | 7.5.0 | Drapeaux de pays |
+| Technologie      | Version | Rôle                                      |
+| ---------------- | ------- | ----------------------------------------- |
+| **Nuxt UI**      | 4.0.0   | Composants UI avec Tailwind + Headless UI |
+| **Tailwind CSS** | -       | Framework CSS utilitaire (via Nuxt UI)    |
+| **Nuxt Icon**    | -       | Icônes vectorielles (Iconify)             |
+| **Chart.js**     | 4.5.1   | Graphiques et visualisations              |
+| **FullCalendar** | 6.1.15+ | Planning et calendrier interactif         |
+| **Leaflet**      | -       | Cartes interactives (via nuxt-leaflet)    |
+| **flag-icons**   | 7.5.0   | Drapeaux de pays                          |
 
 ### 2.3 Backend & Database
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **Nitro** | (Nuxt 4) | Moteur serveur universel |
-| **Prisma** | 6.18.0 | ORM (Object-Relational Mapping) |
-| **MySQL** | 8.0 | Base de données relationnelle |
-| **@prisma/nuxt** | 0.3.0 | Intégration Prisma pour Nuxt |
+| Technologie      | Version  | Rôle                            |
+| ---------------- | -------- | ------------------------------- |
+| **Nitro**        | (Nuxt 4) | Moteur serveur universel        |
+| **Prisma**       | 6.18.0   | ORM (Object-Relational Mapping) |
+| **MySQL**        | 8.0      | Base de données relationnelle   |
+| **@prisma/nuxt** | 0.3.0    | Intégration Prisma pour Nuxt    |
 
 ### 2.4 Authentification & Sécurité
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **nuxt-auth-utils** | 0.5.23 | Auth par sessions scellées (sealed cookies) |
-| **bcryptjs** | 3.0.2 | Hachage de mots de passe |
-| **md5** | 2.3.0 | Hash email pour Gravatar |
-| **zod** | 4.1.9 | Validation de schémas TypeScript |
+| Technologie         | Version | Rôle                                        |
+| ------------------- | ------- | ------------------------------------------- |
+| **nuxt-auth-utils** | 0.5.23  | Auth par sessions scellées (sealed cookies) |
+| **bcryptjs**        | 3.0.2   | Hachage de mots de passe                    |
+| **md5**             | 2.3.0   | Hash email pour Gravatar                    |
+| **zod**             | 4.1.9   | Validation de schémas TypeScript            |
 
 ### 2.5 Fonctionnalités & Intégrations
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **@nuxtjs/i18n** | 10.0.3 | Internationalisation (13 langues) |
-| **@nuxtjs/seo** | 3.2.2 | SEO (sitemap, robots, meta tags) |
-| **nuxt-qrcode** | 0.4.8 | Génération de QR codes |
-| **web-push** | 3.6.7 | Notifications push Web |
-| **@anthropic-ai/sdk** | 0.67.0 | IA pour extraction de workshops |
-| **nodemailer** | 7.0.5 | Envoi d'emails SMTP |
-| **node-cron** | 3.0.3 | Tâches planifiées (cron jobs) |
-| **@vue-email** | 0.0.21 | Templates d'emails en Vue |
+| Technologie           | Version | Rôle                              |
+| --------------------- | ------- | --------------------------------- |
+| **@nuxtjs/i18n**      | 10.0.3  | Internationalisation (13 langues) |
+| **@nuxtjs/seo**       | 3.2.2   | SEO (sitemap, robots, meta tags)  |
+| **nuxt-qrcode**       | 0.4.8   | Génération de QR codes            |
+| **web-push**          | 3.6.7   | Notifications push Web            |
+| **@anthropic-ai/sdk** | 0.67.0  | IA pour extraction de workshops   |
+| **nodemailer**        | 7.0.5   | Envoi d'emails SMTP               |
+| **node-cron**         | 3.0.3   | Tâches planifiées (cron jobs)     |
+| **@vue-email**        | 0.0.21  | Templates d'emails en Vue         |
 
 ### 2.6 Build & Dev Tools
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **Vite** | (Nuxt 4) | Build tool rapide |
-| **ESLint** | 9.32.0 | Linter JavaScript/TypeScript |
-| **Prettier** | 3.3.3 | Formatage de code |
-| **Vitest** | 3.2.4 | Framework de tests unitaires |
-| **@nuxt/test-utils** | 3.19.2 | Utilitaires de tests pour Nuxt |
-| **happy-dom** | 18.0.1 | DOM virtuel pour tests |
-| **tsx** | 4.19.1 | Exécution TypeScript directe |
+| Technologie          | Version  | Rôle                           |
+| -------------------- | -------- | ------------------------------ |
+| **Vite**             | (Nuxt 4) | Build tool rapide              |
+| **ESLint**           | 9.32.0   | Linter JavaScript/TypeScript   |
+| **Prettier**         | 3.3.3    | Formatage de code              |
+| **Vitest**           | 3.2.4    | Framework de tests unitaires   |
+| **@nuxt/test-utils** | 3.19.2   | Utilitaires de tests pour Nuxt |
+| **happy-dom**        | 18.0.1   | DOM virtuel pour tests         |
+| **tsx**              | 4.19.1   | Exécution TypeScript directe   |
 
 ### 2.7 DevOps & Déploiement
 
-| Technologie | Version | Rôle |
-|-------------|---------|------|
-| **Docker** | 20.10+ | Conteneurisation |
-| **Docker Compose** | v2.0+ | Orchestration multi-conteneurs |
-| **GitHub Actions** | - | CI/CD automatisé |
-| **Node.js** | 22 | Runtime JavaScript |
-| **Sharp** | 0.33.5 | Optimisation d'images |
+| Technologie        | Version | Rôle                           |
+| ------------------ | ------- | ------------------------------ |
+| **Docker**         | 20.10+  | Conteneurisation               |
+| **Docker Compose** | v2.0+   | Orchestration multi-conteneurs |
+| **GitHub Actions** | -       | CI/CD automatisé               |
+| **Node.js**        | 22      | Runtime JavaScript             |
+| **Sharp**          | 0.33.5  | Optimisation d'images          |
 
 ### 2.8 Dépendances système
 
@@ -164,6 +165,7 @@ DevOps:    Docker + Docker Compose + GitHub Actions
 ```
 
 **Prérequis** :
+
 - Node.js 22.x (strictement)
 - MySQL 8.0+
 - Docker Engine 20.10+ (pour Docker)
@@ -201,22 +203,26 @@ DevOps:    Docker + Docker Compose + GitHub Actions
 ### 3.2 Layers d'architecture
 
 #### Layer 1 : Présentation (Frontend)
+
 - **Pages** : Routes file-based (`app/pages/*.vue`)
 - **Composants** : Composants Vue réutilisables (`app/components/`)
 - **Layouts** : Mises en page (`app/layouts/`)
 - **Stores** : State management Pinia (`app/stores/`)
 
 #### Layer 2 : Business Logic
+
 - **Composables** : Logique réutilisable (`app/composables/`)
 - **Utils** : Fonctions utilitaires (`app/utils/`, `server/utils/`)
 - **Middleware** : Guards de navigation (`app/middleware/`, `server/middleware/`)
 
 #### Layer 3 : API & Server
+
 - **API Routes** : Endpoints RESTful (`server/api/`)
 - **Server Utils** : Helpers serveur (`server/utils/`)
 - **Tasks** : Tâches planifiées cron (`server/tasks/`)
 
 #### Layer 4 : Data Access
+
 - **Prisma Schema** : Modèles de données (`prisma/schema.prisma`)
 - **Migrations** : Historique DB (`prisma/migrations/`)
 - **Seed** : Données de test (`scripts/seed-dev.ts`)
@@ -245,6 +251,7 @@ DevOps:    Docker + Docker Compose + GitHub Actions
 ```
 
 **Avantages** :
+
 - Flexibilité maximale
 - Pas de hiérarchie rigide
 - Droits par édition si nécessaire
@@ -320,6 +327,7 @@ DevOps:    Docker + Docker Compose + GitHub Actions
 ```
 
 **Caractéristiques** :
+
 - **Pas de JWT** : Cookies scellés (sealed cookies)
 - **Server-side sessions** : Données en cookie chiffré
 - **CSRF protection** : Cookies SameSite=Lax
@@ -412,6 +420,7 @@ app/
 ```
 
 **Points clés** :
+
 - **File-based routing** : Chaque `.vue` dans `pages/` = route
 - **Auto-import** : Composants/composables importés automatiquement
 - **Type-safe** : TypeScript strict avec Zod pour validation
@@ -480,6 +489,7 @@ server/
 ```
 
 **Points clés** :
+
 - **Convention de nommage** : `[id]` = paramètre dynamique
 - **HTTP methods** : `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`
 - **Auto-import** : `~/server/utils` importé automatiquement
@@ -507,6 +517,7 @@ prisma/
 ```
 
 **Modèles principaux** :
+
 - **User** : Utilisateurs (auth, profil, préférences)
 - **Convention** : Conventions (métadonnées, localisation)
 - **Edition** : Éditions annuelles d'une convention
@@ -549,6 +560,7 @@ i18n/
 ```
 
 **Système i18n** :
+
 - **Lazy loading** : Chargement à la demande par domaine
 - **13 langues** : Français langue source, autres traduites
 - **Fallback intelligent** : EN si traduction manquante
@@ -587,6 +599,7 @@ test/
 ```
 
 **Statistiques tests** :
+
 - **Total** : 1235+ tests
 - **Unit** : ~273 tests
 - **Nuxt** : ~962 tests
@@ -714,6 +727,7 @@ export default defineNuxtConfig({
 ```
 
 **Points notables** :
+
 - **Icon server bundle** : Mode `remote` pour réduire la taille
 - **Hot reload Docker** : Polling activé pour Windows
 - **SEO conditionnel** : Sitemap uniquement en prod
@@ -867,6 +881,7 @@ model Conversation {
 ```
 
 **Statistiques** :
+
 - **50+ modèles** (User, Convention, Edition, Volunteer, etc.)
 - **200+ champs** au total
 - **Relations complexes** : Many-to-many, cascades
@@ -942,6 +957,7 @@ model Conversation {
 #### `.gitignore`
 
 **Fichiers ignorés** :
+
 ```
 # Build
 .output
@@ -970,10 +986,12 @@ public/uploads/
 #### `docker-compose.dev.yml`
 
 **Services** :
+
 - **database** : MySQL 8.0 (port 3306)
 - **app** : Nuxt dev server (port 3000 + 24678 HMR)
 
 **Caractéristiques** :
+
 - Hot reload avec polling (Docker Windows)
 - Volumes pour code source (cached)
 - Variables d'env complètes
@@ -982,6 +1000,7 @@ public/uploads/
 #### `docker-compose.test.yml`
 
 **Services** :
+
 - **test-db** : MySQL 8.0 (port 3308)
 - **test-runner** : Vitest (ephemeral)
 
@@ -990,10 +1009,12 @@ public/uploads/
 #### `docker-compose.release.yml`
 
 **Services** :
+
 - **database** : MySQL 8.0 production
 - **app** : Build Nuxt optimisé
 
 **Caractéristiques** :
+
 - Multi-stage build
 - Compression Brotli/Gzip
 - Restart policies
@@ -1030,11 +1051,13 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.1 Structure des endpoints
 
 **Convention de nommage** :
+
 ```
 /api/{resource}/[{id}]/{action}.{method}.ts
 ```
 
 **Exemples** :
+
 - `GET /api/conventions` → `server/api/conventions/index.get.ts`
 - `POST /api/conventions` → `server/api/conventions/index.post.ts`
 - `GET /api/conventions/:id` → `server/api/conventions/[id]/index.get.ts`
@@ -1044,7 +1067,9 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.2 Authentification
 
 #### POST /api/auth/register
+
 **Body** :
+
 ```typescript
 {
   email: string
@@ -1053,7 +1078,9 @@ CMD ["node", ".output/server/index.mjs"]
   recaptchaToken?: string
 }
 ```
+
 **Response** :
+
 ```typescript
 {
   user: {
@@ -1066,7 +1093,9 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/auth/login
+
 **Body** :
+
 ```typescript
 {
   identifier: string  // email ou pseudo
@@ -1074,7 +1103,9 @@ CMD ["node", ".output/server/index.mjs"]
   rememberMe?: boolean
 }
 ```
+
 **Response** :
+
 ```typescript
 {
   user: {
@@ -1087,18 +1118,23 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/auth/verify-email
+
 **Body** :
+
 ```typescript
 {
-  code: string  // Code à 6 chiffres
+  code: string // Code à 6 chiffres
 }
 ```
 
 #### POST /api/auth/logout
+
 **Response** : 200 OK (clears session)
 
 #### POST /api/auth/forgot-password
+
 **Body** :
+
 ```typescript
 {
   email: string
@@ -1106,7 +1142,9 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/auth/reset-password
+
 **Body** :
+
 ```typescript
 {
   token: string
@@ -1117,7 +1155,9 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.3 Conventions
 
 #### GET /api/conventions
+
 **Query params** :
+
 ```typescript
 {
   search?: string
@@ -1126,7 +1166,9 @@ CMD ["node", ".output/server/index.mjs"]
   offset?: number
 }
 ```
+
 **Response** :
+
 ```typescript
 {
   conventions: Convention[]
@@ -1135,8 +1177,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/conventions
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   name: string
@@ -1145,7 +1189,9 @@ CMD ["node", ".output/server/index.mjs"]
   imageUrl?: string
 }
 ```
+
 **Response** :
+
 ```typescript
 {
   convention: Convention
@@ -1153,7 +1199,9 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/conventions/:id
+
 **Response** :
+
 ```typescript
 {
   id: number
@@ -1171,8 +1219,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### PUT /api/conventions/:id
+
 **Auth** : Required + `canEditConvention`
 **Body** :
+
 ```typescript
 {
   name?: string
@@ -1182,11 +1232,14 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### DELETE /api/conventions/:id
+
 **Auth** : Required + `canDeleteConvention`
 
 #### GET /api/conventions/:id/organizers
+
 **Auth** : Required
 **Response** :
+
 ```typescript
 {
   organizers: {
@@ -1210,13 +1263,16 @@ CMD ["node", ".output/server/index.mjs"]
       id: number
       pseudo: string
     }
-  }[]
+  }
+  ;[]
 }
 ```
 
 #### POST /api/conventions/:id/organizers
+
 **Auth** : Required + `canManageOrganizers`
 **Body** :
+
 ```typescript
 {
   userIdentifier?: string  // email ou pseudo (search user)
@@ -1234,8 +1290,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### PUT /api/conventions/:id/organizers/:organizerId
+
 **Auth** : Required + `canManageOrganizers`
 **Body** :
+
 ```typescript
 {
   title?: string
@@ -1244,12 +1302,15 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### DELETE /api/conventions/:id/organizers/:organizerId
+
 **Auth** : Required + `canManageOrganizers`
 
 ### 6.4 Éditions
 
 #### GET /api/editions
+
 **Query params** :
+
 ```typescript
 {
   search?: string
@@ -1263,8 +1324,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/editions
+
 **Auth** : Required + `canAddEdition` sur convention
 **Body** :
+
 ```typescript
 {
   conventionId: number
@@ -1281,23 +1344,29 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/editions/:id
+
 **Response** : Édition complète avec:
+
 - Détails édition
 - Convention parent
 - Permissions utilisateur
 - Stats (nombre bénévoles, billets vendus)
 
 #### PUT /api/editions/:id
+
 **Auth** : Required + `canEdit` sur édition
 
 #### DELETE /api/editions/:id
+
 **Auth** : Required + `canDelete` sur édition
 
 ### 6.5 Bénévoles
 
 #### GET /api/editions/:id/volunteers/applications
+
 **Auth** : Required (organizer)
 **Response** :
+
 ```typescript
 {
   applications: {
@@ -1318,14 +1387,18 @@ CMD ["node", ".output/server/index.mjs"]
       teamId: string
       teamName: string
       isLeader: boolean
-    }[]
-  }[]
+    }
+    ;[]
+  }
+  ;[]
 }
 ```
 
 #### POST /api/editions/:id/volunteers/applications
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   motivation?: string
@@ -1337,8 +1410,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### PUT /api/editions/:id/volunteers/applications/:applicationId
+
 **Auth** : Required (owner ou organizer)
 **Body** :
+
 ```typescript
 {
   status?: 'ACCEPTED' | 'REJECTED' | 'CANCELLED'
@@ -1348,7 +1423,9 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/editions/:id/volunteers/teams
+
 **Response** :
+
 ```typescript
 {
   teams: {
@@ -1363,8 +1440,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/editions/:id/volunteers/teams
+
 **Auth** : Required (organizer)
 **Body** :
+
 ```typescript
 {
   name: string
@@ -1374,19 +1453,24 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/editions/:id/volunteers/applications/:applicationId/teams/:teamId
+
 **Auth** : Required (organizer)
 **Body** :
+
 ```typescript
 {
   isLeader?: boolean
 }
 ```
+
 **Action** : Assigner bénévole à équipe
 
 ### 6.6 Planning bénévoles
 
 #### GET /api/editions/:id/volunteer-time-slots
+
 **Response** :
+
 ```typescript
 {
   slots: {
@@ -1401,14 +1485,18 @@ CMD ["node", ".output/server/index.mjs"]
       userId: number
       userName: string
       status: 'ASSIGNED' | 'CONFIRMED' | 'CANCELLED'
-    }[]
-  }[]
+    }
+    ;[]
+  }
+  ;[]
 }
 ```
 
 #### POST /api/editions/:id/volunteer-time-slots
+
 **Auth** : Required (organizer)
 **Body** :
+
 ```typescript
 {
   name: string
@@ -1421,8 +1509,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/editions/:id/volunteer-time-slots/:slotId/assignments
+
 **Auth** : Required (organizer)
 **Body** :
+
 ```typescript
 {
   userId: number
@@ -1432,7 +1522,9 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.7 Billetterie
 
 #### GET /api/editions/:id/ticketing
+
 **Response** :
+
 ```typescript
 {
   tiers: {
@@ -1442,13 +1534,15 @@ CMD ["node", ".output/server/index.mjs"]
     capacity: number
     sold: number
     available: number
-  }[]
+  }
+  ;[]
   options: {
     id: number
     name: string
     price: number
     type: 'ADDON' | 'MEAL'
-  }[]
+  }
+  ;[]
   stats: {
     totalRevenue: number
     totalSold: number
@@ -1458,8 +1552,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/editions/:id/ticketing/tiers
+
 **Auth** : Required (organizer)
 **Body** :
+
 ```typescript
 {
   name: string
@@ -1472,8 +1568,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/editions/:id/ticketing/orders
+
 **Auth** : Required (organizer)
 **Query** :
+
 ```typescript
 {
   status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED'
@@ -1484,7 +1582,9 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.8 Covoiturage
 
 #### GET /api/editions/:id/carpool-offers
+
 **Response** :
+
 ```typescript
 {
   offers: {
@@ -1504,8 +1604,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/carpool-offers
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   editionId: number
@@ -1519,8 +1621,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/carpool-offers/:id/bookings
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   seats: number
@@ -1531,7 +1635,9 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.9 Workshops
 
 #### GET /api/editions/:id/workshops
+
 **Response** :
+
 ```typescript
 {
   workshops: {
@@ -1547,13 +1653,16 @@ CMD ["node", ".output/server/index.mjs"]
       pseudo: string
     }
     participants: number
-  }[]
+  }
+  ;[]
 }
 ```
 
 #### POST /api/editions/:id/workshops
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   title: string
@@ -1568,8 +1677,10 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.10 Messagerie
 
 #### GET /api/messenger/conversations
+
 **Auth** : Required
 **Response** :
+
 ```typescript
 {
   conversations: {
@@ -1589,8 +1700,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/messenger/conversations/:conversationId/messages
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   content: string
@@ -1598,8 +1711,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/messenger/conversations/:conversationId/messages
+
 **Auth** : Required
 **Query** :
+
 ```typescript
 {
   limit?: number
@@ -1610,8 +1725,10 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.11 Admin
 
 #### GET /api/admin/users
+
 **Auth** : Required (isGlobalAdmin)
 **Response** :
+
 ```typescript
 {
   users: User[]
@@ -1620,8 +1737,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/admin/error-logs
+
 **Auth** : Required (isGlobalAdmin)
 **Response** :
+
 ```typescript
 {
   logs: {
@@ -1635,8 +1754,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### POST /api/admin/notifications/test
+
 **Auth** : Required (isGlobalAdmin)
 **Body** :
+
 ```typescript
 {
   userId: number
@@ -1648,8 +1769,10 @@ CMD ["node", ".output/server/index.mjs"]
 ### 6.12 Profil & Notifications
 
 #### GET /api/profile
+
 **Auth** : Required
 **Response** :
+
 ```typescript
 {
   id: number
@@ -1662,8 +1785,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### PUT /api/profile
+
 **Auth** : Required
 **Body** :
+
 ```typescript
 {
   pseudo?: string
@@ -1674,8 +1799,10 @@ CMD ["node", ".output/server/index.mjs"]
 ```
 
 #### GET /api/notifications
+
 **Auth** : Required
 **Response** :
+
 ```typescript
 {
   notifications: {
@@ -1685,12 +1812,14 @@ CMD ["node", ".output/server/index.mjs"]
     type: string
     isRead: boolean
     createdAt: string
-  }[]
+  }
+  ;[]
   unreadCount: number
 }
 ```
 
 #### PATCH /api/notifications/:id/unread
+
 **Auth** : Required
 **Action** : Marquer comme lu
 
@@ -1857,10 +1986,7 @@ Convention
 **Fichier** : `server/utils/permissions/edition-permissions.ts`
 
 ```typescript
-export async function canUserEditEdition(
-  userId: number,
-  editionId: number
-): Promise<boolean> {
+export async function canUserEditEdition(userId: number, editionId: number): Promise<boolean> {
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     include: {
@@ -1900,26 +2026,27 @@ export async function canUserEditEdition(
 
 #### Matrice de permissions
 
-| Action | Droit requis |
-|--------|-------------|
-| Modifier convention | `canEditConvention` |
-| Supprimer convention | `canDeleteConvention` |
-| Ajouter/retirer organisateurs | `canManageOrganizers` |
-| Modifier droits organisateurs | `canManageOrganizers` |
-| Créer édition | `canAddEdition` |
-| Modifier n'importe quelle édition | `canEditAllEditions` |
-| Modifier édition spécifique | `EditionOrganizerPermission.canEdit` OU créateur édition |
-| Supprimer n'importe quelle édition | `canDeleteAllEditions` |
-| Supprimer édition spécifique | `EditionOrganizerPermission.canDelete` |
-| Gérer bénévoles | Droit édition (edit) |
-| Gérer billetterie | Droit édition (edit) |
-| Gérer workshops | Droit édition (edit) |
+| Action                             | Droit requis                                             |
+| ---------------------------------- | -------------------------------------------------------- |
+| Modifier convention                | `canEditConvention`                                      |
+| Supprimer convention               | `canDeleteConvention`                                    |
+| Ajouter/retirer organisateurs      | `canManageOrganizers`                                    |
+| Modifier droits organisateurs      | `canManageOrganizers`                                    |
+| Créer édition                      | `canAddEdition`                                          |
+| Modifier n'importe quelle édition  | `canEditAllEditions`                                     |
+| Modifier édition spécifique        | `EditionOrganizerPermission.canEdit` OU créateur édition |
+| Supprimer n'importe quelle édition | `canDeleteAllEditions`                                   |
+| Supprimer édition spécifique       | `EditionOrganizerPermission.canDelete`                   |
+| Gérer bénévoles                    | Droit édition (edit)                                     |
+| Gérer billetterie                  | Droit édition (edit)                                     |
+| Gérer workshops                    | Droit édition (edit)                                     |
 
 #### Audit trail
 
 **Table** : `OrganizerPermissionHistory`
 
 Enregistre automatiquement :
+
 - Ajout d'organisateur
 - Modification de droits
 - Retrait d'organisateur
@@ -2026,7 +2153,7 @@ export default defineI18nConfig(() => ({
   legacy: false,
   locale: 'en',
   fallbackLocale: 'en',
-  messages: {},  // Messages chargés dynamiquement
+  messages: {}, // Messages chargés dynamiquement
 }))
 ```
 
@@ -2233,9 +2360,9 @@ model OrderItem {
 
 ```typescript
 enum ConversationType {
-  TEAM_GROUP = 'TEAM_GROUP',              // Groupe entier équipe
-  TEAM_LEADER_PRIVATE = 'TEAM_LEADER_PRIVATE',  // Leader ↔ Membre
-  DIRECT = 'DIRECT',                      // 1 à 1
+  TEAM_GROUP = 'TEAM_GROUP', // Groupe entier équipe
+  TEAM_LEADER_PRIVATE = 'TEAM_LEADER_PRIVATE', // Leader ↔ Membre
+  DIRECT = 'DIRECT', // 1 à 1
 }
 ```
 
@@ -2264,10 +2391,7 @@ for (const member of nonLeaders) {
       editionId,
       teamId,
       participants: {
-        create: [
-          { userId: member.userId },
-          ...leaders.map((l) => ({ userId: l.userId })),
-        ],
+        create: [{ userId: member.userId }, ...leaders.map((l) => ({ userId: l.userId }))],
       },
     },
   })
@@ -2388,6 +2512,7 @@ PRISMA_LOG_LEVEL="error,warn"  # error,warn,info,query
 #### docker-compose.dev.yml
 
 **Services** :
+
 - **database** : MySQL 8.0
   - Port : 3306
   - Volume : `mysql_data`
@@ -2400,20 +2525,23 @@ PRISMA_LOG_LEVEL="error,warn"  # error,warn,info,query
   - Command : `npm run dev`
 
 **Volumes** :
+
 ```yaml
 volumes:
-  mysql_data:        # Données MySQL persistantes
-  uploads_data:      # Fichiers uploadés
-  node_modules:      # Dépendances npm (partagées hôte/conteneur)
+  mysql_data: # Données MySQL persistantes
+  uploads_data: # Fichiers uploadés
+  node_modules: # Dépendances npm (partagées hôte/conteneur)
 ```
 
 **Network** :
+
 - Default bridge network
 - Communication inter-services par nom
 
 #### docker-compose.test.yml
 
 **Différences** :
+
 - Port MySQL : **3308** (évite conflit avec dev)
 - Pas de volume node_modules (build fresh)
 - Commande : `npm run test:db:run`
@@ -2421,6 +2549,7 @@ volumes:
 #### docker-compose.release.yml
 
 **Optimisations production** :
+
 - Multi-stage build (dependencies → builder → runtime)
 - Image finale : `node:22-slim` (minimale)
 - Compression assets : Brotli + Gzip
@@ -2428,6 +2557,7 @@ volumes:
 - External network : `proxy-network` (pour reverse proxy)
 
 **Variables d'env requises** :
+
 - `NUXT_SESSION_PASSWORD` (obligatoire)
 - `DATABASE_URL`
 - Autres selon fonctionnalités activées
@@ -3023,6 +3153,7 @@ convention-de-jonglerie/
 **Recommandations** :
 
 1. **Database Indexing** :
+
    ```sql
    -- Ajouter indexes sur colonnes fréquemment recherchées
    CREATE INDEX idx_edition_dates ON Edition(startDate, endDate);
@@ -3048,14 +3179,15 @@ convention-de-jonglerie/
 **Recommandations** :
 
 1. **Rate Limiting** :
+
    ```typescript
    // server/middleware/rate-limit.ts
    import { defineEventHandler, createError } from 'h3'
    import { RateLimiterMemory } from 'rate-limiter-flexible'
 
    const rateLimiter = new RateLimiterMemory({
-     points: 10,      // 10 requests
-     duration: 60,    // per 60 seconds
+     points: 10, // 10 requests
+     duration: 60, // per 60 seconds
    })
 
    export default defineEventHandler(async (event) => {
@@ -3069,6 +3201,7 @@ convention-de-jonglerie/
    ```
 
 2. **CSP Headers** :
+
    ```typescript
    // nuxt.config.ts
    nitro: {
@@ -3083,6 +3216,7 @@ convention-de-jonglerie/
    ```
 
 3. **Audit de dépendances** :
+
    ```bash
    npm audit
    npm audit fix
@@ -3119,6 +3253,7 @@ convention-de-jonglerie/
    - New Relic ou DataDog pour APM
 
 2. **Logging structuré** :
+
    ```typescript
    // server/utils/logger.ts
    import pino from 'pino'
@@ -3132,6 +3267,7 @@ convention-de-jonglerie/
    ```
 
 3. **Health checks** :
+
    ```typescript
    // server/api/health.get.ts
    export default defineEventHandler(async () => {
@@ -3207,34 +3343,34 @@ convention-de-jonglerie/
 
 #### Code Quality
 
-| Métrique | Valeur actuelle | Cible |
-|----------|----------------|-------|
-| **Test coverage** | ~70% | 80%+ |
-| **Tests passing** | 1235/1235 | 100% |
-| **TypeScript strict** | ✅ Oui | ✅ |
-| **ESLint errors** | 0 | 0 |
-| **Bundle size** | ~800KB | <500KB |
-| **Lighthouse Score** | - | 90+ |
+| Métrique              | Valeur actuelle | Cible  |
+| --------------------- | --------------- | ------ |
+| **Test coverage**     | ~70%            | 80%+   |
+| **Tests passing**     | 1235/1235       | 100%   |
+| **TypeScript strict** | ✅ Oui          | ✅     |
+| **ESLint errors**     | 0               | 0      |
+| **Bundle size**       | ~800KB          | <500KB |
+| **Lighthouse Score**  | -               | 90+    |
 
 #### Performance (à mesurer)
 
-| Métrique | Cible |
-|----------|-------|
+| Métrique | Cible  |
+| -------- | ------ |
 | **TTFB** | <200ms |
-| **FCP** | <1.8s |
-| **LCP** | <2.5s |
-| **TTI** | <3.8s |
-| **CLS** | <0.1 |
+| **FCP**  | <1.8s  |
+| **LCP**  | <2.5s  |
+| **TTI**  | <3.8s  |
+| **CLS**  | <0.1   |
 
 #### Sécurité
 
-| Aspect | Status |
-|--------|--------|
-| **HTTPS** | ✅ Production |
-| **HSTS** | ⚠️ À implémenter |
-| **CSP** | ⚠️ À implémenter |
-| **Rate limiting** | ❌ À implémenter |
-| **2FA** | ❌ Opportunité future |
+| Aspect            | Status                |
+| ----------------- | --------------------- |
+| **HTTPS**         | ✅ Production         |
+| **HSTS**          | ⚠️ À implémenter      |
+| **CSP**           | ⚠️ À implémenter      |
+| **Rate limiting** | ❌ À implémenter      |
+| **2FA**           | ❌ Opportunité future |
 
 ### 10.5 Checklist pré-production
 
@@ -3269,12 +3405,14 @@ convention-de-jonglerie/
 ✅ **DevOps mature** (Docker, CI/CD, multi-env)
 
 **Points d'excellence** :
+
 - Système de permissions le plus flexible possible (granular rights)
 - Internationalisation professionnelle (13 langues)
 - Stack full-stack cohérente et moderne
 - Tests automatisés complets
 
 **Opportunités d'amélioration** :
+
 - Performance (caching Redis, CDN)
 - Sécurité (rate limiting, CSP headers)
 - Observabilité (monitoring, structured logging)

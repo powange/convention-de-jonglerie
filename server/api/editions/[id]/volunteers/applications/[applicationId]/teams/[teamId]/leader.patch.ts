@@ -3,6 +3,7 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { getVolunteerTeamById, setTeamLeader } from '@@/server/utils/editions/volunteers/teams'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import {
   validateEditionId,
   validateResourceId,
@@ -38,7 +39,7 @@ export default wrapApiHandler(
         editionId: true,
         status: true,
         user: {
-          select: { id: true, pseudo: true, prenom: true, nom: true },
+          select: userWithNameSelect,
         },
       },
     })

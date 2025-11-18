@@ -26,6 +26,10 @@
 - **Règle de commit** : Ne commit jamais sans que la commande `/commit-push` ait été demandée
   - Exception : Si une commande slash (comme `/quality-check`) inclut explicitement `/commit-push` dans son workflow, alors le commit est autorisé
   - Toujours attendre l'instruction explicite de commit de l'utilisateur ou d'une commande slash qui l'inclut
+- **Helpers de sélection Prisma** : Toujours utiliser les helpers standardisés de `server/utils/prisma-select-helpers.ts` au lieu de dupliquer les sélections de champs. Voir `docs/prisma-select-helpers.md` pour la liste complète et les exemples d'utilisation.
+  - Exemples : `userBasicSelect`, `carpoolOfferInclude`, `editionListInclude`
+  - Si un pattern se répète 3+ fois, créer un nouveau helper
+  - Toujours importer et étendre avec spread si besoin de champs supplémentaires
 
 ## Détails du projet
 

@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { carpoolBookingInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -21,17 +22,7 @@ export default wrapApiHandler(
           ? { carpoolOfferId: offerId, requesterId: userId }
           : { carpoolOfferId: -1 },
       orderBy: { createdAt: 'desc' },
-      include: {
-        requester: {
-          select: {
-            id: true,
-            pseudo: true,
-            emailHash: true,
-            profilePicture: true,
-            updatedAt: true,
-          },
-        },
-      },
+      include: carpoolBookingInclude,
     })
 
     return bookings.map((b) => ({

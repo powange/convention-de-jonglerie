@@ -6,6 +6,7 @@ import {
   findUserByPseudoOrEmail,
 } from '@@/server/utils/organizer-management'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -60,7 +61,7 @@ export default wrapApiHandler(
       const prisma = new PrismaClient()
       userToAdd = await fetchResourceOrFail(prisma.user, userId, {
         errorMessage: 'Utilisateur introuvable',
-        select: { id: true, pseudo: true },
+        select: userBasicSelect,
       })
     } else if (userIdentifier) {
       // Sinon, rechercher par pseudo ou email (comportement existant)

@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -28,9 +29,7 @@ export default wrapApiHandler(
         source: true,
         user: {
           select: {
-            id: true,
-            prenom: true,
-            nom: true,
+            ...userWithNameSelect,
             emailHash: true,
           },
         },

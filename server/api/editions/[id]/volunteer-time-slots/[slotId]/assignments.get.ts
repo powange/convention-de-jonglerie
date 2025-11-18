@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import { volunteerAssignmentDetailedInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -36,26 +37,7 @@ export default wrapApiHandler(
       where: {
         timeSlotId: slotId,
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            nom: true,
-            prenom: true,
-            email: true,
-            emailHash: true,
-            profilePicture: true,
-            updatedAt: true,
-          },
-        },
-        assignedBy: {
-          select: {
-            id: true,
-            pseudo: true,
-          },
-        },
-      },
+      include: volunteerAssignmentDetailedInclude,
       orderBy: {
         assignedAt: 'asc',
       },

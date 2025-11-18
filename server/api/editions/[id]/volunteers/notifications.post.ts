@@ -4,6 +4,7 @@ import { NotificationService } from '@@/server/utils/notification-service'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
@@ -114,11 +115,7 @@ export default wrapApiHandler(async (event) => {
     where: whereClause,
     include: {
       user: {
-        select: {
-          id: true,
-          pseudo: true,
-          emailHash: true,
-        },
+        select: userBasicSelect,
       },
     },
   })

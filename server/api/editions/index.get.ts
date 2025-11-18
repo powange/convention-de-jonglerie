@@ -1,5 +1,6 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { prisma } from '@@/server/utils/prisma'
+import { editionListSelect } from '@@/server/utils/prisma-select-helpers'
 
 // import type { Edition } from '~/types';
 
@@ -270,57 +271,20 @@ export default wrapApiHandler(
     const editions = await prisma.edition.findMany({
       where: finalWhere,
       select: {
-        // Champs essentiels affichés dans les cartes
-        id: true,
-        name: true,
-        description: true,
-        country: true,
-        city: true,
-        latitude: true,
-        longitude: true,
-        startDate: true,
-        endDate: true,
-        imageUrl: true,
-
-        // Services et équipements (affichés avec des icônes)
-        hasFoodTrucks: true,
-        hasKidsZone: true,
-        acceptsPets: true,
-        hasTentCamping: true,
-        hasTruckCamping: true,
-        hasFamilyCamping: true,
-        hasSleepingRoom: true,
-        hasGym: true,
-        hasFireSpace: true,
-        hasGala: true,
-        hasOpenStage: true,
-        hasConcert: true,
-        hasCantine: true,
-        hasAerialSpace: true,
-        hasSlacklineSpace: true,
-        hasToilets: true,
-        hasShowers: true,
-        hasAccessibility: true,
-        hasWorkshops: true,
-        hasCashPayment: true,
-        hasCreditCardPayment: true,
-        hasAfjTokenPayment: true,
-        hasLongShow: true,
-        hasATM: true,
-
-        // Relations (seuls champs nécessaires)
+        ...editionListSelect,
         creator: {
-          select: { id: true, pseudo: true },
+          select: {
+            id: true,
+            pseudo: true,
+          },
         },
         convention: {
-          select: { id: true, name: true, logo: true },
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+          },
         },
-
-        // CHAMPS EXCLUS (visibles uniquement sur la page détail) :
-        // - addressLine1, addressLine2, postalCode, region
-        // - officialWebsiteUrl, facebookUrl, instagramUrl, ticketingUrl
-        // - createdAt, updatedAt, creatorId, conventionId, isOnline
-        // - tous les champs volunteers* (20+ champs)
       },
       orderBy: {
         startDate: 'asc', // Tri croissant par date de début (plus proche en premier)

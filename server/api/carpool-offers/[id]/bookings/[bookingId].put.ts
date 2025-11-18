@@ -3,6 +3,7 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { userWithProfileSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -69,7 +70,7 @@ export default wrapApiHandler(
       data: { status: newStatus },
       include: {
         requester: {
-          select: { id: true, pseudo: true, profilePicture: true },
+          select: userWithProfileSelect,
         },
       },
     })

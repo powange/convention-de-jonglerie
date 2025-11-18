@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { prisma } from '@@/server/utils/prisma'
+import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(async (event) => {
@@ -48,11 +49,7 @@ export default wrapApiHandler(async (event) => {
     include: {
       sender: {
         select: {
-          id: true,
-          pseudo: true,
-          emailHash: true,
-          prenom: true,
-          nom: true,
+          ...userWithNameSelect,
           profilePicture: true,
           updatedAt: true,
         },
@@ -61,12 +58,8 @@ export default wrapApiHandler(async (event) => {
         include: {
           user: {
             select: {
-              id: true,
-              pseudo: true,
-              emailHash: true,
+              ...userWithNameSelect,
               email: true,
-              prenom: true,
-              nom: true,
               phone: true,
               profilePicture: true,
               updatedAt: true,
@@ -116,12 +109,8 @@ export default wrapApiHandler(async (event) => {
         include: {
           user: {
             select: {
-              id: true,
-              pseudo: true,
-              emailHash: true,
+              ...userWithNameSelect,
               email: true,
-              prenom: true,
-              nom: true,
               phone: true,
               profilePicture: true,
               updatedAt: true,
