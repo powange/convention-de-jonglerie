@@ -98,6 +98,7 @@ const sections = [
     { name: 'docker:dev:logs', desc: 'Logs application' },
     { name: 'docker:dev:exec', desc: 'Shell conteneur app' },
     { name: 'docker:dev:get-lockfile', desc: 'Récupère package-lock.json depuis le conteneur' },
+    { name: 'docker:dev:get-package', desc: 'Récupère package.json depuis le conteneur' },
     { name: 'docker:release:up', desc: 'Env release local' },
     { name: 'docker:release:down', desc: 'Arrête env release' }
   ] },
