@@ -52,6 +52,7 @@
     "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f app",
     "docker:dev:exec": "docker compose -f docker-compose.dev.yml exec app sh",
     "docker:dev:get-lockfile": "docker cp convention-app-dev:/app/package-lock.json ./package-lock.json && echo '✓ package-lock.json copié depuis le conteneur'",
+    "docker:dev:get-package": "docker cp convention-app-dev:/app/package.json ./package.json && echo '✓ package.json copié depuis le conteneur'",
     "db:seed:dev": "npx tsx scripts/seed-dev.ts",
     "db:seed:password": "npx tsx scripts/list-seed-accounts.ts",
     "db:reset:dev": "npx prisma migrate reset --force --skip-seed",

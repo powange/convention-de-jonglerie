@@ -55,19 +55,19 @@ Si erreur JWT :
 
 ## Image Node paramétrable
 
-Tous les Dockerfile / docker-compose acceptent un argument ou variable `BASE_NODE_IMAGE` (par défaut `node:22-slim`).
+Tous les Dockerfile / docker-compose acceptent un argument ou variable `BASE_NODE_IMAGE` (par défaut `node:24-slim`).
 
 Changer d'image sans modifier les fichiers :
 
 ```bash
 # Exemple: utiliser l'image Debian slim si souci avec alpine / credentials helper
-BASE_NODE_IMAGE=node:22-slim docker compose -f docker-compose.test-all.yml build
+BASE_NODE_IMAGE=node:24-slim docker compose -f docker-compose.test-all.yml build
 
 # Lancer les tests avec override
-BASE_NODE_IMAGE=node:22-slim npm run docker:test
+BASE_NODE_IMAGE=node:24-slim npm run docker:test
 
 # En développement
-BASE_NODE_IMAGE=node:22-slim docker compose -f docker-compose.dev.yml up -d --build
+BASE_NODE_IMAGE=node:24-slim docker compose -f docker-compose.dev.yml up -d --build
 ```
 
 Avantages :
@@ -78,7 +78,7 @@ Avantages :
 Astuce : exportez dans votre shell pour rendre l'override persistant durant la session :
 
 ```bash
-export BASE_NODE_IMAGE=node:22-slim
+export BASE_NODE_IMAGE=node:24-slim
 ```
 
 Puis reconstruisez vos services.

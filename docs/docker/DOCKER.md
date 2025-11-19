@@ -357,7 +357,7 @@ Le Dockerfile utilise une approche simplifiée. Pour une optimisation maximale e
 
 ```dockerfile
 # Stage 1: Build
-FROM node:22-slim AS builder
+FROM node:24-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -365,7 +365,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Runtime
-FROM node:22-slim
+FROM node:24-slim
 WORKDIR /app
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/public ./public

@@ -27,7 +27,7 @@ services:
       context: .
       target: runtime
       args:
-        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
     container_name: convention-app-release
     restart: unless-stopped
     environment:

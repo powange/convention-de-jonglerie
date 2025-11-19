@@ -1,7 +1,7 @@
 # Dockerfile multi-stage pour Convention de Jonglerie
 
 # Stage de base commun (image paramétrable)
-ARG BASE_NODE_IMAGE=node:22-slim
+ARG BASE_NODE_IMAGE=node:24-slim
 FROM ${BASE_NODE_IMAGE} AS base
 RUN apt-get update && apt-get install -y curl openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
 WORKDIR /app

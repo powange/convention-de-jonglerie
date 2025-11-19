@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: Dockerfile.test
       args:
-        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
     container_name: convention-test-runner
     environment:
       # Configuration de la base de données pour les tests
@@ -71,7 +71,7 @@ services:
       context: .
       dockerfile: Dockerfile.test
       args:
-        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
     container_name: convention-test-ui
     environment:
       DATABASE_URL: 'mysql://test_user:test_password@test-db:3306/test_convention_db'

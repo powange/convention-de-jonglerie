@@ -1030,19 +1030,19 @@ public/uploads/
 
 ```dockerfile
 # Stage 1: Dependencies
-FROM node:22-slim AS deps
+FROM node:24-slim AS deps
 COPY package*.json ./
 RUN npm ci --only=production
 
 # Stage 2: Builder
-FROM node:22-slim AS builder
+FROM node:24-slim AS builder
 COPY . .
 RUN npm ci
 RUN npx prisma generate
 RUN npm run build
 
 # Stage 3: Runtime
-FROM node:22-slim
+FROM node:24-slim
 COPY --from=builder /app/.output ./.output
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
@@ -2555,7 +2555,7 @@ volumes:
 **Optimisations production** :
 
 - Multi-stage build (dependencies → builder → runtime)
-- Image finale : `node:22-slim` (minimale)
+- Image finale : `node:24-slim` (minimale)
 - Compression assets : Brotli + Gzip
 - Restart policy : `unless-stopped`
 - External network : `proxy-network` (pour reverse proxy)
