@@ -59,7 +59,7 @@ jobs:
         id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: node_modules/.prisma
+          path: server/generated/prisma
           key: ${{ steps.cache-keys.outputs.prisma }}
           restore-keys: |
             ${{ runner.os }}-prisma-
@@ -125,11 +125,15 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Restore Prisma client
+        id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: node_modules/.prisma
+          path: server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Generate Prisma Client (if cache miss)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
 
       - name: Restore Nuxt build
         uses: actions/cache@v4
@@ -168,11 +172,15 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Restore Prisma client
+        id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: node_modules/.prisma
+          path: server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Generate Prisma Client (if cache miss)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
 
       - name: Build application
         run: npm run build
@@ -239,11 +247,15 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Restore Prisma client
+        id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: node_modules/.prisma
+          path: server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Generate Prisma Client (if cache miss)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
 
       - name: Restore Nuxt build
         uses: actions/cache@v4
