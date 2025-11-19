@@ -27,6 +27,10 @@ if (PrismaClient) {
       },
     },
   })
+
+  // Exposer prismaTest comme global 'prisma' pour simuler l'auto-import Nitro
+  // Cela permet aux fonctions server/utils/* d'utiliser prisma directement
+  ;(globalThis as any).prisma = prismaTest
 }
 
 export { prismaTest }
