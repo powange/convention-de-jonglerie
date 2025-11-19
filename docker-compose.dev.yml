@@ -28,7 +28,7 @@ services:
       context: .
       target: dev
       args:
-        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:25-slim}
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
     container_name: convention-app-dev
     working_dir: /app
     # Note: pas de user: spécifié pour éviter les problèmes de permissions avec les volumes
