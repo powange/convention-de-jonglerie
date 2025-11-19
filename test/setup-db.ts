@@ -1,11 +1,11 @@
 import { beforeAll, afterAll } from 'vitest'
 
-// Import dynamique de Prisma pour éviter les problèmes de résolution
-let PrismaClient: typeof import('@prisma/client').PrismaClient
-let prismaTest: import('@prisma/client').PrismaClient
+// Import dynamique de Prisma depuis le chemin personnalisé (cohérent avec server/utils/prisma.ts)
+let PrismaClient: typeof import('../server/generated/prisma/client').PrismaClient
+let prismaTest: import('../server/generated/prisma/client').PrismaClient
 
 try {
-  const prismaModule = await import('@prisma/client')
+  const prismaModule = await import('../server/generated/prisma/client')
   PrismaClient = prismaModule.PrismaClient
 } catch {
   console.warn('Prisma Client non disponible, les tests DB seront skippés')
