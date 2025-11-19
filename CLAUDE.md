@@ -117,6 +117,8 @@
 - `npm run docker:dev:down` : Arrêter les services de développement
 - `npm run docker:dev:logs` : Afficher les logs de l'application
 - `npm run docker:dev:exec` : Ouvrir un shell dans le conteneur de l'application
+- `npm run docker:dev:get-lockfile` : Copier le package-lock.json du conteneur vers l'hôte
+- `npm run docker:dev:get-package` : Copier le package.json du conteneur vers l'hôte
 
 **Scripts de traduction i18n :**
 
