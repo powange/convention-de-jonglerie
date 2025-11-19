@@ -1,5 +1,4 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { prisma } from '@@/server/utils/prisma'
 import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
 

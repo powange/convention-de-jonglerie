@@ -1,7 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { sendEmail, generateAccountDeletionEmailHtml } from '@@/server/utils/emailService'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { readBody } from 'h3'

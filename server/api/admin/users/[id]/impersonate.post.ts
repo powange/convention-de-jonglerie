@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { setImpersonationCookie } from '@@/server/utils/impersonation-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
 

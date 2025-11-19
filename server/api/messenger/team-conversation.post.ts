@@ -1,5 +1,4 @@
 import { ensureVolunteerConversations } from '@@/server/utils/messenger-helpers'
-import { prisma } from '@@/server/utils/prisma'
 
 /**
  * POST /api/messenger/team-conversation

@@ -1,5 +1,3 @@
-import { prisma } from './prisma'
-
 export interface NotificationPreferences {
   volunteerReminders: boolean
   applicationUpdates: boolean

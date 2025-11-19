@@ -1,8 +1,6 @@
 import { ORGANIZER_RIGHTS } from '@@/server/constants/permissions'
 import { checkAdminMode } from '@@/server/utils/organizer-management'
 
-import { prisma } from '../prisma'
-
 import type { UserForPermissions } from './types'
 import type { OrganizerRight } from '@@/server/constants/permissions'
 import type {

@@ -92,7 +92,9 @@
       "Bash(do echo \"=== $lang ===\")",
       "Bash(npx prisma format:*)",
       "WebFetch(domain:fullcalendar.io)",
-      "WebFetch(domain:www.prisma.io)"
+      "WebFetch(domain:www.prisma.io)",
+      "WebFetch(domain:nuxt.com)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": [],

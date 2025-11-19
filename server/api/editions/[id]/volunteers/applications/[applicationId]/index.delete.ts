@@ -1,6 +1,5 @@
 import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(

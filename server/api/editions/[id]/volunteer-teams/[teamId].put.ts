@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 

@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y openssl default-mysql-client && rm -rf 
 WORKDIR /app
 
 # Dossiers requis au runtime
-RUN mkdir -p /app/public/uploads /app/backups
+RUN mkdir -p /app/public/uploads /app/backups /uploads
 
 # Copier artefacts et dépendances depuis builder
 COPY --from=builder /app/.output ./.output
@@ -59,10 +59,21 @@ CMD ["/app/entrypoint.sh"]
 # Stage dev (optionnel pour iso image)
 # -------------------------
 FROM base AS dev
-# Ce stage sert d'image de dev. En pratique, on monte le code et node_modules en volume
-# et npm install se fait au démarrage (docker-start.sh) pour éviter les rebuilds
-# Copier package.json et package-lock.json pour npm install au démarrage
+# Ce stage sert d'image de dev avec les dépendances pré-installées
+# Le code est monté en volume pour le hot-reload, node_modules reste dans un volume Docker
 COPY package*.json ./
+COPY prisma ./prisma/
+
+# Créer les dossiers requis pour le développement
+RUN mkdir -p /app/public/uploads /app/backups /uploads
+
+# Installer les dépendances dans l'image pour un démarrage rapide
+RUN if [ -f package-lock.json ]; then \
+      echo "Using npm ci (dev stage)" && npm ci; \
+    else \
+      echo "No package-lock.json -> npm install (dev stage)" && npm install; \
+    fi
+
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
 EXPOSE 3000 24678
 CMD ["npm", "run", "dev"]

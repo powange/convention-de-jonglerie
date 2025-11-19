@@ -1,5 +1,3 @@
-import { prisma } from '../prisma'
-
 /**
  * Vérifie si un utilisateur a les permissions de modification sur une édition
  * (créateur de l'édition, auteur de la convention, organisateur, ou admin global)

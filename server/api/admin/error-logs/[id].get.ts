@@ -1,6 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
 export default wrapApiHandler(

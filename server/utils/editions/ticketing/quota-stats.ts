@@ -1,5 +1,3 @@
-import { prisma } from '../../prisma'
-
 export interface QuotaStats {
   id: number
   title: string

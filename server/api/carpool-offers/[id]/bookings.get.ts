@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { carpoolBookingInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'

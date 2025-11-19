@@ -8,7 +8,9 @@ vi.mock('../../../../../server/utils/emailService', () => ({
 
 import { sendEmail, generatePasswordResetEmailHtml } from '../../../../../server/utils/emailService'
 import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
 const mockGeneratePasswordResetEmailHtml = generatePasswordResetEmailHtml as ReturnType<

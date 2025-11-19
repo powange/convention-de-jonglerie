@@ -1,7 +1,5 @@
 import webpush from 'web-push'
 
-import { prisma } from './prisma'
-
 // Interface pour les données de notification push
 interface PushNotificationData {
   title: string

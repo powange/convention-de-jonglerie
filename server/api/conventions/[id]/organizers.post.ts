@@ -57,8 +57,6 @@ export default wrapApiHandler(
 
     // Si userId est fourni, l'utiliser directement
     if (userId) {
-      const { PrismaClient } = await import('@prisma/client')
-      const prisma = new PrismaClient()
       userToAdd = await fetchResourceOrFail(prisma.user, userId, {
         errorMessage: 'Utilisateur introuvable',
         select: userBasicSelect,

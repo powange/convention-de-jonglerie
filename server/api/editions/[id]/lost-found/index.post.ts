@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(

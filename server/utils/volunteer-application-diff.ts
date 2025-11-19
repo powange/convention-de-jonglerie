@@ -2,8 +2,6 @@
  * Utilitaire pour comparer les modifications des candidatures de bénévoles
  */
 
-import { prisma } from './prisma'
-
 export interface ApplicationData {
   [key: string]: any // Flexible pour accepter les données Prisma
 }

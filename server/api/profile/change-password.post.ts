@@ -1,6 +1,5 @@
 import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { changePasswordSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'

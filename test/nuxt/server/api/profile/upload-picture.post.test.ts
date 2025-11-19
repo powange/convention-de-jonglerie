@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { prismaMock } from '../../../../__mocks__/prisma'
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 // Mock des fonctions d'upload
 const mockHandleImageUpload = vi.fn()

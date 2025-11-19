@@ -1,7 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
-import { prisma } from '@@/server/utils/prisma'
 import { validatePagination } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(

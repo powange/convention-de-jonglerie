@@ -2,9 +2,6 @@ import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpe
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 export default wrapApiHandler(
   async (event) => {

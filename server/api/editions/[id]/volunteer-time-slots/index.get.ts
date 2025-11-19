@@ -3,7 +3,6 @@ import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
 } from '@@/server/utils/permissions/volunteer-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(

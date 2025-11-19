@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getImpersonationCookie } from '@@/server/utils/impersonation-helpers'
-import { prisma } from '@@/server/utils/prisma'
 
 import { requireUserSession } from '#imports'
 

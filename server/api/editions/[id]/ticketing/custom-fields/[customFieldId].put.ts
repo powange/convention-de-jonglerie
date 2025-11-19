@@ -1,6 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 const bodySchema = z.object({

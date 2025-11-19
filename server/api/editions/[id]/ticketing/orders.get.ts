@@ -1,7 +1,6 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { validatePagination, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(

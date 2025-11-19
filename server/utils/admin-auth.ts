@@ -1,5 +1,3 @@
-import { prisma } from './prisma'
-
 import type { EventHandlerRequest, H3Event } from 'h3'
 
 /**

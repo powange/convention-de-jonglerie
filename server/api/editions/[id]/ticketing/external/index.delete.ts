@@ -1,6 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
-import { prisma } from '@@/server/utils/prisma'
 
 export default wrapApiHandler(
   async (event) => {

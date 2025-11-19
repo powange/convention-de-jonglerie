@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 const subscriptionSchema = z.object({

@@ -4,7 +4,6 @@ import {
   getConventionForDelete,
   shouldArchiveInsteadOfDelete,
 } from '@@/server/utils/permissions/convention-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 
 import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'

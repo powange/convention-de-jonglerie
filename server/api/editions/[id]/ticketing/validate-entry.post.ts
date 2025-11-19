@@ -2,7 +2,6 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { updateUserInfo } from '@@/server/utils/editions/ticketing/user-info-update'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 const bodySchema = z.object({

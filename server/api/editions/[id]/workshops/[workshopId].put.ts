@@ -4,9 +4,6 @@ import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permission
 import { buildUpdateData, fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { updateWorkshopSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 export default wrapApiHandler(
   async (event) => {

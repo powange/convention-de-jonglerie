@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { sanitizeEmail } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'

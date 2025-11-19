@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../generated/prisma/client'
 
 /**
  * Singleton Prisma Client pour éviter les multiples connexions à la base de données
@@ -20,7 +20,7 @@ const getPrismaLogLevel = () => {
   return process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
 }
 
-export const prisma =
+const prisma =
   globalThis.__prisma ||
   new PrismaClient({
     log: getPrismaLogLevel() as any,
@@ -35,3 +35,5 @@ if (process.env.NODE_ENV === 'development') {
 process.on('beforeExit', async () => {
   await prisma.$disconnect()
 })
+
+export default prisma

@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditConvention } from '@@/server/utils/permissions/convention-permissions'
-import { prisma } from '@@/server/utils/prisma'
 
 interface RequestBody {
   files: any[]

@@ -7,7 +7,9 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 
 import { canManageOrganizers } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].patch'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockCanManage = canManageOrganizers as ReturnType<typeof vi.fn>
 

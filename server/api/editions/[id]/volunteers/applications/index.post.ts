@@ -9,7 +9,6 @@ import {
   validateAvailability,
   validateTeamPreferences,
 } from '@@/server/utils/editions/volunteers/applications'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
 import { sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'

@@ -1,5 +1,3 @@
-import { prisma } from './prisma'
-
 import type { VolunteerMealType } from '@prisma/client'
 
 /**

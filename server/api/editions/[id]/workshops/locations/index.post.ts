@@ -4,10 +4,7 @@ import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { validateAndSanitize } from '@@/server/utils/validation-schemas'
-import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
-
-const prisma = new PrismaClient()
 
 const locationSchema = z.object({
   name: z.string().min(1).max(100),

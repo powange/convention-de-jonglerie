@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { broadcastCounterUpdate } from '@@/server/utils/ticketing-counter-sse'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'

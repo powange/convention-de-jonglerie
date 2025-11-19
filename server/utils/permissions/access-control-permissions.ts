@@ -1,5 +1,4 @@
 import { requireAuth, type AuthenticatedUser } from '../auth-utils'
-import { prisma } from '../prisma'
 
 /**
  * Vérifie si un bénévole est actuellement en créneau de contrôle d'accès

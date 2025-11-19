@@ -1,6 +1,5 @@
 // Retrait de l'ancien enum de rôles; tout est géré par droits booléens
 // Removed unused types import (frontend types not needed server-side)
-import { prisma } from './prisma'
 
 import type {
   OrganizerPermissionSnapshot,

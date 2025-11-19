@@ -1,5 +1,4 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { editionListSelect } from '@@/server/utils/prisma-select-helpers'
 
 // import type { Edition } from '~/types';

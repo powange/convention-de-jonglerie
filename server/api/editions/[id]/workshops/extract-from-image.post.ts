@@ -4,9 +4,6 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 export default wrapApiHandler(
   async (event) => {

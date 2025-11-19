@@ -3,7 +3,6 @@ import { readFile } from 'fs/promises'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getConventionForEdit } from '@@/server/utils/permissions/convention-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { updateConventionSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
 

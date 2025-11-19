@@ -3,6 +3,12 @@ import { vi } from 'vitest'
 // Fallbacks globaux partagés entre suites de tests.
 // Chaque suite peut surcharger ces valeurs ensuite.
 
+// Mock Prisma comme auto-import global (similaire aux autres utils Nitro)
+if (!(globalThis as any).prisma) {
+  const { prismaMock } = await import('./__mocks__/prisma')
+  ;(globalThis as any).prisma = prismaMock
+}
+
 // defineEventHandler passe-plat si absent
 if (!globalThis.defineEventHandler) {
   globalThis.defineEventHandler = vi.fn(

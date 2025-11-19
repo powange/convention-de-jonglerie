@@ -1,5 +1,3 @@
-import { prisma } from '../prisma'
-
 /**
  * Vérifie si un utilisateur peut créer un workshop pour une édition donnée
  * Un utilisateur peut créer un workshop s'il est :

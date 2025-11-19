@@ -1,5 +1,4 @@
 import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 
 export default wrapApiHandler(
   async (event) => {

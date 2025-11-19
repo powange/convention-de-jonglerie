@@ -7,7 +7,6 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '@@/server/utils/emailService'
-import { prisma } from '@@/server/utils/prisma'
 import { registerRateLimiter } from '@@/server/utils/rate-limiter'
 import { sanitizeEmail, sanitizeString } from '@@/server/utils/validation-helpers'
 import { registerSchema } from '@@/server/utils/validation-schemas'

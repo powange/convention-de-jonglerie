@@ -1,5 +1,3 @@
-import { prisma } from '../../prisma'
-
 export interface TierData {
   name: string
   customName?: string | null

@@ -1,6 +1,5 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
-import { prisma } from './prisma'
 import { carpoolUserSelect, userWithNameSelect } from './prisma-select-helpers'
 
 import type { H3Event } from 'h3'

@@ -7,7 +7,9 @@ vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => 
 
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import handler from '../../../../../../server/api/editions/[id]/ticketing/orders.get'
-import { prismaMock } from '../../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockCanAccess = canAccessEditionData as ReturnType<typeof vi.fn>
 

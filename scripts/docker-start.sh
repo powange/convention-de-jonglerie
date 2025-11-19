@@ -6,15 +6,29 @@ echo "Starting app initialization..."
 # Créer les dossiers avec les bonnes permissions si nécessaire
 mkdir -p .nuxt .output node_modules/.prisma
 
-# Installer/mettre à jour les dépendances si nécessaire
+# Vérifier si les dépendances doivent être mises à jour
 echo "Checking dependencies..."
-if [ -f package-lock.json ]; then
-  echo "Using npm ci for reproducible install..."
-  npm ci
+if [ ! -d "node_modules" ]; then
+  echo "node_modules not found, installing dependencies..."
+  if [ -f package-lock.json ]; then
+    npm ci
+  else
+    npm install
+  fi
+elif [ package.json -nt node_modules ] || [ package-lock.json -nt node_modules ]; then
+  echo "Dependencies changed, updating..."
+  if [ -f package-lock.json ]; then
+    npm ci
+  else
+    npm install
+  fi
 else
-  echo "No package-lock.json found, using npm install..."
-  npm install
+  echo "Dependencies up to date, skipping install"
 fi
+
+# Préparer Nuxt pour générer les fichiers TypeScript nécessaires
+echo "Preparing Nuxt..."
+npx nuxt prepare
 
 # Exécuter les migrations Prisma
 echo "Generating Prisma client..."

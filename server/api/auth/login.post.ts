@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { authRateLimiter } from '@@/server/utils/rate-limiter'
 import { sanitizeString } from '@@/server/utils/validation-helpers'
 import bcrypt from 'bcryptjs'

@@ -42,8 +42,6 @@ export default defineNuxtConfig({
       { from: 'nuxt-auth-utils', name: 'setUserSession' },
       { from: 'nuxt-auth-utils', name: 'clearUserSession' },
     ],
-    // Exclure prisma des auto-imports pour éviter son exposition côté client
-    exclude: [/prisma/],
   },
 
   modules: [
@@ -54,7 +52,6 @@ export default defineNuxtConfig({
     process.env.NODE_ENV !== 'production' ? '@nuxt/test-utils/module' : undefined,
     '@nuxt/ui',
     '@pinia/nuxt',
-    '@prisma/nuxt',
     'nuxt-auth-utils',
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
@@ -72,7 +69,7 @@ export default defineNuxtConfig({
   nitro: {
     ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
     externals: {
-      external: ['node-cron', '@prisma/client', '.prisma/client'],
+      external: ['node-cron', '@prisma/client'],
     },
     experimental: {
       tasks: true,
@@ -354,19 +351,11 @@ export default defineNuxtConfig({
       },
     },
     resolve: {
-      alias: {
-        // Alias Prisma retiré - géré automatiquement par @prisma/nuxt
-      },
+      alias: {},
     },
     optimizeDeps: {
-      exclude: ['node-cron', '@prisma/client', '.prisma/client'],
+      exclude: ['node-cron', '@prisma/client'],
     },
-  },
-  // Configuration du module Prisma
-  prisma: {
-    installStudio: false,
-    // Désactiver complètement l'exposition côté client
-    autoSetupPrisma: false,
   },
   experimental: {
     appManifest: false,

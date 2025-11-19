@@ -26,7 +26,9 @@ import {
 } from '../../../../../server/utils/emailService'
 import bcrypt from 'bcryptjs'
 import registerHandler from '../../../../../server/api/auth/register.post'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
 const mockGenerateVerificationCode = generateVerificationCode as ReturnType<typeof vi.fn>

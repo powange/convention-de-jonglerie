@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Import du handler après les mocks
 import createConventionHandler from '../../../../../server/api/conventions/index.post'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 describe('API Convention - Création', () => {
   const mockUser = {

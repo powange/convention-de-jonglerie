@@ -1,5 +1,3 @@
-import { prisma } from '../utils/prisma'
-
 export default defineTask({
   meta: {
     name: 'convention-favorites-reminders',

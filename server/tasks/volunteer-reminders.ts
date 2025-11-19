@@ -1,5 +1,4 @@
 import { NotificationService } from '../utils/notification-service'
-import { prisma } from '../utils/prisma'
 
 export default defineTask({
   meta: {

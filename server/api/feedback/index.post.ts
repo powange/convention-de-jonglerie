@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { getRequestIP } from 'h3'
 import { z } from 'zod'
 

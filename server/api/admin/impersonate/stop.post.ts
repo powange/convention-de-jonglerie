@@ -3,7 +3,6 @@ import {
   getImpersonationCookie,
   clearImpersonationCookie,
 } from '@@/server/utils/impersonation-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 
 import { setUserSession } from '#imports'

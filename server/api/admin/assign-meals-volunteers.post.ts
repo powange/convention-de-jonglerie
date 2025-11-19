@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireGlobalAdmin } from '@@/server/utils/auth-utils'
-import { prisma } from '@@/server/utils/prisma'
 import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 
 /**

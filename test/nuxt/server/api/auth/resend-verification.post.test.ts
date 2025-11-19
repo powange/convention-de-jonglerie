@@ -19,7 +19,9 @@ import {
 } from '../../../../../server/utils/emailService'
 import { emailRateLimiter } from '../../../../../server/utils/rate-limiter'
 import handler from '../../../../../server/api/auth/resend-verification.post'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
 const mockGenerateVerificationCode = generateVerificationCode as ReturnType<typeof vi.fn>

@@ -1,9 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { assertResourceExists } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 export default wrapApiHandler(
   async (event) => {

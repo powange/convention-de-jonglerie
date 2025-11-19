@@ -1,6 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { DateTime } from 'luxon'
 
 export default wrapApiHandler(
@@ -66,9 +65,6 @@ export default wrapApiHandler(
     teardownEnd.setHours(23, 59, 59, 999)
 
     // Log pour debug
-    console.log('[DEBUG purchases.get] Edition:', editionId)
-    console.log('[DEBUG purchases.get] Date range:', setupStart, '-', teardownEnd)
-    console.log('[DEBUG purchases.get] Granularity:', granularity)
 
     // Récupérer tous les achats (items de commandes payées)
     const [
@@ -185,13 +181,6 @@ export default wrapApiHandler(
         },
       }),
     ])
-
-    // Log les résultats
-    console.log('[DEBUG purchases.get] Items trouvés:')
-    console.log('  - participantsItemsManual:', participantsItemsManual.length)
-    console.log('  - participantsItemsExternal:', participantsItemsExternal.length)
-    console.log('  - othersItemsManual:', othersItemsManual.length)
-    console.log('  - othersItemsExternal:', othersItemsExternal.length)
 
     // Créer des tranches horaires selon la granularité choisie
     const startDateTime = DateTime.fromJSDate(setupStart)
@@ -331,9 +320,6 @@ export default wrapApiHandler(
         othersExternal: othersExternal.reduce((a, b) => a + b, 0),
       },
     }
-
-    console.log('[DEBUG purchases.get] Totaux:', result.totals)
-    console.log('[DEBUG purchases.get] Nombre de labels:', result.labels.length)
 
     return result
   },

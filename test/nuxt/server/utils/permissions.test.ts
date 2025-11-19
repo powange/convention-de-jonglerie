@@ -1,25 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock du module prisma avec fonction factory pour éviter le hoisting
-vi.mock('../../../../server/utils/prisma', () => ({
-  prisma: {
-    user: {
-      findUnique: vi.fn(),
-    },
-    edition: {
-      findUnique: vi.fn(),
-    },
-  },
-}))
-
 import {
   hasEditionEditPermission,
   hasEditionDeletePermission,
 } from '../../../../server/utils/permissions/permissions'
-import { prisma } from '../../../../server/utils/prisma'
 
-// Récupérer les mocks pour les utiliser dans les tests
-const mockPrisma = prisma as any
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const mockPrisma = (globalThis as any).prisma
 
 describe('Permissions', () => {
   beforeEach(() => {

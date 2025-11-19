@@ -2,7 +2,6 @@ import {
   ensureVolunteerConversations,
   removeVolunteerFromTeamConversations,
 } from '../../messenger-helpers'
-import { prisma } from '../../prisma'
 
 /**
  * Récupère les équipes de bénévoles d'une édition

@@ -1,5 +1,4 @@
 import { requireAuth, type AuthenticatedUser } from '../auth-utils'
-import { prisma } from '../prisma'
 
 /**
  * Vérifie que l'utilisateur a les permissions pour gérer les bénévoles d'une édition

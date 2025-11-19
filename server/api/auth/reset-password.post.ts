@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { passwordSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'

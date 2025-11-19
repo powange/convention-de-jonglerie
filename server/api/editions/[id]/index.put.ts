@@ -4,7 +4,6 @@ import { invalidateEditionCache } from '@@/server/utils/cache-helpers'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
 import { getEditionForEdit } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { updateEditionSchema } from '@@/server/utils/validation-schemas'
 

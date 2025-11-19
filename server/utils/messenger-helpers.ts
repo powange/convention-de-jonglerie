@@ -1,5 +1,3 @@
-import { prisma } from './prisma'
-
 import type { PrismaTransaction } from '@@/server/types/prisma-helpers'
 
 /**

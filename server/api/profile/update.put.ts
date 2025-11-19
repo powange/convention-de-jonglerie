@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getEmailHash } from '@@/server/utils/email-hash'
-import { prisma } from '@@/server/utils/prisma'
 import { sanitizeString } from '@@/server/utils/validation-helpers'
 import {
   updateProfileSchema,

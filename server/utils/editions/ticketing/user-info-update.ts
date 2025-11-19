@@ -1,5 +1,3 @@
-import { prisma } from '@@/server/utils/prisma'
-
 export interface UserInfoUpdate {
   firstName?: string | null
   lastName?: string | null

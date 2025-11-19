@@ -6,7 +6,9 @@ import getEditionHandler from '../../../server/api/editions/[id]/index.get'
 import updateEditionHandler from '../../../server/api/editions/[id]/index.put'
 import getEditionsHandler from '../../../server/api/editions/index.get'
 import createEditionHandler from '../../../server/api/editions/index.post'
-import { prismaMock } from '../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 // Mock des modules utilitaires
 vi.mock('../../../server/utils/geocoding', () => ({

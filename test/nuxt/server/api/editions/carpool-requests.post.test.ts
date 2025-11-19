@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 
-import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/editions/[id]/carpool-requests/index.post'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 // Mock des modules Nuxt
 const mockEvent = {

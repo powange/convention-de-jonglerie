@@ -2,7 +2,9 @@ import bcrypt from 'bcryptjs'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import * as validationSchemas from '../../../../../server/utils/validation-schemas'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 // Créer un handler simplifié pour les tests
 const mockHandler = async (event: any) => {

@@ -11,7 +11,9 @@ import {
   isAcceptedVolunteer,
 } from '@@/server/utils/permissions/volunteer-permissions'
 import handler from '../../../../../server/api/editions/[id]/volunteer-time-slots/index.get'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockRequirePlanningAccess = requireVolunteerPlanningAccess as ReturnType<typeof vi.fn>
 const mockIsAcceptedVolunteer = isAcceptedVolunteer as ReturnType<typeof vi.fn>

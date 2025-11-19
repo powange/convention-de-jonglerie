@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import handler from '../../../../../../../server/api/editions/[id]/volunteers/applications/index.post'
-import { prismaMock } from '../../../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 describe('/api/editions/[id]/volunteers/applications POST', () => {
   const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)

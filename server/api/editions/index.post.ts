@@ -8,7 +8,6 @@ import {
   moveTempImageFromPlaceholder,
 } from '@@/server/utils/move-temp-image'
 import { getConventionForEditionCreation } from '@@/server/utils/permissions/convention-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { editionWithFavoritesInclude } from '@@/server/utils/prisma-select-helpers'
 import { editionSchema } from '@@/server/utils/validation-schemas'
 

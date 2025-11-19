@@ -3,7 +3,6 @@ import { createHash } from 'node:crypto'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { sanitizeEmail, validateEditionId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(

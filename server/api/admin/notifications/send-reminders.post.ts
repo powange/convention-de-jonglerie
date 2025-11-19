@@ -1,7 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { NotificationHelpers } from '@@/server/utils/notification-service'
-import { prisma } from '@@/server/utils/prisma'
 
 export default wrapApiHandler(
   async (event) => {

@@ -1,5 +1,4 @@
 import { applyCustomName } from '@@/server/utils/editions/ticketing/tiers'
-import { prisma } from '@@/server/utils/prisma'
 
 /**
  * Route publique pour récupérer les tarifs actifs d'une édition

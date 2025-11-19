@@ -3,7 +3,6 @@ import { createHash } from 'crypto'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { applyCustomName } from '@@/server/utils/editions/ticketing/tiers'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 const itemSchema = z.object({

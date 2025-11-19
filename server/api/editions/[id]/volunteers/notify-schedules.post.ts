@@ -7,7 +7,6 @@ import {
 } from '@@/server/utils/emailService'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
-import { prisma } from '@@/server/utils/prisma'
 import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 

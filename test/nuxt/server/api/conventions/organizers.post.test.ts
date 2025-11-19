@@ -13,7 +13,9 @@ import {
   findUserByPseudoOrEmail,
 } from '@@/server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers.post'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 const mockAddOrganizer = addConventionOrganizer as ReturnType<typeof vi.fn>
 const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>

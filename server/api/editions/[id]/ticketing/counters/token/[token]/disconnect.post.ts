@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { prisma } from '@@/server/utils/prisma'
 import { counterStreamManager } from '@@/server/utils/ticketing-counter-sse'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'

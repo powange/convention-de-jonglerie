@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../../server/api/editions/[id]/index.get'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 describe('/api/editions/[id] GET', () => {
   const mockEdition = {

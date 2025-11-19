@@ -5,7 +5,6 @@ import {
   generateVerificationEmailHtml,
   getSiteUrl,
 } from '@@/server/utils/emailService'
-import { prisma } from '@@/server/utils/prisma'
 import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { emailRateLimiter } from '@@/server/utils/rate-limiter'
 import { sanitizeEmail } from '@@/server/utils/validation-helpers'

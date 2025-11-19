@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
 import { carpoolOfferFullInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 

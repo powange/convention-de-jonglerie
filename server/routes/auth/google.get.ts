@@ -2,7 +2,6 @@ import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createErro
 import { $fetch } from 'ofetch'
 
 import { getEmailHash } from '../../utils/email-hash'
-import { prisma } from '../../utils/prisma'
 
 function slugifyPseudo(base: string) {
   const clean =

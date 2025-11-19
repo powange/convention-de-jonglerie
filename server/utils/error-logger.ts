@@ -1,7 +1,5 @@
 import { getHeaders, getHeader } from 'h3'
 
-import { prisma } from './prisma'
-
 import type { H3Event } from 'h3'
 
 interface ErrorInfo {

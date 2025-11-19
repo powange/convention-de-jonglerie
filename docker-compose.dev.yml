@@ -100,8 +100,6 @@ services:
       # Persister les uploads comme en release (évite d'écraser en rebuild)
       - uploads_data:/app/public/uploads
       - uploads:/uploads
-      # Node modules synchronisé avec l'hôte
-      - ./node_modules:/app/node_modules
       # Fichiers de configuration
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
       - ./app.config.ts:/app/app.config.ts:cached
@@ -109,6 +107,8 @@ services:
       - ./tsconfig.json:/app/tsconfig.json:cached
       - ./vitest.config.ts:/app/vitest.config.ts:cached
       - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
+      # Node modules dans un volume Docker persistant (pas synchronisé avec l'hôte)
+      - node_modules:/app/node_modules
       # Synchroniser les dossiers de build du container vers l'hôte
       - ./.nuxt:/app/.nuxt
       - ./.output:/app/.output
@@ -126,5 +126,5 @@ volumes:
     driver: local
   uploads:
     driver: local
-  #node_modules:
-  #  driver: local
+  node_modules:
+    driver: local

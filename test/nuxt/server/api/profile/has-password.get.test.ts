@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import hasPasswordHandler from '../../../../../server/api/profile/has-password.get'
-import { prismaMock } from '../../../../__mocks__/prisma'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 vi.mock('../../../../../server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event: any) => {

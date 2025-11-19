@@ -6,7 +6,6 @@ import {
   type NotificationType as CustomNotificationType,
 } from './notification-preferences'
 import { notificationStreamManager } from './notification-stream-manager'
-import { prisma } from './prisma'
 import { pushNotificationService } from './push-notification-service'
 import { translateServerSide } from './server-i18n'
 

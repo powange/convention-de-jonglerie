@@ -5,7 +5,6 @@ import type { Convention, Edition, User } from '~/app/types'
 
 import { deleteFromBothLocations } from './copy-to-output'
 import { getConventionForEdit } from './permissions/convention-permissions'
-import { prisma } from './prisma'
 
 export interface ImageDeletionOptions {
   entityType: 'convention' | 'edition' | 'user'

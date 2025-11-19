@@ -13,7 +13,7 @@ config.global.stubs = {
 // Mock Prisma pour les tests Nuxt (routes serveur) afin d'éviter l'accès DB réel
 vi.mock('../server/utils/prisma', async () => {
   const { prismaMock } = await import('./__mocks__/prisma')
-  return { prisma: prismaMock }
+  return { default: prismaMock }
 })
 
 // Mock des utilitaires Nitro/H3 (en conservant le vrai createError)
