@@ -29,6 +29,7 @@ export default wrapApiHandler(
         name: true,
         startDate: true,
         endDate: true,
+        imageUrl: true,
         convention: {
           select: {
             id: true,

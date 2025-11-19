@@ -1560,21 +1560,24 @@ model Conversation {
 }
 
 model ConversationParticipant {
-  id             String    @id @default(cuid())
-  conversationId String
-  userId         Int
-  joinedAt       DateTime  @default(now())
-  leftAt         DateTime? // NULL = toujours participant, non-NULL = a quitté
-  lastReadAt     DateTime? // Pour les badges "non lu"
+  id                String    @id @default(cuid())
+  conversationId    String
+  userId            Int
+  joinedAt          DateTime  @default(now())
+  leftAt            DateTime? // NULL = toujours participant, non-NULL = a quitté
+  lastReadAt        DateTime? // Pour les badges "non lu" (deprecated, utiliser lastReadMessageId)
+  lastReadMessageId String? // ID du dernier message lu par ce participant
 
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages     Message[]
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        Message[]
+  lastReadMessage Message?     @relation("LastReadMessage", fields: [lastReadMessageId], references: [id], onDelete: SetNull)
 
   @@unique([conversationId, userId])
   @@index([conversationId])
   @@index([userId])
   @@index([leftAt])
+  @@index([lastReadMessageId])
 }
 
 model Message {
@@ -1586,8 +1589,9 @@ model Message {
   editedAt       DateTime?
   deletedAt      DateTime? // Soft delete
 
-  conversation Conversation            @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  participant  ConversationParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  conversation           Conversation              @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  participant            ConversationParticipant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  lastReadByParticipants ConversationParticipant[] @relation("LastReadMessage")
 
   @@index([conversationId])
   @@index([participantId])

@@ -34,6 +34,16 @@
             :items="accordionItems"
             :unmount-on-hide="false"
           >
+            <template #leading="{ item }">
+              <UAvatar
+                v-if="item.edition?.imageUrl"
+                :src="useImageUrl().getImageUrl(item.edition.imageUrl, 'edition', item.edition.id)"
+                :alt="item.label"
+                size="sm"
+              />
+              <UAvatar v-else :alt="item.label" size="sm" />
+            </template>
+
             <template #trailing="{ item }">
               <UBadge v-if="item.totalUnread > 0" color="red" size="xs">
                 {{ item.totalUnread }}
@@ -254,6 +264,7 @@ const {
   fetchConversations,
   fetchMessages,
   sendMessage: sendMessageApi,
+  markMessageAsRead,
 } = useMessenger()
 
 // États
@@ -309,6 +320,7 @@ const accordionItems = computed(() => {
       value: String(edition.id),
       conversations: sortedConversations,
       totalUnread,
+      edition, // Passer l'édition complète pour accéder à imageUrl dans les slots
     }
   })
 })
@@ -492,4 +504,20 @@ watch(selectedEditionId, (newEditionId) => {
     openAccordionItems.value.push(newEditionId)
   }
 })
+
+// Surveiller les messages pour marquer le dernier comme lu quand un nouveau arrive
+watch(
+  allMessages,
+  async (newMessages) => {
+    // Si on a des messages et qu'une conversation est sélectionnée
+    if (newMessages.length > 0 && selectedConversationId.value) {
+      // Récupérer le dernier message de la liste
+      const lastMessage = newMessages[newMessages.length - 1]
+
+      // Marquer ce message comme lu
+      await markMessageAsRead(selectedConversationId.value, lastMessage.id)
+    }
+  },
+  { deep: true }
+)
 </script>

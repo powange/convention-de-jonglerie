@@ -28,7 +28,7 @@ services:
       context: .
       target: dev
       args:
-        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:25-slim}
     container_name: convention-app-dev
     working_dir: /app
     # Note: pas de user: spécifié pour éviter les problèmes de permissions avec les volumes
@@ -100,6 +100,8 @@ services:
       # Persister les uploads comme en release (évite d'écraser en rebuild)
       - uploads_data:/app/public/uploads
       - uploads:/uploads
+      # Node modules synchronisé avec l'hôte
+      - ./node_modules:/app/node_modules
       # Fichiers de configuration
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
       - ./app.config.ts:/app/app.config.ts:cached
@@ -107,10 +109,9 @@ services:
       - ./tsconfig.json:/app/tsconfig.json:cached
       - ./vitest.config.ts:/app/vitest.config.ts:cached
       - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
-      # Caches/deps persistants côté Docker (volumes nommés pour éviter les problèmes de permissions)
-      - node_modules:/app/node_modules
-      # Note: .nuxt et .output ne sont PAS montés comme volumes pour éviter les problèmes de permissions
-      # Ces dossiers restent dans le conteneur
+      # Synchroniser les dossiers de build du container vers l'hôte
+      - ./.nuxt:/app/.nuxt
+      - ./.output:/app/.output
     ports:
       - '3000:3000' # Application Nuxt
       - '24678:24678' # Vite HMR (Hot Module Replacement)
@@ -125,7 +126,5 @@ volumes:
     driver: local
   uploads:
     driver: local
-  node_modules:
-    driver: local
-  # ollama_data:
-  #   driver: local
+  #node_modules:
+  #  driver: local

@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { NotificationService } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
+import { pushNotificationService } from '@@/server/utils/push-notification-service'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -98,9 +98,7 @@ export default wrapApiHandler(
       data: { updatedAt: new Date() },
     })
 
-    // Envoyer des notifications aux autres participants
-    const _editionName =
-      participant.conversation.edition.name || participant.conversation.edition.convention.name
+    // Envoyer des notifications push aux autres participants (uniquement s'ils ne sont pas sur la page)
     const teamName = participant.conversation.team?.name
     const conversationType = participant.conversation.type
 
@@ -113,24 +111,71 @@ export default wrapApiHandler(
 
     const truncatedContent = content.length > 100 ? content.substring(0, 97) + '...' : content
 
+    // Récupérer tous les participants avec leur lastReadMessageId pour déterminer s'ils ont déjà lu ce message
+    const participantsWithReadStatus = await prisma.conversationParticipant.findMany({
+      where: {
+        conversationId,
+        leftAt: null,
+        userId: {
+          not: user.id, // Tous les participants sauf l'envoyeur
+        },
+      },
+      select: {
+        userId: true,
+        lastReadMessageId: true,
+      },
+    })
+
+    // Récupérer tous les messages de la conversation pour déterminer si le participant est à jour
+    const allMessagesIds = await prisma.message.findMany({
+      where: {
+        conversationId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 2, // On ne prend que les 2 derniers messages (le nouveau + le précédent)
+    })
+
+    // Le message précédent (celui juste avant le nouveau qu'on vient de créer)
+    const previousMessageId = allMessagesIds.length > 1 ? allMessagesIds[1].id : null
+
     await Promise.all(
-      participant.conversation.participants.map(async (p) => {
+      participantsWithReadStatus.map(async (p) => {
         try {
-          await NotificationService.create({
-            userId: p.userId,
-            type: 'INFO',
+          // Vérifier si l'utilisateur a lu le message précédent
+          // Si lastReadMessageId === previousMessageId, alors il est à jour et sur la conversation
+          const isUpToDate = previousMessageId && p.lastReadMessageId === previousMessageId
+
+          // Ne pas envoyer de push si l'utilisateur est à jour (il est sur la conversation)
+          if (isUpToDate) {
+            console.log(
+              `[Messenger] Utilisateur ${p.userId} est à jour sur la conversation, pas de push envoyée`
+            )
+            return
+          }
+
+          // Envoyer la notification push
+          await pushNotificationService.sendToUser(p.userId, {
             title: notificationTitle,
             message: `${user.pseudo}: ${truncatedContent}`,
-            category: 'messenger',
-            entityType: 'Conversation',
-            entityId: conversationId,
-            actionUrl: `/messenger?editionId=${participant.conversation.edition.id}&conversationId=${conversationId}`,
+            url: `/messenger?editionId=${participant.conversation.edition.id}&conversationId=${conversationId}`,
             actionText: 'Voir le message',
-            notificationType: 'new_message',
+            icon: '/favicons/android-chrome-192x192.png',
+            badge: '/favicons/favicon-32x32.png',
           })
+
+          console.log(
+            `[Messenger] Notification push envoyée à l'utilisateur ${p.userId} pour le message dans la conversation ${conversationId}`
+          )
         } catch (error) {
           console.error(
-            `Erreur lors de l'envoi de la notification à l'utilisateur ${p.userId}:`,
+            `Erreur lors de l'envoi de la notification push à l'utilisateur ${p.userId}:`,
             error
           )
         }

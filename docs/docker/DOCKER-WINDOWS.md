@@ -386,4 +386,4 @@ docker compose -f docker-compose.dev.yml logs -f --tail=100 app
 ### Support du projet
 
 - Issues GitHub du projet
-- Documentation DOCKER.md pour l'utilisation générale
+- Documentation docs/docker/DOCKER.md pour l'utilisation générale

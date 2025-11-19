@@ -3,6 +3,7 @@ export interface MessengerEdition {
   name: string | null
   startDate: Date
   endDate: Date
+  imageUrl: string | null
   convention: {
     id: number
     name: string
@@ -224,6 +225,24 @@ export const useMessenger = () => {
     }
   }
 
+  /**
+   * Marque un message comme lu dans une conversation
+   * Met à jour le lastReadMessageId pour indiquer quel message a été lu en dernier
+   */
+  const markMessageAsRead = async (conversationId: string, messageId: string): Promise<boolean> => {
+    try {
+      await $fetch(`/api/messenger/conversations/${conversationId}/mark-read`, {
+        method: 'PATCH',
+        body: { messageId },
+      })
+      return true
+    } catch (error) {
+      console.error('Erreur lors du marquage du message comme lu:', error)
+      // Ne pas afficher de toast pour cette erreur car c'est une action silencieuse
+      return false
+    }
+  }
+
   return {
     fetchEditions,
     fetchConversations,
@@ -231,5 +250,6 @@ export const useMessenger = () => {
     sendMessage,
     editMessage,
     deleteMessage,
+    markMessageAsRead,
   }
 }

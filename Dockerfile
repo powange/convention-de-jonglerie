@@ -59,14 +59,10 @@ CMD ["/app/entrypoint.sh"]
 # Stage dev (optionnel pour iso image)
 # -------------------------
 FROM base AS dev
-# Ce stage sert d’image de dev si souhaité. En pratique, on monte le code en volume
-# et on utilise npm run dev dans docker compose (docker-compose.dev.yml)
+# Ce stage sert d'image de dev. En pratique, on monte le code et node_modules en volume
+# et npm install se fait au démarrage (docker-start.sh) pour éviter les rebuilds
+# Copier package.json et package-lock.json pour npm install au démarrage
 COPY package*.json ./
-RUN if [ -f package-lock.json ]; then \
-			echo "Using npm ci (dev stage)" && npm ci; \
-		else \
-			echo "No package-lock.json -> npm install (dev stage)" && npm install; \
-		fi
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
 EXPOSE 3000 24678
 CMD ["npm", "run", "dev"]
