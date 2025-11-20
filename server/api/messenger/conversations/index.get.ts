@@ -87,6 +87,7 @@ export default wrapApiHandler(
                 id: true,
                 pseudo: true,
                 profilePicture: true,
+                emailHash: true,
               },
             },
           },

@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen">
-    <!-- En-tête de page -->
-    <div class="mb-6">
+  <div class="h-[calc(100vh-80px)] flex flex-col">
+    <!-- En-tête de page (masqué sur mobile) -->
+    <div class="mb-6 flex-shrink-0 hidden lg:block">
       <h1 class="text-3xl font-bold flex items-center gap-3">
         <UIcon name="i-heroicons-chat-bubble-left-right" class="text-blue-600" />
         Messagerie
@@ -9,35 +9,39 @@
     </div>
 
     <!-- Layout principal : 2 colonnes -->
-    <div class="grid grid-cols-12 gap-4 h-[calc(100vh-200px)]">
+    <div class="grid grid-cols-12 gap-4 flex-1 overflow-hidden">
       <!-- Colonne 1 : Conversations groupées par édition -->
-      <div class="col-span-12 lg:col-span-5">
-        <UCard class="h-full overflow-auto">
+      <div
+        class="col-span-12 lg:col-span-5 flex flex-col overflow-hidden"
+        :class="{ hidden: showConversationOnMobile, 'lg:flex': showConversationOnMobile }"
+      >
+        <UCard class="h-full flex flex-col overflow-hidden">
           <template #header>
             <h3 class="font-semibold">Conversations</h3>
           </template>
 
-          <div v-if="loading" class="text-center py-8">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
-            <p class="text-sm text-gray-500 mt-2">Chargement...</p>
-          </div>
+          <div class="flex-1 overflow-y-auto">
+            <div v-if="loading" class="text-center py-8">
+              <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
+              <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+            </div>
 
-          <div v-else-if="accordionItems.length === 0" class="text-center py-8">
-            <UIcon name="i-heroicons-inbox" class="h-12 w-12 mx-auto text-gray-400" />
-            <p class="text-sm text-gray-500 mt-2">Aucune conversation</p>
-          </div>
+            <div v-else-if="accordionItems.length === 0" class="text-center py-8">
+              <UIcon name="i-heroicons-inbox" class="h-12 w-12 mx-auto text-gray-400" />
+              <p class="text-sm text-gray-500 mt-2">Aucune conversation</p>
+            </div>
 
-          <UAccordion
-            v-else
-            v-model="openAccordionItems"
-            type="multiple"
-            :items="accordionItems"
-            :unmount-on-hide="false"
-          >
+            <UAccordion
+              v-else
+              v-model="openAccordionItems"
+              type="multiple"
+              :items="accordionItems"
+              :unmount-on-hide="false"
+            >
             <template #leading="{ item }">
               <UAvatar
                 v-if="item.edition?.imageUrl"
-                :src="useImageUrl().getImageUrl(item.edition.imageUrl, 'edition', item.edition.id)"
+                :src="useImageUrl().getImageUrl(item.edition.imageUrl, 'edition', item.edition.id) || undefined"
                 :alt="item.label"
                 size="sm"
               />
@@ -45,7 +49,7 @@
             </template>
 
             <template #trailing="{ item }">
-              <UBadge v-if="item.totalUnread > 0" color="red" size="xs">
+              <UBadge v-if="item.totalUnread > 0" color="error" size="xs">
                 {{ item.totalUnread }}
               </UBadge>
             </template>
@@ -104,7 +108,7 @@
                     </div>
 
                     <!-- Badge non lu -->
-                    <UBadge v-if="conversation.unreadCount > 0" color="red" size="xs">
+                    <UBadge v-if="conversation.unreadCount > 0" color="error" size="xs">
                       {{ conversation.unreadCount }}
                     </UBadge>
                   </div>
@@ -112,43 +116,67 @@
               </div>
             </template>
           </UAccordion>
+          </div>
         </UCard>
       </div>
 
       <!-- Colonne 2 : Chat -->
-      <div class="col-span-12 lg:col-span-7">
-        <UCard class="h-full flex flex-col" :ui="{ body: { padding: '' } }">
+      <div
+        class="col-span-12 lg:col-span-7 flex flex-col overflow-hidden"
+        :class="{ hidden: !showConversationOnMobile, 'lg:flex': !showConversationOnMobile }"
+      >
+        <UCard class="h-full flex flex-col overflow-hidden" :ui="{ body: 'p-0 flex flex-col flex-1 overflow-hidden' }">
           <template #header>
-            <div v-if="selectedConversation" class="flex items-center gap-3">
-              <UIcon
-                :name="
-                  selectedConversation.type === 'TEAM_GROUP'
-                    ? 'i-heroicons-user-group'
-                    : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                      ? 'i-heroicons-megaphone'
-                      : 'i-heroicons-user'
-                "
-                :style="selectedConversation.team ? { color: selectedConversation.team.color } : {}"
-                class="h-6 w-6"
-              />
-              <div>
-                <h3 class="font-semibold">
-                  {{
-                    selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                      ? 'Responsables bénévoles'
-                      : selectedConversation.team?.name || 'Conversation'
-                  }}
-                </h3>
-                <p class="text-xs text-gray-500">
-                  {{
+            <div v-if="selectedConversation" class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <!-- Bouton retour (mobile uniquement) -->
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-arrow-left"
+                  class="lg:hidden"
+                  @click="showConversationOnMobile = false"
+                />
+
+                <UIcon
+                  :name="
                     selectedConversation.type === 'TEAM_GROUP'
-                      ? 'Discussion de groupe'
+                      ? 'i-heroicons-user-group'
                       : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                        ? 'Conversation avec les organisateurs'
-                        : 'Conversation privée'
-                  }}
-                </p>
+                        ? 'i-heroicons-megaphone'
+                        : 'i-heroicons-user'
+                  "
+                  :style="selectedConversation.team ? { color: selectedConversation.team.color } : {}"
+                  class="h-6 w-6"
+                />
+                <div>
+                  <h3 class="font-semibold">
+                    {{
+                      selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                        ? 'Responsables bénévoles'
+                        : selectedConversation.team?.name || 'Conversation'
+                    }}
+                  </h3>
+                  <p class="text-xs text-gray-500">
+                    {{
+                      selectedConversation.type === 'TEAM_GROUP'
+                        ? 'Discussion de groupe'
+                        : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                          ? 'Conversation avec les organisateurs'
+                          : 'Conversation privée'
+                    }}
+                  </p>
+                </div>
               </div>
+
+              <!-- Bouton participants -->
+              <UButton
+                color="neutral"
+                variant="ghost"
+                :label="`${selectedConversation.participants.length}`"
+                icon="i-heroicons-users"
+                @click="showParticipantsModal = true"
+              />
             </div>
             <h3 v-else class="font-semibold">Sélectionnez une conversation</h3>
           </template>
@@ -163,7 +191,7 @@
             </div>
           </div>
 
-          <template v-else>
+          <div v-else class="flex-1 flex flex-col overflow-hidden">
             <!-- Zone de messages avec UChatMessages -->
             <div class="flex-1 overflow-y-auto">
               <div v-if="loadingMessages" class="text-center py-8">
@@ -195,9 +223,9 @@
                 :should-auto-scroll="true"
               >
                 <template #leading="{ message }">
-                  <UAvatar
-                    :src="message.metadata?.avatarSrc"
-                    :alt="message.metadata?.authorName"
+                  <UiUserAvatar
+                    v-if="message.metadata?.user"
+                    :user="message.metadata.user"
                     size="sm"
                   />
                 </template>
@@ -226,8 +254,9 @@
             </div>
 
             <!-- Formulaire d'envoi avec UChatPrompt -->
-            <div class="border-t dark:border-gray-700 p-4">
+            <div class="border-t dark:border-gray-700 p-4 shrink-0">
               <UChatPrompt
+                ref="chatPromptRef"
                 v-model="newMessage"
                 placeholder="Écrivez votre message..."
                 :disabled="sending"
@@ -236,10 +265,28 @@
                 <UChatPromptSubmit :disabled="!newMessage.trim()" :loading="sending" />
               </UChatPrompt>
             </div>
-          </template>
+          </div>
         </UCard>
       </div>
     </div>
+
+    <!-- Modal des participants -->
+    <UModal v-model:open="showParticipantsModal" title="Participants">
+      <template #body>
+        <div v-if="selectedConversation" class="space-y-3">
+          <div
+            v-for="participant in selectedConversation.participants"
+            :key="participant.id"
+            class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            <UiUserAvatar :user="participant.user" size="md" />
+            <div class="flex-1">
+              <p class="font-medium">{{ participant.user.pseudo }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -271,6 +318,8 @@ const {
 const loading = ref(true)
 const loadingMessages = ref(false)
 const sending = ref(false)
+const showParticipantsModal = ref(false)
+const showConversationOnMobile = ref(false) // true = affiche la conversation, false = affiche la liste
 
 const editionsWithConversations = ref<
   Map<number, { edition: MessengerEdition; conversations: Conversation[] }>
@@ -280,6 +329,7 @@ const messages = ref<ConversationMessage[]>([])
 const selectedConversationId = ref<string | null>(null)
 const newMessage = ref('')
 const openAccordionItems = ref<string[]>([])
+const chatPromptRef = ref()
 
 // Computed
 const selectedConversation = computed(() => {
@@ -342,11 +392,6 @@ const allMessages = computed(() => {
 const formattedMessages = computed(() => {
   return allMessages.value.map((message) => {
     const isCurrentUser = message.participant.user.id === authStore.user?.id
-    const avatarSrc = message.participant.user.profilePicture
-      ? message.participant.user.profilePicture
-      : message.participant.user.emailHash
-        ? `https://www.gravatar.com/avatar/${message.participant.user.emailHash}?d=mp`
-        : undefined
 
     return {
       id: message.id,
@@ -361,7 +406,7 @@ const formattedMessages = computed(() => {
         authorName: message.participant.user.pseudo,
         createdAt: message.createdAt,
         editedAt: message.editedAt,
-        avatarSrc,
+        user: message.participant.user, // Passer l'objet user complet pour UserAvatar
       },
     }
   })
@@ -417,6 +462,9 @@ async function selectConversation(conversationId: string) {
   messages.value = result.data
   loadingMessages.value = false
 
+  // Sur mobile, afficher la conversation
+  showConversationOnMobile.value = true
+
   // Mettre à jour l'URL
   router.push({ query: { conversationId } })
 }
@@ -433,7 +481,9 @@ function updateConversationLastMessage(conversationId: string, message: Conversa
           content: message.content,
           createdAt: message.createdAt,
           participant: {
-            userId: message.participant.userId,
+            user: {
+              id: message.participant.user.id,
+            },
           },
         },
       ]
@@ -461,6 +511,15 @@ async function sendMessage() {
 
     // Vider le champ de saisie
     newMessage.value = ''
+
+    // Refocus le champ de saisie pour permettre d'écrire immédiatement un nouveau message
+    await nextTick()
+    if (chatPromptRef.value?.$el) {
+      const textarea = chatPromptRef.value.$el.querySelector('textarea')
+      if (textarea) {
+        textarea.focus()
+      }
+    }
 
     // Le message arrivera aussi via SSE mais sera dédupliqué par l'ID
     // UChatMessages gère automatiquement le scroll
@@ -515,7 +574,9 @@ watch(
       const lastMessage = newMessages[newMessages.length - 1]
 
       // Marquer ce message comme lu
-      await markMessageAsRead(selectedConversationId.value, lastMessage.id)
+      if (lastMessage) {
+        await markMessageAsRead(selectedConversationId.value, lastMessage.id)
+      }
     }
   },
   { deep: true }

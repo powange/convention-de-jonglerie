@@ -21,6 +21,7 @@ export interface ConversationParticipant {
     id: number
     pseudo: string
     profilePicture: string | null
+    emailHash: string
   }
 }
 
