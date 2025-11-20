@@ -268,7 +268,8 @@ jobs:
         if: matrix.test-group.db
         run: |
           # Reset la base complètement pour éviter les conflits de migration
-          npx prisma migrate reset --force --skip-seed
+          # Note: prisma/seed.ts est vide, donc pas de données de seed à charger
+          npx prisma migrate reset --force
 
       - name: Run tests - ${{ matrix.test-group.name }}
         run: ${{ matrix.test-group.cmd }}
