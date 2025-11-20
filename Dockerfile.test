@@ -16,6 +16,7 @@ WORKDIR /app
 
 # Copier les fichiers de configuration
 COPY package*.json ./
+COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Installer toutes les dépendances (dev + prod)
@@ -28,8 +29,8 @@ RUN if [ -f package-lock.json ]; then \
 # Copier le reste du code
 COPY . .
 
-# Générer le client Prisma
-RUN npx prisma generate
+# Générer le client Prisma (avec DATABASE_URL factice pour Prisma 7)
+RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
 
 # Créer les dossiers nécessaires
 RUN mkdir -p /app/public/uploads /app/.nuxt /app/.output
