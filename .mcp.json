@@ -14,6 +14,14 @@
       "env": {
         "VITEST_PROJECT_DIR": "/Users/<your-username>/path/to/your/project/root"
       }
+    },
+    "Prisma-Local": {
+      "command": "npx",
+      "args": ["-y", "prisma", "mcp"]
+    },
+    "Prisma-Remote": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.prisma.io/mcp"]
     }
   }
 }
