@@ -236,7 +236,7 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
     const path = urlObj.pathname
 
     // Récupérer l'utilisateur connecté si disponible
-    const userId = event.context.user?.id || null
+    const userId = event.context?.user?.id || null
 
     // Récupérer le referer (page d'origine)
     const referer = getHeader(event, 'referer') || getHeader(event, 'referrer') || undefined
@@ -296,7 +296,7 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
       statusCode,
       method: event.node.req.method,
       url: event.node.req.url,
-      userId: event.context.user?.id,
+      userId: event.context?.user?.id,
       timestamp: new Date().toISOString(),
     })
   }

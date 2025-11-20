@@ -15,7 +15,6 @@ export default wrapApiHandler(
     }
 
     const { email, excludeUserIds } = parse.data
-    const { prisma } = await import('@@/server/utils/prisma')
 
     const user = await prisma.user.findFirst({
       where: {
