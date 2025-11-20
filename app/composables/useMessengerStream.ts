@@ -7,6 +7,18 @@ interface StreamStats {
   error: string | null
 }
 
+interface GlobalMessageNotification {
+  conversationId: string
+  messageId: string
+  content: string
+  createdAt: Date
+  participant: {
+    user: {
+      id: number
+    }
+  }
+}
+
 /**
  * Composable pour gérer le stream SSE des messages en temps réel
  */
@@ -175,5 +187,105 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
     connect,
     disconnect,
     clearMessages,
+  }
+}
+
+/**
+ * Composable pour écouter tous les nouveaux messages de l'utilisateur (stream global)
+ * Permet de mettre à jour les compteurs de messages non lus en temps réel
+ */
+export const useGlobalMessengerStream = () => {
+  const _toast = useToast()
+
+  // Notifications de nouveaux messages
+  const newMessageNotifications = ref<GlobalMessageNotification[]>([])
+
+  // Instance EventSource
+  let eventSource: EventSource | null = null
+  const isConnected = ref(false)
+
+  /**
+   * Établit la connexion SSE globale
+   */
+  const connect = () => {
+    if (eventSource || isConnected.value) {
+      return
+    }
+
+    try {
+      const url = '/api/messenger/stream'
+      console.log('[Messenger Global SSE] Connexion à:', url)
+
+      eventSource = new EventSource(url)
+
+      // Gestion de l'ouverture
+      eventSource.onopen = () => {
+        console.log('[Messenger Global SSE] ✅ Connexion établie')
+        isConnected.value = true
+      }
+
+      // Réception de tous les événements
+      eventSource.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data)
+
+          if (message.type === 'connected') {
+            console.log(
+              `[Messenger Global SSE] Connecté - ${message.conversationsCount} conversations`
+            )
+          } else if (message.type === 'new-message') {
+            console.log('[Messenger Global SSE] Nouveau message reçu:', message.data)
+            newMessageNotifications.value.push(message.data)
+          } else if (message.type === 'ping') {
+            // Ignorer les pings
+          }
+        } catch (error) {
+          console.error('[Messenger Global SSE] Erreur parsing message:', error)
+        }
+      }
+
+      // Gestion des erreurs
+      eventSource.onerror = (error) => {
+        console.error('[Messenger Global SSE] Erreur de connexion:', error)
+        disconnect()
+      }
+    } catch (error) {
+      console.error('[Messenger Global SSE] Erreur lors de la connexion:', error)
+    }
+  }
+
+  /**
+   * Ferme la connexion SSE globale
+   */
+  const disconnect = () => {
+    if (eventSource) {
+      console.log('[Messenger Global SSE] Déconnexion du stream')
+      eventSource.close()
+      eventSource = null
+    }
+    isConnected.value = false
+  }
+
+  /**
+   * Vide les notifications
+   */
+  const clearNotifications = () => {
+    newMessageNotifications.value = []
+  }
+
+  // Nettoyage lors de la destruction
+  onUnmounted(() => {
+    disconnect()
+  })
+
+  return {
+    // État
+    newMessageNotifications: readonly(newMessageNotifications),
+    isConnected: readonly(isConnected),
+
+    // Actions
+    connect,
+    disconnect,
+    clearNotifications,
   }
 }

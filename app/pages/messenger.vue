@@ -38,84 +38,94 @@
               :items="accordionItems"
               :unmount-on-hide="false"
             >
-            <template #leading="{ item }">
-              <UAvatar
-                v-if="item.edition?.imageUrl"
-                :src="useImageUrl().getImageUrl(item.edition.imageUrl, 'edition', item.edition.id) || undefined"
-                :alt="item.label"
-                size="sm"
-              />
-              <UAvatar v-else :alt="item.label" size="sm" />
-            </template>
+              <template #leading="{ item }">
+                <div v-if="item.edition?.imageUrl" class="w-10 h-10 flex-shrink-0">
+                  <img
+                    :src="
+                      useImageUrl().getImageUrl(item.edition.imageUrl, 'edition', item.edition.id)
+                    "
+                    :alt="item.label"
+                    class="w-full h-full object-contain rounded"
+                  />
+                </div>
+                <UIcon v-else name="i-heroicons-calendar" class="w-10 h-10 text-gray-400" />
+              </template>
 
-            <template #trailing="{ item }">
-              <UBadge v-if="item.totalUnread > 0" color="error" size="xs">
-                {{ item.totalUnread }}
-              </UBadge>
-            </template>
+              <template #trailing="{ item, open }">
+                <div class="flex items-center gap-2">
+                  <UBadge v-if="item.totalUnread > 0" color="error" size="sm">
+                    {{ item.totalUnread }}
+                  </UBadge>
+                  <UIcon
+                    name="i-heroicons-chevron-down"
+                    class="transition-transform duration-200"
+                    :class="[open ? 'rotate-180' : '']"
+                  />
+                </div>
+              </template>
 
-            <template #body="{ item }">
-              <div class="space-y-2">
-                <button
-                  v-for="conversation in item.conversations"
-                  :key="conversation.id"
-                  :class="[
-                    'w-full text-left p-3 rounded-lg transition-colors',
-                    selectedConversationId === conversation.id
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent',
-                  ]"
-                  @click="selectConversation(conversation.id)"
-                >
-                  <div class="flex items-start justify-between gap-2">
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2">
-                        <UIcon
-                          :name="
-                            conversation.type === 'TEAM_GROUP'
-                              ? 'i-heroicons-user-group'
-                              : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                                ? 'i-heroicons-megaphone'
-                                : 'i-heroicons-user'
-                          "
-                          :style="conversation.team ? { color: conversation.team.color } : {}"
-                        />
-                        <p class="font-medium truncate">
+              <template #body="{ item }">
+                <div class="space-y-2">
+                  <button
+                    v-for="conversation in item.conversations"
+                    :key="conversation.id"
+                    :class="[
+                      'w-full text-left p-3 rounded-lg transition-colors',
+                      selectedConversationId === conversation.id
+                        ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent',
+                    ]"
+                    @click="selectConversation(conversation.id)"
+                  >
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                          <UIcon
+                            :name="
+                              conversation.type === 'TEAM_GROUP'
+                                ? 'i-heroicons-user-group'
+                                : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                                  ? 'i-heroicons-megaphone'
+                                  : 'i-heroicons-user'
+                            "
+                            :style="conversation.team ? { color: conversation.team.color } : {}"
+                          />
+                          <p class="font-medium truncate">
+                            {{
+                              conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                                ? 'Responsables bénévoles'
+                                : conversation.team?.name || 'Conversation'
+                            }}
+                          </p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">
                           {{
-                            conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                              ? 'Responsables bénévoles'
-                              : conversation.team?.name || 'Conversation'
+                            conversation.type === 'TEAM_GROUP'
+                              ? 'Groupe'
+                              : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
+                                ? 'Organisateurs'
+                                : 'Privé avec responsable'
                           }}
                         </p>
+
+                        <!-- Dernier message -->
+                        <p
+                          v-if="conversation.messages[0]"
+                          class="text-sm text-gray-600 dark:text-gray-400 truncate mt-2"
+                        >
+                          {{ conversation.messages[0].content }}
+                        </p>
                       </div>
-                      <p class="text-xs text-gray-500 mt-1">
-                        {{
-                          conversation.type === 'TEAM_GROUP'
-                            ? 'Groupe'
-                            : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                              ? 'Organisateurs'
-                              : 'Privé avec responsable'
-                        }}
-                      </p>
 
-                      <!-- Dernier message -->
-                      <p
-                        v-if="conversation.messages[0]"
-                        class="text-sm text-gray-600 dark:text-gray-400 truncate mt-2"
-                      >
-                        {{ conversation.messages[0].content }}
-                      </p>
+                      <!-- Badge non lu -->
+                      <UBadge v-if="conversation.unreadCount > 0" color="error" size="sm">
+                        {{ conversation.unreadCount }}
+                      </UBadge>
                     </div>
-
-                    <!-- Badge non lu -->
-                    <UBadge v-if="conversation.unreadCount > 0" color="error" size="xs">
-                      {{ conversation.unreadCount }}
-                    </UBadge>
-                  </div>
-                </button>
-              </div>
-            </template>
-          </UAccordion>
+                  </button>
+                </div>
+              </template>
+            </UAccordion>
           </div>
         </UCard>
       </div>
@@ -125,7 +135,10 @@
         class="col-span-12 lg:col-span-7 flex flex-col overflow-hidden"
         :class="{ hidden: !showConversationOnMobile, 'lg:flex': !showConversationOnMobile }"
       >
-        <UCard class="h-full flex flex-col overflow-hidden" :ui="{ body: 'p-0 flex flex-col flex-1 overflow-hidden' }">
+        <UCard
+          class="h-full flex flex-col overflow-hidden"
+          :ui="{ body: 'p-0 flex flex-col flex-1 overflow-hidden' }"
+        >
           <template #header>
             <div v-if="selectedConversation" class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -146,7 +159,9 @@
                         ? 'i-heroicons-megaphone'
                         : 'i-heroicons-user'
                   "
-                  :style="selectedConversation.team ? { color: selectedConversation.team.color } : {}"
+                  :style="
+                    selectedConversation.team ? { color: selectedConversation.team.color } : {}
+                  "
                   class="h-6 w-6"
                 />
                 <div>
@@ -412,8 +427,11 @@ const formattedMessages = computed(() => {
   })
 })
 
-// Stream SSE
+// Stream SSE pour la conversation courante
 const { realtimeMessages: streamRealtimeMessages } = useMessengerStream(selectedConversationId)
+
+// Stream SSE global pour toutes les conversations
+const { newMessageNotifications, connect: connectGlobalStream } = useGlobalMessengerStream()
 
 // Charger toutes les éditions et conversations au montage
 onMounted(async () => {
@@ -442,6 +460,9 @@ onMounted(async () => {
     editionsWithConversations.value = editionsData
     loading.value = false
 
+    // Connecter le stream global pour recevoir les notifications de nouveaux messages
+    connectGlobalStream()
+
     // Si conversationId dans query params, sélectionner la conversation
     const queryConversationId = route.query.conversationId
     if (queryConversationId && typeof queryConversationId === 'string') {
@@ -461,6 +482,15 @@ async function selectConversation(conversationId: string) {
   const result = await fetchMessages(conversationId)
   messages.value = result.data
   loadingMessages.value = false
+
+  // Réinitialiser le compteur de messages non lus pour cette conversation
+  for (const [_editionId, data] of editionsWithConversations.value.entries()) {
+    const conversation = data.conversations.find((c) => c.id === conversationId)
+    if (conversation) {
+      conversation.unreadCount = 0
+      break
+    }
+  }
 
   // Sur mobile, afficher la conversation
   showConversationOnMobile.value = true
@@ -576,6 +606,50 @@ watch(
       // Marquer ce message comme lu
       if (lastMessage) {
         await markMessageAsRead(selectedConversationId.value, lastMessage.id)
+      }
+    }
+  },
+  { deep: true }
+)
+
+// Surveiller les notifications globales de nouveaux messages pour mettre à jour les compteurs
+watch(
+  newMessageNotifications,
+  (notifications) => {
+    if (notifications.length === 0) return
+
+    // Prendre la dernière notification
+    const notification = notifications[notifications.length - 1]
+
+    // Ne rien faire si c'est la conversation courante (déjà gérée par le stream spécifique)
+    if (notification.conversationId === selectedConversationId.value) {
+      return
+    }
+
+    // Mettre à jour la conversation concernée
+    for (const [_editionId, data] of editionsWithConversations.value.entries()) {
+      const conversation = data.conversations.find((c) => c.id === notification.conversationId)
+      if (conversation) {
+        // Incrémenter le compteur de messages non lus
+        conversation.unreadCount = (conversation.unreadCount || 0) + 1
+
+        // Mettre à jour le dernier message affiché dans la liste
+        conversation.messages = [
+          {
+            id: notification.messageId,
+            content: notification.content,
+            createdAt: notification.createdAt,
+            participant: {
+              user: {
+                id: notification.participant.user.id,
+              },
+            },
+          },
+        ]
+
+        // Mettre à jour updatedAt pour le tri
+        conversation.updatedAt = notification.createdAt
+        break
       }
     }
   },
