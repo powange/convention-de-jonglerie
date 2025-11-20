@@ -16,19 +16,22 @@ COPY package*.json ./
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
-# Installer dépendances complètes puis générer Prisma (ci si lock, sinon install)
+# Installer dépendances complètes (ci si lock, sinon install)
 RUN if [ -f package-lock.json ]; then \
 			echo "Using npm ci (builder stage)" && npm ci; \
 		else \
 			echo "No package-lock.json -> npm install (builder stage)" && npm install; \
 		fi
 
+# Générer le client Prisma AVANT le build (requis pour Prisma 7)
+RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
+
 # Copier le reste du code et construire
 COPY . .
 RUN npm run build
 
 # Conserver uniquement les dépendances de prod
-RUN npm prune --omit=dev && npx prisma generate
+RUN npm prune --omit=dev
 
 # -------------------------
 # Stage runtime (production)
@@ -46,6 +49,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./
+COPY --from=builder /app/server/generated ./server/generated
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/scripts ./scripts
 
