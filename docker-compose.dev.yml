@@ -107,6 +107,7 @@ services:
       - ./tsconfig.json:/app/tsconfig.json:cached
       - ./vitest.config.ts:/app/vitest.config.ts:cached
       - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
+      - ./prisma.config.ts:/app/prisma.config.ts:cached
       # Node modules dans un volume Docker persistant (pas synchronisé avec l'hôte)
       - node_modules:/app/node_modules
       # Synchroniser les dossiers de build du container vers l'hôte

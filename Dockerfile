@@ -13,6 +13,7 @@ FROM base AS builder
 
 # Copier les manifests et Prisma (pour le client)
 COPY package*.json ./
+COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Installer dépendances complètes puis générer Prisma (ci si lock, sinon install)
@@ -44,6 +45,7 @@ COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/scripts ./scripts
 
@@ -62,6 +64,7 @@ FROM base AS dev
 # Ce stage sert d'image de dev avec les dépendances pré-installées
 # Le code est monté en volume pour le hot-reload, node_modules reste dans un volume Docker
 COPY package*.json ./
+COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Créer les dossiers requis pour le développement

@@ -89,6 +89,7 @@
     "@nuxtjs/i18n": "^10.0.3",
     "@nuxtjs/seo": "^3.2.2",
     "@pinia/nuxt": "^0.11.2",
+    "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "^7.0.0",
     "@types/nodemailer": "^6.4.17",
     "@unhead/vue": "^2.0.12",

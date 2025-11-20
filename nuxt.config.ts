@@ -77,6 +77,11 @@ export default defineNuxtConfig({
     rollupConfig: {
       plugins: [vue()],
     },
+    esbuild: {
+      options: {
+        target: 'es2020', // Support pour BigInt et autres fonctionnalités modernes
+      },
+    },
     // Compression des assets statiques (gzip et brotli)
     compressPublicAssets: {
       gzip: true,
