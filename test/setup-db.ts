@@ -1,4 +1,6 @@
 import { beforeAll, afterAll } from 'vitest'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import mariadb from 'mariadb'
 
 // Import dynamique de Prisma depuis le chemin personnalisé (cohérent avec server/utils/prisma.ts)
 let PrismaClient: typeof import('../server/generated/prisma/client').PrismaClient
@@ -18,14 +20,24 @@ if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
     'mysql://convention_user:convention_password@localhost:3308/convention_db'
 }
 
-// Instance Prisma pour les tests
+// Instance Prisma pour les tests avec adaptateur MariaDB (Prisma 7)
 if (PrismaClient) {
+  const databaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+  const url = new URL(databaseUrl)
+
+  // Créer l'adaptateur MariaDB avec les paramètres de connexion
+  const adapter = new PrismaMariaDb({
+    host: url.hostname,
+    port: parseInt(url.port) || 3306,
+    user: url.username,
+    password: url.password,
+    database: url.pathname.slice(1),
+    connectionLimit: 5,
+    bigIntAsNumber: true,
+  })
+
   prismaTest = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
-      },
-    },
+    adapter,
   })
 
   // Exposer prismaTest comme global 'prisma' pour simuler l'auto-import Nitro
