@@ -608,7 +608,14 @@ onMounted(async () => {
 
     // Si conversationId dans query params, sélectionner la conversation
     const queryConversationId = route.query.conversationId
+    const queryEditionId = route.query.editionId
+
     if (queryConversationId && typeof queryConversationId === 'string') {
+      // Si editionId est fourni, ouvrir l'accordéon de cette édition
+      if (queryEditionId && typeof queryEditionId === 'string') {
+        openAccordionItems.value = [queryEditionId]
+      }
+
       await selectConversation(queryConversationId)
     }
   } catch (error) {
