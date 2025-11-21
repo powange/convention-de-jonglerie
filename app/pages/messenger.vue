@@ -34,7 +34,11 @@
                 <div v-if="item.edition?.imageUrl" class="w-10 h-10 flex-shrink-0">
                   <img
                     :src="
-                      useImageUrl().getImageUrl(item.edition.imageUrl, 'edition', item.edition.id)
+                      useImageUrl().getImageUrl(
+                        item.edition.imageUrl ?? undefined,
+                        'edition',
+                        item.edition.id
+                      )
                     "
                     :alt="item.label"
                     class="w-full h-full object-contain rounded"
@@ -230,8 +234,8 @@
                   variant: 'soft',
                   side: 'left',
                 }"
-                :should-scroll-to-bottom="true"
-                :should-auto-scroll="true"
+                :should-scroll-to-bottom="false"
+                :should-auto-scroll="false"
               >
                 <template #leading="{ message }">
                   <UiUserAvatar
@@ -251,13 +255,20 @@
                       {{ message.metadata?.authorName }}
                     </p>
                     <!-- Contenu du message -->
-                    <p class="text-sm break-words whitespace-pre-wrap">
+                    <p
+                      class="text-sm break-words whitespace-pre-wrap"
+                      :class="{ 'italic opacity-50': message.metadata?.isDeleted }"
+                    >
                       {{ message.parts[0]?.text }}
                     </p>
                     <!-- Horodatage et statut d'édition -->
                     <p class="text-xs mt-1 opacity-70">
                       {{ formatMessageTime(message.metadata?.createdAt) }}
-                      <span v-if="message.metadata?.editedAt" class="ml-1">(modifié)</span>
+                      <span
+                        v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
+                        class="ml-1"
+                        >(modifié)</span
+                      >
                     </p>
                   </div>
                 </template>
@@ -326,6 +337,7 @@ const {
   fetchConversations,
   fetchMessages,
   sendMessage: sendMessageApi,
+  deleteMessage,
   markMessageAsRead,
 } = useMessenger()
 
@@ -386,7 +398,7 @@ const accordionItems = computed(() => {
     })
 
     return {
-      label: edition.name || edition.convention.name,
+      label: edition.name ?? edition.convention.name,
       icon: 'i-heroicons-calendar',
       value: String(edition.id),
       conversations: sortedConversations,
@@ -413,6 +425,20 @@ const allMessages = computed(() => {
 const formattedMessages = computed(() => {
   return allMessages.value.map((message) => {
     const isCurrentUser = message.participant.user.id === authStore.user?.id
+    const isDeleted = !!message.deletedAt
+
+    // Actions natives pour les messages de l'utilisateur non supprimés
+    const actions =
+      isCurrentUser && !isDeleted
+        ? [
+            {
+              icon: 'i-lucide-trash',
+              color: 'error' as const,
+              label: 'Supprimer',
+              onClick: () => handleDeleteMessage(message.id),
+            },
+          ]
+        : undefined
 
     return {
       id: message.id,
@@ -420,21 +446,25 @@ const formattedMessages = computed(() => {
       parts: [
         {
           type: 'text',
-          text: message.content,
+          text: message.content, // Le contenu est déjà "Message supprimé" si deletedAt existe (transformé côté serveur)
         },
       ],
+      actions,
       metadata: {
         authorName: message.participant.user.pseudo,
         createdAt: message.createdAt,
         editedAt: message.editedAt,
+        deletedAt: message.deletedAt,
         user: message.participant.user, // Passer l'objet user complet pour UserAvatar
+        isDeleted,
       },
     }
   })
 })
 
 // Stream SSE pour la conversation courante
-const { realtimeMessages: streamRealtimeMessages } = useMessengerStream(selectedConversationId)
+const { realtimeMessages: streamRealtimeMessages, messageUpdates } =
+  useMessengerStream(selectedConversationId)
 
 // Stream SSE global pour toutes les conversations
 const {
@@ -629,9 +659,15 @@ async function loadMoreMessages() {
 
   loadingMoreMessages.value = true
 
-  // Sauvegarder la hauteur actuelle du scroll pour restaurer la position
+  // Sauvegarder la position de scroll et la hauteur actuelle
   const container = messagesContainerRef.value
-  const previousScrollHeight = container?.scrollHeight || 0
+  if (!container) {
+    loadingMoreMessages.value = false
+    return
+  }
+
+  const previousScrollHeight = container.scrollHeight
+  const previousScrollTop = container.scrollTop
 
   try {
     const result = await fetchMessages(selectedConversationId.value, {
@@ -645,13 +681,21 @@ async function loadMoreMessages() {
     // Mettre à jour hasMoreMessages
     hasMoreMessages.value = result.pagination?.hasNextPage ?? result.data.length >= messagesLimit
 
-    // Restaurer la position de scroll après l'ajout des messages
+    // Attendre que le DOM soit mis à jour
     await nextTick()
-    if (container) {
-      const newScrollHeight = container.scrollHeight
-      const scrollDiff = newScrollHeight - previousScrollHeight
-      container.scrollTop = container.scrollTop + scrollDiff
-    }
+
+    // Attendre un court délai pour que le rendu soit complètement terminé
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    // Calculer la nouvelle hauteur du contenu
+    const newScrollHeight = container.scrollHeight
+
+    // Calculer la différence de hauteur (les nouveaux messages ajoutés)
+    const heightDifference = newScrollHeight - previousScrollHeight
+
+    // Restaurer la position de scroll en ajoutant la différence de hauteur
+    // Cela maintient exactement la même position visuelle pour l'utilisateur
+    container.scrollTop = previousScrollTop + heightDifference
   } catch (error) {
     console.error('Erreur lors du chargement des messages précédents:', error)
   } finally {
@@ -718,6 +762,15 @@ async function sendMessage() {
   }
 }
 
+// Supprimer un message
+async function handleDeleteMessage(messageId: string) {
+  if (!selectedConversationId.value) return
+
+  // Envoyer la requête de suppression
+  // La mise à jour de l'UI se fera automatiquement via le SSE (événement message-updated)
+  await deleteMessage(selectedConversationId.value, messageId)
+}
+
 // Formater le temps du message
 function formatMessageTime(date: Date) {
   const messageDate = new Date(date)
@@ -770,10 +823,37 @@ watch(
         await markMessageAsRead(selectedConversationId.value, lastMessage.id)
       }
 
-      // Scroller vers le bas si un nouveau message est arrivé
-      if (oldMessages && newMessages.length > oldMessages.length) {
-        scrollToBottom()
+      // Scroller vers le bas UNIQUEMENT si le dernier message a changé
+      // (ce qui indique un nouveau message à la fin, pas un chargement au début)
+      if (oldMessages && oldMessages.length > 0 && newMessages.length > oldMessages.length) {
+        const oldLastMessage = oldMessages[oldMessages.length - 1]
+        const newLastMessage = newMessages[newMessages.length - 1]
+
+        // Scroller seulement si le dernier message est différent
+        if (oldLastMessage?.id !== newLastMessage?.id) {
+          scrollToBottom()
+        }
       }
+    }
+  },
+  { deep: true }
+)
+
+// Surveiller les mises à jour de messages (suppressions/modifications) via SSE
+watch(
+  messageUpdates,
+  (updates) => {
+    if (updates.length === 0) return
+
+    // Prendre la dernière mise à jour
+    const update = updates[updates.length - 1] as unknown as ConversationMessage
+    if (!update) return
+
+    // Mettre à jour le message dans messages.value si présent
+    const messageIndex = messages.value.findIndex((m) => m.id === update.id)
+    if (messageIndex !== -1) {
+      // Remplacer le message par la version mise à jour (approche immutable)
+      messages.value = messages.value.map((m) => (m.id === update.id ? update : m))
     }
   },
   { deep: true }
@@ -787,6 +867,7 @@ watch(
 
     // Prendre la dernière notification
     const notification = notifications[notifications.length - 1]
+    if (!notification) return
 
     // Ne rien faire si c'est la conversation courante (déjà gérée par le stream spécifique)
     if (notification.conversationId === selectedConversationId.value) {

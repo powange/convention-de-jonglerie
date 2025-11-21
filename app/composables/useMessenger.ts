@@ -31,6 +31,7 @@ export interface ConversationMessage {
   content: string
   createdAt: Date
   editedAt: Date | null
+  deletedAt: Date | null
   participant: {
     id: string
     user: {

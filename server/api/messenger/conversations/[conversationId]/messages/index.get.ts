@@ -40,11 +40,10 @@ export default wrapApiHandler(
       })
     }
 
-    // Récupérer les messages
+    // Récupérer les messages (incluant les supprimés pour afficher "Message supprimé")
     const messages = await prisma.message.findMany({
       where: {
         conversationId,
-        deletedAt: null,
       },
       include: {
         participant: {
@@ -68,11 +67,10 @@ export default wrapApiHandler(
       take: limit,
     })
 
-    // Compter le total de messages
+    // Compter le total de messages (incluant les supprimés)
     const total = await prisma.message.count({
       where: {
         conversationId,
-        deletedAt: null,
       },
     })
 
@@ -88,9 +86,18 @@ export default wrapApiHandler(
 
     const page = Math.floor(offset / limit) + 1
 
-    // Transformer les messages pour supprimer participantId
+    // Transformer les messages pour supprimer participantId et masquer le contenu des messages supprimés
     const transformedMessages = messages.map((message) => {
       const { participantId: _participantId, ...messageWithoutParticipantId } = message
+
+      // Remplacer le contenu par "Message supprimé" si le message est supprimé
+      if (message.deletedAt) {
+        return {
+          ...messageWithoutParticipantId,
+          content: 'Message supprimé',
+        }
+      }
+
       return messageWithoutParticipantId
     })
 

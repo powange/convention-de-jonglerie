@@ -41,6 +41,9 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
   // Messages reçus en temps réel
   const realtimeMessages = ref<ConversationMessage[]>([])
 
+  // Messages mis à jour (suppression ou modification)
+  const messageUpdates = ref<ConversationMessage[]>([])
+
   // Instance EventSource
   let eventSource: EventSource | null = null
   let reconnectTimer: NodeJS.Timeout | null = null
@@ -89,6 +92,19 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
           } else if (data.type === 'message') {
             // Ajouter le message à la liste
             realtimeMessages.value.push(data.data)
+          } else if (data.type === 'message-updated') {
+            // Mettre à jour un message existant (suppression ou modification)
+            const messageId = data.data.id
+            const messageIndex = realtimeMessages.value.findIndex((m) => m.id === messageId)
+
+            if (messageIndex !== -1) {
+              // Remplacer le message par la version mise à jour
+              realtimeMessages.value[messageIndex] = data.data
+            }
+
+            // Ajouter à la liste des mises à jour pour que la page puisse gérer
+            // les messages qui ne sont pas dans realtimeMessages
+            messageUpdates.value.push(data.data)
           }
         } catch (error) {
           console.error('[Messenger SSE] Erreur parsing event:', error)
@@ -164,6 +180,13 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
     realtimeMessages.value = []
   }
 
+  /**
+   * Vide la liste des mises à jour de messages
+   */
+  const clearMessageUpdates = () => {
+    messageUpdates.value = []
+  }
+
   // Surveiller les changements de conversationId
   watch(conversationId, (newId, oldId) => {
     if (oldId) {
@@ -187,11 +210,13 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
     isConnected: computed(() => streamStats.value.isConnected),
     isConnecting: computed(() => streamStats.value.isConnecting),
     realtimeMessages: readonly(realtimeMessages),
+    messageUpdates: readonly(messageUpdates),
 
     // Actions
     connect,
     disconnect,
     clearMessages,
+    clearMessageUpdates,
   }
 }
 

@@ -93,6 +93,9 @@ export default wrapApiHandler(
           },
         },
         messages: {
+          where: {
+            deletedAt: null, // Ne récupérer que les messages non supprimés
+          },
           orderBy: {
             createdAt: 'desc',
           },

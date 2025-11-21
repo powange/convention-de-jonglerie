@@ -35,11 +35,11 @@ export default wrapApiHandler(
     }
 
     // Vérifier que le message appartient bien à cette conversation
+    // Note: On autorise de marquer comme lu un message supprimé
     const message = await prisma.message.findFirst({
       where: {
         id: messageId,
         conversationId,
-        deletedAt: null,
       },
     })
 

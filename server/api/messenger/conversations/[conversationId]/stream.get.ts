@@ -37,10 +37,12 @@ export default wrapApiHandler(
 
     // Timestamp du début de la connexion
     let lastMessageTime = new Date()
+    let lastUpdateCheckTime = new Date()
 
     // Fonction pour vérifier les nouveaux messages
     const checkForNewMessages = async () => {
       try {
+        // 1. Vérifier les nouveaux messages (createdAt récent)
         const newMessages = await prisma.message.findMany({
           where: {
             conversationId,
@@ -78,6 +80,62 @@ export default wrapApiHandler(
           // Mettre à jour le timestamp
           lastMessageTime = newMessages[newMessages.length - 1].createdAt
         }
+
+        // 2. Vérifier les messages supprimés ou modifiés récemment
+        const updatedMessages = await prisma.message.findMany({
+          where: {
+            conversationId,
+            OR: [
+              {
+                deletedAt: {
+                  gte: lastUpdateCheckTime,
+                },
+              },
+              {
+                editedAt: {
+                  gte: lastUpdateCheckTime,
+                },
+              },
+            ],
+          },
+          include: {
+            participant: {
+              select: {
+                id: true,
+                userId: true,
+                user: {
+                  select: {
+                    id: true,
+                    pseudo: true,
+                    profilePicture: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        })
+
+        if (updatedMessages.length > 0) {
+          for (const message of updatedMessages) {
+            // Envoyer un événement de type "message-updated" pour les suppressions/modifications
+            await eventStream.push(
+              JSON.stringify({
+                type: 'message-updated',
+                data: {
+                  ...message,
+                  // Masquer le contenu si le message est supprimé
+                  content: message.deletedAt ? 'Message supprimé' : message.content,
+                },
+              })
+            )
+          }
+        }
+
+        // Mettre à jour le timestamp de vérification des updates
+        lastUpdateCheckTime = new Date()
       } catch (error) {
         console.error('Erreur lors de la vérification des nouveaux messages:', error)
       }
