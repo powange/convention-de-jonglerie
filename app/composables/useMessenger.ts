@@ -17,6 +17,7 @@ export interface ConversationParticipant {
   id: string
   userId: number
   lastReadAt: Date | null
+  isLeader?: boolean // Présent uniquement pour les conversations d'équipe
   user: {
     id: number
     pseudo: string

@@ -123,7 +123,7 @@ export default wrapApiHandler(
       },
     })
 
-    // Calculer le nombre de messages non lus pour chaque conversation
+    // Calculer le nombre de messages non lus et enrichir avec isLeader pour chaque conversation
     const conversationsWithUnreadCount = await Promise.all(
       conversations.map(async (conversation) => {
         const currentUserParticipant = conversation.participants.find((p) => p.userId === user.id)
@@ -147,8 +147,46 @@ export default wrapApiHandler(
           },
         })
 
+        // Pour les conversations d'équipe, récupérer l'information isLeader pour chaque participant
+        let participantsWithLeaderInfo = conversation.participants
+
+        if (conversation.teamId) {
+          // Récupérer les informations isLeader pour tous les participants de cette équipe
+          const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
+            where: {
+              teamId: conversation.teamId,
+              application: {
+                userId: {
+                  in: conversation.participants.map((p) => p.userId),
+                },
+                editionId,
+              },
+            },
+            select: {
+              isLeader: true,
+              application: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
+          })
+
+          // Mapper les participants avec leur statut isLeader
+          participantsWithLeaderInfo = conversation.participants.map((participant) => {
+            const assignment = leaderAssignments.find(
+              (a) => a.application.userId === participant.userId
+            )
+            return {
+              ...participant,
+              isLeader: assignment?.isLeader || false,
+            }
+          })
+        }
+
         return {
           ...conversation,
+          participants: participantsWithLeaderInfo,
           unreadCount,
         }
       })

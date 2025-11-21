@@ -46,6 +46,35 @@ export default wrapApiHandler(
     // Timestamp du début de la connexion
     let lastMessageTime = new Date()
 
+    // Fonction pour vérifier les événements de typing dans toutes les conversations
+    const checkForTypingEvents = () => {
+      try {
+        const typingEvents = getTypingStatesForConversations(conversationIds)
+
+        for (const event of typingEvents) {
+          // Ne broadcaster que les événements de typing des autres utilisateurs
+          const typingUserIds = event.userIds.filter((id) => id !== user.id)
+
+          if (typingUserIds.length > 0) {
+            eventStream.push(
+              JSON.stringify({
+                type: 'typing',
+                data: {
+                  conversationId: event.conversationId,
+                  userIds: typingUserIds,
+                },
+              })
+            )
+          }
+        }
+      } catch (error) {
+        console.error(
+          '[Global Stream] Erreur lors de la vérification des événements typing:',
+          error
+        )
+      }
+    }
+
     // Fonction pour vérifier les nouveaux messages dans toutes les conversations
     const checkForNewMessages = async () => {
       try {
@@ -138,15 +167,17 @@ export default wrapApiHandler(
       try {
         eventStream.push(JSON.stringify({ type: 'ping', timestamp: Date.now() }))
         checkForNewMessages()
+        checkForTypingEvents()
       } catch (error) {
         console.error('[Global Stream] Erreur lors du ping:', error)
         clearInterval(pingInterval)
       }
     }, 30000)
 
-    // Vérifier les messages toutes les 2 secondes
+    // Vérifier les messages et typing toutes les 2 secondes
     const messageCheckInterval = setInterval(() => {
       checkForNewMessages()
+      checkForTypingEvents()
     }, 2000)
 
     // Nettoyer lors de la fermeture de la connexion

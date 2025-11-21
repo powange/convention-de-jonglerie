@@ -19,6 +19,11 @@ interface GlobalMessageNotification {
   }
 }
 
+interface TypingEvent {
+  conversationId: string
+  userIds: number[]
+}
+
 /**
  * Composable pour gérer le stream SSE des messages en temps réel
  */
@@ -190,25 +195,31 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
   }
 }
 
+// Singleton : état partagé entre toutes les instances du composable
+const globalStreamState = {
+  newMessageNotifications: ref<GlobalMessageNotification[]>([]),
+  typingEvents: ref<Map<string, number[]>>(new Map()),
+  typingTimeouts: new Map<string, NodeJS.Timeout>(),
+  isConnected: ref(false),
+  eventSource: null as EventSource | null,
+}
+
 /**
  * Composable pour écouter tous les nouveaux messages de l'utilisateur (stream global)
  * Permet de mettre à jour les compteurs de messages non lus en temps réel
+ * SINGLETON : une seule connexion SSE partagée entre toutes les instances
  */
 export const useGlobalMessengerStream = () => {
   const _toast = useToast()
 
-  // Notifications de nouveaux messages
-  const newMessageNotifications = ref<GlobalMessageNotification[]>([])
-
-  // Instance EventSource
-  let eventSource: EventSource | null = null
-  const isConnected = ref(false)
+  // Durée après laquelle un indicateur de typing est considéré comme périmé (5 secondes)
+  const TYPING_DISPLAY_TIMEOUT = 5000
 
   /**
    * Établit la connexion SSE globale
    */
   const connect = () => {
-    if (eventSource || isConnected.value) {
+    if (globalStreamState.eventSource || globalStreamState.isConnected.value) {
       return
     }
 
@@ -216,16 +227,16 @@ export const useGlobalMessengerStream = () => {
       const url = '/api/messenger/stream'
       console.log('[Messenger Global SSE] Connexion à:', url)
 
-      eventSource = new EventSource(url)
+      globalStreamState.eventSource = new EventSource(url)
 
       // Gestion de l'ouverture
-      eventSource.onopen = () => {
+      globalStreamState.eventSource.onopen = () => {
         console.log('[Messenger Global SSE] ✅ Connexion établie')
-        isConnected.value = true
+        globalStreamState.isConnected.value = true
       }
 
       // Réception de tous les événements
-      eventSource.onmessage = (event) => {
+      globalStreamState.eventSource.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
 
@@ -235,7 +246,34 @@ export const useGlobalMessengerStream = () => {
             )
           } else if (message.type === 'new-message') {
             console.log('[Messenger Global SSE] Nouveau message reçu:', message.data)
-            newMessageNotifications.value.push(message.data)
+            globalStreamState.newMessageNotifications.value.push(message.data)
+          } else if (message.type === 'typing') {
+            // Mettre à jour l'état de typing pour la conversation
+            const typingData = message.data as TypingEvent
+
+            // Effacer le timeout précédent pour cette conversation
+            const existingTimeout = globalStreamState.typingTimeouts.get(typingData.conversationId)
+            if (existingTimeout) {
+              clearTimeout(existingTimeout)
+            }
+
+            if (typingData.userIds && typingData.userIds.length > 0) {
+              globalStreamState.typingEvents.value.set(
+                typingData.conversationId,
+                typingData.userIds
+              )
+
+              // Créer un timeout pour nettoyer automatiquement après 5 secondes
+              const timeout = setTimeout(() => {
+                globalStreamState.typingEvents.value.delete(typingData.conversationId)
+                globalStreamState.typingTimeouts.delete(typingData.conversationId)
+              }, TYPING_DISPLAY_TIMEOUT)
+
+              globalStreamState.typingTimeouts.set(typingData.conversationId, timeout)
+            } else {
+              globalStreamState.typingEvents.value.delete(typingData.conversationId)
+              globalStreamState.typingTimeouts.delete(typingData.conversationId)
+            }
           } else if (message.type === 'ping') {
             // Ignorer les pings
           }
@@ -245,7 +283,7 @@ export const useGlobalMessengerStream = () => {
       }
 
       // Gestion des erreurs
-      eventSource.onerror = (error) => {
+      globalStreamState.eventSource.onerror = (error) => {
         console.error('[Messenger Global SSE] Erreur de connexion:', error)
         disconnect()
       }
@@ -258,30 +296,36 @@ export const useGlobalMessengerStream = () => {
    * Ferme la connexion SSE globale
    */
   const disconnect = () => {
-    if (eventSource) {
+    if (globalStreamState.eventSource) {
       console.log('[Messenger Global SSE] Déconnexion du stream')
-      eventSource.close()
-      eventSource = null
+      globalStreamState.eventSource.close()
+      globalStreamState.eventSource = null
     }
-    isConnected.value = false
+
+    // Nettoyer tous les timeouts de typing
+    for (const timeout of globalStreamState.typingTimeouts.values()) {
+      clearTimeout(timeout)
+    }
+    globalStreamState.typingTimeouts.clear()
+
+    globalStreamState.isConnected.value = false
   }
 
   /**
    * Vide les notifications
    */
   const clearNotifications = () => {
-    newMessageNotifications.value = []
+    globalStreamState.newMessageNotifications.value = []
   }
 
-  // Nettoyage lors de la destruction
-  onUnmounted(() => {
-    disconnect()
-  })
+  // Note: on ne déconnecte PAS automatiquement onUnmounted car c'est un singleton
+  // La connexion doit rester active tant que l'application est ouverte
 
   return {
-    // État
-    newMessageNotifications: readonly(newMessageNotifications),
-    isConnected: readonly(isConnected),
+    // État (partagé entre toutes les instances)
+    newMessageNotifications: readonly(globalStreamState.newMessageNotifications),
+    typingEvents: readonly(globalStreamState.typingEvents),
+    isConnected: readonly(globalStreamState.isConnected),
 
     // Actions
     connect,
