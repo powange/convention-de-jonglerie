@@ -223,55 +223,44 @@
                 <p class="text-xs text-gray-400 mt-1">Soyez le premier à envoyer un message !</p>
               </div>
 
-              <UChatMessages
-                v-else
-                :messages="formattedMessages"
-                :user="{
-                  variant: 'soft',
-                  side: 'right',
-                }"
-                :assistant="{
-                  variant: 'soft',
-                  side: 'left',
-                }"
-                :should-scroll-to-bottom="false"
-                :should-auto-scroll="false"
-              >
-                <template #leading="{ message }">
-                  <UiUserAvatar
-                    v-if="message.metadata?.user"
-                    :user="message.metadata.user"
-                    size="sm"
-                  />
-                </template>
-
-                <template #content="{ message }">
-                  <div>
-                    <!-- Nom de l'auteur pour les messages des autres -->
-                    <p
-                      v-if="message.role === 'assistant'"
-                      class="text-xs font-medium mb-1 opacity-70"
-                    >
-                      {{ message.metadata?.authorName }}
-                    </p>
-                    <!-- Contenu du message -->
-                    <p
-                      class="text-sm break-words whitespace-pre-wrap"
-                      :class="{ 'italic opacity-50': message.metadata?.isDeleted }"
-                    >
-                      {{ message.parts[0]?.text }}
-                    </p>
-                    <!-- Horodatage et statut d'édition -->
-                    <p class="text-xs mt-1 opacity-70">
-                      {{ formatMessageTime(message.metadata?.createdAt) }}
-                      <span
-                        v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
-                        class="ml-1"
-                        >(modifié)</span
+              <UChatMessages v-else :should-scroll-to-bottom="false" :should-auto-scroll="false">
+                <UChatMessage
+                  v-for="message in formattedMessages"
+                  :key="message.id"
+                  v-bind="message"
+                  :role="message.role"
+                  :side="message.isCurrentUser ? 'right' : 'left'"
+                  :avatar="{ src: message.avatarUrl.value }"
+                  :actions="message.actions"
+                >
+                  <template #content>
+                    <div>
+                      <!-- Nom de l'auteur pour les messages des autres -->
+                      <p
+                        v-if="message.role === 'assistant'"
+                        class="text-xs font-medium mb-1 opacity-70"
                       >
-                    </p>
-                  </div>
-                </template>
+                        {{ message.metadata?.authorName }}
+                      </p>
+                      <!-- Contenu du message -->
+                      <p
+                        class="text-sm break-words whitespace-pre-wrap"
+                        :class="{ 'italic opacity-50': message.metadata?.isDeleted }"
+                      >
+                        {{ message.parts[0]?.text }}
+                      </p>
+                      <!-- Horodatage et statut d'édition -->
+                      <p class="text-xs mt-1 opacity-70">
+                        {{ formatMessageTime(message.metadata?.createdAt) }}
+                        <span
+                          v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
+                          class="ml-1"
+                          >(modifié)</span
+                        >
+                      </p>
+                    </div>
+                  </template>
+                </UChatMessage>
               </UChatMessages>
             </div>
 
@@ -323,6 +312,9 @@ import type {
   ConversationMessage,
 } from '~/composables/useMessenger'
 import { useAuthStore } from '~/stores/auth'
+import { useAvatar } from '~/utils/avatar'
+
+const { getUserAvatarWithCache } = useAvatar()
 
 definePageMeta({
   middleware: 'auth-protected',
@@ -435,14 +427,18 @@ const formattedMessages = computed(() => {
               icon: 'i-lucide-trash',
               color: 'error' as const,
               label: 'Supprimer',
+              trailing: true,
               onClick: () => handleDeleteMessage(message.id),
             },
           ]
         : undefined
 
+    const { currentUrl: avatarUrl } = getUserAvatarWithCache(message.participant.user, 32)
+
     return {
       id: message.id,
-      role: isCurrentUser ? 'user' : 'assistant',
+      isCurrentUser: isCurrentUser,
+      role: 'user',
       parts: [
         {
           type: 'text',
@@ -450,6 +446,7 @@ const formattedMessages = computed(() => {
         },
       ],
       actions,
+      avatarUrl,
       metadata: {
         authorName: message.participant.user.pseudo,
         createdAt: message.createdAt,

@@ -58,6 +58,83 @@ const generateInitialsAvatar = (name: string, size: number): string => {
   return `data:image/svg+xml;base64,${btoa(svg)}`
 }
 
+// Interface pour le cache d'images
+interface ImageCache {
+  [url: string]: {
+    status: 'success' | 'error'
+    timestamp: number
+    fallbackUrl?: string
+  }
+}
+
+const CACHE_KEY = 'image-load-cache'
+const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 heures
+
+// Récupérer le cache depuis localStorage
+const getCache = (): ImageCache => {
+  if (typeof window === 'undefined') return {}
+  try {
+    const cached = localStorage.getItem(CACHE_KEY)
+    return cached ? JSON.parse(cached) : {}
+  } catch {
+    return {}
+  }
+}
+
+// Sauvegarder dans le cache
+const setCache = (url: string, status: 'success' | 'error', fallback?: string) => {
+  if (typeof window === 'undefined') return
+  try {
+    const cache = getCache()
+    cache[url] = {
+      status,
+      timestamp: Date.now(),
+      fallbackUrl: fallback,
+    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache))
+  } catch {
+    // Ignore les erreurs de localStorage (quota dépassé, etc.)
+  }
+}
+
+// Nettoyer les entrées expirées du cache
+const cleanCache = () => {
+  if (typeof window === 'undefined') return
+  try {
+    const cache = getCache()
+    const now = Date.now()
+    const cleanedCache: ImageCache = {}
+
+    for (const url in cache) {
+      const entry = cache[url]
+      // Garder seulement les entrées non expirées
+      if (entry && now - entry.timestamp <= CACHE_DURATION) {
+        cleanedCache[url] = entry
+      }
+    }
+
+    // Sauvegarder le cache nettoyé
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cleanedCache))
+  } catch {
+    // Ignore les erreurs
+  }
+}
+
+// Vérifier si une URL est dans le cache et valide
+const getCachedStatus = (url: string) => {
+  const cache = getCache()
+  const cached = cache[url]
+
+  if (!cached) return null
+
+  // Vérifier si le cache n'est pas expiré
+  if (Date.now() - cached.timestamp > CACHE_DURATION) {
+    return null
+  }
+
+  return cached
+}
+
 export const useAvatar = () => {
   const { getImageUrl } = useImageUrl()
 
@@ -96,15 +173,128 @@ export const useAvatar = () => {
         return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
       }
 
-      return `${imageUrl}?v=${version}`
+      // Convertir l'URL relative en URL absolue pour éviter l'optimisation _ipx de Nuxt Image
+      let finalUrl = imageUrl
+      if (imageUrl.startsWith('/') && typeof window !== 'undefined') {
+        finalUrl = `${window.location.origin}${imageUrl}`
+      }
+
+      return `${finalUrl}?v=${version}`
     }
 
     // Sinon, utiliser Gravatar
     return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
   }
 
+  /**
+   * Version avec cache et retry automatique pour les images externes
+   * Retourne un objet réactif avec l'URL courante et l'état de chargement
+   */
+  const getUserAvatarWithCache = (
+    user: {
+      id?: number
+      emailHash: string
+      profilePicture?: string | null
+      updatedAt?: string
+      pseudo?: string
+    },
+    size: number = 80
+  ) => {
+    const imageUrl = getUserAvatar(user, size)
+    const fallbackUrl = getUserAvatar(
+      {
+        ...user,
+        profilePicture: null, // Force l'utilisation du fallback (Gravatar ou initiales)
+      },
+      size
+    )
+
+    console.log('Avatar imageUrl:', imageUrl)
+    console.log('Avatar fallbackUrl:', fallbackUrl)
+
+    // Détecter si l'URL est une image externe (Google, etc.)
+    const isExternalImage =
+      imageUrl.startsWith('http://') ||
+      (imageUrl.startsWith('https://') &&
+        !imageUrl.includes('gravatar.com') &&
+        !imageUrl.startsWith('data:'))
+
+    console.log('Is external image:', isExternalImage)
+
+    const currentUrl = ref<string>(imageUrl)
+    const isLoading = ref(true)
+    const hasError = ref(false)
+
+    // Si ce n'est pas une image externe, pas besoin de cache/retry
+    if (!isExternalImage) {
+      currentUrl.value = imageUrl
+      isLoading.value = false
+      console.log('Using non-external image, skipping cache logic.')
+      console.log('Final avatar URL:', currentUrl.value)
+      return { currentUrl, isLoading, hasError }
+    }
+
+    // Charger l'image avec cache et retry pour les images externes
+    const loadImage = () => {
+      // Nettoyer le cache au démarrage
+      cleanCache()
+
+      // Vérifier le cache
+      const cached = getCachedStatus(imageUrl)
+      if (cached) {
+        if (cached.status === 'error' && cached.fallbackUrl) {
+          currentUrl.value = cached.fallbackUrl
+          hasError.value = false
+          isLoading.value = false
+          return
+        }
+        if (cached.status === 'success') {
+          currentUrl.value = imageUrl
+          hasError.value = false
+          isLoading.value = false
+          return
+        }
+      }
+
+      // Essayer de charger l'image
+      const img = new Image()
+
+      img.onload = () => {
+        currentUrl.value = imageUrl
+        hasError.value = false
+        isLoading.value = false
+        setCache(imageUrl, 'success')
+      }
+
+      img.onerror = () => {
+        // Si l'image échoue, utiliser le fallback
+        currentUrl.value = fallbackUrl
+        hasError.value = true
+        isLoading.value = false
+        setCache(imageUrl, 'error', fallbackUrl)
+      }
+
+      img.src = imageUrl
+    }
+
+    // Lancer le chargement immédiatement côté client
+    if (typeof window !== 'undefined') {
+      // Utiliser nextTick pour s'assurer que le DOM est prêt, mais sans onMounted
+      nextTick(() => {
+        loadImage()
+      })
+    }
+
+    return {
+      currentUrl,
+      isLoading,
+      hasError,
+    }
+  }
+
   return {
     getUserAvatar,
+    getUserAvatarWithCache,
     generateInitialsAvatar,
     getInitials,
   }

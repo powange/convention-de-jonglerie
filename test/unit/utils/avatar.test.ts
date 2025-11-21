@@ -100,7 +100,7 @@ describe('avatar utils', () => {
       const url = getUserAvatar(user)
 
       expect(mockGetImageUrl).toHaveBeenCalledWith('avatar.jpg', 'profile', 1)
-      expect(url).toBe('/uploads/profiles/1/avatar.jpg?v=1641031200000')
+      expect(url).toBe('http://localhost:3000/uploads/profiles/1/avatar.jpg?v=1641031200000')
     })
 
     it("devrait utiliser Date.now() si pas d'updatedAt", () => {
@@ -117,7 +117,7 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user)
 
-      expect(url).toBe('/uploads/profiles/2/avatar.jpg?v=1640995200000')
+      expect(url).toBe('http://localhost:3000/uploads/profiles/2/avatar.jpg?v=1640995200000')
       expect(mockDateNow).toHaveBeenCalled()
     })
 

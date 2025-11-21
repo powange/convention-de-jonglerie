@@ -5,7 +5,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useImageLoader } from '~/composables/useImageLoader'
 import { useAvatar } from '~/utils/avatar'
 
 interface User {
@@ -31,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
   shrink: false,
 })
 
-const { getUserAvatar } = useAvatar()
+const { getUserAvatarWithCache } = useAvatar()
 
 // Mapping des tailles vers les pixels
 const sizeMap = {
@@ -55,34 +54,8 @@ const pixelSize = computed(() => {
   return typeof props.size === 'number' ? props.size : sizeMap[props.size]
 })
 
-const avatarUrl = computed(() => {
-  return getUserAvatar(props.user, pixelSize.value)
-})
-
-// Générer une URL de fallback (avatar avec initiales ou Gravatar)
-const fallbackUrl = computed(() => {
-  return getUserAvatar(
-    {
-      ...props.user,
-      profilePicture: null, // Force l'utilisation du fallback
-    },
-    pixelSize.value
-  )
-})
-
-// Détecter si l'URL est une image externe (Google, etc.)
-const isExternalImage = computed(() => {
-  const url = avatarUrl.value
-  return (
-    url.startsWith('http://') ||
-    (url.startsWith('https://') && !url.includes('gravatar.com') && !url.startsWith('data:'))
-  )
-})
-
-// Utiliser le système de cache et retry uniquement pour les images externes
-const { currentUrl } = isExternalImage.value
-  ? useImageLoader(avatarUrl.value, fallbackUrl.value)
-  : { currentUrl: avatarUrl }
+// Utiliser la nouvelle fonction avec cache et retry automatique
+const { currentUrl } = getUserAvatarWithCache(props.user, pixelSize.value)
 
 // URL finale à afficher
 const displayUrl = computed(() => currentUrl.value)
