@@ -761,12 +761,12 @@ watch(
   allMessages,
   async (newMessages, oldMessages) => {
     // Si on a des messages et qu'une conversation est sélectionnée
-    if (newMessages.length > 0 && selectedConversationId.value) {
+    if (newMessages.length > 0 && selectedConversationId.value && !loadingMessages.value) {
       // Récupérer le dernier message de la liste
       const lastMessage = newMessages[newMessages.length - 1]
 
-      // Marquer ce message comme lu
-      if (lastMessage) {
+      // Marquer ce message comme lu seulement s'il existe
+      if (lastMessage && lastMessage.id) {
         await markMessageAsRead(selectedConversationId.value, lastMessage.id)
       }
 
