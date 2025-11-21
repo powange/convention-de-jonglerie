@@ -209,17 +209,12 @@ export const useAvatar = () => {
       size
     )
 
-    console.log('Avatar imageUrl:', imageUrl)
-    console.log('Avatar fallbackUrl:', fallbackUrl)
-
     // Détecter si l'URL est une image externe (Google, etc.)
     const isExternalImage =
       imageUrl.startsWith('http://') ||
       (imageUrl.startsWith('https://') &&
         !imageUrl.includes('gravatar.com') &&
         !imageUrl.startsWith('data:'))
-
-    console.log('Is external image:', isExternalImage)
 
     const currentUrl = ref<string>(imageUrl)
     const isLoading = ref(true)
@@ -229,8 +224,6 @@ export const useAvatar = () => {
     if (!isExternalImage) {
       currentUrl.value = imageUrl
       isLoading.value = false
-      console.log('Using non-external image, skipping cache logic.')
-      console.log('Final avatar URL:', currentUrl.value)
       return { currentUrl, isLoading, hasError }
     }
 
