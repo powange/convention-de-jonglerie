@@ -94,12 +94,18 @@
       "WebFetch(domain:fullcalendar.io)",
       "WebFetch(domain:www.prisma.io)",
       "WebFetch(domain:nuxt.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(npm run docker:dev:get-lockfile:*)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"],
-  "enableAllProjectMcpServers": true
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner",
+    "Prisma-Remote"
+  ]
 }
