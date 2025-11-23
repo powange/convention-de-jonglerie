@@ -19,8 +19,8 @@ export default defineTask({
       const upcomingEditions = await prisma.edition.findMany({
         where: {
           startDate: {
-            gte: notificationStart.toISOString().split('T')[0],
-            lte: notificationEnd.toISOString().split('T')[0],
+            gte: notificationStart,
+            lte: notificationEnd,
           },
           status: {
             in: ['DRAFT', 'PUBLISHED'],
