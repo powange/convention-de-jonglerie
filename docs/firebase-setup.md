@@ -10,6 +10,8 @@ Ce document explique comment configurer Firebase Cloud Messaging (FCM) pour les 
 
 ## Configuration côté client
 
+### 1. Configuration Firebase App
+
 La configuration client est déjà dans le code (`app/config/firebase.config.ts`) :
 
 ```typescript
@@ -22,6 +24,28 @@ La configuration client est déjà dans le code (`app/config/firebase.config.ts`
   appId: '1:136924576295:web:b9d515a218409804c9ec02',
 }
 ```
+
+### 2. Clé VAPID pour Cloud Messaging
+
+**IMPORTANT** : Pour que Firebase Cloud Messaging fonctionne, vous devez configurer une clé VAPID.
+
+#### Obtenir la clé VAPID :
+
+1. Aller sur [Firebase Console](https://console.firebase.google.com/)
+2. Sélectionner le projet `juggling-convention`
+3. **Project Settings** (⚙️) → **Cloud Messaging**
+4. Section **Web Push certificates**
+5. Cliquer sur **Generate key pair** (si pas encore fait)
+6. Copier la **clé publique**
+
+#### Ajouter dans .env :
+
+```bash
+# Firebase Cloud Messaging - VAPID Public Key
+NUXT_PUBLIC_FIREBASE_VAPID_KEY="BKagOny0KF_2pCJQ3m....votre_cle_vapid_complete"
+```
+
+**Note** : Cette clé est publique et peut être exposée côté client.
 
 ## Configuration côté serveur
 
@@ -98,13 +122,15 @@ Le service worker Firebase est déjà configuré dans `public/firebase-messaging
 ### Côté client (obtenir un token FCM)
 
 ```typescript
-const { $firebase } = useNuxtApp()
+// Utiliser le composable
+const { requestPermissionAndGetToken, isAvailable } = useFirebaseMessaging()
 
-if ($firebase.messaging) {
-  const token = await getToken($firebase.messaging, {
-    vapidKey: 'VOTRE_VAPID_KEY_FCM'
-  })
-  console.log('FCM Token:', token)
+if (isAvailable.value) {
+  const token = await requestPermissionAndGetToken()
+  if (token) {
+    console.log('FCM Token:', token)
+    // Envoyer le token au serveur pour l'enregistrer en base de données
+  }
 }
 ```
 

@@ -6,6 +6,7 @@ import { getToken, onMessage, type MessagePayload } from 'firebase/messaging'
 export function useFirebaseMessaging() {
   const { $firebase } = useNuxtApp()
   const toast = useToast()
+  const config = useRuntimeConfig()
 
   /**
    * Demander la permission pour les notifications et obtenir le token FCM
@@ -25,11 +26,18 @@ export function useFirebaseMessaging() {
         return null
       }
 
-      // Note: La VAPID key doit être obtenue depuis Firebase Console
-      // Project Settings > Cloud Messaging > Web Push certificates
-      // Pour l'instant, on utilise le système VAPID existant
+      // Récupérer la clé VAPID depuis la configuration
+      const vapidKey = config.public.firebaseVapidKey
+
+      if (!vapidKey) {
+        console.error('❌ VAPID key manquante. Configurez NUXT_PUBLIC_FIREBASE_VAPID_KEY dans .env')
+        return null
+      }
+
+      console.log('🔑 Utilisation de la clé VAPID:', vapidKey.substring(0, 20) + '...')
+
       const token = await getToken($firebase.messaging, {
-        // serviceWorkerRegistration: await navigator.serviceWorker.register('/firebase-messaging-sw.js'),
+        vapidKey,
       })
 
       if (token) {
