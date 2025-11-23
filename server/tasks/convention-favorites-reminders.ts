@@ -9,7 +9,6 @@ export default defineTask({
     try {
       // Calculer la date dans 3 jours (avec une marge de 1 jour)
       const now = new Date()
-      const _targetDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
 
       // Fenêtre de notification : entre 2.5 et 3.5 jours pour éviter les doublons
       const notificationStart = new Date(now.getTime() + 2.5 * 24 * 60 * 60 * 1000)
@@ -22,9 +21,6 @@ export default defineTask({
             gte: notificationStart,
             lte: notificationEnd,
           },
-          status: {
-            in: ['DRAFT', 'PUBLISHED'],
-          },
         },
         include: {
           convention: {
@@ -34,17 +30,13 @@ export default defineTask({
               logo: true,
             },
           },
-          favorites: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  email: true,
-                  pseudo: true,
-                  nom: true,
-                  prenom: true,
-                },
-              },
+          favoritedBy: {
+            select: {
+              id: true,
+              email: true,
+              pseudo: true,
+              nom: true,
+              prenom: true,
             },
           },
         },
@@ -56,7 +48,7 @@ export default defineTask({
 
       // Traiter chaque édition
       for (const edition of upcomingEditions) {
-        if (edition.favorites.length > 0) {
+        if (edition.favoritedBy.length > 0) {
           const editionName = edition.name || edition.convention.name
           const startDate = new Date(edition.startDate).toLocaleDateString('fr-FR', {
             weekday: 'long',
@@ -67,14 +59,12 @@ export default defineTask({
 
           console.log(`💫 Traitement de l'édition: ${editionName}`)
           console.log(`   Date de début: ${startDate}`)
-          console.log(`   Nombre de favoris: ${edition.favorites.length}`)
+          console.log(`   Nombre de favoris: ${edition.favoritedBy.length}`)
 
-          for (const favorite of edition.favorites) {
+          for (const user of edition.favoritedBy) {
             // TODO: Intégrer avec votre système de notifications existant
             // Pour l'instant, on log les notifications qui devraient être envoyées
-            console.log(
-              `🔔 Notification à envoyer à ${favorite.user.pseudo} (${favorite.user.email})`
-            )
+            console.log(`🔔 Notification à envoyer à ${user.pseudo} (${user.email})`)
             console.log(`   Édition: ${editionName}`)
             console.log(`   Convention: ${edition.convention.name}`)
             console.log(`   Lieu: ${edition.city}, ${edition.country}`)
@@ -94,10 +84,12 @@ export default defineTask({
       )
 
       return {
-        success: true,
-        editionsProcessed: upcomingEditions.length,
-        notificationsSent: totalNotificationsSent,
-        timestamp: new Date().toISOString(),
+        result: {
+          success: true,
+          editionsProcessed: upcomingEditions.length,
+          notificationsSent: totalNotificationsSent,
+          timestamp: new Date().toISOString(),
+        },
       }
     } catch (error) {
       console.error("❌ Erreur lors de l'envoi des notifications de conventions favorites:", error)
