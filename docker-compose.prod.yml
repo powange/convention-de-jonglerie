@@ -28,47 +28,19 @@ services:
       target: runtime
     container_name: convention-app-prod
     restart: unless-stopped
+    # Charger toutes les variables d'environnement depuis le fichier .env
+    env_file:
+      - .env
+    # Variables d'environnement spécifiques à Docker (peuvent override le .env)
     environment:
+      # Database URL avec le hostname Docker
       DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database-prod:3306/${MYSQL_DATABASE:-convention_db}'
+      # Configuration Nuxt pour Docker
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'production'
-      NUXT_PUBLIC_SITE_URL: '${NUXT_PUBLIC_SITE_URL}'
-      NUXT_SESSION_PASSWORD: '${NUXT_SESSION_PASSWORD}'
-      SEND_EMAILS: '${SEND_EMAILS}'
-      SMTP_USER: '${SMTP_USER}'
-      SMTP_PASS: '${SMTP_PASS}'
-      # Google OAuth
-      NUXT_OAUTH_GOOGLE_CLIENT_ID: '${NUXT_OAUTH_GOOGLE_CLIENT_ID}'
-      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: '${NUXT_OAUTH_GOOGLE_CLIENT_SECRET}'
-      # Optionnel si vous avez une URL publique
-      NUXT_OAUTH_GOOGLE_REDIRECT_URL: '${NUXT_OAUTH_GOOGLE_REDIRECT_URL}'
-      # Facebook OAuth
-      NUXT_OAUTH_FACEBOOK_CLIENT_ID: '${NUXT_OAUTH_FACEBOOK_CLIENT_ID}'
-      NUXT_OAUTH_FACEBOOK_CLIENT_SECRET: '${NUXT_OAUTH_FACEBOOK_CLIENT_SECRET}'
-      NUXT_OAUTH_FACEBOOK_REDIRECT_URL: '${NUXT_OAUTH_FACEBOOK_REDIRECT_URL}'
-      # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
-      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: '${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}'
-      NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
-      # Configuration nuxt-file-storage
-      NUXT_FILE_STORAGE_MOUNT: '${NUXT_FILE_STORAGE_MOUNT:-/uploads}'
-      # Configuration VAPID pour notifications push
-      NUXT_PUBLIC_VAPID_PUBLIC_KEY: '${NUXT_PUBLIC_VAPID_PUBLIC_KEY}'
-      VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY}'
-      VAPID_SUBJECT: '${VAPID_SUBJECT}'
-      # Pour le chiffrement des données sensibles (ex: cartes bancaires)
-      ENCRYPTION_SECRET: '${ENCRYPTION_SECRET:-change-this-to-a-strong-random-secret-key-min-32-chars}'
-      ENCRYPTION_SALT: '${ENCRYPTION_SALT:-change-this-salt-to-random-value}'
-      # URL de l'API HelloAsso (par défaut: https://api.helloasso.com)
-      HELLOASSO_API_URL: '${HELLOASSO_API_URL:-https://api.helloasso.com}'
-      # Clé API Anthropic Claude pour l'extraction de workshops depuis images
-      ANTHROPIC_API_KEY: '${ANTHROPIC_API_KEY}'
-      # Configuration du provider IA (anthropic, ollama ou lmstudio)
-      AI_PROVIDER: '${AI_PROVIDER:-anthropic}'
+      # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
-      OLLAMA_MODEL: '${OLLAMA_MODEL:-llava}'
-      LMSTUDIO_BASE_URL: '${LMSTUDIO_BASE_URL:-http://localhost:1234}'
-      LMSTUDIO_MODEL: '${LMSTUDIO_MODEL:-auto}'
     volumes:
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/backups:/app/backups
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/app/public/uploads
