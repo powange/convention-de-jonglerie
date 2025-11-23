@@ -25,6 +25,7 @@ export function getTranslationsToLoad(path: string): string[] {
     '/verify-email': ['auth'],
     '/reset-password': ['auth'],
     '/forgot-password': ['auth'],
+    '/messenger': ['messenger'],
   }
 
   // Vérifier les routes statiques
@@ -178,5 +179,20 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/gestion.json'),
     cs: () => import('~~/i18n/locales/cs/gestion.json'),
     sv: () => import('~~/i18n/locales/sv/gestion.json'),
+  },
+  messenger: {
+    en: () => import('~~/i18n/locales/en/messenger.json'),
+    da: () => import('~~/i18n/locales/da/messenger.json'),
+    de: () => import('~~/i18n/locales/de/messenger.json'),
+    es: () => import('~~/i18n/locales/es/messenger.json'),
+    fr: () => import('~~/i18n/locales/fr/messenger.json'),
+    it: () => import('~~/i18n/locales/it/messenger.json'),
+    nl: () => import('~~/i18n/locales/nl/messenger.json'),
+    pl: () => import('~~/i18n/locales/pl/messenger.json'),
+    pt: () => import('~~/i18n/locales/pt/messenger.json'),
+    ru: () => import('~~/i18n/locales/ru/messenger.json'),
+    uk: () => import('~~/i18n/locales/uk/messenger.json'),
+    cs: () => import('~~/i18n/locales/cs/messenger.json'),
+    sv: () => import('~~/i18n/locales/sv/messenger.json'),
   },
 }

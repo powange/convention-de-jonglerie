@@ -59,6 +59,24 @@ export default wrapApiHandler(
             },
           },
         },
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            deletedAt: true,
+            participant: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    pseudo: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -95,10 +113,26 @@ export default wrapApiHandler(
         return {
           ...messageWithoutParticipantId,
           content: 'Message supprimé',
+          // Si le message auquel on répond est supprimé, le masquer aussi
+          replyTo: message.replyTo
+            ? {
+                ...message.replyTo,
+                content: message.replyTo.deletedAt ? 'Message supprimé' : message.replyTo.content,
+              }
+            : null,
         }
       }
 
-      return messageWithoutParticipantId
+      // Masquer le contenu du message replyTo s'il est supprimé
+      return {
+        ...messageWithoutParticipantId,
+        replyTo: message.replyTo
+          ? {
+              ...message.replyTo,
+              content: message.replyTo.deletedAt ? 'Message supprimé' : message.replyTo.content,
+            }
+          : null,
+      }
     })
 
     return createPaginatedResponse(transformedMessages.reverse(), total, page, limit)

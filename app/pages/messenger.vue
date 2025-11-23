@@ -226,6 +226,7 @@
               <UChatMessages v-else :should-scroll-to-bottom="false" :should-auto-scroll="false">
                 <UChatMessage
                   v-for="message in formattedMessages"
+                  :id="`message-${message.id}`"
                   :key="message.id"
                   v-bind="message"
                   :role="message.role"
@@ -242,6 +243,24 @@
                       >
                         {{ message.metadata?.authorName }}
                       </p>
+
+                      <!-- Citation du message auquel on répond -->
+                      <div
+                        v-if="message.metadata?.replyTo"
+                        class="mb-2 p-2 rounded-md bg-gray-100 dark:bg-gray-800 border-l-4 border-primary cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        @click="scrollToMessage(message.metadata.replyTo.id)"
+                      >
+                        <p class="text-xs font-medium text-primary mb-1">
+                          {{ message.metadata.replyTo.participant.user.pseudo }}
+                        </p>
+                        <p
+                          class="text-xs opacity-70 truncate"
+                          :class="{ italic: message.metadata.replyTo.deletedAt }"
+                        >
+                          {{ message.metadata.replyTo.content }}
+                        </p>
+                      </div>
+
                       <!-- Contenu du message -->
                       <p
                         class="text-sm break-words whitespace-pre-wrap"
@@ -269,6 +288,33 @@
 
             <!-- Formulaire d'envoi avec UChatPrompt -->
             <div class="border-t dark:border-gray-700 p-4 shrink-0">
+              <!-- Preview de la réponse -->
+              <div
+                v-if="replyingToMessage"
+                class="mb-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border-l-4 border-primary"
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <UIcon name="i-heroicons-arrow-uturn-left" class="h-4 w-4 text-primary" />
+                      <p class="text-xs font-medium text-primary">
+                        Répondre à {{ replyingToMessage.participant.user.pseudo }}
+                      </p>
+                    </div>
+                    <p class="text-sm opacity-70 truncate">
+                      {{ replyingToMessage.content }}
+                    </p>
+                  </div>
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    size="sm"
+                    @click="cancelReply"
+                  />
+                </div>
+              </div>
+
               <UChatPrompt
                 ref="chatPromptRef"
                 v-model="newMessage"
@@ -350,6 +396,7 @@ const newMessage = ref('')
 const openAccordionItems = ref<string[]>([])
 const chatPromptRef = ref()
 const messagesContainerRef = ref<HTMLElement | null>(null)
+const replyingToMessage = ref<ConversationMessage | null>(null)
 
 // Pagination des messages
 const hasMoreMessages = ref(true)
@@ -419,19 +466,29 @@ const formattedMessages = computed(() => {
     const isCurrentUser = message.participant.user.id === authStore.user?.id
     const isDeleted = !!message.deletedAt
 
-    // Actions natives pour les messages de l'utilisateur non supprimés
-    const actions =
-      isCurrentUser && !isDeleted
-        ? [
-            {
-              icon: 'i-lucide-trash',
-              color: 'error' as const,
-              label: 'Supprimer',
-              trailing: true,
-              onClick: () => handleDeleteMessage(message.id),
-            },
-          ]
-        : undefined
+    // Actions natives pour les messages non supprimés
+    const actions = !isDeleted
+      ? [
+          {
+            icon: 'i-heroicons-arrow-uturn-left',
+            color: 'neutral' as const,
+            label: 'Répondre',
+            trailing: true,
+            onClick: () => handleReplyToMessage(message),
+          },
+          ...(isCurrentUser
+            ? [
+                {
+                  icon: 'i-lucide-trash',
+                  color: 'error' as const,
+                  label: 'Supprimer',
+                  trailing: true,
+                  onClick: () => handleDeleteMessage(message.id),
+                },
+              ]
+            : []),
+        ]
+      : undefined
 
     const { currentUrl: avatarUrl } = getUserAvatarWithCache(message.participant.user, 32)
 
@@ -452,6 +509,7 @@ const formattedMessages = computed(() => {
         createdAt: message.createdAt,
         editedAt: message.editedAt,
         deletedAt: message.deletedAt,
+        replyTo: message.replyTo,
         user: message.participant.user, // Passer l'objet user complet pour UserAvatar
         isDeleted,
       },
@@ -496,6 +554,46 @@ function scrollToBottom() {
       messagesContainerRef.value.scrollTop = messagesContainerRef.value.scrollHeight
     }
   })
+}
+
+/**
+ * Scrolle vers un message spécifique et le met en évidence
+ */
+function scrollToMessage(messageId: string) {
+  nextTick(() => {
+    const messageElement = document.getElementById(`message-${messageId}`)
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Ajouter une animation de highlight
+      messageElement.classList.add('highlight-message')
+      setTimeout(() => {
+        messageElement.classList.remove('highlight-message')
+      }, 2000)
+    }
+  })
+}
+
+/**
+ * Commence une réponse à un message
+ */
+function handleReplyToMessage(message: ConversationMessage) {
+  replyingToMessage.value = message
+  // Focus le champ de saisie
+  nextTick(() => {
+    if (chatPromptRef.value?.$el) {
+      const textarea = chatPromptRef.value.$el.querySelector('textarea')
+      if (textarea) {
+        textarea.focus()
+      }
+    }
+  })
+}
+
+/**
+ * Annule la réponse en cours
+ */
+function cancelReply() {
+  replyingToMessage.value = null
 }
 
 /**
@@ -737,7 +835,11 @@ async function sendMessage() {
   }
 
   sending.value = true
-  const message = await sendMessageApi(selectedConversationId.value, newMessage.value.trim())
+  const message = await sendMessageApi(
+    selectedConversationId.value,
+    newMessage.value.trim(),
+    replyingToMessage.value?.id
+  )
   sending.value = false
 
   if (message) {
@@ -747,8 +849,9 @@ async function sendMessage() {
     // Mettre à jour le dernier message de la conversation pour le tri
     updateConversationLastMessage(selectedConversationId.value, message)
 
-    // Vider le champ de saisie
+    // Vider le champ de saisie et annuler la réponse
     newMessage.value = ''
+    replyingToMessage.value = null
 
     // Scroller vers le bas pour voir le nouveau message
     scrollToBottom()
@@ -908,3 +1011,21 @@ watch(
   { deep: true }
 )
 </script>
+
+<style scoped>
+@keyframes highlight-pulse {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgb(59 130 246 / 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight-message {
+  animation: highlight-pulse 2s ease-in-out;
+}
+</style>

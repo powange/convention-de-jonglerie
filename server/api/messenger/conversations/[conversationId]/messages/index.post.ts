@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   content: z.string().min(1).max(10000),
+  replyToId: z.string().optional(), // ID du message auquel on répond
 })
 
 /**
@@ -16,7 +17,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const conversationId = getRouterParam(event, 'conversationId')!
     const body = await readBody(event)
-    const { content } = bodySchema.parse(body)
+    const { content, replyToId } = bodySchema.parse(body)
 
     // Vérifier que l'utilisateur est participant de cette conversation
     const participant = await prisma.conversationParticipant.findFirst({
@@ -67,12 +68,30 @@ export default wrapApiHandler(
       })
     }
 
+    // Si replyToId est fourni, vérifier que le message existe et appartient à la même conversation
+    if (replyToId) {
+      const replyToMessage = await prisma.message.findFirst({
+        where: {
+          id: replyToId,
+          conversationId,
+        },
+      })
+
+      if (!replyToMessage) {
+        throw createError({
+          statusCode: 400,
+          message: "Le message auquel vous tentez de répondre n'existe pas dans cette conversation",
+        })
+      }
+    }
+
     // Créer le message
     const message = await prisma.message.create({
       data: {
         conversationId,
         participantId: participant.id,
         content,
+        replyToId,
       },
       include: {
         participant: {
@@ -84,6 +103,24 @@ export default wrapApiHandler(
                 pseudo: true,
                 profilePicture: true,
                 emailHash: true,
+              },
+            },
+          },
+        },
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            deletedAt: true,
+            participant: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    pseudo: true,
+                  },
+                },
               },
             },
           },

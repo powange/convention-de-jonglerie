@@ -32,6 +32,19 @@ export interface ConversationMessage {
   createdAt: Date
   editedAt: Date | null
   deletedAt: Date | null
+  replyToId: string | null
+  replyTo: {
+    id: string
+    content: string
+    createdAt: Date
+    deletedAt: Date | null
+    participant: {
+      user: {
+        id: number
+        pseudo: string
+      }
+    }
+  } | null
   participant: {
     id: string
     user: {
@@ -157,14 +170,15 @@ export const useMessenger = () => {
    */
   const sendMessage = async (
     conversationId: string,
-    content: string
+    content: string,
+    replyToId?: string
   ): Promise<ConversationMessage | null> => {
     try {
       const response = await $fetch<{ success: boolean; data: ConversationMessage }>(
         `/api/messenger/conversations/${conversationId}/messages`,
         {
           method: 'POST',
-          body: { content },
+          body: { content, replyToId },
         }
       )
       return response.data

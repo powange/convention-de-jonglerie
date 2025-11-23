@@ -1,0 +1,35 @@
+{
+  "messenger": {
+    "conversations": "Conversations",
+    "no_conversations": "Aucune conversation",
+    "select_conversation": "Sélectionnez une conversation pour commencer",
+    "loading": "Chargement...",
+    "loading_previous_messages": "Chargement des messages précédents...",
+    "beginning_of_conversation": "Début de la conversation",
+    "loading_messages": "Chargement des messages...",
+    "no_messages": "Aucun message pour le moment",
+    "be_first_to_send": "Soyez le premier à envoyer un message !",
+    "message_placeholder": "Écrivez votre message...",
+    "reply_to": "Répondre à {pseudo}",
+    "reply": "Répondre",
+    "delete": "Supprimer",
+    "deleted_message": "Message supprimé",
+    "edited": "modifié",
+    "just_now": "À l'instant",
+    "minutes_ago": "Il y a {count}min",
+    "hours_ago": "Il y a {count}h",
+    "participants": "Participants",
+    "conversation_types": {
+      "group": "Discussion de groupe",
+      "organizers": "Conversation avec les organisateurs",
+      "private": "Conversation privée"
+    },
+    "subtitles": {
+      "group": "Groupe",
+      "organizers": "Organisateurs",
+      "private_leader": "Privé avec le responsable",
+      "private_leaders": "Privé avec les responsables"
+    },
+    "volunteer_managers": "Responsables bénévoles"
+  }
+}
