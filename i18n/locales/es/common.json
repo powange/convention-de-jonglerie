@@ -58,6 +58,11 @@
     "dinner": "Cena",
     "download": "Descargar",
     "edit": "Editar",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Enviar mensaje al equipo"
+      }
+    },
     "editor": {
       "back_to_edit": "Volver a edición",
       "block_tooltip": "Bloque de código",
@@ -89,7 +94,9 @@
     "help": "Ayuda",
     "inactive": "Inactivo",
     "item": "Artículo",
+    "item_selected": "elemento seleccionado",
     "items": "Artículos",
+    "items_selected": "elementos seleccionados",
     "link_copied": "Enlace copiado",
     "loading": "Cargando...",
     "location": "Ubicación",
@@ -939,6 +946,7 @@
     "loading_favorites": "Cargando tus favoritos...",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
+    "messenger": "Mensajería",
     "my_conventions": "Mis Convenciones",
     "my_favorites": "Mis favoritos",
     "my_volunteer_applications": "Mis solicitudes de voluntario",

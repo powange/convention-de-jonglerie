@@ -1,35 +1,34 @@
 {
   "messenger": {
-    "conversations": "[TODO]",
-    "no_conversations": "[TODO]",
-    "select_conversation": "[TODO]",
-    "loading": "[TODO]",
-    "loading_previous_messages": "[TODO]",
-    "beginning_of_conversation": "[TODO]",
-    "loading_messages": "[TODO]",
-    "no_messages": "[TODO]",
-    "be_first_to_send": "[TODO]",
-    "message_placeholder": "[TODO]",
-    "reply_to": "[TODO]",
-    "reply": "[TODO]",
-    "delete": "[TODO]",
-    "deleted_message": "[TODO]",
-    "edited": "[TODO]",
-    "just_now": "[TODO]",
-    "minutes_ago": "[TODO]",
-    "hours_ago": "[TODO]",
-    "participants": "[TODO]",
+    "be_first_to_send": "Sii il primo a inviare un messaggio!",
+    "beginning_of_conversation": "Inizio della conversazione",
     "conversation_types": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private": "[TODO]"
+      "group": "Chat di gruppo",
+      "organizers": "Conversazione con organizzatori",
+      "private": "Conversazione privata"
     },
+    "conversations": "Conversazioni",
+    "delete": "Elimina",
+    "edited": "modificato",
+    "hours_ago": "{count}h fa",
+    "just_now": "Proprio ora",
+    "loading": "Caricamento...",
+    "loading_messages": "Caricamento messaggi...",
+    "loading_previous_messages": "Caricamento messaggi precedenti...",
+    "message_placeholder": "Scrivi il tuo messaggio...",
+    "minutes_ago": "{count}min fa",
+    "no_conversations": "Nessuna conversazione",
+    "no_messages": "Nessun messaggio ancora",
+    "participants": "Partecipanti",
+    "reply": "Rispondi",
+    "reply_to": "Rispondi a {pseudo}",
+    "select_conversation": "Seleziona una conversazione per iniziare",
     "subtitles": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private_leader": "[TODO]",
-      "private_leaders": "[TODO]"
+      "group": "Gruppo",
+      "organizers": "Organizzatori",
+      "private_leader": "Privato con il responsabile",
+      "private_leaders": "Privato con i responsabili"
     },
-    "volunteer_managers": "[TODO]"
+    "volunteer_managers": "Responsabili volontari"
   }
 }

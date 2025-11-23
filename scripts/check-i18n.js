@@ -7,6 +7,13 @@ import { parseArgs } from 'util'
 
 import { glob } from 'glob'
 
+import {
+  SPLIT_CONFIG,
+  getTargetFile,
+  flattenObject as sharedFlattenObject,
+  writeLocaleFiles,
+} from './translation/shared-config.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -684,70 +691,14 @@ async function main() {
             }
             console.log(`${GREEN}✓ Sauvegarde créée: ${path.basename(backupDir)}${RESET}`)
 
-            // Configuration pour redistribuer les clés dans les bons fichiers
-            // On utilise la même logique que split-i18n.js
-            const SPLIT_CONFIG = {
-              common: [
-                'common',
-                'navigation',
-                'footer',
-                'errors',
-                'messages',
-                'validation',
-                'countries',
-                'dates',
-                'log',
-                'c',
-                'calendar',
-              ],
-              admin: ['admin'],
-              edition: ['editions', 'conventions', 'organizers', 'carpool', 'diet'],
-              auth: ['auth', 'profile'],
-              public: ['homepage', 'pages', 'seo'],
-              components: ['components', 'forms', 'upload'],
-              app: ['app', 'pwa', 'services'],
-              // Fichiers séparés
-              feedback: ['feedback'],
-              notifications: ['notifications', 'push_notifications'],
-              permissions: ['permissions'],
-              ticketing: ['ticketing'],
-              artists: ['artists'],
-              workshops: ['workshops'],
-              gestion: ['gestion'],
-            }
-
-            const getTargetFile = (key) => {
-              for (const [file, keys] of Object.entries(SPLIT_CONFIG)) {
-                if (keys.includes(key)) {
-                  return file
-                }
-              }
-              return 'common'
-            }
-
             // Supprimer les clés inutilisées du français uniquement
             const updatedLocaleData = removeKeysFromObject(localeData, unusedKeys)
 
-            // Organiser les données mises à jour par fichier
-            const fileContents = {}
-            for (const file of Object.keys(SPLIT_CONFIG)) {
-              fileContents[file] = {}
-            }
+            // Aplatir les données pour l'écriture (writeLocaleFiles attend des données aplaties)
+            const flatUpdatedData = sharedFlattenObject(updatedLocaleData)
 
-            for (const [key, value] of Object.entries(updatedLocaleData)) {
-              const targetFile = getTargetFile(key)
-              fileContents[targetFile][key] = value
-            }
-
-            // Écrire les fichiers mis à jour
-            let updatedFiles = 0
-            for (const [file, data] of Object.entries(fileContents)) {
-              if (Object.keys(data).length > 0) {
-                const filePath = path.join(localeDir, `${file}.json`)
-                fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf8')
-                updatedFiles++
-              }
-            }
+            // Écrire les fichiers mis à jour en utilisant la fonction partagée
+            const updatedFiles = writeLocaleFiles('fr', flatUpdatedData)
 
             console.log(`${GREEN}✓ ${unusedKeys.length} clé(s) supprimée(s) avec succès !${RESET}`)
             console.log(`${CYAN}${updatedFiles} fichier(s) mis à jour${RESET}`)

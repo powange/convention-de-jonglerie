@@ -58,6 +58,11 @@
     "dinner": "Jantar",
     "download": "Transferir",
     "edit": "Editar",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Enviar mensagem para a equipe"
+      }
+    },
     "editor": {
       "back_to_edit": "Voltar à edição",
       "block_tooltip": "Bloco de código",
@@ -89,7 +94,9 @@
     "help": "Ajuda",
     "inactive": "Inativo",
     "item": "Artigo",
+    "item_selected": "item selecionado",
     "items": "Artigos",
+    "items_selected": "itens selecionados",
     "link_copied": "Link copiado",
     "loading": "A carregar...",
     "location": "Local",
@@ -939,6 +946,7 @@
     "loading_favorites": "A carregar os seus favoritos...",
     "login": "Iniciar Sessão",
     "logout": "Terminar Sessão",
+    "messenger": "Mensagens",
     "my_conventions": "As Minhas Convenções",
     "my_favorites": "Os meus favoritos",
     "my_volunteer_applications": "As minhas candidaturas de voluntário",

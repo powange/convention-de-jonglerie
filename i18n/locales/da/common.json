@@ -58,6 +58,11 @@
     "dinner": "Middag",
     "download": "Download",
     "edit": "Rediger",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Send besked til team"
+      }
+    },
     "editor": {
       "back_to_edit": "Tilbage til redigering",
       "block_tooltip": "Kodeblok",
@@ -89,7 +94,9 @@
     "help": "Hjælp",
     "inactive": "Inaktiv",
     "item": "Vare",
+    "item_selected": "element valgt",
     "items": "Varer",
+    "items_selected": "elementer valgt",
     "link_copied": "Link kopieret",
     "loading": "Indlæser...",
     "location": "Sted",
@@ -939,6 +946,7 @@
     "loading_favorites": "Indlæser dine favoritter...",
     "login": "Log ind",
     "logout": "Log ud",
+    "messenger": "Beskeder",
     "my_conventions": "Mine konventioner",
     "my_favorites": "Mine favoritter",
     "my_volunteer_applications": "Mine frivillige ansøgninger",

@@ -58,6 +58,11 @@
     "dinner": "Middag",
     "download": "Nedladdningar",
     "edit": "Modifiera",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Skicka meddelande till teamet"
+      }
+    },
     "editor": {
       "back_to_edit": "Tillbaka till redigering",
       "block_tooltip": "Kodblock",
@@ -89,7 +94,9 @@
     "help": "Hjälp",
     "inactive": "Inaktiv",
     "item": "Artikel",
+    "item_selected": "objekt valt",
     "items": "Artiklar",
+    "items_selected": "objekt valda",
     "link_copied": "Länk kopierad",
     "loading": "Laddar...",
     "location": "Plats",
@@ -939,6 +946,7 @@
     "loading_favorites": "Ladda dina favoriter...",
     "login": "Anslutning",
     "logout": "Frånkoppling",
+    "messenger": "Meddelanden",
     "my_conventions": "Mina konvent",
     "my_favorites": "Mina favoriter",
     "my_volunteer_applications": "Mina volontäransökningar",

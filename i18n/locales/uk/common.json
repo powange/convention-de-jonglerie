@@ -58,6 +58,11 @@
     "dinner": "Вечеря",
     "download": "Завантажити",
     "edit": "Редагувати",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Надіслати повідомлення команді"
+      }
+    },
     "editor": {
       "back_to_edit": "Повернутися до редагування",
       "block_tooltip": "Блок коду",
@@ -89,7 +94,9 @@
     "help": "Допомога",
     "inactive": "Неактивний",
     "item": "Предмет",
+    "item_selected": "елемент вибрано",
     "items": "Предмети",
+    "items_selected": "елементи вибрано",
     "link_copied": "Посилання скопійовано",
     "loading": "Завантаження...",
     "location": "Місце",
@@ -939,6 +946,7 @@
     "loading_favorites": "Завантаження ваших улюблених...",
     "login": "Увійти",
     "logout": "Вийти",
+    "messenger": "Повідомлення",
     "my_conventions": "Мої Конвенції",
     "my_favorites": "Мої Улюблені",
     "my_volunteer_applications": "Мої заявки волонтера",

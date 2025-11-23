@@ -58,6 +58,11 @@
     "dinner": "Ужин",
     "download": "Скачать",
     "edit": "Редактировать",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Отправить сообщение команде"
+      }
+    },
     "editor": {
       "back_to_edit": "Вернуться к редактированию",
       "block_tooltip": "Блок кода",
@@ -89,7 +94,9 @@
     "help": "Помощь",
     "inactive": "Неактивный",
     "item": "Предмет",
+    "item_selected": "элемент выбран",
     "items": "Предметы",
+    "items_selected": "элементы выбраны",
     "link_copied": "Ссылка скопирована",
     "loading": "Загрузка...",
     "location": "Местоположение",
@@ -939,6 +946,7 @@
     "loading_favorites": "Загрузка ваших избранных...",
     "login": "Войти",
     "logout": "Выйти",
+    "messenger": "Сообщения",
     "my_conventions": "Мои Конвенции",
     "my_favorites": "Мои Избранные",
     "my_volunteer_applications": "Мои заявки волонтера",

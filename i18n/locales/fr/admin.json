@@ -59,9 +59,18 @@
     "change_profile_picture_description": "Téléchargez ou modifiez la photo de profil de cet utilisateur",
     "cleanup_expired_tokens": "Nettoyage tokens expirés",
     "cleanup_resolved_error_logs": "Nettoyage logs d'erreur",
-    "organizers": "Organisateurs",
-    "organizers_count": "{count} organisateurs",
     "coming_soon": "Bientôt disponible",
+    "config": {
+      "ai": "Intelligence Artificielle",
+      "email": "Email",
+      "env_variables": "Variables d'environnement (process.env)",
+      "environment": "Environnement",
+      "load_error": "Erreur lors du chargement de la configuration",
+      "public": "Configuration Publique",
+      "server": "Configuration Serveur",
+      "title": "Configuration Système",
+      "view_config": "Voir la configuration"
+    },
     "confirm_action": "Confirmer l'action",
     "confirm_archive_convention": "Êtes-vous sûr de vouloir archiver cette convention ?",
     "confirm_delete": "Confirmer la suppression",
@@ -240,11 +249,11 @@
     "monitor_tasks": "Surveiller l'exécution",
     "name_a_z": "Par nom (A-Z)",
     "name_z_a": "Par nom (Z-A)",
+    "never_connected": "Jamais connecté",
     "new_conventions_this_month": "+{count} ce mois",
     "new_editions_this_month": "+{count} ce mois",
     "new_notification": "Nouvelle notification",
     "new_users_this_month": "+{count} ce mois",
-    "never_connected": "Jamais connecté",
     "newest_first": "Plus récents d'abord",
     "no_activity": "Aucune activité",
     "no_conventions_found": "Aucune convention trouvée",
@@ -258,6 +267,8 @@
     "notification_management": "Gestion des Notifications",
     "notifications_sent": "Notifications envoyées",
     "oldest_first": "Plus anciens d'abord",
+    "organizers": "Organisateurs",
+    "organizers_count": "{count} organisateurs",
     "original_user": "Utilisateur original",
     "pages": {
       "conventions": {
@@ -320,6 +331,7 @@
     "user_management_description": "Liste complète des utilisateurs inscrits sur la plateforme",
     "user_offline": "Utilisateur hors ligne",
     "user_promoted_successfully": "Utilisateur promu avec succès",
+    "users": "Utilisateurs",
     "users_online": "En ligne",
     "verified": "Vérifié",
     "verified_emails": "Emails vérifiés",
@@ -328,17 +340,6 @@
     "view_profile": "Voir le profil",
     "view_profiles": "Voir les profils",
     "volunteer_reminders": "Rappels bénévoles",
-    "volunteers_count": "{count} bénévoles",
-    "config": {
-      "title": "Configuration Système",
-      "server": "Configuration Serveur",
-      "public": "Configuration Publique",
-      "environment": "Environnement",
-      "ai": "Intelligence Artificielle",
-      "email": "Email",
-      "env_variables": "Variables d'environnement (process.env)",
-      "load_error": "Erreur lors du chargement de la configuration",
-      "view_config": "Voir la configuration"
-    }
+    "volunteers_count": "{count} bénévoles"
   }
 }

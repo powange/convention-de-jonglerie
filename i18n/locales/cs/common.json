@@ -58,6 +58,11 @@
     "dinner": "Večeře",
     "download": "Stáhnout",
     "edit": "Upravit",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Poslat zprávu týmu"
+      }
+    },
     "editor": {
       "back_to_edit": "Zpět na editaci",
       "block_tooltip": "Blok kódu",
@@ -89,7 +94,9 @@
     "help": "Nápověda",
     "inactive": "Neaktivní",
     "item": "Článek",
+    "item_selected": "vybraná položka",
     "items": "Články",
+    "items_selected": "vybrané položky",
     "link_copied": "Odkaz zkopírován",
     "loading": "Načítání...",
     "location": "Umístění",
@@ -939,6 +946,7 @@
     "loading_favorites": "Načítání oblíbených položek...",
     "login": "Připojení",
     "logout": "Odpojení",
+    "messenger": "Zprávy",
     "my_conventions": "Mé konvence",
     "my_favorites": "Moji oblíbení",
     "my_volunteer_applications": "Moje přihlášky jako dobrovolník",

@@ -1,35 +1,34 @@
 {
   "messenger": {
-    "conversations": "[TODO]",
-    "no_conversations": "[TODO]",
-    "select_conversation": "[TODO]",
-    "loading": "[TODO]",
-    "loading_previous_messages": "[TODO]",
-    "beginning_of_conversation": "[TODO]",
-    "loading_messages": "[TODO]",
-    "no_messages": "[TODO]",
-    "be_first_to_send": "[TODO]",
-    "message_placeholder": "[TODO]",
-    "reply_to": "[TODO]",
-    "reply": "[TODO]",
-    "delete": "[TODO]",
-    "deleted_message": "[TODO]",
-    "edited": "[TODO]",
-    "just_now": "[TODO]",
-    "minutes_ago": "[TODO]",
-    "hours_ago": "[TODO]",
-    "participants": "[TODO]",
+    "be_first_to_send": "Будьте первым, кто отправит сообщение!",
+    "beginning_of_conversation": "Начало разговора",
     "conversation_types": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private": "[TODO]"
+      "group": "Групповой чат",
+      "organizers": "Разговор с организаторами",
+      "private": "Приватный разговор"
     },
+    "conversations": "Разговоры",
+    "delete": "Удалить",
+    "edited": "изменено",
+    "hours_ago": "{count}ч назад",
+    "just_now": "Только что",
+    "loading": "Загрузка...",
+    "loading_messages": "Загрузка сообщений...",
+    "loading_previous_messages": "Загрузка предыдущих сообщений...",
+    "message_placeholder": "Напишите ваше сообщение...",
+    "minutes_ago": "{count}мин назад",
+    "no_conversations": "Нет разговоров",
+    "no_messages": "Пока нет сообщений",
+    "participants": "Участники",
+    "reply": "Ответить",
+    "reply_to": "Ответить {pseudo}",
+    "select_conversation": "Выберите разговор для начала",
     "subtitles": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private_leader": "[TODO]",
-      "private_leaders": "[TODO]"
+      "group": "Группа",
+      "organizers": "Организаторы",
+      "private_leader": "Приватно с руководителем",
+      "private_leaders": "Приватно с руководителями"
     },
-    "volunteer_managers": "[TODO]"
+    "volunteer_managers": "Руководители волонтёров"
   }
 }

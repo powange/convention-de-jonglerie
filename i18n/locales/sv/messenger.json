@@ -1,35 +1,34 @@
 {
   "messenger": {
-    "conversations": "[TODO]",
-    "no_conversations": "[TODO]",
-    "select_conversation": "[TODO]",
-    "loading": "[TODO]",
-    "loading_previous_messages": "[TODO]",
-    "beginning_of_conversation": "[TODO]",
-    "loading_messages": "[TODO]",
-    "no_messages": "[TODO]",
-    "be_first_to_send": "[TODO]",
-    "message_placeholder": "[TODO]",
-    "reply_to": "[TODO]",
-    "reply": "[TODO]",
-    "delete": "[TODO]",
-    "deleted_message": "[TODO]",
-    "edited": "[TODO]",
-    "just_now": "[TODO]",
-    "minutes_ago": "[TODO]",
-    "hours_ago": "[TODO]",
-    "participants": "[TODO]",
+    "be_first_to_send": "Var först med att skicka ett meddelande!",
+    "beginning_of_conversation": "Början av konversation",
     "conversation_types": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private": "[TODO]"
+      "group": "Gruppchatt",
+      "organizers": "Konversation med arrangörer",
+      "private": "Privat konversation"
     },
+    "conversations": "Konversationer",
+    "delete": "Ta bort",
+    "edited": "redigerad",
+    "hours_ago": "{count}h sedan",
+    "just_now": "Nyss",
+    "loading": "Laddar...",
+    "loading_messages": "Laddar meddelanden...",
+    "loading_previous_messages": "Laddar tidigare meddelanden...",
+    "message_placeholder": "Skriv ditt meddelande...",
+    "minutes_ago": "{count}min sedan",
+    "no_conversations": "Inga konversationer",
+    "no_messages": "Inga meddelanden ännu",
+    "participants": "Deltagare",
+    "reply": "Svara",
+    "reply_to": "Svara till {pseudo}",
+    "select_conversation": "Välj en konversation för att börja",
     "subtitles": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private_leader": "[TODO]",
-      "private_leaders": "[TODO]"
+      "group": "Grupp",
+      "organizers": "Arrangörer",
+      "private_leader": "Privat med ledare",
+      "private_leaders": "Privat med ledare"
     },
-    "volunteer_managers": "[TODO]"
+    "volunteer_managers": "Volontärledare"
   }
 }

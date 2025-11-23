@@ -58,6 +58,11 @@
     "dinner": "Diner",
     "download": "Downloaden",
     "edit": "Bewerken",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Bericht naar team sturen"
+      }
+    },
     "editor": {
       "back_to_edit": "Terug naar bewerken",
       "block_tooltip": "Codeblok",
@@ -89,7 +94,9 @@
     "help": "Hulp",
     "inactive": "Inactief",
     "item": "Artikel",
+    "item_selected": "item geselecteerd",
     "items": "Artikelen",
+    "items_selected": "items geselecteerd",
     "link_copied": "Link gekopieerd",
     "loading": "Laden...",
     "location": "Locatie",
@@ -939,6 +946,7 @@
     "loading_favorites": "Je favorieten laden...",
     "login": "Inloggen",
     "logout": "Uitloggen",
+    "messenger": "Berichten",
     "my_conventions": "Mijn Conventies",
     "my_favorites": "Mijn Favorieten",
     "my_volunteer_applications": "Mijn vrijwilligersaanvragen",

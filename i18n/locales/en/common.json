@@ -58,6 +58,11 @@
     "dinner": "Dinner",
     "download": "Download",
     "edit": "Edit",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Send message to team"
+      }
+    },
     "editor": {
       "back_to_edit": "Back to edit",
       "block_tooltip": "Code block",
@@ -89,7 +94,9 @@
     "help": "Help",
     "inactive": "Inactive",
     "item": "Item",
+    "item_selected": "item selected",
     "items": "Items",
+    "items_selected": "items selected",
     "link_copied": "Link copied",
     "loading": "Loading...",
     "location": "Location",
@@ -939,6 +946,7 @@
     "loading_favorites": "Loading your favorites...",
     "login": "Login",
     "logout": "Logout",
+    "messenger": "Messaging",
     "my_conventions": "My Conventions",
     "my_favorites": "My Favorites",
     "my_volunteer_applications": "My volunteer applications",

@@ -1,35 +1,34 @@
 {
   "messenger": {
-    "conversations": "[TODO]",
-    "no_conversations": "[TODO]",
-    "select_conversation": "[TODO]",
-    "loading": "[TODO]",
-    "loading_previous_messages": "[TODO]",
-    "beginning_of_conversation": "[TODO]",
-    "loading_messages": "[TODO]",
-    "no_messages": "[TODO]",
-    "be_first_to_send": "[TODO]",
-    "message_placeholder": "[TODO]",
-    "reply_to": "[TODO]",
-    "reply": "[TODO]",
-    "delete": "[TODO]",
-    "deleted_message": "[TODO]",
-    "edited": "[TODO]",
-    "just_now": "[TODO]",
-    "minutes_ago": "[TODO]",
-    "hours_ago": "[TODO]",
-    "participants": "[TODO]",
+    "be_first_to_send": "Be the first to send a message!",
+    "beginning_of_conversation": "Beginning of conversation",
     "conversation_types": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private": "[TODO]"
+      "group": "Group chat",
+      "organizers": "Conversation with organizers",
+      "private": "Private conversation"
     },
+    "conversations": "Conversations",
+    "delete": "Delete",
+    "edited": "edited",
+    "hours_ago": "{count}h ago",
+    "just_now": "Just now",
+    "loading": "Loading...",
+    "loading_messages": "Loading messages...",
+    "loading_previous_messages": "Loading previous messages...",
+    "message_placeholder": "Write your message...",
+    "minutes_ago": "{count}min ago",
+    "no_conversations": "No conversations",
+    "no_messages": "No messages yet",
+    "participants": "Participants",
+    "reply": "Reply",
+    "reply_to": "Reply to {pseudo}",
+    "select_conversation": "Select a conversation to start",
     "subtitles": {
-      "group": "[TODO]",
-      "organizers": "[TODO]",
-      "private_leader": "[TODO]",
-      "private_leaders": "[TODO]"
+      "group": "Group",
+      "organizers": "Organizers",
+      "private_leader": "Private with leader",
+      "private_leaders": "Private with leaders"
     },
-    "volunteer_managers": "[TODO]"
+    "volunteer_managers": "Volunteer Managers"
   }
 }

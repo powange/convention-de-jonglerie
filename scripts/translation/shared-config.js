@@ -44,6 +44,7 @@ export const SPLIT_CONFIG = {
   artists: ['artists'],
   gestion: ['gestion'],
   app: ['app', 'pwa', 'services'],
+  messenger: ['messenger'],
 }
 
 export const LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')

@@ -9,18 +9,18 @@
       >
         <UCard class="h-full flex flex-col overflow-hidden">
           <template #header>
-            <h3 class="font-semibold">Conversations</h3>
+            <h3 class="font-semibold">{{ $t('messenger.conversations') }}</h3>
           </template>
 
           <div class="flex-1 overflow-y-auto">
             <div v-if="loading" class="text-center py-8">
               <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
-              <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+              <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.loading') }}</p>
             </div>
 
             <div v-else-if="accordionItems.length === 0" class="text-center py-8">
               <UIcon name="i-heroicons-inbox" class="h-12 w-12 mx-auto text-gray-400" />
-              <p class="text-sm text-gray-500 mt-2">Aucune conversation</p>
+              <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.no_conversations') }}</p>
             </div>
 
             <UAccordion
@@ -158,10 +158,10 @@
                   <p class="text-xs text-gray-500">
                     {{
                       selectedConversation.type === 'TEAM_GROUP'
-                        ? 'Discussion de groupe'
+                        ? $t('messenger.conversation_types.group')
                         : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                          ? 'Conversation avec les organisateurs'
-                          : 'Conversation privée'
+                          ? $t('messenger.conversation_types.organizers')
+                          : $t('messenger.conversation_types.private')
                     }}
                   </p>
                 </div>
@@ -176,7 +176,7 @@
                 @click="showParticipantsModal = true"
               />
             </div>
-            <h3 v-else class="font-semibold">Sélectionnez une conversation</h3>
+            <h3 v-else class="font-semibold">{{ $t('messenger.select_conversation') }}</h3>
           </template>
 
           <div v-if="!selectedConversationId" class="flex-1 flex items-center justify-center p-8">
@@ -185,7 +185,7 @@
                 name="i-heroicons-chat-bubble-left-right"
                 class="h-16 w-16 mx-auto text-gray-400"
               />
-              <p class="text-sm text-gray-500 mt-4">Sélectionnez une conversation pour commencer</p>
+              <p class="text-sm text-gray-500 mt-4">{{ $t('messenger.select_conversation') }}</p>
             </div>
           </div>
 
@@ -198,7 +198,9 @@
                 class="text-center py-4 sticky top-0 bg-white dark:bg-gray-900 z-10"
               >
                 <UIcon name="i-heroicons-arrow-path" class="animate-spin h-5 w-5 mx-auto" />
-                <p class="text-xs text-gray-500 mt-1">Chargement des messages précédents...</p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ $t('messenger.loading_previous_messages') }}
+                </p>
               </div>
 
               <!-- Message quand il n'y a plus de messages -->
@@ -206,12 +208,12 @@
                 v-else-if="!hasMoreMessages && messages.length > 0 && !loadingMessages"
                 class="text-center py-3 text-xs text-gray-400"
               >
-                Début de la conversation
+                {{ $t('messenger.beginning_of_conversation') }}
               </div>
 
               <div v-if="loadingMessages" class="text-center py-8">
                 <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
-                <p class="text-sm text-gray-500 mt-2">Chargement des messages...</p>
+                <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.loading_messages') }}</p>
               </div>
 
               <div v-else-if="formattedMessages.length === 0" class="text-center py-8">
@@ -219,14 +221,13 @@
                   name="i-heroicons-chat-bubble-left"
                   class="h-12 w-12 mx-auto text-gray-400"
                 />
-                <p class="text-sm text-gray-500 mt-2">Aucun message pour le moment</p>
-                <p class="text-xs text-gray-400 mt-1">Soyez le premier à envoyer un message !</p>
+                <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.no_messages') }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ $t('messenger.be_first_to_send') }}</p>
               </div>
 
               <UChatMessages v-else :should-scroll-to-bottom="false" :should-auto-scroll="false">
                 <UChatMessage
                   v-for="message in formattedMessages"
-                  :id="`message-${message.id}`"
                   :key="message.id"
                   v-bind="message"
                   :role="message.role"
@@ -274,7 +275,7 @@
                         <span
                           v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
                           class="ml-1"
-                          >(modifié)</span
+                          >({{ $t('messenger.edited') }})</span
                         >
                       </p>
                     </div>
@@ -298,7 +299,11 @@
                     <div class="flex items-center gap-2 mb-1">
                       <UIcon name="i-heroicons-arrow-uturn-left" class="h-4 w-4 text-primary" />
                       <p class="text-xs font-medium text-primary">
-                        Répondre à {{ replyingToMessage.participant.user.pseudo }}
+                        {{
+                          $t('messenger.reply_to', {
+                            pseudo: replyingToMessage.participant.user.pseudo,
+                          })
+                        }}
                       </p>
                     </div>
                     <p class="text-sm opacity-70 truncate">
@@ -318,7 +323,7 @@
               <UChatPrompt
                 ref="chatPromptRef"
                 v-model="newMessage"
-                placeholder="Écrivez votre message..."
+                :placeholder="$t('messenger.message_placeholder')"
                 :disabled="sending"
                 @submit="sendMessage"
                 @input="handleTypingInput"
@@ -332,7 +337,7 @@
     </div>
 
     <!-- Modal des participants -->
-    <UModal v-model:open="showParticipantsModal" title="Participants">
+    <UModal v-model:open="showParticipantsModal" :title="$t('messenger.participants')">
       <template #body>
         <div v-if="selectedConversation" class="space-y-3">
           <div
@@ -367,9 +372,13 @@ definePageMeta({
   layout: 'messenger',
 })
 
+// Charger les traductions messenger en lazy loading
+await useLazyI18n('messenger')
+
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const {
   fetchEditions,
   fetchConversations,
@@ -472,7 +481,7 @@ const formattedMessages = computed(() => {
           {
             icon: 'i-heroicons-arrow-uturn-left',
             color: 'neutral' as const,
-            label: 'Répondre',
+            label: t('messenger.reply'),
             trailing: true,
             onClick: () => handleReplyToMessage(message),
           },
@@ -481,7 +490,7 @@ const formattedMessages = computed(() => {
                 {
                   icon: 'i-lucide-trash',
                   color: 'error' as const,
-                  label: 'Supprimer',
+                  label: t('messenger.delete'),
                   trailing: true,
                   onClick: () => handleDeleteMessage(message.id),
                 },
@@ -614,7 +623,7 @@ function handleScroll() {
  */
 function getConversationDisplayName(conversation: Conversation): string {
   if (conversation.type === 'VOLUNTEER_TO_ORGANIZERS') {
-    return 'Responsables bénévoles'
+    return t('messenger.volunteer_managers')
   }
 
   if (conversation.type === 'TEAM_GROUP') {
@@ -654,21 +663,21 @@ function getConversationDisplayName(conversation: Conversation): string {
  */
 function getConversationSubtitle(conversation: Conversation): string {
   if (conversation.type === 'TEAM_GROUP') {
-    return 'Groupe'
+    return t('messenger.subtitles.group')
   }
 
   if (conversation.type === 'VOLUNTEER_TO_ORGANIZERS') {
-    return 'Organisateurs'
+    return t('messenger.subtitles.organizers')
   }
 
   // Pour les conversations privées (TEAM_LEADER_PRIVATE)
   const otherParticipants = conversation.participants.filter((p) => p.userId !== authStore.user?.id)
 
   if (otherParticipants.length <= 1) {
-    return 'Privé avec le responsable'
+    return t('messenger.subtitles.private_leader')
   }
 
-  return 'Privé avec les responsables'
+  return t('messenger.subtitles.private_leaders')
 }
 
 // Charger toutes les éditions et conversations au montage
@@ -885,11 +894,11 @@ function formatMessageTime(date: Date) {
   const diffMs = now.getTime() - messageDate.getTime()
   const diffMins = Math.floor(diffMs / 60000)
 
-  if (diffMins < 1) return "À l'instant"
-  if (diffMins < 60) return `Il y a ${diffMins}min`
+  if (diffMins < 1) return t('messenger.just_now')
+  if (diffMins < 60) return t('messenger.minutes_ago', { count: diffMins })
 
   const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `Il y a ${diffHours}h`
+  if (diffHours < 24) return t('messenger.hours_ago', { count: diffHours })
 
   return messageDate.toLocaleDateString('fr-FR', {
     day: 'numeric',

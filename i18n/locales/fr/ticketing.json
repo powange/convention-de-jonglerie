@@ -8,24 +8,47 @@
       "unknown": "Inconnu",
       "volunteer_found": "Bénévole trouvé"
     },
+    "counters": {
+      "connected": "Connecté",
+      "counter_created": "Compteur créé avec succès",
+      "counter_deleted": "Compteur supprimé avec succès",
+      "counter_name": "Nom du compteur",
+      "counter_name_placeholder": "Ex: Entrée spectacle principal",
+      "counter_reset": "Compteur réinitialisé avec succès",
+      "create_counter": "Créer un compteur",
+      "create_error": "Erreur lors de la création du compteur",
+      "create_first_counter": "Créer votre premier compteur",
+      "created": "Créé",
+      "current_value": "Valeur actuelle",
+      "delete_confirmation": "Êtes-vous sûr de vouloir supprimer le compteur \"{name}\" ?",
+      "delete_counter": "Supprimer le compteur",
+      "delete_error": "Erreur lors de la suppression du compteur",
+      "description": "Gérez les compteurs synchronisés en temps réel pour compter les jauges",
+      "disconnected": "Déconnecté",
+      "info_title": "Informations",
+      "last_update": "Dernière mise à jour",
+      "loading": "Chargement des compteurs...",
+      "no_counters": "Aucun compteur",
+      "no_counters_description": "Créez un compteur pour commencer à compter les jauges",
+      "pending_operations": "{count} opération(s) en attente | {count} opération en attente | {count} opérations en attente",
+      "qr_code_description": "Partagez ce QR code pour permettre à d'autres personnes de rejoindre ce compteur",
+      "qr_code_title": "QR Code de partage",
+      "regenerate_token": "Régénérer le token",
+      "regenerate_token_error": "Erreur lors de la régénération du token",
+      "regenerate_token_warning": "Attention : régénérer le token invalidera l'ancien lien de partage et le QR code actuel. Tous les utilisateurs devront utiliser le nouveau lien pour accéder au compteur.",
+      "reset": "Réinitialiser",
+      "reset_confirmation": "Êtes-vous sûr de vouloir réinitialiser ce compteur à 0 ?",
+      "reset_counter": "Réinitialiser le compteur",
+      "share_text": "Rejoignez ce compteur pour suivre les entrées en temps réel",
+      "step": "Incrément",
+      "syncing": "Synchronisation en cours...",
+      "title": "Compteurs",
+      "token_regenerated": "Token régénéré avec succès"
+    },
     "my_ticket": {
       "how_to_use_description": "Présentez ce QR code à l'entrée pour valider votre billet.",
       "how_to_use_title": "Comment utiliser ce QR code",
       "logo_alt": "HelloAsso"
-    },
-    "orders": {
-      "cancel_order": "Annuler la commande",
-      "cancel_order_confirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
-      "cancel_order_confirm_message": "Cette action annulera la commande et bloquera tous les billets associés. Les billets ne pourront plus être utilisés.",
-      "canceling_order": "Annulation en cours...",
-      "cancel_order_error": "Erreur lors de l'annulation de la commande",
-      "order_canceled": "Commande annulée",
-      "delete_order": "Supprimer la commande",
-      "delete_order_confirm": "Êtes-vous sûr de vouloir supprimer cette commande ?",
-      "delete_order_confirm_message": "Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
-      "deleting_order": "Suppression en cours...",
-      "delete_order_error": "Erreur lors de la suppression de la commande",
-      "order_deleted": "Commande supprimée"
     },
     "options": {
       "list": {
@@ -50,16 +73,30 @@
         "type_label": "Type d'option"
       }
     },
+    "orders": {
+      "cancel_order": "Annuler la commande",
+      "cancel_order_confirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
+      "cancel_order_confirm_message": "Cette action annulera la commande et bloquera tous les billets associés. Les billets ne pourront plus être utilisés.",
+      "cancel_order_error": "Erreur lors de l'annulation de la commande",
+      "canceling_order": "Annulation en cours...",
+      "delete_order": "Supprimer la commande",
+      "delete_order_confirm": "Êtes-vous sûr de vouloir supprimer cette commande ?",
+      "delete_order_confirm_message": "Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
+      "delete_order_error": "Erreur lors de la suppression de la commande",
+      "deleting_order": "Suppression en cours...",
+      "order_canceled": "Commande annulée",
+      "order_deleted": "Commande supprimée"
+    },
     "participant": {
       "entry_validated": "Entrée déjà validée",
-      "logo_alt": "HelloAsso",
-      "no_slot_assigned": "Aucun créneau assigné",
-      "ticket_type": "Type de billet",
-      "type": "Type",
-      "volunteer_validated": "Le bénévole a validé son entrée",
       "first_name": "Prénom",
       "last_name": "Nom",
-      "phone": "Téléphone"
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Aucun créneau assigné",
+      "phone": "Téléphone",
+      "ticket_type": "Type de billet",
+      "type": "Type",
+      "volunteer_validated": "Le bénévole a validé son entrée"
     },
     "quotas": {
       "list": {
@@ -70,10 +107,10 @@
         "title": "Gestion des quotas"
       },
       "stats": {
+        "exceeded": "DÉPASSEMENT",
         "title": "Statistiques des quotas",
         "used": "Utilisé",
-        "validated": "Validés",
-        "exceeded": "DÉPASSEMENT"
+        "validated": "Validés"
       }
     },
     "returnable_items": {
@@ -92,56 +129,19 @@
         "remove_title": "Retirer cet article ?"
       }
     },
-    "counters": {
-      "title": "Compteurs",
-      "description": "Gérez les compteurs synchronisés en temps réel pour compter les jauges",
-      "create_counter": "Créer un compteur",
-      "create_first_counter": "Créer votre premier compteur",
-      "counter_name": "Nom du compteur",
-      "counter_name_placeholder": "Ex: Entrée spectacle principal",
-      "no_counters": "Aucun compteur",
-      "no_counters_description": "Créez un compteur pour commencer à compter les jauges",
-      "loading": "Chargement des compteurs...",
-      "delete_counter": "Supprimer le compteur",
-      "delete_confirmation": "Êtes-vous sûr de vouloir supprimer le compteur \"{name}\" ?",
-      "counter_created": "Compteur créé avec succès",
-      "counter_deleted": "Compteur supprimé avec succès",
-      "counter_reset": "Compteur réinitialisé avec succès",
-      "create_error": "Erreur lors de la création du compteur",
-      "delete_error": "Erreur lors de la suppression du compteur",
-      "created": "Créé",
-      "last_update": "Dernière mise à jour",
-      "connected": "Connecté",
-      "disconnected": "Déconnecté",
-      "current_value": "Valeur actuelle",
-      "step": "Incrément",
-      "reset": "Réinitialiser",
-      "reset_counter": "Réinitialiser le compteur",
-      "reset_confirmation": "Êtes-vous sûr de vouloir réinitialiser ce compteur à 0 ?",
-      "qr_code_title": "QR Code de partage",
-      "qr_code_description": "Partagez ce QR code pour permettre à d'autres personnes de rejoindre ce compteur",
-      "share_text": "Rejoignez ce compteur pour suivre les entrées en temps réel",
-      "info_title": "Informations",
-      "syncing": "Synchronisation en cours...",
-      "pending_operations": "{count} opération(s) en attente | {count} opération en attente | {count} opérations en attente",
-      "regenerate_token": "Régénérer le token",
-      "regenerate_token_warning": "Attention : régénérer le token invalidera l'ancien lien de partage et le QR code actuel. Tous les utilisateurs devront utiliser le nouveau lien pour accéder au compteur.",
-      "token_regenerated": "Token régénéré avec succès",
-      "regenerate_token_error": "Erreur lors de la régénération du token"
-    },
     "stats": {
-      "participants": "Participants",
-      "volunteers": "Bénévoles",
       "artists": "Artistes",
-      "organizers": "Organisateurs"
+      "organizers": "Organisateurs",
+      "participants": "Participants",
+      "volunteers": "Bénévoles"
     },
     "tiers": {
       "list": {
+        "drag_to_reorder": "Glisser pour réordonner",
         "inactive": "Inactif",
         "loading": "Chargement...",
         "logo_alt": "HelloAsso",
-        "none_found": "Aucun tarif trouvé",
-        "drag_to_reorder": "Glisser pour réordonner"
+        "none_found": "Aucun tarif trouvé"
       },
       "modal": {
         "description_label": "Description",
@@ -149,15 +149,15 @@
         "free_price_label": "Tarif libre",
         "max_amount_label": "Montant maximum (€)",
         "max_amount_placeholder": "0.00",
+        "meals_label": "Repas inclus",
+        "meals_placeholder": "Sélectionner les repas inclus dans ce tarif",
         "min_amount_label": "Montant minimum (€)",
         "min_amount_placeholder": "0.00",
         "name_label": "Nom du tarif",
         "name_placeholder": "Ex: Pass 3 jours",
-        "no_quota_selected": "Aucun quota sélectionné",
         "no_item_selected": "Aucun article sélectionné",
         "no_meal_selected": "Aucun repas sélectionné",
-        "meals_label": "Repas inclus",
-        "meals_placeholder": "Sélectionner les repas inclus dans ce tarif",
+        "no_quota_selected": "Aucun quota sélectionné",
         "position_label": "Position d'affichage",
         "position_placeholder": "0",
         "price_label": "Prix (€)",
