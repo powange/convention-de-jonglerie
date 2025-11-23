@@ -35,7 +35,7 @@
     </div>
 
     <!-- Actions rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Envoyer des rappels -->
       <UCard>
         <div class="text-center p-6">
@@ -89,6 +89,24 @@
           </p>
           <UButton variant="outline" color="primary" @click="showTestModal = true">
             {{ $t('admin.test') }}
+          </UButton>
+        </div>
+      </UCard>
+
+      <!-- Test Firebase -->
+      <UCard>
+        <div class="text-center p-6">
+          <div
+            class="mx-auto mb-4 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center"
+          >
+            <UIcon name="i-heroicons-fire" class="h-6 w-6 text-orange-600 dark:text-orange-400" />
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Test Firebase</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Tester Firebase Cloud Messaging
+          </p>
+          <UButton variant="outline" color="orange" @click="showFirebaseTestModal = true">
+            Tester FCM
           </UButton>
         </div>
       </UCard>
@@ -813,12 +831,118 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal de test Firebase -->
+    <UModal
+      v-model:open="showFirebaseTestModal"
+      title="Test Firebase Cloud Messaging"
+      description="Testez l'envoi de notifications via Firebase"
+    >
+      <template #body>
+        <div class="space-y-6">
+          <!-- Statut Firebase -->
+          <div
+            class="p-4 rounded-lg border"
+            :class="
+              isAvailable
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+            "
+          >
+            <div class="flex items-center gap-2">
+              <UIcon
+                :name="isAvailable ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                class="h-5 w-5"
+                :class="isAvailable ? 'text-green-600' : 'text-red-600'"
+              />
+              <span class="font-medium" :class="isAvailable ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'">
+                Firebase Cloud Messaging {{ isAvailable ? 'disponible' : 'non disponible' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Étape 1: Obtenir le token -->
+          <div class="space-y-3">
+            <h4 class="font-medium text-sm text-gray-900 dark:text-white">
+              1. Obtenir le token FCM
+            </h4>
+            <UButton
+              variant="outline"
+              color="orange"
+              icon="i-heroicons-key"
+              :disabled="!isAvailable"
+              @click="getFirebaseToken"
+            >
+              {{ firebaseToken ? 'Renouveler le token' : 'Obtenir le token' }}
+            </UButton>
+            <div v-if="firebaseToken" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Token FCM:</p>
+              <p class="text-xs font-mono break-all text-gray-900 dark:text-gray-100">
+                {{ firebaseToken.substring(0, 50) }}...
+              </p>
+            </div>
+          </div>
+
+          <!-- Étape 2: Configuration de la notification -->
+          <div class="space-y-3">
+            <h4 class="font-medium text-sm text-gray-900 dark:text-white">
+              2. Configuration de la notification
+            </h4>
+
+            <UFormField label="Titre" required>
+              <UInput
+                v-model="firebaseTestForm.title"
+                placeholder="Titre de la notification..."
+              />
+            </UFormField>
+
+            <UFormField label="Message" required>
+              <UTextarea
+                v-model="firebaseTestForm.body"
+                placeholder="Message de la notification..."
+                :rows="3"
+              />
+            </UFormField>
+
+            <UFormField label="URL d'action" description="URL de redirection lors du clic">
+              <UInput
+                v-model="firebaseTestForm.actionUrl"
+                placeholder="/notifications"
+              />
+            </UFormField>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton
+            variant="ghost"
+            :disabled="testingFirebase"
+            @click="showFirebaseTestModal = false"
+          >
+            Annuler
+          </UButton>
+          <UButton
+            color="orange"
+            :loading="testingFirebase"
+            :disabled="!firebaseToken || !firebaseTestForm.title || !firebaseTestForm.body"
+            @click="testFirebaseNotification"
+          >
+            <UIcon name="i-heroicons-fire" class="mr-2" />
+            {{ testingFirebase ? 'Envoi en cours...' : 'Envoyer via Firebase' }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { formatTimeAgoIntl } from '@vueuse/core'
 import { z } from 'zod'
+
+const { requestPermissionAndGetToken, isAvailable } = useFirebaseMessaging()
 
 // Protection admin
 definePageMeta({
@@ -836,8 +960,10 @@ const toast = useToast()
 const sendingReminders = ref(false)
 const showCreateModal = ref(false)
 const showTestModal = ref(false)
+const showFirebaseTestModal = ref(false)
 const creatingNotification = ref(false)
 const testingAdvanced = ref(false)
+const testingFirebase = ref(false)
 const loadingRecent = ref(false)
 
 interface NotificationStats {
@@ -997,6 +1123,14 @@ const testForm = reactive({
     | 'system-error'
     | 'custom',
   message: '',
+})
+
+// Firebase test
+const firebaseToken = ref<string | null>(null)
+const firebaseTestForm = reactive({
+  title: 'Test Firebase',
+  body: 'Ceci est une notification de test via Firebase Cloud Messaging',
+  actionUrl: '/notifications',
 })
 
 // Options
@@ -1414,6 +1548,75 @@ const resetTestForm = () => {
   // Reset des variables de recherche
   searchedUsers.value = []
   searchQuery.value = ''
+}
+
+// Fonctions Firebase
+const getFirebaseToken = async () => {
+  try {
+    const token = await requestPermissionAndGetToken()
+    if (token) {
+      firebaseToken.value = token
+      toast.add({
+        color: 'success',
+        title: 'Token FCM obtenu',
+        description: 'Le token Firebase a été récupéré avec succès',
+      })
+    } else {
+      toast.add({
+        color: 'error',
+        title: 'Erreur',
+        description: 'Impossible d\'obtenir le token FCM. Vérifiez les permissions.',
+      })
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération du token FCM:', error)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Une erreur est survenue lors de la récupération du token',
+    })
+  }
+}
+
+const testFirebaseNotification = async () => {
+  if (!firebaseToken.value) {
+    toast.add({
+      color: 'error',
+      title: 'Token manquant',
+      description: 'Veuillez d\'abord obtenir un token FCM',
+    })
+    return
+  }
+
+  testingFirebase.value = true
+  try {
+    await $fetch('/api/admin/notifications/test-firebase', {
+      method: 'POST',
+      body: {
+        token: firebaseToken.value,
+        title: firebaseTestForm.title,
+        body: firebaseTestForm.body,
+        actionUrl: firebaseTestForm.actionUrl,
+      },
+    })
+
+    toast.add({
+      color: 'success',
+      title: 'Notification Firebase envoyée',
+      description: 'La notification de test a été envoyée via Firebase Cloud Messaging',
+    })
+
+    showFirebaseTestModal.value = false
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi de la notification Firebase:', error)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: (error as any).data?.message || 'Impossible d\'envoyer la notification Firebase',
+    })
+  } finally {
+    testingFirebase.value = false
+  }
 }
 
 // Fonction pour basculer le statut de lecture d'une notification
