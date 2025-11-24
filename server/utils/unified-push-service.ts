@@ -20,16 +20,29 @@ interface PushNotificationData {
 class UnifiedPushService {
   /**
    * Envoyer une notification à un utilisateur spécifique
-   * Utilise FCM si disponible, sinon VAPID
+   * Utilise FCM en priorité, sinon VAPID en fallback
+   * Cette stratégie évite d'envoyer deux notifications au même utilisateur
    */
   async sendToUser(userId: number, data: PushNotificationData): Promise<boolean> {
-    const results = await Promise.allSettled([
-      this.sendViaFirebase(userId, data),
-      this.sendViaVapid(userId, data),
-    ])
+    // Essayer Firebase FCM en premier
+    const fcmSuccess = await this.sendViaFirebase(userId, data)
 
-    // Succès si au moins une méthode a fonctionné
-    return results.some((r) => r.status === 'fulfilled' && r.value)
+    if (fcmSuccess) {
+      console.log(`✅ [Unified] Notification envoyée via FCM à l'utilisateur ${userId}`)
+      return true // FCM a fonctionné, pas besoin de VAPID
+    }
+
+    // Fallback sur VAPID si FCM a échoué ou n'est pas disponible
+    console.log(`🔄 [Unified] FCM non disponible, tentative via VAPID pour l'utilisateur ${userId}`)
+    const vapidSuccess = await this.sendViaVapid(userId, data)
+
+    if (vapidSuccess) {
+      console.log(`✅ [Unified] Notification envoyée via VAPID à l'utilisateur ${userId}`)
+    } else {
+      console.log(`❌ [Unified] Échec d'envoi de notification à l'utilisateur ${userId}`)
+    }
+
+    return vapidSuccess
   }
 
   /**
