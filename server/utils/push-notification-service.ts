@@ -166,21 +166,37 @@ class PushNotificationService {
       await webpush.sendNotification(pushSubscription, payload)
       return true
     } catch (error: any) {
-      console.error(`[Push Service] ✗ Erreur d'envoi:`, {
+      const errorDetails = {
         message: error.message,
         statusCode: error.statusCode,
-        body: error.body,
-        headers: error.headers,
-        stack: error.stack?.split('\n').slice(0, 3).join('\n'),
-      })
+        endpoint: subscription.endpoint?.substring(0, 50) + '...',
+        subscriptionId: subscription.id,
+      }
 
-      if (error.statusCode === 410) {
+      // Log détaillé pour les erreurs inattendues
+      if (error.statusCode) {
+        console.error(
+          `[Push Service] ✗ Erreur HTTP ${error.statusCode} pour subscription ${subscription.id}:`,
+          errorDetails
+        )
+      } else {
+        console.error(`[Push Service] ✗ Erreur d'envoi pour subscription ${subscription.id}:`, errorDetails)
+      }
+
+      // Codes HTTP indiquant une subscription expirée ou invalide
+      // 404: Subscription not found
+      // 410: Subscription expired (Gone)
+      if (error.statusCode === 404 || error.statusCode === 410) {
+        console.log(
+          `[Push Service] 🧹 Désactivation de l'abonnement invalide (${error.statusCode}) pour subscription ${subscription.id}`
+        )
         try {
-          await prisma.pushSubscription.delete({
+          await prisma.pushSubscription.update({
             where: { id: subscription.id },
+            data: { isActive: false },
           })
-        } catch (deleteError) {
-          console.error('[Push Service] Erreur lors de la suppression:', deleteError)
+        } catch (updateError) {
+          console.error('[Push Service] Erreur lors de la désactivation:', updateError)
         }
       }
 
@@ -206,16 +222,43 @@ class PushNotificationService {
    * Obtenir les statistiques des subscriptions
    */
   async getStats() {
-    const totalSubscriptions = await prisma.pushSubscription.count()
-    const uniqueUsers = await prisma.pushSubscription.groupBy({
-      by: ['userId'],
-    })
+    const [totalSubscriptions, activeSubscriptions, inactiveSubscriptions, uniqueUsers] = await Promise.all([
+      prisma.pushSubscription.count(),
+      prisma.pushSubscription.count({ where: { isActive: true } }),
+      prisma.pushSubscription.count({ where: { isActive: false } }),
+      prisma.pushSubscription.groupBy({
+        by: ['userId'],
+        where: { isActive: true },
+      }),
+    ])
 
     return {
       totalSubscriptions,
+      activeSubscriptions,
+      inactiveSubscriptions,
       uniqueUsers: uniqueUsers.length,
       initialized: this.initialized,
     }
+  }
+
+  /**
+   * Nettoyer les anciennes subscriptions inactives (plus de 30 jours)
+   */
+  async cleanupInactiveSubscriptions(): Promise<number> {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+    const result = await prisma.pushSubscription.deleteMany({
+      where: {
+        isActive: false,
+        updatedAt: {
+          lt: thirtyDaysAgo,
+        },
+      },
+    })
+
+    console.log(`[Push Service] 🧹 ${result.count} anciennes subscriptions inactives supprimées`)
+    return result.count
   }
 }
 
