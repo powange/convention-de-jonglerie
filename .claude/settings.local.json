@@ -102,10 +102,5 @@
     "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "nuxt",
-    "nuxt-ui",
-    "vitest-runner",
-    "Prisma-Remote"
-  ]
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"]
 }

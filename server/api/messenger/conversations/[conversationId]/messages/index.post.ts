@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { pushNotificationService } from '@@/server/utils/push-notification-service'
+import { unifiedPushService } from '@@/server/utils/unified-push-service'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -261,7 +261,7 @@ export default wrapApiHandler(
           }
 
           // Envoyer la notification push
-          await pushNotificationService.sendToUser(p.userId, {
+          await unifiedPushService.sendToUser(p.userId, {
             title: notificationTitle,
             message: `${user.pseudo}: ${truncatedContent}`,
             url: `/messenger?editionId=${participant.conversation.edition.id}&conversationId=${conversationId}`,

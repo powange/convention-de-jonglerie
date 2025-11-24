@@ -229,7 +229,9 @@
           <!-- Toggle Push Notifications -->
           <NotificationsPushNotificationToggle class="mb-8" />
 
-          <div class="flex items-center justify-between p-6">
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6"
+          >
             <div class="flex items-center gap-4">
               <UIcon name="i-heroicons-cog-6-tooth" class="w-6 h-6 text-gray-400" />
               <div>
@@ -246,7 +248,7 @@
               variant="soft"
               color="info"
               size="lg"
-              class="transition-all duration-200 hover:transform hover:scale-105"
+              class="w-full sm:w-auto transition-all duration-200 hover:transform hover:scale-105"
               @click="showNotificationPreferencesModal = true"
             >
               Gérer les notifications

@@ -1,13 +1,16 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
 import { getMessaging, type Messaging, isSupported } from 'firebase/messaging'
 
-import { firebaseConfig } from '../config/firebase.config'
+import { getFirebaseConfig } from '../config/firebase.config'
 
 /**
  * Plugin Firebase pour Nuxt (client-side only)
  * Initialise Firebase et expose les services via provide
  */
 export default defineNuxtPlugin(async () => {
+  // Récupérer la configuration Firebase depuis le runtimeConfig
+  const firebaseConfig = getFirebaseConfig()
+
   // Vérifier si Firebase n'est pas déjà initialisé
   let app: FirebaseApp
   const existingApps = getApps()
@@ -32,7 +35,7 @@ export default defineNuxtPlugin(async () => {
       console.warn('⚠️ Firebase Cloud Messaging non supporté dans ce navigateur')
     }
   } catch (error) {
-    console.error('❌ Erreur lors de l\'initialisation de Firebase Messaging:', error)
+    console.error("❌ Erreur lors de l'initialisation de Firebase Messaging:", error)
   }
 
   // Exposer les services Firebase via provide

@@ -57,22 +57,16 @@
       v-if="isSubscribed && authStore.user?.isGlobalAdmin"
       class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
     >
-      <div class="flex gap-2">
-        <UButton
-          size="sm"
-          variant="outline"
-          icon="i-heroicons-paper-airplane"
-          :loading="isTesting"
-          @click="testNotification"
-        >
-          {{ $t('notifications.push.test_button') }}
-        </UButton>
-
-        <!-- Bouton de debug temporaire -->
-        <UButton size="sm" variant="ghost" icon="i-heroicons-arrow-path" @click="forceCheck">
-          Debug
-        </UButton>
-      </div>
+      <UButton
+        type="button"
+        size="sm"
+        variant="outline"
+        icon="i-heroicons-paper-airplane"
+        :loading="isTesting"
+        @click="testNotification"
+      >
+        {{ $t('notifications.push.test_button') }}
+      </UButton>
     </div>
 
     <!-- Message d'erreur -->
@@ -88,32 +82,85 @@
 </template>
 
 <script setup lang="ts">
+import { useFirebaseMessaging } from '~/composables/useFirebaseMessaging'
 import { usePushNotifications } from '~/composables/usePushNotifications'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
+const toast = useToast()
 
-// Utiliser le composable de push notifications
+// Utiliser le composable de push notifications VAPID
 const {
   isSupported,
   isSubscribed,
   isLoading,
   error,
   permission,
-  subscribe,
-  unsubscribe,
+  subscribe: subscribeVapid,
+  unsubscribe: unsubscribeVapid,
   testNotification: testPushNotification,
-  forceCheck,
 } = usePushNotifications()
+
+// Utiliser le composable Firebase Cloud Messaging
+const {
+  requestPermissionAndGetToken,
+  unsubscribe: unsubscribeFcm,
+  isAvailable: isFirebaseAvailable,
+} = useFirebaseMessaging()
 
 const isTesting = ref(false)
 
 // Gérer les changements du switch via l'événement update:model-value
 const handleToggleChange = async (newValue: boolean) => {
   if (newValue) {
-    await subscribe()
+    console.log('[PushToggle] Activation des notifications push...')
+    console.log('[PushToggle] Firebase disponible:', isFirebaseAvailable.value)
+
+    // Activer les deux systèmes en parallèle
+    const results = await Promise.allSettled([
+      subscribeVapid(),
+      isFirebaseAvailable.value ? requestPermissionAndGetToken() : Promise.resolve(null),
+    ])
+
+    console.log('[PushToggle] Résultats:', {
+      vapid: results[0],
+      fcm: results[1],
+    })
+
+    // Vérifier les résultats
+    const vapidSuccess = results[0].status === 'fulfilled'
+    const fcmSuccess = results[1].status === 'fulfilled' && results[1].value !== null
+
+    console.log('[PushToggle] Succès:', { vapidSuccess, fcmSuccess })
+
+    if (vapidSuccess || fcmSuccess) {
+      toast.add({
+        color: 'success',
+        title: 'Notifications activées',
+        description: 'Vous recevrez désormais des notifications push',
+        icon: 'i-heroicons-bell',
+      })
+    } else {
+      toast.add({
+        color: 'error',
+        title: 'Erreur',
+        description: "Impossible d'activer les notifications push",
+        icon: 'i-heroicons-exclamation-triangle',
+      })
+    }
   } else {
-    await unsubscribe()
+    // Désactiver les deux systèmes en parallèle
+    await Promise.allSettled([
+      unsubscribeVapid(),
+      isFirebaseAvailable.value ? unsubscribeFcm() : Promise.resolve(true),
+    ])
+
+    toast.add({
+      color: 'neutral',
+      title: 'Notifications désactivées',
+      description: 'Vous ne recevrez plus de notifications push',
+      icon: 'i-heroicons-bell-slash',
+    })
   }
 }
 

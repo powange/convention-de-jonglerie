@@ -6,8 +6,8 @@ import {
   type NotificationType as CustomNotificationType,
 } from './notification-preferences'
 import { notificationStreamManager } from './notification-stream-manager'
-import { pushNotificationService } from './push-notification-service'
 import { translateServerSide } from './server-i18n'
+import { unifiedPushService } from './unified-push-service'
 
 import type { NotificationType } from '@prisma/client'
 
@@ -151,9 +151,9 @@ export const NotificationService = {
         },
       }
 
-      const pushSent = await pushNotificationService.sendToUser(notification.userId, pushData)
+      const pushSent = await unifiedPushService.sendToUser(notification.userId, pushData)
       console.log(
-        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push (langue: ${userLang})`
+        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push (FCM+VAPID, langue: ${userLang})`
       )
     } catch (error) {
       console.error('[NotificationService] Erreur envoi Push:', error)

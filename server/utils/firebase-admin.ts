@@ -19,21 +19,39 @@ class FirebaseAdminService {
     if (this.initialized) return
 
     try {
-      // Récupérer les credentials depuis les variables d'environnement
+      // Méthode 1: Variables d'environnement séparées (recommandé pour multi-environnements)
+      const projectId = process.env.FIREBASE_PROJECT_ID
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
+
+      // Méthode 2: JSON complet (legacy, pour compatibilité)
       const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT
 
-      if (!serviceAccountJson) {
-        console.warn(
-          '[Firebase Admin] FIREBASE_SERVICE_ACCOUNT non configuré - FCM désactivé (utilisation de web-push VAPID)'
-        )
-        return
-      }
+      let serviceAccount: any
 
-      let serviceAccount
-      try {
-        serviceAccount = JSON.parse(serviceAccountJson)
-      } catch (error) {
-        console.error('[Firebase Admin] Erreur de parsing du service account:', error)
+      if (projectId && privateKey && clientEmail) {
+        // Utiliser les variables séparées
+        serviceAccount = {
+          projectId,
+          privateKey,
+          clientEmail,
+        }
+        console.log(`[Firebase Admin] Configuration via variables séparées (projet: ${projectId})`)
+      } else if (serviceAccountJson) {
+        // Utiliser le JSON complet (legacy)
+        try {
+          serviceAccount = JSON.parse(serviceAccountJson)
+          console.log(
+            `[Firebase Admin] Configuration via JSON complet (projet: ${serviceAccount.project_id})`
+          )
+        } catch (error) {
+          console.error('[Firebase Admin] Erreur de parsing du service account:', error)
+          return
+        }
+      } else {
+        console.warn(
+          '[Firebase Admin] Configuration Firebase manquante - FCM désactivé (utilisation de web-push VAPID uniquement)'
+        )
         return
       }
 
@@ -41,7 +59,7 @@ class FirebaseAdminService {
       if (admin.apps.length === 0) {
         this.app = admin.initializeApp({
           credential: admin.credential.cert(serviceAccount),
-          projectId: serviceAccount.project_id,
+          projectId: serviceAccount.projectId || serviceAccount.project_id,
         })
         console.log('✅ Firebase Admin SDK initialisé')
       } else {
@@ -51,7 +69,7 @@ class FirebaseAdminService {
 
       this.initialized = true
     } catch (error) {
-      console.error('[Firebase Admin] Erreur lors de l\'initialisation:', error)
+      console.error("[Firebase Admin] Erreur lors de l'initialisation:", error)
     }
   }
 
@@ -124,7 +142,7 @@ class FirebaseAdminService {
         invalidTokens,
       }
     } catch (error) {
-      console.error('[Firebase Admin] Erreur lors de l\'envoi:', error)
+      console.error("[Firebase Admin] Erreur lors de l'envoi:", error)
       return { success: 0, failure: tokens.length, invalidTokens: [] }
     }
   }
@@ -157,7 +175,7 @@ class FirebaseAdminService {
       await messaging.send(message)
       return true
     } catch (error) {
-      console.error('[Firebase Admin] Erreur lors de l\'envoi au topic:', error)
+      console.error("[Firebase Admin] Erreur lors de l'envoi au topic:", error)
       return false
     }
   }
@@ -177,7 +195,7 @@ class FirebaseAdminService {
       await messaging.subscribeToTopic(tokens, topic)
       return true
     } catch (error) {
-      console.error('[Firebase Admin] Erreur lors de l\'abonnement au topic:', error)
+      console.error("[Firebase Admin] Erreur lors de l'abonnement au topic:", error)
       return false
     }
   }

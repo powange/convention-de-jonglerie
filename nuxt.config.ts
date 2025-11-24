@@ -331,7 +331,15 @@ export default defineNuxtConfig({
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
       vapidPublicKey: process.env.NUXT_PUBLIC_VAPID_PUBLIC_KEY || '', // VAPID public key for push notifications
+      firebaseVapidKey: process.env.NUXT_PUBLIC_FIREBASE_VAPID_KEY || '', // Firebase VAPID public key for FCM
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '', // Base URL of the site
+      // Firebase configuration (varies by environment)
+      firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
+      firebaseAuthDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      firebaseProjectId: process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      firebaseStorageBucket: process.env.NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+      firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      firebaseAppId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID || '',
     },
   },
   vite: {

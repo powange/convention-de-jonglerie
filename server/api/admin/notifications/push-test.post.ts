@@ -1,6 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { pushNotificationService } from '@@/server/utils/push-notification-service'
+import { unifiedPushService } from '@@/server/utils/unified-push-service'
 import { z } from 'zod'
 
 const testPushSchema = z.object({
@@ -26,7 +26,7 @@ export default wrapApiHandler(
 
     if (data.allUsers) {
       // Envoyer à tous les utilisateurs
-      const count = await pushNotificationService.sendToAll({
+      const count = await unifiedPushService.sendToAll({
         title: data.title,
         message: data.message,
         url: '/notifications',
@@ -39,7 +39,7 @@ export default wrapApiHandler(
       }
     } else if (data.userIds && data.userIds.length > 0) {
       // Envoyer à plusieurs utilisateurs
-      const results = await pushNotificationService.sendToUsers(data.userIds, {
+      const results = await unifiedPushService.sendToUsers(data.userIds, {
         title: data.title,
         message: data.message,
         url: '/notifications',
@@ -53,7 +53,7 @@ export default wrapApiHandler(
       }
     } else if (data.userId) {
       // Envoyer à un utilisateur spécifique
-      const sent = await pushNotificationService.sendToUser(data.userId, {
+      const sent = await unifiedPushService.sendToUser(data.userId, {
         title: data.title,
         message: data.message,
         url: '/notifications',
@@ -66,7 +66,7 @@ export default wrapApiHandler(
     } else {
       // Envoyer à l'admin lui-même pour test
       console.log('[Push Test API] Test pour userId:', adminUser.id)
-      const sent = await pushNotificationService.testPush(adminUser.id)
+      const sent = await unifiedPushService.testPush(adminUser.id)
       console.log('[Push Test API] Résultat:', sent)
       result = {
         success: sent,
@@ -75,7 +75,7 @@ export default wrapApiHandler(
     }
 
     // Obtenir les stats
-    const stats = await pushNotificationService.getStats()
+    const stats = await unifiedPushService.getStats()
 
     return {
       ...result,

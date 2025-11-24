@@ -855,7 +855,14 @@
                 class="h-5 w-5"
                 :class="isAvailable ? 'text-green-600' : 'text-red-600'"
               />
-              <span class="font-medium" :class="isAvailable ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'">
+              <span
+                class="font-medium"
+                :class="
+                  isAvailable
+                    ? 'text-green-900 dark:text-green-100'
+                    : 'text-red-900 dark:text-red-100'
+                "
+              >
                 Firebase Cloud Messaging {{ isAvailable ? 'disponible' : 'non disponible' }}
               </span>
             </div>
@@ -890,10 +897,7 @@
             </h4>
 
             <UFormField label="Titre" required>
-              <UInput
-                v-model="firebaseTestForm.title"
-                placeholder="Titre de la notification..."
-              />
+              <UInput v-model="firebaseTestForm.title" placeholder="Titre de la notification..." />
             </UFormField>
 
             <UFormField label="Message" required>
@@ -905,10 +909,7 @@
             </UFormField>
 
             <UFormField label="URL d'action" description="URL de redirection lors du clic">
-              <UInput
-                v-model="firebaseTestForm.actionUrl"
-                placeholder="/notifications"
-              />
+              <UInput v-model="firebaseTestForm.actionUrl" placeholder="/notifications" />
             </UFormField>
           </div>
         </div>
@@ -1403,17 +1404,14 @@ const searchUsers = async (query: string) => {
       },
     })
 
-    searchedUsers.value = response.users.map((u: any) => ({
+    searchedUsers.value = response.data.map((u: any) => ({
       id: u.id,
-      label: `${u.pseudo} (${u.email})`, // Afficher pseudo et email
-      email: u.email, // Email complet disponible via l'API admin
-      isRealUser: true, // Marquer comme vrai utilisateur
-      avatar: u.profilePicture
-        ? {
-            src: u.profilePicture,
-            alt: u.pseudo,
-          }
-        : undefined,
+      label: `${u.pseudo} (${u.email})`,
+      pseudo: u.pseudo,
+      email: u.email,
+      emailHash: '', // Non nécessaire pour l'affichage mais requis par l'interface
+      profilePicture: u.profilePicture,
+      isRealUser: true,
     }))
   } catch (error) {
     console.error('Erreur lors de la recherche:', error)
@@ -1439,17 +1437,14 @@ const searchUsersForCreate = async (query: string) => {
       },
     })
 
-    createSearchedUsers.value = response.users.map((u: any) => ({
+    createSearchedUsers.value = response.data.map((u: any) => ({
       id: u.id,
       label: `${u.pseudo} (${u.email})`,
+      pseudo: u.pseudo,
       email: u.email,
+      emailHash: '', // Non nécessaire pour l'affichage mais requis par l'interface
+      profilePicture: u.profilePicture,
       isRealUser: true,
-      avatar: u.profilePicture
-        ? {
-            src: u.profilePicture,
-            alt: u.pseudo,
-          }
-        : undefined,
     }))
   } catch (error) {
     console.error('Erreur lors de la recherche:', error)
@@ -1565,7 +1560,7 @@ const getFirebaseToken = async () => {
       toast.add({
         color: 'error',
         title: 'Erreur',
-        description: 'Impossible d\'obtenir le token FCM. Vérifiez les permissions.',
+        description: "Impossible d'obtenir le token FCM. Vérifiez les permissions.",
       })
     }
   } catch (error) {
@@ -1583,7 +1578,7 @@ const testFirebaseNotification = async () => {
     toast.add({
       color: 'error',
       title: 'Token manquant',
-      description: 'Veuillez d\'abord obtenir un token FCM',
+      description: "Veuillez d'abord obtenir un token FCM",
     })
     return
   }
@@ -1608,11 +1603,11 @@ const testFirebaseNotification = async () => {
 
     showFirebaseTestModal.value = false
   } catch (error) {
-    console.error('Erreur lors de l\'envoi de la notification Firebase:', error)
+    console.error("Erreur lors de l'envoi de la notification Firebase:", error)
     toast.add({
       color: 'error',
       title: 'Erreur',
-      description: (error as any).data?.message || 'Impossible d\'envoyer la notification Firebase',
+      description: (error as any).data?.message || "Impossible d'envoyer la notification Firebase",
     })
   } finally {
     testingFirebase.value = false

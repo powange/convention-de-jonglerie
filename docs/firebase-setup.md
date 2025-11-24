@@ -65,6 +65,7 @@ FIREBASE_SERVICE_ACCOUNT='{"type":"service_account","project_id":"juggling-conve
 ```
 
 **Important** :
+
 - Mettre toutes les guillemets en échappement si nécessaire
 - Garder les `\n` dans la clé privée
 - Utiliser des guillemets simples pour entourer le JSON
@@ -143,11 +144,11 @@ const result = await firebaseAdmin.sendToTokens(
   ['token1', 'token2'],
   {
     title: 'Titre',
-    body: 'Message'
+    body: 'Message',
   },
   {
     url: '/notifications',
-    type: 'info'
+    type: 'info',
   }
 )
 ```
@@ -169,8 +170,31 @@ Pour migrer progressivement :
 - La clé privée du Service Account doit rester **secrète** (côté serveur uniquement)
 - Firebase gère automatiquement les restrictions de domaine et les quotas
 
+## Compatibilité navigateurs
+
+### Navigateurs supportés ✅
+
+- **Chrome** (recommandé)
+- **Edge**
+- **Firefox**
+- **Safari** (avec limitations)
+
+### Navigateurs non supportés ❌
+
+- **Opera** : Bug général avec le Push API (affecte toutes les technologies de notifications push)
+  - Affecte Firebase Cloud Messaging ([Issue #9380](https://github.com/firebase/firebase-js-sdk/issues/9380))
+  - Affecte également Web Push VAPID
+  - Erreur : `AbortError: Registration failed - push service error`
+  - **Cause** : Bug dans l'implémentation du Push API d'Opera
+  - **Solution** : Utiliser Chrome, Edge ou Firefox
+
+L'application détecte automatiquement Opera et affiche un message approprié à l'utilisateur.
+
+**Note importante** : Le problème n'est pas lié à Firebase spécifiquement, mais à l'implémentation du Push API standard dans Opera. Aucune solution de contournement n'existe actuellement.
+
 ## Ressources
 
 - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)
 - [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup)
 - [Service Worker Firebase](https://firebase.google.com/docs/cloud-messaging/js/receive)
+- [Opera FCM Bug](https://github.com/firebase/firebase-js-sdk/issues/9380)

@@ -4,33 +4,49 @@ export default wrapApiHandler(
   async (event) => {
     const session = await requireUserSession(event)
     const userId = session.user.id
-    const { endpoint } = await readBody(event)
-
-    if (!endpoint) {
-      throw createError({
-        statusCode: 400,
-        message: 'Endpoint requis',
-      })
-    }
+    const body = await readBody(event)
+    const endpoint = body?.endpoint
 
     try {
-      // Vérifier si cette subscription existe et est active
-      const subscription = await prisma.pushSubscription.findFirst({
+      // Vérifier VAPID subscription si un endpoint est fourni
+      let vapidActive = false
+      if (endpoint) {
+        const subscription = await prisma.pushSubscription.findFirst({
+          where: {
+            userId,
+            endpoint,
+            isActive: true,
+          },
+        })
+        vapidActive = !!subscription
+      }
+
+      // Vérifier FCM token (au moins un token actif)
+      const fcmTokenCount = await prisma.fcmToken.count({
         where: {
           userId,
-          endpoint,
           isActive: true,
         },
       })
+      const fcmActive = fcmTokenCount > 0
 
+      // Actif si au moins un des deux systèmes est actif
       return {
-        isActive: !!subscription,
+        isActive: vapidActive || fcmActive,
+        details: {
+          vapid: vapidActive,
+          fcm: fcmActive,
+        },
       }
     } catch (error) {
       console.error('[Push Check] Erreur lors de la vérification:', error)
       // En cas d'erreur, on retourne false par sécurité
       return {
         isActive: false,
+        details: {
+          vapid: false,
+          fcm: false,
+        },
       }
     }
   },

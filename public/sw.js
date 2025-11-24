@@ -23,7 +23,7 @@ self.addEventListener('push', (event) => {
     const options = {
       body: data.message || data.body || 'Nouvelle notification',
       icon: '/favicons/android-chrome-192x192.png',
-      badge: '/favicons/favicon-32x32.png',
+      badge: '/favicons/notification-badge.png',
       vibrate: [200, 100, 200],
       timestamp: new Date().getTime(),
       tag: data.id || 'notification',

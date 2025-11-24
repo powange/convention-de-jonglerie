@@ -10,6 +10,10 @@ interface PushSubscriptionState {
   subscription: PushSubscription | null
 }
 
+// Flag GLOBAL pour désactiver temporairement le reload sur controllerchange
+// Doit être global pour persister entre les instances du composable
+let globalAllowReloadOnControllerChange = true
+
 export const usePushNotifications = () => {
   const config = useRuntimeConfig()
   const authStore = useAuthStore()
@@ -121,39 +125,32 @@ export const usePushNotifications = () => {
 
       const subscription = await registration.pushManager.getSubscription()
 
-      // Si on a une subscription ET la permission est accordée
-      if (subscription && Notification.permission === 'granted') {
-        // Vérifier côté serveur si la subscription est toujours active
-        try {
-          const response = await $fetch('/api/notifications/push/check', {
-            method: 'POST',
-            body: {
-              endpoint: subscription.endpoint,
-            },
-          })
+      // Vérifier côté serveur si l'utilisateur a des notifications actives (VAPID ou FCM)
+      try {
+        const response = await $fetch('/api/notifications/push/check', {
+          method: 'POST',
+          body: {
+            endpoint: subscription?.endpoint, // Peut être undefined si pas de subscription VAPID
+          },
+        })
 
-          if (response.isActive) {
-            state.isSubscribed = true
-            state.subscription = subscription
-            notificationStore.setRealTimeEnabled(true)
-          } else {
-            state.isSubscribed = false
-            state.subscription = subscription
-          }
-        } catch (error) {
-          console.error('[Push] Erreur vérification serveur:', error)
-          // En cas d'erreur, on considère la subscription comme inactive
+        if (response.isActive) {
+          state.isSubscribed = true
+          state.subscription = subscription
+          notificationStore.setRealTimeEnabled(true)
+        } else {
           state.isSubscribed = false
           state.subscription = subscription
+          // Si on a une subscription locale mais qu'elle n'est pas active côté serveur
+          if (subscription && Notification.permission !== 'granted') {
+            await subscription.unsubscribe().catch(console.error)
+          }
         }
-      } else {
-        // Si pas de subscription OU permission non accordée, pas d'abonnement valide
+      } catch (error) {
+        console.error('[Push] Erreur vérification serveur:', error)
+        // En cas d'erreur, on considère la subscription comme inactive
         state.isSubscribed = false
-        state.subscription = null
-
-        if (subscription && Notification.permission !== 'granted') {
-          await subscription.unsubscribe().catch(console.error)
-        }
+        state.subscription = subscription
       }
     } catch (error) {
       console.error("[Push] Erreur lors de la vérification de l'abonnement:", error)
@@ -199,6 +196,8 @@ export const usePushNotifications = () => {
 
   // S'abonner aux notifications push
   const subscribe = async () => {
+    console.log('[Push VAPID] 🚀 Début de subscribe()')
+
     if (!authStore.user) {
       toast.add({
         color: 'warning',
@@ -207,6 +206,10 @@ export const usePushNotifications = () => {
       })
       return false
     }
+
+    // Désactiver temporairement le reload automatique
+    console.log('[Push VAPID] ⏸️ Désactivation du reload automatique')
+    globalAllowReloadOnControllerChange = false
 
     state.isLoading = true
     state.error = null
@@ -262,6 +265,29 @@ export const usePushNotifications = () => {
             code: subscribeError.code,
             stack: subscribeError.stack,
           })
+
+          // Détecter si c'est Opera
+          const isOpera =
+            navigator.userAgent.indexOf('OPR') > -1 || navigator.userAgent.indexOf('Opera') > -1
+
+          if (
+            subscribeError.name === 'AbortError' &&
+            subscribeError.message.includes('push service error')
+          ) {
+            if (isOpera) {
+              console.warn('⚠️ Opera ne supporte pas le Push API correctement')
+              toast.add({
+                color: 'amber',
+                title: 'Navigateur non compatible',
+                description:
+                  'Les notifications push ne sont pas supportées sur Opera. Utilisez Chrome, Edge ou Firefox.',
+                icon: 'i-heroicons-exclamation-triangle',
+                timeout: 8000,
+              })
+              throw new Error('Navigateur non compatible (Opera)')
+            }
+          }
+
           throw subscribeError
         }
       }
@@ -282,14 +308,11 @@ export const usePushNotifications = () => {
       notificationStore.setRealTimeEnabled(true)
       window.dispatchEvent(new CustomEvent('push-notifications-enabled'))
 
-      toast.add({
-        color: 'success',
-        title: 'Notifications activées',
-        description: 'Vous recevrez maintenant des notifications push',
-      })
+      // Toast géré par le composant appelant
+      console.log('[Push VAPID] ✅ Subscribe réussie, retour true')
       return true
     } catch (error: any) {
-      console.error("[Push] Erreur lors de l'abonnement:", error)
+      console.error("[Push VAPID] ❌ Erreur lors de l'abonnement:", error)
       state.error = error?.message || "Impossible d'activer les notifications"
 
       toast.add({
@@ -298,9 +321,17 @@ export const usePushNotifications = () => {
         description: state.error,
       })
 
+      console.log('[Push VAPID] ❌ Subscribe échouée, retour false')
       return false
     } finally {
       state.isLoading = false
+      // Réactiver le reload automatique après un délai
+      console.log('[Push VAPID] 🔄 Réactivation du reload dans 2 secondes')
+      setTimeout(() => {
+        globalAllowReloadOnControllerChange = true
+        console.log('[Push VAPID] ▶️ Reload automatique réactivé')
+      }, 2000) // 2 secondes de délai
+      console.log('[Push VAPID] 🏁 Fin de subscribe()')
     }
   }
 
@@ -327,11 +358,7 @@ export const usePushNotifications = () => {
       notificationStore.setRealTimeEnabled(false)
       window.dispatchEvent(new CustomEvent('push-notifications-disabled'))
 
-      toast.add({
-        color: 'success',
-        title: 'Notifications désactivées',
-        description: 'Vous ne recevrez plus de notifications push',
-      })
+      // Toast géré par le composant appelant
       return true
     } catch (error) {
       console.error('[Push] Erreur lors du désabonnement:', error)
@@ -386,7 +413,7 @@ export const usePushNotifications = () => {
     const notification = new Notification('🎯 Test de notification', {
       body: 'Ceci est une notification de test locale',
       icon: '/favicons/android-chrome-192x192.png',
-      badge: '/favicons/favicon-32x32.png',
+      badge: '/favicons/notification-badge.png',
     })
 
     notification.onclick = () => {
@@ -417,7 +444,14 @@ export const usePushNotifications = () => {
       // Écouter les changements de Service Worker
       if (navigator.serviceWorker) {
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          window.location.reload()
+          if (globalAllowReloadOnControllerChange) {
+            console.log('[PushNotifications] Service Worker controller changed, reloading...')
+            window.location.reload()
+          } else {
+            console.log(
+              '[PushNotifications] Service Worker controller changed, but reload is disabled'
+            )
+          }
         })
       }
     }

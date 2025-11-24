@@ -34,8 +34,7 @@ export default wrapApiHandler(
     if (parsed.targetUserEmail) {
       const targetUser = await fetchResourceByFieldOrFail(
         prisma.user,
-        'email',
-        parsed.targetUserEmail,
+        { email: parsed.targetUserEmail },
         {
           errorMessage: `Utilisateur avec l'email ${parsed.targetUserEmail} introuvable`,
           select: { id: true },
