@@ -155,7 +155,7 @@ class PushNotificationService {
         message: data.message,
         body: data.message, // Alias pour compatibilité
         icon: data.icon || '/favicons/android-chrome-192x192.png',
-        badge: data.badge || '/favicons/favicon-32x32.png',
+        badge: data.badge || '/favicons/notification-badge.png',
         actionUrl: data.url,
         actionText: data.actionText,
         id: data.id,
