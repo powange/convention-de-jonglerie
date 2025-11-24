@@ -202,16 +202,18 @@ const admin = {
     return app
   }),
 
-  messaging: vi.fn((app?: MockApp): MockMessaging => ({
-    send: vi.fn(async () => 'mock-message-id'),
-    sendEachForMulticast: vi.fn(async () => ({
-      successCount: 1,
-      failureCount: 0,
-      responses: [{ success: true }],
-    })),
-    subscribeToTopic: vi.fn(async () => undefined),
-    unsubscribeFromTopic: vi.fn(async () => undefined),
-  })),
+  messaging: vi.fn(
+    (app?: MockApp): MockMessaging => ({
+      send: vi.fn(async () => 'mock-message-id'),
+      sendEachForMulticast: vi.fn(async () => ({
+        successCount: 1,
+        failureCount: 0,
+        responses: [{ success: true }],
+      })),
+      subscribeToTopic: vi.fn(async () => undefined),
+      unsubscribeFromTopic: vi.fn(async () => undefined),
+    })
+  ),
 
   credential: {
     cert: vi.fn((serviceAccount: any) => ({
@@ -346,8 +348,8 @@ describe('Test avec erreur Firebase', () => {
           success: false,
           error: {
             code: 'messaging/invalid-registration-token',
-            message: 'Invalid token'
-          }
+            message: 'Invalid token',
+          },
         },
       ],
     }))

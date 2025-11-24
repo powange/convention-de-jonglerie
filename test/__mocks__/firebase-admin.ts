@@ -29,16 +29,18 @@ const admin = {
     return app
   }),
 
-  messaging: vi.fn((app?: MockApp): MockMessaging => ({
-    send: vi.fn(async () => 'mock-message-id'),
-    sendEachForMulticast: vi.fn(async () => ({
-      successCount: 1,
-      failureCount: 0,
-      responses: [{ success: true }],
-    })),
-    subscribeToTopic: vi.fn(async () => undefined),
-    unsubscribeFromTopic: vi.fn(async () => undefined),
-  })),
+  messaging: vi.fn(
+    (app?: MockApp): MockMessaging => ({
+      send: vi.fn(async () => 'mock-message-id'),
+      sendEachForMulticast: vi.fn(async () => ({
+        successCount: 1,
+        failureCount: 0,
+        responses: [{ success: true }],
+      })),
+      subscribeToTopic: vi.fn(async () => undefined),
+      unsubscribeFromTopic: vi.fn(async () => undefined),
+    })
+  ),
 
   credential: {
     cert: vi.fn((serviceAccount: any) => ({
@@ -49,57 +51,48 @@ const admin = {
   },
 }
 
-// Export namespace types pour compatibilité TypeScript
-export namespace admin {
-  export namespace app {
-    export type App = MockApp
+// Export types pour compatibilité TypeScript avec firebase-admin
+export type AdminApp = MockApp
+export type AdminMessaging = MockMessaging
+
+export interface AdminMessage {
+  notification?: {
+    title?: string
+    body?: string
   }
+  data?: Record<string, string>
+  topic?: string
+  token?: string
+}
 
-  export namespace messaging {
-    export type Messaging = MockMessaging
-
-    export interface Message {
-      notification?: {
-        title?: string
-        body?: string
-      }
-      data?: Record<string, string>
-      topic?: string
-      token?: string
-    }
-
-    export interface MulticastMessage {
-      notification?: {
-        title?: string
-        body?: string
-      }
-      data?: Record<string, string>
-      tokens: string[]
-    }
-
-    export interface BatchResponse {
-      successCount: number
-      failureCount: number
-      responses: Array<{
-        success: boolean
-        error?: {
-          code?: string
-          message?: string
-        }
-      }>
-    }
+export interface AdminMulticastMessage {
+  notification?: {
+    title?: string
+    body?: string
   }
+  data?: Record<string, string>
+  tokens: string[]
+}
 
-  export namespace credential {
-    export interface ServiceAccount {
-      projectId?: string
-      project_id?: string
-      privateKey?: string
-      private_key?: string
-      clientEmail?: string
-      client_email?: string
+export interface AdminBatchResponse {
+  successCount: number
+  failureCount: number
+  responses: Array<{
+    success: boolean
+    error?: {
+      code?: string
+      message?: string
     }
-  }
+  }>
+}
+
+export interface AdminServiceAccount {
+  projectId?: string
+  project_id?: string
+  privateKey?: string
+  private_key?: string
+  clientEmail?: string
+  client_email?: string
 }
 
 export default admin
