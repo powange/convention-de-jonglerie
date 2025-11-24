@@ -23,6 +23,9 @@ class ConversationPresenceService {
    * Marquer un utilisateur comme présent sur une conversation
    */
   markPresent(userId: number, conversationId: string): void {
+    // Vérifier si l'utilisateur était déjà présent (pour les logs)
+    const wasPresent = this.isPresent(userId, conversationId)
+
     if (!this.presenceMap.has(conversationId)) {
       this.presenceMap.set(conversationId, new Set())
     }
@@ -43,9 +46,12 @@ class ConversationPresenceService {
 
     this.cleanupTimeouts.set(key, timeout)
 
-    console.log(
-      `[Presence] Utilisateur ${userId} présent sur conversation ${conversationId} (${this.presenceMap.get(conversationId)?.size} présent(s))`
-    )
+    // Logger uniquement si c'est un nouveau présent (pas un refresh)
+    if (!wasPresent) {
+      console.log(
+        `✅ [Presence] Utilisateur ${userId} rejoint conversation ${conversationId} (${this.presenceMap.get(conversationId)?.size} présent(s))`
+      )
+    }
   }
 
   /**
@@ -53,6 +59,8 @@ class ConversationPresenceService {
    */
   markAbsent(userId: number, conversationId: string): void {
     const users = this.presenceMap.get(conversationId)
+    const wasPresent = users?.has(userId) || false
+
     if (users) {
       users.delete(userId)
       if (users.size === 0) {
@@ -68,9 +76,12 @@ class ConversationPresenceService {
       this.cleanupTimeouts.delete(key)
     }
 
-    console.log(
-      `[Presence] Utilisateur ${userId} absent de conversation ${conversationId} (${users?.size || 0} présent(s))`
-    )
+    // Logger uniquement si l'utilisateur était effectivement présent
+    if (wasPresent) {
+      console.log(
+        `👋 [Presence] Utilisateur ${userId} quitte conversation ${conversationId} (${users?.size || 0} présent(s))`
+      )
+    }
   }
 
   /**
