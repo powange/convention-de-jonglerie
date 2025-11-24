@@ -41,6 +41,28 @@ export default defineConfig({
         plugins: [tsconfigPaths()],
         resolve: {
           alias: [
+            // Mock Firebase modules pour les tests
+            {
+              find: 'firebase/app',
+              replacement: resolve(
+                fileURLToPath(new URL('.', import.meta.url)),
+                'test/__mocks__/firebase-app.ts'
+              ),
+            },
+            {
+              find: 'firebase/messaging',
+              replacement: resolve(
+                fileURLToPath(new URL('.', import.meta.url)),
+                'test/__mocks__/firebase-messaging.ts'
+              ),
+            },
+            {
+              find: 'firebase-admin',
+              replacement: resolve(
+                fileURLToPath(new URL('.', import.meta.url)),
+                'test/__mocks__/firebase-admin.ts'
+              ),
+            },
             {
               find: /^#app\/(.*)$/,
               replacement:

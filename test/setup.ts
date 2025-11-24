@@ -125,4 +125,47 @@ vi.mock('../server/utils/rate-limiter', () => {
 // Fournir également une implémentation globale de useRuntimeConfig pour les routes serveur qui l'appellent en global
 ;(globalThis as any).useRuntimeConfig = vi.fn(() => ({}))
 
+// Mock Firebase modules pour éviter les erreurs de résolution dans les tests
+vi.mock('firebase/app', () => ({
+  initializeApp: vi.fn(() => ({ name: '[DEFAULT]', options: {} })),
+  getApps: vi.fn(() => []),
+  getApp: vi.fn(() => ({ name: '[DEFAULT]', options: {} })),
+}))
+
+vi.mock('firebase/messaging', () => ({
+  getMessaging: vi.fn(() => ({})),
+  isSupported: vi.fn(async () => false), // Désactivé dans les tests
+  getToken: vi.fn(async () => 'mock-fcm-token'),
+  onMessage: vi.fn(() => vi.fn()), // Retourne unsubscribe function
+}))
+
+vi.mock('firebase-admin', () => {
+  const admin = {
+    apps: [],
+    initializeApp: vi.fn((config?: any) => {
+      const app = { name: '[DEFAULT]', options: config || {} }
+      admin.apps.push(app)
+      return app
+    }),
+    messaging: vi.fn(() => ({
+      send: vi.fn(async () => 'mock-message-id'),
+      sendEachForMulticast: vi.fn(async () => ({
+        successCount: 1,
+        failureCount: 0,
+        responses: [{ success: true }],
+      })),
+      subscribeToTopic: vi.fn(async () => undefined),
+      unsubscribeFromTopic: vi.fn(async () => undefined),
+    })),
+    credential: {
+      cert: vi.fn((serviceAccount: any) => ({
+        projectId: serviceAccount.projectId || serviceAccount.project_id,
+        privateKey: serviceAccount.privateKey || serviceAccount.private_key,
+        clientEmail: serviceAccount.clientEmail || serviceAccount.client_email,
+      })),
+    },
+  }
+  return { default: admin }
+})
+
 // Forcer la valeur utilisée par nuxt.config.ts au cas où le runtime lirait la config réelle
