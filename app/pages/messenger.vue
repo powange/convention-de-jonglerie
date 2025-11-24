@@ -345,7 +345,15 @@
             :key="participant.id"
             class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
-            <UiUserAvatar :user="participant.user" size="md" />
+            <div class="relative">
+              <UiUserAvatar :user="participant.user" size="md" />
+              <!-- Pastille verte de présence -->
+              <div
+                v-if="presentUserIds.includes(participant.user.id)"
+                class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"
+                :title="$t('messenger.online')"
+              />
+            </div>
             <div class="flex-1">
               <p class="font-medium">{{ participant.user.pseudo }}</p>
             </div>
@@ -406,6 +414,7 @@ const openAccordionItems = ref<string[]>([])
 const chatPromptRef = ref()
 const messagesContainerRef = ref<HTMLElement | null>(null)
 const replyingToMessage = ref<ConversationMessage | null>(null)
+const presentUserIds = ref<number[]>([])
 
 // Pagination des messages
 const hasMoreMessages = ref(true)
@@ -887,6 +896,27 @@ async function handleDeleteMessage(messageId: string) {
   await deleteMessage(selectedConversationId.value, messageId)
 }
 
+// Récupérer la liste des utilisateurs présents sur la conversation
+async function fetchPresence() {
+  if (!selectedConversationId.value) {
+    presentUserIds.value = []
+    return
+  }
+
+  try {
+    const response = await $fetch<{
+      success: boolean
+      data: { presentUserIds: number[] }
+    }>(`/api/messenger/conversations/${selectedConversationId.value}/presence`)
+
+    if (response.success) {
+      presentUserIds.value = response.data.presentUserIds
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération de la présence:', error)
+  }
+}
+
 // Formater le temps du message
 function formatMessageTime(date: Date) {
   const messageDate = new Date(date)
@@ -1019,6 +1049,32 @@ watch(
   },
   { deep: true }
 )
+
+// Actualiser la présence quand la conversation change
+watch(selectedConversationId, async (newId) => {
+  if (newId) {
+    await fetchPresence()
+  } else {
+    presentUserIds.value = []
+  }
+})
+
+// Actualiser la présence toutes les 10 secondes
+let presenceInterval: ReturnType<typeof setInterval> | null = null
+
+onMounted(() => {
+  presenceInterval = setInterval(() => {
+    if (selectedConversationId.value) {
+      fetchPresence()
+    }
+  }, 10000) // 10 secondes
+})
+
+onUnmounted(() => {
+  if (presenceInterval) {
+    clearInterval(presenceInterval)
+  }
+})
 </script>
 
 <style scoped>

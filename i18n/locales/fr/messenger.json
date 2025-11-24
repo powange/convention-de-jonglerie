@@ -19,6 +19,7 @@
     "minutes_ago": "Il y a {count}min",
     "no_conversations": "Aucune conversation",
     "no_messages": "Aucun message pour le moment",
+    "online": "En ligne",
     "participants": "Participants",
     "reply": "Répondre",
     "reply_to": "Répondre à {pseudo}",
