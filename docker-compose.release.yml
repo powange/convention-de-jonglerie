@@ -30,9 +30,9 @@ services:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
     container_name: convention-app-release
     restart: unless-stopped
-    # Charger toutes les variables d'environnement depuis le fichier .env
+    # Charger toutes les variables d'environnement depuis le fichier stack.env (Portainer)
     env_file:
-      - .env
+      - stack.env
     # Variables d'environnement spécifiques à Docker (peuvent override le .env)
     environment:
       # Database URL avec le hostname Docker
