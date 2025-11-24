@@ -242,7 +242,7 @@ export default wrapApiHandler(
           }
 
           // Envoyer la notification push
-          await unifiedPushService.sendToUser(p.userId, {
+          const pushSent = await unifiedPushService.sendToUser(p.userId, {
             title: notificationTitle,
             message: `${user.pseudo}: ${truncatedContent}`,
             url: `/messenger?editionId=${participant.conversation.edition.id}&conversationId=${conversationId}`,
@@ -251,9 +251,15 @@ export default wrapApiHandler(
             badge: '/favicons/notification-badge.png',
           })
 
-          console.log(
-            `[Messenger] Notification push envoyée à l'utilisateur ${p.userId} pour le message dans la conversation ${conversationId}`
-          )
+          if (pushSent) {
+            console.log(
+              `[Messenger] ✅ Notification push envoyée à l'utilisateur ${p.userId} pour le message dans la conversation ${conversationId}`
+            )
+          } else {
+            console.log(
+              `[Messenger] ❌ Échec d'envoi de notification push à l'utilisateur ${p.userId} pour le message dans la conversation ${conversationId}`
+            )
+          }
         } catch (error) {
           console.error(
             `Erreur lors de l'envoi de la notification push à l'utilisateur ${p.userId}:`,

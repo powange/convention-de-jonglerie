@@ -184,9 +184,10 @@ class PushNotificationService {
       }
 
       // Codes HTTP indiquant une subscription expirée ou invalide
+      // 403: Forbidden (clés VAPID invalides ou non correspondantes)
       // 404: Subscription not found
       // 410: Subscription expired (Gone)
-      if (error.statusCode === 404 || error.statusCode === 410) {
+      if (error.statusCode === 403 || error.statusCode === 404 || error.statusCode === 410) {
         console.log(
           `[Push Service] 🧹 Désactivation de l'abonnement invalide (${error.statusCode}) pour subscription ${subscription.id}`
         )
