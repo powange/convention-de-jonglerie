@@ -153,7 +153,7 @@ const success = await unifiedPushService.sendToUser(userId, {
   url: '/notifications',
   actionText: 'Voir',
   icon: '/favicons/android-chrome-192x192.png',
-  badge: '/favicons/favicon-32x32.png',
+  badge: '/favicons/notification-badge.png',
 })
 
 // Envoyer à plusieurs utilisateurs
