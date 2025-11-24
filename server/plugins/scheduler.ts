@@ -42,6 +42,15 @@ export default defineNitroPlugin(async (_nitroApp) => {
       }
     })
 
+    // Nettoyage des subscriptions push inactives (quotidien à 4h du matin)
+    cron.schedule('0 4 * * *', async () => {
+      try {
+        await runTask('cleanup-inactive-subscriptions')
+      } catch (error) {
+        console.error("Erreur lors de l'exécution de cleanup-inactive-subscriptions:", error)
+      }
+    })
+
     console.log('✅ Système de cron initialisé avec succès')
   } else {
     console.log('⏸️ Système de cron désactivé (développement)')

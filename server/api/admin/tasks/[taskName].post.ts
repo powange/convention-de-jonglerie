@@ -14,6 +14,7 @@ export default wrapApiHandler(
       'convention-favorites-reminders',
       'cleanup-expired-tokens',
       'cleanup-resolved-error-logs',
+      'cleanup-inactive-subscriptions',
     ]
 
     if (!taskName || !availableTasks.includes(taskName)) {
