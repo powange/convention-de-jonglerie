@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { conversationPresenceService } from '@@/server/utils/conversation-presence-service'
 import { unifiedPushService } from '@@/server/utils/unified-push-service'
 import { z } from 'zod'
 
@@ -191,36 +192,16 @@ export default wrapApiHandler(
       },
     })
 
-    // Récupérer tous les messages de la conversation pour déterminer si le participant est à jour
-    const allMessagesIds = await prisma.message.findMany({
-      where: {
-        conversationId,
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        createdAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 2, // On ne prend que les 2 derniers messages (le nouveau + le précédent)
-    })
-
-    // Le message précédent (celui juste avant le nouveau qu'on vient de créer)
-    const previousMessageId = allMessagesIds.length > 1 ? allMessagesIds[1].id : null
-
     await Promise.all(
       participantsWithReadStatus.map(async (p) => {
         try {
-          // Vérifier si l'utilisateur a lu le message précédent
-          // Si lastReadMessageId === previousMessageId, alors il est à jour et sur la conversation
-          const isUpToDate = previousMessageId && p.lastReadMessageId === previousMessageId
+          // Vérifier si l'utilisateur est présent sur la conversation (via connexion SSE active)
+          const isPresent = conversationPresenceService.isPresent(p.userId, conversationId)
 
-          // Ne pas envoyer de push si l'utilisateur est à jour (il est sur la conversation)
-          if (isUpToDate) {
+          // Ne pas envoyer de push si l'utilisateur est présent sur la conversation
+          if (isPresent) {
             console.log(
-              `[Messenger] Utilisateur ${p.userId} est à jour sur la conversation, pas de push envoyée`
+              `[Messenger] Utilisateur ${p.userId} est présent sur la conversation (SSE actif), pas de push envoyée`
             )
             return
           }

@@ -1,9 +1,11 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { conversationPresenceService } from '@@/server/utils/conversation-presence-service'
 
 /**
  * GET /api/messenger/conversations/[conversationId]/stream
  * Stream SSE pour recevoir les nouveaux messages en temps réel
+ * Permet également de tracker la présence des utilisateurs sur la conversation
  */
 export default wrapApiHandler(
   async (event) => {
@@ -25,6 +27,9 @@ export default wrapApiHandler(
         message: "Vous n'avez pas accès à cette conversation",
       })
     }
+
+    // Marquer l'utilisateur comme présent sur cette conversation
+    conversationPresenceService.markPresent(user.id, conversationId)
 
     // Configurer SSE
     setResponseHeaders(event, {
@@ -146,6 +151,8 @@ export default wrapApiHandler(
       try {
         await eventStream.push(JSON.stringify({ type: 'ping', timestamp: Date.now() }))
         await checkForNewMessages()
+        // Rafraîchir la présence à chaque ping
+        conversationPresenceService.markPresent(user.id, conversationId)
       } catch (error) {
         console.error('Erreur lors du ping:', error)
         clearInterval(pingInterval)
@@ -161,6 +168,8 @@ export default wrapApiHandler(
     event.node.req.on('close', () => {
       clearInterval(pingInterval)
       clearInterval(messageCheckInterval)
+      // Marquer l'utilisateur comme absent
+      conversationPresenceService.markAbsent(user.id, conversationId)
       eventStream.close()
     })
 
