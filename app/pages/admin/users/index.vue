@@ -255,23 +255,36 @@ const stats = computed(() => {
 const columns = [
   {
     accessorKey: 'connectionStatus',
-    header: '', // Pas de header pour la pastille
+    header: '', // Pas de header pour les indicateurs
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
       const isConnected = user.isConnected
+      const hasPushEnabled = user._count.fcmTokens > 0
 
       return h(
         'div',
         {
-          class: 'flex justify-center items-center',
-          title: isConnected ? t('admin.user_connected') : t('admin.user_offline'),
+          class: 'flex justify-center items-center gap-1',
         },
         [
+          // Pastille de connexion SSE
           h('div', {
             class: [
               'w-3 h-3 rounded-full',
               isConnected ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600',
             ],
+            title: isConnected ? t('admin.user_connected') : t('admin.user_offline'),
+          }),
+          // Icône notifications push
+          h(resolveComponent('UIcon'), {
+            name: hasPushEnabled ? 'i-heroicons-bell-solid' : 'i-heroicons-bell-slash',
+            class: [
+              'w-4 h-4',
+              hasPushEnabled ? 'text-blue-500' : 'text-gray-300 dark:text-gray-600',
+            ],
+            title: hasPushEnabled
+              ? t('admin.push_notifications_enabled', { count: user._count.fcmTokens })
+              : t('admin.push_notifications_disabled'),
           }),
         ]
       )
@@ -283,6 +296,7 @@ const columns = [
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
       return h(resolveComponent('UiUserDisplayForAdmin'), {
+        key: `user-display-${user.id}`,
         user: user,
         size: 'md',
         showEmail: false,

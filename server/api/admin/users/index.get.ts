@@ -67,6 +67,7 @@ export default wrapApiHandler(
         select: {
           id: true,
           email: true,
+          emailHash: true,
           pseudo: true,
           nom: true,
           prenom: true,
@@ -82,6 +83,7 @@ export default wrapApiHandler(
               createdConventions: true,
               createdEditions: true,
               favoriteEditions: true,
+              fcmTokens: true,
             },
           },
         },

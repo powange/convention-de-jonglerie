@@ -331,6 +331,8 @@
     "user_management_description": "Liste complète des utilisateurs inscrits sur la plateforme",
     "user_offline": "Utilisateur hors ligne",
     "user_promoted_successfully": "Utilisateur promu avec succès",
+    "push_notifications_enabled": "Notifications push activées ({count} appareil(s))",
+    "push_notifications_disabled": "Notifications push désactivées",
     "users": "Utilisateurs",
     "users_online": "En ligne",
     "verified": "Vérifié",

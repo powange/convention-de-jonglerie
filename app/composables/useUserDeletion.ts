@@ -34,6 +34,7 @@ export type DeletionReasonCode = keyof typeof DELETION_REASONS
 export interface AdminUser {
   id: number
   email: string
+  emailHash: string
   pseudo: string
   nom: string
   prenom: string
@@ -45,6 +46,7 @@ export interface AdminUser {
     createdConventions: number
     createdEditions: number
     favoriteEditions: number
+    fcmTokens: number
   }
 }
 

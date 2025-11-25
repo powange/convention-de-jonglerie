@@ -331,6 +331,8 @@
     "user_management_description": "Complete list of users registered on the platform",
     "user_offline": "User offline",
     "user_promoted_successfully": "User promoted successfully",
+    "push_notifications_enabled": "Push notifications enabled ({count} device(s))",
+    "push_notifications_disabled": "Push notifications disabled",
     "users": "Users",
     "users_online": "Online",
     "verified": "Verified",
