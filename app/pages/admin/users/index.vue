@@ -563,6 +563,7 @@ const formatRelativeTime = (date: string) => {
 }
 
 const getUserActions = (user: AdminUserWithConnection) => {
+  const authStore = useAuthStore()
   const actions: any[] = [
     // Action pour voir le profil
     {
@@ -571,6 +572,17 @@ const getUserActions = (user: AdminUserWithConnection) => {
       to: `/admin/users/${user.id}`,
     },
   ]
+
+  // Action pour contacter l'utilisateur (seulement si ce n'est pas soi-même)
+  if (user.id !== authStore.user?.id) {
+    actions.push({
+      label: t('admin.contact_user'),
+      icon: 'i-heroicons-chat-bubble-left-right',
+      onSelect: () => {
+        startPrivateConversation(user)
+      },
+    })
+  }
 
   // Action d'impersonation (seulement pour les utilisateurs non-admin)
   if (!user.isGlobalAdmin) {
@@ -617,6 +629,32 @@ const getUserActions = (user: AdminUserWithConnection) => {
   }
 
   return [actions]
+}
+
+// Fonction pour démarrer une conversation privée
+const startPrivateConversation = async (user: AdminUserWithConnection) => {
+  try {
+    const result = await $fetch<{
+      success: boolean
+      data: { conversationId: string; created: boolean }
+    }>('/api/messenger/private', {
+      method: 'POST',
+      body: { userId: user.id },
+    })
+
+    if (result.success) {
+      // Naviguer vers la messagerie avec la conversation
+      await navigateTo(`/messenger?conversationId=${result.data.conversationId}`)
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de la création de la conversation:', error)
+
+    useToast().add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.contact_user_error'),
+      color: 'error',
+    })
+  }
 }
 
 // Fonction d'impersonation

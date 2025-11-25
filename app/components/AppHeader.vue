@@ -36,6 +36,9 @@
           </UButton>
         </div>
 
+        <!-- Bouton messagerie (si connecté) -->
+        <MessengerHeaderButton v-if="authStore.isAuthenticated" />
+
         <!-- Centre de notifications (si connecté) -->
         <NotificationsCenter v-if="authStore.isAuthenticated" />
 

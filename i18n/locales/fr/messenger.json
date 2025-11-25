@@ -10,6 +10,8 @@
       "private": "Conversation privée"
     },
     "organizers_group": "Groupe organisateurs",
+    "private_conversation": "Conversation privée",
+    "private_conversations": "Conversations privées",
     "conversations": "Conversations",
     "delete": "Supprimer",
     "edited": "modifié",
@@ -31,6 +33,7 @@
       "group": "Groupe",
       "organizers": "Organisateurs",
       "organizers_group": "Groupe organisateurs",
+      "private": "Privé",
       "private_leader": "Privé avec le responsable",
       "private_leaders": "Privé avec les responsables"
     },

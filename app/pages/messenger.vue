@@ -18,52 +18,34 @@
               <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.loading') }}</p>
             </div>
 
-            <div v-else-if="accordionItems.length === 0" class="text-center py-8">
+            <div v-else-if="!hasAnyConversation" class="text-center py-8">
               <UIcon name="i-heroicons-inbox" class="h-12 w-12 mx-auto text-gray-400" />
               <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.no_conversations') }}</p>
             </div>
 
-            <UAccordion
-              v-else
-              v-model="openAccordionItems"
-              type="multiple"
-              :items="accordionItems"
-              :unmount-on-hide="false"
-            >
-              <template #leading="{ item }">
-                <div v-if="item.edition?.imageUrl" class="w-10 h-10 flex-shrink-0">
-                  <img
-                    :src="
-                      useImageUrl().getImageUrl(
-                        item.edition.imageUrl ?? undefined,
-                        'edition',
-                        item.edition.id
-                      )
-                    "
-                    :alt="item.label"
-                    class="w-full h-full object-contain rounded"
-                  />
-                </div>
-                <UIcon v-else name="i-heroicons-calendar" class="w-10 h-10 text-gray-400" />
-              </template>
-
-              <template #trailing="{ item, open }">
-                <div class="flex items-center gap-2">
-                  <UBadge v-if="item.totalUnread > 0" color="error" size="sm">
-                    {{ item.totalUnread }}
+            <div v-else class="space-y-4">
+              <!-- Section Conversations privées -->
+              <div v-if="sortedPrivateConversations.length > 0">
+                <div
+                  class="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2"
+                >
+                  <div class="flex items-center gap-2">
+                    <UIcon
+                      name="i-heroicons-chat-bubble-left-right"
+                      class="w-5 h-5 text-gray-500"
+                    />
+                    <span class="font-medium text-sm">{{
+                      $t('messenger.private_conversations')
+                    }}</span>
+                  </div>
+                  <UBadge v-if="privateConversationsTotalUnread > 0" color="error" size="sm">
+                    {{ privateConversationsTotalUnread }}
                   </UBadge>
-                  <UIcon
-                    name="i-heroicons-chevron-down"
-                    class="transition-transform duration-200"
-                    :class="[open ? 'rotate-180' : '']"
-                  />
                 </div>
-              </template>
 
-              <template #body="{ item }">
-                <div class="space-y-2">
+                <div class="space-y-2 pl-2">
                   <button
-                    v-for="conversation in item.conversations"
+                    v-for="conversation in sortedPrivateConversations"
                     :key="conversation.id"
                     :class="[
                       'w-full text-left p-3 rounded-lg transition-colors',
@@ -75,23 +57,22 @@
                   >
                     <div class="flex items-start justify-between gap-2">
                       <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
-                          <UIcon
-                            :name="getConversationIcon(conversation)"
-                            :style="conversation.team ? { color: conversation.team.color } : {}"
+                        <div class="flex items-center gap-3">
+                          <!-- Avatar de l'autre participant pour les conversations privées -->
+                          <UiUserAvatar
+                            v-if="getOtherParticipant(conversation)"
+                            :user="getOtherParticipant(conversation)!"
+                            size="md"
                           />
+                          <UIcon v-else :name="getConversationIcon(conversation)" />
                           <p class="font-medium truncate">
                             {{ getConversationDisplayName(conversation) }}
                           </p>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">
-                          {{ getConversationSubtitle(conversation) }}
-                        </p>
-
                         <!-- Dernier message -->
                         <p
                           v-if="conversation.messages[0]"
-                          class="text-sm text-gray-600 dark:text-gray-400 truncate mt-2"
+                          class="text-sm text-gray-600 dark:text-gray-400 truncate mt-1"
                         >
                           {{ conversation.messages[0].content }}
                         </p>
@@ -104,8 +85,93 @@
                     </div>
                   </button>
                 </div>
-              </template>
-            </UAccordion>
+              </div>
+
+              <!-- Section Conversations par édition -->
+              <UAccordion
+                v-if="accordionItems.length > 0"
+                v-model="openAccordionItems"
+                type="multiple"
+                :items="accordionItems"
+                :unmount-on-hide="false"
+              >
+                <template #leading="{ item }">
+                  <div v-if="item.edition?.imageUrl" class="w-10 h-10 flex-shrink-0">
+                    <img
+                      :src="
+                        useImageUrl().getImageUrl(
+                          item.edition.imageUrl ?? undefined,
+                          'edition',
+                          item.edition.id
+                        )
+                      "
+                      :alt="item.label"
+                      class="w-full h-full object-contain rounded"
+                    />
+                  </div>
+                  <UIcon v-else name="i-heroicons-calendar" class="w-10 h-10 text-gray-400" />
+                </template>
+
+                <template #trailing="{ item, open }">
+                  <div class="flex items-center gap-2">
+                    <UBadge v-if="item.totalUnread > 0" color="error" size="sm">
+                      {{ item.totalUnread }}
+                    </UBadge>
+                    <UIcon
+                      name="i-heroicons-chevron-down"
+                      class="transition-transform duration-200"
+                      :class="[open ? 'rotate-180' : '']"
+                    />
+                  </div>
+                </template>
+
+                <template #body="{ item }">
+                  <div class="space-y-2">
+                    <button
+                      v-for="conversation in item.conversations"
+                      :key="conversation.id"
+                      :class="[
+                        'w-full text-left p-3 rounded-lg transition-colors',
+                        selectedConversationId === conversation.id
+                          ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent',
+                      ]"
+                      @click="selectConversation(conversation.id)"
+                    >
+                      <div class="flex items-start justify-between gap-2">
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <UIcon
+                              :name="getConversationIcon(conversation)"
+                              :style="conversation.team ? { color: conversation.team.color } : {}"
+                            />
+                            <p class="font-medium truncate">
+                              {{ getConversationDisplayName(conversation) }}
+                            </p>
+                          </div>
+                          <p class="text-xs text-gray-500 mt-1">
+                            {{ getConversationSubtitle(conversation) }}
+                          </p>
+
+                          <!-- Dernier message -->
+                          <p
+                            v-if="conversation.messages[0]"
+                            class="text-sm text-gray-600 dark:text-gray-400 truncate mt-2"
+                          >
+                            {{ conversation.messages[0].content }}
+                          </p>
+                        </div>
+
+                        <!-- Badge non lu -->
+                        <UBadge v-if="conversation.unreadCount > 0" color="error" size="sm">
+                          {{ conversation.unreadCount }}
+                        </UBadge>
+                      </div>
+                    </button>
+                  </div>
+                </template>
+              </UAccordion>
+            </div>
           </div>
         </UCard>
       </div>
@@ -132,7 +198,18 @@
                   @click="showConversationOnMobile = false"
                 />
 
+                <!-- Avatar pour conversations privées avec pastille de présence, icône sinon -->
+                <div v-if="getOtherParticipant(selectedConversation)" class="relative">
+                  <UiUserAvatar :user="getOtherParticipant(selectedConversation)!" size="md" />
+                  <!-- Pastille de présence -->
+                  <div
+                    v-if="presentUserIds.includes(getOtherParticipant(selectedConversation)!.id)"
+                    class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"
+                    :title="$t('messenger.online')"
+                  />
+                </div>
                 <UIcon
+                  v-else
                   :name="getConversationIcon(selectedConversation)"
                   :style="
                     selectedConversation.team ? { color: selectedConversation.team.color } : {}
@@ -143,14 +220,15 @@
                   <h3 class="font-semibold">
                     {{ getConversationDisplayName(selectedConversation) }}
                   </h3>
-                  <p class="text-xs text-gray-500">
+                  <p v-if="selectedConversation.type !== 'PRIVATE'" class="text-xs text-gray-500">
                     {{ getConversationTypeLabel(selectedConversation) }}
                   </p>
                 </div>
               </div>
 
-              <!-- Bouton participants -->
+              <!-- Bouton participants (masqué pour les conversations privées) -->
               <UButton
+                v-if="selectedConversation.type !== 'PRIVATE'"
                 color="neutral"
                 variant="ghost"
                 :label="`${selectedConversation.participants.length}`"
@@ -384,6 +462,7 @@ const { t } = useI18n()
 const {
   fetchEditions,
   fetchConversations,
+  fetchPrivateConversations,
   fetchMessages,
   sendMessage: sendMessageApi,
   deleteMessage,
@@ -400,6 +479,7 @@ const showConversationOnMobile = ref(false) // true = affiche la conversation, f
 const editionsWithConversations = ref<
   Map<number, { edition: MessengerEdition; conversations: Conversation[] }>
 >(new Map())
+const privateConversations = ref<Conversation[]>([])
 const messages = ref<ConversationMessage[]>([])
 
 const selectedConversationId = ref<string | null>(null)
@@ -420,6 +500,11 @@ const isMobile = ref(false)
 
 // Computed
 const selectedConversation = computed(() => {
+  // Chercher d'abord dans les conversations privées
+  const privateConv = privateConversations.value.find((c) => c.id === selectedConversationId.value)
+  if (privateConv) return privateConv
+
+  // Sinon chercher dans les conversations liées aux éditions
   for (const { conversations } of editionsWithConversations.value.values()) {
     const conversation = conversations.find((c) => c.id === selectedConversationId.value)
     if (conversation) return conversation
@@ -427,9 +512,14 @@ const selectedConversation = computed(() => {
   return undefined
 })
 
-// Trouver l'édition de la conversation sélectionnée
+// Trouver l'édition de la conversation sélectionnée (ou 'private' pour les conversations privées)
 const selectedEditionId = computed(() => {
   if (!selectedConversationId.value) return null
+
+  // Vérifier si c'est une conversation privée
+  if (privateConversations.value.some((c) => c.id === selectedConversationId.value)) {
+    return 'private'
+  }
 
   for (const [editionId, { conversations }] of editionsWithConversations.value.entries()) {
     if (conversations.some((c) => c.id === selectedConversationId.value)) {
@@ -460,6 +550,25 @@ const accordionItems = computed(() => {
       edition, // Passer l'édition complète pour accéder à imageUrl dans les slots
     }
   })
+})
+
+// Computed pour les conversations privées triées
+const sortedPrivateConversations = computed(() => {
+  return [...privateConversations.value].sort((a, b) => {
+    const dateA = a.messages[0]?.createdAt ? new Date(a.messages[0].createdAt).getTime() : 0
+    const dateB = b.messages[0]?.createdAt ? new Date(b.messages[0].createdAt).getTime() : 0
+    return dateB - dateA // Ordre décroissant (plus récent en premier)
+  })
+})
+
+// Total des messages non lus des conversations privées
+const privateConversationsTotalUnread = computed(() => {
+  return privateConversations.value.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0)
+})
+
+// Vérifier s'il y a des conversations (éditions ou privées)
+const hasAnyConversation = computed(() => {
+  return accordionItems.value.length > 0 || privateConversations.value.length > 0
 })
 
 const allMessages = computed(() => {
@@ -643,6 +752,8 @@ function getConversationIcon(conversation: Conversation): string {
       return 'i-heroicons-megaphone'
     case 'ORGANIZERS_GROUP':
       return 'i-heroicons-building-office-2'
+    case 'PRIVATE':
+      return 'i-heroicons-chat-bubble-left-right'
     default:
       return 'i-heroicons-user'
   }
@@ -680,6 +791,19 @@ function getConversationDisplayName(conversation: Conversation): string {
     return conversation.team?.name || 'Conversation'
   }
 
+  // Pour les conversations privées 1-à-1 (PRIVATE)
+  if (conversation.type === 'PRIVATE') {
+    const currentUser = authStore.user
+    if (!currentUser) return t('messenger.private_conversation')
+
+    // Trouver l'autre participant
+    const otherParticipant = conversation.participants.find((p) => p.userId !== currentUser.id)
+    if (otherParticipant) {
+      return otherParticipant.user.pseudo
+    }
+    return t('messenger.private_conversation')
+  }
+
   // Pour les conversations privées avec responsable(s) d'équipe (TEAM_LEADER_PRIVATE)
   if (conversation.type === 'TEAM_LEADER_PRIVATE' && conversation.team) {
     const currentUser = authStore.user
@@ -709,6 +833,16 @@ function getConversationDisplayName(conversation: Conversation): string {
 }
 
 /**
+ * Retourne l'autre participant d'une conversation privée 1-à-1
+ */
+function getOtherParticipant(conversation: Conversation) {
+  if (conversation.type !== 'PRIVATE') return null
+  const currentUser = authStore.user
+  if (!currentUser) return null
+  return conversation.participants.find((p) => p.userId !== currentUser.id)?.user || null
+}
+
+/**
  * Retourne le sous-titre d'une conversation
  */
 function getConversationSubtitle(conversation: Conversation): string {
@@ -722,6 +856,10 @@ function getConversationSubtitle(conversation: Conversation): string {
 
   if (conversation.type === 'ORGANIZERS_GROUP') {
     return t('messenger.subtitles.organizers_group')
+  }
+
+  if (conversation.type === 'PRIVATE') {
+    return t('messenger.subtitles.private')
   }
 
   // Pour les conversations privées (TEAM_LEADER_PRIVATE)
@@ -762,6 +900,10 @@ onMounted(async () => {
     }
 
     editionsWithConversations.value = editionsData
+
+    // Charger les conversations privées 1-à-1
+    privateConversations.value = await fetchPrivateConversations()
+
     loading.value = false
 
     // Connecter le stream global pour recevoir les notifications de nouveaux messages
@@ -802,11 +944,18 @@ async function selectConversation(conversationId: string) {
   scrollToBottom()
 
   // Réinitialiser le compteur de messages non lus pour cette conversation
-  for (const [_editionId, data] of editionsWithConversations.value.entries()) {
-    const conversation = data.conversations.find((c) => c.id === conversationId)
-    if (conversation) {
-      conversation.unreadCount = 0
-      break
+  // D'abord vérifier dans les conversations privées
+  const privateConv = privateConversations.value.find((c) => c.id === conversationId)
+  if (privateConv) {
+    privateConv.unreadCount = 0
+  } else {
+    // Sinon chercher dans les éditions
+    for (const [_editionId, data] of editionsWithConversations.value.entries()) {
+      const conversation = data.conversations.find((c) => c.id === conversationId)
+      if (conversation) {
+        conversation.unreadCount = 0
+        break
+      }
     }
   }
 

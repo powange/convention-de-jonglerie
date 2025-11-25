@@ -54,6 +54,8 @@
     "cannot_load_activity": "Impossible de charger l'activité récente",
     "cannot_load_stats": "Impossible de charger les statistiques",
     "cannot_load_users": "Impossible de charger les utilisateurs",
+    "contact_user": "Contacter",
+    "contact_user_error": "Impossible de créer la conversation",
     "carpool_offers_count": "{count} covoiturages",
     "change_profile_picture": "Modifier la photo de profil",
     "change_profile_picture_description": "Téléchargez ou modifiez la photo de profil de cet utilisateur",

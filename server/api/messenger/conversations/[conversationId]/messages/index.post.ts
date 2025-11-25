@@ -138,12 +138,14 @@ export default wrapApiHandler(
 
     // Envoyer des notifications push aux autres participants (uniquement s'ils ne sont pas sur la page)
     const teamName = participant.conversation.team?.name
-    const editionName = participant.conversation.edition.name
+    const editionName = participant.conversation.edition?.name
     const conversationType = participant.conversation.type
+    const editionId = participant.conversation.edition?.id
 
     const truncatedContent = content.length > 100 ? content.substring(0, 97) + '...' : content
 
     // Récupérer tous les participants avec leur lastReadMessageId et leurs rôles pour déterminer le titre de notification
+    // Pour les conversations privées, on n'a pas besoin des infos d'organisation/bénévolat
     const participantsWithReadStatus = await prisma.conversationParticipant.findMany({
       where: {
         conversationId,
@@ -157,37 +159,43 @@ export default wrapApiHandler(
         lastReadMessageId: true,
         user: {
           select: {
-            organizations: {
-              where: {
-                convention: {
-                  editions: {
-                    some: {
-                      id: participant.conversation.edition.id,
+            pseudo: true,
+            // Uniquement pour les conversations liées à une édition
+            ...(editionId
+              ? {
+                  organizations: {
+                    where: {
+                      convention: {
+                        editions: {
+                          some: {
+                            id: editionId,
+                          },
+                        },
+                      },
+                    },
+                    select: {
+                      id: true,
                     },
                   },
-                },
-              },
-              select: {
-                id: true,
-              },
-            },
-            volunteerApplications: {
-              where: {
-                editionId: participant.conversation.edition.id,
-                status: 'ACCEPTED',
-              },
-              select: {
-                teamAssignments: {
-                  where: {
-                    teamId: participant.conversation.teamId,
-                    isLeader: true,
+                  volunteerApplications: {
+                    where: {
+                      editionId: editionId,
+                      status: 'ACCEPTED',
+                    },
+                    select: {
+                      teamAssignments: {
+                        where: {
+                          teamId: participant.conversation.teamId,
+                          isLeader: true,
+                        },
+                        select: {
+                          isLeader: true,
+                        },
+                      },
+                    },
                   },
-                  select: {
-                    isLeader: true,
-                  },
-                },
-              },
-            },
+                }
+              : {}),
           },
         },
       },
@@ -209,37 +217,53 @@ export default wrapApiHandler(
 
           // Déterminer le titre de la notification en fonction du type de conversation et du rôle du destinataire
           let notificationTitle: string
-          const isOrganizer = p.user.organizations.length > 0
 
-          // Vérifier si l'utilisateur est responsable d'équipe pour cette conversation
-          const isTeamLeader = p.user.volunteerApplications.some((app) =>
-            app.teamAssignments.some((assignment) => assignment.isLeader)
-          )
-
-          if (conversationType === 'TEAM_GROUP') {
-            // Pour un groupe d'équipe, même titre pour tout le monde
-            notificationTitle = `Nouveau message dans ${teamName} - ${editionName}`
-          } else if (conversationType === 'TEAM_LEADER_PRIVATE') {
-            // Pour une conversation privée avec un responsable d'équipe
-            if (isTeamLeader) {
-              // Le destinataire est un responsable
-              notificationTitle = `Nouveau message d'un bénévole ${teamName} - ${editionName}`
-            } else {
-              // Le destinataire est un bénévole
-              notificationTitle = `Nouveau message d'un responsable ${teamName} - ${editionName}`
-            }
-          } else if (conversationType === 'VOLUNTEER_TO_ORGANIZERS') {
-            // Pour une conversation bénévole <-> organisateurs
-            if (isOrganizer) {
-              // Le destinataire est un organisateur
-              notificationTitle = `Nouveau message d'un bénévole ${editionName}`
-            } else {
-              // Le destinataire est un bénévole
-              notificationTitle = `Nouveau message d'un organisateur ${editionName}`
-            }
+          // Pour les conversations privées 1-à-1 (sans édition)
+          if (conversationType === 'PRIVATE') {
+            notificationTitle = `Message de ${user.pseudo}`
           } else {
-            // Fallback
-            notificationTitle = `Nouveau message - ${editionName}`
+            // Pour les conversations liées à une édition
+            const userWithOrgs = p.user as {
+              pseudo: string
+              organizations?: { id: number }[]
+              volunteerApplications?: { teamAssignments: { isLeader: boolean }[] }[]
+            }
+            const isOrganizer = userWithOrgs.organizations?.length ?? 0 > 0
+
+            // Vérifier si l'utilisateur est responsable d'équipe pour cette conversation
+            const isTeamLeader =
+              userWithOrgs.volunteerApplications?.some((app) =>
+                app.teamAssignments.some((assignment) => assignment.isLeader)
+              ) ?? false
+
+            if (conversationType === 'TEAM_GROUP') {
+              // Pour un groupe d'équipe, même titre pour tout le monde
+              notificationTitle = `Nouveau message dans ${teamName} - ${editionName}`
+            } else if (conversationType === 'TEAM_LEADER_PRIVATE') {
+              // Pour une conversation privée avec un responsable d'équipe
+              if (isTeamLeader) {
+                // Le destinataire est un responsable
+                notificationTitle = `Nouveau message d'un bénévole ${teamName} - ${editionName}`
+              } else {
+                // Le destinataire est un bénévole
+                notificationTitle = `Nouveau message d'un responsable ${teamName} - ${editionName}`
+              }
+            } else if (conversationType === 'VOLUNTEER_TO_ORGANIZERS') {
+              // Pour une conversation bénévole <-> organisateurs
+              if (isOrganizer) {
+                // Le destinataire est un organisateur
+                notificationTitle = `Nouveau message d'un bénévole ${editionName}`
+              } else {
+                // Le destinataire est un bénévole
+                notificationTitle = `Nouveau message d'un organisateur ${editionName}`
+              }
+            } else if (conversationType === 'ORGANIZERS_GROUP') {
+              // Pour un groupe d'organisateurs
+              notificationTitle = `Nouveau message des organisateurs - ${editionName}`
+            } else {
+              // Fallback
+              notificationTitle = `Nouveau message - ${editionName}`
+            }
           }
 
           // Générer l'URL de l'avatar de l'expéditeur
@@ -258,10 +282,15 @@ export default wrapApiHandler(
 
           // Envoyer la notification push (le service unifié gère les logs)
           // Pour les messages, l'icon est l'avatar de l'expéditeur
+          // L'URL de la notification dépend du type de conversation
+          const notificationUrl = editionId
+            ? `/messenger?editionId=${editionId}&conversationId=${conversationId}`
+            : `/messenger?conversationId=${conversationId}`
+
           await unifiedPushService.sendToUser(p.userId, {
             title: notificationTitle,
             message: `${user.pseudo}: ${truncatedContent}`,
-            url: `/messenger?editionId=${participant.conversation.edition.id}&conversationId=${conversationId}`,
+            url: notificationUrl,
             actionText: 'Voir le message',
             icon: senderAvatarUrl, // Avatar de l'expéditeur comme icon principal
             badge: '/favicons/notification-badge.png',

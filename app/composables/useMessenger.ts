@@ -58,7 +58,12 @@ export interface ConversationMessage {
 
 export interface Conversation {
   id: string
-  type: 'TEAM_GROUP' | 'TEAM_LEADER_PRIVATE' | 'VOLUNTEER_TO_ORGANIZERS' | 'ORGANIZERS_GROUP'
+  type:
+    | 'TEAM_GROUP'
+    | 'TEAM_LEADER_PRIVATE'
+    | 'VOLUNTEER_TO_ORGANIZERS'
+    | 'ORGANIZERS_GROUP'
+    | 'PRIVATE'
   createdAt: Date
   updatedAt: Date
   team: {
@@ -260,9 +265,30 @@ export const useMessenger = () => {
     }
   }
 
+  /**
+   * Récupère les conversations privées 1-à-1 de l'utilisateur (non liées à une édition)
+   */
+  const fetchPrivateConversations = async (): Promise<Conversation[]> => {
+    try {
+      const response = await $fetch<{ success: boolean; data: Conversation[] }>(
+        '/api/messenger/private-conversations'
+      )
+      return response.data
+    } catch (error) {
+      console.error('Erreur lors de la récupération des conversations privées:', error)
+      toast.add({
+        color: 'error',
+        title: 'Erreur',
+        description: 'Impossible de récupérer les conversations privées',
+      })
+      return []
+    }
+  }
+
   return {
     fetchEditions,
     fetchConversations,
+    fetchPrivateConversations,
     fetchMessages,
     sendMessage,
     editMessage,
