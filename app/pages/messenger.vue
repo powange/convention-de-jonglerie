@@ -667,8 +667,8 @@ const { realtimeMessages: streamRealtimeMessages, messageUpdates } =
 // Stream SSE de notifications (inclut les événements messenger)
 const {
   messengerNewMessages,
+  messengerPresence,
   getTypingUsersForConversation,
-  getPresentUsersForConversation,
   initPresenceForConversation,
 } = useNotificationStream()
 
@@ -678,7 +678,9 @@ const { handleInput: handleTypingInput } = useTypingIndicator(selectedConversati
 // Computed pour récupérer les utilisateurs présents dans la conversation courante (via SSE)
 const presentUserIds = computed(() => {
   if (!selectedConversationId.value) return []
-  return getPresentUsersForConversation(selectedConversationId.value)
+  // Accéder directement à la Map réactive pour créer la dépendance
+  const presenceSet = messengerPresence.value.get(selectedConversationId.value)
+  return presenceSet ? Array.from(presenceSet) : []
 })
 
 // Computed pour récupérer les utilisateurs en train d'écrire dans la conversation courante

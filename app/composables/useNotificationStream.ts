@@ -38,44 +38,52 @@ interface MessengerPresenceData {
   presentUserIds: number[]
 }
 
+// ============================================
+// État global partagé (singleton)
+// ============================================
+
+// État de la connexion SSE
+const connectionStats = ref<SSEConnectionStats>({
+  isConnected: false,
+  isConnecting: false,
+  connectionId: null,
+  lastPing: null,
+  reconnectAttempts: 0,
+  error: null,
+})
+
+// État du compteur de messages non lus (messenger)
+const messengerUnread = ref<MessengerUnreadData>({
+  unreadCount: 0,
+  conversationCount: 0,
+})
+
+// Notifications de nouveaux messages (messenger)
+const messengerNewMessages = ref<MessengerNewMessageData[]>([])
+
+// État de typing par conversation (conversationId -> Set<userId>)
+const messengerTypingUsers = ref<Map<string, Set<number>>>(new Map())
+
+// Timeouts pour nettoyer automatiquement les états de typing
+const typingTimeouts = new Map<string, NodeJS.Timeout>()
+
+// État de présence par conversation (conversationId -> Set<userId>)
+const messengerPresence = ref<Map<string, Set<number>>>(new Map())
+
+// Instance EventSource
+let eventSource: EventSource | null = null
+let reconnectTimer: NodeJS.Timeout | null = null
+const maxReconnectAttempts = 5
+let reconnectDelay = 1000 // Start with 1 second
+
+// ============================================
+// Composable
+// ============================================
+
 export const useNotificationStream = () => {
   const notificationStore = useNotificationsStore()
   const authStore = useAuthStore()
   const toast = useToast()
-
-  // État de la connexion SSE
-  const connectionStats = ref<SSEConnectionStats>({
-    isConnected: false,
-    isConnecting: false,
-    connectionId: null,
-    lastPing: null,
-    reconnectAttempts: 0,
-    error: null,
-  })
-
-  // État du compteur de messages non lus (messenger)
-  const messengerUnread = ref<MessengerUnreadData>({
-    unreadCount: 0,
-    conversationCount: 0,
-  })
-
-  // Notifications de nouveaux messages (messenger)
-  const messengerNewMessages = ref<MessengerNewMessageData[]>([])
-
-  // État de typing par conversation (conversationId -> Set<userId>)
-  const messengerTypingUsers = ref<Map<string, Set<number>>>(new Map())
-
-  // Timeouts pour nettoyer automatiquement les états de typing
-  const typingTimeouts = new Map<string, NodeJS.Timeout>()
-
-  // État de présence par conversation (conversationId -> Set<userId>)
-  const messengerPresence = ref<Map<string, Set<number>>>(new Map())
-
-  // Instance EventSource
-  let eventSource: EventSource | null = null
-  let reconnectTimer: NodeJS.Timeout | null = null
-  const maxReconnectAttempts = 5
-  let reconnectDelay = 1000 // Start with 1 second
 
   /**
    * Établit la connexion SSE
@@ -174,13 +182,6 @@ export const useNotificationStream = () => {
           const data: MessengerTypingData = JSON.parse(event.data)
           const { conversationId, typingUserId, isTyping } = data
 
-          // Créer le Set si nécessaire
-          if (!messengerTypingUsers.value.has(conversationId)) {
-            messengerTypingUsers.value.set(conversationId, new Set())
-          }
-
-          const typingSet = messengerTypingUsers.value.get(conversationId)!
-
           // Nettoyer le timeout existant pour cet utilisateur
           const timeoutKey = `${conversationId}-${typingUserId}`
           const existingTimeout = typingTimeouts.get(timeoutKey)
@@ -189,14 +190,32 @@ export const useNotificationStream = () => {
             typingTimeouts.delete(timeoutKey)
           }
 
+          // Créer une nouvelle Map pour déclencher la réactivité Vue
+          const newTypingMap = new Map(messengerTypingUsers.value)
+
+          // Créer le Set si nécessaire
+          if (!newTypingMap.has(conversationId)) {
+            newTypingMap.set(conversationId, new Set())
+          }
+
+          const typingSet = new Set(newTypingMap.get(conversationId)!)
+
           if (isTyping) {
             typingSet.add(typingUserId)
 
             // Auto-clean après 5 secondes si pas de mise à jour
             const timeout = setTimeout(() => {
-              typingSet.delete(typingUserId)
-              if (typingSet.size === 0) {
-                messengerTypingUsers.value.delete(conversationId)
+              const cleanupMap = new Map(messengerTypingUsers.value)
+              const cleanupSet = cleanupMap.get(conversationId)
+              if (cleanupSet) {
+                const newCleanupSet = new Set(cleanupSet)
+                newCleanupSet.delete(typingUserId)
+                if (newCleanupSet.size === 0) {
+                  cleanupMap.delete(conversationId)
+                } else {
+                  cleanupMap.set(conversationId, newCleanupSet)
+                }
+                messengerTypingUsers.value = cleanupMap
               }
               typingTimeouts.delete(timeoutKey)
             }, 5000)
@@ -205,9 +224,16 @@ export const useNotificationStream = () => {
           } else {
             typingSet.delete(typingUserId)
             if (typingSet.size === 0) {
-              messengerTypingUsers.value.delete(conversationId)
+              newTypingMap.delete(conversationId)
             }
           }
+
+          // Mettre à jour le Set dans la Map si non vide
+          if (typingSet.size > 0) {
+            newTypingMap.set(conversationId, typingSet)
+          }
+
+          messengerTypingUsers.value = newTypingMap
         } catch (error) {
           console.error('[SSE Client] Erreur parsing messenger_typing:', error)
         }
@@ -220,7 +246,10 @@ export const useNotificationStream = () => {
           const { conversationId, presentUserIds } = data
 
           // Mettre à jour la liste des utilisateurs présents
-          messengerPresence.value.set(conversationId, new Set(presentUserIds))
+          // Créer une nouvelle Map pour déclencher la réactivité Vue
+          const newPresenceMap = new Map(messengerPresence.value)
+          newPresenceMap.set(conversationId, new Set(presentUserIds))
+          messengerPresence.value = newPresenceMap
         } catch (error) {
           console.error('[SSE Client] Erreur parsing messenger_presence:', error)
         }
@@ -357,7 +386,10 @@ export const useNotificationStream = () => {
    * Utilisé pour le chargement initial (avant les mises à jour SSE)
    */
   const initPresenceForConversation = (conversationId: string, userIds: number[]): void => {
-    messengerPresence.value.set(conversationId, new Set(userIds))
+    // Créer une nouvelle Map pour déclencher la réactivité Vue
+    const newPresenceMap = new Map(messengerPresence.value)
+    newPresenceMap.set(conversationId, new Set(userIds))
+    messengerPresence.value = newPresenceMap
   }
 
   /**
