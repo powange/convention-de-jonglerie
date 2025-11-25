@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { messengerUnreadService } from '@@/server/utils/messenger-unread-service'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -59,6 +60,11 @@ export default wrapApiHandler(
         lastReadMessageId: messageId,
         lastReadAt: new Date(), // On garde aussi lastReadAt pour compatibilité
       },
+    })
+
+    // Envoyer le compteur de messages non lus mis à jour via SSE
+    messengerUnreadService.sendUnreadCountToUser(user.id).catch((error) => {
+      console.error('[Messenger] Erreur lors de la mise à jour du compteur SSE:', error)
     })
 
     return {

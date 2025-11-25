@@ -2,6 +2,10 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { getUserAvatarUrl } from '@@/server/utils/avatar-url'
 import { conversationPresenceService } from '@@/server/utils/conversation-presence-service'
+import {
+  messengerStreamService,
+  messengerUnreadService,
+} from '@@/server/utils/messenger-unread-service'
 import { unifiedPushService } from '@@/server/utils/unified-push-service'
 import { z } from 'zod'
 
@@ -303,6 +307,30 @@ export default wrapApiHandler(
         }
       })
     )
+
+    // Envoyer les événements SSE aux autres participants
+    const otherParticipantIds = participantsWithReadStatus.map((p) => p.userId)
+    if (otherParticipantIds.length > 0) {
+      // Données du nouveau message pour le stream SSE
+      const newMessageData = {
+        conversationId,
+        messageId: message.id,
+        content: message.content,
+        createdAt: message.createdAt,
+        senderId: user.id,
+        senderPseudo: user.pseudo,
+      }
+
+      // Exécuter en arrière-plan sans bloquer la réponse
+      Promise.all([
+        // Envoyer la notification de nouveau message
+        messengerStreamService.sendNewMessageToUsers(otherParticipantIds, newMessageData),
+        // Envoyer le compteur de messages non lus mis à jour
+        messengerUnreadService.sendUnreadCountToUsers(otherParticipantIds),
+      ]).catch((error) => {
+        console.error('[Messenger] Erreur lors de la mise à jour SSE:', error)
+      })
+    }
 
     // Transformer le message pour supprimer participantId
     const { participantId: _participantId, ...messageWithoutParticipantId } = message

@@ -665,12 +665,8 @@ const formattedMessages = computed(() => {
 const { realtimeMessages: streamRealtimeMessages, messageUpdates } =
   useMessengerStream(selectedConversationId)
 
-// Stream SSE global pour toutes les conversations
-const {
-  newMessageNotifications,
-  typingEvents,
-  connect: connectGlobalStream,
-} = useGlobalMessengerStream()
+// Stream SSE de notifications (inclut les événements messenger)
+const { messengerNewMessages, getTypingUsersForConversation } = useNotificationStream()
 
 // Gestion du typing indicator
 const { handleInput: handleTypingInput } = useTypingIndicator(selectedConversationId)
@@ -679,8 +675,8 @@ const { handleInput: handleTypingInput } = useTypingIndicator(selectedConversati
 const typingUsersInCurrentConversation = computed(() => {
   if (!selectedConversationId.value) return []
 
-  const userIds = typingEvents.value.get(selectedConversationId.value)
-  if (!userIds || userIds.length === 0) return []
+  const userIds = getTypingUsersForConversation(selectedConversationId.value)
+  if (userIds.length === 0) return []
 
   // Récupérer les infos des utilisateurs depuis les participants de la conversation
   const conversation = selectedConversation.value
@@ -926,8 +922,8 @@ onMounted(async () => {
 
     loading.value = false
 
-    // Connecter le stream global pour recevoir les notifications de nouveaux messages
-    connectGlobalStream()
+    // Le stream de notifications est déjà connecté globalement via app.vue
+    // Il inclut maintenant les événements messenger (nouveaux messages, typing)
 
     // Si conversationId dans query params, sélectionner la conversation
     const queryConversationId = route.query.conversationId
@@ -1229,7 +1225,7 @@ watch(
 
 // Surveiller les notifications globales de nouveaux messages pour mettre à jour les compteurs
 watch(
-  newMessageNotifications,
+  messengerNewMessages,
   (notifications) => {
     if (notifications.length === 0) return
 
@@ -1242,7 +1238,7 @@ watch(
       return
     }
 
-    // Mettre à jour la conversation concernée
+    // Mettre à jour la conversation concernée dans les éditions
     for (const [_editionId, data] of editionsWithConversations.value.entries()) {
       const conversation = data.conversations.find((c) => c.id === notification.conversationId)
       if (conversation) {
@@ -1257,7 +1253,7 @@ watch(
             createdAt: notification.createdAt,
             participant: {
               user: {
-                id: notification.participant.user.id,
+                id: notification.senderId,
               },
             },
           },
@@ -1265,8 +1261,34 @@ watch(
 
         // Mettre à jour updatedAt pour le tri
         conversation.updatedAt = notification.createdAt
-        break
+        return
       }
+    }
+
+    // Vérifier aussi les conversations privées
+    const privateConv = privateConversations.value.find(
+      (c) => c.id === notification.conversationId
+    )
+    if (privateConv) {
+      // Incrémenter le compteur de messages non lus
+      privateConv.unreadCount = (privateConv.unreadCount || 0) + 1
+
+      // Mettre à jour le dernier message affiché dans la liste
+      privateConv.messages = [
+        {
+          id: notification.messageId,
+          content: notification.content,
+          createdAt: notification.createdAt,
+          participant: {
+            user: {
+              id: notification.senderId,
+            },
+          },
+        },
+      ]
+
+      // Mettre à jour updatedAt pour le tri
+      privateConv.updatedAt = notification.createdAt
     }
   },
   { deep: true }

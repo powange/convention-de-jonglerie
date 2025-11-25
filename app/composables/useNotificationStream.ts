@@ -11,6 +11,26 @@ interface SSEConnectionStats {
   error: string | null
 }
 
+interface MessengerUnreadData {
+  unreadCount: number
+  conversationCount: number
+}
+
+interface MessengerNewMessageData {
+  conversationId: string
+  messageId: string
+  content: string
+  createdAt: Date
+  senderId: number
+  senderPseudo: string
+}
+
+interface MessengerTypingData {
+  conversationId: string
+  typingUserId: number
+  isTyping: boolean
+}
+
 export const useNotificationStream = () => {
   const notificationStore = useNotificationsStore()
   const authStore = useAuthStore()
@@ -25,6 +45,21 @@ export const useNotificationStream = () => {
     reconnectAttempts: 0,
     error: null,
   })
+
+  // État du compteur de messages non lus (messenger)
+  const messengerUnread = ref<MessengerUnreadData>({
+    unreadCount: 0,
+    conversationCount: 0,
+  })
+
+  // Notifications de nouveaux messages (messenger)
+  const messengerNewMessages = ref<MessengerNewMessageData[]>([])
+
+  // État de typing par conversation (conversationId -> Set<userId>)
+  const messengerTypingUsers = ref<Map<string, Set<number>>>(new Map())
+
+  // Timeouts pour nettoyer automatiquement les états de typing
+  const typingTimeouts = new Map<string, NodeJS.Timeout>()
 
   // Instance EventSource
   let eventSource: EventSource | null = null
@@ -101,6 +136,71 @@ export const useNotificationStream = () => {
       eventSource.addEventListener('ping', () => {
         connectionStats.value.lastPing = new Date()
         // console.log('[SSE Client] Ping reçu')
+      })
+
+      // Réception des mises à jour du compteur messenger
+      eventSource.addEventListener('messenger_unread', (event) => {
+        try {
+          const data: MessengerUnreadData = JSON.parse(event.data)
+          messengerUnread.value = data
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_unread:', error)
+        }
+      })
+
+      // Réception des nouveaux messages messenger
+      eventSource.addEventListener('messenger_new_message', (event) => {
+        try {
+          const data: MessengerNewMessageData = JSON.parse(event.data)
+          messengerNewMessages.value.push(data)
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_new_message:', error)
+        }
+      })
+
+      // Réception des événements de typing messenger
+      eventSource.addEventListener('messenger_typing', (event) => {
+        try {
+          const data: MessengerTypingData = JSON.parse(event.data)
+          const { conversationId, typingUserId, isTyping } = data
+
+          // Créer le Set si nécessaire
+          if (!messengerTypingUsers.value.has(conversationId)) {
+            messengerTypingUsers.value.set(conversationId, new Set())
+          }
+
+          const typingSet = messengerTypingUsers.value.get(conversationId)!
+
+          // Nettoyer le timeout existant pour cet utilisateur
+          const timeoutKey = `${conversationId}-${typingUserId}`
+          const existingTimeout = typingTimeouts.get(timeoutKey)
+          if (existingTimeout) {
+            clearTimeout(existingTimeout)
+            typingTimeouts.delete(timeoutKey)
+          }
+
+          if (isTyping) {
+            typingSet.add(typingUserId)
+
+            // Auto-clean après 5 secondes si pas de mise à jour
+            const timeout = setTimeout(() => {
+              typingSet.delete(typingUserId)
+              if (typingSet.size === 0) {
+                messengerTypingUsers.value.delete(conversationId)
+              }
+              typingTimeouts.delete(timeoutKey)
+            }, 5000)
+
+            typingTimeouts.set(timeoutKey, timeout)
+          } else {
+            typingSet.delete(typingUserId)
+            if (typingSet.size === 0) {
+              messengerTypingUsers.value.delete(conversationId)
+            }
+          }
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_typing:', error)
+        }
       })
 
       // Gestion des erreurs
@@ -187,6 +287,41 @@ export const useNotificationStream = () => {
   }
 
   /**
+   * Charge le compteur de messages non lus initial depuis l'API
+   */
+  const fetchMessengerUnreadCount = async () => {
+    if (!authStore.user) {
+      messengerUnread.value = { unreadCount: 0, conversationCount: 0 }
+      return
+    }
+
+    try {
+      const response = await $fetch<{
+        success: boolean
+        data: { unreadCount: number; conversationCount: number }
+      }>('/api/messenger/unread-count')
+      messengerUnread.value = response.data
+    } catch (error) {
+      console.error('[SSE Client] Erreur lors de la récupération des messages non lus:', error)
+    }
+  }
+
+  /**
+   * Vide la liste des nouveaux messages messenger
+   */
+  const clearMessengerNewMessages = () => {
+    messengerNewMessages.value = []
+  }
+
+  /**
+   * Récupère les IDs des utilisateurs en train d'écrire dans une conversation
+   */
+  const getTypingUsersForConversation = (conversationId: string): number[] => {
+    const typingSet = messengerTypingUsers.value.get(conversationId)
+    return typingSet ? Array.from(typingSet) : []
+  }
+
+  /**
    * Utilitaire pour obtenir la couleur selon le type de notification
    */
   const getNotificationColor = (type: string) => {
@@ -237,11 +372,25 @@ export const useNotificationStream = () => {
     isConnected: computed(() => connectionStats.value.isConnected),
     isConnecting: computed(() => connectionStats.value.isConnecting),
 
+    // État messenger - compteur
+    messengerUnread: readonly(messengerUnread),
+    messengerUnreadCount: computed(() => messengerUnread.value.unreadCount),
+    messengerConversationCount: computed(() => messengerUnread.value.conversationCount),
+
+    // État messenger - nouveaux messages
+    messengerNewMessages: readonly(messengerNewMessages),
+
+    // État messenger - typing
+    messengerTypingUsers: readonly(messengerTypingUsers),
+
     // Actions
     connect,
     disconnect,
     reconnect,
     cleanup,
     handleVisibilityChange,
+    fetchMessengerUnreadCount,
+    clearMessengerNewMessages,
+    getTypingUsersForConversation,
   }
 }

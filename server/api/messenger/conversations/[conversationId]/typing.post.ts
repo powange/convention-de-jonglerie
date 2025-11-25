@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { messengerStreamService } from '@@/server/utils/messenger-unread-service'
 import { z } from 'zod'
 
 const typingSchema = z.object({
@@ -34,12 +35,29 @@ export default wrapApiHandler(
 
     const { isTyping } = parse.data
 
-    // Vérifier que l'utilisateur est participant de cette conversation
+    // Vérifier que l'utilisateur est participant de cette conversation et récupérer les autres participants
     const participant = await prisma.conversationParticipant.findFirst({
       where: {
         conversationId,
         userId: user.id,
         leftAt: null,
+      },
+      include: {
+        conversation: {
+          include: {
+            participants: {
+              where: {
+                leftAt: null,
+                userId: {
+                  not: user.id, // Tous les participants sauf l'utilisateur actuel
+                },
+              },
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
       },
     })
 
@@ -50,8 +68,22 @@ export default wrapApiHandler(
       })
     }
 
-    // Stocker l'état de typing en mémoire
+    // Stocker l'état de typing en mémoire (pour compatibilité)
     setTypingState(user.id, conversationId, isTyping)
+
+    // Envoyer l'événement de typing aux autres participants via SSE
+    const otherParticipantIds = participant.conversation.participants.map((p) => p.userId)
+    if (otherParticipantIds.length > 0) {
+      messengerStreamService
+        .sendTypingToUsers(otherParticipantIds, {
+          conversationId,
+          typingUserId: user.id,
+          isTyping,
+        })
+        .catch((error) => {
+          console.error('[Messenger] Erreur lors de l\'envoi du typing SSE:', error)
+        })
+    }
 
     return { success: true, isTyping }
   },

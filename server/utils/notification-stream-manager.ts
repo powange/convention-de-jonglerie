@@ -73,6 +73,54 @@ class NotificationStreamManager {
    * Envoie une notification à toutes les connexions d'un utilisateur
    */
   async notifyUser(userId: number, notification: any) {
+    return this.sendEvent(userId, 'notification', notification)
+  }
+
+  /**
+   * Envoie le compteur de messages non lus à un utilisateur
+   */
+  async sendMessengerUnreadCount(
+    userId: number,
+    data: { unreadCount: number; conversationCount: number }
+  ) {
+    return this.sendEvent(userId, 'messenger_unread', data)
+  }
+
+  /**
+   * Envoie une notification de nouveau message à un utilisateur
+   */
+  async sendMessengerNewMessage(
+    userId: number,
+    data: {
+      conversationId: string
+      messageId: string
+      content: string
+      createdAt: Date
+      senderId: number
+      senderPseudo: string
+    }
+  ) {
+    return this.sendEvent(userId, 'messenger_new_message', data)
+  }
+
+  /**
+   * Envoie un événement de typing à un utilisateur
+   */
+  async sendMessengerTyping(
+    userId: number,
+    data: {
+      conversationId: string
+      typingUserId: number
+      isTyping: boolean
+    }
+  ) {
+    return this.sendEvent(userId, 'messenger_typing', data)
+  }
+
+  /**
+   * Envoie un événement générique à toutes les connexions d'un utilisateur
+   */
+  private async sendEvent(userId: number, eventName: string, data: any) {
     const userConnectionIds = this.userConnections.get(userId)
     if (!userConnectionIds || userConnectionIds.size === 0) {
       return false // Aucune connexion active
@@ -90,12 +138,12 @@ class NotificationStreamManager {
 
       try {
         connection.stream.push({
-          event: 'notification',
-          data: JSON.stringify(notification),
+          event: eventName,
+          data: JSON.stringify(data),
         })
         sentCount++
       } catch (error) {
-        console.error(`[SSE] Erreur envoi notification à ${connectionId}:`, error)
+        console.error(`[SSE] Erreur envoi ${eventName} à ${connectionId}:`, error)
         toRemove.push(connectionId)
       }
     }
