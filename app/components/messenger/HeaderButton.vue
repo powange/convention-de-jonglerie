@@ -1,5 +1,6 @@
 <template>
-  <NuxtLink to="/messenger">
+  <!-- Afficher uniquement si l'utilisateur a au moins une conversation -->
+  <NuxtLink v-if="hasConversations" to="/messenger">
     <UButton
       icon="i-heroicons-chat-bubble-left-right"
       variant="ghost"
@@ -25,20 +26,27 @@ import { useAuthStore } from '~/stores/auth'
 const authStore = useAuthStore()
 
 const unreadCount = ref(0)
+const conversationCount = ref(0)
 let pollingInterval: ReturnType<typeof setInterval> | null = null
 
-// Fonction pour récupérer le nombre de messages non lus
+// L'utilisateur a-t-il au moins une conversation ?
+const hasConversations = computed(() => conversationCount.value > 0)
+
+// Fonction pour récupérer le nombre de messages non lus et de conversations
 const fetchUnreadCount = async () => {
   if (!authStore.isAuthenticated) {
     unreadCount.value = 0
+    conversationCount.value = 0
     return
   }
 
   try {
-    const response = await $fetch<{ success: boolean; data: { unreadCount: number } }>(
-      '/api/messenger/unread-count'
-    )
+    const response = await $fetch<{
+      success: boolean
+      data: { unreadCount: number; conversationCount: number }
+    }>('/api/messenger/unread-count')
     unreadCount.value = response.data.unreadCount
+    conversationCount.value = response.data.conversationCount
   } catch (error) {
     console.error('Erreur lors de la récupération des messages non lus:', error)
   }
@@ -90,6 +98,7 @@ watch(
       startPolling()
     } else {
       unreadCount.value = 0
+      conversationCount.value = 0
       stopPolling()
     }
   }

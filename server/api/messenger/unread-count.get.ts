@@ -21,10 +21,12 @@ export default wrapApiHandler(
       },
     })
 
-    if (participations.length === 0) {
+    const conversationCount = participations.length
+
+    if (conversationCount === 0) {
       return {
         success: true,
-        data: { unreadCount: 0 },
+        data: { unreadCount: 0, conversationCount: 0 },
       }
     }
 
@@ -51,7 +53,7 @@ export default wrapApiHandler(
 
     return {
       success: true,
-      data: { unreadCount: totalUnread },
+      data: { unreadCount: totalUnread, conversationCount },
     }
   },
   { operationName: 'GetMessengerUnreadCount' }
