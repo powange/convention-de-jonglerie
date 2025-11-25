@@ -25,67 +25,78 @@
 
             <div v-else class="space-y-4">
               <!-- Section Conversations privées -->
-              <div v-if="sortedPrivateConversations.length > 0">
-                <div
-                  class="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2"
-                >
-                  <div class="flex items-center gap-2">
-                    <UIcon
-                      name="i-heroicons-chat-bubble-left-right"
-                      class="w-5 h-5 text-gray-500"
-                    />
-                    <span class="font-medium text-sm">{{
-                      $t('messenger.private_conversations')
-                    }}</span>
-                  </div>
-                  <UBadge v-if="privateConversationsTotalUnread > 0" color="error" size="sm">
-                    {{ privateConversationsTotalUnread }}
-                  </UBadge>
-                </div>
+              <UAccordion
+                v-if="sortedPrivateConversations.length > 0"
+                v-model="openPrivateAccordion"
+                type="multiple"
+                :items="privateAccordionItems"
+                :unmount-on-hide="false"
+              >
+                <template #leading>
+                  <UIcon
+                    name="i-heroicons-chat-bubble-left-right"
+                    class="w-10 h-10 text-gray-400"
+                  />
+                </template>
 
-                <div class="space-y-2 pl-2">
-                  <button
-                    v-for="conversation in sortedPrivateConversations"
-                    :key="conversation.id"
-                    :class="[
-                      'w-full text-left p-3 rounded-lg transition-colors',
-                      selectedConversationId === conversation.id
-                        ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent',
-                    ]"
-                    @click="selectConversation(conversation.id)"
-                  >
-                    <div class="flex items-start justify-between gap-2">
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-3">
-                          <!-- Avatar de l'autre participant pour les conversations privées -->
-                          <UiUserAvatar
-                            v-if="getOtherParticipant(conversation)"
-                            :user="getOtherParticipant(conversation)!"
-                            size="md"
-                          />
-                          <UIcon v-else :name="getConversationIcon(conversation)" />
-                          <p class="font-medium truncate">
-                            {{ getConversationDisplayName(conversation) }}
+                <template #trailing="{ open }">
+                  <div class="flex items-center gap-2">
+                    <UBadge v-if="privateConversationsTotalUnread > 0" color="error" size="sm">
+                      {{ privateConversationsTotalUnread }}
+                    </UBadge>
+                    <UIcon
+                      name="i-heroicons-chevron-down"
+                      class="transition-transform duration-200"
+                      :class="[open ? 'rotate-180' : '']"
+                    />
+                  </div>
+                </template>
+
+                <template #body>
+                  <div class="space-y-2 ml-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                    <button
+                      v-for="conversation in sortedPrivateConversations"
+                      :key="conversation.id"
+                      :class="[
+                        'w-full text-left p-3 rounded-lg transition-colors',
+                        selectedConversationId === conversation.id
+                          ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent',
+                      ]"
+                      @click="selectConversation(conversation.id)"
+                    >
+                      <div class="flex items-start justify-between gap-2">
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-3">
+                            <!-- Avatar de l'autre participant pour les conversations privées -->
+                            <UiUserAvatar
+                              v-if="getOtherParticipant(conversation)"
+                              :user="getOtherParticipant(conversation)!"
+                              size="md"
+                            />
+                            <UIcon v-else :name="getConversationIcon(conversation)" />
+                            <p class="font-medium truncate">
+                              {{ getConversationDisplayName(conversation) }}
+                            </p>
+                          </div>
+                          <!-- Dernier message -->
+                          <p
+                            v-if="conversation.messages[0]"
+                            class="text-sm text-gray-600 dark:text-gray-400 truncate mt-1"
+                          >
+                            {{ conversation.messages[0].content }}
                           </p>
                         </div>
-                        <!-- Dernier message -->
-                        <p
-                          v-if="conversation.messages[0]"
-                          class="text-sm text-gray-600 dark:text-gray-400 truncate mt-1"
-                        >
-                          {{ conversation.messages[0].content }}
-                        </p>
-                      </div>
 
-                      <!-- Badge non lu -->
-                      <UBadge v-if="conversation.unreadCount > 0" color="error" size="sm">
-                        {{ conversation.unreadCount }}
-                      </UBadge>
-                    </div>
-                  </button>
-                </div>
-              </div>
+                        <!-- Badge non lu -->
+                        <UBadge v-if="conversation.unreadCount > 0" color="error" size="sm">
+                          {{ conversation.unreadCount }}
+                        </UBadge>
+                      </div>
+                    </button>
+                  </div>
+                </template>
+              </UAccordion>
 
               <!-- Section Conversations par édition -->
               <UAccordion
@@ -126,7 +137,7 @@
                 </template>
 
                 <template #body="{ item }">
-                  <div class="space-y-2">
+                  <div class="space-y-2 ml-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
                     <button
                       v-for="conversation in item.conversations"
                       :key="conversation.id"
@@ -485,6 +496,7 @@ const messages = ref<ConversationMessage[]>([])
 const selectedConversationId = ref<string | null>(null)
 const newMessage = ref('')
 const openAccordionItems = ref<string[]>([])
+const openPrivateAccordion = ref<string[]>(['private']) // Ouvert par défaut
 const chatPromptRef = ref()
 const messagesContainerRef = ref<HTMLElement | null>(null)
 const replyingToMessage = ref<ConversationMessage | null>(null)
@@ -560,6 +572,14 @@ const sortedPrivateConversations = computed(() => {
     return dateB - dateA // Ordre décroissant (plus récent en premier)
   })
 })
+
+// Item d'accordéon pour les conversations privées
+const privateAccordionItems = computed(() => [
+  {
+    label: t('messenger.private_conversations'),
+    value: 'private',
+  },
+])
 
 // Total des messages non lus des conversations privées
 const privateConversationsTotalUnread = computed(() => {
@@ -1145,9 +1165,14 @@ watch(streamRealtimeMessages, (newMessages) => {
   }
 })
 
-// Surveiller les changements de conversation sélectionnée pour ouvrir automatiquement l'édition correspondante
+// Surveiller les changements de conversation sélectionnée pour ouvrir automatiquement l'accordéon correspondant
 watch(selectedEditionId, (newEditionId) => {
-  if (newEditionId && !openAccordionItems.value.includes(newEditionId)) {
+  if (newEditionId === 'private') {
+    // Ouvrir l'accordéon des conversations privées
+    if (!openPrivateAccordion.value.includes('private')) {
+      openPrivateAccordion.value.push('private')
+    }
+  } else if (newEditionId && !openAccordionItems.value.includes(newEditionId)) {
     openAccordionItems.value.push(newEditionId)
   }
 })
