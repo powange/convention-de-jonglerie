@@ -318,3 +318,136 @@ export async function ensureVolunteerToOrganizersConversation(
 
   return conversation.id
 }
+
+/**
+ * Crée ou récupère la conversation de groupe entre tous les organisateurs d'une édition
+ * @param editionId - ID de l'édition
+ * @param tx - Transaction Prisma optionnelle
+ * @returns L'ID de la conversation créée ou existante
+ */
+export async function ensureOrganizersGroupConversation(
+  editionId: number,
+  tx?: PrismaTransaction
+): Promise<string> {
+  const client = tx || prisma
+
+  // 1. Récupérer tous les organisateurs de l'édition (table EditionOrganizer)
+  // On passe par la relation organizer (ConventionOrganizer) pour obtenir le userId
+  const editionOrganizers = await client.editionOrganizer.findMany({
+    where: {
+      editionId,
+    },
+    select: {
+      organizer: {
+        select: {
+          userId: true,
+        },
+      },
+    },
+  })
+
+  const organizerUserIds = editionOrganizers.map((org) => org.organizer.userId)
+
+  // Si aucun organisateur, lever une erreur
+  if (organizerUserIds.length === 0) {
+    throw new Error('Aucun organisateur trouvé pour cette édition')
+  }
+
+  // 2. Chercher la conversation existante de type ORGANIZERS_GROUP pour cette édition
+  const existingConversation = await client.conversation.findFirst({
+    where: {
+      editionId,
+      teamId: null,
+      type: 'ORGANIZERS_GROUP',
+    },
+    include: {
+      participants: true,
+    },
+  })
+
+  let conversation: { id: string }
+
+  if (!existingConversation) {
+    // 3. Créer une nouvelle conversation avec tous les organisateurs
+    conversation = await client.conversation.create({
+      data: {
+        editionId,
+        teamId: null,
+        type: 'ORGANIZERS_GROUP',
+        participants: {
+          create: organizerUserIds.map((userId) => ({
+            userId,
+          })),
+        },
+      },
+    })
+  } else {
+    // 4. Synchroniser les participants
+    conversation = existingConversation
+
+    // Pour chaque organisateur actuel
+    for (const organizerUserId of organizerUserIds) {
+      const existingParticipant = existingConversation.participants.find(
+        (p) => p.userId === organizerUserId
+      )
+
+      if (!existingParticipant) {
+        // Ajouter le nouvel organisateur
+        await client.conversationParticipant.create({
+          data: {
+            conversationId: conversation.id,
+            userId: organizerUserId,
+          },
+        })
+      } else if (existingParticipant.leftAt) {
+        // Réactiver l'organisateur s'il avait quitté
+        await client.conversationParticipant.update({
+          where: { id: existingParticipant.id },
+          data: { leftAt: null },
+        })
+      }
+    }
+
+    // Marquer comme "parti" les participants qui ne sont plus organisateurs
+    for (const participant of existingConversation.participants) {
+      if (!organizerUserIds.includes(participant.userId) && !participant.leftAt) {
+        await client.conversationParticipant.update({
+          where: { id: participant.id },
+          data: { leftAt: new Date() },
+        })
+      }
+    }
+  }
+
+  return conversation.id
+}
+
+/**
+ * Synchronise les participants de la conversation ORGANIZERS_GROUP quand un organisateur est ajouté/retiré
+ * @param editionId - ID de l'édition
+ * @param tx - Transaction Prisma optionnelle
+ */
+export async function syncOrganizersGroupParticipants(
+  editionId: number,
+  tx?: PrismaTransaction
+): Promise<void> {
+  const client = tx || prisma
+
+  // Vérifier si la conversation existe
+  const existingConversation = await client.conversation.findFirst({
+    where: {
+      editionId,
+      teamId: null,
+      type: 'ORGANIZERS_GROUP',
+    },
+  })
+
+  // Si la conversation n'existe pas encore, ne rien faire
+  // Elle sera créée quand un organisateur y accèdera
+  if (!existingConversation) {
+    return
+  }
+
+  // Appeler ensureOrganizersGroupConversation qui synchronisera les participants
+  await ensureOrganizersGroupConversation(editionId, tx)
+}

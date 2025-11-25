@@ -1,3 +1,4 @@
+import { syncOrganizersGroupParticipants } from '@@/server/utils/messenger-helpers'
 import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
@@ -147,6 +148,9 @@ export default wrapApiHandler(
           },
         },
       })
+
+      // Synchroniser les participants de la conversation organisateurs (si elle existe)
+      await syncOrganizersGroupParticipants(editionId)
 
       return {
         success: true,

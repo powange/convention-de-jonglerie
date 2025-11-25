@@ -58,7 +58,7 @@ export interface ConversationMessage {
 
 export interface Conversation {
   id: string
-  type: 'TEAM_GROUP' | 'TEAM_LEADER_PRIVATE' | 'VOLUNTEER_TO_ORGANIZERS'
+  type: 'TEAM_GROUP' | 'TEAM_LEADER_PRIVATE' | 'VOLUNTEER_TO_ORGANIZERS' | 'ORGANIZERS_GROUP'
   createdAt: Date
   updatedAt: Date
   team: {

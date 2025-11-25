@@ -1536,6 +1536,7 @@ enum ConversationType {
   TEAM_GROUP // Discussion de groupe d'équipe
   TEAM_LEADER_PRIVATE // Conversation privée avec le responsable d'équipe
   VOLUNTEER_TO_ORGANIZERS // Conversation entre un bénévole et les organisateurs ayant les droits de gestion des bénévoles
+  ORGANIZERS_GROUP // Discussion de groupe entre tous les organisateurs de l'édition
 }
 
 model Conversation {

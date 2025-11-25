@@ -6,8 +6,10 @@
     "conversation_types": {
       "group": "Discussion de groupe",
       "organizers": "Conversation avec les organisateurs",
+      "organizers_group": "Discussion entre organisateurs",
       "private": "Conversation privée"
     },
+    "organizers_group": "Groupe organisateurs",
     "conversations": "Conversations",
     "delete": "Supprimer",
     "edited": "modifié",
@@ -28,6 +30,7 @@
     "subtitles": {
       "group": "Groupe",
       "organizers": "Organisateurs",
+      "organizers_group": "Groupe organisateurs",
       "private_leader": "Privé avec le responsable",
       "private_leaders": "Privé avec les responsables"
     },

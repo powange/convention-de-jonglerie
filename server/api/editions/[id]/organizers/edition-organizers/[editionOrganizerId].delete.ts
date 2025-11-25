@@ -1,3 +1,4 @@
+import { syncOrganizersGroupParticipants } from '@@/server/utils/messenger-helpers'
 import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
@@ -81,6 +82,9 @@ export default wrapApiHandler(
           id: editionOrganizerId,
         },
       })
+
+      // Synchroniser les participants de la conversation organisateurs (si elle existe)
+      await syncOrganizersGroupParticipants(editionId)
 
       return {
         success: true,

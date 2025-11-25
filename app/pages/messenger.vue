@@ -77,13 +77,7 @@
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                           <UIcon
-                            :name="
-                              conversation.type === 'TEAM_GROUP'
-                                ? 'i-heroicons-user-group'
-                                : conversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                                  ? 'i-heroicons-megaphone'
-                                  : 'i-heroicons-user'
-                            "
+                            :name="getConversationIcon(conversation)"
                             :style="conversation.team ? { color: conversation.team.color } : {}"
                           />
                           <p class="font-medium truncate">
@@ -139,13 +133,7 @@
                 />
 
                 <UIcon
-                  :name="
-                    selectedConversation.type === 'TEAM_GROUP'
-                      ? 'i-heroicons-user-group'
-                      : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                        ? 'i-heroicons-megaphone'
-                        : 'i-heroicons-user'
-                  "
+                  :name="getConversationIcon(selectedConversation)"
                   :style="
                     selectedConversation.team ? { color: selectedConversation.team.color } : {}
                   "
@@ -156,13 +144,7 @@
                     {{ getConversationDisplayName(selectedConversation) }}
                   </h3>
                   <p class="text-xs text-gray-500">
-                    {{
-                      selectedConversation.type === 'TEAM_GROUP'
-                        ? $t('messenger.conversation_types.group')
-                        : selectedConversation.type === 'VOLUNTEER_TO_ORGANIZERS'
-                          ? $t('messenger.conversation_types.organizers')
-                          : $t('messenger.conversation_types.private')
-                    }}
+                    {{ getConversationTypeLabel(selectedConversation) }}
                   </p>
                 </div>
               </div>
@@ -651,11 +633,47 @@ function handleScroll() {
 }
 
 /**
+ * Retourne l'icône d'une conversation selon son type
+ */
+function getConversationIcon(conversation: Conversation): string {
+  switch (conversation.type) {
+    case 'TEAM_GROUP':
+      return 'i-heroicons-user-group'
+    case 'VOLUNTEER_TO_ORGANIZERS':
+      return 'i-heroicons-megaphone'
+    case 'ORGANIZERS_GROUP':
+      return 'i-heroicons-building-office-2'
+    default:
+      return 'i-heroicons-user'
+  }
+}
+
+/**
+ * Retourne le libellé du type de conversation
+ */
+function getConversationTypeLabel(conversation: Conversation): string {
+  switch (conversation.type) {
+    case 'TEAM_GROUP':
+      return t('messenger.conversation_types.group')
+    case 'VOLUNTEER_TO_ORGANIZERS':
+      return t('messenger.conversation_types.organizers')
+    case 'ORGANIZERS_GROUP':
+      return t('messenger.conversation_types.organizers_group')
+    default:
+      return t('messenger.conversation_types.private')
+  }
+}
+
+/**
  * Retourne le nom d'affichage d'une conversation
  */
 function getConversationDisplayName(conversation: Conversation): string {
   if (conversation.type === 'VOLUNTEER_TO_ORGANIZERS') {
     return t('messenger.volunteer_managers')
+  }
+
+  if (conversation.type === 'ORGANIZERS_GROUP') {
+    return t('messenger.organizers_group')
   }
 
   if (conversation.type === 'TEAM_GROUP') {
@@ -700,6 +718,10 @@ function getConversationSubtitle(conversation: Conversation): string {
 
   if (conversation.type === 'VOLUNTEER_TO_ORGANIZERS') {
     return t('messenger.subtitles.organizers')
+  }
+
+  if (conversation.type === 'ORGANIZERS_GROUP') {
+    return t('messenger.subtitles.organizers_group')
   }
 
   // Pour les conversations privées (TEAM_LEADER_PRIVATE)

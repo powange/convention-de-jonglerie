@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { ensureOrganizersGroupConversation } from '@@/server/utils/messenger-helpers'
 import { z } from 'zod'
 
 const querySchema = z.object({
@@ -45,14 +46,30 @@ export default wrapApiHandler(
       }),
     ])
 
-    const isOrganizer = edition?.convention?.organizers?.length > 0
-    const hasAccess = volunteerApplication || isOrganizer
+    // Vérifier si l'utilisateur est un organisateur de l'édition (EditionOrganizer)
+    const editionOrganizer = await prisma.editionOrganizer.findFirst({
+      where: {
+        editionId,
+        organizer: {
+          userId: user.id,
+        },
+      },
+    })
+
+    const isConventionOrganizer = edition?.convention?.organizers?.length > 0
+    const isEditionOrganizer = !!editionOrganizer
+    const hasAccess = volunteerApplication || isConventionOrganizer || isEditionOrganizer
 
     if (!hasAccess) {
       throw createError({
         statusCode: 403,
         message: "Vous n'avez pas accès aux conversations de cette édition",
       })
+    }
+
+    // Si l'utilisateur est un organisateur de l'édition, s'assurer qu'il est dans la conversation groupe organisateurs
+    if (isEditionOrganizer) {
+      await ensureOrganizersGroupConversation(editionId)
     }
 
     // Récupérer les conversations de l'utilisateur pour cette édition
