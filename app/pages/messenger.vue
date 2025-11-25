@@ -500,7 +500,6 @@ const openPrivateAccordion = ref<string[]>(['private']) // Ouvert par défaut
 const chatPromptRef = ref()
 const messagesContainerRef = ref<HTMLElement | null>(null)
 const replyingToMessage = ref<ConversationMessage | null>(null)
-const presentUserIds = ref<number[]>([])
 
 // Pagination des messages
 const hasMoreMessages = ref(true)
@@ -666,10 +665,21 @@ const { realtimeMessages: streamRealtimeMessages, messageUpdates } =
   useMessengerStream(selectedConversationId)
 
 // Stream SSE de notifications (inclut les événements messenger)
-const { messengerNewMessages, getTypingUsersForConversation } = useNotificationStream()
+const {
+  messengerNewMessages,
+  getTypingUsersForConversation,
+  getPresentUsersForConversation,
+  initPresenceForConversation,
+} = useNotificationStream()
 
 // Gestion du typing indicator
 const { handleInput: handleTypingInput } = useTypingIndicator(selectedConversationId)
+
+// Computed pour récupérer les utilisateurs présents dans la conversation courante (via SSE)
+const presentUserIds = computed(() => {
+  if (!selectedConversationId.value) return []
+  return getPresentUsersForConversation(selectedConversationId.value)
+})
 
 // Computed pour récupérer les utilisateurs en train d'écrire dans la conversation courante
 const typingUsersInCurrentConversation = computed(() => {
@@ -1109,27 +1119,6 @@ async function handleDeleteMessage(messageId: string) {
   await deleteMessage(selectedConversationId.value, messageId)
 }
 
-// Récupérer la liste des utilisateurs présents sur la conversation
-async function fetchPresence() {
-  if (!selectedConversationId.value) {
-    presentUserIds.value = []
-    return
-  }
-
-  try {
-    const response = await $fetch<{
-      success: boolean
-      data: { presentUserIds: number[] }
-    }>(`/api/messenger/conversations/${selectedConversationId.value}/presence`)
-
-    if (response.success) {
-      presentUserIds.value = response.data.presentUserIds
-    }
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la présence:', error)
-  }
-}
-
 // Formater le temps du message
 function formatMessageTime(date: Date) {
   const messageDate = new Date(date)
@@ -1266,9 +1255,7 @@ watch(
     }
 
     // Vérifier aussi les conversations privées
-    const privateConv = privateConversations.value.find(
-      (c) => c.id === notification.conversationId
-    )
+    const privateConv = privateConversations.value.find((c) => c.id === notification.conversationId)
     if (privateConv) {
       // Incrémenter le compteur de messages non lus
       privateConv.unreadCount = (privateConv.unreadCount || 0) + 1
@@ -1294,29 +1281,25 @@ watch(
   { deep: true }
 )
 
-// Actualiser la présence quand la conversation change
+// Charger la présence initiale lors du changement de conversation
+// Les mises à jour suivantes arrivent en temps réel via SSE (useNotificationStream)
 watch(selectedConversationId, async (newId) => {
   if (newId) {
-    await fetchPresence()
-  } else {
-    presentUserIds.value = []
-  }
-})
+    // Charger la présence initiale via API (une seule fois)
+    try {
+      const response = await $fetch<{
+        success: boolean
+        data: { presentUserIds: number[] }
+      }>(`/api/messenger/conversations/${newId}/presence`)
 
-// Actualiser la présence toutes les 10 secondes
-let presenceInterval: ReturnType<typeof setInterval> | null = null
-
-onMounted(() => {
-  presenceInterval = setInterval(() => {
-    if (selectedConversationId.value) {
-      fetchPresence()
+      // Initialiser le state de présence dans le composable
+      // Les mises à jour suivantes arriveront via SSE
+      if (response.success) {
+        initPresenceForConversation(newId, response.data.presentUserIds)
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la présence initiale:', error)
     }
-  }, 10000) // 10 secondes
-})
-
-onUnmounted(() => {
-  if (presenceInterval) {
-    clearInterval(presenceInterval)
   }
 })
 </script>

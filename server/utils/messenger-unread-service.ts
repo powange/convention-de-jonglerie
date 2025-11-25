@@ -68,6 +68,47 @@ export const messengerStreamService = {
       })
     )
   },
+
+  /**
+   * Envoie un événement de présence à un utilisateur
+   */
+  async sendPresenceToUser(
+    userId: number,
+    data: {
+      conversationId: string
+      changedUserId: number
+      isPresent: boolean
+      presentUserIds: number[]
+    }
+  ): Promise<boolean> {
+    return notificationStreamManager.sendMessengerPresence(userId, data)
+  },
+
+  /**
+   * Envoie un événement de présence à plusieurs utilisateurs
+   */
+  async sendPresenceToUsers(
+    userIds: number[],
+    data: {
+      conversationId: string
+      changedUserId: number
+      isPresent: boolean
+      presentUserIds: number[]
+    }
+  ): Promise<void> {
+    await Promise.all(
+      userIds.map(async (userId) => {
+        try {
+          await this.sendPresenceToUser(userId, data)
+        } catch (error) {
+          console.error(
+            `[MessengerStream] Erreur lors de l'envoi de la présence à l'utilisateur ${userId}:`,
+            error
+          )
+        }
+      })
+    )
+  },
 }
 
 /**
@@ -77,7 +118,9 @@ export const messengerUnreadService = {
   /**
    * Calcule le nombre de messages non lus pour un utilisateur
    */
-  async getUnreadCount(userId: number): Promise<{ unreadCount: number; conversationCount: number }> {
+  async getUnreadCount(
+    userId: number
+  ): Promise<{ unreadCount: number; conversationCount: number }> {
     // Récupérer toutes les conversations où l'utilisateur est participant actif
     const participations = await prisma.conversationParticipant.findMany({
       where: {

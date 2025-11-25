@@ -81,7 +81,7 @@ export default wrapApiHandler(
           isTyping,
         })
         .catch((error) => {
-          console.error('[Messenger] Erreur lors de l\'envoi du typing SSE:', error)
+          console.error("[Messenger] Erreur lors de l'envoi du typing SSE:", error)
         })
     }
 

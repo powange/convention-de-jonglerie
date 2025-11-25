@@ -118,6 +118,21 @@ class NotificationStreamManager {
   }
 
   /**
+   * Envoie un événement de présence à un utilisateur
+   */
+  async sendMessengerPresence(
+    userId: number,
+    data: {
+      conversationId: string
+      changedUserId: number
+      isPresent: boolean
+      presentUserIds: number[]
+    }
+  ) {
+    return this.sendEvent(userId, 'messenger_presence', data)
+  }
+
+  /**
    * Envoie un événement générique à toutes les connexions d'un utilisateur
    */
   private async sendEvent(userId: number, eventName: string, data: any) {

@@ -31,6 +31,13 @@ interface MessengerTypingData {
   isTyping: boolean
 }
 
+interface MessengerPresenceData {
+  conversationId: string
+  changedUserId: number
+  isPresent: boolean
+  presentUserIds: number[]
+}
+
 export const useNotificationStream = () => {
   const notificationStore = useNotificationsStore()
   const authStore = useAuthStore()
@@ -60,6 +67,9 @@ export const useNotificationStream = () => {
 
   // Timeouts pour nettoyer automatiquement les états de typing
   const typingTimeouts = new Map<string, NodeJS.Timeout>()
+
+  // État de présence par conversation (conversationId -> Set<userId>)
+  const messengerPresence = ref<Map<string, Set<number>>>(new Map())
 
   // Instance EventSource
   let eventSource: EventSource | null = null
@@ -203,6 +213,19 @@ export const useNotificationStream = () => {
         }
       })
 
+      // Réception des événements de présence messenger
+      eventSource.addEventListener('messenger_presence', (event) => {
+        try {
+          const data: MessengerPresenceData = JSON.parse(event.data)
+          const { conversationId, presentUserIds } = data
+
+          // Mettre à jour la liste des utilisateurs présents
+          messengerPresence.value.set(conversationId, new Set(presentUserIds))
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_presence:', error)
+        }
+      })
+
       // Gestion des erreurs
       eventSource.onerror = (error) => {
         console.error('[SSE Client] Erreur de connexion:', {
@@ -322,6 +345,22 @@ export const useNotificationStream = () => {
   }
 
   /**
+   * Récupère les IDs des utilisateurs présents dans une conversation
+   */
+  const getPresentUsersForConversation = (conversationId: string): number[] => {
+    const presenceSet = messengerPresence.value.get(conversationId)
+    return presenceSet ? Array.from(presenceSet) : []
+  }
+
+  /**
+   * Initialise la liste des utilisateurs présents dans une conversation
+   * Utilisé pour le chargement initial (avant les mises à jour SSE)
+   */
+  const initPresenceForConversation = (conversationId: string, userIds: number[]): void => {
+    messengerPresence.value.set(conversationId, new Set(userIds))
+  }
+
+  /**
    * Utilitaire pour obtenir la couleur selon le type de notification
    */
   const getNotificationColor = (type: string) => {
@@ -383,6 +422,9 @@ export const useNotificationStream = () => {
     // État messenger - typing
     messengerTypingUsers: readonly(messengerTypingUsers),
 
+    // État messenger - présence
+    messengerPresence: readonly(messengerPresence),
+
     // Actions
     connect,
     disconnect,
@@ -392,5 +434,7 @@ export const useNotificationStream = () => {
     fetchMessengerUnreadCount,
     clearMessengerNewMessages,
     getTypingUsersForConversation,
+    getPresentUsersForConversation,
+    initPresenceForConversation,
   }
 }
