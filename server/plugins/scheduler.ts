@@ -51,6 +51,15 @@ export default defineNitroPlugin(async (_nitroApp) => {
       }
     })
 
+    // Nettoyage des conversations vides (quotidien à 5h du matin)
+    cron.schedule('0 5 * * *', async () => {
+      try {
+        await runTask('cleanup-empty-conversations')
+      } catch (error) {
+        console.error("Erreur lors de l'exécution de cleanup-empty-conversations:", error)
+      }
+    })
+
     console.log('✅ Système de cron initialisé avec succès')
   } else {
     console.log('⏸️ Système de cron désactivé (développement)')

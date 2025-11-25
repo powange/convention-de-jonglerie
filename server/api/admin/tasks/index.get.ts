@@ -37,6 +37,20 @@ export default wrapApiHandler(
         cronExpression: '0 3 1 * *',
         category: 'Maintenance',
       },
+      {
+        name: 'cleanup-inactive-subscriptions',
+        description: 'Nettoie les subscriptions push inactives',
+        schedule: 'Quotidien à 4h',
+        cronExpression: '0 4 * * *',
+        category: 'Maintenance',
+      },
+      {
+        name: 'cleanup-empty-conversations',
+        description: 'Supprime les conversations sans messages créées il y a plus de 7 jours',
+        schedule: 'Quotidien à 5h',
+        cronExpression: '0 5 * * *',
+        category: 'Maintenance',
+      },
     ]
 
     return {
