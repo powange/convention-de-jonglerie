@@ -46,15 +46,19 @@ const messaging = firebase.messaging()
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Message reçu en arrière-plan:', payload)
 
+  // Les données sont dans payload.data (messages data-only pour éviter les doublons)
+  const data = payload.data || {}
+
   // Personnaliser la notification
-  const notificationTitle = payload.notification?.title || 'Nouvelle notification'
+  const notificationTitle = data.title || 'Nouvelle notification'
   const notificationOptions = {
-    body: payload.notification?.body || '',
-    icon: payload.notification?.icon || '/favicons/android-chrome-192x192.png',
-    badge: payload.notification?.badge || '/favicons/notification-badge.png',
-    tag: payload.data?.id || 'notification',
+    body: data.body || '',
+    // Utiliser l'icon fourni (avatar pour les messages) ou le logo par défaut
+    icon: data.icon || '/favicons/android-chrome-192x192.png',
+    badge: '/favicons/notification-badge.png',
+    tag: data.id || 'notification',
     requireInteraction: false,
-    data: payload.data,
+    data: data,
   }
 
   // Afficher la notification
@@ -68,7 +72,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
   // Ouvrir ou focus l'application
-  const urlToOpen = event.notification.data?.actionUrl || '/'
+  const urlToOpen = event.notification.data?.url || '/'
 
   event.waitUntil(
     clients

@@ -51,7 +51,6 @@ model User {
   passwordResetTokens                PasswordResetToken[]
   favoriteEditions                   Edition[]                           @relation("FavoriteEditions")
   attendingEditions                  Edition[]                           @relation("AttendingEditions")
-  pushSubscriptions                  PushSubscription[]
   fcmTokens                          FcmToken[]
   volunteerNotificationGroups        VolunteerNotificationGroup[]
   volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
@@ -705,21 +704,6 @@ enum NotificationType {
   SUCCESS
   WARNING
   ERROR
-}
-
-model PushSubscription {
-  id        String   @id @default(cuid())
-  userId    Int
-  endpoint  String   @db.VarChar(500)
-  p256dh    String   @db.VarChar(255)
-  auth      String   @db.VarChar(255)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, endpoint])
-  @@index([userId])
 }
 
 model FcmToken {
@@ -1594,14 +1578,14 @@ model ConversationParticipant {
 }
 
 model Message {
-  id              String    @id @default(cuid())
-  conversationId  String
-  participantId   String
-  content         String    @db.Text
-  replyToId       String? // ID du message auquel on répond (optionnel)
-  createdAt       DateTime  @default(now())
-  editedAt        DateTime?
-  deletedAt       DateTime? // Soft delete
+  id             String    @id @default(cuid())
+  conversationId String
+  participantId  String
+  content        String    @db.Text
+  replyToId      String? // ID du message auquel on répond (optionnel)
+  createdAt      DateTime  @default(now())
+  editedAt       DateTime?
+  deletedAt      DateTime? // Soft delete
 
   conversation           Conversation              @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   participant            ConversationParticipant   @relation(fields: [participantId], references: [id], onDelete: Cascade)

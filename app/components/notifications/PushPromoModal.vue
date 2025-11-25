@@ -77,10 +77,8 @@
 <script setup lang="ts">
 import { useFirebaseMessaging } from '~/composables/useFirebaseMessaging'
 import { usePushNotificationPromo } from '~/composables/usePushNotificationPromo'
-import { usePushNotifications } from '~/composables/usePushNotifications'
 
-const { subscribe: subscribeVapid } = usePushNotifications()
-const { requestPermissionAndGetToken, isAvailable: isFirebaseAvailable } = useFirebaseMessaging()
+const { requestPermissionAndGetToken } = useFirebaseMessaging()
 const { shouldShow, markAsEnabled, dismiss: dismissPromo } = usePushNotificationPromo()
 
 // Créer une référence locale qui suit shouldShow
@@ -99,18 +97,9 @@ const benefits = ['carpool', 'volunteer', 'reminders', 'important']
 const onEnable = async () => {
   loading.value = true
   try {
-    // Activer les deux systèmes en parallèle
-    const results = await Promise.allSettled([
-      subscribeVapid(),
-      isFirebaseAvailable.value ? requestPermissionAndGetToken() : Promise.resolve(null),
-    ])
+    const token = await requestPermissionAndGetToken()
 
-    // Vérifier les résultats
-    const vapidSuccess = results[0].status === 'fulfilled' && results[0].value === true
-    const fcmSuccess = results[1].status === 'fulfilled' && results[1].value !== null
-
-    // Succès si au moins un système fonctionne
-    if (vapidSuccess || fcmSuccess) {
+    if (token) {
       markAsEnabled()
     }
   } finally {

@@ -146,32 +146,47 @@ export default wrapApiHandler(
       }
     }
 
+    // Nettoyer lors de la fermeture de la connexion
+    let cleanedUp = false
+    const cleanup = () => {
+      if (cleanedUp) return
+      cleanedUp = true
+      clearInterval(pingInterval)
+      clearInterval(messageCheckInterval)
+      // Marquer l'utilisateur comme absent
+      conversationPresenceService.markAbsent(user.id, conversationId)
+      try {
+        eventStream.close()
+      } catch {
+        // Ignorer les erreurs de fermeture
+      }
+    }
+
     // Envoyer un ping toutes les 30 secondes pour garder la connexion vivante
     const pingInterval = setInterval(async () => {
       try {
         await eventStream.push(JSON.stringify({ type: 'ping', timestamp: Date.now() }))
         await checkForNewMessages()
-        // Rafraîchir la présence à chaque ping
-        conversationPresenceService.markPresent(user.id, conversationId)
       } catch (error) {
         console.error('Erreur lors du ping:', error)
-        clearInterval(pingInterval)
+        cleanup()
       }
     }, 30000)
 
-    // Vérifier les messages toutes les 2 secondes
+    // Vérifier les messages toutes les 2 secondes et envoyer un heartbeat pour détecter les déconnexions
     const messageCheckInterval = setInterval(async () => {
-      await checkForNewMessages()
+      try {
+        // Envoyer un heartbeat silencieux pour détecter si la connexion est fermée
+        await eventStream.push(JSON.stringify({ type: 'heartbeat' }))
+        await checkForNewMessages()
+      } catch {
+        cleanup()
+      }
     }, 2000)
 
-    // Nettoyer lors de la fermeture de la connexion
-    event.node.req.on('close', () => {
-      clearInterval(pingInterval)
-      clearInterval(messageCheckInterval)
-      // Marquer l'utilisateur comme absent
-      conversationPresenceService.markAbsent(user.id, conversationId)
-      eventStream.close()
-    })
+    event.node.req.on('close', cleanup)
+    event.node.req.on('aborted', cleanup)
+    event.node.req.on('error', cleanup)
 
     return eventStream.send()
   },

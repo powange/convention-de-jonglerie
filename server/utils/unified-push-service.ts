@@ -1,9 +1,7 @@
 import { firebaseAdmin } from './firebase-admin'
-import { pushNotificationService } from './push-notification-service'
 
 /**
- * Service unifié de notifications push
- * Utilise Firebase FCM en priorité, puis Web Push VAPID en fallback
+ * Service de notifications push via Firebase Cloud Messaging (FCM)
  */
 
 interface PushNotificationData {
@@ -15,34 +13,29 @@ interface PushNotificationData {
   actionText?: string
   id?: string
   type?: string
+  image?: string // Image à afficher à droite de la notification (ex: avatar de l'expéditeur)
 }
 
 class UnifiedPushService {
   /**
-   * Envoyer une notification à un utilisateur spécifique
-   * Utilise FCM en priorité, sinon VAPID en fallback
-   * Cette stratégie évite d'envoyer deux notifications au même utilisateur
+   * Envoyer une notification à un utilisateur spécifique via FCM
    */
   async sendToUser(userId: number, data: PushNotificationData): Promise<boolean> {
-    // Essayer Firebase FCM en premier
-    const fcmSuccess = await this.sendViaFirebase(userId, data)
-
-    if (fcmSuccess) {
-      console.log(`✅ [Unified] Notification envoyée via FCM à l'utilisateur ${userId}`)
-      return true // FCM a fonctionné, pas besoin de VAPID
+    if (!firebaseAdmin.isInitialized()) {
+      return false
     }
 
-    // Fallback sur VAPID si FCM a échoué ou n'est pas disponible
-    console.log(`🔄 [Unified] FCM non disponible, tentative via VAPID pour l'utilisateur ${userId}`)
-    const vapidSuccess = await this.sendViaVapid(userId, data)
+    // Vérifier si l'utilisateur a des tokens FCM actifs
+    const fcmTokensCount = await prisma.fcmToken.count({
+      where: { userId, isActive: true },
+    })
 
-    if (vapidSuccess) {
-      console.log(`✅ [Unified] Notification envoyée via VAPID à l'utilisateur ${userId}`)
-    } else {
-      console.log(`❌ [Unified] Échec d'envoi de notification à l'utilisateur ${userId}`)
+    if (fcmTokensCount === 0) {
+      // Pas de token = rien à faire, ce n'est pas un échec
+      return false
     }
 
-    return vapidSuccess
+    return this.sendViaFirebase(userId, data)
   }
 
   /**
@@ -94,6 +87,8 @@ class UnifiedPushService {
           id: data.id || '',
           type: data.type || 'info',
           timestamp: new Date().toISOString(),
+          icon: data.icon || '', // Icon personnalisé (avatar pour les messages)
+          image: data.image || '', // Grande image (si fournie)
         }
       )
 
@@ -109,9 +104,11 @@ class UnifiedPushService {
         console.log(`🧹 [FCM] ${result.invalidTokens.length} tokens invalides supprimés`)
       }
 
-      console.log(
-        `📲 [FCM] Envoi à l'utilisateur ${userId}: ${result.success} succès, ${result.failure} échecs`
-      )
+      if (result.success > 0) {
+        console.log(`📲 [FCM] Notification envoyée à l'utilisateur ${userId}`)
+      } else {
+        console.log(`❌ [FCM] Échec d'envoi à l'utilisateur ${userId}`)
+      }
 
       return result.success > 0
     } catch (error) {
@@ -121,32 +118,35 @@ class UnifiedPushService {
   }
 
   /**
-   * Envoyer via Web Push VAPID
-   */
-  private async sendViaVapid(userId: number, data: PushNotificationData): Promise<boolean> {
-    try {
-      const success = await pushNotificationService.sendToUser(userId, data)
-
-      if (success) {
-        console.log(`📲 [VAPID] Notification envoyée à l'utilisateur ${userId}`)
-      }
-
-      return success
-    } catch (error) {
-      console.error("[VAPID] Erreur lors de l'envoi:", error)
-      return false
-    }
-  }
-
-  /**
-   * Envoyer une notification à tous les utilisateurs
+   * Envoyer une notification à tous les utilisateurs ayant des tokens FCM
    */
   async sendToAll(data: PushNotificationData): Promise<number> {
-    // Pour l'instant, utilise seulement VAPID pour sendToAll
-    // Firebase FCM nécessiterait de récupérer tous les tokens et envoyer par batch
-    const count = await pushNotificationService.sendToAll(data)
-    console.log(`📲 [Unified] Notification envoyée à ${count} utilisateur(s)`)
-    return count
+    if (!firebaseAdmin.isInitialized()) {
+      return 0
+    }
+
+    try {
+      // Récupérer tous les utilisateurs avec des tokens FCM actifs
+      const usersWithTokens = await prisma.fcmToken.findMany({
+        where: { isActive: true },
+        select: { userId: true },
+        distinct: ['userId'],
+      })
+
+      let successCount = 0
+      for (const { userId } of usersWithTokens) {
+        const success = await this.sendViaFirebase(userId, data)
+        if (success) successCount++
+      }
+
+      console.log(
+        `📲 [FCM] Notification envoyée à ${successCount}/${usersWithTokens.length} utilisateur(s)`
+      )
+      return successCount
+    } catch (error) {
+      console.error("[FCM] Erreur lors de l'envoi à tous:", error)
+      return 0
+    }
   }
 
   /**
@@ -164,22 +164,25 @@ class UnifiedPushService {
   }
 
   /**
-   * Obtenir les statistiques des deux systèmes
+   * Obtenir les statistiques FCM
    */
   async getStats() {
-    const [fcmCount, vapidStats] = await Promise.all([
-      prisma.fcmToken.count({
+    const [totalTokens, activeTokens, uniqueUsers] = await Promise.all([
+      prisma.fcmToken.count(),
+      prisma.fcmToken.count({ where: { isActive: true } }),
+      prisma.fcmToken.groupBy({
+        by: ['userId'],
         where: { isActive: true },
       }),
-      pushNotificationService.getStats(),
     ])
 
     return {
       fcm: {
-        totalTokens: fcmCount,
+        totalTokens,
+        activeTokens,
+        uniqueUsers: uniqueUsers.length,
         enabled: firebaseAdmin.isInitialized(),
       },
-      vapid: vapidStats,
     }
   }
 }

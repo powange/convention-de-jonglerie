@@ -34,8 +34,8 @@ export default wrapApiHandler(
       },
     })
 
-    // Compter les notifications push actives
-    const pushSubscriptionsActive = await prisma.pushSubscription.count({
+    // Compter les tokens FCM actifs
+    const fcmTokensActive = await prisma.fcmToken.count({
       where: {
         isActive: true,
       },
@@ -45,7 +45,7 @@ export default wrapApiHandler(
       totalSent,
       unreadCount,
       thisWeekCount,
-      pushSubscriptionsActive,
+      fcmTokensActive,
     }
   },
   { operationName: 'GetNotificationStats' }

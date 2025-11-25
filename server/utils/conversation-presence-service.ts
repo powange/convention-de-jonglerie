@@ -3,21 +3,9 @@
  * Permet de savoir en temps réel quels utilisateurs sont sur quelle conversation
  */
 
-interface PresenceEntry {
-  userId: number
-  conversationId: string
-  lastSeen: Date
-}
-
 class ConversationPresenceService {
   // Map: conversationId -> Set<userId>
   private presenceMap: Map<string, Set<number>> = new Map()
-
-  // Map pour stocker les timeouts de nettoyage
-  private cleanupTimeouts: Map<string, NodeJS.Timeout> = new Map()
-
-  // Durée avant de considérer un utilisateur comme absent (en ms)
-  private readonly PRESENCE_TIMEOUT = 15000 // 15 secondes
 
   /**
    * Marquer un utilisateur comme présent sur une conversation
@@ -31,20 +19,6 @@ class ConversationPresenceService {
     }
 
     this.presenceMap.get(conversationId)!.add(userId)
-
-    // Annuler le timeout de nettoyage existant
-    const key = this.getKey(userId, conversationId)
-    const existingTimeout = this.cleanupTimeouts.get(key)
-    if (existingTimeout) {
-      clearTimeout(existingTimeout)
-    }
-
-    // Créer un nouveau timeout de nettoyage
-    const timeout = setTimeout(() => {
-      this.markAbsent(userId, conversationId)
-    }, this.PRESENCE_TIMEOUT)
-
-    this.cleanupTimeouts.set(key, timeout)
 
     // Logger uniquement si c'est un nouveau présent (pas un refresh)
     if (!wasPresent) {
@@ -66,14 +40,6 @@ class ConversationPresenceService {
       if (users.size === 0) {
         this.presenceMap.delete(conversationId)
       }
-    }
-
-    // Nettoyer le timeout
-    const key = this.getKey(userId, conversationId)
-    const timeout = this.cleanupTimeouts.get(key)
-    if (timeout) {
-      clearTimeout(timeout)
-      this.cleanupTimeouts.delete(key)
     }
 
     // Logger uniquement si l'utilisateur était effectivement présent
@@ -134,13 +100,6 @@ class ConversationPresenceService {
         users: Array.from(users),
       })),
     }
-  }
-
-  /**
-   * Générer une clé unique pour userId + conversationId
-   */
-  private getKey(userId: number, conversationId: string): string {
-    return `${userId}:${conversationId}`
   }
 }
 

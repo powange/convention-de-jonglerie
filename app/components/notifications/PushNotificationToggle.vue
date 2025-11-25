@@ -83,107 +83,133 @@
 
 <script setup lang="ts">
 import { useFirebaseMessaging } from '~/composables/useFirebaseMessaging'
-import { usePushNotifications } from '~/composables/usePushNotifications'
 import { useAuthStore } from '~/stores/auth'
+import { useNotificationsStore } from '~/stores/notifications'
 
 const authStore = useAuthStore()
+const notificationStore = useNotificationsStore()
 const toast = useToast()
 
-// Utiliser le composable de push notifications VAPID
-const {
-  isSupported,
-  isSubscribed,
-  isLoading,
-  error,
-  permission,
-  subscribe: subscribeVapid,
-  unsubscribe: unsubscribeVapid,
-  testNotification: testPushNotification,
-} = usePushNotifications()
-
 // Utiliser le composable Firebase Cloud Messaging
-const {
-  requestPermissionAndGetToken,
-  unsubscribe: unsubscribeFcm,
-  isAvailable: isFirebaseAvailable,
-} = useFirebaseMessaging()
+const { requestPermissionAndGetToken, unsubscribe: unsubscribeFcm } = useFirebaseMessaging()
 
+// État local
+const isLoading = ref(false)
+const isSubscribed = ref(false)
+const error = ref<string | null>(null)
+const permission = ref<NotificationPermission | null>(null)
 const isTesting = ref(false)
 
-// Gérer les changements du switch via l'événement update:model-value
+// Support des notifications
+const isSupported = computed(() => {
+  if (!import.meta.client) return false
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+})
+
+// Vérifier l'état de la subscription au montage
+onMounted(async () => {
+  if (!isSupported.value) return
+
+  permission.value = Notification.permission
+
+  // Vérifier si l'utilisateur a un token FCM actif
+  try {
+    const response = await $fetch('/api/notifications/fcm/check')
+    isSubscribed.value = response.hasActiveToken
+    if (isSubscribed.value) {
+      notificationStore.setRealTimeEnabled(true)
+    }
+  } catch (err) {
+    console.error('[PushToggle] Erreur vérification FCM:', err)
+  }
+})
+
+// Gérer les changements du switch
 const handleToggleChange = async (newValue: boolean) => {
-  if (newValue) {
-    console.log('[PushToggle] Activation des notifications push...')
-    console.log('[PushToggle] Firebase disponible:', isFirebaseAvailable.value)
-
-    // Activer les deux systèmes en parallèle
-    const results = await Promise.allSettled([
-      subscribeVapid(),
-      isFirebaseAvailable.value ? requestPermissionAndGetToken() : Promise.resolve(null),
-    ])
-
-    console.log('[PushToggle] Résultats:', {
-      vapid: results[0],
-      fcm: results[1],
+  if (!authStore.user) {
+    toast.add({
+      color: 'warning',
+      title: 'Connexion requise',
+      description: 'Vous devez être connecté pour activer les notifications',
     })
+    return
+  }
 
-    // Vérifier les résultats
-    const vapidSuccess = results[0].status === 'fulfilled'
-    const fcmSuccess = results[1].status === 'fulfilled' && results[1].value !== null
+  isLoading.value = true
+  error.value = null
 
-    console.log('[PushToggle] Succès:', { vapidSuccess, fcmSuccess })
+  try {
+    if (newValue) {
+      console.log('[PushToggle] Activation des notifications FCM...')
 
-    if (vapidSuccess || fcmSuccess) {
-      toast.add({
-        color: 'success',
-        title: 'Notifications activées',
-        description: 'Vous recevrez désormais des notifications push',
-        icon: 'i-heroicons-bell',
-      })
+      const token = await requestPermissionAndGetToken()
+
+      if (token) {
+        isSubscribed.value = true
+        permission.value = Notification.permission
+        notificationStore.setRealTimeEnabled(true)
+
+        toast.add({
+          color: 'success',
+          title: 'Notifications activées',
+          description: 'Vous recevrez désormais des notifications push',
+          icon: 'i-heroicons-bell',
+        })
+      } else {
+        permission.value = Notification.permission
+        if (Notification.permission === 'denied') {
+          error.value = 'Les notifications sont bloquées dans les paramètres du navigateur'
+        } else {
+          error.value = "Impossible d'activer les notifications"
+        }
+      }
     } else {
+      console.log('[PushToggle] Désactivation des notifications FCM...')
+
+      await unsubscribeFcm()
+      isSubscribed.value = false
+      notificationStore.setRealTimeEnabled(false)
+
       toast.add({
-        color: 'error',
-        title: 'Erreur',
-        description: "Impossible d'activer les notifications push",
-        icon: 'i-heroicons-exclamation-triangle',
+        color: 'neutral',
+        title: 'Notifications désactivées',
+        description: 'Vous ne recevrez plus de notifications push',
+        icon: 'i-heroicons-bell-slash',
       })
     }
-  } else {
-    // Désactiver les deux systèmes en parallèle
-    await Promise.allSettled([
-      unsubscribeVapid(),
-      isFirebaseAvailable.value ? unsubscribeFcm() : Promise.resolve(true),
-    ])
-
-    toast.add({
-      color: 'neutral',
-      title: 'Notifications désactivées',
-      description: 'Vous ne recevrez plus de notifications push',
-      icon: 'i-heroicons-bell-slash',
-    })
+  } catch (err: any) {
+    console.error('[PushToggle] Erreur:', err)
+    error.value = err?.message || 'Une erreur est survenue'
+  } finally {
+    isLoading.value = false
   }
 }
 
-// Tester une notification
+// Tester une notification (admin uniquement)
 const testNotification = async () => {
   isTesting.value = true
 
   try {
-    // Tester localement d'abord
-    testPushNotification()
+    await $fetch('/api/admin/notifications/push-test', {
+      method: 'POST',
+      body: {
+        title: '🎯 Test de notification',
+        message: 'Cette notification a été envoyée depuis le serveur !',
+      },
+    })
 
-    // Puis tester depuis le serveur (pour les admins)
-    if (authStore.user?.isGlobalAdmin) {
-      await $fetch('/api/admin/notifications/push-test', {
-        method: 'POST',
-        body: {
-          title: '🎯 Test depuis le serveur',
-          message: 'Cette notification a été envoyée depuis le serveur !',
-        },
-      })
-    }
+    toast.add({
+      color: 'success',
+      title: 'Test envoyé',
+      description: 'Notification de test envoyée',
+    })
   } catch (err) {
     console.error('Erreur lors du test:', err)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: "Impossible d'envoyer la notification de test",
+    })
   } finally {
     isTesting.value = false
   }

@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getUserAvatarUrl } from '@@/server/utils/avatar-url'
 import { conversationPresenceService } from '@@/server/utils/conversation-presence-service'
 import { unifiedPushService } from '@@/server/utils/unified-push-service'
 import { z } from 'zod'
@@ -241,25 +242,30 @@ export default wrapApiHandler(
             notificationTitle = `Nouveau message - ${editionName}`
           }
 
-          // Envoyer la notification push
-          const pushSent = await unifiedPushService.sendToUser(p.userId, {
+          // Générer l'URL de l'avatar de l'expéditeur
+          const config = useRuntimeConfig()
+          const baseUrl = config.public.siteUrl || 'https://juggling-convention.com'
+          const senderUser = message.participant.user
+          const senderAvatarUrl = getUserAvatarUrl(
+            {
+              id: senderUser.id,
+              emailHash: senderUser.emailHash,
+              profilePicture: senderUser.profilePicture,
+            },
+            baseUrl,
+            96
+          )
+
+          // Envoyer la notification push (le service unifié gère les logs)
+          // Pour les messages, l'icon est l'avatar de l'expéditeur
+          await unifiedPushService.sendToUser(p.userId, {
             title: notificationTitle,
             message: `${user.pseudo}: ${truncatedContent}`,
             url: `/messenger?editionId=${participant.conversation.edition.id}&conversationId=${conversationId}`,
             actionText: 'Voir le message',
-            icon: '/favicons/android-chrome-192x192.png',
+            icon: senderAvatarUrl, // Avatar de l'expéditeur comme icon principal
             badge: '/favicons/notification-badge.png',
           })
-
-          if (pushSent) {
-            console.log(
-              `[Messenger] ✅ Notification push envoyée à l'utilisateur ${p.userId} pour le message dans la conversation ${conversationId}`
-            )
-          } else {
-            console.log(
-              `[Messenger] ❌ Échec d'envoi de notification push à l'utilisateur ${p.userId} pour le message dans la conversation ${conversationId}`
-            )
-          }
         } catch (error) {
           console.error(
             `Erreur lors de l'envoi de la notification push à l'utilisateur ${p.userId}:`,

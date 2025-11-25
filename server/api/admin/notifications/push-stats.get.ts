@@ -1,23 +1,23 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { pushNotificationService } from '@@/server/utils/push-notification-service'
+import { unifiedPushService } from '@@/server/utils/unified-push-service'
 
 export default wrapApiHandler(
   async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
-    // Obtenir les stats du service
-    const serviceStats = await pushNotificationService.getStats()
+    // Obtenir les stats du service FCM
+    const serviceStats = await unifiedPushService.getStats()
 
     // Obtenir des stats détaillées depuis la DB
-    const [totalSubscriptions, uniqueUsers, recentSubscriptions] = await Promise.all([
-      prisma.pushSubscription.count(),
-      prisma.pushSubscription.groupBy({
+    const [totalTokens, uniqueUsers, recentTokens] = await Promise.all([
+      prisma.fcmToken.count(),
+      prisma.fcmToken.groupBy({
         by: ['userId'],
         _count: true,
       }),
-      prisma.pushSubscription.findMany({
+      prisma.fcmToken.findMany({
         orderBy: { createdAt: 'desc' },
         take: 5,
         include: {
@@ -32,11 +32,11 @@ export default wrapApiHandler(
       }),
     ])
 
-    // Calculer les abonnements par jour sur les 7 derniers jours
+    // Calculer les tokens par jour sur les 7 derniers jours
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-    const subscriptionsByDay = await prisma.pushSubscription.groupBy({
+    const tokensByDay = await prisma.fcmToken.groupBy({
       by: ['createdAt'],
       where: {
         createdAt: {
@@ -48,10 +48,18 @@ export default wrapApiHandler(
 
     return {
       ...serviceStats,
-      totalSubscriptions,
+      totalTokens,
       uniqueUsers: uniqueUsers.length,
-      recentSubscriptions,
-      subscriptionsByDay: subscriptionsByDay.map((day) => ({
+      recentTokens: recentTokens.map((token) => ({
+        id: token.id,
+        userId: token.userId,
+        isActive: token.isActive,
+        createdAt: token.createdAt,
+        updatedAt: token.updatedAt,
+        user: token.user,
+        token: token.token.substring(0, 30) + '...',
+      })),
+      tokensByDay: tokensByDay.map((day) => ({
         date: day.createdAt,
         count: day._count,
       })),

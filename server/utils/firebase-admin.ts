@@ -113,10 +113,38 @@ class FirebaseAdminService {
     }
 
     try {
+      // Récupérer l'image (avatar) si fournie - doit être une URL absolue pour Android
+      // On ne met pas d'imageUrl si pas d'image fournie (évite l'erreur invalid-payload)
+      const imageUrl = data?.image && data.image.startsWith('http') ? data.image : undefined
+
       const message: admin.messaging.MulticastMessage = {
-        notification,
-        data,
+        // Data pour le service worker web (messages data-only pour éviter les doublons web)
+        data: {
+          ...data,
+          title: notification.title,
+          body: notification.body,
+        },
         tokens,
+        // Configuration Android native avec notification visible
+        android: {
+          priority: 'high',
+          notification: {
+            title: notification.title,
+            body: notification.body,
+            icon: 'ic_notification', // Small icon (doit être dans l'app native, sinon ignoré)
+            ...(imageUrl && { imageUrl }), // Large icon à droite du texte (seulement si URL valide)
+            clickAction: 'OPEN_APP',
+          },
+        },
+        // Configuration Web - pas de notification pour éviter les doublons (géré par SW)
+        webpush: {
+          headers: {
+            Urgency: 'high',
+          },
+          fcmOptions: {
+            link: data?.url || '/',
+          },
+        },
       }
 
       const response = await messaging.sendEachForMulticast(message)

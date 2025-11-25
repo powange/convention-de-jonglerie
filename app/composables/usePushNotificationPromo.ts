@@ -1,4 +1,3 @@
-import { usePushNotifications } from '~/composables/usePushNotifications'
 import { useAuthStore } from '~/stores/auth'
 
 interface PromoState {
@@ -6,22 +5,31 @@ interface PromoState {
   isDismissedForSession: boolean
   lastDismissed: number | null
   sessionStartTime: number | null
+  isSubscribed: boolean
+  permission: NotificationPermission | null
 }
 
 const STORAGE_KEY = 'push-notification-promo'
 const SESSION_KEY = 'push-promo-session'
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 jours en millisecondes
-const MIN_SESSION_TIME = 30 * 1000 // 10 secondes minimum avant de montrer la modale
+const MIN_SESSION_TIME = 30 * 1000 // 30 secondes minimum avant de montrer la modale
 
 export const usePushNotificationPromo = () => {
   const authStore = useAuthStore()
-  const { isSupported, isSubscribed, permission } = usePushNotifications()
 
   const state = reactive<PromoState>({
     shouldShow: false,
     isDismissedForSession: false,
     lastDismissed: null,
     sessionStartTime: null,
+    isSubscribed: false,
+    permission: null,
+  })
+
+  // Support des notifications
+  const isSupported = computed(() => {
+    if (!import.meta.client) return false
+    return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
   })
 
   // Charger l'état depuis le localStorage et sessionStorage
@@ -43,8 +51,24 @@ export const usePushNotificationPromo = () => {
         state.sessionStartTime = parsed.sessionStartTime || null
         state.isDismissedForSession = parsed.isDismissedForSession || false
       }
+
+      // Charger la permission du navigateur
+      state.permission = Notification.permission
     } catch (error) {
       console.warn("Erreur lors du chargement de l'état de la promo push:", error)
+    }
+  }
+
+  // Vérifier si l'utilisateur a un token FCM actif
+  const checkSubscription = async () => {
+    if (!import.meta.client || !authStore.isAuthenticated) return
+
+    try {
+      const response = await $fetch('/api/notifications/fcm/check')
+      state.isSubscribed = response.hasActiveToken
+    } catch (error) {
+      console.warn('[PushPromo] Erreur vérification FCM:', error)
+      state.isSubscribed = false
     }
   }
 
@@ -85,12 +109,12 @@ export const usePushNotificationPromo = () => {
     }
 
     // L'utilisateur ne doit pas déjà être abonné
-    if (isSubscribed.value) {
+    if (state.isSubscribed) {
       return false
     }
 
     // La permission ne doit pas être refusée définitivement
-    if (permission.value === 'denied') {
+    if (state.permission === 'denied') {
       return false
     }
 
@@ -160,6 +184,7 @@ export const usePushNotificationPromo = () => {
   const markAsEnabled = () => {
     state.shouldShow = false
     state.isDismissedForSession = true
+    state.isSubscribed = true
     saveState()
     // Ne pas sauvegarder lastDismissed car l'utilisateur a activé
   }
@@ -177,8 +202,9 @@ export const usePushNotificationPromo = () => {
   }
 
   // Initialisation
-  onMounted(() => {
+  onMounted(async () => {
     loadState()
+    await checkSubscription()
 
     // Attendre que l'auth store soit initialisé
     watchEffect(() => {
@@ -193,6 +219,9 @@ export const usePushNotificationPromo = () => {
 
   return {
     shouldShow: readonly(toRef(state, 'shouldShow')),
+    isSubscribed: readonly(toRef(state, 'isSubscribed')),
+    permission: readonly(toRef(state, 'permission')),
+    isSupported,
     dismiss,
     markAsEnabled,
     reset,
