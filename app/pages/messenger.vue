@@ -226,61 +226,73 @@
               </div>
 
               <UChatMessages v-else :should-scroll-to-bottom="false" :should-auto-scroll="false">
-                <UChatMessage
+                <div
                   v-for="message in formattedMessages"
+                  :id="`message-${message.id}`"
                   :key="message.id"
-                  v-bind="message"
-                  :role="message.role"
-                  :side="message.isCurrentUser ? 'right' : 'left'"
-                  :avatar="{ src: message.avatarUrl.value }"
-                  :actions="message.actions"
                 >
+                  <UChatMessage
+                    v-bind="message"
+                    :role="message.role"
+                    :side="message.isCurrentUser ? 'right' : 'left'"
+                    :avatar="{ src: message.avatarUrl.value }"
+                    :actions="isMobile ? undefined : message.actions"
+                  >
                   <template #content>
-                    <div>
-                      <!-- Nom de l'auteur pour les messages des autres -->
-                      <p
-                        v-if="message.role === 'assistant'"
-                        class="text-xs font-medium mb-1 opacity-70"
-                      >
-                        {{ message.metadata?.authorName }}
-                      </p>
-
-                      <!-- Citation du message auquel on répond -->
-                      <div
-                        v-if="message.metadata?.replyTo"
-                        class="mb-2 p-2 rounded-md bg-gray-100 dark:bg-gray-800 border-l-4 border-primary cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                        @click="scrollToMessage(message.metadata.replyTo.id)"
-                      >
-                        <p class="text-xs font-medium text-primary mb-1">
-                          {{ message.metadata.replyTo.participant.user.pseudo }}
-                        </p>
+                    <MessengerMessageBubble
+                      :message-id="message.id"
+                      :can-delete="message.isCurrentUser"
+                      :is-deleted="message.metadata?.isDeleted"
+                      @reply="handleReplyToMessage(getOriginalMessage(message.id)!)"
+                      @delete="handleDeleteMessage(message.id)"
+                    >
+                      <div>
+                        <!-- Nom de l'auteur pour les messages des autres -->
                         <p
-                          class="text-xs opacity-70 truncate"
-                          :class="{ italic: message.metadata.replyTo.deletedAt }"
+                          v-if="message.role === 'assistant'"
+                          class="text-xs font-medium mb-1 opacity-70"
                         >
-                          {{ message.metadata.replyTo.content }}
+                          {{ message.metadata?.authorName }}
+                        </p>
+
+                        <!-- Citation du message auquel on répond -->
+                        <div
+                          v-if="message.metadata?.replyTo"
+                          class="mb-2 p-2 rounded-md bg-gray-100 dark:bg-gray-800 border-l-4 border-primary cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                          @click="scrollToMessage(message.metadata.replyTo.id)"
+                        >
+                          <p class="text-xs font-medium text-primary mb-1">
+                            {{ message.metadata.replyTo.participant.user.pseudo }}
+                          </p>
+                          <p
+                            class="text-xs opacity-70 truncate"
+                            :class="{ italic: message.metadata.replyTo.deletedAt }"
+                          >
+                            {{ message.metadata.replyTo.content }}
+                          </p>
+                        </div>
+
+                        <!-- Contenu du message -->
+                        <p
+                          class="text-sm break-words whitespace-pre-wrap"
+                          :class="{ 'italic opacity-50': message.metadata?.isDeleted }"
+                        >
+                          {{ message.parts[0]?.text }}
+                        </p>
+                        <!-- Horodatage et statut d'édition -->
+                        <p class="text-xs mt-1 opacity-70">
+                          {{ formatMessageTime(message.metadata?.createdAt) }}
+                          <span
+                            v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
+                            class="ml-1"
+                            >({{ $t('messenger.edited') }})</span
+                          >
                         </p>
                       </div>
-
-                      <!-- Contenu du message -->
-                      <p
-                        class="text-sm break-words whitespace-pre-wrap"
-                        :class="{ 'italic opacity-50': message.metadata?.isDeleted }"
-                      >
-                        {{ message.parts[0]?.text }}
-                      </p>
-                      <!-- Horodatage et statut d'édition -->
-                      <p class="text-xs mt-1 opacity-70">
-                        {{ formatMessageTime(message.metadata?.createdAt) }}
-                        <span
-                          v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
-                          class="ml-1"
-                          >({{ $t('messenger.edited') }})</span
-                        >
-                      </p>
-                    </div>
+                    </MessengerMessageBubble>
                   </template>
-                </UChatMessage>
+                  </UChatMessage>
+                </div>
               </UChatMessages>
             </div>
 
@@ -420,6 +432,9 @@ const presentUserIds = ref<number[]>([])
 const hasMoreMessages = ref(true)
 const loadingMoreMessages = ref(false)
 const messagesLimit = 50
+
+// Détection mobile pour afficher swipe/long press au lieu des boutons d'actions
+const isMobile = ref(false)
 
 // Computed
 const selectedConversation = computed(() => {
@@ -592,9 +607,17 @@ function scrollToMessage(messageId: string) {
 }
 
 /**
+ * Récupère le message original à partir de son ID
+ */
+function getOriginalMessage(messageId: string): ConversationMessage | undefined {
+  return allMessages.value.find((m) => m.id === messageId)
+}
+
+/**
  * Commence une réponse à un message
  */
-function handleReplyToMessage(message: ConversationMessage) {
+function handleReplyToMessage(message: ConversationMessage | undefined) {
+  if (!message) return
   replyingToMessage.value = message
   // Focus le champ de saisie
   nextTick(() => {
@@ -691,6 +714,9 @@ function getConversationSubtitle(conversation: Conversation): string {
 
 // Charger toutes les éditions et conversations au montage
 onMounted(async () => {
+  // Détecter si c'est un appareil tactile
+  isMobile.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
   try {
     loading.value = true
 

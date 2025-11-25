@@ -2,6 +2,7 @@
   "messenger": {
     "be_first_to_send": "Soyez le premier à envoyer un message !",
     "beginning_of_conversation": "Début de la conversation",
+    "message_actions": "Actions",
     "conversation_types": {
       "group": "Discussion de groupe",
       "organizers": "Conversation avec les organisateurs",
