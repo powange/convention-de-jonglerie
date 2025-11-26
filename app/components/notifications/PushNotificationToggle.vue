@@ -52,12 +52,17 @@
       </div>
     </div>
 
-    <!-- Bouton de test (admin uniquement) -->
+    <!-- Gestion des appareils (toujours visible pour gérer les autres appareils) -->
     <div
-      v-if="isSubscribed && authStore.user?.isGlobalAdmin"
-      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between"
     >
+      <ClientOnly>
+        <NotificationsPushDevicesModal />
+      </ClientOnly>
+
+      <!-- Bouton de test (admin uniquement, si subscribed sur cet appareil) -->
       <UButton
+        v-if="isSubscribed && authStore.user?.isGlobalAdmin"
         type="button"
         size="sm"
         variant="outline"
@@ -89,6 +94,7 @@ import { useNotificationsStore } from '~/stores/notifications'
 const authStore = useAuthStore()
 const notificationStore = useNotificationsStore()
 const toast = useToast()
+const { getDeviceId } = useDeviceId()
 
 // Utiliser le composable Firebase Cloud Messaging
 const { requestPermissionAndGetToken, unsubscribe: unsubscribeFcm } = useFirebaseMessaging()
@@ -99,22 +105,24 @@ const isSubscribed = ref(false)
 const error = ref<string | null>(null)
 const permission = ref<NotificationPermission | null>(null)
 const isTesting = ref(false)
-
-// Support des notifications
-const isSupported = computed(() => {
-  if (!import.meta.client) return false
-  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
-})
+const isSupported = ref(false)
 
 // Vérifier l'état de la subscription au montage
 onMounted(async () => {
+  // Vérifier le support des notifications côté client
+  isSupported.value =
+    'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+
   if (!isSupported.value) return
 
   permission.value = Notification.permission
 
-  // Vérifier si l'utilisateur a un token FCM actif
+  // Vérifier si cet appareil a un token FCM actif (basé sur le deviceId)
   try {
-    const response = await $fetch('/api/notifications/fcm/check')
+    const deviceId = getDeviceId()
+    const response = await $fetch('/api/notifications/fcm/check', {
+      query: { deviceId },
+    })
     isSubscribed.value = response.hasActiveToken
     if (isSubscribed.value) {
       notificationStore.setRealTimeEnabled(true)

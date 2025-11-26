@@ -7,6 +7,7 @@ export function useFirebaseMessaging() {
   const { $firebase } = useNuxtApp()
   const toast = useToast()
   const config = useRuntimeConfig()
+  const { getDeviceId } = useDeviceId()
 
   // Cache pour éviter les appels trop fréquents
   let lastTokenRequest = 0
@@ -115,11 +116,12 @@ export function useFirebaseMessaging() {
       if (token) {
         console.log('✅ Token FCM obtenu:', token.substring(0, 20) + '...')
 
-        // Enregistrer le token côté serveur
+        // Enregistrer le token côté serveur avec le deviceId
         try {
+          const deviceId = getDeviceId()
           await $fetch('/api/notifications/fcm/subscribe', {
             method: 'POST',
-            body: { token },
+            body: { token, deviceId },
           })
           console.log('✅ Token FCM enregistré côté serveur')
         } catch (error) {

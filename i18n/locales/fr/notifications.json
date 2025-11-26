@@ -59,6 +59,17 @@
       "test_button": "Tester une notification",
       "title": "Notifications push"
     },
+    "devices": {
+      "manage_button": "Gérer les appareils",
+      "title": "Appareils enregistrés",
+      "description": "Les appareils suivants reçoivent vos notifications push. Vous pouvez supprimer un appareil pour ne plus y recevoir de notifications.",
+      "no_devices": "Aucun appareil enregistré",
+      "current_device": "Cet appareil",
+      "registered_at": "Ajouté le {date}",
+      "deleted": "Appareil supprimé",
+      "error_loading": "Erreur lors du chargement des appareils",
+      "error_deleting": "Erreur lors de la suppression de l'appareil"
+    },
     "system": {
       "error": {
         "message": "Une erreur s'est produite : {errorMessage}",

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { token } = await readBody(event)
+  const { token, deviceId } = await readBody(event)
 
   if (!token || typeof token !== 'string') {
     throw createError({
@@ -19,6 +19,9 @@ export default defineEventHandler(async (event) => {
       message: 'Token FCM requis',
     })
   }
+
+  // Récupérer le User-Agent pour identifier l'appareil (informatif)
+  const userAgent = getHeader(event, 'user-agent') || null
 
   try {
     // Vérifier si le token existe déjà
@@ -32,13 +35,15 @@ export default defineEventHandler(async (event) => {
     })
 
     if (existing) {
-      // Réactiver si désactivé
-      if (!existing.isActive) {
-        await prisma.fcmToken.update({
-          where: { id: existing.id },
-          data: { isActive: true },
-        })
-      }
+      // Mettre à jour le deviceId, User-Agent et réactiver si désactivé
+      await prisma.fcmToken.update({
+        where: { id: existing.id },
+        data: {
+          isActive: true,
+          deviceId: deviceId || existing.deviceId,
+          userAgent,
+        },
+      })
 
       return { success: true, message: 'Token FCM déjà enregistré' }
     }
@@ -49,6 +54,8 @@ export default defineEventHandler(async (event) => {
         userId: session.user.id,
         token,
         isActive: true,
+        deviceId: deviceId || null,
+        userAgent,
       },
     })
 
