@@ -339,6 +339,9 @@
 import { ref, onMounted, h, watch, computed } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
+
+// Charger les traductions du fichier edition.json pour les clés edition.*
+await useLazyI18n('edition')
 import type { Convention, HttpError, Edition } from '~/types'
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 
