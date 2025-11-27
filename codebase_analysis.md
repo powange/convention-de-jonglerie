@@ -24,6 +24,7 @@
 **Type:** Application web full-stack pour la gestion et découverte de conventions de jonglerie
 
 **Objectif:** Plateforme collaborative permettant aux jongleurs et organisateurs d'événements de :
+
 - Consulter et découvrir des conventions
 - Gérer des éditions d'événements
 - Gérer les bénévoles, artistes, ateliers
@@ -38,6 +39,7 @@
 ## Stack Technique
 
 ### Frontend
+
 - **Nuxt.js** 4.2.0 - Framework Vue.js universel
 - **Vue.js** 3.5.17 - Framework JavaScript réactif
 - **Nuxt UI** 4.0.0 - Composants UI avec Tailwind CSS
@@ -47,6 +49,7 @@
 - **Nuxt i18n** 10.0.3 - 13 langues supportées
 
 ### Backend
+
 - **Nitro** (intégré Nuxt) - Moteur serveur
 - **Prisma** 7.0.0 - ORM
 - **MySQL/MariaDB** - Base de données
@@ -54,24 +57,28 @@
 - **bcryptjs** 3.0.2 - Hachage mots de passe
 
 ### Visualisation & UI
+
 - **FullCalendar** 6.1.15+ - Calendrier interactif
 - **Chart.js** 4.5.1 - Graphiques
 - **html5-qrcode** 2.3.8 - Scanner QR
 - **jspdf** 3.0.3 - Génération PDF
 
 ### Communication
+
 - **Firebase Cloud Messaging** - Push notifications
 - **Server-Sent Events** - Notifications temps réel
 - **Nodemailer** 7.0.5 - Emails
 - **Vue Email** 0.0.21 - Templates email
 
 ### Tests
+
 - **Vitest** 3.2.4 - 4 projets de test
 - **@nuxt/test-utils** 3.19.2
 - **happy-dom** 18.0.1
 - **@testing-library/vue** 8.1.0
 
 ### Autres
+
 - **Anthropic Claude API** - Analyse IA d'images
 - **Luxon** 3.5.0 - Manipulation dates
 - **Zod** 4.1.9 - Validation schémas
@@ -244,18 +251,21 @@ convention-de-jonglerie/
 ### Modèles Principaux (50+ tables)
 
 #### Utilisateurs & Auth
+
 - **User** - Utilisateurs (email hashé, langue préférée, providers auth)
 - **AuthSession** - Sessions authentification
 - **PasswordResetToken** - Tokens reset mot de passe
 - **VerificationToken** - Tokens vérification email
 
 #### Conventions & Éditions
+
 - **Convention** - Conventions de jonglerie
 - **Edition** - Éditions annuelles
 - **ConventionOrganizer** - Organisateurs avec permissions granulaires
 - **EditionOrganizerPermission** - Surcharges permissions par édition
 
 #### Billetterie
+
 - **TicketingTier** - Paliers tarifaires
 - **TicketingOption** - Options de billetterie
 - **TicketingOrder** - Commandes
@@ -263,6 +273,7 @@ convention-de-jonglerie/
 - **HelloAssoConfig** - Configuration HelloAsso
 
 #### Bénévoles
+
 - **EditionVolunteerApplication** - Candidatures
 - **VolunteerTeam** - Équipes
 - **VolunteerTimeSlot** - Créneaux horaires
@@ -270,17 +281,20 @@ convention-de-jonglerie/
 - **VolunteerMeal** - Repas bénévoles
 
 #### Artistes & Spectacles
+
 - **EditionArtist** - Artistes invités
 - **Show** - Spectacles
 - **ShowArtist** - Relation artistes/spectacles
 - **ArtistMealSelection** - Repas artistes
 
 #### Ateliers
+
 - **Workshop** - Ateliers
 - **WorkshopLocation** - Lieux
 - **WorkshopFavorite** - Favoris utilisateurs
 
 #### Notifications & Messagerie
+
 - **Notification** - Notifications persistées
 - **FcmToken** - Tokens Firebase
 - **Conversation** - Conversations
@@ -288,6 +302,7 @@ convention-de-jonglerie/
 - **ConversationParticipant** - Participants
 
 #### Autres Fonctionnalités
+
 - **CarpoolOffer** / **CarpoolRequest** - Covoiturage
 - **LostFoundItem** - Objets trouvés
 - **ApiErrorLog** - Logs erreurs
@@ -325,12 +340,14 @@ User 1──N Notification
 ## Endpoints API
 
 ### Statistiques
+
 - **Total:** 314 fichiers d'endpoints
 - **Modules:** 12 (admin, auth, conventions, editions, notifications, etc.)
 
 ### Principaux Modules
 
 #### `/api/auth/*` - Authentification
+
 - `POST /api/auth/login` - Connexion
 - `POST /api/auth/register` - Inscription
 - `POST /api/auth/logout` - Déconnexion
@@ -340,16 +357,19 @@ User 1──N Notification
 - `GET /api/auth/check-session` - Vérifier session
 
 #### `/api/admin/*` - Administration (26 endpoints)
+
 - Gestion utilisateurs, logs erreurs, feedback
 - Statistiques, sauvegardes, notifications push test
 - Impersonation utilisateurs
 
 #### `/api/conventions/*` - Conventions (47 endpoints)
+
 - CRUD conventions
 - Gestion organisateurs avec permissions granulaires
 - Gestion éditions associées
 
 #### `/api/editions/*` - Éditions (185+ endpoints)
+
 - CRUD éditions
 - **Bénévoles:** Candidatures, équipes, affectations, repas
 - **Billetterie:** Tiers, options, commandes, HelloAsso sync
@@ -359,15 +379,18 @@ User 1──N Notification
 - **Images:** Upload, suppression
 
 #### `/api/notifications/*` - Notifications (8 endpoints)
+
 - Liste, marquer comme lues, supprimer
 - Préférences utilisateur (13 types)
 - Statistiques
 
 #### `/api/messenger/*` - Messagerie (12 endpoints)
+
 - Conversations, messages
 - SSE temps réel pour présence/messages
 
 #### `/api/carpool-*` - Covoiturage (18 endpoints)
+
 - Offres et demandes
 - Recherche, filtrage
 
@@ -389,7 +412,7 @@ export default defineEventHandler(async (event) => {
   // Business logic
   const organizer = await prisma.conventionOrganizer.create({
     data: validated,
-    include: organizerInclude
+    include: organizerInclude,
   })
 
   return { success: true, data: organizer }
@@ -472,6 +495,7 @@ Documenté dans `docs/system/ORGANIZER_PERMISSIONS.md`
 #### 7 Types de Droits
 
 **Globaux (6):**
+
 1. `editConvention` - Modifier convention
 2. `deleteConvention` - Supprimer convention
 3. `manageOrganizers` - Gérer organisateurs
@@ -479,8 +503,7 @@ Documenté dans `docs/system/ORGANIZER_PERMISSIONS.md`
 5. `editAllEditions` - Modifier toutes éditions
 6. `deleteAllEditions` - Supprimer toutes éditions
 
-**Par Édition:**
-7. `perEdition[].{canEdit, canDelete, canManageVolunteers}` - Surcharges spécifiques
+**Par Édition:** 7. `perEdition[].{canEdit, canDelete, canManageVolunteers}` - Surcharges spécifiques
 
 #### Format API
 
@@ -571,6 +594,7 @@ enum NotificationType {
 #### Préférences Utilisateur
 
 Chaque type configurable indépendamment pour chaque canal:
+
 - In-app (toujours activé)
 - Push (opt-in)
 - Email (opt-in)
@@ -833,7 +857,7 @@ services:
     environment:
       - NODE_ENV=development
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - db
 
@@ -845,7 +869,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - '3306:3306'
 ```
 
 ### Variables d'Environnement
@@ -853,6 +877,7 @@ services:
 Voir `.env.portainer.example` pour template complet
 
 **Essentielles:**
+
 - `DATABASE_URL` - MySQL connection
 - `NUXT_SESSION_PASSWORD` - Sessions (32+ chars)
 - `SMTP_USER`, `SMTP_PASS` - Emails
@@ -938,6 +963,7 @@ Voir `.env.portainer.example` pour template complet
 ### 🚀 Améliorations Suggérées
 
 1. **Rate Limiting**
+
    ```typescript
    // server/middleware/rate-limit.ts
    import { createRateLimiter } from 'h3-rate-limiter'
@@ -955,6 +981,7 @@ Voir `.env.portainer.example` pour template complet
    - Logs structurés (Winston/Pino)
 
 3. **Cache**
+
    ```typescript
    // Cache conventions publiques
    const conventions = await cachedEventHandler(
@@ -973,17 +1000,17 @@ Voir `.env.portainer.example` pour template complet
 
 ### 📊 Métriques Projet
 
-| Métrique | Valeur |
-|----------|--------|
-| Fichiers TypeScript | ~500+ |
-| Endpoints API | 314 |
-| Composables | 37 |
-| Pages Vue | 57 |
-| Stores Pinia | 5 |
-| Modèles Prisma | 50+ |
-| Langues i18n | 13 |
-| Fichiers docs | 37 |
-| Scripts npm | 65+ |
+| Métrique            | Valeur |
+| ------------------- | ------ |
+| Fichiers TypeScript | ~500+  |
+| Endpoints API       | 314    |
+| Composables         | 37     |
+| Pages Vue           | 57     |
+| Stores Pinia        | 5      |
+| Modèles Prisma      | 50+    |
+| Langues i18n        | 13     |
+| Fichiers docs       | 37     |
+| Scripts npm         | 65+    |
 
 ---
 
