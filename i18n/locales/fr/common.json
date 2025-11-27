@@ -163,7 +163,22 @@
     "volunteer": "Bénévole",
     "volunteers_short": "Bénévoles",
     "week": "Semaine",
-    "yes": "Oui"
+    "yes": "Oui",
+    "timezone": "Fuseau horaire",
+    "timezones": {
+      "regions": {
+        "africa": "Afrique",
+        "america": "Amérique",
+        "antarctica": "Antarctique",
+        "arctic": "Arctique",
+        "asia": "Asie",
+        "atlantic": "Atlantique",
+        "australia": "Australie",
+        "europe": "Europe",
+        "indian": "Océan Indien",
+        "pacific": "Pacifique"
+      }
+    }
   },
   "countries": {
     "czech_republic": "République Tchèque"

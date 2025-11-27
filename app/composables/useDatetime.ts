@@ -98,6 +98,173 @@ export const useDatetime = () => {
   }
 
   /**
+   * Formate une date pour l'affichage dans un fuseau horaire spécifique
+   * @param date - Date à formater
+   * @param timezone - Fuseau horaire IANA (ex: "Europe/Paris", "America/New_York")
+   * @param locale - Locale pour le formatage (défaut: 'fr-FR')
+   * @param options - Options de formatage supplémentaires
+   * @returns String formatée dans le fuseau horaire spécifié
+   */
+  const formatInTimezone = (
+    date: Date | string | null,
+    timezone: string,
+    locale: string = 'fr-FR',
+    options: Omit<Intl.DateTimeFormatOptions, 'timeZone'> = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }
+  ): string => {
+    if (!date) return ''
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+
+    if (isNaN(dateObj.getTime())) return ''
+
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        ...options,
+        timeZone: timezone,
+      }).format(dateObj)
+    } catch {
+      // Fallback si le timezone est invalide
+      console.warn(`Timezone invalide: ${timezone}, utilisation du fuseau local`)
+      return new Intl.DateTimeFormat(locale, options).format(dateObj)
+    }
+  }
+
+  /**
+   * Formate uniquement la date (sans l'heure) dans un fuseau horaire spécifique
+   * @param date - Date à formater
+   * @param timezone - Fuseau horaire IANA (optionnel, utilise le fuseau local si non fourni)
+   * @param locale - Locale pour le formatage (défaut: 'fr-FR')
+   * @returns String formatée (date uniquement)
+   */
+  const formatDateInTimezone = (
+    date: Date | string | null,
+    timezone?: string | null,
+    locale: string = 'fr-FR'
+  ): string => {
+    if (!date) return ''
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+
+    if (isNaN(dateObj.getTime())) return ''
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }
+
+    if (timezone) {
+      options.timeZone = timezone
+    }
+
+    try {
+      return new Intl.DateTimeFormat(locale, options).format(dateObj)
+    } catch {
+      // Fallback si le timezone est invalide
+      delete options.timeZone
+      return new Intl.DateTimeFormat(locale, options).format(dateObj)
+    }
+  }
+
+  /**
+   * Formate uniquement l'heure dans un fuseau horaire spécifique
+   * @param date - Date à formater
+   * @param timezone - Fuseau horaire IANA (optionnel, utilise le fuseau local si non fourni)
+   * @param locale - Locale pour le formatage (défaut: 'fr-FR')
+   * @returns String formatée (heure uniquement)
+   */
+  const formatTimeInTimezone = (
+    date: Date | string | null,
+    timezone?: string | null,
+    locale: string = 'fr-FR'
+  ): string => {
+    if (!date) return ''
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+
+    if (isNaN(dateObj.getTime())) return ''
+
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+    }
+
+    if (timezone) {
+      options.timeZone = timezone
+    }
+
+    try {
+      return new Intl.DateTimeFormat(locale, options).format(dateObj)
+    } catch {
+      // Fallback si le timezone est invalide
+      delete options.timeZone
+      return new Intl.DateTimeFormat(locale, options).format(dateObj)
+    }
+  }
+
+  /**
+   * Obtient l'abréviation du fuseau horaire pour une date donnée
+   * @param date - Date pour laquelle obtenir l'abréviation (important pour DST)
+   * @param timezone - Fuseau horaire IANA
+   * @returns Abréviation du fuseau (ex: "CET", "CEST", "PST", "PDT")
+   */
+  const getTimezoneAbbreviation = (date: Date | string | null, timezone: string): string => {
+    if (!date) return ''
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+
+    if (isNaN(dateObj.getTime())) return ''
+
+    try {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        timeZoneName: 'short',
+      })
+      const parts = formatter.formatToParts(dateObj)
+      const tzPart = parts.find((p) => p.type === 'timeZoneName')
+      return tzPart?.value || ''
+    } catch {
+      return ''
+    }
+  }
+
+  /**
+   * Formate une date avec l'indication du fuseau horaire
+   * @param date - Date à formater
+   * @param timezone - Fuseau horaire IANA
+   * @param locale - Locale pour le formatage
+   * @param showTimezoneAbbrev - Afficher l'abréviation du fuseau (défaut: true)
+   * @returns String formatée avec indication du fuseau (ex: "15 juillet 2025 à 10:00 CET")
+   */
+  const formatWithTimezone = (
+    date: Date | string | null,
+    timezone: string,
+    locale: string = 'fr-FR',
+    showTimezoneAbbrev: boolean = true
+  ): string => {
+    if (!date) return ''
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+
+    if (isNaN(dateObj.getTime())) return ''
+
+    const formatted = formatInTimezone(dateObj, timezone, locale)
+
+    if (showTimezoneAbbrev) {
+      const abbrev = getTimezoneAbbreviation(dateObj, timezone)
+      return abbrev ? `${formatted} (${abbrev})` : formatted
+    }
+
+    return formatted
+  }
+
+  /**
    * Valide qu'une date de fin est postérieure à une date de début
    * @param startDate - Date de début
    * @param endDate - Date de fin
@@ -134,6 +301,11 @@ export const useDatetime = () => {
     toApiFormat,
     fromApiFormat,
     formatForDisplay,
+    formatInTimezone,
+    formatDateInTimezone,
+    formatTimeInTimezone,
+    getTimezoneAbbreviation,
+    formatWithTimezone,
     validateDateRange,
     createLocalDate,
   }

@@ -140,6 +140,35 @@
             </div>
           </div>
 
+          <!-- Fuseau horaire -->
+          <UFormField
+            :label="$t('common.timezone')"
+            name="timezone"
+            :description="$t('components.edition_form.timezone_description')"
+          >
+            <USelectMenu
+              v-model="state.timezone"
+              :items="timezoneItems"
+              :placeholder="$t('forms.placeholders.select_timezone')"
+              value-key="value"
+              :filter-fields="['label', 'city', 'region', 'value']"
+              size="lg"
+              class="w-full"
+              :ui="{ content: 'max-h-80' }"
+            >
+              <template #leading>
+                <UIcon name="i-heroicons-globe-alt" class="text-gray-400" />
+              </template>
+              <template #item-label="{ item }">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">{{ item.city }}</span>
+                  <span class="text-muted text-xs">{{ item.region }}</span>
+                  <span class="text-muted text-xs ml-auto">{{ item.offset }}</span>
+                </div>
+              </template>
+            </USelectMenu>
+          </UFormField>
+
           <div class="space-y-4">
             <div class="flex items-center gap-2 mb-2">
               <UIcon name="i-heroicons-map-pin" class="text-primary-500" />
@@ -543,6 +572,7 @@ import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useDatetime } from '~/composables/useDatetime'
+import { useTimezones } from '~/composables/useTimezones'
 import type { Edition, Convention } from '~/types'
 
 import type { StepperItem } from '@nuxt/ui'
@@ -562,8 +592,12 @@ const toast = useToast()
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const servicesByCategory = getTranslatedServicesByCategory
 const { toApiFormat, fromApiFormat } = useDatetime()
+const { getSelectMenuItems, getDefaultTimezoneForCountry } = useTimezones()
 // const authStore = useAuthStore();
 const showCustomCountry = ref(false)
+
+// Items pour le sélecteur de fuseau horaire (calculé une seule fois)
+const timezoneItems = computed(() => getSelectMenuItems())
 
 // Récupérer l'ID de l'édition uniquement depuis les props (initialData)
 // La route peut contenir l'ID de convention ou d'édition selon le contexte
@@ -639,6 +673,7 @@ const state = reactive({
   city: props.initialData?.city || '',
   region: props.initialData?.region || '',
   country: props.initialData?.country || '',
+  timezone: props.initialData?.timezone || null,
   ticketingUrl: props.initialData?.ticketingUrl || '',
   officialWebsiteUrl: props.initialData?.officialWebsiteUrl || '',
   facebookUrl: props.initialData?.facebookUrl || '',
@@ -979,6 +1014,12 @@ const handleCountryChange = (value: any) => {
       const input = document.querySelector('input[name="country"]') as HTMLInputElement
       if (input) input.focus()
     })
+  } else if (value && !state.timezone) {
+    // Suggérer le fuseau horaire par défaut pour ce pays si pas déjà défini
+    const defaultTz = getDefaultTimezoneForCountry(value)
+    if (defaultTz) {
+      state.timezone = defaultTz
+    }
   }
 }
 
@@ -1010,6 +1051,7 @@ const handleSubmit = () => {
     name: state.name?.trim() || null,
     addressLine2: state.addressLine2?.trim() || null,
     region: state.region?.trim() || null,
+    timezone: state.timezone || null,
     ticketingUrl: state.ticketingUrl?.trim() || null,
     officialWebsiteUrl: state.officialWebsiteUrl?.trim() || null,
     facebookUrl: state.facebookUrl?.trim() || null,
@@ -1186,6 +1228,7 @@ watch(
       state.city = newVal.city || ''
       state.region = newVal.region || ''
       state.country = newVal.country || ''
+      state.timezone = newVal.timezone || null
       state.ticketingUrl = newVal.ticketingUrl || ''
       state.officialWebsiteUrl = newVal.officialWebsiteUrl || ''
       state.facebookUrl = newVal.facebookUrl || ''

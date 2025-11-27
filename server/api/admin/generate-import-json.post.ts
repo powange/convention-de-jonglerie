@@ -46,8 +46,9 @@ Le JSON doit avoir exactement cette structure :
   "edition": {
     "name": "Nom de l'édition (string, optionnel - ex: 'CIJ 2025 - Paris')",
     "description": "Description de l'édition (string, optionnel)",
-    "startDate": "Date de début au format YYYY-MM-DD (requis)",
-    "endDate": "Date de fin au format YYYY-MM-DD (requis)",
+    "startDate": "Date et heure de début (requis) - format YYYY-MM-DDTHH:MM:SS si horaire trouvé, sinon YYYY-MM-DD",
+    "endDate": "Date et heure de fin (requis) - format YYYY-MM-DDTHH:MM:SS si horaire trouvé, sinon YYYY-MM-DD",
+    "timezone": "Fuseau horaire IANA (IMPORTANT - ex: 'Europe/Paris', 'Europe/Berlin', 'America/New_York')",
     "addressLine1": "Adresse principale (string, requis)",
     "addressLine2": "Complément d'adresse (string, optionnel)",
     "city": "Ville (string, requis)",
@@ -86,12 +87,27 @@ Le JSON doit avoir exactement cette structure :
 }
 
 RÈGLES IMPORTANTES:
-1. Les dates DOIVENT être au format YYYY-MM-DD (ex: "2025-07-15")
-2. Si tu ne trouves pas une information requise, mets une valeur vide "" pour les strings ou invente une valeur plausible
-3. Pour l'email, si tu ne le trouves pas, utilise "contact@" + le domaine du site
-4. Les booléens sont tous optionnels, mets true seulement si l'information est clairement mentionnée
-5. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
-6. N'ajoute pas de commentaires dans le JSON`
+1. DATES ET HORAIRES: Cherche activement les horaires d'ouverture et de fermeture de l'événement !
+   - Si tu trouves des horaires (ex: "ouverture à 14h", "de 10h à 22h", "begins at 9am"), utilise le format YYYY-MM-DDTHH:MM:SS
+   - Exemples: "2025-07-15T14:00:00" pour une ouverture à 14h, "2025-07-20T18:00:00" pour une fermeture à 18h
+   - Si aucun horaire trouvé, utilise juste YYYY-MM-DD
+2. TIMEZONE: TOUJOURS renseigner le fuseau horaire ! Déduis-le du pays/ville :
+   - France -> "Europe/Paris"
+   - Allemagne -> "Europe/Berlin"
+   - UK/Angleterre -> "Europe/London"
+   - Belgique -> "Europe/Brussels"
+   - Suisse -> "Europe/Zurich"
+   - Italie -> "Europe/Rome"
+   - Espagne -> "Europe/Madrid"
+   - Pays-Bas -> "Europe/Amsterdam"
+   - USA côte Est -> "America/New_York"
+   - USA côte Ouest -> "America/Los_Angeles"
+   - Canada -> "America/Toronto" ou "America/Vancouver"
+3. Si tu ne trouves pas une information requise, mets une valeur vide "" pour les strings ou invente une valeur plausible
+4. Pour l'email, si tu ne le trouves pas, utilise "contact@" + le domaine du site
+5. Les booléens sont tous optionnels, mets true seulement si l'information est clairement mentionnée
+6. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
+7. N'ajoute pas de commentaires dans le JSON`
 
 export default wrapApiHandler(
   async (event) => {

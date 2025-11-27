@@ -127,6 +127,10 @@
                   <li><code>edition.description</code> - Description de l'édition</li>
                   <li><code>edition.addressLine2</code> - Complément d'adresse</li>
                   <li><code>edition.region</code> - Région</li>
+                  <li>
+                    <code>edition.timezone</code> - Fuseau horaire IANA (ex: "Europe/Paris",
+                    "America/New_York")
+                  </li>
                   <li><code>edition.latitude/longitude</code> - Coordonnées GPS</li>
                   <li><code>edition.imageUrl</code> - URL de l'image de l'édition</li>
                   <li><code>edition.ticketingUrl</code> - URL de billetterie</li>
@@ -151,6 +155,27 @@
                 </ul>
                 <p class="text-xs text-gray-600 mt-2">
                   💡 Pour les événements multi-jours, le format date simple est recommandé.
+                </p>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-2">Fuseau horaire (timezone)</h4>
+                <p class="text-sm mb-2">
+                  Le fuseau horaire doit être au format IANA. Exemples courants :
+                </p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-1 text-sm">
+                  <span><code>Europe/Paris</code> - France</span>
+                  <span><code>Europe/Berlin</code> - Allemagne</span>
+                  <span><code>Europe/London</code> - UK</span>
+                  <span><code>Europe/Brussels</code> - Belgique</span>
+                  <span><code>Europe/Zurich</code> - Suisse</span>
+                  <span><code>Europe/Rome</code> - Italie</span>
+                  <span><code>America/New_York</code> - USA Est</span>
+                  <span><code>America/Los_Angeles</code> - USA Ouest</span>
+                  <span><code>America/Toronto</code> - Canada</span>
+                </div>
+                <p class="text-xs text-gray-600 mt-2">
+                  💡 L'IA déduit automatiquement le fuseau horaire à partir du pays/ville.
                 </p>
               </div>
 
@@ -350,6 +375,7 @@ const exampleJson = `{
     "addressLine2": "Hall 5",
     "city": "Paris",
     "region": "Île-de-France",
+    "timezone": "Europe/Paris",
     "country": "France",
     "postalCode": "75015",
     "latitude": 48.8566,

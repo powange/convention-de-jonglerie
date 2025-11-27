@@ -19,6 +19,7 @@ const importSchema = z.object({
     addressLine2: z.string().nullable().optional(),
     city: z.string().min(1),
     region: z.string().nullable().optional(),
+    timezone: z.string().nullable().optional(), // Fuseau horaire IANA (ex: "Europe/Paris")
     country: z.string().min(1),
     postalCode: z.string().min(1),
     latitude: z.number().optional(),
@@ -122,6 +123,7 @@ export default wrapApiHandler(
         addressLine2: validatedData.edition.addressLine2,
         city: validatedData.edition.city,
         region: validatedData.edition.region,
+        timezone: validatedData.edition.timezone,
         country: validatedData.edition.country,
         postalCode: validatedData.edition.postalCode,
         latitude: validatedData.edition.latitude,

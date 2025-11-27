@@ -83,6 +83,7 @@ model Edition {
   country                           String
   postalCode                        String
   region                            String?
+  timezone                          String? // IANA timezone (ex: "Europe/Paris", "America/New_York")
   latitude                          Float?
   longitude                         Float?
   facebookUrl                       String?

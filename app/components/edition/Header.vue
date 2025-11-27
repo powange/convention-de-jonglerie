@@ -441,18 +441,46 @@ const toggleFavorite = async () => {
   }
 }
 
-// Formatter la plage de dates
+// Formatter la plage de dates avec support du fuseau horaire
 const formatDateRange = (start: string, end: string) => {
   const { locale } = useI18n()
   const startDate = new Date(start)
   const endDate = new Date(end)
-  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
+  const timezone = props.edition.timezone || undefined
 
-  if (startDate.toDateString() === endDate.toDateString()) {
-    return startDate.toLocaleDateString(locale.value, options)
+  const baseOptions: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: timezone,
   }
 
-  return `${startDate.toLocaleDateString(locale.value, { day: 'numeric', month: 'long' })} - ${endDate.toLocaleDateString(locale.value, options)}`
+  const shortOptions: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'long',
+    timeZone: timezone,
+  }
+
+  // Vérifier si les dates sont le même jour (en tenant compte du fuseau horaire)
+  const startFormatted = new Intl.DateTimeFormat(locale.value, {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    timeZone: timezone,
+  }).format(startDate)
+
+  const endFormatted = new Intl.DateTimeFormat(locale.value, {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    timeZone: timezone,
+  }).format(endDate)
+
+  if (startFormatted === endFormatted) {
+    return new Intl.DateTimeFormat(locale.value, baseOptions).format(startDate)
+  }
+
+  return `${new Intl.DateTimeFormat(locale.value, shortOptions).format(startDate)} - ${new Intl.DateTimeFormat(locale.value, baseOptions).format(endDate)}`
 }
 
 // Obtenir le titre de la page selon la page courante
