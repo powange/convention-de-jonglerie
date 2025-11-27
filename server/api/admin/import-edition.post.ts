@@ -1,5 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { downloadAndStoreImage } from '@@/server/utils/file-helpers'
 import { z } from 'zod'
 
 // Schéma de validation pour l'import
@@ -112,6 +113,7 @@ export default wrapApiHandler(
     }
 
     // Créer l'édition (sans creatorId pour qu'elle soit orpheline)
+    // D'abord sans l'image pour avoir l'ID
     const edition = await prisma.edition.create({
       data: {
         conventionId: convention.id,
@@ -132,7 +134,8 @@ export default wrapApiHandler(
         facebookUrl: validatedData.edition.facebookUrl || null,
         instagramUrl: validatedData.edition.instagramUrl || null,
         officialWebsiteUrl: validatedData.edition.officialWebsiteUrl || null,
-        imageUrl: validatedData.edition.imageUrl,
+        // imageUrl sera mis à jour après téléchargement
+        imageUrl: null,
         // Caractéristiques
         hasFoodTrucks: validatedData.edition.hasFoodTrucks ?? false,
         hasKidsZone: validatedData.edition.hasKidsZone ?? false,
@@ -167,6 +170,37 @@ export default wrapApiHandler(
       },
     })
 
+    // Si une URL d'image est fournie, télécharger et stocker l'image
+    let imageDownloadResult: { success: boolean; filename: string | null; error?: string } | null =
+      null
+    if (validatedData.edition.imageUrl) {
+      console.log(
+        `[ADMIN IMPORT] Téléchargement de l'affiche depuis: ${validatedData.edition.imageUrl}`
+      )
+
+      imageDownloadResult = await downloadAndStoreImage(
+        validatedData.edition.imageUrl,
+        edition.id,
+        'editions',
+        true // verbose
+      )
+
+      if (imageDownloadResult.success && imageDownloadResult.filename) {
+        // Mettre à jour l'édition avec le nom du fichier local
+        await prisma.edition.update({
+          where: { id: edition.id },
+          data: { imageUrl: imageDownloadResult.filename },
+        })
+        console.log(
+          `[ADMIN IMPORT] Affiche téléchargée et stockée: ${imageDownloadResult.filename}`
+        )
+      } else {
+        console.warn(
+          `[ADMIN IMPORT] Échec du téléchargement de l'affiche: ${imageDownloadResult.error}`
+        )
+      }
+    }
+
     // Logger l'import pour audit
     console.log(
       `[ADMIN IMPORT] Convention "${convention.name}" (ID: ${convention.id}) et édition "${edition.name}" (ID: ${edition.id}) importées avec succès`
@@ -177,6 +211,8 @@ export default wrapApiHandler(
       conventionId: convention.id,
       editionId: edition.id,
       message: 'Import réussi',
+      imageDownloaded: imageDownloadResult?.success ?? false,
+      imageError: imageDownloadResult?.error,
     }
   },
   { operationName: 'ImportEdition' }

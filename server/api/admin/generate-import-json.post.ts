@@ -61,6 +61,7 @@ Le JSON doit avoir exactement cette structure :
     "facebookUrl": "URL Facebook (string URL, optionnel)",
     "instagramUrl": "URL Instagram (string URL, optionnel)",
     "officialWebsiteUrl": "Site web officiel (string URL, optionnel)",
+    "imageUrl": "URL de l'affiche/poster de l'événement (string URL, optionnel - cherche les images principales)",
     "hasFoodTrucks": "Présence de food trucks (boolean, optionnel)",
     "hasKidsZone": "Espace enfants (boolean, optionnel)",
     "acceptsPets": "Animaux acceptés (boolean, optionnel)",
@@ -103,11 +104,16 @@ RÈGLES IMPORTANTES:
    - USA côte Est -> "America/New_York"
    - USA côte Ouest -> "America/Los_Angeles"
    - Canada -> "America/Toronto" ou "America/Vancouver"
-3. Si tu ne trouves pas une information requise, mets une valeur vide "" pour les strings ou invente une valeur plausible
-4. Pour l'email, si tu ne le trouves pas, utilise "contact@" + le domaine du site
-5. Les booléens sont tous optionnels, mets true seulement si l'information est clairement mentionnée
-6. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
-7. N'ajoute pas de commentaires dans le JSON`
+3. AFFICHE/POSTER: Cherche l'URL de l'affiche ou image principale de l'événement !
+   - Regarde les balises <img> avec des classes comme "poster", "affiche", "banner", "hero"
+   - Cherche les images Open Graph (og:image) ou Twitter Card
+   - L'URL doit être complète (commencer par http:// ou https://)
+   - Privilégie les grandes images (pas les icônes ou logos)
+4. Si tu ne trouves pas une information requise, mets une valeur vide "" pour les strings ou invente une valeur plausible
+5. Pour l'email, si tu ne le trouves pas, utilise "contact@" + le domaine du site
+6. Les booléens sont tous optionnels, mets true seulement si l'information est clairement mentionnée
+7. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
+8. N'ajoute pas de commentaires dans le JSON`
 
 export default wrapApiHandler(
   async (event) => {
