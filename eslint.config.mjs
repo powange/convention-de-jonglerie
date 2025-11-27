@@ -5,7 +5,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 export default withNuxt(
   // Règles globales légères pour réduire le bruit sans masquer les erreurs importantes
   {
-  files: ['**/*.{js,cjs,mjs,ts,tsx,vue}'],
+    files: ['**/*.{js,cjs,mjs,ts,tsx,vue}'],
     rules: {
       // Les props par défaut ne sont pas nécessaires en script setup + TS
       'vue/require-default-prop': 'off',
@@ -13,9 +13,9 @@ export default withNuxt(
       'vue/html-self-closing': 'off',
       // Autoriser variables préfixées par _ à être non utilisées
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-  // Trop strict pour une migration en cours ; préférer améliorer progressivement
-  '@typescript-eslint/no-explicit-any': 'off',
-  'no-unused-vars': 'off',
+      // Trop strict pour une migration en cours ; préférer améliorer progressivement
+      '@typescript-eslint/no-explicit-any': 'off',
+      'no-unused-vars': 'off',
       // Style d'import unifié (mode warn pour adoption progressive)
       'import/order': ['warn', {
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
@@ -51,10 +51,10 @@ export default withNuxt(
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
       'import/first': 'off',
-  'import/no-mutable-exports': 'off',
-  'no-useless-escape': 'off',
-  'import/order': 'off',
-  'import/newline-after-import': 'off',
+      'import/no-mutable-exports': 'off',
+      'no-useless-escape': 'off',
+      'import/order': 'off',
+      'import/newline-after-import': 'off',
     },
   },
   // Scripts utilitaires Node
