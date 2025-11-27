@@ -68,6 +68,13 @@ export default defineNuxtConfig({
   },
   nitro: {
     ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
+    // Routes avec timeout étendu pour les appels IA longs
+    routeRules: {
+      '/api/admin/generate-import-json': {
+        // Headers pour indiquer au client que la requête peut être longue
+        headers: { 'X-Accel-Buffering': 'no' },
+      },
+    },
     externals: {
       external: ['node-cron', '@prisma/client'],
     },

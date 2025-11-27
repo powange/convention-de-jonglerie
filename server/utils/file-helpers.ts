@@ -115,7 +115,9 @@ export async function downloadAndStoreImage(
     // Vérifier la taille
     const contentLength = response.headers.get('content-length')
     if (contentLength && parseInt(contentLength) > MAX_IMAGE_SIZE) {
-      throw new Error(`Image trop volumineuse: ${Math.round(parseInt(contentLength) / 1024 / 1024)}MB (max: 10MB)`)
+      throw new Error(
+        `Image trop volumineuse: ${Math.round(parseInt(contentLength) / 1024 / 1024)}MB (max: 10MB)`
+      )
     }
 
     // Lire le contenu
@@ -123,7 +125,9 @@ export async function downloadAndStoreImage(
     const buffer = Buffer.from(arrayBuffer)
 
     if (buffer.length > MAX_IMAGE_SIZE) {
-      throw new Error(`Image trop volumineuse: ${Math.round(buffer.length / 1024 / 1024)}MB (max: 10MB)`)
+      throw new Error(
+        `Image trop volumineuse: ${Math.round(buffer.length / 1024 / 1024)}MB (max: 10MB)`
+      )
     }
 
     if (verbose) {

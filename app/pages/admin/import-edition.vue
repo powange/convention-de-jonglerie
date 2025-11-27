@@ -546,8 +546,38 @@ const validateAndImport = async () => {
   }
 }
 
+// Intervalle de polling (en ms)
+const POLL_INTERVAL = 2000
+
 /**
- * Génère le JSON depuis les URLs fournies via IA
+ * Poll le statut d'une tâche jusqu'à ce qu'elle soit terminée
+ */
+const pollTaskStatus = async (taskId: string): Promise<any> => {
+  const maxAttempts = 90 // 3 minutes max (90 * 2s)
+  let attempts = 0
+
+  while (attempts < maxAttempts) {
+    attempts++
+
+    const response = await $fetch(`/api/admin/generate-import-json/${taskId}`)
+
+    if (response.status === 'completed' && response.result) {
+      return response.result
+    }
+
+    if (response.status === 'failed') {
+      throw new Error(response.error || 'Erreur lors de la génération')
+    }
+
+    // Attendre avant le prochain poll
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL))
+  }
+
+  throw new Error('Timeout: la génération a pris trop de temps')
+}
+
+/**
+ * Génère le JSON depuis les URLs fournies via IA (avec polling asynchrone)
  */
 const generateFromUrls = async () => {
   generateError.value = ''
@@ -586,17 +616,21 @@ const generateFromUrls = async () => {
   try {
     generating.value = true
 
-    const response = await $fetch('/api/admin/generate-import-json', {
+    // Étape 1: Créer la tâche
+    const taskResponse = await $fetch('/api/admin/generate-import-json', {
       method: 'POST',
       body: { urls },
     })
 
+    // Étape 2: Polling jusqu'à la fin
+    const result = await pollTaskStatus(taskResponse.taskId)
+
     // Mettre le JSON généré dans le champ d'input et le formater
     try {
-      const parsed = JSON.parse(response.json)
+      const parsed = JSON.parse(result.json)
       jsonInput.value = JSON.stringify(parsed, null, 2)
     } catch {
-      jsonInput.value = response.json
+      jsonInput.value = result.json
     }
 
     // Réinitialiser les résultats de validation
@@ -605,11 +639,12 @@ const generateFromUrls = async () => {
 
     useToast().add({
       title: t('admin.import.generate_success'),
-      description: t('admin.import.generate_success_description', { provider: response.provider }),
+      description: t('admin.import.generate_success_description', { provider: result.provider }),
       color: 'success',
     })
   } catch (error: any) {
-    generateError.value = error?.data?.message || t('admin.import.generate_failed')
+    generateError.value =
+      error?.data?.message || error?.message || t('admin.import.generate_failed')
   } finally {
     generating.value = false
   }

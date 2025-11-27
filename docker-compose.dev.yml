@@ -52,6 +52,8 @@ services:
       CHOKIDAR_INTERVAL: '1000'
       # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
+      # URL LM Studio avec hostname Docker (host.docker.internal pointe vers l'hôte)
+      LMSTUDIO_BASE_URL: '${LMSTUDIO_BASE_URL:-http://host.docker.internal:1234}'
     volumes:
       # Monter uniquement le code pour ne pas écraser node_modules
       - ./app:/app/app:cached
@@ -86,6 +88,9 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    # Permet d'accéder aux services de l'hôte (LM Studio, etc.)
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
 
 volumes:
   mysql_data:
