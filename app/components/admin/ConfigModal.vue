@@ -44,29 +44,71 @@
               {{ $t('admin.config.ai') }}
             </h4>
             <div class="space-y-2 text-sm">
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">Provider:</span>
-                <span class="ml-2 font-mono font-semibold">{{ config.server.ai.provider }}</span>
+              <!-- Provider actif -->
+              <div
+                class="bg-gray-50 dark:bg-gray-800 p-2 rounded flex items-center justify-between"
+              >
+                <span class="text-gray-600 dark:text-gray-400">Provider actif:</span>
+                <UBadge
+                  :color="
+                    config.server.ai.provider === 'lmstudio'
+                      ? 'success'
+                      : config.server.ai.provider === 'anthropic'
+                        ? 'info'
+                        : 'warning'
+                  "
+                  variant="soft"
+                >
+                  {{ config.server.ai.provider }}
+                </UBadge>
               </div>
+
+              <!-- Anthropic -->
               <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
                 <span class="text-gray-600 dark:text-gray-400">Anthropic API Key:</span>
                 <span class="ml-2 font-mono">{{ config.server.ai.anthropicApiKey }}</span>
               </div>
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">Ollama URL:</span>
-                <span class="ml-2 font-mono">{{ config.server.ai.ollamaBaseUrl }}</span>
+
+              <!-- LM Studio -->
+              <div
+                class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800"
+              >
+                <div class="font-medium text-blue-700 dark:text-blue-300 mb-2">LM Studio</div>
+                <div class="space-y-1">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-400">URL:</span>
+                    <span class="font-mono text-xs">{{ config.server.ai.lmstudioBaseUrl }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-600 dark:text-gray-400">Vision (images):</span>
+                    <UBadge color="purple" variant="soft" size="xs">
+                      {{ config.server.ai.lmstudioModel }}
+                    </UBadge>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-600 dark:text-gray-400">Texte (JSON):</span>
+                    <UBadge color="success" variant="soft" size="xs">
+                      {{ config.server.ai.lmstudioTextModel }}
+                    </UBadge>
+                  </div>
+                </div>
               </div>
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">Ollama Model:</span>
-                <span class="ml-2 font-mono">{{ config.server.ai.ollamaModel }}</span>
-              </div>
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">LM Studio URL:</span>
-                <span class="ml-2 font-mono">{{ config.server.ai.lmstudioBaseUrl }}</span>
-              </div>
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">LM Studio Model:</span>
-                <span class="ml-2 font-mono">{{ config.server.ai.lmstudioModel }}</span>
+
+              <!-- Ollama -->
+              <div
+                class="bg-orange-50 dark:bg-orange-900/20 p-3 rounded border border-orange-200 dark:border-orange-800"
+              >
+                <div class="font-medium text-orange-700 dark:text-orange-300 mb-2">Ollama</div>
+                <div class="space-y-1">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-400">URL:</span>
+                    <span class="font-mono text-xs">{{ config.server.ai.ollamaBaseUrl }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-400">Model:</span>
+                    <span class="font-mono text-xs">{{ config.server.ai.ollamaModel }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

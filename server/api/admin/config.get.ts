@@ -31,6 +31,8 @@ export default wrapApiHandler(
           ollamaModel: process.env.OLLAMA_MODEL || config.ollamaModel || 'non défini',
           lmstudioBaseUrl: process.env.LMSTUDIO_BASE_URL || config.lmstudioBaseUrl || 'non défini',
           lmstudioModel: process.env.LMSTUDIO_MODEL || config.lmstudioModel || 'non défini',
+          lmstudioTextModel:
+            process.env.LMSTUDIO_TEXT_MODEL || config.lmstudioTextModel || 'non défini',
         },
         // Configuration email
         email: {
@@ -68,6 +70,7 @@ export default wrapApiHandler(
         AI_PROVIDER: process.env.AI_PROVIDER || 'non défini',
         LMSTUDIO_BASE_URL: process.env.LMSTUDIO_BASE_URL || 'non défini',
         LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'non défini',
+        LMSTUDIO_TEXT_MODEL: process.env.LMSTUDIO_TEXT_MODEL || 'non défini',
         OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || 'non défini',
         OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'non défini',
         ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ? '***SET***' : 'non défini',

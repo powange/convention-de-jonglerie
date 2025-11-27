@@ -23,6 +23,52 @@
       </ol>
     </nav>
 
+    <!-- Génération depuis URLs -->
+    <UCard class="mb-6">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <UIcon name="i-heroicons-sparkles" class="text-yellow-500" size="24" />
+          <h2 class="text-xl font-bold">{{ $t('admin.import.generate_from_urls') }}</h2>
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{ $t('admin.import.generate_description') }}
+        </p>
+
+        <UFormField :label="$t('admin.import.urls_input')" :hint="$t('admin.import.urls_hint')">
+          <UTextarea
+            v-model="urlsInput"
+            :rows="4"
+            :placeholder="$t('admin.import.urls_placeholder')"
+            class="font-mono w-full"
+          />
+        </UFormField>
+
+        <UButton
+          color="warning"
+          :loading="generating"
+          :disabled="!urlsInput.trim()"
+          icon="i-heroicons-sparkles"
+          @click="generateFromUrls"
+        >
+          {{ $t('admin.import.generate_json') }}
+        </UButton>
+
+        <!-- Erreur de génération -->
+        <UAlert
+          v-if="generateError"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="$t('admin.import.generate_error')"
+        >
+          <template #description>{{ generateError }}</template>
+        </UAlert>
+      </div>
+    </UCard>
+
     <UCard>
       <template #header>
         <div class="flex items-center justify-between">
@@ -73,6 +119,7 @@
                 <h4 class="font-semibold mb-2">{{ $t('admin.import.optional_fields') }}</h4>
                 <ul class="list-disc list-inside space-y-1 text-sm">
                   <li><code>convention.description</code> - Description de la convention</li>
+                  <li><code>convention.logo</code> - URL du logo</li>
                   <li>
                     <code>edition.name</code> - Nom de l'édition (si omis, utilise le nom de la
                     convention)
@@ -81,10 +128,15 @@
                   <li><code>edition.addressLine2</code> - Complément d'adresse</li>
                   <li><code>edition.region</code> - Région</li>
                   <li><code>edition.latitude/longitude</code> - Coordonnées GPS</li>
+                  <li><code>edition.imageUrl</code> - URL de l'image de l'édition</li>
                   <li><code>edition.ticketingUrl</code> - URL de billetterie</li>
                   <li><code>edition.facebookUrl</code> - Page Facebook</li>
                   <li><code>edition.instagramUrl</code> - Page Instagram</li>
                   <li><code>edition.officialWebsiteUrl</code> - Site officiel</li>
+                  <li><code>edition.isOnline</code> - Événement en ligne (boolean)</li>
+                  <li><code>edition.volunteersOpen</code> - Inscriptions bénévoles ouvertes</li>
+                  <li><code>edition.volunteersDescription</code> - Description pour bénévoles</li>
+                  <li><code>edition.volunteersExternalUrl</code> - URL externe bénévoles</li>
                 </ul>
               </div>
 
@@ -106,19 +158,30 @@
                 <h4 class="font-semibold mb-2">{{ $t('admin.import.features_fields') }}</h4>
                 <p class="text-sm mb-2">{{ $t('admin.import.features_description') }}</p>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-1 text-sm">
-                  <code>hasFoodTrucks</code>
-                  <code>hasKidsZone</code>
-                  <code>acceptsPets</code>
-                  <code>hasTentCamping</code>
-                  <code>hasTruckCamping</code>
-                  <code>hasGym</code>
-                  <code>hasCantine</code>
-                  <code>hasShowers</code>
-                  <code>hasToilets</code>
-                  <code>hasWorkshops</code>
-                  <code>hasOpenStage</code>
-                  <code>hasConcert</code>
-                  <code>hasGala</code>
+                  <span title="Food trucks"><code>hasFoodTrucks</code></span>
+                  <span title="Espace enfants"><code>hasKidsZone</code></span>
+                  <span title="Animaux acceptés"><code>acceptsPets</code></span>
+                  <span title="Camping tente"><code>hasTentCamping</code></span>
+                  <span title="Camping véhicule"><code>hasTruckCamping</code></span>
+                  <span title="Camping famille"><code>hasFamilyCamping</code></span>
+                  <span title="Gymnase"><code>hasGym</code></span>
+                  <span title="Cantine"><code>hasCantine</code></span>
+                  <span title="Douches"><code>hasShowers</code></span>
+                  <span title="Toilettes"><code>hasToilets</code></span>
+                  <span title="Dortoir"><code>hasSleepingRoom</code></span>
+                  <span title="Ateliers"><code>hasWorkshops</code></span>
+                  <span title="Scène ouverte"><code>hasOpenStage</code></span>
+                  <span title="Concert"><code>hasConcert</code></span>
+                  <span title="Gala"><code>hasGala</code></span>
+                  <span title="Spectacle long"><code>hasLongShow</code></span>
+                  <span title="Espace aérien"><code>hasAerialSpace</code></span>
+                  <span title="Espace feu"><code>hasFireSpace</code></span>
+                  <span title="Espace slackline"><code>hasSlacklineSpace</code></span>
+                  <span title="Accessibilité PMR"><code>hasAccessibility</code></span>
+                  <span title="Paiement espèces"><code>hasCashPayment</code></span>
+                  <span title="Paiement CB"><code>hasCreditCardPayment</code></span>
+                  <span title="Jetons AFJ"><code>hasAfjTokenPayment</code></span>
+                  <span title="Distributeur"><code>hasATM</code></span>
                 </div>
               </div>
 
@@ -266,6 +329,11 @@ const jsonInput = ref('')
 const importing = ref(false)
 const validationResult = ref<any>(null)
 const importResult = ref<any>(null)
+
+// Génération depuis URLs
+const urlsInput = ref('')
+const generating = ref(false)
+const generateError = ref('')
 
 const exampleJson = `{
   "convention": {
@@ -449,6 +517,75 @@ const validateAndImport = async () => {
     })
   } finally {
     importing.value = false
+  }
+}
+
+/**
+ * Génère le JSON depuis les URLs fournies via IA
+ */
+const generateFromUrls = async () => {
+  generateError.value = ''
+
+  // Parser les URLs (une par ligne)
+  const urls = urlsInput.value
+    .split('\n')
+    .map((url) => url.trim())
+    .filter((url) => url.length > 0)
+
+  if (urls.length === 0) {
+    generateError.value = t('admin.import.no_urls')
+    return
+  }
+
+  // Valider les URLs
+  const invalidUrls = urls.filter((url) => {
+    try {
+      new URL(url)
+      return false
+    } catch {
+      return true
+    }
+  })
+
+  if (invalidUrls.length > 0) {
+    generateError.value = t('admin.import.invalid_urls', { urls: invalidUrls.join(', ') })
+    return
+  }
+
+  if (urls.length > 5) {
+    generateError.value = t('admin.import.too_many_urls')
+    return
+  }
+
+  try {
+    generating.value = true
+
+    const response = await $fetch('/api/admin/generate-import-json', {
+      method: 'POST',
+      body: { urls },
+    })
+
+    // Mettre le JSON généré dans le champ d'input et le formater
+    try {
+      const parsed = JSON.parse(response.json)
+      jsonInput.value = JSON.stringify(parsed, null, 2)
+    } catch {
+      jsonInput.value = response.json
+    }
+
+    // Réinitialiser les résultats de validation
+    validationResult.value = null
+    importResult.value = null
+
+    useToast().add({
+      title: t('admin.import.generate_success'),
+      description: t('admin.import.generate_success_description', { provider: response.provider }),
+      color: 'success',
+    })
+  } catch (error: any) {
+    generateError.value = error?.data?.message || t('admin.import.generate_failed')
+  } finally {
+    generating.value = false
   }
 }
 </script>

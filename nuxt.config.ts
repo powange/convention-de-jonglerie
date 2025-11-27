@@ -319,7 +319,8 @@ export default defineNuxtConfig({
     ollamaBaseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434', // URL de base d'Ollama
     ollamaModel: process.env.OLLAMA_MODEL || 'llava', // Modèle Ollama avec vision
     lmstudioBaseUrl: process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234', // URL de base de LM Studio
-    lmstudioModel: process.env.LMSTUDIO_MODEL || 'auto', // Modèle LM Studio (auto = utilise le modèle chargé)
+    lmstudioModel: process.env.LMSTUDIO_MODEL || 'auto', // Modèle LM Studio vision (auto = utilise le modèle chargé)
+    lmstudioTextModel: process.env.LMSTUDIO_TEXT_MODEL || 'auto', // Modèle LM Studio texte pour génération JSON
     // Supporte aussi la convention Nuxt NUXT_*
     recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3
