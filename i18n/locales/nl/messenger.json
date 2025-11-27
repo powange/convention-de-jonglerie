@@ -5,6 +5,7 @@
     "conversation_types": {
       "group": "Groepschat",
       "organizers": "Gesprek met organisatoren",
+      "organizers_group": "Discussie tussen organisatoren",
       "private": "Privégesprek"
     },
     "conversations": "Gesprekken",
@@ -15,17 +16,24 @@
     "loading": "Laden...",
     "loading_messages": "Berichten laden...",
     "loading_previous_messages": "Vorige berichten laden...",
+    "message_actions": "Acties",
     "message_placeholder": "Schrijf je bericht...",
     "minutes_ago": "{count}min geleden",
     "no_conversations": "Geen gesprekken",
     "no_messages": "Nog geen berichten",
+    "online": "Online",
+    "organizers_group": "Organisatorengroep",
     "participants": "Deelnemers",
+    "private_conversation": "Privégesprek",
+    "private_conversations": "Privégesprekken",
     "reply": "Antwoorden",
     "reply_to": "Antwoord aan {pseudo}",
     "select_conversation": "Selecteer een gesprek om te beginnen",
     "subtitles": {
       "group": "Groep",
       "organizers": "Organisatoren",
+      "organizers_group": "Organisatorengroep",
+      "private": "Privé",
       "private_leader": "Privé met leider",
       "private_leaders": "Privé met leiders"
     },

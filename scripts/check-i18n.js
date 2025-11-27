@@ -35,6 +35,11 @@ const EXCLUDED_FILES = [
   // Ajouter d'autres fichiers ici si nécessaire
 ]
 
+// Dossiers à exclure de l'analyse (patterns)
+const EXCLUDED_DIRS = [
+  'server/generated/', // Fichiers générés par Prisma
+]
+
 /**
  * Charge tous les fichiers de traduction depuis le dossier de locale
  * et les fusionne en un seul objet
@@ -491,9 +496,17 @@ async function getAllRelevantFiles() {
     files = files.concat([...found])
   }
 
-  // Filtrer les fichiers exclus
+  // Filtrer les fichiers exclus (fichiers individuels et dossiers)
   const filteredFiles = files.filter((file) => {
     const relativePath = path.relative(projectRoot, file).replace(/\\/g, '/')
+
+    // Vérifier si le fichier est dans un dossier exclu
+    const isInExcludedDir = EXCLUDED_DIRS.some((excludedDir) => {
+      return relativePath.startsWith(excludedDir)
+    })
+    if (isInExcludedDir) return false
+
+    // Vérifier si le fichier est exclu individuellement
     const isExcluded = EXCLUDED_FILES.some((excludedFile) => {
       const normalizedExcluded = excludedFile.replace(/\\/g, '/')
       return relativePath === normalizedExcluded

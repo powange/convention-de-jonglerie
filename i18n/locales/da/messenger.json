@@ -5,6 +5,7 @@
     "conversation_types": {
       "group": "Gruppechat",
       "organizers": "Samtale med arrangører",
+      "organizers_group": "Diskussion mellem arrangører",
       "private": "Privat samtale"
     },
     "conversations": "Samtaler",
@@ -15,17 +16,24 @@
     "loading": "Indlæser...",
     "loading_messages": "Indlæser beskeder...",
     "loading_previous_messages": "Indlæser tidligere beskeder...",
+    "message_actions": "Handlinger",
     "message_placeholder": "Skriv din besked...",
     "minutes_ago": "{count}min siden",
     "no_conversations": "Ingen samtaler",
     "no_messages": "Ingen beskeder endnu",
+    "online": "Online",
+    "organizers_group": "Arrangørgruppe",
     "participants": "Deltagere",
+    "private_conversation": "Privat samtale",
+    "private_conversations": "Private samtaler",
     "reply": "Svar",
     "reply_to": "Svar til {pseudo}",
     "select_conversation": "Vælg en samtale for at starte",
     "subtitles": {
       "group": "Gruppe",
       "organizers": "Arrangører",
+      "organizers_group": "Arrangørgruppe",
+      "private": "Privat",
       "private_leader": "Privat med leder",
       "private_leaders": "Privat med ledere"
     },

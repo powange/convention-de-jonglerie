@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Weet je zeker dat je deze melding wilt verwijderen?",
     "confirm_delete_title": "Melding verwijderen",
+    "devices": {
+      "current_device": "Dit apparaat",
+      "deleted": "Apparaat verwijderd",
+      "description": "De volgende apparaten ontvangen uw push-notificaties. U kunt een apparaat verwijderen om geen notificaties meer te ontvangen.",
+      "error_deleting": "Fout bij verwijderen van apparaat",
+      "error_loading": "Fout bij laden van apparaten",
+      "manage_button": "Apparaten beheren",
+      "no_devices": "Geen geregistreerde apparaten",
+      "registered_at": "Toegevoegd op {date}",
+      "title": "Geregistreerde apparaten"
+    },
     "edition": {
       "new_convention": {
         "message": "De conventie \"{conventionName}\" is zojuist toegevoegd aan het platform.",

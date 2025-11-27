@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Sind Sie sicher, dass Sie diese Benachrichtigung löschen möchten?",
     "confirm_delete_title": "Benachrichtigung löschen",
+    "devices": {
+      "current_device": "Dieses Gerät",
+      "deleted": "Gerät gelöscht",
+      "description": "Die folgenden Geräte empfangen Ihre Push-Benachrichtigungen. Sie können ein Gerät entfernen, um keine Benachrichtigungen mehr darauf zu erhalten.",
+      "error_deleting": "Fehler beim Löschen des Geräts",
+      "error_loading": "Fehler beim Laden der Geräte",
+      "manage_button": "Geräte verwalten",
+      "no_devices": "Keine registrierten Geräte",
+      "registered_at": "Hinzugefügt am {date}",
+      "title": "Registrierte Geräte"
+    },
     "edition": {
       "new_convention": {
         "message": "Die Convention \"{conventionName}\" wurde gerade zur Plattform hinzugefügt.",

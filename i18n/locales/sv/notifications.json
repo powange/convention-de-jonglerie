@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Är du säker på att du vill ta bort detta meddelande?",
     "confirm_delete_title": "Ta bort meddelande",
+    "devices": {
+      "current_device": "Denna enhet",
+      "deleted": "Enhet raderad",
+      "description": "Följande enheter tar emot dina push-notiser. Du kan ta bort en enhet för att sluta ta emot notiser på den.",
+      "error_deleting": "Fel vid radering av enhet",
+      "error_loading": "Fel vid laddning av enheter",
+      "manage_button": "Hantera enheter",
+      "no_devices": "Inga registrerade enheter",
+      "registered_at": "Tillagt {date}",
+      "title": "Registrerade enheter"
+    },
     "edition": {
       "new_convention": {
         "message": "Konventionen \"{conventionName}\" har just lagts till i plattformen.",

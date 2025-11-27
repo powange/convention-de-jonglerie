@@ -5,6 +5,7 @@
     "conversation_types": {
       "group": "Gruppchatt",
       "organizers": "Konversation med arrangörer",
+      "organizers_group": "Diskussion mellan arrangörer",
       "private": "Privat konversation"
     },
     "conversations": "Konversationer",
@@ -15,17 +16,24 @@
     "loading": "Laddar...",
     "loading_messages": "Laddar meddelanden...",
     "loading_previous_messages": "Laddar tidigare meddelanden...",
+    "message_actions": "Åtgärder",
     "message_placeholder": "Skriv ditt meddelande...",
     "minutes_ago": "{count}min sedan",
     "no_conversations": "Inga konversationer",
     "no_messages": "Inga meddelanden ännu",
+    "online": "Online",
+    "organizers_group": "Arrangörsgrupp",
     "participants": "Deltagare",
+    "private_conversation": "Privat konversation",
+    "private_conversations": "Privata konversationer",
     "reply": "Svara",
     "reply_to": "Svara till {pseudo}",
     "select_conversation": "Välj en konversation för att börja",
     "subtitles": {
       "group": "Grupp",
       "organizers": "Arrangörer",
+      "organizers_group": "Arrangörsgrupp",
+      "private": "Privat",
       "private_leader": "Privat med ledare",
       "private_leaders": "Privat med ledare"
     },

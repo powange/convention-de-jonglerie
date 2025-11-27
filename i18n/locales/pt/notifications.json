@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Tem certeza de que deseja excluir esta notificação?",
     "confirm_delete_title": "Excluir notificação",
+    "devices": {
+      "current_device": "Este dispositivo",
+      "deleted": "Dispositivo eliminado",
+      "description": "Os seguintes dispositivos recebem as suas notificações push. Pode remover um dispositivo para deixar de receber notificações nele.",
+      "error_deleting": "Erro ao eliminar o dispositivo",
+      "error_loading": "Erro ao carregar os dispositivos",
+      "manage_button": "Gerir dispositivos",
+      "no_devices": "Nenhum dispositivo registado",
+      "registered_at": "Adicionado em {date}",
+      "title": "Dispositivos registados"
+    },
     "edition": {
       "new_convention": {
         "message": "A convenção \"{conventionName}\" acabou de ser adicionada à plataforma.",

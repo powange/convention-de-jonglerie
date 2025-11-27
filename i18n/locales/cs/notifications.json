@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Opravdu chcete toto oznámení odstranit?",
     "confirm_delete_title": "Odstranění oznámení",
+    "devices": {
+      "current_device": "Toto zařízení",
+      "deleted": "Zařízení odstraněno",
+      "description": "Následující zařízení přijímají vaše push notifikace. Můžete zařízení odstranit, abyste na něj již nedostávali notifikace.",
+      "error_deleting": "Chyba při odstraňování zařízení",
+      "error_loading": "Chyba při načítání zařízení",
+      "manage_button": "Spravovat zařízení",
+      "no_devices": "Žádné registrované zařízení",
+      "registered_at": "Přidáno {date}",
+      "title": "Registrovaná zařízení"
+    },
     "edition": {
       "new_convention": {
         "message": "Do platformy byla právě přidána konvence \"{conventionName}\".",

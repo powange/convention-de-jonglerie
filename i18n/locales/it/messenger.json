@@ -5,6 +5,7 @@
     "conversation_types": {
       "group": "Chat di gruppo",
       "organizers": "Conversazione con organizzatori",
+      "organizers_group": "Discussione tra organizzatori",
       "private": "Conversazione privata"
     },
     "conversations": "Conversazioni",
@@ -15,17 +16,24 @@
     "loading": "Caricamento...",
     "loading_messages": "Caricamento messaggi...",
     "loading_previous_messages": "Caricamento messaggi precedenti...",
+    "message_actions": "Azioni",
     "message_placeholder": "Scrivi il tuo messaggio...",
     "minutes_ago": "{count}min fa",
     "no_conversations": "Nessuna conversazione",
     "no_messages": "Nessun messaggio ancora",
+    "online": "Online",
+    "organizers_group": "Gruppo organizzatori",
     "participants": "Partecipanti",
+    "private_conversation": "Conversazione privata",
+    "private_conversations": "Conversazioni private",
     "reply": "Rispondi",
     "reply_to": "Rispondi a {pseudo}",
     "select_conversation": "Seleziona una conversazione per iniziare",
     "subtitles": {
       "group": "Gruppo",
       "organizers": "Organizzatori",
+      "organizers_group": "Gruppo organizzatori",
+      "private": "Privato",
       "private_leader": "Privato con il responsabile",
       "private_leaders": "Privato con i responsabili"
     },

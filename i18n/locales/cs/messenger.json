@@ -5,6 +5,7 @@
     "conversation_types": {
       "group": "Skupinový chat",
       "organizers": "Konverzace s organizátory",
+      "organizers_group": "Diskuse mezi organizátory",
       "private": "Soukromá konverzace"
     },
     "conversations": "Konverzace",
@@ -15,17 +16,24 @@
     "loading": "Načítání...",
     "loading_messages": "Načítání zpráv...",
     "loading_previous_messages": "Načítání předchozích zpráv...",
+    "message_actions": "Akce",
     "message_placeholder": "Napište svou zprávu...",
     "minutes_ago": "Před {count}min",
     "no_conversations": "Žádné konverzace",
     "no_messages": "Zatím žádné zprávy",
+    "online": "Online",
+    "organizers_group": "Skupina organizátorů",
     "participants": "Účastníci",
+    "private_conversation": "Soukromá konverzace",
+    "private_conversations": "Soukromé konverzace",
     "reply": "Odpovědět",
     "reply_to": "Odpovědět uživateli {pseudo}",
     "select_conversation": "Vyberte konverzaci pro zahájení",
     "subtitles": {
       "group": "Skupina",
       "organizers": "Organizátoři",
+      "organizers_group": "Skupina organizátorů",
+      "private": "Soukromé",
       "private_leader": "Soukromé s vedoucím",
       "private_leaders": "Soukromé s vedoucími"
     },

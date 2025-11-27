@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Czy na pewno chcesz usunąć to powiadomienie?",
     "confirm_delete_title": "Usuń powiadomienie",
+    "devices": {
+      "current_device": "To urządzenie",
+      "deleted": "Urządzenie usunięte",
+      "description": "Następujące urządzenia otrzymują Twoje powiadomienia push. Możesz usunąć urządzenie, aby nie otrzymywać na nim więcej powiadomień.",
+      "error_deleting": "Błąd podczas usuwania urządzenia",
+      "error_loading": "Błąd podczas ładowania urządzeń",
+      "manage_button": "Zarządzaj urządzeniami",
+      "no_devices": "Brak zarejestrowanych urządzeń",
+      "registered_at": "Dodano {date}",
+      "title": "Zarejestrowane urządzenia"
+    },
     "edition": {
       "new_convention": {
         "message": "Konwencja \"{conventionName}\" została właśnie dodana do platformy.",

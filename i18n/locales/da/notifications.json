@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Er du sikker på, at du vil slette denne notifikation?",
     "confirm_delete_title": "Slet notifikation",
+    "devices": {
+      "current_device": "Denne enhed",
+      "deleted": "Enhed slettet",
+      "description": "Følgende enheder modtager dine push-notifikationer. Du kan fjerne en enhed for ikke længere at modtage notifikationer på den.",
+      "error_deleting": "Fejl ved sletning af enhed",
+      "error_loading": "Fejl ved indlæsning af enheder",
+      "manage_button": "Administrer enheder",
+      "no_devices": "Ingen registrerede enheder",
+      "registered_at": "Tilføjet {date}",
+      "title": "Registrerede enheder"
+    },
     "edition": {
       "new_convention": {
         "message": "Festivalen \"{conventionName}\" er lige blevet tilføjet til platformen.",

@@ -5,6 +5,7 @@
     "conversation_types": {
       "group": "Групповой чат",
       "organizers": "Разговор с организаторами",
+      "organizers_group": "Обсуждение между организаторами",
       "private": "Приватный разговор"
     },
     "conversations": "Разговоры",
@@ -15,17 +16,24 @@
     "loading": "Загрузка...",
     "loading_messages": "Загрузка сообщений...",
     "loading_previous_messages": "Загрузка предыдущих сообщений...",
+    "message_actions": "Действия",
     "message_placeholder": "Напишите ваше сообщение...",
     "minutes_ago": "{count}мин назад",
     "no_conversations": "Нет разговоров",
     "no_messages": "Пока нет сообщений",
+    "online": "В сети",
+    "organizers_group": "Группа организаторов",
     "participants": "Участники",
+    "private_conversation": "Личная беседа",
+    "private_conversations": "Личные беседы",
     "reply": "Ответить",
     "reply_to": "Ответить {pseudo}",
     "select_conversation": "Выберите разговор для начала",
     "subtitles": {
       "group": "Группа",
       "organizers": "Организаторы",
+      "organizers_group": "Группа организаторов",
+      "private": "Личное",
       "private_leader": "Приватно с руководителем",
       "private_leaders": "Приватно с руководителями"
     },
