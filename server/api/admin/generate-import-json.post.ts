@@ -17,6 +17,10 @@ import {
   fetchWithTimeout,
   isBrowserlessAvailable,
 } from '@@/server/utils/fetch-helpers'
+import {
+  generateFeaturesDescription,
+  generateJsonExample,
+} from '@@/server/utils/import-json-schema'
 import { extractAndFormatWebContent } from '@@/server/utils/web-content-extractor'
 import { z } from 'zod'
 
@@ -84,21 +88,39 @@ RÈGLES:
 5. instagramUrl = lien Instagram si trouvé dans les sources
 6. Réponds UNIQUEMENT avec le JSON complet, sans commentaires`
 
-// Prompt système complet pour Anthropic (modèles avec grand contexte)
-const SYSTEM_PROMPT_FULL = `Tu extrais les informations d'une convention de jonglerie depuis des pages web.
-Génère un JSON au format spécifié. Le nom doit être celui de L'ÉVÉNEMENT, pas du site source.
-Email: UNIQUEMENT si explicitement trouvé dans les sources, sinon laisser vide. NE PAS INVENTER.
-Instagram: Extraire le lien Instagram si présent dans les sources.
-Déduis le timezone IANA du pays (France=Europe/Paris, Allemagne=Europe/Berlin, etc.).
-Réponds UNIQUEMENT avec le JSON, sans texte autour.
+// Génère le prompt système complet pour Anthropic (modèles avec grand contexte)
+function getFullSystemPrompt(): string {
+  return `Tu extrais les informations d'une convention de jonglerie depuis des pages web.
 
-FORMAT:
-${JSON_FORMAT_FOR_AI}`
+RÈGLES IMPORTANTES:
+- Le nom doit être celui de L'ÉVÉNEMENT, pas du site source
+- Email: UNIQUEMENT si explicitement trouvé, sinon laisser vide (NE PAS INVENTER)
+- Instagram: Extraire le lien si présent
+- Timezone: Déduis le timezone IANA du pays (France=Europe/Paris, Allemagne=Europe/Berlin, etc.)
+- Caractéristiques: Mets true UNIQUEMENT si explicitement mentionné dans le contenu
 
-// Prompt système compact pour LM Studio (contexte limité ~4096 tokens)
-const SYSTEM_PROMPT_COMPACT = `Extrais les infos de convention de jonglerie en JSON.
-Format: {"convention":{"name":"NOM_EVENT","email":"","description":""},"edition":{"name":"","description":"","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","timezone":"Europe/Paris","addressLine1":"","addressLine2":"","city":"","region":"","country":"","postalCode":"","latitude":null,"longitude":null,"ticketingUrl":"","facebookUrl":"","instagramUrl":"","officialWebsiteUrl":"","imageUrl":""}}
-Règles: nom=événement pas site, email=seulement si trouvé (pas inventer), instagram=si trouvé, timezone=IANA du pays. JSON seul.`
+CARACTÉRISTIQUES À DÉTECTER (mettre true si mentionné):
+${generateFeaturesDescription()}
+
+STRUCTURE JSON ATTENDUE:
+${generateJsonExample()}
+
+Réponds UNIQUEMENT avec le JSON, sans texte autour.`
+}
+
+// Génère le prompt système compact pour LM Studio (contexte limité ~4096 tokens)
+function getCompactSystemPrompt(): string {
+  return `Extrais les infos de convention de jonglerie en JSON.
+
+RÈGLES: nom=événement (pas site), email=seulement si trouvé, timezone=IANA du pays.
+
+CARACTÉRISTIQUES (true si mentionné): camping tente (hasTentCamping), camping-car (hasTruckCamping), dortoir (hasSleepingRoom), food trucks (hasFoodTrucks), cantine (hasCantine), gymnase (hasGym), espace feu (hasFireSpace), ateliers (hasWorkshops), zone enfants (hasKidsZone), gala (hasGala), scène ouverte (hasOpenStage), concert (hasConcert), douches (hasShowers), WC (hasToilets).
+
+FORMAT JSON:
+{"convention":{"name":"","email":"","description":""},"edition":{"name":"","description":"","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","timezone":"Europe/Paris","addressLine1":"","city":"","region":"","country":"","postalCode":"","latitude":null,"longitude":null,"ticketingUrl":"","facebookUrl":"","instagramUrl":"","officialWebsiteUrl":"","imageUrl":"","hasTentCamping":false,"hasTruckCamping":false,"hasSleepingRoom":false,"hasFoodTrucks":false,"hasCantine":false,"hasGym":false,"hasFireSpace":false,"hasWorkshops":false,"hasKidsZone":false,"hasGala":false,"hasOpenStage":false,"hasConcert":false,"hasShowers":false,"hasToilets":false}}
+
+JSON seul, sans texte.`
+}
 
 /**
  * Étapes de la génération (pour le suivi côté frontend)
@@ -545,7 +567,7 @@ async function callLMStudio(baseUrl: string, model: string, content: string): Pr
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: SYSTEM_PROMPT_COMPACT },
+            { role: 'system', content: getCompactSystemPrompt() },
             {
               role: 'user',
               content: `Données:\n${truncatedContent}\n\nGénère le JSON:`,
@@ -619,7 +641,7 @@ async function callAnthropic(apiKey: string, content: string): Promise<string> {
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 4096,
-    system: SYSTEM_PROMPT_FULL,
+    system: getFullSystemPrompt(),
     messages: [
       {
         role: 'user',
@@ -657,7 +679,7 @@ async function callOllama(baseUrl: string, model: string, content: string): Prom
     },
     body: JSON.stringify({
       model,
-      prompt: `${SYSTEM_PROMPT_FULL}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
+      prompt: `${getFullSystemPrompt()}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
       stream: false,
     }),
   })
