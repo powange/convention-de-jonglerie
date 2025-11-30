@@ -2,11 +2,13 @@ import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getTask } from '@@/server/utils/async-tasks'
 
-import type { GenerateImportResult } from '../generate-import-json.post'
+import type { AgentGenerateResult } from '../generate-import-json-agent.post'
+
+const DEFAULT_MAX_ITERATIONS = 8
 
 /**
- * GET /api/admin/generate-import-json/[taskId]
- * Récupère le statut et le résultat d'une tâche de génération
+ * GET /api/admin/generate-import-json-agent/[taskId]
+ * Récupère le statut et le résultat d'une tâche d'exploration agent
  */
 export default wrapApiHandler(
   async (event) => {
@@ -24,7 +26,7 @@ export default wrapApiHandler(
     }
 
     // Récupérer la tâche
-    const task = getTask<GenerateImportResult>(taskId)
+    const task = getTask<AgentGenerateResult>(taskId)
 
     if (!task) {
       throw createError({
@@ -38,6 +40,7 @@ export default wrapApiHandler(
       return {
         taskId: task.id,
         status: task.status,
+        progress: 100,
         result: task.result,
       }
     }
@@ -50,19 +53,21 @@ export default wrapApiHandler(
       }
     }
 
-    // Tâche en cours - inclure l'étape actuelle depuis les métadonnées
-    const step = task.metadata?.step as string | undefined
-    const stepLabel = task.metadata?.stepLabel as string | undefined
-
+    // Tâche en cours - inclure les métadonnées de progression
+    const metadata = task.metadata || {}
     return {
       taskId: task.id,
       status: task.status,
-      progress: task.progress,
-      step,
-      stepLabel,
+      progress: task.progress || 0,
+      pagesVisited: (metadata.pagesVisited as number) || 0,
+      currentIteration: (metadata.currentIteration as number) || 0,
+      maxIterations: (metadata.maxIterations as number) || DEFAULT_MAX_ITERATIONS,
       message:
-        stepLabel || (task.status === 'processing' ? 'Génération en cours...' : 'En attente...'),
+        (metadata.statusMessage as string) ||
+        (task.status === 'processing'
+          ? 'Exploration des pages en cours...'
+          : 'En attente de traitement...'),
     }
   },
-  { operationName: 'GetGenerateImportJsonStatus' }
+  { operationName: 'GetGenerateImportJsonAgentStatus' }
 )

@@ -73,6 +73,17 @@ export function updateTaskStatus(
 }
 
 /**
+ * Met à jour les métadonnées d'une tâche
+ */
+export function updateTaskMetadata(taskId: string, metadata: Record<string, unknown>): void {
+  const task = tasks.get(taskId)
+  if (task) {
+    task.metadata = { ...task.metadata, ...metadata }
+    task.updatedAt = new Date()
+  }
+}
+
+/**
  * Marque une tâche comme terminée avec son résultat
  */
 export function completeTask<T>(taskId: string, result: T): void {

@@ -1,6 +1,22 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { createTask, runTaskInBackground } from '@@/server/utils/async-tasks'
+import { createTask, runTaskInBackground, updateTaskMetadata } from '@@/server/utils/async-tasks'
+import {
+  extractEditionFeatures,
+  mergeFeaturesIntoJson,
+} from '@@/server/utils/edition-features-extractor'
+import {
+  facebookEventToImportJson,
+  scrapeFacebookEvent,
+  type FacebookImportJson,
+} from '@@/server/utils/facebook-event-scraper'
+import {
+  BROWSER_HEADERS,
+  fetchWithBrowserless,
+  fetchWithTimeout,
+  isBrowserlessAvailable,
+} from '@@/server/utils/fetch-helpers'
+import { extractAndFormatWebContent } from '@@/server/utils/web-content-extractor'
 import { z } from 'zod'
 
 const requestSchema = z.object({
@@ -19,215 +35,455 @@ export interface GenerateImportResult {
   urlsProcessed: number
 }
 
-/**
- * Fetch avec timeout
- */
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit,
-  timeout: number
-): Promise<Response> {
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), timeout)
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    })
-    return response
-  } finally {
-    clearTimeout(timeoutId)
-  }
-}
-
-// Prompt système pour l'IA
-const SYSTEM_PROMPT = `Tu es un assistant spécialisé dans l'extraction d'informations sur les conventions de jonglerie.
-À partir des contenus de pages web fournis, tu dois extraire les informations et générer un JSON structuré.
-
-⚠️ CHAMPS OBLIGATOIRES (doivent TOUJOURS être présents et non vides) :
-- convention.name : Nom de la convention (string)
-- convention.email : Email de contact (string email valide)
-- edition.startDate : Date de début (format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS)
-- edition.endDate : Date de fin (format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS)
-- edition.addressLine1 : Adresse principale (string)
-- edition.city : Ville (string)
-- edition.country : Pays (string, ex: "France")
-- edition.postalCode : Code postal (string)
-
-Le JSON doit avoir exactement cette structure :
-{
+// Format JSON pour le prompt IA (avec indications OBLIGATOIRE/optionnel)
+const JSON_FORMAT_FOR_AI = `{
   "convention": {
-    "name": "OBLIGATOIRE - Nom de la convention",
-    "email": "OBLIGATOIRE - Email de contact (format email valide)",
-    "description": "optionnel - Description de la convention"
+    "name": "OBLIGATOIRE - Nom de l'événement",
+    "email": "OBLIGATOIRE - Email de contact",
+    "description": "optionnel"
   },
   "edition": {
-    "name": "optionnel - Nom de l'édition (ex: 'CIJ 2025 - Paris')",
-    "description": "optionnel - Description de l'édition",
-    "startDate": "OBLIGATOIRE - Date/heure début (YYYY-MM-DDTHH:MM:SS ou YYYY-MM-DD)",
-    "endDate": "OBLIGATOIRE - Date/heure fin (YYYY-MM-DDTHH:MM:SS ou YYYY-MM-DD)",
-    "timezone": "RECOMMANDÉ - Fuseau horaire IANA (ex: 'Europe/Paris')",
-    "addressLine1": "OBLIGATOIRE - Adresse principale",
-    "addressLine2": "optionnel - Complément d'adresse",
-    "city": "OBLIGATOIRE - Ville",
-    "region": "optionnel - Région/État",
-    "country": "OBLIGATOIRE - Pays (ex: 'France')",
-    "postalCode": "OBLIGATOIRE - Code postal",
-    "latitude": "optionnel - Latitude GPS (number)",
-    "longitude": "optionnel - Longitude GPS (number)",
-    "ticketingUrl": "optionnel - URL de billetterie",
-    "facebookUrl": "optionnel - URL page/événement Facebook",
-    "instagramUrl": "optionnel - URL Instagram",
-    "officialWebsiteUrl": "optionnel - Site web officiel",
-    "imageUrl": "optionnel - URL de l'affiche/poster (image principale)",
-    "hasFoodTrucks": "optionnel - boolean",
-    "hasKidsZone": "optionnel - boolean",
-    "acceptsPets": "optionnel - boolean",
-    "hasTentCamping": "optionnel - boolean",
-    "hasTruckCamping": "optionnel - boolean",
-    "hasGym": "optionnel - boolean",
-    "hasCantine": "optionnel - boolean",
-    "hasShowers": "optionnel - boolean",
-    "hasToilets": "optionnel - boolean",
-    "hasWorkshops": "optionnel - boolean",
-    "hasOpenStage": "optionnel - boolean",
-    "hasConcert": "optionnel - boolean",
-    "hasGala": "optionnel - boolean",
-    "hasAccessibility": "optionnel - boolean",
-    "hasAerialSpace": "optionnel - boolean",
-    "hasFamilyCamping": "optionnel - boolean",
-    "hasSleepingRoom": "optionnel - boolean",
-    "hasFireSpace": "optionnel - boolean",
-    "hasSlacklineSpace": "optionnel - boolean",
-    "hasCashPayment": "optionnel - boolean",
-    "hasCreditCardPayment": "optionnel - boolean",
-    "hasLongShow": "optionnel - boolean"
+    "name": "optionnel",
+    "description": "optionnel",
+    "startDate": "OBLIGATOIRE - Format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS",
+    "endDate": "OBLIGATOIRE - Format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS",
+    "timezone": "OBLIGATOIRE - Format IANA (ex: Europe/Paris, Australia/Melbourne)",
+    "addressLine1": "OBLIGATOIRE - Adresse",
+    "addressLine2": "optionnel",
+    "city": "OBLIGATOIRE",
+    "region": "optionnel",
+    "country": "OBLIGATOIRE",
+    "postalCode": "OBLIGATOIRE",
+    "latitude": "optionnel - number",
+    "longitude": "optionnel - number",
+    "ticketingUrl": "optionnel",
+    "facebookUrl": "optionnel",
+    "instagramUrl": "optionnel",
+    "officialWebsiteUrl": "optionnel",
+    "imageUrl": "optionnel"
+  }
+}`
+
+// Prompt pour compléter un JSON pré-rempli (Facebook + autres URLs)
+const PROMPT_COMPLETE_JSON = `Tu dois compléter un JSON pré-rempli avec les informations des sources fournies.
+
+CHAMPS PRIORITAIRES À REMPLIR:
+- convention.name : Le nom de la CONVENTION (pas l'édition). Cherche dans les sources le nom générique de l'événement récurrent.
+- convention.email : L'email de contact UNIQUEMENT s'il est explicitement mentionné dans les sources. NE PAS INVENTER.
+- instagramUrl : Le lien vers le compte Instagram s'il est mentionné (format: https://instagram.com/...)
+
+FORMAT ATTENDU:
+${JSON_FORMAT_FOR_AI}
+
+RÈGLES:
+1. NE MODIFIE PAS les champs déjà remplis (non vides)
+2. Complète les champs vides ("" ou null) avec les données des sources
+3. convention.name = nom générique de la convention (ex: "Spinfest" pas "Spinfest 2025")
+4. convention.email = UNIQUEMENT si trouvé explicitement dans les sources, sinon laisser vide ""
+5. instagramUrl = lien Instagram si trouvé dans les sources
+6. Réponds UNIQUEMENT avec le JSON complet, sans commentaires`
+
+// Prompt système complet pour Anthropic (modèles avec grand contexte)
+const SYSTEM_PROMPT_FULL = `Tu extrais les informations d'une convention de jonglerie depuis des pages web.
+Génère un JSON au format spécifié. Le nom doit être celui de L'ÉVÉNEMENT, pas du site source.
+Email: UNIQUEMENT si explicitement trouvé dans les sources, sinon laisser vide. NE PAS INVENTER.
+Instagram: Extraire le lien Instagram si présent dans les sources.
+Déduis le timezone IANA du pays (France=Europe/Paris, Allemagne=Europe/Berlin, etc.).
+Réponds UNIQUEMENT avec le JSON, sans texte autour.
+
+FORMAT:
+${JSON_FORMAT_FOR_AI}`
+
+// Prompt système compact pour LM Studio (contexte limité ~4096 tokens)
+const SYSTEM_PROMPT_COMPACT = `Extrais les infos de convention de jonglerie en JSON.
+Format: {"convention":{"name":"NOM_EVENT","email":"","description":""},"edition":{"name":"","description":"","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","timezone":"Europe/Paris","addressLine1":"","addressLine2":"","city":"","region":"","country":"","postalCode":"","latitude":null,"longitude":null,"ticketingUrl":"","facebookUrl":"","instagramUrl":"","officialWebsiteUrl":"","imageUrl":""}}
+Règles: nom=événement pas site, email=seulement si trouvé (pas inventer), instagram=si trouvé, timezone=IANA du pays. JSON seul.`
+
+/**
+ * Étapes de la génération (pour le suivi côté frontend)
+ */
+export const GENERATION_STEPS = {
+  scraping_facebook: 'Récupération des données Facebook...',
+  fetching_urls: 'Récupération du contenu des URLs...',
+  generating_json: 'Génération du JSON via IA...',
+  extracting_features: 'Détection des services (camping, restauration, spectacles...)',
+  completed: 'Terminé',
+} as const
+
+export type GenerationStep = keyof typeof GENERATION_STEPS
+
+/**
+ * Met à jour l'étape de la tâche
+ */
+function updateStep(taskId: string | undefined, step: GenerationStep): void {
+  if (taskId) {
+    updateTaskMetadata(taskId, {
+      step,
+      stepLabel: GENERATION_STEPS[step],
+    })
   }
 }
-
-RÈGLES IMPORTANTES:
-
-1. ÉVÉNEMENTS FACEBOOK (PRIORITÉ HAUTE):
-   Si une URL facebook.com/events/ est fournie, c'est une SOURCE PRIORITAIRE ! Extrais en priorité :
-   - Le titre de l'événement -> name de l'édition
-   - La description complète de l'événement -> description de l'édition
-   - Les dates et heures exactes (Facebook affiche toujours les horaires précis)
-   - Le lieu avec adresse complète (Facebook structure bien l'adresse)
-   - L'image de couverture de l'événement -> imageUrl
-   - L'URL de l'événement Facebook -> facebookUrl
-   - Les informations sur la billetterie si présentes -> ticketingUrl
-   Facebook contient souvent des informations très structurées, utilise-les au maximum !
-
-2. DATES ET HORAIRES: Cherche activement les horaires d'ouverture et de fermeture !
-   - Facebook affiche les dates au format "Samedi 15 juillet 2025 de 14:00 à 22:00" -> extrais précisément
-   - Si tu trouves des horaires, utilise le format YYYY-MM-DDTHH:MM:SS
-   - Exemples: "2025-07-15T14:00:00" pour une ouverture à 14h
-   - Si aucun horaire trouvé, utilise juste YYYY-MM-DD
-
-3. TIMEZONE: TOUJOURS renseigner le fuseau horaire ! Déduis-le du pays/ville :
-   - France -> "Europe/Paris"
-   - Allemagne -> "Europe/Berlin"
-   - UK/Angleterre -> "Europe/London"
-   - Belgique -> "Europe/Brussels"
-   - Suisse -> "Europe/Zurich"
-   - Italie -> "Europe/Rome"
-   - Espagne -> "Europe/Madrid"
-   - Pays-Bas -> "Europe/Amsterdam"
-   - USA côte Est -> "America/New_York"
-   - USA côte Ouest -> "America/Los_Angeles"
-   - Canada -> "America/Toronto" ou "America/Vancouver"
-
-4. AFFICHE/POSTER: Cherche l'URL de l'affiche ou image principale !
-   - Sur Facebook: l'image de couverture de l'événement (og:image)
-   - Sur les sites: balises <img> avec classes "poster", "affiche", "banner", "hero"
-   - Cherche les images Open Graph (og:image) ou Twitter Card
-   - L'URL doit être complète (commencer par http:// ou https://)
-   - Privilégie les grandes images (pas les icônes ou logos)
-
-5. FUSION DES SOURCES: Si plusieurs URLs sont fournies, fusionne intelligemment les informations :
-   - Facebook pour les dates/heures/lieu/description
-   - Site officiel pour les détails (équipements, services, billetterie)
-   - Privilégie les informations les plus complètes et précises
-
-6. Si tu ne trouves pas une information requise, mets une valeur vide "" pour les strings
-7. Pour l'email, si tu ne le trouves pas, utilise "contact@" + le domaine du site officiel
-8. Les booléens sont tous optionnels, mets true seulement si l'information est clairement mentionnée
-9. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
-10. N'ajoute pas de commentaires dans le JSON`
 
 /**
  * Fonction de génération du JSON (exécutée en arrière-plan)
+ *
+ * Nouvelle approche Facebook-first:
+ * 1. Si URL Facebook présente: extraire les données directement en JSON pré-rempli
+ * 2. Si autres URLs: récupérer leur contenu
+ * 3. Appeler l'IA pour compléter les champs manquants (si JSON pré-rempli) ou générer tout (sinon)
+ * 4. Extraire les caractéristiques (services) de l'édition via IA
  */
-export async function generateImportJson(urls: string[]): Promise<GenerateImportResult> {
-  // Récupérer le contenu des URLs avec timeout
-  const contents: string[] = []
-  for (const url of urls) {
+export async function generateImportJson(
+  urls: string[],
+  taskId?: string
+): Promise<GenerateImportResult> {
+  // Vérifier si browserless est disponible
+  const config = useRuntimeConfig()
+  const browserlessUrl = config.browserlessUrl
+  const useBrowserless = browserlessUrl && (await isBrowserlessAvailable(browserlessUrl))
+
+  if (useBrowserless) {
+    console.log(`[GENERATE-IMPORT] Utilisation de browserless: ${browserlessUrl}`)
+  } else {
+    console.log('[GENERATE-IMPORT] Browserless non disponible, utilisation de fetch simple')
+  }
+
+  // Séparer les URLs Facebook des autres
+  const facebookUrls = urls.filter((url) => url.includes('facebook.com/events'))
+  const otherUrls = urls.filter((url) => !url.includes('facebook.com/events'))
+
+  console.log(
+    `[GENERATE-IMPORT] URLs Facebook Events: ${facebookUrls.length}, Autres URLs: ${otherUrls.length}`
+  )
+
+  // Structure pour le JSON pré-rempli (depuis Facebook)
+  let prefilledJson: FacebookImportJson | null = null
+
+  // Étape 1: Traiter les URLs Facebook avec facebook-event-scraper
+  if (facebookUrls.length > 0) {
+    updateStep(taskId, 'scraping_facebook')
+  }
+
+  for (const url of facebookUrls) {
     try {
-      const response = await fetchWithTimeout(
-        url,
-        {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
-          },
-        },
-        URL_FETCH_TIMEOUT
-      )
+      console.log(`[GENERATE-IMPORT] Scraping Facebook Event: ${url}`)
+      const fbEvent = await scrapeFacebookEvent(url)
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      if (fbEvent) {
+        console.log('[GENERATE-IMPORT] === Données Facebook Event Scraper ===')
+        console.log(JSON.stringify(fbEvent, null, 2))
+        console.log('[GENERATE-IMPORT] === Fin données Facebook ===')
+
+        // Convertir en JSON d'import pré-rempli
+        prefilledJson = facebookEventToImportJson(fbEvent)
+        console.log('[GENERATE-IMPORT] JSON pré-rempli depuis Facebook:')
+        console.log(JSON.stringify(prefilledJson, null, 2))
+
+        // On ne traite qu'une seule URL Facebook (la première avec des données)
+        break
       }
-
-      const html = await response.text()
-
-      // Extraire le texte du HTML (simplification basique)
-      const textContent = extractTextFromHtml(html, url)
-      contents.push(`=== Contenu de ${url} ===\n${textContent}`)
     } catch (error: any) {
-      const errorMsg =
-        error.name === 'AbortError' ? `Timeout après ${URL_FETCH_TIMEOUT / 1000}s` : error.message
-      contents.push(`=== Erreur pour ${url} ===\nImpossible de récupérer le contenu: ${errorMsg}`)
+      console.error(`[GENERATE-IMPORT] Erreur scraping Facebook ${url}: ${error.message}`)
     }
   }
 
-  const combinedContent = contents.join('\n\n')
-  console.log(`[GENERATE-IMPORT] Contenu combiné: ${combinedContent.length} caractères`)
+  // Étape 2: Récupérer le contenu des autres URLs
+  const otherContents: string[] = []
+
+  // Budget de contenu adapté selon si on a déjà un JSON pré-rempli
+  const totalContentBudget = prefilledJson ? 1500 : 2500 // Moins de contenu si on complète juste
+  const maxContentPerUrl =
+    otherUrls.length > 0 ? Math.floor(totalContentBudget / otherUrls.length) : totalContentBudget
+
+  if (otherUrls.length > 0) {
+    updateStep(taskId, 'fetching_urls')
+  }
+
+  for (const url of otherUrls) {
+    try {
+      let html: string
+
+      if (useBrowserless) {
+        html = await fetchWithBrowserless(browserlessUrl, url, {
+          timeout: URL_FETCH_TIMEOUT,
+          waitForNetworkIdle: true,
+        })
+        console.log(
+          `[GENERATE-IMPORT] HTML récupéré via browserless pour ${url}: ${html.length} caractères`
+        )
+      } else {
+        const response = await fetchWithTimeout(
+          url,
+          { headers: BROWSER_HEADERS },
+          URL_FETCH_TIMEOUT
+        )
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        html = await response.text()
+      }
+
+      // Extraire le contenu du HTML avec le nouvel utilitaire
+      const textContent = extractAndFormatWebContent(html, url, maxContentPerUrl)
+      otherContents.push(textContent)
+    } catch (error: any) {
+      const errorMsg =
+        error.name === 'AbortError' ? `Timeout après ${URL_FETCH_TIMEOUT / 1000}s` : error.message
+      console.error(`[GENERATE-IMPORT] Erreur fetch ${url}: ${errorMsg}`)
+      otherContents.push(
+        `=== Erreur pour ${url} ===\nImpossible de récupérer le contenu: ${errorMsg}`
+      )
+    }
+  }
 
   // Récupérer la configuration IA
-  const config = useRuntimeConfig()
   const aiProvider = config.aiProvider || 'lmstudio'
   console.log(`[GENERATE-IMPORT] Provider IA: ${aiProvider}`)
 
   let generatedJson: string
 
+  // Étape 3: Générer ou compléter le JSON via IA
+  updateStep(taskId, 'generating_json')
+
+  if (prefilledJson && otherContents.length === 0) {
+    // Cas 1: Uniquement Facebook, pas d'IA - retourne le JSON tel quel
+    console.log("[GENERATE-IMPORT] Facebook seul, pas d'IA")
+    generatedJson = JSON.stringify(prefilledJson, null, 2)
+  } else if (prefilledJson && otherContents.length > 0) {
+    // Cas 2: Facebook + autres URLs - demander à l'IA de compléter convention.name, convention.email et autres champs vides
+    console.log('[GENERATE-IMPORT] Facebook + autres URLs, IA complète les champs manquants')
+    const combinedOtherContent = otherContents.join('\n\n')
+    generatedJson = await callAIToCompleteJson(
+      config,
+      aiProvider,
+      prefilledJson,
+      combinedOtherContent
+    )
+  } else {
+    // Cas 3: Pas de Facebook - extraction complète par l'IA
+    console.log("[GENERATE-IMPORT] Pas de Facebook, extraction complète par l'IA")
+    const combinedContent = otherContents.join('\n\n')
+
+    if (aiProvider === 'lmstudio') {
+      generatedJson = await callLMStudio(
+        config.lmstudioBaseUrl || 'http://localhost:1234',
+        config.lmstudioTextModel || config.lmstudioModel || 'auto',
+        combinedContent
+      )
+    } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
+      generatedJson = await callAnthropic(config.anthropicApiKey, combinedContent)
+    } else if (aiProvider === 'ollama') {
+      generatedJson = await callOllama(
+        config.ollamaBaseUrl || 'http://localhost:11434',
+        config.ollamaModel || 'llama3',
+        combinedContent
+      )
+    } else {
+      throw new Error(`Provider IA non configuré ou non supporté: ${aiProvider}`)
+    }
+  }
+
+  // Étape 4: Extraire les caractéristiques (services) de l'édition via IA
+  // On utilise la description de l'édition pour détecter les services offerts
+  updateStep(taskId, 'extracting_features')
+
+  let finalJson = generatedJson
+  try {
+    const parsedJson = JSON.parse(generatedJson)
+    const description = parsedJson.edition?.description || ''
+
+    if (description && description.length >= 50) {
+      console.log('[GENERATE-IMPORT] Extraction des caractéristiques via IA...')
+      const features = await extractEditionFeatures(description, aiProvider, {
+        lmstudioBaseUrl: config.lmstudioBaseUrl,
+        lmstudioTextModel: config.lmstudioTextModel,
+        lmstudioModel: config.lmstudioModel,
+        anthropicApiKey: config.anthropicApiKey,
+        ollamaBaseUrl: config.ollamaBaseUrl,
+        ollamaModel: config.ollamaModel,
+      })
+
+      if (Object.keys(features).length > 0) {
+        console.log('[GENERATE-IMPORT] Caractéristiques détectées:', features)
+        const enrichedJson = mergeFeaturesIntoJson(parsedJson, features)
+        finalJson = JSON.stringify(enrichedJson, null, 2)
+      } else {
+        console.log('[GENERATE-IMPORT] Aucune caractéristique détectée')
+      }
+    } else {
+      console.log('[GENERATE-IMPORT] Description trop courte pour extraire les caractéristiques')
+    }
+  } catch (error: any) {
+    console.error(`[GENERATE-IMPORT] Erreur extraction caractéristiques: ${error.message}`)
+    // On continue avec le JSON de base si l'extraction échoue
+  }
+
+  // Marquer comme terminé
+  updateStep(taskId, 'completed')
+
+  return {
+    success: true,
+    json: finalJson,
+    provider: prefilledJson && otherContents.length === 0 ? 'facebook-direct' : aiProvider,
+    urlsProcessed: urls.length,
+  }
+}
+
+/**
+ * Appelle l'IA pour compléter un JSON pré-rempli avec des données supplémentaires
+ */
+async function callAIToCompleteJson(
+  config: ReturnType<typeof useRuntimeConfig>,
+  aiProvider: string,
+  prefilledJson: FacebookImportJson,
+  additionalContent: string
+): Promise<string> {
+  // Construire le prompt avec le JSON pré-rempli et les données supplémentaires
+  const prefilledJsonStr = JSON.stringify(prefilledJson, null, 2)
+
+  const userPrompt = additionalContent
+    ? `JSON PRÉ-REMPLI (ne modifie pas les champs déjà remplis):\n${prefilledJsonStr}\n\nDONNÉES SUPPLÉMENTAIRES:\n${additionalContent}\n\nComplète le JSON:`
+    : `JSON PRÉ-REMPLI (complète les champs vides):\n${prefilledJsonStr}\n\nComplète le JSON:`
+
   if (aiProvider === 'lmstudio') {
-    // Utiliser le modèle texte (lmstudioTextModel) pour la génération JSON
-    generatedJson = await callLMStudio(
+    return await callLMStudioComplete(
       config.lmstudioBaseUrl || 'http://localhost:1234',
       config.lmstudioTextModel || config.lmstudioModel || 'auto',
-      combinedContent
+      userPrompt
     )
   } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
-    generatedJson = await callAnthropic(config.anthropicApiKey, combinedContent)
+    return await callAnthropicComplete(config.anthropicApiKey, userPrompt)
   } else if (aiProvider === 'ollama') {
-    generatedJson = await callOllama(
+    return await callOllamaComplete(
       config.ollamaBaseUrl || 'http://localhost:11434',
       config.ollamaModel || 'llama3',
-      combinedContent
+      userPrompt
     )
   } else {
     throw new Error(`Provider IA non configuré ou non supporté: ${aiProvider}`)
   }
+}
 
-  return {
-    success: true,
-    json: generatedJson,
-    provider: aiProvider,
-    urlsProcessed: urls.length,
+/**
+ * Appel LM Studio pour compléter un JSON (prompt optimisé)
+ */
+async function callLMStudioComplete(
+  baseUrl: string,
+  model: string,
+  userPrompt: string
+): Promise<string> {
+  // Limiter le contenu pour LM Studio
+  const maxContent = 1800
+  const truncatedPrompt =
+    userPrompt.length > maxContent
+      ? userPrompt.substring(0, maxContent) + '\n...(tronqué)'
+      : userPrompt
+
+  console.log(
+    `[GENERATE-IMPORT] LM Studio Complete: ${userPrompt.length} -> ${truncatedPrompt.length} caractères`
+  )
+
+  const response = await fetchWithTimeout(
+    `${baseUrl}/v1/chat/completions`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: PROMPT_COMPLETE_JSON },
+          { role: 'user', content: truncatedPrompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 1024,
+      }),
+    },
+    LLM_TIMEOUT
+  )
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw createError({ statusCode: 503, message: `Erreur LM Studio: ${error}` })
   }
+
+  const data = await response.json()
+  const responseText = data.choices?.[0]?.message?.content || ''
+
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) {
+    throw createError({ statusCode: 500, message: "L'IA n'a pas généré de JSON valide" })
+  }
+
+  try {
+    JSON.parse(jsonMatch[0])
+  } catch {
+    throw createError({ statusCode: 500, message: "Le JSON généré par l'IA n'est pas valide" })
+  }
+
+  return jsonMatch[0]
+}
+
+/**
+ * Appel Anthropic pour compléter un JSON
+ */
+async function callAnthropicComplete(apiKey: string, userPrompt: string): Promise<string> {
+  const { default: Anthropic } = await import('@anthropic-ai/sdk')
+  const client = new Anthropic({ apiKey, timeout: LLM_TIMEOUT })
+
+  console.log('[GENERATE-IMPORT] Appel Anthropic Complete en cours...')
+  const startTime = Date.now()
+
+  const message = await client.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 4096,
+    system: PROMPT_COMPLETE_JSON,
+    messages: [{ role: 'user', content: userPrompt }],
+  })
+
+  console.log(`[GENERATE-IMPORT] Réponse Anthropic reçue en ${Date.now() - startTime}ms`)
+
+  const responseText = message.content
+    .filter((block) => block.type === 'text')
+    .map((block) => (block as any).text)
+    .join('')
+
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) {
+    throw createError({ statusCode: 500, message: "L'IA n'a pas généré de JSON valide" })
+  }
+
+  return jsonMatch[0]
+}
+
+/**
+ * Appel Ollama pour compléter un JSON
+ */
+async function callOllamaComplete(
+  baseUrl: string,
+  model: string,
+  userPrompt: string
+): Promise<string> {
+  const response = await fetch(`${baseUrl}/api/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      prompt: `${PROMPT_COMPLETE_JSON}\n\n${userPrompt}`,
+      stream: false,
+    }),
+  })
+
+  if (!response.ok) {
+    throw createError({ statusCode: 503, message: `Erreur Ollama: ${response.statusText}` })
+  }
+
+  const data = await response.json()
+  const responseText = data.response || ''
+
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) {
+    throw createError({ statusCode: 500, message: "L'IA n'a pas généré de JSON valide" })
+  }
+
+  return jsonMatch[0]
 }
 
 /**
@@ -249,7 +505,7 @@ export default wrapApiHandler(
     console.log(`[GENERATE-IMPORT] Tâche créée: ${task.id} pour ${urls.length} URL(s)`)
 
     // Lancer la génération en arrière-plan
-    runTaskInBackground(task.id, () => generateImportJson(urls))
+    runTaskInBackground(task.id, () => generateImportJson(urls, task.id))
 
     // Retourner immédiatement le taskId
     return {
@@ -262,124 +518,19 @@ export default wrapApiHandler(
 )
 
 /**
- * Extrait le texte pertinent d'une page HTML avec métadonnées enrichies
- */
-function extractTextFromHtml(html: string, url: string): string {
-  // Détecter si c'est une page Facebook
-  const isFacebook = url.includes('facebook.com')
-
-  // Supprimer les scripts et styles
-  let text = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-    .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, '')
-
-  // Extraire le titre
-  const titleMatch = text.match(/<title[^>]*>([^<]*)<\/title>/i)
-  const title = titleMatch ? titleMatch[1].trim() : ''
-
-  // Extraire les meta descriptions
-  const metaDescMatch = text.match(
-    /<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i
-  )
-  const metaDesc = metaDescMatch ? metaDescMatch[1].trim() : ''
-
-  // Extraire les métadonnées Open Graph (très importantes pour Facebook)
-  const ogData: Record<string, string> = {}
-  const ogMatches = html.matchAll(
-    /<meta[^>]*property=["'](og:[^"']+)["'][^>]*content=["']([^"']*)["'][^>]*>/gi
-  )
-  for (const match of ogMatches) {
-    ogData[match[1]] = match[2]
-  }
-  // Format alternatif (content avant property)
-  const ogMatchesAlt = html.matchAll(
-    /<meta[^>]*content=["']([^"']*)["'][^>]*property=["'](og:[^"']+)["'][^>]*>/gi
-  )
-  for (const match of ogMatchesAlt) {
-    ogData[match[2]] = match[1]
-  }
-
-  // Construire la section métadonnées
-  let metadata = `URL: ${url}\n`
-  metadata += `Type: ${isFacebook ? 'Événement Facebook' : 'Site web'}\n`
-  metadata += `Titre: ${title}\n`
-  metadata += `Description: ${metaDesc}\n`
-
-  // Ajouter les données Open Graph si présentes
-  if (Object.keys(ogData).length > 0) {
-    metadata += '\n=== Métadonnées Open Graph ===\n'
-    if (ogData['og:title']) metadata += `og:title: ${ogData['og:title']}\n`
-    if (ogData['og:description']) metadata += `og:description: ${ogData['og:description']}\n`
-    if (ogData['og:image']) metadata += `og:image: ${ogData['og:image']}\n`
-    if (ogData['og:url']) metadata += `og:url: ${ogData['og:url']}\n`
-    if (ogData['og:site_name']) metadata += `og:site_name: ${ogData['og:site_name']}\n`
-    // Données spécifiques aux événements
-    if (ogData['og:type']) metadata += `og:type: ${ogData['og:type']}\n`
-    // Autres données OG potentiellement utiles
-    for (const [key, value] of Object.entries(ogData)) {
-      if (
-        !['og:title', 'og:description', 'og:image', 'og:url', 'og:site_name', 'og:type'].includes(
-          key
-        )
-      ) {
-        metadata += `${key}: ${value}\n`
-      }
-    }
-  }
-
-  // Extraire les données JSON-LD (souvent utilisées pour les événements)
-  const jsonLdMatches = html.matchAll(
-    /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
-  )
-  for (const match of jsonLdMatches) {
-    try {
-      const jsonLd = JSON.parse(match[1])
-      if (
-        jsonLd['@type'] === 'Event' ||
-        (Array.isArray(jsonLd['@graph']) &&
-          jsonLd['@graph'].some((item: any) => item['@type'] === 'Event'))
-      ) {
-        metadata += '\n=== Données structurées Event (JSON-LD) ===\n'
-        metadata += JSON.stringify(jsonLd, null, 2).substring(0, 2000) + '\n'
-      }
-    } catch {
-      // Ignorer les erreurs de parsing JSON
-    }
-  }
-
-  // Supprimer toutes les balises HTML pour le contenu textuel
-  text = text.replace(/<[^>]+>/g, ' ')
-
-  // Décoder les entités HTML
-  text = text
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&euro;/g, '€')
-    .replace(/&#x27;/g, "'")
-    .replace(/&#x2F;/g, '/')
-
-  // Nettoyer les espaces multiples
-  text = text.replace(/\s+/g, ' ').trim()
-
-  // Limiter la longueur du contenu textuel
-  // Pour les modèles locaux (LM Studio), on limite davantage pour éviter les timeouts
-  const maxContentLength = 4000
-  if (text.length > maxContentLength) {
-    text = text.substring(0, maxContentLength) + '...'
-  }
-
-  return `${metadata}\n=== Contenu textuel ===\n${text}`
-}
-
-/**
  * Appel à LM Studio (API compatible OpenAI) avec timeout
+ * Utilise le prompt compact pour respecter la limite de contexte (4096 tokens)
  */
 async function callLMStudio(baseUrl: string, model: string, content: string): Promise<string> {
+  // Limiter le contenu pour LM Studio (contexte 4096 tokens ~ 3000 caractères max pour le contenu)
+  const maxContent = 2000
+  const truncatedContent =
+    content.length > maxContent ? content.substring(0, maxContent) + '\n...(tronqué)' : content
+
+  console.log(
+    `[GENERATE-IMPORT] LM Studio: contenu ${content.length} -> ${truncatedContent.length} caractères`
+  )
+
   let response: Response
   try {
     response = await fetchWithTimeout(
@@ -392,14 +543,14 @@ async function callLMStudio(baseUrl: string, model: string, content: string): Pr
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'system', content: SYSTEM_PROMPT_COMPACT },
             {
               role: 'user',
-              content: `Voici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
+              content: `Données:\n${truncatedContent}\n\nGénère le JSON:`,
             },
           ],
           temperature: 0.3,
-          max_tokens: 4096,
+          max_tokens: 1024,
         }),
       },
       LLM_TIMEOUT
@@ -466,7 +617,7 @@ async function callAnthropic(apiKey: string, content: string): Promise<string> {
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 4096,
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPT_FULL,
     messages: [
       {
         role: 'user',
@@ -504,7 +655,7 @@ async function callOllama(baseUrl: string, model: string, content: string): Prom
     },
     body: JSON.stringify({
       model,
-      prompt: `${SYSTEM_PROMPT}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
+      prompt: `${SYSTEM_PROMPT_FULL}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
       stream: false,
     }),
   })

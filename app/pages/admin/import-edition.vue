@@ -46,15 +46,87 @@
           />
         </UFormField>
 
-        <UButton
-          color="warning"
-          :loading="generating"
-          :disabled="!urlsInput.trim()"
-          icon="i-heroicons-sparkles"
-          @click="generateFromUrls"
-        >
-          {{ $t('admin.import.generate_json') }}
-        </UButton>
+        <!-- Choix de la méthode de génération -->
+        <UFormField :label="$t('admin.import.generation_method')">
+          <URadioGroup v-model="generationMethod" :items="generationMethodItems" variant="card" />
+        </UFormField>
+
+        <div class="flex gap-3">
+          <UButton
+            color="warning"
+            :loading="generating"
+            :disabled="!urlsInput.trim() || testingUrls"
+            icon="i-heroicons-sparkles"
+            @click="generateFromUrls"
+          >
+            {{ $t('admin.import.generate_json') }}
+          </UButton>
+          <UButton
+            color="neutral"
+            variant="outline"
+            :loading="testingUrls"
+            :disabled="!urlsInput.trim() || generating"
+            icon="i-heroicons-magnifying-glass"
+            @click="testUrls"
+          >
+            {{ $t('admin.import.test_urls') }}
+          </UButton>
+        </div>
+
+        <!-- Progression de la méthode simple -->
+        <div v-if="generating && generationMethod === 'simple'" class="space-y-2">
+          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <UIcon name="i-heroicons-cog-6-tooth" class="animate-spin" />
+            <span>{{ simpleStatus }}</span>
+          </div>
+          <!-- Indicateur d'étapes -->
+          <div class="flex items-center gap-1">
+            <div
+              v-for="(step, index) in [
+                'scraping_facebook',
+                'fetching_urls',
+                'generating_json',
+                'extracting_features',
+              ]"
+              :key="step"
+              class="flex items-center"
+            >
+              <div
+                class="w-2 h-2 rounded-full transition-colors"
+                :class="{
+                  'bg-warning-500': simpleStep === step,
+                  'bg-success-500':
+                    [
+                      'scraping_facebook',
+                      'fetching_urls',
+                      'generating_json',
+                      'extracting_features',
+                    ].indexOf(simpleStep) > index,
+                  'bg-gray-300 dark:bg-gray-600':
+                    [
+                      'scraping_facebook',
+                      'fetching_urls',
+                      'generating_json',
+                      'extracting_features',
+                    ].indexOf(simpleStep) < index || !simpleStep,
+                }"
+              />
+              <div v-if="index < 3" class="w-4 h-0.5 bg-gray-300 dark:bg-gray-600" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Progression de l'agent -->
+        <div v-if="generating && generationMethod === 'agent'" class="space-y-2">
+          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <UIcon name="i-heroicons-globe-alt" class="animate-pulse" />
+            <span>{{ agentStatus }}</span>
+          </div>
+          <UProgress :value="agentProgress" size="sm" color="warning" />
+          <p class="text-xs text-gray-500">
+            {{ $t('admin.import.agent_exploring', { count: agentPagesVisited }) }}
+          </p>
+        </div>
 
         <!-- Erreur de génération -->
         <UAlert
@@ -66,6 +138,391 @@
         >
           <template #description>{{ generateError }}</template>
         </UAlert>
+
+        <!-- Résultat de l'agent -->
+        <UAlert
+          v-if="agentResult && !generating"
+          icon="i-heroicons-check-circle"
+          color="success"
+          variant="soft"
+          :title="$t('admin.import.agent_success')"
+        >
+          <template #description>
+            <p>
+              {{
+                $t('admin.import.agent_result', {
+                  pages: agentResult.urlsProcessed?.length || 0,
+                  iterations: agentResult.iterations || 0,
+                })
+              }}
+            </p>
+            <ul v-if="agentResult.urlsProcessed?.length" class="mt-2 text-xs space-y-1">
+              <li v-for="url in agentResult.urlsProcessed" :key="url" class="truncate">
+                • {{ url }}
+              </li>
+            </ul>
+          </template>
+        </UAlert>
+      </div>
+    </UCard>
+
+    <!-- Résultats du test des URLs -->
+    <UCard v-if="testResults.length > 0" class="mb-6">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <UIcon name="i-heroicons-document-magnifying-glass" class="text-info-500" size="24" />
+            <h2 class="text-xl font-bold">{{ $t('admin.import.test_results_title') }}</h2>
+          </div>
+          <UButton
+            icon="i-heroicons-x-mark"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            @click="testResults = []"
+          />
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <!-- Sélecteur d'URL -->
+        <UFormField :label="$t('admin.import.select_url')">
+          <USelect v-model="selectedTestUrl" :items="testResultItems" class="w-full" />
+        </UFormField>
+
+        <!-- Résultat de l'URL sélectionnée -->
+        <div v-if="selectedTestResult" class="space-y-4">
+          <!-- Statut -->
+          <UAlert
+            v-if="!selectedTestResult.success"
+            icon="i-heroicons-exclamation-triangle"
+            color="error"
+            variant="soft"
+            :title="$t('admin.import.test_url_error')"
+          >
+            <template #description>{{ selectedTestResult.error }}</template>
+          </UAlert>
+
+          <!-- Données Facebook -->
+          <div
+            v-if="selectedTestResult.type === 'facebook' && selectedTestResult.facebookData"
+            class="space-y-4"
+          >
+            <UAlert
+              icon="i-mdi-facebook"
+              color="info"
+              variant="soft"
+              :title="$t('admin.import.facebook_event_data')"
+            />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Informations principales -->
+              <div class="space-y-2">
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.main_info') }}
+                </h4>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                  <p>
+                    <strong>{{ $t('common.name') }}:</strong>
+                    {{ selectedTestResult.facebookData.name || '-' }}
+                  </p>
+                  <p v-if="selectedTestResult.facebookData.startTimestamp">
+                    <strong>{{ $t('admin.import.start_date') }}:</strong>
+                    {{ formatTimestamp(selectedTestResult.facebookData.startTimestamp) }}
+                  </p>
+                  <p v-if="selectedTestResult.facebookData.endTimestamp">
+                    <strong>{{ $t('admin.import.end_date') }}:</strong>
+                    {{ formatTimestamp(selectedTestResult.facebookData.endTimestamp) }}
+                  </p>
+                  <p v-if="selectedTestResult.facebookData.timezone">
+                    <strong>{{ $t('admin.import.timezone') }}:</strong>
+                    {{ selectedTestResult.facebookData.timezone }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Lieu -->
+              <div v-if="selectedTestResult.facebookData.location" class="space-y-2">
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.location') }}
+                </h4>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                  <p v-if="selectedTestResult.facebookData.location.name">
+                    <strong>{{ $t('common.name') }}:</strong>
+                    {{ selectedTestResult.facebookData.location.name }}
+                  </p>
+                  <p v-if="selectedTestResult.facebookData.location.address">
+                    <strong>{{ $t('admin.import.address') }}:</strong>
+                    {{ selectedTestResult.facebookData.location.address }}
+                  </p>
+                  <p v-if="selectedTestResult.facebookData.location.countryCode">
+                    <strong>{{ $t('admin.import.country_code') }}:</strong>
+                    {{ selectedTestResult.facebookData.location.countryCode }}
+                  </p>
+                  <p v-if="selectedTestResult.facebookData.location.coordinates">
+                    <strong>{{ $t('admin.import.coordinates') }}:</strong>
+                    {{ selectedTestResult.facebookData.location.coordinates.latitude }},
+                    {{ selectedTestResult.facebookData.location.coordinates.longitude }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- URLs -->
+              <div class="space-y-2">
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.urls') }}
+                </h4>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                  <p v-if="selectedTestResult.facebookData.ticketUrl">
+                    <strong>{{ $t('admin.import.ticketing') }}:</strong>
+                    <a
+                      :href="selectedTestResult.facebookData.ticketUrl"
+                      target="_blank"
+                      class="text-primary-500 hover:underline break-all"
+                    >
+                      {{ selectedTestResult.facebookData.ticketUrl }}
+                    </a>
+                  </p>
+                  <p
+                    v-if="
+                      selectedTestResult.facebookData.photo?.imageUri ||
+                      selectedTestResult.facebookData.photo?.url
+                    "
+                  >
+                    <strong>{{ $t('admin.import.image') }}:</strong>
+                    <a
+                      :href="
+                        selectedTestResult.facebookData.photo.imageUri ||
+                        selectedTestResult.facebookData.photo.url
+                      "
+                      target="_blank"
+                      class="text-primary-500 hover:underline break-all"
+                    >
+                      {{ $t('admin.import.view_image') }}
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Image preview -->
+              <div
+                v-if="
+                  selectedTestResult.facebookData.photo?.imageUri ||
+                  selectedTestResult.facebookData.photo?.url
+                "
+                class="space-y-2"
+              >
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.image_preview') }}
+                </h4>
+                <img
+                  :src="
+                    selectedTestResult.facebookData.photo.imageUri ||
+                    selectedTestResult.facebookData.photo.url
+                  "
+                  :alt="selectedTestResult.facebookData.name"
+                  class="max-h-48 rounded-lg object-cover"
+                />
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div v-if="selectedTestResult.facebookData.description" class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                {{ $t('common.description') }}
+              </h4>
+              <div
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm max-h-48 overflow-y-auto whitespace-pre-wrap"
+              >
+                {{ selectedTestResult.facebookData.description }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Données Web -->
+          <div
+            v-else-if="selectedTestResult.type === 'website' && selectedTestResult.webContent"
+            class="space-y-4"
+          >
+            <UAlert
+              icon="i-heroicons-globe-alt"
+              color="success"
+              variant="soft"
+              :title="$t('admin.import.website_data')"
+            />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Informations principales -->
+              <div class="space-y-2">
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.main_info') }}
+                </h4>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                  <p>
+                    <strong>{{ $t('admin.import.page_title') }}:</strong>
+                    {{ selectedTestResult.webContent.title || '-' }}
+                  </p>
+                  <p v-if="selectedTestResult.webContent.metaDescription">
+                    <strong>{{ $t('admin.import.meta_description') }}:</strong>
+                    {{ selectedTestResult.webContent.metaDescription }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Open Graph -->
+              <div
+                v-if="Object.keys(selectedTestResult.webContent.openGraph).length > 0"
+                class="space-y-2"
+              >
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.open_graph') }}
+                </h4>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                  <p v-for="(value, key) in selectedTestResult.webContent.openGraph" :key="key">
+                    <strong>og:{{ key }}:</strong> {{ value }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Contact Info -->
+              <div class="space-y-2">
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.contact_info') }}
+                </h4>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                  <p v-if="selectedTestResult.webContent.contactInfo.emails.length">
+                    <strong>{{ $t('admin.import.emails_found') }}:</strong>
+                    {{ selectedTestResult.webContent.contactInfo.emails.join(', ') }}
+                  </p>
+                  <p v-if="selectedTestResult.webContent.contactInfo.phones.length">
+                    <strong>{{ $t('admin.import.phones_found') }}:</strong>
+                    {{ selectedTestResult.webContent.contactInfo.phones.join(', ') }}
+                  </p>
+                  <p v-if="selectedTestResult.webContent.contactInfo.instagramUrls.length">
+                    <strong>Instagram:</strong>
+                    <a
+                      v-for="(url, idx) in selectedTestResult.webContent.contactInfo.instagramUrls"
+                      :key="idx"
+                      :href="url"
+                      target="_blank"
+                      class="text-primary-500 hover:underline mr-2"
+                    >
+                      {{ url }}
+                    </a>
+                  </p>
+                  <p v-if="selectedTestResult.webContent.contactInfo.facebookUrls.length">
+                    <strong>Facebook:</strong>
+                    <a
+                      v-for="(url, idx) in selectedTestResult.webContent.contactInfo.facebookUrls"
+                      :key="idx"
+                      :href="url"
+                      target="_blank"
+                      class="text-primary-500 hover:underline mr-2"
+                    >
+                      {{ url }}
+                    </a>
+                  </p>
+                  <p v-if="selectedTestResult.webContent.contactInfo.ticketingUrls.length">
+                    <strong>{{ $t('admin.import.ticketing') }}:</strong>
+                    <a
+                      v-for="(url, idx) in selectedTestResult.webContent.contactInfo.ticketingUrls"
+                      :key="idx"
+                      :href="url"
+                      target="_blank"
+                      class="text-primary-500 hover:underline mr-2"
+                    >
+                      {{ url }}
+                    </a>
+                  </p>
+                  <p
+                    v-if="
+                      !selectedTestResult.webContent.contactInfo.emails.length &&
+                      !selectedTestResult.webContent.contactInfo.phones.length &&
+                      !selectedTestResult.webContent.contactInfo.instagramUrls.length &&
+                      !selectedTestResult.webContent.contactInfo.facebookUrls.length &&
+                      !selectedTestResult.webContent.contactInfo.ticketingUrls.length
+                    "
+                    class="text-gray-500 italic"
+                  >
+                    {{ $t('admin.import.no_contact_info') }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Image OG -->
+              <div v-if="selectedTestResult.webContent.openGraph.image" class="space-y-2">
+                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                  {{ $t('admin.import.image_preview') }}
+                </h4>
+                <img
+                  :src="selectedTestResult.webContent.openGraph.image"
+                  :alt="selectedTestResult.webContent.title"
+                  class="max-h-48 rounded-lg object-cover"
+                />
+              </div>
+            </div>
+
+            <!-- JSON-LD Events -->
+            <div v-if="selectedTestResult.webContent.jsonLdEvents.length > 0" class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                {{ $t('admin.import.json_ld_events') }}
+              </h4>
+              <div
+                v-for="(event, idx) in selectedTestResult.webContent.jsonLdEvents"
+                :key="idx"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm"
+              >
+                <pre class="overflow-x-auto whitespace-pre-wrap">{{
+                  JSON.stringify(event, null, 2)
+                }}</pre>
+              </div>
+            </div>
+
+            <!-- Navigation du site -->
+            <div v-if="selectedTestResult.webContent.navigation?.length > 0" class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                {{ $t('admin.import.site_navigation') }}
+              </h4>
+              <div
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm max-h-64 overflow-y-auto"
+              >
+                <pre class="whitespace-pre-wrap">{{
+                  JSON.stringify(selectedTestResult.webContent.navigation, null, 2)
+                }}</pre>
+              </div>
+            </div>
+
+            <!-- Liens utiles -->
+            <div v-if="selectedTestResult.webContent.links.length > 0" class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                {{ $t('admin.import.useful_links') }}
+              </h4>
+              <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
+                <p v-for="(link, idx) in selectedTestResult.webContent.links" :key="idx">
+                  <a
+                    :href="link"
+                    target="_blank"
+                    class="text-primary-500 hover:underline break-all"
+                  >
+                    {{ link }}
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            <!-- Contenu textuel -->
+            <div v-if="selectedTestResult.webContent.textContent" class="space-y-2">
+              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                {{ $t('admin.import.text_content') }}
+              </h4>
+              <div
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm max-h-96 overflow-y-auto whitespace-pre-wrap"
+              >
+                {{ selectedTestResult.webContent.textContent }}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </UCard>
 
@@ -349,7 +806,7 @@ definePageMeta({
 const { t } = useI18n()
 const { $fetch } = useNuxtApp()
 
-const showDocumentation = ref(true)
+const showDocumentation = ref(false)
 const jsonInput = ref('')
 const importing = ref(false)
 const validationResult = ref<any>(null)
@@ -359,6 +816,54 @@ const importResult = ref<any>(null)
 const urlsInput = ref('')
 const generating = ref(false)
 const generateError = ref('')
+const generationMethod = ref<'simple' | 'agent'>('simple')
+
+// État spécifique à la méthode simple
+const simpleStatus = ref('')
+const simpleStep = ref('')
+
+// État spécifique à l'agent
+const agentStatus = ref('')
+const agentProgress = ref(0)
+const agentPagesVisited = ref(0)
+const agentResult = ref<any>(null)
+
+// État pour le test des URLs
+const testingUrls = ref(false)
+const testResults = ref<any[]>([])
+const selectedTestUrl = ref<string>('')
+
+// Items pour le choix de la méthode de génération
+const generationMethodItems = computed(() => [
+  {
+    label: t('admin.import.method_simple'),
+    description: t('admin.import.method_simple_description'),
+    value: 'simple',
+  },
+  {
+    label: t('admin.import.method_agent'),
+    description: t('admin.import.method_agent_description'),
+    value: 'agent',
+  },
+])
+
+// Items pour le select des résultats de test
+const testResultItems = computed(() =>
+  testResults.value.map((result) => {
+    const hostname = new URL(result.url).hostname
+    const status = result.success ? '✅' : '❌'
+    const type = result.type === 'facebook' ? '📘' : '🌐'
+    return {
+      label: `${status} ${type} ${hostname}`,
+      value: result.url,
+    }
+  })
+)
+
+// Résultat de test sélectionné
+const selectedTestResult = computed(() =>
+  testResults.value.find((r) => r.url === selectedTestUrl.value)
+)
 
 const exampleJson = `{
   "convention": {
@@ -550,16 +1055,22 @@ const validateAndImport = async () => {
 const POLL_INTERVAL = 2000
 
 /**
- * Poll le statut d'une tâche jusqu'à ce qu'elle soit terminée
+ * Poll le statut d'une tâche (méthode simple)
  */
-const pollTaskStatus = async (taskId: string): Promise<any> => {
+const pollSimpleTaskStatus = async (taskId: string): Promise<any> => {
   const maxAttempts = 90 // 3 minutes max (90 * 2s)
   let attempts = 0
 
   while (attempts < maxAttempts) {
     attempts++
 
-    const response = await $fetch(`/api/admin/generate-import-json/${taskId}`)
+    const response = (await $fetch(`/api/admin/generate-import-json/${taskId}`)) as any
+
+    // Mettre à jour l'étape en cours
+    if (response.step) {
+      simpleStep.value = response.step
+      simpleStatus.value = response.stepLabel || response.message || ''
+    }
 
     if (response.status === 'completed' && response.result) {
       return response.result
@@ -577,10 +1088,127 @@ const pollTaskStatus = async (taskId: string): Promise<any> => {
 }
 
 /**
- * Génère le JSON depuis les URLs fournies via IA (avec polling asynchrone)
+ * Poll le statut d'une tâche agent avec mise à jour de la progression
  */
+const pollAgentTaskStatus = async (taskId: string): Promise<any> => {
+  const maxAttempts = 150 // 5 minutes max pour l'agent (150 * 2s)
+  let attempts = 0
+
+  while (attempts < maxAttempts) {
+    attempts++
+
+    const response = (await $fetch(`/api/admin/generate-import-json-agent/${taskId}`)) as any
+
+    // Mettre à jour la progression avec les métadonnées
+    agentProgress.value = response.progress || 0
+    agentPagesVisited.value = response.pagesVisited || 0
+
+    if (response.status === 'processing') {
+      agentStatus.value = response.message || t('admin.import.agent_processing')
+    }
+
+    if (response.status === 'completed' && response.result) {
+      agentPagesVisited.value = response.result.urlsProcessed?.length || 0
+      return response.result
+    }
+
+    if (response.status === 'failed') {
+      throw new Error(response.error || "Erreur lors de l'exploration")
+    }
+
+    // Attendre avant le prochain poll
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL))
+  }
+
+  throw new Error("Timeout: l'exploration a pris trop de temps")
+}
+
+/**
+ * Formate un timestamp Unix en date lisible
+ */
+const formatTimestamp = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000)
+  return date.toLocaleString('fr-FR', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  })
+}
+
+/**
+ * Teste les URLs fournies sans passer par l'IA
+ */
+const testUrls = async () => {
+  generateError.value = ''
+  testResults.value = []
+  selectedTestUrl.value = ''
+
+  // Parser les URLs (une par ligne)
+  const urls = urlsInput.value
+    .split('\n')
+    .map((url) => url.trim())
+    .filter((url) => url.length > 0)
+
+  if (urls.length === 0) {
+    generateError.value = t('admin.import.no_urls')
+    return
+  }
+
+  // Valider les URLs
+  const invalidUrls = urls.filter((url) => {
+    try {
+      new URL(url)
+      return false
+    } catch {
+      return true
+    }
+  })
+
+  if (invalidUrls.length > 0) {
+    generateError.value = t('admin.import.invalid_urls', { urls: invalidUrls.join(', ') })
+    return
+  }
+
+  if (urls.length > 5) {
+    generateError.value = t('admin.import.too_many_urls')
+    return
+  }
+
+  try {
+    testingUrls.value = true
+
+    const response = await $fetch('/api/admin/test-urls', {
+      method: 'POST',
+      body: { urls },
+    })
+
+    testResults.value = response.results
+    // Sélectionner automatiquement la première URL
+    if (response.results.length > 0) {
+      selectedTestUrl.value = response.results[0].url
+    }
+
+    useToast().add({
+      title: t('admin.import.test_success'),
+      description: t('admin.import.test_success_description', { count: response.results.length }),
+      color: 'success',
+    })
+  } catch (error: any) {
+    generateError.value = error?.data?.message || error?.message || t('admin.import.test_failed')
+  } finally {
+    testingUrls.value = false
+  }
+}
+
 const generateFromUrls = async () => {
   generateError.value = ''
+  // Réinitialiser l'état de la méthode simple
+  simpleStatus.value = t('admin.import.simple_starting')
+  simpleStep.value = ''
+  // Réinitialiser l'état de l'agent
+  agentResult.value = null
+  agentProgress.value = 0
+  agentPagesVisited.value = 0
+  agentStatus.value = t('admin.import.agent_starting')
 
   // Parser les URLs (une par ligne)
   const urls = urlsInput.value
@@ -616,14 +1244,26 @@ const generateFromUrls = async () => {
   try {
     generating.value = true
 
-    // Étape 1: Créer la tâche
-    const taskResponse = await $fetch('/api/admin/generate-import-json', {
-      method: 'POST',
-      body: { urls },
-    })
+    let result: any
 
-    // Étape 2: Polling jusqu'à la fin
-    const result = await pollTaskStatus(taskResponse.taskId)
+    if (generationMethod.value === 'agent') {
+      // Méthode Agent (exploration intelligente)
+      const taskResponse = await $fetch('/api/admin/generate-import-json-agent', {
+        method: 'POST',
+        body: { urls },
+      })
+
+      result = await pollAgentTaskStatus(taskResponse.taskId)
+      agentResult.value = result
+    } else {
+      // Méthode Simple (extraction directe)
+      const taskResponse = await $fetch('/api/admin/generate-import-json', {
+        method: 'POST',
+        body: { urls },
+      })
+
+      result = await pollSimpleTaskStatus(taskResponse.taskId)
+    }
 
     // Mettre le JSON généré dans le champ d'input et le formater
     try {
