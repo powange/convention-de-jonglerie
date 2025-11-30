@@ -404,12 +404,32 @@ export async function runAgentExploration(
 ): Promise<AgentGenerateResult> {
   const config = useRuntimeConfig()
 
-  // Debug: afficher la config IA
-  console.log(`[AGENT] Config IA au démarrage:`, {
-    aiProvider: config.aiProvider,
-    hasAnthropicKey: !!config.anthropicApiKey,
-    lmstudioBaseUrl: config.lmstudioBaseUrl,
+  // Lire le provider depuis process.env en priorité (comme config.get.ts)
+  // car useRuntimeConfig() ne récupère pas toujours les NUXT_* au runtime
+  const effectiveConfig = {
+    ...config,
+    aiProvider: process.env.AI_PROVIDER || process.env.NUXT_AI_PROVIDER || config.aiProvider,
+    lmstudioBaseUrl:
+      process.env.LMSTUDIO_BASE_URL ||
+      process.env.NUXT_LMSTUDIO_BASE_URL ||
+      config.lmstudioBaseUrl,
+    lmstudioModel:
+      process.env.LMSTUDIO_MODEL || process.env.NUXT_LMSTUDIO_MODEL || config.lmstudioModel,
+    lmstudioTextModel:
+      process.env.LMSTUDIO_TEXT_MODEL ||
+      process.env.NUXT_LMSTUDIO_TEXT_MODEL ||
+      config.lmstudioTextModel,
+  }
+
+  // Debug: afficher la config IA effective
+  console.log(`[AGENT] Config IA effective:`, {
+    aiProvider: effectiveConfig.aiProvider,
+    hasAnthropicKey: !!effectiveConfig.anthropicApiKey,
+    lmstudioBaseUrl: effectiveConfig.lmstudioBaseUrl,
   })
+
+  // Utiliser effectiveConfig au lieu de config pour le reste de la fonction
+  const configToUse = effectiveConfig as typeof config
 
   const logs: AgentLog[] = []
   const visitedUrls: string[] = []
@@ -518,8 +538,8 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
     console.log(`[AGENT] Phase 3 - Iteration ${iteration}/${maxAdditionalIterations}`)
 
     // Appeler le LLM
-    const systemPrompt = getSystemPrompt(config.aiProvider || 'lmstudio')
-    const agentResponse = await callAgentLLM(config, systemPrompt, conversationHistory)
+    const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+    const agentResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
 
     if (agentResponse.action === 'fetch' && agentResponse.url) {
       const urlToFetch = agentResponse.url
@@ -627,8 +647,8 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
       content: forcePrompt,
     })
 
-    const systemPrompt = getSystemPrompt(config.aiProvider || 'lmstudio')
-    const finalResponse = await callAgentLLM(config, systemPrompt, conversationHistory)
+    const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+    const finalResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
     console.log('[AGENT] Réponse au forçage:', finalResponse)
 
     if (finalResponse.json) {
@@ -728,14 +748,18 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
         statusMessage: 'Détection des services (camping, restauration, spectacles...)',
       })
 
-      const features = await extractEditionFeatures(description, config.aiProvider || 'lmstudio', {
-        lmstudioBaseUrl: config.lmstudioBaseUrl,
-        lmstudioTextModel: config.lmstudioTextModel,
-        lmstudioModel: config.lmstudioModel,
-        anthropicApiKey: config.anthropicApiKey,
-        ollamaBaseUrl: config.ollamaBaseUrl,
-        ollamaModel: config.ollamaModel,
-      })
+      const features = await extractEditionFeatures(
+        description,
+        configToUse.aiProvider || 'lmstudio',
+        {
+          lmstudioBaseUrl: configToUse.lmstudioBaseUrl,
+          lmstudioTextModel: configToUse.lmstudioTextModel,
+          lmstudioModel: configToUse.lmstudioModel,
+          anthropicApiKey: configToUse.anthropicApiKey,
+          ollamaBaseUrl: configToUse.ollamaBaseUrl,
+          ollamaModel: configToUse.ollamaModel,
+        }
+      )
 
       if (Object.keys(features).length > 0) {
         console.log('[AGENT] Caractéristiques détectées:', features)
@@ -758,7 +782,7 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
   return {
     success: true,
     json: enrichedJson,
-    provider: config.aiProvider || 'lmstudio',
+    provider: configToUse.aiProvider || 'lmstudio',
     urlsProcessed: visitedUrls,
     iterations: urls.length + iteration,
   }
