@@ -202,7 +202,7 @@ export default wrapApiHandler(
         hasAfjTokenPayment: validatedData.edition.hasAfjTokenPayment ?? false,
         hasATM: validatedData.edition.hasATM ?? false,
         hasLongShow: validatedData.edition.hasLongShow ?? false,
-        isOnline: validatedData.edition.isOnline ?? false,
+        isOnline: validatedData.edition.isOnline ?? true, // Par défaut true car une édition importée est en ligne
         // Champs bénévoles
         volunteersOpen: validatedData.edition.volunteersOpen ?? false,
         volunteersDescription: validatedData.edition.volunteersDescription,

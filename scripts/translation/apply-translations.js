@@ -136,9 +136,7 @@ function applyTranslations() {
       const translation = translations[keyPath][lang]
 
       if (!translation) {
-        console.log(
-          `  ${colors.yellow}⚠ ${keyPath}: Pas de traduction pour ${lang}${colors.reset}`
-        )
+        console.log(`  ${colors.yellow}⚠ ${keyPath}: Pas de traduction pour ${lang}${colors.reset}`)
         continue
       }
 
@@ -159,9 +157,7 @@ function applyTranslations() {
       }
 
       if (!currentValue.toString().startsWith('[TODO]')) {
-        console.log(
-          `  ${colors.blue}ℹ ${keyPath}: Déjà traduit ("${currentValue}")${colors.reset}`
-        )
+        console.log(`  ${colors.blue}ℹ ${keyPath}: Déjà traduit ("${currentValue}")${colors.reset}`)
         continue
       }
 

@@ -1,5 +1,9 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { getEffectiveAIConfig, type EffectiveAIConfig } from '@@/server/utils/ai-config'
+import {
+  getEffectiveAIConfig,
+  getMaxContentSizeForProvider,
+  type EffectiveAIConfig,
+} from '@@/server/utils/ai-config'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createTask, runTaskInBackground, updateTaskMetadata } from '@@/server/utils/async-tasks'
 import {
@@ -18,6 +22,13 @@ import {
   isBrowserlessAvailable,
 } from '@@/server/utils/fetch-helpers'
 import {
+  type ProgressCallback,
+  sendStepEvent,
+  sendUrlFetchedEvent,
+  type GenerationStep as SSEGenerationStep,
+} from '@@/server/utils/import-generation-sse'
+import {
+  generateCompactDirectPrompt,
   generateFeaturesDescription,
   generateJsonExample,
 } from '@@/server/utils/import-json-schema'
@@ -97,6 +108,7 @@ RÈGLES IMPORTANTES:
 - Email: UNIQUEMENT si explicitement trouvé, sinon laisser vide (NE PAS INVENTER)
 - Instagram: Extraire le lien si présent
 - Timezone: Déduis le timezone IANA du pays (France=Europe/Paris, Allemagne=Europe/Berlin, etc.)
+- Dates: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
 - Caractéristiques: Mets true UNIQUEMENT si explicitement mentionné dans le contenu
 
 CARACTÉRISTIQUES À DÉTECTER (mettre true si mentionné):
@@ -106,20 +118,6 @@ STRUCTURE JSON ATTENDUE:
 ${generateJsonExample()}
 
 Réponds UNIQUEMENT avec le JSON, sans texte autour.`
-}
-
-// Génère le prompt système compact pour LM Studio (contexte limité ~4096 tokens)
-function getCompactSystemPrompt(): string {
-  return `Extrais les infos de convention de jonglerie en JSON.
-
-RÈGLES: nom=événement (pas site), email=seulement si trouvé, timezone=IANA du pays.
-
-CARACTÉRISTIQUES (true si mentionné): camping tente (hasTentCamping), camping-car (hasTruckCamping), dortoir (hasSleepingRoom), food trucks (hasFoodTrucks), cantine (hasCantine), gymnase (hasGym), espace feu (hasFireSpace), ateliers (hasWorkshops), zone enfants (hasKidsZone), gala (hasGala), scène ouverte (hasOpenStage), concert (hasConcert), douches (hasShowers), WC (hasToilets).
-
-FORMAT JSON:
-{"convention":{"name":"","email":"","description":""},"edition":{"name":"","description":"","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","timezone":"Europe/Paris","addressLine1":"","city":"","region":"","country":"","postalCode":"","latitude":null,"longitude":null,"ticketingUrl":"","facebookUrl":"","instagramUrl":"","officialWebsiteUrl":"","imageUrl":"","hasTentCamping":false,"hasTruckCamping":false,"hasSleepingRoom":false,"hasFoodTrucks":false,"hasCantine":false,"hasGym":false,"hasFireSpace":false,"hasWorkshops":false,"hasKidsZone":false,"hasGala":false,"hasOpenStage":false,"hasConcert":false,"hasShowers":false,"hasToilets":false}}
-
-JSON seul, sans texte.`
 }
 
 /**
@@ -136,15 +134,34 @@ export const GENERATION_STEPS = {
 export type GenerationStep = keyof typeof GENERATION_STEPS
 
 /**
- * Met à jour l'étape de la tâche
+ * Met à jour l'étape de la tâche (polling) et/ou envoie un événement SSE
  */
-function updateStep(taskId: string | undefined, step: GenerationStep): void {
+function updateStep(
+  taskId: string | undefined,
+  step: GenerationStep,
+  onProgress?: ProgressCallback
+): void {
+  // Mode polling (ancien système)
   if (taskId) {
     updateTaskMetadata(taskId, {
       step,
       stepLabel: GENERATION_STEPS[step],
     })
   }
+  // Mode SSE (nouveau système)
+  if (onProgress) {
+    sendStepEvent(onProgress, step as SSEGenerationStep)
+  }
+}
+
+/**
+ * Options pour la génération d'import JSON
+ */
+export interface GenerateImportOptions {
+  /** ID de tâche pour le mode polling (ancien système) */
+  taskId?: string
+  /** Callback de progression pour le mode SSE (nouveau système) */
+  onProgress?: ProgressCallback
 }
 
 /**
@@ -158,8 +175,9 @@ function updateStep(taskId: string | undefined, step: GenerationStep): void {
  */
 export async function generateImportJson(
   urls: string[],
-  taskId?: string
+  options: GenerateImportOptions = {}
 ): Promise<GenerateImportResult> {
+  const { taskId, onProgress } = options
   // Récupérer la config IA effective (lit process.env en priorité)
   const effectiveConfig = getEffectiveAIConfig()
 
@@ -185,7 +203,7 @@ export async function generateImportJson(
 
   // Étape 1: Traiter les URLs Facebook avec facebook-event-scraper
   if (facebookUrls.length > 0) {
-    updateStep(taskId, 'scraping_facebook')
+    updateStep(taskId, 'scraping_facebook', onProgress)
   }
 
   for (const url of facebookUrls) {
@@ -214,13 +232,23 @@ export async function generateImportJson(
   // Étape 2: Récupérer le contenu des autres URLs
   const otherContents: string[] = []
 
-  // Budget de contenu adapté selon si on a déjà un JSON pré-rempli
-  const totalContentBudget = prefilledJson ? 1500 : 2500 // Moins de contenu si on complète juste
+  // Budget de contenu adapté dynamiquement selon le context length du modèle
+  const aiProvider = effectiveConfig.aiProvider || 'lmstudio'
+  const dynamicMaxContent = await getMaxContentSizeForProvider(
+    aiProvider,
+    effectiveConfig.lmstudioBaseUrl
+  )
+  // Réduire si on a déjà un JSON pré-rempli (moins besoin de contenu)
+  const totalContentBudget = prefilledJson ? Math.floor(dynamicMaxContent * 0.6) : dynamicMaxContent
   const maxContentPerUrl =
     otherUrls.length > 0 ? Math.floor(totalContentBudget / otherUrls.length) : totalContentBudget
 
+  console.log(
+    `[GENERATE-IMPORT] Budget contenu: ${totalContentBudget} chars (provider: ${aiProvider}, prefilled: ${!!prefilledJson})`
+  )
+
   if (otherUrls.length > 0) {
-    updateStep(taskId, 'fetching_urls')
+    updateStep(taskId, 'fetching_urls', onProgress)
   }
 
   for (const url of otherUrls) {
@@ -248,6 +276,11 @@ export async function generateImportJson(
       // Extraire le contenu du HTML avec le nouvel utilitaire
       const textContent = extractAndFormatWebContent(html, url, maxContentPerUrl)
       otherContents.push(textContent)
+
+      // Notifier la progression SSE
+      if (onProgress) {
+        sendUrlFetchedEvent(onProgress, url)
+      }
     } catch (error: any) {
       const errorMsg =
         error.name === 'AbortError' ? `Timeout après ${URL_FETCH_TIMEOUT / 1000}s` : error.message
@@ -258,14 +291,10 @@ export async function generateImportJson(
     }
   }
 
-  // Récupérer la configuration IA effective
-  const aiProvider = effectiveConfig.aiProvider || 'lmstudio'
-  console.log(`[GENERATE-IMPORT] Provider IA: ${aiProvider}`)
-
   let generatedJson: string
 
   // Étape 3: Générer ou compléter le JSON via IA
-  updateStep(taskId, 'generating_json')
+  updateStep(taskId, 'generating_json', onProgress)
 
   if (prefilledJson && otherContents.length === 0) {
     // Cas 1: Uniquement Facebook, pas d'IA - retourne le JSON tel quel
@@ -279,7 +308,8 @@ export async function generateImportJson(
       effectiveConfig,
       aiProvider,
       prefilledJson,
-      combinedOtherContent
+      combinedOtherContent,
+      dynamicMaxContent
     )
   } else {
     // Cas 3: Pas de Facebook - extraction complète par l'IA
@@ -290,7 +320,8 @@ export async function generateImportJson(
       generatedJson = await callLMStudio(
         effectiveConfig.lmstudioBaseUrl || 'http://localhost:1234',
         effectiveConfig.lmstudioTextModel || effectiveConfig.lmstudioModel || 'auto',
-        combinedContent
+        combinedContent,
+        dynamicMaxContent
       )
     } else if (aiProvider === 'anthropic' && effectiveConfig.anthropicApiKey) {
       generatedJson = await callAnthropic(effectiveConfig.anthropicApiKey, combinedContent)
@@ -307,7 +338,7 @@ export async function generateImportJson(
 
   // Étape 4: Extraire les caractéristiques (services) de l'édition via IA
   // On utilise la description de l'édition pour détecter les services offerts
-  updateStep(taskId, 'extracting_features')
+  updateStep(taskId, 'extracting_features', onProgress)
 
   let finalJson = generatedJson
   try {
@@ -341,7 +372,7 @@ export async function generateImportJson(
   }
 
   // Marquer comme terminé
-  updateStep(taskId, 'completed')
+  updateStep(taskId, 'completed', onProgress)
 
   return {
     success: true,
@@ -358,7 +389,8 @@ async function callAIToCompleteJson(
   config: EffectiveAIConfig,
   aiProvider: string,
   prefilledJson: FacebookImportJson,
-  additionalContent: string
+  additionalContent: string,
+  maxContent: number
 ): Promise<string> {
   // Construire le prompt avec le JSON pré-rempli et les données supplémentaires
   const prefilledJsonStr = JSON.stringify(prefilledJson, null, 2)
@@ -371,7 +403,8 @@ async function callAIToCompleteJson(
     return await callLMStudioComplete(
       config.lmstudioBaseUrl || 'http://localhost:1234',
       config.lmstudioTextModel || config.lmstudioModel || 'auto',
-      userPrompt
+      userPrompt,
+      maxContent
     )
   } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
     return await callAnthropicComplete(config.anthropicApiKey, userPrompt)
@@ -392,17 +425,17 @@ async function callAIToCompleteJson(
 async function callLMStudioComplete(
   baseUrl: string,
   model: string,
-  userPrompt: string
+  userPrompt: string,
+  maxContent: number
 ): Promise<string> {
-  // Limiter le contenu pour LM Studio
-  const maxContent = 1800
+  // Limiter le contenu selon le context length du modèle
   const truncatedPrompt =
     userPrompt.length > maxContent
       ? userPrompt.substring(0, maxContent) + '\n...(tronqué)'
       : userPrompt
 
   console.log(
-    `[GENERATE-IMPORT] LM Studio Complete: ${userPrompt.length} -> ${truncatedPrompt.length} caractères`
+    `[GENERATE-IMPORT] LM Studio Complete: ${userPrompt.length} -> ${truncatedPrompt.length} caractères (max: ${maxContent})`
   )
 
   const response = await fetchWithTimeout(
@@ -529,7 +562,7 @@ export default wrapApiHandler(
     console.log(`[GENERATE-IMPORT] Tâche créée: ${task.id} pour ${urls.length} URL(s)`)
 
     // Lancer la génération en arrière-plan
-    runTaskInBackground(task.id, () => generateImportJson(urls, task.id))
+    runTaskInBackground(task.id, () => generateImportJson(urls, { taskId: task.id }))
 
     // Retourner immédiatement le taskId
     return {
@@ -543,16 +576,20 @@ export default wrapApiHandler(
 
 /**
  * Appel à LM Studio (API compatible OpenAI) avec timeout
- * Utilise le prompt compact pour respecter la limite de contexte (4096 tokens)
+ * Utilise le prompt compact pour respecter la limite de contexte
  */
-async function callLMStudio(baseUrl: string, model: string, content: string): Promise<string> {
-  // Limiter le contenu pour LM Studio (contexte 4096 tokens ~ 3000 caractères max pour le contenu)
-  const maxContent = 2000
+async function callLMStudio(
+  baseUrl: string,
+  model: string,
+  content: string,
+  maxContent: number
+): Promise<string> {
+  // Limiter le contenu selon le context length du modèle
   const truncatedContent =
     content.length > maxContent ? content.substring(0, maxContent) + '\n...(tronqué)' : content
 
   console.log(
-    `[GENERATE-IMPORT] LM Studio: contenu ${content.length} -> ${truncatedContent.length} caractères`
+    `[GENERATE-IMPORT] LM Studio: contenu ${content.length} -> ${truncatedContent.length} caractères (max: ${maxContent})`
   )
 
   let response: Response
@@ -567,7 +604,7 @@ async function callLMStudio(baseUrl: string, model: string, content: string): Pr
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: getCompactSystemPrompt() },
+            { role: 'system', content: generateCompactDirectPrompt() },
             {
               role: 'user',
               content: `Données:\n${truncatedContent}\n\nGénère le JSON:`,

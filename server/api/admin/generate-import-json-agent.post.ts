@@ -1,5 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { getEffectiveAIConfig } from '@@/server/utils/ai-config'
+import { getEffectiveAIConfig, getMaxContentSizeForProvider } from '@@/server/utils/ai-config'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import {
   createTask,
@@ -18,6 +18,12 @@ import {
 } from '@@/server/utils/facebook-event-scraper'
 import { BROWSER_HEADERS, fetchWithTimeout } from '@@/server/utils/fetch-helpers'
 import {
+  type ProgressCallback,
+  sendProgressEvent,
+  sendStepEvent,
+  sendUrlFetchedEvent,
+} from '@@/server/utils/import-generation-sse'
+import {
   generateAgentSystemPrompt,
   generateCompactAgentSystemPrompt,
   generateForceGenerationPrompt,
@@ -34,9 +40,11 @@ const requestSchema = z.object({
 // Timeout pour les requêtes HTTP (en ms)
 const URL_FETCH_TIMEOUT = 15000 // 15 secondes par URL
 const LLM_TIMEOUT = 180000 // 3 minutes pour le LLM
-const MAX_AGENT_ITERATIONS = 4 // Maximum de pages à explorer (réduit pour éviter context overflow)
-const MAX_TOTAL_CONTENT_SIZE = 10000 // Limite de contenu total en caractères (réduit pour modèles locaux 4k ctx)
-const MAX_PAGE_CONTENT_SIZE = 2500 // Limite par page en caractères
+const MAX_AGENT_ITERATIONS = 4 // Maximum de pages à explorer
+
+// Limites par défaut (seront ajustées dynamiquement selon le context length)
+const DEFAULT_MAX_TOTAL_CONTENT_SIZE = 10000
+const DEFAULT_MAX_PAGE_CONTENT_SIZE = 2500
 
 // Type pour le résultat de la génération
 export interface AgentGenerateResult {
@@ -315,9 +323,10 @@ function formatFacebookDataAsContent(fbEvent: FacebookScraperResult, url: string
  */
 async function fetchAndExtractContent(
   url: string,
-  taskId: string,
+  taskId: string | undefined,
   visitedUrls: string[],
   logs: AgentLog[],
+  maxPageContentSize: number,
   facebookData?: { event: FacebookScraperResult | null; prefilledJson: any | null }
 ): Promise<{
   success: boolean
@@ -326,9 +335,11 @@ async function fetchAndExtractContent(
   facebookEvent?: FacebookScraperResult
 }> {
   try {
-    updateTaskMetadata(taskId, {
-      statusMessage: `Exploration: ${new URL(url).hostname}${new URL(url).pathname.substring(0, 30)}...`,
-    })
+    if (taskId) {
+      updateTaskMetadata(taskId, {
+        statusMessage: `Exploration: ${new URL(url).hostname}${new URL(url).pathname.substring(0, 30)}...`,
+      })
+    }
 
     // Utiliser le scraper Facebook pour les événements Facebook
     if (isFacebookEventUrl(url)) {
@@ -370,7 +381,7 @@ async function fetchAndExtractContent(
     }
 
     const html = await response.text()
-    const pageContent = extractAndFormatWebContent(html, url, MAX_PAGE_CONTENT_SIZE)
+    const pageContent = extractAndFormatWebContent(html, url, maxPageContentSize)
 
     visitedUrls.push(url)
 
@@ -397,20 +408,76 @@ async function fetchAndExtractContent(
 }
 
 /**
+ * Options pour l'exploration par agent
+ */
+export interface AgentExplorationOptions {
+  /** ID de tâche pour le mode polling (ancien système) */
+  taskId?: string
+  /** Callback de progression pour le mode SSE (nouveau système) */
+  onProgress?: ProgressCallback
+}
+
+/**
  * Fonction principale de l'agent d'exploration
  */
 export async function runAgentExploration(
   urls: string[],
-  taskId: string
+  options: AgentExplorationOptions = {}
 ): Promise<AgentGenerateResult> {
+  const { taskId, onProgress } = options
+
+  // Helper pour envoyer les événements de progression (polling + SSE)
+  const notifyStep = (
+    step:
+      | 'fetching_urls'
+      | 'exploring_page'
+      | 'generating_json'
+      | 'extracting_features'
+      | 'completed'
+  ) => {
+    if (onProgress) {
+      sendStepEvent(onProgress, step)
+    }
+  }
+
+  const notifyProgress = (urlsVisited: number, maxUrls: number, currentUrl?: string) => {
+    if (onProgress) {
+      sendProgressEvent(onProgress, urlsVisited, maxUrls, currentUrl)
+    }
+  }
+
+  const notifyUrlFetched = (url: string) => {
+    if (onProgress) {
+      sendUrlFetchedEvent(onProgress, url)
+    }
+  }
+
   // Récupérer la config IA effective (lit process.env en priorité)
   const configToUse = getEffectiveAIConfig()
+
+  // Calculer les limites de contenu dynamiquement selon le context length du modèle
+  const aiProvider = configToUse.aiProvider || 'lmstudio'
+  const dynamicMaxContent = await getMaxContentSizeForProvider(
+    aiProvider,
+    configToUse.lmstudioBaseUrl
+  )
+  // Pour l'agent, on répartit le budget : ~40% par page, ~80% total (on garde de la marge pour les itérations)
+  const maxPageContentSize = Math.max(
+    DEFAULT_MAX_PAGE_CONTENT_SIZE,
+    Math.floor(dynamicMaxContent * 0.4)
+  )
+  const maxTotalContentSize = Math.max(
+    DEFAULT_MAX_TOTAL_CONTENT_SIZE,
+    Math.floor(dynamicMaxContent * 0.8)
+  )
 
   // Debug: afficher la config IA effective
   console.log(`[AGENT] Config IA effective:`, {
     aiProvider: configToUse.aiProvider,
     hasAnthropicKey: !!configToUse.anthropicApiKey,
     lmstudioBaseUrl: configToUse.lmstudioBaseUrl,
+    maxPageContentSize,
+    maxTotalContentSize,
   })
 
   const logs: AgentLog[] = []
@@ -435,24 +502,38 @@ export async function runAgentExploration(
   // PHASE 1: Explorer TOUTES les URLs fournies
   // ============================================
   console.log(`[AGENT] Phase 1: Exploration des ${urls.length} URLs fournies`)
-  updateTaskMetadata(taskId, {
-    phase: 'initial',
-    statusMessage: `Phase 1: Exploration des ${urls.length} URLs fournies...`,
-  })
+  notifyStep('fetching_urls')
+  if (taskId) {
+    updateTaskMetadata(taskId, {
+      phase: 'initial',
+      statusMessage: `Phase 1: Exploration des ${urls.length} URLs fournies...`,
+    })
+  }
 
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i]
     const progressPercent = Math.round(((i + 1) / urls.length) * 30) // Phase 1 = 0-30%
-    updateTaskStatus(taskId, 'processing', progressPercent)
-    updateTaskMetadata(taskId, {
-      pagesVisited: visitedUrls.length,
-      statusMessage: `Exploration ${i + 1}/${urls.length}: ${new URL(url).hostname}...`,
-    })
+    if (taskId) {
+      updateTaskStatus(taskId, 'processing', progressPercent)
+      updateTaskMetadata(taskId, {
+        pagesVisited: visitedUrls.length,
+        statusMessage: `Exploration ${i + 1}/${urls.length}: ${new URL(url).hostname}...`,
+      })
+    }
+    notifyProgress(i, urls.length, url)
 
-    const result = await fetchAndExtractContent(url, taskId, visitedUrls, logs, facebookData)
+    const result = await fetchAndExtractContent(
+      url,
+      taskId,
+      visitedUrls,
+      logs,
+      maxPageContentSize,
+      facebookData
+    )
     if (result.success && result.content) {
       collectedContent.push(result.content)
       totalContentSize += result.content.length
+      notifyUrlFetched(url)
     }
   }
 
@@ -467,21 +548,24 @@ export async function runAgentExploration(
   // PHASE 2: Demander à l'IA quelles pages supplémentaires explorer
   // ============================================
   console.log('[AGENT] Phase 2: Analyse et suggestions de pages supplémentaires')
-  updateTaskStatus(taskId, 'processing', 35)
-  updateTaskMetadata(taskId, {
-    phase: 'analysis',
-    pagesVisited: visitedUrls.length,
-    statusMessage: 'Analyse du contenu et recherche de pages supplémentaires...',
-  })
+  notifyStep('exploring_page')
+  if (taskId) {
+    updateTaskStatus(taskId, 'processing', 35)
+    updateTaskMetadata(taskId, {
+      phase: 'analysis',
+      pagesVisited: visitedUrls.length,
+      statusMessage: 'Analyse du contenu et recherche de pages supplémentaires...',
+    })
+  }
 
   const conversationHistory: Array<{ role: string; content: string }> = []
 
   // Construire le message COMPACT avec le contenu collecté
   // Limiter le contenu pour éviter le débordement de contexte
   const truncatedContent = collectedContent
-    .map((c) => c.substring(0, MAX_PAGE_CONTENT_SIZE))
+    .map((c) => c.substring(0, maxPageContentSize))
     .join('\n---\n')
-    .substring(0, MAX_TOTAL_CONTENT_SIZE)
+    .substring(0, maxTotalContentSize)
 
   const initialAnalysis = `Contenu de ${visitedUrls.length} page(s):
 
@@ -508,14 +592,17 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
   ) {
     iteration++
     const progressPercent = 35 + Math.round((iteration / maxAdditionalIterations) * 55) // Phase 2-3 = 35-90%
-    updateTaskStatus(taskId, 'processing', progressPercent)
-    updateTaskMetadata(taskId, {
-      phase: 'exploration',
-      pagesVisited: visitedUrls.length,
-      currentIteration: iteration,
-      maxIterations: maxAdditionalIterations,
-      statusMessage: `Exploration supplémentaire ${iteration}/${maxAdditionalIterations} - ${visitedUrls.length} page(s) au total`,
-    })
+    if (taskId) {
+      updateTaskStatus(taskId, 'processing', progressPercent)
+      updateTaskMetadata(taskId, {
+        phase: 'exploration',
+        pagesVisited: visitedUrls.length,
+        currentIteration: iteration,
+        maxIterations: maxAdditionalIterations,
+        statusMessage: `Exploration supplémentaire ${iteration}/${maxAdditionalIterations} - ${visitedUrls.length} page(s) au total`,
+      })
+    }
+    notifyProgress(visitedUrls.length, MAX_AGENT_ITERATIONS)
 
     console.log(`[AGENT] Phase 3 - Iteration ${iteration}/${maxAdditionalIterations}`)
 
@@ -547,7 +634,7 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
       consecutiveInvalidRequests = 0
 
       // Vérifier la limite de contenu
-      if (totalContentSize > MAX_TOTAL_CONTENT_SIZE) {
+      if (totalContentSize > maxTotalContentSize) {
         conversationHistory.push({
           role: 'assistant',
           content: `FETCH_URL: ${urlToFetch}`,
@@ -560,16 +647,25 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
       }
 
       // Fetch la page
-      const result = await fetchAndExtractContent(urlToFetch, taskId, visitedUrls, logs)
+      const result = await fetchAndExtractContent(
+        urlToFetch,
+        taskId,
+        visitedUrls,
+        logs,
+        maxPageContentSize
+      )
 
       if (result.success && result.content) {
         collectedContent.push(result.content)
         totalContentSize += result.content.length
+        notifyUrlFetched(urlToFetch)
 
-        updateTaskMetadata(taskId, {
-          pagesVisited: visitedUrls.length,
-          lastVisitedUrl: urlToFetch,
-        })
+        if (taskId) {
+          updateTaskMetadata(taskId, {
+            pagesVisited: visitedUrls.length,
+            lastVisitedUrl: urlToFetch,
+          })
+        }
 
         conversationHistory.push({
           role: 'assistant',
@@ -615,10 +711,13 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
   // Si on n'a pas de JSON après toutes les itérations, forcer la génération
   if (!finalJson) {
     console.log('[AGENT] Forçage de la génération du JSON final')
-    updateTaskMetadata(taskId, {
-      phase: 'generation',
-      statusMessage: 'Génération du JSON final...',
-    })
+    notifyStep('generating_json')
+    if (taskId) {
+      updateTaskMetadata(taskId, {
+        phase: 'generation',
+        statusMessage: 'Génération du JSON final...',
+      })
+    }
 
     // Utiliser un prompt de génération forcée depuis le module import-json-schema
     const contentSummary = collectedContent.slice(0, 3).join('\n\n---\n\n')
@@ -657,13 +756,15 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
       if (!finalJson) {
         // Fallback: utiliser la méthode simple de génération
         console.log('[AGENT] Fallback vers la méthode simple de génération')
-        updateTaskMetadata(taskId, {
-          phase: 'fallback',
-          statusMessage: 'Utilisation de la méthode de génération simple...',
-        })
+        if (taskId) {
+          updateTaskMetadata(taskId, {
+            phase: 'fallback',
+            statusMessage: 'Utilisation de la méthode de génération simple...',
+          })
+        }
 
         try {
-          const simpleResult = await generateImportJson(visitedUrls)
+          const simpleResult = await generateImportJson(visitedUrls, {})
           if (simpleResult.success && simpleResult.json) {
             finalJson = simpleResult.json
             console.log('[AGENT] JSON généré via la méthode simple (fallback)')
@@ -684,11 +785,14 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
   // ============================================
   // PHASE 4: Fusion avec les données Facebook et extraction des caractéristiques
   // ============================================
-  updateTaskStatus(taskId, 'processing', 90)
-  updateTaskMetadata(taskId, {
-    phase: 'enrichment',
-    statusMessage: 'Enrichissement du JSON...',
-  })
+  notifyStep('extracting_features')
+  if (taskId) {
+    updateTaskStatus(taskId, 'processing', 90)
+    updateTaskMetadata(taskId, {
+      phase: 'enrichment',
+      statusMessage: 'Enrichissement du JSON...',
+    })
+  }
 
   let enrichedJson = finalJson
 
@@ -726,9 +830,11 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
     const description = parsedJson.edition?.description || ''
     if (description && description.length >= 50) {
       console.log('[AGENT] Extraction des caractéristiques via IA...')
-      updateTaskMetadata(taskId, {
-        statusMessage: 'Détection des services (camping, restauration, spectacles...)',
-      })
+      if (taskId) {
+        updateTaskMetadata(taskId, {
+          statusMessage: 'Détection des services (camping, restauration, spectacles...)',
+        })
+      }
 
       const features = await extractEditionFeatures(
         description,
@@ -755,11 +861,14 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
     // On continue avec le JSON non enrichi
   }
 
-  updateTaskStatus(taskId, 'processing', 100)
-  updateTaskMetadata(taskId, {
-    phase: 'completed',
-    statusMessage: 'Génération terminée',
-  })
+  notifyStep('completed')
+  if (taskId) {
+    updateTaskStatus(taskId, 'processing', 100)
+    updateTaskMetadata(taskId, {
+      phase: 'completed',
+      statusMessage: 'Génération terminée',
+    })
+  }
 
   return {
     success: true,
@@ -789,7 +898,7 @@ export default wrapApiHandler(
     console.log(`[AGENT] Tâche créée: ${task.id} pour ${urls.length} URL(s)`)
 
     // Lancer l'exploration en arrière-plan
-    runTaskInBackground(task.id, () => runAgentExploration(urls, task.id))
+    runTaskInBackground(task.id, () => runAgentExploration(urls, { taskId: task.id }))
 
     // Retourner immédiatement le taskId
     return {

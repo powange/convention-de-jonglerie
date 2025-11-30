@@ -43,9 +43,6 @@ export const EDITION_FEATURES_DESCRIPTIONS: Record<string, string> = {
   hasCashPayment: 'Paiement en espèces accepté',
   hasCreditCardPayment: 'Paiement par carte bancaire accepté',
   hasAfjTokenPayment: 'Paiement par jetons AFJ accepté',
-
-  // Autres
-  isOnline: 'Événement en ligne / virtuel (pas de lieu physique)',
 }
 
 /**

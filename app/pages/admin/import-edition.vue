@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto">
+  <div>
     <!-- Breadcrumb -->
     <nav class="flex mb-4" :aria-label="$t('navigation.breadcrumb')">
       <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -1051,76 +1051,116 @@ const validateAndImport = async () => {
   }
 }
 
-// Intervalle de polling (en ms)
-const POLL_INTERVAL = 2000
-
 /**
- * Poll le statut d'une tâche (méthode simple)
+ * Labels des étapes pour l'affichage
  */
-const pollSimpleTaskStatus = async (taskId: string): Promise<any> => {
-  const maxAttempts = 90 // 3 minutes max (90 * 2s)
-  let attempts = 0
-
-  while (attempts < maxAttempts) {
-    attempts++
-
-    const response = (await $fetch(`/api/admin/generate-import-json/${taskId}`)) as any
-
-    // Mettre à jour l'étape en cours
-    if (response.step) {
-      simpleStep.value = response.step
-      simpleStatus.value = response.stepLabel || response.message || ''
-    }
-
-    if (response.status === 'completed' && response.result) {
-      return response.result
-    }
-
-    if (response.status === 'failed') {
-      throw new Error(response.error || 'Erreur lors de la génération')
-    }
-
-    // Attendre avant le prochain poll
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL))
-  }
-
-  throw new Error('Timeout: la génération a pris trop de temps')
+const stepLabels: Record<string, string> = {
+  starting: 'Démarrage...',
+  scraping_facebook: 'Récupération des données Facebook...',
+  fetching_urls: 'Récupération du contenu des URLs...',
+  generating_json: 'Génération du JSON via IA...',
+  exploring_page: 'Exploration des pages...',
+  extracting_features: 'Détection des services...',
+  completed: 'Terminé',
 }
 
 /**
- * Poll le statut d'une tâche agent avec mise à jour de la progression
+ * Génère le JSON via SSE (Server-Sent Events)
+ * Remplace l'ancien système de polling
  */
-const pollAgentTaskStatus = async (taskId: string): Promise<any> => {
-  const maxAttempts = 150 // 5 minutes max pour l'agent (150 * 2s)
-  let attempts = 0
+const generateWithSSE = (urls: string[], method: 'direct' | 'agent'): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const encodedUrls = urls.map((url) => encodeURIComponent(url)).join(',')
+    const sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
 
-  while (attempts < maxAttempts) {
-    attempts++
+    // withCredentials: true pour envoyer les cookies de session
+    const eventSource = new EventSource(sseUrl, { withCredentials: true })
+    let result: any = null
 
-    const response = (await $fetch(`/api/admin/generate-import-json-agent/${taskId}`)) as any
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log('[SSE] Event received:', data.type)
 
-    // Mettre à jour la progression avec les métadonnées
-    agentProgress.value = response.progress || 0
-    agentPagesVisited.value = response.pagesVisited || 0
+        switch (data.type) {
+          case 'connected':
+            console.log(`[SSE] Connecté: method=${data.method}, urls=${data.urlCount}`)
+            break
 
-    if (response.status === 'processing') {
-      agentStatus.value = response.message || t('admin.import.agent_processing')
+          case 'ping':
+            // Ping pour maintenir la connexion ouverte - ignorer silencieusement
+            break
+
+          case 'step':
+            // Mettre à jour l'étape en cours
+            if (method === 'direct') {
+              simpleStep.value = data.step
+              simpleStatus.value = data.label || stepLabels[data.step] || ''
+            } else {
+              agentStatus.value = data.label || stepLabels[data.step] || ''
+            }
+            break
+
+          case 'progress':
+            // Mettre à jour la progression (spécifique à l'agent)
+            if (method === 'agent') {
+              agentPagesVisited.value = data.urlsVisited || 0
+              agentProgress.value = Math.round((data.urlsVisited / data.maxUrls) * 100)
+            }
+            break
+
+          case 'url_fetched':
+            console.log(`[SSE] URL récupérée: ${data.currentUrl}`)
+            break
+
+          case 'result':
+            result = {
+              success: data.success,
+              json: data.json,
+              provider: data.provider,
+              urlsProcessed: data.urlsProcessed,
+            }
+            if (method === 'agent') {
+              agentPagesVisited.value = data.urlsProcessed || 0
+            }
+            // Ne pas fermer ici, attendre que le serveur ferme
+            break
+
+          case 'error':
+            eventSource.close()
+            reject(new Error(data.message || 'Erreur inconnue'))
+            break
+        }
+      } catch (err) {
+        console.error('[SSE] Erreur parsing:', err)
+      }
     }
 
-    if (response.status === 'completed' && response.result) {
-      agentPagesVisited.value = response.result.urlsProcessed?.length || 0
-      return response.result
+    eventSource.onerror = () => {
+      eventSource.close()
+      // Si on a un résultat, c'est que la connexion s'est fermée normalement après le résultat
+      if (result) {
+        resolve(result)
+      } else {
+        reject(new Error('Connexion SSE perdue'))
+      }
     }
 
-    if (response.status === 'failed') {
-      throw new Error(response.error || "Erreur lors de l'exploration")
-    }
-
-    // Attendre avant le prochain poll
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL))
-  }
-
-  throw new Error("Timeout: l'exploration a pris trop de temps")
+    // Timeout de sécurité (5 minutes)
+    setTimeout(
+      () => {
+        if (eventSource.readyState !== EventSource.CLOSED) {
+          eventSource.close()
+          if (result) {
+            resolve(result)
+          } else {
+            reject(new Error('Timeout: la génération a pris trop de temps'))
+          }
+        }
+      },
+      5 * 60 * 1000
+    )
+  })
 }
 
 /**
@@ -1244,25 +1284,12 @@ const generateFromUrls = async () => {
   try {
     generating.value = true
 
-    let result: any
+    // Utiliser SSE au lieu du polling
+    const method = generationMethod.value === 'agent' ? 'agent' : 'direct'
+    const result = await generateWithSSE(urls, method)
 
     if (generationMethod.value === 'agent') {
-      // Méthode Agent (exploration intelligente)
-      const taskResponse = await $fetch('/api/admin/generate-import-json-agent', {
-        method: 'POST',
-        body: { urls },
-      })
-
-      result = await pollAgentTaskStatus(taskResponse.taskId)
       agentResult.value = result
-    } else {
-      // Méthode Simple (extraction directe)
-      const taskResponse = await $fetch('/api/admin/generate-import-json', {
-        method: 'POST',
-        body: { urls },
-      })
-
-      result = await pollSimpleTaskStatus(taskResponse.taskId)
     }
 
     // Mettre le JSON généré dans le champ d'input et le formater

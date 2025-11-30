@@ -764,9 +764,7 @@ async function main() {
       `${BOLD}4. Textes hardcodés dans les fichiers Vue (potentiellement non traduits)${RESET}`
     )
     if (hardcodedTexts.length > 0) {
-      console.log(
-        `${YELLOW}⚠ Textes trouvés dans ${hardcodedTexts.length} fichier(s) Vue:${RESET}`
-      )
+      console.log(`${YELLOW}⚠ Textes trouvés dans ${hardcodedTexts.length} fichier(s) Vue:${RESET}`)
 
       hardcodedTexts.forEach(({ file, texts }) => {
         console.log(`\n  ${CYAN}${file}:${RESET}`)
