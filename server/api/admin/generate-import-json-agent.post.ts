@@ -403,6 +403,14 @@ export async function runAgentExploration(
   taskId: string
 ): Promise<AgentGenerateResult> {
   const config = useRuntimeConfig()
+
+  // Debug: afficher la config IA
+  console.log(`[AGENT] Config IA au démarrage:`, {
+    aiProvider: config.aiProvider,
+    hasAnthropicKey: !!config.anthropicApiKey,
+    lmstudioBaseUrl: config.lmstudioBaseUrl,
+  })
+
   const logs: AgentLog[] = []
   const visitedUrls: string[] = []
   const collectedContent: string[] = []
