@@ -1,4 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { getEffectiveAIConfig } from '@@/server/utils/ai-config'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import {
   createTask,
@@ -402,34 +403,15 @@ export async function runAgentExploration(
   urls: string[],
   taskId: string
 ): Promise<AgentGenerateResult> {
-  const config = useRuntimeConfig()
-
-  // Lire le provider depuis process.env en priorité (comme config.get.ts)
-  // car useRuntimeConfig() ne récupère pas toujours les NUXT_* au runtime
-  const effectiveConfig = {
-    ...config,
-    aiProvider: process.env.AI_PROVIDER || process.env.NUXT_AI_PROVIDER || config.aiProvider,
-    lmstudioBaseUrl:
-      process.env.LMSTUDIO_BASE_URL ||
-      process.env.NUXT_LMSTUDIO_BASE_URL ||
-      config.lmstudioBaseUrl,
-    lmstudioModel:
-      process.env.LMSTUDIO_MODEL || process.env.NUXT_LMSTUDIO_MODEL || config.lmstudioModel,
-    lmstudioTextModel:
-      process.env.LMSTUDIO_TEXT_MODEL ||
-      process.env.NUXT_LMSTUDIO_TEXT_MODEL ||
-      config.lmstudioTextModel,
-  }
+  // Récupérer la config IA effective (lit process.env en priorité)
+  const configToUse = getEffectiveAIConfig()
 
   // Debug: afficher la config IA effective
   console.log(`[AGENT] Config IA effective:`, {
-    aiProvider: effectiveConfig.aiProvider,
-    hasAnthropicKey: !!effectiveConfig.anthropicApiKey,
-    lmstudioBaseUrl: effectiveConfig.lmstudioBaseUrl,
+    aiProvider: configToUse.aiProvider,
+    hasAnthropicKey: !!configToUse.anthropicApiKey,
+    lmstudioBaseUrl: configToUse.lmstudioBaseUrl,
   })
-
-  // Utiliser effectiveConfig au lieu de config pour le reste de la fonction
-  const configToUse = effectiveConfig as typeof config
 
   const logs: AgentLog[] = []
   const visitedUrls: string[] = []

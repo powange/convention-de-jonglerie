@@ -1,4 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { getEffectiveAIConfig, type EffectiveAIConfig } from '@@/server/utils/ai-config'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createTask, runTaskInBackground, updateTaskMetadata } from '@@/server/utils/async-tasks'
 import {
@@ -137,27 +138,8 @@ export async function generateImportJson(
   urls: string[],
   taskId?: string
 ): Promise<GenerateImportResult> {
-  // Vérifier si browserless est disponible
-  const config = useRuntimeConfig()
-
-  // Lire les variables d'env en priorité (comme config.get.ts)
-  // car useRuntimeConfig() ne récupère pas toujours les NUXT_* au runtime
-  const effectiveConfig = {
-    ...config,
-    aiProvider: process.env.AI_PROVIDER || process.env.NUXT_AI_PROVIDER || config.aiProvider,
-    lmstudioBaseUrl:
-      process.env.LMSTUDIO_BASE_URL ||
-      process.env.NUXT_LMSTUDIO_BASE_URL ||
-      config.lmstudioBaseUrl,
-    lmstudioModel:
-      process.env.LMSTUDIO_MODEL || process.env.NUXT_LMSTUDIO_MODEL || config.lmstudioModel,
-    lmstudioTextModel:
-      process.env.LMSTUDIO_TEXT_MODEL ||
-      process.env.NUXT_LMSTUDIO_TEXT_MODEL ||
-      config.lmstudioTextModel,
-    browserlessUrl:
-      process.env.BROWSERLESS_URL || process.env.NUXT_BROWSERLESS_URL || config.browserlessUrl,
-  }
+  // Récupérer la config IA effective (lit process.env en priorité)
+  const effectiveConfig = getEffectiveAIConfig()
 
   const browserlessUrl = effectiveConfig.browserlessUrl
   const useBrowserless = browserlessUrl && (await isBrowserlessAvailable(browserlessUrl))
@@ -272,7 +254,7 @@ export async function generateImportJson(
     console.log('[GENERATE-IMPORT] Facebook + autres URLs, IA complète les champs manquants')
     const combinedOtherContent = otherContents.join('\n\n')
     generatedJson = await callAIToCompleteJson(
-      effectiveConfig as typeof config,
+      effectiveConfig,
       aiProvider,
       prefilledJson,
       combinedOtherContent
@@ -351,7 +333,7 @@ export async function generateImportJson(
  * Appelle l'IA pour compléter un JSON pré-rempli avec des données supplémentaires
  */
 async function callAIToCompleteJson(
-  config: ReturnType<typeof useRuntimeConfig>,
+  config: EffectiveAIConfig,
   aiProvider: string,
   prefilledJson: FacebookImportJson,
   additionalContent: string
