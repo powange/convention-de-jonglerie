@@ -76,6 +76,8 @@ async function callAgentLLM(
 ): Promise<{ action: 'fetch' | 'generate'; url?: string; json?: string }> {
   const aiProvider = config.aiProvider || 'lmstudio'
 
+  console.log(`[AGENT] Provider IA configuré: ${aiProvider}`)
+
   let responseText: string
 
   if (aiProvider === 'lmstudio') {
@@ -100,7 +102,12 @@ async function callAgentLLM(
 
     const data = await response.json()
     responseText = data.choices?.[0]?.message?.content || ''
-  } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
+  } else if (aiProvider === 'anthropic') {
+    if (!config.anthropicApiKey) {
+      throw new Error(
+        `Provider 'anthropic' configuré mais ANTHROPIC_API_KEY manquante. Vérifiez votre .env ou utilisez AI_PROVIDER=lmstudio`
+      )
+    }
     const { default: Anthropic } = await import('@anthropic-ai/sdk')
     const client = new Anthropic({
       apiKey: config.anthropicApiKey,
@@ -121,8 +128,31 @@ async function callAgentLLM(
       .filter((block) => block.type === 'text')
       .map((block) => (block as any).text)
       .join('')
+  } else if (aiProvider === 'ollama') {
+    const response = await fetchWithTimeout(
+      `${config.ollamaBaseUrl || 'http://localhost:11434'}/api/generate`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: config.ollamaModel || 'llama3',
+          prompt: `${systemPrompt}\n\n${conversationHistory.map((m) => `${m.role}: ${m.content}`).join('\n')}`,
+          stream: false,
+        }),
+      },
+      LLM_TIMEOUT
+    )
+
+    if (!response.ok) {
+      throw new Error(`Ollama error: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    responseText = data.response || ''
   } else {
-    throw new Error(`Provider IA non supporté: ${aiProvider}`)
+    throw new Error(
+      `Provider IA non supporté: ${aiProvider}. Providers valides: lmstudio, anthropic, ollama`
+    )
   }
 
   console.log(`[AGENT] Réponse LLM: ${responseText.substring(0, 200)}...`)
