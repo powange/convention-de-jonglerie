@@ -139,7 +139,27 @@ export async function generateImportJson(
 ): Promise<GenerateImportResult> {
   // Vérifier si browserless est disponible
   const config = useRuntimeConfig()
-  const browserlessUrl = config.browserlessUrl
+
+  // Lire les variables d'env en priorité (comme config.get.ts)
+  // car useRuntimeConfig() ne récupère pas toujours les NUXT_* au runtime
+  const effectiveConfig = {
+    ...config,
+    aiProvider: process.env.AI_PROVIDER || process.env.NUXT_AI_PROVIDER || config.aiProvider,
+    lmstudioBaseUrl:
+      process.env.LMSTUDIO_BASE_URL ||
+      process.env.NUXT_LMSTUDIO_BASE_URL ||
+      config.lmstudioBaseUrl,
+    lmstudioModel:
+      process.env.LMSTUDIO_MODEL || process.env.NUXT_LMSTUDIO_MODEL || config.lmstudioModel,
+    lmstudioTextModel:
+      process.env.LMSTUDIO_TEXT_MODEL ||
+      process.env.NUXT_LMSTUDIO_TEXT_MODEL ||
+      config.lmstudioTextModel,
+    browserlessUrl:
+      process.env.BROWSERLESS_URL || process.env.NUXT_BROWSERLESS_URL || config.browserlessUrl,
+  }
+
+  const browserlessUrl = effectiveConfig.browserlessUrl
   const useBrowserless = browserlessUrl && (await isBrowserlessAvailable(browserlessUrl))
 
   if (useBrowserless) {
@@ -234,8 +254,8 @@ export async function generateImportJson(
     }
   }
 
-  // Récupérer la configuration IA
-  const aiProvider = config.aiProvider || 'lmstudio'
+  // Récupérer la configuration IA effective
+  const aiProvider = effectiveConfig.aiProvider || 'lmstudio'
   console.log(`[GENERATE-IMPORT] Provider IA: ${aiProvider}`)
 
   let generatedJson: string
@@ -252,7 +272,7 @@ export async function generateImportJson(
     console.log('[GENERATE-IMPORT] Facebook + autres URLs, IA complète les champs manquants')
     const combinedOtherContent = otherContents.join('\n\n')
     generatedJson = await callAIToCompleteJson(
-      config,
+      effectiveConfig as typeof config,
       aiProvider,
       prefilledJson,
       combinedOtherContent
@@ -264,16 +284,16 @@ export async function generateImportJson(
 
     if (aiProvider === 'lmstudio') {
       generatedJson = await callLMStudio(
-        config.lmstudioBaseUrl || 'http://localhost:1234',
-        config.lmstudioTextModel || config.lmstudioModel || 'auto',
+        effectiveConfig.lmstudioBaseUrl || 'http://localhost:1234',
+        effectiveConfig.lmstudioTextModel || effectiveConfig.lmstudioModel || 'auto',
         combinedContent
       )
-    } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
-      generatedJson = await callAnthropic(config.anthropicApiKey, combinedContent)
+    } else if (aiProvider === 'anthropic' && effectiveConfig.anthropicApiKey) {
+      generatedJson = await callAnthropic(effectiveConfig.anthropicApiKey, combinedContent)
     } else if (aiProvider === 'ollama') {
       generatedJson = await callOllama(
-        config.ollamaBaseUrl || 'http://localhost:11434',
-        config.ollamaModel || 'llama3',
+        effectiveConfig.ollamaBaseUrl || 'http://localhost:11434',
+        effectiveConfig.ollamaModel || 'llama3',
         combinedContent
       )
     } else {
@@ -293,12 +313,12 @@ export async function generateImportJson(
     if (description && description.length >= 50) {
       console.log('[GENERATE-IMPORT] Extraction des caractéristiques via IA...')
       const features = await extractEditionFeatures(description, aiProvider, {
-        lmstudioBaseUrl: config.lmstudioBaseUrl,
-        lmstudioTextModel: config.lmstudioTextModel,
-        lmstudioModel: config.lmstudioModel,
-        anthropicApiKey: config.anthropicApiKey,
-        ollamaBaseUrl: config.ollamaBaseUrl,
-        ollamaModel: config.ollamaModel,
+        lmstudioBaseUrl: effectiveConfig.lmstudioBaseUrl,
+        lmstudioTextModel: effectiveConfig.lmstudioTextModel,
+        lmstudioModel: effectiveConfig.lmstudioModel,
+        anthropicApiKey: effectiveConfig.anthropicApiKey,
+        ollamaBaseUrl: effectiveConfig.ollamaBaseUrl,
+        ollamaModel: effectiveConfig.ollamaModel,
       })
 
       if (Object.keys(features).length > 0) {
