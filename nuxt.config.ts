@@ -328,6 +328,8 @@ export default defineNuxtConfig({
     lmstudioBaseUrl: process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234', // URL de base de LM Studio
     lmstudioModel: process.env.LMSTUDIO_MODEL || 'auto', // Modèle LM Studio vision (auto = utilise le modèle chargé)
     lmstudioTextModel: process.env.LMSTUDIO_TEXT_MODEL || 'auto', // Modèle LM Studio texte pour génération JSON
+    // Browserless pour le scraping de pages web (JavaScript rendu)
+    browserlessUrl: process.env.BROWSERLESS_URL || '', // URL du service browserless (ex: http://192.168.0.13:3001)
     // Supporte aussi la convention Nuxt NUXT_*
     recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3

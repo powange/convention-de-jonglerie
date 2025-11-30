@@ -4,8 +4,6 @@ export default defineTask({
     description: 'Clean up expired authentication tokens',
   },
   async run({ payload: _payload }) {
-    console.log('🗑️ Exécution de la tâche: nettoyage des tokens expirés')
-
     try {
       const now = new Date()
 
@@ -13,46 +11,22 @@ export default defineTask({
       const expiredPasswordTokens = await prisma.passwordResetToken.deleteMany({
         where: {
           OR: [
-            {
-              expiresAt: {
-                lt: now,
-              },
-            },
-            {
-              used: true,
-              createdAt: {
-                lt: new Date(now.getTime() - 24 * 60 * 60 * 1000), // Utilisés depuis plus de 24h
-              },
-            },
+            { expiresAt: { lt: now } },
+            { used: true, createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
           ],
         },
       })
 
-      console.log(
-        `🗑️ Supprimé ${expiredPasswordTokens.count} tokens de réinitialisation de mot de passe expirés`
-      )
-
-      // Nettoyer les anciennes sessions (si vous en avez dans votre base de données)
-      // Note: Nuxt Auth Utils utilise des cookies signés, donc pas forcément stockés en DB
-      // Cette section est optionnelle selon votre implémentation
-
-      // Statistiques de nettoyage
-      const totalCleaned = expiredPasswordTokens.count
-
-      if (totalCleaned > 0) {
-        console.log(`✅ Tâche terminée: ${totalCleaned} tokens expirés supprimés`)
-      } else {
-        console.log('✅ Tâche terminée: aucun token expiré à nettoyer')
-      }
+      console.log(`[CRON cleanup-expired-tokens] ${expiredPasswordTokens.count} tokens supprimés`)
 
       return {
         success: true,
         passwordResetTokensCleaned: expiredPasswordTokens.count,
-        totalCleaned,
+        totalCleaned: expiredPasswordTokens.count,
         timestamp: new Date().toISOString(),
       }
     } catch (error) {
-      console.error('❌ Erreur lors du nettoyage des tokens expirés:', error)
+      console.error('[CRON cleanup-expired-tokens] Erreur:', error)
       throw error
     }
   },

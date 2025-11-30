@@ -1,7 +1,39 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { downloadAndStoreImage } from '@@/server/utils/file-helpers'
+import { DateTime } from 'luxon'
 import { z } from 'zod'
+
+/**
+ * Convertit une date string en Date UTC en tenant compte du timezone.
+ *
+ * Si la date contient déjà un suffixe 'Z' ou un offset (+/-), elle est interprétée telle quelle.
+ * Sinon, elle est interprétée comme une date locale dans le timezone spécifié.
+ *
+ * @param dateString - La date au format ISO (ex: "2025-07-15T14:00:00" ou "2025-07-15")
+ * @param timezone - Le timezone IANA (ex: "Europe/Paris"). Si non fourni, UTC est utilisé.
+ * @returns La date en UTC
+ */
+function parseDateWithTimezone(dateString: string, timezone?: string | null): Date {
+  // Si la date contient déjà un indicateur de timezone (Z ou +/-), l'utiliser directement
+  if (dateString.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(dateString)) {
+    return new Date(dateString)
+  }
+
+  // Si un timezone est fourni, interpréter la date comme étant dans ce timezone
+  if (timezone) {
+    const dt = DateTime.fromISO(dateString, { zone: timezone })
+    if (dt.isValid) {
+      return dt.toJSDate()
+    }
+    // Si le timezone n'est pas valide, log et fallback
+    console.warn(`[IMPORT] Timezone invalide "${timezone}", interprétation de la date comme UTC`)
+  }
+
+  // Fallback: interpréter comme UTC
+  // Ajouter 'Z' pour forcer l'interprétation UTC
+  return new Date(dateString + (dateString.includes('T') ? 'Z' : 'T00:00:00Z'))
+}
 
 // Schéma de validation pour l'import
 const importSchema = z.object({
@@ -95,12 +127,21 @@ export default wrapApiHandler(
       })
     }
 
+    // Parser les dates avec le timezone
+    const timezone = validatedData.edition.timezone
+    const startDate = parseDateWithTimezone(validatedData.edition.startDate, timezone)
+    const endDate = parseDateWithTimezone(validatedData.edition.endDate, timezone)
+
+    console.log(
+      `[ADMIN IMPORT] Dates parsées: start=${startDate.toISOString()}, end=${endDate.toISOString()}, timezone=${timezone || 'UTC'}`
+    )
+
     // Vérifier qu'une édition avec les mêmes dates n'existe pas déjà pour cette convention
     const existingEdition = await prisma.edition.findFirst({
       where: {
         conventionId: convention.id,
-        startDate: new Date(validatedData.edition.startDate),
-        endDate: new Date(validatedData.edition.endDate),
+        startDate,
+        endDate,
         city: validatedData.edition.city,
       },
     })
@@ -119,8 +160,8 @@ export default wrapApiHandler(
         conventionId: convention.id,
         name: validatedData.edition.name || null,
         description: validatedData.edition.description,
-        startDate: new Date(validatedData.edition.startDate),
-        endDate: new Date(validatedData.edition.endDate),
+        startDate,
+        endDate,
         addressLine1: validatedData.edition.addressLine1,
         addressLine2: validatedData.edition.addressLine2,
         city: validatedData.edition.city,
