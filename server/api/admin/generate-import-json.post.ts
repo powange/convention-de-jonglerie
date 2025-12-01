@@ -28,10 +28,17 @@ import {
   type GenerationStep as SSEGenerationStep,
 } from '@@/server/utils/import-generation-sse'
 import {
+  COMMON_RULES_FULL,
   generateCompactDirectPrompt,
   generateFeaturesDescription,
   generateJsonExample,
+  PROMPT_COMPLETE_PREFILLED_JSON,
 } from '@@/server/utils/import-json-schema'
+import {
+  isJugglingEdgeEventUrl,
+  jugglingEdgeEventToImportJson,
+  scrapeJugglingEdgeEvent,
+} from '@@/server/utils/jugglingedge-scraper'
 import { extractAndFormatWebContent } from '@@/server/utils/web-content-extractor'
 import { z } from 'zod'
 
@@ -51,65 +58,14 @@ export interface GenerateImportResult {
   urlsProcessed: number
 }
 
-// Format JSON pour le prompt IA (avec indications OBLIGATOIRE/optionnel)
-const JSON_FORMAT_FOR_AI = `{
-  "convention": {
-    "name": "OBLIGATOIRE - Nom de l'événement",
-    "email": "OBLIGATOIRE - Email de contact",
-    "description": "optionnel"
-  },
-  "edition": {
-    "name": "optionnel",
-    "description": "optionnel",
-    "startDate": "OBLIGATOIRE - Format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS",
-    "endDate": "OBLIGATOIRE - Format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS",
-    "timezone": "OBLIGATOIRE - Format IANA (ex: Europe/Paris, Australia/Melbourne)",
-    "addressLine1": "OBLIGATOIRE - Adresse",
-    "addressLine2": "optionnel",
-    "city": "OBLIGATOIRE",
-    "region": "optionnel",
-    "country": "OBLIGATOIRE",
-    "postalCode": "OBLIGATOIRE",
-    "latitude": "optionnel - number",
-    "longitude": "optionnel - number",
-    "ticketingUrl": "optionnel",
-    "facebookUrl": "optionnel",
-    "instagramUrl": "optionnel",
-    "officialWebsiteUrl": "optionnel",
-    "imageUrl": "optionnel"
-  }
-}`
-
-// Prompt pour compléter un JSON pré-rempli (Facebook + autres URLs)
-const PROMPT_COMPLETE_JSON = `Tu dois compléter un JSON pré-rempli avec les informations des sources fournies.
-
-CHAMPS PRIORITAIRES À REMPLIR:
-- convention.name : Le nom de la CONVENTION (pas l'édition). Cherche dans les sources le nom générique de l'événement récurrent.
-- convention.email : L'email de contact UNIQUEMENT s'il est explicitement mentionné dans les sources. NE PAS INVENTER.
-- instagramUrl : Le lien vers le compte Instagram s'il est mentionné (format: https://instagram.com/...)
-
-FORMAT ATTENDU:
-${JSON_FORMAT_FOR_AI}
-
-RÈGLES:
-1. NE MODIFIE PAS les champs déjà remplis (non vides)
-2. Complète les champs vides ("" ou null) avec les données des sources
-3. convention.name = nom générique de la convention (ex: "Spinfest" pas "Spinfest 2025")
-4. convention.email = UNIQUEMENT si trouvé explicitement dans les sources, sinon laisser vide ""
-5. instagramUrl = lien Instagram si trouvé dans les sources
-6. Réponds UNIQUEMENT avec le JSON complet, sans commentaires`
+// Note: PROMPT_COMPLETE_PREFILLED_JSON est importé depuis import-json-schema.ts (partagé ED/EI)
 
 // Génère le prompt système complet pour Anthropic (modèles avec grand contexte)
 function getFullSystemPrompt(): string {
   return `Tu extrais les informations d'une convention de jonglerie depuis des pages web.
 
 RÈGLES IMPORTANTES:
-- Le nom doit être celui de L'ÉVÉNEMENT, pas du site source
-- Email: UNIQUEMENT si explicitement trouvé, sinon laisser vide (NE PAS INVENTER)
-- Instagram: Extraire le lien si présent
-- Timezone: Déduis le timezone IANA du pays (France=Europe/Paris, Allemagne=Europe/Berlin, etc.)
-- Dates: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
-- Caractéristiques: Mets true UNIQUEMENT si explicitement mentionné dans le contenu
+${COMMON_RULES_FULL}
 
 CARACTÉRISTIQUES À DÉTECTER (mettre true si mentionné):
 ${generateFeaturesDescription()}
@@ -125,6 +81,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte autour.`
  */
 export const GENERATION_STEPS = {
   scraping_facebook: 'Récupération des données Facebook...',
+  scraping_jugglingedge: 'Récupération des données JugglingEdge...',
   fetching_urls: 'Récupération du contenu des URLs...',
   generating_json: 'Génération du JSON via IA...',
   extracting_features: 'Détection des services (camping, restauration, spectacles...)',
@@ -190,12 +147,15 @@ export async function generateImportJson(
     console.log('[GENERATE-IMPORT] Browserless non disponible, utilisation de fetch simple')
   }
 
-  // Séparer les URLs Facebook des autres
+  // Séparer les URLs par source de données structurées
   const facebookUrls = urls.filter((url) => url.includes('facebook.com/events'))
-  const otherUrls = urls.filter((url) => !url.includes('facebook.com/events'))
+  const jugglingEdgeUrls = urls.filter((url) => isJugglingEdgeEventUrl(url))
+  const otherUrls = urls.filter(
+    (url) => !url.includes('facebook.com/events') && !isJugglingEdgeEventUrl(url)
+  )
 
   console.log(
-    `[GENERATE-IMPORT] URLs Facebook Events: ${facebookUrls.length}, Autres URLs: ${otherUrls.length}`
+    `[GENERATE-IMPORT] URLs: Facebook=${facebookUrls.length}, JugglingEdge=${jugglingEdgeUrls.length}, Autres=${otherUrls.length}`
   )
 
   // Structure pour le JSON pré-rempli (depuis Facebook)
@@ -226,6 +186,34 @@ export async function generateImportJson(
       }
     } catch (error: any) {
       console.error(`[GENERATE-IMPORT] Erreur scraping Facebook ${url}: ${error.message}`)
+    }
+  }
+
+  // Étape 1b: Si pas de données Facebook, essayer JugglingEdge
+  if (!prefilledJson && jugglingEdgeUrls.length > 0) {
+    updateStep(taskId, 'scraping_jugglingedge', onProgress)
+
+    for (const url of jugglingEdgeUrls) {
+      try {
+        console.log(`[GENERATE-IMPORT] Scraping JugglingEdge Event: ${url}`)
+        const jeEvent = await scrapeJugglingEdgeEvent(url)
+
+        if (jeEvent) {
+          console.log('[GENERATE-IMPORT] === Données JugglingEdge JSON-LD ===')
+          console.log(JSON.stringify(jeEvent, null, 2))
+          console.log('[GENERATE-IMPORT] === Fin données JugglingEdge ===')
+
+          // Convertir en JSON d'import pré-rempli
+          prefilledJson = jugglingEdgeEventToImportJson(jeEvent)
+          console.log('[GENERATE-IMPORT] JSON pré-rempli depuis JugglingEdge:')
+          console.log(JSON.stringify(prefilledJson, null, 2))
+
+          // On ne traite qu'une seule URL JugglingEdge (la première avec des données)
+          break
+        }
+      } catch (error: any) {
+        console.error(`[GENERATE-IMPORT] Erreur scraping JugglingEdge ${url}: ${error.message}`)
+      }
     }
   }
 
@@ -446,7 +434,7 @@ async function callLMStudioComplete(
       body: JSON.stringify({
         model,
         messages: [
-          { role: 'system', content: PROMPT_COMPLETE_JSON },
+          { role: 'system', content: PROMPT_COMPLETE_PREFILLED_JSON },
           { role: 'user', content: truncatedPrompt },
         ],
         temperature: 0.3,
@@ -491,7 +479,7 @@ async function callAnthropicComplete(apiKey: string, userPrompt: string): Promis
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 4096,
-    system: PROMPT_COMPLETE_JSON,
+    system: PROMPT_COMPLETE_PREFILLED_JSON,
     messages: [{ role: 'user', content: userPrompt }],
   })
 
@@ -523,7 +511,7 @@ async function callOllamaComplete(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model,
-      prompt: `${PROMPT_COMPLETE_JSON}\n\n${userPrompt}`,
+      prompt: `${PROMPT_COMPLETE_PREFILLED_JSON}\n\n${userPrompt}`,
       stream: false,
     }),
   })

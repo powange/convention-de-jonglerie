@@ -73,59 +73,55 @@
           </UButton>
         </div>
 
-        <!-- Progression de la méthode simple -->
-        <div v-if="generating && generationMethod === 'simple'" class="space-y-2">
-          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <UIcon name="i-heroicons-cog-6-tooth" class="animate-spin" />
-            <span>{{ simpleStatus }}</span>
-          </div>
-          <!-- Indicateur d'étapes -->
-          <div class="flex items-center gap-1">
+        <!-- Progression unifiée (ED et EI) -->
+        <div v-if="generating" class="space-y-1">
+          <!-- Liste unifiée : historique + étape en cours -->
+          <template v-for="(entry, idx) in stepHistory" :key="idx">
             <div
-              v-for="(step, index) in [
-                'scraping_facebook',
-                'fetching_urls',
-                'generating_json',
-                'extracting_features',
-              ]"
-              :key="step"
-              class="flex items-center"
+              class="flex items-center gap-2 text-sm"
+              :class="
+                isCurrentStep(idx)
+                  ? 'text-gray-700 dark:text-gray-200'
+                  : 'text-gray-500 dark:text-gray-400'
+              "
             >
-              <div
-                class="w-2 h-2 rounded-full transition-colors"
-                :class="{
-                  'bg-warning-500': simpleStep === step,
-                  'bg-success-500':
-                    [
-                      'scraping_facebook',
-                      'fetching_urls',
-                      'generating_json',
-                      'extracting_features',
-                    ].indexOf(simpleStep) > index,
-                  'bg-gray-300 dark:bg-gray-600':
-                    [
-                      'scraping_facebook',
-                      'fetching_urls',
-                      'generating_json',
-                      'extracting_features',
-                    ].indexOf(simpleStep) < index || !simpleStep,
-                }"
+              <!-- Icône : spinner pour l'étape en cours, check pour les autres -->
+              <UIcon
+                v-if="isCurrentStep(idx)"
+                :name="currentStepIcon"
+                :class="currentStepIconClass"
               />
-              <div v-if="index < 3" class="w-4 h-0.5 bg-gray-300 dark:bg-gray-600" />
+              <UIcon
+                v-else-if="entry.step === 'completed'"
+                name="i-heroicons-check-circle"
+                class="text-success-500"
+              />
+              <UIcon v-else name="i-heroicons-check" class="text-success-500" />
+              <!-- Durée depuis le début -->
+              <span class="text-gray-400 font-mono text-xs w-14">
+                {{ isCurrentStep(idx) ? formatMs(currentElapsedTime) : formatDuration(entry, idx) }}
+              </span>
+              <!-- Label -->
+              <span>{{ entry.label }}</span>
             </div>
+            <!-- Sous-étapes (URLs récupérées) -->
+            <div
+              v-for="(subStep, subIdx) in entry.subSteps || []"
+              :key="`${idx}-${subIdx}`"
+              class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 ml-6"
+            >
+              <UIcon name="i-heroicons-arrow-right-circle" class="text-gray-400" />
+              <span class="font-mono w-14">{{ formatSubStepWrapper(entry, subStep, subIdx) }}</span>
+              <span>{{ getHostname(subStep.url) }}</span>
+            </div>
+          </template>
+          <!-- Barre de progression pour l'exploration (agent uniquement) -->
+          <div v-if="generationMethod === 'agent' && agentProgress > 0" class="mt-2">
+            <UProgress :value="agentProgress" size="sm" color="warning" />
+            <p class="text-xs text-gray-500 mt-1">
+              {{ $t('admin.import.agent_exploring', { count: agentPagesVisited }) }}
+            </p>
           </div>
-        </div>
-
-        <!-- Progression de l'agent -->
-        <div v-if="generating && generationMethod === 'agent'" class="space-y-2">
-          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <UIcon name="i-heroicons-globe-alt" class="animate-pulse" />
-            <span>{{ agentStatus }}</span>
-          </div>
-          <UProgress :value="agentProgress" size="sm" color="warning" />
-          <p class="text-xs text-gray-500">
-            {{ $t('admin.import.agent_exploring', { count: agentPagesVisited }) }}
-          </p>
         </div>
 
         <!-- Erreur de génération -->
@@ -204,324 +200,16 @@
           </UAlert>
 
           <!-- Données Facebook -->
-          <div
+          <AdminImportTestResultFacebook
             v-if="selectedTestResult.type === 'facebook' && selectedTestResult.facebookData"
-            class="space-y-4"
-          >
-            <UAlert
-              icon="i-mdi-facebook"
-              color="info"
-              variant="soft"
-              :title="$t('admin.import.facebook_event_data')"
-            />
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Informations principales -->
-              <div class="space-y-2">
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.main_info') }}
-                </h4>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                  <p>
-                    <strong>{{ $t('common.name') }}:</strong>
-                    {{ selectedTestResult.facebookData.name || '-' }}
-                  </p>
-                  <p v-if="selectedTestResult.facebookData.startTimestamp">
-                    <strong>{{ $t('admin.import.start_date') }}:</strong>
-                    {{ formatTimestamp(selectedTestResult.facebookData.startTimestamp) }}
-                  </p>
-                  <p v-if="selectedTestResult.facebookData.endTimestamp">
-                    <strong>{{ $t('admin.import.end_date') }}:</strong>
-                    {{ formatTimestamp(selectedTestResult.facebookData.endTimestamp) }}
-                  </p>
-                  <p v-if="selectedTestResult.facebookData.timezone">
-                    <strong>{{ $t('admin.import.timezone') }}:</strong>
-                    {{ selectedTestResult.facebookData.timezone }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Lieu -->
-              <div v-if="selectedTestResult.facebookData.location" class="space-y-2">
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.location') }}
-                </h4>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                  <p v-if="selectedTestResult.facebookData.location.name">
-                    <strong>{{ $t('common.name') }}:</strong>
-                    {{ selectedTestResult.facebookData.location.name }}
-                  </p>
-                  <p v-if="selectedTestResult.facebookData.location.address">
-                    <strong>{{ $t('admin.import.address') }}:</strong>
-                    {{ selectedTestResult.facebookData.location.address }}
-                  </p>
-                  <p v-if="selectedTestResult.facebookData.location.countryCode">
-                    <strong>{{ $t('admin.import.country_code') }}:</strong>
-                    {{ selectedTestResult.facebookData.location.countryCode }}
-                  </p>
-                  <p v-if="selectedTestResult.facebookData.location.coordinates">
-                    <strong>{{ $t('admin.import.coordinates') }}:</strong>
-                    {{ selectedTestResult.facebookData.location.coordinates.latitude }},
-                    {{ selectedTestResult.facebookData.location.coordinates.longitude }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- URLs -->
-              <div class="space-y-2">
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.urls') }}
-                </h4>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                  <p v-if="selectedTestResult.facebookData.ticketUrl">
-                    <strong>{{ $t('admin.import.ticketing') }}:</strong>
-                    <a
-                      :href="selectedTestResult.facebookData.ticketUrl"
-                      target="_blank"
-                      class="text-primary-500 hover:underline break-all"
-                    >
-                      {{ selectedTestResult.facebookData.ticketUrl }}
-                    </a>
-                  </p>
-                  <p
-                    v-if="
-                      selectedTestResult.facebookData.photo?.imageUri ||
-                      selectedTestResult.facebookData.photo?.url
-                    "
-                  >
-                    <strong>{{ $t('admin.import.image') }}:</strong>
-                    <a
-                      :href="
-                        selectedTestResult.facebookData.photo.imageUri ||
-                        selectedTestResult.facebookData.photo.url
-                      "
-                      target="_blank"
-                      class="text-primary-500 hover:underline break-all"
-                    >
-                      {{ $t('admin.import.view_image') }}
-                    </a>
-                  </p>
-                </div>
-              </div>
-
-              <!-- Image preview -->
-              <div
-                v-if="
-                  selectedTestResult.facebookData.photo?.imageUri ||
-                  selectedTestResult.facebookData.photo?.url
-                "
-                class="space-y-2"
-              >
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.image_preview') }}
-                </h4>
-                <img
-                  :src="
-                    selectedTestResult.facebookData.photo.imageUri ||
-                    selectedTestResult.facebookData.photo.url
-                  "
-                  :alt="selectedTestResult.facebookData.name"
-                  class="max-h-48 rounded-lg object-cover"
-                />
-              </div>
-            </div>
-
-            <!-- Description -->
-            <div v-if="selectedTestResult.facebookData.description" class="space-y-2">
-              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                {{ $t('common.description') }}
-              </h4>
-              <div
-                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm max-h-48 overflow-y-auto whitespace-pre-wrap"
-              >
-                {{ selectedTestResult.facebookData.description }}
-              </div>
-            </div>
-          </div>
+            :facebook-data="selectedTestResult.facebookData"
+          />
 
           <!-- Données Web -->
-          <div
+          <AdminImportTestResultWebsite
             v-else-if="selectedTestResult.type === 'website' && selectedTestResult.webContent"
-            class="space-y-4"
-          >
-            <UAlert
-              icon="i-heroicons-globe-alt"
-              color="success"
-              variant="soft"
-              :title="$t('admin.import.website_data')"
-            />
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Informations principales -->
-              <div class="space-y-2">
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.main_info') }}
-                </h4>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                  <p>
-                    <strong>{{ $t('admin.import.page_title') }}:</strong>
-                    {{ selectedTestResult.webContent.title || '-' }}
-                  </p>
-                  <p v-if="selectedTestResult.webContent.metaDescription">
-                    <strong>{{ $t('admin.import.meta_description') }}:</strong>
-                    {{ selectedTestResult.webContent.metaDescription }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Open Graph -->
-              <div
-                v-if="Object.keys(selectedTestResult.webContent.openGraph).length > 0"
-                class="space-y-2"
-              >
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.open_graph') }}
-                </h4>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                  <p v-for="(value, key) in selectedTestResult.webContent.openGraph" :key="key">
-                    <strong>og:{{ key }}:</strong> {{ value }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Contact Info -->
-              <div class="space-y-2">
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.contact_info') }}
-                </h4>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                  <p v-if="selectedTestResult.webContent.contactInfo.emails.length">
-                    <strong>{{ $t('admin.import.emails_found') }}:</strong>
-                    {{ selectedTestResult.webContent.contactInfo.emails.join(', ') }}
-                  </p>
-                  <p v-if="selectedTestResult.webContent.contactInfo.phones.length">
-                    <strong>{{ $t('admin.import.phones_found') }}:</strong>
-                    {{ selectedTestResult.webContent.contactInfo.phones.join(', ') }}
-                  </p>
-                  <p v-if="selectedTestResult.webContent.contactInfo.instagramUrls.length">
-                    <strong>Instagram:</strong>
-                    <a
-                      v-for="(url, idx) in selectedTestResult.webContent.contactInfo.instagramUrls"
-                      :key="idx"
-                      :href="url"
-                      target="_blank"
-                      class="text-primary-500 hover:underline mr-2"
-                    >
-                      {{ url }}
-                    </a>
-                  </p>
-                  <p v-if="selectedTestResult.webContent.contactInfo.facebookUrls.length">
-                    <strong>Facebook:</strong>
-                    <a
-                      v-for="(url, idx) in selectedTestResult.webContent.contactInfo.facebookUrls"
-                      :key="idx"
-                      :href="url"
-                      target="_blank"
-                      class="text-primary-500 hover:underline mr-2"
-                    >
-                      {{ url }}
-                    </a>
-                  </p>
-                  <p v-if="selectedTestResult.webContent.contactInfo.ticketingUrls.length">
-                    <strong>{{ $t('admin.import.ticketing') }}:</strong>
-                    <a
-                      v-for="(url, idx) in selectedTestResult.webContent.contactInfo.ticketingUrls"
-                      :key="idx"
-                      :href="url"
-                      target="_blank"
-                      class="text-primary-500 hover:underline mr-2"
-                    >
-                      {{ url }}
-                    </a>
-                  </p>
-                  <p
-                    v-if="
-                      !selectedTestResult.webContent.contactInfo.emails.length &&
-                      !selectedTestResult.webContent.contactInfo.phones.length &&
-                      !selectedTestResult.webContent.contactInfo.instagramUrls.length &&
-                      !selectedTestResult.webContent.contactInfo.facebookUrls.length &&
-                      !selectedTestResult.webContent.contactInfo.ticketingUrls.length
-                    "
-                    class="text-gray-500 italic"
-                  >
-                    {{ $t('admin.import.no_contact_info') }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Image OG -->
-              <div v-if="selectedTestResult.webContent.openGraph.image" class="space-y-2">
-                <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                  {{ $t('admin.import.image_preview') }}
-                </h4>
-                <img
-                  :src="selectedTestResult.webContent.openGraph.image"
-                  :alt="selectedTestResult.webContent.title"
-                  class="max-h-48 rounded-lg object-cover"
-                />
-              </div>
-            </div>
-
-            <!-- JSON-LD Events -->
-            <div v-if="selectedTestResult.webContent.jsonLdEvents.length > 0" class="space-y-2">
-              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                {{ $t('admin.import.json_ld_events') }}
-              </h4>
-              <div
-                v-for="(event, idx) in selectedTestResult.webContent.jsonLdEvents"
-                :key="idx"
-                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm"
-              >
-                <pre class="overflow-x-auto whitespace-pre-wrap">{{
-                  JSON.stringify(event, null, 2)
-                }}</pre>
-              </div>
-            </div>
-
-            <!-- Navigation du site -->
-            <div v-if="selectedTestResult.webContent.navigation?.length > 0" class="space-y-2">
-              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                {{ $t('admin.import.site_navigation') }}
-              </h4>
-              <div
-                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm max-h-64 overflow-y-auto"
-              >
-                <pre class="whitespace-pre-wrap">{{
-                  JSON.stringify(selectedTestResult.webContent.navigation, null, 2)
-                }}</pre>
-              </div>
-            </div>
-
-            <!-- Liens utiles -->
-            <div v-if="selectedTestResult.webContent.links.length > 0" class="space-y-2">
-              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                {{ $t('admin.import.useful_links') }}
-              </h4>
-              <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm space-y-1">
-                <p v-for="(link, idx) in selectedTestResult.webContent.links" :key="idx">
-                  <a
-                    :href="link"
-                    target="_blank"
-                    class="text-primary-500 hover:underline break-all"
-                  >
-                    {{ link }}
-                  </a>
-                </p>
-              </div>
-            </div>
-
-            <!-- Contenu textuel -->
-            <div v-if="selectedTestResult.webContent.textContent" class="space-y-2">
-              <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
-                {{ $t('admin.import.text_content') }}
-              </h4>
-              <div
-                class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-sm max-h-96 overflow-y-auto whitespace-pre-wrap"
-              >
-                {{ selectedTestResult.webContent.textContent }}
-              </div>
-            </div>
-          </div>
+            :web-content="selectedTestResult.webContent"
+          />
         </div>
       </div>
     </UCard>
@@ -704,6 +392,17 @@
             {{ $t('admin.import.load_example') }}
           </UButton>
 
+          <UButton
+            variant="soft"
+            color="neutral"
+            size="lg"
+            :disabled="!jsonInput.trim()"
+            :icon="jsonCopied ? 'i-heroicons-check' : 'i-heroicons-clipboard-document'"
+            @click="copyJsonToClipboard"
+          >
+            {{ jsonCopied ? $t('common.copied') : $t('common.copy') }}
+          </UButton>
+
           <UButton variant="ghost" color="neutral" size="lg" @click="clearForm">
             {{ $t('common.clear') }}
           </UButton>
@@ -796,7 +495,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import type { StepHistoryEntry, SubStepEntry } from '~/composables/useElapsedTimer'
 
 // Middleware de protection pour super admin
 definePageMeta({
@@ -804,10 +503,23 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { $fetch } = useNuxtApp()
+const toast = useToast()
+
+// Composables
+const {
+  formatMs,
+  formatStepDuration,
+  formatSubStepDuration,
+  currentElapsedTime,
+  start: startTimer,
+  stop: stopTimer,
+  reset: resetTimer,
+} = useElapsedTimer()
+const { parseAndValidateUrls, getHostname } = useUrlValidation()
 
 const showDocumentation = ref(false)
 const jsonInput = ref('')
+const jsonCopied = ref(false)
 const importing = ref(false)
 const validationResult = ref<any>(null)
 const importResult = ref<any>(null)
@@ -819,11 +531,39 @@ const generateError = ref('')
 const generationMethod = ref<'simple' | 'agent'>('simple')
 
 // État spécifique à la méthode simple
-const simpleStatus = ref('')
 const simpleStep = ref('')
+// Historique des étapes avec timestamps et sous-étapes
+const stepHistory = ref<StepHistoryEntry[]>([])
+
+// Helpers pour l'affichage unifié de la progression
+const isCurrentStep = (idx: number): boolean =>
+  idx === stepHistory.value.length - 1 && simpleStep.value !== 'completed'
+
+const currentStepIcon = computed(() =>
+  generationMethod.value === 'agent' ? 'i-heroicons-globe-alt' : 'i-heroicons-cog-6-tooth'
+)
+
+const currentStepIconClass = computed(() =>
+  generationMethod.value === 'agent'
+    ? 'animate-pulse text-warning-500'
+    : 'animate-spin text-warning-500'
+)
+
+// Wrapper pour formatStepDuration avec l'historique courant
+const formatDuration = (entry: StepHistoryEntry, idx?: number): string => {
+  return formatStepDuration(entry, idx ?? 0, stepHistory.value)
+}
+
+// Wrapper pour formatSubStepDuration
+const formatSubStepWrapper = (
+  parentEntry: StepHistoryEntry,
+  subStep: SubStepEntry,
+  subIdx: number
+): string => {
+  return formatSubStepDuration(parentEntry, subStep, subIdx)
+}
 
 // État spécifique à l'agent
-const agentStatus = ref('')
 const agentProgress = ref(0)
 const agentPagesVisited = ref(0)
 const agentResult = ref<any>(null)
@@ -940,6 +680,18 @@ const clearForm = () => {
   importResult.value = null
 }
 
+const copyJsonToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(jsonInput.value)
+    jsonCopied.value = true
+    setTimeout(() => {
+      jsonCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
+
 const validateJson = (input: string): any => {
   const errors = []
   let data = null
@@ -1019,10 +771,13 @@ const validateAndImport = async () => {
     importing.value = true
     importResult.value = null
 
-    const response = await $fetch('/api/admin/import-edition', {
-      method: 'POST',
-      body: validationResult.value.data,
-    })
+    const response = await $fetch<{ editionId: string; conventionId: string }>(
+      '/api/admin/import-edition',
+      {
+        method: 'POST',
+        body: validationResult.value.data,
+      }
+    )
 
     importResult.value = {
       success: true,
@@ -1030,7 +785,7 @@ const validateAndImport = async () => {
       conventionId: response.conventionId,
     }
 
-    useToast().add({
+    toast.add({
       title: t('admin.import.import_success'),
       description: t('admin.import.import_success_toast'),
       color: 'success',
@@ -1041,7 +796,7 @@ const validateAndImport = async () => {
       error: error?.data?.message || t('admin.import.import_failed'),
     }
 
-    useToast().add({
+    toast.add({
       title: t('common.error'),
       description: importResult.value.error,
       color: 'error',
@@ -1052,16 +807,13 @@ const validateAndImport = async () => {
 }
 
 /**
- * Labels des étapes pour l'affichage
+ * Récupère le label d'une étape depuis les traductions i18n
  */
-const stepLabels: Record<string, string> = {
-  starting: 'Démarrage...',
-  scraping_facebook: 'Récupération des données Facebook...',
-  fetching_urls: 'Récupération du contenu des URLs...',
-  generating_json: 'Génération du JSON via IA...',
-  exploring_page: 'Exploration des pages...',
-  extracting_features: 'Détection des services...',
-  completed: 'Terminé',
+const getStepLabel = (step: string): string => {
+  const key = `admin.import.steps.${step}`
+  const translated = t(key)
+  // Si la clé n'existe pas, t() retourne la clé elle-même
+  return translated !== key ? translated : step
 }
 
 /**
@@ -1091,15 +843,17 @@ const generateWithSSE = (urls: string[], method: 'direct' | 'agent'): Promise<an
             // Ping pour maintenir la connexion ouverte - ignorer silencieusement
             break
 
-          case 'step':
-            // Mettre à jour l'étape en cours
-            if (method === 'direct') {
-              simpleStep.value = data.step
-              simpleStatus.value = data.label || stepLabels[data.step] || ''
-            } else {
-              agentStatus.value = data.label || stepLabels[data.step] || ''
-            }
+          case 'step': {
+            // Mettre à jour l'étape en cours et ajouter à l'historique
+            const label = data.label || getStepLabel(data.step)
+            simpleStep.value = data.step
+            stepHistory.value.push({
+              step: data.step,
+              label,
+              timestamp: new Date(),
+            })
             break
+          }
 
           case 'progress':
             // Mettre à jour la progression (spécifique à l'agent)
@@ -1109,9 +863,21 @@ const generateWithSSE = (urls: string[], method: 'direct' | 'agent'): Promise<an
             }
             break
 
-          case 'url_fetched':
+          case 'url_fetched': {
             console.log(`[SSE] URL récupérée: ${data.currentUrl}`)
+            // Ajouter comme sous-étape de la dernière étape
+            const lastStep = stepHistory.value[stepHistory.value.length - 1]
+            if (lastStep) {
+              if (!lastStep.subSteps) {
+                lastStep.subSteps = []
+              }
+              lastStep.subSteps.push({
+                url: data.currentUrl,
+                timestamp: new Date(),
+              })
+            }
             break
+          }
 
           case 'result':
             result = {
@@ -1164,17 +930,6 @@ const generateWithSSE = (urls: string[], method: 'direct' | 'agent'): Promise<an
 }
 
 /**
- * Formate un timestamp Unix en date lisible
- */
-const formatTimestamp = (timestamp: number): string => {
-  const date = new Date(timestamp * 1000)
-  return date.toLocaleString('fr-FR', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  })
-}
-
-/**
  * Teste les URLs fournies sans passer par l'IA
  */
 const testUrls = async () => {
@@ -1182,41 +937,18 @@ const testUrls = async () => {
   testResults.value = []
   selectedTestUrl.value = ''
 
-  // Parser les URLs (une par ligne)
-  const urls = urlsInput.value
-    .split('\n')
-    .map((url) => url.trim())
-    .filter((url) => url.length > 0)
-
-  if (urls.length === 0) {
-    generateError.value = t('admin.import.no_urls')
+  // Parser et valider les URLs
+  const urlsResult = parseAndValidateUrls(urlsInput.value)
+  if (!urlsResult.success) {
+    generateError.value = urlsResult.error!
     return
   }
-
-  // Valider les URLs
-  const invalidUrls = urls.filter((url) => {
-    try {
-      new URL(url)
-      return false
-    } catch {
-      return true
-    }
-  })
-
-  if (invalidUrls.length > 0) {
-    generateError.value = t('admin.import.invalid_urls', { urls: invalidUrls.join(', ') })
-    return
-  }
-
-  if (urls.length > 5) {
-    generateError.value = t('admin.import.too_many_urls')
-    return
-  }
+  const urls = urlsResult.urls!
 
   try {
     testingUrls.value = true
 
-    const response = await $fetch('/api/admin/test-urls', {
+    const response = await $fetch<{ results: any[] }>('/api/admin/test-urls', {
       method: 'POST',
       body: { urls },
     })
@@ -1227,7 +959,7 @@ const testUrls = async () => {
       selectedTestUrl.value = response.results[0].url
     }
 
-    useToast().add({
+    toast.add({
       title: t('admin.import.test_success'),
       description: t('admin.import.test_success_description', { count: response.results.length }),
       color: 'success',
@@ -1241,45 +973,25 @@ const testUrls = async () => {
 
 const generateFromUrls = async () => {
   generateError.value = ''
-  // Réinitialiser l'état de la méthode simple
-  simpleStatus.value = t('admin.import.simple_starting')
+  // Réinitialiser l'état
   simpleStep.value = ''
-  // Réinitialiser l'état de l'agent
+  stepHistory.value = []
   agentResult.value = null
   agentProgress.value = 0
   agentPagesVisited.value = 0
-  agentStatus.value = t('admin.import.agent_starting')
 
-  // Parser les URLs (une par ligne)
-  const urls = urlsInput.value
-    .split('\n')
-    .map((url) => url.trim())
-    .filter((url) => url.length > 0)
+  // Initialiser le timer pour le temps d'exécution
+  resetTimer()
+  startTimer()
 
-  if (urls.length === 0) {
-    generateError.value = t('admin.import.no_urls')
+  // Parser et valider les URLs
+  const urlsResult = parseAndValidateUrls(urlsInput.value)
+  if (!urlsResult.success) {
+    generateError.value = urlsResult.error!
+    stopTimer()
     return
   }
-
-  // Valider les URLs
-  const invalidUrls = urls.filter((url) => {
-    try {
-      new URL(url)
-      return false
-    } catch {
-      return true
-    }
-  })
-
-  if (invalidUrls.length > 0) {
-    generateError.value = t('admin.import.invalid_urls', { urls: invalidUrls.join(', ') })
-    return
-  }
-
-  if (urls.length > 5) {
-    generateError.value = t('admin.import.too_many_urls')
-    return
-  }
+  const urls = urlsResult.urls!
 
   try {
     generating.value = true
@@ -1304,7 +1016,7 @@ const generateFromUrls = async () => {
     validationResult.value = null
     importResult.value = null
 
-    useToast().add({
+    toast.add({
       title: t('admin.import.generate_success'),
       description: t('admin.import.generate_success_description', { provider: result.provider }),
       color: 'success',
@@ -1314,6 +1026,7 @@ const generateFromUrls = async () => {
       error?.data?.message || error?.message || t('admin.import.generate_failed')
   } finally {
     generating.value = false
+    stopTimer()
   }
 }
 </script>

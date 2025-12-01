@@ -20,6 +20,7 @@ export type ImportGenerationEventType =
 export type GenerationStep =
   | 'starting'
   | 'scraping_facebook'
+  | 'scraping_jugglingedge'
   | 'fetching_urls'
   | 'generating_json'
   | 'exploring_page' // EI uniquement
@@ -32,6 +33,7 @@ export type GenerationStep =
 export const STEP_LABELS: Record<GenerationStep, string> = {
   starting: 'Démarrage...',
   scraping_facebook: 'Récupération des données Facebook...',
+  scraping_jugglingedge: 'Récupération des données JugglingEdge...',
   fetching_urls: 'Récupération du contenu des URLs...',
   generating_json: 'Génération du JSON via IA...',
   exploring_page: 'Exploration des pages...',

@@ -22,12 +22,26 @@ export const OPTIONAL_FIELDS =
   'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, latitude, longitude'
 
 /**
- * Règles communes pour l'extraction (partagée ED/EI)
+ * Règles communes pour l'extraction (partagée ED/EI) - VERSION COMPLÈTE
+ */
+export const COMMON_RULES_FULL = `1. NOM: Le nom doit être celui de L'ÉVÉNEMENT/CONVENTION, pas du site source
+2. EMAIL: UNIQUEMENT si explicitement trouvé dans les sources (NE PAS INVENTER, ne pas deviner). Si non trouvé, laisser ""
+3. URLs (ticketingUrl, instagramUrl, etc.): UNIQUEMENT si explicitement trouvées dans les sources. NE JAMAIS INVENTER d'URL. Si non trouvée, laisser ""
+4. TIMEZONE: TOUJOURS déduire le timezone IANA à partir du PAYS de l'événement (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
+5. DATES: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
+6. CARACTÉRISTIQUES: Mets true UNIQUEMENT si explicitement mentionné dans le contenu (camping, douches, spectacles, etc.)
+7. PRIORITÉ FACEBOOK/JUGGLINGEDGE: Si des données structurées sont fournies (Facebook, JugglingEdge JSON-LD), elles sont fiables et prioritaires`
+
+/**
+ * Règles communes pour l'extraction (partagée ED/EI) - VERSION COMPACTE
  */
 export const COMMON_RULES_COMPACT = `- nom=événement (pas site source)
-- email=seulement si explicitement trouvé (NE PAS INVENTER)
-- timezone=DÉDUIS le timezone IANA du PAYS (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
-- dates avec heures si trouvées (YYYY-MM-DDTHH:MM:SS)`
+- email=seulement si explicitement trouvé (NE PAS INVENTER), sinon ""
+- URLs (ticketingUrl, instagramUrl...)=JAMAIS INVENTER, seulement si trouvées, sinon ""
+- timezone=DÉDUIS du PAYS (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
+- dates avec heures si trouvées (YYYY-MM-DDTHH:MM:SS)
+- caractéristiques=true seulement si explicitement mentionné
+- PRIORITÉ données structurées (Facebook, JugglingEdge JSON-LD)`
 
 /**
  * Génère la section des champs pour les prompts compacts
@@ -36,6 +50,64 @@ export function generateFieldsSection(): string {
   return `CHAMPS OBLIGATOIRES: ${REQUIRED_FIELDS}
 CHAMPS OPTIONNELS: ${OPTIONAL_FIELDS}`
 }
+
+// ============================================
+// PROMPT DE COMPLÉTION JSON PRÉ-REMPLI (ED/EI)
+// ============================================
+
+/**
+ * Format JSON avec indications OBLIGATOIRE/optionnel pour l'IA
+ */
+export const JSON_FORMAT_FOR_COMPLETION = `{
+  "convention": {
+    "name": "OBLIGATOIRE - Nom de l'événement",
+    "email": "OBLIGATOIRE - Email de contact",
+    "description": "optionnel"
+  },
+  "edition": {
+    "name": "optionnel",
+    "description": "optionnel",
+    "startDate": "OBLIGATOIRE - Format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS",
+    "endDate": "OBLIGATOIRE - Format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS",
+    "timezone": "OBLIGATOIRE - Format IANA (ex: Europe/Paris, Australia/Melbourne)",
+    "addressLine1": "OBLIGATOIRE - Adresse",
+    "addressLine2": "optionnel",
+    "city": "OBLIGATOIRE",
+    "region": "optionnel",
+    "country": "OBLIGATOIRE",
+    "postalCode": "OBLIGATOIRE",
+    "latitude": "optionnel - number",
+    "longitude": "optionnel - number",
+    "ticketingUrl": "optionnel",
+    "facebookUrl": "optionnel",
+    "instagramUrl": "optionnel",
+    "officialWebsiteUrl": "optionnel",
+    "imageUrl": "optionnel"
+  }
+}`
+
+/**
+ * Prompt pour compléter un JSON pré-rempli (Facebook + autres sources)
+ * Utilisé par ED et EI quand des données Facebook sont disponibles
+ */
+export const PROMPT_COMPLETE_PREFILLED_JSON = `Tu dois compléter un JSON pré-rempli avec les informations des sources fournies.
+
+CHAMPS PRIORITAIRES À REMPLIR:
+- convention.name : Le nom de la CONVENTION (pas l'édition). Cherche dans les sources le nom générique de l'événement récurrent.
+- convention.email : L'email de contact UNIQUEMENT s'il est explicitement mentionné dans les sources. NE PAS INVENTER.
+- instagramUrl : Le lien vers le compte Instagram s'il est mentionné (format: https://instagram.com/...)
+
+FORMAT ATTENDU:
+${JSON_FORMAT_FOR_COMPLETION}
+
+RÈGLES:
+1. NE MODIFIE JAMAIS les champs déjà remplis (non vides) - SURTOUT startDate et endDate
+2. Complète les champs vides ("" ou null) avec les données des sources
+3. convention.name = nom générique de la convention (ex: "Spinfest" pas "Spinfest 2025")
+4. convention.email = UNIQUEMENT si trouvé explicitement dans les sources, sinon laisser vide ""
+5. instagramUrl = lien Instagram si trouvé dans les sources
+6. DATES: Garde le format exact des dates pré-remplies (avec heures si présentes). N'enlève JAMAIS les heures.
+7. Réponds UNIQUEMENT avec le JSON complet, sans commentaires`
 
 /**
  * Définition des champs du schéma d'import avec leurs descriptions
@@ -279,12 +351,11 @@ STRUCTURE JSON ATTENDUE:
 ${generateJsonExample()}
 
 RÈGLES IMPORTANTES:
-1. PRIORITÉ FACEBOOK: Si un événement Facebook est fourni, ses données sont fiables (dates, lieu, image)
-2. NAVIGATION: Utilise la navigation du site pour trouver les pages importantes (tarifs, infos pratiques, lieu, bénévoles)
-3. Dates: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
-4. Timezone: TOUJOURS déduire le timezone IANA à partir du pays de l'événement, pas de la langue du site
-5. Caractéristiques: Mets true uniquement si explicitement mentionné (camping, douches, spectacles, etc.)
-6. Réponds UNIQUEMENT avec l'action choisie, sans explication
+${COMMON_RULES_FULL}
+
+RÈGLES SPÉCIFIQUES À L'EXPLORATION:
+- NAVIGATION: Utilise la navigation du site pour trouver les pages importantes (tarifs, infos pratiques, lieu, bénévoles)
+- Réponds UNIQUEMENT avec l'action choisie, sans explication
 
 Quand tu génères le JSON, utilise GENERATE_JSON suivi du JSON complet.`
 }
@@ -300,6 +371,11 @@ ${generateFieldsSection()}
 
 RÈGLES:
 ${COMMON_RULES_COMPACT}
+
+DATES AVEC HEURES:
+- Cherche les horaires: "à partir de 10h", "ouverture 14h", "début vendredi 18h", "10:00", "14h00"
+- Si heure trouvée: format YYYY-MM-DDTHH:MM:SS (ex: 2025-07-15T10:00:00)
+- Si pas d'heure: format YYYY-MM-DD
 
 CARACTÉRISTIQUES (true si mentionné): ${generateCompactFeaturesDescription()}
 
@@ -325,12 +401,16 @@ ${generateFieldsSection()}
 FORMAT JSON:
 ${generateCompactJsonFormat()}
 
+DATES AVEC HEURES:
+- Cherche les horaires: "à partir de 10h", "ouverture 14h", "début vendredi 18h", "10:00", "14h00"
+- Si heure trouvée: format YYYY-MM-DDTHH:MM:SS (ex: 2025-07-15T10:00:00)
+- Si pas d'heure: format YYYY-MM-DD
+
 CARACTÉRISTIQUES (true si mentionné): ${generateCompactFeaturesDescription()}
 
 RÈGLES:
 ${COMMON_RULES_COMPACT}
-- PRIORITÉ FACEBOOK: Si événement Facebook fourni, ses données priment
-- Utilise la NAVIGATION du site pour trouver infos pratiques, tarifs, lieu
+- NAVIGATION: Utilise la navigation du site pour trouver infos pratiques, tarifs, lieu
 - Réponds UNIQUEMENT avec l'action`
 }
 
@@ -350,9 +430,16 @@ INSTRUCTION FINALE:
 Génère le JSON d'import avec la structure complète. Si une information obligatoire n'a pas été trouvée, utilise une valeur par défaut ou "".
 Pour les caractéristiques (has...), mets true uniquement si explicitement mentionné.
 
-Réponds UNIQUEMENT avec le JSON, sans FETCH_URL, sans GENERATE_JSON, juste le JSON:
-{
-  "convention": { "name": "...", "email": "...", "description": "..." },
-  "edition": { "name": "...", "startDate": "YYYY-MM-DD", "endDate": "YYYY-MM-DD", ... }
-}`
+RÈGLES:
+${COMMON_RULES_COMPACT}
+
+IMPORTANT POUR LES DATES:
+- Si tu trouves des heures (horaires), inclus-les dans startDate et endDate au format YYYY-MM-DDTHH:MM:SS
+- Cherche des indications comme "à partir de 10h", "ouverture 14h", "début vendredi 18h", etc.
+- Si aucune heure n'est trouvée, utilise le format YYYY-MM-DD
+
+FORMAT JSON ATTENDU:
+${generateCompactJsonFormat()}
+
+Réponds UNIQUEMENT avec le JSON complet, sans FETCH_URL, sans GENERATE_JSON.`
 }

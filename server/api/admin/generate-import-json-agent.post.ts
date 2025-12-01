@@ -27,7 +27,14 @@ import {
   generateAgentSystemPrompt,
   generateCompactAgentSystemPrompt,
   generateForceGenerationPrompt,
+  PROMPT_COMPLETE_PREFILLED_JSON,
 } from '@@/server/utils/import-json-schema'
+import {
+  isJugglingEdgeEventUrl,
+  scrapeJugglingEdgeEvent,
+  jugglingEdgeEventToImportJson,
+  formatJugglingEdgeDataAsContent,
+} from '@@/server/utils/jugglingedge-scraper'
 import { extractAndFormatWebContent } from '@@/server/utils/web-content-extractor'
 import { z } from 'zod'
 
@@ -62,6 +69,170 @@ export interface AgentLog {
   url?: string
   message: string
   timestamp: Date
+}
+
+/**
+ * Extrait les heures du contenu texte et les ajoute aux dates si absentes
+ * Recherche des patterns comme "10h", "10:00", "à partir de 14h", "ouverture 9h30"
+ * Cherche aussi des patterns spécifiques pour début/fin de convention
+ */
+function extractAndApplyTimeFromContent(parsedJson: any, collectedContent: string[]): void {
+  // Si les dates contiennent déjà des heures (format avec T), ne rien faire
+  const startDate = parsedJson.edition?.startDate || ''
+  const endDate = parsedJson.edition?.endDate || ''
+
+  const startHasTime = startDate.includes('T')
+  const endHasTime = endDate.includes('T')
+
+  if (startHasTime && endHasTime) {
+    console.log('[AGENT] Dates contiennent déjà des heures, pas de modification')
+    return
+  }
+
+  // Chercher les heures dans le contenu
+  const fullContent = collectedContent.join(' ').toLowerCase()
+  console.log(`[AGENT] Recherche d'heures dans ${fullContent.length} caractères de contenu`)
+
+  // Extraire un échantillon du contenu pour le log (premiers 500 caractères)
+  console.log(`[AGENT] Extrait du contenu: ${fullContent.substring(0, 500).replace(/\n/g, ' ')}...`)
+
+  // Patterns spécifiques pour les heures de début de convention
+  const startTimePatterns = [
+    // "ouverture vendredi à 18h" / "ouverture le vendredi à 18h"
+    /ouverture\s+(?:le\s+)?(?:vendredi|samedi|dimanche|jeudi)?\s*(?:à|a|:)?\s*(\d{1,2})[h:](\d{2})?/gi,
+    // "début vendredi 18h" / "début à 14h"
+    /d[eé]but\s+(?:le\s+)?(?:vendredi|samedi|dimanche|jeudi)?\s*(?:à|a|:)?\s*(\d{1,2})[h:](\d{2})?/gi,
+    // "à partir de 10h"
+    /[àa]\s*partir\s+de\s+(\d{1,2})[h:](\d{2})?/gi,
+    // "dès 10h" / "dès 10:00"
+    /d[eè]s\s+(\d{1,2})[h:](\d{2})?/gi,
+    // "from 10am" / "from 2pm"
+    /from\s+(\d{1,2})\s*(?:am|pm|h)/gi,
+    // "accueil à partir de 14h"
+    /accueil\s+(?:à\s+partir\s+de\s+)?(\d{1,2})[h:](\d{2})?/gi,
+  ]
+
+  // Patterns spécifiques pour les heures de fin de convention
+  const endTimePatterns = [
+    // "fermeture dimanche à 18h"
+    /fermeture\s+(?:le\s+)?(?:dimanche|samedi|lundi)?\s*(?:à|a|:)?\s*(\d{1,2})[h:](\d{2})?/gi,
+    // "fin dimanche 18h" / "fin à 18h"
+    /fin\s+(?:le\s+)?(?:dimanche|samedi|lundi)?\s*(?:à|a|:)?\s*(\d{1,2})[h:](\d{2})?/gi,
+    // "jusqu'à 18h"
+    /jusqu['']?\s*[àa]\s*(\d{1,2})[h:](\d{2})?/gi,
+    // "clôture à 17h"
+    /cl[oô]ture\s+(?:à|a)?\s*(\d{1,2})[h:](\d{2})?/gi,
+  ]
+
+  // Patterns génériques pour les heures (fallback)
+  const genericTimePatterns = [
+    // "10h", "10h30", "10:30"
+    /(\d{1,2})[h:](\d{2})/g,
+    // "10h" seul
+    /(\d{1,2})h(?!\d)/g,
+  ]
+
+  // Fonction pour extraire une heure depuis un match
+  const extractTime = (match: RegExpExecArray): string | null => {
+    const hours = parseInt(match[1], 10)
+    const minutes = match[2] ? parseInt(match[2], 10) : 0
+
+    // Valider l'heure (entre 6h et 23h pour une convention)
+    if (hours >= 6 && hours <= 23 && minutes >= 0 && minutes < 60) {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+    }
+    return null
+  }
+
+  // Chercher l'heure de début
+  let foundStartTime: string | null = null
+  if (!startHasTime) {
+    for (const pattern of startTimePatterns) {
+      pattern.lastIndex = 0 // Reset le pattern
+      const match = pattern.exec(fullContent)
+      if (match) {
+        foundStartTime = extractTime(match)
+        if (foundStartTime) {
+          console.log(`[AGENT] Heure de début trouvée avec pattern spécifique: ${foundStartTime}`)
+          break
+        }
+      }
+    }
+  }
+
+  // Chercher l'heure de fin
+  let foundEndTime: string | null = null
+  if (!endHasTime) {
+    for (const pattern of endTimePatterns) {
+      pattern.lastIndex = 0 // Reset le pattern
+      const match = pattern.exec(fullContent)
+      if (match) {
+        foundEndTime = extractTime(match)
+        if (foundEndTime) {
+          console.log(`[AGENT] Heure de fin trouvée avec pattern spécifique: ${foundEndTime}`)
+          break
+        }
+      }
+    }
+  }
+
+  // Fallback: chercher toutes les heures génériques si pas trouvé avec patterns spécifiques
+  if (!foundStartTime || !foundEndTime) {
+    const allTimes: string[] = []
+    for (const pattern of genericTimePatterns) {
+      pattern.lastIndex = 0
+      let match
+      while ((match = pattern.exec(fullContent)) !== null) {
+        const time = extractTime(match)
+        if (time && !allTimes.includes(time)) {
+          allTimes.push(time)
+        }
+      }
+    }
+
+    if (allTimes.length > 0) {
+      // Trier les heures
+      allTimes.sort()
+      console.log(`[AGENT] Heures génériques trouvées: ${allTimes.join(', ')}`)
+
+      // Utiliser la plus tôt pour le début (si pas déjà trouvée)
+      if (!foundStartTime && !startHasTime) {
+        // Prendre une heure raisonnable pour un début (entre 8h et 14h de préférence)
+        const earlyTimes = allTimes.filter((t) => {
+          const h = parseInt(t.split(':')[0], 10)
+          return h >= 8 && h <= 14
+        })
+        foundStartTime = earlyTimes[0] || allTimes[0]
+        console.log(`[AGENT] Heure de début (fallback): ${foundStartTime}`)
+      }
+
+      // Utiliser la plus tardive pour la fin (si pas déjà trouvée)
+      if (!foundEndTime && !endHasTime) {
+        // Prendre une heure raisonnable pour une fin (entre 16h et 22h de préférence)
+        const lateTimes = allTimes.filter((t) => {
+          const h = parseInt(t.split(':')[0], 10)
+          return h >= 16 && h <= 22
+        })
+        foundEndTime = lateTimes[lateTimes.length - 1] || allTimes[allTimes.length - 1]
+        console.log(`[AGENT] Heure de fin (fallback): ${foundEndTime}`)
+      }
+    }
+  }
+
+  // Appliquer les heures trouvées
+  if (foundStartTime && startDate && !startHasTime) {
+    parsedJson.edition.startDate = `${startDate}T${foundStartTime}`
+    console.log(`[AGENT] startDate enrichie: ${parsedJson.edition.startDate}`)
+  } else if (!startHasTime && startDate) {
+    console.log("[AGENT] Pas d'heure de début trouvée, date non modifiée")
+  }
+
+  if (foundEndTime && endDate && !endHasTime) {
+    parsedJson.edition.endDate = `${endDate}T${foundEndTime}`
+    console.log(`[AGENT] endDate enrichie: ${parsedJson.edition.endDate}`)
+  } else if (!endHasTime && endDate) {
+    console.log("[AGENT] Pas d'heure de fin trouvée, date non modifiée")
+  }
 }
 
 // Choix du prompt selon le provider IA
@@ -373,7 +544,38 @@ async function fetchAndExtractContent(
       }
     }
 
-    // Fetch classique pour les autres URLs ou si le scraper Facebook a échoué
+    // Utiliser le scraper JugglingEdge pour les événements JugglingEdge
+    if (isJugglingEdgeEventUrl(url)) {
+      console.log(`[AGENT] Utilisation du scraper JugglingEdge pour: ${url}`)
+
+      const jeEvent = await scrapeJugglingEdgeEvent(url)
+
+      if (jeEvent) {
+        const pageContent = formatJugglingEdgeDataAsContent(jeEvent, url)
+        visitedUrls.push(url)
+
+        // Stocker les données JugglingEdge pré-remplies (réutilise la structure facebookData)
+        if (facebookData && !facebookData.prefilledJson) {
+          facebookData.prefilledJson = jugglingEdgeEventToImportJson(jeEvent)
+        }
+
+        logs.push({
+          iteration: 0,
+          action: 'fetched',
+          url,
+          message: `JugglingEdge Event scrappé avec succès (${pageContent.length} caractères)`,
+          timestamp: new Date(),
+        })
+
+        console.log(`[AGENT] JugglingEdge Event scrappé: ${jeEvent.name}`)
+        return { success: true, content: pageContent }
+      } else {
+        // Fallback sur le fetch classique si le scraper échoue
+        console.log(`[AGENT] Scraper JugglingEdge échoué, fallback sur fetch classique`)
+      }
+    }
+
+    // Fetch classique pour les autres URLs ou si les scrapers ont échoué
     const response = await fetchWithTimeout(url, { headers: BROWSER_HEADERS }, URL_FETCH_TIMEOUT)
 
     if (!response.ok) {
@@ -719,17 +921,39 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
       })
     }
 
-    // Utiliser un prompt de génération forcée depuis le module import-json-schema
-    const contentSummary = collectedContent.slice(0, 3).join('\n\n---\n\n')
-    const forcePrompt = generateForceGenerationPrompt(visitedUrls, contentSummary)
+    // Si on a des données Facebook, utiliser le prompt de complétion pré-rempli (comme ED)
+    // Sinon, utiliser le prompt de génération forcée standard
+    let forcePrompt: string
+    let systemPromptToUse: string
+
+    if (facebookData.prefilledJson) {
+      console.log('[AGENT] Utilisation du prompt de complétion avec données Facebook pré-remplies')
+      const prefilledJsonStr = JSON.stringify(facebookData.prefilledJson, null, 2)
+      const contentSummary = collectedContent.slice(0, 2).join('\n\n---\n\n')
+
+      forcePrompt = `Voici un JSON pré-rempli avec les données Facebook:
+
+${prefilledJsonStr}
+
+Et voici les informations supplémentaires trouvées sur les autres pages:
+
+${contentSummary}
+
+Complète les champs vides avec les informations des sources. Réponds UNIQUEMENT avec le JSON complet.`
+
+      systemPromptToUse = PROMPT_COMPLETE_PREFILLED_JSON
+    } else {
+      const contentSummary = collectedContent.slice(0, 3).join('\n\n---\n\n')
+      forcePrompt = generateForceGenerationPrompt(visitedUrls, contentSummary)
+      systemPromptToUse = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+    }
 
     conversationHistory.push({
       role: 'user',
       content: forcePrompt,
     })
 
-    const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
-    const finalResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
+    const finalResponse = await callAgentLLM(configToUse, systemPromptToUse, conversationHistory)
     console.log('[AGENT] Réponse au forçage:', finalResponse)
 
     if (finalResponse.json) {
@@ -799,22 +1023,60 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
   try {
     let parsedJson = JSON.parse(finalJson)
 
-    // Si on a des données Facebook pré-remplies, les fusionner avec le JSON généré
-    // Les données Facebook sont prioritaires pour les champs qu'elles contiennent
+    // Si on a des données Facebook/JugglingEdge pré-remplies, les fusionner avec le JSON généré
+    // Les données pré-remplies sont PRIORITAIRES pour les champs qu'elles contiennent
     if (facebookData.prefilledJson) {
-      console.log('[AGENT] Fusion avec les données Facebook pré-remplies')
+      console.log('[AGENT] Fusion avec les données pré-remplies (Facebook/JugglingEdge)')
       const fbJson = facebookData.prefilledJson
 
-      // Fusionner edition (Facebook prioritaire pour les champs remplis)
+      // Log des dates pré-remplies vs générées
+      console.log('[AGENT] Dates pré-remplies:', {
+        startDate: fbJson.edition?.startDate,
+        endDate: fbJson.edition?.endDate,
+      })
+      console.log('[AGENT] Dates générées par IA:', {
+        startDate: parsedJson.edition?.startDate,
+        endDate: parsedJson.edition?.endDate,
+      })
+
+      // Fusionner edition (données pré-remplies prioritaires pour les champs remplis)
+      // EXCEPTION: pour les dates, si l'IA a trouvé des heures et pas les données pré-remplies,
+      // on préserve les heures de l'IA
       if (fbJson.edition) {
         for (const [key, value] of Object.entries(fbJson.edition)) {
-          // Ne remplacer que si la valeur Facebook n'est pas vide
+          // Ne remplacer que si la valeur pré-remplie n'est pas vide
           if (value !== '' && value !== null && value !== undefined) {
             parsedJson.edition = parsedJson.edition || {}
+
+            // Traitement spécial pour les dates: préserver les heures de l'IA si disponibles
+            if ((key === 'startDate' || key === 'endDate') && typeof value === 'string') {
+              const prefilledDate = value as string
+              const aiDate = parsedJson.edition[key] as string | undefined
+
+              // Si la date pré-remplie n'a pas d'heure (pas de T) mais que l'IA en a trouvé une
+              if (!prefilledDate.includes('T') && aiDate && aiDate.includes('T')) {
+                // Extraire l'heure de la date de l'IA et l'appliquer à la date pré-remplie
+                const aiTime = aiDate.split('T')[1]
+                if (aiTime) {
+                  parsedJson.edition[key] = `${prefilledDate}T${aiTime}`
+                  console.log(
+                    `[AGENT] Date ${key}: combinée date pré-remplie (${prefilledDate}) + heure IA (${aiTime})`
+                  )
+                  continue // Ne pas écraser avec la valeur pré-remplie
+                }
+              }
+            }
+
             parsedJson.edition[key] = value
           }
         }
       }
+
+      // Log des dates après fusion
+      console.log('[AGENT] Dates après fusion:', {
+        startDate: parsedJson.edition?.startDate,
+        endDate: parsedJson.edition?.endDate,
+      })
 
       // Pour convention, garder les données de l'agent (plus complètes généralement)
       // sauf si l'agent n'a pas trouvé ces infos
@@ -824,7 +1086,19 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
           parsedJson.convention.name = fbJson.convention.name
         }
       }
+    } else {
+      console.log('[AGENT] Pas de données pré-remplies, dates générées uniquement par IA:', {
+        startDate: parsedJson.edition?.startDate,
+        endDate: parsedJson.edition?.endDate,
+      })
     }
+
+    // Enrichir les dates avec les heures trouvées dans le contenu (si pas déjà présentes)
+    extractAndApplyTimeFromContent(parsedJson, collectedContent)
+    console.log('[AGENT] Dates finales après enrichissement:', {
+      startDate: parsedJson.edition?.startDate,
+      endDate: parsedJson.edition?.endDate,
+    })
 
     // Extraire les caractéristiques (services) via IA
     const description = parsedJson.edition?.description || ''
