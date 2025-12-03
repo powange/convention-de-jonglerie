@@ -26,18 +26,20 @@ export const OPTIONAL_FIELDS =
  */
 export const COMMON_RULES_FULL = `1. NOM: Le nom doit être celui de L'ÉVÉNEMENT/CONVENTION, pas du site source
 2. EMAIL: UNIQUEMENT si explicitement trouvé dans les sources (NE PAS INVENTER, ne pas deviner). Si non trouvé, laisser ""
-3. URLs (ticketingUrl, instagramUrl, etc.): UNIQUEMENT si explicitement trouvées dans les sources. NE JAMAIS INVENTER d'URL. Si non trouvée, laisser ""
-4. TIMEZONE: TOUJOURS déduire le timezone IANA à partir du PAYS de l'événement (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
-5. DATES: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
-6. CARACTÉRISTIQUES: Mets true UNIQUEMENT si explicitement mentionné dans le contenu (camping, douches, spectacles, etc.)
-7. PRIORITÉ FACEBOOK/JUGGLINGEDGE: Si des données structurées sont fournies (Facebook, JugglingEdge JSON-LD), elles sont fiables et prioritaires`
+3. URLs (ticketingUrl, instagramUrl, imageUrl, etc.): COPIER EXACTEMENT l'URL trouvée dans les sources, caractère par caractère, sans modifier un seul caractère. NE JAMAIS INVENTER d'URL. Si non trouvée, laisser ""
+4. IMAGE URL: Si og:image est fourni, COPIER L'URL EXACTE sans aucune modification. Les URLs Google (lh3.googleusercontent.com) contiennent des identifiants uniques - ne pas les modifier.
+5. TIMEZONE: TOUJOURS déduire le timezone IANA à partir du PAYS de l'événement (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
+6. DATES: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
+7. CARACTÉRISTIQUES: Mets true UNIQUEMENT si explicitement mentionné dans le contenu (camping, douches, spectacles, etc.)
+8. PRIORITÉ FACEBOOK/JUGGLINGEDGE: Si des données structurées sont fournies (Facebook, JugglingEdge JSON-LD), elles sont fiables et prioritaires`
 
 /**
  * Règles communes pour l'extraction (partagée ED/EI) - VERSION COMPACTE
  */
 export const COMMON_RULES_COMPACT = `- nom=événement (pas site source)
 - email=seulement si explicitement trouvé (NE PAS INVENTER), sinon ""
-- URLs (ticketingUrl, instagramUrl...)=JAMAIS INVENTER, seulement si trouvées, sinon ""
+- URLs=COPIER EXACTEMENT caractère par caractère (imageUrl, ticketingUrl...), JAMAIS INVENTER
+- imageUrl=COPIER l'URL og:image EXACTE (ne pas modifier les URLs Google)
 - timezone=DÉDUIS du PAYS (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
 - dates avec heures si trouvées (YYYY-MM-DDTHH:MM:SS)
 - caractéristiques=true seulement si explicitement mentionné
@@ -321,8 +323,13 @@ export function generateAgentSystemPrompt(): string {
 Tu analyses des pages web pour extraire les données nécessaires à l'import d'une convention.
 
 ACTIONS DISPONIBLES (une seule par réponse):
-- FETCH_URL: <url> -> Explorer une page supplémentaire pour trouver plus d'informations
+- FETCH_URL: <url> -> Explorer une page supplémentaire (COPIE L'URL EXACTE, ne l'invente pas)
 - GENERATE_JSON -> Générer le JSON final avec toutes les informations collectées
+
+IMPORTANT POUR FETCH_URL:
+- Cherche "LIENS À EXPLORER" dans le contenu fourni (site officiel, Facebook, etc.)
+- COPIE l'URL EXACTE caractère par caractère depuis le contenu
+- N'INVENTE JAMAIS d'URL, utilise uniquement celles listées dans le contenu
 
 CHAMPS OBLIGATOIRES (le JSON doit contenir au minimum):
 - convention.name: Nom de la convention
@@ -337,7 +344,7 @@ CHAMPS OBLIGATOIRES (le JSON doit contenir au minimum):
 CHAMPS OPTIONNELS IMPORTANTS:
 - edition.region: Région/État/Province (ex: Île-de-France, Victoria, California)
 - edition.timezone: DÉDUIS le timezone IANA du PAYS de l'événement (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
-- edition.imageUrl: URL de l'affiche (chercher og:image ou images dans le contenu)
+- edition.imageUrl: COPIER EXACTEMENT l'URL og:image trouvée (ne pas modifier les URLs Google lh3.googleusercontent.com)
 - edition.ticketingUrl: URL de la billetterie
 - edition.facebookUrl, edition.instagramUrl, edition.officialWebsiteUrl
 - edition.latitude, edition.longitude: Coordonnées GPS si disponibles
@@ -393,8 +400,13 @@ export function generateCompactAgentSystemPrompt(): string {
   return `Tu extrais des infos de conventions de jonglerie.
 
 ACTIONS (une seule par réponse):
-- FETCH_URL: <url> -> explorer une page
+- FETCH_URL: <url> -> explorer une page (COPIE L'URL EXACTE du contenu, ne l'invente pas)
 - GENERATE_JSON -> générer le JSON final
+
+IMPORTANT POUR FETCH_URL:
+- Cherche "LIENS À EXPLORER" dans le contenu fourni
+- COPIE l'URL EXACTE caractère par caractère (ex: FETCH_URL: https://www.chocfest.net)
+- N'INVENTE JAMAIS d'URL, utilise uniquement celles listées
 
 ${generateFieldsSection()}
 

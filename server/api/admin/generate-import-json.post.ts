@@ -39,11 +39,13 @@ import {
   jugglingEdgeEventToImportJson,
   scrapeJugglingEdgeEvent,
 } from '@@/server/utils/jugglingedge-scraper'
-import { extractAndFormatWebContent } from '@@/server/utils/web-content-extractor'
+import { extractWebContent, formatExtractionForAI } from '@@/server/utils/web-content-extractor'
 import { z } from 'zod'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),
+  // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
+  previewedImageUrl: z.string().url().optional(),
 })
 
 // Timeout pour les requêtes HTTP (en ms)
@@ -119,6 +121,8 @@ export interface GenerateImportOptions {
   taskId?: string
   /** Callback de progression pour le mode SSE (nouveau système) */
   onProgress?: ProgressCallback
+  /** Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente) */
+  previewedImageUrl?: string
 }
 
 /**
@@ -134,7 +138,7 @@ export async function generateImportJson(
   urls: string[],
   options: GenerateImportOptions = {}
 ): Promise<GenerateImportResult> {
-  const { taskId, onProgress } = options
+  const { taskId, onProgress, previewedImageUrl } = options
   // Récupérer la config IA effective (lit process.env en priorité)
   const effectiveConfig = getEffectiveAIConfig()
 
@@ -219,6 +223,8 @@ export async function generateImportJson(
 
   // Étape 2: Récupérer le contenu des autres URLs
   const otherContents: string[] = []
+  // Stocker les images OG trouvées pour les injecter plus tard (l'IA peut halluciner les URLs)
+  const foundOgImages: string[] = []
 
   // Budget de contenu adapté dynamiquement selon le context length du modèle
   const aiProvider = effectiveConfig.aiProvider || 'lmstudio'
@@ -261,9 +267,16 @@ export async function generateImportJson(
         html = await response.text()
       }
 
-      // Extraire le contenu du HTML avec le nouvel utilitaire
-      const textContent = extractAndFormatWebContent(html, url, maxContentPerUrl)
+      // Extraire le contenu structuré du HTML
+      const extraction = extractWebContent(html, url)
+      const textContent = formatExtractionForAI(extraction, maxContentPerUrl)
       otherContents.push(textContent)
+
+      // Stocker l'image OG si trouvée (pour la réinjecter après la génération IA)
+      if (extraction.openGraph.image) {
+        console.log(`[GENERATE-IMPORT] Image OG trouvée: ${extraction.openGraph.image}`)
+        foundOgImages.push(extraction.openGraph.image)
+      }
 
       // Notifier la progression SSE
       if (onProgress) {
@@ -331,6 +344,25 @@ export async function generateImportJson(
   let finalJson = generatedJson
   try {
     const parsedJson = JSON.parse(generatedJson)
+
+    // Post-traitement: Injecter l'image trouvée lors du test ou extraite programmatiquement
+    // Priorité: 1) previewedImageUrl (du test) 2) foundOgImages (de l'extraction)
+    // L'IA peut halluciner des URLs différentes, donc on utilise l'image du test en priorité
+    const imageToInject = previewedImageUrl || (foundOgImages.length > 0 ? foundOgImages[0] : null)
+    if (imageToInject) {
+      const currentImageUrl = parsedJson.edition?.imageUrl || ''
+
+      // Si pas d'image ou image différente de celle trouvée, utiliser celle du test/extraction
+      if (!currentImageUrl || currentImageUrl !== imageToInject) {
+        console.log(
+          `[GENERATE-IMPORT] Injection de l'image (IA: "${currentImageUrl}" -> ${previewedImageUrl ? 'Test' : 'Extraction'}: "${imageToInject}")`
+        )
+        if (!parsedJson.edition) parsedJson.edition = {}
+        parsedJson.edition.imageUrl = imageToInject
+        generatedJson = JSON.stringify(parsedJson, null, 2)
+      }
+    }
+
     const description = parsedJson.edition?.description || ''
 
     if (description && description.length >= 50) {
@@ -350,9 +382,11 @@ export async function generateImportJson(
         finalJson = JSON.stringify(enrichedJson, null, 2)
       } else {
         console.log('[GENERATE-IMPORT] Aucune caractéristique détectée')
+        finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
       }
     } else {
       console.log('[GENERATE-IMPORT] Description trop courte pour extraire les caractéristiques')
+      finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
     }
   } catch (error: any) {
     console.error(`[GENERATE-IMPORT] Erreur extraction caractéristiques: ${error.message}`)

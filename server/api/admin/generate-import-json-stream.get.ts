@@ -11,6 +11,8 @@ import type { ImportGenerationEvent } from '@@/server/utils/import-generation-ss
 const querySchema = z.object({
   method: z.enum(['direct', 'agent']).default('direct'),
   urls: z.string().min(1), // URLs séparées par des virgules
+  // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
+  previewedImageUrl: z.string().url().optional(),
 })
 
 /**
@@ -30,7 +32,7 @@ export default wrapApiHandler(
 
     // Récupérer et valider les paramètres query
     const query = getQuery(event)
-    const { method, urls: urlsString } = querySchema.parse(query)
+    const { method, urls: urlsString, previewedImageUrl } = querySchema.parse(query)
 
     // Parser les URLs
     const urls = urlsString
@@ -152,11 +154,11 @@ export default wrapApiHandler(
             if (method === 'direct') {
               // Extraction Directe (ED)
               console.log('[GENERATE-STREAM] Lancement ED...')
-              result = await generateImportJson(urls, { onProgress })
+              result = await generateImportJson(urls, { onProgress, previewedImageUrl })
             } else {
               // Exploration Intelligente (EI)
               console.log('[GENERATE-STREAM] Lancement EI...')
-              result = await runAgentExploration(urls, { onProgress })
+              result = await runAgentExploration(urls, { onProgress, previewedImageUrl })
             }
 
             // Ne pas envoyer si le client s'est déconnecté

@@ -817,13 +817,30 @@ const getStepLabel = (step: string): string => {
 }
 
 /**
+ * Extrait la première image OG trouvée dans les résultats de test
+ */
+const getPreviewedImageUrl = (): string | undefined => {
+  for (const result of testResults.value) {
+    if (result.webContent?.openGraph?.image) {
+      return result.webContent.openGraph.image
+    }
+  }
+  return undefined
+}
+
+/**
  * Génère le JSON via SSE (Server-Sent Events)
  * Remplace l'ancien système de polling
  */
 const generateWithSSE = (urls: string[], method: 'direct' | 'agent'): Promise<any> => {
   return new Promise((resolve, reject) => {
     const encodedUrls = urls.map((url) => encodeURIComponent(url)).join(',')
-    const sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
+    // Passer l'image trouvée lors du test pour éviter les hallucinations d'URL
+    const previewedImage = getPreviewedImageUrl()
+    let sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
+    if (previewedImage) {
+      sseUrl += `&previewedImageUrl=${encodeURIComponent(previewedImage)}`
+    }
 
     // withCredentials: true pour envoyer les cookies de session
     const eventSource = new EventSource(sseUrl, { withCredentials: true })

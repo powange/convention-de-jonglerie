@@ -52,6 +52,11 @@ export interface JugglingEdgeScraperResult {
     latitude: number | null
     longitude: number | null
   } | null
+  // Liens externes trouvés sur la page (pour exploration par l'agent)
+  externalLinks: {
+    officialWebsite: string | null
+    facebookEvent: string | null
+  }
 }
 
 /**
@@ -272,6 +277,62 @@ function extractAddressFromNominatim(
 }
 
 // ============================================
+// EXTRACTION DES LIENS EXTERNES
+// ============================================
+
+/**
+ * Extrait les liens externes d'une page JugglingEdge
+ * (site officiel, événement Facebook)
+ */
+function extractExternalLinks(html: string): {
+  officialWebsite: string | null
+  facebookEvent: string | null
+} {
+  const result = {
+    officialWebsite: null as string | null,
+    facebookEvent: null as string | null,
+  }
+
+  // Extraire tous les liens href
+  const hrefRegex = /href="([^"]+)"/gi
+  const matches = [...html.matchAll(hrefRegex)]
+
+  for (const match of matches) {
+    const href = match[1]
+
+    // Ignorer les liens JugglingEdge, Google Maps, et les ancres
+    if (
+      href.startsWith('#') ||
+      href.includes('jugglingedge.com') ||
+      href.includes('maps.google.com') ||
+      href.includes('google.com/maps')
+    ) {
+      continue
+    }
+
+    // Détecter les événements Facebook
+    if (href.includes('facebook.com/events/') && !result.facebookEvent) {
+      // Nettoyer l'URL (supprimer les entités HTML)
+      result.facebookEvent = href.replace(/&amp;/g, '&')
+    }
+
+    // Détecter les sites officiels (URLs externes qui ne sont pas des réseaux sociaux)
+    if (
+      href.startsWith('http') &&
+      !href.includes('facebook.com') &&
+      !href.includes('twitter.com') &&
+      !href.includes('instagram.com') &&
+      !href.includes('youtube.com') &&
+      !result.officialWebsite
+    ) {
+      result.officialWebsite = href.replace(/&amp;/g, '&')
+    }
+  }
+
+  return result
+}
+
+// ============================================
 // SCRAPER PRINCIPAL
 // ============================================
 
@@ -336,6 +397,15 @@ export async function scrapeJugglingEdgeEvent(
 
     console.log('[JUGGLINGEDGE] JSON-LD Event trouvé:', eventData.name)
 
+    // Extraire les liens externes (site officiel, Facebook)
+    const externalLinks = extractExternalLinks(html)
+    if (externalLinks.officialWebsite) {
+      console.log(`[JUGGLINGEDGE] Site officiel trouvé: ${externalLinks.officialWebsite}`)
+    }
+    if (externalLinks.facebookEvent) {
+      console.log(`[JUGGLINGEDGE] Facebook Event trouvé: ${externalLinks.facebookEvent}`)
+    }
+
     // Extraire les données de base
     const result: JugglingEdgeScraperResult = {
       name: eventData.name ? decodeHtmlEntities(eventData.name) : null,
@@ -346,6 +416,7 @@ export async function scrapeJugglingEdgeEvent(
       endDate: eventData.endDate || null,
       url: eventData.url || url,
       location: null,
+      externalLinks,
     }
 
     // Parser l'adresse si présente
@@ -409,9 +480,9 @@ export function jugglingEdgeEventToImportJson(
       longitude: jeEvent.location?.longitude ?? null,
       imageUrl: '', // JugglingEdge ne fournit pas d'image dans JSON-LD
       ticketingUrl: '', // À extraire du contenu si présent
-      facebookUrl: '',
+      facebookUrl: jeEvent.externalLinks.facebookEvent || '',
       instagramUrl: '',
-      officialWebsiteUrl: '', // À déduire par l'IA depuis la description
+      officialWebsiteUrl: jeEvent.externalLinks.officialWebsite || '',
     },
   }
 
@@ -535,6 +606,18 @@ export function formatJugglingEdgeDataAsContent(
 
   if (jeEvent.description) {
     content += `\n--- DESCRIPTION ---\n${jeEvent.description}\n`
+  }
+
+  // Ajouter les liens externes pour l'exploration
+  if (jeEvent.externalLinks.officialWebsite || jeEvent.externalLinks.facebookEvent) {
+    content += `\n--- LIENS À EXPLORER (FETCH_URL recommandé) ---\n`
+    if (jeEvent.externalLinks.officialWebsite) {
+      content += `Site officiel: ${jeEvent.externalLinks.officialWebsite}\n`
+    }
+    if (jeEvent.externalLinks.facebookEvent) {
+      content += `Événement Facebook: ${jeEvent.externalLinks.facebookEvent}\n`
+    }
+    content += `(Ces liens peuvent contenir des infos supplémentaires: email, tarifs, camping, restauration, etc.)\n`
   }
 
   content += `\n=== FIN DONNÉES JUGGLINGEDGE ===\n`

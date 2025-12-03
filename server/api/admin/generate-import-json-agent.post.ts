@@ -35,7 +35,7 @@ import {
   jugglingEdgeEventToImportJson,
   formatJugglingEdgeDataAsContent,
 } from '@@/server/utils/jugglingedge-scraper'
-import { extractAndFormatWebContent } from '@@/server/utils/web-content-extractor'
+import { extractWebContent, formatExtractionForAI } from '@@/server/utils/web-content-extractor'
 import { z } from 'zod'
 
 import { generateImportJson } from './generate-import-json.post'
@@ -504,6 +504,12 @@ async function fetchAndExtractContent(
   content?: string
   error?: string
   facebookEvent?: FacebookScraperResult
+  ogImage?: string // Image OG trouvée (pour la réinjecter après la génération IA)
+  // Liens externes trouvés sur la page (pour exploration automatique)
+  externalLinks?: {
+    officialWebsite: string | null
+    facebookEvent: string | null
+  }
 }> {
   try {
     if (taskId) {
@@ -568,7 +574,8 @@ async function fetchAndExtractContent(
         })
 
         console.log(`[AGENT] JugglingEdge Event scrappé: ${jeEvent.name}`)
-        return { success: true, content: pageContent }
+        // Retourner aussi les liens externes pour exploration automatique
+        return { success: true, content: pageContent, externalLinks: jeEvent.externalLinks }
       } else {
         // Fallback sur le fetch classique si le scraper échoue
         console.log(`[AGENT] Scraper JugglingEdge échoué, fallback sur fetch classique`)
@@ -583,7 +590,10 @@ async function fetchAndExtractContent(
     }
 
     const html = await response.text()
-    const pageContent = extractAndFormatWebContent(html, url, maxPageContentSize)
+
+    // Extraire le contenu structuré pour avoir accès à l'image OG
+    const extraction = extractWebContent(html, url)
+    const pageContent = formatExtractionForAI(extraction, maxPageContentSize)
 
     visitedUrls.push(url)
 
@@ -595,7 +605,12 @@ async function fetchAndExtractContent(
       timestamp: new Date(),
     })
 
-    return { success: true, content: pageContent }
+    // Retourner aussi l'image OG si trouvée
+    return {
+      success: true,
+      content: pageContent,
+      ogImage: extraction.openGraph.image,
+    }
   } catch (error: any) {
     console.error(`[AGENT] Erreur fetch ${url}: ${error.message}`)
     logs.push({
@@ -617,6 +632,8 @@ export interface AgentExplorationOptions {
   taskId?: string
   /** Callback de progression pour le mode SSE (nouveau système) */
   onProgress?: ProgressCallback
+  /** Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente) */
+  previewedImageUrl?: string
 }
 
 /**
@@ -626,7 +643,7 @@ export async function runAgentExploration(
   urls: string[],
   options: AgentExplorationOptions = {}
 ): Promise<AgentGenerateResult> {
-  const { taskId, onProgress } = options
+  const { taskId, onProgress, previewedImageUrl } = options
 
   // Helper pour envoyer les événements de progression (polling + SSE)
   const notifyStep = (
@@ -686,6 +703,8 @@ export async function runAgentExploration(
   const visitedUrls: string[] = []
   const collectedContent: string[] = []
   let totalContentSize = 0
+  // Stocker les images OG trouvées pour les injecter plus tard (l'IA peut halluciner les URLs)
+  const foundOgImages: string[] = []
 
   // Stockage des données Facebook (si une URL Facebook est fournie)
   const facebookData: { event: FacebookScraperResult | null; prefilledJson: any | null } = {
@@ -712,9 +731,12 @@ export async function runAgentExploration(
     })
   }
 
+  // Collecter les liens externes pour exploration automatique
+  const externalLinksToExplore: string[] = []
+
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i]
-    const progressPercent = Math.round(((i + 1) / urls.length) * 30) // Phase 1 = 0-30%
+    const progressPercent = Math.round(((i + 1) / urls.length) * 20) // Phase 1 = 0-20%
     if (taskId) {
       updateTaskStatus(taskId, 'processing', progressPercent)
       updateTaskMetadata(taskId, {
@@ -736,6 +758,28 @@ export async function runAgentExploration(
       collectedContent.push(result.content)
       totalContentSize += result.content.length
       notifyUrlFetched(url)
+
+      // Stocker l'image OG si trouvée
+      if (result.ogImage) {
+        console.log(`[AGENT] Image OG trouvée: ${result.ogImage}`)
+        foundOgImages.push(result.ogImage)
+      }
+
+      // Collecter les liens externes trouvés (pour exploration automatique)
+      if (result.externalLinks) {
+        if (result.externalLinks.officialWebsite) {
+          externalLinksToExplore.push(result.externalLinks.officialWebsite)
+          console.log(
+            `[AGENT] Lien externe trouvé (site officiel): ${result.externalLinks.officialWebsite}`
+          )
+        }
+        if (result.externalLinks.facebookEvent) {
+          externalLinksToExplore.push(result.externalLinks.facebookEvent)
+          console.log(
+            `[AGENT] Lien externe trouvé (Facebook): ${result.externalLinks.facebookEvent}`
+          )
+        }
+      }
     }
   }
 
@@ -747,12 +791,79 @@ export async function runAgentExploration(
   console.log(`[AGENT] Phase 1 terminée: ${visitedUrls.length} pages explorées`)
 
   // ============================================
+  // PHASE 1.5: Explorer automatiquement les liens externes
+  // ============================================
+  if (externalLinksToExplore.length > 0) {
+    console.log(
+      `[AGENT] Phase 1.5: Exploration automatique de ${externalLinksToExplore.length} liens externes`
+    )
+    if (taskId) {
+      updateTaskMetadata(taskId, {
+        phase: 'external_links',
+        statusMessage: `Exploration des liens externes (${externalLinksToExplore.length})...`,
+      })
+    }
+
+    for (let i = 0; i < externalLinksToExplore.length; i++) {
+      const extUrl = externalLinksToExplore[i]
+
+      // Vérifier si déjà visité
+      if (visitedUrls.includes(extUrl)) {
+        console.log(`[AGENT] Lien externe déjà visité: ${extUrl}`)
+        continue
+      }
+
+      // Vérifier la limite de contenu
+      if (totalContentSize > maxTotalContentSize) {
+        console.log(`[AGENT] Limite de contenu atteinte, arrêt exploration externe`)
+        break
+      }
+
+      const progressPercent = 20 + Math.round(((i + 1) / externalLinksToExplore.length) * 15) // Phase 1.5 = 20-35%
+      if (taskId) {
+        updateTaskStatus(taskId, 'processing', progressPercent)
+        updateTaskMetadata(taskId, {
+          pagesVisited: visitedUrls.length,
+          statusMessage: `Exploration lien externe ${i + 1}/${externalLinksToExplore.length}: ${new URL(extUrl).hostname}...`,
+        })
+      }
+      notifyProgress(visitedUrls.length, MAX_AGENT_ITERATIONS, extUrl)
+
+      console.log(`[AGENT] Exploration automatique: ${extUrl}`)
+      const result = await fetchAndExtractContent(
+        extUrl,
+        taskId,
+        visitedUrls,
+        logs,
+        maxPageContentSize,
+        facebookData
+      )
+
+      if (result.success && result.content) {
+        collectedContent.push(result.content)
+        totalContentSize += result.content.length
+        notifyUrlFetched(extUrl)
+
+        // Stocker l'image OG si trouvée
+        if (result.ogImage) {
+          console.log(`[AGENT] Image OG trouvée (lien externe): ${result.ogImage}`)
+          foundOgImages.push(result.ogImage)
+        }
+      }
+    }
+
+    console.log(
+      `[AGENT] Phase 1.5 terminée: ${visitedUrls.length} pages explorées au total (dont liens externes)`
+    )
+  }
+
+  // ============================================
   // PHASE 2: Demander à l'IA quelles pages supplémentaires explorer
   // ============================================
   console.log('[AGENT] Phase 2: Analyse et suggestions de pages supplémentaires')
   notifyStep('exploring_page')
   if (taskId) {
-    updateTaskStatus(taskId, 'processing', 35)
+    updateTaskStatus(taskId, 'processing', 40)
     updateTaskMetadata(taskId, {
       phase: 'analysis',
       pagesVisited: visitedUrls.length,
@@ -769,12 +880,21 @@ export async function runAgentExploration(
     .join('\n---\n')
     .substring(0, maxTotalContentSize)
 
+  // Modifier les instructions selon si des liens externes ont été explorés ou non
+  const linksExploredMsg =
+    externalLinksToExplore.length > 0
+      ? `\nNOTE: Les liens externes (site officiel, Facebook) ont déjà été explorés automatiquement ci-dessus.`
+      : ''
+
   const initialAnalysis = `Contenu de ${visitedUrls.length} page(s):
 
 ${truncatedContent}
+${linksExploredMsg}
 
-Si tu as name, email, dates, adresse, ville, pays, code postal -> GENERATE_JSON avec le JSON complet.
-Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
+INSTRUCTIONS:
+1. Si tu as TOUTES les infos nécessaires (name, email, dates, adresse complète) -> GENERATE_JSON
+2. S'il manque des infos importantes et qu'il y a d'autres liens dans le contenu (pas encore explorés) -> FETCH_URL: <url>
+3. Génère le JSON dès que tu as suffisamment d'informations`
 
   conversationHistory.push({ role: 'user', content: initialAnalysis })
 
@@ -793,7 +913,7 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
     consecutiveInvalidRequests < MAX_CONSECUTIVE_INVALID
   ) {
     iteration++
-    const progressPercent = 35 + Math.round((iteration / maxAdditionalIterations) * 55) // Phase 2-3 = 35-90%
+    const progressPercent = 40 + Math.round((iteration / maxAdditionalIterations) * 50) // Phase 2-3 = 40-90%
     if (taskId) {
       updateTaskStatus(taskId, 'processing', progressPercent)
       updateTaskMetadata(taskId, {
@@ -861,6 +981,12 @@ Sinon, si des liens utiles sont listés -> FETCH_URL: <url>`
         collectedContent.push(result.content)
         totalContentSize += result.content.length
         notifyUrlFetched(urlToFetch)
+
+        // Stocker l'image OG si trouvée
+        if (result.ogImage) {
+          console.log(`[AGENT] Image OG trouvée (exploration): ${result.ogImage}`)
+          foundOgImages.push(result.ogImage)
+        }
 
         if (taskId) {
           updateTaskMetadata(taskId, {
@@ -1099,6 +1225,23 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
       startDate: parsedJson.edition?.startDate,
       endDate: parsedJson.edition?.endDate,
     })
+
+    // Post-traitement: Injecter l'image trouvée lors du test ou extraite programmatiquement
+    // Priorité: 1) previewedImageUrl (du test) 2) foundOgImages (de l'extraction)
+    // L'IA peut halluciner des URLs différentes, donc on utilise l'image du test en priorité
+    const imageToInject = previewedImageUrl || (foundOgImages.length > 0 ? foundOgImages[0] : null)
+    if (imageToInject) {
+      const currentImageUrl = parsedJson.edition?.imageUrl || ''
+
+      // Si pas d'image ou image différente de celle trouvée, utiliser celle du test/extraction
+      if (!currentImageUrl || currentImageUrl !== imageToInject) {
+        console.log(
+          `[AGENT] Injection de l'image (IA: "${currentImageUrl}" -> ${previewedImageUrl ? 'Test' : 'Extraction'}: "${imageToInject}")`
+        )
+        if (!parsedJson.edition) parsedJson.edition = {}
+        parsedJson.edition.imageUrl = imageToInject
+      }
+    }
 
     // Extraire les caractéristiques (services) via IA
     const description = parsedJson.edition?.description || ''
