@@ -302,7 +302,15 @@
         "exploring_page": "Exploration des pages...",
         "extracting_features": "Détection des services...",
         "completed": "Terminé"
-      }
+      },
+      "duplicate_warning_title": "Éditions similaires détectées",
+      "duplicate_warning_description": "Une ou plusieurs éditions existent déjà à la même période dans le même pays. Vérifiez qu'il ne s'agit pas d'un doublon avant de continuer.",
+      "duplicate_editions_found": "{count} édition(s) similaire(s) trouvée(s)",
+      "duplicate_edition_dates": "Du {startDate} au {endDate}",
+      "proceed_anyway": "Importer quand même",
+      "cancel_import": "Annuler",
+      "checking_duplicates": "Vérification des doublons...",
+      "no_duplicates_found": "Aucune édition similaire trouvée"
     },
     "inactive": "Inactif",
     "last_execution_details": "Détails de la dernière exécution",

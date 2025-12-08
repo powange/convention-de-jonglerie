@@ -381,11 +381,15 @@
           <UButton
             color="primary"
             size="lg"
-            :loading="importing"
+            :loading="importing || checkingDuplicates"
             :disabled="!jsonInput.trim()"
             @click="validateAndImport"
           >
-            {{ $t('admin.import.validate_and_import') }}
+            {{
+              checkingDuplicates
+                ? $t('admin.import.checking_duplicates')
+                : $t('admin.import.validate_and_import')
+            }}
           </UButton>
 
           <UButton variant="soft" color="neutral" size="lg" @click="loadExample">
@@ -491,6 +495,102 @@
         </div>
       </div>
     </UCard>
+
+    <!-- Modale d'avertissement pour les doublons -->
+    <UModal v-model:open="showDuplicateModal">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <UIcon name="i-heroicons-exclamation-triangle" class="text-warning-500" size="24" />
+          <span class="font-semibold">{{ $t('admin.import.duplicate_warning_title') }}</span>
+        </div>
+      </template>
+
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('admin.import.duplicate_warning_description') }}
+          </p>
+
+          <UAlert
+            icon="i-heroicons-information-circle"
+            color="warning"
+            variant="soft"
+            :title="
+              $t('admin.import.duplicate_editions_found', { count: duplicateEditions.length })
+            "
+          />
+
+          <!-- Liste des éditions en doublon -->
+          <div class="space-y-3 max-h-80 overflow-y-auto">
+            <div
+              v-for="edition in duplicateEditions"
+              :key="edition.id"
+              class="p-3 border rounded-lg dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <div class="flex items-start gap-3">
+                <!-- Logo de la convention -->
+                <div
+                  v-if="edition.convention?.logo"
+                  class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700"
+                >
+                  <img
+                    :src="edition.convention.logo"
+                    :alt="edition.convention.name"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="w-12 h-12 flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+                >
+                  <UIcon name="i-heroicons-calendar" class="text-gray-400" size="20" />
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-medium text-gray-900 dark:text-white truncate">
+                    {{ edition.name || edition.convention?.name }}
+                  </h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ edition.convention?.name }}
+                  </p>
+                  <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                    {{
+                      $t('admin.import.duplicate_edition_dates', {
+                        startDate: formatDuplicateDate(edition.startDate),
+                        endDate: formatDuplicateDate(edition.endDate),
+                      })
+                    }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ edition.city }}, {{ edition.country }}
+                  </p>
+                </div>
+
+                <!-- Lien vers l'édition -->
+                <NuxtLink
+                  :to="`/editions/${edition.id}`"
+                  target="_blank"
+                  class="flex-shrink-0 text-primary-500 hover:text-primary-600"
+                >
+                  <UIcon name="i-heroicons-arrow-top-right-on-square" size="20" />
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton color="neutral" variant="outline" @click="showDuplicateModal = false">
+            {{ $t('admin.import.cancel_import') }}
+          </UButton>
+          <UButton color="warning" :loading="importing" @click="performImport">
+            {{ $t('admin.import.proceed_anyway') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -523,6 +623,11 @@ const jsonCopied = ref(false)
 const importing = ref(false)
 const validationResult = ref<any>(null)
 const importResult = ref<any>(null)
+
+// État pour la détection des doublons
+const checkingDuplicates = ref(false)
+const duplicateEditions = ref<any[]>([])
+const showDuplicateModal = ref(false)
 
 // Génération depuis URLs
 const urlsInput = ref('')
@@ -759,17 +864,49 @@ const isValidDate = (dateString: string): boolean => {
   return date instanceof Date && !isNaN(date.getTime())
 }
 
-const validateAndImport = async () => {
-  validationResult.value = validateJson(jsonInput.value)
+/**
+ * Vérifie s'il existe des éditions similaires (même période, même pays)
+ */
+const checkForDuplicates = async (data: any): Promise<boolean> => {
+  try {
+    checkingDuplicates.value = true
+    const response = await $fetch<{
+      hasDuplicates: boolean
+      duplicates: any[]
+      count: number
+    }>('/api/admin/check-duplicate-editions', {
+      method: 'POST',
+      body: {
+        startDate: data.edition.startDate,
+        endDate: data.edition.endDate,
+        country: data.edition.country,
+      },
+    })
 
-  if (!validationResult.value.success) {
-    return
+    if (response.hasDuplicates) {
+      duplicateEditions.value = response.duplicates
+      return true
+    }
+
+    duplicateEditions.value = []
+    return false
+  } catch (error) {
+    console.error('Erreur lors de la vérification des doublons:', error)
+    // En cas d'erreur, on continue l'import (fail-safe)
+    return false
+  } finally {
+    checkingDuplicates.value = false
   }
+}
 
-  // Si la validation est réussie, procéder à l'import
+/**
+ * Effectue l'import après validation et confirmation des doublons
+ */
+const performImport = async () => {
   try {
     importing.value = true
     importResult.value = null
+    showDuplicateModal.value = false
 
     const response = await $fetch<{ editionId: string; conventionId: string }>(
       '/api/admin/import-edition',
@@ -804,6 +941,34 @@ const validateAndImport = async () => {
   } finally {
     importing.value = false
   }
+}
+
+const validateAndImport = async () => {
+  validationResult.value = validateJson(jsonInput.value)
+
+  if (!validationResult.value.success) {
+    return
+  }
+
+  // Vérifier s'il existe des éditions similaires
+  const hasDuplicates = await checkForDuplicates(validationResult.value.data)
+
+  if (hasDuplicates) {
+    // Afficher la modale d'avertissement
+    showDuplicateModal.value = true
+    return
+  }
+
+  // Si pas de doublons, procéder à l'import directement
+  await performImport()
+}
+
+/**
+ * Formate une date pour l'affichage dans la liste des doublons
+ */
+const formatDuplicateDate = (date: string | Date) => {
+  const d = new Date(date)
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 /**
