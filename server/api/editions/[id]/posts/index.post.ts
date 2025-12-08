@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { editionPostSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
@@ -14,15 +13,6 @@ export default wrapApiHandler(
     await fetchResourceOrFail(prisma.edition, editionId, {
       errorMessage: 'Édition non trouvée',
     })
-
-    // Vérifier les permissions pour poster sur cette édition
-    const hasPermission = await hasEditionEditPermission(user.id, editionId)
-    if (!hasPermission) {
-      throw createError({
-        statusCode: 403,
-        message: 'Vous devez être organisateur pour poster sur cette édition',
-      })
-    }
 
     // Valider les données
     const body = await readBody(event)
