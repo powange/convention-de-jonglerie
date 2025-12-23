@@ -239,6 +239,7 @@ export async function getHelloAssoTiersAndOptions(
     minAmount?: number
     maxAmount?: number
     isActive: boolean
+    extraOptionIds: (number | string)[] // IDs des options associées à ce tarif
   }>
   options: Array<{
     id: number | string
@@ -294,6 +295,11 @@ export async function getHelloAssoTiersAndOptions(
       `🎫 [HelloAsso] Tier "${tier.label || tier.name}" has ${tierCustomFields.length} custom fields`
     )
 
+    // Extraire les IDs des options associées à ce tarif
+    const extraOptionIds = (tier.extraOptions || [])
+      .map((opt: HelloAssoExtraOption) => opt.id || opt.name || '')
+      .filter(Boolean)
+
     return {
       id: tier.id,
       name: tier.label || tier.name || '',
@@ -304,6 +310,7 @@ export async function getHelloAssoTiersAndOptions(
       maxAmount: tier.maxAmount,
       isActive: tier.isActive ?? true, // Actif par défaut si non spécifié
       customFields: tierCustomFields, // Inclure les custom fields (du tier ou du formulaire)
+      extraOptionIds, // IDs des options associées à ce tarif
     }
   })
 
@@ -362,6 +369,17 @@ async function fetchOrdersPageFromHelloAsso(
       customFields?: Array<{
         name: string
         answer: string
+      }>
+      options?: Array<{
+        name: string
+        amount: number
+        priceCategory: string
+        isRequired: boolean
+        optionId: number
+        customFields?: Array<{
+          name: string
+          answer: string
+        }>
       }>
     }>
   }>
@@ -463,6 +481,17 @@ export async function fetchOrdersFromHelloAsso(
       customFields?: Array<{
         name: string
         answer: string
+      }>
+      options?: Array<{
+        name: string
+        amount: number
+        priceCategory: string
+        isRequired: boolean
+        optionId: number
+        customFields?: Array<{
+          name: string
+          answer: string
+        }>
       }>
     }>
   }>

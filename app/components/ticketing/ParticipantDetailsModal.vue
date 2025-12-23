@@ -100,10 +100,12 @@
                       ? 'warning'
                       : participant.ticket.order.status === 'Onsite'
                         ? 'info'
-                        : participant.ticket.order.status === 'Refunded'
+                        : participant.ticket.order.status === 'Refunded' ||
+                            participant.ticket.order.status === 'Canceled'
                           ? 'error'
                           : 'neutral'
                 "
+                :size="participant.ticket.order.status === 'Canceled' ? 'lg' : undefined"
                 variant="soft"
               >
                 {{
@@ -115,7 +117,9 @@
                         ? 'Sur place'
                         : participant.ticket.order.status === 'Refunded'
                           ? 'Annulée'
-                          : participant.ticket.order.status
+                          : participant.ticket.order.status === 'Canceled'
+                            ? 'Annulée'
+                            : participant.ticket.order.status
                 }}
               </UBadge>
             </div>
@@ -245,7 +249,13 @@
                               : 'text-primary-600 dark:text-primary-400'
                           "
                         >
-                          {{ (item.amount / 100).toFixed(2) }} €
+                          {{ (getItemTotalAmount(item) / 100).toFixed(2) }} €
+                          <span
+                            v-if="item.selectedOptions && item.selectedOptions.length > 0"
+                            class="text-xs opacity-75"
+                          >
+                            ({{ (item.amount / 100).toFixed(2) }} € + options)
+                          </span>
                         </p>
                       </div>
                       <div>
@@ -258,12 +268,12 @@
                               ? 'success'
                               : item.state === 'Pending'
                                 ? 'warning'
-                                : item.state === 'Refunded'
+                                : item.state === 'Refunded' || item.state === 'Canceled'
                                   ? 'error'
                                   : 'neutral'
                           "
                           variant="soft"
-                          size="xs"
+                          size="lg"
                         >
                           {{
                             item.state === 'Processed'
@@ -272,7 +282,9 @@
                                 ? 'En attente'
                                 : item.state === 'Refunded'
                                   ? 'Remboursé'
-                                  : item.state
+                                  : item.state === 'Canceled'
+                                    ? 'Annulé'
+                                    : item.state
                           }}
                         </UBadge>
                       </div>
@@ -309,6 +321,32 @@
                           {{ field.answer }}
                         </p>
                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Options sélectionnées -->
+                  <div
+                    v-if="item.selectedOptions && item.selectedOptions.length > 0"
+                    class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium uppercase tracking-wide"
+                    >
+                      Options
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      <UBadge
+                        v-for="selectedOption in item.selectedOptions"
+                        :key="selectedOption.id"
+                        color="primary"
+                        variant="soft"
+                        size="sm"
+                      >
+                        {{ selectedOption.option.name }}
+                        <span v-if="selectedOption.option.price" class="ml-1 opacity-75">
+                          (+{{ (selectedOption.option.price / 100).toFixed(2) }} €)
+                        </span>
+                      </UBadge>
                     </div>
                   </div>
                 </div>
@@ -814,6 +852,20 @@ interface TicketData {
             customFieldName?: string
           }>
         }
+        selectedOptions?: Array<{
+          id: number
+          amount: number
+          option: {
+            id: number
+            name: string
+            type: string
+            price: number | null
+            returnableItems?: Array<{
+              id: number
+              name: string
+            }>
+          }
+        }>
       }>
     }
     customFields?: Array<{
@@ -985,6 +1037,7 @@ const returnableItemsToDistribute = computed(() => {
       const participantName =
         `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
 
+      // Articles du tarif
       if (item.tier?.returnableItems) {
         for (const tierItem of item.tier.returnableItems) {
           // Construire le nom avec origine si disponible
@@ -996,10 +1049,25 @@ const returnableItemsToDistribute = computed(() => {
           // Créer un ID unique en utilisant un index global pour éviter les collisions
           // même si plusieurs billets ont le même tarif et la même réponse au champ personnalisé
           itemsList.push({
-            id: `${item.id}-${tierItem.returnableItem.id}-${globalIndex++}`,
+            id: `${item.id}-tier-${tierItem.returnableItem.id}-${globalIndex++}`,
             name: `${itemName} - ${participantName}`,
             participantName,
           })
+        }
+      }
+
+      // Articles des options sélectionnées
+      if (item.selectedOptions) {
+        for (const selectedOption of item.selectedOptions) {
+          if (selectedOption.option.returnableItems) {
+            for (const optionItem of selectedOption.option.returnableItems) {
+              itemsList.push({
+                id: `${item.id}-option-${selectedOption.id}-${optionItem.id}-${globalIndex++}`,
+                name: `${optionItem.name} - ${participantName}`,
+                participantName,
+              })
+            }
+          }
         }
       }
     }
@@ -1099,6 +1167,16 @@ const paymentItems = computed(() => {
   return props.participant.ticket.order.items?.filter((item) => item.type === 'Payment') || []
 })
 
+// Calcule le montant total d'un item (billet + options)
+const getItemTotalAmount = (item: {
+  amount: number
+  selectedOptions?: Array<{ option: { price: number | null } }>
+}) => {
+  const optionsTotal =
+    item.selectedOptions?.reduce((sum, so) => sum + (so.option.price || 0), 0) || 0
+  return item.amount + optionsTotal
+}
+
 const selectAllParticipants = () => {
   if (props.participant && 'ticket' in props.participant) {
     // Ne sélectionner que les participants non-validés et non-donations
@@ -1107,7 +1185,7 @@ const selectAllParticipants = () => {
   }
 }
 
-// Computed pour calculer le montant total à payer
+// Computed pour calculer le montant total à payer (billet + options)
 const amountToPay = computed(() => {
   if (!props.participant || !('ticket' in props.participant)) return 0
 
@@ -1115,13 +1193,13 @@ const amountToPay = computed(() => {
   if (selectedParticipants.value.length > 0) {
     return participantItems.value
       .filter((item) => selectedParticipants.value.includes(item.id))
-      .reduce((total, item) => total + item.amount, 0)
+      .reduce((total, item) => total + getItemTotalAmount(item), 0)
   }
 
   // Sinon, calculer le total de la commande (seulement les items non validés)
   return participantItems.value
     .filter((item) => !item.entryValidated)
-    .reduce((total, item) => total + item.amount, 0)
+    .reduce((total, item) => total + getItemTotalAmount(item), 0)
 })
 
 const showValidateTicketsConfirm = () => {

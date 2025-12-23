@@ -95,7 +95,9 @@
       "WebFetch(domain:www.prisma.io)",
       "WebFetch(domain:nuxt.com)",
       "WebFetch(domain:github.com)",
-      "Bash(npm run docker:dev:get-lockfile:*)"
+      "Bash(npm run docker:dev:get-lockfile:*)",
+      "Bash(git diff:*)",
+      "mcp__nuxt-ui__get-component-metadata"
     ],
     "deny": [],
     "ask": [],

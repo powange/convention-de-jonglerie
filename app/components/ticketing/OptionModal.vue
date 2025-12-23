@@ -150,6 +150,32 @@
             </template>
           </USelectMenu>
         </UFormField>
+
+        <UFormField
+          label="Tarifs associés"
+          name="tiers"
+          :help="
+            isHelloAssoOption
+              ? 'Les associations tarif-option sont gérées par HelloAsso'
+              : 'Cette option ne sera proposée que pour les tarifs sélectionnés'
+          "
+        >
+          <USelectMenu
+            v-model="form.tierIds"
+            :items="tiers.map((tier) => ({ label: tier.name, value: tier.id }))"
+            value-key="value"
+            multiple
+            searchable
+            :disabled="isHelloAssoOption"
+            placeholder="Sélectionner les tarifs..."
+            class="w-full"
+          >
+            <template #label>
+              <span v-if="form.tierIds.length === 0">Tous les tarifs</span>
+              <span v-else>{{ form.tierIds.length }} tarif(s) sélectionné(s)</span>
+            </template>
+          </USelectMenu>
+        </UFormField>
       </form>
     </template>
 
@@ -181,6 +207,7 @@ interface TicketingOption {
   helloAssoOptionId?: number
   quotas?: any[]
   returnableItems?: any[]
+  tiers?: any[]
 }
 
 const props = defineProps<{
@@ -226,25 +253,31 @@ const form = ref({
   position: 0,
   quotaIds: [] as number[],
   returnableItemIds: [] as number[],
+  tierIds: [] as number[],
 })
 
 const choicesText = ref('')
 const priceInEuros = ref<number | null>(null)
 
-// Charger les quotas et items disponibles
+// Charger les quotas, items et tarifs disponibles
 const quotas = ref<any[]>([])
 const returnableItems = ref<any[]>([])
+const tiers = ref<any[]>([])
 
 const loadQuotasAndItems = async () => {
   try {
-    const [quotasData, itemsData] = await Promise.all([
+    const [quotasData, itemsData, tiersData] = await Promise.all([
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
-      $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`),
+      $fetch<{ success: boolean; returnableItems: any[] }>(
+        `/api/editions/${props.editionId}/ticketing/returnable-items`
+      ),
+      $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/tiers`),
     ])
     quotas.value = quotasData
-    returnableItems.value = itemsData
+    returnableItems.value = itemsData.returnableItems
+    tiers.value = tiersData
   } catch (error) {
-    console.error('Failed to load quotas and items:', error)
+    console.error('Failed to load quotas, items and tiers:', error)
   }
 }
 
@@ -266,6 +299,7 @@ watch(
           quotaIds: props.option.quotas?.map((q: any) => q.quotaId) || [],
           returnableItemIds:
             props.option.returnableItems?.map((r: any) => r.returnableItemId) || [],
+          tierIds: props.option.tiers?.map((t: any) => t.tierId) || [],
         }
         choicesText.value = props.option.choices?.join('\n') || ''
         // Convertir le prix de centimes en euros
@@ -280,6 +314,7 @@ watch(
           position: 0,
           quotaIds: [],
           returnableItemIds: [],
+          tierIds: [],
         }
         choicesText.value = ''
         priceInEuros.value = null
@@ -317,6 +352,7 @@ const handleSubmit = async () => {
       price: priceInEuros.value ? Math.round(priceInEuros.value * 100) : null,
       quotaIds: form.value.quotaIds,
       returnableItemIds: form.value.returnableItemIds,
+      tierIds: form.value.tierIds,
     }
 
     if (props.option) {

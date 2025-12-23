@@ -122,6 +122,12 @@ export default wrapApiHandler(
                   },
                 },
               },
+              selectedOptions: {
+                include: {
+                  option: true,
+                },
+                orderBy: { id: 'asc' },
+              },
             },
             orderBy: { id: 'asc' },
           },

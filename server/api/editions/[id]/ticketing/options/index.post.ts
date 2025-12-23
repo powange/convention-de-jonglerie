@@ -13,6 +13,7 @@ const bodySchema = z.object({
   position: z.number().int().min(0).default(0),
   quotaIds: z.array(z.number().int()).optional().default([]),
   returnableItemIds: z.array(z.number().int()).optional().default([]),
+  tierIds: z.array(z.number().int()).optional().default([]),
 })
 
 export default wrapApiHandler(

@@ -418,6 +418,29 @@
                         <span class="text-gray-500 dark:text-gray-500">{{ field.answer }}</span>
                       </div>
                     </div>
+                    <!-- Options sélectionnées -->
+                    <div
+                      v-if="item.selectedOptions && item.selectedOptions.length > 0"
+                      class="space-y-0.5 mt-1"
+                    >
+                      <div
+                        v-for="selectedOption in item.selectedOptions"
+                        :key="selectedOption.id"
+                        class="flex items-start gap-1"
+                      >
+                        <UIcon
+                          name="i-heroicons-check-circle"
+                          class="h-3 w-3 inline flex-shrink-0 mt-0.5 text-primary-500"
+                        />
+                        <span class="font-medium">{{ selectedOption.option.name }}</span>
+                        <span
+                          v-if="selectedOption.amount > 0"
+                          class="text-gray-500 dark:text-gray-500"
+                        >
+                          (+{{ (selectedOption.amount / 100).toFixed(2) }}€)
+                        </span>
+                      </div>
+                    </div>
                     <div
                       v-if="
                         item.qrCode &&
@@ -440,7 +463,7 @@
                 </div>
                 <div class="text-right flex-shrink-0 flex flex-col items-end gap-2">
                   <div class="font-semibold text-sm text-primary-600 dark:text-primary-400">
-                    {{ (item.amount / 100).toFixed(2) }}€
+                    {{ getItemTotalAmount(item) }}€
                   </div>
                   <UBadge
                     :color="item.state === 'Processed' ? 'success' : 'neutral'"
@@ -899,6 +922,14 @@ const formatDate = (date: string | Date) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+// Calculer le montant total d'un item (tarif + options)
+const getItemTotalAmount = (item: any) => {
+  const baseAmount = item.amount || 0
+  const optionsAmount =
+    item.selectedOptions?.reduce((sum: number, opt: any) => sum + (opt.amount || 0), 0) || 0
+  return ((baseAmount + optionsAmount) / 100).toFixed(2)
 }
 
 // Charger les commandes avec pagination

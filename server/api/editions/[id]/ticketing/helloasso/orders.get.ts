@@ -146,6 +146,8 @@ export default wrapApiHandler(
                 },
               })
 
+              let savedItemId: number
+
               if (existingItem) {
                 // Mettre à jour l'item existant
                 await tx.ticketingOrderItem.update({
@@ -163,9 +165,10 @@ export default wrapApiHandler(
                     customFields: item.customFields || null,
                   },
                 })
+                savedItemId = existingItem.id
               } else {
                 // Créer un nouvel item
-                await tx.ticketingOrderItem.create({
+                const newItem = await tx.ticketingOrderItem.create({
                   data: {
                     orderId: savedOrder.id,
                     helloAssoItemId: item.id,
@@ -181,6 +184,54 @@ export default wrapApiHandler(
                     customFields: item.customFields || null,
                   },
                 })
+                savedItemId = newItem.id
+              }
+
+              // Synchroniser les options sélectionnées
+              if (item.options && item.options.length > 0) {
+                // Récupérer toutes les options de l'édition pour faire la correspondance
+                const availableOptions = await tx.ticketingOption.findMany({
+                  where: { editionId },
+                })
+
+                for (const selectedOption of item.options) {
+                  // Chercher l'option correspondante par helloAssoOptionId
+                  const matchingOption = availableOptions.find(
+                    (opt) => opt.helloAssoOptionId === String(selectedOption.optionId)
+                  )
+
+                  if (matchingOption) {
+                    // Upsert l'association orderItem <-> option
+                    await tx.ticketingOrderItemOption.upsert({
+                      where: {
+                        orderItemId_optionId: {
+                          orderItemId: savedItemId,
+                          optionId: matchingOption.id,
+                        },
+                      },
+                      create: {
+                        orderItemId: savedItemId,
+                        optionId: matchingOption.id,
+                        amount: selectedOption.amount || 0,
+                        customFields: selectedOption.customFields || null,
+                      },
+                      update: {
+                        amount: selectedOption.amount || 0,
+                        customFields: selectedOption.customFields || null,
+                      },
+                    })
+                  } else {
+                    console.log('⚠️ Option HelloAsso non trouvée:', {
+                      optionId: selectedOption.optionId,
+                      optionName: selectedOption.name,
+                      availableOptions: availableOptions.map((o) => ({
+                        id: o.id,
+                        helloAssoOptionId: o.helloAssoOptionId,
+                        name: o.name,
+                      })),
+                    })
+                  }
+                }
               }
             }
           }

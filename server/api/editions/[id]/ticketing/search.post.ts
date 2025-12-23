@@ -61,10 +61,38 @@ export default wrapApiHandler(
                   tier: {
                     include: returnableItemsIncludes,
                   },
+                  selectedOptions: {
+                    include: {
+                      option: {
+                        include: {
+                          returnableItems: {
+                            include: {
+                              returnableItem: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                    orderBy: { id: 'asc' },
+                  },
                 },
                 orderBy: { id: 'asc' },
               },
             },
+          },
+          selectedOptions: {
+            include: {
+              option: {
+                include: {
+                  returnableItems: {
+                    include: {
+                      returnableItem: true,
+                    },
+                  },
+                },
+              },
+            },
+            orderBy: { id: 'asc' },
           },
         },
         take: 20, // Limiter à 20 résultats
@@ -605,11 +633,39 @@ export default wrapApiHandler(
                         returnableItems: calculateReturnableItemsForTicket(orderItem),
                       }
                     : null,
+                  selectedOptions: orderItem.selectedOptions.map((so) => ({
+                    id: so.id,
+                    amount: so.amount,
+                    option: {
+                      id: so.option.id,
+                      name: so.option.name,
+                      type: so.option.type,
+                      price: so.option.price,
+                      returnableItems: so.option.returnableItems.map((ri) => ({
+                        id: ri.returnableItem.id,
+                        name: ri.returnableItem.name,
+                      })),
+                    },
+                  })),
                 })),
               },
               customFields: item.customFields as any,
               entryValidated: item.entryValidated,
               entryValidatedAt: item.entryValidatedAt,
+              selectedOptions: item.selectedOptions.map((so) => ({
+                id: so.id,
+                amount: so.amount,
+                option: {
+                  id: so.option.id,
+                  name: so.option.name,
+                  type: so.option.type,
+                  price: so.option.price,
+                  returnableItems: so.option.returnableItems.map((ri) => ({
+                    id: ri.returnableItem.id,
+                    name: ri.returnableItem.name,
+                  })),
+                },
+              })),
             },
           },
         })),

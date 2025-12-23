@@ -276,6 +276,71 @@ export default wrapApiHandler(
         }
       })
 
+      // Créer les associations tarif-option
+      await prisma.$transaction(async (tx) => {
+        // Récupérer tous les tarifs sauvegardés
+        const savedTiers = await tx.ticketingTier.findMany({
+          where: { externalTicketingId: config.id },
+        })
+
+        // Récupérer toutes les options sauvegardées
+        const savedOptions = await tx.ticketingOption.findMany({
+          where: { externalTicketingId: config.id },
+        })
+
+        // Créer un map helloAssoOptionId -> dbOptionId
+        const optionIdMap = new Map<string, number>()
+        for (const opt of savedOptions) {
+          if (opt.helloAssoOptionId) {
+            optionIdMap.set(opt.helloAssoOptionId, opt.id)
+          }
+        }
+
+        // Pour chaque tarif HelloAsso avec des options
+        for (const haTier of result.tiers || []) {
+          // Trouver le tarif sauvegardé correspondant
+          const savedTier = savedTiers.find((t) => t.helloAssoTierId === haTier.id)
+          if (!savedTier) continue
+
+          // Récupérer les associations existantes pour ce tarif
+          const existingAssociations = await tx.ticketingTierOption.findMany({
+            where: { tierId: savedTier.id },
+          })
+          const existingOptionIds = new Set(existingAssociations.map((a) => a.optionId))
+
+          // Supprimer les associations obsolètes
+          const expectedOptionIds = new Set<number>()
+          for (const haOptionId of haTier.extraOptionIds || []) {
+            const dbOptionId = optionIdMap.get(String(haOptionId))
+            if (dbOptionId) {
+              expectedOptionIds.add(dbOptionId)
+            }
+          }
+
+          const associationsToDelete = existingAssociations.filter(
+            (a) => !expectedOptionIds.has(a.optionId)
+          )
+          if (associationsToDelete.length > 0) {
+            await tx.ticketingTierOption.deleteMany({
+              where: { id: { in: associationsToDelete.map((a) => a.id) } },
+            })
+          }
+
+          // Créer les nouvelles associations
+          for (const haOptionId of haTier.extraOptionIds || []) {
+            const dbOptionId = optionIdMap.get(String(haOptionId))
+            if (dbOptionId && !existingOptionIds.has(dbOptionId)) {
+              await tx.ticketingTierOption.create({
+                data: {
+                  tierId: savedTier.id,
+                  optionId: dbOptionId,
+                },
+              })
+            }
+          }
+        }
+      })
+
       // Mettre à jour la date de dernière synchronisation
       await prisma.externalTicketing.update({
         where: { id: config.id },

@@ -352,6 +352,17 @@
                   >
                     {{ ordersLoaded ? 'Recharger' : 'Charger' }} participants
                   </UButton>
+                  <UButton
+                    v-if="authStore.isAdminModeActive"
+                    color="neutral"
+                    variant="soft"
+                    icon="i-heroicons-code-bracket"
+                    :loading="loadingRawJson"
+                    size="lg"
+                    @click="loadRawHelloAssoJson"
+                  >
+                    JSON brut
+                  </UButton>
                 </div>
               </div>
 
@@ -720,6 +731,58 @@
         @save="handleConfigSave"
         @test="handleConfigTest"
       />
+
+      <!-- Modal JSON brut (admin only) -->
+      <UModal
+        v-model:open="showRawJsonModal"
+        title="JSON brut HelloAsso"
+        :ui="{ width: 'sm:max-w-4xl' }"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <UAlert
+              icon="i-heroicons-information-circle"
+              color="info"
+              variant="soft"
+              description="Ce sont les données brutes retournées par l'API HelloAsso. Seules les 10 premières commandes sont affichées."
+            />
+            <!-- Onglets pour basculer entre Form et Orders -->
+            <div class="flex gap-2">
+              <UButton
+                :color="rawJsonActiveTab === 'form' ? 'primary' : 'neutral'"
+                :variant="rawJsonActiveTab === 'form' ? 'solid' : 'soft'"
+                size="sm"
+                @click="rawJsonActiveTab = 'form'"
+              >
+                Formulaire
+              </UButton>
+              <UButton
+                :color="rawJsonActiveTab === 'orders' ? 'primary' : 'neutral'"
+                :variant="rawJsonActiveTab === 'orders' ? 'solid' : 'soft'"
+                size="sm"
+                @click="rawJsonActiveTab = 'orders'"
+              >
+                Commandes (10 premières)
+              </UButton>
+            </div>
+            <div class="max-h-[60vh] overflow-auto">
+              <pre
+                class="text-xs bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto whitespace-pre-wrap"
+                >{{ currentRawJson }}</pre
+              >
+            </div>
+          </div>
+        </template>
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton variant="soft" color="neutral" @click="copyRawJson">
+              <UIcon name="i-heroicons-clipboard" class="mr-1" />
+              Copier
+            </UButton>
+            <UButton color="primary" @click="showRawJsonModal = false"> Fermer </UButton>
+          </div>
+        </template>
+      </UModal>
     </div>
   </div>
 </template>
@@ -1191,6 +1254,69 @@ const loadOrdersFromHelloAsso = async () => {
 }
 
 const loadedCustomFields = ref<any[]>([])
+
+// JSON brut HelloAsso (admin only)
+const loadingRawJson = ref(false)
+const showRawJsonModal = ref(false)
+const rawJsonFormData = ref<string>('')
+const rawJsonOrdersData = ref<string>('')
+const rawJsonActiveTab = ref<'form' | 'orders'>('form')
+
+const loadRawHelloAssoJson = async () => {
+  if (loadingRawJson.value) return
+
+  loadingRawJson.value = true
+
+  try {
+    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/raw`)
+
+    rawJsonFormData.value = JSON.stringify(response.form, null, 2)
+    rawJsonOrdersData.value = JSON.stringify(response.orders, null, 2)
+    rawJsonActiveTab.value = 'form'
+    showRawJsonModal.value = true
+
+    toast.add({
+      title: 'JSON brut chargé',
+      description: 'Les données brutes HelloAsso ont été récupérées',
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Failed to load raw JSON:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de charger les données brutes',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingRawJson.value = false
+  }
+}
+
+const currentRawJson = computed(() =>
+  rawJsonActiveTab.value === 'form' ? rawJsonFormData.value : rawJsonOrdersData.value
+)
+
+const copyRawJson = async () => {
+  try {
+    await navigator.clipboard.writeText(currentRawJson.value)
+    toast.add({
+      title: 'Copié !',
+      description: 'Le JSON a été copié dans le presse-papiers',
+      icon: 'i-heroicons-clipboard-document-check',
+      color: 'success',
+    })
+  } catch (error) {
+    console.error('Failed to copy:', error)
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de copier dans le presse-papiers',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
 
 const items = computed(
   () =>

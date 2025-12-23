@@ -104,6 +104,19 @@
             {{ itemRelation.returnableItem.name }}
           </UBadge>
         </div>
+
+        <!-- Tarifs associés -->
+        <div v-if="option.tiers && option.tiers.length > 0" class="flex flex-wrap gap-1">
+          <p class="font-medium text-gray-700 dark:text-gray-300">Tarifs :</p>
+          <UBadge
+            v-for="tierRelation in option.tiers"
+            :key="tierRelation.tier.id"
+            color="primary"
+            variant="soft"
+          >
+            {{ tierRelation.tier.name }}
+          </UBadge>
+        </div>
       </div>
 
       <template #footer>

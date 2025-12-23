@@ -8,6 +8,7 @@ export interface OptionData {
   position: number
   quotaIds?: number[]
   returnableItemIds?: number[]
+  tierIds?: number[] // Tarifs associés à cette option
 }
 
 /**
@@ -20,6 +21,7 @@ export async function getEditionOptions(editionId: number) {
     include: {
       quotas: { include: { quota: true } },
       returnableItems: { include: { returnableItem: true } },
+      tiers: { include: { tier: true } },
     },
   })
 }
@@ -60,6 +62,9 @@ export async function createOption(editionId: number, data: OptionData) {
           returnableItemId,
         })),
       },
+      tiers: {
+        create: (data.tierIds || []).map((tierId) => ({ tierId })),
+      },
     },
   })
 }
@@ -87,11 +92,12 @@ export async function updateOption(optionId: number, editionId: number, data: Op
 
   // Mettre à jour l'option avec ses relations
   return await prisma.$transaction(async (tx) => {
-    // Supprimer les anciennes relations
+    // Supprimer les anciennes relations (sauf tiers pour HelloAsso)
     await tx.ticketingOptionQuota.deleteMany({ where: { optionId } })
     await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
 
-    // Pour les options HelloAsso, on met à jour uniquement les relations
+    // Pour les options HelloAsso, on met à jour uniquement les relations quotas et returnableItems
+    // Les associations tarif-option sont gérées par la synchronisation HelloAsso
     // Pour les options manuelles, on met à jour tout
     if (isHelloAssoOption) {
       return await tx.ticketingOption.update({
@@ -105,9 +111,13 @@ export async function updateOption(optionId: number, editionId: number, data: Op
               returnableItemId,
             })),
           },
+          // Note: les associations tiers sont gérées par HelloAsso, on ne les modifie pas
         },
       })
     } else {
+      // Pour les options manuelles, on peut modifier les associations tiers
+      await tx.ticketingTierOption.deleteMany({ where: { optionId } })
+
       return await tx.ticketingOption.update({
         where: { id: optionId },
         data: {
@@ -125,6 +135,9 @@ export async function updateOption(optionId: number, editionId: number, data: Op
             create: (data.returnableItemIds || []).map((returnableItemId) => ({
               returnableItemId,
             })),
+          },
+          tiers: {
+            create: (data.tierIds || []).map((tierId) => ({ tierId })),
           },
         },
       })
