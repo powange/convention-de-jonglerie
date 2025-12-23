@@ -311,10 +311,10 @@ const pagination = ref({
   totalPages: 0,
 })
 const searchQuery = ref('')
-const selectedPhase = ref<string | null>(null)
-const selectedType = ref<string | null>(null)
-const selectedMealType = ref<string | null>(null)
-const selectedDate = ref<string | null>(null)
+const selectedPhase = ref('all')
+const selectedType = ref('all')
+const selectedMealType = ref('all')
+const selectedDate = ref('all')
 const availableDates = ref<string[]>([])
 
 // Variables pour la génération des PDFs de restauration
@@ -323,28 +323,28 @@ const generatingCateringPdf = ref(false)
 
 // Options de filtres
 const phaseOptions = computed(() => [
-  { value: null, label: t('edition.meals.all_phases') },
+  { value: 'all', label: t('edition.meals.all_phases') },
   { value: 'SETUP', label: t('common.setup') },
   { value: 'EVENT', label: t('common.event') },
   { value: 'TEARDOWN', label: t('common.teardown') },
 ])
 
 const typeOptions = computed(() => [
-  { value: null, label: t('edition.meals.all_types') },
+  { value: 'all', label: t('edition.meals.all_types') },
   { value: 'participant', label: t('common.participant') },
   { value: 'volunteer', label: t('common.volunteer') },
   { value: 'artist', label: t('common.artist') },
 ])
 
 const mealTypeOptions = computed(() => [
-  { value: null, label: t('edition.meals.all_meal_types') },
+  { value: 'all', label: t('edition.meals.all_meal_types') },
   { value: 'BREAKFAST', label: t('common.breakfast') },
   { value: 'LUNCH', label: t('common.lunch') },
   { value: 'DINNER', label: t('common.dinner') },
 ])
 
 const dateOptions = computed(() => [
-  { value: null, label: t('edition.meals.all_dates') },
+  { value: 'all', label: t('edition.meals.all_dates') },
   ...availableDates.value.map((date) => ({
     value: date,
     label: new Date(date).toLocaleDateString('fr-FR', {
@@ -457,19 +457,19 @@ const fetchParticipants = async () => {
       params.search = searchQuery.value.trim()
     }
 
-    if (selectedPhase.value) {
+    if (selectedPhase.value && selectedPhase.value !== 'all') {
       params.phase = selectedPhase.value
     }
 
-    if (selectedType.value) {
+    if (selectedType.value && selectedType.value !== 'all') {
       params.type = selectedType.value
     }
 
-    if (selectedMealType.value) {
+    if (selectedMealType.value && selectedMealType.value !== 'all') {
       params.mealType = selectedMealType.value
     }
 
-    if (selectedDate.value) {
+    if (selectedDate.value && selectedDate.value !== 'all') {
       params.date = selectedDate.value
     }
 
@@ -479,7 +479,11 @@ const fetchParticipants = async () => {
 
     if (response.success) {
       participants.value = response.data || []
-      pagination.value = response.pagination
+      // Mapper les propriétés de pagination (API: limit/totalCount -> Frontend: pageSize/total)
+      pagination.value.page = response.pagination.page
+      pagination.value.pageSize = response.pagination.limit
+      pagination.value.total = response.pagination.totalCount
+      pagination.value.totalPages = response.pagination.totalPages
       availableDates.value = response.availableDates || []
       stats.value = response.stats || null
     }
