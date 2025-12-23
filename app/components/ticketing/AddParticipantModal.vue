@@ -779,6 +779,9 @@ interface TicketingOption {
   isRequired: boolean
   choices: string[] | null
   price: number | null
+  tiers?: Array<{
+    tierId: number
+  }>
 }
 
 interface TicketingQuota {
@@ -916,6 +919,19 @@ const stepperItems = computed(() => {
 
 // Indices des étapes (s'adaptent selon le type de participant et la présence d'options)
 const hasOptions = computed(() => editionOptions.value && editionOptions.value.length > 0)
+
+// Vérifie si les tarifs sélectionnés ont des options disponibles
+const hasOptionsForSelectedTiers = computed(() => {
+  // Récupérer les IDs des tarifs sélectionnés
+  const selectedTierIds = Object.entries(tierQuantities.value)
+    .filter(([_, qty]) => qty > 0)
+    .map(([id]) => parseInt(id))
+
+  if (selectedTierIds.length === 0) return false
+
+  // Vérifier si au moins un tarif a des options
+  return selectedTierIds.some((tierId) => getOptionsForTier(tierId).length > 0)
+})
 
 // Pour identifié: étape 0 (info) -> 1 (tarifs) -> 2 (options si présentes) -> récap -> paiement
 // Pour anonyme: étape 1 (tarifs) -> 2 (options si présentes) -> récap -> paiement
@@ -1076,11 +1092,18 @@ const getItemAmountError = (item: SelectedItem) => {
   return ''
 }
 
-// Récupérer toutes les options pour un tarif donné
-// Note: Pour l'instant, on retourne toutes les options de l'édition pour tous les tarifs
-// car il n'y a pas de liaison Tier -> Quota -> Option dans la base de données
-const getOptionsForTier = (_tierId: number): TicketingOption[] => {
-  return editionOptions.value
+// Récupérer les options disponibles pour un tarif donné
+// Les options sans association de tarif sont affichées pour tous les tarifs
+// Les options avec des associations ne sont affichées que pour les tarifs concernés
+const getOptionsForTier = (tierId: number): TicketingOption[] => {
+  return editionOptions.value.filter((option) => {
+    // Si l'option n'a pas d'associations de tarifs, elle est disponible pour tous
+    if (!option.tiers || option.tiers.length === 0) {
+      return true
+    }
+    // Sinon, vérifier si le tarif est dans la liste des tarifs associés
+    return option.tiers.some((t) => t.tierId === tierId)
+  })
 }
 
 // Récupérer les custom fields d'un tarif
@@ -1244,8 +1267,9 @@ const nextStep = () => {
       }
 
       for (let i = 0; i < quantity; i++) {
-        // Pré-activer les options requises (sauf YesNo car ne pas cocher = "No")
-        const requiredOptions = (editionOptions.value || [])
+        // Pré-activer les options requises du tarif (sauf YesNo car ne pas cocher = "No")
+        const tierOptions = getOptionsForTier(tier.id)
+        const requiredOptions = tierOptions
           .filter((opt) => opt.isRequired && opt.type !== 'YesNo')
           .map((opt) => opt.id)
 
@@ -1266,9 +1290,9 @@ const nextStep = () => {
     }
   }
 
-  // Si on est à l'étape 1 (sélection des tarifs) et qu'il n'y a pas d'options
+  // Si on est à l'étape 1 (sélection des tarifs) et qu'il n'y a pas d'options pour les tarifs sélectionnés
   // Passer directement à l'étape récapitulatif (sauter l'étape Options)
-  if (currentStep.value === 1 && !hasOptions.value) {
+  if (currentStep.value === 1 && !hasOptionsForSelectedTiers.value) {
     currentStep.value = summaryStepIndex.value
   } else {
     currentStep.value++
@@ -1277,9 +1301,9 @@ const nextStep = () => {
 
 const previousStep = () => {
   if (currentStep.value > 0) {
-    // Si on est à l'étape récapitulatif et qu'il n'y a pas d'options
+    // Si on est à l'étape récapitulatif et qu'il n'y a pas d'options pour les tarifs sélectionnés
     // Revenir directement à l'étape sélection des tarifs (sauter l'étape Options)
-    if (currentStep.value === summaryStepIndex.value && !hasOptions.value) {
+    if (currentStep.value === summaryStepIndex.value && !hasOptionsForSelectedTiers.value) {
       currentStep.value = 1
     } else {
       currentStep.value--
