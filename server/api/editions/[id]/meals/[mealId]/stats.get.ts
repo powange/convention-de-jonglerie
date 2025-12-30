@@ -18,10 +18,15 @@ export default wrapApiHandler(
     }
 
     // Vérifier que le repas existe et appartient à cette édition
+    // On inclut les relations tiers et options pour éviter des requêtes séparées
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
         editionId,
+      },
+      include: {
+        tiers: { select: { tierId: true } },
+        options: { select: { optionId: true } },
       },
     })
 
@@ -75,21 +80,9 @@ export default wrapApiHandler(
     })
 
     // 3. Compter les participants ayant accès à ce repas (via tarifs ET options, avec déduplication)
-    // D'abord, récupérer tous les tarifs qui donnent accès à ce repas
-    const tierMeals = await prisma.ticketingTierMeal.findMany({
-      where: { mealId },
-      select: { tierId: true },
-    })
-
-    const tierIds = tierMeals.map((tm) => tm.tierId)
-
-    // Récupérer toutes les options qui donnent accès à ce repas
-    const optionMeals = await prisma.ticketingOptionMeal.findMany({
-      where: { mealId },
-      select: { optionId: true },
-    })
-
-    const optionIds = optionMeals.map((om) => om.optionId)
+    // Utiliser les relations déjà chargées avec le meal
+    const tierIds = meal.tiers.map((t) => t.tierId)
+    const optionIds = meal.options.map((o) => o.optionId)
 
     // Pour compter avec déduplication, on récupère tous les orderItems uniques
     const uniqueOrderItemIds = new Set<number>()
@@ -125,7 +118,7 @@ export default wrapApiHandler(
 
     // Récupérer les orderItems via les options (déduplication)
     if (optionIds.length > 0) {
-      const orderItemSelectionsFromOptions = await prisma.ticketingOrderItemSelection.findMany({
+      const orderItemSelectionsFromOptions = await prisma.ticketingOrderItemOption.findMany({
         where: {
           optionId: { in: optionIds },
           orderItem: {

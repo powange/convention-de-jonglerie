@@ -27,10 +27,15 @@ export default wrapApiHandler(
     const validatedData = validateMealSchema.parse(body)
 
     // Vérifier que le repas existe et appartient à cette édition
+    // On inclut les relations tiers et options pour vérifier l'accès
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
         editionId,
+      },
+      include: {
+        tiers: { select: { tierId: true } },
+        options: { select: { optionId: true } },
       },
     })
 
@@ -110,31 +115,21 @@ export default wrapApiHandler(
         })
       }
 
-      // Vérifier que le tarif du participant donne accès à ce repas
+      // Vérifier que le tarif ou les options du participant donnent accès à ce repas
+      // Utiliser les relations déjà chargées avec le meal
+      const mealTierIds = new Set(meal.tiers.map((t) => t.tierId))
+      const mealOptionIds = new Set(meal.options.map((o) => o.optionId))
+
       let hasAccess = false
 
-      if (orderItem.tierId) {
-        const tierMeal = await prisma.ticketingTierMeal.findUnique({
-          where: {
-            tierId_mealId: {
-              tierId: orderItem.tierId,
-              mealId,
-            },
-          },
-        })
-        hasAccess = !!tierMeal
+      // Vérifier l'accès via le tarif
+      if (orderItem.tierId && mealTierIds.has(orderItem.tierId)) {
+        hasAccess = true
       }
 
       // Si pas d'accès via le tarif, vérifier les options
       if (!hasAccess && orderItem.selectedOptions.length > 0) {
-        const optionIds = orderItem.selectedOptions.map((so) => so.optionId)
-        const optionMeal = await prisma.ticketingOptionMeal.findFirst({
-          where: {
-            optionId: { in: optionIds },
-            mealId,
-          },
-        })
-        hasAccess = !!optionMeal
+        hasAccess = orderItem.selectedOptions.some((so) => mealOptionIds.has(so.optionId))
       }
 
       if (!hasAccess) {

@@ -22,10 +22,15 @@ export default wrapApiHandler(
     const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'all'
 
     // Vérifier que le repas existe et appartient à cette édition
+    // On inclut les relations tiers et options pour éviter des requêtes séparées
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
         editionId,
+      },
+      include: {
+        tiers: { select: { tierId: true } },
+        options: { select: { optionId: true } },
       },
     })
 
@@ -130,13 +135,8 @@ export default wrapApiHandler(
       // Set pour suivre les orderItems déjà ajoutés (déduplication tarif/option)
       const addedOrderItemIds = new Set<number>()
 
-      // Récupérer tous les tarifs qui donnent accès à ce repas
-      const tierMeals = await prisma.ticketingTierMeal.findMany({
-        where: { mealId },
-        select: { tierId: true },
-      })
-
-      const tierIds = tierMeals.map((tm) => tm.tierId)
+      // Utiliser les relations déjà chargées avec le meal
+      const tierIds = meal.tiers.map((t) => t.tierId)
 
       if (tierIds.length > 0) {
         // Récupérer tous les orderItems qui ont un de ces tarifs
@@ -179,17 +179,12 @@ export default wrapApiHandler(
         }
       }
 
-      // Récupérer toutes les options qui donnent accès à ce repas
-      const optionMeals = await prisma.ticketingOptionMeal.findMany({
-        where: { mealId },
-        select: { optionId: true },
-      })
-
-      const optionIds = optionMeals.map((om) => om.optionId)
+      // Utiliser les relations déjà chargées avec le meal
+      const optionIds = meal.options.map((o) => o.optionId)
 
       if (optionIds.length > 0) {
         // Récupérer les orderItemSelections qui ont ces options
-        const orderItemSelections = await prisma.ticketingOrderItemSelection.findMany({
+        const orderItemSelections = await prisma.ticketingOrderItemOption.findMany({
           where: {
             optionId: { in: optionIds },
             orderItem: {
