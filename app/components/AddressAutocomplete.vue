@@ -71,7 +71,7 @@ const _handleInput = (_e: Event) => {
 const fetchSuggestions = async () => {
   try {
     const response = await $fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&addressdetails=1&limit=5&countrycodes=fr,de,es,gb,it`,
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&addressdetails=1&limit=5`,
       {
         headers: {
           'User-Agent': 'ConventionJonglerieApp/1.0 (contact@yourdomain.com)',

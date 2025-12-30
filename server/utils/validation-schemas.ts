@@ -118,11 +118,12 @@ export const editionSchema = z
     imageUrl: z.string().nullable().optional(),
     startDate: dateSchema,
     endDate: dateSchema,
+    timezone: z.string().nullable().optional(),
     addressLine1: z
       .string()
       .min(1, 'Adresse ligne 1 requise')
       .max(200, "L'adresse ne peut pas dépasser 200 caractères"),
-    addressLine2: z.string().optional(),
+    addressLine2: z.string().nullable().optional(),
     postalCode: z
       .string()
       .min(1, 'Code postal requis')
@@ -131,7 +132,7 @@ export const editionSchema = z
       .string()
       .min(1, 'Ville requise')
       .max(100, 'La ville ne peut pas dépasser 100 caractères'),
-    region: z.string().optional(),
+    region: z.string().nullable().optional(),
     country: z
       .string()
       .min(1, 'Pays requis')
@@ -202,6 +203,7 @@ export const updateEditionSchema = z
     imageUrl: z.string().nullable().optional(),
     startDate: optionalDateSchema,
     endDate: optionalDateSchema,
+    timezone: z.string().nullable().optional(),
     addressLine1: z
       .string()
       .min(1, 'Adresse ligne 1 requise')
