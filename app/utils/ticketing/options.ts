@@ -22,6 +22,22 @@ export interface TicketingOption {
       name: string
     }
   }>
+  tiers?: Array<{
+    tier: {
+      id: number
+      name: string
+    }
+  }>
+  meals?: Array<{
+    meal: {
+      id: number
+      editionId: number
+      date: string
+      mealType: 'BREAKFAST' | 'LUNCH' | 'DINNER'
+      enabled: boolean
+      phases: string[]
+    }
+  }>
 }
 
 export interface OptionFormData {
@@ -34,6 +50,8 @@ export interface OptionFormData {
   position: number
   quotaIds: number[]
   returnableItemIds: number[]
+  tierIds?: number[]
+  mealIds?: number[]
 }
 
 export async function fetchOptions(editionId: number): Promise<TicketingOption[]> {

@@ -176,6 +176,27 @@
             </template>
           </USelectMenu>
         </UFormField>
+
+        <UFormField
+          label="Repas associés"
+          name="meals"
+          help="Cette option donnera accès aux repas sélectionnés"
+        >
+          <USelectMenu
+            v-model="form.mealIds"
+            :items="mealsOptions"
+            value-key="value"
+            multiple
+            searchable
+            placeholder="Sélectionner les repas..."
+            class="w-full"
+          >
+            <template #label>
+              <span v-if="form.mealIds.length === 0">Aucun repas sélectionné</span>
+              <span v-else>{{ form.mealIds.length }} repas sélectionné(s)</span>
+            </template>
+          </USelectMenu>
+        </UFormField>
       </form>
     </template>
 
@@ -208,6 +229,7 @@ interface TicketingOption {
   quotas?: any[]
   returnableItems?: any[]
   tiers?: any[]
+  meals?: any[]
 }
 
 const props = defineProps<{
@@ -254,30 +276,56 @@ const form = ref({
   quotaIds: [] as number[],
   returnableItemIds: [] as number[],
   tierIds: [] as number[],
+  mealIds: [] as number[],
 })
 
 const choicesText = ref('')
 const priceInEuros = ref<number | null>(null)
 
-// Charger les quotas, items et tarifs disponibles
+// Charger les quotas, items, tarifs et repas disponibles
 const quotas = ref<any[]>([])
 const returnableItems = ref<any[]>([])
 const tiers = ref<any[]>([])
+const meals = ref<any[]>([])
+
+// Utiliser les utilitaires meals pour formater les labels
+const { getMealTypeLabel } = useMealTypeLabel()
+const { getPhasesLabel } = useMealPhaseLabel()
+
+// Computed pour formater les options de repas
+const mealsOptions = computed(() => {
+  return meals.value.map((meal) => {
+    const dateStr = new Date(meal.date).toLocaleDateString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+    const mealTypeLabel = getMealTypeLabel(meal.mealType)
+    const phasesLabel = getPhasesLabel(meal.phases)
+
+    return {
+      label: `${dateStr} - ${mealTypeLabel} (${phasesLabel})`,
+      value: meal.id,
+    }
+  })
+})
 
 const loadQuotasAndItems = async () => {
   try {
-    const [quotasData, itemsData, tiersData] = await Promise.all([
+    const [quotasData, itemsData, tiersData, mealsData] = await Promise.all([
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
       $fetch<{ success: boolean; returnableItems: any[] }>(
         `/api/editions/${props.editionId}/ticketing/returnable-items`
       ),
       $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/tiers`),
+      $fetch(`/api/editions/${props.editionId}/volunteers/meals`),
     ])
     quotas.value = quotasData
     returnableItems.value = itemsData.returnableItems
     tiers.value = tiersData
+    meals.value = Array.isArray(mealsData?.meals) ? mealsData.meals : []
   } catch (error) {
-    console.error('Failed to load quotas, items and tiers:', error)
+    console.error('Failed to load quotas, items, tiers and meals:', error)
   }
 }
 
@@ -300,6 +348,7 @@ watch(
           returnableItemIds:
             props.option.returnableItems?.map((r: any) => r.returnableItemId) || [],
           tierIds: props.option.tiers?.map((t: any) => t.tierId) || [],
+          mealIds: props.option.meals?.map((m: any) => m.mealId) || [],
         }
         choicesText.value = props.option.choices?.join('\n') || ''
         // Convertir le prix de centimes en euros
@@ -315,6 +364,7 @@ watch(
           quotaIds: [],
           returnableItemIds: [],
           tierIds: [],
+          mealIds: [],
         }
         choicesText.value = ''
         priceInEuros.value = null
@@ -353,6 +403,7 @@ const handleSubmit = async () => {
       quotaIds: form.value.quotaIds,
       returnableItemIds: form.value.returnableItemIds,
       tierIds: form.value.tierIds,
+      mealIds: form.value.mealIds,
     }
 
     if (props.option) {

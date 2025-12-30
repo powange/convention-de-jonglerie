@@ -143,7 +143,10 @@ export default wrapApiHandler(
       }
     }
 
-    // 3. Rechercher dans les participants (via les tarifs ayant accès à ce repas)
+    // 3. Rechercher dans les participants (via les tarifs ET options ayant accès à ce repas)
+    // Set pour suivre les orderItems déjà ajoutés (déduplication tarif/option)
+    const addedOrderItemIds = new Set<number>()
+
     // D'abord, récupérer tous les tarifs qui donnent accès à ce repas
     const tierMeals = await prisma.ticketingTierMeal.findMany({
       where: { mealId },
@@ -171,6 +174,73 @@ export default wrapApiHandler(
       })
 
       for (const item of orderItems) {
+        addedOrderItemIds.add(item.id)
+
+        const matchesSearch =
+          item.lastName?.toLowerCase().includes(searchLower) ||
+          item.firstName?.toLowerCase().includes(searchLower) ||
+          item.email?.toLowerCase().includes(searchLower)
+
+        if (matchesSearch) {
+          // Trouver si ce participant a déjà une validation de repas
+          const mealValidation = item.mealAccess.find((ma) => ma.mealId === mealId)
+
+          results.push({
+            uniqueId: `participant-${item.id}`,
+            id: item.id,
+            type: 'participant',
+            firstName: item.firstName,
+            lastName: item.lastName,
+            pseudo: null,
+            email: item.email,
+            phone: null,
+            consumedAt: mealValidation?.consumedAt || null,
+          })
+        }
+      }
+    }
+
+    // 4. Rechercher dans les participants via les options ayant accès à ce repas
+    const optionMeals = await prisma.ticketingOptionMeal.findMany({
+      where: { mealId },
+      select: { optionId: true },
+    })
+
+    const optionIds = optionMeals.map((om) => om.optionId)
+
+    if (optionIds.length > 0) {
+      // Récupérer les orderItemSelections qui ont ces options
+      const orderItemSelections = await prisma.ticketingOrderItemSelection.findMany({
+        where: {
+          optionId: { in: optionIds },
+          orderItem: {
+            state: { in: ['Valid', 'Processed'] },
+            order: {
+              editionId,
+              status: 'Processed',
+            },
+          },
+        },
+        include: {
+          orderItem: {
+            include: {
+              mealAccess: {
+                where: { mealId },
+              },
+            },
+          },
+        },
+      })
+
+      for (const selection of orderItemSelections) {
+        const item = selection.orderItem
+
+        // Éviter les doublons : si le participant a déjà le repas via un tarif, ne pas l'ajouter
+        if (addedOrderItemIds.has(item.id)) {
+          continue
+        }
+        addedOrderItemIds.add(item.id)
+
         const matchesSearch =
           item.lastName?.toLowerCase().includes(searchLower) ||
           item.firstName?.toLowerCase().includes(searchLower) ||

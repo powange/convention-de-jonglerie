@@ -7,7 +7,9 @@ export interface TicketingTier {
   price: number
   minAmount: number | null
   maxAmount: number | null
+  position: number
   isActive: boolean
+  countAsParticipant?: boolean
   helloAssoTierId: number | null
   validFrom?: string | null // Date de début de validité
   validUntil?: string | null // Date de fin de validité
@@ -45,9 +47,14 @@ export interface TierFormData {
   price: number
   minAmount: number | null
   maxAmount: number | null
+  position: number
   isActive: boolean
+  countAsParticipant?: boolean
+  validFrom?: string | null
+  validUntil?: string | null
   quotaIds: number[]
   returnableItemIds: number[]
+  mealIds?: number[]
 }
 
 export async function fetchTiers(editionId: number): Promise<TicketingTier[]> {

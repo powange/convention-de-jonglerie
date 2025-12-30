@@ -9,6 +9,7 @@ export interface OptionData {
   quotaIds?: number[]
   returnableItemIds?: number[]
   tierIds?: number[] // Tarifs associés à cette option
+  mealIds?: number[] // Repas associés à cette option
 }
 
 /**
@@ -22,6 +23,7 @@ export async function getEditionOptions(editionId: number) {
       quotas: { include: { quota: true } },
       returnableItems: { include: { returnableItem: true } },
       tiers: { include: { tier: true } },
+      meals: { include: { meal: true } },
     },
   })
 }
@@ -65,6 +67,9 @@ export async function createOption(editionId: number, data: OptionData) {
       tiers: {
         create: (data.tierIds || []).map((tierId) => ({ tierId })),
       },
+      meals: {
+        create: (data.mealIds || []).map((mealId) => ({ mealId })),
+      },
     },
   })
 }
@@ -95,8 +100,9 @@ export async function updateOption(optionId: number, editionId: number, data: Op
     // Supprimer les anciennes relations (sauf tiers pour HelloAsso)
     await tx.ticketingOptionQuota.deleteMany({ where: { optionId } })
     await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
+    await tx.ticketingOptionMeal.deleteMany({ where: { optionId } })
 
-    // Pour les options HelloAsso, on met à jour uniquement les relations quotas et returnableItems
+    // Pour les options HelloAsso, on met à jour uniquement les relations quotas, returnableItems et meals
     // Les associations tarif-option sont gérées par la synchronisation HelloAsso
     // Pour les options manuelles, on met à jour tout
     if (isHelloAssoOption) {
@@ -110,6 +116,9 @@ export async function updateOption(optionId: number, editionId: number, data: Op
             create: (data.returnableItemIds || []).map((returnableItemId) => ({
               returnableItemId,
             })),
+          },
+          meals: {
+            create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },
           // Note: les associations tiers sont gérées par HelloAsso, on ne les modifie pas
         },
@@ -138,6 +147,9 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           },
           tiers: {
             create: (data.tierIds || []).map((tierId) => ({ tierId })),
+          },
+          meals: {
+            create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },
         },
       })

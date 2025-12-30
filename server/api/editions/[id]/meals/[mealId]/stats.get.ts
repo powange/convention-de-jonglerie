@@ -74,7 +74,7 @@ export default wrapApiHandler(
       },
     })
 
-    // 3. Compter les participants ayant accès à ce repas
+    // 3. Compter les participants ayant accès à ce repas (via tarifs ET options, avec déduplication)
     // D'abord, récupérer tous les tarifs qui donnent accès à ce repas
     const tierMeals = await prisma.ticketingTierMeal.findMany({
       where: { mealId },
@@ -83,12 +83,21 @@ export default wrapApiHandler(
 
     const tierIds = tierMeals.map((tm) => tm.tierId)
 
-    let participantCount = 0
-    let participantValidatedCount = 0
+    // Récupérer toutes les options qui donnent accès à ce repas
+    const optionMeals = await prisma.ticketingOptionMeal.findMany({
+      where: { mealId },
+      select: { optionId: true },
+    })
 
+    const optionIds = optionMeals.map((om) => om.optionId)
+
+    // Pour compter avec déduplication, on récupère tous les orderItems uniques
+    const uniqueOrderItemIds = new Set<number>()
+    const validatedOrderItemIds = new Set<number>()
+
+    // Récupérer les orderItems via les tarifs
     if (tierIds.length > 0) {
-      // Compter tous les orderItems qui ont un de ces tarifs
-      participantCount = await prisma.ticketingOrderItem.count({
+      const orderItemsFromTiers = await prisma.ticketingOrderItem.findMany({
         where: {
           tierId: { in: tierIds },
           state: { in: ['Valid', 'Processed'] },
@@ -97,15 +106,29 @@ export default wrapApiHandler(
             status: 'Processed',
           },
         },
+        select: {
+          id: true,
+          mealAccess: {
+            where: { mealId, consumedAt: { not: null } },
+            select: { id: true },
+          },
+        },
       })
 
-      // Compter les participants qui ont validé leur repas
-      participantValidatedCount = await prisma.ticketingOrderItemMeal.count({
+      for (const item of orderItemsFromTiers) {
+        uniqueOrderItemIds.add(item.id)
+        if (item.mealAccess.length > 0) {
+          validatedOrderItemIds.add(item.id)
+        }
+      }
+    }
+
+    // Récupérer les orderItems via les options (déduplication)
+    if (optionIds.length > 0) {
+      const orderItemSelectionsFromOptions = await prisma.ticketingOrderItemSelection.findMany({
         where: {
-          mealId,
-          consumedAt: { not: null },
+          optionId: { in: optionIds },
           orderItem: {
-            tierId: { in: tierIds },
             state: { in: ['Valid', 'Processed'] },
             order: {
               editionId,
@@ -113,8 +136,33 @@ export default wrapApiHandler(
             },
           },
         },
+        select: {
+          orderItem: {
+            select: {
+              id: true,
+              mealAccess: {
+                where: { mealId, consumedAt: { not: null } },
+                select: { id: true },
+              },
+            },
+          },
+        },
       })
+
+      for (const selection of orderItemSelectionsFromOptions) {
+        const item = selection.orderItem
+        // Ajouter uniquement si pas déjà ajouté via tarif
+        if (!uniqueOrderItemIds.has(item.id)) {
+          uniqueOrderItemIds.add(item.id)
+          if (item.mealAccess.length > 0) {
+            validatedOrderItemIds.add(item.id)
+          }
+        }
+      }
     }
+
+    const participantCount = uniqueOrderItemIds.size
+    const participantValidatedCount = validatedOrderItemIds.size
 
     const total = volunteerCount + artistCount + participantCount
     const validated = volunteerValidatedCount + artistValidatedCount + participantValidatedCount

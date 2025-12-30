@@ -28,6 +28,7 @@ export default wrapApiHandler(
       imageUrl,
       startDate,
       endDate,
+      timezone,
       addressLine1,
       addressLine2,
       postalCode,
@@ -247,6 +248,7 @@ export default wrapApiHandler(
       updatedData.convention = { connect: { id: conventionId } }
     }
 
+    if (timezone !== undefined) updatedData.timezone = timezone
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl
     if (officialWebsiteUrl !== undefined) updatedData.officialWebsiteUrl = officialWebsiteUrl
     if (facebookUrl !== undefined) updatedData.facebookUrl = facebookUrl

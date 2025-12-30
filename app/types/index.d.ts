@@ -33,6 +33,7 @@ export interface Edition {
   imageUrl?: string | null
   startDate: string
   endDate: string
+  timezone?: string | null
   addressLine1: string
   addressLine2?: string | null
   postalCode: string
@@ -176,6 +177,7 @@ export interface EditionFormData {
   imageUrl?: string
   startDate: string
   endDate: string
+  timezone?: string | null
   addressLine1: string
   addressLine2?: string
   postalCode: string

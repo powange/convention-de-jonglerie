@@ -14,6 +14,7 @@ const bodySchema = z.object({
   quotaIds: z.array(z.number().int()).optional().default([]),
   returnableItemIds: z.array(z.number().int()).optional().default([]),
   tierIds: z.array(z.number().int()).optional().default([]),
+  mealIds: z.array(z.number().int()).optional().default([]),
 })
 
 export default wrapApiHandler(

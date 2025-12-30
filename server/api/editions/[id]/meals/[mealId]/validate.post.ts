@@ -97,6 +97,9 @@ export default wrapApiHandler(
         include: {
           order: true,
           tier: true,
+          selectedOptions: {
+            select: { optionId: true },
+          },
         },
       })
 
@@ -108,16 +111,33 @@ export default wrapApiHandler(
       }
 
       // Vérifier que le tarif du participant donne accès à ce repas
-      const tierMeal = await prisma.ticketingTierMeal.findUnique({
-        where: {
-          tierId_mealId: {
-            tierId: orderItem.tierId!,
+      let hasAccess = false
+
+      if (orderItem.tierId) {
+        const tierMeal = await prisma.ticketingTierMeal.findUnique({
+          where: {
+            tierId_mealId: {
+              tierId: orderItem.tierId,
+              mealId,
+            },
+          },
+        })
+        hasAccess = !!tierMeal
+      }
+
+      // Si pas d'accès via le tarif, vérifier les options
+      if (!hasAccess && orderItem.selectedOptions.length > 0) {
+        const optionIds = orderItem.selectedOptions.map((so) => so.optionId)
+        const optionMeal = await prisma.ticketingOptionMeal.findFirst({
+          where: {
+            optionId: { in: optionIds },
             mealId,
           },
-        },
-      })
+        })
+        hasAccess = !!optionMeal
+      }
 
-      if (!tierMeal) {
+      if (!hasAccess) {
         throw createError({
           statusCode: 403,
           message: "Ce participant n'a pas accès à ce repas",

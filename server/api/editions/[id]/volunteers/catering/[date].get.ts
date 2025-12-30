@@ -79,6 +79,24 @@ export default wrapApiHandler(async (event) => {
           },
         },
       },
+      // Inclure les participants via les options de billetterie
+      options: {
+        include: {
+          option: {
+            include: {
+              orderItemSelections: {
+                include: {
+                  orderItem: {
+                    include: {
+                      order: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
       mealType: 'asc',
@@ -130,20 +148,56 @@ export default wrapApiHandler(async (event) => {
     }))
 
     // Récupérer les participants via les tarifs avec repas
-    const ticketParticipants = meal.tiers.flatMap((tierMeal) =>
-      tierMeal.tier.orderItems.map((orderItem) => ({
-        type: 'ticket' as const,
-        nom: orderItem.lastName || orderItem.order.payerLastName || '',
-        prenom: orderItem.firstName || orderItem.order.payerFirstName || '',
-        email: orderItem.email || orderItem.order.payerEmail || '',
-        phone: '',
-        dietaryPreference: null,
-        allergies: null,
-        allergySeverity: null,
-        emergencyContactName: null,
-        emergencyContactPhone: null,
-      }))
+    // Set pour suivre les orderItems déjà ajoutés (déduplication tarif/option)
+    const addedOrderItemIds = new Set<number>()
+
+    const ticketParticipantsFromTiers = meal.tiers.flatMap((tierMeal) =>
+      tierMeal.tier.orderItems.map((orderItem) => {
+        addedOrderItemIds.add(orderItem.id)
+        return {
+          type: 'ticket' as const,
+          nom: orderItem.lastName || orderItem.order.payerLastName || '',
+          prenom: orderItem.firstName || orderItem.order.payerFirstName || '',
+          email: orderItem.email || orderItem.order.payerEmail || '',
+          phone: '',
+          dietaryPreference: null,
+          allergies: null,
+          allergySeverity: null,
+          emergencyContactName: null,
+          emergencyContactPhone: null,
+        }
+      })
     )
+
+    // Récupérer les participants via les options avec repas (uniquement si pas déjà via tarif)
+    const ticketParticipantsFromOptions = meal.options.flatMap((optionMeal) =>
+      optionMeal.option.orderItemSelections
+        .filter((selection) => {
+          // Filtrer les orderItems non-Processed et les doublons
+          if (!selection.orderItem) return false
+          if (selection.orderItem.state !== 'Processed') return false
+          if (addedOrderItemIds.has(selection.orderItem.id)) return false
+          addedOrderItemIds.add(selection.orderItem.id)
+          return true
+        })
+        .map((selection) => {
+          const orderItem = selection.orderItem!
+          return {
+            type: 'ticket' as const,
+            nom: orderItem.lastName || orderItem.order.payerLastName || '',
+            prenom: orderItem.firstName || orderItem.order.payerFirstName || '',
+            email: orderItem.email || orderItem.order.payerEmail || '',
+            phone: '',
+            dietaryPreference: null,
+            allergies: null,
+            allergySeverity: null,
+            emergencyContactName: null,
+            emergencyContactPhone: null,
+          }
+        })
+    )
+
+    const ticketParticipants = [...ticketParticipantsFromTiers, ...ticketParticipantsFromOptions]
 
     const allParticipants = [...volunteers, ...artists, ...ticketParticipants].sort((a, b) => {
       const nameA = `${a.nom || ''} ${a.prenom || ''}`
