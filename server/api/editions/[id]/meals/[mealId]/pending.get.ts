@@ -176,26 +176,22 @@ export default wrapApiHandler(
     if (type === 'participant' || type === 'all') {
       const addedOrderItemIds = new Set<number>()
 
-      // Helper pour vérifier si un orderItem est valide
-      const isValidOrderItem = (item: {
-        state: string
-        order: { editionId: number; status: string }
-      }) => {
-        return (
-          (item.state === 'Valid' || item.state === 'Processed') &&
-          item.order.editionId === editionId &&
-          item.order.status === 'Processed'
+      // DEBUG: Log pour comprendre ce qui se passe
+      console.log('[DEBUG pending] meal.options count:', meal.options.length)
+      for (const optionMeal of meal.options) {
+        console.log('[DEBUG pending] option:', optionMeal.option.id, optionMeal.option.name)
+        console.log(
+          '[DEBUG pending] orderItemSelections count:',
+          optionMeal.option.orderItemSelections.length
         )
+        for (const sel of optionMeal.option.orderItemSelections) {
+          console.log('[DEBUG pending] orderItem:', sel.orderItem.id, sel.orderItem.firstName, sel.orderItem.lastName, 'state:', sel.orderItem.state, 'order:', sel.orderItem.order)
+        }
       }
 
       // Parcourir les orderItems via les tarifs (déjà chargés via les relations imbriquées)
       for (const tierMeal of meal.tiers) {
         for (const item of tierMeal.tier.orderItems) {
-          // Filtrer en TypeScript au lieu de dans Prisma
-          if (!isValidOrderItem(item)) {
-            continue
-          }
-
           addedOrderItemIds.add(item.id)
 
           // Vérifier si ce participant n'a pas encore validé son repas
@@ -217,14 +213,10 @@ export default wrapApiHandler(
       }
 
       // Parcourir les orderItems via les options (déjà chargés via les relations imbriquées)
+      // SANS FILTRE pour debug
       for (const optionMeal of meal.options) {
         for (const selection of optionMeal.option.orderItemSelections) {
           const item = selection.orderItem
-
-          // Filtrer en TypeScript au lieu de dans Prisma
-          if (!isValidOrderItem(item)) {
-            continue
-          }
 
           // Éviter les doublons : si le participant a déjà le repas via un tarif, ne pas l'ajouter
           if (addedOrderItemIds.has(item.id)) {
