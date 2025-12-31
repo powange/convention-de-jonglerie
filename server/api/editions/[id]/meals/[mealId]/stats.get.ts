@@ -19,6 +19,7 @@ export default wrapApiHandler(
 
     // Vérifier que le repas existe et appartient à cette édition
     // On inclut les relations tiers et options avec les orderItems pour éviter des requêtes séparées
+    // Note: On ne filtre pas dans la requête Prisma car les filtres nested ne fonctionnent pas correctement en production
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
@@ -30,12 +31,10 @@ export default wrapApiHandler(
             tier: {
               include: {
                 orderItems: {
-                  where: {
-                    state: { in: ['Valid', 'Processed'] },
-                    order: { editionId, status: 'Processed' },
-                  },
-                  select: {
-                    id: true,
+                  include: {
+                    order: {
+                      select: { editionId: true, status: true },
+                    },
                     mealAccess: {
                       where: { mealId },
                       select: { id: true, consumedAt: true },
@@ -51,16 +50,12 @@ export default wrapApiHandler(
             option: {
               include: {
                 orderItemSelections: {
-                  where: {
-                    orderItem: {
-                      state: { in: ['Valid', 'Processed'] },
-                      order: { editionId, status: 'Processed' },
-                    },
-                  },
                   include: {
                     orderItem: {
-                      select: {
-                        id: true,
+                      include: {
+                        order: {
+                          select: { editionId: true, status: true },
+                        },
                         mealAccess: {
                           where: { mealId },
                           select: { id: true, consumedAt: true },
@@ -130,9 +125,26 @@ export default wrapApiHandler(
     const uniqueOrderItemIds = new Set<number>()
     const validatedOrderItemIds = new Set<number>()
 
+    // Helper pour vérifier si un orderItem est valide
+    const isValidOrderItem = (item: {
+      state: string
+      order: { editionId: number; status: string }
+    }) => {
+      return (
+        (item.state === 'Valid' || item.state === 'Processed') &&
+        item.order.editionId === editionId &&
+        item.order.status === 'Processed'
+      )
+    }
+
     // Compter les orderItems via les tarifs (déjà chargés via les relations imbriquées)
     for (const tierMeal of meal.tiers) {
       for (const orderItem of tierMeal.tier.orderItems) {
+        // Filtrer en TypeScript au lieu de dans Prisma
+        if (!isValidOrderItem(orderItem)) {
+          continue
+        }
+
         uniqueOrderItemIds.add(orderItem.id)
         // Vérifier si le repas a été consommé
         const hasConsumed = orderItem.mealAccess.some((ma) => ma.consumedAt !== null)
@@ -146,6 +158,12 @@ export default wrapApiHandler(
     for (const optionMeal of meal.options) {
       for (const selection of optionMeal.option.orderItemSelections) {
         const orderItem = selection.orderItem
+
+        // Filtrer en TypeScript au lieu de dans Prisma
+        if (!isValidOrderItem(orderItem)) {
+          continue
+        }
+
         // Ajouter uniquement si pas déjà ajouté via tarif (déduplication)
         if (!uniqueOrderItemIds.has(orderItem.id)) {
           uniqueOrderItemIds.add(orderItem.id)
