@@ -28,8 +28,7 @@ export default wrapApiHandler(
     const searchLower = searchTerm.toLowerCase()
 
     // Vérifier que le repas existe et appartient à cette édition
-    // On inclut les relations tiers et options avec les orderItems pour éviter des requêtes séparées
-    // Note: On ne filtre pas dans la requête Prisma car les filtres nested ne fonctionnent pas correctement en production
+    // Structure identique à participants.get.ts qui fonctionne
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
@@ -41,10 +40,11 @@ export default wrapApiHandler(
             tier: {
               include: {
                 orderItems: {
-                  include: {
-                    order: {
-                      select: { editionId: true, status: true },
-                    },
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
                     mealAccess: {
                       where: { mealId },
                       select: { id: true, consumedAt: true },
@@ -55,6 +55,7 @@ export default wrapApiHandler(
             },
           },
         },
+        // Structure identique à participants.get.ts
         options: {
           include: {
             option: {
@@ -62,10 +63,11 @@ export default wrapApiHandler(
                 orderItemSelections: {
                   include: {
                     orderItem: {
-                      include: {
-                        order: {
-                          select: { editionId: true, status: true },
-                        },
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
                         mealAccess: {
                           where: { mealId },
                           select: { id: true, consumedAt: true },
@@ -190,29 +192,12 @@ export default wrapApiHandler(
     }
 
     // 3. Rechercher dans les participants (via les tarifs ET options ayant accès à ce repas)
-    // Utiliser les relations déjà chargées avec le meal (évite les requêtes directes sur les modèles)
+    // Structure identique à participants.get.ts
     const addedOrderItemIds = new Set<number>()
 
-    // Helper pour vérifier si un orderItem est valide
-    const isValidOrderItem = (item: {
-      state: string
-      order: { editionId: number; status: string }
-    }) => {
-      return (
-        (item.state === 'Valid' || item.state === 'Processed') &&
-        item.order.editionId === editionId &&
-        item.order.status === 'Processed'
-      )
-    }
-
-    // Parcourir les orderItems via les tarifs (déjà chargés via les relations imbriquées)
+    // Parcourir les orderItems via les tarifs
     for (const tierMeal of meal.tiers) {
       for (const item of tierMeal.tier.orderItems) {
-        // Filtrer en TypeScript au lieu de dans Prisma
-        if (!isValidOrderItem(item)) {
-          continue
-        }
-
         addedOrderItemIds.add(item.id)
 
         const matchesSearch =
@@ -239,17 +224,12 @@ export default wrapApiHandler(
       }
     }
 
-    // 4. Rechercher dans les participants via les options (déjà chargés via les relations imbriquées)
+    // 4. Rechercher dans les participants via les options
     for (const optionMeal of meal.options) {
       for (const selection of optionMeal.option.orderItemSelections) {
         const item = selection.orderItem
 
-        // Filtrer en TypeScript au lieu de dans Prisma
-        if (!isValidOrderItem(item)) {
-          continue
-        }
-
-        // Éviter les doublons : si le participant a déjà le repas via un tarif, ne pas l'ajouter
+        // Éviter les doublons : si le participant a déjà le repas via un tarif
         if (addedOrderItemIds.has(item.id)) {
           continue
         }

@@ -22,8 +22,7 @@ export default wrapApiHandler(
     const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'all'
 
     // Vérifier que le repas existe et appartient à cette édition
-    // On inclut les relations tiers et options avec les orderItems pour éviter des requêtes séparées
-    // Note: On ne filtre pas dans la requête Prisma car les filtres nested ne fonctionnent pas correctement en production
+    // Structure identique à participants.get.ts qui fonctionne
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
@@ -35,10 +34,11 @@ export default wrapApiHandler(
             tier: {
               include: {
                 orderItems: {
-                  include: {
-                    order: {
-                      select: { editionId: true, status: true },
-                    },
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
                     mealAccess: {
                       where: { mealId },
                       select: { id: true, consumedAt: true },
@@ -49,6 +49,7 @@ export default wrapApiHandler(
             },
           },
         },
+        // Structure identique à participants.get.ts
         options: {
           include: {
             option: {
@@ -56,10 +57,11 @@ export default wrapApiHandler(
                 orderItemSelections: {
                   include: {
                     orderItem: {
-                      include: {
-                        order: {
-                          select: { editionId: true, status: true },
-                        },
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
                         mealAccess: {
                           where: { mealId },
                           select: { id: true, consumedAt: true },
@@ -172,24 +174,11 @@ export default wrapApiHandler(
     }
 
     // 3. Participants non validés (via tarifs ET options, avec déduplication)
-    // Utiliser les relations déjà chargées avec le meal (évite les requêtes directes sur les modèles)
+    // Structure identique à participants.get.ts
     if (type === 'participant' || type === 'all') {
       const addedOrderItemIds = new Set<number>()
 
-      // DEBUG: Log pour comprendre ce qui se passe
-      console.log('[DEBUG pending] meal.options count:', meal.options.length)
-      for (const optionMeal of meal.options) {
-        console.log('[DEBUG pending] option:', optionMeal.option.id, optionMeal.option.name)
-        console.log(
-          '[DEBUG pending] orderItemSelections count:',
-          optionMeal.option.orderItemSelections.length
-        )
-        for (const sel of optionMeal.option.orderItemSelections) {
-          console.log('[DEBUG pending] orderItem:', sel.orderItem.id, sel.orderItem.firstName, sel.orderItem.lastName, 'state:', sel.orderItem.state, 'order:', sel.orderItem.order)
-        }
-      }
-
-      // Parcourir les orderItems via les tarifs (déjà chargés via les relations imbriquées)
+      // Parcourir les orderItems via les tarifs
       for (const tierMeal of meal.tiers) {
         for (const item of tierMeal.tier.orderItems) {
           addedOrderItemIds.add(item.id)
@@ -212,13 +201,12 @@ export default wrapApiHandler(
         }
       }
 
-      // Parcourir les orderItems via les options (déjà chargés via les relations imbriquées)
-      // SANS FILTRE pour debug
+      // Parcourir les orderItems via les options
       for (const optionMeal of meal.options) {
         for (const selection of optionMeal.option.orderItemSelections) {
           const item = selection.orderItem
 
-          // Éviter les doublons : si le participant a déjà le repas via un tarif, ne pas l'ajouter
+          // Éviter les doublons : si le participant a déjà le repas via un tarif
           if (addedOrderItemIds.has(item.id)) {
             continue
           }
