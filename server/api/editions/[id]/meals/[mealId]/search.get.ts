@@ -28,15 +28,67 @@ export default wrapApiHandler(
     const searchLower = searchTerm.toLowerCase()
 
     // Vérifier que le repas existe et appartient à cette édition
-    // On inclut les relations tiers et options pour éviter des requêtes séparées
+    // On inclut les relations tiers et options avec les orderItems pour éviter des requêtes séparées
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
         editionId,
       },
       include: {
-        tiers: { select: { tierId: true } },
-        options: { select: { optionId: true } },
+        tiers: {
+          include: {
+            tier: {
+              include: {
+                orderItems: {
+                  where: {
+                    state: { in: ['Valid', 'Processed'] },
+                    order: { editionId, status: 'Processed' },
+                  },
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    mealAccess: {
+                      where: { mealId },
+                      select: { id: true, consumedAt: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        options: {
+          include: {
+            option: {
+              include: {
+                orderItemSelections: {
+                  where: {
+                    orderItem: {
+                      state: { in: ['Valid', 'Processed'] },
+                      order: { editionId, status: 'Processed' },
+                    },
+                  },
+                  include: {
+                    orderItem: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        mealAccess: {
+                          where: { mealId },
+                          select: { id: true, consumedAt: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     })
 
@@ -149,31 +201,12 @@ export default wrapApiHandler(
     }
 
     // 3. Rechercher dans les participants (via les tarifs ET options ayant accès à ce repas)
-    // Set pour suivre les orderItems déjà ajoutés (déduplication tarif/option)
+    // Utiliser les relations déjà chargées avec le meal (évite les requêtes directes sur les modèles)
     const addedOrderItemIds = new Set<number>()
 
-    // Utiliser les relations déjà chargées avec le meal
-    const tierIds = meal.tiers.map((t) => t.tierId)
-
-    if (tierIds.length > 0) {
-      // Récupérer tous les orderItems qui ont un de ces tarifs
-      const orderItems = await prisma.ticketingOrderItem.findMany({
-        where: {
-          tierId: { in: tierIds },
-          state: { in: ['Valid', 'Processed'] },
-          order: {
-            editionId,
-            status: 'Processed',
-          },
-        },
-        include: {
-          mealAccess: {
-            where: { mealId },
-          },
-        },
-      })
-
-      for (const item of orderItems) {
+    // Parcourir les orderItems via les tarifs (déjà chargés via les relations imbriquées)
+    for (const tierMeal of meal.tiers) {
+      for (const item of tierMeal.tier.orderItems) {
         addedOrderItemIds.add(item.id)
 
         const matchesSearch =
@@ -183,7 +216,7 @@ export default wrapApiHandler(
 
         if (matchesSearch) {
           // Trouver si ce participant a déjà une validation de repas
-          const mealValidation = item.mealAccess.find((ma) => ma.mealId === mealId)
+          const mealValidation = item.mealAccess.find((ma) => ma.consumedAt !== null)
 
           results.push({
             uniqueId: `participant-${item.id}`,
@@ -200,35 +233,9 @@ export default wrapApiHandler(
       }
     }
 
-    // 4. Rechercher dans les participants via les options ayant accès à ce repas
-    // Utiliser les relations déjà chargées avec le meal
-    const optionIds = meal.options.map((o) => o.optionId)
-
-    if (optionIds.length > 0) {
-      // Récupérer les orderItemSelections qui ont ces options
-      const orderItemSelections = await prisma.ticketingOrderItemOption.findMany({
-        where: {
-          optionId: { in: optionIds },
-          orderItem: {
-            state: { in: ['Valid', 'Processed'] },
-            order: {
-              editionId,
-              status: 'Processed',
-            },
-          },
-        },
-        include: {
-          orderItem: {
-            include: {
-              mealAccess: {
-                where: { mealId },
-              },
-            },
-          },
-        },
-      })
-
-      for (const selection of orderItemSelections) {
+    // 4. Rechercher dans les participants via les options (déjà chargés via les relations imbriquées)
+    for (const optionMeal of meal.options) {
+      for (const selection of optionMeal.option.orderItemSelections) {
         const item = selection.orderItem
 
         // Éviter les doublons : si le participant a déjà le repas via un tarif, ne pas l'ajouter
@@ -244,7 +251,7 @@ export default wrapApiHandler(
 
         if (matchesSearch) {
           // Trouver si ce participant a déjà une validation de repas
-          const mealValidation = item.mealAccess.find((ma) => ma.mealId === mealId)
+          const mealValidation = item.mealAccess.find((ma) => ma.consumedAt !== null)
 
           results.push({
             uniqueId: `participant-${item.id}`,

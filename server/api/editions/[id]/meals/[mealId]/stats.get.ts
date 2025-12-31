@@ -18,15 +18,61 @@ export default wrapApiHandler(
     }
 
     // Vérifier que le repas existe et appartient à cette édition
-    // On inclut les relations tiers et options pour éviter des requêtes séparées
+    // On inclut les relations tiers et options avec les orderItems pour éviter des requêtes séparées
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
         editionId,
       },
       include: {
-        tiers: { select: { tierId: true } },
-        options: { select: { optionId: true } },
+        tiers: {
+          include: {
+            tier: {
+              include: {
+                orderItems: {
+                  where: {
+                    state: { in: ['Valid', 'Processed'] },
+                    order: { editionId, status: 'Processed' },
+                  },
+                  select: {
+                    id: true,
+                    mealAccess: {
+                      where: { mealId },
+                      select: { id: true, consumedAt: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        options: {
+          include: {
+            option: {
+              include: {
+                orderItemSelections: {
+                  where: {
+                    orderItem: {
+                      state: { in: ['Valid', 'Processed'] },
+                      order: { editionId, status: 'Processed' },
+                    },
+                  },
+                  include: {
+                    orderItem: {
+                      select: {
+                        id: true,
+                        mealAccess: {
+                          where: { mealId },
+                          select: { id: true, consumedAt: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     })
 
@@ -80,75 +126,33 @@ export default wrapApiHandler(
     })
 
     // 3. Compter les participants ayant accès à ce repas (via tarifs ET options, avec déduplication)
-    // Utiliser les relations déjà chargées avec le meal
-    const tierIds = meal.tiers.map((t) => t.tierId)
-    const optionIds = meal.options.map((o) => o.optionId)
-
-    // Pour compter avec déduplication, on récupère tous les orderItems uniques
+    // Utiliser les relations déjà chargées avec le meal (évite les requêtes directes sur les modèles)
     const uniqueOrderItemIds = new Set<number>()
     const validatedOrderItemIds = new Set<number>()
 
-    // Récupérer les orderItems via les tarifs
-    if (tierIds.length > 0) {
-      const orderItemsFromTiers = await prisma.ticketingOrderItem.findMany({
-        where: {
-          tierId: { in: tierIds },
-          state: { in: ['Valid', 'Processed'] },
-          order: {
-            editionId,
-            status: 'Processed',
-          },
-        },
-        select: {
-          id: true,
-          mealAccess: {
-            where: { mealId, consumedAt: { not: null } },
-            select: { id: true },
-          },
-        },
-      })
-
-      for (const item of orderItemsFromTiers) {
-        uniqueOrderItemIds.add(item.id)
-        if (item.mealAccess.length > 0) {
-          validatedOrderItemIds.add(item.id)
+    // Compter les orderItems via les tarifs (déjà chargés via les relations imbriquées)
+    for (const tierMeal of meal.tiers) {
+      for (const orderItem of tierMeal.tier.orderItems) {
+        uniqueOrderItemIds.add(orderItem.id)
+        // Vérifier si le repas a été consommé
+        const hasConsumed = orderItem.mealAccess.some((ma) => ma.consumedAt !== null)
+        if (hasConsumed) {
+          validatedOrderItemIds.add(orderItem.id)
         }
       }
     }
 
-    // Récupérer les orderItems via les options (déduplication)
-    if (optionIds.length > 0) {
-      const orderItemSelectionsFromOptions = await prisma.ticketingOrderItemOption.findMany({
-        where: {
-          optionId: { in: optionIds },
-          orderItem: {
-            state: { in: ['Valid', 'Processed'] },
-            order: {
-              editionId,
-              status: 'Processed',
-            },
-          },
-        },
-        select: {
-          orderItem: {
-            select: {
-              id: true,
-              mealAccess: {
-                where: { mealId, consumedAt: { not: null } },
-                select: { id: true },
-              },
-            },
-          },
-        },
-      })
-
-      for (const selection of orderItemSelectionsFromOptions) {
-        const item = selection.orderItem
-        // Ajouter uniquement si pas déjà ajouté via tarif
-        if (!uniqueOrderItemIds.has(item.id)) {
-          uniqueOrderItemIds.add(item.id)
-          if (item.mealAccess.length > 0) {
-            validatedOrderItemIds.add(item.id)
+    // Compter les orderItems via les options (déjà chargés via les relations imbriquées)
+    for (const optionMeal of meal.options) {
+      for (const selection of optionMeal.option.orderItemSelections) {
+        const orderItem = selection.orderItem
+        // Ajouter uniquement si pas déjà ajouté via tarif (déduplication)
+        if (!uniqueOrderItemIds.has(orderItem.id)) {
+          uniqueOrderItemIds.add(orderItem.id)
+          // Vérifier si le repas a été consommé
+          const hasConsumed = orderItem.mealAccess.some((ma) => ma.consumedAt !== null)
+          if (hasConsumed) {
+            validatedOrderItemIds.add(orderItem.id)
           }
         }
       }
