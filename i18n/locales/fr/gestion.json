@@ -137,7 +137,7 @@
       "counters_description": "Créer et gérer des compteurs synchronisés en temps réel",
       "counters_title": "Compteurs",
       "external_link_description": "Connecter HelloAsso ou autre plateforme",
-      "external_link_title": "Lier une billeterie externe",
+      "external_link_title": "Lier une billetterie externe",
       "onsite_registration_disabled": "L'ajout de participants sur place est désactivé",
       "onsite_registration_enabled": "Les organisateurs peuvent ajouter des participants sur place",
       "orders_description": "Consulter les commandes et participants",
@@ -190,7 +190,7 @@
       "stats_volunteers": "Bénévoles",
       "tiers_description": "Gérer les tarifs, options, quotas et articles à restituer",
       "tiers_title": "Tarifs, options & quotas",
-      "title": "Billeterie"
+      "title": "Billetterie"
     },
     "title": "Gestion",
     "volunteers": {
