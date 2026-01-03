@@ -497,9 +497,10 @@
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="flex justify-center">
             <UPagination
-              v-model:page="currentPage"
+              :page="currentPage"
               :total="totalOrders"
               :items-per-page="pageSize"
+              @update:page="onPageChange"
             />
           </div>
         </div>
@@ -946,7 +947,7 @@ const loadOrders = async () => {
 
     orders.value = response.data || []
     totalPages.value = response.pagination?.totalPages || 1
-    totalOrders.value = response.pagination?.total || 0
+    totalOrders.value = response.pagination?.totalCount || 0
 
     // Mettre à jour les stats si elles sont retournées
     if (response.stats) {
@@ -983,14 +984,15 @@ const resetFilters = () => {
   entryStatusFilter.value = 'all'
 }
 
+// Fonction pour gérer le changement de page
+const onPageChange = (page: number) => {
+  currentPage.value = page
+  loadOrders()
+}
+
 // Réinitialiser à la page 1 quand on effectue une recherche ou change les filtres
 watch([searchQuery, selectedTierIds, entryStatusFilter], () => {
   currentPage.value = 1
-  loadOrders()
-})
-
-// Charger les commandes quand on change de page
-watch(currentPage, () => {
   loadOrders()
 })
 

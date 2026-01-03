@@ -45,10 +45,10 @@ export interface OrdersResponse {
   pagination: {
     page: number
     limit: number
-    total: number
+    totalCount: number
     totalPages: number
-    hasNext: boolean
-    hasPrev: boolean
+    hasNextPage: boolean
+    hasPrevPage: boolean
   }
   stats?: {
     totalOrders: number
