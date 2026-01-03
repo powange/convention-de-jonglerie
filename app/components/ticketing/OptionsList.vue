@@ -117,6 +117,19 @@
             {{ tierRelation.tier.name }}
           </UBadge>
         </div>
+
+        <!-- Repas associés -->
+        <div v-if="option.meals && option.meals.length > 0" class="flex flex-wrap gap-1">
+          <p class="font-medium text-gray-700 dark:text-gray-300">Repas :</p>
+          <UBadge
+            v-for="mealRelation in option.meals"
+            :key="mealRelation.meal.id"
+            color="success"
+            variant="soft"
+          >
+            {{ formatMeal(mealRelation.meal) }}
+          </UBadge>
+        </div>
       </div>
 
       <template #footer>
@@ -169,6 +182,8 @@
 </template>
 
 <script setup lang="ts">
+import { useMealTypeLabel } from '~/composables/useMeals'
+import { formatMealDate } from '~/utils/meals'
 import { deleteOption, type TicketingOption } from '~/utils/ticketing/options'
 
 const props = defineProps<{
@@ -181,11 +196,19 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
+const { getMealTypeLabel } = useMealTypeLabel()
+
 const optionModalOpen = ref(false)
 const selectedOption = ref<TicketingOption | null>(null)
 const deleteConfirmOpen = ref(false)
 const optionToDelete = ref<TicketingOption | null>(null)
 const deleting = ref(false)
+
+const formatMeal = (meal: any) => {
+  const date = formatMealDate(meal.date)
+  const mealTypeLabel = getMealTypeLabel(meal.mealType)
+  return `${date} - ${mealTypeLabel}`
+}
 
 const openOptionModal = (option?: TicketingOption) => {
   selectedOption.value = option || null

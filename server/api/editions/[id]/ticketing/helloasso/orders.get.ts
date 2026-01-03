@@ -150,6 +150,8 @@ export default wrapApiHandler(
 
               if (existingItem) {
                 // Mettre à jour l'item existant
+                // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
+                // Les options sont gérées dans TicketingOrderItemOption
                 await tx.ticketingOrderItem.update({
                   where: { id: existingItem.id },
                   data: {
@@ -162,12 +164,14 @@ export default wrapApiHandler(
                     amount: item.amount,
                     state: item.state,
                     qrCode: item.qrCode,
-                    customFields: item.customFields || null,
+                    customFields: item.customFields || undefined,
                   },
                 })
                 savedItemId = existingItem.id
               } else {
                 // Créer un nouvel item
+                // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
+                // Les options sont gérées dans TicketingOrderItemOption
                 const newItem = await tx.ticketingOrderItem.create({
                   data: {
                     orderId: savedOrder.id,
@@ -181,7 +185,7 @@ export default wrapApiHandler(
                     amount: item.amount,
                     state: item.state,
                     qrCode: item.qrCode,
-                    customFields: item.customFields || null,
+                    customFields: item.customFields || undefined,
                   },
                 })
                 savedItemId = newItem.id
@@ -189,16 +193,29 @@ export default wrapApiHandler(
 
               // Synchroniser les options sélectionnées
               if (item.options && item.options.length > 0) {
-                // Récupérer toutes les options de l'édition pour faire la correspondance
+                // Récupérer toutes les options de l'édition avec leurs repas
                 const availableOptions = await tx.ticketingOption.findMany({
                   where: { editionId },
+                  include: {
+                    meals: true,
+                  },
                 })
 
                 for (const selectedOption of item.options) {
-                  // Chercher l'option correspondante par helloAssoOptionId
-                  const matchingOption = availableOptions.find(
-                    (opt) => opt.helloAssoOptionId === String(selectedOption.optionId)
-                  )
+                  // Chercher l'option correspondante :
+                  // 1. Par helloAssoOptionId (si l'option vient de HelloAsso)
+                  // 2. Par ID (si l'option a été créée manuellement)
+                  const matchingOption = availableOptions.find((opt) => {
+                    // D'abord chercher par helloAssoOptionId
+                    if (opt.helloAssoOptionId === String(selectedOption.optionId)) {
+                      return true
+                    }
+                    // Sinon, chercher par ID de l'option locale
+                    if (opt.id === selectedOption.optionId) {
+                      return true
+                    }
+                    return false
+                  })
 
                   if (matchingOption) {
                     // Upsert l'association orderItem <-> option
@@ -213,13 +230,37 @@ export default wrapApiHandler(
                         orderItemId: savedItemId,
                         optionId: matchingOption.id,
                         amount: selectedOption.amount || 0,
-                        customFields: selectedOption.customFields || null,
+                        customFields: selectedOption.customFields || undefined,
                       },
                       update: {
                         amount: selectedOption.amount || 0,
-                        customFields: selectedOption.customFields || null,
+                        customFields: selectedOption.customFields || undefined,
                       },
                     })
+
+                    // Créer les accès repas si l'option donne accès à des repas
+                    if (matchingOption.meals && matchingOption.meals.length > 0) {
+                      for (const mealRelation of matchingOption.meals) {
+                        // Vérifier si l'accès existe déjà
+                        const existingMealAccess = await tx.ticketingOrderItemMeal.findUnique({
+                          where: {
+                            orderItemId_mealId: {
+                              orderItemId: savedItemId,
+                              mealId: mealRelation.mealId,
+                            },
+                          },
+                        })
+
+                        if (!existingMealAccess) {
+                          await tx.ticketingOrderItemMeal.create({
+                            data: {
+                              orderItemId: savedItemId,
+                              mealId: mealRelation.mealId,
+                            },
+                          })
+                        }
+                      }
+                    }
                   } else {
                     console.log('⚠️ Option HelloAsso non trouvée:', {
                       optionId: selectedOption.optionId,

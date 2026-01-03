@@ -155,6 +155,11 @@ export default wrapApiHandler(
             customFields: undefined,
           }
 
+          // Séparer les options des vrais customFields
+          const allCustomFields = participant.customFields || []
+          const optionFields = allCustomFields.filter((field) => field.optionId)
+          const realCustomFields = allCustomFields.filter((field) => !field.optionId)
+
           const orderItem = await prisma.ticketingOrderItem.create({
             data: {
               orderId: order.id,
@@ -169,9 +174,50 @@ export default wrapApiHandler(
               state: body.isPaid ? 'Processed' : 'Pending',
               qrCode, // Même QR code pour tous les items de la commande
               entryValidated: false,
-              customFields: participant.customFields || null,
+              customFields: realCustomFields.length > 0 ? realCustomFields : null,
             },
           })
+
+          // Créer les associations d'options et les accès repas
+          if (optionFields.length > 0) {
+            for (const optionField of optionFields) {
+              // Récupérer l'option avec ses repas associés
+              const option = await prisma.ticketingOption.findUnique({
+                where: { id: optionField.optionId },
+                include: {
+                  meals: {
+                    include: {
+                      meal: true,
+                    },
+                  },
+                },
+              })
+
+              if (option) {
+                // Créer l'association orderItem <-> option
+                await prisma.ticketingOrderItemOption.create({
+                  data: {
+                    orderItemId: orderItem.id,
+                    optionId: option.id,
+                    amount: 0,
+                    customFields: null,
+                  },
+                })
+
+                // Créer les accès repas si l'option donne accès à des repas
+                if (option.meals && option.meals.length > 0) {
+                  for (const mealRelation of option.meals) {
+                    await prisma.ticketingOrderItemMeal.create({
+                      data: {
+                        orderItemId: orderItem.id,
+                        mealId: mealRelation.mealId,
+                      },
+                    })
+                  }
+                }
+              }
+            }
+          }
 
           orderItems.push(orderItem)
         }

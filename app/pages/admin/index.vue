@@ -496,6 +496,40 @@
           </UCard>
         </NuxtLink>
 
+        <!-- Migration des options de repas -->
+        <NuxtLink to="/admin/migrate-meal-options" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-arrow-path"
+                      class="h-6 w-6 text-teal-600 dark:text-teal-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">Migration des options de repas</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  Migrer les options depuis customFields vers la structure de base de données
+                  appropriée
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-circle-stack" class="h-4 w-4" />
+                    Migration de données
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
+                    Accès repas automatiques
+                  </span>
+                </div>
+              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+            </div>
+          </UCard>
+        </NuxtLink>
+
         <UCard class="opacity-75 border-dashed border-2 border-gray-300 dark:border-gray-600">
           <div class="flex items-start justify-between">
             <div class="flex-1">
