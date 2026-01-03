@@ -3,6 +3,35 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { validatePagination, validateEditionId } from '@@/server/utils/validation-helpers'
 
+interface CustomFieldAnswer {
+  name: string
+  answer: string
+}
+
+interface CustomFieldFilter {
+  name: string
+  value: string
+}
+
+// Fonction helper pour vérifier si une commande correspond aux filtres customFields
+function orderMatchesCustomFieldFilters(
+  order: { items: { customFields: unknown }[] },
+  filters: CustomFieldFilter[],
+  mode: 'and' | 'or' = 'and'
+): boolean {
+  const matchesFilter = (filter: CustomFieldFilter) =>
+    order.items.some((item) => {
+      if (!item.customFields || !Array.isArray(item.customFields)) return false
+      return (item.customFields as CustomFieldAnswer[]).some(
+        (field) => field.name === filter.name && String(field.answer) === filter.value
+      )
+    })
+
+  // Mode ET : tous les filtres doivent être satisfaits
+  // Mode OU : au moins un filtre doit être satisfait
+  return mode === 'and' ? filters.every(matchesFilter) : filters.some(matchesFilter)
+}
+
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
@@ -23,7 +52,30 @@ export default wrapApiHandler(
     const search = (query.search as string) || ''
     const tierIdsParam = (query.tierIds as string) || ''
     const tierIds = tierIdsParam ? tierIdsParam.split(',').map((id) => parseInt(id)) : []
+    const optionIdsParam = (query.optionIds as string) || ''
+    const optionIds = optionIdsParam ? optionIdsParam.split(',').map((id) => parseInt(id)) : []
     const entryStatus = (query.entryStatus as string) || 'all'
+
+    // Parse les filtres de champs personnalisés (format JSON array)
+    const customFieldFiltersParam = (query.customFieldFilters as string) || ''
+    let customFieldFilters: CustomFieldFilter[] = []
+    if (customFieldFiltersParam) {
+      try {
+        const parsed = JSON.parse(customFieldFiltersParam)
+        if (Array.isArray(parsed)) {
+          customFieldFilters = parsed.filter(
+            (f): f is CustomFieldFilter =>
+              typeof f === 'object' && typeof f.name === 'string' && typeof f.value === 'string'
+          )
+        }
+      } catch {
+        // Ignorer les erreurs de parsing JSON
+      }
+    }
+
+    // Mode de filtrage des champs personnalisés (ET ou OU)
+    const customFieldFilterMode =
+      (query.customFieldFilterMode as string) === 'or' ? 'or' : ('and' as const)
 
     try {
       // Construire la condition de recherche
@@ -74,6 +126,17 @@ export default wrapApiHandler(
         })
       }
 
+      // Ajouter le filtre par options (mode OU - au moins une des options sélectionnées)
+      if (optionIds.length > 0) {
+        itemsConditions.push({
+          selectedOptions: {
+            some: {
+              optionId: { in: optionIds },
+            },
+          },
+        })
+      }
+
       // Construire la condition finale pour les items
       const itemsCondition =
         itemsConditions.length > 0
@@ -89,53 +152,93 @@ export default wrapApiHandler(
             }
           : {}
 
-      // Compter le nombre total de commandes (toutes les commandes de l'édition)
-      const total = await prisma.ticketingOrder.count({
-        where: {
-          editionId,
-          ...searchCondition,
-          ...itemsCondition,
-        },
-      })
+      // Vérifier si on doit filtrer par customFields (nécessite filtrage JS)
+      const hasCustomFieldFilter = customFieldFilters.length > 0
 
-      // Récupérer les commandes paginées (toutes les commandes de l'édition)
-      const orders = await prisma.ticketingOrder.findMany({
-        where: {
-          editionId,
-          ...searchCondition,
-          ...itemsCondition,
-        },
+      // Include commun pour les items
+      const itemsInclude = {
         include: {
-          externalTicketing: {
-            select: {
-              provider: true,
+          tier: {
+            include: {
+              returnableItems: {
+                include: {
+                  returnableItem: true,
+                },
+              },
             },
           },
-          items: {
+          selectedOptions: {
             include: {
-              tier: {
-                include: {
-                  returnableItems: {
-                    include: {
-                      returnableItem: true,
-                    },
-                  },
-                },
-              },
-              selectedOptions: {
-                include: {
-                  option: true,
-                },
-                orderBy: { id: 'asc' },
-              },
+              option: true,
             },
-            orderBy: { id: 'asc' },
+            orderBy: { id: 'asc' as const },
           },
         },
-        orderBy: { orderDate: 'desc' },
-        skip,
-        take,
-      })
+        orderBy: { id: 'asc' as const },
+      }
+
+      let orders: any[]
+      let total: number
+
+      if (hasCustomFieldFilter) {
+        // Récupérer TOUTES les commandes sans pagination pour filtrer par customFields
+        const allOrders = await prisma.ticketingOrder.findMany({
+          where: {
+            editionId,
+            ...searchCondition,
+            ...itemsCondition,
+          },
+          include: {
+            externalTicketing: {
+              select: {
+                provider: true,
+              },
+            },
+            items: itemsInclude,
+          },
+          orderBy: { orderDate: 'desc' },
+        })
+
+        // Filtrer par customFields en JavaScript
+        const filteredOrders = allOrders.filter((order) =>
+          orderMatchesCustomFieldFilters(order, customFieldFilters, customFieldFilterMode)
+        )
+
+        // Calculer le total après filtrage
+        total = filteredOrders.length
+
+        // Appliquer la pagination manuellement
+        orders = filteredOrders.slice(skip, skip + take)
+      } else {
+        // Compter le nombre total de commandes
+        total = await prisma.ticketingOrder.count({
+          where: {
+            editionId,
+            ...searchCondition,
+            ...itemsCondition,
+          },
+        })
+
+        // Récupérer les commandes paginées
+        orders = await prisma.ticketingOrder.findMany({
+          where: {
+            editionId,
+            ...searchCondition,
+            ...itemsCondition,
+          },
+          include: {
+            externalTicketing: {
+              select: {
+                provider: true,
+              },
+            },
+            items: itemsInclude,
+          },
+          orderBy: { orderDate: 'desc' },
+          skip,
+          take,
+        })
+      }
 
       // Calculer les stats globales en tenant compte des filtres
       let stats = null

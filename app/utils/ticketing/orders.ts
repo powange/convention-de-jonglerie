@@ -22,6 +22,16 @@ export interface OrderItem {
       }
     }>
   } | null
+  selectedOptions?: Array<{
+    id: number
+    optionId: number
+    amount: number
+    option: {
+      id: number
+      name: string
+      price: number
+    }
+  }>
 }
 
 export interface Order {
@@ -59,6 +69,11 @@ export interface OrdersResponse {
   } | null
 }
 
+export interface CustomFieldFilter {
+  name: string
+  value: string
+}
+
 export async function fetchOrders(
   editionId: number,
   options?: {
@@ -66,7 +81,10 @@ export async function fetchOrders(
     limit?: number
     search?: string
     tierIds?: number[]
+    optionIds?: number[]
     entryStatus?: 'all' | 'validated' | 'not_validated'
+    customFieldFilters?: CustomFieldFilter[]
+    customFieldFilterMode?: 'and' | 'or'
   }
 ): Promise<OrdersResponse> {
   const params = new URLSearchParams()
@@ -76,8 +94,17 @@ export async function fetchOrders(
   if (options?.tierIds && options.tierIds.length > 0) {
     params.append('tierIds', options.tierIds.join(','))
   }
+  if (options?.optionIds && options.optionIds.length > 0) {
+    params.append('optionIds', options.optionIds.join(','))
+  }
   if (options?.entryStatus && options.entryStatus !== 'all') {
     params.append('entryStatus', options.entryStatus)
+  }
+  if (options?.customFieldFilters && options.customFieldFilters.length > 0) {
+    params.append('customFieldFilters', JSON.stringify(options.customFieldFilters))
+    if (options.customFieldFilterMode) {
+      params.append('customFieldFilterMode', options.customFieldFilterMode)
+    }
   }
 
   const url = `/api/editions/${editionId}/ticketing/orders${params.toString() ? `?${params.toString()}` : ''}`

@@ -170,7 +170,7 @@
 
             <!-- Section des filtres (cachée par défaut) -->
             <div v-if="isFiltersOpen" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Filtre par tarifs -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -210,6 +210,48 @@
                   </USelect>
                 </div>
 
+                <!-- Filtre par options -->
+                <div v-if="optionSelectItems.length > 0">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Filtrer par options
+                  </label>
+                  <USelect
+                    v-model="selectedOptionIds"
+                    :items="optionSelectItems"
+                    multiple
+                    placeholder="Sélectionner des options"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                  >
+                    <template #default="{ modelValue }">
+                      <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                        {{ modelValue.length }}
+                        {{
+                          modelValue.length > 1
+                            ? $t('common.items_selected')
+                            : $t('common.item_selected')
+                        }}
+                      </span>
+                      <span v-else class="text-gray-400 dark:text-gray-500">
+                        Sélectionner des options
+                      </span>
+                    </template>
+                    <template #item-label="{ item }">
+                      <div class="flex items-center justify-between w-full">
+                        <span>{{ item.label }}</span>
+                        <span
+                          v-if="item.price > 0"
+                          class="text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          +{{ (item.price / 100).toFixed(2) }}€
+                        </span>
+                      </div>
+                    </template>
+                  </USelect>
+                </div>
+
                 <!-- Filtre par statut d'entrée -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -227,8 +269,112 @@
                 </div>
               </div>
 
+              <!-- Filtres par champs personnalisés -->
+              <div v-if="customFieldNameItems.length > 0" class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Champs personnalisés
+                    <span v-if="customFieldFilters.length > 0" class="text-gray-500 font-normal">
+                      ({{ customFieldFilters.length }} filtre{{
+                        customFieldFilters.length > 1 ? 's' : ''
+                      }})
+                    </span>
+                  </label>
+
+                  <!-- Switch ET/OU (visible quand il y a au moins 2 filtres) -->
+                  <div
+                    v-if="customFieldFilters.length >= 2"
+                    class="flex items-center gap-2 text-sm"
+                  >
+                    <span
+                      :class="
+                        customFieldFilterMode === 'and'
+                          ? 'text-primary-600 dark:text-primary-400 font-medium'
+                          : 'text-gray-500'
+                      "
+                    >
+                      ET
+                    </span>
+                    <USwitch
+                      :model-value="customFieldFilterMode === 'or'"
+                      size="sm"
+                      color="primary"
+                      @update:model-value="customFieldFilterMode = $event ? 'or' : 'and'"
+                    />
+                    <span
+                      :class="
+                        customFieldFilterMode === 'or'
+                          ? 'text-primary-600 dark:text-primary-400 font-medium'
+                          : 'text-gray-500'
+                      "
+                    >
+                      OU
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Filtres existants -->
+                <div v-if="customFieldFilters.length > 0" class="space-y-2">
+                  <div
+                    v-for="(filter, index) in customFieldFilters"
+                    :key="index"
+                    class="flex items-center gap-2 p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg"
+                  >
+                    <UIcon
+                      name="i-heroicons-funnel"
+                      class="h-4 w-4 text-primary-600 flex-shrink-0"
+                    />
+                    <span class="text-sm text-gray-700 dark:text-gray-300 flex-1">
+                      <span class="font-medium">{{ filter.name }}</span>
+                      <span class="mx-1">=</span>
+                      <span class="text-primary-600 dark:text-primary-400">{{ filter.value }}</span>
+                    </span>
+                    <UButton
+                      color="error"
+                      variant="ghost"
+                      size="xs"
+                      icon="i-heroicons-x-mark"
+                      @click="removeCustomFieldFilter(index)"
+                    />
+                  </div>
+                </div>
+
+                <!-- Formulaire pour ajouter un nouveau filtre -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                  <USelect
+                    v-model="newFilterName"
+                    :items="customFieldNameItems"
+                    placeholder="Sélectionner un champ"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                  />
+                  <USelect
+                    v-model="newFilterValue"
+                    :items="newFilterValueItems"
+                    :disabled="!newFilterName"
+                    placeholder="Sélectionner une valeur"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                  />
+                  <UButton
+                    color="primary"
+                    variant="soft"
+                    size="md"
+                    icon="i-heroicons-plus"
+                    :disabled="!newFilterName || !newFilterValue"
+                    @click="addCustomFieldFilter"
+                  >
+                    Ajouter
+                  </UButton>
+                </div>
+              </div>
+
               <!-- Bouton de réinitialisation -->
-              <div v-if="selectedTierIds.length > 0 || entryStatusFilter !== 'all'" class="pt-2">
+              <div v-if="activeFiltersCount > 0" class="pt-2">
                 <UButton
                   color="neutral"
                   variant="ghost"
@@ -720,7 +866,7 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { fetchOrders, type Order } from '~/utils/ticketing/orders'
+import { fetchOrders, type Order, type CustomFieldFilter } from '~/utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '~/utils/ticketing/tiers'
 
 definePageMeta({
@@ -748,6 +894,7 @@ const stats = ref({
 })
 
 const searchQuery = ref('')
+const debouncedSearchQuery = refDebounced(searchQuery, 400) // Délai de 400ms avant recherche
 const currentPage = ref(1)
 const pageSize = ref(20)
 const totalPages = ref(0)
@@ -756,8 +903,25 @@ const totalOrders = ref(0)
 // Filtres
 const tiers = ref<TicketingTier[]>([])
 const selectedTierIds = ref<number[]>([])
+const selectedOptionIds = ref<number[]>([])
 const entryStatusFilter = ref<'all' | 'validated' | 'not_validated'>('all')
 const isFiltersOpen = ref(false)
+
+// Filtres par champs personnalisés (support de plusieurs filtres)
+const customFieldFilters = ref<CustomFieldFilter[]>([])
+const customFieldFilterMode = ref<'and' | 'or'>('and')
+const distinctCustomFields = ref<{ name: string; values: string[] }[]>([])
+// Refs pour le formulaire d'ajout d'un nouveau filtre
+const newFilterName = ref('')
+const newFilterValue = ref('')
+
+// Options pour le filtre par options
+interface TicketingOption {
+  id: number
+  name: string
+  price: number
+}
+const options = ref<TicketingOption[]>([])
 
 // Options pour le filtre de statut d'entrée
 const entryStatusOptions = [
@@ -940,9 +1104,13 @@ const loadOrders = async () => {
     const response = await fetchOrders(editionId, {
       page: currentPage.value,
       limit: pageSize.value,
-      search: searchQuery.value,
+      search: debouncedSearchQuery.value,
       tierIds: selectedTierIds.value.length > 0 ? selectedTierIds.value : undefined,
+      optionIds: selectedOptionIds.value.length > 0 ? selectedOptionIds.value : undefined,
       entryStatus: entryStatusFilter.value,
+      customFieldFilters:
+        customFieldFilters.value.length > 0 ? customFieldFilters.value : undefined,
+      customFieldFilterMode: customFieldFilterMode.value,
     })
 
     orders.value = response.data || []
@@ -970,18 +1138,76 @@ const tierSelectItems = computed(() => {
   }))
 })
 
+// Computed pour transformer les options en items pour le select
+const optionSelectItems = computed(() => {
+  return options.value.map((option) => ({
+    label: option.name,
+    value: option.id,
+    price: option.price,
+  }))
+})
+
+// Computed pour les noms de champs personnalisés
+const customFieldNameItems = computed(() => {
+  return distinctCustomFields.value.map((field) => ({
+    label: field.name,
+    value: field.name,
+  }))
+})
+
+// Computed pour les valeurs du champ personnalisé sélectionné pour le nouveau filtre
+const newFilterValueItems = computed(() => {
+  if (!newFilterName.value) return []
+  const field = distinctCustomFields.value.find((f) => f.name === newFilterName.value)
+  if (!field) return []
+  return field.values.map((value) => ({
+    label: value,
+    value: value,
+  }))
+})
+
+// Ajouter un nouveau filtre de champ personnalisé
+const addCustomFieldFilter = () => {
+  if (!newFilterName.value || !newFilterValue.value) return
+  // Éviter les doublons (même champ + même valeur)
+  const alreadyExists = customFieldFilters.value.some(
+    (f) => f.name === newFilterName.value && f.value === newFilterValue.value
+  )
+  if (!alreadyExists) {
+    customFieldFilters.value.push({
+      name: newFilterName.value,
+      value: newFilterValue.value,
+    })
+  }
+  // Réinitialiser le formulaire
+  newFilterName.value = ''
+  newFilterValue.value = ''
+}
+
+// Supprimer un filtre de champ personnalisé
+const removeCustomFieldFilter = (index: number) => {
+  customFieldFilters.value.splice(index, 1)
+}
+
 // Compter le nombre de filtres actifs
 const activeFiltersCount = computed(() => {
   let count = 0
   if (selectedTierIds.value.length > 0) count += selectedTierIds.value.length
+  if (selectedOptionIds.value.length > 0) count += selectedOptionIds.value.length
   if (entryStatusFilter.value !== 'all') count += 1
+  count += customFieldFilters.value.length
   return count
 })
 
 // Fonction pour réinitialiser tous les filtres
 const resetFilters = () => {
   selectedTierIds.value = []
+  selectedOptionIds.value = []
   entryStatusFilter.value = 'all'
+  customFieldFilters.value = []
+  customFieldFilterMode.value = 'and'
+  newFilterName.value = ''
+  newFilterValue.value = ''
 }
 
 // Fonction pour gérer le changement de page
@@ -991,9 +1217,25 @@ const onPageChange = (page: number) => {
 }
 
 // Réinitialiser à la page 1 quand on effectue une recherche ou change les filtres
-watch([searchQuery, selectedTierIds, entryStatusFilter], () => {
-  currentPage.value = 1
-  loadOrders()
+watch(
+  [
+    debouncedSearchQuery,
+    selectedTierIds,
+    selectedOptionIds,
+    entryStatusFilter,
+    customFieldFilters,
+    customFieldFilterMode,
+  ],
+  () => {
+    currentPage.value = 1
+    loadOrders()
+  },
+  { deep: true }
+)
+
+// Réinitialiser la valeur quand on change le nom du champ personnalisé (pour le formulaire d'ajout)
+watch(newFilterName, () => {
+  newFilterValue.value = ''
 })
 
 onMounted(async () => {
@@ -1013,14 +1255,20 @@ onMounted(async () => {
 
 const loadData = async () => {
   try {
-    // Charger la configuration et les tarifs en parallèle
-    const [configResponse, tiersData] = await Promise.all([
+    // Charger la configuration, les tarifs, les options et les champs personnalisés en parallèle
+    const [configResponse, tiersData, optionsData, customFieldsData] = await Promise.all([
       $fetch(`/api/editions/${editionId}/ticketing/external`),
       fetchTiers(editionId),
+      $fetch<TicketingOption[]>(`/api/editions/${editionId}/ticketing/options`),
+      $fetch<{ name: string; values: string[] }[]>(
+        `/api/editions/${editionId}/ticketing/custom-fields/distinct`
+      ),
     ])
 
     hasExternalTicketing.value = configResponse.hasConfig
     tiers.value = tiersData
+    options.value = optionsData || []
+    distinctCustomFields.value = customFieldsData || []
 
     if (configResponse.hasConfig) {
       lastSync.value = configResponse.config?.lastSyncAt
