@@ -157,7 +157,7 @@
                   </p>
                   <!-- Prix fixe ou fourchette de prix libre -->
                   <p
-                    v-if="!tier.minAmount && !tier.maxAmount"
+                    v-if="tier.minAmount == null && tier.maxAmount == null"
                     class="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-2"
                   >
                     {{ formatPrice(tier.price) }}
@@ -167,10 +167,10 @@
                     class="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-2"
                   >
                     Prix libre
-                    <span v-if="tier.minAmount" class="text-xs text-gray-500">
+                    <span v-if="tier.minAmount != null" class="text-xs text-gray-500">
                       (min: {{ formatPrice(tier.minAmount) }})
                     </span>
-                    <span v-if="tier.maxAmount" class="text-xs text-gray-500">
+                    <span v-if="tier.maxAmount != null" class="text-xs text-gray-500">
                       (max: {{ formatPrice(tier.maxAmount) }})
                     </span>
                   </p>
@@ -204,7 +204,12 @@
                     />
                   </div>
                   <span
-                    v-if="tierQuantities[tier.id] && tierQuantities[tier.id] > 0"
+                    v-if="
+                      tierQuantities[tier.id] &&
+                      tierQuantities[tier.id] > 0 &&
+                      tier.minAmount == null &&
+                      tier.maxAmount == null
+                    "
                     class="text-xs font-semibold text-primary-600 dark:text-primary-400"
                   >
                     Total: {{ formatPrice(tier.price * tierQuantities[tier.id]) }}
@@ -412,7 +417,7 @@
                   <div>
                     <h4 class="font-medium text-gray-900 dark:text-white">{{ item.tierName }}</h4>
                     <p
-                      v-if="!item.minAmount && !item.maxAmount"
+                      v-if="item.minAmount == null && item.maxAmount == null"
                       class="text-sm text-gray-600 dark:text-gray-400"
                     >
                       {{ formatPrice(item.price) }}
@@ -425,13 +430,13 @@
                 </div>
 
                 <!-- Champ de montant personnalisé pour les tarifs à prix libre -->
-                <div v-if="item.minAmount || item.maxAmount">
+                <div v-if="item.minAmount != null || item.maxAmount != null">
                   <UFormField label="Montant (€)" :error="getItemAmountError(item)">
                     <UInput
                       :model-value="item.price / 100"
                       type="number"
-                      :min="item.minAmount ? item.minAmount / 100 : 0"
-                      :max="item.maxAmount ? item.maxAmount / 100 : undefined"
+                      :min="item.minAmount != null ? item.minAmount / 100 : 0"
+                      :max="item.maxAmount != null ? item.maxAmount / 100 : undefined"
                       step="0.01"
                       placeholder="Montant en euros"
                       @update:model-value="
@@ -439,10 +444,10 @@
                       "
                     />
                   </UFormField>
-                  <p v-if="item.minAmount || item.maxAmount" class="text-xs text-gray-500 mt-1">
-                    <span v-if="item.minAmount"> Min: {{ formatPrice(item.minAmount) }} </span>
-                    <span v-if="item.minAmount && item.maxAmount"> - </span>
-                    <span v-if="item.maxAmount"> Max: {{ formatPrice(item.maxAmount) }} </span>
+                  <p v-if="item.minAmount != null || item.maxAmount != null" class="text-xs text-gray-500 mt-1">
+                    <span v-if="item.minAmount != null"> Min: {{ formatPrice(item.minAmount) }} </span>
+                    <span v-if="item.minAmount != null && item.maxAmount != null"> - </span>
+                    <span v-if="item.maxAmount != null"> Max: {{ formatPrice(item.maxAmount) }} </span>
                   </p>
                 </div>
 
@@ -1014,7 +1019,7 @@ const canGoNext = computed(() => {
     // Vérifier que tous les montants personnalisés sont valides
     return selectedItems.value.every((item) => {
       // Vérifier les montants pour les tarifs à prix libre
-      if (item.minAmount || item.maxAmount) {
+      if (item.minAmount != null || item.maxAmount != null) {
         if (getItemAmountError(item)) return false
       }
       // Vérifier les infos participant si différent de l'acheteur
@@ -1079,14 +1084,14 @@ const getOptionPrice = (optionId?: number): number => {
 }
 
 const getItemAmountError = (item: SelectedItem) => {
-  if (!item.price || item.price < 0) {
+  if (item.price == null || item.price < 0) {
     return 'Veuillez saisir un montant valide'
   }
   const minAmount = item.minAmount ?? 0
   if (item.price < minAmount) {
     return `Le montant minimum est ${formatPrice(minAmount)}`
   }
-  if (item.maxAmount && item.price > item.maxAmount) {
+  if (item.maxAmount != null && item.price > item.maxAmount) {
     return `Le montant maximum est ${formatPrice(item.maxAmount)}`
   }
   return ''
@@ -1261,7 +1266,7 @@ const nextStep = () => {
       const quantity = tierQuantities.value[tier.id] || 0
       // Déterminer le prix initial : minimum pour les prix libres, sinon prix du tarif
       let itemPrice = tier.price
-      if (tier.minAmount || tier.maxAmount) {
+      if (tier.minAmount != null || tier.maxAmount != null) {
         // Pour les prix libres, initialiser au minimum (ou 0 si pas de minimum)
         itemPrice = tier.minAmount ?? 0
       }

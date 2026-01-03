@@ -58,7 +58,13 @@
           />
         </UFormField>
 
-        <UFormField :label="$t('ticketing.tiers.modal.price_label')" name="price" required>
+        <!-- Prix fixe (masqué si tarif libre) -->
+        <UFormField
+          v-if="!form.isFree"
+          :label="$t('ticketing.tiers.modal.price_label')"
+          name="price"
+          required
+        >
           <UInput
             v-model="form.priceInEuros"
             :disabled="isHelloAssoTier"
@@ -82,15 +88,18 @@
                   Permettre au participant de choisir le montant
                 </label>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Le participant pourra définir le montant qu'il souhaite payer dans la plage
-                  définie
+                  Le participant pourra choisir le montant qu'il souhaite payer
                 </p>
               </div>
             </div>
           </UFormField>
 
           <div v-if="form.isFree" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-            <UFormField :label="$t('ticketing.tiers.modal.min_amount_label')" name="minAmount">
+            <UFormField
+              :label="$t('ticketing.tiers.modal.min_amount_label')"
+              name="minAmount"
+              help="Peut être à 0€ pour permettre la participation gratuite"
+            >
               <UInput
                 v-model="form.minAmountInEuros"
                 :disabled="isHelloAssoTier"
@@ -102,7 +111,11 @@
               />
             </UFormField>
 
-            <UFormField :label="$t('ticketing.tiers.modal.max_amount_label')" name="maxAmount">
+            <UFormField
+              :label="$t('ticketing.tiers.modal.max_amount_label')"
+              name="maxAmount"
+              help="Laissez vide pour un don sans limite haute"
+            >
               <UInput
                 v-model="form.maxAmountInEuros"
                 :disabled="isHelloAssoTier"
@@ -467,12 +480,14 @@ watch(
           customName: props.tier.customName || '',
           description: props.tier.description || '',
           priceInEuros: (props.tier.price / 100).toFixed(2),
-          minAmountInEuros: props.tier.minAmount ? (props.tier.minAmount / 100).toFixed(2) : '',
-          maxAmountInEuros: props.tier.maxAmount ? (props.tier.maxAmount / 100).toFixed(2) : '',
+          minAmountInEuros:
+            props.tier.minAmount != null ? (props.tier.minAmount / 100).toFixed(2) : '',
+          maxAmountInEuros:
+            props.tier.maxAmount != null ? (props.tier.maxAmount / 100).toFixed(2) : '',
           position: props.tier.position,
           isActive: props.tier.isActive,
           countAsParticipant: props.tier.countAsParticipant ?? true,
-          isFree: !!(props.tier.minAmount || props.tier.maxAmount),
+          isFree: props.tier.minAmount != null || props.tier.maxAmount != null,
           validFrom: validFromLocal,
           validUntil: validUntilLocal,
           isAllDay,
@@ -540,6 +555,20 @@ watch(
   }
 )
 
+// Watcher pour pré-remplir minAmount quand on active "Tarif libre"
+watch(
+  () => form.value.isFree,
+  (isFree, wasFree) => {
+    if (isFree && !wasFree) {
+      // Activation du tarif libre : pré-remplir minAmount avec le prix actuel si > 0
+      const currentPrice = parseFloat(form.value.priceInEuros)
+      if (currentPrice > 0 && !form.value.minAmountInEuros) {
+        form.value.minAmountInEuros = form.value.priceInEuros
+      }
+    }
+  }
+)
+
 // Computed pour obtenir les dates finales avec les bonnes heures
 const finalValidFrom = computed(() => {
   if (!form.value.validFrom) return null
@@ -582,17 +611,28 @@ const handleSubmit = async () => {
 
   saving.value = true
   try {
+    // En mode tarif libre, utiliser minAmount comme prix de référence (ou 0 si non défini)
+    const priceValue = form.value.isFree
+      ? form.value.minAmountInEuros
+        ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
+        : 0
+      : Math.round(parseFloat(form.value.priceInEuros) * 100)
+
     const data = {
       name: form.value.name.trim(),
       customName: form.value.customName.trim() || null,
       description: form.value.description.trim() || null,
-      price: Math.round(parseFloat(form.value.priceInEuros) * 100),
+      price: priceValue,
       minAmount:
-        form.value.isFree && form.value.minAmountInEuros
+        form.value.isFree &&
+        form.value.minAmountInEuros != null &&
+        form.value.minAmountInEuros !== ''
           ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
           : null,
       maxAmount:
-        form.value.isFree && form.value.maxAmountInEuros
+        form.value.isFree &&
+        form.value.maxAmountInEuros != null &&
+        form.value.maxAmountInEuros !== ''
           ? Math.round(parseFloat(form.value.maxAmountInEuros) * 100)
           : null,
       position: form.value.position,

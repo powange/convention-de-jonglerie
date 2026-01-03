@@ -89,7 +89,11 @@
       <!-- Colonne Prix -->
       <template #price-cell="{ row }">
         <div class="flex flex-col items-start">
-          <div class="flex items-baseline gap-1">
+          <!-- Prix fixe -->
+          <div
+            v-if="row.original.minAmount == null && row.original.maxAmount == null"
+            class="flex items-baseline gap-1"
+          >
             <span
               class="text-lg font-bold"
               :class="
@@ -100,17 +104,27 @@
             </span>
             <span class="text-xs text-gray-500">€</span>
           </div>
-          <div
-            v-if="row.original.minAmount || row.original.maxAmount"
-            class="text-xs text-gray-500"
-          >
-            <span v-if="row.original.minAmount"
-              >Min: {{ (row.original.minAmount / 100).toFixed(2) }}€</span
+          <!-- Prix libre -->
+          <div v-else class="flex flex-col gap-1">
+            <span
+              class="text-sm font-semibold"
+              :class="
+                row.original.isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'
+              "
             >
-            <span v-if="row.original.minAmount && row.original.maxAmount"> • </span>
-            <span v-if="row.original.maxAmount"
-              >Max: {{ (row.original.maxAmount / 100).toFixed(2) }}€</span
-            >
+              Prix libre
+            </span>
+            <div class="text-xs text-gray-500">
+              <span v-if="row.original.minAmount != null"
+                >Min: {{ (row.original.minAmount / 100).toFixed(2) }}€</span
+              >
+              <span v-if="row.original.minAmount != null && row.original.maxAmount != null">
+                •
+              </span>
+              <span v-if="row.original.maxAmount != null"
+                >Max: {{ (row.original.maxAmount / 100).toFixed(2) }}€</span
+              >
+            </div>
           </div>
         </div>
       </template>
