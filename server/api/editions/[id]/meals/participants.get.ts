@@ -83,6 +83,9 @@ export default wrapApiHandler(
             tier: {
               include: {
                 orderItems: {
+                  where: {
+                    state: 'Processed',
+                  },
                   select: {
                     id: true,
                     firstName: true,
@@ -101,6 +104,11 @@ export default wrapApiHandler(
             option: {
               include: {
                 orderItemSelections: {
+                  where: {
+                    orderItem: {
+                      state: 'Processed',
+                    },
+                  },
                   include: {
                     orderItem: {
                       select: {

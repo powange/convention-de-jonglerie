@@ -30,6 +30,9 @@ export default wrapApiHandler(
             tier: {
               include: {
                 orderItems: {
+                  where: {
+                    entryValidated: true,
+                  },
                   select: {
                     id: true,
                     mealAccess: {
@@ -48,6 +51,11 @@ export default wrapApiHandler(
             option: {
               include: {
                 orderItemSelections: {
+                  where: {
+                    orderItem: {
+                      entryValidated: true,
+                    },
+                  },
                   include: {
                     orderItem: {
                       select: {

@@ -85,6 +85,11 @@ export default wrapApiHandler(async (event) => {
           option: {
             include: {
               orderItemSelections: {
+                where: {
+                  orderItem: {
+                    state: 'Processed',
+                  },
+                },
                 include: {
                   orderItem: {
                     include: {
@@ -173,9 +178,8 @@ export default wrapApiHandler(async (event) => {
     const ticketParticipantsFromOptions = meal.options.flatMap((optionMeal) =>
       optionMeal.option.orderItemSelections
         .filter((selection) => {
-          // Filtrer les orderItems non-Processed et les doublons
+          // Filtrer les doublons (les orderItems non validés sont déjà filtrés par Prisma)
           if (!selection.orderItem) return false
-          if (selection.orderItem.state !== 'Processed') return false
           if (addedOrderItemIds.has(selection.orderItem.id)) return false
           addedOrderItemIds.add(selection.orderItem.id)
           return true
