@@ -46,20 +46,19 @@ export default wrapApiHandler(
           throw new Error('Nom de fichier temporaire du logo non défini')
         }
 
-        // Construire le chemin complet du fichier temporaire
-        const tempPath = `temp/conventions/${conventionId}/${tempFilename}`
-        const finalPath = `conventions/${conventionId}/${tempFilename}`
+        // Construire le chemin du dossier temporaire
+        const tempFolder = `temp/conventions/${conventionId}`
+        const finalFolder = `conventions/${conventionId}`
 
         console.log(`Nom de fichier extrait: ${tempFilename}`)
-        console.log(`Tentative de déplacement de ${tempPath} vers ${finalPath}`)
+        console.log(`Tentative de déplacement de ${tempFolder}/${tempFilename} vers ${finalFolder}/${tempFilename}`)
 
-        // getFileLocally retourne le PATH, pas le contenu !
-        // Il faut lire le fichier depuis ce path
-        console.log(`Récupération du path via nuxt-file-storage: ${tempPath}`)
-        const tempFilePath = getFileLocally(tempPath)
+        // getFileLocally prend (filename, filelocation) séparément
+        console.log(`Récupération du path via nuxt-file-storage: ${tempFilename} dans ${tempFolder}`)
+        const tempFilePath = getFileLocally(tempFilename, tempFolder)
 
         if (!tempFilePath) {
-          throw new Error(`Fichier temporaire introuvable via nuxt-file-storage: ${tempPath}`)
+          throw new Error(`Fichier temporaire introuvable via nuxt-file-storage: ${tempFolder}/${tempFilename}`)
         }
 
         console.log('Path récupéré:', tempFilePath)
@@ -108,7 +107,7 @@ export default wrapApiHandler(
         // Supprimer le fichier temporaire
         console.log('Suppression du fichier temporaire...')
         try {
-          await deleteFile(tempPath)
+          await deleteFile(tempFilename, tempFolder)
           console.log('Fichier temporaire supprimé')
         } catch (deleteError) {
           console.warn('Impossible de supprimer le fichier temporaire:', deleteError)
@@ -138,14 +137,17 @@ export default wrapApiHandler(
     // Gérer la suppression de l'ancien logo si nécessaire
     if (validatedData.logo === null && existingConvention.logo) {
       try {
-        // Si c'est juste un nom de fichier, construire le path complet
-        const oldLogoPath = existingConvention.logo.includes('/')
-          ? existingConvention.logo.replace('/uploads/', '')
-          : `conventions/${conventionId}/${existingConvention.logo}`
+        // Extraire le nom du fichier et le dossier
+        const oldFilename = existingConvention.logo.includes('/')
+          ? existingConvention.logo.split('/').pop()!
+          : existingConvention.logo
+        const oldFolder = existingConvention.logo.includes('/')
+          ? existingConvention.logo.replace('/uploads/', '').split('/').slice(0, -1).join('/')
+          : `conventions/${conventionId}`
 
-        // Utiliser deleteFile de nuxt-file-storage
-        await deleteFile(oldLogoPath)
-        console.log(`Ancien logo supprimé avec nuxt-file-storage: ${oldLogoPath}`)
+        // Utiliser deleteFile de nuxt-file-storage avec (filename, folder)
+        await deleteFile(oldFilename, oldFolder)
+        console.log(`Ancien logo supprimé: ${oldFilename} dans ${oldFolder}`)
       } catch (error) {
         // Log l'erreur mais ne pas faire échouer la mise à jour
         console.warn(`Impossible de supprimer l'ancien logo: ${existingConvention.logo}`, error)

@@ -300,21 +300,23 @@ export async function moveTemporaryFile(
       throw new Error('Nom de fichier temporaire non défini')
     }
 
-    // Construire les chemins
-    const tempPath = customTempPath || `temp/${resourceType}/${resourceId}/${tempFilename}`
+    // Construire les chemins (dossier séparé du nom de fichier pour nuxt-file-storage)
+    const tempFolder = customTempPath
+      ? customTempPath.split('/').slice(0, -1).join('/')
+      : `temp/${resourceType}/${resourceId}`
     const finalPath = customFinalPath || `${resourceType}/${resourceId}`
 
     if (verbose) {
       console.log(`Nom de fichier: ${tempFilename}`)
-      console.log(`Chemin temporaire: ${tempPath}`)
+      console.log(`Dossier temporaire: ${tempFolder}`)
       console.log(`Chemin final: ${finalPath}`)
     }
 
-    // Récupérer le path local via nuxt-file-storage
-    const tempFilePath = getFileLocally(tempPath)
+    // Récupérer le path local via nuxt-file-storage (filename, folder séparés)
+    const tempFilePath = getFileLocally(tempFilename, tempFolder)
 
     if (!tempFilePath) {
-      throw new Error(`Fichier temporaire introuvable: ${tempPath}`)
+      throw new Error(`Fichier temporaire introuvable: ${tempFolder}/${tempFilename}`)
     }
 
     if (verbose) {
@@ -352,9 +354,9 @@ export async function moveTemporaryFile(
     // Stocker dans le dossier final
     const newFilename = await storeFileLocally(serverFile, randomSuffixLength, finalPath)
 
-    // Supprimer le fichier temporaire
+    // Supprimer le fichier temporaire (filename, folder séparés)
     try {
-      await deleteFile(tempPath)
+      await deleteFile(tempFilename, tempFolder)
       if (verbose) {
         console.log('Fichier temporaire supprimé')
       }
@@ -405,15 +407,26 @@ export async function deleteOldFile(
   if (!oldFileUrl) return
 
   try {
-    // Si c'est une URL complète, extraire le chemin relatif
-    const filePath = oldFileUrl.includes('/')
-      ? oldFileUrl.replace('/uploads/', '')
-      : `${resourceType}/${resourceId}/${oldFileUrl}`
+    // Extraire le nom du fichier et le dossier séparément pour nuxt-file-storage
+    let filename: string
+    let folder: string
 
-    await deleteFile(filePath)
+    if (oldFileUrl.includes('/')) {
+      // C'est un chemin complet, extraire les parties
+      const cleanPath = oldFileUrl.replace('/uploads/', '')
+      const parts = cleanPath.split('/')
+      filename = parts.pop()!
+      folder = parts.join('/')
+    } else {
+      // C'est juste un nom de fichier
+      filename = oldFileUrl
+      folder = `${resourceType}/${resourceId}`
+    }
+
+    await deleteFile(filename, folder)
 
     if (verbose) {
-      console.log(`Ancien fichier supprimé: ${filePath}`)
+      console.log(`Ancien fichier supprimé: ${filename} dans ${folder}`)
     }
   } catch (error) {
     console.warn(`Impossible de supprimer l'ancien fichier: ${oldFileUrl}`, error)

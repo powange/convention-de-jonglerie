@@ -39,13 +39,13 @@ export default wrapApiHandler(
           throw new Error('Nom de fichier temporaire invalide')
         }
 
-        // Construire les chemins
-        const tempPath = `temp/profiles/${userId}/${tempFilename}`
+        // Construire le chemin du dossier temporaire
+        const tempFolder = `temp/profiles/${userId}`
 
-        // Récupérer et lire le fichier temporaire
-        const tempFilePath = getFileLocally(tempPath)
+        // Récupérer et lire le fichier temporaire (filename, folder séparés)
+        const tempFilePath = getFileLocally(tempFilename, tempFolder)
         if (!tempFilePath) {
-          throw new Error(`Fichier temporaire introuvable: ${tempPath}`)
+          throw new Error(`Fichier temporaire introuvable: ${tempFolder}/${tempFilename}`)
         }
 
         const { readFile } = await import('fs/promises')
@@ -65,9 +65,9 @@ export default wrapApiHandler(
         // Stocker dans le dossier final
         const newFilename = await storeFileLocally(serverFile, 8, `profiles/${userId}`)
 
-        // Supprimer le fichier temporaire
+        // Supprimer le fichier temporaire (filename, folder séparés)
         try {
-          await deleteFile(tempPath)
+          await deleteFile(tempFilename, tempFolder)
         } catch (deleteError) {
           console.warn('Impossible de supprimer le fichier temporaire:', deleteError)
         }
@@ -86,14 +86,17 @@ export default wrapApiHandler(
     // Gérer la suppression de l'ancienne photo si nécessaire
     if (profilePicture === null && existingUser.profilePicture) {
       try {
-        // Si c'est juste un nom de fichier, construire le path complet
-        const oldPicturePath = existingUser.profilePicture.includes('/')
-          ? existingUser.profilePicture.replace('/uploads/', '')
-          : `profiles/${userId}/${existingUser.profilePicture}`
+        // Extraire le nom du fichier et le dossier séparément
+        const oldFilename = existingUser.profilePicture.includes('/')
+          ? existingUser.profilePicture.split('/').pop()!
+          : existingUser.profilePicture
+        const oldFolder = existingUser.profilePicture.includes('/')
+          ? existingUser.profilePicture.replace('/uploads/', '').split('/').slice(0, -1).join('/')
+          : `profiles/${userId}`
 
-        // Utiliser deleteFile de nuxt-file-storage
-        await deleteFile(oldPicturePath)
-        console.log(`Ancienne photo supprimée avec nuxt-file-storage: ${oldPicturePath}`)
+        // Utiliser deleteFile de nuxt-file-storage (filename, folder séparés)
+        await deleteFile(oldFilename, oldFolder)
+        console.log(`Ancienne photo supprimée: ${oldFilename} dans ${oldFolder}`)
       } catch (error) {
         // Log l'erreur mais ne pas faire échouer la mise à jour
         console.warn(

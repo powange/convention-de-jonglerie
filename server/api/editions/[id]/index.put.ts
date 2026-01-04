@@ -122,20 +122,19 @@ export default wrapApiHandler(
           throw new Error("Nom de fichier temporaire de l'image non défini")
         }
 
-        // Construire le chemin complet du fichier temporaire
-        const tempPath = `temp/editions/${editionId}/${tempFilename}`
-        const finalPath = `editions/${editionId}/${tempFilename}`
+        // Construire le chemin du dossier temporaire
+        const tempFolder = `temp/editions/${editionId}`
+        const finalFolder = `editions/${editionId}`
 
         console.log(`Nom de fichier extrait: ${tempFilename}`)
-        console.log(`Tentative de déplacement de ${tempPath} vers ${finalPath}`)
+        console.log(`Tentative de déplacement de ${tempFolder}/${tempFilename} vers ${finalFolder}/${tempFilename}`)
 
-        // getFileLocally retourne le PATH, pas le contenu !
-        // Il faut lire le fichier depuis ce path
-        console.log(`Récupération du path via nuxt-file-storage: ${tempPath}`)
-        const tempFilePath = getFileLocally(tempPath)
+        // getFileLocally prend (filename, filelocation) séparément
+        console.log(`Récupération du path via nuxt-file-storage: ${tempFilename} dans ${tempFolder}`)
+        const tempFilePath = getFileLocally(tempFilename, tempFolder)
 
         if (!tempFilePath) {
-          throw new Error(`Fichier temporaire introuvable via nuxt-file-storage: ${tempPath}`)
+          throw new Error(`Fichier temporaire introuvable via nuxt-file-storage: ${tempFolder}/${tempFilename}`)
         }
 
         console.log('Path récupéré:', tempFilePath)
@@ -185,7 +184,7 @@ export default wrapApiHandler(
         // Supprimer le fichier temporaire
         console.log('Suppression du fichier temporaire...')
         try {
-          await deleteFile(tempPath)
+          await deleteFile(tempFilename, tempFolder)
           console.log('Fichier temporaire supprimé')
         } catch (deleteError) {
           console.warn('Impossible de supprimer le fichier temporaire:', deleteError)
@@ -215,14 +214,17 @@ export default wrapApiHandler(
     // Gérer la suppression de l'ancienne image si nécessaire
     if (imageUrl === null && edition.imageUrl) {
       try {
-        // Si c'est juste un nom de fichier, construire le path complet
-        const oldImagePath = edition.imageUrl.includes('/')
-          ? edition.imageUrl.replace('/uploads/', '')
-          : `editions/${editionId}/${edition.imageUrl}`
+        // Extraire le nom du fichier et le dossier
+        const oldFilename = edition.imageUrl.includes('/')
+          ? edition.imageUrl.split('/').pop()!
+          : edition.imageUrl
+        const oldFolder = edition.imageUrl.includes('/')
+          ? edition.imageUrl.replace('/uploads/', '').split('/').slice(0, -1).join('/')
+          : `editions/${editionId}`
 
-        // Utiliser deleteFile de nuxt-file-storage
-        await deleteFile(oldImagePath)
-        console.log(`Ancienne image supprimée avec nuxt-file-storage: ${oldImagePath}`)
+        // Utiliser deleteFile de nuxt-file-storage avec (filename, folder)
+        await deleteFile(oldFilename, oldFolder)
+        console.log(`Ancienne image supprimée: ${oldFilename} dans ${oldFolder}`)
       } catch (error) {
         // Log l'erreur mais ne pas faire échouer la mise à jour
         console.warn(`Impossible de supprimer l'ancienne image: ${edition.imageUrl}`, error)

@@ -70,8 +70,8 @@ export default wrapApiHandler(
 
         console.log(`Fichier stocké: ${storedFilename}`)
 
-        // Vérifier que le fichier a été réellement créé
-        const storedPath = getFileLocally(`temp/profiles/${targetUserId}/${storedFilename}`)
+        // Vérifier que le fichier a été réellement créé (filename, folder séparés)
+        const storedPath = getFileLocally(storedFilename, `temp/profiles/${targetUserId}`)
         console.log(`Chemin du fichier stocké: ${storedPath}`)
         console.log(`Fichier existe: ${!!storedPath}`)
 
