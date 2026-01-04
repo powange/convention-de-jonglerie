@@ -92,9 +92,9 @@ export const useTimezones = () => {
         items.push({
           label: `${cities} (GMT${offset})`,
           // Champs supplémentaires pour la recherche et l'affichage
-          alternativeName: tz.alternativeName,
+          city: cities,
+          region: tz.alternativeName,
           country: tz.countryName,
-          cities,
           offset,
           value: tz.name,
         })
@@ -135,9 +135,7 @@ export const useTimezones = () => {
    */
   const formatTimezoneWithOffset = (timezone: string): string => {
     const timezones = getTimeZones()
-    const tz = timezones.find(
-      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
-    )
+    const tz = timezones.find((t: TimeZone) => t.name === timezone || t.group.includes(timezone))
 
     if (tz) {
       const cities = tz.mainCities.slice(0, 3).join(', ')
@@ -154,9 +152,7 @@ export const useTimezones = () => {
    */
   const getTimezoneOffset = (timezone: string): string => {
     const timezones = getTimeZones()
-    const tz = timezones.find(
-      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
-    )
+    const tz = timezones.find((t: TimeZone) => t.name === timezone || t.group.includes(timezone))
 
     if (tz) {
       return `GMT${formatOffset(tz.currentTimeOffsetInMinutes)}`
@@ -182,9 +178,7 @@ export const useTimezones = () => {
    */
   const getTimezoneAbbreviation = (timezone: string): string => {
     const timezones = getTimeZones()
-    const tz = timezones.find(
-      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
-    )
+    const tz = timezones.find((t: TimeZone) => t.name === timezone || t.group.includes(timezone))
     return tz?.abbreviation || ''
   }
 
@@ -193,9 +187,7 @@ export const useTimezones = () => {
    */
   const getTimezoneInfo = (timezone: string): TimeZone | undefined => {
     const timezones = getTimeZones()
-    return timezones.find(
-      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
-    )
+    return timezones.find((t: TimeZone) => t.name === timezone || t.group.includes(timezone))
   }
 
   return {
