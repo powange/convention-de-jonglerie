@@ -157,7 +157,7 @@
                   </p>
                   <!-- Prix fixe ou fourchette de prix libre -->
                   <p
-                    v-if="tier.minAmount == null && tier.maxAmount == null"
+                    v-if="isFixedPrice(tier)"
                     class="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-2"
                   >
                     {{ formatPrice(tier.price) }}
@@ -205,10 +205,7 @@
                   </div>
                   <span
                     v-if="
-                      tierQuantities[tier.id] &&
-                      tierQuantities[tier.id] > 0 &&
-                      tier.minAmount == null &&
-                      tier.maxAmount == null
+                      tierQuantities[tier.id] && tierQuantities[tier.id] > 0 && isFixedPrice(tier)
                     "
                     class="text-xs font-semibold text-primary-600 dark:text-primary-400"
                   >
@@ -416,10 +413,7 @@
                 <div class="flex items-start justify-between">
                   <div>
                     <h4 class="font-medium text-gray-900 dark:text-white">{{ item.tierName }}</h4>
-                    <p
-                      v-if="item.minAmount == null && item.maxAmount == null"
-                      class="text-sm text-gray-600 dark:text-gray-400"
-                    >
+                    <p v-if="isFixedPrice(item)" class="text-sm text-gray-600 dark:text-gray-400">
                       {{ formatPrice(item.price) }}
                     </p>
                     <p v-else class="text-sm text-gray-600 dark:text-gray-400">Prix libre</p>
@@ -430,7 +424,7 @@
                 </div>
 
                 <!-- Champ de montant personnalisé pour les tarifs à prix libre -->
-                <div v-if="item.minAmount != null || item.maxAmount != null">
+                <div v-if="isFreePrice(item)">
                   <UFormField label="Montant (€)" :error="getItemAmountError(item)">
                     <UInput
                       :model-value="item.price / 100"
@@ -677,8 +671,8 @@
                   : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
               "
               @click="
-                paymentMethod = 'cash';
-                checkNumber = '';
+                paymentMethod = 'cash'
+                checkNumber = ''
               "
             >
               <div class="flex items-center gap-3">
@@ -711,8 +705,8 @@
                   : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
               "
               @click="
-                paymentMethod = 'card';
-                checkNumber = '';
+                paymentMethod = 'card'
+                checkNumber = ''
               "
             >
               <div class="flex items-center gap-3">
@@ -776,8 +770,8 @@
                   : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
               "
               @click="
-                paymentMethod = null;
-                checkNumber = '';
+                paymentMethod = null
+                checkNumber = ''
               "
             >
               <div class="flex items-center gap-3">
@@ -852,6 +846,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+
+import { isFreePrice, isFixedPrice } from '~/utils/ticketing/tiers'
 
 interface TicketingOption {
   id: number
@@ -1105,7 +1101,7 @@ const canGoNext = computed(() => {
     // Vérifier que tous les montants personnalisés sont valides
     return selectedItems.value.every((item) => {
       // Vérifier les montants pour les tarifs à prix libre
-      if (item.minAmount != null || item.maxAmount != null) {
+      if (isFreePrice(item)) {
         if (getItemAmountError(item)) return false
       }
       // Vérifier les infos participant si différent de l'acheteur
@@ -1352,7 +1348,7 @@ const nextStep = () => {
       const quantity = tierQuantities.value[tier.id] || 0
       // Déterminer le prix initial : minimum pour les prix libres, sinon prix du tarif
       let itemPrice = tier.price
-      if (tier.minAmount != null || tier.maxAmount != null) {
+      if (isFreePrice(tier)) {
         // Pour les prix libres, initialiser au minimum (ou 0 si pas de minimum)
         itemPrice = tier.minAmount ?? 0
       }

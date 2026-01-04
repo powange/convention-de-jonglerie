@@ -16,6 +16,30 @@ export interface TierData {
 }
 
 /**
+ * Interface pour les objets pouvant être vérifiés pour le prix libre
+ */
+export interface FreePriceCheckable {
+  minAmount?: number | null
+  maxAmount?: number | null
+}
+
+/**
+ * Vérifie si un tarif est à prix libre
+ * Un tarif est à prix libre si minAmount ou maxAmount est défini
+ */
+export function isFreePrice(tier: FreePriceCheckable): boolean {
+  return tier.minAmount != null || tier.maxAmount != null
+}
+
+/**
+ * Vérifie si un tarif est à prix fixe
+ * Un tarif est à prix fixe si minAmount et maxAmount sont tous deux null/undefined
+ */
+export function isFixedPrice(tier: FreePriceCheckable): boolean {
+  return tier.minAmount == null && tier.maxAmount == null
+}
+
+/**
  * Applique le nom personnalisé si défini
  */
 export function applyCustomName<T extends { name: string; customName?: string | null }>(

@@ -304,7 +304,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { createTier, updateTier } from '~/utils/ticketing/tiers'
+import { createTier, isFreePrice, updateTier } from '~/utils/ticketing/tiers'
 
 interface TicketingTier {
   id: number
@@ -487,7 +487,7 @@ watch(
           position: props.tier.position,
           isActive: props.tier.isActive,
           countAsParticipant: props.tier.countAsParticipant ?? true,
-          isFree: props.tier.minAmount != null || props.tier.maxAmount != null,
+          isFree: isFreePrice(props.tier),
           validFrom: validFromLocal,
           validUntil: validUntilLocal,
           isAllDay,

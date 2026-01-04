@@ -90,10 +90,7 @@
       <template #price-cell="{ row }">
         <div class="flex flex-col items-start">
           <!-- Prix fixe -->
-          <div
-            v-if="row.original.minAmount == null && row.original.maxAmount == null"
-            class="flex items-baseline gap-1"
-          >
+          <div v-if="isFixedPrice(row.original)" class="flex items-baseline gap-1">
             <span
               class="text-lg font-bold"
               :class="
@@ -283,7 +280,7 @@
 
 <script setup lang="ts">
 import { formatMealDisplay } from '~/utils/meals'
-import { deleteTier, type TicketingTier } from '~/utils/ticketing/tiers'
+import { deleteTier, isFixedPrice, type TicketingTier } from '~/utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
 
