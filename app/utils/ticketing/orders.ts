@@ -69,7 +69,8 @@ export interface OrdersResponse {
     totalDonations: number
     totalDonationsAmount: number
     amountsByPaymentMethod: {
-      card: number
+      cardHelloAsso: number
+      cardOnsite: number
       cash: number
       check: number
       online: number

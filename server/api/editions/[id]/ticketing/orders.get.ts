@@ -252,6 +252,7 @@ export default wrapApiHandler(
             amount: true,
             status: true,
             paymentMethod: true,
+            externalTicketingId: true,
             items: {
               select: {
                 type: true,
@@ -288,7 +289,12 @@ export default wrapApiHandler(
             } else if (order.status === 'Refunded') {
               acc.refunded += amount
             } else if (order.paymentMethod === 'card') {
-              acc.card += amount
+              // Distinguer carte HelloAsso et carte sur place
+              if (order.externalTicketingId) {
+                acc.cardHelloAsso += amount
+              } else {
+                acc.cardOnsite += amount
+              }
             } else if (order.paymentMethod === 'cash') {
               acc.cash += amount
             } else if (order.paymentMethod === 'check') {
@@ -301,7 +307,8 @@ export default wrapApiHandler(
             return acc
           },
           {
-            card: 0,
+            cardHelloAsso: 0,
+            cardOnsite: 0,
             cash: 0,
             check: 0,
             online: 0,

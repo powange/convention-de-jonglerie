@@ -949,9 +949,9 @@
       <template #body>
         <div class="space-y-4">
           <div class="space-y-3">
-            <!-- Carte -->
+            <!-- Carte HelloAsso -->
             <div
-              v-if="stats?.amountsByPaymentMethod?.card && stats.amountsByPaymentMethod.card > 0"
+              v-if="stats?.amountsByPaymentMethod?.cardHelloAsso && stats.amountsByPaymentMethod.cardHelloAsso > 0"
               class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
             >
               <div class="flex items-center gap-3">
@@ -959,12 +959,31 @@
                   <UIcon name="i-heroicons-credit-card" class="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Carte bancaire</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements en ligne (HelloAsso)</p>
+                  <p class="font-medium text-gray-900 dark:text-white">Carte bancaire (HelloAsso)</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements en ligne via HelloAsso</p>
                 </div>
               </div>
               <p class="text-lg font-bold text-green-600">
-                {{ (stats.amountsByPaymentMethod.card / 100).toFixed(2) }}€
+                {{ (stats.amountsByPaymentMethod.cardHelloAsso / 100).toFixed(2) }}€
+              </p>
+            </div>
+
+            <!-- Carte sur place -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.cardOnsite && stats.amountsByPaymentMethod.cardOnsite > 0"
+              class="flex items-center justify-between p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-credit-card" class="h-5 w-5 text-teal-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Carte bancaire (sur place)</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements par terminal sur place</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-teal-600">
+                {{ (stats.amountsByPaymentMethod.cardOnsite / 100).toFixed(2) }}€
               </p>
             </div>
 
