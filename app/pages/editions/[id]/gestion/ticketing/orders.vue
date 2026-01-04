@@ -50,8 +50,7 @@
               :to="`/editions/${edition.id}/gestion/ticketing/external`"
               color="primary"
               variant="soft"
-              size="sm"
-              icon="i-heroicons-arrow-right"
+                            icon="i-heroicons-arrow-right"
             >
               Configurer une billeterie externe
             </UButton>
@@ -160,7 +159,7 @@
                   v-if="activeFiltersCount > 0"
                   color="primary"
                   variant="solid"
-                  size="xs"
+                  size="sm"
                   class="ml-2"
                 >
                   {{ activeFiltersCount }}
@@ -297,8 +296,7 @@
                     </span>
                     <USwitch
                       :model-value="customFieldFilterMode === 'or'"
-                      size="sm"
-                      color="primary"
+                                            color="primary"
                       @update:model-value="customFieldFilterMode = $event ? 'or' : 'and'"
                     />
                     <span
@@ -332,7 +330,7 @@
                     <UButton
                       color="error"
                       variant="ghost"
-                      size="xs"
+                      size="sm"
                       icon="i-heroicons-x-mark"
                       @click="removeCustomFieldFilter(index)"
                     />
@@ -378,7 +376,7 @@
                 <UButton
                   color="neutral"
                   variant="ghost"
-                  size="xs"
+                  size="sm"
                   icon="i-heroicons-x-mark"
                   @click="resetFilters"
                 >
@@ -413,7 +411,7 @@
           <UCard v-for="order in orders" :key="order.id" class="hover:shadow-md transition-shadow">
             <!-- En-tête de la commande -->
             <div
-              class="flex items-start justify-between mb-4 pb-4 border-b border-gray-200 dark:border-gray-700"
+              class="flex items-start justify-between mb-4"
             >
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
@@ -430,20 +428,51 @@
                     Annulée
                   </UBadge>
                   <!-- Badge origine : En ligne vs Sur place -->
-                  <img
+                  <UPopover
                     v-if="order.externalTicketing?.provider === 'HELLOASSO'"
-                    src="~/assets/img/helloasso/logo.svg"
-                    alt="HelloAsso"
-                    class="h-5 w-auto"
-                    :title="`Commande provenant de HelloAsso (ID: ${order.helloAssoOrderId})`"
-                  />
-                  <img
+                    mode="hover"
+                    :open-delay="200"
+                  >
+                    <img
+                      src="~/assets/img/helloasso/logo.svg"
+                      alt="HelloAsso"
+                      class="h-5 w-auto cursor-help"
+                    />
+                    <template #content>
+                      <div class="p-3 max-w-xs">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                          HelloAsso
+                        </p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                          Commande importée depuis HelloAsso
+                        </p>
+                        <p v-if="order.helloAssoOrderId" class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono">
+                          ID: {{ order.helloAssoOrderId }}
+                        </p>
+                      </div>
+                    </template>
+                  </UPopover>
+                  <UPopover
                     v-else-if="!order.externalTicketing"
-                    src="/logos/logo-jc.svg"
-                    alt="Sur place"
-                    class="h-5 w-auto"
-                    title="Commande créée sur place"
-                  />
+                    mode="hover"
+                    :open-delay="200"
+                  >
+                    <img
+                      src="/logos/logo-jc.svg"
+                      alt="Sur place"
+                      class="h-5 w-auto cursor-help"
+                    />
+                    <template #content>
+                      <div class="p-3 max-w-xs">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                          Sur place
+                        </p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                          Commande créée manuellement sur place
+                        </p>
+                      </div>
+                    </template>
+                  </UPopover>
                   <!-- Badge statut de paiement -->
                   <UBadge
                     v-if="
@@ -452,8 +481,7 @@
                     "
                     color="success"
                     variant="soft"
-                    size="sm"
-                  >
+                                      >
                     <template #leading>
                       <UIcon name="i-heroicons-check-circle" class="h-3 w-3" />
                     </template>
@@ -463,8 +491,7 @@
                     v-else-if="order.paymentMethod === 'cash'"
                     color="success"
                     variant="soft"
-                    size="sm"
-                  >
+                                      >
                     <template #leading>
                       <UIcon name="i-heroicons-banknotes" class="h-3 w-3" />
                     </template>
@@ -474,8 +501,7 @@
                     v-else-if="order.paymentMethod === 'card'"
                     color="success"
                     variant="soft"
-                    size="sm"
-                  >
+                                      >
                     <template #leading>
                       <UIcon name="i-heroicons-credit-card" class="h-3 w-3" />
                     </template>
@@ -485,8 +511,7 @@
                     v-else-if="order.paymentMethod === 'check'"
                     color="success"
                     variant="soft"
-                    size="sm"
-                    :title="order.checkNumber ? `Chèque n°${order.checkNumber}` : undefined"
+                                        :title="order.checkNumber ? `Chèque n°${order.checkNumber}` : undefined"
                   >
                     <template #leading>
                       <UIcon name="i-heroicons-document-text" class="h-3 w-3" />
@@ -497,8 +522,7 @@
                     v-else-if="order.status === 'Pending'"
                     color="warning"
                     variant="soft"
-                    size="sm"
-                  >
+                                      >
                     <template #leading>
                       <UIcon name="i-heroicons-clock" class="h-3 w-3" />
                     </template>
@@ -516,7 +540,7 @@
                   </div>
                   <div class="flex items-center gap-1">
                     <UIcon name="i-heroicons-hashtag" class="h-4 w-4" />
-                    <span class="font-mono text-xs">{{ order.helloAssoOrderId }}</span>
+                    <span class="font-mono text-xs">{{ order.id }}</span>
                   </div>
                 </div>
               </div>
@@ -524,17 +548,12 @@
                 <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {{ (order.amount / 100).toFixed(2) }}€
                 </div>
-                <UBadge color="primary" variant="subtle" size="sm">
-                  {{ order.items?.length || 0 }} billet{{
-                    (order.items?.length || 0) > 1 ? 's' : ''
-                  }}
-                </UBadge>
                 <!-- Bouton d'annulation/suppression (seulement pour les commandes manuelles) -->
                 <UButton
                   v-if="!order.externalTicketing"
                   :color="order.status === 'Refunded' ? 'error' : 'warning'"
                   variant="soft"
-                  size="xs"
+                  size="sm"
                   :icon="order.status === 'Refunded' ? 'i-heroicons-trash' : 'i-heroicons-x-circle'"
                   @click="showCancelModal(order)"
                 >
@@ -548,6 +567,11 @@
             </div>
 
             <!-- Items de la commande -->
+            <div class="mb-3">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ order.items?.length || 0 }} billet{{ (order.items?.length || 0) > 1 ? 's' : '' }}
+              </h4>
+            </div>
             <div class="space-y-2">
               <div
                 v-for="item in order.items"
@@ -556,7 +580,7 @@
                 :class="
                   item.entryValidated
                     ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800'
-                    : 'bg-gray-50 dark:bg-gray-900/50'
+                    : 'bg-gray-50 dark:bg-gray-900/50 border-2 border-gray-200 dark:border-gray-700'
                 "
               >
                 <div class="flex-1 min-w-0">
@@ -576,12 +600,16 @@
                     >
                       {{ item.name || item.type }}
                     </span>
-                    <UBadge v-if="item.entryValidated" color="success" variant="soft" size="xs">
+                    <UBadge v-if="item.entryValidated" color="success" variant="soft">
                       <UIcon name="i-heroicons-check-circle" class="h-3 w-3 mr-1" />
                       Entrée validée
                     </UBadge>
                   </div>
                   <div class="text-xs text-gray-600 dark:text-gray-400 space-y-0.5">
+                    <div class="flex items-center gap-1">
+                      <UIcon name="i-heroicons-hashtag" class="h-3 w-3" />
+                      <span class="font-mono text-xs">{{ item.id }}</span>
+                    </div>
                     <div v-if="item.firstName || item.lastName">
                       <UIcon name="i-heroicons-user" class="h-3 w-3 inline mr-1" />
                       {{ item.firstName }} {{ item.lastName }}
@@ -639,7 +667,7 @@
                       <UButton
                         color="primary"
                         variant="soft"
-                        size="xs"
+                        size="sm"
                         icon="i-heroicons-qr-code"
                         @click="showQrCode(item)"
                       >
@@ -653,11 +681,27 @@
                     {{ getItemTotalAmount(item) }}€
                   </div>
                   <UBadge
-                    :color="item.state === 'Processed' ? 'success' : 'neutral'"
+                    :color="
+                      item.state === 'Processed'
+                        ? 'success'
+                        : item.state === 'Pending'
+                          ? 'warning'
+                          : item.state === 'Canceled'
+                            ? 'error'
+                            : 'neutral'
+                    "
                     variant="subtle"
-                    size="xs"
+                    size="sm"
                   >
-                    {{ item.state }}
+                    {{
+                      item.state === 'Processed'
+                        ? 'Traité'
+                        : item.state === 'Pending'
+                          ? 'En attente'
+                          : item.state === 'Canceled'
+                            ? 'Annulé'
+                            : item.state
+                    }}
                   </UBadge>
                   <!-- Bouton de validation/invalidation -->
                   <UButton
@@ -668,7 +712,7 @@
                     "
                     :color="item.entryValidated ? 'warning' : 'success'"
                     variant="soft"
-                    size="xs"
+                    size="sm"
                     :icon="
                       item.entryValidated ? 'i-heroicons-x-circle' : 'i-heroicons-check-circle'
                     "
