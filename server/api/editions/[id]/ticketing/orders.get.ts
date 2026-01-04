@@ -250,6 +250,8 @@ export default wrapApiHandler(
           },
           select: {
             amount: true,
+            status: true,
+            paymentMethod: true,
             items: {
               select: {
                 type: true,
@@ -276,12 +278,45 @@ export default wrapApiHandler(
           return sum + donations.reduce((itemSum, item) => itemSum + item.amount, 0)
         }, 0)
 
+        // Calculer les montants par méthode de paiement
+        const amountsByPaymentMethod = allOrders.reduce(
+          (acc, order) => {
+            const amount = order.amount
+
+            if (order.status === 'Pending') {
+              acc.pending += amount
+            } else if (order.status === 'Refunded') {
+              acc.refunded += amount
+            } else if (order.paymentMethod === 'card') {
+              acc.card += amount
+            } else if (order.paymentMethod === 'cash') {
+              acc.cash += amount
+            } else if (order.paymentMethod === 'check') {
+              acc.check += amount
+            } else if (order.status === 'Processed' || order.status === 'Onsite') {
+              // Anciennes commandes payées sans méthode spécifique
+              acc.online += amount
+            }
+
+            return acc
+          },
+          {
+            card: 0,
+            cash: 0,
+            check: 0,
+            online: 0,
+            pending: 0,
+            refunded: 0,
+          }
+        )
+
         stats = {
           totalOrders: total,
           totalItems,
           totalAmount,
           totalDonations,
           totalDonationsAmount,
+          amountsByPaymentMethod,
         }
       }
 

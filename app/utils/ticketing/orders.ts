@@ -68,6 +68,14 @@ export interface OrdersResponse {
     totalAmount: number
     totalDonations: number
     totalDonationsAmount: number
+    amountsByPaymentMethod: {
+      card: number
+      cash: number
+      check: number
+      online: number
+      pending: number
+      refunded: number
+    }
   } | null
 }
 

@@ -90,17 +90,18 @@
             </div>
           </UCard>
 
-          <UCard>
+          <UCard class="cursor-pointer hover:shadow-lg transition-shadow" @click="isAmountDetailsModalOpen = true">
             <div class="flex items-center gap-4">
               <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <UIcon name="i-heroicons-currency-euro" class="h-6 w-6 text-purple-600" />
               </div>
-              <div>
+              <div class="flex-1">
                 <p class="text-sm text-gray-600 dark:text-gray-400">Montant total</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
                   {{ (stats.totalAmount / 100).toFixed(2) }}€
                 </p>
               </div>
+              <UIcon name="i-heroicons-chevron-right" class="h-5 w-5 text-gray-400" />
             </div>
           </UCard>
 
@@ -942,6 +943,144 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal détails des montants -->
+    <UModal v-model:open="isAmountDetailsModalOpen" title="Détail des montants par méthode de paiement">
+      <template #body>
+        <div class="space-y-4">
+          <div class="space-y-3">
+            <!-- Carte -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.card && stats.amountsByPaymentMethod.card > 0"
+              class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-credit-card" class="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Carte bancaire</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements en ligne (HelloAsso)</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-green-600">
+                {{ (stats.amountsByPaymentMethod.card / 100).toFixed(2) }}€
+              </p>
+            </div>
+
+            <!-- Liquide -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.cash && stats.amountsByPaymentMethod.cash > 0"
+              class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-banknotes" class="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Liquide</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements en espèces sur place</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-blue-600">
+                {{ (stats.amountsByPaymentMethod.cash / 100).toFixed(2) }}€
+              </p>
+            </div>
+
+            <!-- Chèque -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.check && stats.amountsByPaymentMethod.check > 0"
+              class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-document-text" class="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Chèque</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements par chèque</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-purple-600">
+                {{ (stats.amountsByPaymentMethod.check / 100).toFixed(2) }}€
+              </p>
+            </div>
+
+            <!-- Paiements en ligne (anciennes commandes) -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.online && stats.amountsByPaymentMethod.online > 0"
+              class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-gray-100 dark:bg-gray-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-gray-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Payé (méthode non spécifiée)</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Anciennes commandes payées</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-gray-600">
+                {{ (stats.amountsByPaymentMethod.online / 100).toFixed(2) }}€
+              </p>
+            </div>
+
+            <!-- En attente -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.pending && stats.amountsByPaymentMethod.pending > 0"
+              class="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-clock" class="h-5 w-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">En attente de paiement</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Commandes non finalisées</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-yellow-600">
+                {{ (stats.amountsByPaymentMethod.pending / 100).toFixed(2) }}€
+              </p>
+            </div>
+
+            <!-- Remboursé -->
+            <div
+              v-if="stats?.amountsByPaymentMethod?.refunded && stats.amountsByPaymentMethod.refunded > 0"
+              class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-arrow-uturn-left" class="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Remboursé</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Commandes annulées et remboursées</p>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-red-600">
+                {{ (stats.amountsByPaymentMethod.refunded / 100).toFixed(2) }}€
+              </p>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                  <UIcon name="i-heroicons-currency-euro" class="h-6 w-6 text-primary-600" />
+                </div>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">Total général</p>
+              </div>
+              <p class="text-2xl font-bold text-primary-600">
+                {{ (stats.totalAmount / 100).toFixed(2) }}€
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -1023,6 +1162,9 @@ const showQrCode = (item: any) => {
   selectedItem.value = item
   isQrModalOpen.value = true
 }
+
+// Modal détails des montants
+const isAmountDetailsModalOpen = ref(false)
 
 // Modal et logique d'annulation de commande
 const isCancelModalOpen = ref(false)
