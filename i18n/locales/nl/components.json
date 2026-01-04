@@ -109,7 +109,8 @@
       "step_services_title": "Aangeboden Diensten",
       "ticketing_link": "Ticketverkooplink",
       "ticketing_section_description": "Informatie voor het kopen van tickets",
-      "ticketing_section_title": "Ticketverkoop"
+      "ticketing_section_title": "Ticketverkoop",
+      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",
@@ -172,6 +173,7 @@
       "search_by_name": "Zoeken op naam",
       "select_convention": "Selecteer een conventie",
       "select_countries": "Selecteer landen...",
+      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
       "start_typing_address": "Begin met het typen van een adres..."
     }
   },

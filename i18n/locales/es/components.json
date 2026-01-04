@@ -109,7 +109,8 @@
       "step_services_title": "Servicios Ofrecidos",
       "ticketing_link": "Enlace de venta de entradas",
       "ticketing_section_description": "Información para comprar entradas",
-      "ticketing_section_title": "Venta de entradas"
+      "ticketing_section_title": "Venta de entradas",
+      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "Todas son favoritas",
@@ -172,6 +173,7 @@
       "search_by_name": "Buscar por nombre",
       "select_convention": "Selecciona una convención",
       "select_countries": "Seleccionar países...",
+      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
       "start_typing_address": "Comienza a escribir una dirección..."
     }
   },

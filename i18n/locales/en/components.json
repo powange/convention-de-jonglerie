@@ -109,7 +109,8 @@
       "step_services_title": "Offered Services",
       "ticketing_link": "Ticketing link",
       "ticketing_section_description": "Information for purchasing tickets",
-      "ticketing_section_title": "Ticketing"
+      "ticketing_section_title": "Ticketing",
+      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "All are favorites",
@@ -172,6 +173,7 @@
       "search_by_name": "Search by name",
       "select_convention": "Select a convention",
       "select_countries": "Select countries...",
+      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
       "start_typing_address": "Start typing an address..."
     }
   },

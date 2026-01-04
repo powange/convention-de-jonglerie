@@ -98,6 +98,17 @@
       "type": "Typ",
       "volunteer_validated": "Dobrovolník potvrdil svůj vstup"
     },
+    "payment": {
+      "checkNumber": "[TODO] Numéro du chèque",
+      "methods": {
+        "card": "[TODO] Carte bancaire",
+        "cash": "[TODO] Liquide",
+        "check": "[TODO] Chèque",
+        "pending": "[TODO] Non payé",
+        "pendingSubtitle": "[TODO] En attente"
+      },
+      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+    },
     "quotas": {
       "list": {
         "description_label": "popis",

@@ -109,7 +109,8 @@
       "step_services_title": "Servizi Offerti",
       "ticketing_link": "Link biglietteria",
       "ticketing_section_description": "Informazioni per l'acquisto dei biglietti",
-      "ticketing_section_title": "Biglietteria"
+      "ticketing_section_title": "Biglietteria",
+      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "Tutte sono preferite",
@@ -172,6 +173,7 @@
       "search_by_name": "Cerca per nome",
       "select_convention": "Seleziona un convegno",
       "select_countries": "Seleziona paesi...",
+      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
       "start_typing_address": "Inizia a digitare un indirizzo..."
     }
   },

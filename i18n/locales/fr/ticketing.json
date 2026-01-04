@@ -1,16 +1,5 @@
 {
   "ticketing": {
-    "payment": {
-      "selectMethod": "Sélectionnez le mode de paiement",
-      "checkNumber": "Numéro du chèque",
-      "methods": {
-        "cash": "Liquide",
-        "card": "Carte bancaire",
-        "check": "Chèque",
-        "pending": "Non payé",
-        "pendingSubtitle": "En attente"
-      }
-    },
     "access_control": {
       "loading": "Chargement...",
       "no_ticket_found": "Aucun billet trouvé",
@@ -108,6 +97,17 @@
       "ticket_type": "Type de billet",
       "type": "Type",
       "volunteer_validated": "Le bénévole a validé son entrée"
+    },
+    "payment": {
+      "checkNumber": "Numéro du chèque",
+      "methods": {
+        "card": "Carte bancaire",
+        "cash": "Liquide",
+        "check": "Chèque",
+        "pending": "Non payé",
+        "pendingSubtitle": "En attente"
+      },
+      "selectMethod": "Sélectionnez le mode de paiement"
     },
     "quotas": {
       "list": {

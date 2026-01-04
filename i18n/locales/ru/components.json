@@ -109,7 +109,8 @@
       "step_services_title": "Предлагаемые услуги",
       "ticketing_link": "Ссылка на билеты",
       "ticketing_section_description": "Информация для покупки билетов",
-      "ticketing_section_title": "Билеты"
+      "ticketing_section_title": "Билеты",
+      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "Все избранные",
@@ -172,6 +173,7 @@
       "search_by_name": "Поиск по названию",
       "select_convention": "Выберите конвенцию",
       "select_countries": "Выберите страны...",
+      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
       "start_typing_address": "Начните вводить адрес..."
     }
   },

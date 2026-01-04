@@ -109,7 +109,8 @@
       "step_services_title": "Пропоновані послуги",
       "ticketing_link": "Посилання на квитки",
       "ticketing_section_description": "Інформація для придбання квитків",
-      "ticketing_section_title": "Квитки"
+      "ticketing_section_title": "Квитки",
+      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",
@@ -172,6 +173,7 @@
       "search_by_name": "Пошук за назвою",
       "select_convention": "Вибрати конвенцію",
       "select_countries": "Вибрати країни...",
+      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
       "start_typing_address": "Почніть вводити адресу..."
     }
   },

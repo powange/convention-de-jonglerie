@@ -41,13 +41,13 @@
     "clear": "Effacer",
     "click_to_view_full": "Cliquer pour voir le texte complet",
     "close": "Fermer",
-    "copy": "Copier",
-    "copied": "Copié !",
     "confirm": "Confirmer",
     "confirmation": "Confirmation",
     "contact_email": "Email de contact",
     "continue": "Continuer",
     "convention": "Convention",
+    "copied": "Copié !",
+    "copy": "Copier",
     "copy_error": "Erreur lors de la copie",
     "copy_link": "Copier le lien",
     "country": "Pays",
@@ -60,6 +60,11 @@
     "dinner": "Dîner",
     "download": "Télécharger",
     "edit": "Modifier",
+    "edition": {
+      "volunteers": {
+        "send_message_to_team": "Envoyer un message à l'équipe"
+      }
+    },
     "editor": {
       "back_to_edit": "Revenir à l'édition",
       "block_tooltip": "Bloc de code",
@@ -79,11 +84,6 @@
       "split_mode": "Mode divisé",
       "split_tooltip": "Édition et prévisualisation côte à côte",
       "toggle_preview": "Basculer la prévisualisation"
-    },
-    "edition": {
-      "volunteers": {
-        "send_message_to_team": "Envoyer un message à l'équipe"
-      }
     },
     "email": "E-mail",
     "end": "Fin",
@@ -149,6 +149,7 @@
     "ticket": "Billet",
     "ticketing_short": "Billetterie",
     "time": "Heure",
+    "timezone": "Fuseau horaire",
     "tip": "Conseil",
     "title": "Titre",
     "total": "Total",
@@ -165,25 +166,7 @@
     "volunteer": "Bénévole",
     "volunteers_short": "Bénévoles",
     "week": "Semaine",
-    "yes": "Oui",
-    "timezone": "Fuseau horaire",
-    "timezones": {
-      "regions": {
-        "africa": "Afrique",
-        "america": "Amérique",
-        "antarctica": "Antarctique",
-        "arctic": "Arctique",
-        "asia": "Asie",
-        "atlantic": "Atlantique",
-        "australia": "Australie",
-        "europe": "Europe",
-        "indian": "Océan Indien",
-        "pacific": "Pacifique"
-      }
-    }
-  },
-  "countries": {
-    "czech_republic": "République Tchèque"
+    "yes": "Oui"
   },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",

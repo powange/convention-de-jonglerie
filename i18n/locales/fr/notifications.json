@@ -36,6 +36,17 @@
     },
     "confirm_delete_description": "Êtes-vous sûr de vouloir supprimer cette notification ?",
     "confirm_delete_title": "Supprimer la notification",
+    "devices": {
+      "current_device": "Cet appareil",
+      "deleted": "Appareil supprimé",
+      "description": "Les appareils suivants reçoivent vos notifications push. Vous pouvez supprimer un appareil pour ne plus y recevoir de notifications.",
+      "error_deleting": "Erreur lors de la suppression de l'appareil",
+      "error_loading": "Erreur lors du chargement des appareils",
+      "manage_button": "Gérer les appareils",
+      "no_devices": "Aucun appareil enregistré",
+      "registered_at": "Ajouté le {date}",
+      "title": "Appareils enregistrés"
+    },
     "edition": {
       "new_convention": {
         "message": "La convention \"{conventionName}\" vient d'être ajoutée à la plateforme.",
@@ -58,17 +69,6 @@
       "not_supported": "Notifications push non supportées sur ce navigateur",
       "test_button": "Tester une notification",
       "title": "Notifications push"
-    },
-    "devices": {
-      "manage_button": "Gérer les appareils",
-      "title": "Appareils enregistrés",
-      "description": "Les appareils suivants reçoivent vos notifications push. Vous pouvez supprimer un appareil pour ne plus y recevoir de notifications.",
-      "no_devices": "Aucun appareil enregistré",
-      "current_device": "Cet appareil",
-      "registered_at": "Ajouté le {date}",
-      "deleted": "Appareil supprimé",
-      "error_loading": "Erreur lors du chargement des appareils",
-      "error_deleting": "Erreur lors de la suppression de l'appareil"
     },
     "system": {
       "error": {
