@@ -733,8 +733,8 @@
                 : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
             "
             @click="
-              paymentMethod = 'cash'
-              checkNumber = ''
+              paymentMethod = 'cash';
+              checkNumber = '';
             "
           >
             <div class="flex items-center gap-3">
@@ -765,8 +765,8 @@
                 : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
             "
             @click="
-              paymentMethod = 'card'
-              checkNumber = ''
+              paymentMethod = 'card';
+              checkNumber = '';
             "
           >
             <div class="flex items-center gap-3">
@@ -828,8 +828,8 @@
                 : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
             "
             @click="
-              paymentMethod = null
-              checkNumber = ''
+              paymentMethod = null;
+              checkNumber = '';
             "
           >
             <div class="flex items-center gap-3">
