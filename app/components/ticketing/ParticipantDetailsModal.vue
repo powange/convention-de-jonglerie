@@ -696,7 +696,7 @@
           color="warning"
           variant="soft"
           title="Paiement en attente"
-          description="Cette commande n'a pas encore été marquée comme payée. Souhaitez-vous confirmer le paiement avant de valider l'entrée ?"
+          description="Cette commande n'a pas encore été marquée comme payée. Sélectionnez le mode de paiement avant de valider l'entrée."
         />
 
         <!-- Montant à payer -->
@@ -719,64 +719,142 @@
           </div>
         </div>
 
-        <div class="space-y-3">
+        <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+          Sélectionnez le mode de paiement
+        </p>
+
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Paiement liquide -->
           <div
             class="p-4 rounded-lg border-2 cursor-pointer transition-all"
             :class="
-              paymentConfirmedChoice
+              paymentMethod === 'cash'
                 ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                 : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
             "
-            @click="paymentConfirmedChoice = true"
+            @click="
+              paymentMethod = 'cash'
+              checkNumber = ''
+            "
           >
             <div class="flex items-center gap-3">
               <UIcon
-                :name="paymentConfirmedChoice ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                :name="paymentMethod === 'cash' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
                 :class="
-                  paymentConfirmedChoice
+                  paymentMethod === 'cash'
                     ? 'text-green-600 dark:text-green-400'
                     : 'text-gray-400 dark:text-gray-600'
                 "
                 class="h-6 w-6"
               />
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">Paiement reçu</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Le participant a payé et la commande sera marquée comme payée
+              <div class="flex-1">
+                <p class="font-medium text-gray-900 dark:text-white">Liquide</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ (amountToPay / 100).toFixed(2) }} €
                 </p>
               </div>
             </div>
           </div>
 
+          <!-- Paiement carte bancaire -->
           <div
             class="p-4 rounded-lg border-2 cursor-pointer transition-all"
             :class="
-              !paymentConfirmedChoice
-                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
+              paymentMethod === 'card'
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
             "
-            @click="paymentConfirmedChoice = false"
+            @click="
+              paymentMethod = 'card'
+              checkNumber = ''
+            "
           >
             <div class="flex items-center gap-3">
               <UIcon
-                :name="!paymentConfirmedChoice ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                :name="paymentMethod === 'card' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
                 :class="
-                  !paymentConfirmedChoice
+                  paymentMethod === 'card'
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-400 dark:text-gray-600'
+                "
+                class="h-6 w-6"
+              />
+              <div class="flex-1">
+                <p class="font-medium text-gray-900 dark:text-white">Carte bancaire</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ (amountToPay / 100).toFixed(2) }} €
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paiement chèque -->
+          <div
+            class="p-4 rounded-lg border-2 cursor-pointer transition-all"
+            :class="
+              paymentMethod === 'check'
+                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
+            "
+            @click="paymentMethod = 'check'"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                :name="
+                  paymentMethod === 'check' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'
+                "
+                :class="
+                  paymentMethod === 'check'
+                    ? 'text-purple-600 dark:text-purple-400'
+                    : 'text-gray-400 dark:text-gray-600'
+                "
+                class="h-6 w-6"
+              />
+              <div class="flex-1">
+                <p class="font-medium text-gray-900 dark:text-white">Chèque</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ (amountToPay / 100).toFixed(2) }} €
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paiement non reçu -->
+          <div
+            class="p-4 rounded-lg border-2 cursor-pointer transition-all"
+            :class="
+              paymentMethod === null
+                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
+            "
+            @click="
+              paymentMethod = null
+              checkNumber = ''
+            "
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                :name="paymentMethod === null ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                :class="
+                  paymentMethod === null
                     ? 'text-orange-600 dark:text-orange-400'
                     : 'text-gray-400 dark:text-gray-600'
                 "
                 class="h-6 w-6"
               />
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">
-                  Paiement non reçu (continuer sans payer)
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Valider l'entrée sans marquer la commande comme payée
-                </p>
+              <div class="flex-1">
+                <p class="font-medium text-gray-900 dark:text-white">Non payé</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">En attente</p>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Champ pour le numéro de chèque -->
+        <div v-if="paymentMethod === 'check'" class="mt-4">
+          <UFormField label="Numéro du chèque" required>
+            <UInput v-model="checkNumber" placeholder="Ex: 1234567" class="w-full" />
+          </UFormField>
         </div>
       </div>
     </template>
@@ -786,7 +864,12 @@
         <UButton color="neutral" variant="soft" @click="showPaymentConfirmModal = false">
           Annuler
         </UButton>
-        <UButton color="primary" icon="i-heroicons-check" @click="confirmPaymentAndContinue">
+        <UButton
+          color="primary"
+          icon="i-heroicons-check"
+          :disabled="paymentMethod === 'check' && !checkNumber.trim()"
+          @click="confirmPaymentAndContinue"
+        >
           Continuer
         </UButton>
       </div>
@@ -981,7 +1064,10 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
   validate: [
     participantIds: number[],
-    markAsPaid?: boolean,
+    paymentInfo?: {
+      paymentMethod?: 'cash' | 'card' | 'check' | null
+      checkNumber?: string
+    },
     userInfo?: {
       firstName?: string | null
       lastName?: string | null
@@ -1012,7 +1098,8 @@ const validating = ref(false)
 const showValidateModal = ref(false)
 const showInvalidateModal = ref(false)
 const showPaymentConfirmModal = ref(false)
-const paymentConfirmedChoice = ref(true)
+const paymentMethod = ref<'cash' | 'card' | 'check' | null>(null)
+const checkNumber = ref('')
 const ticketToInvalidate = ref<number | null>(null)
 
 // Gestion des informations éditables pour artistes et bénévoles
@@ -1233,40 +1320,73 @@ const confirmValidateEntry = async () => {
   try {
     // Si c'est un bénévole
     if (props.participant && 'volunteer' in props.participant) {
-      emit('validate', [props.participant.volunteer.id], paymentConfirmedChoice.value, {
-        firstName: editableFirstName.value,
-        lastName: editableLastName.value,
-        email: editableEmail.value,
-        phone: editablePhone.value,
-      })
+      emit(
+        'validate',
+        [props.participant.volunteer.id],
+        {
+          paymentMethod: paymentMethod.value,
+          checkNumber: checkNumber.value,
+        },
+        {
+          firstName: editableFirstName.value,
+          lastName: editableLastName.value,
+          email: editableEmail.value,
+          phone: editablePhone.value,
+        }
+      )
     }
     // Si c'est un artiste
     else if (props.participant && 'artist' in props.participant) {
-      emit('validate', [props.participant.artist.id], paymentConfirmedChoice.value, {
-        firstName: editableFirstName.value,
-        lastName: editableLastName.value,
-        email: editableEmail.value,
-        phone: editablePhone.value,
-      })
+      emit(
+        'validate',
+        [props.participant.artist.id],
+        {
+          paymentMethod: paymentMethod.value,
+          checkNumber: checkNumber.value,
+        },
+        {
+          firstName: editableFirstName.value,
+          lastName: editableLastName.value,
+          email: editableEmail.value,
+          phone: editablePhone.value,
+        }
+      )
     }
     // Si c'est un organisateur
     else if (props.participant && 'organizer' in props.participant) {
-      emit('validate', [props.participant.organizer.id], paymentConfirmedChoice.value, {
-        firstName: editableFirstName.value,
-        lastName: editableLastName.value,
-        email: editableEmail.value,
-        phone: editablePhone.value,
-      })
+      emit(
+        'validate',
+        [props.participant.organizer.id],
+        {
+          paymentMethod: paymentMethod.value,
+          checkNumber: checkNumber.value,
+        },
+        {
+          firstName: editableFirstName.value,
+          lastName: editableLastName.value,
+          email: editableEmail.value,
+          phone: editablePhone.value,
+        }
+      )
     }
     // Si ce sont des tickets sélectionnés
     else if (selectedParticipants.value.length > 0) {
-      emit('validate', selectedParticipants.value, paymentConfirmedChoice.value, undefined)
+      emit(
+        'validate',
+        selectedParticipants.value,
+        {
+          paymentMethod: paymentMethod.value,
+          checkNumber: checkNumber.value,
+        },
+        undefined
+      )
       // Réinitialiser la sélection après validation
       selectedParticipants.value = []
     }
     showValidateModal.value = false
     // Réinitialiser le choix de paiement pour la prochaine validation
-    paymentConfirmedChoice.value = true
+    paymentMethod.value = null
+    checkNumber.value = ''
   } finally {
     validating.value = false
   }

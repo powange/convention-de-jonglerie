@@ -7,7 +7,8 @@ import { z } from 'zod'
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
   type: z.enum(['ticket', 'volunteer', 'artist', 'organizer']).optional().default('ticket'),
-  markAsPaid: z.boolean().optional().default(false),
+  paymentMethod: z.enum(['cash', 'card', 'check']).nullable().optional(),
+  checkNumber: z.string().optional(),
   userInfo: z
     .object({
       firstName: z.string().nullable().optional(),
@@ -406,7 +407,7 @@ export default wrapApiHandler(
         })
 
         // Si le paiement est confirmé, mettre à jour le statut de la commande et des items
-        if (body.markAsPaid) {
+        if (body.paymentMethod) {
           // Récupérer les items validés pour obtenir les IDs de commandes
           const validatedItems = await prisma.ticketingOrderItem.findMany({
             where: {
@@ -423,7 +424,7 @@ export default wrapApiHandler(
           // Extraire les IDs uniques des commandes
           const orderIds = [...new Set(validatedItems.map((item) => item.orderId))]
 
-          // Mettre à jour le statut des commandes de "Pending" à "Onsite"
+          // Mettre à jour le statut et la méthode de paiement des commandes de "Pending" à "Onsite"
           await prisma.ticketingOrder.updateMany({
             where: {
               id: {
@@ -433,6 +434,8 @@ export default wrapApiHandler(
             },
             data: {
               status: 'Onsite',
+              paymentMethod: body.paymentMethod,
+              checkNumber: body.paymentMethod === 'check' ? body.checkNumber : null,
             },
           })
 

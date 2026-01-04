@@ -97,12 +97,20 @@
       "WebFetch(domain:github.com)",
       "Bash(npm run docker:dev:get-lockfile:*)",
       "Bash(git diff:*)",
-      "mcp__nuxt-ui__get-component-metadata"
+      "mcp__nuxt-ui__get-component-metadata",
+      "mcp__nuxt-ui__get-component",
+      "Skill(run-tests)",
+      "Skill(commit-push)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner",
+    "Prisma-Remote"
+  ]
 }

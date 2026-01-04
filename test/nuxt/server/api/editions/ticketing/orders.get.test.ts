@@ -104,6 +104,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       totalAmount: 8000, // 5000 + 3000
       totalDonations: 1,
       totalDonationsAmount: 500,
+      amountsByPaymentMethod: {
+        cardHelloAsso: 0,
+        cardOnsite: 0,
+        cash: 0,
+        check: 0,
+        online: 0,
+        pending: 0,
+        refunded: 0,
+      },
     })
   })
 
@@ -146,6 +155,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       totalAmount: 5000,
       totalDonations: 0,
       totalDonationsAmount: 0,
+      amountsByPaymentMethod: {
+        cardHelloAsso: 0,
+        cardOnsite: 0,
+        cash: 0,
+        check: 0,
+        online: 0,
+        pending: 0,
+        refunded: 0,
+      },
     })
 
     // Vérifier que le filtre de tarifs a été appliqué aux stats
@@ -163,6 +181,9 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         }),
         select: {
           amount: true,
+          status: true,
+          paymentMethod: true,
+          externalTicketingId: true,
           items: {
             select: {
               type: true,
@@ -213,6 +234,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       totalAmount: 5000,
       totalDonations: 0,
       totalDonationsAmount: 0,
+      amountsByPaymentMethod: {
+        cardHelloAsso: 0,
+        cardOnsite: 0,
+        cash: 0,
+        check: 0,
+        online: 0,
+        pending: 0,
+        refunded: 0,
+      },
     })
 
     // Vérifier que le filtre de statut d'entrée a été appliqué aux stats
@@ -228,6 +258,9 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         }),
         select: {
           amount: true,
+          status: true,
+          paymentMethod: true,
+          externalTicketingId: true,
           items: {
             select: {
               type: true,

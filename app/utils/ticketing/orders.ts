@@ -94,6 +94,7 @@ export async function fetchOrders(
     tierIds?: number[]
     optionIds?: number[]
     entryStatus?: 'all' | 'validated' | 'not_validated'
+    paymentMethods?: Array<'cash' | 'card' | 'check' | 'pending' | 'unknown'>
     customFieldFilters?: CustomFieldFilter[]
     customFieldFilterMode?: 'and' | 'or'
   }
@@ -110,6 +111,9 @@ export async function fetchOrders(
   }
   if (options?.entryStatus && options.entryStatus !== 'all') {
     params.append('entryStatus', options.entryStatus)
+  }
+  if (options?.paymentMethods && options.paymentMethods.length > 0) {
+    params.append('paymentMethods', options.paymentMethods.join(','))
   }
   if (options?.customFieldFilters && options.customFieldFilters.length > 0) {
     params.append('customFieldFilters', JSON.stringify(options.customFieldFilters))

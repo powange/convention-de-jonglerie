@@ -55,6 +55,12 @@ export default wrapApiHandler(
     const optionIdsParam = (query.optionIds as string) || ''
     const optionIds = optionIdsParam ? optionIdsParam.split(',').map((id) => parseInt(id)) : []
     const entryStatus = (query.entryStatus as string) || 'all'
+    const paymentMethodsParam = (query.paymentMethods as string) || ''
+    const paymentMethods = paymentMethodsParam
+      ? paymentMethodsParam
+          .split(',')
+          .filter((m) => ['cash', 'card', 'check', 'pending', 'unknown'].includes(m))
+      : []
 
     // Parse les filtres de champs personnalisés (format JSON array)
     const customFieldFiltersParam = (query.customFieldFilters as string) || ''
@@ -85,6 +91,7 @@ export default wrapApiHandler(
               { payerFirstName: { contains: search } },
               { payerLastName: { contains: search } },
               { payerEmail: { contains: search } },
+              { checkNumber: { contains: search } },
               {
                 items: {
                   some: {
@@ -100,6 +107,27 @@ export default wrapApiHandler(
             ],
           }
         : {}
+
+      // Construire la condition de filtre par méthode de paiement
+      const paymentMethodCondition =
+        paymentMethods.length > 0
+          ? {
+              OR: paymentMethods.map((method) => {
+                if (method === 'pending') {
+                  return { status: 'Pending' }
+                } else if (method === 'unknown') {
+                  return {
+                    AND: [
+                      { OR: [{ status: 'Processed' }, { status: 'Onsite' }] },
+                      { paymentMethod: null },
+                    ],
+                  }
+                } else {
+                  return { paymentMethod: method as 'cash' | 'card' | 'check' }
+                }
+              }),
+            }
+          : {}
 
       // Construire la condition de filtre combinée pour les items
       const itemsConditions: any[] = []
@@ -186,6 +214,7 @@ export default wrapApiHandler(
           where: {
             editionId,
             ...searchCondition,
+            ...paymentMethodCondition,
             ...itemsCondition,
           },
           include: {
@@ -215,6 +244,7 @@ export default wrapApiHandler(
           where: {
             editionId,
             ...searchCondition,
+            ...paymentMethodCondition,
             ...itemsCondition,
           },
         })
@@ -224,6 +254,7 @@ export default wrapApiHandler(
           where: {
             editionId,
             ...searchCondition,
+            ...paymentMethodCondition,
             ...itemsCondition,
           },
           include: {
@@ -246,6 +277,7 @@ export default wrapApiHandler(
         const allOrders = await prisma.ticketingOrder.findMany({
           where: {
             editionId,
+            ...paymentMethodCondition,
             ...itemsCondition,
           },
           select: {

@@ -444,10 +444,17 @@
                       "
                     />
                   </UFormField>
-                  <p v-if="item.minAmount != null || item.maxAmount != null" class="text-xs text-gray-500 mt-1">
-                    <span v-if="item.minAmount != null"> Min: {{ formatPrice(item.minAmount) }} </span>
+                  <p
+                    v-if="item.minAmount != null || item.maxAmount != null"
+                    class="text-xs text-gray-500 mt-1"
+                  >
+                    <span v-if="item.minAmount != null">
+                      Min: {{ formatPrice(item.minAmount) }}
+                    </span>
                     <span v-if="item.minAmount != null && item.maxAmount != null"> - </span>
-                    <span v-if="item.maxAmount != null"> Max: {{ formatPrice(item.maxAmount) }} </span>
+                    <span v-if="item.maxAmount != null">
+                      Max: {{ formatPrice(item.maxAmount) }}
+                    </span>
                   </p>
                 </div>
 
@@ -669,11 +676,16 @@
                   ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                   : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
               "
-              @click="paymentMethod = 'cash'; checkNumber = ''"
+              @click="
+                paymentMethod = 'cash'
+                checkNumber = ''
+              "
             >
               <div class="flex items-center gap-3">
                 <UIcon
-                  :name="paymentMethod === 'cash' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                  :name="
+                    paymentMethod === 'cash' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'
+                  "
                   :class="
                     paymentMethod === 'cash'
                       ? 'text-green-600 dark:text-green-400'
@@ -698,11 +710,16 @@
                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                   : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
               "
-              @click="paymentMethod = 'card'; checkNumber = ''"
+              @click="
+                paymentMethod = 'card'
+                checkNumber = ''
+              "
             >
               <div class="flex items-center gap-3">
                 <UIcon
-                  :name="paymentMethod === 'card' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                  :name="
+                    paymentMethod === 'card' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'
+                  "
                   :class="
                     paymentMethod === 'card'
                       ? 'text-blue-600 dark:text-blue-400'
@@ -731,7 +748,9 @@
             >
               <div class="flex items-center gap-3">
                 <UIcon
-                  :name="paymentMethod === 'check' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                  :name="
+                    paymentMethod === 'check' ? 'i-heroicons-check-circle' : 'i-heroicons-circle'
+                  "
                   :class="
                     paymentMethod === 'check'
                       ? 'text-purple-600 dark:text-purple-400'
@@ -756,7 +775,10 @@
                   ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
                   : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
               "
-              @click="paymentMethod = null; checkNumber = ''"
+              @click="
+                paymentMethod = null
+                checkNumber = ''
+              "
             >
               <div class="flex items-center gap-3">
                 <UIcon
@@ -779,11 +801,7 @@
           <!-- Champ pour le numéro de chèque -->
           <div v-if="paymentMethod === 'check'" class="mt-4">
             <UFormField label="Numéro du chèque" required>
-              <UInput
-                v-model="checkNumber"
-                placeholder="Ex: 1234567"
-                class="w-full"
-              />
+              <UInput v-model="checkNumber" placeholder="Ex: 1234567" class="w-full" />
             </UFormField>
           </div>
         </div>

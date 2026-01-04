@@ -837,7 +837,10 @@ const handleScan = async (code: string) => {
 
 const handleValidateParticipants = async (
   participantIds: number[],
-  markAsPaid = false,
+  paymentInfo?: {
+    paymentMethod?: 'cash' | 'card' | 'check' | null
+    checkNumber?: string
+  },
   userInfo?: {
     firstName?: string | null
     lastName?: string | null
@@ -852,7 +855,8 @@ const handleValidateParticipants = async (
       body: {
         participantIds,
         type: participantType.value,
-        markAsPaid,
+        paymentMethod: paymentInfo?.paymentMethod,
+        checkNumber: paymentInfo?.checkNumber,
         userInfo,
       },
     })

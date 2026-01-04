@@ -50,7 +50,7 @@
               :to="`/editions/${edition.id}/gestion/ticketing/external`"
               color="primary"
               variant="soft"
-                            icon="i-heroicons-arrow-right"
+              icon="i-heroicons-arrow-right"
             >
               Configurer une billeterie externe
             </UButton>
@@ -90,7 +90,10 @@
             </div>
           </UCard>
 
-          <UCard class="cursor-pointer hover:shadow-lg transition-shadow" @click="isAmountDetailsModalOpen = true">
+          <UCard
+            class="cursor-pointer hover:shadow-lg transition-shadow"
+            @click="isAmountDetailsModalOpen = true"
+          >
             <div class="flex items-center gap-4">
               <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <UIcon name="i-heroicons-currency-euro" class="h-6 w-6 text-purple-600" />
@@ -143,7 +146,7 @@
             <div class="flex items-center gap-4">
               <UInput
                 v-model="searchQuery"
-                placeholder="Rechercher par nom, email..."
+                placeholder="Rechercher par nom, email, numéro de chèque..."
                 icon="i-heroicons-magnifying-glass"
                 class="flex-1"
                 size="lg"
@@ -267,6 +270,23 @@
                     :ui="{ content: 'min-w-fit' }"
                   />
                 </div>
+
+                <!-- Filtre par méthode de paiement -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Méthode de paiement
+                  </label>
+                  <USelect
+                    v-model="paymentMethodFilter"
+                    :items="paymentMethodOptions"
+                    placeholder="Toutes les méthodes"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                    multiple
+                  />
+                </div>
               </div>
 
               <!-- Filtres par champs personnalisés -->
@@ -297,7 +317,7 @@
                     </span>
                     <USwitch
                       :model-value="customFieldFilterMode === 'or'"
-                                            color="primary"
+                      color="primary"
                       @update:model-value="customFieldFilterMode = $event ? 'or' : 'and'"
                     />
                     <span
@@ -411,9 +431,7 @@
         <div v-else class="space-y-4">
           <UCard v-for="order in orders" :key="order.id" class="hover:shadow-md transition-shadow">
             <!-- En-tête de la commande -->
-            <div
-              class="flex items-start justify-between mb-4"
-            >
+            <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
                   <UIcon name="i-heroicons-shopping-cart" class="h-5 w-5 text-primary-600" />
@@ -421,11 +439,7 @@
                     {{ order.payerFirstName }} {{ order.payerLastName }}
                   </h3>
                   <!-- Badge Annulée (seulement si la commande est annulée) -->
-                  <UBadge
-                    v-if="order.status === 'Refunded'"
-                    color="error"
-                    variant="soft"
-                  >
+                  <UBadge v-if="order.status === 'Refunded'" color="error" variant="soft">
                     Annulée
                   </UBadge>
                   <!-- Badge origine : En ligne vs Sur place -->
@@ -447,22 +461,17 @@
                         <p class="text-xs text-gray-600 dark:text-gray-400">
                           Commande importée depuis HelloAsso
                         </p>
-                        <p v-if="order.helloAssoOrderId" class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono">
+                        <p
+                          v-if="order.helloAssoOrderId"
+                          class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono"
+                        >
                           ID: {{ order.helloAssoOrderId }}
                         </p>
                       </div>
                     </template>
                   </UPopover>
-                  <UPopover
-                    v-else-if="!order.externalTicketing"
-                    mode="hover"
-                    :open-delay="200"
-                  >
-                    <img
-                      src="/logos/logo-jc.svg"
-                      alt="Sur place"
-                      class="h-5 w-auto cursor-help"
-                    />
+                  <UPopover v-else-if="!order.externalTicketing" mode="hover" :open-delay="200">
+                    <img src="/logos/logo-jc.svg" alt="Sur place" class="h-5 w-auto cursor-help" />
                     <template #content>
                       <div class="p-3 max-w-xs">
                         <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
@@ -480,29 +489,23 @@
                       (order.status === 'Processed' || order.status === 'Onsite') &&
                       !order.paymentMethod
                     "
-                    color="success"
+                    color="warning"
                     variant="soft"
-                                      >
+                    class="cursor-pointer hover:ring-2 hover:ring-warning-500 transition-all"
+                    @click="openPaymentMethodModal(order)"
+                  >
                     <template #leading>
-                      <UIcon name="i-heroicons-check-circle" class="h-3 w-3" />
+                      <UIcon name="i-heroicons-exclamation-triangle" class="h-3 w-3" />
                     </template>
-                    Payé
+                    Payé - Méthode non renseignée
                   </UBadge>
-                  <UBadge
-                    v-else-if="order.paymentMethod === 'cash'"
-                    color="success"
-                    variant="soft"
-                                      >
+                  <UBadge v-else-if="order.paymentMethod === 'cash'" color="success" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-banknotes" class="h-3 w-3" />
                     </template>
                     Payé - Liquide
                   </UBadge>
-                  <UBadge
-                    v-else-if="order.paymentMethod === 'card'"
-                    color="success"
-                    variant="soft"
-                                      >
+                  <UBadge v-else-if="order.paymentMethod === 'card'" color="success" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-credit-card" class="h-3 w-3" />
                     </template>
@@ -512,18 +515,14 @@
                     v-else-if="order.paymentMethod === 'check'"
                     color="success"
                     variant="soft"
-                                        :title="order.checkNumber ? `Chèque n°${order.checkNumber}` : undefined"
+                    :title="order.checkNumber ? `Chèque n°${order.checkNumber}` : undefined"
                   >
                     <template #leading>
                       <UIcon name="i-heroicons-document-text" class="h-3 w-3" />
                     </template>
                     Payé - Chèque{{ order.checkNumber ? ` n°${order.checkNumber}` : '' }}
                   </UBadge>
-                  <UBadge
-                    v-else-if="order.status === 'Pending'"
-                    color="warning"
-                    variant="soft"
-                                      >
+                  <UBadge v-else-if="order.status === 'Pending'" color="warning" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-clock" class="h-3 w-3" />
                     </template>
@@ -945,13 +944,19 @@
     </UModal>
 
     <!-- Modal détails des montants -->
-    <UModal v-model:open="isAmountDetailsModalOpen" title="Détail des montants par méthode de paiement">
+    <UModal
+      v-model:open="isAmountDetailsModalOpen"
+      title="Détail des montants par méthode de paiement"
+    >
       <template #body>
         <div class="space-y-4">
           <div class="space-y-3">
             <!-- Carte HelloAsso -->
             <div
-              v-if="stats?.amountsByPaymentMethod?.cardHelloAsso && stats.amountsByPaymentMethod.cardHelloAsso > 0"
+              v-if="
+                stats?.amountsByPaymentMethod?.cardHelloAsso &&
+                stats.amountsByPaymentMethod.cardHelloAsso > 0
+              "
               class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
             >
               <div class="flex items-center gap-3">
@@ -959,8 +964,12 @@
                   <UIcon name="i-heroicons-credit-card" class="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Carte bancaire (HelloAsso)</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements en ligne via HelloAsso</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Carte bancaire (HelloAsso)
+                  </p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    Paiements en ligne via HelloAsso
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-green-600">
@@ -970,7 +979,10 @@
 
             <!-- Carte sur place -->
             <div
-              v-if="stats?.amountsByPaymentMethod?.cardOnsite && stats.amountsByPaymentMethod.cardOnsite > 0"
+              v-if="
+                stats?.amountsByPaymentMethod?.cardOnsite &&
+                stats.amountsByPaymentMethod.cardOnsite > 0
+              "
               class="flex items-center justify-between p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg"
             >
               <div class="flex items-center gap-3">
@@ -978,8 +990,12 @@
                   <UIcon name="i-heroicons-credit-card" class="h-5 w-5 text-teal-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Carte bancaire (sur place)</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements par terminal sur place</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Carte bancaire (sur place)
+                  </p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    Paiements par terminal sur place
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-teal-600">
@@ -998,7 +1014,9 @@
                 </div>
                 <div>
                   <p class="font-medium text-gray-900 dark:text-white">Liquide</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Paiements en espèces sur place</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    Paiements en espèces sur place
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-blue-600">
@@ -1027,7 +1045,9 @@
 
             <!-- Paiements en ligne (anciennes commandes) -->
             <div
-              v-if="stats?.amountsByPaymentMethod?.online && stats.amountsByPaymentMethod.online > 0"
+              v-if="
+                stats?.amountsByPaymentMethod?.online && stats.amountsByPaymentMethod.online > 0
+              "
               class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg"
             >
               <div class="flex items-center gap-3">
@@ -1035,7 +1055,9 @@
                   <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-gray-600" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Payé (méthode non spécifiée)</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    Payé (méthode non spécifiée)
+                  </p>
                   <p class="text-xs text-gray-600 dark:text-gray-400">Anciennes commandes payées</p>
                 </div>
               </div>
@@ -1046,7 +1068,9 @@
 
             <!-- En attente -->
             <div
-              v-if="stats?.amountsByPaymentMethod?.pending && stats.amountsByPaymentMethod.pending > 0"
+              v-if="
+                stats?.amountsByPaymentMethod?.pending && stats.amountsByPaymentMethod.pending > 0
+              "
               class="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg"
             >
               <div class="flex items-center gap-3">
@@ -1065,7 +1089,9 @@
 
             <!-- Remboursé -->
             <div
-              v-if="stats?.amountsByPaymentMethod?.refunded && stats.amountsByPaymentMethod.refunded > 0"
+              v-if="
+                stats?.amountsByPaymentMethod?.refunded && stats.amountsByPaymentMethod.refunded > 0
+              "
               class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
             >
               <div class="flex items-center gap-3">
@@ -1074,7 +1100,9 @@
                 </div>
                 <div>
                   <p class="font-medium text-gray-900 dark:text-white">Remboursé</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">Commandes annulées et remboursées</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">
+                    Commandes annulées et remboursées
+                  </p>
                 </div>
               </div>
               <p class="text-lg font-bold text-red-600">
@@ -1085,7 +1113,9 @@
 
           <!-- Total -->
           <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+            <div
+              class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg"
+            >
               <div class="flex items-center gap-3">
                 <div class="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
                   <UIcon name="i-heroicons-currency-euro" class="h-6 w-6 text-primary-600" />
@@ -1097,6 +1127,205 @@
               </p>
             </div>
           </div>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Modal de définition de la méthode de paiement -->
+    <UModal
+      v-model:open="isPaymentMethodModalOpen"
+      title="Définir la méthode de paiement"
+      :description="
+        selectedOrder
+          ? `Commande de ${selectedOrder.payerFirstName} ${selectedOrder.payerLastName} - ${(selectedOrder.amount / 100).toFixed(2)}€`
+          : ''
+      "
+    >
+      <template #body>
+        <div v-if="selectedOrder" class="space-y-6">
+          <!-- Sélection de la méthode de paiement -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Méthode de paiement
+            </label>
+            <div class="grid grid-cols-1 gap-3">
+              <!-- Liquide -->
+              <button
+                type="button"
+                class="relative flex items-center gap-3 p-4 border-2 rounded-lg transition-all"
+                :class="
+                  selectedPaymentMethod === 'cash'
+                    ? 'border-success-500 bg-success-50 dark:bg-success-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-success-300 dark:hover:border-success-700'
+                "
+                @click="selectedPaymentMethod = 'cash'"
+              >
+                <div
+                  class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg"
+                  :class="
+                    selectedPaymentMethod === 'cash'
+                      ? 'bg-success-100 dark:bg-success-900/30'
+                      : 'bg-gray-100 dark:bg-gray-800'
+                  "
+                >
+                  <UIcon
+                    name="i-heroicons-banknotes"
+                    class="h-5 w-5"
+                    :class="
+                      selectedPaymentMethod === 'cash'
+                        ? 'text-success-600 dark:text-success-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                    "
+                  />
+                </div>
+                <div class="flex-1 text-left">
+                  <p
+                    class="font-medium"
+                    :class="
+                      selectedPaymentMethod === 'cash'
+                        ? 'text-success-900 dark:text-success-100'
+                        : 'text-gray-900 dark:text-white'
+                    "
+                  >
+                    Liquide
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Paiement en espèces</p>
+                </div>
+                <UIcon
+                  v-if="selectedPaymentMethod === 'cash'"
+                  name="i-heroicons-check-circle-solid"
+                  class="h-5 w-5 text-success-600 dark:text-success-400"
+                />
+              </button>
+
+              <!-- Carte bancaire -->
+              <button
+                type="button"
+                class="relative flex items-center gap-3 p-4 border-2 rounded-lg transition-all"
+                :class="
+                  selectedPaymentMethod === 'card'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                "
+                @click="selectedPaymentMethod = 'card'"
+              >
+                <div
+                  class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg"
+                  :class="
+                    selectedPaymentMethod === 'card'
+                      ? 'bg-primary-100 dark:bg-primary-900/30'
+                      : 'bg-gray-100 dark:bg-gray-800'
+                  "
+                >
+                  <UIcon
+                    name="i-heroicons-credit-card"
+                    class="h-5 w-5"
+                    :class="
+                      selectedPaymentMethod === 'card'
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                    "
+                  />
+                </div>
+                <div class="flex-1 text-left">
+                  <p
+                    class="font-medium"
+                    :class="
+                      selectedPaymentMethod === 'card'
+                        ? 'text-primary-900 dark:text-primary-100'
+                        : 'text-gray-900 dark:text-white'
+                    "
+                  >
+                    Carte bancaire
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Paiement par carte</p>
+                </div>
+                <UIcon
+                  v-if="selectedPaymentMethod === 'card'"
+                  name="i-heroicons-check-circle-solid"
+                  class="h-5 w-5 text-primary-600 dark:text-primary-400"
+                />
+              </button>
+
+              <!-- Chèque -->
+              <button
+                type="button"
+                class="relative flex items-center gap-3 p-4 border-2 rounded-lg transition-all"
+                :class="
+                  selectedPaymentMethod === 'check'
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700'
+                "
+                @click="selectedPaymentMethod = 'check'"
+              >
+                <div
+                  class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg"
+                  :class="
+                    selectedPaymentMethod === 'check'
+                      ? 'bg-purple-100 dark:bg-purple-900/30'
+                      : 'bg-gray-100 dark:bg-gray-800'
+                  "
+                >
+                  <UIcon
+                    name="i-heroicons-document-text"
+                    class="h-5 w-5"
+                    :class="
+                      selectedPaymentMethod === 'check'
+                        ? 'text-purple-600 dark:text-purple-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                    "
+                  />
+                </div>
+                <div class="flex-1 text-left">
+                  <p
+                    class="font-medium"
+                    :class="
+                      selectedPaymentMethod === 'check'
+                        ? 'text-purple-900 dark:text-purple-100'
+                        : 'text-gray-900 dark:text-white'
+                    "
+                  >
+                    Chèque
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Paiement par chèque</p>
+                </div>
+                <UIcon
+                  v-if="selectedPaymentMethod === 'check'"
+                  name="i-heroicons-check-circle-solid"
+                  class="h-5 w-5 text-purple-600 dark:text-purple-400"
+                />
+              </button>
+            </div>
+          </div>
+
+          <!-- Numéro de chèque -->
+          <div v-if="selectedPaymentMethod === 'check'">
+            <UFormField label="Numéro de chèque (optionnel)">
+              <UInput v-model="selectedCheckNumber" placeholder="Ex: 1234567" />
+            </UFormField>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="soft"
+            :disabled="isUpdatingPaymentMethod"
+            @click="closePaymentMethodModal"
+          >
+            Annuler
+          </UButton>
+          <UButton
+            color="primary"
+            variant="solid"
+            :loading="isUpdatingPaymentMethod"
+            :disabled="!selectedPaymentMethod || isUpdatingPaymentMethod"
+            @click="updatePaymentMethod"
+          >
+            Définir la méthode de paiement
+          </UButton>
         </div>
       </template>
     </UModal>
@@ -1148,6 +1377,7 @@ const tiers = ref<TicketingTier[]>([])
 const selectedTierIds = ref<number[]>([])
 const selectedOptionIds = ref<number[]>([])
 const entryStatusFilter = ref<'all' | 'validated' | 'not_validated'>('all')
+const paymentMethodFilter = ref<Array<'cash' | 'card' | 'check' | 'pending' | 'unknown'>>([])
 const isFiltersOpen = ref(false)
 
 // Filtres par champs personnalisés (support de plusieurs filtres)
@@ -1171,6 +1401,15 @@ const entryStatusOptions = [
   { label: 'Tous les billets', value: 'all' },
   { label: 'Entrée validée', value: 'validated' },
   { label: 'Entrée non validée', value: 'not_validated' },
+]
+
+// Options pour le filtre de méthode de paiement
+const paymentMethodOptions = [
+  { label: 'Liquide', value: 'cash' },
+  { label: 'Carte bancaire', value: 'card' },
+  { label: 'Chèque', value: 'check' },
+  { label: 'En attente', value: 'pending' },
+  { label: 'Méthode non renseignée', value: 'unknown' },
 ]
 
 // Modal QR Code
@@ -1238,6 +1477,70 @@ const cancelOrder = async () => {
     })
   } finally {
     isCanceling.value = false
+  }
+}
+
+// Modal et logique de définition de méthode de paiement
+const isPaymentMethodModalOpen = ref(false)
+const selectedOrder = ref<Order | null>(null)
+const selectedPaymentMethod = ref<'cash' | 'card' | 'check' | null>(null)
+const selectedCheckNumber = ref('')
+const isUpdatingPaymentMethod = ref(false)
+
+const openPaymentMethodModal = (order: Order) => {
+  selectedOrder.value = order
+  selectedPaymentMethod.value = null
+  selectedCheckNumber.value = ''
+  isPaymentMethodModalOpen.value = true
+}
+
+const closePaymentMethodModal = () => {
+  isPaymentMethodModalOpen.value = false
+  selectedOrder.value = null
+  selectedPaymentMethod.value = null
+  selectedCheckNumber.value = ''
+}
+
+const updatePaymentMethod = async () => {
+  if (!selectedOrder.value || !selectedPaymentMethod.value) return
+
+  isUpdatingPaymentMethod.value = true
+  try {
+    await $fetch(
+      `/api/editions/${editionId}/ticketing/orders/${selectedOrder.value.id}/payment-method`,
+      {
+        method: 'PATCH',
+        body: {
+          paymentMethod: selectedPaymentMethod.value,
+          checkNumber:
+            selectedPaymentMethod.value === 'check' ? selectedCheckNumber.value : undefined,
+        },
+      }
+    )
+
+    // Fermer la modal
+    closePaymentMethodModal()
+
+    // Recharger les commandes
+    await loadOrders()
+
+    // Message de succès
+    useToast().add({
+      title: 'Méthode de paiement définie',
+      description: 'La méthode de paiement a été enregistrée avec succès',
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (error: any) {
+    console.error('Failed to update payment method:', error)
+    useToast().add({
+      title: 'Erreur',
+      description: error.data?.message || 'Erreur lors de la mise à jour de la méthode de paiement',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle',
+    })
+  } finally {
+    isUpdatingPaymentMethod.value = false
   }
 }
 
@@ -1354,6 +1657,7 @@ const loadOrders = async () => {
       tierIds: selectedTierIds.value.length > 0 ? selectedTierIds.value : undefined,
       optionIds: selectedOptionIds.value.length > 0 ? selectedOptionIds.value : undefined,
       entryStatus: entryStatusFilter.value,
+      paymentMethods: paymentMethodFilter.value.length > 0 ? paymentMethodFilter.value : undefined,
       customFieldFilters:
         customFieldFilters.value.length > 0 ? customFieldFilters.value : undefined,
       customFieldFilterMode: customFieldFilterMode.value,
@@ -1441,6 +1745,7 @@ const activeFiltersCount = computed(() => {
   if (selectedTierIds.value.length > 0) count += selectedTierIds.value.length
   if (selectedOptionIds.value.length > 0) count += selectedOptionIds.value.length
   if (entryStatusFilter.value !== 'all') count += 1
+  if (paymentMethodFilter.value.length > 0) count += paymentMethodFilter.value.length
   count += customFieldFilters.value.length
   return count
 })
@@ -1450,6 +1755,7 @@ const resetFilters = () => {
   selectedTierIds.value = []
   selectedOptionIds.value = []
   entryStatusFilter.value = 'all'
+  paymentMethodFilter.value = []
   customFieldFilters.value = []
   customFieldFilterMode.value = 'and'
   newFilterName.value = ''
@@ -1469,6 +1775,7 @@ watch(
     selectedTierIds,
     selectedOptionIds,
     entryStatusFilter,
+    paymentMethodFilter,
     customFieldFilters,
     customFieldFilterMode,
   ],
