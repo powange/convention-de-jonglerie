@@ -421,30 +421,15 @@
                   <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ order.payerFirstName }} {{ order.payerLastName }}
                   </h3>
+                  <!-- Badge Annulée (seulement si la commande est annulée) -->
                   <UBadge
-                    :color="
-                      order.status === 'Processed'
-                        ? 'success'
-                        : order.status === 'Pending'
-                          ? 'warning'
-                          : order.status === 'Onsite'
-                            ? 'info'
-                            : order.status === 'Refunded'
-                              ? 'error'
-                              : 'neutral'
-                    "
+                    v-if="order.status === 'Refunded'"
+                    color="error"
                     variant="soft"
                   >
-                    {{
-                      order.status === 'Pending'
-                        ? 'En attente de paiement'
-                        : order.status === 'Onsite'
-                          ? 'Sur place'
-                          : order.status === 'Refunded'
-                            ? 'Annulée'
-                            : order.status
-                    }}
+                    Annulée
                   </UBadge>
+                  <!-- Badge origine : En ligne vs Sur place -->
                   <img
                     v-if="order.externalTicketing?.provider === 'HELLOASSO'"
                     src="~/assets/img/helloasso/logo.svg"
@@ -452,16 +437,72 @@
                     class="h-5 w-auto"
                     :title="`Commande provenant de HelloAsso (ID: ${order.helloAssoOrderId})`"
                   />
-                  <UBadge
+                  <img
                     v-else-if="!order.externalTicketing"
-                    color="secondary"
+                    src="/logos/logo-jc.svg"
+                    alt="Sur place"
+                    class="h-5 w-auto"
+                    title="Commande créée sur place"
+                  />
+                  <!-- Badge statut de paiement -->
+                  <UBadge
+                    v-if="
+                      (order.status === 'Processed' || order.status === 'Onsite') &&
+                      !order.paymentMethod
+                    "
+                    color="success"
                     variant="soft"
                     size="sm"
                   >
                     <template #leading>
-                      <UIcon name="i-heroicons-user-plus" class="h-3 w-3" />
+                      <UIcon name="i-heroicons-check-circle" class="h-3 w-3" />
                     </template>
-                    Manuelle
+                    Payé
+                  </UBadge>
+                  <UBadge
+                    v-else-if="order.paymentMethod === 'cash'"
+                    color="success"
+                    variant="soft"
+                    size="sm"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-banknotes" class="h-3 w-3" />
+                    </template>
+                    Payé - Liquide
+                  </UBadge>
+                  <UBadge
+                    v-else-if="order.paymentMethod === 'card'"
+                    color="success"
+                    variant="soft"
+                    size="sm"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-credit-card" class="h-3 w-3" />
+                    </template>
+                    Payé - Carte
+                  </UBadge>
+                  <UBadge
+                    v-else-if="order.paymentMethod === 'check'"
+                    color="success"
+                    variant="soft"
+                    size="sm"
+                    :title="order.checkNumber ? `Chèque n°${order.checkNumber}` : undefined"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-document-text" class="h-3 w-3" />
+                    </template>
+                    Payé - Chèque{{ order.checkNumber ? ` n°${order.checkNumber}` : '' }}
+                  </UBadge>
+                  <UBadge
+                    v-else-if="order.status === 'Pending'"
+                    color="warning"
+                    variant="soft"
+                    size="sm"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-clock" class="h-3 w-3" />
+                    </template>
+                    En attente de paiement
                   </UBadge>
                 </div>
                 <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">

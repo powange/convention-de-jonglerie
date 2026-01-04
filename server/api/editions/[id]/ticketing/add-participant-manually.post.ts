@@ -36,8 +36,10 @@ const bodySchema = z.object({
   payerEmail: z.string().email(),
   // Liste des tarifs sélectionnés avec quantités et participants personnalisés
   items: z.array(itemSchema).min(1),
-  // Statut de paiement
-  isPaid: z.boolean().default(true),
+  // Type de paiement (cash, card, check) ou null si non payé
+  paymentMethod: z.enum(['cash', 'card', 'check']).nullable().default(null),
+  // Numéro de chèque (uniquement si paymentMethod = 'check')
+  checkNumber: z.string().optional(),
 })
 
 export default wrapApiHandler(
@@ -133,7 +135,9 @@ export default wrapApiHandler(
           payerLastName: body.payerLastName,
           payerEmail: body.payerEmail,
           amount: totalAmount,
-          status: body.isPaid ? 'Onsite' : 'Pending',
+          status: body.paymentMethod ? 'Onsite' : 'Pending',
+          paymentMethod: body.paymentMethod,
+          checkNumber: body.checkNumber || null,
           orderDate,
         },
       })
@@ -171,7 +175,7 @@ export default wrapApiHandler(
               name: tier.name,
               type: null,
               amount: itemPrice,
-              state: body.isPaid ? 'Processed' : 'Pending',
+              state: body.paymentMethod ? 'Processed' : 'Pending',
               qrCode, // Même QR code pour tous les items de la commande
               entryValidated: false,
               customFields: realCustomFields.length > 0 ? realCustomFields : null,

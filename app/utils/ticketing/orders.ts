@@ -42,6 +42,8 @@ export interface Order {
   payerEmail: string
   amount: number
   status: string
+  paymentMethod?: string | null
+  checkNumber?: string | null
   orderDate: Date
   items?: OrderItem[]
   externalTicketing?: {
