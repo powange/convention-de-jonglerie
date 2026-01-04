@@ -328,42 +328,6 @@
           </UCard>
         </NuxtLink>
 
-        <!-- Assignation des repas bénévoles -->
-        <UCard
-          class="hover:shadow-lg transition-shadow cursor-pointer"
-          @click="showMealsConfirmModal = true"
-        >
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <UIcon name="i-cbi:mealie" class="h-6 w-6 text-orange-600 dark:text-orange-400" />
-                </div>
-                <h3 class="font-semibold text-lg">Repas bénévoles</h3>
-              </div>
-              <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                Assigner automatiquement les repas aux bénévoles acceptés sans repas
-              </p>
-              <div class="flex items-center gap-4 text-sm text-gray-500">
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-user-group" class="h-4 w-4" />
-                  Bénévoles acceptés
-                </span>
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-clock" class="h-4 w-4" />
-                  Auto-assignation
-                </span>
-              </div>
-            </div>
-            <UIcon v-if="!assigningMeals" name="i-heroicons-play" class="h-5 w-5 text-gray-400" />
-            <UIcon
-              v-else
-              name="i-heroicons-arrow-path"
-              class="h-5 w-5 text-orange-500 animate-spin"
-            />
-          </div>
-        </UCard>
-
         <!-- Gestion des feedbacks -->
         <NuxtLink to="/admin/feedback" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
@@ -496,40 +460,6 @@
           </UCard>
         </NuxtLink>
 
-        <!-- Migration des options de repas -->
-        <NuxtLink to="/admin/migrate-meal-options" class="block">
-          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
-                    <UIcon
-                      name="i-heroicons-arrow-path"
-                      class="h-6 w-6 text-teal-600 dark:text-teal-400"
-                    />
-                  </div>
-                  <h3 class="font-semibold text-lg">Migration des options de repas</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                  Migrer les options depuis customFields vers la structure de base de données
-                  appropriée
-                </p>
-                <div class="flex items-center gap-4 text-sm text-gray-500">
-                  <span class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-circle-stack" class="h-4 w-4" />
-                    Migration de données
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
-                    Accès repas automatiques
-                  </span>
-                </div>
-              </div>
-              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
-            </div>
-          </UCard>
-        </NuxtLink>
-
         <UCard class="opacity-75 border-dashed border-2 border-gray-300 dark:border-gray-600">
           <div class="flex items-start justify-between">
             <div class="flex-1">
@@ -590,19 +520,6 @@
 
     <!-- Modal de configuration -->
     <AdminConfigModal v-model:open="showConfigModal" />
-
-    <!-- Modal de confirmation pour l'assignation des repas -->
-    <UiConfirmModal
-      v-model="showMealsConfirmModal"
-      title="Assigner les repas bénévoles"
-      description="Êtes-vous sûr de vouloir assigner automatiquement les repas à tous les bénévoles acceptés sans repas ? Cette action va parcourir toutes les éditions et assigner les repas disponibles."
-      confirm-label="Assigner les repas"
-      confirm-color="primary"
-      confirm-icon="i-cbi:mealie"
-      :loading="assigningMeals"
-      @confirm="assignMealsToVolunteers"
-      @cancel="showMealsConfirmModal = false"
-    />
   </div>
 </template>
 
@@ -649,10 +566,6 @@ const recentActivity = ref<Activity[]>([])
 
 // Gestion du mode administrateur
 const adminModeToggle = ref(authStore.isAdminModeActive)
-
-// État pour l'assignation des repas
-const assigningMeals = ref(false)
-const showMealsConfirmModal = ref(false)
 
 // Fonctions utilitaires
 const { locale } = useI18n()
@@ -774,47 +687,6 @@ const toggleAdminMode = (enabled: boolean) => {
       icon: 'i-heroicons-shield-exclamation',
       color: 'neutral',
     })
-  }
-}
-
-// Fonction pour assigner les repas aux bénévoles
-const assignMealsToVolunteers = async () => {
-  if (assigningMeals.value) return
-
-  assigningMeals.value = true
-
-  try {
-    const result = await $fetch('/api/admin/assign-meals-volunteers', {
-      method: 'POST',
-    })
-
-    if (result.success) {
-      toast.add({
-        title: 'Assignation terminée',
-        description: result.message,
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-
-      // Afficher les détails si souhaité
-      if (result.stats.processed > 0) {
-        console.log("📊 Statistiques d'assignation des repas:", result.stats)
-        console.log('📋 Détails:', result.volunteers)
-      }
-
-      // Fermer la modal après succès
-      showMealsConfirmModal.value = false
-    }
-  } catch (error: any) {
-    console.error("Erreur lors de l'assignation des repas:", error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible d'assigner les repas",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    assigningMeals.value = false
   }
 }
 
