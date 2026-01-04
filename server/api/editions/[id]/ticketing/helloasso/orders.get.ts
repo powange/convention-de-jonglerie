@@ -92,6 +92,7 @@ export default wrapApiHandler(
                 payerEmail: order.payer.email,
                 amount: order.items.reduce((sum, item) => sum + item.amount, 0),
                 status: 'Processed', // TODO: récupérer le statut réel
+                paymentMethod: 'card', // HelloAsso = paiement par carte
                 orderDate: new Date(order.date), // Date de la commande HelloAsso
               },
               update: {
@@ -100,6 +101,7 @@ export default wrapApiHandler(
                 payerEmail: order.payer.email,
                 amount: order.items.reduce((sum, item) => sum + item.amount, 0),
                 status: 'Processed',
+                paymentMethod: 'card', // HelloAsso = paiement par carte
                 orderDate: new Date(order.date), // Mettre à jour la date si elle a changé
               },
             })
