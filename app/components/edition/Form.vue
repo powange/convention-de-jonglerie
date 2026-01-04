@@ -332,7 +332,7 @@
                     <USelectMenu
                       v-else
                       v-model="selectedCountry"
-                      :items="countryOptions"
+                      :items="countrySelectOptions"
                       :placeholder="$t('common.select')"
                       size="lg"
                       class="w-full"
@@ -574,6 +574,7 @@ import { useTranslatedConventionServices } from '~/composables/useConventionServ
 import { useDatetime } from '~/composables/useDatetime'
 import { useTimezones } from '~/composables/useTimezones'
 import type { Edition, Convention } from '~/types'
+import { countrySelectOptions } from '~/utils/countries'
 
 import type { StepperItem } from '@nuxt/ui'
 
@@ -717,26 +718,6 @@ const calendarEndDate = ref<CalendarDate | null>(null)
 const startTime = ref('09:00')
 const endTime = ref('18:00')
 
-// Options de pays les plus courants pour les conventions de jonglerie
-const countryOptions = [
-  { label: 'France', value: 'France', icon: 'flag:fr-4x3' },
-  { label: 'Belgique', value: 'Belgique', icon: 'flag:be-4x3' },
-  { label: 'Suisse', value: 'Suisse', icon: 'flag:ch-4x3' },
-  { label: 'Allemagne', value: 'Allemagne', icon: 'flag:de-4x3' },
-  { label: 'Pays-Bas', value: 'Pays-Bas', icon: 'flag:nl-4x3' },
-  { label: 'Italie', value: 'Italie', icon: 'flag:it-4x3' },
-  { label: 'Espagne', value: 'Espagne', icon: 'flag:es-4x3' },
-  { label: 'Royaume-Uni', value: 'Royaume-Uni', icon: 'flag:gb-4x3' },
-  { label: 'Luxembourg', value: 'Luxembourg', icon: 'flag:lu-4x3' },
-  { label: 'Autriche', value: 'Autriche', icon: 'flag:at-4x3' },
-  { label: 'Portugal', value: 'Portugal', icon: 'flag:pt-4x3' },
-  { label: 'Pologne', value: 'Pologne', icon: 'flag:pl-4x3' },
-  { label: t('countries.czech_republic'), value: 'République Tchèque', icon: 'flag:cz-4x3' },
-  { label: 'Canada', value: 'Canada', icon: 'flag:ca-4x3' },
-  { label: 'États-Unis', value: 'États-Unis', icon: 'flag:us-4x3' },
-  { label: 'Autre', value: 'Autre', icon: 'i-heroicons-globe-europe-africa' },
-]
-
 // Options d'heures (de 00:00 à 23:30 par intervalles de 30 min)
 const timeOptions = computed(() => {
   const options = []
@@ -783,7 +764,7 @@ const conventionOptions = computed(() => {
 
 // Pays sélectionné pour l'affichage avec drapeau
 const selectedCountry = computed({
-  get: () => countryOptions.find((option) => option.value === state.country) || null,
+  get: () => countrySelectOptions.find((option) => option.value === state.country) || null,
   set: (value) => {
     state.country = value?.value || ''
   },
@@ -1000,7 +981,7 @@ const handleAddressSelected = (address: {
   state.country = address.country
 
   // Vérifier si le pays est dans la liste
-  const countryExists = countryOptions.some((option) => option.value === address.country)
+  const countryExists = countrySelectOptions.some((option) => option.value === address.country)
   showCustomCountry.value = !countryExists && address.country !== ''
 }
 

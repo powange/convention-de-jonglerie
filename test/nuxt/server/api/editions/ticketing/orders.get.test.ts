@@ -321,6 +321,57 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     )
   })
 
+  it('filtre par ID de commande numérique', async () => {
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', search: '123' })
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(1)
+    prismaMock.ticketingOrder.findMany.mockResolvedValue([])
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.ticketingOrder.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          editionId: 1,
+          OR: expect.arrayContaining([
+            { id: 123 }, // Recherche par ID de commande
+            { payerFirstName: { contains: '123' } },
+          ]),
+        }),
+      })
+    )
+  })
+
+  it('filtre par ID de billet numérique', async () => {
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', search: '456' })
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(1)
+    prismaMock.ticketingOrder.findMany.mockResolvedValue([])
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.ticketingOrder.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          editionId: 1,
+          OR: expect.arrayContaining([
+            {
+              items: {
+                some: {
+                  OR: expect.arrayContaining([
+                    { id: 456 }, // Recherche par ID de billet
+                  ]),
+                },
+              },
+            },
+          ]),
+        }),
+      })
+    )
+  })
+
   it('rejette utilisateur non authentifié', async () => {
     await expect(
       handler({ ...baseEvent, context: { ...baseEvent.context, user: null } } as any)

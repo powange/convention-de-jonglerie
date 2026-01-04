@@ -84,10 +84,16 @@ export default wrapApiHandler(
       (query.customFieldFilterMode as string) === 'or' ? 'or' : ('and' as const)
 
     try {
+      // Vérifier si la recherche est un ID numérique
+      const searchAsNumber = parseInt(search)
+      const isNumericSearch = search && !isNaN(searchAsNumber) && searchAsNumber > 0
+
       // Construire la condition de recherche
       const searchCondition = search
         ? {
             OR: [
+              // Recherche par ID de commande (si numérique)
+              ...(isNumericSearch ? [{ id: searchAsNumber }] : []),
               { payerFirstName: { contains: search } },
               { payerLastName: { contains: search } },
               { payerEmail: { contains: search } },
@@ -96,6 +102,8 @@ export default wrapApiHandler(
                 items: {
                   some: {
                     OR: [
+                      // Recherche par ID de billet (si numérique)
+                      ...(isNumericSearch ? [{ id: searchAsNumber }] : []),
                       { name: { contains: search } },
                       { firstName: { contains: search } },
                       { lastName: { contains: search } },

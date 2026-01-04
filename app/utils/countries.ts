@@ -95,3 +95,17 @@ export function formatCountriesForSelect(countries: string[]) {
     flag: getCountryCode(country),
   }))
 }
+
+/**
+ * Liste des noms de pays disponibles (triée alphabétiquement)
+ */
+export const countryNames = Object.keys(countryToCode).sort((a, b) => a.localeCompare(b, 'fr'))
+
+/**
+ * Options de pays pour les composants USelect avec icônes de drapeaux
+ */
+export const countrySelectOptions = countryNames.map((country) => ({
+  label: country,
+  value: country,
+  icon: `flag:${countryToCode[country]}-4x3`,
+}))
