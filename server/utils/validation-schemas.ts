@@ -410,40 +410,43 @@ export function handleValidationError(error: z.ZodError) {
 }
 
 // Schémas de workshop
-export const workshopSchema = z
-  .object({
-    title: z
-      .string()
-      .min(3, 'Le titre doit contenir au moins 3 caractères')
-      .max(200, 'Le titre ne peut pas dépasser 200 caractères'),
-    description: z
-      .string()
-      .max(5000, 'La description ne peut pas dépasser 5000 caractères')
-      .nullable()
-      .optional(),
-    startDateTime: dateSchema,
-    endDateTime: dateSchema,
-    maxParticipants: z
-      .number()
-      .int('Le nombre maximum de participants doit être un entier')
-      .positive('Le nombre maximum de participants doit être positif')
-      .nullable()
-      .optional(),
-    locationId: z
-      .number()
-      .int('ID de lieu invalide')
-      .positive('ID de lieu invalide')
-      .nullable()
-      .optional(),
-    locationName: z
-      .string()
-      .min(1, 'Le nom du lieu est requis')
-      .max(100, 'Le nom du lieu ne peut pas dépasser 100 caractères')
-      .nullable()
-      .optional(),
-    editionStartDate: dateSchema.optional(), // Pour la validation
-    editionEndDate: dateSchema.optional(), // Pour la validation
-  })
+// Schéma de base sans refinements (pour permettre .partial() avec Zod v4)
+const workshopBaseSchema = z.object({
+  title: z
+    .string()
+    .min(3, 'Le titre doit contenir au moins 3 caractères')
+    .max(200, 'Le titre ne peut pas dépasser 200 caractères'),
+  description: z
+    .string()
+    .max(5000, 'La description ne peut pas dépasser 5000 caractères')
+    .nullable()
+    .optional(),
+  startDateTime: dateSchema,
+  endDateTime: dateSchema,
+  maxParticipants: z
+    .number()
+    .int('Le nombre maximum de participants doit être un entier')
+    .positive('Le nombre maximum de participants doit être positif')
+    .nullable()
+    .optional(),
+  locationId: z
+    .number()
+    .int('ID de lieu invalide')
+    .positive('ID de lieu invalide')
+    .nullable()
+    .optional(),
+  locationName: z
+    .string()
+    .min(1, 'Le nom du lieu est requis')
+    .max(100, 'Le nom du lieu ne peut pas dépasser 100 caractères')
+    .nullable()
+    .optional(),
+  editionStartDate: dateSchema.optional(), // Pour la validation
+  editionEndDate: dateSchema.optional(), // Pour la validation
+})
+
+// Schéma complet avec refinements pour la création
+export const workshopSchema = workshopBaseSchema
   .refine((data) => new Date(data.endDateTime) > new Date(data.startDateTime), {
     message: 'La date de fin doit être après la date de début',
     path: ['endDateTime'],
@@ -467,4 +470,5 @@ export const workshopSchema = z
     }
   )
 
-export const updateWorkshopSchema = workshopSchema.partial()
+// Schéma partiel pour les mises à jour (sans refinements car Zod v4 ne supporte pas .partial() avec refinements)
+export const updateWorkshopSchema = workshopBaseSchema.partial()
