@@ -1,117 +1,168 @@
+import { getTimeZones, type TimeZone } from '@vvo/tzdb'
+
 import type { SelectMenuItem } from '@nuxt/ui'
 
 /**
- * Mapping des régions IANA vers des noms traduits
+ * Mapping des codes continent vers des noms en français
  */
-const REGION_LABELS: Record<string, string> = {
-  Africa: 'Afrique',
-  America: 'Amérique',
-  Antarctica: 'Antarctique',
-  Arctic: 'Arctique',
-  Asia: 'Asie',
-  Atlantic: 'Atlantique',
-  Australia: 'Australie',
-  Europe: 'Europe',
-  Indian: 'Océan Indien',
-  Pacific: 'Pacifique',
+const CONTINENT_LABELS: Record<string, string> = {
+  EU: 'Europe',
+  NA: 'Amérique du Nord',
+  SA: 'Amérique du Sud',
+  AS: 'Asie',
+  OC: 'Océanie',
+  AF: 'Afrique',
+  AN: 'Antarctique',
 }
 
 /**
- * Mapping pays -> timezone par défaut (pour pré-sélection automatique)
+ * Ordre d'affichage des continents (Europe en premier car plus pertinent)
  */
-const COUNTRY_DEFAULT_TIMEZONES: Record<string, string> = {
-  France: 'Europe/Paris',
-  Allemagne: 'Europe/Berlin',
-  Germany: 'Europe/Berlin',
-  Espagne: 'Europe/Madrid',
-  Spain: 'Europe/Madrid',
-  Italie: 'Europe/Rome',
-  Italy: 'Europe/Rome',
-  'Royaume-Uni': 'Europe/London',
-  'United Kingdom': 'Europe/London',
-  Belgique: 'Europe/Brussels',
-  Belgium: 'Europe/Brussels',
-  Suisse: 'Europe/Zurich',
-  Switzerland: 'Europe/Zurich',
-  Canada: 'America/Toronto',
-  'États-Unis': 'America/New_York',
-  'United States': 'America/New_York',
-  USA: 'America/New_York',
-  Japon: 'Asia/Tokyo',
-  Japan: 'Asia/Tokyo',
-  Chine: 'Asia/Shanghai',
-  China: 'Asia/Shanghai',
-  Australie: 'Australia/Sydney',
-  Australia: 'Australia/Sydney',
-  Brésil: 'America/Sao_Paulo',
-  Brazil: 'America/Sao_Paulo',
-  Mexique: 'America/Mexico_City',
-  Mexico: 'America/Mexico_City',
-  Inde: 'Asia/Kolkata',
-  India: 'Asia/Kolkata',
-  Argentine: 'America/Buenos_Aires',
-  Argentina: 'America/Buenos_Aires',
-  Pays: 'Europe/Amsterdam',
-  Netherlands: 'Europe/Amsterdam',
-  Portugal: 'Europe/Lisbon',
-  Pologne: 'Europe/Warsaw',
-  Poland: 'Europe/Warsaw',
-  Autriche: 'Europe/Vienna',
-  Austria: 'Europe/Vienna',
-  Russie: 'Europe/Moscow',
-  Russia: 'Europe/Moscow',
-}
+const CONTINENT_ORDER = ['EU', 'NA', 'SA', 'AS', 'OC', 'AF', 'AN']
 
 /**
- * Composable pour gérer les fuseaux horaires IANA
+ * Composable pour gérer les fuseaux horaires IANA via @vvo/tzdb
  */
 export const useTimezones = () => {
   /**
-   * Récupère tous les fuseaux horaires disponibles via l'API Intl
+   * Récupère tous les fuseaux horaires avec leurs métadonnées
    */
-  const getAllTimezones = (): string[] => {
+  const getAllTimezones = () => {
+    return getTimeZones()
+  }
+
+  /**
+   * Formate l'offset en heures:minutes (ex: "+05:30", "-08:00")
+   */
+  const formatOffset = (offsetInMinutes: number): string => {
+    const sign = offsetInMinutes >= 0 ? '+' : '-'
+    const absOffset = Math.abs(offsetInMinutes)
+    const hours = Math.floor(absOffset / 60)
+    const minutes = absOffset % 60
+    return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  }
+
+  /**
+   * Génère les items pour le USelectMenu avec groupes par continent
+   * Format : "Villes principales (GMT+X) - Nom alternatif"
+   */
+  const getSelectMenuItems = (): SelectMenuItem[] => {
+    const timezones = getTimeZones()
+    const items: SelectMenuItem[] = []
+
+    // Grouper par continent
+    const grouped: Record<string, typeof timezones> = {}
+    for (const tz of timezones) {
+      const continent = tz.continentCode
+      if (!grouped[continent]) {
+        grouped[continent] = []
+      }
+      grouped[continent].push(tz)
+    }
+
+    // Construire les items dans l'ordre des continents
+    for (const continentCode of CONTINENT_ORDER) {
+      const continentTimezones = grouped[continentCode]
+      if (!continentTimezones || continentTimezones.length === 0) continue
+
+      // Ajouter un séparateur si ce n'est pas le premier groupe
+      if (items.length > 0) {
+        items.push({ type: 'separator' })
+      }
+
+      // Ajouter le label du groupe (continent)
+      items.push({
+        type: 'label',
+        label: CONTINENT_LABELS[continentCode] || continentCode,
+      })
+
+      // Trier par offset puis par nom
+      const sortedTimezones = [...continentTimezones].sort((a, b) => {
+        if (a.rawOffsetInMinutes !== b.rawOffsetInMinutes) {
+          return a.rawOffsetInMinutes - b.rawOffsetInMinutes
+        }
+        return a.alternativeName.localeCompare(b.alternativeName)
+      })
+
+      // Ajouter les fuseaux de ce groupe
+      for (const tz of sortedTimezones) {
+        const cities = tz.mainCities.slice(0, 3).join(', ')
+        const offset = formatOffset(tz.currentTimeOffsetInMinutes)
+
+        items.push({
+          label: `${cities} (GMT${offset})`,
+          // Champs supplémentaires pour la recherche et l'affichage
+          alternativeName: tz.alternativeName,
+          country: tz.countryName,
+          cities,
+          offset,
+          value: tz.name,
+        })
+      }
+    }
+
+    return items
+  }
+
+  /**
+   * Obtient le fuseau horaire par défaut pour un pays donné
+   */
+  const getDefaultTimezoneForCountry = (country: string): string | undefined => {
+    const timezones = getTimeZones()
+    // Chercher un fuseau horaire qui correspond au pays
+    const match = timezones.find(
+      (tz: TimeZone) =>
+        tz.countryName.toLowerCase() === country.toLowerCase() ||
+        tz.countryCode.toLowerCase() === country.toLowerCase()
+    )
+    return match?.name
+  }
+
+  /**
+   * Obtient le fuseau horaire actuel du navigateur
+   */
+  const getBrowserTimezone = (): string => {
     try {
-      return Intl.supportedValuesOf('timeZone')
+      return Intl.DateTimeFormat().resolvedOptions().timeZone
     } catch {
-      // Fallback pour les navigateurs qui ne supportent pas supportedValuesOf
-      console.warn("Intl.supportedValuesOf non supporté, utilisation d'une liste par défaut")
-      return [
-        'Europe/Paris',
-        'Europe/London',
-        'Europe/Berlin',
-        'America/New_York',
-        'America/Los_Angeles',
-        'Asia/Tokyo',
-        'Asia/Shanghai',
-        'Australia/Sydney',
-      ]
+      return 'Europe/Paris'
     }
   }
 
   /**
-   * Groupe les fuseaux horaires par région
+   * Formate un fuseau horaire pour l'affichage
+   * Ex: "Europe/Paris" -> "Paris, Lyon, Marseille (GMT+01:00)"
    */
-  const getGroupedTimezones = (): Record<string, string[]> => {
-    const timezones = getAllTimezones()
-    const grouped: Record<string, string[]> = {}
+  const formatTimezoneWithOffset = (timezone: string): string => {
+    const timezones = getTimeZones()
+    const tz = timezones.find(
+      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
+    )
 
-    for (const tz of timezones) {
-      const [region] = tz.split('/')
-      if (region && REGION_LABELS[region]) {
-        if (!grouped[region]) {
-          grouped[region] = []
-        }
-        grouped[region].push(tz)
-      }
+    if (tz) {
+      const cities = tz.mainCities.slice(0, 3).join(', ')
+      const offset = formatOffset(tz.currentTimeOffsetInMinutes)
+      return `${cities} (GMT${offset})`
     }
 
-    return grouped
+    // Fallback si non trouvé
+    return timezone
   }
 
   /**
    * Obtient l'offset GMT d'un fuseau horaire
    */
   const getTimezoneOffset = (timezone: string): string => {
+    const timezones = getTimeZones()
+    const tz = timezones.find(
+      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
+    )
+
+    if (tz) {
+      return `GMT${formatOffset(tz.currentTimeOffsetInMinutes)}`
+    }
+
+    // Fallback via Intl
     try {
       const now = new Date()
       const formatter = new Intl.DateTimeFormat('en-US', {
@@ -127,129 +178,34 @@ export const useTimezones = () => {
   }
 
   /**
-   * Génère les items pour le USelectMenu avec groupes par région
-   * Format : "Ville (GMT+X)" avec région en label de groupe
-   */
-  const getSelectMenuItems = (): SelectMenuItem[] => {
-    const grouped = getGroupedTimezones()
-    const items: SelectMenuItem[] = []
-
-    // Ordre des régions (Europe en premier car plus pertinent pour ce projet)
-    const regionOrder = [
-      'Europe',
-      'America',
-      'Asia',
-      'Australia',
-      'Pacific',
-      'Africa',
-      'Atlantic',
-      'Indian',
-      'Antarctica',
-      'Arctic',
-    ]
-
-    for (const region of regionOrder) {
-      if (!grouped[region]) continue
-
-      // Ajouter un séparateur si ce n'est pas le premier groupe
-      if (items.length > 0) {
-        items.push({ type: 'separator' })
-      }
-
-      // Ajouter le label du groupe (région)
-      items.push({
-        type: 'label',
-        label: REGION_LABELS[region] || region,
-      })
-
-      // Ajouter les fuseaux de ce groupe
-      for (const tz of grouped[region]) {
-        // Extraire le nom de la ville (ex: "Europe/Paris" -> "Paris")
-        const cityPart = tz.split('/').slice(1).join('/').replace(/_/g, ' ')
-        const offset = getTimezoneOffset(tz)
-        const regionLabel = REGION_LABELS[region] || region
-
-        items.push({
-          label: `${cityPart || tz} (${offset})`,
-          // Champ supplémentaire pour la recherche et l'affichage
-          region: regionLabel,
-          city: cityPart || tz,
-          offset,
-          value: tz,
-        })
-      }
-    }
-
-    return items
-  }
-
-  /**
-   * Obtient le fuseau horaire par défaut pour un pays donné
-   */
-  const getDefaultTimezoneForCountry = (country: string): string | undefined => {
-    return COUNTRY_DEFAULT_TIMEZONES[country]
-  }
-
-  /**
-   * Obtient le fuseau horaire actuel du navigateur
-   */
-  const getBrowserTimezone = (): string => {
-    try {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone
-    } catch {
-      return 'Europe/Paris'
-    }
-  }
-
-  /**
-   * Formate un fuseau horaire pour l'affichage (avec offset actuel)
-   * Ex: "Europe/Paris" -> "Europe/Paris (UTC+1)"
-   */
-  const formatTimezoneWithOffset = (timezone: string): string => {
-    try {
-      const now = new Date()
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: timezone,
-        timeZoneName: 'shortOffset',
-      })
-      const parts = formatter.formatToParts(now)
-      const offsetPart = parts.find((p) => p.type === 'timeZoneName')
-      const offset = offsetPart?.value || ''
-
-      // Extraire le nom de la ville
-      const cityPart = timezone.split('/').slice(1).join('/').replace(/_/g, ' ')
-      return `${cityPart} (${offset})`
-    } catch {
-      return timezone
-    }
-  }
-
-  /**
    * Obtient l'abréviation du fuseau horaire (ex: "CET", "PST")
    */
-  const getTimezoneAbbreviation = (timezone: string, date?: Date): string => {
-    try {
-      const d = date || new Date()
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: timezone,
-        timeZoneName: 'short',
-      })
-      const parts = formatter.formatToParts(d)
-      const tzPart = parts.find((p) => p.type === 'timeZoneName')
-      return tzPart?.value || ''
-    } catch {
-      return ''
-    }
+  const getTimezoneAbbreviation = (timezone: string): string => {
+    const timezones = getTimeZones()
+    const tz = timezones.find(
+      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
+    )
+    return tz?.abbreviation || ''
+  }
+
+  /**
+   * Obtient les informations complètes d'un fuseau horaire
+   */
+  const getTimezoneInfo = (timezone: string): TimeZone | undefined => {
+    const timezones = getTimeZones()
+    return timezones.find(
+      (t: TimeZone) => t.name === timezone || t.group.includes(timezone)
+    )
   }
 
   return {
     getAllTimezones,
-    getGroupedTimezones,
     getSelectMenuItems,
     getDefaultTimezoneForCountry,
     getBrowserTimezone,
     formatTimezoneWithOffset,
     getTimezoneAbbreviation,
     getTimezoneOffset,
+    getTimezoneInfo,
   }
 }
