@@ -100,17 +100,14 @@
       "mcp__nuxt-ui__get-component-metadata",
       "mcp__nuxt-ui__get-component",
       "Skill(run-tests)",
-      "Skill(commit-push)"
+      "Skill(commit-push)",
+      "Bash(docker logs:*)",
+      "Skill(quality-check)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "nuxt",
-    "nuxt-ui",
-    "vitest-runner",
-    "Prisma-Remote"
-  ]
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"]
 }

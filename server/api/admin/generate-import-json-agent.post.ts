@@ -1,5 +1,9 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { getEffectiveAIConfig, getMaxContentSizeForProvider } from '@@/server/utils/ai-config'
+import {
+  AI_TIMEOUTS,
+  getEffectiveAIConfig,
+  getMaxContentSizeForProvider,
+} from '@@/server/utils/ai-config'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import {
   createTask,
@@ -44,9 +48,6 @@ const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),
 })
 
-// Timeout pour les requêtes HTTP (en ms)
-const URL_FETCH_TIMEOUT = 15000 // 15 secondes par URL
-const LLM_TIMEOUT = 180000 // 3 minutes pour le LLM
 const MAX_AGENT_ITERATIONS = 4 // Maximum de pages à explorer
 
 // Limites par défaut (seront ajustées dynamiquement selon le context length)
@@ -273,7 +274,7 @@ async function callAgentLLM(
           max_tokens: 4096,
         }),
       },
-      LLM_TIMEOUT
+      AI_TIMEOUTS.LLM_REQUEST
     )
 
     if (!response.ok) {
@@ -291,7 +292,7 @@ async function callAgentLLM(
     const { default: Anthropic } = await import('@anthropic-ai/sdk')
     const client = new Anthropic({
       apiKey: config.anthropicApiKey,
-      timeout: LLM_TIMEOUT,
+      timeout: AI_TIMEOUTS.LLM_REQUEST,
     })
 
     const message = await client.messages.create({
@@ -320,7 +321,7 @@ async function callAgentLLM(
           stream: false,
         }),
       },
-      LLM_TIMEOUT
+      AI_TIMEOUTS.LLM_REQUEST
     )
 
     if (!response.ok) {
@@ -583,7 +584,11 @@ async function fetchAndExtractContent(
     }
 
     // Fetch classique pour les autres URLs ou si les scrapers ont échoué
-    const response = await fetchWithTimeout(url, { headers: BROWSER_HEADERS }, URL_FETCH_TIMEOUT)
+    const response = await fetchWithTimeout(
+      url,
+      { headers: BROWSER_HEADERS },
+      AI_TIMEOUTS.URL_FETCH
+    )
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`)

@@ -70,7 +70,7 @@ export default wrapApiHandler(
       }
     } catch (error: unknown) {
       console.error('Update payment method error:', error)
-      if (error.statusCode) throw error
+      if ((error as { statusCode?: number }).statusCode) throw error
       throw createError({
         statusCode: 500,
         message: 'Erreur lors de la mise à jour de la méthode de paiement',

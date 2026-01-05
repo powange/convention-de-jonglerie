@@ -77,7 +77,7 @@ export default wrapApiHandler(
       }
     } catch (error: unknown) {
       console.error('Delete order error:', error)
-      if (error.statusCode) throw error
+      if ((error as { statusCode?: number }).statusCode) throw error
       throw createError({
         statusCode: 500,
         message: "Erreur lors de l'annulation ou de la suppression de la commande",

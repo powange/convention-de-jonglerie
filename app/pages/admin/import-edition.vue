@@ -73,56 +73,22 @@
           </UButton>
         </div>
 
-        <!-- Progression unifiée (ED et EI) -->
-        <div v-if="generating" class="space-y-1">
-          <!-- Liste unifiée : historique + étape en cours -->
-          <template v-for="(entry, idx) in stepHistory" :key="idx">
-            <div
-              class="flex items-center gap-2 text-sm"
-              :class="
-                isCurrentStep(idx)
-                  ? 'text-gray-700 dark:text-gray-200'
-                  : 'text-gray-500 dark:text-gray-400'
-              "
-            >
-              <!-- Icône : spinner pour l'étape en cours, check pour les autres -->
-              <UIcon
-                v-if="isCurrentStep(idx)"
-                :name="currentStepIcon"
-                :class="currentStepIconClass"
-              />
-              <UIcon
-                v-else-if="entry.step === 'completed'"
-                name="i-heroicons-check-circle"
-                class="text-success-500"
-              />
-              <UIcon v-else name="i-heroicons-check" class="text-success-500" />
-              <!-- Durée depuis le début -->
-              <span class="text-gray-400 font-mono text-xs w-14">
-                {{ isCurrentStep(idx) ? formatMs(currentElapsedTime) : formatDuration(entry, idx) }}
-              </span>
-              <!-- Label -->
-              <span>{{ entry.label }}</span>
-            </div>
-            <!-- Sous-étapes (URLs récupérées) -->
-            <div
-              v-for="(subStep, subIdx) in entry.subSteps || []"
-              :key="`${idx}-${subIdx}`"
-              class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 ml-6"
-            >
-              <UIcon name="i-heroicons-arrow-right-circle" class="text-gray-400" />
-              <span class="font-mono w-14">{{ formatSubStepWrapper(entry, subStep, subIdx) }}</span>
-              <span>{{ getHostname(subStep.url) }}</span>
-            </div>
-          </template>
-          <!-- Barre de progression pour l'exploration (agent uniquement) -->
-          <div v-if="generationMethod === 'agent' && agentProgress > 0" class="mt-2">
-            <UProgress :value="agentProgress" size="sm" color="warning" />
-            <p class="text-xs text-gray-500 mt-1">
-              {{ $t('admin.import.agent_exploring', { count: agentPagesVisited }) }}
-            </p>
-          </div>
-        </div>
+        <!-- Progression de génération -->
+        <AdminImportGenerationProgress
+          v-if="generating"
+          :step-history="stepHistory"
+          :method="generationMethod"
+          :agent-progress="agentProgress"
+          :agent-pages-visited="agentPagesVisited"
+          :current-elapsed-time="currentElapsedTime"
+          :current-step-icon="currentStepIcon"
+          :current-step-icon-class="currentStepIconClass"
+          :is-current-step="isCurrentStep"
+          :format-ms="formatMs"
+          :format-duration="formatDuration"
+          :format-sub-step="formatSubStepWrapper"
+          :get-hostname="getHostname"
+        />
 
         <!-- Erreur de génération -->
         <UAlert
@@ -136,29 +102,7 @@
         </UAlert>
 
         <!-- Résultat de l'agent -->
-        <UAlert
-          v-if="agentResult && !generating"
-          icon="i-heroicons-check-circle"
-          color="success"
-          variant="soft"
-          :title="$t('admin.import.agent_success')"
-        >
-          <template #description>
-            <p>
-              {{
-                $t('admin.import.agent_result', {
-                  pages: agentResult.urlsProcessed?.length || 0,
-                  iterations: agentResult.iterations || 0,
-                })
-              }}
-            </p>
-            <ul v-if="agentResult.urlsProcessed?.length" class="mt-2 text-xs space-y-1">
-              <li v-for="url in agentResult.urlsProcessed" :key="url" class="truncate">
-                • {{ url }}
-              </li>
-            </ul>
-          </template>
-        </UAlert>
+        <AdminImportAgentResult v-if="agentResult && !generating" :result="agentResult" />
       </div>
     </UCard>
 
@@ -234,136 +178,7 @@
 
       <!-- Documentation -->
       <div v-if="showDocumentation" class="mb-6">
-        <UAlert
-          icon="i-heroicons-information-circle"
-          color="info"
-          variant="soft"
-          :title="$t('admin.import.documentation_title')"
-        >
-          <template #description>
-            <div class="mt-2 space-y-4">
-              <p>{{ $t('admin.import.documentation_intro') }}</p>
-
-              <div>
-                <h4 class="font-semibold mb-2">{{ $t('admin.import.required_fields') }}</h4>
-                <ul class="list-disc list-inside space-y-1 text-sm">
-                  <li><code>convention.name</code> - Nom de la convention</li>
-                  <li><code>convention.email</code> - Email de contact (pour revendication)</li>
-                  <li>
-                    <code>edition.startDate</code> - Date de début (YYYY-MM-DD ou format ISO UTC)
-                  </li>
-                  <li><code>edition.endDate</code> - Date de fin (YYYY-MM-DD ou format ISO UTC)</li>
-                  <li><code>edition.addressLine1</code> - Adresse</li>
-                  <li><code>edition.city</code> - Ville</li>
-                  <li><code>edition.country</code> - Pays</li>
-                  <li><code>edition.postalCode</code> - Code postal</li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 class="font-semibold mb-2">{{ $t('admin.import.optional_fields') }}</h4>
-                <ul class="list-disc list-inside space-y-1 text-sm">
-                  <li><code>convention.description</code> - Description de la convention</li>
-                  <li><code>convention.logo</code> - URL du logo</li>
-                  <li>
-                    <code>edition.name</code> - Nom de l'édition (si omis, utilise le nom de la
-                    convention)
-                  </li>
-                  <li><code>edition.description</code> - Description de l'édition</li>
-                  <li><code>edition.addressLine2</code> - Complément d'adresse</li>
-                  <li><code>edition.region</code> - Région</li>
-                  <li>
-                    <code>edition.timezone</code> - Fuseau horaire IANA (ex: "Europe/Paris",
-                    "America/New_York")
-                  </li>
-                  <li><code>edition.latitude/longitude</code> - Coordonnées GPS</li>
-                  <li><code>edition.imageUrl</code> - URL de l'image de l'édition</li>
-                  <li><code>edition.ticketingUrl</code> - URL de billetterie</li>
-                  <li><code>edition.facebookUrl</code> - Page Facebook</li>
-                  <li><code>edition.instagramUrl</code> - Page Instagram</li>
-                  <li><code>edition.officialWebsiteUrl</code> - Site officiel</li>
-                  <li><code>edition.isOnline</code> - Événement en ligne (boolean)</li>
-                  <li><code>edition.volunteersOpen</code> - Inscriptions bénévoles ouvertes</li>
-                  <li><code>edition.volunteersDescription</code> - Description pour bénévoles</li>
-                  <li><code>edition.volunteersExternalUrl</code> - URL externe bénévoles</li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 class="font-semibold mb-2">Formats de dates acceptés</h4>
-                <p class="text-sm mb-2">Les dates peuvent être au format :</p>
-                <ul class="list-disc list-inside space-y-1 text-sm">
-                  <li><code>"2025-10-24"</code> - Date simple (recommandé)</li>
-                  <li><code>"2025-10-24T14:30:00"</code> - Date avec heure</li>
-                  <li><code>"2025-10-24T14:30:00Z"</code> - Date avec heure UTC</li>
-                  <li><code>"2025-10-24T14:30:00.000Z"</code> - Date complète ISO UTC</li>
-                </ul>
-                <p class="text-xs text-gray-600 mt-2">
-                  💡 Pour les événements multi-jours, le format date simple est recommandé.
-                </p>
-              </div>
-
-              <div>
-                <h4 class="font-semibold mb-2">Fuseau horaire (timezone)</h4>
-                <p class="text-sm mb-2">
-                  Le fuseau horaire doit être au format IANA. Exemples courants :
-                </p>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-1 text-sm">
-                  <span><code>Europe/Paris</code> - France</span>
-                  <span><code>Europe/Berlin</code> - Allemagne</span>
-                  <span><code>Europe/London</code> - UK</span>
-                  <span><code>Europe/Brussels</code> - Belgique</span>
-                  <span><code>Europe/Zurich</code> - Suisse</span>
-                  <span><code>Europe/Rome</code> - Italie</span>
-                  <span><code>America/New_York</code> - USA Est</span>
-                  <span><code>America/Los_Angeles</code> - USA Ouest</span>
-                  <span><code>America/Toronto</code> - Canada</span>
-                </div>
-                <p class="text-xs text-gray-600 mt-2">
-                  💡 L'IA déduit automatiquement le fuseau horaire à partir du pays/ville.
-                </p>
-              </div>
-
-              <div>
-                <h4 class="font-semibold mb-2">{{ $t('admin.import.features_fields') }}</h4>
-                <p class="text-sm mb-2">{{ $t('admin.import.features_description') }}</p>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-1 text-sm">
-                  <span title="Food trucks"><code>hasFoodTrucks</code></span>
-                  <span title="Espace enfants"><code>hasKidsZone</code></span>
-                  <span title="Animaux acceptés"><code>acceptsPets</code></span>
-                  <span title="Camping tente"><code>hasTentCamping</code></span>
-                  <span title="Camping véhicule"><code>hasTruckCamping</code></span>
-                  <span title="Camping famille"><code>hasFamilyCamping</code></span>
-                  <span title="Gymnase"><code>hasGym</code></span>
-                  <span title="Cantine"><code>hasCantine</code></span>
-                  <span title="Douches"><code>hasShowers</code></span>
-                  <span title="Toilettes"><code>hasToilets</code></span>
-                  <span title="Dortoir"><code>hasSleepingRoom</code></span>
-                  <span title="Ateliers"><code>hasWorkshops</code></span>
-                  <span title="Scène ouverte"><code>hasOpenStage</code></span>
-                  <span title="Concert"><code>hasConcert</code></span>
-                  <span title="Gala"><code>hasGala</code></span>
-                  <span title="Spectacle long"><code>hasLongShow</code></span>
-                  <span title="Espace aérien"><code>hasAerialSpace</code></span>
-                  <span title="Espace feu"><code>hasFireSpace</code></span>
-                  <span title="Espace slackline"><code>hasSlacklineSpace</code></span>
-                  <span title="Accessibilité PMR"><code>hasAccessibility</code></span>
-                  <span title="Paiement espèces"><code>hasCashPayment</code></span>
-                  <span title="Paiement CB"><code>hasCreditCardPayment</code></span>
-                  <span title="Jetons AFJ"><code>hasAfjTokenPayment</code></span>
-                  <span title="Distributeur"><code>hasATM</code></span>
-                </div>
-              </div>
-
-              <div>
-                <h4 class="font-semibold mb-2">{{ $t('admin.import.example_json') }}</h4>
-                <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-x-auto text-xs">{{
-                  exampleJson
-                }}</pre>
-              </div>
-            </div>
-          </template>
-        </UAlert>
+        <AdminImportDocumentation :example-json="exampleJson" />
       </div>
 
       <!-- Import Form -->
@@ -497,106 +312,16 @@
     </UCard>
 
     <!-- Modale d'avertissement pour les doublons -->
-    <UModal v-model:open="showDuplicateModal">
-      <template #header>
-        <div class="flex items-center gap-3">
-          <UIcon name="i-heroicons-exclamation-triangle" class="text-warning-500" size="24" />
-          <span class="font-semibold">{{ $t('admin.import.duplicate_warning_title') }}</span>
-        </div>
-      </template>
-
-      <template #body>
-        <div class="space-y-4">
-          <p class="text-gray-600 dark:text-gray-400">
-            {{ $t('admin.import.duplicate_warning_description') }}
-          </p>
-
-          <UAlert
-            icon="i-heroicons-information-circle"
-            color="warning"
-            variant="soft"
-            :title="
-              $t('admin.import.duplicate_editions_found', { count: duplicateEditions.length })
-            "
-          />
-
-          <!-- Liste des éditions en doublon -->
-          <div class="space-y-3 max-h-80 overflow-y-auto">
-            <div
-              v-for="edition in duplicateEditions"
-              :key="edition.id"
-              class="p-3 border rounded-lg dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-            >
-              <div class="flex items-start gap-3">
-                <!-- Logo de la convention -->
-                <div
-                  v-if="edition.convention?.logo"
-                  class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700"
-                >
-                  <img
-                    :src="edition.convention.logo"
-                    :alt="edition.convention.name"
-                    class="w-full h-full object-cover"
-                  />
-                </div>
-                <div
-                  v-else
-                  class="w-12 h-12 flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
-                >
-                  <UIcon name="i-heroicons-calendar" class="text-gray-400" size="20" />
-                </div>
-
-                <div class="flex-1 min-w-0">
-                  <h4 class="font-medium text-gray-900 dark:text-white truncate">
-                    {{ edition.name || edition.convention?.name }}
-                  </h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ edition.convention?.name }}
-                  </p>
-                  <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                    {{
-                      $t('admin.import.duplicate_edition_dates', {
-                        startDate: formatDuplicateDate(edition.startDate),
-                        endDate: formatDuplicateDate(edition.endDate),
-                      })
-                    }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ edition.city }}, {{ edition.country }}
-                  </p>
-                </div>
-
-                <!-- Lien vers l'édition -->
-                <NuxtLink
-                  :to="`/editions/${edition.id}`"
-                  target="_blank"
-                  class="flex-shrink-0 text-primary-500 hover:text-primary-600"
-                >
-                  <UIcon name="i-heroicons-arrow-top-right-on-square" size="20" />
-                </NuxtLink>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton color="neutral" variant="outline" @click="showDuplicateModal = false">
-            {{ $t('admin.import.cancel_import') }}
-          </UButton>
-          <UButton color="warning" :loading="importing" @click="performImport">
-            {{ $t('admin.import.proceed_anyway') }}
-          </UButton>
-        </div>
-      </template>
-    </UModal>
+    <AdminImportDuplicateModal
+      v-model:open="showDuplicateModal"
+      :duplicate-editions="duplicateEditions"
+      :importing="importing"
+      @confirm="performImport"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { StepHistoryEntry, SubStepEntry } from '~/composables/useElapsedTimer'
-
 // Middleware de protection pour super admin
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
@@ -605,17 +330,28 @@ definePageMeta({
 const { t } = useI18n()
 const toast = useToast()
 
-// Composables
+// Composable de génération
 const {
-  formatMs,
-  formatStepDuration,
-  formatSubStepDuration,
+  generating,
+  generateError,
+  generationMethod,
+  stepHistory,
+  agentProgress,
+  agentPagesVisited,
+  agentResult,
   currentElapsedTime,
-  start: startTimer,
-  stop: stopTimer,
-  reset: resetTimer,
-} = useElapsedTimer()
-const { parseAndValidateUrls, getHostname } = useUrlValidation()
+  formatMs,
+  formatDuration,
+  formatSubStepWrapper,
+  isCurrentStep,
+  currentStepIcon,
+  currentStepIconClass,
+  getHostname,
+  generate,
+} = useImportGeneration()
+
+// Validation des URLs pour le test
+const { parseAndValidateUrls } = useUrlValidation()
 
 const showDocumentation = ref(false)
 const jsonInput = ref('')
@@ -631,47 +367,6 @@ const showDuplicateModal = ref(false)
 
 // Génération depuis URLs
 const urlsInput = ref('')
-const generating = ref(false)
-const generateError = ref('')
-const generationMethod = ref<'simple' | 'agent'>('simple')
-
-// État spécifique à la méthode simple
-const simpleStep = ref('')
-// Historique des étapes avec timestamps et sous-étapes
-const stepHistory = ref<StepHistoryEntry[]>([])
-
-// Helpers pour l'affichage unifié de la progression
-const isCurrentStep = (idx: number): boolean =>
-  idx === stepHistory.value.length - 1 && simpleStep.value !== 'completed'
-
-const currentStepIcon = computed(() =>
-  generationMethod.value === 'agent' ? 'i-heroicons-globe-alt' : 'i-heroicons-cog-6-tooth'
-)
-
-const currentStepIconClass = computed(() =>
-  generationMethod.value === 'agent'
-    ? 'animate-pulse text-warning-500'
-    : 'animate-spin text-warning-500'
-)
-
-// Wrapper pour formatStepDuration avec l'historique courant
-const formatDuration = (entry: StepHistoryEntry, idx?: number): string => {
-  return formatStepDuration(entry, idx ?? 0, stepHistory.value)
-}
-
-// Wrapper pour formatSubStepDuration
-const formatSubStepWrapper = (
-  parentEntry: StepHistoryEntry,
-  subStep: SubStepEntry,
-  subIdx: number
-): string => {
-  return formatSubStepDuration(parentEntry, subStep, subIdx)
-}
-
-// État spécifique à l'agent
-const agentProgress = ref(0)
-const agentPagesVisited = ref(0)
-const agentResult = ref<any>(null)
 
 // État pour le test des URLs
 const testingUrls = ref(false)
@@ -964,24 +659,6 @@ const validateAndImport = async () => {
 }
 
 /**
- * Formate une date pour l'affichage dans la liste des doublons
- */
-const formatDuplicateDate = (date: string | Date) => {
-  const d = new Date(date)
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-}
-
-/**
- * Récupère le label d'une étape depuis les traductions i18n
- */
-const getStepLabel = (step: string): string => {
-  const key = `admin.import.steps.${step}`
-  const translated = t(key)
-  // Si la clé n'existe pas, t() retourne la clé elle-même
-  return translated !== key ? translated : step
-}
-
-/**
  * Extrait la première image OG trouvée dans les résultats de test
  */
 const getPreviewedImageUrl = (): string | undefined => {
@@ -991,124 +668,6 @@ const getPreviewedImageUrl = (): string | undefined => {
     }
   }
   return undefined
-}
-
-/**
- * Génère le JSON via SSE (Server-Sent Events)
- * Remplace l'ancien système de polling
- */
-const generateWithSSE = (urls: string[], method: 'direct' | 'agent'): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    const encodedUrls = urls.map((url) => encodeURIComponent(url)).join(',')
-    // Passer l'image trouvée lors du test pour éviter les hallucinations d'URL
-    const previewedImage = getPreviewedImageUrl()
-    let sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
-    if (previewedImage) {
-      sseUrl += `&previewedImageUrl=${encodeURIComponent(previewedImage)}`
-    }
-
-    // withCredentials: true pour envoyer les cookies de session
-    const eventSource = new EventSource(sseUrl, { withCredentials: true })
-    let result: any = null
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        console.log('[SSE] Event received:', data.type)
-
-        switch (data.type) {
-          case 'connected':
-            console.log(`[SSE] Connecté: method=${data.method}, urls=${data.urlCount}`)
-            break
-
-          case 'ping':
-            // Ping pour maintenir la connexion ouverte - ignorer silencieusement
-            break
-
-          case 'step': {
-            // Mettre à jour l'étape en cours et ajouter à l'historique
-            const label = data.label || getStepLabel(data.step)
-            simpleStep.value = data.step
-            stepHistory.value.push({
-              step: data.step,
-              label,
-              timestamp: new Date(),
-            })
-            break
-          }
-
-          case 'progress':
-            // Mettre à jour la progression (spécifique à l'agent)
-            if (method === 'agent') {
-              agentPagesVisited.value = data.urlsVisited || 0
-              agentProgress.value = Math.round((data.urlsVisited / data.maxUrls) * 100)
-            }
-            break
-
-          case 'url_fetched': {
-            console.log(`[SSE] URL récupérée: ${data.currentUrl}`)
-            // Ajouter comme sous-étape de la dernière étape
-            const lastStep = stepHistory.value[stepHistory.value.length - 1]
-            if (lastStep) {
-              if (!lastStep.subSteps) {
-                lastStep.subSteps = []
-              }
-              lastStep.subSteps.push({
-                url: data.currentUrl,
-                timestamp: new Date(),
-              })
-            }
-            break
-          }
-
-          case 'result':
-            result = {
-              success: data.success,
-              json: data.json,
-              provider: data.provider,
-              urlsProcessed: data.urlsProcessed,
-            }
-            if (method === 'agent') {
-              agentPagesVisited.value = data.urlsProcessed || 0
-            }
-            // Ne pas fermer ici, attendre que le serveur ferme
-            break
-
-          case 'error':
-            eventSource.close()
-            reject(new Error(data.message || 'Erreur inconnue'))
-            break
-        }
-      } catch (err) {
-        console.error('[SSE] Erreur parsing:', err)
-      }
-    }
-
-    eventSource.onerror = () => {
-      eventSource.close()
-      // Si on a un résultat, c'est que la connexion s'est fermée normalement après le résultat
-      if (result) {
-        resolve(result)
-      } else {
-        reject(new Error('Connexion SSE perdue'))
-      }
-    }
-
-    // Timeout de sécurité (5 minutes)
-    setTimeout(
-      () => {
-        if (eventSource.readyState !== EventSource.CLOSED) {
-          eventSource.close()
-          if (result) {
-            resolve(result)
-          } else {
-            reject(new Error('Timeout: la génération a pris trop de temps'))
-          }
-        }
-      },
-      5 * 60 * 1000
-    )
-  })
 }
 
 /**
@@ -1154,38 +713,13 @@ const testUrls = async () => {
 }
 
 const generateFromUrls = async () => {
-  generateError.value = ''
-  // Réinitialiser l'état
-  simpleStep.value = ''
-  stepHistory.value = []
-  agentResult.value = null
-  agentProgress.value = 0
-  agentPagesVisited.value = 0
+  // Récupérer l'image prévisualisée pour éviter les hallucinations d'URL
+  const previewedImage = getPreviewedImageUrl()
 
-  // Initialiser le timer pour le temps d'exécution
-  resetTimer()
-  startTimer()
+  // Lancer la génération via le composable
+  const result = await generate(urlsInput.value, previewedImage)
 
-  // Parser et valider les URLs
-  const urlsResult = parseAndValidateUrls(urlsInput.value)
-  if (!urlsResult.success) {
-    generateError.value = urlsResult.error!
-    stopTimer()
-    return
-  }
-  const urls = urlsResult.urls!
-
-  try {
-    generating.value = true
-
-    // Utiliser SSE au lieu du polling
-    const method = generationMethod.value === 'agent' ? 'agent' : 'direct'
-    const result = await generateWithSSE(urls, method)
-
-    if (generationMethod.value === 'agent') {
-      agentResult.value = result
-    }
-
+  if (result) {
     // Mettre le JSON généré dans le champ d'input et le formater
     try {
       const parsed = JSON.parse(result.json)
@@ -1203,12 +737,6 @@ const generateFromUrls = async () => {
       description: t('admin.import.generate_success_description', { provider: result.provider }),
       color: 'success',
     })
-  } catch (error: any) {
-    generateError.value =
-      error?.data?.message || error?.message || t('admin.import.generate_failed')
-  } finally {
-    generating.value = false
-    stopTimer()
   }
 }
 </script>

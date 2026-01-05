@@ -127,14 +127,20 @@ export default wrapApiHandler(
         const finalFolder = `editions/${editionId}`
 
         console.log(`Nom de fichier extrait: ${tempFilename}`)
-        console.log(`Tentative de déplacement de ${tempFolder}/${tempFilename} vers ${finalFolder}/${tempFilename}`)
+        console.log(
+          `Tentative de déplacement de ${tempFolder}/${tempFilename} vers ${finalFolder}/${tempFilename}`
+        )
 
         // getFileLocally prend (filename, filelocation) séparément
-        console.log(`Récupération du path via nuxt-file-storage: ${tempFilename} dans ${tempFolder}`)
+        console.log(
+          `Récupération du path via nuxt-file-storage: ${tempFilename} dans ${tempFolder}`
+        )
         const tempFilePath = getFileLocally(tempFilename, tempFolder)
 
         if (!tempFilePath) {
-          throw new Error(`Fichier temporaire introuvable via nuxt-file-storage: ${tempFolder}/${tempFilename}`)
+          throw new Error(
+            `Fichier temporaire introuvable via nuxt-file-storage: ${tempFolder}/${tempFilename}`
+          )
         }
 
         console.log('Path récupéré:', tempFilePath)

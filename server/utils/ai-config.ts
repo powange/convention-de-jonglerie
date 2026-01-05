@@ -1,3 +1,7 @@
+import { loggers } from './logger'
+
+const log = loggers.aiConfig
+
 /**
  * Utilitaire pour récupérer la configuration IA effective
  *
@@ -5,6 +9,44 @@
  * Pour permettre de configurer l'IA au runtime sans rebuild, on lit
  * process.env en priorité, puis les variables NUXT_*, puis le runtimeConfig.
  */
+
+/**
+ * Timeouts centralisés (en millisecondes)
+ * Configurables via variables d'environnement
+ */
+export const AI_TIMEOUTS = {
+  /** Timeout pour les requêtes HTTP de fetch d'URLs (par défaut: 15s) */
+  URL_FETCH: parseInt(process.env.AI_TIMEOUT_URL_FETCH || '15000', 10),
+
+  /** Timeout pour les appels LLM (par défaut: 3 minutes) */
+  LLM_REQUEST: parseInt(process.env.AI_TIMEOUT_LLM || '180000', 10),
+
+  /** Timeout pour la détection du context length LM Studio (par défaut: 3s) */
+  CONTEXT_LENGTH_DETECTION: parseInt(process.env.AI_TIMEOUT_CONTEXT_DETECTION || '3000', 10),
+
+  /** Timeout SSE côté client (par défaut: 5 minutes) */
+  SSE_CLIENT: parseInt(process.env.AI_TIMEOUT_SSE || '300000', 10),
+
+  /** Durée du cache du context length (par défaut: 5 minutes) */
+  CONTEXT_LENGTH_CACHE: parseInt(process.env.AI_CACHE_CONTEXT_LENGTH || '300000', 10),
+
+  /** Durée du cache du contenu web (par défaut: 5 minutes) */
+  WEB_CONTENT_CACHE: parseInt(process.env.AI_CACHE_WEB_CONTENT || '300000', 10),
+} as const
+
+/**
+ * Limites pour l'agent d'exploration
+ */
+export const AGENT_LIMITS = {
+  /** Nombre maximum de pages à explorer */
+  MAX_ITERATIONS: parseInt(process.env.AI_AGENT_MAX_ITERATIONS || '4', 10),
+
+  /** Taille maximale par page (caractères, par défaut) */
+  DEFAULT_MAX_PAGE_CONTENT_SIZE: 2500,
+
+  /** Taille maximale totale du contenu (caractères, par défaut) */
+  DEFAULT_MAX_TOTAL_CONTENT_SIZE: 10000,
+} as const
 
 /**
  * Récupère la configuration IA effective en lisant process.env en priorité
@@ -52,7 +94,6 @@ export type EffectiveAIConfig = ReturnType<typeof getEffectiveAIConfig>
  */
 let cachedContextLength: number | null = null
 let cacheTimestamp: number = 0
-const CACHE_DURATION_MS = 5 * 60 * 1000 // 5 minutes
 
 /**
  * Valeurs par défaut de context length selon le provider
@@ -71,13 +112,13 @@ export async function getLMStudioContextLength(baseUrl: string): Promise<number>
   const now = Date.now()
 
   // Utiliser le cache si disponible et récent
-  if (cachedContextLength !== null && now - cacheTimestamp < CACHE_DURATION_MS) {
+  if (cachedContextLength !== null && now - cacheTimestamp < AI_TIMEOUTS.CONTEXT_LENGTH_CACHE) {
     return cachedContextLength
   }
 
   try {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000) // 3s timeout
+    const timeout = setTimeout(() => controller.abort(), AI_TIMEOUTS.CONTEXT_LENGTH_DETECTION)
 
     const response = await fetch(`${baseUrl}/v1/models`, {
       signal: controller.signal,
@@ -86,7 +127,7 @@ export async function getLMStudioContextLength(baseUrl: string): Promise<number>
     clearTimeout(timeout)
 
     if (!response.ok) {
-      console.warn(`[AI-CONFIG] Impossible de récupérer les modèles LM Studio: ${response.status}`)
+      log.warn(`Impossible de récupérer les modèles LM Studio: ${response.status}`)
       return DEFAULT_CONTEXT_LENGTHS.lmstudio
     }
 
@@ -102,18 +143,16 @@ export async function getLMStudioContextLength(baseUrl: string): Promise<number>
       cachedContextLength = contextLength
       cacheTimestamp = now
 
-      console.log(
-        `[AI-CONFIG] Context length LM Studio détecté: ${contextLength} tokens (modèle: ${model.id})`
-      )
+      log.info(`Context length LM Studio détecté: ${contextLength} tokens (modèle: ${model.id})`)
       return contextLength
     }
 
     return DEFAULT_CONTEXT_LENGTHS.lmstudio
   } catch (error: any) {
     if (error.name === 'AbortError') {
-      console.warn('[AI-CONFIG] Timeout lors de la récupération du context length LM Studio')
+      log.warn('Timeout lors de la récupération du context length LM Studio')
     } else {
-      console.warn(`[AI-CONFIG] Erreur récupération context length: ${error.message}`)
+      log.warn(`Erreur récupération context length: ${error.message}`)
     }
     return DEFAULT_CONTEXT_LENGTHS.lmstudio
   }
@@ -146,9 +185,7 @@ export async function getMaxContentSizeForProvider(
   if (provider === 'lmstudio' && lmstudioBaseUrl) {
     const contextLength = await getLMStudioContextLength(lmstudioBaseUrl)
     const maxContent = calculateMaxContentSize(contextLength)
-    console.log(
-      `[AI-CONFIG] Max content pour LM Studio: ${maxContent} caractères (context: ${contextLength})`
-    )
+    log.info(`Max content pour LM Studio: ${maxContent} caractères (context: ${contextLength})`)
     return maxContent
   }
 

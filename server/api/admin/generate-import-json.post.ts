@@ -1,8 +1,8 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import {
+  AI_TIMEOUTS,
   getEffectiveAIConfig,
   getMaxContentSizeForProvider,
-  type EffectiveAIConfig,
 } from '@@/server/utils/ai-config'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { createTask, runTaskInBackground, updateTaskMetadata } from '@@/server/utils/async-tasks'
@@ -47,10 +47,6 @@ const requestSchema = z.object({
   // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
   previewedImageUrl: z.string().url().optional(),
 })
-
-// Timeout pour les requêtes HTTP (en ms)
-const URL_FETCH_TIMEOUT = 15000 // 15 secondes par URL
-const LLM_TIMEOUT = 180000 // 3 minutes pour le LLM (modèles locaux peuvent être lents)
 
 // Type pour le résultat de la génération
 export interface GenerateImportResult {
@@ -251,7 +247,7 @@ export async function generateImportJson(
 
       if (useBrowserless) {
         html = await fetchWithBrowserless(browserlessUrl, url, {
-          timeout: URL_FETCH_TIMEOUT,
+          timeout: AI_TIMEOUTS.URL_FETCH,
           waitForNetworkIdle: true,
         })
         console.log(
@@ -261,7 +257,7 @@ export async function generateImportJson(
         const response = await fetchWithTimeout(
           url,
           { headers: BROWSER_HEADERS },
-          URL_FETCH_TIMEOUT
+          AI_TIMEOUTS.URL_FETCH
         )
         if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`)
         html = await response.text()
@@ -284,7 +280,9 @@ export async function generateImportJson(
       }
     } catch (error: any) {
       const errorMsg =
-        error.name === 'AbortError' ? `Timeout après ${URL_FETCH_TIMEOUT / 1000}s` : error.message
+        error.name === 'AbortError'
+          ? `Timeout après ${AI_TIMEOUTS.URL_FETCH / 1000}s`
+          : error.message
       console.error(`[GENERATE-IMPORT] Erreur fetch ${url}: ${errorMsg}`)
       otherContents.push(
         `=== Erreur pour ${url} ===\nImpossible de récupérer le contenu: ${errorMsg}`
@@ -475,7 +473,7 @@ async function callLMStudioComplete(
         max_tokens: 1024,
       }),
     },
-    LLM_TIMEOUT
+    AI_TIMEOUTS.LLM_REQUEST
   )
 
   if (!response.ok) {
@@ -505,7 +503,7 @@ async function callLMStudioComplete(
  */
 async function callAnthropicComplete(apiKey: string, userPrompt: string): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
-  const client = new Anthropic({ apiKey, timeout: LLM_TIMEOUT })
+  const client = new Anthropic({ apiKey, timeout: AI_TIMEOUTS.LLM_REQUEST })
 
   console.log('[GENERATE-IMPORT] Appel Anthropic Complete en cours...')
   const startTime = Date.now()
@@ -636,13 +634,13 @@ async function callLMStudio(
           max_tokens: 1024,
         }),
       },
-      LLM_TIMEOUT
+      AI_TIMEOUTS.LLM_REQUEST
     )
   } catch (error: any) {
     if (error.name === 'AbortError') {
       throw createError({
         statusCode: 504,
-        message: `Timeout LM Studio: le modèle n'a pas répondu dans les ${LLM_TIMEOUT / 1000} secondes. Essayez avec moins d'URLs ou un modèle plus rapide.`,
+        message: `Timeout LM Studio: le modèle n'a pas répondu dans les ${AI_TIMEOUTS.LLM_REQUEST / 1000} secondes. Essayez avec moins d'URLs ou un modèle plus rapide.`,
       })
     }
     throw createError({
@@ -691,7 +689,7 @@ async function callAnthropic(apiKey: string, content: string): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
   const client = new Anthropic({
     apiKey,
-    timeout: LLM_TIMEOUT, // Timeout de 2 minutes
+    timeout: AI_TIMEOUTS.LLM_REQUEST, // Timeout de 2 minutes
   })
 
   console.log('[GENERATE-IMPORT] Appel Anthropic en cours...')
