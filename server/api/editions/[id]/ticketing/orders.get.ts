@@ -62,6 +62,14 @@ export default wrapApiHandler(
           .filter((m) => ['cash', 'card', 'check', 'pending', 'unknown'].includes(m))
       : []
 
+    // Parse le filtre par type d'item (Registration, Donation, Membership, Payment)
+    const itemTypesParam = (query.itemTypes as string) || ''
+    const itemTypes = itemTypesParam
+      ? itemTypesParam
+          .split(',')
+          .filter((t) => ['Registration', 'Donation', 'Membership', 'Payment'].includes(t))
+      : []
+
     // Parse les filtres de champs personnalisés (format JSON array)
     const customFieldFiltersParam = (query.customFieldFilters as string) || ''
     let customFieldFilters: CustomFieldFilter[] = []
@@ -170,6 +178,13 @@ export default wrapApiHandler(
               optionId: { in: optionIds },
             },
           },
+        })
+      }
+
+      // Ajouter le filtre par type d'item (Participant, Donation, Membership, Payment)
+      if (itemTypes.length > 0) {
+        itemsConditions.push({
+          type: { in: itemTypes },
         })
       }
 

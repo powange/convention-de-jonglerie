@@ -173,7 +173,7 @@ export default wrapApiHandler(
               lastName: participant.lastName,
               email: participant.email,
               name: tier.name,
-              type: null,
+              type: 'Registration',
               amount: itemPrice,
               state: body.paymentMethod ? 'Processed' : 'Pending',
               qrCode, // Même QR code pour tous les items de la commande

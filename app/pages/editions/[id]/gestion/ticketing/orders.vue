@@ -287,6 +287,35 @@
                     multiple
                   />
                 </div>
+
+                <!-- Filtre par type d'item -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Type de billet
+                  </label>
+                  <USelect
+                    v-model="itemTypeFilter"
+                    :items="itemTypeOptions"
+                    placeholder="Tous les types"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                    multiple
+                  >
+                    <template #default="{ modelValue }">
+                      <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                        {{ modelValue.length }}
+                        {{
+                          modelValue.length > 1
+                            ? $t('common.items_selected')
+                            : $t('common.item_selected')
+                        }}
+                      </span>
+                      <span v-else class="text-gray-400 dark:text-gray-500"> Tous les types </span>
+                    </template>
+                  </USelect>
+                </div>
               </div>
 
               <!-- Filtres par champs personnalisés -->
@@ -431,17 +460,43 @@
         <div v-else class="space-y-4">
           <UCard v-for="order in orders" :key="order.id" class="hover:shadow-md transition-shadow">
             <!-- En-tête de la commande -->
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                  <UIcon name="i-heroicons-shopping-cart" class="h-5 w-5 text-primary-600" />
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <div class="flex items-start gap-3 mb-4">
+              <!-- Contenu principal -->
+              <div class="flex-1 min-w-0">
+                <!-- Ligne 1 : icône + nom + badge annulée -->
+                <div class="flex items-center gap-2 mb-2">
+                  <UPopover mode="click">
+                    <UIcon
+                      name="i-heroicons-shopping-cart"
+                      class="h-5 w-5 text-green-600 cursor-pointer flex-shrink-0"
+                    />
+                    <template #content>
+                      <div class="p-2">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">ID commande</p>
+                        <p class="font-mono text-sm font-medium text-gray-900 dark:text-white">
+                          #{{ order.id }}
+                        </p>
+                      </div>
+                    </template>
+                  </UPopover>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                    :title="`${order.payerFirstName} ${order.payerLastName}`"
+                  >
                     {{ order.payerFirstName }} {{ order.payerLastName }}
                   </h3>
                   <!-- Badge Annulée (seulement si la commande est annulée) -->
-                  <UBadge v-if="order.status === 'Refunded'" color="error" variant="soft">
+                  <UBadge
+                    v-if="order.status === 'Refunded'"
+                    color="error"
+                    variant="soft"
+                    class="flex-shrink-0"
+                  >
                     Annulée
                   </UBadge>
+                </div>
+                <!-- Ligne 2 : badges origine et paiement -->
+                <div class="flex flex-wrap items-center gap-2 mb-2">
                   <!-- Badge origine : En ligne vs Sur place -->
                   <UPopover
                     v-if="order.externalTicketing?.provider === 'HELLOASSO'"
@@ -497,19 +552,22 @@
                     <template #leading>
                       <UIcon name="i-heroicons-exclamation-triangle" class="h-3 w-3" />
                     </template>
-                    Payé - Méthode non renseignée
+                    <span class="hidden sm:inline">Payé - Méthode non renseignée</span>
+                    <span class="sm:hidden">À définir</span>
                   </UBadge>
                   <UBadge v-else-if="order.paymentMethod === 'cash'" color="success" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-banknotes" class="h-3 w-3" />
                     </template>
-                    Payé - Liquide
+                    <span class="hidden sm:inline">Payé - Liquide</span>
+                    <span class="sm:hidden">Liquide</span>
                   </UBadge>
                   <UBadge v-else-if="order.paymentMethod === 'card'" color="success" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-credit-card" class="h-3 w-3" />
                     </template>
-                    Payé - Carte
+                    <span class="hidden sm:inline">Payé - Carte</span>
+                    <span class="sm:hidden">Carte</span>
                   </UBadge>
                   <UBadge
                     v-else-if="order.paymentMethod === 'check'"
@@ -520,49 +578,47 @@
                     <template #leading>
                       <UIcon name="i-heroicons-document-text" class="h-3 w-3" />
                     </template>
-                    Payé - Chèque{{ order.checkNumber ? ` n°${order.checkNumber}` : '' }}
+                    <span class="hidden sm:inline">
+                      Payé - Chèque{{ order.checkNumber ? ` n°${order.checkNumber}` : '' }}
+                    </span>
+                    <span class="sm:hidden">Chèque</span>
                   </UBadge>
                   <UBadge v-else-if="order.status === 'Pending'" color="warning" variant="soft">
                     <template #leading>
                       <UIcon name="i-heroicons-clock" class="h-3 w-3" />
                     </template>
-                    En attente de paiement
+                    <span class="hidden sm:inline">En attente de paiement</span>
+                    <span class="sm:hidden">En attente</span>
                   </UBadge>
                 </div>
-                <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-envelope" class="h-4 w-4" />
-                    {{ order.payerEmail }}
+                <!-- Ligne 3 : email et date -->
+                <div
+                  class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-gray-600 dark:text-gray-400"
+                >
+                  <div class="flex items-center gap-1 min-w-0">
+                    <UIcon name="i-heroicons-envelope" class="h-4 w-4 flex-shrink-0" />
+                    <span class="truncate">{{ order.payerEmail }}</span>
                   </div>
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1 flex-shrink-0">
                     <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
                     {{ formatDate(order.orderDate) }}
                   </div>
-                  <div class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-hashtag" class="h-4 w-4" />
-                    <span class="font-mono text-xs">{{ order.id }}</span>
-                  </div>
                 </div>
               </div>
-              <div class="text-right flex flex-col items-end gap-2">
+              <!-- Montant + menu actions -->
+              <div class="flex items-start gap-2 flex-shrink-0">
                 <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {{ (order.amount / 100).toFixed(2) }}€
                 </div>
-                <!-- Bouton d'annulation/suppression (seulement pour les commandes manuelles) -->
-                <UButton
-                  v-if="!order.externalTicketing"
-                  :color="order.status === 'Refunded' ? 'error' : 'warning'"
-                  variant="soft"
-                  size="sm"
-                  :icon="order.status === 'Refunded' ? 'i-heroicons-trash' : 'i-heroicons-x-circle'"
-                  @click="showCancelModal(order)"
-                >
-                  {{
-                    order.status === 'Refunded'
-                      ? $t('ticketing.orders.delete_order')
-                      : $t('ticketing.orders.cancel_order')
-                  }}
-                </UButton>
+                <!-- Menu d'actions -->
+                <UDropdownMenu :items="getOrderMenuItems(order)" :ui="{ content: 'min-w-48' }">
+                  <UButton
+                    icon="i-heroicons-ellipsis-vertical"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                  />
+                </UDropdownMenu>
               </div>
             </div>
 
@@ -585,11 +641,21 @@
               >
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1">
-                    <UIcon
-                      name="i-heroicons-ticket"
-                      class="h-4 w-4 flex-shrink-0"
-                      :class="item.entryValidated ? 'text-green-600' : 'text-gray-500'"
-                    />
+                    <UPopover mode="click">
+                      <UIcon
+                        :name="getItemIconInfo(item.type).icon"
+                        class="h-4 w-4 flex-shrink-0 cursor-pointer"
+                        :class="getItemIconInfo(item.type).color"
+                      />
+                      <template #content>
+                        <div class="p-2">
+                          <p class="text-xs text-gray-500 dark:text-gray-400">ID billet</p>
+                          <p class="font-mono text-sm font-medium text-gray-900 dark:text-white">
+                            #{{ item.id }}
+                          </p>
+                        </div>
+                      </template>
+                    </UPopover>
                     <span
                       class="font-medium text-sm"
                       :class="
@@ -605,13 +671,9 @@
                       Entrée validée
                     </UBadge>
                   </div>
-                  <div class="text-xs text-gray-600 dark:text-gray-400 space-y-0.5">
-                    <div class="flex items-center gap-1">
-                      <UIcon name="i-heroicons-hashtag" class="h-3 w-3" />
-                      <span class="font-mono text-xs">{{ item.id }}</span>
-                    </div>
+                  <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                     <div v-if="item.firstName || item.lastName">
-                      <UIcon name="i-heroicons-user" class="h-3 w-3 inline mr-1" />
+                      <UIcon name="i-heroicons-user" class="h-4 w-4 inline mr-1" />
                       {{ item.firstName }} {{ item.lastName }}
                       <span v-if="item.email" class="ml-1">({{ item.email }})</span>
                     </div>
@@ -621,14 +683,14 @@
                         Array.isArray(item.customFields) &&
                         item.customFields.length > 0
                       "
-                      class="space-y-0.5 mt-1"
+                      class="space-y-1 mt-1"
                     >
                       <div
                         v-for="field in item.customFields"
                         :key="field.name"
                         class="flex items-start gap-1"
                       >
-                        <UIcon name="i-heroicons-tag" class="h-3 w-3 inline flex-shrink-0 mt-0.5" />
+                        <UIcon name="i-heroicons-tag" class="h-4 w-4 inline flex-shrink-0 mt-0.5" />
                         <span class="font-medium">{{ field.name }} :</span>
                         <span class="text-gray-500 dark:text-gray-500">{{ field.answer }}</span>
                       </div>
@@ -636,7 +698,7 @@
                     <!-- Options sélectionnées -->
                     <div
                       v-if="item.selectedOptions && item.selectedOptions.length > 0"
-                      class="space-y-0.5 mt-1"
+                      class="space-y-1 mt-1"
                     >
                       <div
                         v-for="selectedOption in item.selectedOptions"
@@ -645,7 +707,7 @@
                       >
                         <UIcon
                           name="i-heroicons-check-circle"
-                          class="h-3 w-3 inline flex-shrink-0 mt-0.5 text-primary-500"
+                          class="h-4 w-4 inline flex-shrink-0 mt-0.5 text-primary-500"
                         />
                         <span class="font-medium">{{ selectedOption.option.name }}</span>
                         <span
@@ -656,70 +718,47 @@
                         </span>
                       </div>
                     </div>
-                    <div
-                      v-if="
-                        item.qrCode &&
-                        item.type !== 'Donation' &&
-                        item.type !== 'Membership' &&
-                        item.type !== 'Payment'
-                      "
-                    >
-                      <UButton
-                        color="primary"
-                        variant="soft"
-                        size="sm"
-                        icon="i-heroicons-qr-code"
-                        @click="showQrCode(item)"
-                      >
-                        QR Code
-                      </UButton>
-                    </div>
                   </div>
                 </div>
-                <div class="text-right flex-shrink-0 flex flex-col items-end gap-2">
-                  <div class="font-semibold text-sm text-primary-600 dark:text-primary-400">
-                    {{ getItemTotalAmount(item) }}€
+                <!-- Montant + statut + menu actions -->
+                <div class="flex items-start gap-2 flex-shrink-0">
+                  <div class="text-right flex flex-col items-end gap-1">
+                    <div class="font-bold text-lg text-primary-600 dark:text-primary-400">
+                      {{ getItemTotalAmount(item) }}€
+                    </div>
+                    <UBadge
+                      :color="
+                        item.state === 'Processed'
+                          ? 'success'
+                          : item.state === 'Pending'
+                            ? 'warning'
+                            : item.state === 'Canceled'
+                              ? 'error'
+                              : 'neutral'
+                      "
+                      variant="subtle"
+                      size="sm"
+                    >
+                      {{
+                        item.state === 'Processed'
+                          ? 'Traité'
+                          : item.state === 'Pending'
+                            ? 'En attente'
+                            : item.state === 'Canceled'
+                              ? 'Annulé'
+                              : item.state
+                      }}
+                    </UBadge>
                   </div>
-                  <UBadge
-                    :color="
-                      item.state === 'Processed'
-                        ? 'success'
-                        : item.state === 'Pending'
-                          ? 'warning'
-                          : item.state === 'Canceled'
-                            ? 'error'
-                            : 'neutral'
-                    "
-                    variant="subtle"
-                    size="sm"
-                  >
-                    {{
-                      item.state === 'Processed'
-                        ? 'Traité'
-                        : item.state === 'Pending'
-                          ? 'En attente'
-                          : item.state === 'Canceled'
-                            ? 'Annulé'
-                            : item.state
-                    }}
-                  </UBadge>
-                  <!-- Bouton de validation/invalidation -->
-                  <UButton
-                    v-if="
-                      item.type !== 'Donation' &&
-                      item.type !== 'Membership' &&
-                      item.type !== 'Payment'
-                    "
-                    :color="item.entryValidated ? 'warning' : 'success'"
-                    variant="soft"
-                    size="sm"
-                    :icon="
-                      item.entryValidated ? 'i-heroicons-x-circle' : 'i-heroicons-check-circle'
-                    "
-                    @click="showValidateModal(item)"
-                  >
-                    {{ item.entryValidated ? 'Invalider' : 'Valider' }}
-                  </UButton>
+                  <!-- Menu d'actions du billet -->
+                  <UDropdownMenu :items="getItemMenuItems(item)" :ui="{ content: 'min-w-40' }">
+                    <UButton
+                      icon="i-heroicons-ellipsis-vertical"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                    />
+                  </UDropdownMenu>
                 </div>
               </div>
             </div>
@@ -1338,7 +1377,12 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { fetchOrders, type Order, type CustomFieldFilter } from '~/utils/ticketing/orders'
+import {
+  fetchOrders,
+  type Order,
+  type CustomFieldFilter,
+  type ItemType,
+} from '~/utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '~/utils/ticketing/tiers'
 
 definePageMeta({
@@ -1378,6 +1422,7 @@ const selectedTierIds = ref<number[]>([])
 const selectedOptionIds = ref<number[]>([])
 const entryStatusFilter = ref<'all' | 'validated' | 'not_validated'>('all')
 const paymentMethodFilter = ref<Array<'cash' | 'card' | 'check' | 'pending' | 'unknown'>>([])
+const itemTypeFilter = ref<ItemType[]>([])
 const isFiltersOpen = ref(false)
 
 // Filtres par champs personnalisés (support de plusieurs filtres)
@@ -1412,6 +1457,28 @@ const paymentMethodOptions = [
   { label: 'Méthode non renseignée', value: 'unknown' },
 ]
 
+// Options pour le filtre de type d'item
+const itemTypeOptions = [
+  { label: 'Billets', value: 'Registration', icon: 'i-heroicons-ticket' },
+  { label: 'Donations', value: 'Donation', icon: 'i-heroicons-heart' },
+  { label: 'Adhésions', value: 'Membership', icon: 'i-heroicons-user-group' },
+  { label: 'Paiements', value: 'Payment', icon: 'i-heroicons-banknotes' },
+]
+
+// Icône et couleur selon le type d'item
+const getItemIconInfo = (type: string | null) => {
+  switch (type) {
+    case 'Donation':
+      return { icon: 'i-heroicons-heart', color: 'text-pink-600' }
+    case 'Membership':
+      return { icon: 'i-heroicons-user-group', color: 'text-purple-600' }
+    case 'Payment':
+      return { icon: 'i-heroicons-banknotes', color: 'text-green-600' }
+    default:
+      return { icon: 'i-heroicons-ticket', color: 'text-blue-600' }
+  }
+}
+
 // Modal QR Code
 const isQrModalOpen = ref(false)
 const selectedItem = ref<any>(null)
@@ -1419,6 +1486,95 @@ const selectedItem = ref<any>(null)
 const showQrCode = (item: any) => {
   selectedItem.value = item
   isQrModalOpen.value = true
+}
+
+// Génère les items du menu d'actions pour une commande
+const getOrderMenuItems = (order: Order) => {
+  const items: any[][] = []
+
+  // Groupe 1 : Définir méthode de paiement (si applicable)
+  if (
+    !order.externalTicketing &&
+    (order.status === 'Processed' || order.status === 'Onsite') &&
+    !order.paymentMethod
+  ) {
+    items.push([
+      {
+        label: 'Définir le paiement',
+        icon: 'i-heroicons-credit-card',
+        onSelect: () => openPaymentMethodModal(order),
+      },
+    ])
+  }
+
+  // Groupe 2 : Annuler/Supprimer (commandes manuelles uniquement)
+  if (!order.externalTicketing) {
+    const isRefunded = order.status === 'Refunded'
+    items.push([
+      {
+        label: isRefunded
+          ? $t('ticketing.orders.delete_order')
+          : $t('ticketing.orders.cancel_order'),
+        icon: isRefunded ? 'i-heroicons-trash' : 'i-heroicons-x-circle',
+        color: 'error' as const,
+        onSelect: () => showCancelModal(order),
+      },
+    ])
+  }
+
+  // Si aucune action disponible, afficher un message
+  if (items.length === 0) {
+    items.push([
+      {
+        label: 'Aucune action disponible',
+        disabled: true,
+      },
+    ])
+  }
+
+  return items
+}
+
+// Génère les items du menu d'actions pour un billet
+const getItemMenuItems = (item: any) => {
+  const items: any[][] = []
+  const isSpecialType =
+    item.type === 'Donation' || item.type === 'Membership' || item.type === 'Payment'
+
+  // Groupe 1 : QR Code (si disponible)
+  if (item.qrCode && !isSpecialType) {
+    items.push([
+      {
+        label: 'Afficher le QR Code',
+        icon: 'i-heroicons-qr-code',
+        onSelect: () => showQrCode(item),
+      },
+    ])
+  }
+
+  // Groupe 2 : Valider/Invalider l'entrée (sauf donations, adhésions, paiements)
+  if (!isSpecialType) {
+    items.push([
+      {
+        label: item.entryValidated ? "Invalider l'entrée" : "Valider l'entrée",
+        icon: item.entryValidated ? 'i-heroicons-x-circle' : 'i-heroicons-check-circle',
+        color: item.entryValidated ? ('warning' as const) : ('success' as const),
+        onSelect: () => showValidateModal(item),
+      },
+    ])
+  }
+
+  // Si aucune action disponible
+  if (items.length === 0) {
+    items.push([
+      {
+        label: 'Aucune action',
+        disabled: true,
+      },
+    ])
+  }
+
+  return items
 }
 
 // Modal détails des montants
@@ -1658,6 +1814,7 @@ const loadOrders = async () => {
       optionIds: selectedOptionIds.value.length > 0 ? selectedOptionIds.value : undefined,
       entryStatus: entryStatusFilter.value,
       paymentMethods: paymentMethodFilter.value.length > 0 ? paymentMethodFilter.value : undefined,
+      itemTypes: itemTypeFilter.value.length > 0 ? itemTypeFilter.value : undefined,
       customFieldFilters:
         customFieldFilters.value.length > 0 ? customFieldFilters.value : undefined,
       customFieldFilterMode: customFieldFilterMode.value,
@@ -1746,6 +1903,7 @@ const activeFiltersCount = computed(() => {
   if (selectedOptionIds.value.length > 0) count += selectedOptionIds.value.length
   if (entryStatusFilter.value !== 'all') count += 1
   if (paymentMethodFilter.value.length > 0) count += paymentMethodFilter.value.length
+  if (itemTypeFilter.value.length > 0) count += itemTypeFilter.value.length
   count += customFieldFilters.value.length
   return count
 })
@@ -1756,6 +1914,7 @@ const resetFilters = () => {
   selectedOptionIds.value = []
   entryStatusFilter.value = 'all'
   paymentMethodFilter.value = []
+  itemTypeFilter.value = []
   customFieldFilters.value = []
   customFieldFilterMode.value = 'and'
   newFilterName.value = ''
@@ -1776,6 +1935,7 @@ watch(
     selectedOptionIds,
     entryStatusFilter,
     paymentMethodFilter,
+    itemTypeFilter,
     customFieldFilters,
     customFieldFilterMode,
   ],

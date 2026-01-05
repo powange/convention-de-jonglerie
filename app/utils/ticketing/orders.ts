@@ -85,6 +85,8 @@ export interface CustomFieldFilter {
   value: string
 }
 
+export type ItemType = 'Registration' | 'Donation' | 'Membership' | 'Payment'
+
 export async function fetchOrders(
   editionId: number,
   options?: {
@@ -95,6 +97,7 @@ export async function fetchOrders(
     optionIds?: number[]
     entryStatus?: 'all' | 'validated' | 'not_validated'
     paymentMethods?: Array<'cash' | 'card' | 'check' | 'pending' | 'unknown'>
+    itemTypes?: ItemType[]
     customFieldFilters?: CustomFieldFilter[]
     customFieldFilterMode?: 'and' | 'or'
   }
@@ -114,6 +117,9 @@ export async function fetchOrders(
   }
   if (options?.paymentMethods && options.paymentMethods.length > 0) {
     params.append('paymentMethods', options.paymentMethods.join(','))
+  }
+  if (options?.itemTypes && options.itemTypes.length > 0) {
+    params.append('itemTypes', options.itemTypes.join(','))
   }
   if (options?.customFieldFilters && options.customFieldFilters.length > 0) {
     params.append('customFieldFilters', JSON.stringify(options.customFieldFilters))
