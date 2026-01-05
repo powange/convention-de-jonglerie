@@ -1,1027 +1,1214 @@
-# Analyse Complète du Codebase - Convention de Jonglerie
+# Analyse Complete du Codebase - Juggling Convention
 
-## Table des Matières
+## Table des matieres
 
-1. [Vue d'ensemble du Projet](#vue-densemble-du-projet)
-2. [Stack Technique](#stack-technique)
-3. [Architecture Globale](#architecture-globale)
-4. [Structure des Répertoires](#structure-des-répertoires)
-5. [Schéma de Base de Données](#schéma-de-base-de-données)
-6. [Endpoints API](#endpoints-api)
-7. [Système d'Authentification](#système-dauthentification)
-8. [Système de Permissions](#système-de-permissions)
-9. [Système de Notifications](#système-de-notifications)
-10. [Internationalisation](#internationalisation)
-11. [Tests](#tests)
-12. [Docker et Déploiement](#docker-et-déploiement)
-13. [Intégrations Externes](#intégrations-externes)
-14. [Recommandations](#recommandations)
-
----
-
-## Vue d'ensemble du Projet
-
-**Type:** Application web full-stack pour la gestion et découverte de conventions de jonglerie
-
-**Objectif:** Plateforme collaborative permettant aux jongleurs et organisateurs d'événements de :
-
-- Consulter et découvrir des conventions
-- Gérer des éditions d'événements
-- Gérer les bénévoles, artistes, ateliers
-- Système de billetterie intégré ou externe
-- Covoiturage, objets trouvés, messagerie
-- Notifications multi-canal (in-app, push, email)
-
-**Version Node:** >= 22 < 26
+1. [Vue d'ensemble](#vue-densemble)
+2. [Structure des repertoires](#structure-des-repertoires)
+3. [Architecture technique](#architecture-technique)
+4. [Modele de donnees](#modele-de-donnees)
+5. [API Endpoints](#api-endpoints)
+6. [Frontend - Pages et composants](#frontend---pages-et-composants)
+7. [Gestion d'etat (Pinia Stores)](#gestion-detat-pinia-stores)
+8. [Systeme d'authentification](#systeme-dauthentification)
+9. [Internationalisation (i18n)](#internationalisation-i18n)
+10. [Tests](#tests)
+11. [Patterns et conventions](#patterns-et-conventions)
+12. [Diagrammes d'architecture](#diagrammes-darchitecture)
+13. [Recommandations](#recommandations)
 
 ---
 
-## Stack Technique
+## Vue d'ensemble
 
-### Frontend
+### Description du projet
 
-- **Nuxt.js** 4.2.0 - Framework Vue.js universel
-- **Vue.js** 3.5.17 - Framework JavaScript réactif
-- **Nuxt UI** 4.0.0 - Composants UI avec Tailwind CSS
-- **Pinia** 3.0.3 - Gestion d'état
-- **TypeScript** 5.8.3
-- **VueUse** 13.6.0 - Composables Vue
-- **Nuxt i18n** 10.0.3 - 13 langues supportées
+**Juggling Convention** est une application web full-stack permettant de gerer et decouvrir des conventions de jonglerie. La plateforme offre :
 
-### Backend
+- Consultation et gestion de conventions et editions
+- Systeme de favoris
+- Gestion des benevoles avec planning
+- Covoiturage collaboratif
+- Billetterie integree (HelloAsso)
+- Gestion des artistes et spectacles
+- Messagerie interne
+- Workshops et ateliers
+- Objets perdus/trouves
 
-- **Nitro** (intégré Nuxt) - Moteur serveur
-- **Prisma** 7.0.0 - ORM
-- **MySQL/MariaDB** - Base de données
-- **nuxt-auth-utils** 0.5.23 - Sessions scellées
-- **bcryptjs** 3.0.2 - Hachage mots de passe
+### Stack technologique
 
-### Visualisation & UI
+| Categorie | Technologies |
+|-----------|-------------|
+| **Framework** | Nuxt.js 4.2.0 / Vue.js 3.5.17 |
+| **UI** | Nuxt UI 4.0.0 / Tailwind CSS |
+| **State Management** | Pinia 3.0.3 |
+| **Backend** | Nitro (integre a Nuxt) |
+| **ORM** | Prisma 7.0.0 |
+| **Base de donnees** | MySQL |
+| **Authentification** | nuxt-auth-utils 0.5.23 (sessions/cookies) |
+| **i18n** | @nuxtjs/i18n 10.0.3 (13 langues) |
+| **Tests** | Vitest 3.2.4 / Nuxt Test Utils |
+| **Validation** | Zod 4.1.9 |
+| **Calendrier** | FullCalendar 6.1.15 |
+| **Graphiques** | Chart.js 4.5.1 |
+| **Notifications** | Firebase Cloud Messaging |
 
-- **FullCalendar** 6.1.15+ - Calendrier interactif
-- **Chart.js** 4.5.1 - Graphiques
-- **html5-qrcode** 2.3.8 - Scanner QR
-- **jspdf** 3.0.3 - Génération PDF
+### Contraintes techniques
 
-### Communication
-
-- **Firebase Cloud Messaging** - Push notifications
-- **Server-Sent Events** - Notifications temps réel
-- **Nodemailer** 7.0.5 - Emails
-- **Vue Email** 0.0.21 - Templates email
-
-### Tests
-
-- **Vitest** 3.2.4 - 4 projets de test
-- **@nuxt/test-utils** 3.19.2
-- **happy-dom** 18.0.1
-- **@testing-library/vue** 8.1.0
-
-### Autres
-
-- **Anthropic Claude API** - Analyse IA d'images
-- **Luxon** 3.5.0 - Manipulation dates
-- **Zod** 4.1.9 - Validation schémas
+- Node.js >= 22 < 26
+- Application PWA installable
+- Support de 13 langues
+- Deploiement Docker
 
 ---
 
-## Architecture Globale
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CLIENT (Browser)                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │ Vue 3 Pages  │  │ Composables  │  │ Pinia Stores │          │
-│  │ Nuxt UI      │  │ useAuth      │  │ auth.ts      │          │
-│  │ Components   │  │ useNotif...  │  │ notifications│          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-│         │                  │                  │                  │
-│         └──────────────────┴──────────────────┘                  │
-│                            │                                     │
-│                    ┌───────▼────────┐                           │
-│                    │ SSE Stream     │◄────┐                     │
-│                    │ FCM Push       │     │                     │
-│                    └────────────────┘     │                     │
-└─────────────────────────────────────────────────────────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   NUXT 4 SSR    │
-                    └────────┬────────┘
-                             │
-┌─────────────────────────────────────────────────────────────────┐
-│                      SERVER (Nitro)                              │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                    API Endpoints (314)                    │  │
-│  │  /api/auth/*  /api/conventions/*  /api/editions/*        │  │
-│  │  /api/admin/*  /api/notifications/*  /api/messenger/*    │  │
-│  └──────────────────────┬───────────────────────────────────┘  │
-│                         │                                        │
-│  ┌──────────────────────▼───────────────────────────────────┐  │
-│  │              Server Utils & Services                      │  │
-│  │  ┌─────────────┐ ┌──────────────┐ ┌──────────────┐      │  │
-│  │  │ Permissions │ │ Notification │ │ Email Service│      │  │
-│  │  │ Helpers     │ │ Service      │ │              │      │  │
-│  │  └─────────────┘ └──────────────┘ └──────────────┘      │  │
-│  │  ┌─────────────┐ ┌──────────────┐                        │  │
-│  │  │ SSE Stream  │ │ Firebase     │                        │  │
-│  │  │ Manager     │ │ Admin        │                        │  │
-│  │  └─────────────┘ └──────────────┘                        │  │
-│  └──────────────────────┬───────────────────────────────────┘  │
-│                         │                                        │
-│  ┌──────────────────────▼───────────────────────────────────┐  │
-│  │                  Prisma ORM                               │  │
-│  └──────────────────────┬───────────────────────────────────┘  │
-└─────────────────────────┼────────────────────────────────────────┘
-                          │
-                ┌─────────▼──────────┐
-                │  MySQL/MariaDB     │
-                │  50+ Tables        │
-                └────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                   EXTERNAL SERVICES                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │ HelloAsso    │  │ Firebase FCM │  │ Anthropic AI │          │
-│  │ Ticketing    │  │ Push Notifs  │  │ Image OCR    │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Structure des Répertoires
+## Structure des repertoires
 
 ```
 convention-de-jonglerie/
 ├── app/                          # Frontend Nuxt
-│   ├── assets/                   # CSS, fonts (22 fichiers)
-│   ├── components/               # Composants Vue réutilisables
-│   │   ├── edition/              # Composants spécifiques éditions
-│   │   ├── admin/                # Composants admin
-│   │   └── ui/                   # Composants UI génériques
-│   ├── composables/              # Hooks Vue (37 composables)
-│   │   ├── useAuth.ts
-│   │   ├── useNotificationStream.ts
-│   │   ├── useFirebaseMessaging.ts
-│   │   ├── useMessenger.ts
-│   │   └── ...
-│   ├── layouts/                  # Layouts Nuxt (5 layouts)
-│   ├── middleware/               # Middlewares de route (2 middlewares)
-│   ├── pages/                    # Pages Vue (57 pages)
+│   ├── assets/                   # Ressources statiques (CSS, images)
+│   ├── components/               # Composants Vue reutilisables (~100+)
+│   │   ├── admin/                # Composants administration
+│   │   ├── artists/              # Gestion des artistes
+│   │   ├── convention/           # Composants convention
+│   │   ├── edition/              # Composants edition
+│   │   │   ├── carpool/          # Covoiturage
+│   │   │   ├── ticketing/        # Billetterie
+│   │   │   └── volunteer/        # Benevoles
+│   │   ├── feedback/             # Retours utilisateurs
+│   │   ├── management/           # Gestion
+│   │   ├── notifications/        # Centre de notifications
+│   │   ├── organizer/            # Organisateurs
+│   │   ├── organizers/           # Gestion organisateurs
+│   │   ├── shows/                # Spectacles
+│   │   ├── ticketing/            # Billetterie
+│   │   ├── ui/                   # Composants UI generiques
+│   │   ├── volunteers/           # Benevoles
+│   │   └── workshops/            # Ateliers
+│   ├── composables/              # Hooks Vue reutilisables (~40)
+│   ├── layouts/                  # Layouts Nuxt (3)
+│   │   ├── default.vue           # Layout principal
+│   │   ├── edition-dashboard.vue # Dashboard edition
+│   │   └── messenger.vue         # Layout messagerie
+│   ├── middleware/               # Middlewares client (6)
+│   ├── pages/                    # Pages de l'application (~60)
 │   │   ├── admin/                # Pages admin
-│   │   ├── gestion/              # Pages gestion événements
-│   │   ├── my-editions/          # Pages utilisateur
-│   │   └── ...
-│   ├── plugins/                  # Plugins Nuxt (1 plugin)
-│   ├── stores/                   # Stores Pinia (5 stores)
-│   │   ├── auth.ts
-│   │   ├── notifications.ts
-│   │   ├── editions.ts
-│   │   ├── favoritesEditions.ts
-│   │   └── impersonation.ts
-│   └── utils/                    # Utilitaires client (6 fichiers)
-│
-├── server/                       # Backend Nitro
-│   ├── api/                      # Endpoints API (314 fichiers)
-│   │   ├── admin/                # Routes admin
 │   │   ├── auth/                 # Authentification
-│   │   ├── conventions/          # CRUD conventions
-│   │   ├── editions/             # CRUD éditions + ressources
-│   │   ├── notifications/        # Système notifications
+│   │   ├── conventions/          # Conventions
+│   │   └── editions/             # Editions et gestion
+│   ├── plugins/                  # Plugins Nuxt (5)
+│   ├── stores/                   # Stores Pinia (5)
+│   └── types/                    # Types TypeScript
+├── server/                       # Backend Nitro
+│   ├── api/                      # Endpoints API (~150+)
+│   │   ├── admin/                # API administration
+│   │   ├── auth/                 # Authentification
+│   │   ├── carpool-offers/       # Offres covoiturage
+│   │   ├── carpool-requests/     # Demandes covoiturage
+│   │   ├── conventions/          # Conventions
+│   │   ├── editions/             # Editions
+│   │   │   └── [id]/             # Operations par edition
+│   │   │       ├── ticketing/    # Billetterie
+│   │   │       ├── volunteers/   # Benevoles
+│   │   │       └── workshops/    # Ateliers
+│   │   ├── feedback/             # Retours
+│   │   ├── files/                # Upload fichiers
 │   │   ├── messenger/            # Messagerie
-│   │   ├── carpool-*/            # Covoiturage
-│   │   └── ...
-│   ├── middleware/               # Middlewares serveur (1 middleware)
-│   ├── routes/                   # Routes serveur SSE (1 route)
-│   ├── tasks/                    # Tâches Nitro cron (6 tâches)
-│   └── utils/                    # Utilitaires serveur (56 fichiers)
-│       ├── notification-service.ts
-│       ├── notification-stream-manager.ts
-│       ├── firebase-admin.ts
-│       ├── emailService.ts
-│       ├── prisma.ts
-│       ├── permissions/          # Helpers permissions
-│       └── editions/ticketing/   # Logique billetterie
-│
-├── prisma/                       # Prisma ORM
-│   ├── schema.prisma             # Schéma DB (50+ modèles)
-│   ├── migrations/               # Migrations DB
-│   └── seed.ts                   # Données de seed
-│
+│   │   ├── notifications/        # Notifications
+│   │   ├── profile/              # Profil utilisateur
+│   │   └── users/                # Utilisateurs
+│   ├── generated/                # Client Prisma genere
+│   ├── middleware/               # Middlewares serveur (3)
+│   ├── types/                    # Types API
+│   └── utils/                    # Utilitaires serveur (~70)
+│       ├── editions/             # Utilitaires editions
+│       │   ├── ticketing/        # Billetterie
+│       │   └── volunteers/       # Benevoles
+│       └── permissions/          # Gestion permissions
+├── prisma/                       # Base de donnees
+│   ├── schema.prisma             # Schema (1662 lignes, ~60 modeles)
+│   └── migrations/               # Migrations
 ├── i18n/                         # Internationalisation
-│   ├── i18n.config.ts
-│   └── locales/                  # 13 langues × 6 domaines
-│       ├── en/, fr/, de/, es/...
-│       └── {lang}/{domain}.json
-│
-├── docs/                         # Documentation (37 fichiers)
-│   ├── README.md
-│   ├── system/                   # Documentation système
-│   ├── ticketing/                # Documentation billetterie
-│   ├── volunteers/               # Documentation bénévoles
-│   └── ...
-│
-├── scripts/                      # Scripts Node.js (25 scripts)
-│   ├── translation/              # Scripts i18n
-│   ├── seed-dev.ts               # Seed développement
-│   └── ...
-│
-├── tests/                        # Tests (17 fichiers)
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-│
-├── public/                       # Assets statiques
-│   ├── logos/
-│   ├── favicons/
-│   └── ...
-│
-├── docker-compose.*.yml          # Configurations Docker (7 fichiers)
-├── nuxt.config.ts                # Configuration Nuxt
-├── vitest.config.ts              # Configuration tests
-├── tsconfig.json                 # Configuration TypeScript
-├── package.json                  # Dépendances et scripts
-└── .env                          # Variables d'environnement
+│   ├── i18n.config.ts            # Configuration i18n
+│   └── locales/                  # Fichiers de traduction (13 langues)
+│       ├── fr/                   # Francais (reference)
+│       ├── en/                   # Anglais
+│       ├── de/                   # Allemand
+│       └── ...                   # Autres langues
+├── test/                         # Tests
+│   ├── unit/                     # Tests unitaires
+│   ├── nuxt/                     # Tests Nuxt
+│   ├── integration/              # Tests d'integration
+│   └── e2e/                      # Tests end-to-end
+├── scripts/                      # Scripts utilitaires
+├── public/                       # Fichiers statiques publics
+└── docs/                         # Documentation
 ```
 
 ---
 
-## Schéma de Base de Données
+## Architecture technique
 
-### Modèles Principaux (50+ tables)
-
-#### Utilisateurs & Auth
-
-- **User** - Utilisateurs (email hashé, langue préférée, providers auth)
-- **AuthSession** - Sessions authentification
-- **PasswordResetToken** - Tokens reset mot de passe
-- **VerificationToken** - Tokens vérification email
-
-#### Conventions & Éditions
-
-- **Convention** - Conventions de jonglerie
-- **Edition** - Éditions annuelles
-- **ConventionOrganizer** - Organisateurs avec permissions granulaires
-- **EditionOrganizerPermission** - Surcharges permissions par édition
-
-#### Billetterie
-
-- **TicketingTier** - Paliers tarifaires
-- **TicketingOption** - Options de billetterie
-- **TicketingOrder** - Commandes
-- **ExternalTicketing** - Billetterie externe
-- **HelloAssoConfig** - Configuration HelloAsso
-
-#### Bénévoles
-
-- **EditionVolunteerApplication** - Candidatures
-- **VolunteerTeam** - Équipes
-- **VolunteerTimeSlot** - Créneaux horaires
-- **VolunteerAssignment** - Affectations
-- **VolunteerMeal** - Repas bénévoles
-
-#### Artistes & Spectacles
-
-- **EditionArtist** - Artistes invités
-- **Show** - Spectacles
-- **ShowArtist** - Relation artistes/spectacles
-- **ArtistMealSelection** - Repas artistes
-
-#### Ateliers
-
-- **Workshop** - Ateliers
-- **WorkshopLocation** - Lieux
-- **WorkshopFavorite** - Favoris utilisateurs
-
-#### Notifications & Messagerie
-
-- **Notification** - Notifications persistées
-- **FcmToken** - Tokens Firebase
-- **Conversation** - Conversations
-- **Message** - Messages
-- **ConversationParticipant** - Participants
-
-#### Autres Fonctionnalités
-
-- **CarpoolOffer** / **CarpoolRequest** - Covoiturage
-- **LostFoundItem** - Objets trouvés
-- **ApiErrorLog** - Logs erreurs
-- **Feedback** - Retours utilisateurs
-- **EditionImage** - Images éditions
-
-### Relations Clés
+### Diagramme d'architecture globale
 
 ```
-Convention 1──N Edition
-    │
-    └──N ConventionOrganizer
-           │
-           └──N EditionOrganizerPermission
+┌─────────────────────────────────────────────────────────────────────┐
+│                           CLIENT (Browser)                           │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
+│  │   Vue.js    │  │  Pinia      │  │  Nuxt UI    │  │  i18n       │ │
+│  │   Pages     │  │  Stores     │  │  Components │  │  13 langs   │ │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘ │
+│                           │                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                    Nuxt Middleware (Client)                      ││
+│  │  auth-protected | guest-only | super-admin | load-translations   ││
+│  └─────────────────────────────────────────────────────────────────┘│
+└────────────────────────────────────┬────────────────────────────────┘
+                                     │ HTTP/SSE
+┌────────────────────────────────────┴────────────────────────────────┐
+│                           SERVER (Nitro)                             │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                    Server Middleware                             ││
+│  │           auth | cache-headers | noindex                         ││
+│  └─────────────────────────────────────────────────────────────────┘│
+│                           │                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                      API Handlers                                ││
+│  │  /api/auth/*  /api/editions/*  /api/conventions/*  /api/admin/* ││
+│  │  /api/carpool-*  /api/notifications/*  /api/messenger/*         ││
+│  └─────────────────────────────────────────────────────────────────┘│
+│                           │                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                     Utils & Services                             ││
+│  │  prisma | permissions | auth-utils | email | notifications      ││
+│  │  rate-limiter | validation | SSE managers | error-logger        ││
+│  └─────────────────────────────────────────────────────────────────┘│
+└────────────────────────────────────┬────────────────────────────────┘
+                                     │
+┌────────────────────────────────────┴────────────────────────────────┐
+│                           DATABASE                                   │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                        MySQL + Prisma                            ││
+│  │   ~60 modeles | Relations complexes | Indexes optimises          ││
+│  └─────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────┘
 
-Edition 1──N EditionVolunteerApplication
-    │
-    ├──N VolunteerTeam 1──N VolunteerTimeSlot 1──N VolunteerAssignment
-    ├──N Workshop
-    ├──N EditionArtist
-    ├──N Show
-    ├──N TicketingTier 1──N TicketingOption 1──N TicketingOrder
-    └──1 HelloAssoConfig
+                    EXTERNAL SERVICES
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│   Firebase FCM  │  │   HelloAsso     │  │   SMTP Email    │
+│   Push Notifs   │  │   Ticketing     │  │   Nodemailer    │
+└─────────────────┘  └─────────────────┘  └─────────────────┘
+```
 
-User 1──N Notification
-    │
-    ├──N FcmToken
-    ├──N ConversationParticipant N──1 Conversation 1──N Message
-    ├──N WorkshopFavorite
-    └──N CarpoolOffer / CarpoolRequest
+### Flux d'authentification
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Client    │     │   Server    │     │  Database   │
+└──────┬──────┘     └──────┬──────┘     └──────┬──────┘
+       │                   │                   │
+       │  POST /api/auth/login                 │
+       │  {identifier, password}               │
+       │──────────────────>│                   │
+       │                   │  Verify user      │
+       │                   │──────────────────>│
+       │                   │<──────────────────│
+       │                   │                   │
+       │                   │  bcrypt.compare() │
+       │                   │  setUserSession() │
+       │                   │  (sealed cookie)  │
+       │                   │                   │
+       │  Set-Cookie: session=...             │
+       │<──────────────────│                   │
+       │                   │                   │
+       │  Subsequent requests with cookie      │
+       │──────────────────>│                   │
+       │                   │  getUserSession() │
+       │                   │  (validate cookie)│
+       │                   │                   │
 ```
 
 ---
 
-## Endpoints API
+## Modele de donnees
 
-### Statistiques
+### Entites principales
 
-- **Total:** 314 fichiers d'endpoints
-- **Modules:** 12 (admin, auth, conventions, editions, notifications, etc.)
+Le schema Prisma definit ~60 modeles. Voici les principales entites :
 
-### Principaux Modules
+#### Utilisateurs et authentification
 
-#### `/api/auth/*` - Authentification
+```prisma
+model User {
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  emailHash         String    // MD5 pour Gravatar
+  pseudo            String    @unique
+  nom               String?
+  prenom            String?
+  password          String?
+  authProvider      String    @default("email")  // email, google, facebook, MANUAL
+  isGlobalAdmin     Boolean   @default(false)
+  isEmailVerified   Boolean   @default(false)
+  preferredLanguage String    @default("fr")
+  // ... relations
+}
+```
 
-- `POST /api/auth/login` - Connexion
-- `POST /api/auth/register` - Inscription
-- `POST /api/auth/logout` - Déconnexion
-- `POST /api/auth/forgot-password` - Mot de passe oublié
-- `POST /api/auth/reset-password` - Réinitialisation
-- `POST /api/auth/verify-email` - Vérification email
-- `GET /api/auth/check-session` - Vérifier session
+#### Conventions et editions
 
-#### `/api/admin/*` - Administration (26 endpoints)
+```prisma
+model Convention {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?   @db.Text
+  logo        String?
+  authorId    Int?      // Nullable pour imports
+  isArchived  Boolean   @default(false)
+  editions    Edition[]
+  organizers  ConventionOrganizer[]
+}
 
-- Gestion utilisateurs, logs erreurs, feedback
-- Statistiques, sauvegardes, notifications push test
-- Impersonation utilisateurs
+model Edition {
+  id                Int       @id @default(autoincrement())
+  name              String?
+  conventionId      Int
+  startDate         DateTime
+  endDate           DateTime
+  city              String
+  country           String
+  // ~50 champs de services (hasGym, hasCantine, etc.)
+  volunteersOpen    Boolean   @default(false)
+  workshopsEnabled  Boolean   @default(false)
+  // ... relations
+}
+```
 
-#### `/api/conventions/*` - Conventions (47 endpoints)
+#### Systeme de permissions
 
-- CRUD conventions
-- Gestion organisateurs avec permissions granulaires
-- Gestion éditions associées
+```prisma
+model ConventionOrganizer {
+  id                  Int     @id @default(autoincrement())
+  conventionId        Int
+  userId              Int
+  canEditConvention   Boolean @default(false)
+  canDeleteConvention Boolean @default(false)
+  canManageOrganizers Boolean @default(false)
+  canManageVolunteers Boolean @default(false)
+  canManageArtists    Boolean @default(false)
+  canManageTicketing  Boolean @default(false)
+  // Permissions par edition
+  perEditionPermissions EditionOrganizerPermission[]
+}
 
-#### `/api/editions/*` - Éditions (185+ endpoints)
+model EditionOrganizerPermission {
+  organizerId         Int
+  editionId           Int
+  canEdit             Boolean @default(false)
+  canDelete           Boolean @default(false)
+  canManageVolunteers Boolean @default(false)
+  canManageArtists    Boolean @default(false)
+  canManageMeals      Boolean @default(false)
+  canManageTicketing  Boolean @default(false)
+}
+```
 
-- CRUD éditions
-- **Bénévoles:** Candidatures, équipes, affectations, repas
-- **Billetterie:** Tiers, options, commandes, HelloAsso sync
-- **Ateliers:** CRUD, favoris, planification
-- **Artistes:** CRUD, spectacles, repas
-- **Objets trouvés:** CRUD, recherche
-- **Images:** Upload, suppression
+### Diagramme ER simplifie
 
-#### `/api/notifications/*` - Notifications (8 endpoints)
+```
+┌─────────────┐       ┌─────────────────────┐       ┌─────────────┐
+│    User     │───────│ ConventionOrganizer │───────│ Convention  │
+└─────────────┘  N:M  └─────────────────────┘  N:1  └─────────────┘
+       │                        │                         │
+       │                        │                         │ 1:N
+       │                ┌───────┴───────┐                │
+       │                │ EditionOrg.   │         ┌─────────────┐
+       │                │ Permission    │─────────│   Edition   │
+       │                └───────────────┘   N:1   └─────────────┘
+       │                                                 │
+       │                                          ┌──────┼──────┐
+       │                                          │      │      │
+       │                                    ┌─────┴──┐┌──┴───┐┌─┴────┐
+       │                                    │Carpool ││Volun-││Ticket│
+       │                                    │Offer   ││teer  ││Order │
+       └────────────────────────────────────┴────────┘└──────┘└──────┘
 
-- Liste, marquer comme lues, supprimer
-- Préférences utilisateur (13 types)
-- Statistiques
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Modules principaux                                │
+├─────────────────────┬─────────────────────┬─────────────────────────┤
+│ Covoiturage         │ Benevoles           │ Billetterie             │
+├─────────────────────┼─────────────────────┼─────────────────────────┤
+│ CarpoolOffer        │ VolunteerApplication│ TicketingOrder          │
+│ CarpoolRequest      │ VolunteerTeam       │ TicketingOrderItem      │
+│ CarpoolBooking      │ VolunteerTimeSlot   │ TicketingTier           │
+│ CarpoolComment      │ VolunteerAssignment │ TicketingOption         │
+│ CarpoolPassenger    │ VolunteerMeal       │ TicketingQuota          │
+└─────────────────────┴─────────────────────┴─────────────────────────┘
 
-#### `/api/messenger/*` - Messagerie (12 endpoints)
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Autres modules                                    │
+├─────────────────────┬─────────────────────┬─────────────────────────┤
+│ Ateliers            │ Artistes/Spectacles │ Messagerie              │
+├─────────────────────┼─────────────────────┼─────────────────────────┤
+│ Workshop            │ EditionArtist       │ Conversation            │
+│ WorkshopLocation    │ Show                │ ConversationParticipant │
+│ WorkshopFavorite    │ ShowArtist          │ Message                 │
+└─────────────────────┴─────────────────────┴─────────────────────────┘
+```
 
-- Conversations, messages
-- SSE temps réel pour présence/messages
+---
 
-#### `/api/carpool-*` - Covoiturage (18 endpoints)
+## API Endpoints
 
-- Offres et demandes
-- Recherche, filtrage
+### Vue d'ensemble des routes API
 
-### Format Standard Endpoint
+L'application expose ~150+ endpoints organises par domaine :
+
+#### Authentification (`/api/auth/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/auth/login` | Connexion utilisateur |
+| POST | `/api/auth/logout` | Deconnexion |
+| POST | `/api/auth/register` | Inscription |
+| POST | `/api/auth/verify-email` | Verification email |
+| POST | `/api/auth/resend-verification` | Renvoyer code |
+| POST | `/api/auth/request-password-reset` | Demande reset MDP |
+| POST | `/api/auth/reset-password` | Reset MDP |
+| GET | `/api/auth/verify-reset-token` | Verifier token reset |
+| POST | `/api/auth/check-email` | Verifier disponibilite email |
+
+#### Conventions (`/api/conventions/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| GET | `/api/conventions/[id]` | Detail convention |
+| POST | `/api/conventions` | Creer convention |
+| DELETE | `/api/conventions/[id]` | Supprimer convention |
+| PATCH | `/api/conventions/[id]/archive` | Archiver convention |
+| GET | `/api/conventions/my-conventions` | Mes conventions |
+| GET | `/api/conventions/[id]/editions` | Editions d'une convention |
+| GET | `/api/conventions/[id]/organizers` | Organisateurs |
+| POST | `/api/conventions/[id]/claim` | Revendiquer convention |
+
+#### Editions (`/api/editions/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| GET | `/api/editions` | Liste editions (paginee, filtree) |
+| GET | `/api/editions/[id]` | Detail edition |
+| POST | `/api/editions` | Creer edition |
+| PUT | `/api/editions/[id]` | Modifier edition |
+| DELETE | `/api/editions/[id]` | Supprimer edition |
+
+#### Benevoles (`/api/editions/[id]/volunteers/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| GET | `/volunteers/applications` | Liste candidatures |
+| POST | `/volunteers/applications` | Postuler |
+| PATCH | `/volunteers/applications/[appId]/status` | Accepter/Refuser |
+| GET | `/volunteers/teams` | Equipes benevoles |
+| POST | `/volunteers/teams` | Creer equipe |
+| GET | `/volunteers/time-slots` | Creneaux planning |
+| POST | `/volunteers/assignments` | Assigner benevole |
+
+#### Billetterie (`/api/editions/[id]/ticketing/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| GET | `/ticketing/tiers` | Tarifs disponibles |
+| POST | `/ticketing/orders` | Creer commande |
+| GET | `/ticketing/orders` | Liste commandes |
+| POST | `/ticketing/verify-qrcode` | Valider QR code |
+| GET | `/ticketing/stats` | Statistiques |
+| POST | `/ticketing/helloasso/orders` | Sync HelloAsso |
+
+#### Covoiturage (`/api/carpool-offers/`, `/api/carpool-requests/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| POST | `/carpool-offers` | Creer offre |
+| GET | `/carpool-offers/[id]` | Detail offre |
+| POST | `/carpool-offers/[id]/bookings` | Reserver places |
+| PUT | `/carpool-offers/[id]/bookings/[bId]` | Accepter/Refuser |
+| POST | `/carpool-offers/[id]/comments` | Commenter |
+| POST | `/carpool-requests` | Creer demande |
+
+#### Notifications (`/api/notifications/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| GET | `/notifications` | Liste notifications |
+| GET | `/notifications/stats` | Statistiques |
+| PATCH | `/notifications/[id]/read` | Marquer comme lu |
+| PATCH | `/notifications/mark-all-read` | Tout marquer lu |
+| DELETE | `/notifications/[id]/delete` | Supprimer |
+| GET | `/notifications/stream` | SSE temps reel |
+
+#### Administration (`/api/admin/`)
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| GET | `/admin/users` | Liste utilisateurs |
+| GET | `/admin/users/[id]` | Detail utilisateur |
+| PUT | `/admin/users/[id]` | Modifier utilisateur |
+| DELETE | `/admin/users/[id]` | Supprimer utilisateur |
+| POST | `/admin/users/[id]/impersonate` | Se faire passer pour |
+| GET | `/admin/feedback` | Retours utilisateurs |
+| GET | `/admin/error-logs` | Logs d'erreurs |
+| POST | `/admin/backup/create` | Creer backup |
+
+### Pattern des handlers API
+
+Tous les handlers utilisent le wrapper `wrapApiHandler` :
 
 ```typescript
-// Exemple: /api/conventions/[id]/organizers/index.post.ts
-export default defineEventHandler(async (event) => {
-  const user = await requireUserSession(event)
-  const conventionId = getRouterParam(event, 'id')!
+// server/api/auth/login.post.ts
+import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { authRateLimiter } from '@@/server/utils/rate-limiter'
+import { z } from 'zod'
 
-  // Validation permissions
-  await requireConventionPermission(event, conventionId, 'manageOrganizers')
+const loginSchema = z.object({
+  identifier: z.string().min(1),
+  password: z.string().min(1),
+  rememberMe: z.boolean().optional().default(false),
+})
 
-  // Validation body
-  const body = await readBody(event)
-  const validated = organizerSchema.parse(body)
+export default wrapApiHandler(
+  async (event) => {
+    await authRateLimiter(event)
+    const body = await readBody(event)
+    const { identifier, password, rememberMe } = loginSchema.parse(body)
 
-  // Business logic
-  const organizer = await prisma.conventionOrganizer.create({
-    data: validated,
-    include: organizerInclude,
-  })
+    // ... logique metier
 
-  return { success: true, data: organizer }
+    await setUserSession(event, { user: { ... } }, sessionConfig)
+    return { user: { ... } }
+  },
+  { operationName: 'Login' }
+)
+```
+
+---
+
+## Frontend - Pages et composants
+
+### Pages principales (~60)
+
+#### Pages publiques
+
+| Route | Fichier | Description |
+|-------|---------|-------------|
+| `/` | `pages/index.vue` | Accueil avec carte et agenda |
+| `/login` | `pages/login.vue` | Connexion |
+| `/register` | `pages/register.vue` | Inscription |
+| `/verify-email` | `pages/verify-email.vue` | Verification email |
+| `/privacy-policy` | `pages/privacy-policy.vue` | Politique confidentialite |
+| `/editions/[id]` | `pages/editions/[id]/index.vue` | Detail edition |
+| `/editions/[id]/carpool` | `pages/editions/[id]/carpool.vue` | Covoiturage |
+| `/editions/[id]/workshops` | `pages/editions/[id]/workshops.vue` | Ateliers |
+| `/editions/[id]/volunteers` | `pages/editions/[id]/volunteers/index.vue` | Benevoles |
+
+#### Pages authentifiees
+
+| Route | Fichier | Description |
+|-------|---------|-------------|
+| `/profile` | `pages/profile.vue` | Profil utilisateur |
+| `/favorites` | `pages/favorites.vue` | Mes favoris |
+| `/notifications` | `pages/notifications.vue` | Notifications |
+| `/messenger` | `pages/messenger.vue` | Messagerie |
+| `/my-conventions` | `pages/my-conventions.vue` | Mes conventions |
+| `/my-volunteer-applications` | `pages/my-volunteer-applications.vue` | Mes candidatures |
+
+#### Pages de gestion (organisateurs)
+
+| Route | Fichier | Description |
+|-------|---------|-------------|
+| `/editions/[id]/gestion` | `pages/editions/[id]/gestion/index.vue` | Dashboard gestion |
+| `/editions/[id]/gestion/organizers` | `pages/editions/[id]/gestion/organizers.vue` | Organisateurs |
+| `/editions/[id]/gestion/volunteers/*` | `pages/editions/[id]/gestion/volunteers/*.vue` | Gestion benevoles |
+| `/editions/[id]/gestion/ticketing/*` | `pages/editions/[id]/gestion/ticketing/*.vue` | Gestion billetterie |
+| `/editions/[id]/gestion/artists/*` | `pages/editions/[id]/gestion/artists/*.vue` | Gestion artistes |
+| `/editions/[id]/gestion/meals/*` | `pages/editions/[id]/gestion/meals/*.vue` | Gestion repas |
+
+#### Pages administration
+
+| Route | Fichier | Description |
+|-------|---------|-------------|
+| `/admin` | `pages/admin/index.vue` | Dashboard admin |
+| `/admin/users` | `pages/admin/users/index.vue` | Gestion utilisateurs |
+| `/admin/conventions` | `pages/admin/conventions.vue` | Gestion conventions |
+| `/admin/feedback` | `pages/admin/feedback.vue` | Retours utilisateurs |
+| `/admin/error-logs` | `pages/admin/error-logs.vue` | Logs d'erreurs |
+| `/admin/crons` | `pages/admin/crons.vue` | Taches planifiees |
+| `/admin/backup` | `pages/admin/backup.vue` | Sauvegardes |
+
+### Composants principaux (~100+)
+
+#### Composants UI generiques (`app/components/ui/`)
+
+- `ConfirmModal.vue` - Modale de confirmation
+- `DateTimePicker.vue` - Selecteur date/heure
+- `ImageUpload.vue` - Upload d'images
+- `SelectLanguage.vue` - Selecteur de langue
+- `UserDisplay.vue` - Affichage utilisateur
+- `LazyFullCalendar.vue` - Calendrier FullCalendar
+
+#### Composants metier
+
+- `EditionCard.vue` - Carte d'edition
+- `FiltersPanel.vue` - Panneau de filtres
+- `HomeMap.vue` - Carte des conventions
+- `HomeAgenda.vue` - Agenda des conventions
+- `FavoritesMap.vue` - Carte des favoris
+- `UserSelector.vue` - Selecteur d'utilisateur
+- `CountryMultiSelect.vue` - Selection multi-pays
+- `MinimalMarkdownEditor.vue` - Editeur Markdown
+
+#### Composants benevoles (`app/components/edition/volunteer/`)
+
+- `ApplicationModal.vue` - Modale candidature
+- `Table.vue` - Tableau benevoles
+- `planning/PlanningCard.vue` - Planning
+- `planning/SlotModal.vue` - Edition creneaux
+- `notifications/Manager.vue` - Gestionnaire notifs
+
+#### Composants billetterie (`app/components/ticketing/`)
+
+- `QrCodeScanner.vue` - Scanner QR
+- `CustomFieldsList.vue` - Champs personnalises
+- `QuotasList.vue` - Gestion quotas
+- `stats/*.vue` - Graphiques statistiques
+
+### Layouts
+
+```vue
+<!-- app/layouts/default.vue -->
+<template>
+  <div>
+    <AppHeader />
+    <UMain>
+      <UPage>
+        <UPageBody>
+          <UContainer>
+            <slot />
+          </UContainer>
+        </UPageBody>
+      </UPage>
+    </UMain>
+    <AppFooter />
+  </div>
+</template>
+```
+
+---
+
+## Gestion d'etat (Pinia Stores)
+
+### Stores disponibles
+
+| Store | Fichier | Description |
+|-------|---------|-------------|
+| `auth` | `stores/auth.ts` | Authentification et session |
+| `editions` | `stores/editions.ts` | Gestion des editions |
+| `favoritesEditions` | `stores/favoritesEditions.ts` | Editions favorites |
+| `notifications` | `stores/notifications.ts` | Notifications |
+| `impersonation` | `stores/impersonation.ts` | Mode impersonation admin |
+
+### Store Auth
+
+```typescript
+// app/stores/auth.ts
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: null as User | null,
+    rememberMe: false,
+    adminMode: false,
+  }),
+  getters: {
+    isAuthenticated: (state) => !!state.user,
+    isGlobalAdmin: (state) => state.user?.isGlobalAdmin || false,
+    isAdminModeActive: (state) => state.user?.isGlobalAdmin && state.adminMode,
+  },
+  actions: {
+    async register(email, password, pseudo, nom, prenom) { ... },
+    async login(identifier, password, rememberMe = false) { ... },
+    async logout() { ... },
+    initializeAuth() { ... },
+    updateUser(updatedUser: Partial<User>) { ... },
+    enableAdminMode() { ... },
+    disableAdminMode() { ... },
+  },
+})
+```
+
+### Store Editions
+
+```typescript
+// app/stores/editions.ts
+export const useEditionStore = defineStore('editions', {
+  state: () => ({
+    editions: [] as Edition[],
+    loading: false,
+    error: null as string | null,
+    pagination: { total: 0, page: 1, limit: 12, totalPages: 0 },
+    allEditions: [] as Edition[], // Pour l'agenda
+  }),
+  getters: {
+    getEditionById: (state) => (id: number) =>
+      state.editions.find((edition) => edition.id === id),
+  },
+  actions: {
+    async fetchEditions(filters?: EditionFilters) { ... },
+    async fetchEditionById(id: number, opts?) { ... },
+    async addEdition(editionData) { ... },
+    async updateEdition(id, editionData) { ... },
+    async deleteEdition(id) { ... },
+    // Methodes de permissions
+    canEditEdition(edition, userId): boolean { ... },
+    canDeleteEdition(edition, userId): boolean { ... },
+    canManageVolunteers(edition, userId): boolean { ... },
+    canManageArtists(edition, userId): boolean { ... },
+    isOrganizer(edition, userId): boolean { ... },
+  },
+})
+```
+
+### Store Notifications
+
+```typescript
+// app/stores/notifications.ts
+export const useNotificationsStore = defineStore('notifications', {
+  state: () => ({
+    notifications: [] as Notification[],
+    unreadCount: 0,
+    loading: false,
+    realTimeEnabled: false,
+    // ...
+  }),
+  getters: {
+    unreadNotifications: (state) => state.notifications.filter(n => !n.isRead),
+    notificationsByCategory: (state) => { ... },
+    recentNotifications: (state) => state.notifications.filter(n => !n.isRead).slice(0, 5),
+  },
+  actions: {
+    async fetchNotifications(filters, append = false) { ... },
+    async markAsRead(notificationId) { ... },
+    async markAllAsRead(category?) { ... },
+    addRealTimeNotification(notification) { ... }, // Via SSE
+    // ...
+  },
 })
 ```
 
 ---
 
-## Système d'Authentification
+## Systeme d'authentification
 
-### Stratégie: Sessions Scellées (nuxt-auth-utils)
+### Vue d'ensemble
 
-- **PAS de JWT** - Sessions côté serveur
-- **Cookies scellés** - Chiffrement AES-256-GCM
-- **Durée:** 30 jours par défaut (configurable avec "remember me")
-- **Secret:** Variable `NUXT_SESSION_PASSWORD` (32+ caractères)
+L'authentification utilise `nuxt-auth-utils` avec des sessions basees sur des cookies scelles (sealed cookies).
 
-### Helpers Disponibles
+### Flux de connexion
 
-```typescript
-// Serveur (server/api/*)
-const session = await getUserSession(event)       // Optionnel
-const session = await requireUserSession(event)   // Requis
-await setUserSession(event, { user: { id, email, ... } })
-await clearUserSession(event)
+1. **Client** : Envoie identifiant/mot de passe via `POST /api/auth/login`
+2. **Serveur** :
+   - Valide les credentials avec bcrypt
+   - Verifie que l'email est confirme
+   - Cree une session avec `setUserSession()`
+   - Retourne un cookie scelle
+3. **Client** :
+   - Stocke les infos user dans le store
+   - Les requetes suivantes incluent automatiquement le cookie
 
-// Client (app/composables/useAuth.ts)
-const { loggedIn, user, session, fetch, clear } = useUserSession()
-```
-
-### Structure Session
+### Middlewares client
 
 ```typescript
-interface UserSession {
-  user: {
-    id: string
-    email: string
-    firstName: string
-    lastName: string
-    isAdmin: boolean
-    preferredLanguage: string
+// app/middleware/auth-protected.ts
+export default defineNuxtRouteMiddleware(async (to) => {
+  if (!import.meta.client) return
+
+  const authStore = useAuthStore()
+
+  // Hydratation depuis localStorage/sessionStorage
+  if (!authStore.user) {
+    const stored = localStorage.getItem('authUser') || sessionStorage.getItem('authUser')
+    if (stored) authStore.user = JSON.parse(stored)
   }
-}
+
+  // Fallback: fetch session depuis serveur
+  if (!authStore.user) {
+    try {
+      const { user } = await $fetch('/api/session/me')
+      authStore.user = user
+    } catch { /* ignore */ }
+  }
+
+  // Redirection si non authentifie
+  if (!authStore.user) {
+    const { buildLoginUrl } = useReturnTo()
+    return navigateTo(buildLoginUrl(to.fullPath))
+  }
+})
 ```
 
-### Providers Auth Supportés
+### Middlewares disponibles
 
-- **Email/Password** - Principal
-- **Google OAuth** - Futur
-- **GitHub OAuth** - Futur
+| Middleware | Description |
+|------------|-------------|
+| `auth-protected.ts` | Pages necessitant authentification |
+| `guest-only.ts` | Pages pour non-connectes (login, register) |
+| `super-admin.ts` | Pages admin uniquement |
+| `authenticated.ts` | Variante auth-protected |
+| `verify-email-access.ts` | Acces page verification email |
+| `load-translations.global.ts` | Chargement traductions |
 
-### Protection Routes
+### Plugin d'initialisation
 
 ```typescript
-// Middleware: server/middleware/auth.ts
-export default defineEventHandler(async (event) => {
-  const path = event.path
-
-  // Routes publiques
-  if (path.startsWith('/api/public/')) return
-
-  // Routes protégées
-  if (path.startsWith('/api/admin/')) {
-    const session = await requireUserSession(event)
-    if (!session.user.isAdmin) {
-      throw createError({ statusCode: 403, message: 'Admin only' })
-    }
+// app/plugins/auth.client.ts
+export default defineNuxtPlugin(() => {
+  if (import.meta.client) {
+    const authStore = useAuthStore()
+    authStore.initializeAuth() // Hydrate depuis session serveur
   }
 })
 ```
 
 ---
 
-## Système de Permissions
+## Internationalisation (i18n)
 
-### Permissions Granulaires Organisateurs
-
-Documenté dans `docs/system/ORGANIZER_PERMISSIONS.md`
-
-#### 7 Types de Droits
-
-**Globaux (6):**
-
-1. `editConvention` - Modifier convention
-2. `deleteConvention` - Supprimer convention
-3. `manageOrganizers` - Gérer organisateurs
-4. `addEdition` - Ajouter éditions
-5. `editAllEditions` - Modifier toutes éditions
-6. `deleteAllEditions` - Supprimer toutes éditions
-
-**Par Édition:** 7. `perEdition[].{canEdit, canDelete, canManageVolunteers}` - Surcharges spécifiques
-
-#### Format API
-
-```typescript
-// GET /api/conventions/[id]/organizers
-{
-  "organizers": [
-    {
-      "id": "123",
-      "userId": "user-456",
-      "user": { "firstName": "John", "lastName": "Doe" },
-      "rights": {
-        "editConvention": true,
-        "deleteConvention": false,
-        "manageOrganizers": true,
-        "addEdition": true,
-        "editAllEditions": false,
-        "deleteAllEditions": false
-      },
-      "perEdition": [
-        {
-          "editionId": "ed-789",
-          "canEdit": true,
-          "canDelete": false,
-          "canManageVolunteers": true
-        }
-      ]
-    }
-  ]
-}
-```
-
-#### Helpers Permissions
-
-```typescript
-// server/utils/permissions/convention-permissions.ts
-await requireConventionPermission(event, conventionId, 'editConvention')
-await requireConventionOwnerOrPermission(event, conventionId, 'manageOrganizers')
-
-// server/utils/permissions/edition-permissions.ts
-await requireEditionPermission(event, editionId, 'canEdit')
-```
-
----
-
-## Système de Notifications
-
-### Architecture Multi-Canal
-
-Documenté dans `docs/system/NOTIFICATION_SYSTEM.md` (1314 lignes)
-
-#### 4 Canaux de Livraison
-
-1. **Base de Données** - Persistance (table `Notification`)
-2. **SSE (Server-Sent Events)** - Temps réel in-app
-3. **FCM (Firebase Cloud Messaging)** - Push notifications
-4. **Email** - Templates Vue Email
-
-#### 13 Types de Notifications
-
-```typescript
-enum NotificationType {
-  // Bénévoles
-  VOLUNTEER_APPLICATION_STATUS_CHANGED
-  VOLUNTEER_ASSIGNMENT_CHANGED
-  VOLUNTEER_TEAM_ANNOUNCEMENT
-
-  // Covoiturage
-  CARPOOL_REQUEST_RECEIVED
-  CARPOOL_REQUEST_ACCEPTED
-  CARPOOL_REQUEST_REJECTED
-  CARPOOL_OFFER_MATCHED
-
-  // Messagerie
-  NEW_MESSAGE
-
-  // Éditions
-  EDITION_UPDATE
-  WORKSHOP_FAVORITED_CHANGED
-
-  // Admin
-  NEW_FEEDBACK
-  NEW_ERROR_LOG
-  SYSTEM_ANNOUNCEMENT
-}
-```
-
-#### Préférences Utilisateur
-
-Chaque type configurable indépendamment pour chaque canal:
-
-- In-app (toujours activé)
-- Push (opt-in)
-- Email (opt-in)
-
-#### Flux de Notification
-
-```
-1. Event déclenché
-   │
-2. notification-service.ts
-   ├─► Créer en DB
-   ├─► Envoyer SSE (si connecté)
-   ├─► Envoyer FCM (si tokens + préf activée)
-   └─► Envoyer Email (si préf activée)
-
-3. Client reçoit
-   ├─► SSE stream (temps réel)
-   ├─► FCM push (background/foreground)
-   └─► Email (async)
-```
-
-#### SSE Stream Manager
-
-```typescript
-// server/utils/notification-stream-manager.ts
-class NotificationStreamManager {
-  private streams = new Map<string, H3Event>()
-
-  addStream(userId: string, event: H3Event)
-  removeStream(userId: string)
-  sendToUser(userId: string, notification: Notification)
-  sendToMultipleUsers(userIds: string[], notification: Notification)
-}
-
-// Route: /api/notifications/stream
-export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
-
-  setHeader(event, 'Content-Type', 'text/event-stream')
-  setHeader(event, 'Cache-Control', 'no-cache')
-  setHeader(event, 'Connection', 'keep-alive')
-
-  notificationStreamManager.addStream(session.user.id, event)
-
-  // Cleanup on disconnect
-  event.node.req.on('close', () => {
-    notificationStreamManager.removeStream(session.user.id)
-  })
-})
-```
-
-#### Client SSE
-
-```typescript
-// app/composables/useNotificationStream.ts
-export function useNotificationStream() {
-  const notificationsStore = useNotificationsStore()
-  let eventSource: EventSource | null = null
-
-  const connect = () => {
-    eventSource = new EventSource('/api/notifications/stream')
-
-    eventSource.onmessage = (event) => {
-      const notification = JSON.parse(event.data)
-      notificationsStore.addNotification(notification)
-    }
-
-    eventSource.onerror = () => {
-      eventSource?.close()
-      setTimeout(connect, 5000) // Reconnect
-    }
-  }
-
-  onUnmounted(() => eventSource?.close())
-
-  return { connect }
-}
-```
-
----
-
-## Internationalisation
-
-### 13 Langues Supportées
-
-Tchèque (cs), Danois (da), Allemand (de), **Anglais (en)**, Espagnol (es), **Français (fr)**, Italien (it), Néerlandais (nl), Polonais (pl), Portugais (pt), Russe (ru), Suédois (sv), Ukrainien (uk)
-
-### Structure Lazy Loading
-
-```
-i18n/locales/
-├── en/
-│   ├── common.json        # Commun (boutons, erreurs)
-│   ├── notifications.json # Notifications
-│   ├── components.json    # Composants UI
-│   ├── app.json          # Application
-│   ├── public.json       # Pages publiques
-│   └── feedback.json     # Feedback
-├── fr/
-│   ├── common.json
-│   ├── notifications.json
-│   ├── components.json
-│   ├── app.json
-│   ├── public.json
-│   ├── feedback.json
-│   └── gestion.json      # Spécifique FR (exemple)
-└── de/, es/, ...
-```
-
-### Configuration Nuxt i18n
+### Configuration
 
 ```typescript
 // nuxt.config.ts
 i18n: {
-  lazy: true,
+  lazy: true,  // Lazy loading des traductions
   defaultLocale: 'en',
-  strategy: 'no_prefix',
+  locales: [
+    { code: 'fr', language: 'fr', name: 'Francais', files: ['fr/common.json', ...] },
+    { code: 'en', language: 'en', name: 'English', files: ['en/common.json', ...] },
+    { code: 'de', language: 'de', name: 'Deutsch', files: ['de/common.json', ...] },
+    // ... 13 langues au total
+  ],
+  langDir: 'locales/',
+  strategy: 'no_prefix',  // Pas de prefixe URL
   detectBrowserLanguage: {
     useCookie: true,
     cookieKey: 'i18n_redirected',
+    redirectOn: 'root',
     fallbackLocale: 'en',
-  },
-  bundle: {
-    compositionOnly: true,
-    runtimeOnly: false,
-    fullInstall: false,
-    dropMessageCompiler: false, // Garder pour SSR
   },
 }
 ```
 
-### Utilisation
+### Langues supportees
 
-```vue
-<template>
-  <UButton>{{ $t('common.save') }}</UButton>
-  <p>{{ $t('notifications.volunteer_accepted', { name: 'John' }) }}</p>
-</template>
+| Code | Langue | Statut |
+|------|--------|--------|
+| `fr` | Francais | Reference |
+| `en` | English | Complete |
+| `de` | Deutsch | Complete |
+| `es` | Espanol | Complete |
+| `it` | Italiano | Complete |
+| `nl` | Nederlands | Complete |
+| `pl` | Polski | Complete |
+| `pt` | Portugues | Complete |
+| `ru` | Russky | Complete |
+| `sv` | Svenska | Complete |
+| `cs` | Cestina | Complete |
+| `da` | Dansk | Complete |
+| `uk` | Ukrainska | Complete |
 
-<script setup>
-const { t, locale } = useI18n()
+### Structure des fichiers de traduction
 
-const message = computed(() => t('app.welcome'))
-locale.value = 'fr' // Changer langue
-</script>
+```
+i18n/locales/
+├── fr/                    # Langue de reference
+│   ├── common.json        # Traductions communes
+│   ├── notifications.json # Notifications
+│   ├── components.json    # Composants UI
+│   ├── app.json          # Application generale
+│   ├── public.json       # Pages publiques
+│   ├── feedback.json     # Retours utilisateurs
+│   └── gestion.json      # Gestion (FR uniquement)
+├── en/
+│   └── ...
+└── ...
 ```
 
 ### Scripts i18n
 
 ```bash
-npm run check-i18n              # Clés manquantes/inutilisées
-npm run check-translations      # Comparer locales
-npm run i18n:mark-todo          # Marquer clés [TODO]
+npm run check-i18n        # Analyse cles manquantes/inutilisees
+npm run check-translations # Compare traductions entre locales
+npm run i18n:add          # Ajouter une traduction
+npm run i18n:mark-todo    # Marquer cles modifiees comme [TODO]
 ```
 
 ---
 
 ## Tests
 
-### Configuration Multi-Projet Vitest
+### Configuration
+
+Le projet utilise Vitest avec plusieurs configurations :
 
 ```typescript
-// vitest.config.ts
-export default defineConfig({
-  test: {
-    projects: [
-      {
-        name: 'unit',
-        environment: 'happy-dom',
-        include: ['tests/unit/**/*.test.ts'],
-      },
-      {
-        name: 'nuxt',
-        environment: 'nuxt',
-        include: ['tests/**/*.nuxt.test.ts'],
-      },
-      {
-        name: 'e2e',
-        environment: 'happy-dom',
-        include: ['tests/e2e/**/*.test.ts'],
-      },
-      {
-        name: 'integration',
-        environment: 'node',
-        include: ['tests/integration/**/*.test.ts'],
-      },
-    ],
-  },
-})
+// vitest.config.ts (simplifie)
+export default {
+  projects: [
+    { name: 'unit', ... },        // Tests unitaires
+    { name: 'nuxt', ... },        // Tests Nuxt
+    { name: 'integration', ... }, // Tests DB
+    { name: 'e2e', ... },         // Tests E2E
+  ]
+}
 ```
 
-### Scripts Tests
+### Structure des tests
+
+```
+test/
+├── unit/                     # Tests unitaires (~15 fichiers)
+│   ├── composables/          # Tests composables
+│   ├── stores/               # Tests Pinia stores
+│   ├── utils/                # Tests utilitaires
+│   ├── i18n/                 # Tests traductions
+│   └── security/             # Tests securite
+├── nuxt/                     # Tests Nuxt (~50 fichiers)
+│   ├── components/           # Tests composants
+│   ├── features/             # Tests fonctionnalites
+│   ├── middleware/           # Tests middlewares
+│   ├── pages/                # Tests pages
+│   └── server/               # Tests API
+│       ├── api/              # Tests endpoints
+│       └── utils/            # Tests utils serveur
+├── integration/              # Tests integration DB (~7 fichiers)
+└── e2e/                      # Tests end-to-end
+```
+
+### Commandes de test
 
 ```bash
-npm run test:unit         # Tests unitaires (watch)
-npm run test:unit:run     # Tests unitaires (CI)
-npm run test:nuxt         # Tests Nuxt (watch)
-npm run test:nuxt:run     # Tests Nuxt (CI)
-npm run test:e2e          # Tests E2E (watch)
-npm run test:e2e:run      # Tests E2E (CI)
-npm run test:db           # Tests intégration DB
-npm run test:ui           # Interface Vitest UI
+npm run test              # Tests unitaires (watch)
+npm run test:unit:run     # Tests unitaires (run)
+npm run test:nuxt:run     # Tests Nuxt
 npm run test:all          # Tous les tests
+npm run test:db:run       # Tests integration DB
+npm run docker:test       # Tests dans Docker
 ```
 
-### Exemple Test Nuxt
+### Exemple de test
 
 ```typescript
-// tests/composables/useAuth.nuxt.test.ts
-import { describe, it, expect } from 'vitest'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+// test/nuxt/server/api/conventions/create.test.ts
+import { describe, it, expect, vi } from 'vitest'
+import { registerEndpoint } from '@nuxt/test-utils/runtime'
 
-describe('useAuth', () => {
-  it('should login user', async () => {
-    const { $fetch } = useNuxtApp()
+describe('POST /api/conventions', () => {
+  it('should create a convention for authenticated user', async () => {
+    // Mock Prisma
+    const mockConvention = { id: 1, name: 'Test' }
+    vi.mocked(prisma.convention.create).mockResolvedValue(mockConvention)
 
-    const result = await $fetch('/api/auth/login', {
+    // Call endpoint
+    const result = await $fetch('/api/conventions', {
       method: 'POST',
-      body: { email: 'test@example.com', password: 'password' },
+      body: { name: 'Test', description: 'Description' }
     })
 
-    expect(result.success).toBe(true)
+    expect(result).toMatchObject({ id: 1, name: 'Test' })
   })
 })
 ```
 
 ---
 
-## Docker et Déploiement
+## Patterns et conventions
 
-### Environnements Docker
+### API Handlers
 
-```bash
-# Développement (hot reload, volumes)
-npm run docker:dev
-npm run docker:dev:detached
-npm run docker:dev:logs
+**Pattern `wrapApiHandler`** : Tous les handlers utilisent ce wrapper pour :
+- Gestion centralisee des erreurs
+- Transformation des erreurs Zod en 400
+- Transformation des erreurs Prisma
+- Logging des erreurs
 
-# Tests
-npm run docker:test              # Tous tests
-npm run docker:test:unit         # Tests unitaires
-npm run docker:test:integration  # Tests DB
+```typescript
+export default wrapApiHandler(
+  async (event) => {
+    // Validation
+    const body = schema.parse(await readBody(event))
 
-# Release (staging/prod)
-npm run docker:release:up
+    // Logique metier
+    const result = await prisma.model.create({ data: body })
+
+    return result
+  },
+  { operationName: 'CreateResource' }
+)
 ```
 
-### Configuration Docker Compose
+### Helpers Prisma Select
 
-```yaml
-# docker-compose.dev.yml
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-    ports:
-      - '3000:3000'
-    depends_on:
-      - db
+Pour eviter la duplication des selections de champs :
 
-  db:
-    image: mariadb:11
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: convention
-    volumes:
-      - db_data:/var/lib/mysql
-    ports:
-      - '3306:3306'
+```typescript
+// server/utils/prisma-select-helpers.ts
+export const userBasicSelect = { id: true, pseudo: true }
+export const userWithProfileSelect = { id: true, pseudo: true, profilePicture: true }
+export const carpoolUserSelect = userWithProfileAndGravatarSelect
+
+// Utilisation
+const users = await prisma.user.findMany({
+  select: userBasicSelect
+})
 ```
 
-### Variables d'Environnement
+### Composables
 
-Voir `.env.portainer.example` pour template complet
+**Pattern des composables** :
+- Prefixe `use` (ex: `useDateFormat`, `useLeafletMap`)
+- Retourne des refs reactives et des fonctions
+- Gere le cleanup automatiquement
 
-**Essentielles:**
+```typescript
+// app/composables/useDateFormat.ts
+export function useDateFormat() {
+  const { locale } = useI18n()
 
-- `DATABASE_URL` - MySQL connection
-- `NUXT_SESSION_PASSWORD` - Sessions (32+ chars)
-- `SMTP_USER`, `SMTP_PASS` - Emails
-- `NUXT_PUBLIC_FIREBASE_*` - Firebase config
-- `FIREBASE_ADMIN_*` - Firebase Admin SDK
-- `ANTHROPIC_API_KEY` - API Claude (optionnel)
-- `NUXT_PUBLIC_RECAPTCHA_*` - reCAPTCHA
+  const formatDate = (date: string | Date, format = 'long') => {
+    // ...
+  }
+
+  return { formatDate }
+}
+```
+
+### Permissions
+
+**Systeme de permissions granulaire** :
+- Permissions globales sur la convention
+- Permissions specifiques par edition
+- Verification cote client ET serveur
+
+```typescript
+// Client (store)
+const canEdit = editionStore.canEditEdition(edition, userId)
+
+// Serveur (utils)
+const hasPermission = await hasEditionEditPermission(userId, editionId)
+if (!hasPermission) throw createError({ statusCode: 403 })
+```
+
+### Validation
+
+**Zod pour validation** :
+- Schemas reutilisables
+- Messages d'erreur i18n
+- Transformation automatique des erreurs
+
+```typescript
+const editionSchema = z.object({
+  name: z.string().optional(),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  city: z.string().min(1),
+  country: z.string().length(2),
+  // ...
+})
+```
+
+### Notifications temps reel
+
+**SSE (Server-Sent Events)** pour :
+- Notifications utilisateur
+- Stats billetterie en temps reel
+- Compteurs de caisse
+- Indicateurs de frappe messagerie
+
+```typescript
+// Serveur
+export default defineEventHandler((event) => {
+  setHeader(event, 'Content-Type', 'text/event-stream')
+  const stream = createStream()
+  // ...
+})
+
+// Client (composable)
+const { connect, disconnect } = useNotificationStream()
+```
 
 ---
 
-## Intégrations Externes
+## Diagrammes d'architecture
 
-### HelloAsso - Billetterie Externe
+### Flux de donnees - Page Edition
 
-- Synchronisation commandes via API
-- Webhook pour événements temps réel
-- Configuration chiffrée (`HELLOASSO_ENCRYPTION_SECRET`)
-- Mapping options ↔ tarifs HelloAsso
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Page editions/[id]/index.vue                  │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        │                       │                       │
+        v                       v                       v
+┌───────────────┐   ┌───────────────────┐   ┌───────────────────┐
+│ useAsyncData  │   │   EditionStore    │   │  FavoritesStore   │
+│ fetch edition │   │  getEditionById   │   │   isFavorite      │
+└───────┬───────┘   └─────────┬─────────┘   └─────────┬─────────┘
+        │                     │                       │
+        │                     v                       │
+        │           ┌───────────────────┐             │
+        │           │    Composables    │             │
+        │           │ useEditionStatus  │             │
+        │           │ useOrganizerTitle │             │
+        │           │   useDateFormat   │             │
+        │           └─────────┬─────────┘             │
+        │                     │                       │
+        v                     v                       v
+┌─────────────────────────────────────────────────────────────────┐
+│                        Vue Template                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │ EditionCard │  │  Services   │  │  Actions    │              │
+│  │   Header    │  │   Icons     │  │  Buttons    │              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### Firebase Cloud Messaging
+### Architecture des permissions
 
-- Push notifications web/mobile
-- Tokens multi-appareils par utilisateur
-- Service worker client
-- Firebase Admin SDK serveur
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Verification Permission                       │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    v                       v
+          ┌─────────────────┐     ┌─────────────────┐
+          │   Global Admin  │     │  Non-Admin User │
+          │   isGlobalAdmin │     │                 │
+          └────────┬────────┘     └────────┬────────┘
+                   │                       │
+          (acces total)              ┌─────┴─────┐
+                                     v           v
+                           ┌───────────────┐ ┌───────────────┐
+                           │    Auteur     │ │  Organisateur │
+                           │ authorId ==   │ │  Convention   │
+                           │   userId      │ └───────┬───────┘
+                           └───────────────┘         │
+                                               ┌─────┴─────┐
+                                               v           v
+                                    ┌───────────────┐ ┌───────────────┐
+                                    │   Droits      │ │   Droits      │
+                                    │   Globaux     │ │   Par Edition │
+                                    │ canEditConv.. │ │ perEdition... │
+                                    └───────────────┘ └───────────────┘
+```
 
-### Anthropic Claude API
+### Cycle de vie d'une commande de billetterie
 
-- Analyse OCR d'images
-- Extraction infos billetterie HelloAsso
-- Fallback providers: Ollama, LM Studio
-- Configurable via `AI_PROVIDER`
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Flux Billetterie                               │
+└─────────────────────────────────────────────────────────────────┘
 
-### SMTP Email
-
-- Nodemailer pour envoi
-- Templates Vue Email
-- Configuration: `SMTP_USER`, `SMTP_PASS`
-- Flag: `SEND_EMAILS=true/false`
+  HelloAsso                       Application
+     │                                │
+     │  Webhook notification          │
+     │──────────────────────────────>│
+     │                                │
+     │              ┌─────────────────┴─────────────────┐
+     │              v                                   │
+     │    ┌─────────────────┐                          │
+     │    │ Parse HelloAsso │                          │
+     │    │     payload     │                          │
+     │    └────────┬────────┘                          │
+     │             │                                   │
+     │             v                                   │
+     │    ┌─────────────────┐     ┌─────────────────┐ │
+     │    │  Upsert Order   │────>│  Upsert Items   │ │
+     │    └────────┬────────┘     └────────┬────────┘ │
+     │             │                       │          │
+     │             v                       v          │
+     │    ┌─────────────────┐     ┌─────────────────┐ │
+     │    │  Match Tiers    │     │ Process Custom  │ │
+     │    │   & Options     │     │    Fields       │ │
+     │    └────────┬────────┘     └────────┬────────┘ │
+     │             │                       │          │
+     │             └───────────┬───────────┘          │
+     │                         │                      │
+     │                         v                      │
+     │              ┌─────────────────┐               │
+     │              │ Update Quotas   │               │
+     │              │  if configured  │               │
+     │              └────────┬────────┘               │
+     │                       │                        │
+     │                       v                        │
+     │              ┌─────────────────┐               │
+     │              │ Broadcast SSE   │               │
+     │              │   stats update  │               │
+     │              └─────────────────┘               │
+     │                                                │
+```
 
 ---
 
 ## Recommandations
 
-### 🎯 Points Forts
+### Points forts
 
-1. **Architecture Moderne** - Nuxt 4, TypeScript, Prisma ORM
-2. **Permissions Granulaires** - Système flexible et extensible
-3. **Multi-Canal Notifications** - SSE + Push + Email
-4. **Tests Structurés** - 4 projets Vitest distincts
-5. **i18n Lazy Loading** - 13 langues, bundles optimisés
-6. **Docker Dev** - Environnement reproductible
+1. **Architecture modulaire** : Separation claire frontend/backend avec Nuxt
+2. **Typage fort** : TypeScript partout, schemas Zod pour validation
+3. **Permissions granulaires** : Systeme flexible et scalable
+4. **Internationalisation** : Support de 13 langues avec lazy loading
+5. **Tests complets** : Unit, integration, E2E
+6. **Helpers reutilisables** : prisma-select-helpers, api-helpers
+7. **Documentation inline** : Commentaires detailles dans le code
+8. **PWA** : Application installable
 
-### ⚠️ Points d'Attention
+### Points d'amelioration suggeres
 
-#### Sécurité
+1. **Couverture de tests** : Augmenter la couverture des tests E2E
+2. **Documentation API** : Ajouter OpenAPI/Swagger pour l'API
+3. **Monitoring** : Integrer des outils de monitoring (Sentry, etc.)
+4. **Cache** : Implementer un cache Redis pour les donnees frequentes
+5. **Rate limiting** : Etendre aux endpoints critiques
+6. **Audit logs** : Journaliser les actions admin sensibles
 
-- ✅ Validation Zod généralisée
-- ⚠️ Vérifier rate limiting API (notamment auth)
-- ⚠️ Audit permissions endpoints admin
-- ✅ Emails hashés en DB (confidentialité)
+### Securite
 
-#### Performance
+- [x] Mots de passe hashes (bcrypt)
+- [x] Sessions scellees (cookies signes)
+- [x] Rate limiting sur authentification
+- [x] Validation des entrees (Zod)
+- [x] Verification email obligatoire
+- [x] Permissions verifiees cote serveur
+- [ ] CSP headers (a verifier)
+- [ ] Audit de securite complet
 
-- ⚠️ **314 endpoints** - Considérer code splitting
-- ⚠️ SSE connections - Limiter nombre/utilisateur
-- ✅ Nuxt UI serverBundle: 'remote' (optimisé)
-- ⚠️ Prisma queries - Vérifier N+1 avec includes
+### Performance
 
-#### Maintenabilité
-
-- ✅ Documentation exhaustive (37 fichiers)
-- ⚠️ Helpers Prisma select - Étendre usage (`docs/prisma-select-helpers.md`)
-- ⚠️ Tests coverage - Augmenter couverture E2E
-- ✅ Scripts i18n automatisés
-
-#### Scalabilité
-
-- ⚠️ SSE Stream Manager - Considérer Redis pour multi-instance
-- ⚠️ Notifications - Queue system (Bull/BullMQ) pour volume élevé
-- ✅ Database indexes - Vérifier couverture
-
-### 🚀 Améliorations Suggérées
-
-1. **Rate Limiting**
-
-   ```typescript
-   // server/middleware/rate-limit.ts
-   import { createRateLimiter } from 'h3-rate-limiter'
-
-   export default defineEventHandler(async (event) => {
-     if (event.path.startsWith('/api/auth/')) {
-       await createRateLimiter({ max: 5, window: 60000 })(event)
-     }
-   })
-   ```
-
-2. **Monitoring**
-   - Intégrer Sentry pour tracking erreurs
-   - Métriques Prometheus pour performances
-   - Logs structurés (Winston/Pino)
-
-3. **Cache**
-
-   ```typescript
-   // Cache conventions publiques
-   const conventions = await cachedEventHandler(
-     async () => prisma.convention.findMany({ where: { isPublic: true } }),
-     { maxAge: 60 * 5 } // 5 minutes
-   )
-   ```
-
-4. **Tests E2E**
-   - Augmenter couverture parcours utilisateurs critiques
-   - Playwright pour tests navigateur complets
-
-5. **Documentation API**
-   - Générer docs OpenAPI/Swagger
-   - Exemples requêtes avec Postman/Insomnia
-
-### 📊 Métriques Projet
-
-| Métrique            | Valeur |
-| ------------------- | ------ |
-| Fichiers TypeScript | ~500+  |
-| Endpoints API       | 314    |
-| Composables         | 37     |
-| Pages Vue           | 57     |
-| Stores Pinia        | 5      |
-| Modèles Prisma      | 50+    |
-| Langues i18n        | 13     |
-| Fichiers docs       | 37     |
-| Scripts npm         | 65+    |
+- [x] Lazy loading des traductions
+- [x] Pagination des listes
+- [x] Indexes Prisma optimises
+- [x] Compression des assets (gzip/brotli)
+- [x] Icons en mode remote (reduit la taille du bundle)
+- [ ] Cache HTTP (a optimiser)
+- [ ] Optimisation des queries N+1
 
 ---
 
 ## Conclusion
 
-**Convention de Jonglerie** est une application full-stack moderne et bien architecturée, avec des fonctionnalités avancées (notifications multi-canal, permissions granulaires, i18n lazy loading) et une base de code maintenable. Les points d'amélioration identifiés concernent principalement la scalabilité (SSE multi-instance, queue notifications) et le monitoring (logs, métriques).
+Le projet **Juggling Convention** est une application mature et bien structuree, suivant les meilleures pratiques modernes du developpement web full-stack. L'architecture modulaire, le typage fort, et le systeme de permissions granulaire en font une base solide pour l'evolution future.
 
-Le projet bénéficie d'une documentation exhaustive et de patterns cohérents, facilitant l'onboarding de nouveaux développeurs.
+Les principaux domaines fonctionnels (conventions, benevoles, billetterie, covoiturage, messagerie) sont bien implementes avec une attention particuliere portee a l'experience utilisateur et a l'internationalisation.
 
 ---
 
-**Généré le:** 2025-11-27
-**Version Nuxt:** 4.2.0
-**Version Node:** >= 22 < 26
+*Document genere le 5 janvier 2026*
+*Version du codebase analysee : main (commit 59ccbcdf)*
