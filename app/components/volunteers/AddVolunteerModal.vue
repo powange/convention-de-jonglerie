@@ -62,7 +62,7 @@
             </div>
           </div>
 
-          <div v-else-if="searchEmail && !searching" class="text-center py-4">
+          <div v-else-if="searchEmail && !searching && isValidEmailInput" class="text-center py-4">
             <UIcon name="i-heroicons-user-minus" class="h-12 w-12 text-gray-300 mx-auto mb-2" />
             <p class="text-sm text-gray-500">{{ $t('edition.volunteers.no_user_found') }}</p>
           </div>
@@ -117,20 +117,20 @@
             />
           </UFormField>
 
-          <UFormField :label="$t('auth.first_name')" required>
+          <UFormField :label="$t('edition.volunteers.first_name')" required>
             <UInput
               v-model="newUser.prenom"
               type="text"
-              :placeholder="$t('auth.first_name_placeholder')"
+              :placeholder="$t('edition.volunteers.first_name_placeholder')"
               icon="i-heroicons-user"
             />
           </UFormField>
 
-          <UFormField :label="$t('auth.last_name')" required>
+          <UFormField :label="$t('edition.volunteers.last_name')" required>
             <UInput
               v-model="newUser.nom"
               type="text"
-              :placeholder="$t('auth.last_name_placeholder')"
+              :placeholder="$t('edition.volunteers.last_name_placeholder')"
               icon="i-heroicons-user"
             />
           </UFormField>
@@ -240,9 +240,20 @@ const isNewUserValid = computed(() => {
   )
 })
 
-// Fonction de recherche
+// Computed pour vérifier si l'email de recherche est valide (pour le template)
+const isValidEmailInput = computed(() => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchEmail.value.trim())
+})
+
+// Validation email simple
+const isValidEmail = (email: string) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+// Fonction de recherche (correspondance exacte par email)
 const performSearch = async (email: string) => {
-  if (!email || email.length < 3) {
+  const trimmedEmail = email.trim().toLowerCase()
+  if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
     searchResults.value = []
     return
   }
@@ -252,7 +263,7 @@ const performSearch = async (email: string) => {
 
   try {
     const response = await $fetch<{ users: User[] }>('/api/users/search', {
-      params: { email },
+      params: { emailExact: trimmedEmail },
     })
     searchResults.value = response.users || []
   } catch (err: any) {
@@ -263,13 +274,18 @@ const performSearch = async (email: string) => {
   }
 }
 
-// Watch avec debounce
+// Watch avec debounce - recherche uniquement si email valide
 let debounceTimeout: NodeJS.Timeout
 watch(searchEmail, (newEmail) => {
   clearTimeout(debounceTimeout)
-  debounceTimeout = setTimeout(() => {
-    performSearch(newEmail)
-  }, 500)
+  // Ne déclenche la recherche que si l'email semble complet
+  if (isValidEmail(newEmail.trim())) {
+    debounceTimeout = setTimeout(() => {
+      performSearch(newEmail)
+    }, 300)
+  } else {
+    searchResults.value = []
+  }
 })
 
 const selectUser = (user: User) => {
