@@ -46,8 +46,8 @@
     "contact_email": "Контактний email",
     "continue": "Продовжити",
     "convention": "Конвенція",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Скопійовано!",
+    "copy": "Копіювати",
     "copy_error": "Помилка при копіюванні",
     "copy_link": "Копіювати посилання",
     "country": "Країна",
@@ -149,7 +149,7 @@
     "ticket": "Квиток",
     "ticketing_short": "Квитки",
     "time": "Час",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Часовий пояс",
     "tip": "Порада",
     "title": "Заголовок",
     "total": "Всього",
@@ -167,9 +167,6 @@
     "volunteers_short": "Волонтери",
     "week": "Тиждень",
     "yes": "Так"
-  },
-  "countries": {
-    "czech_republic": "Чеська Республіка"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

@@ -46,8 +46,8 @@
     "contact_email": "Kontaktní e-mail",
     "continue": "Pokračovat",
     "convention": "Dohoda",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Zkopírováno!",
+    "copy": "Kopírovat",
     "copy_error": "Chyba při kopírování",
     "copy_link": "Kopírovat odkaz",
     "country": "Země",
@@ -149,7 +149,7 @@
     "ticket": "Vstupenka",
     "ticketing_short": "Vstupenky",
     "time": "Čas",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Časové pásmo",
     "tip": "Rada",
     "title": "Název",
     "total": "Celkem",
@@ -167,9 +167,6 @@
     "volunteers_short": "Dobrovolníci",
     "week": "Týden",
     "yes": "Ano"
-  },
-  "countries": {
-    "czech_republic": "Česká republika"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

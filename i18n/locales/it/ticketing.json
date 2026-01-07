@@ -99,15 +99,15 @@
       "volunteer_validated": "Il volontario ha convalidato il suo ingresso"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Numero dell'assegno",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Carta di credito",
+        "cash": "Contanti",
+        "check": "Assegno",
+        "pending": "Non pagato",
+        "pendingSubtitle": "In attesa"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Seleziona il metodo di pagamento"
     },
     "quotas": {
       "list": {

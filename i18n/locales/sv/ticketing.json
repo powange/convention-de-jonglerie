@@ -99,15 +99,15 @@
       "volunteer_validated": "Volontären har validerat sin post"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Checknummer",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Bankkort",
+        "cash": "Kontant",
+        "check": "Check",
+        "pending": "Ej betald",
+        "pendingSubtitle": "Väntar"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Välj betalningsmetod"
     },
     "quotas": {
       "list": {

@@ -99,15 +99,15 @@
       "volunteer_validated": "Волонтер підтвердив свій вхід"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Номер чека",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Банківська картка",
+        "cash": "Готівка",
+        "check": "Чек",
+        "pending": "Не оплачено",
+        "pendingSubtitle": "Очікування"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Виберіть спосіб оплати"
     },
     "quotas": {
       "list": {

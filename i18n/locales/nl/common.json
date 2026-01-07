@@ -46,8 +46,8 @@
     "contact_email": "Contact e-mail",
     "continue": "Doorgaan",
     "convention": "Conventie",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Gekopieerd!",
+    "copy": "Kopiëren",
     "copy_error": "Fout bij kopiëren",
     "copy_link": "Link kopiëren",
     "country": "Land",
@@ -149,7 +149,7 @@
     "ticket": "Ticket",
     "ticketing_short": "Kaartverkoop",
     "time": "Tijd",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Tijdzone",
     "tip": "Tip",
     "title": "Titel",
     "total": "Totaal",
@@ -167,9 +167,6 @@
     "volunteers_short": "Vrijwilligers",
     "week": "Week",
     "yes": "Ja"
-  },
-  "countries": {
-    "czech_republic": "Tsjechische Republiek"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

@@ -99,15 +99,15 @@
       "volunteer_validated": "The volunteer has validated their entry"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Check number",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Bank card",
+        "cash": "Cash",
+        "check": "Check",
+        "pending": "Not paid",
+        "pendingSubtitle": "Pending"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Select payment method"
     },
     "quotas": {
       "list": {

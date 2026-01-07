@@ -46,8 +46,8 @@
     "contact_email": "Email de contacto",
     "continue": "Continuar",
     "convention": "Convención",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "¡Copiado!",
+    "copy": "Copiar",
     "copy_error": "Error al copiar",
     "copy_link": "Copiar enlace",
     "country": "País",
@@ -149,7 +149,7 @@
     "ticket": "Entrada",
     "ticketing_short": "Venta de entradas",
     "time": "Hora",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Zona horaria",
     "tip": "Consejo",
     "title": "Título",
     "total": "Total",
@@ -167,9 +167,6 @@
     "volunteers_short": "Voluntarios",
     "week": "Semana",
     "yes": "Sí"
-  },
-  "countries": {
-    "czech_republic": "República Checa"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",

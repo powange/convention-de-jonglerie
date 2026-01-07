@@ -46,8 +46,8 @@
     "contact_email": "Контактный email",
     "continue": "Продолжить",
     "convention": "Конвенция",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Скопировано!",
+    "copy": "Копировать",
     "copy_error": "Ошибка при копировании",
     "copy_link": "Копировать ссылку",
     "country": "Страна",
@@ -149,7 +149,7 @@
     "ticket": "Билет",
     "ticketing_short": "Билеты",
     "time": "Время",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Часовой пояс",
     "tip": "Совет",
     "title": "Заголовок",
     "total": "Всего",
@@ -167,9 +167,6 @@
     "volunteers_short": "Волонтёры",
     "week": "Неделя",
     "yes": "Да"
-  },
-  "countries": {
-    "czech_republic": "Чешская Республика"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

@@ -110,7 +110,7 @@
       "ticketing_link": "Billetsalgslink",
       "ticketing_section_description": "Information om køb af billetter",
       "ticketing_section_title": "Billetsalg",
-      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Datoer og tidspunkter vil blive vist i denne tidszone"
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",
@@ -173,7 +173,7 @@
       "search_by_name": "Søg efter navn",
       "select_convention": "Vælg en konvention",
       "select_countries": "Vælg lande...",
-      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
+      "select_timezone": "Vælg en tidszone",
       "start_typing_address": "Begynd at skrive en adresse..."
     }
   },

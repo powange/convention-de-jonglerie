@@ -99,15 +99,15 @@
       "volunteer_validated": "Wolontariusz zwalidował swoje wejście"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Numer czeku",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Karta płatnicza",
+        "cash": "Gotówka",
+        "check": "Czek",
+        "pending": "Nieopłacone",
+        "pendingSubtitle": "Oczekujące"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Wybierz metodę płatności"
     },
     "quotas": {
       "list": {

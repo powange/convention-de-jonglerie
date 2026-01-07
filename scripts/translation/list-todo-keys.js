@@ -195,12 +195,69 @@ function analyzeLanguageFiles() {
     `${colors.yellow}Langues concernées: ${languageFiles.filter((lang) => lang !== REFERENCE_LANG).length}${colors.reset}`
   )
 
-  // Générer un template de configuration
-  generateConfigTemplate(sortedTodoKeys, languageData, languageFiles)
+  // Générer les fichiers de traduction
+  const args = process.argv.slice(2)
+  if (args.includes('--legacy')) {
+    // Ancien format: un seul fichier avec toutes les langues
+    generateConfigTemplate(sortedTodoKeys, languageData, languageFiles)
+  } else {
+    // Nouveau format par défaut: un fichier par langue
+    generatePerLanguageFiles(sortedTodoKeys, languageData, languageFiles)
+  }
 }
 
 /**
- * Génère un template de fichier de configuration
+ * Génère des fichiers de traduction par langue (un fichier par langue)
+ * Format: todo-{lang}.json avec { "clé": "valeur française de référence" }
+ */
+function generatePerLanguageFiles(todoKeys, languageData, languageFiles) {
+  if (todoKeys.length === 0) return
+
+  const generatedFiles = []
+
+  for (const lang of languageFiles) {
+    if (lang === REFERENCE_LANG) continue
+
+    // Collecter les clés TODO pour cette langue
+    const todoForLang = {}
+
+    for (const keyPath of todoKeys) {
+      const value = getNestedValue(languageData[lang], keyPath)
+
+      // Si la clé est manquante ou commence par [TODO]
+      if (!value || value.toString().startsWith('[TODO]')) {
+        // Récupérer la valeur française de référence
+        const refValue = getNestedValue(languageData[REFERENCE_LANG], keyPath)
+        if (refValue && !refValue.toString().startsWith('[TODO]')) {
+          todoForLang[keyPath] = refValue
+        }
+      }
+    }
+
+    // Générer le fichier seulement s'il y a des clés à traduire
+    if (Object.keys(todoForLang).length > 0) {
+      const filePath = path.join(__dirname, `todo-${lang}.json`)
+      fs.writeFileSync(filePath, JSON.stringify(todoForLang, null, 2) + '\n')
+      generatedFiles.push({ lang, count: Object.keys(todoForLang).length, path: filePath })
+    }
+  }
+
+  if (generatedFiles.length > 0) {
+    console.log(`\n${colors.green}${colors.bold}📄 Fichiers générés par langue:${colors.reset}`)
+    for (const file of generatedFiles) {
+      console.log(`  ${colors.cyan}todo-${file.lang}.json${colors.reset} (${file.count} clés)`)
+    }
+    console.log(`\n${colors.yellow}💡 Workflow:${colors.reset}`)
+    console.log(`  1. Remplacez les valeurs françaises par les traductions dans chaque fichier`)
+    console.log(
+      `  2. Lancez: ${colors.cyan}node scripts/translation/apply-translations.js${colors.reset}`
+    )
+    console.log(`  3. Les fichiers todo-*.json seront automatiquement supprimés après application`)
+  }
+}
+
+/**
+ * Génère un template de fichier de configuration (ancien format, conservé pour compatibilité)
  */
 function generateConfigTemplate(todoKeys, languageData, languageFiles) {
   if (todoKeys.length === 0) return

@@ -99,15 +99,15 @@
       "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Schecknummer",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Bankkarte",
+        "cash": "Bargeld",
+        "check": "Scheck",
+        "pending": "Nicht bezahlt",
+        "pendingSubtitle": "Ausstehend"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Zahlungsmethode auswählen"
     },
     "quotas": {
       "list": {

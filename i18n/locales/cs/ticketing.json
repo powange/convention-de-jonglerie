@@ -99,15 +99,15 @@
       "volunteer_validated": "Dobrovolník potvrdil svůj vstup"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Číslo šeku",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Platební karta",
+        "cash": "Hotovost",
+        "check": "Šek",
+        "pending": "Nezaplaceno",
+        "pendingSubtitle": "Čeká na vyřízení"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Vyberte způsob platby"
     },
     "quotas": {
       "list": {

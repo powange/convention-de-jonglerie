@@ -46,8 +46,8 @@
     "contact_email": "Email di contatto",
     "continue": "Continua",
     "convention": "Convegno",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Copiato!",
+    "copy": "Copia",
     "copy_error": "Errore durante la copia",
     "copy_link": "Copia link",
     "country": "Paese",
@@ -149,7 +149,7 @@
     "ticket": "Biglietto",
     "ticketing_short": "Biglietteria",
     "time": "Ora",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Fuso orario",
     "tip": "Consiglio",
     "title": "Titolo",
     "total": "Totale",
@@ -167,9 +167,6 @@
     "volunteers_short": "Volontari",
     "week": "Settimana",
     "yes": "Sì"
-  },
-  "countries": {
-    "czech_republic": "Repubblica Ceca"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

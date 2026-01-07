@@ -99,15 +99,15 @@
       "volunteer_validated": "Frivillig har valideret sin adgang"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Checknummer",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Betalingskort",
+        "cash": "Kontant",
+        "check": "Check",
+        "pending": "Ikke betalt",
+        "pendingSubtitle": "Afventer"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Vælg betalingsmetode"
     },
     "quotas": {
       "list": {

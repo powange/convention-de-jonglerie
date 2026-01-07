@@ -46,8 +46,8 @@
     "contact_email": "Kontakt e-mail",
     "continue": "Fortsæt",
     "convention": "Konvention",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Kopieret!",
+    "copy": "Kopier",
     "copy_error": "Fejl ved kopiering",
     "copy_link": "Kopiér link",
     "country": "Land",
@@ -149,7 +149,7 @@
     "ticket": "Billet",
     "ticketing_short": "Billetsalg",
     "time": "Tid",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Tidszone",
     "tip": "Tip",
     "title": "Titel",
     "total": "Total",
@@ -167,9 +167,6 @@
     "volunteers_short": "Frivillige",
     "week": "Uge",
     "yes": "Ja"
-  },
-  "countries": {
-    "czech_republic": "Tjekkiet"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",

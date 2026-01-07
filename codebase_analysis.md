@@ -36,21 +36,21 @@
 
 ### Stack technologique
 
-| Categorie | Technologies |
-|-----------|-------------|
-| **Framework** | Nuxt.js 4.2.0 / Vue.js 3.5.17 |
-| **UI** | Nuxt UI 4.0.0 / Tailwind CSS |
-| **State Management** | Pinia 3.0.3 |
-| **Backend** | Nitro (integre a Nuxt) |
-| **ORM** | Prisma 7.0.0 |
-| **Base de donnees** | MySQL |
+| Categorie            | Technologies                              |
+| -------------------- | ----------------------------------------- |
+| **Framework**        | Nuxt.js 4.2.0 / Vue.js 3.5.17             |
+| **UI**               | Nuxt UI 4.0.0 / Tailwind CSS              |
+| **State Management** | Pinia 3.0.3                               |
+| **Backend**          | Nitro (integre a Nuxt)                    |
+| **ORM**              | Prisma 7.0.0                              |
+| **Base de donnees**  | MySQL                                     |
 | **Authentification** | nuxt-auth-utils 0.5.23 (sessions/cookies) |
-| **i18n** | @nuxtjs/i18n 10.0.3 (13 langues) |
-| **Tests** | Vitest 3.2.4 / Nuxt Test Utils |
-| **Validation** | Zod 4.1.9 |
-| **Calendrier** | FullCalendar 6.1.15 |
-| **Graphiques** | Chart.js 4.5.1 |
-| **Notifications** | Firebase Cloud Messaging |
+| **i18n**             | @nuxtjs/i18n 10.0.3 (13 langues)          |
+| **Tests**            | Vitest 3.2.4 / Nuxt Test Utils            |
+| **Validation**       | Zod 4.1.9                                 |
+| **Calendrier**       | FullCalendar 6.1.15                       |
+| **Graphiques**       | Chart.js 4.5.1                            |
+| **Notifications**    | Firebase Cloud Messaging                  |
 
 ### Contraintes techniques
 
@@ -366,98 +366,98 @@ L'application expose ~150+ endpoints organises par domaine :
 
 #### Authentification (`/api/auth/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| POST | `/api/auth/login` | Connexion utilisateur |
-| POST | `/api/auth/logout` | Deconnexion |
-| POST | `/api/auth/register` | Inscription |
-| POST | `/api/auth/verify-email` | Verification email |
-| POST | `/api/auth/resend-verification` | Renvoyer code |
-| POST | `/api/auth/request-password-reset` | Demande reset MDP |
-| POST | `/api/auth/reset-password` | Reset MDP |
-| GET | `/api/auth/verify-reset-token` | Verifier token reset |
-| POST | `/api/auth/check-email` | Verifier disponibilite email |
+| Methode | Route                              | Description                  |
+| ------- | ---------------------------------- | ---------------------------- |
+| POST    | `/api/auth/login`                  | Connexion utilisateur        |
+| POST    | `/api/auth/logout`                 | Deconnexion                  |
+| POST    | `/api/auth/register`               | Inscription                  |
+| POST    | `/api/auth/verify-email`           | Verification email           |
+| POST    | `/api/auth/resend-verification`    | Renvoyer code                |
+| POST    | `/api/auth/request-password-reset` | Demande reset MDP            |
+| POST    | `/api/auth/reset-password`         | Reset MDP                    |
+| GET     | `/api/auth/verify-reset-token`     | Verifier token reset         |
+| POST    | `/api/auth/check-email`            | Verifier disponibilite email |
 
 #### Conventions (`/api/conventions/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| GET | `/api/conventions/[id]` | Detail convention |
-| POST | `/api/conventions` | Creer convention |
-| DELETE | `/api/conventions/[id]` | Supprimer convention |
-| PATCH | `/api/conventions/[id]/archive` | Archiver convention |
-| GET | `/api/conventions/my-conventions` | Mes conventions |
-| GET | `/api/conventions/[id]/editions` | Editions d'une convention |
-| GET | `/api/conventions/[id]/organizers` | Organisateurs |
-| POST | `/api/conventions/[id]/claim` | Revendiquer convention |
+| Methode | Route                              | Description               |
+| ------- | ---------------------------------- | ------------------------- |
+| GET     | `/api/conventions/[id]`            | Detail convention         |
+| POST    | `/api/conventions`                 | Creer convention          |
+| DELETE  | `/api/conventions/[id]`            | Supprimer convention      |
+| PATCH   | `/api/conventions/[id]/archive`    | Archiver convention       |
+| GET     | `/api/conventions/my-conventions`  | Mes conventions           |
+| GET     | `/api/conventions/[id]/editions`   | Editions d'une convention |
+| GET     | `/api/conventions/[id]/organizers` | Organisateurs             |
+| POST    | `/api/conventions/[id]/claim`      | Revendiquer convention    |
 
 #### Editions (`/api/editions/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| GET | `/api/editions` | Liste editions (paginee, filtree) |
-| GET | `/api/editions/[id]` | Detail edition |
-| POST | `/api/editions` | Creer edition |
-| PUT | `/api/editions/[id]` | Modifier edition |
-| DELETE | `/api/editions/[id]` | Supprimer edition |
+| Methode | Route                | Description                       |
+| ------- | -------------------- | --------------------------------- |
+| GET     | `/api/editions`      | Liste editions (paginee, filtree) |
+| GET     | `/api/editions/[id]` | Detail edition                    |
+| POST    | `/api/editions`      | Creer edition                     |
+| PUT     | `/api/editions/[id]` | Modifier edition                  |
+| DELETE  | `/api/editions/[id]` | Supprimer edition                 |
 
 #### Benevoles (`/api/editions/[id]/volunteers/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| GET | `/volunteers/applications` | Liste candidatures |
-| POST | `/volunteers/applications` | Postuler |
-| PATCH | `/volunteers/applications/[appId]/status` | Accepter/Refuser |
-| GET | `/volunteers/teams` | Equipes benevoles |
-| POST | `/volunteers/teams` | Creer equipe |
-| GET | `/volunteers/time-slots` | Creneaux planning |
-| POST | `/volunteers/assignments` | Assigner benevole |
+| Methode | Route                                     | Description        |
+| ------- | ----------------------------------------- | ------------------ |
+| GET     | `/volunteers/applications`                | Liste candidatures |
+| POST    | `/volunteers/applications`                | Postuler           |
+| PATCH   | `/volunteers/applications/[appId]/status` | Accepter/Refuser   |
+| GET     | `/volunteers/teams`                       | Equipes benevoles  |
+| POST    | `/volunteers/teams`                       | Creer equipe       |
+| GET     | `/volunteers/time-slots`                  | Creneaux planning  |
+| POST    | `/volunteers/assignments`                 | Assigner benevole  |
 
 #### Billetterie (`/api/editions/[id]/ticketing/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| GET | `/ticketing/tiers` | Tarifs disponibles |
-| POST | `/ticketing/orders` | Creer commande |
-| GET | `/ticketing/orders` | Liste commandes |
-| POST | `/ticketing/verify-qrcode` | Valider QR code |
-| GET | `/ticketing/stats` | Statistiques |
-| POST | `/ticketing/helloasso/orders` | Sync HelloAsso |
+| Methode | Route                         | Description        |
+| ------- | ----------------------------- | ------------------ |
+| GET     | `/ticketing/tiers`            | Tarifs disponibles |
+| POST    | `/ticketing/orders`           | Creer commande     |
+| GET     | `/ticketing/orders`           | Liste commandes    |
+| POST    | `/ticketing/verify-qrcode`    | Valider QR code    |
+| GET     | `/ticketing/stats`            | Statistiques       |
+| POST    | `/ticketing/helloasso/orders` | Sync HelloAsso     |
 
 #### Covoiturage (`/api/carpool-offers/`, `/api/carpool-requests/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| POST | `/carpool-offers` | Creer offre |
-| GET | `/carpool-offers/[id]` | Detail offre |
-| POST | `/carpool-offers/[id]/bookings` | Reserver places |
-| PUT | `/carpool-offers/[id]/bookings/[bId]` | Accepter/Refuser |
-| POST | `/carpool-offers/[id]/comments` | Commenter |
-| POST | `/carpool-requests` | Creer demande |
+| Methode | Route                                 | Description      |
+| ------- | ------------------------------------- | ---------------- |
+| POST    | `/carpool-offers`                     | Creer offre      |
+| GET     | `/carpool-offers/[id]`                | Detail offre     |
+| POST    | `/carpool-offers/[id]/bookings`       | Reserver places  |
+| PUT     | `/carpool-offers/[id]/bookings/[bId]` | Accepter/Refuser |
+| POST    | `/carpool-offers/[id]/comments`       | Commenter        |
+| POST    | `/carpool-requests`                   | Creer demande    |
 
 #### Notifications (`/api/notifications/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| GET | `/notifications` | Liste notifications |
-| GET | `/notifications/stats` | Statistiques |
-| PATCH | `/notifications/[id]/read` | Marquer comme lu |
-| PATCH | `/notifications/mark-all-read` | Tout marquer lu |
-| DELETE | `/notifications/[id]/delete` | Supprimer |
-| GET | `/notifications/stream` | SSE temps reel |
+| Methode | Route                          | Description         |
+| ------- | ------------------------------ | ------------------- |
+| GET     | `/notifications`               | Liste notifications |
+| GET     | `/notifications/stats`         | Statistiques        |
+| PATCH   | `/notifications/[id]/read`     | Marquer comme lu    |
+| PATCH   | `/notifications/mark-all-read` | Tout marquer lu     |
+| DELETE  | `/notifications/[id]/delete`   | Supprimer           |
+| GET     | `/notifications/stream`        | SSE temps reel      |
 
 #### Administration (`/api/admin/`)
 
-| Methode | Route | Description |
-|---------|-------|-------------|
-| GET | `/admin/users` | Liste utilisateurs |
-| GET | `/admin/users/[id]` | Detail utilisateur |
-| PUT | `/admin/users/[id]` | Modifier utilisateur |
-| DELETE | `/admin/users/[id]` | Supprimer utilisateur |
-| POST | `/admin/users/[id]/impersonate` | Se faire passer pour |
-| GET | `/admin/feedback` | Retours utilisateurs |
-| GET | `/admin/error-logs` | Logs d'erreurs |
-| POST | `/admin/backup/create` | Creer backup |
+| Methode | Route                           | Description           |
+| ------- | ------------------------------- | --------------------- |
+| GET     | `/admin/users`                  | Liste utilisateurs    |
+| GET     | `/admin/users/[id]`             | Detail utilisateur    |
+| PUT     | `/admin/users/[id]`             | Modifier utilisateur  |
+| DELETE  | `/admin/users/[id]`             | Supprimer utilisateur |
+| POST    | `/admin/users/[id]/impersonate` | Se faire passer pour  |
+| GET     | `/admin/feedback`               | Retours utilisateurs  |
+| GET     | `/admin/error-logs`             | Logs d'erreurs        |
+| POST    | `/admin/backup/create`          | Creer backup          |
 
 ### Pattern des handlers API
 
@@ -498,51 +498,51 @@ export default wrapApiHandler(
 
 #### Pages publiques
 
-| Route | Fichier | Description |
-|-------|---------|-------------|
-| `/` | `pages/index.vue` | Accueil avec carte et agenda |
-| `/login` | `pages/login.vue` | Connexion |
-| `/register` | `pages/register.vue` | Inscription |
-| `/verify-email` | `pages/verify-email.vue` | Verification email |
-| `/privacy-policy` | `pages/privacy-policy.vue` | Politique confidentialite |
-| `/editions/[id]` | `pages/editions/[id]/index.vue` | Detail edition |
-| `/editions/[id]/carpool` | `pages/editions/[id]/carpool.vue` | Covoiturage |
-| `/editions/[id]/workshops` | `pages/editions/[id]/workshops.vue` | Ateliers |
-| `/editions/[id]/volunteers` | `pages/editions/[id]/volunteers/index.vue` | Benevoles |
+| Route                       | Fichier                                    | Description                  |
+| --------------------------- | ------------------------------------------ | ---------------------------- |
+| `/`                         | `pages/index.vue`                          | Accueil avec carte et agenda |
+| `/login`                    | `pages/login.vue`                          | Connexion                    |
+| `/register`                 | `pages/register.vue`                       | Inscription                  |
+| `/verify-email`             | `pages/verify-email.vue`                   | Verification email           |
+| `/privacy-policy`           | `pages/privacy-policy.vue`                 | Politique confidentialite    |
+| `/editions/[id]`            | `pages/editions/[id]/index.vue`            | Detail edition               |
+| `/editions/[id]/carpool`    | `pages/editions/[id]/carpool.vue`          | Covoiturage                  |
+| `/editions/[id]/workshops`  | `pages/editions/[id]/workshops.vue`        | Ateliers                     |
+| `/editions/[id]/volunteers` | `pages/editions/[id]/volunteers/index.vue` | Benevoles                    |
 
 #### Pages authentifiees
 
-| Route | Fichier | Description |
-|-------|---------|-------------|
-| `/profile` | `pages/profile.vue` | Profil utilisateur |
-| `/favorites` | `pages/favorites.vue` | Mes favoris |
-| `/notifications` | `pages/notifications.vue` | Notifications |
-| `/messenger` | `pages/messenger.vue` | Messagerie |
-| `/my-conventions` | `pages/my-conventions.vue` | Mes conventions |
-| `/my-volunteer-applications` | `pages/my-volunteer-applications.vue` | Mes candidatures |
+| Route                        | Fichier                               | Description        |
+| ---------------------------- | ------------------------------------- | ------------------ |
+| `/profile`                   | `pages/profile.vue`                   | Profil utilisateur |
+| `/favorites`                 | `pages/favorites.vue`                 | Mes favoris        |
+| `/notifications`             | `pages/notifications.vue`             | Notifications      |
+| `/messenger`                 | `pages/messenger.vue`                 | Messagerie         |
+| `/my-conventions`            | `pages/my-conventions.vue`            | Mes conventions    |
+| `/my-volunteer-applications` | `pages/my-volunteer-applications.vue` | Mes candidatures   |
 
 #### Pages de gestion (organisateurs)
 
-| Route | Fichier | Description |
-|-------|---------|-------------|
-| `/editions/[id]/gestion` | `pages/editions/[id]/gestion/index.vue` | Dashboard gestion |
-| `/editions/[id]/gestion/organizers` | `pages/editions/[id]/gestion/organizers.vue` | Organisateurs |
-| `/editions/[id]/gestion/volunteers/*` | `pages/editions/[id]/gestion/volunteers/*.vue` | Gestion benevoles |
-| `/editions/[id]/gestion/ticketing/*` | `pages/editions/[id]/gestion/ticketing/*.vue` | Gestion billetterie |
-| `/editions/[id]/gestion/artists/*` | `pages/editions/[id]/gestion/artists/*.vue` | Gestion artistes |
-| `/editions/[id]/gestion/meals/*` | `pages/editions/[id]/gestion/meals/*.vue` | Gestion repas |
+| Route                                 | Fichier                                        | Description         |
+| ------------------------------------- | ---------------------------------------------- | ------------------- |
+| `/editions/[id]/gestion`              | `pages/editions/[id]/gestion/index.vue`        | Dashboard gestion   |
+| `/editions/[id]/gestion/organizers`   | `pages/editions/[id]/gestion/organizers.vue`   | Organisateurs       |
+| `/editions/[id]/gestion/volunteers/*` | `pages/editions/[id]/gestion/volunteers/*.vue` | Gestion benevoles   |
+| `/editions/[id]/gestion/ticketing/*`  | `pages/editions/[id]/gestion/ticketing/*.vue`  | Gestion billetterie |
+| `/editions/[id]/gestion/artists/*`    | `pages/editions/[id]/gestion/artists/*.vue`    | Gestion artistes    |
+| `/editions/[id]/gestion/meals/*`      | `pages/editions/[id]/gestion/meals/*.vue`      | Gestion repas       |
 
 #### Pages administration
 
-| Route | Fichier | Description |
-|-------|---------|-------------|
-| `/admin` | `pages/admin/index.vue` | Dashboard admin |
-| `/admin/users` | `pages/admin/users/index.vue` | Gestion utilisateurs |
-| `/admin/conventions` | `pages/admin/conventions.vue` | Gestion conventions |
-| `/admin/feedback` | `pages/admin/feedback.vue` | Retours utilisateurs |
-| `/admin/error-logs` | `pages/admin/error-logs.vue` | Logs d'erreurs |
-| `/admin/crons` | `pages/admin/crons.vue` | Taches planifiees |
-| `/admin/backup` | `pages/admin/backup.vue` | Sauvegardes |
+| Route                | Fichier                       | Description          |
+| -------------------- | ----------------------------- | -------------------- |
+| `/admin`             | `pages/admin/index.vue`       | Dashboard admin      |
+| `/admin/users`       | `pages/admin/users/index.vue` | Gestion utilisateurs |
+| `/admin/conventions` | `pages/admin/conventions.vue` | Gestion conventions  |
+| `/admin/feedback`    | `pages/admin/feedback.vue`    | Retours utilisateurs |
+| `/admin/error-logs`  | `pages/admin/error-logs.vue`  | Logs d'erreurs       |
+| `/admin/crons`       | `pages/admin/crons.vue`       | Taches planifiees    |
+| `/admin/backup`      | `pages/admin/backup.vue`      | Sauvegardes          |
 
 ### Composants principaux (~100+)
 
@@ -608,13 +608,13 @@ export default wrapApiHandler(
 
 ### Stores disponibles
 
-| Store | Fichier | Description |
-|-------|---------|-------------|
-| `auth` | `stores/auth.ts` | Authentification et session |
-| `editions` | `stores/editions.ts` | Gestion des editions |
-| `favoritesEditions` | `stores/favoritesEditions.ts` | Editions favorites |
-| `notifications` | `stores/notifications.ts` | Notifications |
-| `impersonation` | `stores/impersonation.ts` | Mode impersonation admin |
+| Store               | Fichier                       | Description                 |
+| ------------------- | ----------------------------- | --------------------------- |
+| `auth`              | `stores/auth.ts`              | Authentification et session |
+| `editions`          | `stores/editions.ts`          | Gestion des editions        |
+| `favoritesEditions` | `stores/favoritesEditions.ts` | Editions favorites          |
+| `notifications`     | `stores/notifications.ts`     | Notifications               |
+| `impersonation`     | `stores/impersonation.ts`     | Mode impersonation admin    |
 
 ### Store Auth
 
@@ -742,7 +742,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     try {
       const { user } = await $fetch('/api/session/me')
       authStore.user = user
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   // Redirection si non authentifie
@@ -755,14 +757,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 ### Middlewares disponibles
 
-| Middleware | Description |
-|------------|-------------|
-| `auth-protected.ts` | Pages necessitant authentification |
-| `guest-only.ts` | Pages pour non-connectes (login, register) |
-| `super-admin.ts` | Pages admin uniquement |
-| `authenticated.ts` | Variante auth-protected |
-| `verify-email-access.ts` | Acces page verification email |
-| `load-translations.global.ts` | Chargement traductions |
+| Middleware                    | Description                                |
+| ----------------------------- | ------------------------------------------ |
+| `auth-protected.ts`           | Pages necessitant authentification         |
+| `guest-only.ts`               | Pages pour non-connectes (login, register) |
+| `super-admin.ts`              | Pages admin uniquement                     |
+| `authenticated.ts`            | Variante auth-protected                    |
+| `verify-email-access.ts`      | Acces page verification email              |
+| `load-translations.global.ts` | Chargement traductions                     |
 
 ### Plugin d'initialisation
 
@@ -806,21 +808,21 @@ i18n: {
 
 ### Langues supportees
 
-| Code | Langue | Statut |
-|------|--------|--------|
-| `fr` | Francais | Reference |
-| `en` | English | Complete |
-| `de` | Deutsch | Complete |
-| `es` | Espanol | Complete |
-| `it` | Italiano | Complete |
-| `nl` | Nederlands | Complete |
-| `pl` | Polski | Complete |
-| `pt` | Portugues | Complete |
-| `ru` | Russky | Complete |
-| `sv` | Svenska | Complete |
-| `cs` | Cestina | Complete |
-| `da` | Dansk | Complete |
-| `uk` | Ukrainska | Complete |
+| Code | Langue     | Statut    |
+| ---- | ---------- | --------- |
+| `fr` | Francais   | Reference |
+| `en` | English    | Complete  |
+| `de` | Deutsch    | Complete  |
+| `es` | Espanol    | Complete  |
+| `it` | Italiano   | Complete  |
+| `nl` | Nederlands | Complete  |
+| `pl` | Polski     | Complete  |
+| `pt` | Portugues  | Complete  |
+| `ru` | Russky     | Complete  |
+| `sv` | Svenska    | Complete  |
+| `cs` | Cestina    | Complete  |
+| `da` | Dansk      | Complete  |
+| `uk` | Ukrainska  | Complete  |
 
 ### Structure des fichiers de traduction
 
@@ -917,7 +919,7 @@ describe('POST /api/conventions', () => {
     // Call endpoint
     const result = await $fetch('/api/conventions', {
       method: 'POST',
-      body: { name: 'Test', description: 'Description' }
+      body: { name: 'Test', description: 'Description' },
     })
 
     expect(result).toMatchObject({ id: 1, name: 'Test' })
@@ -932,6 +934,7 @@ describe('POST /api/conventions', () => {
 ### API Handlers
 
 **Pattern `wrapApiHandler`** : Tous les handlers utilisent ce wrapper pour :
+
 - Gestion centralisee des erreurs
 - Transformation des erreurs Zod en 400
 - Transformation des erreurs Prisma
@@ -964,13 +967,14 @@ export const carpoolUserSelect = userWithProfileAndGravatarSelect
 
 // Utilisation
 const users = await prisma.user.findMany({
-  select: userBasicSelect
+  select: userBasicSelect,
 })
 ```
 
 ### Composables
 
 **Pattern des composables** :
+
 - Prefixe `use` (ex: `useDateFormat`, `useLeafletMap`)
 - Retourne des refs reactives et des fonctions
 - Gere le cleanup automatiquement
@@ -991,6 +995,7 @@ export function useDateFormat() {
 ### Permissions
 
 **Systeme de permissions granulaire** :
+
 - Permissions globales sur la convention
 - Permissions specifiques par edition
 - Verification cote client ET serveur
@@ -1007,6 +1012,7 @@ if (!hasPermission) throw createError({ statusCode: 403 })
 ### Validation
 
 **Zod pour validation** :
+
 - Schemas reutilisables
 - Messages d'erreur i18n
 - Transformation automatique des erreurs
@@ -1025,6 +1031,7 @@ const editionSchema = z.object({
 ### Notifications temps reel
 
 **SSE (Server-Sent Events)** pour :
+
 - Notifications utilisateur
 - Stats billetterie en temps reel
 - Compteurs de caisse
@@ -1210,5 +1217,5 @@ Les principaux domaines fonctionnels (conventions, benevoles, billetterie, covoi
 
 ---
 
-*Document genere le 5 janvier 2026*
-*Version du codebase analysee : main (commit 59ccbcdf)*
+_Document genere le 5 janvier 2026_
+_Version du codebase analysee : main (commit 59ccbcdf)_

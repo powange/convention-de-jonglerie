@@ -110,7 +110,7 @@
       "ticketing_link": "Ticketing-Link",
       "ticketing_section_description": "Informationen zum Ticketkauf",
       "ticketing_section_title": "Ticketverkauf",
-      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Datum und Uhrzeit werden in dieser Zeitzone angezeigt"
     },
     "favorites_map": {
       "all_favorites": "Alle sind Favoriten",
@@ -173,7 +173,7 @@
       "search_by_name": "Nach Name suchen",
       "select_convention": "Eine Convention auswählen",
       "select_countries": "Länder auswählen...",
-      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
+      "select_timezone": "Zeitzone auswählen",
       "start_typing_address": "Beginne eine Adresse zu tippen..."
     }
   },

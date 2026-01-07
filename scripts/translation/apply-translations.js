@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const CONFIG_FILE = path.join(__dirname, 'translations-config.json')
+const TODO_FILE_PATTERN = /^todo-([a-z]{2})\.json$/
 
 // Couleurs pour l'affichage
 const colors = {
@@ -49,17 +50,68 @@ function getNestedValue(obj, keyPath) {
 }
 
 /**
- * Charge le fichier de configuration des traductions
+ * Cherche les fichiers todo-{lang}.json dans le répertoire des scripts
  */
-function loadTranslationsConfig() {
+function findTodoFiles() {
+  const files = fs.readdirSync(__dirname)
+  const todoFiles = []
+
+  for (const file of files) {
+    const match = file.match(TODO_FILE_PATTERN)
+    if (match) {
+      todoFiles.push({
+        path: path.join(__dirname, file),
+        lang: match[1],
+        filename: file,
+      })
+    }
+  }
+
+  return todoFiles
+}
+
+/**
+ * Charge les fichiers de traduction par langue (nouveau format)
+ * Retourne un objet { translations, todoFiles, format: 'per-language' }
+ */
+function loadPerLanguageFiles() {
+  const todoFiles = findTodoFiles()
+
+  if (todoFiles.length === 0) {
+    return null
+  }
+
+  // Convertir au format interne: { keyPath: { lang: translation } }
+  const translations = {}
+
+  for (const todoFile of todoFiles) {
+    try {
+      const content = fs.readFileSync(todoFile.path, 'utf-8')
+      const langTranslations = JSON.parse(content)
+
+      for (const [keyPath, translation] of Object.entries(langTranslations)) {
+        if (!translations[keyPath]) {
+          translations[keyPath] = {}
+        }
+        translations[keyPath][todoFile.lang] = translation
+      }
+    } catch (error) {
+      console.error(
+        `${colors.red}❌ Erreur lors du chargement de ${todoFile.filename}: ${error.message}${colors.reset}`
+      )
+    }
+  }
+
+  return { translations, todoFiles, format: 'per-language' }
+}
+
+/**
+ * Charge le fichier de configuration des traductions (ancien format)
+ * Retourne un objet { translations, format: 'legacy' }
+ */
+function loadLegacyConfig() {
   if (!fs.existsSync(CONFIG_FILE)) {
-    console.error(
-      `${colors.red}❌ Fichier de configuration non trouvé: ${CONFIG_FILE}${colors.reset}`
-    )
-    console.log(
-      `${colors.yellow}💡 Lancez d'abord: node scripts/translation/list-todo-keys.js${colors.reset}`
-    )
-    process.exit(1)
+    return null
   }
 
   try {
@@ -70,15 +122,63 @@ function loadTranslationsConfig() {
       console.error(
         `${colors.red}❌ Structure invalide: 'translations' manquant dans le fichier de config${colors.reset}`
       )
-      process.exit(1)
+      return null
     }
 
-    return config.translations
+    return { translations: config.translations, format: 'legacy' }
   } catch (error) {
     console.error(
       `${colors.red}❌ Erreur lors du chargement de la configuration: ${error.message}${colors.reset}`
     )
-    process.exit(1)
+    return null
+  }
+}
+
+/**
+ * Charge le fichier de configuration des traductions
+ * Supporte les deux formats: par langue (todo-*.json) et legacy (translations-config.json)
+ */
+function loadTranslationsConfig() {
+  // Essayer d'abord le nouveau format (par langue)
+  const perLanguage = loadPerLanguageFiles()
+  if (perLanguage) {
+    console.log(
+      `${colors.cyan}📁 Format détecté: fichiers par langue (${perLanguage.todoFiles.length} fichier(s))${colors.reset}`
+    )
+    return perLanguage
+  }
+
+  // Sinon essayer l'ancien format
+  const legacy = loadLegacyConfig()
+  if (legacy) {
+    console.log(`${colors.cyan}📁 Format détecté: fichier unique (legacy)${colors.reset}`)
+    return legacy
+  }
+
+  // Aucun fichier trouvé
+  console.error(`${colors.red}❌ Aucun fichier de traduction trouvé${colors.reset}`)
+  console.log(
+    `${colors.yellow}💡 Lancez d'abord: node scripts/translation/list-todo-keys.js${colors.reset}`
+  )
+  process.exit(1)
+}
+
+/**
+ * Supprime les fichiers todo-*.json après application réussie
+ */
+function cleanupTodoFiles(todoFiles) {
+  if (!todoFiles || todoFiles.length === 0) return
+
+  console.log(`\n${colors.cyan}🧹 Nettoyage des fichiers todo-*.json...${colors.reset}`)
+  for (const todoFile of todoFiles) {
+    try {
+      fs.unlinkSync(todoFile.path)
+      console.log(`  ${colors.green}✓ Supprimé: ${todoFile.filename}${colors.reset}`)
+    } catch (error) {
+      console.log(
+        `  ${colors.yellow}⚠ Impossible de supprimer ${todoFile.filename}: ${error.message}${colors.reset}`
+      )
+    }
   }
 }
 
@@ -88,7 +188,8 @@ function loadTranslationsConfig() {
 function applyTranslations() {
   console.log(`${colors.blue}${colors.bold}=== APPLICATION DES TRADUCTIONS ===${colors.reset}\n`)
 
-  const translations = loadTranslationsConfig()
+  const config = loadTranslationsConfig()
+  const translations = config.translations
   const keyPaths = Object.keys(translations)
 
   if (keyPaths.length === 0) {
@@ -98,8 +199,7 @@ function applyTranslations() {
     return
   }
 
-  console.log(`${colors.cyan}Clés à traiter: ${keyPaths.length}${colors.reset}`)
-  console.log(`${colors.cyan}Fichier de configuration: ${CONFIG_FILE}${colors.reset}\n`)
+  console.log(`${colors.cyan}Clés à traiter: ${keyPaths.length}${colors.reset}\n`)
 
   // Obtenir la liste des dossiers de langue
   const languageFiles = fs
@@ -194,6 +294,11 @@ function applyTranslations() {
   console.log(`${colors.green}✓ ${totalFiles} fichier(s) modifié(s)${colors.reset}`)
   console.log(`${colors.cyan}📁 Fichiers traités: ${languageFiles.join(', ')}${colors.reset}`)
 
+  // Nettoyer les fichiers todo-*.json si format par langue
+  if (config.format === 'per-language' && totalUpdates > 0) {
+    cleanupTodoFiles(config.todoFiles)
+  }
+
   if (totalUpdates > 0) {
     console.log(
       `\n${colors.yellow}💡 N'oubliez pas de vérifier les changements avec git diff${colors.reset}`
@@ -208,7 +313,8 @@ function applyTranslations() {
 function validateConfig() {
   console.log(`${colors.blue}${colors.bold}=== VALIDATION DE LA CONFIGURATION ===${colors.reset}\n`)
 
-  const translations = loadTranslationsConfig()
+  const config = loadTranslationsConfig()
+  const translations = config.translations
   const keyPaths = Object.keys(translations)
 
   if (keyPaths.length === 0) {
@@ -269,17 +375,28 @@ if (args.includes('--validate') || args.includes('-v')) {
   console.log(`${colors.bold}Options:${colors.reset}`)
   console.log(`  --validate, -v    Valide le fichier de configuration sans appliquer`)
   console.log(`  --help, -h        Affiche cette aide\n`)
-  console.log(`${colors.bold}Prérequis:${colors.reset}`)
-  console.log(`  - Fichier translations-config.json dans le même répertoire`)
-  console.log(`  - Généré avec: node scripts/translation/list-todo-keys.js\n`)
-  console.log(`${colors.bold}Workflow:${colors.reset}`)
+  console.log(`${colors.bold}Formats supportés:${colors.reset}`)
+  console.log(
+    `  ${colors.green}• Par langue (recommandé):${colors.reset} todo-{lang}.json (ex: todo-de.json, todo-es.json)`
+  )
+  console.log(
+    `  ${colors.yellow}• Legacy:${colors.reset} translations-config.json (ancien format)\n`
+  )
+  console.log(`${colors.bold}Workflow (format par langue):${colors.reset}`)
   console.log(`  1. ${colors.cyan}node scripts/translation/list-todo-keys.js${colors.reset}`)
+  console.log(`     → Génère todo-de.json, todo-es.json, etc.`)
+  console.log(
+    `  2. ${colors.cyan}Remplacer les valeurs françaises par les traductions${colors.reset}`
+  )
+  console.log(`  3. ${colors.cyan}node scripts/translation/apply-translations.js${colors.reset}`)
+  console.log(`     → Applique et supprime automatiquement les fichiers todo-*.json\n`)
+  console.log(`${colors.bold}Workflow (format legacy):${colors.reset}`)
+  console.log(
+    `  1. ${colors.cyan}node scripts/translation/list-todo-keys.js --legacy${colors.reset}`
+  )
   console.log(`  2. ${colors.cyan}Éditer translations-config.template.json${colors.reset}`)
   console.log(`  3. ${colors.cyan}Renommer en translations-config.json${colors.reset}`)
-  console.log(
-    `  4. ${colors.cyan}node scripts/translation/apply-translations.js --validate${colors.reset}`
-  )
-  console.log(`  5. ${colors.cyan}node scripts/translation/apply-translations.js${colors.reset}`)
+  console.log(`  4. ${colors.cyan}node scripts/translation/apply-translations.js${colors.reset}`)
 } else {
   if (validateConfig()) {
     console.log(

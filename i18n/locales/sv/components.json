@@ -110,7 +110,7 @@
       "ticketing_link": "Länk till biljettförsäljning",
       "ticketing_section_description": "Information om biljettköp",
       "ticketing_section_title": "Biljetter",
-      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Datum och tider kommer att visas i denna tidszon"
     },
     "favorites_map": {
       "all_favorites": "Alla är favoriter",
@@ -173,7 +173,7 @@
       "search_by_name": "Sök efter namn",
       "select_convention": "Välj en kongress",
       "select_countries": "Välj länder...",
-      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
+      "select_timezone": "Välj en tidszon",
       "start_typing_address": "Börja skriva in en adress..."
     }
   },

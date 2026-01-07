@@ -46,8 +46,8 @@
     "contact_email": "Kontakta oss via e-post",
     "continue": "Fortsätt",
     "convention": "Avtal",
-    "copied": "[TODO] Copié !",
-    "copy": "[TODO] Copier",
+    "copied": "Kopierat!",
+    "copy": "Kopiera",
     "copy_error": "Fel vid kopiering",
     "copy_link": "Kopiera länk",
     "country": "Land",
@@ -149,7 +149,7 @@
     "ticket": "Biljett",
     "ticketing_short": "Biljetter",
     "time": "Tid",
-    "timezone": "[TODO] Fuseau horaire",
+    "timezone": "Tidszon",
     "tip": "Rådet",
     "title": "Titel",
     "total": "Totalt",
@@ -167,9 +167,6 @@
     "volunteers_short": "Volontärer",
     "week": "Veckan",
     "yes": "Ja"
-  },
-  "countries": {
-    "czech_republic": "Tjeckien"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

@@ -110,7 +110,7 @@
       "ticketing_link": "Odkaz na prodej vstupenek",
       "ticketing_section_description": "Informace o nákupu vstupenek",
       "ticketing_section_title": "Vstupenky",
-      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Data a časy budou zobrazeny v tomto časovém pásmu"
     },
     "favorites_map": {
       "all_favorites": "Všichni jsou oblíbení",
@@ -173,7 +173,7 @@
       "search_by_name": "Vyhledávání podle jména",
       "select_convention": "Vyberte konvenci",
       "select_countries": "Vybrané země...",
-      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
+      "select_timezone": "Vyberte časové pásmo",
       "start_typing_address": "Začněte psát adresu..."
     }
   },

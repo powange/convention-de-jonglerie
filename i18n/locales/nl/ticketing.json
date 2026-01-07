@@ -99,15 +99,15 @@
       "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd"
     },
     "payment": {
-      "checkNumber": "[TODO] Numéro du chèque",
+      "checkNumber": "Chequenummer",
       "methods": {
-        "card": "[TODO] Carte bancaire",
-        "cash": "[TODO] Liquide",
-        "check": "[TODO] Chèque",
-        "pending": "[TODO] Non payé",
-        "pendingSubtitle": "[TODO] En attente"
+        "card": "Bankkaart",
+        "cash": "Contant",
+        "check": "Cheque",
+        "pending": "Niet betaald",
+        "pendingSubtitle": "In afwachting"
       },
-      "selectMethod": "[TODO] Sélectionnez le mode de paiement"
+      "selectMethod": "Selecteer betaalmethode"
     },
     "quotas": {
       "list": {

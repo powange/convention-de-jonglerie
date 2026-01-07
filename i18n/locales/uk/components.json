@@ -110,7 +110,7 @@
       "ticketing_link": "Посилання на квитки",
       "ticketing_section_description": "Інформація для придбання квитків",
       "ticketing_section_title": "Квитки",
-      "timezone_description": "[TODO] Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Дати та час відображатимуться в цьому часовому поясі"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",
@@ -173,7 +173,7 @@
       "search_by_name": "Пошук за назвою",
       "select_convention": "Вибрати конвенцію",
       "select_countries": "Вибрати країни...",
-      "select_timezone": "[TODO] Sélectionnez un fuseau horaire",
+      "select_timezone": "Виберіть часовий пояс",
       "start_typing_address": "Почніть вводити адресу..."
     }
   },

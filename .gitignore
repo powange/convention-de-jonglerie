@@ -42,5 +42,6 @@ public/uploads/
 # Translation config files (generated)
 scripts/translation/translations-config.json
 scripts/translation/translations-config.template.json
+scripts/translation/todo-*.json
 
 !.gitkeep
