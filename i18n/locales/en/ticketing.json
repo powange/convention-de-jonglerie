@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "All artists have validated their ticket!",
+      "all_organizers_validated": "All organizers have validated their ticket!",
+      "all_volunteers_validated": "All volunteers have validated their ticket!",
+      "artists_count": "{count} artist not validated | {count} artists not validated",
+      "artists_not_validated_description": "List of artists who have not yet scanned their ticket at access control.",
+      "artists_not_validated_title": "Artists who haven't validated their ticket",
       "loading": "Loading...",
       "no_ticket_found": "No ticket found",
+      "organizers_count": "{count} organizer not validated | {count} organizers not validated",
+      "organizers_not_validated_description": "List of organizers who have not yet scanned their ticket at access control.",
+      "organizers_not_validated_title": "Organizers who haven't validated their ticket",
+      "scan_qr_code": "Scan a QR code",
+      "search_description": "Search for a ticket by name, first name or email",
       "search_placeholder": "Last name, first name or email...",
+      "search_ticket": "Search for a ticket",
+      "shows_label": "Show: | Shows:",
+      "sync_helloasso": "Sync HelloAsso",
+      "teams_label": "Team: | Teams:",
       "ticket_found": "Ticket found",
       "unknown": "Unknown",
-      "volunteer_found": "Volunteer found"
+      "volunteer_found": "Volunteer found",
+      "volunteers_count": "{count} volunteer not validated | {count} volunteers not validated",
+      "volunteers_not_validated_description": "List of accepted volunteers who have not yet scanned their ticket at access control.",
+      "volunteers_not_validated_title": "Volunteers who haven't validated their ticket"
     },
     "counters": {
       "connected": "Connected",

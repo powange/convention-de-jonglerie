@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Všichni umělci ověřili svou vstupenku!",
+      "all_organizers_validated": "Všichni organizátoři ověřili svou vstupenku!",
+      "all_volunteers_validated": "Všichni dobrovolníci ověřili svou vstupenku!",
+      "artists_count": "{count} umělec neověřen | {count} umělců neověřeno",
+      "artists_not_validated_description": "Seznam umělců, kteří ještě nenaskenovali vstupenku při kontrole vstupu.",
+      "artists_not_validated_title": "Umělci, kteří neověřili vstupenku",
       "loading": "Načítání...",
       "no_ticket_found": "Nebyly nalezeny žádné vstupenky",
+      "organizers_count": "{count} organizátor neověřen | {count} organizátorů neověřeno",
+      "organizers_not_validated_description": "Seznam organizátorů, kteří ještě nenaskenovali vstupenku při kontrole vstupu.",
+      "organizers_not_validated_title": "Organizátoři, kteří neověřili vstupenku",
+      "scan_qr_code": "Naskenovat QR kód",
+      "search_description": "Vyhledejte vstupenku podle jména, příjmení nebo e-mailu",
       "search_placeholder": "Příjmení, jméno nebo e-mail...",
+      "search_ticket": "Hledat vstupenku",
+      "shows_label": "Představení: | Představení:",
+      "sync_helloasso": "Synchronizovat HelloAsso",
+      "teams_label": "Tým: | Týmy:",
       "ticket_found": "Nalezená vstupenka",
       "unknown": "Neznámý",
-      "volunteer_found": "Nalezený dobrovolník"
+      "volunteer_found": "Nalezený dobrovolník",
+      "volunteers_count": "{count} dobrovolník neověřen | {count} dobrovolníků neověřeno",
+      "volunteers_not_validated_description": "Seznam přijatých dobrovolníků, kteří ještě nenaskenovali vstupenku při kontrole vstupu.",
+      "volunteers_not_validated_title": "Dobrovolníci, kteří neověřili vstupenku"
     },
     "counters": {
       "connected": "Připojeno",

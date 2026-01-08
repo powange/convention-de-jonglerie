@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Все артисты подтвердили свой билет!",
+      "all_organizers_validated": "Все организаторы подтвердили свой билет!",
+      "all_volunteers_validated": "Все волонтёры подтвердили свой билет!",
+      "artists_count": "{count} артист не подтверждён | {count} артистов не подтверждено",
+      "artists_not_validated_description": "Список артистов, которые ещё не отсканировали свой билет на контроле доступа.",
+      "artists_not_validated_title": "Артисты, не подтвердившие билет",
       "loading": "Загрузка...",
       "no_ticket_found": "Билет не найден",
+      "organizers_count": "{count} организатор не подтверждён | {count} организаторов не подтверждено",
+      "organizers_not_validated_description": "Список организаторов, которые ещё не отсканировали свой билет на контроле доступа.",
+      "organizers_not_validated_title": "Организаторы, не подтвердившие билет",
+      "scan_qr_code": "Сканировать QR-код",
+      "search_description": "Поиск билета по имени, фамилии или электронной почте",
       "search_placeholder": "Фамилия, имя или email...",
+      "search_ticket": "Искать билет",
+      "shows_label": "Шоу: | Шоу:",
+      "sync_helloasso": "Синхронизировать HelloAsso",
+      "teams_label": "Команда: | Команды:",
       "ticket_found": "Билет найден",
       "unknown": "Неизвестно",
-      "volunteer_found": "Волонтёр найден"
+      "volunteer_found": "Волонтёр найден",
+      "volunteers_count": "{count} волонтёр не подтверждён | {count} волонтёров не подтверждено",
+      "volunteers_not_validated_description": "Список принятых волонтёров, которые ещё не отсканировали свой билет на контроле доступа.",
+      "volunteers_not_validated_title": "Волонтёры, не подтвердившие билет"
     },
     "counters": {
       "connected": "Подключено",

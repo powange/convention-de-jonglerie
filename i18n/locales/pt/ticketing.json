@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Todos os artistas validaram o seu bilhete!",
+      "all_organizers_validated": "Todos os organizadores validaram o seu bilhete!",
+      "all_volunteers_validated": "Todos os voluntários validaram o seu bilhete!",
+      "artists_count": "{count} artista não validado | {count} artistas não validados",
+      "artists_not_validated_description": "Lista de artistas que ainda não digitalizaram o seu bilhete no controlo de acesso.",
+      "artists_not_validated_title": "Artistas que não validaram o bilhete",
       "loading": "Carregando...",
       "no_ticket_found": "Nenhum bilhete encontrado",
+      "organizers_count": "{count} organizador não validado | {count} organizadores não validados",
+      "organizers_not_validated_description": "Lista de organizadores que ainda não digitalizaram o seu bilhete no controlo de acesso.",
+      "organizers_not_validated_title": "Organizadores que não validaram o bilhete",
+      "scan_qr_code": "Digitalizar um código QR",
+      "search_description": "Pesquise um bilhete por nome, apelido ou email",
       "search_placeholder": "Sobrenome, nome ou e-mail...",
+      "search_ticket": "Pesquisar um bilhete",
+      "shows_label": "Espetáculo: | Espetáculos:",
+      "sync_helloasso": "Sincronizar HelloAsso",
+      "teams_label": "Equipa: | Equipas:",
       "ticket_found": "Bilhete encontrado",
       "unknown": "Desconhecido",
-      "volunteer_found": "Voluntário encontrado"
+      "volunteer_found": "Voluntário encontrado",
+      "volunteers_count": "{count} voluntário não validado | {count} voluntários não validados",
+      "volunteers_not_validated_description": "Lista de voluntários aceitos que ainda não digitalizaram o seu bilhete no controlo de acesso.",
+      "volunteers_not_validated_title": "Voluntários que não validaram o bilhete"
     },
     "counters": {
       "connected": "Conectado",

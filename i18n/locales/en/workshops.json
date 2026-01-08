@@ -47,6 +47,7 @@
     "no_workshops_found_description": "The AI was unable to detect any workshops in this image. Try a clearer image.",
     "no_workshops_selected": "No workshop selected",
     "only_images_allowed": "Only images are accepted",
+    "page_title": "Workshops",
     "propose_workshop": "Propose workshop",
     "remove_from_favorites": "Remove from favorites",
     "select_all": "Select all",

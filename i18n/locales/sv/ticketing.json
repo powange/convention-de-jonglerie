@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Alla artister har validerat sin biljett!",
+      "all_organizers_validated": "Alla arrangörer har validerat sin biljett!",
+      "all_volunteers_validated": "Alla volontärer har validerat sin biljett!",
+      "artists_count": "{count} artist inte validerad | {count} artister inte validerade",
+      "artists_not_validated_description": "Lista över artister som ännu inte har skannat sin biljett vid inpasseringskontrollen.",
+      "artists_not_validated_title": "Artister som inte har validerat sin biljett",
       "loading": "Laddar...",
       "no_ticket_found": "Inga biljetter hittades",
+      "organizers_count": "{count} arrangör inte validerad | {count} arrangörer inte validerade",
+      "organizers_not_validated_description": "Lista över arrangörer som ännu inte har skannat sin biljett vid inpasseringskontrollen.",
+      "organizers_not_validated_title": "Arrangörer som inte har validerat sin biljett",
+      "scan_qr_code": "Skanna en QR-kod",
+      "search_description": "Sök efter en biljett med namn, förnamn eller e-post",
       "search_placeholder": "Efternamn, förnamn eller e-post...",
+      "search_ticket": "Sök efter en biljett",
+      "shows_label": "Show: | Shower:",
+      "sync_helloasso": "Synkronisera HelloAsso",
+      "teams_label": "Team: | Team:",
       "ticket_found": "Biljett hittades",
       "unknown": "Okänd",
-      "volunteer_found": "Volontär hittad"
+      "volunteer_found": "Volontär hittad",
+      "volunteers_count": "{count} volontär inte validerad | {count} volontärer inte validerade",
+      "volunteers_not_validated_description": "Lista över accepterade volontärer som ännu inte har skannat sin biljett vid inpasseringskontrollen.",
+      "volunteers_not_validated_title": "Volontärer som inte har validerat sin biljett"
     },
     "counters": {
       "connected": "Ansluten",

@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Alle artiesten hebben hun ticket gevalideerd!",
+      "all_organizers_validated": "Alle organisatoren hebben hun ticket gevalideerd!",
+      "all_volunteers_validated": "Alle vrijwilligers hebben hun ticket gevalideerd!",
+      "artists_count": "{count} artiest niet gevalideerd | {count} artiesten niet gevalideerd",
+      "artists_not_validated_description": "Lijst van artiesten die hun ticket nog niet hebben gescand bij de toegangscontrole.",
+      "artists_not_validated_title": "Artiesten die hun ticket niet hebben gevalideerd",
       "loading": "Laden...",
       "no_ticket_found": "Geen ticket gevonden",
+      "organizers_count": "{count} organisator niet gevalideerd | {count} organisatoren niet gevalideerd",
+      "organizers_not_validated_description": "Lijst van organisatoren die hun ticket nog niet hebben gescand bij de toegangscontrole.",
+      "organizers_not_validated_title": "Organisatoren die hun ticket niet hebben gevalideerd",
+      "scan_qr_code": "Scan een QR-code",
+      "search_description": "Zoek een ticket op naam, voornaam of e-mail",
       "search_placeholder": "Achternaam, voornaam of e-mail...",
+      "search_ticket": "Zoek een ticket",
+      "shows_label": "Show: | Shows:",
+      "sync_helloasso": "HelloAsso synchroniseren",
+      "teams_label": "Team: | Teams:",
       "ticket_found": "Ticket gevonden",
       "unknown": "Onbekend",
-      "volunteer_found": "Vrijwilliger gevonden"
+      "volunteer_found": "Vrijwilliger gevonden",
+      "volunteers_count": "{count} vrijwilliger niet gevalideerd | {count} vrijwilligers niet gevalideerd",
+      "volunteers_not_validated_description": "Lijst van geaccepteerde vrijwilligers die hun ticket nog niet hebben gescand bij de toegangscontrole.",
+      "volunteers_not_validated_title": "Vrijwilligers die hun ticket niet hebben gevalideerd"
     },
     "counters": {
       "connected": "Verbonden",

@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Tutti gli artisti hanno convalidato il loro biglietto!",
+      "all_organizers_validated": "Tutti gli organizzatori hanno convalidato il loro biglietto!",
+      "all_volunteers_validated": "Tutti i volontari hanno convalidato il loro biglietto!",
+      "artists_count": "{count} artista non convalidato | {count} artisti non convalidati",
+      "artists_not_validated_description": "Elenco degli artisti che non hanno ancora scansionato il biglietto al controllo accessi.",
+      "artists_not_validated_title": "Artisti che non hanno convalidato il biglietto",
       "loading": "Caricamento...",
       "no_ticket_found": "Nessun biglietto trovato",
+      "organizers_count": "{count} organizzatore non convalidato | {count} organizzatori non convalidati",
+      "organizers_not_validated_description": "Elenco degli organizzatori che non hanno ancora scansionato il biglietto al controllo accessi.",
+      "organizers_not_validated_title": "Organizzatori che non hanno convalidato il biglietto",
+      "scan_qr_code": "Scansiona un codice QR",
+      "search_description": "Cerca un biglietto per nome, cognome o email",
       "search_placeholder": "Cognome, nome o email...",
+      "search_ticket": "Cerca un biglietto",
+      "shows_label": "Spettacolo: | Spettacoli:",
+      "sync_helloasso": "Sincronizza HelloAsso",
+      "teams_label": "Squadra: | Squadre:",
       "ticket_found": "Biglietto trovato",
       "unknown": "Sconosciuto",
-      "volunteer_found": "Volontario trovato"
+      "volunteer_found": "Volontario trovato",
+      "volunteers_count": "{count} volontario non convalidato | {count} volontari non convalidati",
+      "volunteers_not_validated_description": "Elenco dei volontari accettati che non hanno ancora scansionato il biglietto al controllo accessi.",
+      "volunteers_not_validated_title": "Volontari che non hanno convalidato il biglietto"
     },
     "counters": {
       "connected": "Connesso",

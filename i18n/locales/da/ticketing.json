@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Alle kunstnere har valideret deres billet!",
+      "all_organizers_validated": "Alle arrangører har valideret deres billet!",
+      "all_volunteers_validated": "Alle frivillige har valideret deres billet!",
+      "artists_count": "{count} kunstner ikke valideret | {count} kunstnere ikke valideret",
+      "artists_not_validated_description": "Liste over kunstnere, der endnu ikke har scannet deres billet ved adgangskontrollen.",
+      "artists_not_validated_title": "Kunstnere, der ikke har valideret deres billet",
       "loading": "Indlæser...",
       "no_ticket_found": "Ingen billet fundet",
+      "organizers_count": "{count} arrangør ikke valideret | {count} arrangører ikke valideret",
+      "organizers_not_validated_description": "Liste over arrangører, der endnu ikke har scannet deres billet ved adgangskontrollen.",
+      "organizers_not_validated_title": "Arrangører, der ikke har valideret deres billet",
+      "scan_qr_code": "Scan en QR-kode",
+      "search_description": "Søg efter en billet efter navn, fornavn eller e-mail",
       "search_placeholder": "Navn, fornavn eller e-mail...",
+      "search_ticket": "Søg efter en billet",
+      "shows_label": "Show: | Shows:",
+      "sync_helloasso": "Synkroniser HelloAsso",
+      "teams_label": "Hold: | Hold:",
       "ticket_found": "Billet fundet",
       "unknown": "Ukendt",
-      "volunteer_found": "Frivillig fundet"
+      "volunteer_found": "Frivillig fundet",
+      "volunteers_count": "{count} frivillig ikke valideret | {count} frivillige ikke valideret",
+      "volunteers_not_validated_description": "Liste over accepterede frivillige, der endnu ikke har scannet deres billet ved adgangskontrollen.",
+      "volunteers_not_validated_title": "Frivillige, der ikke har valideret deres billet"
     },
     "counters": {
       "connected": "Tilsluttet",

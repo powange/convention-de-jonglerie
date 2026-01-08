@@ -1,12 +1,30 @@
 {
   "ticketing": {
     "access_control": {
+      "all_artists_validated": "Alle Künstler haben ihr Ticket validiert!",
+      "all_organizers_validated": "Alle Organisatoren haben ihr Ticket validiert!",
+      "all_volunteers_validated": "Alle Freiwilligen haben ihr Ticket validiert!",
+      "artists_count": "{count} Künstler nicht validiert | {count} Künstler nicht validiert",
+      "artists_not_validated_description": "Liste der Künstler, die ihr Ticket noch nicht an der Zugangskontrolle gescannt haben.",
+      "artists_not_validated_title": "Künstler, die ihr Ticket nicht validiert haben",
       "loading": "Lädt...",
       "no_ticket_found": "Kein Ticket gefunden",
+      "organizers_count": "{count} Organisator nicht validiert | {count} Organisatoren nicht validiert",
+      "organizers_not_validated_description": "Liste der Organisatoren, die ihr Ticket noch nicht an der Zugangskontrolle gescannt haben.",
+      "organizers_not_validated_title": "Organisatoren, die ihr Ticket nicht validiert haben",
+      "scan_qr_code": "QR-Code scannen",
+      "search_description": "Suchen Sie ein Ticket nach Name, Vorname oder E-Mail",
       "search_placeholder": "Name, Vorname oder E-Mail...",
+      "search_ticket": "Ticket suchen",
+      "shows_label": "Show: | Shows:",
+      "sync_helloasso": "HelloAsso synchronisieren",
+      "teams_label": "Team: | Teams:",
       "ticket_found": "Ticket gefunden",
       "unknown": "Unbekannt",
-      "volunteer_found": "Freiwilliger gefunden"
+      "volunteer_found": "Freiwilliger gefunden",
+      "volunteers_count": "{count} Freiwilliger nicht validiert | {count} Freiwillige nicht validiert",
+      "volunteers_not_validated_description": "Liste der akzeptierten Freiwilligen, die ihr Ticket noch nicht an der Zugangskontrolle gescannt haben.",
+      "volunteers_not_validated_title": "Freiwillige, die ihr Ticket nicht validiert haben"
     },
     "counters": {
       "connected": "Verbunden",

@@ -47,6 +47,7 @@
     "no_workshops_found_description": "Die KI konnte in diesem Bild keine Workshops erkennen. Versuchen Sie es mit einem helleren Bild.",
     "no_workshops_selected": "Kein Workshop ausgewählt",
     "only_images_allowed": "Nur Bilder werden akzeptiert",
+    "page_title": "Workshops",
     "propose_workshop": "Workshop vorschlagen",
     "remove_from_favorites": "Aus Favoriten entfernen",
     "select_all": "Alles auswählen",
