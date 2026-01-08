@@ -76,7 +76,7 @@
                 class="w-full justify-center h-[52px]"
                 @click="startScanner"
               >
-                <span class="font-semibold">Scanner un QR code</span>
+                <span class="font-semibold">{{ $t('ticketing.access_control.scan_qr_code') }}</span>
               </UButton>
 
               <!-- Bouton de synchronisation HelloAsso -->
@@ -92,7 +92,9 @@
                   :loading="syncingHelloAsso"
                   @click="syncHelloAsso"
                 >
-                  <span class="font-medium">Synchroniser HelloAsso</span>
+                  <span class="font-medium">{{
+                    $t('ticketing.access_control.sync_helloasso')
+                  }}</span>
                 </UButton>
               </div>
             </div>
@@ -103,14 +105,16 @@
             <div class="space-y-4">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-magnifying-glass" class="text-purple-500" />
-                <h2 class="text-lg font-semibold">Chercher un billet</h2>
+                <h2 class="text-lg font-semibold">
+                  {{ $t('ticketing.access_control.search_ticket') }}
+                </h2>
               </div>
 
               <UAlert
                 icon="i-heroicons-information-circle"
                 color="info"
                 variant="soft"
-                description="Recherchez un billet par nom, prénom ou email"
+                :description="$t('ticketing.access_control.search_description')"
               />
 
               <!-- Zone de recherche -->
@@ -488,19 +492,18 @@
       <!-- Modal liste des bénévoles non validés -->
       <UModal
         v-model:open="volunteersNotValidatedModalOpen"
-        title="Bénévoles n'ayant pas validé leur billet"
+        :title="$t('ticketing.access_control.volunteers_not_validated_title')"
       >
         <template #body>
           <div class="space-y-4">
             <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
               <template #description>
-                Liste des bénévoles acceptés qui n'ont pas encore scanné leur billet au contrôle
-                d'accès.
+                {{ $t('ticketing.access_control.volunteers_not_validated_description') }}
               </template>
             </UAlert>
 
             <div v-if="loadingVolunteersNotValidated" class="text-center py-8">
-              <p class="text-sm text-gray-500">Chargement...</p>
+              <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
             <div
@@ -511,7 +514,9 @@
                 name="i-heroicons-check-circle"
                 class="mx-auto h-12 w-12 text-green-400 mb-2"
               />
-              <p class="text-sm text-gray-500">Tous les bénévoles ont validé leur billet !</p>
+              <p class="text-sm text-gray-500">
+                {{ $t('ticketing.access_control.all_volunteers_validated') }}
+              </p>
             </div>
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -525,7 +530,7 @@
                   v-if="volunteer.teams.length > 0"
                   class="text-xs text-gray-500 dark:text-gray-500 mt-2 ml-14"
                 >
-                  Équipe{{ volunteer.teams.length > 1 ? 's' : '' }} :
+                  {{ $t('ticketing.access_control.teams_label', volunteer.teams.length) }}
                   {{ volunteer.teams.map((t) => t.name).join(', ') }}
                 </div>
               </div>
@@ -535,10 +540,11 @@
 
         <template #footer>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ volunteersNotValidated.length }} bénévole{{
-              volunteersNotValidated.length > 1 ? 's' : ''
+            {{
+              $t('ticketing.access_control.volunteers_count', {
+                count: volunteersNotValidated.length,
+              })
             }}
-            non validé{{ volunteersNotValidated.length > 1 ? 's' : '' }}
           </p>
         </template>
       </UModal>
@@ -546,18 +552,18 @@
       <!-- Modal liste des artistes non validés -->
       <UModal
         v-model:open="artistsNotValidatedModalOpen"
-        title="Artistes n'ayant pas validé leur billet"
+        :title="$t('ticketing.access_control.artists_not_validated_title')"
       >
         <template #body>
           <div class="space-y-4">
             <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
               <template #description>
-                Liste des artistes qui n'ont pas encore scanné leur billet au contrôle d'accès.
+                {{ $t('ticketing.access_control.artists_not_validated_description') }}
               </template>
             </UAlert>
 
             <div v-if="loadingArtistsNotValidated" class="text-center py-8">
-              <p class="text-sm text-gray-500">Chargement...</p>
+              <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
             <div
@@ -568,7 +574,9 @@
                 name="i-heroicons-check-circle"
                 class="mx-auto h-12 w-12 text-green-400 mb-2"
               />
-              <p class="text-sm text-gray-500">Tous les artistes ont validé leur billet !</p>
+              <p class="text-sm text-gray-500">
+                {{ $t('ticketing.access_control.all_artists_validated') }}
+              </p>
             </div>
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -582,7 +590,7 @@
                   v-if="artist.shows.length > 0"
                   class="text-xs text-gray-500 dark:text-gray-500 mt-2 ml-14"
                 >
-                  Spectacle{{ artist.shows.length > 1 ? 's' : '' }} :
+                  {{ $t('ticketing.access_control.shows_label', artist.shows.length) }}
                   {{ artist.shows.map((s) => s.title).join(', ') }}
                 </div>
               </div>
@@ -592,10 +600,9 @@
 
         <template #footer>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ artistsNotValidated.length }} artiste{{
-              artistsNotValidated.length > 1 ? 's' : ''
+            {{
+              $t('ticketing.access_control.artists_count', { count: artistsNotValidated.length })
             }}
-            non validé{{ artistsNotValidated.length > 1 ? 's' : '' }}
           </p>
         </template>
       </UModal>
@@ -603,18 +610,18 @@
       <!-- Modal liste des organisateurs non validés -->
       <UModal
         v-model:open="organizersNotValidatedModalOpen"
-        title="Organisateurs n'ayant pas validé leur billet"
+        :title="$t('ticketing.access_control.organizers_not_validated_title')"
       >
         <template #body>
           <div class="space-y-4">
             <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
               <template #description>
-                Liste des organisateurs qui n'ont pas encore scanné leur billet au contrôle d'accès.
+                {{ $t('ticketing.access_control.organizers_not_validated_description') }}
               </template>
             </UAlert>
 
             <div v-if="loadingOrganizersNotValidated" class="text-center py-8">
-              <p class="text-sm text-gray-500">Chargement...</p>
+              <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
             <div
@@ -625,7 +632,9 @@
                 name="i-heroicons-check-circle"
                 class="mx-auto h-12 w-12 text-green-400 mb-2"
               />
-              <p class="text-sm text-gray-500">Tous les organisateurs ont validé leur billet !</p>
+              <p class="text-sm text-gray-500">
+                {{ $t('ticketing.access_control.all_organizers_validated') }}
+              </p>
             </div>
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -648,10 +657,11 @@
 
         <template #footer>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ organizersNotValidated.length }} organisateur{{
-              organizersNotValidated.length > 1 ? 's' : ''
+            {{
+              $t('ticketing.access_control.organizers_count', {
+                count: organizersNotValidated.length,
+              })
             }}
-            non validé{{ organizersNotValidated.length > 1 ? 's' : '' }}
           </p>
         </template>
       </UModal>

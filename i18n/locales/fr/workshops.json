@@ -1,6 +1,7 @@
 {
   "workshops": {
     "add_location": "Ajouter un lieu",
+    "page_title": "Workshops",
     "add_to_favorites": "Ajouter aux favoris",
     "add_workshop": "Ajouter un workshop",
     "choose_file": "Choisir un fichier",

@@ -7,7 +7,7 @@
       <!-- Actions et titre -->
       <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
-          <h1 class="text-3xl font-bold">Workshops</h1>
+          <h1 class="text-3xl font-bold">{{ $t('workshops.page_title') }}</h1>
           <div class="flex items-center gap-3">
             <!-- Filtre favoris -->
             <URadioGroup

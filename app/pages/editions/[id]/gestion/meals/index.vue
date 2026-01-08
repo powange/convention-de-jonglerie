@@ -22,10 +22,10 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="cbi:mealie" class="text-orange-600 dark:text-orange-400" />
-          Configuration des repas
+          {{ $t('gestion.meals.configuration_title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Gérer les repas proposés aux bénévoles et artistes pendant l'événement
+          {{ $t('gestion.meals.configuration_description') }}
         </p>
       </div>
 
@@ -35,14 +35,14 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="cbi:mealie" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">Repas bénévoles et artistes</h2>
+              <h2 class="text-lg font-semibold">{{ $t('gestion.meals.configuration_title') }}</h2>
             </div>
 
             <UAlert
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
-              description="Les repas sont proposés aux bénévoles acceptés et aux artistes. Activez ou désactivez les repas selon les besoins de votre événement."
+              :description="$t('gestion.meals.configuration_info')"
             />
 
             <!-- Repas bénévoles -->
@@ -58,8 +58,7 @@
                 v-else-if="volunteerMeals.length === 0"
                 class="text-sm text-gray-500 italic p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center"
               >
-                Aucun repas configuré. Les repas seront générés automatiquement en fonction des
-                dates de l'événement.
+                {{ $t('gestion.meals.no_meals_configured') }}
               </div>
 
               <div v-else class="space-y-6">
@@ -109,10 +108,14 @@
                       >
                         <div class="flex items-center justify-between mb-1.5">
                           <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                            Articles à restituer
+                            {{ $t('gestion.meals.returnable_items_label') }}
                           </label>
                           <span class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ getSelectedReturnableItemIds(meal).length }} sélectionné(s)
+                            {{
+                              $t('gestion.meals.selected_count', {
+                                count: getSelectedReturnableItemIds(meal).length,
+                              })
+                            }}
                           </span>
                         </div>
 
@@ -134,9 +137,9 @@
                           :model-value="getSelectedReturnableItems(meal)"
                           :items="returnableItemsForSelect"
                           multiple
-                          placeholder="Sélectionner des articles"
+                          :placeholder="$t('gestion.meals.select_returnable_items')"
                           :disabled="savingMeals || loadingReturnableItems"
-                          :search-input="{ placeholder: 'Rechercher...' }"
+                          :search-input="{ placeholder: $t('common.search') }"
                           size="xs"
                           class="w-full"
                           @update:model-value="(items) => handleReturnableItemsChange(meal, items)"
