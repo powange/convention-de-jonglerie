@@ -242,7 +242,7 @@
                 v-model:search-term="newOrganizersearchTerm"
                 :searched-users="searchedUsers"
                 :searching-users="searchingUsers"
-                placeholder="Rechercher un utilisateur..."
+                :placeholder="$t('edition.gestion.search_user_placeholder')"
               />
             </div>
 
@@ -429,8 +429,9 @@ watch(newOrganizersearchTerm, (newValue) => {
   }, 300)
 })
 
-const searchUsers = async (query: string) => {
-  if (!query || query.length < 2) {
+const searchUsers = async (email: string) => {
+  // Validation basique d'email
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     searchedUsers.value = []
     return
   }
@@ -438,7 +439,7 @@ const searchUsers = async (query: string) => {
   try {
     searchingUsers.value = true
     const response = await $fetch<{ users: any[] }>('/api/users/search', {
-      query: { q: query, limit: 10 },
+      query: { emailExact: email },
     })
 
     searchedUsers.value = response.users.map((user) => ({

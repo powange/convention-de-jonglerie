@@ -422,12 +422,13 @@ const allergySeverityOptions = computed(() =>
   }))
 )
 
-// Fonction helper pour rechercher des utilisateurs
-const searchUsers = async (term: string) => {
-  if (term.length < 2) return []
+// Fonction helper pour rechercher des utilisateurs par email exact
+const searchUsers = async (email: string) => {
+  // Validation basique d'email
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return []
   try {
     const response = await $fetch<{ users: any[] }>('/api/users/search', {
-      params: { q: term },
+      params: { emailExact: email },
     })
     return (response.users || []).map((user) => ({
       id: user.id,
@@ -445,9 +446,10 @@ const searchUsers = async (term: string) => {
   }
 }
 
-// Recherche d'utilisateurs
+// Recherche d'utilisateurs par email exact
 watch(searchTerm, async (newTerm) => {
-  if (newTerm.length < 2) {
+  // Validation basique d'email
+  if (!newTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newTerm)) {
     searchedUsers.value = []
     return
   }
@@ -456,9 +458,10 @@ watch(searchTerm, async (newTerm) => {
   searchingUsers.value = false
 })
 
-// Recherche des responsables pickup
+// Recherche des responsables pickup par email exact
 watch(pickupSearchTerm, async (newTerm) => {
-  if (newTerm.length < 2) {
+  // Validation basique d'email
+  if (!newTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newTerm)) {
     pickupSearchedUsers.value = []
     return
   }
@@ -467,9 +470,10 @@ watch(pickupSearchTerm, async (newTerm) => {
   searchingPickupUsers.value = false
 })
 
-// Recherche des responsables dropoff
+// Recherche des responsables dropoff par email exact
 watch(dropoffSearchTerm, async (newTerm) => {
-  if (newTerm.length < 2) {
+  // Validation basique d'email
+  if (!newTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newTerm)) {
     dropoffSearchedUsers.value = []
     return
   }

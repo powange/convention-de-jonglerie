@@ -148,8 +148,7 @@
     "no_description_available": "Aucune description disponible",
     "no_editions": "Aucune édition pour cette convention",
     "organizers": "Organisateurs",
-    "search_user_placeholder": "Rechercher un utilisateur...",
-    "select_user": "Sélectionner un utilisateur",
+    "select_user": "Entrer l'adresse email",
     "status_control": "Contrôle de visibilité",
     "status_control_desc": "Publier ou dépublier vos éditions selon leur avancement"
   },

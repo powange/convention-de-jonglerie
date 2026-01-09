@@ -136,7 +136,7 @@
                   v-model:search-term="newOrganizersearchTerm"
                   :searched-users="searchedUsers"
                   :searching-users="searchingUsers"
-                  :placeholder="$t('conventions.search_user_placeholder')"
+                  :placeholder="$t('edition.gestion.search_user_placeholder')"
                 />
               </div>
 
@@ -437,7 +437,7 @@
                   v-model:search-term="newOrganizersearchTerm"
                   :searched-users="searchedUsers"
                   :searching-users="searchingUsers"
-                  :placeholder="$t('conventions.search_user_placeholder')"
+                  :placeholder="$t('edition.gestion.search_user_placeholder')"
                 />
               </div>
 
@@ -634,9 +634,10 @@ const editOrganizerRights = ref({
 // Debounce pour la recherche d'utilisateurs
 const debouncedSearchTerm = useDebounce(newOrganizersearchTerm, 300)
 
-// Watchers pour la recherche d'utilisateurs
+// Watchers pour la recherche d'utilisateurs par email exact
 watch(debouncedSearchTerm, async (searchTerm) => {
-  if (!searchTerm || searchTerm.length < 2) {
+  // Validation basique d'email
+  if (!searchTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchTerm)) {
     searchedUsers.value = []
     return
   }
@@ -644,7 +645,7 @@ watch(debouncedSearchTerm, async (searchTerm) => {
   searchingUsers.value = true
   try {
     const response = await $fetch<{ users: any[] }>('/api/users/search', {
-      params: { q: searchTerm },
+      params: { emailExact: searchTerm },
     })
     searchedUsers.value = response.users
   } catch (error) {

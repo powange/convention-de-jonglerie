@@ -1,7 +1,6 @@
 {
   "workshops": {
     "add_location": "Ajouter un lieu",
-    "page_title": "Workshops",
     "add_to_favorites": "Ajouter aux favoris",
     "add_workshop": "Ajouter un workshop",
     "choose_file": "Choisir un fichier",
@@ -48,6 +47,7 @@
     "no_workshops_found_description": "L'IA n'a pas pu détecter de workshops dans cette image. Essayez avec une image plus claire.",
     "no_workshops_selected": "Aucun workshop sélectionné",
     "only_images_allowed": "Seules les images sont acceptées",
+    "page_title": "Workshops",
     "propose_workshop": "Proposer un workshop",
     "remove_from_favorites": "Retirer des favoris",
     "select_all": "Tout sélectionner",

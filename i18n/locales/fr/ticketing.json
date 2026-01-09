@@ -2,16 +2,16 @@
   "ticketing": {
     "access_control": {
       "all_artists_validated": "Tous les artistes ont validé leur billet !",
+      "all_organizers_validated": "Tous les organisateurs ont validé leur billet !",
       "all_volunteers_validated": "Tous les bénévoles ont validé leur billet !",
       "artists_count": "{count} artiste non validé | {count} artistes non validés",
       "artists_not_validated_description": "Liste des artistes qui n'ont pas encore scanné leur billet au contrôle d'accès.",
       "artists_not_validated_title": "Artistes n'ayant pas validé leur billet",
-      "all_organizers_validated": "Tous les organisateurs ont validé leur billet !",
       "loading": "Chargement...",
+      "no_ticket_found": "Aucun billet trouvé",
       "organizers_count": "{count} organisateur non validé | {count} organisateurs non validés",
       "organizers_not_validated_description": "Liste des organisateurs qui n'ont pas encore scanné leur billet au contrôle d'accès.",
       "organizers_not_validated_title": "Organisateurs n'ayant pas validé leur billet",
-      "no_ticket_found": "Aucun billet trouvé",
       "scan_qr_code": "Scanner un QR code",
       "search_description": "Recherchez un billet par nom, prénom ou email",
       "search_placeholder": "Nom, prénom ou email...",

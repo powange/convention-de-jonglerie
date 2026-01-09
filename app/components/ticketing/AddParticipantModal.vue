@@ -62,7 +62,7 @@
           <UFormField
             :label="$t('edition.ticketing.payer_email')"
             required
-            :error="errors.payerEmail"
+            :error="errors.payerEmail || undefined"
           >
             <UFieldGroup class="w-full">
               <UInput
@@ -99,7 +99,7 @@
             v-if="showNameFields"
             :label="$t('edition.ticketing.payer_first_name')"
             required
-            :error="errors.payerFirstName"
+            :error="errors.payerFirstName || undefined"
           >
             <UInput
               v-model="form.payerFirstName"
@@ -113,7 +113,7 @@
             v-if="showNameFields"
             :label="$t('edition.ticketing.payer_last_name')"
             required
-            :error="errors.payerLastName"
+            :error="errors.payerLastName || undefined"
           >
             <UInput
               v-model="form.payerLastName"
@@ -1352,6 +1352,11 @@ const searchUserByEmail = async () => {
   // Réinitialiser l'état
   userFound.value = false
   showNameFields.value = false
+  form.value.payerFirstName = ''
+  form.value.payerLastName = ''
+  errors.value.payerEmail = ''
+  errors.value.payerFirstName = ''
+  errors.value.payerLastName = ''
 
   // Vérifier que l'email est valide
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -1367,13 +1372,13 @@ const searchUserByEmail = async () => {
       '/api/users/search',
       {
         query: {
-          email,
+          emailExact: email,
         },
       }
     )
 
-    // Chercher une correspondance exacte avec l'email
-    const matchingUser = response.users.find((u) => u.email.toLowerCase() === email.toLowerCase())
+    // Avec emailExact, on récupère directement l'utilisateur correspondant
+    const matchingUser = response.users[0]
 
     if (matchingUser) {
       // Utilisateur trouvé : préremplir les champs
@@ -1422,6 +1427,12 @@ watch(
   () => props.open,
   (newValue) => {
     if (newValue) {
+      // Réinitialiser les erreurs à l'ouverture
+      errors.value = {
+        payerFirstName: '',
+        payerLastName: '',
+        payerEmail: '',
+      }
       fetchTiers()
       fetchOptions()
     }
