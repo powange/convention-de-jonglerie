@@ -444,17 +444,13 @@ const searchUsers = async (email: string) => {
 
     searchedUsers.value = response.users.map((user) => ({
       id: user.id,
-      label: user.pseudo,
-      email: user.emailHash,
-      avatar: user.profilePicture
-        ? {
-            src: user.profilePicture,
-            alt: user.pseudo,
-          }
-        : undefined,
+      label: user.pseudo || `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email,
+      pseudo: user.pseudo || `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email,
+      email: user.email,
+      emailHash: user.emailHash,
+      profilePicture: user.profilePicture,
       isRealUser: true,
     }))
-    console.log('Résultats de recherche:', response.users.length, searchedUsers.value)
   } catch (error) {
     console.error('Error searching users:', error)
     searchedUsers.value = []
