@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { select } from '@inquirer/prompts'
+import { spawn } from 'child_process'
+
 // Couleurs pour le terminal
 const colors = {
   blue: '\x1b[34m',
@@ -7,134 +10,358 @@ const colors = {
   yellow: '\x1b[33m',
   cyan: '\x1b[36m',
   magenta: '\x1b[35m',
+  red: '\x1b[31m',
   reset: '\x1b[0m',
   bold: '\x1b[1m',
-  dim: '\x1b[2m'
+  dim: '\x1b[2m',
 }
-
-console.log(`${colors.bold}${colors.blue}📦 Scripts disponibles${colors.reset}\n`)
 
 // Organisation : du quotidien vers le spécialisé
 const sections = [
-  { title: '🚀 Cycle de développement', color: colors.green, scripts: [
-    { name: 'dev', desc: 'Serveur de dev http://localhost:3000' },
-    { name: 'build', desc: 'Build production optimisée' },
-    { name: 'preview', desc: 'Prévisualise le build local' },
-    { name: 'generate', desc: 'Génère le site statique (SSG)' },
-    { name: 'kill-servers', desc: 'Stoppe les serveurs de dev en cours' }
-  ] },
-  { title: '🗄️ Base de données', color: colors.magenta, scripts: [
-    { name: 'db:seed:dev', desc: 'Seed données de dev (faker)' },
-    { name: 'db:seed:password', desc: '🔑 Liste tous les comptes de test avec leurs mots de passe' },
-    { name: 'db:reset:dev', desc: 'Reset complet (DROP + migrations) DEV UNIQUEMENT' },
-    { name: 'db:seed:dev -- --reset', desc: 'Reset + seed (préférer reset puis seed séparés)' },
-    { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' }
-  ] },
-  { title: '👤 Administration', color: colors.yellow, scripts: [
-    { name: 'admin:list', desc: 'Liste les super administrateurs' },
-    { name: 'admin:add <email>', desc: 'Ajoute un super admin' },
-    { name: 'admin:remove <email>', desc: 'Retire un super admin' }
-  ] },
-  { title: '🌐 Internationalisation (i18n)', color: colors.cyan, scripts: [
-    { name: 'check-i18n', desc: 'Analyse clés manquantes/inutilisées/dupliquées/hardcodées' },
-    { name: 'check-i18n -- -s 1', desc: 'Clés manquantes seulement' },
-    { name: 'check-i18n -- -s 2', desc: 'Clés inutilisées seulement' },
-    { name: 'check-i18n -- -s 3', desc: 'Valeurs dupliquées seulement' },
-    { name: 'check-i18n -- -s 4', desc: 'Textes hardcodés seulement' },
-    { name: 'check-i18n -- --delete-unused', desc: 'Supprime automatiquement les clés inutilisées (avec confirmation)' },
-    { name: 'check-i18n -- -s 2 -d', desc: 'Clés inutilisées + suppression automatique' },
-    { name: 'check-i18n -- -h', desc: 'Aide détaillée' },
-    { name: 'check-translations', desc: 'Compare les traductions entre locales' },
-    { name: 'check-translations -- -l es', desc: 'Limité à une locale' },
-  { name: 'check-translations -- -s', desc: 'Résumé uniquement' },
-  { name: 'check-translations -- -p', desc: 'Prune: supprime les clés en trop (diff vs référence)' },
-  { name: 'check-translations -- -p -r fr', desc: 'Prune avec référence explicite (ex: fr)' },
-  { name: 'check-translations -- -f', desc: 'Fill: ajoute les clés manquantes (copie valeurs de la référence)' },
-  { name: 'check-translations -- -f -p', desc: 'Fill puis prune (synchronisation complète)' },
-  { name: 'check-translations -- -f --fill-mode todo', desc: 'Marque les clés à traduire: préfixe [TODO]' },
-  { name: 'check-translations -- -f --fill-mode empty', desc: 'Ajoute les clés manquantes avec valeur vide' },
-  { name: 'check-translations -- -f --fill-mode todo --refill', desc: 'Re-marque aussi les clés déjà identiques à la référence' },
-  { name: 'check-i18n-vars', desc: '🔍 Vérifie que les variables {xxx} sont cohérentes entre toutes les langues' },
-  { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' },
-  { name: 'i18n:mark-todo', desc: '🔖 Auto-détecte et marque les clés FR modifiées comme [TODO] dans les autres langues' },
-  { name: 'i18n:mark-todo "key1" "key2"', desc: '🔖 Marque les clés spécifiées comme [TODO] dans toutes les langues sauf FR' }
-  ] },
-  { title: '🔄 Système de traduction avancé (scripts/translation/)', color: colors.cyan, scripts: [
-    { name: 'scripts/translation/list-todo-keys.js', desc: '🔍 Diagnostic des clés [TODO] + génération template' },
-    { name: 'scripts/translation/apply-translations.js --validate', desc: '✅ Validation du fichier de configuration' },
-    { name: 'scripts/translation/apply-translations.js', desc: '🚀 Application des traductions depuis la config JSON' },
-    { name: 'scripts/translation/apply-translations.js --help', desc: '📖 Aide détaillée du système de traduction' }
-  ] },
-  { title: '🧹 Qualité & formatage', color: colors.yellow, scripts: [
-    { name: 'lint', desc: 'Analyse lint complète' },
-    { name: 'lint:fix', desc: 'Corrige automatiquement' },
-    { name: 'format', desc: 'Formate le code' },
-    { name: 'format:check', desc: 'Vérifie le format' }
-  ] },
-  { title: '🧪 Tests (watch)', color: colors.cyan, scripts: [
-    { name: 'test', desc: 'Tests unitaires watch' },
-    { name: 'test:unit', desc: 'Alias tests unitaires watch' },
-    { name: 'test:nuxt', desc: 'Tests Nuxt (watch)' },
-    { name: 'test:e2e', desc: 'Tests end-to-end (watch)' },
-    { name: 'test:db', desc: 'Tests intégration DB (watch)' },
-    { name: 'test:ui', desc: 'Interface graphique Vitest' }
-  ] },
-  { title: '🧪 Tests (one-shot / CI)', color: colors.cyan, scripts: [
-    { name: 'test:run', desc: 'Unitaires one-shot' },
-    { name: 'test:unit:run', desc: 'Alias unitaire one-shot' },
-    { name: 'test:nuxt:run', desc: 'Nuxt one-shot' },
-    { name: 'test:e2e:run', desc: 'E2E one-shot' },
-    { name: 'test:db:run', desc: 'Intégration DB one-shot' },
-    { name: 'test:all', desc: 'Unit + Nuxt + E2E enchaînés' }
-  ] },
-  { title: '🧪 Tests (environnement docker)', color: colors.blue, scripts: [
-    { name: 'test:setup', desc: 'Démarre MySQL pour les tests' },
-    { name: 'test:teardown', desc: 'Arrête & nettoie environnement test' }
-  ] },
-  { title: '🐳 Docker - développement & release', color: colors.blue, scripts: [
-    { name: 'docker:dev', desc: 'Env dev (build + up)' },
-    { name: 'docker:dev:detached', desc: 'Env dev détaché' },
-    { name: 'docker:dev:down', desc: 'Stoppe services dev' },
-    { name: 'docker:dev:logs', desc: 'Logs application' },
-    { name: 'docker:dev:exec', desc: 'Shell conteneur app' },
-    { name: 'docker:dev:get-lockfile', desc: 'Récupère package-lock.json depuis le conteneur' },
-    { name: 'docker:dev:get-package', desc: 'Récupère package.json depuis le conteneur' },
-    { name: 'docker:release:up', desc: 'Env release local' },
-    { name: 'docker:release:down', desc: 'Arrête env release' }
-  ] },
-  { title: '🐳 Docker - tests', color: colors.blue, scripts: [
-    { name: 'docker:test', desc: 'Tous les tests (runner global)' },
-    { name: 'docker:test:rebuild', desc: 'Rebuild images test (no-cache)' },
-    { name: 'docker:test:clean', desc: 'Nettoyage conteneurs/volumes tests' },
-    { name: 'docker:test:unit', desc: 'Tests unitaires container' },
-    { name: 'docker:test:unit:clean', desc: 'Nettoyage env unitaires' },
-    { name: 'docker:test:integration', desc: 'Tests intégration DB container' },
-    { name: 'docker:test:integration:clean', desc: 'Nettoyage env intégration DB' },
-    { name: 'docker:test:ui', desc: 'UI Vitest container' },
-    { name: 'docker:test:ui:clean', desc: 'Nettoyage env UI tests' }
-  ] },
-  { title: '🗺️ Domaine métier', color: colors.magenta, scripts: [
-    { name: 'geocode', desc: 'Ajoute les coordonnées GPS aux conventions' }
-  ] },
-  { title: '🖼️ Assets & PWA', color: colors.yellow, scripts: [
-    { name: 'favicons', desc: 'Génère les variantes PNG + manifest PWA (à relancer après modif du SVG)' }
-  ] }
+  {
+    title: 'Cycle de développement',
+    icon: '🚀',
+    color: colors.green,
+    scripts: [
+      { name: 'dev', desc: 'Serveur de dev http://localhost:3000' },
+      { name: 'build', desc: 'Build production optimisée' },
+      { name: 'preview', desc: 'Prévisualise le build local' },
+      { name: 'generate', desc: 'Génère le site statique (SSG)' },
+      { name: 'kill-servers', desc: 'Stoppe les serveurs de dev en cours' },
+    ],
+  },
+  {
+    title: 'Base de données',
+    icon: '🗄️',
+    color: colors.magenta,
+    scripts: [
+      { name: 'db:seed:dev', desc: 'Seed données de dev (faker)' },
+      {
+        name: 'db:seed:password',
+        desc: 'Liste tous les comptes de test avec leurs mots de passe',
+      },
+      {
+        name: 'db:reset:dev',
+        desc: 'Reset complet (DROP + migrations) DEV UNIQUEMENT',
+      },
+      { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' },
+    ],
+  },
+  {
+    title: 'Administration',
+    icon: '👤',
+    color: colors.yellow,
+    scripts: [
+      { name: 'admin:list', desc: 'Liste les super administrateurs' },
+      {
+        name: 'admin:add',
+        desc: 'Ajoute un super admin',
+        requiresArg: '<email>',
+      },
+      {
+        name: 'admin:remove',
+        desc: 'Retire un super admin',
+        requiresArg: '<email>',
+      },
+    ],
+  },
+  {
+    title: 'Internationalisation (i18n)',
+    icon: '🌐',
+    color: colors.cyan,
+    scripts: [
+      {
+        name: 'check-i18n',
+        desc: 'Analyse clés manquantes/inutilisées/dupliquées/hardcodées',
+      },
+      {
+        name: 'check-i18n -- -s 1',
+        desc: 'Clés manquantes seulement',
+      },
+      {
+        name: 'check-i18n -- -s 2',
+        desc: 'Clés inutilisées seulement',
+      },
+      {
+        name: 'check-i18n -- -s 3',
+        desc: 'Valeurs dupliquées seulement',
+      },
+      {
+        name: 'check-i18n -- -s 4',
+        desc: 'Textes hardcodés seulement',
+      },
+      {
+        name: 'check-i18n -- --delete-unused',
+        desc: 'Supprime automatiquement les clés inutilisées',
+      },
+      {
+        name: 'check-translations',
+        desc: 'Compare les traductions entre locales',
+      },
+      {
+        name: 'check-translations -- -s',
+        desc: 'Résumé uniquement',
+      },
+      {
+        name: 'check-translations -- -f --fill-mode todo',
+        desc: 'Marque les clés à traduire avec [TODO]',
+      },
+      {
+        name: 'check-i18n-vars',
+        desc: 'Vérifie cohérence des variables {xxx} entre langues',
+      },
+      {
+        name: 'i18n:mark-todo',
+        desc: 'Marque les clés FR modifiées comme [TODO]',
+      },
+    ],
+  },
+  {
+    title: 'Qualité & formatage',
+    icon: '🧹',
+    color: colors.yellow,
+    scripts: [
+      { name: 'lint', desc: 'Analyse lint complète' },
+      { name: 'lint:fix', desc: 'Corrige automatiquement' },
+      { name: 'format', desc: 'Formate le code' },
+      { name: 'format:check', desc: 'Vérifie le format' },
+    ],
+  },
+  {
+    title: 'Tests (watch)',
+    icon: '🧪',
+    color: colors.cyan,
+    scripts: [
+      { name: 'test', desc: 'Tests unitaires watch' },
+      { name: 'test:unit', desc: 'Alias tests unitaires watch' },
+      { name: 'test:nuxt', desc: 'Tests Nuxt (watch)' },
+      { name: 'test:e2e', desc: 'Tests end-to-end (watch)' },
+      { name: 'test:db', desc: 'Tests intégration DB (watch)' },
+      { name: 'test:ui', desc: 'Interface graphique Vitest' },
+    ],
+  },
+  {
+    title: 'Tests (one-shot / CI)',
+    icon: '✅',
+    color: colors.cyan,
+    scripts: [
+      { name: 'test:run', desc: 'Unitaires one-shot' },
+      { name: 'test:unit:run', desc: 'Alias unitaire one-shot' },
+      { name: 'test:nuxt:run', desc: 'Nuxt one-shot' },
+      { name: 'test:e2e:run', desc: 'E2E one-shot' },
+      { name: 'test:db:run', desc: 'Intégration DB one-shot' },
+      { name: 'test:all', desc: 'Unit + Nuxt + E2E enchaînés' },
+    ],
+  },
+  {
+    title: 'Tests (environnement docker)',
+    icon: '🐋',
+    color: colors.blue,
+    scripts: [
+      { name: 'test:setup', desc: 'Démarre MySQL pour les tests' },
+      { name: 'test:teardown', desc: 'Arrête & nettoie environnement test' },
+    ],
+  },
+  {
+    title: 'Docker - développement',
+    icon: '🐳',
+    color: colors.blue,
+    scripts: [
+      { name: 'docker:dev', desc: 'Env dev (build + up)' },
+      { name: 'docker:dev:detached', desc: 'Env dev détaché' },
+      { name: 'docker:dev:down', desc: 'Stoppe services dev' },
+      { name: 'docker:dev:logs', desc: 'Logs application' },
+      { name: 'docker:dev:exec', desc: 'Shell conteneur app' },
+      {
+        name: 'docker:dev:get-lockfile',
+        desc: 'Récupère package-lock.json depuis le conteneur',
+      },
+      {
+        name: 'docker:dev:get-package',
+        desc: 'Récupère package.json depuis le conteneur',
+      },
+    ],
+  },
+  {
+    title: 'Docker - release & tests',
+    icon: '📦',
+    color: colors.blue,
+    scripts: [
+      { name: 'docker:release:up', desc: 'Env release local' },
+      { name: 'docker:release:down', desc: 'Arrête env release' },
+      { name: 'docker:test', desc: 'Tous les tests (runner global)' },
+      { name: 'docker:test:rebuild', desc: 'Rebuild images test (no-cache)' },
+      { name: 'docker:test:clean', desc: 'Nettoyage conteneurs/volumes tests' },
+    ],
+  },
+  {
+    title: 'Domaine métier & Assets',
+    icon: '🗺️',
+    color: colors.magenta,
+    scripts: [
+      { name: 'geocode', desc: 'Ajoute les coordonnées GPS aux conventions' },
+      {
+        name: 'favicons',
+        desc: 'Génère les variantes PNG + manifest PWA',
+      },
+    ],
+  },
 ]
 
-sections.forEach(section => {
-  console.log(`${colors.bold}${section.color}${section.title}${colors.reset}`)
-  section.scripts.forEach(script => {
-    console.log(`  ${colors.green}npm run ${script.name}${colors.reset}${colors.dim} - ${script.desc}${colors.reset}`)
+// Mode liste statique (ancien comportement)
+function showStaticHelp() {
+  console.log(
+    `${colors.bold}${colors.blue}📦 Scripts disponibles${colors.reset}\n`
+  )
+
+  sections.forEach((section) => {
+    console.log(
+      `${colors.bold}${section.color}${section.icon} ${section.title}${colors.reset}`
+    )
+    section.scripts.forEach((script) => {
+      const arg = script.requiresArg ? ` ${colors.yellow}${script.requiresArg}${colors.reset}` : ''
+      console.log(
+        `  ${colors.green}npm run ${script.name}${arg}${colors.reset}${colors.dim} - ${script.desc}${colors.reset}`
+      )
+    })
+    console.log()
   })
-  console.log()
-})
 
-console.log(`${colors.dim}⚙️ Script automatique:${colors.reset}`)
-console.log(`  ${colors.dim}postinstall - S'exécute automatiquement après npm install${colors.reset}\n`)
+  console.log(`${colors.dim}💡 Utilisez ${colors.green}npm run help${colors.dim} sans arguments pour le mode interactif${colors.reset}\n`)
+}
 
-if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  console.log(`${colors.bold}${colors.yellow}💡 Usage:${colors.reset}`)
-  console.log(`  ${colors.green}npm run help${colors.reset} - Affiche cette aide`)
-  console.log(`  ${colors.green}npm run help -- --help${colors.reset} - Affiche l'aide détaillée`)
-  console.log()
+// Exécute un script npm
+function runScript(scriptName) {
+  console.log(
+    `\n${colors.bold}${colors.cyan}▶ Exécution: npm run ${scriptName}${colors.reset}\n`
+  )
+
+  // Construire la commande complète
+  const command = `npm run ${scriptName}`
+
+  const child = spawn(command, {
+    stdio: 'inherit',
+    shell: true,
+  })
+
+  child.on('close', (code) => {
+    if (code === 0) {
+      console.log(
+        `\n${colors.green}✓ Script terminé avec succès${colors.reset}`
+      )
+    } else {
+      console.log(
+        `\n${colors.red}✗ Script terminé avec le code ${code}${colors.reset}`
+      )
+    }
+  })
+}
+
+// Menu interactif principal
+async function interactiveMenu() {
+  console.clear()
+  console.log(
+    `${colors.bold}${colors.blue}📦 Scripts NPM - Menu interactif${colors.reset}\n`
+  )
+
+  try {
+    // Sélection de la catégorie
+    const categoryChoices = [
+      ...sections.map((s) => ({
+        name: `${s.icon} ${s.title} ${colors.dim}(${s.scripts.length} scripts)${colors.reset}`,
+        value: s,
+      })),
+      { name: `${colors.dim}───────────────────────────${colors.reset}`, value: 'separator', disabled: true },
+      { name: '📋 Afficher la liste complète', value: 'list' },
+      { name: '❌ Quitter', value: 'exit' },
+    ]
+
+    const category = await select({
+      message: 'Choisissez une catégorie:',
+      choices: categoryChoices,
+      pageSize: 15,
+    })
+
+    if (category === 'exit') {
+      console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
+      process.exit(0)
+    }
+
+    if (category === 'list') {
+      console.clear()
+      showStaticHelp()
+      console.log(`${colors.dim}Appuyez sur Entrée pour revenir au menu...${colors.reset}`)
+      await new Promise((resolve) => {
+        process.stdin.once('data', resolve)
+      })
+      return interactiveMenu()
+    }
+
+    // Sélection du script dans la catégorie
+    console.clear()
+    console.log(
+      `${colors.bold}${category.color}${category.icon} ${category.title}${colors.reset}\n`
+    )
+
+    const scriptChoices = [
+      ...category.scripts.map((s) => {
+        const arg = s.requiresArg ? ` ${colors.yellow}${s.requiresArg}${colors.reset}` : ''
+        return {
+          name: `${colors.green}${s.name}${arg}${colors.reset} ${colors.dim}- ${s.desc}${colors.reset}`,
+          value: s,
+        }
+      }),
+      { name: `${colors.dim}───────────────────────────${colors.reset}`, value: 'separator', disabled: true },
+      { name: '⬅️  Retour aux catégories', value: 'back' },
+      { name: '❌ Quitter', value: 'exit' },
+    ]
+
+    const script = await select({
+      message: 'Choisissez un script à exécuter:',
+      choices: scriptChoices,
+      pageSize: 15,
+    })
+
+    if (script === 'exit') {
+      console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
+      process.exit(0)
+    }
+
+    if (script === 'back') {
+      return interactiveMenu()
+    }
+
+    // Gestion des scripts nécessitant des arguments
+    if (script.requiresArg) {
+      console.log(
+        `\n${colors.yellow}⚠️  Ce script nécessite un argument: ${script.requiresArg}${colors.reset}`
+      )
+      console.log(
+        `${colors.dim}Exécutez manuellement: ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}\n`
+      )
+      console.log(`${colors.dim}Appuyez sur Entrée pour revenir au menu...${colors.reset}`)
+      await new Promise((resolve) => {
+        process.stdin.once('data', resolve)
+      })
+      return interactiveMenu()
+    }
+
+    // Exécution du script
+    runScript(script.name)
+  } catch (error) {
+    // Gestion de Ctrl+C
+    if (error.name === 'ExitPromptError' || error.message?.includes('User force closed')) {
+      console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
+      process.exit(0)
+    }
+    throw error
+  }
+}
+
+// Point d'entrée
+const args = process.argv.slice(2)
+if (args.includes('--list') || args.includes('-l')) {
+  showStaticHelp()
+} else {
+  interactiveMenu()
 }
