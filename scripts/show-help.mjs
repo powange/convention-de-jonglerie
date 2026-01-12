@@ -265,20 +265,34 @@ async function interactiveMenu() {
     `${colors.bold}${colors.blue}📦 Scripts NPM - Menu interactif${colors.reset}\n`
   )
 
+  // Génère un raccourci clavier pour un index donné (1-9, puis 0, a, b, c...)
+  const getShortcutKey = (index) => {
+    if (index < 9) return String(index + 1) // 1-9
+    if (index === 9) return '0' // 10ème = 0
+    return String.fromCharCode(97 + index - 10) // a, b, c... pour 11+
+  }
+
+  const getShortcutDisplay = (index) => {
+    if (index < 9) return String(index + 1)
+    if (index === 9) return '0'
+    return String.fromCharCode(97 + index - 10)
+  }
+
   try {
-    // Sélection de la catégorie
+    // Sélection de la catégorie avec raccourcis numériques
     const categoryChoices = [
-      ...sections.map((s) => ({
-        name: `${s.icon} ${s.title} ${colors.dim}(${s.scripts.length} scripts)${colors.reset}`,
+      ...sections.map((s, index) => ({
+        name: `${colors.dim}[${getShortcutDisplay(index)}]${colors.reset} ${s.icon} ${s.title} ${colors.dim}(${s.scripts.length} scripts)${colors.reset}`,
         value: s,
+        key: getShortcutKey(index),
       })),
       { name: `${colors.dim}───────────────────────────${colors.reset}`, value: 'separator', disabled: true },
-      { name: '📋 Afficher la liste complète', value: 'list' },
-      { name: '❌ Quitter', value: 'exit' },
+      { name: `${colors.dim}[l]${colors.reset} 📋 Afficher la liste complète`, value: 'list', key: 'l' },
+      { name: `${colors.dim}[q]${colors.reset} ❌ Quitter`, value: 'exit', key: 'q' },
     ]
 
     const category = await select({
-      message: 'Choisissez une catégorie:',
+      message: 'Choisissez une catégorie (ou tapez un numéro):',
       choices: categoryChoices,
       pageSize: 15,
     })
@@ -305,20 +319,21 @@ async function interactiveMenu() {
     )
 
     const scriptChoices = [
-      ...category.scripts.map((s) => {
+      ...category.scripts.map((s, index) => {
         const arg = s.requiresArg ? ` ${colors.yellow}${s.requiresArg}${colors.reset}` : ''
         return {
-          name: `${colors.green}${s.name}${arg}${colors.reset} ${colors.dim}- ${s.desc}${colors.reset}`,
+          name: `${colors.dim}[${getShortcutDisplay(index)}]${colors.reset} ${colors.green}${s.name}${arg}${colors.reset} ${colors.dim}- ${s.desc}${colors.reset}`,
           value: s,
+          key: getShortcutKey(index),
         }
       }),
       { name: `${colors.dim}───────────────────────────${colors.reset}`, value: 'separator', disabled: true },
-      { name: '⬅️  Retour aux catégories', value: 'back' },
-      { name: '❌ Quitter', value: 'exit' },
+      { name: `${colors.dim}[b]${colors.reset} ⬅️  Retour aux catégories`, value: 'back', key: 'b' },
+      { name: `${colors.dim}[q]${colors.reset} ❌ Quitter`, value: 'exit', key: 'q' },
     ]
 
     const script = await select({
-      message: 'Choisissez un script à exécuter:',
+      message: 'Choisissez un script (ou tapez un numéro):',
       choices: scriptChoices,
       pageSize: 15,
     })
