@@ -49,6 +49,7 @@
       "volunteers": "Bénévoles"
     },
     "organizers": {
+      "search_user_placeholder": "Rechercher un utilisateur par email...",
       "add_returnable_item": "Ajouter un article",
       "add_to_edition_error": "Impossible d'ajouter l'organisateur à l'édition",
       "added_to_edition": "Organisateur ajouté à l'édition avec succès",

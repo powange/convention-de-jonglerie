@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Неможливо видалити організатора з видання",
       "removed_from_edition": "Організатора успішно видалено з видання",
       "returnable_items": "Предмети для повернення",
+      "search_user_placeholder": "Пошук користувача за email...",
       "select_returnable_item": "Вибрати предмет",
       "select_to_add": "Виберіть організатора для додавання",
       "status": "Статус",

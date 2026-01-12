@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Impossibile rimuovere l'organizzatore dall'edizione",
       "removed_from_edition": "Organizzatore rimosso con successo dall'edizione",
       "returnable_items": "Articoli da restituire",
+      "search_user_placeholder": "Cerca un utente per email...",
       "select_returnable_item": "Seleziona articolo",
       "select_to_add": "Seleziona un organizzatore da aggiungere",
       "status": "Stato",

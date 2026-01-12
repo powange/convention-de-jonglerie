@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Unable to remove organizer from edition",
       "removed_from_edition": "Organizer successfully removed from edition",
       "returnable_items": "Items to return",
+      "search_user_placeholder": "Search for a user by email...",
       "select_returnable_item": "Select item",
       "select_to_add": "Select an organizer to add",
       "status": "Status",

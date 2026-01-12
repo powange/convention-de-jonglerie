@@ -301,7 +301,7 @@
               v-model:search-term="newOrganizersearchTerm"
               :searched-users="searchedUsers"
               :searching-users="searchingUsers"
-              :placeholder="$t('edition.gestion.search_user_placeholder')"
+              :placeholder="$t('gestion.organizers.search_user_placeholder')"
             />
           </div>
 

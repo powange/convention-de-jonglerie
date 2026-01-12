@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Nelze odebrat organizátora z edice",
       "removed_from_edition": "Organizátor byl úspěšně odebrán z edice",
       "returnable_items": "Položky k vrácení",
+      "search_user_placeholder": "Vyhledat uživatele podle e-mailu...",
       "select_returnable_item": "Vybrat položku",
       "select_to_add": "Vyberte organizátora k přidání",
       "status": "Stav",

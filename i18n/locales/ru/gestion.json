@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Невозможно удалить организатора из издания",
       "removed_from_edition": "Организатор успешно удален из издания",
       "returnable_items": "Предметы для возврата",
+      "search_user_placeholder": "Поиск пользователя по email...",
       "select_returnable_item": "Выбрать предмет",
       "select_to_add": "Выберите организатора для добавления",
       "status": "Статус",

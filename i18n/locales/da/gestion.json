@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Kan ikke fjerne organisator fra udgaven",
       "removed_from_edition": "Organisator fjernet fra udgaven med succes",
       "returnable_items": "Genstande til returnering",
+      "search_user_placeholder": "Søg efter en bruger via e-mail...",
       "select_returnable_item": "Vælg genstand",
       "select_to_add": "Vælg en organisator at tilføje",
       "status": "Status",

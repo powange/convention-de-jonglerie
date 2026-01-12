@@ -330,7 +330,17 @@ function extractI18nKeysFromFile(filePath) {
 
     // Filtrer les faux positifs
     // - Exclure les propriétés d'objets JavaScript communes
-    const jsObjectPatterns = ['leaflet', 'backup.tar.gz']
+    // - Exclure les noms de domaine utilisés dans les scrapers
+    const jsObjectPatterns = [
+      'leaflet',
+      'backup.tar.gz',
+      // Domaines de billetterie (utilisés dans les scrapers)
+      'trybooking.com',
+      'helloasso.com',
+      'shotgun.live',
+      'jugglingedge.com',
+      'www.jugglingedge.com',
+    ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé
     const validI18nPatterns = []

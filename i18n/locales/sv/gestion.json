@@ -91,6 +91,7 @@
       "remove_from_edition_error": "Kan inte ta bort arrangör från utgåvan",
       "removed_from_edition": "Arrangör har tagits bort från utgåvan",
       "returnable_items": "Artiklar att återlämna",
+      "search_user_placeholder": "Sök efter en användare via e-post...",
       "select_returnable_item": "Välj artikel",
       "select_to_add": "Välj en arrangör att lägga till",
       "status": "Status",
