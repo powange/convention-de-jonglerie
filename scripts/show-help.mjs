@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { select } from '@inquirer/prompts'
 import { spawn } from 'child_process'
+
+import { select } from '@inquirer/prompts'
 
 // Couleurs pour le terminal
 const colors = {
