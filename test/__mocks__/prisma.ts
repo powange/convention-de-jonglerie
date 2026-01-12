@@ -46,6 +46,7 @@ export const prismaMock = {
   // Modèles covoiturage
   carpoolOffer: createModelMock(),
   carpoolRequest: createModelMock(),
+  carpoolBooking: createModelMock(),
   carpoolPassenger: createModelMock(),
   carpoolComment: createModelMock(),
   carpoolRequestComment: createModelMock(),
