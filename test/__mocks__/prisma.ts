@@ -8,10 +8,12 @@ const createModelMock = () => ({
   create: vi.fn(),
   createMany: vi.fn(),
   update: vi.fn(),
+  updateMany: vi.fn(),
   delete: vi.fn(),
   deleteMany: vi.fn(),
   count: vi.fn(),
   groupBy: vi.fn(),
+  upsert: vi.fn(),
 })
 
 export const prismaMock = {
@@ -38,6 +40,7 @@ export const prismaMock = {
   volunteerAssignment: createModelMock(),
   apiErrorLog: createModelMock(),
   notification: createModelMock(),
+  fcmToken: createModelMock(),
 
   // Modèles objets trouvés
   lostFoundItem: createModelMock(),
