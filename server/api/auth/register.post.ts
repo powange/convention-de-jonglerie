@@ -25,8 +25,11 @@ export default wrapApiHandler(
     // Sanitisation supplémentaire
     const cleanEmail = sanitizeEmail(validatedData.email)
     const cleanPseudo = sanitizeString(validatedData.pseudo)!
-    const cleanNom = sanitizeString(validatedData.nom)!
-    const cleanPrenom = sanitizeString(validatedData.prenom)!
+    const cleanNom = sanitizeString(validatedData.nom) || null
+    const cleanPrenom = sanitizeString(validatedData.prenom) || null
+
+    // Extraire les catégories utilisateur
+    const { isVolunteer, isArtist, isOrganizer } = validatedData
 
     const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 
@@ -57,6 +60,9 @@ export default wrapApiHandler(
           emailVerificationCode: verificationCode,
           verificationCodeExpiry: verificationExpiry,
           preferredLanguage: userLanguage,
+          isVolunteer,
+          isArtist,
+          isOrganizer,
         },
       })
     } catch (error) {
@@ -74,12 +80,13 @@ export default wrapApiHandler(
     const siteUrl = getSiteUrl()
 
     // Envoyer l'email de vérification
-    const emailHtml = await generateVerificationEmailHtml(verificationCode, cleanPrenom, cleanEmail)
+    const displayName = cleanPrenom || cleanPseudo
+    const emailHtml = await generateVerificationEmailHtml(verificationCode, displayName, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
       html: emailHtml,
-      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
+      text: `Bonjour ${displayName}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
     if (!emailSent) {

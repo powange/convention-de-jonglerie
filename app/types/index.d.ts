@@ -10,6 +10,9 @@ export interface User {
   phone?: string | null // compat ancien champ
   profilePicture?: string | null
   isGlobalAdmin?: boolean
+  isVolunteer?: boolean
+  isArtist?: boolean
+  isOrganizer?: boolean
   createdAt: string
   updatedAt?: string
 }

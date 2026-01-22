@@ -84,19 +84,21 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-              <UFormField :label="$t('auth.first_name')" name="prenom">
+              <UFormField
+                :label="$t('auth.first_name')"
+                name="prenom"
+                :hint="$t('common.optional')"
+              >
                 <UInput
                   v-model="state.prenom"
-                  required
                   :placeholder="$t('auth.first_name_placeholder')"
                   icon="i-heroicons-user"
                   class="w-full"
                 />
               </UFormField>
-              <UFormField :label="$t('auth.last_name')" name="nom">
+              <UFormField :label="$t('auth.last_name')" name="nom" :hint="$t('common.optional')">
                 <UInput
                   v-model="state.nom"
-                  required
                   :placeholder="$t('auth.last_name_placeholder')"
                   icon="i-heroicons-user"
                   class="w-full"
@@ -219,6 +221,32 @@
             </UFormField>
           </div>
 
+          <!-- Section Catégories (optionnelle) -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3
+                class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
+              >
+                {{ $t('profile.user_categories.title') }}
+              </h3>
+              <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                $t('common.optional')
+              }}</span>
+            </div>
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ $t('profile.user_categories.description') }}
+              </p>
+            </div>
+
+            <UFormField
+              :label="$t('profile.user_categories.select_label')"
+              :description="$t('profile.user_categories.select_description')"
+            >
+              <UCheckboxGroup v-model="selectedCategories" :items="categoryItems" />
+            </UFormField>
+          </div>
+
           <!-- Bouton d'inscription -->
           <UButton
             type="submit"
@@ -292,8 +320,8 @@ const schema = z
   .object({
     email: z.string().email(t('errors.invalid_email')),
     pseudo: z.string().min(3, t('errors.username_min_3_chars')),
-    nom: z.string().min(1, t('errors.last_name_required')),
-    prenom: z.string().min(1, t('errors.first_name_required')),
+    nom: z.string().optional().or(z.literal('')),
+    prenom: z.string().optional().or(z.literal('')),
     password: z
       .string()
       .min(8, t('errors.password_too_short'))
@@ -313,6 +341,9 @@ const state = reactive({
   prenom: '',
   password: '',
   confirmPassword: '',
+  isVolunteer: false,
+  isArtist: false,
+  isOrganizer: false,
 })
 const loading = ref(false)
 
@@ -327,6 +358,40 @@ const {
   strengthTextColor: passwordStrengthTextColor,
   getStrengthBarColor: getPasswordStrengthBarColor,
 } = usePasswordStrength(passwordRef)
+
+// Gestion des catégories utilisateur
+const categoryItems = computed(() => [
+  {
+    label: t('profile.user_categories.categories.volunteer'),
+    description: t('profile.user_categories.categories.volunteer_desc'),
+    value: 'volunteer',
+  },
+  {
+    label: t('profile.user_categories.categories.artist'),
+    description: t('profile.user_categories.categories.artist_desc'),
+    value: 'artist',
+  },
+  {
+    label: t('profile.user_categories.categories.organizer'),
+    description: t('profile.user_categories.categories.organizer_desc'),
+    value: 'organizer',
+  },
+])
+
+const selectedCategories = computed({
+  get: () => {
+    const categories: string[] = []
+    if (state.isVolunteer) categories.push('volunteer')
+    if (state.isArtist) categories.push('artist')
+    if (state.isOrganizer) categories.push('organizer')
+    return categories
+  },
+  set: (value: string[]) => {
+    state.isVolunteer = value.includes('volunteer')
+    state.isArtist = value.includes('artist')
+    state.isOrganizer = value.includes('organizer')
+  },
+})
 
 const onGoogleRegister = async () => {
   // Navigation externe pour forcer l'appel de la route serveur (/auth/google)
@@ -344,6 +409,9 @@ const handleRegister = async () => {
         pseudo: state.pseudo,
         nom: state.nom,
         prenom: state.prenom,
+        isVolunteer: state.isVolunteer,
+        isArtist: state.isArtist,
+        isOrganizer: state.isOrganizer,
       },
     })
 

@@ -595,6 +595,17 @@ const getUserActions = (user: AdminUserWithConnection) => {
     })
   }
 
+  // Action pour invalider l'email (seulement si l'email est vérifié)
+  if (user.isEmailVerified) {
+    actions.push({
+      label: t('admin.invalidate_email'),
+      icon: 'i-heroicons-envelope-open',
+      onSelect: () => {
+        invalidateUserEmail(user)
+      },
+    })
+  }
+
   // Actions d'administration
   if (!user.isGlobalAdmin) {
     actions.push({
@@ -777,6 +788,44 @@ const demoteFromAdmin = async (user: AdminUserWithConnection) => {
     useToast().add({
       title: t('common.error'),
       description: error.data?.message || t('admin.demotion_error'),
+      color: 'error',
+    })
+  }
+}
+
+// Fonction pour invalider l'email d'un utilisateur
+const invalidateUserEmail = async (user: AdminUserWithConnection) => {
+  try {
+    const confirmMessage = t('admin.confirm_invalidate_email', {
+      name: `${user.prenom} ${user.nom}`,
+    })
+
+    if (confirm(confirmMessage)) {
+      await $fetch(`/api/admin/users/${user.id}/invalidate-email`, {
+        method: 'PUT',
+      })
+
+      // Mettre à jour l'utilisateur dans la liste locale
+      const userIndex = users.value.findIndex((u) => u.id === user.id)
+      if (userIndex !== -1) {
+        users.value[userIndex] = {
+          ...users.value[userIndex],
+          isEmailVerified: false,
+        }
+      }
+
+      useToast().add({
+        title: t('common.success'),
+        description: t('admin.email_invalidated_successfully'),
+        color: 'success',
+      })
+    }
+  } catch (error: any) {
+    console.error("Erreur lors de l'invalidation de l'email:", error)
+
+    useToast().add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.invalidate_email_error'),
       color: 'error',
     })
   }

@@ -20,6 +20,21 @@ export const useAuthStore = defineStore('auth', {
     isAdminModeActive: (state) => {
       return state.user?.isGlobalAdmin && state.adminMode
     },
+    isVolunteer: (state) => {
+      return state.user?.isVolunteer || false
+    },
+    isArtist: (state) => {
+      return state.user?.isArtist || false
+    },
+    isOrganizer: (state) => {
+      return state.user?.isOrganizer || false
+    },
+    hasCategory: (state) => (category: 'volunteer' | 'artist' | 'organizer') => {
+      if (category === 'volunteer') return state.user?.isVolunteer || false
+      if (category === 'artist') return state.user?.isArtist || false
+      if (category === 'organizer') return state.user?.isOrganizer || false
+      return false
+    },
   },
   actions: {
     async register(email: string, password: string, pseudo: string, nom: string, prenom: string) {

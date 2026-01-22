@@ -26,8 +26,18 @@ export default wrapApiHandler(
       throw error
     }
 
-    const { email, pseudo, nom, prenom, telephone, profilePicture, preferredLanguage } =
-      validatedData
+    const {
+      email,
+      pseudo,
+      nom,
+      prenom,
+      telephone,
+      profilePicture,
+      preferredLanguage,
+      isVolunteer,
+      isArtist,
+      isOrganizer,
+    } = validatedData
 
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
     if (email !== user.email) {
@@ -38,7 +48,7 @@ export default wrapApiHandler(
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
           statusCode: 400,
-          message: 'Cette adresse email est déjà utilisée',
+          message: 'Cette adresse email est déjà utilisée par un autre utilisateur',
         })
       }
     }
@@ -52,7 +62,7 @@ export default wrapApiHandler(
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
           statusCode: 400,
-          message: 'Ce pseudo est déjà utilisé',
+          message: 'Ce pseudo est déjà utilisé par un autre utilisateur',
         })
       }
     }
@@ -146,6 +156,10 @@ export default wrapApiHandler(
         ...(profilePicture !== undefined && { profilePicture: finalProfileFilename }),
         // Mettre à jour la langue préférée si fournie
         ...(preferredLanguage !== undefined && { preferredLanguage }),
+        // Mettre à jour les catégories utilisateur si fournies
+        ...(isVolunteer !== undefined && { isVolunteer }),
+        ...(isArtist !== undefined && { isArtist }),
+        ...(isOrganizer !== undefined && { isOrganizer }),
         // Recalculer emailHash si l'email a changé
         ...(email !== user.email && { emailHash: getEmailHash(email) }),
       },
@@ -159,6 +173,9 @@ export default wrapApiHandler(
         phone: true,
         profilePicture: true,
         preferredLanguage: true,
+        isVolunteer: true,
+        isArtist: true,
+        isOrganizer: true,
         createdAt: true,
         updatedAt: true,
       },

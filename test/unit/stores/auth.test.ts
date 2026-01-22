@@ -129,6 +129,59 @@ describe('useAuthStore', () => {
 
       expect(authStore.isAdminModeActive).toBe(true)
     })
+
+    it('isVolunteer devrait retourner false par défaut', () => {
+      authStore.user = { ...mockUser }
+      expect(authStore.isVolunteer).toBe(false)
+    })
+
+    it('isVolunteer devrait retourner true si isVolunteer est true', () => {
+      authStore.user = { ...mockUser, isVolunteer: true }
+      expect(authStore.isVolunteer).toBe(true)
+    })
+
+    it('isArtist devrait retourner false par défaut', () => {
+      authStore.user = { ...mockUser }
+      expect(authStore.isArtist).toBe(false)
+    })
+
+    it('isArtist devrait retourner true si isArtist est true', () => {
+      authStore.user = { ...mockUser, isArtist: true }
+      expect(authStore.isArtist).toBe(true)
+    })
+
+    it('isOrganizer devrait retourner false par défaut', () => {
+      authStore.user = { ...mockUser }
+      expect(authStore.isOrganizer).toBe(false)
+    })
+
+    it('isOrganizer devrait retourner true si isOrganizer est true', () => {
+      authStore.user = { ...mockUser, isOrganizer: true }
+      expect(authStore.isOrganizer).toBe(true)
+    })
+
+    it('hasCategory devrait vérifier correctement la catégorie volunteer', () => {
+      authStore.user = { ...mockUser, isVolunteer: true }
+      expect(authStore.hasCategory('volunteer')).toBe(true)
+      expect(authStore.hasCategory('artist')).toBe(false)
+    })
+
+    it('hasCategory devrait vérifier correctement la catégorie artist', () => {
+      authStore.user = { ...mockUser, isArtist: true }
+      expect(authStore.hasCategory('artist')).toBe(true)
+      expect(authStore.hasCategory('volunteer')).toBe(false)
+    })
+
+    it('hasCategory devrait vérifier correctement la catégorie organizer', () => {
+      authStore.user = { ...mockUser, isOrganizer: true }
+      expect(authStore.hasCategory('organizer')).toBe(true)
+      expect(authStore.hasCategory('volunteer')).toBe(false)
+    })
+
+    it('hasCategory devrait retourner false sans utilisateur', () => {
+      authStore.user = null
+      expect(authStore.hasCategory('volunteer')).toBe(false)
+    })
   })
 
   describe('Action register', () => {
@@ -291,6 +344,23 @@ describe('useAuthStore', () => {
       authStore.updateUser({ pseudo: 'newpseudo' })
 
       expect(authStore.user).toBeNull()
+    })
+
+    it('devrait préserver les catégories si non fournies', () => {
+      authStore.user = { ...mockUser, isVolunteer: true, isArtist: true }
+      authStore.updateUser({ pseudo: 'newpseudo' })
+
+      expect(authStore.user?.isVolunteer).toBe(true)
+      expect(authStore.user?.isArtist).toBe(true)
+      expect(authStore.user?.pseudo).toBe('newpseudo')
+    })
+
+    it('devrait mettre à jour les catégories si fournies', () => {
+      authStore.user = { ...mockUser, isVolunteer: false }
+      authStore.updateUser({ isVolunteer: true, isArtist: true })
+
+      expect(authStore.user?.isVolunteer).toBe(true)
+      expect(authStore.user?.isArtist).toBe(true)
     })
   })
 

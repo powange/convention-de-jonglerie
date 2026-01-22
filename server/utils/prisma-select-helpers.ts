@@ -103,6 +103,9 @@ export const userPublicProfileSelect = {
   prenom: true,
   profilePicture: true,
   emailHash: true,
+  isVolunteer: true,
+  isArtist: true,
+  isOrganizer: true,
   createdAt: true,
 } satisfies Prisma.UserSelect
 

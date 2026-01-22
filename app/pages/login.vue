@@ -612,13 +612,15 @@ const handlePasswordSubmit = async () => {
       errorMessage = t('errors.invalid_credentials')
     } else if ((error as any).statusCode === 403 || (error as any).status === 403) {
       const errAny = error as any
-      const isEmailNotVerified =
-        errAny.message?.includes('email not verified') ||
-        errAny.message?.includes('email not verified') ||
-        errAny.message?.includes('Email non vérifié') ||
-        errAny.message?.includes('Email non vérifié')
       const errorData = (error as any).data
       const actualData = errorData?.data || errorData
+
+      // Vérifier si c'est une erreur d'email non vérifié via le flag ou le message
+      const isEmailNotVerified =
+        actualData?.requiresEmailVerification === true ||
+        errAny.message?.includes('email not verified') ||
+        errAny.message?.includes('Email non vérifié')
+
       if (isEmailNotVerified) {
         const email = actualData?.email || emailState.email
         toast.add({

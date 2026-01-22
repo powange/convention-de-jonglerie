@@ -120,8 +120,12 @@ export default defineEventHandler(async (event) => {
   // Essayer de retrouver l'utilisateur par email
   let dbUser = await prisma.user.findUnique({ where: { email } })
 
+  // Variable pour savoir si c'est une nouvelle inscription
+  let isNewUser = false
+
   // Créer l'utilisateur si inexistant
   if (!dbUser) {
+    isNewUser = true
     const [prenomRaw, ...rest] = name.trim().split(/\s+/)
     const prenom = (givenName || prenomRaw || email.split('@')[0]).trim()
     const nom = (familyName || rest.join(' ') || 'Google').trim()
@@ -212,6 +216,21 @@ export default defineEventHandler(async (event) => {
   const returnTo = getCookie(event, 'oauth_returnTo')
   if (returnTo) {
     setCookie(event, 'oauth_returnTo', '', { maxAge: 0 }) // Supprimer le cookie
+  }
+
+  // Si c'est un nouvel utilisateur, rediriger vers la page de complétion du profil
+  if (isNewUser) {
+    // Stocker la destination finale dans un cookie pour y retourner après la complétion
+    if (returnTo) {
+      setCookie(event, 'profile_completion_returnTo', returnTo, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 600,
+      })
+    }
+    return sendRedirect(event, '/auth/complete-profile')
   }
 
   // Valider et utiliser returnTo ou rediriger vers la page d'accueil

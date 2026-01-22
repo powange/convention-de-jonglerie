@@ -48,8 +48,19 @@ export const registerSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   pseudo: pseudoSchema,
-  prenom: nameSchema,
-  nom: nameSchema,
+  prenom: z
+    .string()
+    .max(100, 'Ce champ ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
+  nom: z
+    .string()
+    .max(100, 'Ce champ ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
+  isVolunteer: z.boolean().optional().default(false),
+  isArtist: z.boolean().optional().default(false),
+  isOrganizer: z.boolean().optional().default(false),
 })
 
 export const changePasswordSchema = z
@@ -76,6 +87,15 @@ export const updateProfileSchema = z.object({
     .string()
     .refine((val) => getSupportedLocalesCodes().includes(val as any), 'Langue non supportée')
     .optional(),
+  isVolunteer: z.boolean().optional(),
+  isArtist: z.boolean().optional(),
+  isOrganizer: z.boolean().optional(),
+})
+
+export const categoriesUpdateSchema = z.object({
+  isVolunteer: z.boolean(),
+  isArtist: z.boolean(),
+  isOrganizer: z.boolean(),
 })
 
 // Schémas de convention

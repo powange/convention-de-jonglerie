@@ -25,6 +25,7 @@ export function getTranslationsToLoad(path: string): string[] {
     '/verify-email': ['auth'],
     '/reset-password': ['auth'],
     '/forgot-password': ['auth'],
+    '/welcome': ['auth'],
     '/messenger': ['messenger'],
   }
 

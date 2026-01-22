@@ -206,6 +206,9 @@
           </UForm>
         </UCard>
 
+        <!-- Catégories utilisateur -->
+        <ProfileUserCategoriesCard />
+
         <!-- Notifications -->
         <UCard class="shadow-lg border-0">
           <template #header>
@@ -401,7 +404,7 @@
               to="/conventions/add"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              {{ $t('conventions.create') }}
+              {{ $t('profile.create_convention') }}
             </UButton>
 
             <UButton

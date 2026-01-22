@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `isArtist` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `isOrganizer` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `isVolunteer` BOOLEAN NOT NULL DEFAULT false;

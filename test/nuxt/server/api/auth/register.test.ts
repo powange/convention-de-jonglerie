@@ -96,6 +96,79 @@ describe('API Register', () => {
     })
   })
 
+  it('devrait créer un utilisateur sans nom et prénom', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      pseudo: 'testuser',
+      nom: null,
+      prenom: null,
+      isEmailVerified: false,
+    }
+
+    prismaMock.user.create.mockResolvedValue(mockUser)
+
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    const result = await registerHandler(mockEvent)
+
+    expect(result).toEqual({
+      message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
+      requiresVerification: true,
+      email: 'test@example.com',
+    })
+
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        email: 'test@example.com',
+        pseudo: 'testuser',
+        nom: null,
+        prenom: null,
+        isEmailVerified: false,
+        emailVerificationCode: '123456',
+      }),
+    })
+  })
+
+  it("devrait utiliser le pseudo dans l'email si prénom est absent", async () => {
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      pseudo: 'testuser',
+      nom: null,
+      prenom: null,
+      isEmailVerified: false,
+    }
+
+    prismaMock.user.create.mockResolvedValue(mockUser)
+
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await registerHandler(mockEvent)
+
+    // Vérifier que l'email utilise le pseudo
+    expect(mockSendEmail).toHaveBeenCalledWith({
+      to: 'test@example.com',
+      subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
+      html: expect.stringContaining('123456'),
+      text: expect.stringContaining('testuser'), // Utilise le pseudo
+    })
+  })
+
   it("devrait valider le format de l'email", async () => {
     const requestBody = {
       email: 'invalid-email',
@@ -242,5 +315,131 @@ describe('API Register', () => {
       requiresVerification: true,
       email: 'test@example.com',
     })
+  })
+
+  it('devrait enregistrer les catégories utilisateur par défaut (false)', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      isEmailVerified: false,
+    }
+
+    prismaMock.user.create.mockResolvedValue(mockUser)
+
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await registerHandler(mockEvent)
+
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        isVolunteer: false,
+        isArtist: false,
+        isOrganizer: false,
+      }),
+    })
+  })
+
+  it('devrait enregistrer les catégories utilisateur sélectionnées', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      isEmailVerified: false,
+    }
+
+    prismaMock.user.create.mockResolvedValue(mockUser)
+
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      isVolunteer: true,
+      isArtist: false,
+      isOrganizer: true,
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await registerHandler(mockEvent)
+
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        isVolunteer: true,
+        isArtist: false,
+        isOrganizer: true,
+      }),
+    })
+  })
+
+  it('devrait accepter toutes les catégories à true', async () => {
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      isEmailVerified: false,
+    }
+
+    prismaMock.user.create.mockResolvedValue(mockUser)
+
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      isVolunteer: true,
+      isArtist: true,
+      isOrganizer: true,
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await registerHandler(mockEvent)
+
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        isVolunteer: true,
+        isArtist: true,
+        isOrganizer: true,
+      }),
+    })
+  })
+
+  it("devrait rejeter si une catégorie n'est pas un booléen", async () => {
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      isVolunteer: 'invalid',
+      isArtist: false,
+      isOrganizer: false,
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await expect(registerHandler(mockEvent)).rejects.toThrow()
   })
 })

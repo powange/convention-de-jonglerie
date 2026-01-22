@@ -4,6 +4,8 @@ import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { sanitizeEmail } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
+import { setUserSession } from '#imports'
+
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),
   code: z
@@ -65,13 +67,14 @@ export default wrapApiHandler(
 
     // Si l'utilisateur a déjà un mot de passe, activer le compte directement
     if (!needsPassword) {
-      // Activer le compte
+      // Activer le compte et mettre à jour la date de connexion
       const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: {
           isEmailVerified: true,
           emailVerificationCode: null,
           verificationCodeExpiry: null,
+          lastLoginAt: new Date(),
         },
       })
 
@@ -83,6 +86,25 @@ export default wrapApiHandler(
         console.error("Erreur lors de l'envoi de la notification de bienvenue:", notificationError)
       }
 
+      // Créer une session pour connecter automatiquement l'utilisateur
+      await setUserSession(event, {
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          pseudo: updatedUser.pseudo,
+          nom: updatedUser.nom,
+          prenom: updatedUser.prenom,
+          phone: updatedUser.phone,
+          isGlobalAdmin: updatedUser.isGlobalAdmin,
+          isVolunteer: updatedUser.isVolunteer,
+          isArtist: updatedUser.isArtist,
+          isOrganizer: updatedUser.isOrganizer,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
+          isEmailVerified: updatedUser.isEmailVerified,
+        },
+      })
+
       return {
         message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',
         needsPassword: false,
@@ -92,6 +114,14 @@ export default wrapApiHandler(
           pseudo: updatedUser.pseudo,
           nom: updatedUser.nom,
           prenom: updatedUser.prenom,
+          phone: updatedUser.phone,
+          profilePicture: updatedUser.profilePicture,
+          isGlobalAdmin: updatedUser.isGlobalAdmin,
+          isVolunteer: updatedUser.isVolunteer,
+          isArtist: updatedUser.isArtist,
+          isOrganizer: updatedUser.isOrganizer,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
           isEmailVerified: updatedUser.isEmailVerified,
         },
       }

@@ -218,6 +218,7 @@ import type { HttpError } from '~/types'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const authStore = useAuthStore()
 
 // Middleware pour gérer l'accès à la vérification email
 definePageMeta({
@@ -356,7 +357,16 @@ const handleVerification = async () => {
       return
     }
 
-    // Sinon, rediriger vers la page de connexion
+    // Sinon, l'utilisateur est maintenant connecté automatiquement
+    // Mettre à jour le store auth avec les données utilisateur
+    authStore.user = response.user
+
+    // Sauvegarder dans sessionStorage (pas de rememberMe pour la vérification email)
+    if (import.meta.client) {
+      sessionStorage.setItem('authUser', JSON.stringify(response.user))
+      sessionStorage.setItem('rememberMe', 'false')
+    }
+
     toast.add({
       title: t('auth.email_verified_success'),
       description: t('auth.account_now_active'),
@@ -364,7 +374,11 @@ const handleVerification = async () => {
       color: 'success',
     })
 
-    router.push('/login')
+    // Recharger l'application pour synchroniser la session et rediriger
+    // Le délai permet d'afficher le toast avant le rechargement
+    setTimeout(() => {
+      reloadNuxtApp({ path: '/welcome/categories' })
+    }, 500)
   } catch (e: unknown) {
     const error = e as HttpError
     hasError.value = true
@@ -393,7 +407,7 @@ const handleSetPassword = async () => {
   hasError.value = false
 
   try {
-    await $fetch('/api/auth/set-password-and-verify', {
+    const response = await $fetch('/api/auth/set-password-and-verify', {
       method: 'POST',
       body: {
         email: email.value,
@@ -402,6 +416,15 @@ const handleSetPassword = async () => {
       },
     })
 
+    // Mettre à jour le store auth avec les données utilisateur
+    authStore.user = response.user
+
+    // Sauvegarder dans sessionStorage (pas de rememberMe pour la vérification email)
+    if (import.meta.client) {
+      sessionStorage.setItem('authUser', JSON.stringify(response.user))
+      sessionStorage.setItem('rememberMe', 'false')
+    }
+
     toast.add({
       title: t('auth.password_created_success'),
       description: t('auth.account_now_active'),
@@ -409,7 +432,11 @@ const handleSetPassword = async () => {
       color: 'success',
     })
 
-    router.push('/login')
+    // Recharger l'application pour synchroniser la session et rediriger
+    // Le délai permet d'afficher le toast avant le rechargement
+    setTimeout(() => {
+      reloadNuxtApp({ path: '/welcome/categories' })
+    }, 500)
   } catch (e: unknown) {
     const error = e as HttpError
     hasError.value = true

@@ -22,7 +22,7 @@ const mockHandler = async (event: any) => {
     throw error
   }
 
-  const { email, pseudo, nom, prenom, telephone } = body
+  const { email, pseudo, nom, prenom, telephone, isVolunteer, isArtist, isOrganizer } = body
 
   // Vérifier si l'email est déjà utilisé par un autre utilisateur
   if (email !== user.email) {
@@ -59,6 +59,9 @@ const mockHandler = async (event: any) => {
       nom,
       prenom,
       telephone,
+      ...(isVolunteer !== undefined && { isVolunteer }),
+      ...(isArtist !== undefined && { isArtist }),
+      ...(isOrganizer !== undefined && { isOrganizer }),
     },
     select: {
       id: true,
@@ -68,6 +71,9 @@ const mockHandler = async (event: any) => {
       prenom: true,
       telephone: true,
       profilePicture: true,
+      isVolunteer: true,
+      isArtist: true,
+      isOrganizer: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -140,6 +146,9 @@ describe('API Profile Update', () => {
         prenom: true,
         telephone: true,
         profilePicture: true,
+        isVolunteer: true,
+        isArtist: true,
+        isOrganizer: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -264,5 +273,63 @@ describe('API Profile Update', () => {
       statusCode: 400,
       message: 'Données invalides',
     })
+  })
+
+  it('devrait mettre à jour les catégories utilisateur', async () => {
+    vi.mocked(readBody).mockResolvedValue({
+      email: 'test@example.com',
+      pseudo: 'testuser',
+      nom: 'Test',
+      prenom: 'User',
+      telephone: '0123456789',
+      isVolunteer: true,
+      isArtist: true,
+      isOrganizer: false,
+    })
+    prismaMock.user.findUnique.mockResolvedValue(null)
+    const updatedWithCategories = {
+      ...mockUpdatedUser,
+      isVolunteer: true,
+      isArtist: true,
+      isOrganizer: false,
+    }
+    prismaMock.user.update.mockResolvedValue(updatedWithCategories)
+
+    const mockEvent = {
+      context: { user: mockUser },
+    }
+
+    const result = await mockHandler(mockEvent)
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: {
+        email: 'test@example.com',
+        pseudo: 'testuser',
+        nom: 'Test',
+        prenom: 'User',
+        telephone: '0123456789',
+        isVolunteer: true,
+        isArtist: true,
+        isOrganizer: false,
+      },
+      select: {
+        id: true,
+        email: true,
+        pseudo: true,
+        nom: true,
+        prenom: true,
+        telephone: true,
+        profilePicture: true,
+        isVolunteer: true,
+        isArtist: true,
+        isOrganizer: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+    expect(result.isVolunteer).toBe(true)
+    expect(result.isArtist).toBe(true)
+    expect(result.isOrganizer).toBe(false)
   })
 })

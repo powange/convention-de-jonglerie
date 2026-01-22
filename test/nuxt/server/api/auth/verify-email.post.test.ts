@@ -5,6 +5,11 @@ import handler from '../../../../../server/api/auth/verify-email.post'
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
+// Mock de nuxt-auth-utils
+vi.mock('nuxt-auth-utils', () => ({
+  setUserSession: vi.fn(),
+}))
+
 const mockEvent = {}
 
 const mockUser = {
@@ -13,6 +18,14 @@ const mockUser = {
   pseudo: 'testuser',
   nom: 'Doe',
   prenom: 'John',
+  phone: null,
+  profilePicture: null,
+  isGlobalAdmin: false,
+  isVolunteer: false,
+  isArtist: false,
+  isOrganizer: false,
+  createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
   password: 'hashed_password', // Utilisateur avec mot de passe existant
   isEmailVerified: false,
   emailVerificationCode: '123456',
@@ -25,6 +38,14 @@ const mockUserWithoutPassword = {
   pseudo: 'testuser',
   nom: 'Doe',
   prenom: 'John',
+  phone: null,
+  profilePicture: null,
+  isGlobalAdmin: false,
+  isVolunteer: false,
+  isArtist: false,
+  isOrganizer: false,
+  createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
   password: null, // Utilisateur sans mot de passe (invitation)
   isEmailVerified: false,
   emailVerificationCode: '123456',
@@ -36,6 +57,7 @@ const mockVerifiedUser = {
   isEmailVerified: true,
   emailVerificationCode: null,
   verificationCodeExpiry: null,
+  lastLoginAt: new Date(),
 }
 
 describe('/api/auth/verify-email POST', () => {
@@ -66,6 +88,14 @@ describe('/api/auth/verify-email POST', () => {
         pseudo: mockVerifiedUser.pseudo,
         nom: mockVerifiedUser.nom,
         prenom: mockVerifiedUser.prenom,
+        phone: mockVerifiedUser.phone,
+        profilePicture: mockVerifiedUser.profilePicture,
+        isGlobalAdmin: mockVerifiedUser.isGlobalAdmin,
+        isVolunteer: mockVerifiedUser.isVolunteer,
+        isArtist: mockVerifiedUser.isArtist,
+        isOrganizer: mockVerifiedUser.isOrganizer,
+        createdAt: mockVerifiedUser.createdAt,
+        updatedAt: mockVerifiedUser.updatedAt,
         isEmailVerified: mockVerifiedUser.isEmailVerified,
       },
     })
@@ -74,14 +104,17 @@ describe('/api/auth/verify-email POST', () => {
       where: { email: 'user@example.com' },
     })
 
-    expect(prismaMock.user.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: {
-        isEmailVerified: true,
-        emailVerificationCode: null,
-        verificationCodeExpiry: null,
-      },
-    })
+    expect(prismaMock.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: expect.objectContaining({
+          isEmailVerified: true,
+          emailVerificationCode: null,
+          verificationCodeExpiry: null,
+          lastLoginAt: expect.any(Date),
+        }),
+      })
+    )
   })
 
   it('devrait retourner needsPassword: true pour un utilisateur sans mot de passe', async () => {
@@ -122,16 +155,31 @@ describe('/api/auth/verify-email POST', () => {
       email: 'user@example.com', // Email en base en minuscules
     }
 
+    const normalizedVerifiedUser = {
+      ...mockVerifiedUser,
+      email: 'user@example.com',
+    }
+
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.user.findUnique.mockResolvedValue(normalizedUser)
-    prismaMock.user.update.mockResolvedValue(mockVerifiedUser)
+    prismaMock.user.update.mockResolvedValue(normalizedVerifiedUser)
 
-    await handler(mockEvent as any)
+    const result = await handler(mockEvent as any)
 
     // Vérifier que l'email est bien converti en minuscules pour la recherche
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { email: 'user@example.com' },
     })
+
+    // Vérifier que la réponse contient tous les champs attendus
+    expect(result.user).toHaveProperty('id')
+    expect(result.user).toHaveProperty('email')
+    expect(result.user).toHaveProperty('phone')
+    expect(result.user).toHaveProperty('profilePicture')
+    expect(result.user).toHaveProperty('isGlobalAdmin')
+    expect(result.user).toHaveProperty('isVolunteer')
+    expect(result.user).toHaveProperty('isArtist')
+    expect(result.user).toHaveProperty('isOrganizer')
   })
 
   it("devrait rejeter si l'email est invalide", async () => {
@@ -332,6 +380,11 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.message).toBe('Email vérifié avec succès ! Votre compte est maintenant actif.')
+    expect(result).toHaveProperty('needsPassword', false)
+    expect(result.user).toHaveProperty('id')
+    expect(result.user).toHaveProperty('email')
+    expect(result.user).toHaveProperty('phone')
+    expect(result.user).toHaveProperty('profilePicture')
   })
 
   it('devrait gérer correctement la comparaison temporelle UTC', async () => {
@@ -353,6 +406,9 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.message).toBe('Email vérifié avec succès ! Votre compte est maintenant actif.')
+    expect(result).toHaveProperty('needsPassword', false)
+    expect(result.user).toHaveProperty('id')
+    expect(result.user).toHaveProperty('email')
   })
 
   it("ne devrait pas exposer d'informations sensibles dans la réponse", async () => {
@@ -372,5 +428,20 @@ describe('/api/auth/verify-email POST', () => {
     expect(result.user).not.toHaveProperty('verificationCodeExpiry')
     expect(result.user).not.toHaveProperty('password')
     expect(result.user).not.toHaveProperty('passwordResetToken')
+    expect(result.user).not.toHaveProperty('lastLoginAt')
+
+    // Vérifier que les champs attendus sont présents
+    expect(result.user).toHaveProperty('id')
+    expect(result.user).toHaveProperty('email')
+    expect(result.user).toHaveProperty('pseudo')
+    expect(result.user).toHaveProperty('nom')
+    expect(result.user).toHaveProperty('prenom')
+    expect(result.user).toHaveProperty('phone')
+    expect(result.user).toHaveProperty('profilePicture')
+    expect(result.user).toHaveProperty('isGlobalAdmin')
+    expect(result.user).toHaveProperty('isVolunteer')
+    expect(result.user).toHaveProperty('isArtist')
+    expect(result.user).toHaveProperty('isOrganizer')
+    expect(result.user).toHaveProperty('isEmailVerified')
   })
 })
