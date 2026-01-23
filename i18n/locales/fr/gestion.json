@@ -49,7 +49,6 @@
       "volunteers": "Bénévoles"
     },
     "organizers": {
-      "search_user_placeholder": "Rechercher un utilisateur par email...",
       "add_returnable_item": "Ajouter un article",
       "add_to_edition_error": "Impossible d'ajouter l'organisateur à l'édition",
       "added_to_edition": "Organisateur ajouté à l'édition avec succès",
@@ -92,6 +91,7 @@
       "remove_from_edition_error": "Impossible de retirer l'organisateur de l'édition",
       "removed_from_edition": "Organisateur retiré de l'édition avec succès",
       "returnable_items": "Articles à restituer",
+      "search_user_placeholder": "Rechercher un utilisateur par email...",
       "select_returnable_item": "Sélectionner un article",
       "select_to_add": "Sélectionner un organisateur à ajouter",
       "status": "Statut",

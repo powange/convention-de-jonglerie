@@ -76,10 +76,10 @@ export default wrapApiHandler(
       errorMessage: 'Edition not found',
     })
 
-    // Check if edition is offline and user has permission to view it
-    // Only consider it offline when isOnline is explicitly false. If undefined
-    // (legacy records / tests), treat it as online.
-    if (edition.isOnline === false) {
+    // Check access based on edition status
+    // PUBLISHED, PLANNED, and CANCELLED are publicly accessible
+    // OFFLINE editions are only accessible to organizers/creators/admins
+    if (edition.status === 'OFFLINE') {
       // Check if user is authenticated
       const user = optionalAuth(event)
       if (!user) {

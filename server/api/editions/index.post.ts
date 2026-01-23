@@ -121,7 +121,7 @@ export default wrapApiHandler(
         hasCreditCardPayment: hasCreditCardPayment || false,
         hasAfjTokenPayment: hasAfjTokenPayment || false,
         creatorId: user.id,
-        isOnline: false, // Nouvelle édition créée hors ligne par défaut
+        status: 'OFFLINE', // Nouvelle édition créée hors ligne par défaut
       },
       include: editionWithFavoritesInclude,
     })

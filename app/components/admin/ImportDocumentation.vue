@@ -45,7 +45,10 @@
             <li><code>edition.facebookUrl</code> - Page Facebook</li>
             <li><code>edition.instagramUrl</code> - Page Instagram</li>
             <li><code>edition.officialWebsiteUrl</code> - Site officiel</li>
-            <li><code>edition.isOnline</code> - Événement en ligne (boolean)</li>
+            <li>
+              <code>edition.status</code> - Statut de l'édition (PLANNED | PUBLISHED | OFFLINE |
+              CANCELLED)
+            </li>
             <li><code>edition.volunteersOpen</code> - Inscriptions bénévoles ouvertes</li>
             <li><code>edition.volunteersDescription</code> - Description pour bénévoles</li>
             <li><code>edition.volunteersExternalUrl</code> - URL externe bénévoles</li>

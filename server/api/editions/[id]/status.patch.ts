@@ -5,7 +5,7 @@ import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 const statusSchema = z.object({
-  isOnline: z.boolean(),
+  status: z.enum(['PLANNED', 'PUBLISHED', 'OFFLINE', 'CANCELLED']),
 })
 
 export default wrapApiHandler(
@@ -21,7 +21,7 @@ export default wrapApiHandler(
 
     const updatedEdition = await prisma.edition.update({
       where: { id: editionId },
-      data: { isOnline: validatedData.isOnline },
+      data: { status: validatedData.status },
       include: {
         creator: {
           select: { id: true, pseudo: true, emailHash: true, profilePicture: true },

@@ -8,7 +8,7 @@ export default wrapApiHandler(
         convention: {
           isArchived: false,
         },
-        isOnline: true, // Inclure uniquement les éditions en ligne
+        status: 'PUBLISHED', // Inclure uniquement les éditions publiées
         volunteersOpen: true, // Candidatures bénévoles ouvertes
       },
       select: {

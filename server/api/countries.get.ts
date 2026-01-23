@@ -16,7 +16,7 @@ export default wrapApiHandler(
     // Requête DB si pas en cache
     const countries = await prisma.edition.findMany({
       where: {
-        isOnline: true, // Toutes les éditions en ligne (passées, présentes, futures)
+        status: 'PUBLISHED', // Toutes les éditions publiées (passées, présentes, futures)
       },
       select: {
         country: true,

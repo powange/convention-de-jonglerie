@@ -156,6 +156,7 @@ export const editionListSelect = {
   startDate: true,
   endDate: true,
   imageUrl: true,
+  status: true,
 
   // Services et équipements
   hasFoodTrucks: true,

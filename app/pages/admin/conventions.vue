@@ -297,8 +297,20 @@
                           <h6 class="font-medium text-sm truncate">
                             {{ edition.name || convention.name }}
                           </h6>
-                          <UBadge v-if="edition.isOnline" color="success" variant="soft" size="xs">
-                            {{ $t('edition.online_status') }}
+                          <UBadge
+                            :color="
+                              edition.status === 'PUBLISHED'
+                                ? 'success'
+                                : edition.status === 'PLANNED'
+                                  ? 'warning'
+                                  : edition.status === 'CANCELLED'
+                                    ? 'error'
+                                    : 'neutral'
+                            "
+                            variant="soft"
+                            size="xs"
+                          >
+                            {{ $t(`edition.status.${edition.status?.toLowerCase()}`) }}
                           </UBadge>
                         </div>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -553,11 +565,20 @@
                         <h5 class="font-medium">
                           {{ edition.name || convention.name }}
                         </h5>
-                        <UBadge v-if="edition.isOnline" color="success" variant="soft" size="xs">
-                          {{ $t('edition.online_status') }}
-                        </UBadge>
-                        <UBadge v-else color="neutral" variant="soft" size="xs">
-                          {{ $t('edition.offline_edition') }}
+                        <UBadge
+                          :color="
+                            edition.status === 'PUBLISHED'
+                              ? 'success'
+                              : edition.status === 'PLANNED'
+                                ? 'warning'
+                                : edition.status === 'CANCELLED'
+                                  ? 'error'
+                                  : 'neutral'
+                          "
+                          variant="soft"
+                          size="xs"
+                        >
+                          {{ $t(`edition.status.${edition.status?.toLowerCase()}`) }}
                         </UBadge>
                       </div>
 

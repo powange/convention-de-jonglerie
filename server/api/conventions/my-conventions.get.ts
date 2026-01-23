@@ -7,7 +7,7 @@ import type { Prisma } from '@prisma/client'
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
-    // Editions must include isOnline (non-nullable boolean with default false)
+    // Editions must include status (EditionStatus enum with default OFFLINE)
     const editionsSelect: Prisma.EditionSelect = {
       id: true,
       name: true,
@@ -16,7 +16,7 @@ export default wrapApiHandler(
       city: true,
       country: true,
       imageUrl: true,
-      isOnline: true,
+      status: true,
       _count: {
         select: {
           volunteerApplications: true,

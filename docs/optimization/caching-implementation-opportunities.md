@@ -17,7 +17,7 @@ Les recommandations sont classées par **priorité** et **impact attendu**.
 ```typescript
 // Exécute une requête Prisma à chaque appel
 const countries = await prisma.edition.findMany({
-  where: { isOnline: true },
+  where: { status: 'PUBLISHED' },
   select: { country: true },
   distinct: ['country'],
   orderBy: { country: 'asc' },
@@ -53,7 +53,7 @@ export default wrapApiHandler(
     // Requête DB si pas en cache
     const countries = await prisma.edition.findMany({
       where: {
-        isOnline: true, // Toutes les éditions en ligne (passées, présentes, futures)
+        status: 'PUBLISHED', // Toutes les éditions en ligne (passées, présentes, futures)
       },
       select: {
         country: true,
@@ -236,7 +236,7 @@ export default wrapApiHandler(
 ```typescript
 // Requête DB complète à chaque appel du crawler
 const editions = await prisma.edition.findMany({
-  where: { convention: { isArchived: false }, isOnline: true },
+  where: { convention: { isArchived: false }, status: 'PUBLISHED' },
   select: { id: true, updatedAt: true, startDate: true, endDate: true },
 })
 ```
@@ -269,7 +269,7 @@ export default wrapApiHandler(
     const editions = await prisma.edition.findMany({
       where: {
         convention: { isArchived: false },
-        isOnline: true,
+        status: 'PUBLISHED',
       },
       select: {
         id: true,

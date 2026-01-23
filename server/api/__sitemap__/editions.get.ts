@@ -2,13 +2,13 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 
 export default wrapApiHandler(
   async () => {
-    // Récupérer toutes les éditions publiques (convention non archivée, éditions en ligne uniquement)
+    // Récupérer toutes les éditions publiques (convention non archivée, statuts visibles publiquement)
     const editions = await prisma.edition.findMany({
       where: {
         convention: {
           isArchived: false,
         },
-        isOnline: true, // Inclure uniquement les éditions en ligne
+        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
       },
       select: {
         id: true,

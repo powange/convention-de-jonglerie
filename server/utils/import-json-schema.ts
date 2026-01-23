@@ -268,7 +268,7 @@ export const COMPACT_FEATURES_LIST = [
   { key: 'hasCreditCardPayment', label: 'paiement CB' },
   { key: 'hasAfjTokenPayment', label: 'jetons AFJ' },
   { key: 'hasATM', label: 'distributeur' },
-  // Note: isOnline n'est pas inclus car une édition importée est toujours en ligne
+  // Note: status n'est pas inclus car une édition importée est toujours publiée (PUBLISHED)
 ] as const
 
 /**

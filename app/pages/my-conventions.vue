@@ -347,7 +347,7 @@ await useLazyI18n('edition')
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
-const USwitch = resolveComponent('USwitch')
+const USelect = resolveComponent('USelect')
 
 // Type pour les paramètres des cellules du tableau
 interface TableCellParams {
@@ -491,7 +491,7 @@ function closeHistoryModal() {
 const { formatDateTime } = useDateFormat()
 
 // Utiliser le composable pour le statut des éditions
-const { getStatusColor, getStatusText } = useEditionStatus()
+const { getStatusColor, getStatusText, statusOptions: editionStatusOptions } = useEditionStatus()
 
 // Actions pour les conventions
 const getConventionActions = (convention: Convention) => {
@@ -618,8 +618,8 @@ const getEditionsColumns = () => [
     },
   },
   {
-    accessorKey: 'online',
-    header: t('edition.online_status'),
+    accessorKey: 'status',
+    header: t('edition.status_label'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
       const convention = myConventions.value.find((conv) =>
@@ -627,13 +627,19 @@ const getEditionsColumns = () => [
       )
       const allowed = convention && canEditEdition(convention, edition.id)
       return h('div', { class: 'flex justify-center' }, [
-        h(USwitch, {
-          modelValue: edition.isOnline,
-          color: 'primary',
-          size: 'sm',
+        h(USelect, {
+          modelValue: edition.status,
+          items: editionStatusOptions.value,
+          valueKey: 'value',
+          size: 'xs',
           disabled: !allowed,
-          'onUpdate:modelValue': (value: boolean) =>
-            allowed && toggleEditionOnlineStatus(edition.id, value),
+          ui: { content: 'min-w-fit' },
+          'onUpdate:modelValue': (value: string) =>
+            allowed &&
+            updateEditionStatus(
+              edition.id,
+              value as 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
+            ),
         }),
       ])
     },
@@ -1009,17 +1015,19 @@ const getEditionDisplayName = (edition: Edition) => {
   return getEditionDisplayNameWithConvention(edition, convention)
 }
 
-// Toggle edition online status
-const toggleEditionOnlineStatus = async (editionId: number, isOnline: boolean) => {
+// Update edition status
+const updateEditionStatus = async (
+  editionId: number,
+  status: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
+) => {
   try {
     await $fetch(`/api/editions/${editionId}/status`, {
       method: 'PATCH',
-      body: { isOnline },
+      body: { status },
     })
 
-    const message = isOnline ? t('edition.edition_published') : t('edition.edition_set_offline')
     toast.add({
-      title: message,
+      title: t('edition.status_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -1027,7 +1035,7 @@ const toggleEditionOnlineStatus = async (editionId: number, isOnline: boolean) =
     // Reload conventions to update the status
     await fetchMyConventions()
   } catch (error) {
-    console.error('Failed to toggle edition status:', error)
+    console.error('Failed to update edition status:', error)
     toast.add({
       title: t('errors.status_update_failed'),
       icon: 'i-heroicons-x-circle',

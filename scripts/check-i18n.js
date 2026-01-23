@@ -41,6 +41,28 @@ const EXCLUDED_DIRS = [
 ]
 
 /**
+ * Fusionne profondément deux objets (deep merge)
+ */
+function deepMerge(target, source) {
+  const result = { ...target }
+  for (const key in source) {
+    if (
+      source[key] &&
+      typeof source[key] === 'object' &&
+      !Array.isArray(source[key]) &&
+      target[key] &&
+      typeof target[key] === 'object' &&
+      !Array.isArray(target[key])
+    ) {
+      result[key] = deepMerge(target[key], source[key])
+    } else {
+      result[key] = source[key]
+    }
+  }
+  return result
+}
+
+/**
  * Charge tous les fichiers de traduction depuis le dossier de locale
  * et les fusionne en un seul objet
  */
@@ -60,13 +82,13 @@ function loadLocaleFiles() {
       process.exit(1)
     }
 
-    // Fusionner tous les fichiers
-    const mergedData = {}
+    // Fusionner tous les fichiers avec deep merge
+    let mergedData = {}
     for (const file of files) {
       const filePath = path.join(localeDir, file)
       const content = fs.readFileSync(filePath, 'utf8')
       const data = JSON.parse(content)
-      Object.assign(mergedData, data)
+      mergedData = deepMerge(mergedData, data)
     }
 
     console.log(

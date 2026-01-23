@@ -73,7 +73,7 @@ export interface EditionFeatures {
   hasAfjTokenPayment?: boolean
   hasATM?: boolean
   hasLongShow?: boolean
-  isOnline?: boolean
+  status?: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
 }
 
 /**

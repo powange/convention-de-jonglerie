@@ -51,7 +51,7 @@ export default wrapApiHandler(
       startDate?: { gte: Date }
       endDate?: { lte: Date }
       country?: { in: string[] }
-      isOnline?: boolean
+      status?: 'PUBLISHED' | 'OFFLINE' | { in: ('PUBLISHED' | 'OFFLINE')[] }
       hasFoodTrucks?: boolean
       hasKidsZone?: boolean
       acceptsPets?: boolean
@@ -78,10 +78,13 @@ export default wrapApiHandler(
       hasATM?: boolean
     } = {}
 
-    // Par défaut, filtrer les éditions en ligne uniquement
-    // sauf si includeOffline=true est passé explicitement
+    // Par défaut, filtrer les éditions visibles publiquement
+    // (PUBLISHED, PLANNED, CANCELLED) mais pas OFFLINE
     if (includeOffline !== 'true') {
-      where.isOnline = true
+      where.status = { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] }
+    } else {
+      // Inclure aussi OFFLINE
+      where.status = { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] }
     }
 
     if (name) {

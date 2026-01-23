@@ -45,7 +45,7 @@ export interface Edition {
   country: string
   latitude?: number | null
   longitude?: number | null
-  isOnline?: boolean
+  status?: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
   creatorId?: number | null // Nullable pour éditions importées
   creator?: PublicUser
   conventionId: number
@@ -152,6 +152,7 @@ export interface ConventionWithOrganizers extends Convention {
 export interface HasDates {
   startDate: string
   endDate: string
+  status?: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
 }
 
 // Type pour les couleurs de badge Nuxt UI

@@ -118,7 +118,7 @@ model Edition {
   conventionId                      Int
   hasATM                            Boolean                          @default(false)
   hasLongShow                       Boolean                          @default(false)
-  isOnline                          Boolean                          @default(false)
+  status                            EditionStatus                    @default(OFFLINE)
   volunteersDescription             String?                          @db.Text
   volunteersOpen                    Boolean                          @default(false)
   volunteersUpdatedAt               DateTime?
@@ -179,6 +179,7 @@ model Edition {
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
+  @@index([status])
 }
 
 model ConventionOrganizer {
@@ -607,6 +608,13 @@ enum VolunteerStatus {
 enum VolunteerApplicationSource {
   APPLICATION // Candidature spontanée via formulaire
   MANUAL // Ajout manuel par un organisateur
+}
+
+enum EditionStatus {
+  PLANNED   // Planifié - dates confirmées mais détails incomplets
+  PUBLISHED // Publié - en ligne et visible
+  OFFLINE   // Hors ligne - complet mais désactivé/caché
+  CANCELLED // Annulé - convention annulée
 }
 
 // ========== LOGS D'ERREURS ==========

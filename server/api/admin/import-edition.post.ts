@@ -87,7 +87,7 @@ const importSchema = z.object({
     hasAfjTokenPayment: z.boolean().optional(),
     hasATM: z.boolean().optional(),
     hasLongShow: z.boolean().optional(),
-    isOnline: z.boolean().optional(),
+    status: z.enum(['PLANNED', 'PUBLISHED', 'OFFLINE', 'CANCELLED']).optional(),
     // Champs bénévoles
     volunteersOpen: z.boolean().optional(),
     volunteersDescription: z.string().nullable().optional(),
@@ -202,7 +202,7 @@ export default wrapApiHandler(
         hasAfjTokenPayment: validatedData.edition.hasAfjTokenPayment ?? false,
         hasATM: validatedData.edition.hasATM ?? false,
         hasLongShow: validatedData.edition.hasLongShow ?? false,
-        isOnline: validatedData.edition.isOnline ?? true, // Par défaut true car une édition importée est en ligne
+        status: validatedData.edition.status ?? 'PUBLISHED', // Par défaut PUBLISHED car une édition importée est publiée
         // Champs bénévoles
         volunteersOpen: validatedData.edition.volunteersOpen ?? false,
         volunteersDescription: validatedData.edition.volunteersDescription,

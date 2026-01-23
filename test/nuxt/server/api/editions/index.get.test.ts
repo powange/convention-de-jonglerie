@@ -51,7 +51,7 @@ describe('/api/editions GET', () => {
     hasWorkshops: true,
     hasLongShow: false,
     hasATM: true,
-    isOnline: true,
+    status: 'PUBLISHED',
     creator: {
       id: 1,
       pseudo: 'testuser',
@@ -102,7 +102,7 @@ describe('/api/editions GET', () => {
     expect(result.pagination.totalPages).toBe(5)
 
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: {},
+      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
       select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 10, // (page 2 - 1) * limit 10
@@ -122,6 +122,7 @@ describe('/api/editions GET', () => {
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: {
         name: { contains: 'Test Convention' },
+        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
@@ -138,6 +139,7 @@ describe('/api/editions GET', () => {
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: {
         country: { in: ['France', 'Belgium'] },
+        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
@@ -157,6 +159,7 @@ describe('/api/editions GET', () => {
       where: {
         startDate: { gte: new Date(startDate) },
         endDate: { lte: new Date(endDate) },
+        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
@@ -180,6 +183,7 @@ describe('/api/editions GET', () => {
         hasFoodTrucks: true,
         hasToilets: true,
         acceptsPets: true,
+        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
@@ -199,9 +203,14 @@ describe('/api/editions GET', () => {
     await handler(mockEvent as any)
 
     const expectedWhere = expect.objectContaining({
-      OR: expect.arrayContaining([
-        { endDate: { lt: expect.any(Date) } }, // showPast
-        { startDate: { gt: expect.any(Date) } }, // showFuture
+      AND: expect.arrayContaining([
+        { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
+        expect.objectContaining({
+          OR: expect.arrayContaining([
+            { endDate: { lt: expect.any(Date) } }, // showPast
+            { startDate: { gt: expect.any(Date) } }, // showFuture
+          ]),
+        }),
       ]),
     })
 
@@ -244,7 +253,7 @@ describe('/api/editions GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: {},
+      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
       select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
@@ -271,7 +280,7 @@ describe('/api/editions GET', () => {
     })
   })
 
-  it('devrait filtrer les éditions hors ligne par défaut', async () => {
+  it('devrait afficher par défaut les éditions publiées, planifiées et annulées', async () => {
     global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(5)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -281,10 +290,10 @@ describe('/api/editions GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: { isOnline: true },
+      where: { status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] } },
     })
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: { isOnline: true },
+      where: { status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] } },
       select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
@@ -302,10 +311,10 @@ describe('/api/editions GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: {},
+      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
     })
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: {},
+      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
       select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,

@@ -384,7 +384,7 @@ async function main() {
             hasShowers: Math.random() > 0.2,
             hasToilets: Math.random() > 0.1,
             hasCantine: Math.random() > 0.6,
-            isOnline: true,
+            status: 'PUBLISHED',
           },
         })
         console.log(

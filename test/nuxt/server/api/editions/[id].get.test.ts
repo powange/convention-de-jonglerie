@@ -22,6 +22,7 @@ describe('/api/editions/[id] GET', () => {
     latitude: 48.8566,
     longitude: 2.3522,
     imageUrl: null,
+    status: 'PUBLISHED',
     creatorId: 1,
     createdAt: new Date(),
     updatedAt: new Date(),

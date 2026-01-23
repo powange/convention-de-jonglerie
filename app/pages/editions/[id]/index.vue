@@ -7,24 +7,46 @@
       <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else>
-      <!-- Message si l'édition est hors ligne -->
+      <!-- Message si l'édition n'est pas publiée -->
       <UAlert
-        v-if="!edition.isOnline && canManageEdition"
-        icon="i-heroicons-eye-slash"
-        color="warning"
+        v-if="edition.status !== 'PUBLISHED' && canManageEdition"
+        :icon="editionAlertIcon"
+        :color="editionAlertColor"
         variant="soft"
         class="mb-4"
       >
         <template #title>
-          {{ $t('edition.offline_edition') }}
+          {{ editionAlertTitle }}
         </template>
         <template #description>
           <div class="flex items-center justify-between">
-            <span>{{ $t('edition.offline_edition_message') }}</span>
-            <UButton color="primary" size="sm" icon="i-heroicons-globe-alt" @click="publishEdition">
+            <span>{{ editionAlertMessage }}</span>
+            <UButton
+              v-if="shouldShowPublishButton"
+              color="primary"
+              size="sm"
+              icon="i-heroicons-globe-alt"
+              @click="publishEdition"
+            >
               {{ $t('edition.publish_edition') }}
             </UButton>
           </div>
+        </template>
+      </UAlert>
+
+      <!-- Message public pour éditions planifiées ou annulées -->
+      <UAlert
+        v-if="(edition.status === 'PLANNED' || edition.status === 'CANCELLED') && !canManageEdition"
+        :icon="editionAlertIcon"
+        :color="editionAlertColor"
+        variant="soft"
+        class="mb-4"
+      >
+        <template #title>
+          {{ editionAlertTitle }}
+        </template>
+        <template #description>
+          {{ editionAlertMessage }}
         </template>
       </UAlert>
 
@@ -688,6 +710,63 @@ const editionDateRange = computed(() =>
   edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
 )
 
+// Computed properties pour l'alerte de statut
+const editionAlertTitle = computed(() => {
+  if (!edition.value) return ''
+  switch (edition.value.status) {
+    case 'CANCELLED':
+      return t('edition.cancelled_edition')
+    case 'PLANNED':
+      return t('edition.planned_edition')
+    case 'OFFLINE':
+    default:
+      return t('edition.offline_edition')
+  }
+})
+
+const editionAlertMessage = computed(() => {
+  if (!edition.value) return ''
+  switch (edition.value.status) {
+    case 'CANCELLED':
+      return t('edition.cancelled_edition_message')
+    case 'PLANNED':
+      return t('edition.planned_edition_message')
+    case 'OFFLINE':
+    default:
+      return t('edition.offline_edition_message')
+  }
+})
+
+const editionAlertIcon = computed(() => {
+  if (!edition.value) return 'i-heroicons-eye-slash'
+  switch (edition.value.status) {
+    case 'CANCELLED':
+      return 'i-heroicons-x-circle'
+    case 'PLANNED':
+      return 'i-heroicons-clock'
+    case 'OFFLINE':
+    default:
+      return 'i-heroicons-eye-slash'
+  }
+})
+
+const editionAlertColor = computed(() => {
+  if (!edition.value) return 'warning'
+  switch (edition.value.status) {
+    case 'CANCELLED':
+      return 'error'
+    case 'PLANNED':
+      return 'info'
+    case 'OFFLINE':
+    default:
+      return 'warning'
+  }
+})
+
+const shouldShowPublishButton = computed(() => {
+  return edition.value?.status !== 'CANCELLED'
+})
+
 // Définir les métadonnées pour SSR
 // Après await useFetch, passer directement les computed (sans arrow functions) à useSeoMeta
 // Solution de: https://github.com/nuxt/nuxt/issues/23470#issuecomment-1741174856
@@ -772,8 +851,7 @@ useSchemaOrg([
     image: () => (editionImageUrl.value ? [editionImageUrl.value] : undefined),
     url: () => `${useRequestURLOrigin}/editions/${edition.value?.id || editionId}`,
     eventStatus: 'EventScheduled',
-    eventAttendanceMode: () =>
-      edition.value?.isOnline ? 'OnlineEventAttendanceMode' : 'OfflineEventAttendanceMode',
+    eventAttendanceMode: 'OfflineEventAttendanceMode', // Les conventions de jonglerie sont des événements physiques
     organizer: () => ({
       '@type': 'Organization',
       name: conventionName.value,
@@ -843,7 +921,7 @@ const publishEdition = async () => {
   try {
     await $fetch(`/api/editions/${edition.value.id}/status`, {
       method: 'PATCH',
-      body: { isOnline: true },
+      body: { status: 'PUBLISHED' },
     })
 
     // Update local state

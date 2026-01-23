@@ -43,7 +43,7 @@ describe('/api/conventions/my-conventions GET', () => {
             city: 'Paris',
             country: 'France',
             imageUrl: 'image.jpg',
-            isOnline: false,
+            status: 'OFFLINE',
           },
         ],
       },
@@ -75,7 +75,7 @@ describe('/api/conventions/my-conventions GET', () => {
           city: 'Paris',
           country: 'France',
           imageUrl: 'image.jpg',
-          isOnline: false,
+          status: 'OFFLINE',
         },
       ],
     })
@@ -118,7 +118,7 @@ describe('/api/conventions/my-conventions GET', () => {
             city: true,
             country: true,
             imageUrl: true,
-            isOnline: true,
+            status: true,
             _count: {
               select: {
                 volunteerApplications: true,

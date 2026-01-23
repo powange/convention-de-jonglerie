@@ -15,7 +15,7 @@ export interface FacebookScraperResult {
   endTimestamp?: number
   formattedDate: string
   timezone: string
-  isOnline: boolean
+  isOnline: boolean // Propriété de l'API Facebook (non utilisée - notre modèle utilise EditionStatus)
   location?: {
     name?: string
     address?: string

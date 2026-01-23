@@ -18,6 +18,40 @@
     <div v-else>
       <!-- Contenu de gestion -->
       <div class="space-y-6">
+        <!-- Statut de l'édition -->
+        <UCard v-if="canEdit">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-signal" class="text-blue-500" />
+              <h2 class="text-lg font-semibold">{{ $t('edition.status_label') }}</h2>
+            </div>
+            <USelect
+              v-model="localStatus"
+              :items="statusOptions"
+              value-key="value"
+              size="md"
+              :ui="{ content: 'min-w-fit' }"
+            />
+
+            <!-- Description du statut -->
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ currentStatusDescription }}
+            </p>
+
+            <!-- Bouton de sauvegarde (visible uniquement si modification) -->
+            <div v-if="hasStatusChanged" class="flex justify-end">
+              <UButton
+                color="primary"
+                icon="i-heroicons-check"
+                :loading="savingStatus"
+                @click="saveStatus"
+              >
+                {{ $t('common.save') }}
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+
         <!-- Actions de gestion -->
         <UCard v-if="hasManagementActions">
           <div class="space-y-4">
@@ -30,23 +64,6 @@
                 :to="`/editions/${edition.id}/edit`"
               >
                 {{ $t('gestion.edit_edition') }}
-              </UButton>
-              <UButton
-                v-if="canEdit && edition.isOnline"
-                :icon="'i-heroicons-eye-slash'"
-                color="secondary"
-                variant="soft"
-                @click="toggleOnlineStatus(false)"
-              >
-                {{ $t('edition.set_offline') }}
-              </UButton>
-              <UButton
-                v-else-if="canEdit && !edition.isOnline"
-                :icon="'i-heroicons-globe-alt'"
-                color="primary"
-                @click="toggleOnlineStatus(true)"
-              >
-                {{ $t('edition.set_online') }}
               </UButton>
               <UButton
                 v-if="canDelete"
@@ -501,6 +518,36 @@ const hasManagementActions = computed(() => {
   return canEdit.value || canDelete.value
 })
 
+// Gestion du statut de l'édition
+const localStatus = ref<'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'>(
+  edition.value?.status || 'OFFLINE'
+)
+const savingStatus = ref(false)
+
+// Mettre à jour localStatus quand l'édition change
+watch(
+  () => edition.value?.status,
+  (newStatus) => {
+    if (newStatus) {
+      localStatus.value = newStatus
+    }
+  },
+  { immediate: true }
+)
+
+// Description du statut actuel
+const currentStatusDescription = computed(() => {
+  return t(`edition.status_description.${localStatus.value.toLowerCase()}`)
+})
+
+// Détecter si le statut a changé
+const hasStatusChanged = computed(() => {
+  return edition.value && localStatus.value !== edition.value.status
+})
+
+// Options de statut depuis le composable partagé
+const { statusOptions } = useEditionStatus()
+
 const deleteEdition = async (id: number) => {
   if (confirm(t('gestion.confirm_delete_edition'))) {
     try {
@@ -521,34 +568,38 @@ const deleteEdition = async (id: number) => {
   }
 }
 
-const toggleOnlineStatus = async (isOnline: boolean) => {
-  if (!edition.value) return
+const saveStatus = async () => {
+  if (!edition.value || !hasStatusChanged.value) return
 
+  savingStatus.value = true
   try {
     await $fetch(`/api/editions/${edition.value.id}/status`, {
       method: 'PATCH',
-      body: { isOnline },
+      body: { status: localStatus.value },
     })
 
     // Update local state immediately
-    edition.value.isOnline = isOnline
+    edition.value.status = localStatus.value
 
     // Also update in store
     await editionStore.fetchEditionById(editionId, { force: true })
 
-    const message = isOnline ? t('edition.edition_published') : t('edition.edition_set_offline')
     toast.add({
-      title: message,
+      title: t('edition.status_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
   } catch (error) {
-    console.error('Failed to toggle edition status:', error)
+    console.error('Failed to update edition status:', error)
+    // Remettre le statut local à la valeur précédente en cas d'erreur
+    localStatus.value = edition.value.status
     toast.add({
       title: t('errors.status_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
+  } finally {
+    savingStatus.value = false
   }
 }
 </script>

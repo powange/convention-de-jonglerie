@@ -55,7 +55,7 @@ export const editionFeaturesSchema = z.object({
   hasAfjTokenPayment: z.boolean().optional(),
   hasATM: z.boolean().optional(),
   hasLongShow: z.boolean().optional(),
-  isOnline: z.boolean().optional(),
+  status: z.enum(['PLANNED', 'PUBLISHED', 'OFFLINE', 'CANCELLED']).optional(),
 })
 
 /**
