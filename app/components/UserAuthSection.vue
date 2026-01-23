@@ -130,12 +130,16 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
       icon: 'i-heroicons-calendar-days',
       to: '/my-conventions',
     },
-    {
+  ]
+
+  // Ajouter les candidatures bénévoles seulement si l'utilisateur a la catégorie bénévole
+  if (authStore.isVolunteer) {
+    items.push({
       label: t('navigation.my_volunteer_applications'),
       icon: 'i-heroicons-hand-raised',
       to: '/my-volunteer-applications',
-    },
-  ]
+    })
+  }
 
   // Ajouter la messagerie si l'utilisateur a des conversations
   if (messengerStatus.value.hasConversations) {
