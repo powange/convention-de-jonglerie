@@ -238,3 +238,166 @@ export interface ProfileStats {
   editionsFavorited: number
   favoritesReceived: number
 }
+
+// ========== APPEL À SPECTACLES ==========
+
+// Types pour le mode d'appel à spectacles
+export type ShowCallMode = 'INTERNAL' | 'EXTERNAL'
+
+// Types pour le statut des candidatures
+export type ShowApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
+
+// Configuration de l'appel à spectacles sur une édition
+export interface EditionShowCall {
+  id: number
+  editionId: number
+  isOpen: boolean
+  mode: ShowCallMode
+  externalUrl?: string | null
+  description?: string | null
+  deadline?: string | null
+  // Champs demandés (configurables)
+  askPortfolioUrl: boolean
+  askVideoUrl: boolean
+  askTechnicalNeeds: boolean
+  askAccommodation: boolean
+  askDepartureCity: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// Type pour une personne supplémentaire dans le spectacle
+export interface AdditionalPerformer {
+  lastName: string
+  firstName: string
+  email: string
+  phone: string
+}
+
+// Candidature de spectacle
+export interface ShowApplication {
+  id: number
+  showCallId: number
+  userId: number
+  status: ShowApplicationStatus
+
+  // Infos artiste
+  artistName: string
+  artistBio?: string | null
+  portfolioUrl?: string | null
+  videoUrl?: string | null
+
+  // Infos spectacle proposé
+  showTitle: string
+  showDescription: string
+  showDuration: number
+  showCategory?: string | null
+  technicalNeeds?: string | null
+
+  // Personnes supplémentaires
+  additionalPerformersCount: number
+  additionalPerformers?: AdditionalPerformer[] | null
+
+  // Logistique
+  availableDates?: string | null
+  accommodationNeeded: boolean
+  accommodationNotes?: string | null
+  departureCity?: string | null
+
+  // Contact
+  contactPhone?: string | null
+
+  // Gestion
+  organizerNotes?: string | null
+  decidedAt?: string | null
+  decidedById?: number | null
+
+  // Traçabilité
+  createdAt: string
+  updatedAt: string
+
+  // Relations (optionnelles selon le contexte)
+  user?: PublicUser
+  decidedBy?: PublicUser | null
+}
+
+// Formulaire de configuration de l'appel à spectacles
+export interface ShowCallSettingsFormData {
+  isOpen: boolean
+  mode: ShowCallMode
+  externalUrl?: string | null
+  description?: string | null
+  deadline?: string | null
+  askPortfolioUrl: boolean
+  askVideoUrl: boolean
+  askTechnicalNeeds: boolean
+  askAccommodation: boolean
+  askDepartureCity: boolean
+}
+
+// Formulaire de candidature de spectacle
+export interface ShowApplicationFormData {
+  // Infos artiste
+  artistName: string
+  artistBio?: string | null
+  portfolioUrl?: string | null
+  videoUrl?: string | null
+
+  // Infos spectacle proposé
+  showTitle: string
+  showDescription: string
+  showDuration: number
+  showCategory?: string | null
+  technicalNeeds?: string | null
+
+  // Personnes supplémentaires
+  additionalPerformersCount: number
+  additionalPerformers?: AdditionalPerformer[]
+
+  // Logistique
+  availableDates?: string | null
+  accommodationNeeded: boolean
+  accommodationNotes?: string | null
+  departureCity?: string | null
+
+  // Contact
+  contactPhone?: string | null
+}
+
+// Statistiques des candidatures pour un appel à spectacles
+export interface ShowCallStats {
+  total: number
+  pending: number
+  accepted: number
+  rejected: number
+}
+
+// Appel à spectacles avec statistiques (pour les listes)
+export interface EditionShowCallWithStats extends EditionShowCall {
+  stats?: ShowCallStats
+}
+
+// Version simplifiée pour les listes
+export interface EditionShowCallBasic {
+  id: number
+  name: string
+  isOpen: boolean
+  mode: ShowCallMode
+  externalUrl?: string | null
+  description?: string | null
+  deadline?: string | null
+}
+
+// Appel à spectacles public (informations visibles par les artistes)
+export interface EditionShowCallPublic extends EditionShowCallBasic {
+  askPortfolioUrl: boolean
+  askVideoUrl: boolean
+  askTechnicalNeeds: boolean
+  askAccommodation: boolean
+  askDepartureCity: boolean
+}
+
+// Candidature avec le nom de l'appel (pour "Mes candidatures")
+export interface ShowApplicationWithShowCallName extends ShowApplication {
+  showCallName: string
+}

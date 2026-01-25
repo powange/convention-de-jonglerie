@@ -68,6 +68,10 @@ export const prismaMock = {
   conversationParticipant: createModelMock(),
   message: createModelMock(),
 
+  // Modèles appel à spectacles
+  editionShowCall: createModelMock(),
+  showApplication: createModelMock(),
+
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),

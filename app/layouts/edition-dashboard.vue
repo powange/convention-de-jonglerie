@@ -150,6 +150,11 @@ const isOrganizer = computed(() => {
   return editionStore.isOrganizer(edition.value, authStore.user.id)
 })
 
+const _canManageArtists = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageArtists(edition.value, authStore.user.id)
+})
+
 // Vérifier si l'utilisateur est team leader
 const isTeamLeader = ref(false)
 const canAccessMealValidation = ref(false)
@@ -267,21 +272,27 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
 
   // Artistes
   if (isOrganizer.value) {
+    const artistsChildren: NavigationMenuItem[] = [
+      {
+        label: t('gestion.artists.list_title'),
+        to: `/editions/${editionId.value}/gestion/artists`,
+      },
+      {
+        label: t('gestion.shows.list_title'),
+        to: `/editions/${editionId.value}/gestion/artists/shows`,
+      },
+      {
+        label: t('gestion.shows_call.title'),
+        to: `/editions/${editionId.value}/gestion/shows-call`,
+      },
+    ]
+
     managementSection.push({
       label: t('gestion.artists.title'),
       icon: 'i-heroicons-star',
-      children: [
-        {
-          label: t('gestion.artists.list_title'),
-          to: `/editions/${editionId.value}/gestion/artists`,
-        },
-        {
-          label: t('gestion.shows.list_title'),
-          to: `/editions/${editionId.value}/gestion/artists/shows`,
-        },
-      ],
+      children: artistsChildren,
       value: 'artists',
-      defaultOpen: isAccordionOpen('artists'),
+      defaultOpen: isAccordionOpen('artists') || isAccordionOpen('shows-call'),
     })
   }
 

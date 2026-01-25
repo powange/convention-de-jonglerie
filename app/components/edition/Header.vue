@@ -220,6 +220,26 @@
           />
           <span class="hidden sm:inline">{{ t('edition.lost_found') }}</span>
         </NuxtLink>
+
+        <NuxtLink
+          v-if="showsCallTabVisible"
+          :to="`/editions/${edition.id}/shows-call`"
+          :class="[
+            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'shows-call'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          :title="t('shows_call.title')"
+        >
+          <UIcon
+            name="i-heroicons-megaphone"
+            :class="['sm:mr-1']"
+            size="24"
+            class="sm:!w-4 sm:!h-4"
+          />
+          <span class="hidden sm:inline">{{ t('shows_call.title') }}</span>
+        </NuxtLink>
       </nav>
 
       <!-- Titre de la page courante sur mobile -->
@@ -293,6 +313,7 @@ interface Props {
     | 'lost-found'
     | 'volunteers'
     | 'workshops'
+    | 'shows-call'
 }
 
 const props = defineProps<Props>()
@@ -361,6 +382,12 @@ const hasEditionStarted = computed(() => {
 const workshopsTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
   return (props.edition as any).workshopsEnabled === true
+})
+
+// Visibilité onglet appels à spectacles: visible uniquement pour les artistes
+const showsCallTabVisible = computed<boolean>(() => {
+  if (!authStore.isAuthenticated) return false
+  return authStore.isArtist
 })
 
 // Gestion des favoris - Initialisation automatique si utilisateur connecté
@@ -492,6 +519,7 @@ const getPageTitle = (page: string) => {
     'lost-found': t('edition.lost_found'),
     volunteers: t('edition.volunteers.title'),
     workshops: 'Workshops',
+    'shows-call': t('shows_call.title'),
   }
   return titles[page] || t('edition.about_this_edition')
 }

@@ -219,6 +219,15 @@
                 "
                 color="purple"
               />
+
+              <!-- Appels à spectacles -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/shows-call`"
+                icon="i-heroicons-megaphone"
+                :title="$t('gestion.shows_call.title')"
+                :description="$t('gestion.shows_call.list_description')"
+                color="amber"
+              />
             </div>
           </div>
         </UCard>

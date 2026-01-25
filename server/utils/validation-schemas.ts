@@ -492,3 +492,149 @@ export const workshopSchema = workshopBaseSchema
 
 // Schéma partiel pour les mises à jour (sans refinements car Zod v4 ne supporte pas .partial() avec refinements)
 export const updateWorkshopSchema = workshopBaseSchema.partial()
+
+// ========== APPEL À SPECTACLES ==========
+
+// Schéma de configuration de l'appel à spectacles
+export const showCallSettingsSchema = z.object({
+  isOpen: z.boolean(),
+  mode: z.enum(['INTERNAL', 'EXTERNAL'], {
+    message: 'Mode invalide',
+  }),
+  externalUrl: urlSchema,
+  description: z
+    .string()
+    .max(5000, 'La description ne peut pas dépasser 5000 caractères')
+    .nullable()
+    .optional(),
+  deadline: optionalDateSchema.nullable(),
+  askPortfolioUrl: z.boolean().optional().default(true),
+  askVideoUrl: z.boolean().optional().default(true),
+  askTechnicalNeeds: z.boolean().optional().default(true),
+  askAccommodation: z.boolean().optional().default(false),
+  askDepartureCity: z.boolean().optional().default(false),
+})
+
+// Schéma de candidature de spectacle
+export const showApplicationSchema = z
+  .object({
+    // Informations personnelles (obligatoires, mises à jour dans le profil)
+    lastName: z
+      .string()
+      .min(2, 'Le nom doit contenir au moins 2 caractères')
+      .max(100, 'Le nom ne peut pas dépasser 100 caractères'),
+    firstName: z
+      .string()
+      .min(2, 'Le prénom doit contenir au moins 2 caractères')
+      .max(100, 'Le prénom ne peut pas dépasser 100 caractères'),
+    phone: z
+      .string()
+      .min(6, 'Le numéro de téléphone doit contenir au moins 6 caractères')
+      .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères'),
+
+    // Infos artiste
+    artistName: z
+      .string()
+      .min(2, 'Le nom de scène doit contenir au moins 2 caractères')
+      .max(100, 'Le nom de scène ne peut pas dépasser 100 caractères'),
+    artistBio: z
+      .string()
+      .max(3000, 'La biographie ne peut pas dépasser 3000 caractères')
+      .nullable()
+      .optional(),
+    portfolioUrl: urlSchema,
+    videoUrl: urlSchema,
+
+    // Infos spectacle proposé
+    showTitle: z
+      .string()
+      .min(3, 'Le titre du spectacle doit contenir au moins 3 caractères')
+      .max(200, 'Le titre du spectacle ne peut pas dépasser 200 caractères'),
+    showDescription: z
+      .string()
+      .min(20, 'La description doit contenir au moins 20 caractères')
+      .max(5000, 'La description ne peut pas dépasser 5000 caractères'),
+    showDuration: z.coerce
+      .number()
+      .int('La durée doit être un nombre entier')
+      .min(1, 'La durée doit être au moins 1 minute')
+      .max(180, 'La durée ne peut pas dépasser 180 minutes'),
+    showCategory: z
+      .string()
+      .max(100, 'La catégorie ne peut pas dépasser 100 caractères')
+      .nullable()
+      .optional(),
+    technicalNeeds: z
+      .string()
+      .max(3000, 'Les besoins techniques ne peuvent pas dépasser 3000 caractères')
+      .nullable()
+      .optional(),
+    // Personnes supplémentaires dans le spectacle
+    additionalPerformersCount: z.coerce
+      .number()
+      .int('Le nombre doit être un entier')
+      .min(0, 'Le nombre ne peut pas être négatif')
+      .max(50, 'Le nombre ne peut pas dépasser 50'),
+    additionalPerformers: z
+      .array(
+        z.object({
+          lastName: z
+            .string()
+            .min(2, 'Le nom doit contenir au moins 2 caractères')
+            .max(100, 'Le nom ne peut pas dépasser 100 caractères'),
+          firstName: z
+            .string()
+            .min(2, 'Le prénom doit contenir au moins 2 caractères')
+            .max(100, 'Le prénom ne peut pas dépasser 100 caractères'),
+          email: z.string().email('Email invalide'),
+          phone: z
+            .string()
+            .min(6, 'Le numéro de téléphone doit contenir au moins 6 caractères')
+            .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères'),
+        })
+      )
+      .optional()
+      .default([]),
+
+    // Logistique
+    availableDates: z
+      .string()
+      .max(500, 'Les dates disponibles ne peuvent pas dépasser 500 caractères')
+      .nullable()
+      .optional(),
+    accommodationNeeded: z.boolean().optional().default(false),
+    accommodationNotes: z
+      .string()
+      .max(1000, "Les notes d'hébergement ne peuvent pas dépasser 1000 caractères")
+      .nullable()
+      .optional(),
+    departureCity: z
+      .string()
+      .max(100, 'La ville de départ ne peut pas dépasser 100 caractères')
+      .nullable()
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      // Vérifier que le nombre de personnes supplémentaires correspond au tableau
+      const count = data.additionalPerformersCount || 0
+      const performers = data.additionalPerformers || []
+      return performers.length === count
+    },
+    {
+      message: 'Le nombre de personnes supplémentaires doit correspondre aux informations fournies',
+      path: ['additionalPerformers'],
+    }
+  )
+
+// Schéma pour la mise à jour du statut d'une candidature
+export const showApplicationStatusSchema = z.object({
+  status: z.enum(['PENDING', 'ACCEPTED', 'REJECTED'], {
+    message: 'Statut invalide',
+  }),
+  organizerNotes: z
+    .string()
+    .max(3000, 'Les notes ne peuvent pas dépasser 3000 caractères')
+    .nullable()
+    .optional(),
+})
