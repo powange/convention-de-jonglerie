@@ -338,6 +338,11 @@ const canAccessMealValidation = ref(false)
 // État pour vérifier si l'utilisateur a un créneau actif de contrôle d'accès
 const canAccessAccessControlPage = ref(false)
 
+// Vérifier s'il y a des appels à spectacles (utilise _count de la réponse API)
+const hasShowCalls = computed(() => {
+  return (props.edition as any)?._count?.showCalls > 0
+})
+
 // Description de la convention en HTML (rendu Markdown)
 const conventionDescriptionHtml = computedAsync(async () => {
   if (!props.edition?.convention?.description) {
@@ -384,8 +389,9 @@ const workshopsTabVisible = computed<boolean>(() => {
   return (props.edition as any).workshopsEnabled === true
 })
 
-// Visibilité onglet appels à spectacles: visible uniquement pour les artistes
+// Visibilité onglet appels à spectacles: visible pour les artistes s'il y a des appels
 const showsCallTabVisible = computed<boolean>(() => {
+  if (!hasShowCalls.value) return false
   if (!authStore.isAuthenticated) return false
   return authStore.isArtist
 })

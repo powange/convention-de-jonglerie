@@ -141,6 +141,15 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
     })
   }
 
+  // Ajouter les candidatures artiste seulement si l'utilisateur a la catégorie artiste
+  if (authStore.isArtist) {
+    items.push({
+      label: t('navigation.my_artist_applications'),
+      icon: 'i-heroicons-sparkles',
+      to: '/my-artist-applications',
+    })
+  }
+
   // Ajouter la messagerie si l'utilisateur a des conversations
   if (messengerStatus.value.hasConversations) {
     items.push({

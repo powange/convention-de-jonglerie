@@ -30,7 +30,10 @@ export default wrapApiHandler(
         },
         // Champs bénévolat nécessaires pour la page de gestion
         _count: {
-          select: { volunteerApplications: true },
+          select: {
+            volunteerApplications: true,
+            showCalls: true,
+          },
         },
         // Champs bénévolat simples sur le modèle Edition (inclus automatiquement, rien à faire)
         // Champs bénévolat (valeurs)
