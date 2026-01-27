@@ -63,7 +63,6 @@ model ShowApplication {
   additionalPerformers  Json?                       // Tableau JSON [{lastName, firstName, email, phone}]
 
   // Logistique
-  availableDates        String?
   accommodationNeeded   Boolean   @default(false)
   accommodationNotes    String?   @db.Text
   departureCity         String?                     // Ville de départ pour défraiement

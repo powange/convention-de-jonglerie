@@ -249,6 +249,7 @@
                 v-if="selectedApplication.portfolioUrl"
                 :href="selectedApplication.portfolioUrl"
                 target="_blank"
+                rel="noopener noreferrer"
                 class="text-primary-500 hover:underline flex items-center gap-1"
               >
                 <UIcon name="i-heroicons-globe-alt" />
@@ -258,11 +259,30 @@
                 v-if="selectedApplication.videoUrl"
                 :href="selectedApplication.videoUrl"
                 target="_blank"
+                rel="noopener noreferrer"
                 class="text-primary-500 hover:underline flex items-center gap-1"
               >
                 <UIcon name="i-heroicons-play-circle" />
                 {{ $t('gestion.shows_call.form.video_url') }}
               </a>
+            </div>
+            <div v-if="selectedApplication.socialLinks" class="mt-2">
+              <span class="text-gray-500 text-sm">{{
+                $t('gestion.shows_call.form.social_links')
+              }}</span>
+              <div class="mt-1 flex flex-wrap gap-2">
+                <a
+                  v-for="(link, index) in parseSocialLinks(selectedApplication.socialLinks)"
+                  :key="index"
+                  :href="link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-primary-500 hover:underline text-sm flex items-center gap-1"
+                >
+                  <UIcon name="i-heroicons-link" />
+                  {{ getSocialLinkLabel(link) }}
+                </a>
+              </div>
             </div>
           </div>
 
@@ -305,21 +325,12 @@
           </div>
 
           <!-- Logistique -->
-          <div
-            v-if="selectedApplication.accommodationNeeded || selectedApplication.availableDates"
-            class="space-y-3"
-          >
+          <div v-if="selectedApplication.accommodationNeeded" class="space-y-3">
             <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <UIcon name="i-heroicons-truck" class="text-amber-500" />
               {{ $t('gestion.shows_call.logistics') }}
             </h4>
             <div class="text-sm space-y-2">
-              <div v-if="selectedApplication.availableDates">
-                <span class="text-gray-500">{{
-                  $t('gestion.shows_call.form.available_dates')
-                }}</span>
-                <p class="font-medium">{{ selectedApplication.availableDates }}</p>
-              </div>
               <div v-if="selectedApplication.accommodationNeeded">
                 <UBadge color="info" variant="soft">
                   {{ $t('gestion.shows_call.accommodation_needed') }}
@@ -499,6 +510,29 @@ const formatDate = (date: string) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+// Parse social links (one per line)
+const parseSocialLinks = (links: string): string[] => {
+  return links
+    .split('\n')
+    .map((link) => link.trim())
+    .filter((link) => link.length > 0 && link.startsWith('http'))
+}
+
+// Get a readable label for a social link
+const getSocialLinkLabel = (url: string): string => {
+  try {
+    const hostname = new URL(url).hostname.replace('www.', '')
+    // Extract main domain name
+    const parts = hostname.split('.')
+    if (parts.length >= 2) {
+      return parts[parts.length - 2]
+    }
+    return hostname
+  } catch {
+    return url
+  }
 }
 
 const getActionItems = (application: ShowApplication) => [

@@ -314,6 +314,21 @@
                 </div>
                 <USwitch v-model="askDepartureCityLocal" :disabled="saving" />
               </div>
+
+              <!-- Social Links -->
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+              >
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.shows_call.field_social_links') }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ $t('gestion.shows_call.field_social_links_desc') }}
+                  </p>
+                </div>
+                <USwitch v-model="askSocialLinksLocal" :disabled="saving" />
+              </div>
             </div>
           </div>
         </UCard>
@@ -384,6 +399,7 @@ const askVideoUrlLocal = ref(true)
 const askTechnicalNeedsLocal = ref(true)
 const askAccommodationLocal = ref(false)
 const askDepartureCityLocal = ref(false)
+const askSocialLinksLocal = ref(false)
 
 const saving = ref(false)
 const fieldErrors = ref<Record<string, string>>({})
@@ -402,6 +418,7 @@ const initialState = ref({
   askTechnicalNeeds: true,
   askAccommodation: false,
   askDepartureCity: false,
+  askSocialLinks: false,
 })
 
 // Détecter si des changements ont été faits
@@ -418,7 +435,8 @@ const hasChanges = computed(() => {
     askVideoUrlLocal.value !== initialState.value.askVideoUrl ||
     askTechnicalNeedsLocal.value !== initialState.value.askTechnicalNeeds ||
     askAccommodationLocal.value !== initialState.value.askAccommodation ||
-    askDepartureCityLocal.value !== initialState.value.askDepartureCity
+    askDepartureCityLocal.value !== initialState.value.askDepartureCity ||
+    askSocialLinksLocal.value !== initialState.value.askSocialLinks
   )
 })
 
@@ -460,6 +478,7 @@ const fetchSettings = async () => {
     askTechnicalNeedsLocal.value = response.askTechnicalNeeds ?? true
     askAccommodationLocal.value = response.askAccommodation ?? false
     askDepartureCityLocal.value = response.askDepartureCity ?? false
+    askSocialLinksLocal.value = response.askSocialLinks ?? false
 
     // Formater la date pour l'input datetime-local
     if (response.deadline) {
@@ -495,6 +514,7 @@ const updateInitialState = () => {
     askTechnicalNeeds: askTechnicalNeedsLocal.value,
     askAccommodation: askAccommodationLocal.value,
     askDepartureCity: askDepartureCityLocal.value,
+    askSocialLinks: askSocialLinksLocal.value,
   }
 }
 
@@ -517,6 +537,7 @@ const persistSettings = async () => {
       askTechnicalNeeds: askTechnicalNeedsLocal.value,
       askAccommodation: askAccommodationLocal.value,
       askDepartureCity: askDepartureCityLocal.value,
+      askSocialLinks: askSocialLinksLocal.value,
     }
 
     if (modeLocal.value === 'EXTERNAL') {

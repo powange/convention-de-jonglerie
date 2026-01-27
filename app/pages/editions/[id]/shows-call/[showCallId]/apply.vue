@@ -306,6 +306,25 @@
                   class="w-full"
                 />
               </UFormField>
+
+              <UFormField
+                v-if="showCall.askSocialLinks"
+                :label="t('shows_call.form.social_links')"
+                name="socialLinks"
+              >
+                <UTextarea
+                  v-model="formState.socialLinks"
+                  :placeholder="t('shows_call.form.social_links_placeholder')"
+                  :rows="3"
+                  size="lg"
+                  class="w-full"
+                />
+                <template #hint>
+                  <span class="text-xs text-gray-500">
+                    {{ t('shows_call.form.social_links_hint') }}
+                  </span>
+                </template>
+              </UFormField>
             </div>
 
             <!-- Section: Informations spectacle -->
@@ -377,18 +396,6 @@
                   v-model="formState.technicalNeeds"
                   :placeholder="t('shows_call.form.technical_needs_placeholder')"
                   :rows="3"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField
-                :label="t('gestion.shows_call.form.available_dates')"
-                name="availableDates"
-              >
-                <UInput
-                  v-model="formState.availableDates"
-                  :placeholder="t('shows_call.form.available_dates_placeholder')"
                   size="lg"
                   class="w-full"
                 />
@@ -614,12 +621,12 @@ const formState = reactive({
   artistBio: '',
   portfolioUrl: '',
   videoUrl: '',
+  socialLinks: '',
   showTitle: '',
   showDescription: '',
   showDuration: null as number | null,
   showCategory: '',
   technicalNeeds: '',
-  availableDates: '',
   accommodationNeeded: false,
   accommodationNotes: '',
   departureCity: '',
@@ -685,13 +692,13 @@ onMounted(async () => {
         formState.artistBio = app.artistBio || ''
         formState.portfolioUrl = app.portfolioUrl || ''
         formState.videoUrl = app.videoUrl || ''
+        formState.socialLinks = app.socialLinks || ''
         // Informations spectacle
         formState.showTitle = app.showTitle
         formState.showDescription = app.showDescription
         formState.showDuration = app.showDuration
         formState.showCategory = app.showCategory || ''
         formState.technicalNeeds = app.technicalNeeds || ''
-        formState.availableDates = app.availableDates || ''
         // Logistique
         formState.accommodationNeeded = app.accommodationNeeded
         formState.accommodationNotes = app.accommodationNotes || ''
@@ -864,12 +871,12 @@ async function submitApplication(_event: FormSubmitEvent<typeof formState>) {
     artistBio: formState.artistBio || null,
     portfolioUrl: formState.portfolioUrl || null,
     videoUrl: formState.videoUrl || null,
+    socialLinks: formState.socialLinks || null,
     showTitle: formState.showTitle,
     showDescription: formState.showDescription,
     showDuration: formState.showDuration,
     showCategory: formState.showCategory || null,
     technicalNeeds: formState.technicalNeeds || null,
-    availableDates: formState.availableDates || null,
     accommodationNeeded: formState.accommodationNeeded,
     accommodationNotes: formState.accommodationNotes || null,
     departureCity: formState.departureCity || null,

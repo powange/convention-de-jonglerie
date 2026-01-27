@@ -19,6 +19,7 @@ const updateShowCallSchema = z.object({
   askTechnicalNeeds: z.boolean().optional(),
   askAccommodation: z.boolean().optional(),
   askDepartureCity: z.boolean().optional(),
+  askSocialLinks: z.boolean().optional(),
 })
 
 /**
@@ -131,6 +132,9 @@ export default wrapApiHandler(
         }),
         ...(validatedData.askDepartureCity !== undefined && {
           askDepartureCity: validatedData.askDepartureCity,
+        }),
+        ...(validatedData.askSocialLinks !== undefined && {
+          askSocialLinks: validatedData.askSocialLinks,
         }),
       },
     })

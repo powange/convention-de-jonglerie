@@ -262,6 +262,7 @@ export interface EditionShowCall {
   askTechnicalNeeds: boolean
   askAccommodation: boolean
   askDepartureCity: boolean
+  askSocialLinks: boolean
   createdAt: string
   updatedAt: string
 }
@@ -286,6 +287,7 @@ export interface ShowApplication {
   artistBio?: string | null
   portfolioUrl?: string | null
   videoUrl?: string | null
+  socialLinks?: string | null
 
   // Infos spectacle proposé
   showTitle: string
@@ -299,7 +301,6 @@ export interface ShowApplication {
   additionalPerformers?: AdditionalPerformer[] | null
 
   // Logistique
-  availableDates?: string | null
   accommodationNeeded: boolean
   accommodationNotes?: string | null
   departureCity?: string | null
@@ -333,6 +334,7 @@ export interface ShowCallSettingsFormData {
   askTechnicalNeeds: boolean
   askAccommodation: boolean
   askDepartureCity: boolean
+  askSocialLinks: boolean
 }
 
 // Formulaire de candidature de spectacle
@@ -342,6 +344,7 @@ export interface ShowApplicationFormData {
   artistBio?: string | null
   portfolioUrl?: string | null
   videoUrl?: string | null
+  socialLinks?: string | null
 
   // Infos spectacle proposé
   showTitle: string
@@ -355,7 +358,6 @@ export interface ShowApplicationFormData {
   additionalPerformers?: AdditionalPerformer[]
 
   // Logistique
-  availableDates?: string | null
   accommodationNeeded: boolean
   accommodationNotes?: string | null
   departureCity?: string | null
@@ -395,6 +397,7 @@ export interface EditionShowCallPublic extends EditionShowCallBasic {
   askTechnicalNeeds: boolean
   askAccommodation: boolean
   askDepartureCity: boolean
+  askSocialLinks: boolean
 }
 
 // Candidature avec le nom de l'appel (pour "Mes candidatures")

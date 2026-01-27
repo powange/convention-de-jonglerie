@@ -73,6 +73,7 @@ export default wrapApiHandler(
       askTechnicalNeeds: showCall.askTechnicalNeeds,
       askAccommodation: showCall.askAccommodation,
       askDepartureCity: showCall.askDepartureCity,
+      askSocialLinks: showCall.askSocialLinks,
     }
   },
   { operationName: 'GetPublicShowCallInfo' }

@@ -544,6 +544,11 @@ export const showApplicationSchema = z
       .optional(),
     portfolioUrl: urlSchema,
     videoUrl: urlSchema,
+    socialLinks: z
+      .string()
+      .max(2000, 'Les liens réseaux sociaux ne peuvent pas dépasser 2000 caractères')
+      .nullable()
+      .optional(),
 
     // Infos spectacle proposé
     showTitle: z
@@ -597,11 +602,6 @@ export const showApplicationSchema = z
       .default([]),
 
     // Logistique
-    availableDates: z
-      .string()
-      .max(500, 'Les dates disponibles ne peuvent pas dépasser 500 caractères')
-      .nullable()
-      .optional(),
     accommodationNeeded: z.boolean().optional().default(false),
     accommodationNotes: z
       .string()

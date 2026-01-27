@@ -1393,6 +1393,7 @@ model EditionShowCall {
   askTechnicalNeeds Boolean @default(true)
   askAccommodation  Boolean @default(false)
   askDepartureCity  Boolean @default(false) // Demander la ville de départ pour le défraiement
+  askSocialLinks    Boolean @default(false) // Demander les réseaux sociaux
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -1415,6 +1416,7 @@ model ShowApplication {
   artistBio    String?       @db.Text // Présentation de l'artiste
   portfolioUrl String?       // Site web / portfolio
   videoUrl     String?       // Lien vidéo de démonstration
+  socialLinks  String?       @db.Text // Liens réseaux sociaux (un par ligne)
 
   // Infos spectacle proposé
   showTitle                 String  // Titre du spectacle
@@ -1426,7 +1428,6 @@ model ShowApplication {
   additionalPerformers      Json?   // Infos de contact des personnes supplémentaires [{lastName, firstName, email, phone}]
 
   // Logistique
-  availableDates      String?  // Dates disponibles
   accommodationNeeded Boolean  @default(false)
   accommodationNotes  String?  @db.Text
   departureCity       String?  // Ville de départ pour le défraiement

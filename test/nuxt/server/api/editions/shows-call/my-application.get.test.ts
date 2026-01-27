@@ -42,7 +42,6 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application GET', () => 
     showDuration: 30,
     showCategory: 'Jonglage',
     technicalNeeds: 'Besoins techniques',
-    availableDates: 'Tous les jours',
     accommodationNeeded: true,
     accommodationNotes: 'Notes hébergement',
     additionalPerformersCount: 0,

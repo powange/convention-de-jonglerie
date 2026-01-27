@@ -61,7 +61,6 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
     technicalNeeds: 'Besoins techniques',
     additionalPerformersCount: 0,
     additionalPerformers: null,
-    availableDates: 'Tous les jours',
     accommodationNeeded: true,
     accommodationNotes: 'Notes hébergement',
     departureCity: null,
@@ -144,7 +143,6 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         showDuration: 30,
         showCategory: 'Jonglage',
         technicalNeeds: 'Besoins techniques',
-        availableDates: 'Tous les jours',
         accommodationNeeded: true,
         accommodationNotes: 'Notes hébergement',
         contactPhone: '+33123456789',
@@ -178,6 +176,43 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       })
     })
 
+    it('devrait créer une candidature avec socialLinks', async () => {
+      const applicationData = {
+        lastName: 'Dupont',
+        firstName: 'Jean',
+        phone: '+33612345678',
+        artistName: 'Artiste Social',
+        showTitle: 'Spectacle Social',
+        showDescription: 'Description du spectacle avec suffisamment de caractères',
+        showDuration: 25,
+        additionalPerformersCount: 0,
+        socialLinks: 'https://instagram.com/artist\nhttps://youtube.com/@artist',
+      }
+
+      prismaMock.user.update.mockResolvedValue(mockUser)
+      prismaMock.showApplication.create.mockResolvedValue({
+        ...mockApplication,
+        artistName: 'Artiste Social',
+        showTitle: 'Spectacle Social',
+        socialLinks: 'https://instagram.com/artist\nhttps://youtube.com/@artist',
+      })
+
+      global.readBody.mockResolvedValue(applicationData)
+      const mockEvent = { context: { user: mockUser } }
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.success).toBe(true)
+      expect(prismaMock.showApplication.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          artistName: 'Artiste Social',
+          showTitle: 'Spectacle Social',
+          socialLinks: 'https://instagram.com/artist\nhttps://youtube.com/@artist',
+        }),
+        include: expect.any(Object),
+      })
+    })
+
     it('devrait créer une candidature minimale sans champs optionnels', async () => {
       const minimalData = {
         lastName: 'Simple',
@@ -199,9 +234,9 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         artistBio: null,
         portfolioUrl: null,
         videoUrl: null,
+        socialLinks: null,
         showCategory: null,
         technicalNeeds: null,
-        availableDates: null,
         accommodationNeeded: false,
         accommodationNotes: null,
         contactPhone: null,

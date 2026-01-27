@@ -131,6 +131,7 @@ export default wrapApiHandler(
         artistBio: validatedData.artistBio || null,
         portfolioUrl: validatedData.portfolioUrl || null,
         videoUrl: validatedData.videoUrl || null,
+        socialLinks: validatedData.socialLinks || null,
         // Infos spectacle
         showTitle: validatedData.showTitle,
         showDescription: validatedData.showDescription,
@@ -140,7 +141,6 @@ export default wrapApiHandler(
         additionalPerformersCount: validatedData.additionalPerformersCount,
         additionalPerformers: validatedData.additionalPerformers || null,
         // Logistique
-        availableDates: validatedData.availableDates || null,
         accommodationNeeded: validatedData.accommodationNeeded ?? false,
         accommodationNotes: validatedData.accommodationNotes || null,
         departureCity: validatedData.departureCity || null,
