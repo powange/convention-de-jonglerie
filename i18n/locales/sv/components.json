@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Skicka det första meddelandet!",
+        "connected": "Ansluten",
+        "edited": "redigerad",
+        "message_deleted": "Detta meddelande har tagits bort",
+        "no_messages": "Inga meddelanden",
+        "placeholder": "Skriv ditt meddelande...",
+        "title": "Diskussion",
+        "today": "Idag",
+        "yesterday": "Igår"
+      }
+    },
     "carpool": {
       "accept": "Acceptera",
       "add_comment_placeholder": "Lägg till en kommentar...",

@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Отправьте первое сообщение!",
+        "connected": "Подключено",
+        "edited": "изменено",
+        "message_deleted": "Это сообщение было удалено",
+        "no_messages": "Нет сообщений",
+        "placeholder": "Напишите ваше сообщение...",
+        "title": "Обсуждение",
+        "today": "Сегодня",
+        "yesterday": "Вчера"
+      }
+    },
     "carpool": {
       "accept": "Принять",
       "add_comment_placeholder": "Добавить комментарий...",

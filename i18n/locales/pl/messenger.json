@@ -30,6 +30,7 @@
     "reply_to": "Odpowiedz użytkownikowi {pseudo}",
     "select_conversation": "Wybierz rozmowę, aby rozpocząć",
     "subtitles": {
+      "artist_application": "Zgłoszenie spektaklu",
       "group": "Grupa",
       "organizers": "Organizatorzy",
       "organizers_group": "Grupa organizatorów",

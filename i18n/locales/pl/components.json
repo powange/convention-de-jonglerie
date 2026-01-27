@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Wyślij pierwszą wiadomość!",
+        "connected": "Połączono",
+        "edited": "edytowane",
+        "message_deleted": "Ta wiadomość została usunięta",
+        "no_messages": "Brak wiadomości",
+        "placeholder": "Napisz swoją wiadomość...",
+        "title": "Dyskusja",
+        "today": "Dzisiaj",
+        "yesterday": "Wczoraj"
+      }
+    },
     "carpool": {
       "accept": "Zaakceptuj",
       "add_comment_placeholder": "Dodaj komentarz...",

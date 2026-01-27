@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Envoyez le premier message !",
+        "connected": "Connecté",
+        "edited": "modifié",
+        "message_deleted": "Ce message a été supprimé",
+        "no_messages": "Aucun message",
+        "placeholder": "Écrivez votre message...",
+        "title": "Discussion",
+        "today": "Aujourd'hui",
+        "yesterday": "Hier"
+      }
+    },
     "carpool": {
       "accept": "Accepter",
       "add_comment_placeholder": "Ajouter un commentaire...",
@@ -136,19 +149,6 @@
       "per_edition": "Droits par édition",
       "title_label": "Titre / fonction",
       "title_placeholder": "Titre / fonction (optionnel)"
-    },
-    "artist_application": {
-      "chat": {
-        "be_first": "Envoyez le premier message !",
-        "connected": "Connecté",
-        "edited": "modifié",
-        "message_deleted": "Ce message a été supprimé",
-        "no_messages": "Aucun message",
-        "placeholder": "Écrivez votre message...",
-        "title": "Discussion",
-        "today": "Aujourd'hui",
-        "yesterday": "Hier"
-      }
     },
     "posts": {
       "comments_count": "{count} commentaire | {count} commentaires",

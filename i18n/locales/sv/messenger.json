@@ -30,6 +30,7 @@
     "reply_to": "Svara till {pseudo}",
     "select_conversation": "Välj en konversation för att börja",
     "subtitles": {
+      "artist_application": "Föreställningsansökan",
       "group": "Grupp",
       "organizers": "Arrangörer",
       "organizers_group": "Arrangörsgrupp",

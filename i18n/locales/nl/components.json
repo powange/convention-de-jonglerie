@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Stuur het eerste bericht!",
+        "connected": "Verbonden",
+        "edited": "bewerkt",
+        "message_deleted": "Dit bericht is verwijderd",
+        "no_messages": "Geen berichten",
+        "placeholder": "Schrijf je bericht...",
+        "title": "Discussie",
+        "today": "Vandaag",
+        "yesterday": "Gisteren"
+      }
+    },
     "carpool": {
       "accept": "Accepteren",
       "add_comment_placeholder": "Voeg een opmerking toe...",

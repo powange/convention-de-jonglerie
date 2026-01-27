@@ -30,6 +30,7 @@
     "reply_to": "Antwoord aan {pseudo}",
     "select_conversation": "Selecteer een gesprek om te beginnen",
     "subtitles": {
+      "artist_application": "Showaanmelding",
       "group": "Groep",
       "organizers": "Organisatoren",
       "organizers_group": "Organisatorengroep",

@@ -30,6 +30,7 @@
     "reply_to": "Reply to {pseudo}",
     "select_conversation": "Select a conversation to start",
     "subtitles": {
+      "artist_application": "Show application",
       "group": "Group",
       "organizers": "Organizers",
       "organizers_group": "Organizers group",

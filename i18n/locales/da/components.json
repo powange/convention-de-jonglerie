@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Send den første besked!",
+        "connected": "Forbundet",
+        "edited": "redigeret",
+        "message_deleted": "Denne besked er blevet slettet",
+        "no_messages": "Ingen beskeder",
+        "placeholder": "Skriv din besked...",
+        "title": "Diskussion",
+        "today": "I dag",
+        "yesterday": "I går"
+      }
+    },
     "carpool": {
       "accept": "Accepter",
       "add_comment_placeholder": "Tilføj en kommentar...",

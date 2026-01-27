@@ -30,6 +30,7 @@
     "reply_to": "Svar til {pseudo}",
     "select_conversation": "Vælg en samtale for at starte",
     "subtitles": {
+      "artist_application": "Forestillingsansøgning",
       "group": "Gruppe",
       "organizers": "Arrangører",
       "organizers_group": "Arrangørgruppe",

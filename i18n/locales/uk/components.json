@@ -1,5 +1,18 @@
 {
   "components": {
+    "artist_application": {
+      "chat": {
+        "be_first": "Надішліть перше повідомлення!",
+        "connected": "Підключено",
+        "edited": "редаговано",
+        "message_deleted": "Це повідомлення було видалено",
+        "no_messages": "Немає повідомлень",
+        "placeholder": "Напишіть ваше повідомлення...",
+        "title": "Обговорення",
+        "today": "Сьогодні",
+        "yesterday": "Вчора"
+      }
+    },
     "carpool": {
       "accept": "Прийняти",
       "add_comment_placeholder": "Додати коментар...",

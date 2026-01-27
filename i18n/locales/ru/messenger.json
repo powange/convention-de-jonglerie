@@ -30,6 +30,7 @@
     "reply_to": "Ответить {pseudo}",
     "select_conversation": "Выберите разговор для начала",
     "subtitles": {
+      "artist_application": "Заявка на выступление",
       "group": "Группа",
       "organizers": "Организаторы",
       "organizers_group": "Группа организаторов",
