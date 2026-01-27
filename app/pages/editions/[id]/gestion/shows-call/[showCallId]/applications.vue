@@ -379,6 +379,11 @@
             />
           </div>
 
+          <!-- Conversation avec l'artiste -->
+          <div class="space-y-3 border-t pt-4">
+            <ShowApplicationChat :application-id="selectedApplication.id" class="h-80" />
+          </div>
+
           <!-- Décision -->
           <div v-if="selectedApplication.decidedAt" class="text-xs text-gray-400 border-t pt-3">
             {{ $t('gestion.shows_call.decided_info') }}
@@ -512,12 +517,20 @@ const formatDate = (date: string) => {
   })
 }
 
-// Parse social links (one per line)
+// Parse social links (one per line) with proper URL validation
 const parseSocialLinks = (links: string): string[] => {
   return links
     .split('\n')
     .map((link) => link.trim())
-    .filter((link) => link.length > 0 && link.startsWith('http'))
+    .filter((link) => {
+      if (link.length === 0) return false
+      try {
+        const url = new URL(link)
+        return url.protocol === 'http:' || url.protocol === 'https:'
+      } catch {
+        return false
+      }
+    })
 }
 
 // Get a readable label for a social link

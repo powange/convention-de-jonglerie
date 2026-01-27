@@ -51,6 +51,26 @@ export default wrapApiHandler(
                 },
               },
             },
+            showApplication: {
+              select: {
+                id: true,
+                showCall: {
+                  select: {
+                    edition: {
+                      select: {
+                        id: true,
+                        name: true,
+                        convention: {
+                          select: {
+                            name: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
             participants: {
               where: {
                 leftAt: null,
@@ -142,14 +162,21 @@ export default wrapApiHandler(
 
     // Envoyer des notifications push aux autres participants (uniquement s'ils ne sont pas sur la page)
     const teamName = participant.conversation.team?.name
-    const editionName = participant.conversation.edition?.name
     const conversationType = participant.conversation.type
-    const editionId = participant.conversation.edition?.id
+    // Pour ARTIST_APPLICATION, l'édition est via showApplication.showCall.edition
+    const showApplication = participant.conversation.showApplication
+    const editionFromShowApplication = showApplication?.showCall.edition
+    const editionName = participant.conversation.edition?.name ?? editionFromShowApplication?.name
+    const editionId = participant.conversation.edition?.id ?? editionFromShowApplication?.id
+    const conventionName =
+      participant.conversation.edition?.convention?.name ??
+      editionFromShowApplication?.convention?.name
 
     const truncatedContent = content.length > 100 ? content.substring(0, 97) + '...' : content
 
     // Récupérer tous les participants avec leur lastReadMessageId et leurs rôles pour déterminer le titre de notification
     // Pour les conversations privées, on n'a pas besoin des infos d'organisation/bénévolat
+    const teamId = participant.conversation.teamId
     const participantsWithReadStatus = await prisma.conversationParticipant.findMany({
       where: {
         conversationId,
@@ -181,23 +208,28 @@ export default wrapApiHandler(
                       id: true,
                     },
                   },
-                  volunteerApplications: {
-                    where: {
-                      editionId: editionId,
-                      status: 'ACCEPTED',
-                    },
-                    select: {
-                      teamAssignments: {
-                        where: {
-                          teamId: participant.conversation.teamId,
-                          isLeader: true,
+                  // Uniquement si la conversation a une équipe associée
+                  ...(teamId
+                    ? {
+                        volunteerApplications: {
+                          where: {
+                            editionId: editionId,
+                            status: 'ACCEPTED',
+                          },
+                          select: {
+                            teamAssignments: {
+                              where: {
+                                teamId: teamId,
+                                isLeader: true,
+                              },
+                              select: {
+                                isLeader: true,
+                              },
+                            },
+                          },
                         },
-                        select: {
-                          isLeader: true,
-                        },
-                      },
-                    },
-                  },
+                      }
+                    : {}),
                 }
               : {}),
           },
@@ -264,6 +296,9 @@ export default wrapApiHandler(
             } else if (conversationType === 'ORGANIZERS_GROUP') {
               // Pour un groupe d'organisateurs
               notificationTitle = `Nouveau message des organisateurs - ${editionName}`
+            } else if (conversationType === 'ARTIST_APPLICATION') {
+              // Pour une conversation liée à une candidature artiste
+              notificationTitle = `Nouveau message - Candidature spectacle ${conventionName ?? ''}`
             } else {
               // Fallback
               notificationTitle = `Nouveau message - ${editionName}`
@@ -287,9 +322,15 @@ export default wrapApiHandler(
           // Envoyer la notification push (le service unifié gère les logs)
           // Pour les messages, l'icon est l'avatar de l'expéditeur
           // L'URL de la notification dépend du type de conversation
-          const notificationUrl = editionId
-            ? `/messenger?editionId=${editionId}&conversationId=${conversationId}`
-            : `/messenger?conversationId=${conversationId}`
+          let notificationUrl: string
+          if (conversationType === 'ARTIST_APPLICATION' && showApplication?.id) {
+            // Pour les candidatures artistes, pointer vers la page "Mes candidatures"
+            notificationUrl = `/my-artist-applications?applicationId=${showApplication.id}`
+          } else if (editionId) {
+            notificationUrl = `/messenger?editionId=${editionId}&conversationId=${conversationId}`
+          } else {
+            notificationUrl = `/messenger?conversationId=${conversationId}`
+          }
 
           await unifiedPushService.sendToUser(p.userId, {
             title: notificationTitle,

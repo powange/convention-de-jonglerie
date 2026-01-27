@@ -137,6 +137,19 @@
       "title_label": "Titre / fonction",
       "title_placeholder": "Titre / fonction (optionnel)"
     },
+    "artist_application": {
+      "chat": {
+        "be_first": "Envoyez le premier message !",
+        "connected": "Connecté",
+        "edited": "modifié",
+        "message_deleted": "Ce message a été supprimé",
+        "no_messages": "Aucun message",
+        "placeholder": "Écrivez votre message...",
+        "title": "Discussion",
+        "today": "Aujourd'hui",
+        "yesterday": "Hier"
+      }
+    },
     "posts": {
       "comments_count": "{count} commentaire | {count} commentaires",
       "confirm_delete_comment": "Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.",

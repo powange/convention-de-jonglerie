@@ -451,3 +451,112 @@ export async function syncOrganizersGroupParticipants(
   // Appeler ensureOrganizersGroupConversation qui synchronisera les participants
   await ensureOrganizersGroupConversation(editionId, tx)
 }
+
+/**
+ * Crée ou récupère une conversation pour une candidature artiste
+ *
+ * Participants initiaux :
+ * - L'artiste (userId de la ShowApplication)
+ * - L'utilisateur qui envoie le premier message (senderId)
+ *
+ * Les autres organisateurs/admins peuvent voir la conversation mais ne sont
+ * ajoutés comme participants que quand ils envoient un message.
+ *
+ * @param applicationId - ID de la candidature
+ * @param senderId - ID de l'utilisateur qui crée/envoie le premier message
+ * @param tx - Transaction Prisma optionnelle
+ * @returns L'ID de la conversation créée ou existante
+ */
+export async function ensureShowApplicationConversation(
+  applicationId: number,
+  senderId: number,
+  tx?: PrismaTransaction
+): Promise<string> {
+  const client = tx || prisma
+
+  // 1. Récupérer la candidature avec l'édition
+  const application = await client.showApplication.findUnique({
+    where: { id: applicationId },
+    select: {
+      id: true,
+      userId: true,
+      showCall: {
+        select: {
+          edition: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!application) {
+    throw new Error('Candidature introuvable')
+  }
+
+  const editionId = application.showCall.edition.id
+  const artistUserId = application.userId
+
+  // 2. Vérifier si une conversation existe déjà pour cette candidature
+  const existingConversation = await client.conversation.findUnique({
+    where: { showApplicationId: applicationId },
+    include: { participants: true },
+  })
+
+  if (existingConversation) {
+    // Ajouter le sender comme participant s'il ne l'est pas déjà
+    await addShowApplicationParticipantIfNeeded(existingConversation, senderId, client)
+    return existingConversation.id
+  }
+
+  // 3. Créer la conversation avec l'artiste et l'expéditeur
+  const participantIds = [...new Set([artistUserId, senderId])]
+
+  const conversation = await client.conversation.create({
+    data: {
+      editionId,
+      showApplicationId: applicationId,
+      type: 'ARTIST_APPLICATION',
+      participants: {
+        create: participantIds.map((userId) => ({ userId })),
+      },
+    },
+  })
+
+  return conversation.id
+}
+
+/**
+ * Ajoute un utilisateur comme participant à une conversation de candidature artiste
+ * s'il n'est pas déjà participant (appelé quand quelqu'un envoie un message)
+ */
+export async function addShowApplicationParticipantIfNeeded(
+  conversation: { id: string; participants: { userId: number; leftAt: Date | null }[] },
+  userId: number,
+  client: PrismaTransaction | typeof prisma
+): Promise<void> {
+  const existingParticipant = conversation.participants.find((p) => p.userId === userId)
+
+  if (!existingParticipant) {
+    // Ajouter comme nouveau participant
+    await client.conversationParticipant.create({
+      data: {
+        conversationId: conversation.id,
+        userId,
+      },
+    })
+  } else if (existingParticipant.leftAt) {
+    // Réactiver un participant qui avait quitté
+    await client.conversationParticipant.update({
+      where: {
+        conversationId_userId: {
+          conversationId: conversation.id,
+          userId,
+        },
+      },
+      data: { leftAt: null },
+    })
+  }
+}

@@ -782,6 +782,8 @@ function getConversationIcon(conversation: Conversation): string {
       return 'i-heroicons-building-office-2'
     case 'PRIVATE':
       return 'i-heroicons-chat-bubble-left-right'
+    case 'ARTIST_APPLICATION':
+      return 'i-heroicons-sparkles'
     default:
       return 'i-heroicons-user'
   }
@@ -817,6 +819,11 @@ function getConversationDisplayName(conversation: Conversation): string {
 
   if (conversation.type === 'TEAM_GROUP') {
     return conversation.team?.name || 'Conversation'
+  }
+
+  // Pour les conversations de candidature artiste
+  if (conversation.type === 'ARTIST_APPLICATION' && conversation.showApplication) {
+    return conversation.showApplication.showTitle || conversation.showApplication.artistName
   }
 
   // Pour les conversations privées 1-à-1 (PRIVATE)
@@ -888,6 +895,10 @@ function getConversationSubtitle(conversation: Conversation): string {
 
   if (conversation.type === 'PRIVATE') {
     return t('messenger.subtitles.private')
+  }
+
+  if (conversation.type === 'ARTIST_APPLICATION') {
+    return t('messenger.subtitles.artist_application')
   }
 
   // Pour les conversations privées (TEAM_LEADER_PRIVATE)

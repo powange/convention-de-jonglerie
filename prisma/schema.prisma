@@ -1441,9 +1441,10 @@ model ShowApplication {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  showCall  EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  decidedBy User?           @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  showCall     EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy    User?           @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  conversation Conversation? // Conversation avec les organisateurs
 
   @@unique([showCallId, userId])
   @@index([showCallId])
@@ -1699,23 +1700,27 @@ enum ConversationType {
   VOLUNTEER_TO_ORGANIZERS // Conversation entre un bénévole et les organisateurs ayant les droits de gestion des bénévoles
   ORGANIZERS_GROUP // Discussion de groupe entre tous les organisateurs de l'édition
   PRIVATE // Conversation privée 1-à-1 entre deux utilisateurs (non liée à une édition)
+  ARTIST_APPLICATION // Conversation entre un artiste candidat et les organisateurs
 }
 
 model Conversation {
-  id        String           @id @default(cuid())
-  editionId Int? // Optionnel : NULL pour les conversations privées 1-à-1
-  teamId    String? // Optionnel : uniquement pour les conversations liées à une équipe
-  type      ConversationType
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  id                String           @id @default(cuid())
+  editionId         Int? // Optionnel : NULL pour les conversations privées 1-à-1
+  teamId            String? // Optionnel : uniquement pour les conversations liées à une équipe
+  showApplicationId Int?             @unique // Optionnel : uniquement pour les conversations de candidature artiste
+  type              ConversationType
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
-  edition      Edition?                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  team         VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  participants ConversationParticipant[]
-  messages     Message[]
+  edition         Edition?                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  team            VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  showApplication ShowApplication?          @relation(fields: [showApplicationId], references: [id], onDelete: Cascade)
+  participants    ConversationParticipant[]
+  messages        Message[]
 
   @@index([editionId])
   @@index([teamId])
+  @@index([showApplicationId])
   @@index([type])
 }
 

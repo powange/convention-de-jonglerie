@@ -30,6 +30,7 @@
     "reply_to": "Répondre à {pseudo}",
     "select_conversation": "Sélectionnez une conversation pour commencer",
     "subtitles": {
+      "artist_application": "Candidature spectacle",
       "group": "Groupe",
       "organizers": "Organisateurs",
       "organizers_group": "Groupe organisateurs",

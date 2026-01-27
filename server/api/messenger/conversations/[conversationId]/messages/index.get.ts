@@ -1,5 +1,6 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { checkArtistApplicationConversationAccess } from '@@/server/utils/show-application-helpers'
 import { z } from 'zod'
 
 const querySchema = z.object({
@@ -33,11 +34,9 @@ export default wrapApiHandler(
       },
     })
 
+    // Si pas participant, vérifier l'accès spécial pour les conversations ARTIST_APPLICATION
     if (!participant) {
-      throw createError({
-        statusCode: 403,
-        message: "Vous n'avez pas accès à cette conversation",
-      })
+      await checkArtistApplicationConversationAccess(conversationId, user.id, event)
     }
 
     // Récupérer les messages (incluant les supprimés pour afficher "Message supprimé")
@@ -92,15 +91,17 @@ export default wrapApiHandler(
       },
     })
 
-    // Mettre à jour le lastReadAt du participant
-    await prisma.conversationParticipant.update({
-      where: {
-        id: participant.id,
-      },
-      data: {
-        lastReadAt: new Date(),
-      },
-    })
+    // Mettre à jour le lastReadAt du participant (seulement s'il est participant)
+    if (participant) {
+      await prisma.conversationParticipant.update({
+        where: {
+          id: participant.id,
+        },
+        data: {
+          lastReadAt: new Date(),
+        },
+      })
+    }
 
     const page = Math.floor(offset / limit) + 1
 

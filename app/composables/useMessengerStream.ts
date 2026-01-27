@@ -1,3 +1,5 @@
+import { useAuthStore } from '@@/app/stores/auth'
+
 import type { ConversationMessage } from './useMessenger'
 
 interface StreamStats {
@@ -12,6 +14,7 @@ interface StreamStats {
  */
 export const useMessengerStream = (conversationId: Ref<string | null>) => {
   const _toast = useToast()
+  const authStore = useAuthStore()
 
   // État de la connexion SSE
   const streamStats = ref<StreamStats>({
@@ -51,7 +54,11 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
     streamStats.value.error = null
 
     try {
-      const url = `/api/messenger/conversations/${conversationId.value}/stream`
+      // Construire l'URL avec le paramètre adminMode si nécessaire (car EventSource ne supporte pas les headers)
+      let url = `/api/messenger/conversations/${conversationId.value}/stream`
+      if (authStore.isAdminModeActive) {
+        url += '?adminMode=true'
+      }
       console.log('[Messenger SSE] Connexion à:', url)
 
       eventSource = new EventSource(url)

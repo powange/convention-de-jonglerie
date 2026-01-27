@@ -64,12 +64,24 @@ export interface Conversation {
     | 'VOLUNTEER_TO_ORGANIZERS'
     | 'ORGANIZERS_GROUP'
     | 'PRIVATE'
+    | 'ARTIST_APPLICATION'
   createdAt: Date
   updatedAt: Date
   team: {
     id: string
     name: string
     color: string
+  } | null
+  showApplication: {
+    id: number
+    showTitle: string
+    artistName: string
+    user: {
+      id: number
+      pseudo: string
+      profilePicture: string | null
+      emailHash: string
+    }
   } | null
   participants: ConversationParticipant[]
   messages: Array<{

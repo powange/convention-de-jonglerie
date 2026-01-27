@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { ensureOrganizersGroupConversation } from '@@/server/utils/messenger-helpers'
+import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { z } from 'zod'
 
 const querySchema = z.object({
@@ -19,7 +20,7 @@ export default wrapApiHandler(
 
     // Vérifier que l'utilisateur a accès à cette édition
     // Soit via une candidature de bénévole, soit en tant qu'organisateur
-    const [volunteerApplication, edition] = await Promise.all([
+    const [volunteerApplication, edition, artistApplication] = await Promise.all([
       prisma.editionVolunteerApplication.findFirst({
         where: {
           editionId,
@@ -44,6 +45,17 @@ export default wrapApiHandler(
           },
         },
       }),
+      // Vérifier si l'utilisateur a une candidature artiste pour cette édition
+      prisma.showApplication.findFirst({
+        where: {
+          userId: user.id,
+          showCall: {
+            edition: {
+              id: editionId,
+            },
+          },
+        },
+      }),
     ])
 
     // Vérifier si l'utilisateur est un organisateur de l'édition (EditionOrganizer)
@@ -58,7 +70,10 @@ export default wrapApiHandler(
 
     const isConventionOrganizer = edition?.convention?.organizers?.length > 0
     const isEditionOrganizer = !!editionOrganizer
-    const hasAccess = volunteerApplication || isConventionOrganizer || isEditionOrganizer
+    const isArtist = !!artistApplication
+    const isAdminMode = await checkAdminMode(user.id, event)
+    const hasAccess =
+      volunteerApplication || isConventionOrganizer || isEditionOrganizer || isArtist || isAdminMode
 
     if (!hasAccess) {
       throw createError({
@@ -73,9 +88,24 @@ export default wrapApiHandler(
     }
 
     // Récupérer les conversations de l'utilisateur pour cette édition
+    // Inclut les conversations directement liées à l'édition ET les conversations ARTIST_APPLICATION
     const conversations = await prisma.conversation.findMany({
       where: {
-        editionId,
+        OR: [
+          // Conversations directement liées à l'édition
+          { editionId },
+          // Conversations ARTIST_APPLICATION liées à cette édition via showApplication
+          {
+            type: 'ARTIST_APPLICATION',
+            showApplication: {
+              showCall: {
+                edition: {
+                  id: editionId,
+                },
+              },
+            },
+          },
+        ],
         participants: {
           some: {
             userId: user.id,
@@ -89,6 +119,22 @@ export default wrapApiHandler(
             id: true,
             name: true,
             color: true,
+          },
+        },
+        // Inclure les infos de la candidature pour les conversations ARTIST_APPLICATION
+        showApplication: {
+          select: {
+            id: true,
+            showTitle: true,
+            artistName: true,
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                profilePicture: true,
+                emailHash: true,
+              },
+            },
           },
         },
         participants: {

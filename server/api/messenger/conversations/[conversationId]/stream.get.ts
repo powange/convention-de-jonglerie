@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { conversationPresenceService } from '@@/server/utils/conversation-presence-service'
+import { checkArtistApplicationConversationAccess } from '@@/server/utils/show-application-helpers'
 
 /**
  * GET /api/messenger/conversations/[conversationId]/stream
@@ -21,11 +22,9 @@ export default wrapApiHandler(
       },
     })
 
+    // Si pas participant, vérifier l'accès spécial pour les conversations ARTIST_APPLICATION
     if (!participant) {
-      throw createError({
-        statusCode: 403,
-        message: "Vous n'avez pas accès à cette conversation",
-      })
+      await checkArtistApplicationConversationAccess(conversationId, user.id, event)
     }
 
     // Marquer l'utilisateur comme présent sur cette conversation
@@ -173,7 +172,7 @@ export default wrapApiHandler(
       }
     }, 30000)
 
-    // Vérifier les messages toutes les 2 secondes et envoyer un heartbeat pour détecter les déconnexions
+    // Vérifier les messages toutes les 5 secondes et envoyer un heartbeat pour détecter les déconnexions
     const messageCheckInterval = setInterval(async () => {
       try {
         // Envoyer un heartbeat silencieux pour détecter si la connexion est fermée
@@ -182,7 +181,7 @@ export default wrapApiHandler(
       } catch {
         cleanup()
       }
-    }, 2000)
+    }, 5000)
 
     event.node.req.on('close', cleanup)
     event.node.req.on('aborted', cleanup)
