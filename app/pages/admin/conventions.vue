@@ -162,8 +162,11 @@
                   </UBadge>
                 </div>
                 <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {{ formatAuthorName(convention.author) }} •
+                  {{ formatAuthorName(convention.author) }} • {{ $t('admin.created_at') }}
                   {{ formatDate(convention.createdAt) }}
+                  <span v-if="convention.updatedAt !== convention.createdAt">
+                    • {{ $t('admin.updated_at') }} {{ formatDate(convention.updatedAt) }}
+                  </span>
                 </p>
               </div>
             </div>
@@ -319,6 +322,12 @@
                           <UIcon name="i-heroicons-map-pin" class="w-3 h-3 inline" />
                           {{ edition.city }}, {{ edition.country }}
                         </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {{ $t('admin.created_at') }} {{ formatDate(edition.createdAt) }}
+                          <span v-if="edition.updatedAt !== edition.createdAt">
+                            • {{ $t('admin.updated_at') }} {{ formatDate(edition.updatedAt) }}
+                          </span>
+                        </p>
                       </div>
                     </div>
 
@@ -415,6 +424,9 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('admin.created_by') }} {{ formatAuthorName(convention.author) }} •
                   {{ $t('admin.created_at') }} {{ formatDate(convention.createdAt) }}
+                  <span v-if="convention.updatedAt !== convention.createdAt">
+                    • {{ $t('admin.updated_at') }} {{ formatDate(convention.updatedAt) }}
+                  </span>
                 </p>
               </div>
             </div>
@@ -597,6 +609,13 @@
                         <p class="flex items-center gap-1">
                           <UIcon name="i-heroicons-user" class="w-4 h-4" />
                           {{ $t('admin.created_by') }} {{ formatAuthorName(edition.creator) }}
+                        </p>
+                        <p class="flex items-center gap-1">
+                          <UIcon name="i-heroicons-clock" class="w-4 h-4" />
+                          {{ $t('admin.created_at') }} {{ formatDate(edition.createdAt) }}
+                          <span v-if="edition.updatedAt !== edition.createdAt">
+                            • {{ $t('admin.updated_at') }} {{ formatDate(edition.updatedAt) }}
+                          </span>
                         </p>
                       </div>
                     </div>

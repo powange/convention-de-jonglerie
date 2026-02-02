@@ -241,6 +241,68 @@ describe('useEditionStore', () => {
       await expect(editionStore.fetchEditionById(999)).rejects.toThrow('Edition not found')
       expect(editionStore.error).toBe('Edition not found')
     })
+
+    it('devrait récupérer convention.organizers avec force: true pour les permissions', async () => {
+      const editionWithOrganizers = {
+        ...mockEdition,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 2,
+          organizers: [
+            {
+              id: 1,
+              user: { id: 1, pseudo: 'orgUser' },
+              rights: {
+                editConvention: true,
+                editAllEditions: true,
+              },
+              perEditionRights: [],
+            },
+          ],
+        },
+      }
+      vi.mocked($fetch).mockResolvedValue(editionWithOrganizers)
+
+      const result = await editionStore.fetchEditionById(1, { force: true })
+
+      expect($fetch).toHaveBeenCalledWith('/api/editions/1')
+      expect(result.convention).toBeDefined()
+      expect(result.convention?.organizers).toBeDefined()
+      expect(result.convention?.organizers?.length).toBe(1)
+      expect(result.convention?.organizers?.[0].rights?.editAllEditions).toBe(true)
+    })
+
+    it('devrait permettre canEditEdition après fetchEditionById avec force: true', async () => {
+      const userId = 5
+      const editionWithPermissions = {
+        ...mockEdition,
+        creatorId: null, // Pas le créateur
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 2, // Pas l'auteur non plus
+          organizers: [
+            {
+              id: 1,
+              user: { id: userId, pseudo: 'orgUser' },
+              rights: {
+                editConvention: false,
+                editAllEditions: true, // Droit d'éditer toutes les éditions
+              },
+              perEditionRights: [],
+            },
+          ],
+        },
+      }
+      vi.mocked($fetch).mockResolvedValue(editionWithPermissions)
+
+      const result = await editionStore.fetchEditionById(1, { force: true })
+
+      // L'utilisateur devrait pouvoir éditer grâce à editAllEditions
+      const canEdit = editionStore.canEditEdition(result, userId)
+      expect(canEdit).toBe(true)
+    })
   })
 
   describe('Action addEdition', () => {

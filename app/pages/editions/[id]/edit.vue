@@ -46,8 +46,9 @@ const edition = ref(null)
 
 onMounted(async () => {
   try {
-    // Récupérer l'édition spécifique
-    const foundEdition = await editionStore.fetchEditionById(editionId)
+    // Récupérer l'édition spécifique avec force: true pour avoir les données complètes
+    // (notamment convention.organizers pour la vérification des permissions)
+    const foundEdition = await editionStore.fetchEditionById(editionId, { force: true })
 
     // Vérifier que l'utilisateur peut modifier cette édition
     if (!editionStore.canEditEdition(foundEdition, authStore.user?.id || 0)) {
