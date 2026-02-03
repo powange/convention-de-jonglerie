@@ -1,5 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { requireAuth, requireResourceOwner } from '@@/server/utils/auth-utils'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { carpoolRequestInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
@@ -20,7 +20,7 @@ const updateCarpoolRequestSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-    const user = requireAuth(event)
+    requireAuth(event)
     const requestId = validateResourceId(event, 'id', 'demande')
 
     const body = await readBody(event)
@@ -39,12 +39,9 @@ export default wrapApiHandler(
     })
 
     // Seul le créateur peut modifier sa demande
-    if (existingRequest.userId !== user.id) {
-      throw createError({
-        statusCode: 403,
-        message: "Vous n'avez pas les droits pour modifier cette demande",
-      })
-    }
+    requireResourceOwner(event, existingRequest, {
+      errorMessage: "Vous n'avez pas les droits pour modifier cette demande",
+    })
 
     // Préparer les données à mettre à jour
     const updateData: any = {}

@@ -109,6 +109,38 @@ export const userPublicProfileSelect = {
   createdAt: true,
 } satisfies Prisma.UserSelect
 
+/**
+ * Sélection utilisateur complète pour l'administration
+ * Utilisée dans les endpoints admin pour la gestion des utilisateurs
+ *
+ * Occurrences: 2 fichiers (admin/users)
+ */
+export const userAdminSelect = {
+  id: true,
+  email: true,
+  pseudo: true,
+  nom: true,
+  prenom: true,
+  phone: true,
+  profilePicture: true,
+  emailHash: true,
+  isEmailVerified: true,
+  isGlobalAdmin: true,
+  preferredLanguage: true,
+  createdAt: true,
+  updatedAt: true,
+  _count: {
+    select: {
+      createdConventions: true,
+      createdEditions: true,
+      favoriteEditions: true,
+      carpoolOffers: true,
+      carpoolRequests: true,
+      notifications: true,
+    },
+  },
+} satisfies Prisma.UserSelect
+
 // ============================================================================
 // SÉLECTIONS CONVENTION
 // ============================================================================
@@ -455,6 +487,7 @@ export type UserWithProfile = Prisma.UserGetPayload<{ select: typeof userWithPro
 export type UserWithGravatar = Prisma.UserGetPayload<{ select: typeof userWithGravatarSelect }>
 export type UserWithName = Prisma.UserGetPayload<{ select: typeof userWithNameSelect }>
 export type UserPublicProfile = Prisma.UserGetPayload<{ select: typeof userPublicProfileSelect }>
+export type UserAdmin = Prisma.UserGetPayload<{ select: typeof userAdminSelect }>
 
 export type ConventionBasic = Prisma.ConventionGetPayload<{
   select: typeof conventionBasicSelect

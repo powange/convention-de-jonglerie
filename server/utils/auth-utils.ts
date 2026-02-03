@@ -89,6 +89,61 @@ export function requireUserOrGlobalAdmin(event: any, userId: number): Authentica
 }
 
 /**
+ * Type pour une ressource possédant un userId
+ */
+export interface OwnedResource {
+  userId: number
+}
+
+/**
+ * Options pour la vérification de propriété de ressource
+ */
+export interface RequireResourceOwnerOptions {
+  /** Permet aux admins globaux d'accéder à la ressource */
+  allowGlobalAdmin?: boolean
+  /** Message d'erreur personnalisé */
+  errorMessage?: string
+}
+
+/**
+ * Vérifie que l'utilisateur authentifié est le propriétaire de la ressource
+ *
+ * @param event L'événement Nuxt/Nitro
+ * @param resource La ressource avec un champ userId
+ * @param options Options de vérification
+ * @returns L'utilisateur authentifié
+ * @throws createError 403 si pas propriétaire
+ *
+ * @example
+ * const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {...})
+ * requireResourceOwner(event, offer, {
+ *   errorMessage: "Vous n'avez pas les droits pour supprimer cette offre"
+ * })
+ */
+export function requireResourceOwner<T extends OwnedResource>(
+  event: any,
+  resource: T,
+  options: RequireResourceOwnerOptions = {}
+): AuthenticatedUser {
+  const { allowGlobalAdmin = false, errorMessage = 'Accès non autorisé' } = options
+
+  const user = requireAuth(event)
+
+  if (resource.userId === user.id) {
+    return user
+  }
+
+  if (allowGlobalAdmin && user.isGlobalAdmin) {
+    return user
+  }
+
+  throw createError({
+    statusCode: 403,
+    message: errorMessage,
+  })
+}
+
+/**
  * Messages d'erreur d'authentification standardisés
  */
 export const AUTH_ERRORS = {

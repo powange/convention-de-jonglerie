@@ -1,7 +1,7 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { USER_ADMIN_SELECT } from '@@/server/utils/prisma-selects'
+import { userAdminSelect } from '@@/server/utils/prisma-select-helpers'
 import {
   validateUserId,
   checkEmailUniqueness,
@@ -55,7 +55,7 @@ export default wrapApiHandler(
         phone: validatedData.phone || null,
         updatedAt: new Date(),
       },
-      select: USER_ADMIN_SELECT,
+      select: userAdminSelect,
     })
 
     return updatedUser

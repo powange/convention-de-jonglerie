@@ -1,5 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { requireAuth, requireResourceOwner } from '@@/server/utils/auth-utils'
 import { fetchResourceOrFail, buildUpdateData } from '@@/server/utils/prisma-helpers'
 import { carpoolOfferInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
@@ -24,7 +24,7 @@ const updateCarpoolOfferSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
-    const user = requireAuth(event)
+    requireAuth(event)
     const offerId = validateResourceId(event, 'id', 'offre')
 
     const body = await readBody(event)
@@ -43,12 +43,9 @@ export default wrapApiHandler(
     })
 
     // Seul le créateur peut modifier son offre
-    if (existingOffer.userId !== user.id) {
-      throw createError({
-        statusCode: 403,
-        message: "Vous n'avez pas les droits pour modifier cette offre",
-      })
-    }
+    requireResourceOwner(event, existingOffer, {
+      errorMessage: "Vous n'avez pas les droits pour modifier cette offre",
+    })
 
     // Construire les données de mise à jour
     const updateData = buildUpdateData(validatedData, {

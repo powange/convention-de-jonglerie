@@ -8,7 +8,7 @@ import {
   getSiteUrl,
 } from '@@/server/utils/emailService'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { USER_ADMIN_SELECT } from '@@/server/utils/prisma-selects'
+import { userAdminSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateUserId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -45,7 +45,7 @@ export default wrapApiHandler(
         verificationCodeExpiry: verificationExpiry,
         updatedAt: new Date(),
       },
-      select: USER_ADMIN_SELECT,
+      select: userAdminSelect,
     })
 
     // Envoyer un email de vérification

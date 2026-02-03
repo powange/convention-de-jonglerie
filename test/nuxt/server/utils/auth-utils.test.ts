@@ -6,6 +6,7 @@ import {
   optionalAuth,
   requireAuthWithAdminCheck,
   requireUserOrGlobalAdmin,
+  requireResourceOwner,
   createAuthError,
   AUTH_ERRORS,
 } from '../../../../server/utils/auth-utils'
@@ -269,6 +270,107 @@ describe('auth-utils', () => {
       expect(() => requireUserOrGlobalAdmin(event, 1)).toThrow()
       try {
         requireUserOrGlobalAdmin(event, 1)
+      } catch (error: any) {
+        expect(error.statusCode).toBe(401)
+      }
+    })
+  })
+
+  describe('requireResourceOwner', () => {
+    it('devrait autoriser le propriétaire de la ressource', () => {
+      const mockUser = {
+        id: 42,
+        email: 'test@example.com',
+        pseudo: 'testuser',
+        isGlobalAdmin: false,
+      }
+      const event = { context: { user: mockUser } }
+      const resource = { userId: 42, name: 'Test Resource' }
+
+      const result = requireResourceOwner(event, resource)
+
+      expect(result).toEqual(mockUser)
+    })
+
+    it('devrait refuser un utilisateur non propriétaire', () => {
+      const mockUser = {
+        id: 1,
+        email: 'test@example.com',
+        pseudo: 'testuser',
+        isGlobalAdmin: false,
+      }
+      const event = { context: { user: mockUser } }
+      const resource = { userId: 42, name: 'Test Resource' }
+
+      expect(() => requireResourceOwner(event, resource)).toThrow()
+      try {
+        requireResourceOwner(event, resource)
+      } catch (error: any) {
+        expect(error.statusCode).toBe(403)
+        expect(error.message).toBe('Accès non autorisé')
+      }
+    })
+
+    it("devrait utiliser un message d'erreur personnalisé", () => {
+      const mockUser = {
+        id: 1,
+        email: 'test@example.com',
+        pseudo: 'testuser',
+        isGlobalAdmin: false,
+      }
+      const event = { context: { user: mockUser } }
+      const resource = { userId: 42 }
+
+      try {
+        requireResourceOwner(event, resource, {
+          errorMessage: "Vous n'avez pas les droits pour modifier cette offre",
+        })
+      } catch (error: any) {
+        expect(error.statusCode).toBe(403)
+        expect(error.message).toBe("Vous n'avez pas les droits pour modifier cette offre")
+      }
+    })
+
+    it('devrait autoriser un admin global si allowGlobalAdmin est true', () => {
+      const mockUser = {
+        id: 1,
+        email: 'admin@example.com',
+        pseudo: 'admin',
+        isGlobalAdmin: true,
+      }
+      const event = { context: { user: mockUser } }
+      const resource = { userId: 999 }
+
+      const result = requireResourceOwner(event, resource, { allowGlobalAdmin: true })
+
+      expect(result).toEqual(mockUser)
+    })
+
+    it('devrait refuser un admin global si allowGlobalAdmin est false (défaut)', () => {
+      const mockUser = {
+        id: 1,
+        email: 'admin@example.com',
+        pseudo: 'admin',
+        isGlobalAdmin: true,
+      }
+      const event = { context: { user: mockUser } }
+      const resource = { userId: 999 }
+
+      expect(() => requireResourceOwner(event, resource)).toThrow()
+      try {
+        requireResourceOwner(event, resource)
+      } catch (error: any) {
+        expect(error.statusCode).toBe(403)
+      }
+    })
+
+    it('devrait lancer une erreur 401 si pas authentifié', () => {
+      const event = { context: {} }
+      const resource = { userId: 42 }
+
+      expect(() => requireResourceOwner(event, resource)).toThrow()
+      try {
+        requireResourceOwner(event, resource)
       } catch (error: any) {
         expect(error.statusCode).toBe(401)
       }

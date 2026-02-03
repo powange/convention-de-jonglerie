@@ -1,10 +1,10 @@
 import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { requireAuth, requireResourceOwner } from '@@/server/utils/auth-utils'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    const user = requireAuth(event)
+    requireAuth(event)
     const editionId = validateEditionId(event)
     const applicationId = validateResourceId(event, 'applicationId', 'candidature')
 
@@ -16,7 +16,7 @@ export default wrapApiHandler(
     if (!app) throw createError({ statusCode: 404, message: 'Candidature introuvable' })
     if (app.editionId !== editionId)
       throw createError({ statusCode: 404, message: 'Candidature introuvable' })
-    if (app.userId !== user.id) throw createError({ statusCode: 403, message: 'Accès refusé' })
+    requireResourceOwner(event, app, { errorMessage: 'Accès refusé' })
     if (app.status !== 'PENDING')
       throw createError({ statusCode: 400, message: 'Impossible de retirer cette candidature' })
 
