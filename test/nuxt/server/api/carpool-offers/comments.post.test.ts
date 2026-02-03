@@ -17,6 +17,22 @@ const mockEvent = {
   },
 }
 
+// Helper pour créer un mock de commentaire avec le format attendu par le handler
+const createMockComment = (content: string) => ({
+  id: 1,
+  carpoolOfferId: 1,
+  userId: 1,
+  content,
+  createdAt: new Date(),
+  user: {
+    id: 1,
+    pseudo: 'testuser',
+    profilePicture: null,
+    emailHash: 'abc123',
+    updatedAt: new Date(),
+  },
+})
+
 describe('/api/carpool-offers/[id]/comments POST', () => {
   beforeEach(() => {
     // Reset tous les mocks avant chaque test
@@ -38,17 +54,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       locationCity: 'Paris',
     }
 
-    const mockComment = {
-      id: 1,
-      carpoolOfferId: 1,
-      userId: 1,
-      content: requestBody.content,
-      createdAt: new Date(),
-      user: {
-        id: 1,
-        pseudo: 'testuser',
-      },
-    }
+    const mockComment = createMockComment(requestBody.content)
 
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
@@ -59,6 +65,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     expect(result).toEqual(mockComment)
     expect(prismaMock.carpoolOffer.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
+      select: { id: true },
     })
     expect(prismaMock.carpoolComment.create).toHaveBeenCalledWith({
       data: {
@@ -71,6 +78,9 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
           select: {
             id: true,
             pseudo: true,
+            profilePicture: true,
+            emailHash: true,
+            updatedAt: true,
           },
         },
       },
@@ -83,7 +93,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       context: { ...mockEvent.context, user: null },
     }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Authentification requise')
   })
 
   it("devrait rejeter un ID d'offre de covoiturage invalide", async () => {
@@ -94,7 +104,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
 
     global.readBody.mockResolvedValue({ content: 'Test' })
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow("ID d'offre invalide")
+    await expect(handler(eventWithBadId as any)).rejects.toThrow('ID manquant')
   })
 
   it("devrait valider que le contenu n'est pas vide", async () => {
@@ -102,9 +112,11 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       content: '',
     }
 
+    // La ressource parente doit exister pour atteindre la validation du contenu
+    prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(emptyBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le commentaire ne peut pas être vide')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
   })
 
   it("devrait valider que le contenu n'est pas seulement des espaces", async () => {
@@ -112,17 +124,21 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       content: '   ',
     }
 
+    // La ressource parente doit exister pour atteindre la validation du contenu
+    prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(whitespaceBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le commentaire ne peut pas être vide')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
   })
 
   it('devrait valider que le contenu existe', async () => {
     const noContentBody = {}
 
+    // La ressource parente doit exister pour atteindre la validation du contenu
+    prismaMock.carpoolOffer.findUnique.mockResolvedValue({ id: 1 })
     global.readBody.mockResolvedValue(noContentBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Le commentaire ne peut pas être vide')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Le contenu du commentaire est requis')
   })
 
   it('devrait rejeter si offre de covoiturage non trouvée', async () => {
@@ -144,7 +160,9 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.carpoolOffer.findUnique.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      'Erreur lors de la création du commentaire'
+    )
   })
 
   it('devrait gérer les erreurs lors de la création du commentaire', async () => {
@@ -162,7 +180,9 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
     prismaMock.carpoolComment.create.mockRejectedValue(new Error('Creation error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      'Erreur lors de la création du commentaire'
+    )
   })
 
   it('devrait accepter un commentaire long', async () => {
@@ -172,13 +192,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
     }
 
     const mockCarpoolOffer = { id: 1, editionId: 1, userId: 2 }
-    const mockComment = {
-      id: 1,
-      carpoolOfferId: 1,
-      userId: 1,
-      content: longContent,
-      user: { id: 1, pseudo: 'testuser' },
-    }
+    const mockComment = createMockComment(longContent)
 
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
@@ -208,13 +222,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       userId: 1, // Même ID que l'utilisateur connecté
     }
 
-    const mockComment = {
-      id: 1,
-      carpoolOfferId: 1,
-      userId: 1,
-      content: requestBody.content,
-      user: { id: 1, pseudo: 'testuser' },
-    }
+    const mockComment = createMockComment(requestBody.content)
 
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)

@@ -21,9 +21,13 @@ vi.mock('nuxt-file-storage', () => ({
 }))
 
 // Mock fs/promises
-vi.mock('fs/promises', () => ({
-  readFile: vi.fn().mockResolvedValue(Buffer.from('fake-image-data')),
-}))
+vi.mock('fs/promises', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs/promises')>()
+  return {
+    ...actual,
+    readFile: vi.fn().mockResolvedValue(Buffer.from('fake-image-data')),
+  }
+})
 
 describe('/api/editions/[id] PUT', () => {
   const mockUser = {

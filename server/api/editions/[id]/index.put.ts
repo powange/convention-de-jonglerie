@@ -2,6 +2,7 @@ import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { invalidateEditionCache } from '@@/server/utils/cache-helpers'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
+import { handleFileUpload } from '@@/server/utils/file-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
 import { getEditionForEdit } from '@@/server/utils/permissions/edition-permissions'
 import { validateEditionId } from '@@/server/utils/validation-helpers'
@@ -101,141 +102,11 @@ export default wrapApiHandler(
       }
     }
 
-    // Gérer l'image - nouvelle approche : stocker seulement le nom de fichier
-    console.log("=== GESTION DE L'IMAGE D'ÉDITION ===")
-    console.log('validatedData.imageUrl:', imageUrl)
-    console.log('Type de validatedData.imageUrl:', typeof imageUrl)
-
-    let finalImageFilename = imageUrl
-
-    // Déclarer tempFilename en dehors du try pour qu'il soit accessible dans le catch
-    let tempFilename: string | undefined
-
-    // Si une nouvelle image est fournie avec un path temporaire, extraire juste le nom
-    if (imageUrl && typeof imageUrl === 'string' && imageUrl.includes('/temp/')) {
-      try {
-        console.log('Image temporaire détectée, traitement...')
-        // Extraire le nom de fichier depuis l'URL temporaire
-        // Ex: "/uploads/temp/editions/6/abc123.png" -> "abc123.png"
-        tempFilename = imageUrl.split('/').pop()
-        if (!tempFilename) {
-          throw new Error("Nom de fichier temporaire de l'image non défini")
-        }
-
-        // Construire le chemin du dossier temporaire
-        const tempFolder = `temp/editions/${editionId}`
-        const finalFolder = `editions/${editionId}`
-
-        console.log(`Nom de fichier extrait: ${tempFilename}`)
-        console.log(
-          `Tentative de déplacement de ${tempFolder}/${tempFilename} vers ${finalFolder}/${tempFilename}`
-        )
-
-        // getFileLocally prend (filename, filelocation) séparément
-        console.log(
-          `Récupération du path via nuxt-file-storage: ${tempFilename} dans ${tempFolder}`
-        )
-        const tempFilePath = getFileLocally(tempFilename, tempFolder)
-
-        if (!tempFilePath) {
-          throw new Error(
-            `Fichier temporaire introuvable via nuxt-file-storage: ${tempFolder}/${tempFilename}`
-          )
-        }
-
-        console.log('Path récupéré:', tempFilePath)
-
-        // Maintenant lire le contenu réel du fichier
-        const { readFile } = await import('fs/promises')
-        const fileBuffer = await readFile(tempFilePath)
-
-        if (!fileBuffer || fileBuffer.length === 0) {
-          throw new Error(`Impossible de lire le contenu du fichier: ${tempFilePath}`)
-        }
-
-        console.log('Fichier lu avec succès, taille:', fileBuffer.length, 'bytes')
-
-        // Convertir en data URL
-        const base64 = fileBuffer.toString('base64')
-        const dataUrl = `data:image/png;base64,${base64}`
-        console.log('Data URL créée, taille:', dataUrl.length)
-
-        // Créer un objet ServerFile compatible avec nuxt-file-storage
-        const serverFile = {
-          name: tempFilename,
-          content: dataUrl, // Data URL
-          size: dataUrl.length.toString(), // size doit être une string
-          type: 'image/png',
-          lastModified: Date.now().toString(), // lastModified aussi en string
-        }
-
-        console.log('Stockage dans le dossier final...')
-        console.log('ServerFile avant stockage:', {
-          name: serverFile.name,
-          contentType: typeof serverFile.content,
-          contentLength: serverFile.content?.length || 0,
-          size: serverFile.size,
-          type: serverFile.type,
-        })
-
-        // Stocker le fichier dans le dossier final
-        const newFilename = await storeFileLocally(
-          serverFile,
-          8, // Suffixe aléatoire
-          `editions/${editionId}` // Dossier de destination
-        )
-
-        console.log(`Fichier stocké avec succès: ${newFilename || tempFilename}`)
-
-        // Supprimer le fichier temporaire
-        console.log('Suppression du fichier temporaire...')
-        try {
-          await deleteFile(tempFilename, tempFolder)
-          console.log('Fichier temporaire supprimé')
-        } catch (deleteError) {
-          console.warn('Impossible de supprimer le fichier temporaire:', deleteError)
-        }
-
-        // Stocker seulement le nom de fichier en BDD
-        finalImageFilename = newFilename
-
-        console.log(`Fichier ${tempFilename} déplacé avec succès`)
-        console.log(`Image finale qui sera stockée en DB: ${finalImageFilename}`)
-      } catch (error) {
-        console.error('ERREUR lors du déplacement du fichier:', error)
-        // En cas d'erreur de déplacement, on stocke quand même le nom du fichier
-        // Le fichier reste dans temp/ mais au moins on garde la référence
-        finalImageFilename = tempFilename || null
-        console.log(`Erreur de déplacement - on stocke quand même le nom: ${finalImageFilename}`)
-        console.log(`Le fichier reste dans temp/ mais sera accessible`)
-      }
-    } else if (imageUrl && !imageUrl.includes('/temp/')) {
-      // Si c'est déjà un nom de fichier simple, le garder tel quel
-      console.log('Image déjà un nom de fichier simple ou URL existante')
-      finalImageFilename = imageUrl.split('/').pop() || imageUrl
-    }
-
-    console.log(`=== FIN GESTION IMAGE - valeur finale: ${finalImageFilename} ===`)
-
-    // Gérer la suppression de l'ancienne image si nécessaire
-    if (imageUrl === null && edition.imageUrl) {
-      try {
-        // Extraire le nom du fichier et le dossier
-        const oldFilename = edition.imageUrl.includes('/')
-          ? edition.imageUrl.split('/').pop()!
-          : edition.imageUrl
-        const oldFolder = edition.imageUrl.includes('/')
-          ? edition.imageUrl.replace('/uploads/', '').split('/').slice(0, -1).join('/')
-          : `editions/${editionId}`
-
-        // Utiliser deleteFile de nuxt-file-storage avec (filename, folder)
-        await deleteFile(oldFilename, oldFolder)
-        console.log(`Ancienne image supprimée: ${oldFilename} dans ${oldFolder}`)
-      } catch (error) {
-        // Log l'erreur mais ne pas faire échouer la mise à jour
-        console.warn(`Impossible de supprimer l'ancienne image: ${edition.imageUrl}`, error)
-      }
-    }
+    // Gérer l'image avec le helper centralisé
+    const finalImageFilename = await handleFileUpload(imageUrl, edition.imageUrl, {
+      resourceId: editionId,
+      resourceType: 'editions',
+    })
 
     const updatedData: Prisma.EditionUpdateInput = {
       name: name !== undefined ? name?.trim() || null : edition.name,

@@ -1,6 +1,6 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
-import { carpoolUserSelect, userWithNameSelect } from './prisma-select-helpers'
+import { carpoolUserSelect } from './prisma-select-helpers'
 
 import type { H3Event } from 'h3'
 
@@ -91,6 +91,22 @@ export async function createCommentForEntity(
       throw createError({ statusCode: 400, message: 'ID manquant' })
     }
 
+    // Vérifier que la ressource parente existe
+    const parentModelName = config.entityType === 'carpoolOffer' ? 'carpoolOffer' : 'carpoolRequest'
+    const parentModel: any = (prisma as any)[parentModelName]
+    const parentExists = await parentModel.findUnique({
+      where: { id: parsedId },
+      select: { id: true },
+    })
+
+    if (!parentExists) {
+      const errorMsg =
+        config.entityType === 'carpoolOffer'
+          ? 'Offre de covoiturage non trouvée'
+          : 'Demande de covoiturage non trouvée'
+      throw createError({ statusCode: 404, message: errorMsg })
+    }
+
     const body = await readBody(event)
 
     if (!body.content || !body.content.trim()) {
@@ -116,30 +132,12 @@ export async function createCommentForEntity(
       data: commentData,
       include: {
         user: {
-          select: {
-            ...userWithNameSelect,
-            emailHash: true,
-            profilePicture: true,
-          },
+          select: carpoolUserSelect,
         },
       },
     })
 
-    // Transformer la réponse
-    return {
-      ...comment,
-      author: comment.user
-        ? {
-            id: comment.user.id,
-            pseudo: comment.user.pseudo,
-            nom: comment.user.nom,
-            prenom: comment.user.prenom,
-            profilePicture: comment.user.profilePicture,
-            emailHash: comment.user.emailHash,
-          }
-        : null,
-      user: undefined,
-    }
+    return comment
   } catch (error: any) {
     console.error(`Erreur lors de la création du commentaire pour ${config.entityType}:`, error)
 

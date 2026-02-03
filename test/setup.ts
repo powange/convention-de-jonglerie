@@ -24,7 +24,13 @@ vi.mock('h3', async () => {
     defineEventHandler: vi.fn((handler) => handler),
     getRouterParam: vi.fn((event: any, name: string) => event?.context?.params?.[name]),
     getRouterParams: vi.fn((event: any) => event?.context?.params ?? {}),
-    readBody: vi.fn(),
+    // Déléguer à global.readBody pour permettre aux tests de le configurer
+    readBody: vi.fn((...args: any[]) => {
+      if (globalThis.readBody) {
+        return (globalThis.readBody as any)(...args)
+      }
+      return undefined
+    }),
     sendError: vi.fn(),
     // IMPORTANT: garder le vrai createError sinon Nuxt plante dans app/composables/error
     createError: actual.createError,
