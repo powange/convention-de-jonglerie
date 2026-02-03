@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { NotificationHelpers, safeNotify } from '@@/server/utils/notification-service'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { userWithProfileSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
@@ -78,19 +78,18 @@ export default wrapApiHandler(
     })
 
     // Envoyer une notification au propriétaire de l'offre
-    try {
-      const requesterName = booking.requester.pseudo || `Utilisateur ${booking.requester.id}`
-      await NotificationHelpers.carpoolBookingReceived(
-        offer.userId,
-        requesterName,
-        offerId,
-        seats,
-        message
-      )
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
-      // On ne fait pas échouer la création du booking si la notification échoue
-    }
+    const requesterName = booking.requester.pseudo || `Utilisateur ${booking.requester.id}`
+    await safeNotify(
+      () =>
+        NotificationHelpers.carpoolBookingReceived(
+          offer.userId,
+          requesterName,
+          offerId,
+          seats,
+          message
+        ),
+      'covoiturage réservation reçue'
+    )
 
     return booking
   },

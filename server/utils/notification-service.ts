@@ -12,6 +12,31 @@ import { unifiedPushService } from './unified-push-service'
 import type { NotificationType } from '@prisma/client'
 
 /**
+ * Helper pour exécuter une notification sans faire échouer l'opération principale
+ *
+ * @param operation Fonction asynchrone qui envoie la notification
+ * @param context Description du contexte pour le log d'erreur
+ * @returns Le résultat de l'opération ou null en cas d'erreur
+ *
+ * @example
+ * await safeNotify(
+ *   () => NotificationHelpers.carpoolBookingReceived(userId, name, offerId, seats, message),
+ *   'covoiturage réservation'
+ * )
+ */
+export async function safeNotify<T>(
+  operation: () => Promise<T>,
+  context?: string
+): Promise<T | null> {
+  try {
+    return await operation()
+  } catch (error) {
+    console.error(`[NotificationService] Erreur ${context || 'notification'}:`, error)
+    return null
+  }
+}
+
+/**
  * Données pour créer une notification
  * Doit contenir SOIT des clés de traduction SOIT du texte libre
  */

@@ -6,7 +6,11 @@ import {
   buildVolunteerApplicationUpdateData,
   getUserUpdateData,
 } from '@@/server/utils/editions/volunteers/applications'
-import { NotificationService } from '@@/server/utils/notification-service'
+import {
+  NotificationService,
+  NotificationHelpers,
+  safeNotify,
+} from '@@/server/utils/notification-service'
 import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
@@ -185,34 +189,33 @@ export default wrapApiHandler(
       // MAIS seulement si la modification n'est pas faite par le bénévole lui-même
       const isOwnApplication = application.user.id === user.id
       if (!isOwnApplication && (changes.length > 0 || parsed.modificationNote?.trim())) {
-        try {
-          const displayName = application.edition.name || application.edition.convention.name
-          let message = `Votre candidature pour "${displayName}" a été modifiée par les organisateurs`
+        const displayName = application.edition.name || application.edition.convention.name
+        let message = `Votre candidature pour "${displayName}" a été modifiée par les organisateurs`
 
-          if (changes.length > 0) {
-            message += `.\n\nModifications :\n• ${changes.join('\n• ')}`
-          }
-
-          if (parsed.modificationNote?.trim()) {
-            message += `\n\nNote : ${parsed.modificationNote.trim()}`
-          }
-
-          await NotificationService.create({
-            userId: application.user.id,
-            type: 'INFO',
-            title: `Modification de votre candidature bénévole`,
-            message,
-            category: 'volunteer',
-            entityType: 'Edition',
-            entityId: editionId.toString(),
-            actionUrl: `/my-volunteer-applications`,
-            actionText: 'Voir ma candidature',
-            notificationType: 'volunteer_application_modified',
-          })
-        } catch (error) {
-          console.error("Erreur lors de l'envoi de la notification:", error)
-          // Ne pas faire échouer la mise à jour si la notification échoue
+        if (changes.length > 0) {
+          message += `.\n\nModifications :\n• ${changes.join('\n• ')}`
         }
+
+        if (parsed.modificationNote?.trim()) {
+          message += `\n\nNote : ${parsed.modificationNote.trim()}`
+        }
+
+        await safeNotify(
+          () =>
+            NotificationService.create({
+              userId: application.user.id,
+              type: 'INFO',
+              titleText: `Modification de votre candidature bénévole`,
+              messageText: message,
+              category: 'volunteer',
+              entityType: 'Edition',
+              entityId: editionId.toString(),
+              actionUrl: `/my-volunteer-applications`,
+              actionText: 'Voir ma candidature',
+              notificationType: 'volunteer_application_modified',
+            }),
+          'modification candidature bénévole'
+        )
       }
 
       return { success: true, application: updated }
@@ -292,32 +295,32 @@ export default wrapApiHandler(
     }
 
     // Envoyer une notification selon le changement de statut
-    try {
-      const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
-      const { NotificationHelpers } = await import('@@/server/utils/notification-service')
+    const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
 
-      if (target === 'ACCEPTED') {
-        // Récupérer les noms des équipes assignées
-        const assignedTeamNames = updated.teamAssignments.map((ta) => ta.team.name)
-        await NotificationHelpers.volunteerAccepted(
-          application.user.id,
-          editionName,
-          editionId,
-          assignedTeamNames,
-          updated.acceptanceNote
-        )
-      } else if (target === 'REJECTED') {
-        await NotificationHelpers.volunteerRejected(application.user.id, editionName, editionId)
-      } else if (target === 'PENDING') {
-        await NotificationHelpers.volunteerBackToPending(
-          application.user.id,
-          editionName,
-          editionId
-        )
-      }
-    } catch (notificationError) {
-      // Ne pas faire échouer la mise à jour si la notification échoue
-      console.error("Erreur lors de l'envoi de la notification:", notificationError)
+    if (target === 'ACCEPTED') {
+      const assignedTeamNames = updated.teamAssignments.map((ta) => ta.team.name)
+      await safeNotify(
+        () =>
+          NotificationHelpers.volunteerAccepted(
+            application.user.id,
+            editionName,
+            editionId,
+            assignedTeamNames,
+            updated.acceptanceNote
+          ),
+        'candidature bénévole acceptée'
+      )
+    } else if (target === 'REJECTED') {
+      await safeNotify(
+        () => NotificationHelpers.volunteerRejected(application.user.id, editionName, editionId),
+        'candidature bénévole refusée'
+      )
+    } else if (target === 'PENDING') {
+      await safeNotify(
+        () =>
+          NotificationHelpers.volunteerBackToPending(application.user.id, editionName, editionId),
+        'candidature bénévole en attente'
+      )
     }
 
     return { success: true, application: updated }

@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { NotificationService } from '@@/server/utils/notification-service'
+import { NotificationHelpers, safeNotify } from '@@/server/utils/notification-service'
 import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
 import { userWithProfileSelect } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
@@ -75,45 +75,49 @@ export default wrapApiHandler(
     })
 
     // Envoyer notifications selon l'action
-    try {
-      if (action === 'ACCEPT' || action === 'REJECT') {
-        // Notifications au demandeur (passager)
-        const ownerName = offer.user.pseudo || `Utilisateur ${offer.user.id}`
+    if (action === 'ACCEPT' || action === 'REJECT') {
+      const ownerName = offer.user.pseudo || `Utilisateur ${offer.user.id}`
 
-        if (action === 'ACCEPT') {
-          await NotificationService.carpoolBookingAccepted(
-            booking.requesterId,
-            ownerName,
+      if (action === 'ACCEPT') {
+        await safeNotify(
+          () =>
+            NotificationHelpers.carpoolBookingAccepted(
+              booking.requesterId,
+              ownerName,
+              offerId,
+              booking.seats,
+              offer.locationCity,
+              offer.tripDate
+            ),
+          'covoiturage réservation acceptée'
+        )
+      } else {
+        await safeNotify(
+          () =>
+            NotificationHelpers.carpoolBookingRejected(
+              booking.requesterId,
+              ownerName,
+              offerId,
+              booking.seats,
+              offer.locationCity
+            ),
+          'covoiturage réservation refusée'
+        )
+      }
+    } else if (action === 'CANCEL' && booking.status === 'ACCEPTED') {
+      const passengerName = updated.requester.pseudo || `Utilisateur ${updated.requester.id}`
+      await safeNotify(
+        () =>
+          NotificationHelpers.carpoolBookingCancelled(
+            offer.userId,
+            passengerName,
             offerId,
             booking.seats,
             offer.locationCity,
             offer.tripDate
-          )
-        } else if (action === 'REJECT') {
-          await NotificationService.carpoolBookingRejected(
-            booking.requesterId,
-            ownerName,
-            offerId,
-            booking.seats,
-            offer.locationCity
-          )
-        }
-      } else if (action === 'CANCEL' && booking.status === 'ACCEPTED') {
-        // Notification au conducteur quand un passager annule une réservation acceptée
-        const passengerName = updated.requester.pseudo || `Utilisateur ${updated.requester.id}`
-
-        await NotificationService.carpoolBookingCancelled(
-          offer.userId,
-          passengerName,
-          offerId,
-          booking.seats,
-          offer.locationCity,
-          offer.tripDate
-        )
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
-      // On ne fait pas échouer la mise à jour si la notification échoue
+          ),
+        'covoiturage réservation annulée'
+      )
     }
 
     return updated

@@ -3,24 +3,7 @@ import { requireAuth, requireResourceOwner } from '@@/server/utils/auth-utils'
 import { fetchResourceOrFail, buildUpdateData } from '@@/server/utils/prisma-helpers'
 import { carpoolOfferInclude } from '@@/server/utils/prisma-select-helpers'
 import { validateResourceId } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
-
-const updateCarpoolOfferSchema = z.object({
-  tripDate: z.string().optional(),
-  locationCity: z.string().min(1, 'La ville de départ est requise').optional(),
-  locationAddress: z.string().min(1, "L'adresse de départ est requise").optional(),
-  availableSeats: z
-    .number()
-    .int()
-    .min(1, 'Au moins 1 place disponible')
-    .max(8, 'Maximum 8 places')
-    .optional(),
-  description: z.string().max(500, 'Description trop longue (500 caractères max)').optional(),
-  phoneNumber: z.string().max(20, 'Numéro de téléphone trop long').optional().nullable(),
-  smokingAllowed: z.boolean().optional(),
-  petsAllowed: z.boolean().optional(),
-  musicAllowed: z.boolean().optional(),
-})
+import { updateCarpoolOfferSchema } from '@@/server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {
