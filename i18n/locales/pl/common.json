@@ -320,6 +320,7 @@
       "no_tiers_available": "Brak dostępnych cenników",
       "no_validation_yet": "Jeszcze brak walidacji",
       "order": "Zamówienie",
+      "order_created": "Zamówienie utworzone pomyślnie",
       "order_id": "ID zamówienia",
       "organization_slug_label": "Slug organizacji",
       "organization_slug_placeholder": "np.: konwencja-zonglerska",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Nie można opublikować odpowiedzi",
     "cannot_remove_favorite": "Nie można usunąć z ulubionych",
     "city_too_long": "Miasto nie może przekroczyć {max} znaków",
+    "conflict": "Konflikt z istniejącymi danymi",
     "content_required": "Treść jest wymagana",
     "content_too_long": "Treść nie może przekroczyć {max} znaków",
     "convention_creation_error": "Wystąpił błąd podczas tworzenia konwencji",
@@ -888,6 +890,7 @@
     "invalid_email": "Nieprawidłowy e-mail",
     "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {types}",
     "invalid_phone_number": "Nieprawidłowy numer telefonu",
+    "invalid_request": "Nieprawidłowe żądanie",
     "loading_error": "Błąd ładowania",
     "login_failed": "Logowanie nieudane",
     "login_required_convention": "Musisz być zalogowany, aby utworzyć konwencję",
@@ -909,7 +912,8 @@
     "status_update_failed": "Nie udało się zaktualizować statusu",
     "update_error": "Błąd podczas aktualizacji",
     "update_organizer_error": "Błąd aktualizacji współpracownika",
-    "username_min_3_chars": "Nazwa użytkownika musi mieć co najmniej 3 znaki"
+    "username_min_3_chars": "Nazwa użytkownika musi mieć co najmniej 3 znaki",
+    "validation_error": "Błąd walidacji"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Wszelkie prawa zastrzeżone.",

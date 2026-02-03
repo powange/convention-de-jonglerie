@@ -906,7 +906,7 @@ import { reactive, ref, computed, onMounted } from 'vue'
 import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
-import type { HttpError, User } from '~/types'
+import type { User } from '~/types'
 import { LOCALES_CONFIG } from '~/utils/locales'
 
 // Protéger cette page avec le middleware d'authentification
@@ -933,8 +933,6 @@ const formatMemberSince = computed(() => {
   return date.toLocaleDateString(localeCode, { year: 'numeric', month: 'long' })
 })
 
-const loading = ref(false)
-const passwordLoading = ref(false)
 const showPasswordModal = ref(false)
 const showProfilePictureModal = ref(false)
 const showNotificationPreferencesModal = ref(false)
@@ -942,9 +940,6 @@ const userHasPassword = ref(true) // Par défaut, on suppose qu'il a un mot de p
 const profilePictureUrl = ref(authStore.user?.profilePicture || '')
 const avatarKey = ref(Date.now()) // Pour forcer le rechargement de l'avatar
 const pictureValidationLoading = ref(false) // Loading lors de la validation
-
-// Gestion du mode administrateur
-const _adminModeToggle = ref(authStore.isAdminModeActive)
 
 // État des préférences de notifications
 const notificationPreferences = reactive({
@@ -960,8 +955,6 @@ const notificationPreferences = reactive({
   emailSystemNotifications: true,
   emailCarpoolUpdates: true,
 })
-
-const notificationPreferencesLoading = ref(false)
 
 // Options de langues disponibles (basées sur la configuration centralisée)
 const languageOptions = LOCALES_CONFIG.map((locale) => ({
@@ -1056,87 +1049,69 @@ const resetForm = () => {
   state.preferredLanguage = (authStore.user as any)?.preferredLanguage || 'fr'
 }
 
-const updateProfile = async () => {
-  if (!hasChanges.value) return
-
-  loading.value = true
-  try {
-    const updatedUser = await $fetch<User>('/api/profile/update', {
-      method: 'PUT',
-      body: {
-        email: state.email,
-        pseudo: state.pseudo,
-        nom: state.nom || '',
-        prenom: state.prenom || '',
-        telephone: state.telephone || '',
-        preferredLanguage: state.preferredLanguage || 'fr',
-      },
-    })
-
-    // Mettre à jour les données utilisateur dans le store
-    authStore.updateUser({ ...authStore.user!, ...updatedUser })
-
-    toast.add({
+// Action pour mettre à jour le profil
+const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
+  '/api/profile/update',
+  {
+    method: 'PUT',
+    body: () => ({
+      email: state.email,
+      pseudo: state.pseudo,
+      nom: state.nom || '',
+      prenom: state.prenom || '',
+      telephone: state.telephone || '',
+      preferredLanguage: state.preferredLanguage || 'fr',
+    }),
+    successMessage: {
       title: t('profile.profile_updated'),
       description: t('profile.info_saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: unknown) {
-    const httpError = error as HttpError
-    toast.add({
-      title: t('common.error'),
-      description: httpError.data?.message || httpError.message || t('profile.cannot_save_profile'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+    },
+    errorMessages: { default: t('profile.cannot_save_profile') },
+    onSuccess: (updatedUser) => {
+      authStore.updateUser({ ...authStore.user!, ...updatedUser })
+    },
   }
+)
+
+const updateProfile = () => {
+  if (!hasChanges.value) return
+  executeUpdateProfile()
 }
 
-const changePassword = async () => {
-  passwordLoading.value = true
-  try {
-    // Préparer le body en fonction de si l'utilisateur a un mot de passe ou non
-    const body: any = {
-      newPassword: passwordState.newPassword,
-      confirmPassword: passwordState.confirmPassword,
-    }
+// Action pour changer le mot de passe
+const buildPasswordPayload = () => {
+  const body: Record<string, string> = {
+    newPassword: passwordState.newPassword,
+    confirmPassword: passwordState.confirmPassword,
+  }
+  // Ajouter currentPassword seulement si l'utilisateur a déjà un mot de passe
+  if (userHasPassword.value) {
+    body.currentPassword = passwordState.currentPassword
+  }
+  return body
+}
 
-    // Ajouter currentPassword seulement si l'utilisateur a déjà un mot de passe
-    if (userHasPassword.value) {
-      body.currentPassword = passwordState.currentPassword
-    }
-
-    await $fetch('/api/profile/change-password', {
-      method: 'POST',
-      body,
-    })
-
-    showPasswordModal.value = false
-    passwordState.currentPassword = ''
-    passwordState.newPassword = ''
-    passwordState.confirmPassword = ''
-
-    toast.add({
+const { execute: executeChangePassword, loading: passwordLoading } = useApiAction(
+  '/api/profile/change-password',
+  {
+    method: 'POST',
+    body: buildPasswordPayload,
+    successMessage: {
       title: t('profile.password_changed'),
       description: t('profile.password_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: unknown) {
-    const httpError = error as HttpError
-    toast.add({
-      title: t('common.error'),
-      description:
-        httpError.data?.message || httpError.message || t('profile.cannot_change_password'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    passwordLoading.value = false
+    },
+    errorMessages: { default: t('profile.cannot_change_password') },
+    onSuccess: () => {
+      showPasswordModal.value = false
+      passwordState.currentPassword = ''
+      passwordState.newPassword = ''
+      passwordState.confirmPassword = ''
+    },
   }
+)
+
+const changePassword = () => {
+  executeChangePassword()
 }
 
 // Gestionnaires d'événements pour ImageUpload
@@ -1261,33 +1236,23 @@ const loadNotificationPreferences = async () => {
   }
 }
 
-// Fonction pour sauvegarder les préférences de notifications
-const saveNotificationPreferences = async () => {
-  notificationPreferencesLoading.value = true
-  try {
-    await $fetch('/api/profile/notification-preferences', {
-      method: 'PUT',
-      body: notificationPreferences,
-    })
+// Action pour sauvegarder les préférences de notifications
+const { execute: executeSaveNotificationPreferences, loading: notificationPreferencesLoading } =
+  useApiAction('/api/profile/notification-preferences', {
+    method: 'PUT',
+    body: () => ({ ...notificationPreferences }),
+    successMessage: {
+      title: t('profile.preferences_saved'),
+      description: t('profile.notification_preferences_updated'),
+    },
+    errorMessages: { default: t('profile.cannot_save_preferences') },
+    onSuccess: () => {
+      showNotificationPreferencesModal.value = false
+    },
+  })
 
-    showNotificationPreferencesModal.value = false
-    toast.add({
-      title: 'Préférences sauvegardées',
-      description: 'Vos préférences de notifications ont été mises à jour',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde des préférences:', error)
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de sauvegarder vos préférences',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    notificationPreferencesLoading.value = false
-  }
+const saveNotificationPreferences = () => {
+  executeSaveNotificationPreferences()
 }
 
 onMounted(async () => {

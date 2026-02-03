@@ -304,7 +304,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { createTier, isFreePrice, updateTier } from '~/utils/ticketing/tiers'
+import { isFreePrice } from '~/utils/ticketing/tiers'
 
 interface TicketingTier {
   id: number
@@ -336,12 +336,12 @@ const emit = defineEmits<{
   saved: []
 }>()
 
+const { t } = useI18n()
+
 const isOpen = computed({
   get: () => props.open,
   set: (value) => emit('update:open', value),
 })
-
-const saving = ref(false)
 
 // Fonction pour convertir une date en format datetime-local sans décalage horaire
 const toDateTimeLocal = (dateString: string | Date) => {
@@ -596,87 +596,89 @@ const finalValidUntil = computed(() => {
   return form.value.validUntil
 })
 
-const handleSubmit = async () => {
+// Construit les données du formulaire pour l'API
+const buildFormData = () => {
+  // En mode tarif libre, utiliser minAmount comme prix de référence (ou 0 si non défini)
+  const priceValue = form.value.isFree
+    ? form.value.minAmountInEuros
+      ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
+      : 0
+    : Math.round(parseFloat(form.value.priceInEuros) * 100)
+
+  return {
+    name: form.value.name.trim(),
+    customName: form.value.customName.trim() || null,
+    description: form.value.description.trim() || null,
+    price: priceValue,
+    minAmount:
+      form.value.isFree && form.value.minAmountInEuros != null && form.value.minAmountInEuros !== ''
+        ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
+        : null,
+    maxAmount:
+      form.value.isFree && form.value.maxAmountInEuros != null && form.value.maxAmountInEuros !== ''
+        ? Math.round(parseFloat(form.value.maxAmountInEuros) * 100)
+        : null,
+    position: form.value.position,
+    isActive: form.value.isActive,
+    countAsParticipant: form.value.countAsParticipant,
+    validFrom: finalValidFrom.value,
+    validUntil: finalValidUntil.value,
+    quotaIds: form.value.quotaIds,
+    returnableItemIds: form.value.returnableItemIds,
+    mealIds: form.value.mealIds,
+  }
+}
+
+// Callbacks communs
+const onSaveSuccess = () => {
+  emit('saved')
+  isOpen.value = false
+}
+
+// Action pour créer un tarif
+const { execute: executeCreate, loading: isCreating } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/tiers`,
+  {
+    method: 'POST',
+    body: buildFormData,
+    successMessage: { title: t('ticketing.tiers.created') },
+    errorMessages: { default: t('ticketing.tiers.error_saving') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// Action pour mettre à jour un tarif
+const { execute: executeUpdate, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/tiers/${props.tier?.id}`,
+  {
+    method: 'PUT',
+    body: buildFormData,
+    successMessage: { title: t('ticketing.tiers.updated') },
+    errorMessages: { default: t('ticketing.tiers.error_saving') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// État de chargement combiné
+const saving = computed(() => isCreating.value || isUpdating.value)
+
+const handleSubmit = () => {
   const toast = useToast()
 
   if (!form.value.name.trim()) {
     toast.add({
-      title: 'Erreur',
-      description: 'Le nom du tarif est obligatoire',
+      title: t('common.error'),
+      description: t('ticketing.tiers.name_required'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
     return
   }
 
-  saving.value = true
-  try {
-    // En mode tarif libre, utiliser minAmount comme prix de référence (ou 0 si non défini)
-    const priceValue = form.value.isFree
-      ? form.value.minAmountInEuros
-        ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
-        : 0
-      : Math.round(parseFloat(form.value.priceInEuros) * 100)
-
-    const data = {
-      name: form.value.name.trim(),
-      customName: form.value.customName.trim() || null,
-      description: form.value.description.trim() || null,
-      price: priceValue,
-      minAmount:
-        form.value.isFree &&
-        form.value.minAmountInEuros != null &&
-        form.value.minAmountInEuros !== ''
-          ? Math.round(parseFloat(form.value.minAmountInEuros) * 100)
-          : null,
-      maxAmount:
-        form.value.isFree &&
-        form.value.maxAmountInEuros != null &&
-        form.value.maxAmountInEuros !== ''
-          ? Math.round(parseFloat(form.value.maxAmountInEuros) * 100)
-          : null,
-      position: form.value.position,
-      isActive: form.value.isActive,
-      countAsParticipant: form.value.countAsParticipant,
-      validFrom: finalValidFrom.value,
-      validUntil: finalValidUntil.value,
-      quotaIds: form.value.quotaIds,
-      returnableItemIds: form.value.returnableItemIds,
-      mealIds: form.value.mealIds,
-    }
-
-    if (props.tier) {
-      // Mode édition
-      await updateTier(props.editionId, props.tier.id, data)
-      toast.add({
-        title: 'Tarif modifié',
-        description: 'Le tarif a été modifié avec succès',
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } else {
-      // Mode création
-      await createTier(props.editionId, data)
-      toast.add({
-        title: 'Tarif créé',
-        description: 'Le tarif a été créé avec succès',
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    }
-
-    emit('saved')
-    isOpen.value = false
-  } catch (error: any) {
-    console.error('Failed to save tier:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible d'enregistrer le tarif",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+  if (props.tier) {
+    executeUpdate()
+  } else {
+    executeCreate()
   }
 }
 </script>

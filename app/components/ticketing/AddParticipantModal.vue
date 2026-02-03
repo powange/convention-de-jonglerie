@@ -1274,76 +1274,78 @@ const previousStep = () => {
   }
 }
 
-const submitOrder = async () => {
-  if (!canSubmit.value) return
+// Construit les données de la commande pour l'API
+const buildOrderData = () => {
+  // Grouper les items par tarif et montant personnalisé
+  const itemsByTierAndPrice: Record<
+    string,
+    { tierId: number; quantity: number; customAmount?: number; customParticipants: any[] }
+  > = {}
 
-  loading.value = true
-  error.value = ''
+  for (const item of selectedItems.value) {
+    const key = `${item.tierId}-${item.price}`
 
-  try {
-    // Grouper les items par tarif et montant personnalisé
-    const itemsByTierAndPrice: Record<
-      string,
-      { tierId: number; quantity: number; customAmount?: number; customParticipants: any[] }
-    > = {}
-
-    for (const item of selectedItems.value) {
-      // Créer une clé unique basée sur le tarif et le prix
-      const key = `${item.tierId}-${item.price}`
-
-      if (!itemsByTierAndPrice[key]) {
-        itemsByTierAndPrice[key] = {
-          tierId: item.tierId,
-          quantity: 0,
-          customAmount: item.price, // Le prix est déjà en centimes
-          customParticipants: [],
-        }
-      }
-      itemsByTierAndPrice[key].quantity++
-      if (item.isDifferentParticipant) {
-        itemsByTierAndPrice[key].customParticipants.push({
-          firstName: item.firstName,
-          lastName: item.lastName,
-          email: item.email,
-          customFields:
-            item.customFields && item.customFields.length > 0 ? item.customFields : undefined,
-        })
-      } else {
-        // Même si le participant n'est pas différent, on doit envoyer les customFields
-        itemsByTierAndPrice[key].customParticipants.push({
-          firstName: form.value.payerFirstName,
-          lastName: form.value.payerLastName,
-          email: form.value.payerEmail,
-          customFields:
-            item.customFields && item.customFields.length > 0 ? item.customFields : undefined,
-        })
+    if (!itemsByTierAndPrice[key]) {
+      itemsByTierAndPrice[key] = {
+        tierId: item.tierId,
+        quantity: 0,
+        customAmount: item.price,
+        customParticipants: [],
       }
     }
+    itemsByTierAndPrice[key].quantity++
+    if (item.isDifferentParticipant) {
+      itemsByTierAndPrice[key].customParticipants.push({
+        firstName: item.firstName,
+        lastName: item.lastName,
+        email: item.email,
+        customFields:
+          item.customFields && item.customFields.length > 0 ? item.customFields : undefined,
+      })
+    } else {
+      itemsByTierAndPrice[key].customParticipants.push({
+        firstName: form.value.payerFirstName,
+        lastName: form.value.payerLastName,
+        email: form.value.payerEmail,
+        customFields:
+          item.customFields && item.customFields.length > 0 ? item.customFields : undefined,
+      })
+    }
+  }
 
-    const response = await $fetch<{ success: boolean; qrCode: string }>(
-      `/api/editions/${props.editionId}/ticketing/add-participant-manually`,
-      {
-        method: 'POST',
-        body: {
-          payerFirstName: form.value.payerFirstName,
-          payerLastName: form.value.payerLastName,
-          payerEmail: form.value.payerEmail,
-          items: Object.values(itemsByTierAndPrice),
-          paymentMethod: paymentMethod.value,
-          checkNumber: paymentMethod.value === 'check' ? checkNumber.value : undefined,
-        },
-      }
-    )
+  return {
+    payerFirstName: form.value.payerFirstName,
+    payerLastName: form.value.payerLastName,
+    payerEmail: form.value.payerEmail,
+    items: Object.values(itemsByTierAndPrice),
+    paymentMethod: paymentMethod.value,
+    checkNumber: paymentMethod.value === 'check' ? checkNumber.value : undefined,
+  }
+}
 
-    // Émettre l'événement avec le QR code pour redirection
+// Action pour créer la commande
+const { execute: executeCreateOrder, loading } = useApiAction<
+  unknown,
+  { success: boolean; qrCode: string }
+>(() => `/api/editions/${props.editionId}/ticketing/add-participant-manually`, {
+  method: 'POST',
+  body: buildOrderData,
+  successMessage: { title: t('edition.ticketing.order_created') },
+  errorMessages: { default: t('edition.ticketing.add_error') },
+  silentError: true, // On gère l'erreur localement pour l'afficher dans l'UI
+  onSuccess: (response) => {
     emit('order-created', response.qrCode)
     closeModal()
-  } catch (err: any) {
-    console.error('Error creating order:', err)
+  },
+  onError: (err) => {
     error.value = err.data?.message || t('edition.ticketing.add_error')
-  } finally {
-    loading.value = false
-  }
+  },
+})
+
+const submitOrder = () => {
+  if (!canSubmit.value) return
+  error.value = ''
+  executeCreateOrder()
 }
 
 const searchUserByEmail = async () => {

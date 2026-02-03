@@ -110,7 +110,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
-const toast = useToast()
 
 const isOpen = computed({
   get: () => props.open,
@@ -118,8 +117,35 @@ const isOpen = computed({
 })
 
 const commentContent = ref('')
-const isSaving = ref(false)
-const isDeleting = ref(false)
+
+// Action pour sauvegarder le commentaire
+const { execute: executeSave, loading: isSaving } = useApiAction(
+  () => `/api/conventions/${props.editionId}/volunteers/${props.volunteer?.userId}/comment`,
+  {
+    method: 'PUT',
+    body: () => ({ content: commentContent.value.trim() }),
+    successMessage: { title: t('gestion.volunteers.comment_saved_success') },
+    errorMessages: { default: t('gestion.volunteers.comment_save_error') },
+    onSuccess: () => {
+      emit('commentSaved')
+      isOpen.value = false
+    },
+  }
+)
+
+// Action pour supprimer le commentaire
+const { execute: executeDelete, loading: isDeleting } = useApiAction(
+  () => `/api/conventions/${props.editionId}/volunteers/${props.volunteer?.userId}/comment`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('gestion.volunteers.comment_deleted_success') },
+    errorMessages: { default: t('gestion.volunteers.comment_delete_error') },
+    onSuccess: () => {
+      emit('commentSaved')
+      isOpen.value = false
+    },
+  }
+)
 
 const modalTitle = computed(() => {
   if (!props.volunteer) return t('gestion.volunteers.comment_modal_title')
@@ -148,82 +174,17 @@ watch(
   }
 )
 
-const handleSave = async () => {
+const handleSave = () => {
   if (!props.volunteer || !commentContent.value.trim()) return
-
-  isSaving.value = true
-
-  try {
-    await $fetch(
-      `/api/conventions/${props.editionId}/volunteers/${props.volunteer.userId}/comment`,
-      {
-        method: 'PUT',
-        body: {
-          content: commentContent.value.trim(),
-        },
-      }
-    )
-
-    toast.add({
-      title: t('gestion.volunteers.comment_saved_success'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    emit('commentSaved')
-    isOpen.value = false
-  } catch (error: any) {
-    console.error('Failed to save comment:', error)
-
-    toast.add({
-      title: t('common.error'),
-      description: error?.data?.message || t('gestion.volunteers.comment_save_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    isSaving.value = false
-  }
+  executeSave()
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!props.volunteer) return
-
-  isDeleting.value = true
-
-  try {
-    await $fetch(
-      `/api/conventions/${props.editionId}/volunteers/${props.volunteer.userId}/comment`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
-      title: t('gestion.volunteers.comment_deleted_success'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    emit('commentSaved')
-    isOpen.value = false
-  } catch (error: any) {
-    console.error('Failed to delete comment:', error)
-
-    toast.add({
-      title: t('common.error'),
-      description: error?.data?.message || t('gestion.volunteers.comment_delete_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    isDeleting.value = false
-  }
+  executeDelete()
 }
 
 const handleClose = () => {
   commentContent.value = ''
-  isSaving.value = false
-  isDeleting.value = false
 }
 </script>

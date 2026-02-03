@@ -320,6 +320,7 @@
       "no_tiers_available": "Geen tarieven beschikbaar",
       "no_validation_yet": "Nog geen validatie",
       "order": "Bestelling",
+      "order_created": "Bestelling succesvol aangemaakt",
       "order_id": "Bestel-ID",
       "organization_slug_label": "Organisatie-slug",
       "organization_slug_placeholder": "bijv.: jongleer-convention",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Kan antwoord niet publiceren",
     "cannot_remove_favorite": "Kan niet uit favorieten verwijderen",
     "city_too_long": "Stad mag niet meer dan {max} tekens bevatten",
+    "conflict": "Conflict met bestaande gegevens",
     "content_required": "Inhoud is vereist",
     "content_too_long": "Inhoud mag niet meer dan {max} tekens bevatten",
     "convention_creation_error": "Er is een fout opgetreden bij het aanmaken van de conventie",
@@ -888,6 +890,7 @@
     "invalid_email": "Ongeldig e-mailadres",
     "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {types}",
     "invalid_phone_number": "Ongeldig telefoonnummer",
+    "invalid_request": "Ongeldige aanvraag",
     "loading_error": "Laadfout",
     "login_failed": "Inloggen mislukt",
     "login_required_convention": "Je moet ingelogd zijn om een conventie aan te maken",
@@ -909,7 +912,8 @@
     "status_update_failed": "Status bijwerken mislukt",
     "update_error": "Bijwerkfout",
     "update_organizer_error": "Fout bij bijwerken medewerker",
-    "username_min_3_chars": "Gebruikersnaam moet minimaal 3 tekens bevatten"
+    "username_min_3_chars": "Gebruikersnaam moet minimaal 3 tekens bevatten",
+    "validation_error": "Validatiefout"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rechten voorbehouden.",

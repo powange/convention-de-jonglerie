@@ -214,8 +214,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { createOption, updateOption } from '~/utils/ticketing/options'
-
 interface TicketingOption {
   id: number
   name: string
@@ -243,12 +241,12 @@ const emit = defineEmits<{
   saved: []
 }>()
 
+const { t } = useI18n()
+
 const isOpen = computed({
   get: () => props.open,
   set: (value) => emit('update:open', value),
 })
-
-const saving = ref(false)
 
 // Vérifie si c'est une option HelloAsso (lecture seule)
 const isHelloAssoOption = computed(
@@ -373,71 +371,74 @@ watch(
   }
 )
 
-const handleSubmit = async () => {
+// Construit les données du formulaire pour l'API
+const buildFormData = () => ({
+  name: form.value.name.trim(),
+  description: form.value.description.trim() || null,
+  type: form.value.type,
+  isRequired: form.value.isRequired,
+  position: form.value.position,
+  choices:
+    form.value.type === 'MultipleChoice' || form.value.type === 'Select'
+      ? choicesText.value.split('\n').filter((c) => c.trim())
+      : null,
+  price: priceInEuros.value ? Math.round(priceInEuros.value * 100) : null,
+  quotaIds: form.value.quotaIds,
+  returnableItemIds: form.value.returnableItemIds,
+  tierIds: form.value.tierIds,
+  mealIds: form.value.mealIds,
+})
+
+// Callbacks communs
+const onSaveSuccess = () => {
+  emit('saved')
+  isOpen.value = false
+}
+
+// Action pour créer une option
+const { execute: executeCreate, loading: isCreating } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/options`,
+  {
+    method: 'POST',
+    body: buildFormData,
+    successMessage: { title: t('ticketing.options.created') },
+    errorMessages: { default: t('ticketing.options.error_saving') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// Action pour mettre à jour une option
+const { execute: executeUpdate, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/options/${props.option?.id}`,
+  {
+    method: 'PUT',
+    body: buildFormData,
+    successMessage: { title: t('ticketing.options.updated') },
+    errorMessages: { default: t('ticketing.options.error_saving') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// État de chargement combiné
+const saving = computed(() => isCreating.value || isUpdating.value)
+
+const handleSubmit = () => {
   const toast = useToast()
 
   if (!form.value.name.trim()) {
     toast.add({
-      title: 'Erreur',
-      description: "Le nom de l'option est obligatoire",
+      title: t('common.error'),
+      description: t('ticketing.options.name_required'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
     return
   }
 
-  saving.value = true
-  try {
-    const data = {
-      name: form.value.name.trim(),
-      description: form.value.description.trim() || null,
-      type: form.value.type,
-      isRequired: form.value.isRequired,
-      position: form.value.position,
-      choices:
-        form.value.type === 'MultipleChoice' || form.value.type === 'Select'
-          ? choicesText.value.split('\n').filter((c) => c.trim())
-          : null,
-      // Convertir le prix d'euros en centimes (ou null si vide)
-      price: priceInEuros.value ? Math.round(priceInEuros.value * 100) : null,
-      quotaIds: form.value.quotaIds,
-      returnableItemIds: form.value.returnableItemIds,
-      tierIds: form.value.tierIds,
-      mealIds: form.value.mealIds,
-    }
-
-    if (props.option) {
-      // Mode édition
-      await updateOption(props.editionId, props.option.id, data)
-      toast.add({
-        title: 'Option modifiée',
-        description: "L'option a été modifiée avec succès",
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } else {
-      // Mode création
-      await createOption(props.editionId, data)
-      toast.add({
-        title: 'Option créée',
-        description: "L'option a été créée avec succès",
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    }
-
-    emit('saved')
-    isOpen.value = false
-  } catch (error: any) {
-    console.error('Failed to save option:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible d'enregistrer l'option",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+  if (props.option) {
+    executeUpdate()
+  } else {
+    executeCreate()
   }
 }
 </script>

@@ -137,11 +137,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 const router = useRouter()
-
-const loading = ref(false)
 const selectedCategories = ref<string[]>([
   ...(authStore.user?.isVolunteer ? ['volunteer'] : []),
   ...(authStore.user?.isArtist ? ['artist'] : []),
@@ -195,29 +192,22 @@ const canSave = computed(() => {
   return hasCategoryChanges.value
 })
 
-const saveCategories = async () => {
-  // En mode profile, ne sauvegarder que s'il y a des changements
-  if (props.mode === 'profile' && !hasCategoryChanges.value) return
+// Construit le payload pour l'API
+const buildPayload = () => ({
+  isVolunteer: selectedCategories.value.includes('volunteer'),
+  isArtist: selectedCategories.value.includes('artist'),
+  isOrganizer: selectedCategories.value.includes('organizer'),
+})
 
-  loading.value = true
-  try {
-    const updatedUser = await $fetch<User>('/api/profile/categories', {
-      method: 'PUT',
-      body: {
-        isVolunteer: selectedCategories.value.includes('volunteer'),
-        isArtist: selectedCategories.value.includes('artist'),
-        isOrganizer: selectedCategories.value.includes('organizer'),
-      },
-    })
-
+// Action pour sauvegarder les catégories
+const { execute: executeSave, loading } = useApiAction<unknown, User>('/api/profile/categories', {
+  method: 'PUT',
+  body: buildPayload,
+  successMessage: { title: t('profile.user_categories.save_success') },
+  errorMessages: { default: t('profile.user_categories.save_error') },
+  onSuccess: (updatedUser) => {
     // Mettre à jour les données utilisateur dans le store
     authStore.updateUser({ ...authStore.user!, ...updatedUser })
-
-    toast.add({
-      title: t('profile.user_categories.save_success'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
 
     // Callback personnalisé après succès (pour redirection en mode onboarding)
     if (props.onSuccess) {
@@ -226,17 +216,13 @@ const saveCategories = async () => {
       // Redirection par défaut en mode onboarding
       router.push('/')
     }
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string }
-    toast.add({
-      title: t('profile.user_categories.save_error'),
-      description: httpError.data?.message || httpError.message,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
+  },
+})
+
+const saveCategories = () => {
+  // En mode profile, ne sauvegarder que s'il y a des changements
+  if (props.mode === 'profile' && !hasCategoryChanges.value) return
+  executeSave()
 }
 
 const handleSkip = () => {

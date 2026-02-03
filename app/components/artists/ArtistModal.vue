@@ -352,7 +352,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const toast = useToast()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -365,7 +364,6 @@ const selectedUser = ref<any>(null)
 const searchTerm = ref('')
 const searchedUsers = ref<any[]>([])
 const searchingUsers = ref(false)
-const loading = ref(false)
 
 // Variables pour la recherche des responsables pickup/dropoff
 const pickupSearchTerm = ref('')
@@ -497,80 +495,99 @@ const handleUserSelection = (user: any) => {
   }
 }
 
-const handleSubmit = async () => {
-  loading.value = true
-  try {
-    const payload: any = {
-      arrivalDateTime: formData.value.arrivalDateTime || null,
-      departureDateTime: formData.value.departureDateTime || null,
-      dietaryPreference: formData.value.dietaryPreference,
-      allergies: formData.value.allergies || null,
-      allergySeverity: formData.value.allergySeverity,
-      payment: formData.value.payment ? parseFloat(formData.value.payment) : null,
-      paymentPaid: formData.value.paymentPaid,
-      reimbursementMax: formData.value.reimbursementMax
-        ? parseFloat(formData.value.reimbursementMax)
-        : null,
-      reimbursementActual: formData.value.reimbursementActual
-        ? parseFloat(formData.value.reimbursementActual)
-        : null,
-      reimbursementActualPaid: formData.value.reimbursementActualPaid,
-      accommodationAutonomous: formData.value.accommodationAutonomous,
-      accommodationProposal: formData.value.accommodationProposal || null,
-      invoiceRequested: formData.value.invoiceRequested,
-      invoiceProvided: formData.value.invoiceProvided,
-      feeRequested: formData.value.feeRequested,
-      feeProvided: formData.value.feeProvided,
-      pickupRequired: formData.value.pickupRequired,
-      pickupLocation: formData.value.pickupLocation || null,
-      pickupResponsibleId: formData.value.pickupResponsible?.id || null,
-      dropoffRequired: formData.value.dropoffRequired,
-      dropoffLocation: formData.value.dropoffLocation || null,
-      dropoffResponsibleId: formData.value.dropoffResponsible?.id || null,
-    }
+// Construit les données de base pour l'API (commun création/modification)
+const buildBasePayload = () => ({
+  arrivalDateTime: formData.value.arrivalDateTime || null,
+  departureDateTime: formData.value.departureDateTime || null,
+  dietaryPreference: formData.value.dietaryPreference,
+  allergies: formData.value.allergies || null,
+  allergySeverity: formData.value.allergySeverity,
+  payment: formData.value.payment ? parseFloat(formData.value.payment) : null,
+  paymentPaid: formData.value.paymentPaid,
+  reimbursementMax: formData.value.reimbursementMax
+    ? parseFloat(formData.value.reimbursementMax)
+    : null,
+  reimbursementActual: formData.value.reimbursementActual
+    ? parseFloat(formData.value.reimbursementActual)
+    : null,
+  reimbursementActualPaid: formData.value.reimbursementActualPaid,
+  accommodationAutonomous: formData.value.accommodationAutonomous,
+  accommodationProposal: formData.value.accommodationProposal || null,
+  invoiceRequested: formData.value.invoiceRequested,
+  invoiceProvided: formData.value.invoiceProvided,
+  feeRequested: formData.value.feeRequested,
+  feeProvided: formData.value.feeProvided,
+  pickupRequired: formData.value.pickupRequired,
+  pickupLocation: formData.value.pickupLocation || null,
+  pickupResponsibleId: formData.value.pickupResponsible?.id || null,
+  dropoffRequired: formData.value.dropoffRequired,
+  dropoffLocation: formData.value.dropoffLocation || null,
+  dropoffResponsibleId: formData.value.dropoffResponsible?.id || null,
+})
 
-    if (props.artist) {
-      // Mode modification
-      // Ajouter les champs user si l'utilisateur est MANUAL
-      if (isManualUser.value) {
-        payload.userEmail = formData.value.email
-        payload.userPrenom = formData.value.prenom
-        payload.userNom = formData.value.nom
-        payload.userPhone = formData.value.phone || null
-      }
+// Payload pour la modification (inclut les champs user si MANUAL)
+const buildUpdatePayload = () => {
+  const payload: Record<string, unknown> = buildBasePayload()
+  if (isManualUser.value) {
+    payload.userEmail = formData.value.email
+    payload.userPrenom = formData.value.prenom
+    payload.userNom = formData.value.nom
+    payload.userPhone = formData.value.phone || null
+  }
+  return payload
+}
 
-      await $fetch(`/api/editions/${props.editionId}/artists/${props.artist.id}`, {
-        method: 'PUT',
-        body: payload,
-      })
-      toast.add({ title: t('artists.artist_updated'), color: 'success' })
-    } else {
-      // Mode ajout
-      if (selectedUser.value) {
-        payload.userId = selectedUser.value.id
-      } else {
-        payload.email = formData.value.email
-        payload.prenom = formData.value.prenom
-        payload.nom = formData.value.nom
-      }
+// Payload pour la création (inclut userId ou données utilisateur)
+const buildCreatePayload = () => {
+  const payload: Record<string, unknown> = buildBasePayload()
+  if (selectedUser.value) {
+    payload.userId = selectedUser.value.id
+  } else {
+    payload.email = formData.value.email
+    payload.prenom = formData.value.prenom
+    payload.nom = formData.value.nom
+  }
+  return payload
+}
 
-      await $fetch(`/api/editions/${props.editionId}/artists`, {
-        method: 'POST',
-        body: payload,
-      })
-      toast.add({ title: t('artists.artist_added'), color: 'success' })
-    }
+// Callback commun après succès
+const onSaveSuccess = () => {
+  emit('artist-saved')
+  closeModal()
+}
 
-    emit('artist-saved')
-    closeModal()
-  } catch (error: any) {
-    console.error('Error saving artist:', error)
-    toast.add({
-      title: props.artist ? t('artists.error_update') : t('artists.error_add'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+// Action pour créer un artiste
+const { execute: executeCreate, loading: isCreating } = useApiAction(
+  () => `/api/editions/${props.editionId}/artists`,
+  {
+    method: 'POST',
+    body: buildCreatePayload,
+    successMessage: { title: t('artists.artist_added') },
+    errorMessages: { default: t('artists.error_add') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// Action pour modifier un artiste
+const { execute: executeUpdate, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${props.editionId}/artists/${props.artist?.id}`,
+  {
+    method: 'PUT',
+    body: buildUpdatePayload,
+    successMessage: { title: t('artists.artist_updated') },
+    errorMessages: { default: t('artists.error_update') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// État de chargement combiné
+const loading = computed(() => isCreating.value || isUpdating.value)
+
+const handleSubmit = () => {
+  if (props.artist) {
+    executeUpdate()
+  } else {
+    executeCreate()
   }
 }
 

@@ -292,11 +292,9 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits(['success', 'cancel'])
 
-const toast = useToast()
 const { t, locale } = useI18n()
 
 // État du formulaire
-const loading = ref(false)
 const form = reactive({
   locationCity: props.initialData?.locationCity || '',
   locationAddress: props.initialData?.locationAddress || '',
@@ -395,13 +393,78 @@ const schema = computed(() => {
 const isFormValid = computed(() => {
   try {
     schema.value.parse(form)
-    console.log('Form is valid!')
     return true
-  } catch (error) {
-    console.error('Form validation error:', error)
+  } catch {
     return false
   }
 })
+
+// Construire le payload pour l'API
+const buildPayload = () => {
+  const payload: Record<string, unknown> = {
+    ...form,
+    editionId: props.editionId,
+  }
+
+  // Nettoyer les champs non pertinents
+  if (props.formType === 'offer') {
+    delete payload.seatsNeeded
+  } else {
+    delete payload.availableSeats
+    delete payload.locationAddress
+    delete payload.smokingAllowed
+    delete payload.petsAllowed
+    delete payload.musicAllowed
+  }
+
+  return payload
+}
+
+// Callback commun après succès
+const onSuccess = (response: unknown) => {
+  emit('success', response)
+}
+
+// Messages de succès dynamiques
+const getSuccessMessage = () => {
+  if (props.isEditing) {
+    return props.formType === 'offer' ? t('carpool.offer.updated') : t('carpool.request.updated')
+  }
+  return props.formType === 'offer' ? t('carpool.offer.created') : t('carpool.request.created')
+}
+
+// Action pour créer une offre/demande
+const { execute: executeCreate, loading: isCreating } = useApiAction(
+  () =>
+    props.formType === 'offer'
+      ? `/api/editions/${props.editionId}/carpool-offers`
+      : `/api/editions/${props.editionId}/carpool-requests`,
+  {
+    method: 'POST',
+    body: buildPayload,
+    successMessage: { title: getSuccessMessage() },
+    errorMessages: { default: t('errors.generic') },
+    onSuccess,
+  }
+)
+
+// Action pour mettre à jour une offre/demande
+const { execute: executeUpdate, loading: isUpdating } = useApiAction(
+  () =>
+    props.formType === 'offer'
+      ? `/api/carpool-offers/${props.initialData?.id}`
+      : `/api/carpool-requests/${props.initialData?.id}`,
+  {
+    method: 'PUT',
+    body: buildPayload,
+    successMessage: { title: getSuccessMessage() },
+    errorMessages: { default: t('errors.generic') },
+    onSuccess,
+  }
+)
+
+// État de chargement combiné
+const loading = computed(() => isCreating.value || isUpdating.value)
 
 // Utilisation de $fetch dans un watcher pour récupérer les suggestions
 const citySuggestions = ref<any[]>([])
@@ -451,66 +514,11 @@ watch(searchTermDebounced, async (query) => {
 })
 
 // Soumission du formulaire
-const onSubmit = async () => {
-  loading.value = true
-
-  try {
-    let endpoint =
-      props.formType === 'offer'
-        ? `/api/editions/${props.editionId}/carpool-offers`
-        : `/api/editions/${props.editionId}/carpool-requests`
-
-    // En mode édition, ajouter l'ID dans l'endpoint
-    if (props.isEditing && props.initialData?.id) {
-      endpoint =
-        props.formType === 'offer'
-          ? `/api/carpool-offers/${props.initialData.id}`
-          : `/api/carpool-requests/${props.initialData.id}`
-    }
-
-    const payload = {
-      ...form,
-      editionId: props.editionId,
-    }
-
-    // Nettoyer les champs non pertinents
-    if (props.formType === 'offer') {
-      delete payload.seatsNeeded
-    } else {
-      delete payload.availableSeats
-      delete payload.locationAddress
-      delete payload.smokingAllowed
-      delete payload.petsAllowed
-      delete payload.musicAllowed
-    }
-
-    const response = await $fetch(endpoint, {
-      method: props.isEditing ? 'PUT' : 'POST',
-      body: payload,
-    })
-
-    toast.add({
-      title: t('common.success'),
-      description: props.isEditing
-        ? props.formType === 'offer'
-          ? t('carpool.offer.updated')
-          : t('carpool.request.updated')
-        : props.formType === 'offer'
-          ? t('carpool.offer.created')
-          : t('carpool.request.created'),
-      color: 'success',
-    })
-
-    emit('success', response)
-  } catch (error: any) {
-    console.error('Erreur lors de la soumission:', error)
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('errors.generic'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+const onSubmit = () => {
+  if (props.isEditing) {
+    executeUpdate()
+  } else {
+    executeCreate()
   }
 }
 

@@ -446,35 +446,26 @@ const handleSetPassword = async () => {
   }
 }
 
-// Renvoyer le code
-const handleResendCode = async () => {
-  if (resendCooldown.value > 0) return
-
-  try {
-    await $fetch('/api/auth/resend-verification', {
-      method: 'POST',
-      body: { email: email.value },
-    })
-
-    toast.add({
-      title: t('auth.code_resent'),
-      description: t('auth.new_code_sent'),
-      icon: 'i-heroicons-envelope',
-      color: 'success',
-    })
-
+// Action pour renvoyer le code
+const { execute: executeResendCode } = useApiAction('/api/auth/resend-verification', {
+  method: 'POST',
+  body: () => ({ email: email.value }),
+  successMessage: {
+    title: t('auth.code_resent'),
+    description: t('auth.new_code_sent'),
+  },
+  errorMessages: { default: t('errors.server_error') },
+  onSuccess: () => {
     // Réinitialiser le timer et démarrer le cooldown
     timeRemaining.value = 15 * 60
     resendCooldown.value = 60
     startResendCooldown()
-  } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
+  },
+})
+
+const handleResendCode = () => {
+  if (resendCooldown.value > 0) return
+  executeResendCode()
 }
 
 // Démarrer le timer

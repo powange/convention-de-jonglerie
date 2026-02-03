@@ -63,12 +63,43 @@
       "title": "Tellers",
       "token_regenerated": "Token succesvol opnieuw gegenereerd"
     },
+    "custom_fields": {
+      "created": "Aangepast veld succesvol aangemaakt",
+      "error_saving": "Kan aangepast veld niet opslaan",
+      "updated": "Aangepast veld succesvol bijgewerkt"
+    },
+    "external": {
+      "config_delete_error": "Kan configuratie niet verwijderen",
+      "config_deleted": "Configuratie verwijderd",
+      "config_deleted_description": "HelloAsso-ticketing is succesvol losgekoppeld",
+      "config_save_error": "Kan configuratie niet opslaan",
+      "config_saved": "Configuratie opgeslagen",
+      "config_saved_description": "HelloAsso geconfigureerd voor {org}",
+      "connection_error": "Kan geen verbinding maken met HelloAsso",
+      "connection_failed": "Verbinding mislukt",
+      "connection_success": "Verbinding geslaagd!",
+      "connection_success_description": "Formulier gevonden: {name} ({org})",
+      "json_copied": "Gekopieerd!",
+      "json_copied_description": "JSON is gekopieerd naar klembord",
+      "json_copy_error": "Kan niet naar klembord kopiëren",
+      "participants_load_error": "Kan deelnemers niet laden",
+      "participants_loaded": "Deelnemers geladen",
+      "participants_loaded_description": "{orders} bestelling(en) en {items} deelnemer(s) gevonden",
+      "raw_json_load_error": "Kan ruwe gegevens niet laden",
+      "raw_json_loaded": "Ruwe JSON geladen",
+      "raw_json_loaded_description": "HelloAsso ruwe gegevens zijn opgehaald",
+      "tiers_load_error": "Kan tarieven niet laden",
+      "tiers_loaded": "Tarieven geladen",
+      "tiers_loaded_description": "{tiers} tarief(ven), {options} optie(s) en {fields} aangepast(e) veld(en) gevonden"
+    },
     "my_ticket": {
       "how_to_use_description": "Toon deze QR-code bij de ingang om je ticket te valideren.",
       "how_to_use_title": "Hoe gebruik je deze QR-code",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Optie succesvol aangemaakt",
+      "error_saving": "Kan optie niet opslaan",
       "list": {
         "loading": "Laden...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Selecteer quota",
         "title": "HelloAsso optie",
         "type_label": "Type optie"
-      }
+      },
+      "name_required": "Optienaam is verplicht",
+      "updated": "Optie succesvol bijgewerkt"
     },
     "orders": {
       "cancel_order": "Bestelling annuleren",
@@ -100,10 +133,18 @@
       "delete_order": "Opdracht verwijderen",
       "delete_order_confirm": "Weet je zeker dat je deze opdracht wilt verwijderen?",
       "delete_order_confirm_message": "Deze actie verwijdert de bestelling en alle bijbehorende tickets permanent uit de database. Deze actie kan niet ongedaan worden gemaakt.",
-      "delete_order_error": "Fout bij verwijderen bestelling",
       "deleting_order": "Verwijdering bezig...",
+      "entry_invalidated": "Toegang ongeldig gemaakt",
+      "entry_invalidated_description": "Ticket is gemarkeerd als niet gevalideerd",
+      "entry_validated_description": "Ticket is succesvol gevalideerd",
+      "entry_validated_success": "Toegang gevalideerd",
+      "invalidate_entry_error": "Fout bij ongeldig maken van toegang",
       "order_canceled": "Bestelling geannuleerd",
-      "order_deleted": "Bestelling verwijderd"
+      "order_deleted": "Bestelling verwijderd",
+      "payment_method_error": "Fout bij bijwerken van betaalmethode",
+      "payment_method_updated": "Betaalmethode ingesteld",
+      "payment_method_updated_description": "Betaalmethode is succesvol opgeslagen",
+      "validate_entry_error": "Fout bij valideren van toegang"
     },
     "participant": {
       "entry_validated": "Toegang al gevalideerd",
@@ -128,19 +169,33 @@
       "selectMethod": "Selecteer betaalmethode"
     },
     "quotas": {
+      "created": "Quotum succesvol aangemaakt",
+      "deleted": "Quotum succesvol verwijderd",
+      "error_deleting": "Kan quotum niet verwijderen",
+      "error_reordering": "Kan quotumvolgorde niet bijwerken",
+      "error_saving": "Kan quotum niet opslaan",
+      "error_updating": "Kan quotum niet bijwerken",
       "list": {
+        "delete_button": "Verwijderen",
+        "delete_confirm": "Weet u zeker dat u quotum '{name}' wilt verwijderen?",
+        "delete_title": "Quotum verwijderen",
+        "description": "Definieer hier quota om de toegang tot bepaalde diensten te beperken (shows, activiteiten, toegang, enz.)",
         "description_label": "beschrijving",
         "description_placeholder": "Beschrijving (optioneel)",
+        "drag_tooltip": "Sleep om te herordenen",
         "loading": "Laden...",
         "name_placeholder": "Titel van het quotum",
         "title": "Quotumbeheer"
       },
+      "order_updated": "Quotumvolgorde bijgewerkt",
+      "quantity_min": "Aantal moet minimaal 1 zijn",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Quotumstatistieken",
         "used": "Gebruikt",
         "validated": "Gevalideerd"
-      }
+      },
+      "title_required": "Titel is verplicht"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Vrijwilligers"
     },
     "tiers": {
+      "created": "Tarief succesvol aangemaakt",
+      "error_saving": "Kan tarief niet opslaan",
       "list": {
         "drag_to_reorder": "Slepen om te herschikken",
         "inactive": "Inactief",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Selecteer artikelen",
         "status_label": "Status",
         "title": "HelloAsso tarief"
-      }
+      },
+      "name_required": "Tariefnaam is verplicht",
+      "updated": "Tarief succesvol bijgewerkt"
     }
   }
 }

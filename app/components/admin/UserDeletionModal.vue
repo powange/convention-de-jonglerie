@@ -135,12 +135,10 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const { deleteUser, getDeletionReasons, getDeletionReason } = useUserDeletion()
-const toast = useToast()
+const { getDeletionReasons, getDeletionReason } = useUserDeletion()
 const { t } = useI18n()
 
 // État réactif
-const loading = ref(false)
 const selectedReason = ref<
   'NOT_PHYSICAL_PERSON' | 'SPAM_ACTIVITY' | 'INACTIVE_ACCOUNT' | 'POLICY_VIOLATION' | undefined
 >(undefined)
@@ -159,6 +157,23 @@ const selectedReasonData = computed(() => {
   return getDeletionReason(selectedReason.value as any)
 })
 
+// Action pour supprimer un utilisateur
+const { execute: executeDelete, loading } = useApiAction(
+  () => `/api/admin/users/${props.user?.id}`,
+  {
+    method: 'DELETE',
+    body: () => ({ reason: selectedReason.value }),
+    successMessage: { title: t('admin.user_deleted_successfully') },
+    errorMessages: { default: t('admin.deletion_error') },
+    onSuccess: () => {
+      if (props.user) {
+        emit('deleted', props.user)
+      }
+      close()
+    },
+  }
+)
+
 const canConfirm = computed(() => {
   return selectedReason.value && confirmationText.value === props.user?.pseudo && !loading.value
 })
@@ -172,35 +187,11 @@ const close = () => {
 const resetForm = () => {
   selectedReason.value = undefined
   confirmationText.value = ''
-  loading.value = false
 }
 
-const confirmDeletion = async () => {
+const confirmDeletion = () => {
   if (!props.user || !canConfirm.value) return
-
-  loading.value = true
-
-  try {
-    const result = await deleteUser(props.user.id, selectedReason.value as any)
-
-    toast.add({
-      color: 'success',
-      title: t('admin.user_deleted_successfully'),
-      description: result.message,
-    })
-
-    emit('deleted', props.user)
-    close()
-  } catch (error: any) {
-    console.error('Erreur suppression:', error)
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: error.data?.message || t('admin.deletion_error'),
-    })
-  } finally {
-    loading.value = false
-  }
+  executeDelete()
 }
 
 // Watchers

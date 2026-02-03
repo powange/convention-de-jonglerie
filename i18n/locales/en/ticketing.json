@@ -63,12 +63,43 @@
       "title": "Counters",
       "token_regenerated": "Token successfully regenerated"
     },
+    "custom_fields": {
+      "created": "Custom field created successfully",
+      "error_saving": "Unable to save custom field",
+      "updated": "Custom field updated successfully"
+    },
+    "external": {
+      "config_delete_error": "Unable to delete configuration",
+      "config_deleted": "Configuration deleted",
+      "config_deleted_description": "HelloAsso ticketing has been successfully unlinked",
+      "config_save_error": "Unable to save configuration",
+      "config_saved": "Configuration saved",
+      "config_saved_description": "HelloAsso configured for {org}",
+      "connection_error": "Unable to connect to HelloAsso",
+      "connection_failed": "Connection failed",
+      "connection_success": "Connection successful!",
+      "connection_success_description": "Form found: {name} ({org})",
+      "json_copied": "Copied!",
+      "json_copied_description": "JSON has been copied to clipboard",
+      "json_copy_error": "Unable to copy to clipboard",
+      "participants_load_error": "Unable to load participants",
+      "participants_loaded": "Participants loaded",
+      "participants_loaded_description": "{orders} order(s) and {items} participant(s) found",
+      "raw_json_load_error": "Unable to load raw data",
+      "raw_json_loaded": "Raw JSON loaded",
+      "raw_json_loaded_description": "HelloAsso raw data has been retrieved",
+      "tiers_load_error": "Unable to load tiers",
+      "tiers_loaded": "Tiers loaded",
+      "tiers_loaded_description": "{tiers} tier(s), {options} option(s) and {fields} custom field(s) found"
+    },
     "my_ticket": {
       "how_to_use_description": "Show this QR code at the entrance to validate your ticket.",
       "how_to_use_title": "How to use this QR code",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Option created successfully",
+      "error_saving": "Unable to save option",
       "list": {
         "loading": "Loading...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Select quotas",
         "title": "HelloAsso option",
         "type_label": "Option type"
-      }
+      },
+      "name_required": "Option name is required",
+      "updated": "Option updated successfully"
     },
     "orders": {
       "cancel_order": "Cancel order",
@@ -100,10 +133,18 @@
       "delete_order": "Delete command",
       "delete_order_confirm": "Are you sure you want to delete this command?",
       "delete_order_confirm_message": "This action will permanently delete the order and all associated tickets from the database. This action cannot be undone.",
-      "delete_order_error": "Error when deleting order",
       "deleting_order": "Deletion in progress...",
+      "entry_invalidated": "Entry invalidated",
+      "entry_invalidated_description": "Ticket has been marked as not validated",
+      "entry_validated_description": "Ticket has been validated successfully",
+      "entry_validated_success": "Entry validated",
+      "invalidate_entry_error": "Error invalidating entry",
       "order_canceled": "Order cancelled",
-      "order_deleted": "Order deleted"
+      "order_deleted": "Order deleted",
+      "payment_method_error": "Error updating payment method",
+      "payment_method_updated": "Payment method set",
+      "payment_method_updated_description": "Payment method has been saved successfully",
+      "validate_entry_error": "Error validating entry"
     },
     "participant": {
       "entry_validated": "Entry already validated",
@@ -128,19 +169,33 @@
       "selectMethod": "Select payment method"
     },
     "quotas": {
+      "created": "Quota created successfully",
+      "deleted": "Quota deleted successfully",
+      "error_deleting": "Unable to delete quota",
+      "error_reordering": "Unable to update quota order",
+      "error_saving": "Unable to save quota",
+      "error_updating": "Unable to update quota",
       "list": {
+        "delete_button": "Delete",
+        "delete_confirm": "Are you sure you want to delete the quota '{name}'?",
+        "delete_title": "Delete quota",
+        "description": "Define quotas here to limit access to certain services (shows, activities, entries, etc.)",
         "description_label": "description",
         "description_placeholder": "Description (optional)",
+        "drag_tooltip": "Drag to reorder",
         "loading": "Loading...",
         "name_placeholder": "Quota title",
         "title": "Quota management"
       },
+      "order_updated": "Quota order updated",
+      "quantity_min": "Quantity must be at least 1",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Quota statistics",
         "used": "Used",
         "validated": "Validated"
-      }
+      },
+      "title_required": "Title is required"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Volunteers"
     },
     "tiers": {
+      "created": "Tier created successfully",
+      "error_saving": "Unable to save tier",
       "list": {
         "drag_to_reorder": "Drag to reorder",
         "inactive": "Inactive",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Select items",
         "status_label": "Status",
         "title": "HelloAsso tier"
-      }
+      },
+      "name_required": "Tier name is required",
+      "updated": "Tier updated successfully"
     }
   }
 }

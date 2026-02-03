@@ -30,6 +30,19 @@
   - Exemples : `userBasicSelect`, `carpoolOfferInclude`, `editionListInclude`
   - Si un pattern se répète 3+ fois, créer un nouveau helper
   - Toujours importer et étendre avec spread si besoin de champs supplémentaires
+- **Composable `useApiAction`** : Toujours utiliser ce composable pour les appels API côté client au lieu du pattern try/catch/loading/toast manuel. Voir `docs/migration-useApiAction.md` pour la documentation complète.
+  - Gère automatiquement le loading state, les toasts de succès/erreur, et les redirections
+  - Utiliser `useApiAction` pour les actions simples, `useApiActionById` pour les actions sur des listes par ID
+  - Exemple :
+    ```typescript
+    const { execute, loading } = useApiAction('/api/endpoint', {
+      method: 'POST',
+      body: () => formData,
+      successMessage: { title: t('success_key') },
+      errorMessages: { default: t('error_key') },
+      onSuccess: () => emit('saved'),
+    })
+    ```
 
 ## Détails du projet
 

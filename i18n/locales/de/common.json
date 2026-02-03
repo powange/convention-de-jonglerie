@@ -320,6 +320,7 @@
       "no_tiers_available": "Keine Tarife verfügbar",
       "no_validation_yet": "Noch keine Validierung",
       "order": "Bestellung",
+      "order_created": "Bestellung erfolgreich erstellt",
       "order_id": "Bestell-ID",
       "organization_slug_label": "Organisations-Slug",
       "organization_slug_placeholder": "z.B.: jonglier-convention",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Antwort kann nicht veröffentlicht werden",
     "cannot_remove_favorite": "Kann nicht aus Favoriten entfernt werden",
     "city_too_long": "Die Stadt darf nicht länger als {max} Zeichen sein",
+    "conflict": "Konflikt mit vorhandenen Daten",
     "content_required": "Inhalt ist erforderlich",
     "content_too_long": "Der Inhalt darf nicht länger als {max} Zeichen sein",
     "convention_creation_error": "Ein Fehler ist beim Erstellen der Convention aufgetreten",
@@ -888,6 +890,7 @@
     "invalid_email": "Ungültige E-Mail",
     "invalid_file_type": "Ungültiger Dateityp. Akzeptierte Formate: {types}",
     "invalid_phone_number": "Ungültige Telefonnummer",
+    "invalid_request": "Ungültige Anfrage",
     "loading_error": "Ladefehler",
     "login_failed": "Anmeldung fehlgeschlagen",
     "login_required_convention": "Du musst angemeldet sein, um eine Convention zu erstellen",
@@ -909,7 +912,8 @@
     "status_update_failed": "Fehler beim Aktualisieren des Status",
     "update_error": "Fehler beim Aktualisieren",
     "update_organizer_error": "Fehler beim Aktualisieren des Mitarbeiters",
-    "username_min_3_chars": "Der Benutzername muss mindestens 3 Zeichen enthalten"
+    "username_min_3_chars": "Der Benutzername muss mindestens 3 Zeichen enthalten",
+    "validation_error": "Validierungsfehler"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle Rechte vorbehalten.",

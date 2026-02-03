@@ -11,7 +11,7 @@
       color="info"
       variant="soft"
       :title="$t('ticketing.quotas.list.title')"
-      description="Définissez ici les quotas pour limiter l'accès à certaines prestations (spectacles, activités, entrées, etc.)"
+      :description="$t('ticketing.quotas.list.description')"
     />
 
     <div class="space-y-2">
@@ -33,7 +33,7 @@
         <!-- Poignée de drag -->
         <div
           class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          title="Glisser pour réordonner"
+          :title="$t('ticketing.quotas.list.drag_tooltip')"
         >
           <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
         </div>
@@ -114,9 +114,9 @@
   <!-- Modal de confirmation de suppression de quota -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    title="Supprimer le quota"
-    :description="`Êtes-vous sûr de vouloir supprimer le quota '${quotaToDelete?.title}' ?`"
-    confirm-label="Supprimer"
+    :title="$t('ticketing.quotas.list.delete_title')"
+    :description="$t('ticketing.quotas.list.delete_confirm', { name: quotaToDelete?.title })"
+    :confirm-label="$t('ticketing.quotas.list.delete_button')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"
@@ -151,10 +151,11 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-const saving = ref(false)
+const { t } = useI18n()
+const toast = useToast()
+
 const deleteConfirmOpen = ref(false)
 const quotaToDelete = ref<Quota | null>(null)
-const deleting = ref(false)
 
 // Drag and drop
 const draggedQuotaId = ref<number | null>(null)
@@ -181,102 +182,109 @@ const confirmDeleteQuota = (quota: Quota) => {
   deleteConfirmOpen.value = true
 }
 
-const deleteQuota = async () => {
-  if (!quotaToDelete.value) return
-
-  const toast = useToast()
-  deleting.value = true
-  try {
-    await $fetch(`/api/editions/${props.editionId}/ticketing/quotas/${quotaToDelete.value.id}`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
-      title: 'Quota supprimé',
-      description: 'Le quota a été supprimé avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    deleteConfirmOpen.value = false
-    quotaToDelete.value = null
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to delete quota:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de supprimer le quota',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    deleting.value = false
+// Action pour supprimer un quota
+const { execute: executeDeleteQuota, loading: deleting } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/quotas/${quotaToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('ticketing.quotas.deleted') },
+    errorMessages: { default: t('ticketing.quotas.error_deleting') },
+    onSuccess: () => {
+      deleteConfirmOpen.value = false
+      quotaToDelete.value = null
+      emit('refresh')
+    },
   }
+)
+
+const deleteQuota = () => {
+  if (!quotaToDelete.value) return
+  executeDeleteQuota()
 }
 
-const updateQuota = async (
+// Données temporaires pour la mise à jour d'un quota
+const updatePayload = ref<{
+  quotaId: number
+  data: { title: string; description: string | null; quantity: number }
+} | null>(null)
+
+// Action pour mettre à jour un quota (silencieuse car modifications inline)
+const { execute: executeUpdateQuota } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/quotas/${updatePayload.value?.quotaId}`,
+  {
+    method: 'PUT',
+    body: () => updatePayload.value?.data,
+    silentSuccess: true,
+    errorMessages: { default: t('ticketing.quotas.error_updating') },
+    refreshOnSuccess: () => emit('refresh'),
+  }
+)
+
+const updateQuota = (
   quotaId: number,
   updates: Partial<{ title: string; description: string | null; quantity: number }>
 ) => {
-  const toast = useToast()
+  // Trouver le quota à mettre à jour
+  const quota = props.quotas.find((q) => q.id === quotaId)
+  if (!quota) return
 
-  try {
-    // Trouver le quota à mettre à jour
-    const quota = props.quotas.find((q) => q.id === quotaId)
-    if (!quota) return
+  // Construire les données à envoyer
+  const data = {
+    title: updates.title !== undefined ? updates.title.trim() : quota.title,
+    description: updates.description !== undefined ? updates.description : quota.description,
+    quantity: updates.quantity !== undefined ? updates.quantity : quota.quantity,
+  }
 
-    // Construire les données à envoyer
-    const data = {
-      title: updates.title !== undefined ? updates.title.trim() : quota.title,
-      description: updates.description !== undefined ? updates.description : quota.description,
-      quantity: updates.quantity !== undefined ? updates.quantity : quota.quantity,
-    }
-
-    // Validation
-    if (!data.title) {
-      toast.add({
-        title: 'Erreur',
-        description: 'Le titre est obligatoire',
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'error',
-      })
-      return
-    }
-
-    if (data.quantity < 1) {
-      toast.add({
-        title: 'Erreur',
-        description: 'La quantité doit être au moins 1',
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'error',
-      })
-      return
-    }
-
-    await $fetch(`/api/editions/${props.editionId}/ticketing/quotas/${quotaId}`, {
-      method: 'PUT',
-      body: data,
-    })
-
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to update quota:', error)
+  // Validation
+  if (!data.title) {
     toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de mettre à jour le quota',
+      title: t('common.error'),
+      description: t('ticketing.quotas.title_required'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
+    return
   }
+
+  if (data.quantity < 1) {
+    toast.add({
+      title: t('common.error'),
+      description: t('ticketing.quotas.quantity_min'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+    return
+  }
+
+  // Stocker les données et exécuter
+  updatePayload.value = { quotaId, data }
+  executeUpdateQuota()
 }
 
-const handleSave = async () => {
-  const toast = useToast()
+// Action pour créer un quota
+const { execute: executeCreateQuota, loading: saving } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/quotas`,
+  {
+    method: 'POST',
+    body: () => ({
+      title: form.value.title.trim(),
+      description: form.value.description.trim() || null,
+      quantity: form.value.quantity,
+    }),
+    successMessage: { title: t('ticketing.quotas.created') },
+    errorMessages: { default: t('ticketing.quotas.error_saving') },
+    onSuccess: () => {
+      form.value = { title: '', description: '', quantity: 1 }
+      emit('refresh')
+    },
+  }
+)
 
+const handleSave = () => {
   if (!form.value.title.trim()) {
     toast.add({
-      title: 'Erreur',
-      description: 'Le titre est obligatoire',
+      title: t('common.error'),
+      description: t('ticketing.quotas.title_required'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -285,53 +293,15 @@ const handleSave = async () => {
 
   if (form.value.quantity < 1) {
     toast.add({
-      title: 'Erreur',
-      description: 'La quantité doit être au moins 1',
+      title: t('common.error'),
+      description: t('ticketing.quotas.quantity_min'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
     return
   }
 
-  saving.value = true
-  try {
-    const data = {
-      title: form.value.title.trim(),
-      description: form.value.description.trim() || null,
-      quantity: form.value.quantity,
-    }
-
-    await $fetch(`/api/editions/${props.editionId}/ticketing/quotas`, {
-      method: 'POST',
-      body: data,
-    })
-
-    toast.add({
-      title: 'Quota créé',
-      description: 'Le quota a été créé avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Réinitialiser le formulaire
-    form.value = {
-      title: '',
-      description: '',
-      quantity: 1,
-    }
-
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to save quota:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible d'enregistrer le quota",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
-  }
+  executeCreateQuota()
 }
 
 const handleDragStart = (quota: Quota, event: DragEvent) => {
@@ -382,38 +352,26 @@ const handleDrop = async (targetQuota: Quota, event: DragEvent) => {
   dragOverQuotaId.value = null
 }
 
-const updateQuotasPositions = async (quotas: Quota[]) => {
-  const toast = useToast()
+// Positions à envoyer pour le reorder
+const reorderPositions = ref<{ id: number; position: number }[]>([])
 
-  try {
-    // Créer la liste des positions à envoyer à l'API
-    const positions = quotas.map((quota, index) => ({
-      id: quota.id,
-      position: index,
-    }))
-
-    await $fetch(`/api/editions/${props.editionId}/ticketing/quotas/reorder`, {
-      method: 'PUT',
-      body: { positions },
-    })
-
-    toast.add({
-      title: 'Ordre mis à jour',
-      description: "L'ordre des quotas a été enregistré",
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Rafraîchir les données
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to update quotas positions:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible de mettre à jour l'ordre des quotas",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+// Action pour mettre à jour l'ordre des quotas
+const { execute: executeReorder } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/quotas/reorder`,
+  {
+    method: 'PUT',
+    body: () => ({ positions: reorderPositions.value }),
+    successMessage: { title: t('ticketing.quotas.order_updated') },
+    errorMessages: { default: t('ticketing.quotas.error_reordering') },
+    refreshOnSuccess: () => emit('refresh'),
   }
+)
+
+const updateQuotasPositions = (quotas: Quota[]) => {
+  reorderPositions.value = quotas.map((quota, index) => ({
+    id: quota.id,
+    position: index,
+  }))
+  executeReorder()
 }
 </script>

@@ -63,12 +63,43 @@
       "title": "Счетчики",
       "token_regenerated": "Токен успешно перегенерирован"
     },
+    "custom_fields": {
+      "created": "Пользовательское поле успешно создано",
+      "error_saving": "Не удалось сохранить пользовательское поле",
+      "updated": "Пользовательское поле успешно обновлено"
+    },
+    "external": {
+      "config_delete_error": "Не удалось удалить конфигурацию",
+      "config_deleted": "Конфигурация удалена",
+      "config_deleted_description": "Билетная система HelloAsso успешно отключена",
+      "config_save_error": "Не удалось сохранить конфигурацию",
+      "config_saved": "Конфигурация сохранена",
+      "config_saved_description": "HelloAsso настроен для {org}",
+      "connection_error": "Не удалось подключиться к HelloAsso",
+      "connection_failed": "Ошибка подключения",
+      "connection_success": "Подключение успешно!",
+      "connection_success_description": "Форма найдена: {name} ({org})",
+      "json_copied": "Скопировано!",
+      "json_copied_description": "JSON скопирован в буфер обмена",
+      "json_copy_error": "Не удалось скопировать в буфер обмена",
+      "participants_load_error": "Не удалось загрузить участников",
+      "participants_loaded": "Участники загружены",
+      "participants_loaded_description": "Найдено {orders} заказ(ов) и {items} участник(ов)",
+      "raw_json_load_error": "Не удалось загрузить сырые данные",
+      "raw_json_loaded": "Сырой JSON загружен",
+      "raw_json_loaded_description": "Сырые данные HelloAsso получены",
+      "tiers_load_error": "Не удалось загрузить тарифы",
+      "tiers_loaded": "Тарифы загружены",
+      "tiers_loaded_description": "Найдено {tiers} тариф(ов), {options} опций и {fields} пользовательских полей"
+    },
     "my_ticket": {
       "how_to_use_description": "Покажите этот QR-код на входе для валидации билета.",
       "how_to_use_title": "Как использовать этот QR-код",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Опция успешно создана",
+      "error_saving": "Не удалось сохранить опцию",
       "list": {
         "loading": "Загрузка...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Выбрать квоты",
         "title": "Параметр HelloAsso",
         "type_label": "Тип параметра"
-      }
+      },
+      "name_required": "Название опции обязательно",
+      "updated": "Опция успешно обновлена"
     },
     "orders": {
       "cancel_order": "Отменить заказ",
@@ -100,10 +133,18 @@
       "delete_order": "Удалить команду",
       "delete_order_confirm": "Вы уверены, что хотите удалить эту команду?",
       "delete_order_confirm_message": "Это действие приведет к окончательному удалению заказа и всех связанных с ним билетов из базы данных. Это действие нельзя отменить.",
-      "delete_order_error": "Ошибка при удалении заказа",
       "deleting_order": "Удаление в процессе...",
+      "entry_invalidated": "Вход аннулирован",
+      "entry_invalidated_description": "Билет отмечен как не подтверждённый",
+      "entry_validated_description": "Билет успешно подтверждён",
+      "entry_validated_success": "Вход подтверждён",
+      "invalidate_entry_error": "Ошибка при аннулировании входа",
       "order_canceled": "Заказ отменен",
-      "order_deleted": "Заказ удален"
+      "order_deleted": "Заказ удален",
+      "payment_method_error": "Ошибка при обновлении способа оплаты",
+      "payment_method_updated": "Способ оплаты установлен",
+      "payment_method_updated_description": "Способ оплаты успешно сохранён",
+      "validate_entry_error": "Ошибка при подтверждении входа"
     },
     "participant": {
       "entry_validated": "Вход уже подтвержден",
@@ -128,19 +169,33 @@
       "selectMethod": "Выберите способ оплаты"
     },
     "quotas": {
+      "created": "Квота успешно создана",
+      "deleted": "Квота успешно удалена",
+      "error_deleting": "Не удалось удалить квоту",
+      "error_reordering": "Не удалось обновить порядок квот",
+      "error_saving": "Не удалось сохранить квоту",
+      "error_updating": "Не удалось обновить квоту",
       "list": {
+        "delete_button": "Удалить",
+        "delete_confirm": "Вы уверены, что хотите удалить квоту '{name}'?",
+        "delete_title": "Удалить квоту",
+        "description": "Определите здесь квоты для ограничения доступа к определённым услугам (шоу, мероприятия, входы и т.д.)",
         "description_label": "описание",
         "description_placeholder": "Описание (необязательно)",
+        "drag_tooltip": "Перетащите для изменения порядка",
         "loading": "Загрузка...",
         "name_placeholder": "Название квоты",
         "title": "Управление квотами"
       },
+      "order_updated": "Порядок квот обновлён",
+      "quantity_min": "Количество должно быть не менее 1",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Статистика квот",
         "used": "Использовано",
         "validated": "Подтверждено"
-      }
+      },
+      "title_required": "Название обязательно"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Волонтёры"
     },
     "tiers": {
+      "created": "Тариф успешно создан",
+      "error_saving": "Не удалось сохранить тариф",
       "list": {
         "drag_to_reorder": "Перетащите для изменения порядка",
         "inactive": "Неактивно",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Выбрать предметы",
         "status_label": "Статус",
         "title": "Тариф HelloAsso"
-      }
+      },
+      "name_required": "Название тарифа обязательно",
+      "updated": "Тариф успешно обновлён"
     }
   }
 }

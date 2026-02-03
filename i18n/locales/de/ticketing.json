@@ -63,12 +63,43 @@
       "title": "Zähler",
       "token_regenerated": "Token erfolgreich regeneriert"
     },
+    "custom_fields": {
+      "created": "Benutzerdefiniertes Feld erfolgreich erstellt",
+      "error_saving": "Benutzerdefiniertes Feld konnte nicht gespeichert werden",
+      "updated": "Benutzerdefiniertes Feld erfolgreich aktualisiert"
+    },
+    "external": {
+      "config_delete_error": "Konfiguration konnte nicht gelöscht werden",
+      "config_deleted": "Konfiguration gelöscht",
+      "config_deleted_description": "HelloAsso-Ticketing wurde erfolgreich getrennt",
+      "config_save_error": "Konfiguration konnte nicht gespeichert werden",
+      "config_saved": "Konfiguration gespeichert",
+      "config_saved_description": "HelloAsso für {org} konfiguriert",
+      "connection_error": "Verbindung zu HelloAsso nicht möglich",
+      "connection_failed": "Verbindung fehlgeschlagen",
+      "connection_success": "Verbindung erfolgreich!",
+      "connection_success_description": "Formular gefunden: {name} ({org})",
+      "json_copied": "Kopiert!",
+      "json_copied_description": "JSON wurde in die Zwischenablage kopiert",
+      "json_copy_error": "Kopieren in die Zwischenablage nicht möglich",
+      "participants_load_error": "Teilnehmer konnten nicht geladen werden",
+      "participants_loaded": "Teilnehmer geladen",
+      "participants_loaded_description": "{orders} Bestellung(en) und {items} Teilnehmer gefunden",
+      "raw_json_load_error": "Rohdaten konnten nicht geladen werden",
+      "raw_json_loaded": "Roh-JSON geladen",
+      "raw_json_loaded_description": "HelloAsso-Rohdaten wurden abgerufen",
+      "tiers_load_error": "Tarife konnten nicht geladen werden",
+      "tiers_loaded": "Tarife geladen",
+      "tiers_loaded_description": "{tiers} Tarif(e), {options} Option(en) und {fields} benutzerdefinierte(s) Feld(er) gefunden"
+    },
     "my_ticket": {
       "how_to_use_description": "Zeigen Sie diesen QR-Code am Eingang, um Ihr Ticket zu validieren.",
       "how_to_use_title": "So verwenden Sie diesen QR-Code",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Option erfolgreich erstellt",
+      "error_saving": "Option konnte nicht gespeichert werden",
       "list": {
         "loading": "Lädt...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Kontingente auswählen",
         "title": "HelloAsso-Option",
         "type_label": "Optionstyp"
-      }
+      },
+      "name_required": "Optionsname ist erforderlich",
+      "updated": "Option erfolgreich aktualisiert"
     },
     "orders": {
       "cancel_order": "Bestellung abbrechen",
@@ -100,10 +133,18 @@
       "delete_order": "Bestellung löschen",
       "delete_order_confirm": "Sind Sie sicher, dass Sie diesen Befehl löschen möchten?",
       "delete_order_confirm_message": "Diese Aktion wird die Bestellung und alle zugehörigen Tickets dauerhaft aus der Datenbank löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
-      "delete_order_error": "Fehler beim Löschen der Bestellung",
       "deleting_order": "Löschen im Gange...",
+      "entry_invalidated": "Eintritt ungültig gemacht",
+      "entry_invalidated_description": "Ticket wurde als nicht validiert markiert",
+      "entry_validated_description": "Ticket wurde erfolgreich validiert",
+      "entry_validated_success": "Eintritt validiert",
+      "invalidate_entry_error": "Fehler beim Ungültigmachen des Eintritts",
       "order_canceled": "Bestellung storniert",
-      "order_deleted": "Gelöschte Bestellung"
+      "order_deleted": "Gelöschte Bestellung",
+      "payment_method_error": "Fehler beim Aktualisieren der Zahlungsmethode",
+      "payment_method_updated": "Zahlungsmethode festgelegt",
+      "payment_method_updated_description": "Zahlungsmethode wurde erfolgreich gespeichert",
+      "validate_entry_error": "Fehler beim Validieren des Eintritts"
     },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",
@@ -128,19 +169,33 @@
       "selectMethod": "Zahlungsmethode auswählen"
     },
     "quotas": {
+      "created": "Kontingent erfolgreich erstellt",
+      "deleted": "Kontingent erfolgreich gelöscht",
+      "error_deleting": "Kontingent konnte nicht gelöscht werden",
+      "error_reordering": "Kontingentreihenfolge konnte nicht aktualisiert werden",
+      "error_saving": "Kontingent konnte nicht gespeichert werden",
+      "error_updating": "Kontingent konnte nicht aktualisiert werden",
       "list": {
+        "delete_button": "Löschen",
+        "delete_confirm": "Möchten Sie das Kontingent '{name}' wirklich löschen?",
+        "delete_title": "Kontingent löschen",
+        "description": "Definieren Sie hier Kontingente, um den Zugang zu bestimmten Leistungen einzuschränken (Shows, Aktivitäten, Eintritte usw.)",
         "description_label": "Beschreibung",
         "description_placeholder": "Beschreibung (optional)",
+        "drag_tooltip": "Ziehen zum Neuordnen",
         "loading": "Lädt...",
         "name_placeholder": "Titel des Kontingents",
         "title": "Kontingentverwaltung"
       },
+      "order_updated": "Kontingentreihenfolge aktualisiert",
+      "quantity_min": "Menge muss mindestens 1 sein",
       "stats": {
         "exceeded": "ÜBERSCHREITUNG",
         "title": "Kontingentstatistiken",
         "used": "Verwendet",
         "validated": "Validiert"
-      }
+      },
+      "title_required": "Titel ist erforderlich"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Freiwillige"
     },
     "tiers": {
+      "created": "Tarif erfolgreich erstellt",
+      "error_saving": "Tarif konnte nicht gespeichert werden",
       "list": {
         "drag_to_reorder": "Ziehen zum Neuordnen",
         "inactive": "Inaktiv",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Artikel auswählen",
         "status_label": "Status",
         "title": "HelloAsso-Tarif"
-      }
+      },
+      "name_required": "Tarifname ist erforderlich",
+      "updated": "Tarif erfolgreich aktualisiert"
     }
   }
 }

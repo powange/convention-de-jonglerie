@@ -1583,34 +1583,28 @@ const isAmountDetailsModalOpen = ref(false)
 // Modal et logique d'annulation de commande
 const isCancelModalOpen = ref(false)
 const orderToCancel = ref<Order | null>(null)
-const isCanceling = ref(false)
 
 const showCancelModal = (order: Order) => {
   orderToCancel.value = order
   isCancelModalOpen.value = true
 }
 
-const cancelOrder = async () => {
-  if (!orderToCancel.value) return
-
-  const isDeleting = orderToCancel.value.status === 'Refunded'
-  isCanceling.value = true
-  try {
-    const response = await $fetch<{ success: boolean; message: string }>(
-      `/api/editions/${editionId}/ticketing/orders/${orderToCancel.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
+// Action pour annuler/supprimer une commande
+const { execute: executeCancelOrder, loading: isCanceling } = useApiAction<
+  never,
+  { success: boolean; message: string }
+>(() => `/api/editions/${editionId}/ticketing/orders/${orderToCancel.value?.id}`, {
+  method: 'DELETE',
+  silentSuccess: true, // Message conditionnel géré dans onSuccess
+  errorMessages: { default: $t('ticketing.orders.cancel_order_error') },
+  onSuccess: async (response) => {
+    const isDeleting = orderToCancel.value?.status === 'Refunded'
     // Fermer la modal
     isCancelModalOpen.value = false
     orderToCancel.value = null
-
     // Recharger les commandes
     await loadOrders()
-
-    // Message de succès
+    // Message de succès conditionnel
     useToast().add({
       title: isDeleting
         ? $t('ticketing.orders.order_deleted')
@@ -1619,21 +1613,12 @@ const cancelOrder = async () => {
       color: 'success',
       icon: 'i-heroicons-check-circle',
     })
-  } catch (error: any) {
-    console.error('Failed to cancel/delete order:', error)
-    useToast().add({
-      title: $t('common.error'),
-      description:
-        error.data?.message ||
-        (isDeleting
-          ? $t('ticketing.orders.delete_order_error')
-          : $t('ticketing.orders.cancel_order_error')),
-      color: 'error',
-      icon: 'i-heroicons-exclamation-circle',
-    })
-  } finally {
-    isCanceling.value = false
-  }
+  },
+})
+
+const cancelOrder = () => {
+  if (!orderToCancel.value) return
+  executeCancelOrder()
 }
 
 // Modal et logique de définition de méthode de paiement
@@ -1641,7 +1626,6 @@ const isPaymentMethodModalOpen = ref(false)
 const selectedOrder = ref<Order | null>(null)
 const selectedPaymentMethod = ref<'cash' | 'card' | 'check' | null>(null)
 const selectedCheckNumber = ref('')
-const isUpdatingPaymentMethod = ref(false)
 
 const openPaymentMethodModal = (order: Order) => {
   selectedOrder.value = order
@@ -1657,115 +1641,100 @@ const closePaymentMethodModal = () => {
   selectedCheckNumber.value = ''
 }
 
-const updatePaymentMethod = async () => {
-  if (!selectedOrder.value || !selectedPaymentMethod.value) return
+// Construit le payload pour la mise à jour de la méthode de paiement
+const buildPaymentMethodPayload = () => ({
+  paymentMethod: selectedPaymentMethod.value,
+  checkNumber: selectedPaymentMethod.value === 'check' ? selectedCheckNumber.value : undefined,
+})
 
-  isUpdatingPaymentMethod.value = true
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/ticketing/orders/${selectedOrder.value.id}/payment-method`,
-      {
-        method: 'PATCH',
-        body: {
-          paymentMethod: selectedPaymentMethod.value,
-          checkNumber:
-            selectedPaymentMethod.value === 'check' ? selectedCheckNumber.value : undefined,
-        },
-      }
-    )
-
-    // Fermer la modal
-    closePaymentMethodModal()
-
-    // Recharger les commandes
-    await loadOrders()
-
-    // Message de succès
-    useToast().add({
-      title: 'Méthode de paiement définie',
-      description: 'La méthode de paiement a été enregistrée avec succès',
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-  } catch (error: any) {
-    console.error('Failed to update payment method:', error)
-    useToast().add({
-      title: 'Erreur',
-      description: error.data?.message || 'Erreur lors de la mise à jour de la méthode de paiement',
-      color: 'error',
-      icon: 'i-heroicons-exclamation-circle',
-    })
-  } finally {
-    isUpdatingPaymentMethod.value = false
+// Action pour mettre à jour la méthode de paiement
+const { execute: executeUpdatePaymentMethod, loading: isUpdatingPaymentMethod } = useApiAction(
+  () => `/api/editions/${editionId}/ticketing/orders/${selectedOrder.value?.id}/payment-method`,
+  {
+    method: 'PATCH',
+    body: buildPaymentMethodPayload,
+    successMessage: {
+      title: $t('ticketing.orders.payment_method_updated'),
+      description: $t('ticketing.orders.payment_method_updated_description'),
+    },
+    errorMessages: { default: $t('ticketing.orders.payment_method_error') },
+    onSuccess: async () => {
+      closePaymentMethodModal()
+      await loadOrders()
+    },
   }
+)
+
+const updatePaymentMethod = () => {
+  if (!selectedOrder.value || !selectedPaymentMethod.value) return
+  executeUpdatePaymentMethod()
 }
 
 // Modal et logique de validation/invalidation d'entrée
 const isValidateModalOpen = ref(false)
 const itemToValidate = ref<any>(null)
-const isValidating = ref(false)
 
 const showValidateModal = (item: any) => {
   itemToValidate.value = item
   isValidateModalOpen.value = true
 }
 
-const validateEntry = async () => {
+// Callback commun après validation/invalidation
+const onValidationSuccess = async (isInvalidating: boolean) => {
+  isValidateModalOpen.value = false
+  itemToValidate.value = null
+  await loadOrders()
+  useToast().add({
+    title: isInvalidating
+      ? $t('ticketing.orders.entry_invalidated')
+      : $t('ticketing.orders.entry_validated_success'),
+    description: isInvalidating
+      ? $t('ticketing.orders.entry_invalidated_description')
+      : $t('ticketing.orders.entry_validated_description'),
+    color: 'success',
+    icon: 'i-heroicons-check-circle',
+  })
+}
+
+// Action pour valider une entrée
+const { execute: executeValidate, loading: isValidatingEntry } = useApiAction(
+  () => `/api/editions/${editionId}/ticketing/validate-entry`,
+  {
+    method: 'POST',
+    body: () => ({
+      participantIds: [itemToValidate.value?.id],
+      type: 'ticket',
+    }),
+    silentSuccess: true,
+    errorMessages: { default: $t('ticketing.orders.validate_entry_error') },
+    onSuccess: () => onValidationSuccess(false),
+  }
+)
+
+// Action pour invalider une entrée
+const { execute: executeInvalidate, loading: isInvalidatingEntry } = useApiAction(
+  () => `/api/editions/${editionId}/ticketing/invalidate-entry`,
+  {
+    method: 'POST',
+    body: () => ({
+      participantId: itemToValidate.value?.id,
+      type: 'ticket',
+    }),
+    silentSuccess: true,
+    errorMessages: { default: $t('ticketing.orders.invalidate_entry_error') },
+    onSuccess: () => onValidationSuccess(true),
+  }
+)
+
+// État de chargement combiné
+const isValidating = computed(() => isValidatingEntry.value || isInvalidatingEntry.value)
+
+const validateEntry = () => {
   if (!itemToValidate.value) return
-
-  const isInvalidating = itemToValidate.value.entryValidated
-  isValidating.value = true
-  try {
-    if (isInvalidating) {
-      // Invalider l'entrée
-      await $fetch(`/api/editions/${editionId}/ticketing/invalidate-entry`, {
-        method: 'POST',
-        body: {
-          participantId: itemToValidate.value.id,
-          type: 'ticket',
-        },
-      })
-    } else {
-      // Valider l'entrée
-      await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
-        method: 'POST',
-        body: {
-          participantIds: [itemToValidate.value.id],
-          type: 'ticket',
-        },
-      })
-    }
-
-    // Fermer la modal
-    isValidateModalOpen.value = false
-    itemToValidate.value = null
-
-    // Recharger les commandes
-    await loadOrders()
-
-    // Message de succès
-    useToast().add({
-      title: isInvalidating ? 'Entrée invalidée' : 'Entrée validée',
-      description: isInvalidating
-        ? 'Le billet a été marqué comme non validé'
-        : 'Le billet a été validé avec succès',
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-  } catch (error: any) {
-    console.error('Failed to validate/invalidate entry:', error)
-    useToast().add({
-      title: 'Erreur',
-      description:
-        error.data?.message ||
-        (isInvalidating
-          ? "Erreur lors de l'invalidation de l'entrée"
-          : "Erreur lors de la validation de l'entrée"),
-      color: 'error',
-      icon: 'i-heroicons-exclamation-circle',
-    })
-  } finally {
-    isValidating.value = false
+  if (itemToValidate.value.entryValidated) {
+    executeInvalidate()
+  } else {
+    executeValidate()
   }
 }
 

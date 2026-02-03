@@ -63,12 +63,43 @@
       "title": "Tællere",
       "token_regenerated": "Token regenereret med succes"
     },
+    "custom_fields": {
+      "created": "Brugerdefineret felt oprettet med succes",
+      "error_saving": "Kan ikke gemme brugerdefineret felt",
+      "updated": "Brugerdefineret felt opdateret med succes"
+    },
+    "external": {
+      "config_delete_error": "Kan ikke slette konfiguration",
+      "config_deleted": "Konfiguration slettet",
+      "config_deleted_description": "HelloAsso billetsalg er blevet frakoblet",
+      "config_save_error": "Kan ikke gemme konfiguration",
+      "config_saved": "Konfiguration gemt",
+      "config_saved_description": "HelloAsso konfigureret for {org}",
+      "connection_error": "Kan ikke oprette forbindelse til HelloAsso",
+      "connection_failed": "Forbindelse mislykkedes",
+      "connection_success": "Forbindelse oprettet!",
+      "connection_success_description": "Formular fundet: {name} ({org})",
+      "json_copied": "Kopieret!",
+      "json_copied_description": "JSON er kopieret til udklipsholder",
+      "json_copy_error": "Kan ikke kopiere til udklipsholder",
+      "participants_load_error": "Kan ikke indlæse deltagere",
+      "participants_loaded": "Deltagere indlæst",
+      "participants_loaded_description": "{orders} ordre(r) og {items} deltager(e) fundet",
+      "raw_json_load_error": "Kan ikke indlæse rådata",
+      "raw_json_loaded": "Rå JSON indlæst",
+      "raw_json_loaded_description": "HelloAsso rådata er hentet",
+      "tiers_load_error": "Kan ikke indlæse priser",
+      "tiers_loaded": "Priser indlæst",
+      "tiers_loaded_description": "{tiers} pris(er), {options} valgmulighed(er) og {fields} brugerdefineret(e) felt(er) fundet"
+    },
     "my_ticket": {
       "how_to_use_description": "Vis denne QR-kode ved indgangen for at validere din billet.",
       "how_to_use_title": "Sådan bruges denne QR-kode",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Valgmulighed oprettet med succes",
+      "error_saving": "Kan ikke gemme valgmulighed",
       "list": {
         "loading": "Indlæser...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Vælg kvoter",
         "title": "HelloAsso mulighed",
         "type_label": "Type mulighed"
-      }
+      },
+      "name_required": "Valgmulighedens navn er påkrævet",
+      "updated": "Valgmulighed opdateret med succes"
     },
     "orders": {
       "cancel_order": "Annuller ordre",
@@ -100,10 +133,18 @@
       "delete_order": "Slet kommando",
       "delete_order_confirm": "Er du sikker på, at du vil slette denne kommando?",
       "delete_order_confirm_message": "Denne handling vil permanent slette ordren og alle tilknyttede billetter fra databasen. Denne handling kan ikke fortrydes.",
-      "delete_order_error": "Fejl ved sletning af ordre",
       "deleting_order": "Sletning i gang...",
+      "entry_invalidated": "Adgang ugyldiggjort",
+      "entry_invalidated_description": "Billet er markeret som ikke valideret",
+      "entry_validated_description": "Billet er valideret med succes",
+      "entry_validated_success": "Adgang valideret",
+      "invalidate_entry_error": "Fejl ved ugyldiggørelse af adgang",
       "order_canceled": "Ordre annulleret",
-      "order_deleted": "Ordre slettet"
+      "order_deleted": "Ordre slettet",
+      "payment_method_error": "Fejl ved opdatering af betalingsmetode",
+      "payment_method_updated": "Betalingsmetode indstillet",
+      "payment_method_updated_description": "Betalingsmetode er gemt med succes",
+      "validate_entry_error": "Fejl ved validering af adgang"
     },
     "participant": {
       "entry_validated": "Adgang allerede valideret",
@@ -128,19 +169,33 @@
       "selectMethod": "Vælg betalingsmetode"
     },
     "quotas": {
+      "created": "Kvote oprettet med succes",
+      "deleted": "Kvote slettet med succes",
+      "error_deleting": "Kan ikke slette kvote",
+      "error_reordering": "Kan ikke opdatere kvoterækkefølge",
+      "error_saving": "Kan ikke gemme kvote",
+      "error_updating": "Kan ikke opdatere kvote",
       "list": {
+        "delete_button": "Slet",
+        "delete_confirm": "Er du sikker på, at du vil slette kvoten '{name}'?",
+        "delete_title": "Slet kvote",
+        "description": "Definer kvoter her for at begrænse adgangen til bestemte ydelser (shows, aktiviteter, adgange osv.)",
         "description_label": "beskrivelse",
         "description_placeholder": "Beskrivelse (valgfrit)",
+        "drag_tooltip": "Træk for at omarrangere",
         "loading": "Indlæser...",
         "name_placeholder": "Kvotens titel",
         "title": "Kvoterstyring"
       },
+      "order_updated": "Kvoterækkefølge opdateret",
+      "quantity_min": "Antal skal være mindst 1",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Kvotestatistik",
         "used": "Brugt",
         "validated": "Valideret"
-      }
+      },
+      "title_required": "Titel er påkrævet"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Frivillige"
     },
     "tiers": {
+      "created": "Pris oprettet med succes",
+      "error_saving": "Kan ikke gemme pris",
       "list": {
         "drag_to_reorder": "Træk for at omorganisere",
         "inactive": "Inaktiv",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Vælg varer",
         "status_label": "Status",
         "title": "HelloAsso pris"
-      }
+      },
+      "name_required": "Prisens navn er påkrævet",
+      "updated": "Pris opdateret med succes"
     }
   }
 }

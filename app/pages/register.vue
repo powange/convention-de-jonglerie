@@ -306,9 +306,7 @@ import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
 import { usePasswordStrength } from '~/composables/usePasswordStrength'
-import type { HttpError } from '~/types'
 
-const toast = useToast()
 const { t } = useI18n()
 
 // Middleware pour rediriger les utilisateurs connectés
@@ -345,7 +343,6 @@ const state = reactive({
   isArtist: false,
   isOrganizer: false,
 })
-const loading = ref(false)
 
 // États pour l'affichage des mots de passe
 const showPassword = ref(false)
@@ -398,44 +395,41 @@ const onGoogleRegister = async () => {
   await navigateTo('/auth/google', { external: true })
 }
 
-const handleRegister = async () => {
-  loading.value = true
-  try {
-    const response = await $fetch('/api/auth/register', {
-      method: 'POST',
-      body: {
-        email: state.email,
-        password: state.password,
-        pseudo: state.pseudo,
-        nom: state.nom,
-        prenom: state.prenom,
-        isVolunteer: state.isVolunteer,
-        isArtist: state.isArtist,
-        isOrganizer: state.isOrganizer,
-      },
-    })
+// Construit le payload pour l'API
+const buildPayload = () => ({
+  email: state.email,
+  password: state.password,
+  pseudo: state.pseudo,
+  nom: state.nom,
+  prenom: state.prenom,
+  isVolunteer: state.isVolunteer,
+  isArtist: state.isArtist,
+  isOrganizer: state.isOrganizer,
+})
 
-    if (response.requiresVerification) {
-      // Rediriger vers la page de vérification avec l'email
+// Action pour l'inscription
+const { execute: executeRegister, loading } = useApiAction<
+  ReturnType<typeof buildPayload>,
+  { requiresVerification?: boolean; email: string }
+>('/api/auth/register', {
+  method: 'POST',
+  body: buildPayload,
+  successMessage: {
+    title: t('messages.account_created'),
+    description: t('messages.verification_code_sent'),
+  },
+  errorMessages: {
+    409: t('errors.email_or_username_taken'),
+    default: t('errors.registration_failed'),
+  },
+  onSuccess: async (response) => {
+    if (response?.requiresVerification) {
       await navigateTo(`/verify-email?email=${encodeURIComponent(response.email)}`)
-      toast.add({
-        title: t('messages.account_created'),
-        description: t('messages.verification_code_sent'),
-        icon: 'i-heroicons-envelope',
-        color: 'success',
-      })
     }
-  } catch (e: unknown) {
-    const error = e as HttpError
-    let errorMessage = t('errors.registration_failed')
-    if (error.statusCode === 409 || error.status === 409) {
-      errorMessage = t('errors.email_or_username_taken')
-    } else if (error.message || error.data?.message) {
-      errorMessage = error.message || error.data?.message || errorMessage
-    }
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
-  } finally {
-    loading.value = false
-  }
+  },
+})
+
+const handleRegister = () => {
+  executeRegister()
 }
 </script>

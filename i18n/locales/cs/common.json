@@ -320,6 +320,7 @@
       "no_tiers_available": "Žádné sazby nejsou k dispozici",
       "no_validation_yet": "Prozatím bez potvrzení",
       "order": "Objednávání",
+      "order_created": "Objednávka úspěšně vytvořena",
       "order_id": "ID objednávky",
       "organization_slug_label": "Organizace slimák",
       "organization_slug_placeholder": "ex: žonglování-konference",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Nelze zveřejnit komentář",
     "cannot_remove_favorite": "Nelze odebrat oblíbené položky",
     "city_too_long": "Město nesmí překročit {max} znaků",
+    "conflict": "Konflikt s existujícími daty",
     "content_required": "Obsah je vyžadován",
     "content_too_long": "Obsah nesmí překročit {max} znaků",
     "convention_creation_error": "Při vytváření dohody došlo k chybě",
@@ -888,6 +890,7 @@
     "invalid_email": "Neplatný e-mail",
     "invalid_file_type": "Nesprávný typ souboru. Přijatelné formáty: {types}",
     "invalid_phone_number": "Neplatné telefonní číslo",
+    "invalid_request": "Neplatný požadavek",
     "loading_error": "Chyba načítání",
     "login_failed": "Selhání připojení",
     "login_required_convention": "Pro vytvoření dohody musíte být přihlášeni.",
@@ -909,7 +912,8 @@
     "status_update_failed": "Aktualizace stavu se nezdařila",
     "update_error": "Chyba při aktualizaci",
     "update_organizer_error": "Chyba při aktualizaci spolupracovníka",
-    "username_min_3_chars": "Uživatelské jméno musí obsahovat alespoň 3 znaky."
+    "username_min_3_chars": "Uživatelské jméno musí obsahovat alespoň 3 znaky.",
+    "validation_error": "Chyba validace"
   },
   "footer": {
     "copyright": "{year} Žonglérská konvence. Všechna práva vyhrazena.",

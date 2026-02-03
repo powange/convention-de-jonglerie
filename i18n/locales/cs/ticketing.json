@@ -63,12 +63,43 @@
       "title": "Čítače",
       "token_regenerated": "Token úspěšně regenerován"
     },
+    "custom_fields": {
+      "created": "Vlastní pole úspěšně vytvořeno",
+      "error_saving": "Nelze uložit vlastní pole",
+      "updated": "Vlastní pole úspěšně aktualizováno"
+    },
+    "external": {
+      "config_delete_error": "Nelze odstranit konfiguraci",
+      "config_deleted": "Konfigurace odstraněna",
+      "config_deleted_description": "Vstupenky HelloAsso byly úspěšně odpojeny",
+      "config_save_error": "Nelze uložit konfiguraci",
+      "config_saved": "Konfigurace uložena",
+      "config_saved_description": "HelloAsso nakonfigurováno pro {org}",
+      "connection_error": "Nelze se připojit k HelloAsso",
+      "connection_failed": "Připojení selhalo",
+      "connection_success": "Připojení úspěšné!",
+      "connection_success_description": "Formulář nalezen: {name} ({org})",
+      "json_copied": "Zkopírováno!",
+      "json_copied_description": "JSON byl zkopírován do schránky",
+      "json_copy_error": "Nelze zkopírovat do schránky",
+      "participants_load_error": "Nelze načíst účastníky",
+      "participants_loaded": "Účastníci načteni",
+      "participants_loaded_description": "Nalezeno {orders} objednávek a {items} účastníků",
+      "raw_json_load_error": "Nelze načíst surová data",
+      "raw_json_loaded": "Surový JSON načten",
+      "raw_json_loaded_description": "Surová data HelloAsso byla načtena",
+      "tiers_load_error": "Nelze načíst tarify",
+      "tiers_loaded": "Tarify načteny",
+      "tiers_loaded_description": "Nalezeno {tiers} tarifů, {options} možností a {fields} vlastních polí"
+    },
     "my_ticket": {
       "how_to_use_description": "U vstupu předložte tento QR kód a ověřte si platnost vstupenky.",
       "how_to_use_title": "Jak používat tento QR kód",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Možnost úspěšně vytvořena",
+      "error_saving": "Nelze uložit možnost",
       "list": {
         "loading": "Načítání...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Výběr kvót",
         "title": "Možnost HelloAsso",
         "type_label": "Typ možnosti"
-      }
+      },
+      "name_required": "Název možnosti je povinný",
+      "updated": "Možnost úspěšně aktualizována"
     },
     "orders": {
       "cancel_order": "Zrušit objednávku",
@@ -100,10 +133,18 @@
       "delete_order": "Příkaz k odstranění",
       "delete_order_confirm": "Opravdu chcete tento příkaz odstranit?",
       "delete_order_confirm_message": "Tato akce trvale odstraní objednávku a všechny související tipy z databáze. Tuto akci nelze vrátit zpět.",
-      "delete_order_error": "Chyba při mazání objednávky",
       "deleting_order": "Probíhá mazání...",
+      "entry_invalidated": "Vstup zneplatněn",
+      "entry_invalidated_description": "Vstupenka byla označena jako neověřená",
+      "entry_validated_description": "Vstupenka byla úspěšně ověřena",
+      "entry_validated_success": "Vstup ověřen",
+      "invalidate_entry_error": "Chyba při zneplatnění vstupu",
       "order_canceled": "Objednávka zrušena",
-      "order_deleted": "Objednávka vymazána"
+      "order_deleted": "Objednávka vymazána",
+      "payment_method_error": "Chyba při aktualizaci platební metody",
+      "payment_method_updated": "Platební metoda nastavena",
+      "payment_method_updated_description": "Platební metoda byla úspěšně uložena",
+      "validate_entry_error": "Chyba při ověření vstupu"
     },
     "participant": {
       "entry_validated": "Položka již byla ověřena",
@@ -128,19 +169,33 @@
       "selectMethod": "Vyberte způsob platby"
     },
     "quotas": {
+      "created": "Kvóta úspěšně vytvořena",
+      "deleted": "Kvóta úspěšně odstraněna",
+      "error_deleting": "Nelze odstranit kvótu",
+      "error_reordering": "Nelze aktualizovat pořadí kvót",
+      "error_saving": "Nelze uložit kvótu",
+      "error_updating": "Nelze aktualizovat kvótu",
       "list": {
+        "delete_button": "Odstranit",
+        "delete_confirm": "Opravdu chcete odstranit kvótu '{name}'?",
+        "delete_title": "Odstranit kvótu",
+        "description": "Definujte zde kvóty pro omezení přístupu k určitým službám (představení, aktivity, vstupy atd.)",
         "description_label": "popis",
         "description_placeholder": "Popis (nepovinné)",
+        "drag_tooltip": "Přetáhněte pro změnu pořadí",
         "loading": "Načítání...",
         "name_placeholder": "Název kvóty",
         "title": "Správa kvót"
       },
+      "order_updated": "Pořadí kvót aktualizováno",
+      "quantity_min": "Množství musí být alespoň 1",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Statistiky kvót",
         "used": "Použité",
         "validated": "Ověřeno"
-      }
+      },
+      "title_required": "Název je povinný"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Dobrovolníci"
     },
     "tiers": {
+      "created": "Tarif úspěšně vytvořen",
+      "error_saving": "Nelze uložit tarif",
       "list": {
         "drag_to_reorder": "Přetáhněte pro změnu pořadí",
         "inactive": "Neaktivní",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Vybrané položky",
         "status_label": "Stav",
         "title": "Sazba HelloAsso"
-      }
+      },
+      "name_required": "Název tarifu je povinný",
+      "updated": "Tarif úspěšně aktualizován"
     }
   }
 }

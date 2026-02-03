@@ -320,6 +320,7 @@
       "no_tiers_available": "Inga priser tillgängliga",
       "no_validation_yet": "Ingen validering för närvarande",
       "order": "Beställning",
+      "order_created": "Beställning skapad framgångsrikt",
       "order_id": "Order-ID",
       "organization_slug_label": "Organisationens slug",
       "organization_slug_placeholder": "ex: jongleringskonferens",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Det går inte att publicera kommentaren",
     "cannot_remove_favorite": "Det går inte att ta bort favoriter",
     "city_too_long": "Staden kan inte överstiga {max} tecken",
+    "conflict": "Konflikt med befintliga data",
     "content_required": "Innehåll krävs",
     "content_too_long": "Innehållet får inte överstiga {max} tecken",
     "convention_creation_error": "Ett fel inträffade när avtalet skapades",
@@ -888,6 +890,7 @@
     "invalid_email": "Ogiltig e-post",
     "invalid_file_type": "Ogiltig filtyp. Accepterade format: {types}",
     "invalid_phone_number": "Ogiltigt telefonnummer",
+    "invalid_request": "Ogiltig begäran",
     "loading_error": "Fel vid laddning",
     "login_failed": "Felaktig anslutning",
     "login_required_convention": "Du måste vara inloggad för att skapa ett avtal",
@@ -909,7 +912,8 @@
     "status_update_failed": "Statusuppdateringen misslyckades",
     "update_error": "Fel under uppdatering",
     "update_organizer_error": "Fel vid uppdatering av medarbetaren",
-    "username_min_3_chars": "Användarnamnet måste innehålla minst 3 tecken"
+    "username_min_3_chars": "Användarnamnet måste innehålla minst 3 tecken",
+    "validation_error": "Valideringsfel"
   },
   "footer": {
     "copyright": "{year} Jongleringskonvention. Alla rättigheter reserverade.",

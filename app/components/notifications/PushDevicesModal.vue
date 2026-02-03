@@ -58,7 +58,7 @@
               variant="ghost"
               size="sm"
               icon="i-heroicons-trash"
-              :loading="deletingId === device.id"
+              :loading="isDeleting(device.id)"
               :disabled="!!deletingId"
               @click="deleteDevice(device.id)"
             />
@@ -95,7 +95,21 @@ const { getDeviceId } = useDeviceId()
 const isOpen = ref(false)
 const loading = ref(false)
 const devices = ref<Device[]>([])
-const deletingId = ref<string | null>(null)
+
+// Utilisation de useApiActionById pour la suppression
+const {
+  execute: executeDeleteDevice,
+  loadingId: deletingId,
+  isLoading: isDeleting,
+} = useApiActionById((id) => `/api/notifications/fcm/devices/${id}`, {
+  method: 'DELETE',
+  successMessage: { title: t('notifications.devices.deleted') },
+  errorMessages: { default: t('notifications.devices.error_deleting') },
+  onSuccess: (_result, id) => {
+    // Retirer de la liste locale
+    devices.value = devices.value.filter((d) => d.id !== id)
+  },
+})
 
 // DeviceId actuel pour identifier l'appareil courant (plus fiable que le User-Agent)
 const currentDeviceId = ref<string | null>(null)
@@ -136,31 +150,10 @@ async function fetchDevices() {
 }
 
 /**
- * Supprime un appareil
+ * Supprime un appareil (utilise useApiActionById)
  */
-async function deleteDevice(deviceId: string) {
-  deletingId.value = deviceId
-  try {
-    await $fetch(`/api/notifications/fcm/devices/${deviceId}`, {
-      method: 'DELETE',
-    })
-
-    // Retirer de la liste locale
-    devices.value = devices.value.filter((d) => d.id !== deviceId)
-
-    toast.add({
-      color: 'success',
-      title: t('notifications.devices.deleted'),
-    })
-  } catch (error) {
-    console.error('[PushDevices] Erreur suppression:', error)
-    toast.add({
-      color: 'error',
-      title: t('notifications.devices.error_deleting'),
-    })
-  } finally {
-    deletingId.value = null
-  }
+function deleteDevice(deviceId: string) {
+  executeDeleteDevice(deviceId)
 }
 
 /**

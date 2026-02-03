@@ -320,6 +320,7 @@
       "no_tiers_available": "Aucun tarif disponible",
       "no_validation_yet": "Aucune validation pour le moment",
       "order": "Commande",
+      "order_created": "Commande créée avec succès",
       "order_id": "ID de commande",
       "organization_slug_label": "Slug de l'organisation",
       "organization_slug_placeholder": "ex: juggling-convention",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Impossible de publier le commentaire",
     "cannot_remove_favorite": "Impossible de retirer des favoris",
     "city_too_long": "La ville ne peut pas dépasser {max} caractères",
+    "conflict": "Conflit avec une donnée existante",
     "content_required": "Le contenu est requis",
     "content_too_long": "Le contenu ne peut pas dépasser {max} caractères",
     "convention_creation_error": "Une erreur est survenue lors de la création de la convention",
@@ -888,6 +890,7 @@
     "invalid_email": "Email invalide",
     "invalid_file_type": "Type de fichier invalide. Formats acceptés : {types}",
     "invalid_phone_number": "Numéro de téléphone invalide",
+    "invalid_request": "Requête invalide",
     "loading_error": "Erreur de chargement",
     "login_failed": "Échec de la connexion",
     "login_required_convention": "Vous devez être connecté pour créer une convention",
@@ -909,7 +912,8 @@
     "status_update_failed": "Échec de la mise à jour du statut",
     "update_error": "Erreur lors de la mise à jour",
     "update_organizer_error": "Erreur lors de la mise à jour du organisateur",
-    "username_min_3_chars": "Le pseudo doit contenir au moins 3 caractères"
+    "username_min_3_chars": "Le pseudo doit contenir au moins 3 caractères",
+    "validation_error": "Erreur de validation"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Tous droits réservés.",

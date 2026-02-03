@@ -63,12 +63,43 @@
       "title": "Contadores",
       "token_regenerated": "Token regenerado com sucesso"
     },
+    "custom_fields": {
+      "created": "Campo personalizado criado com sucesso",
+      "error_saving": "Não foi possível guardar o campo personalizado",
+      "updated": "Campo personalizado atualizado com sucesso"
+    },
+    "external": {
+      "config_delete_error": "Não foi possível eliminar a configuração",
+      "config_deleted": "Configuração eliminada",
+      "config_deleted_description": "A bilheteira HelloAsso foi desassociada com sucesso",
+      "config_save_error": "Não foi possível guardar a configuração",
+      "config_saved": "Configuração guardada",
+      "config_saved_description": "HelloAsso configurado para {org}",
+      "connection_error": "Não foi possível conectar ao HelloAsso",
+      "connection_failed": "Falha na conexão",
+      "connection_success": "Conexão bem-sucedida!",
+      "connection_success_description": "Formulário encontrado: {name} ({org})",
+      "json_copied": "Copiado!",
+      "json_copied_description": "O JSON foi copiado para a área de transferência",
+      "json_copy_error": "Não foi possível copiar para a área de transferência",
+      "participants_load_error": "Não foi possível carregar os participantes",
+      "participants_loaded": "Participantes carregados",
+      "participants_loaded_description": "{orders} pedido(s) e {items} participante(s) encontrado(s)",
+      "raw_json_load_error": "Não foi possível carregar os dados brutos",
+      "raw_json_loaded": "JSON bruto carregado",
+      "raw_json_loaded_description": "Os dados brutos do HelloAsso foram recuperados",
+      "tiers_load_error": "Não foi possível carregar as tarifas",
+      "tiers_loaded": "Tarifas carregadas",
+      "tiers_loaded_description": "{tiers} tarifa(s), {options} opção(ões) e {fields} campo(s) personalizado(s) encontrado(s)"
+    },
     "my_ticket": {
       "how_to_use_description": "Apresente este código QR na entrada para validar o seu bilhete.",
       "how_to_use_title": "Como usar este código QR",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Opção criada com sucesso",
+      "error_saving": "Não foi possível guardar a opção",
       "list": {
         "loading": "Carregando...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Selecionar quotas",
         "title": "Opção HelloAsso",
         "type_label": "Tipo de opção"
-      }
+      },
+      "name_required": "O nome da opção é obrigatório",
+      "updated": "Opção atualizada com sucesso"
     },
     "orders": {
       "cancel_order": "Cancelar encomenda",
@@ -100,10 +133,18 @@
       "delete_order": "Apagar comando",
       "delete_order_confirm": "Tem a certeza de que pretende apagar este comando?",
       "delete_order_confirm_message": "Esta ação elimina permanentemente a encomenda e todos os bilhetes associados da base de dados. Esta ação não pode ser anulada.",
-      "delete_order_error": "Erro ao eliminar a ordem",
       "deleting_order": "Eliminação em curso...",
+      "entry_invalidated": "Entrada invalidada",
+      "entry_invalidated_description": "O bilhete foi marcado como não validado",
+      "entry_validated_description": "O bilhete foi validado com sucesso",
+      "entry_validated_success": "Entrada validada",
+      "invalidate_entry_error": "Erro ao invalidar a entrada",
       "order_canceled": "Encomenda anulada",
-      "order_deleted": "Ordem suprimida"
+      "order_deleted": "Ordem suprimida",
+      "payment_method_error": "Erro ao atualizar o método de pagamento",
+      "payment_method_updated": "Método de pagamento definido",
+      "payment_method_updated_description": "O método de pagamento foi guardado com sucesso",
+      "validate_entry_error": "Erro ao validar a entrada"
     },
     "participant": {
       "entry_validated": "Entrada já validada",
@@ -128,19 +169,33 @@
       "selectMethod": "Selecione o método de pagamento"
     },
     "quotas": {
+      "created": "Quota criada com sucesso",
+      "deleted": "Quota eliminada com sucesso",
+      "error_deleting": "Não foi possível eliminar a quota",
+      "error_reordering": "Não foi possível atualizar a ordem das quotas",
+      "error_saving": "Não foi possível guardar a quota",
+      "error_updating": "Não foi possível atualizar a quota",
       "list": {
+        "delete_button": "Eliminar",
+        "delete_confirm": "Tem a certeza de que deseja eliminar a quota '{name}'?",
+        "delete_title": "Eliminar quota",
+        "description": "Defina aqui as quotas para limitar o acesso a determinados serviços (espetáculos, atividades, entradas, etc.)",
         "description_label": "descrição",
         "description_placeholder": "Descrição (opcional)",
+        "drag_tooltip": "Arrastar para reordenar",
         "loading": "Carregando...",
         "name_placeholder": "Título da quota",
         "title": "Gestão de quotas"
       },
+      "order_updated": "Ordem das quotas atualizada",
+      "quantity_min": "A quantidade deve ser pelo menos 1",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Estatísticas de quotas",
         "used": "Usado",
         "validated": "Validado"
-      }
+      },
+      "title_required": "O título é obrigatório"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Voluntários"
     },
     "tiers": {
+      "created": "Tarifa criada com sucesso",
+      "error_saving": "Não foi possível guardar a tarifa",
       "list": {
         "drag_to_reorder": "Arraste para reordenar",
         "inactive": "Inativo",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Selecionar artigos",
         "status_label": "Estado",
         "title": "Tarifa HelloAsso"
-      }
+      },
+      "name_required": "O nome da tarifa é obrigatório",
+      "updated": "Tarifa atualizada com sucesso"
     }
   }
 }

@@ -292,7 +292,7 @@
               <UButton color="neutral" variant="outline" @click="resolveModal.isOpen = false">
                 {{ t('common.cancel') }}
               </UButton>
-              <UButton :loading="resolveModal.loading" @click="resolveFeedback">
+              <UButton :loading="resolveLoading" @click="resolveFeedback">
                 {{
                   resolveModal.feedback?.resolved
                     ? t('admin.feedback.mark_unresolved')
@@ -470,9 +470,8 @@ const statusOptions = computed(() => [
 // Modals
 const resolveModal = reactive({
   isOpen: false,
-  feedback: null,
+  feedback: null as any,
   adminNotes: '',
-  loading: false,
 })
 
 const detailsModal = reactive({
@@ -530,37 +529,33 @@ function openDetailsModal(feedback: any) {
   detailsModal.isOpen = true
 }
 
-async function resolveFeedback() {
-  if (resolveModal.loading || !resolveModal.feedback) return
-
-  resolveModal.loading = true
-  try {
-    await $fetch(`/api/admin/feedback/${resolveModal.feedback.id}/resolve`, {
-      method: 'PUT',
-      body: {
-        resolved: !resolveModal.feedback.resolved,
-        adminNotes: resolveModal.adminNotes,
-      },
-    })
-
-    toast.add({
-      title: resolveModal.feedback.resolved
-        ? t('admin.feedback.success.unresolve')
-        : t('admin.feedback.success.resolve'),
-      color: 'success',
-    })
-
-    resolveModal.isOpen = false
-    await fetchFeedbacks()
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour:', error)
-    toast.add({
-      title: t('admin.feedback.error.resolve'),
-      color: 'error',
-    })
-  } finally {
-    resolveModal.loading = false
+// Action pour résoudre/dé-résoudre un feedback
+const { execute: executeResolve, loading: resolveLoading } = useApiAction(
+  () => `/api/admin/feedback/${resolveModal.feedback?.id}/resolve`,
+  {
+    method: 'PUT',
+    body: () => ({
+      resolved: !resolveModal.feedback?.resolved,
+      adminNotes: resolveModal.adminNotes,
+    }),
+    errorMessages: { default: t('admin.feedback.error.resolve') },
+    silentSuccess: true, // On gère le toast manuellement pour le message conditionnel
+    onSuccess: () => {
+      toast.add({
+        title: resolveModal.feedback?.resolved
+          ? t('admin.feedback.success.unresolve')
+          : t('admin.feedback.success.resolve'),
+        color: 'success',
+      })
+      resolveModal.isOpen = false
+      fetchFeedbacks()
+    },
   }
+)
+
+function resolveFeedback() {
+  if (!resolveModal.feedback) return
+  executeResolve()
 }
 
 function getTypeColor(type: string) {

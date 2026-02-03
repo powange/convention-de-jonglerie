@@ -96,7 +96,6 @@
 import { reactive, ref } from 'vue'
 import { z } from 'zod'
 
-const toast = useToast()
 const { t } = useI18n()
 
 // Middleware pour rediriger les utilisateurs connectés
@@ -112,37 +111,20 @@ const state = reactive({
   email: '',
 })
 
-const loading = ref(false)
 const emailSent = ref(false)
 
-const handleSubmit = async () => {
-  loading.value = true
-
-  try {
-    const response = await $fetch('/api/auth/request-password-reset', {
-      method: 'POST',
-      body: {
-        email: state.email,
-      },
-    })
-
+// Action pour demander la réinitialisation du mot de passe
+const { execute: executeSubmit, loading } = useApiAction('/api/auth/request-password-reset', {
+  method: 'POST',
+  body: () => ({ email: state.email }),
+  successMessage: { title: t('auth.email_sent_success') },
+  errorMessages: { default: t('errors.server_error') },
+  onSuccess: () => {
     emailSent.value = true
+  },
+})
 
-    toast.add({
-      title: t('auth.email_sent_success'),
-      description: response.message,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
+const handleSubmit = () => {
+  executeSubmit()
 }
 </script>

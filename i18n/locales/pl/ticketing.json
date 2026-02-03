@@ -63,12 +63,43 @@
       "title": "Liczniki",
       "token_regenerated": "Token pomyślnie zregenerowany"
     },
+    "custom_fields": {
+      "created": "Pole niestandardowe utworzone pomyślnie",
+      "error_saving": "Nie można zapisać pola niestandardowego",
+      "updated": "Pole niestandardowe zaktualizowane pomyślnie"
+    },
+    "external": {
+      "config_delete_error": "Nie można usunąć konfiguracji",
+      "config_deleted": "Konfiguracja usunięta",
+      "config_deleted_description": "Bilety HelloAsso zostały pomyślnie odłączone",
+      "config_save_error": "Nie można zapisać konfiguracji",
+      "config_saved": "Konfiguracja zapisana",
+      "config_saved_description": "HelloAsso skonfigurowane dla {org}",
+      "connection_error": "Nie można połączyć z HelloAsso",
+      "connection_failed": "Połączenie nie powiodło się",
+      "connection_success": "Połączenie udane!",
+      "connection_success_description": "Znaleziono formularz: {name} ({org})",
+      "json_copied": "Skopiowano!",
+      "json_copied_description": "JSON został skopiowany do schowka",
+      "json_copy_error": "Nie można skopiować do schowka",
+      "participants_load_error": "Nie można załadować uczestników",
+      "participants_loaded": "Uczestnicy załadowani",
+      "participants_loaded_description": "Znaleziono {orders} zamówień i {items} uczestników",
+      "raw_json_load_error": "Nie można załadować surowych danych",
+      "raw_json_loaded": "Surowy JSON załadowany",
+      "raw_json_loaded_description": "Surowe dane HelloAsso zostały pobrane",
+      "tiers_load_error": "Nie można załadować taryf",
+      "tiers_loaded": "Taryfy załadowane",
+      "tiers_loaded_description": "Znaleziono {tiers} taryf, {options} opcji i {fields} pól niestandardowych"
+    },
     "my_ticket": {
       "how_to_use_description": "Pokaż ten kod QR przy wejściu, aby zwalidować swój bilet.",
       "how_to_use_title": "Jak używać tego kodu QR",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Opcja utworzona pomyślnie",
+      "error_saving": "Nie można zapisać opcji",
       "list": {
         "loading": "Ładowanie...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Wybierz kwoty",
         "title": "Opcja HelloAsso",
         "type_label": "Typ opcji"
-      }
+      },
+      "name_required": "Nazwa opcji jest wymagana",
+      "updated": "Opcja zaktualizowana pomyślnie"
     },
     "orders": {
       "cancel_order": "Anuluj zamówienie",
@@ -100,10 +133,18 @@
       "delete_order": "Usuń polecenie",
       "delete_order_confirm": "Czy na pewno chcesz usunąć to polecenie?",
       "delete_order_confirm_message": "Ta czynność spowoduje trwałe usunięcie zamówienia i wszystkich powiązanych biletów z bazy danych. Czynności tej nie można cofnąć.",
-      "delete_order_error": "Błąd podczas usuwania zamówienia",
       "deleting_order": "Usuwanie w toku...",
+      "entry_invalidated": "Wejście unieważnione",
+      "entry_invalidated_description": "Bilet został oznaczony jako niezweryfikowany",
+      "entry_validated_description": "Bilet został pomyślnie zweryfikowany",
+      "entry_validated_success": "Wejście zweryfikowane",
+      "invalidate_entry_error": "Błąd podczas unieważniania wejścia",
       "order_canceled": "Zamówienie anulowane",
-      "order_deleted": "Zamówienie usunięte"
+      "order_deleted": "Zamówienie usunięte",
+      "payment_method_error": "Błąd podczas aktualizacji metody płatności",
+      "payment_method_updated": "Metoda płatności ustawiona",
+      "payment_method_updated_description": "Metoda płatności została pomyślnie zapisana",
+      "validate_entry_error": "Błąd podczas weryfikacji wejścia"
     },
     "participant": {
       "entry_validated": "Wejście już zwalidowane",
@@ -128,19 +169,33 @@
       "selectMethod": "Wybierz metodę płatności"
     },
     "quotas": {
+      "created": "Limit utworzony pomyślnie",
+      "deleted": "Limit usunięty pomyślnie",
+      "error_deleting": "Nie można usunąć limitu",
+      "error_reordering": "Nie można zaktualizować kolejności limitów",
+      "error_saving": "Nie można zapisać limitu",
+      "error_updating": "Nie można zaktualizować limitu",
       "list": {
+        "delete_button": "Usuń",
+        "delete_confirm": "Czy na pewno chcesz usunąć limit '{name}'?",
+        "delete_title": "Usuń limit",
+        "description": "Zdefiniuj tutaj limity, aby ograniczyć dostęp do określonych usług (spektakle, zajęcia, wejścia itp.)",
         "description_label": "opis",
         "description_placeholder": "Opis (opcjonalnie)",
+        "drag_tooltip": "Przeciągnij, aby zmienić kolejność",
         "loading": "Ładowanie...",
         "name_placeholder": "Tytuł kwoty",
         "title": "Zarządzanie kwotami"
       },
+      "order_updated": "Kolejność limitów zaktualizowana",
+      "quantity_min": "Ilość musi wynosić co najmniej 1",
       "stats": {
         "exceeded": "OVERRIDE",
         "title": "Statystyki kwot",
         "used": "Używany",
         "validated": "Zwalidowany"
-      }
+      },
+      "title_required": "Tytuł jest wymagany"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Wolontariusze"
     },
     "tiers": {
+      "created": "Taryfa utworzona pomyślnie",
+      "error_saving": "Nie można zapisać taryfy",
       "list": {
         "drag_to_reorder": "Przeciągnij, aby zmienić kolejność",
         "inactive": "Nieaktywny",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Wybierz przedmioty",
         "status_label": "Status",
         "title": "Taryfa HelloAsso"
-      }
+      },
+      "name_required": "Nazwa taryfy jest wymagana",
+      "updated": "Taryfa zaktualizowana pomyślnie"
     }
   }
 }

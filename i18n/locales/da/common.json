@@ -320,6 +320,7 @@
       "no_tiers_available": "Ingen tilgængelige priser",
       "no_validation_yet": "Ingen validering endnu",
       "order": "Ordre",
+      "order_created": "Ordre oprettet med succes",
       "order_id": "Ordre-ID",
       "organization_slug_label": "Organisations-slug",
       "organization_slug_placeholder": "f.eks.: jonglering-konvention",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Kan ikke offentliggøre svar",
     "cannot_remove_favorite": "Kan ikke fjerne fra favoritter",
     "city_too_long": "Byen må ikke overstige {max} tegn",
+    "conflict": "Konflikt med eksisterende data",
     "content_required": "Indhold er påkrævet",
     "content_too_long": "Indholdet må ikke overstige {max} tegn",
     "convention_creation_error": "Der opstod en fejl under oprettelsen af konventionen",
@@ -888,6 +890,7 @@
     "invalid_email": "Ugyldig email",
     "invalid_file_type": "Ugyldig filtype. Accepterede formater: {types}",
     "invalid_phone_number": "Ugyldigt telefonnummer",
+    "invalid_request": "Ugyldig anmodning",
     "loading_error": "Indlæsningsfejl",
     "login_failed": "Login mislykkedes",
     "login_required_convention": "Du skal være logget ind for at oprette en konvention",
@@ -909,7 +912,8 @@
     "status_update_failed": "Kunne ikke opdatere status",
     "update_error": "Fejl under opdatering",
     "update_organizer_error": "Fejl ved opdatering af samarbejdspartner",
-    "username_min_3_chars": "Brugernavnet skal have mindst 3 tegn"
+    "username_min_3_chars": "Brugernavnet skal have mindst 3 tegn",
+    "validation_error": "Valideringsfejl"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rettigheder forbeholdes.",

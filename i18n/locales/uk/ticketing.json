@@ -63,12 +63,43 @@
       "title": "Лічильники",
       "token_regenerated": "Токен успішно регенеровано"
     },
+    "custom_fields": {
+      "created": "Користувацьке поле успішно створено",
+      "error_saving": "Не вдалося зберегти користувацьке поле",
+      "updated": "Користувацьке поле успішно оновлено"
+    },
+    "external": {
+      "config_delete_error": "Не вдалося видалити конфігурацію",
+      "config_deleted": "Конфігурацію видалено",
+      "config_deleted_description": "Квиткову систему HelloAsso успішно від'єднано",
+      "config_save_error": "Не вдалося зберегти конфігурацію",
+      "config_saved": "Конфігурацію збережено",
+      "config_saved_description": "HelloAsso налаштовано для {org}",
+      "connection_error": "Не вдалося підключитися до HelloAsso",
+      "connection_failed": "Помилка підключення",
+      "connection_success": "Підключення успішне!",
+      "connection_success_description": "Форму знайдено: {name} ({org})",
+      "json_copied": "Скопійовано!",
+      "json_copied_description": "JSON скопійовано до буфера обміну",
+      "json_copy_error": "Не вдалося скопіювати до буфера обміну",
+      "participants_load_error": "Не вдалося завантажити учасників",
+      "participants_loaded": "Учасників завантажено",
+      "participants_loaded_description": "Знайдено {orders} замовлень та {items} учасників",
+      "raw_json_load_error": "Не вдалося завантажити необроблені дані",
+      "raw_json_loaded": "Необроблений JSON завантажено",
+      "raw_json_loaded_description": "Необроблені дані HelloAsso отримано",
+      "tiers_load_error": "Не вдалося завантажити тарифи",
+      "tiers_loaded": "Тарифи завантажено",
+      "tiers_loaded_description": "Знайдено {tiers} тарифів, {options} опцій та {fields} користувацьких полів"
+    },
     "my_ticket": {
       "how_to_use_description": "Покажіть цей QR-код на вході для валідації квитка.",
       "how_to_use_title": "Як використовувати цей QR-код",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Опцію успішно створено",
+      "error_saving": "Не вдалося зберегти опцію",
       "list": {
         "loading": "Завантаження...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Вибрати квоти",
         "title": "Параметр HelloAsso",
         "type_label": "Тип параметра"
-      }
+      },
+      "name_required": "Назва опції обов'язкова",
+      "updated": "Опцію успішно оновлено"
     },
     "orders": {
       "cancel_order": "Скасувати замовлення",
@@ -100,10 +133,18 @@
       "delete_order": "Команда видалення",
       "delete_order_confirm": "Ви впевнені, що хочете видалити цю команду?",
       "delete_order_confirm_message": "Ця дія назавжди видалить замовлення і всі пов'язані з ним квитки з бази даних. Ця дія не може бути скасована.",
-      "delete_order_error": "Помилка при видаленні замовлення",
       "deleting_order": "Виконується видалення...",
+      "entry_invalidated": "Вхід анульовано",
+      "entry_invalidated_description": "Квиток позначено як непідтверджений",
+      "entry_validated_description": "Квиток успішно підтверджено",
+      "entry_validated_success": "Вхід підтверджено",
+      "invalidate_entry_error": "Помилка при анулюванні входу",
       "order_canceled": "Замовлення скасовано",
-      "order_deleted": "Замовлення видалено"
+      "order_deleted": "Замовлення видалено",
+      "payment_method_error": "Помилка при оновленні способу оплати",
+      "payment_method_updated": "Спосіб оплати встановлено",
+      "payment_method_updated_description": "Спосіб оплати успішно збережено",
+      "validate_entry_error": "Помилка при підтвердженні входу"
     },
     "participant": {
       "entry_validated": "Вхід вже підтверджено",
@@ -128,19 +169,33 @@
       "selectMethod": "Виберіть спосіб оплати"
     },
     "quotas": {
+      "created": "Квоту успішно створено",
+      "deleted": "Квоту успішно видалено",
+      "error_deleting": "Не вдалося видалити квоту",
+      "error_reordering": "Не вдалося оновити порядок квот",
+      "error_saving": "Не вдалося зберегти квоту",
+      "error_updating": "Не вдалося оновити квоту",
       "list": {
+        "delete_button": "Видалити",
+        "delete_confirm": "Ви впевнені, що хочете видалити квоту '{name}'?",
+        "delete_title": "Видалити квоту",
+        "description": "Визначте тут квоти для обмеження доступу до певних послуг (шоу, заходи, входи тощо)",
         "description_label": "опис",
         "description_placeholder": "Опис (необов'язково)",
+        "drag_tooltip": "Перетягніть для зміни порядку",
         "loading": "Завантаження...",
         "name_placeholder": "Назва квоти",
         "title": "Управління квотами"
       },
+      "order_updated": "Порядок квот оновлено",
+      "quantity_min": "Кількість повинна бути не менше 1",
       "stats": {
         "exceeded": "ЗАМІНИТИ",
         "title": "Статистика квот",
         "used": "Використано",
         "validated": "Підтверджено"
-      }
+      },
+      "title_required": "Назва обов'язкова"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Волонтери"
     },
     "tiers": {
+      "created": "Тариф успішно створено",
+      "error_saving": "Не вдалося зберегти тариф",
       "list": {
         "drag_to_reorder": "Перетягніть для зміни порядку",
         "inactive": "Неактивно",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Вибрати предмети",
         "status_label": "Статус",
         "title": "Тариф HelloAsso"
-      }
+      },
+      "name_required": "Назва тарифу обов'язкова",
+      "updated": "Тариф успішно оновлено"
     }
   }
 }

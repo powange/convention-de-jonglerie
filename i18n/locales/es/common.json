@@ -320,6 +320,7 @@
       "no_tiers_available": "No hay tarifas disponibles",
       "no_validation_yet": "Aún no hay validación",
       "order": "Pedido",
+      "order_created": "Pedido creado con éxito",
       "order_id": "ID de pedido",
       "organization_slug_label": "Slug de la organización",
       "organization_slug_placeholder": "ej.: convencion-malabares",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "No se puede publicar la respuesta",
     "cannot_remove_favorite": "No se puede eliminar de favoritos",
     "city_too_long": "La ciudad no puede exceder {max} caracteres",
+    "conflict": "Conflicto con datos existentes",
     "content_required": "El contenido es requerido",
     "content_too_long": "El contenido no puede exceder {max} caracteres",
     "convention_creation_error": "Ha ocurrido un error al crear la convención",
@@ -888,6 +890,7 @@
     "invalid_email": "Email inválido",
     "invalid_file_type": "Tipo de archivo no válido. Formatos aceptados: {types}",
     "invalid_phone_number": "Número de teléfono inválido",
+    "invalid_request": "Solicitud inválida",
     "loading_error": "Error de carga",
     "login_failed": "Error en el inicio de sesión",
     "login_required_convention": "Debes iniciar sesión para crear una convención",
@@ -909,7 +912,8 @@
     "status_update_failed": "Error al actualizar el estado",
     "update_error": "Error durante la actualización",
     "update_organizer_error": "Error al actualizar colaborador",
-    "username_min_3_chars": "El usuario debe contener al menos 3 caracteres"
+    "username_min_3_chars": "El usuario debe contener al menos 3 caracteres",
+    "validation_error": "Error de validación"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Todos los derechos reservados.",

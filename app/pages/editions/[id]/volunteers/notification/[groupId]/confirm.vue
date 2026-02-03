@@ -113,14 +113,12 @@ interface NotificationData {
 
 const { t } = useI18n()
 const route = useRoute()
-const toast = useToast()
 
 const editionId = route.params.id as string
 const groupId = route.params.groupId as string
 
 // État réactif
 const loading = ref(true)
-const confirming = ref(false)
 const error = ref<string>('')
 const notification = ref<NotificationData | null>(null)
 const confirmationStatus = ref<'pending' | 'confirmed'>('pending')
@@ -144,39 +142,27 @@ const loadNotification = async () => {
   }
 }
 
-// Confirmer la lecture
-const confirmReading = async () => {
-  if (confirming.value) return
-
-  confirming.value = true
-
-  try {
-    const response = await $fetch(
-      `/api/editions/${editionId}/volunteers/notification/${groupId}/confirm`,
-      {
-        method: 'POST',
-      }
-    )
-
+// Action pour confirmer la lecture
+const { execute: executeConfirm, loading: confirming } = useApiAction<
+  undefined,
+  { confirmedAt?: string }
+>(`/api/editions/${editionId}/volunteers/notification/${groupId}/confirm`, {
+  method: 'POST',
+  successMessage: {
+    title: t('edition.volunteers.confirmation_success'),
+    description: t('edition.volunteers.confirmation_success_desc'),
+  },
+  errorMessages: { default: t('edition.volunteers.confirmation_error') },
+  onSuccess: (response) => {
     confirmationStatus.value = 'confirmed'
-    if (response.confirmedAt) {
+    if (response?.confirmedAt) {
       confirmationDate.value = response.confirmedAt
     }
+  },
+})
 
-    toast.add({
-      title: t('edition.volunteers.confirmation_success'),
-      description: t('edition.volunteers.confirmation_success_desc'),
-      color: 'success',
-    })
-  } catch (err: any) {
-    toast.add({
-      title: t('edition.volunteers.confirmation_error'),
-      description: err?.data?.message || t('common.error'),
-      color: 'error',
-    })
-  } finally {
-    confirming.value = false
-  }
+const confirmReading = () => {
+  executeConfirm()
 }
 
 // Formatage de date

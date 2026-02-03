@@ -320,6 +320,7 @@
       "no_tiers_available": "Nessuna tariffa disponibile",
       "no_validation_yet": "Nessuna convalida ancora",
       "order": "Ordine",
+      "order_created": "Ordine creato con successo",
       "order_id": "ID ordine",
       "organization_slug_label": "Slug dell'organizzazione",
       "organization_slug_placeholder": "es.: convention-giocoleria",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Impossibile pubblicare la risposta",
     "cannot_remove_favorite": "Impossibile rimuovere dai preferiti",
     "city_too_long": "La città non può superare {max} caratteri",
+    "conflict": "Conflitto con dati esistenti",
     "content_required": "Il contenuto è richiesto",
     "content_too_long": "Il contenuto non può superare {max} caratteri",
     "convention_creation_error": "Si è verificato un errore durante la creazione del convegno",
@@ -888,6 +890,7 @@
     "invalid_email": "Email non valida",
     "invalid_file_type": "Tipo di file non valido. Formati accettati: {types}",
     "invalid_phone_number": "Numero di telefono non valido",
+    "invalid_request": "Richiesta non valida",
     "loading_error": "Errore di caricamento",
     "login_failed": "Accesso fallito",
     "login_required_convention": "Devi essere connesso per creare un convegno",
@@ -909,7 +912,8 @@
     "status_update_failed": "Impossibile aggiornare lo stato",
     "update_error": "Errore durante l'aggiornamento",
     "update_organizer_error": "Errore nell'aggiornamento del organizere",
-    "username_min_3_chars": "Il nome utente deve contenere almeno 3 caratteri"
+    "username_min_3_chars": "Il nome utente deve contenere almeno 3 caratteri",
+    "validation_error": "Errore di validazione"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Tutti i diritti riservati.",

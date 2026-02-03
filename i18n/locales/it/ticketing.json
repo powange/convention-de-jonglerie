@@ -63,12 +63,43 @@
       "title": "Contatori",
       "token_regenerated": "Token rigenerato con successo"
     },
+    "custom_fields": {
+      "created": "Campo personalizzato creato con successo",
+      "error_saving": "Impossibile salvare il campo personalizzato",
+      "updated": "Campo personalizzato aggiornato con successo"
+    },
+    "external": {
+      "config_delete_error": "Impossibile eliminare la configurazione",
+      "config_deleted": "Configurazione eliminata",
+      "config_deleted_description": "La biglietteria HelloAsso è stata scollegata con successo",
+      "config_save_error": "Impossibile salvare la configurazione",
+      "config_saved": "Configurazione salvata",
+      "config_saved_description": "HelloAsso configurato per {org}",
+      "connection_error": "Impossibile connettersi a HelloAsso",
+      "connection_failed": "Connessione fallita",
+      "connection_success": "Connessione riuscita!",
+      "connection_success_description": "Modulo trovato: {name} ({org})",
+      "json_copied": "Copiato!",
+      "json_copied_description": "Il JSON è stato copiato negli appunti",
+      "json_copy_error": "Impossibile copiare negli appunti",
+      "participants_load_error": "Impossibile caricare i partecipanti",
+      "participants_loaded": "Partecipanti caricati",
+      "participants_loaded_description": "{orders} ordine/i e {items} partecipante/i trovato/i",
+      "raw_json_load_error": "Impossibile caricare i dati grezzi",
+      "raw_json_loaded": "JSON grezzo caricato",
+      "raw_json_loaded_description": "I dati grezzi di HelloAsso sono stati recuperati",
+      "tiers_load_error": "Impossibile caricare le tariffe",
+      "tiers_loaded": "Tariffe caricate",
+      "tiers_loaded_description": "{tiers} tariffa/e, {options} opzione/i e {fields} campo/i personalizzato/i trovato/i"
+    },
     "my_ticket": {
       "how_to_use_description": "Mostra questo codice QR all'ingresso per convalidare il tuo biglietto.",
       "how_to_use_title": "Come utilizzare questo codice QR",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Opzione creata con successo",
+      "error_saving": "Impossibile salvare l'opzione",
       "list": {
         "loading": "Caricamento...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Seleziona quote",
         "title": "Opzione HelloAsso",
         "type_label": "Tipo di opzione"
-      }
+      },
+      "name_required": "Il nome dell'opzione è obbligatorio",
+      "updated": "Opzione aggiornata con successo"
     },
     "orders": {
       "cancel_order": "Annullamento dell'ordine",
@@ -100,10 +133,18 @@
       "delete_order": "Comando di cancellazione",
       "delete_order_confirm": "Siete sicuri di voler eliminare questo comando?",
       "delete_order_confirm_message": "Questa azione cancella definitivamente l'ordine e tutti i biglietti associati dal database. Questa azione non può essere annullata.",
-      "delete_order_error": "Errore durante l'eliminazione dell'ordine",
       "deleting_order": "Cancellazione in corso...",
+      "entry_invalidated": "Ingresso invalidato",
+      "entry_invalidated_description": "Il biglietto è stato contrassegnato come non validato",
+      "entry_validated_description": "Il biglietto è stato validato con successo",
+      "entry_validated_success": "Ingresso validato",
+      "invalidate_entry_error": "Errore durante l'invalidazione dell'ingresso",
       "order_canceled": "Ordine annullato",
-      "order_deleted": "Ordine cancellato"
+      "order_deleted": "Ordine cancellato",
+      "payment_method_error": "Errore durante l'aggiornamento del metodo di pagamento",
+      "payment_method_updated": "Metodo di pagamento impostato",
+      "payment_method_updated_description": "Il metodo di pagamento è stato salvato con successo",
+      "validate_entry_error": "Errore durante la validazione dell'ingresso"
     },
     "participant": {
       "entry_validated": "Ingresso già convalidato",
@@ -128,19 +169,33 @@
       "selectMethod": "Seleziona il metodo di pagamento"
     },
     "quotas": {
+      "created": "Quota creata con successo",
+      "deleted": "Quota eliminata con successo",
+      "error_deleting": "Impossibile eliminare la quota",
+      "error_reordering": "Impossibile aggiornare l'ordine delle quote",
+      "error_saving": "Impossibile salvare la quota",
+      "error_updating": "Impossibile aggiornare la quota",
       "list": {
+        "delete_button": "Elimina",
+        "delete_confirm": "Sei sicuro di voler eliminare la quota '{name}'?",
+        "delete_title": "Elimina quota",
+        "description": "Definisci qui le quote per limitare l'accesso a determinate prestazioni (spettacoli, attività, ingressi, ecc.)",
         "description_label": "descrizione",
         "description_placeholder": "Descrizione (opzionale)",
+        "drag_tooltip": "Trascina per riordinare",
         "loading": "Caricamento...",
         "name_placeholder": "Titolo della quota",
         "title": "Gestione delle quote"
       },
+      "order_updated": "Ordine delle quote aggiornato",
+      "quantity_min": "La quantità deve essere almeno 1",
       "stats": {
         "exceeded": "SOPRAVVIVERE",
         "title": "Statistiche delle quote",
         "used": "Utilizzato",
         "validated": "Convalidato"
-      }
+      },
+      "title_required": "Il titolo è obbligatorio"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Volontari"
     },
     "tiers": {
+      "created": "Tariffa creata con successo",
+      "error_saving": "Impossibile salvare la tariffa",
       "list": {
         "drag_to_reorder": "Trascina per riordinare",
         "inactive": "Inattivo",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Seleziona articoli",
         "status_label": "Stato",
         "title": "Tariffa HelloAsso"
-      }
+      },
+      "name_required": "Il nome della tariffa è obbligatorio",
+      "updated": "Tariffa aggiornata con successo"
     }
   }
 }

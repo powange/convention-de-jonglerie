@@ -147,7 +147,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const toast = useToast()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -158,7 +157,6 @@ const title = computed(() =>
   props.show ? t('gestion.shows.edit_show') : t('gestion.shows.add_show')
 )
 
-const loading = ref(false)
 const artists = ref<any[]>([])
 const returnableItems = ref<any[]>([])
 
@@ -214,48 +212,58 @@ const fetchReturnableItems = async () => {
   }
 }
 
-const handleSubmit = async () => {
-  loading.value = true
-  try {
-    // Convertir la date datetime-local en Date (temps local), puis en ISO
-    const localDate = parseDateTimeLocal(formData.value.startDateTime)
+// Construit le payload pour l'API
+const buildPayload = () => {
+  const localDate = parseDateTimeLocal(formData.value.startDateTime)
+  return {
+    title: formData.value.title,
+    description: formData.value.description || null,
+    startDateTime: localDate.toISOString(),
+    duration: formData.value.duration,
+    location: formData.value.location || null,
+    artistIds: formData.value.artistIds,
+    returnableItemIds: formData.value.returnableItemIds,
+  }
+}
 
-    const payload = {
-      title: formData.value.title,
-      description: formData.value.description || null,
-      startDateTime: localDate.toISOString(),
-      duration: formData.value.duration,
-      location: formData.value.location || null,
-      artistIds: formData.value.artistIds,
-      returnableItemIds: formData.value.returnableItemIds,
-    }
+// Callback commun après succès
+const onSaveSuccess = () => {
+  emit('show-saved')
+  closeModal()
+}
 
-    if (props.show) {
-      // Mode modification
-      await $fetch(`/api/editions/${props.editionId}/shows/${props.show.id}`, {
-        method: 'PUT',
-        body: payload,
-      })
-      toast.add({ title: t('gestion.shows.show_updated'), color: 'success' })
-    } else {
-      // Mode ajout
-      await $fetch(`/api/editions/${props.editionId}/shows`, {
-        method: 'POST',
-        body: payload,
-      })
-      toast.add({ title: t('gestion.shows.show_created'), color: 'success' })
-    }
+// Action pour créer un spectacle
+const { execute: executeCreate, loading: isCreating } = useApiAction(
+  () => `/api/editions/${props.editionId}/shows`,
+  {
+    method: 'POST',
+    body: buildPayload,
+    successMessage: { title: t('gestion.shows.show_created') },
+    errorMessages: { default: t('gestion.shows.error_create') },
+    onSuccess: onSaveSuccess,
+  }
+)
 
-    emit('show-saved')
-    closeModal()
-  } catch (error: any) {
-    console.error('Error saving show:', error)
-    toast.add({
-      title: props.show ? t('gestion.shows.error_update') : t('gestion.shows.error_create'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+// Action pour modifier un spectacle
+const { execute: executeUpdate, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${props.editionId}/shows/${props.show?.id}`,
+  {
+    method: 'PUT',
+    body: buildPayload,
+    successMessage: { title: t('gestion.shows.show_updated') },
+    errorMessages: { default: t('gestion.shows.error_update') },
+    onSuccess: onSaveSuccess,
+  }
+)
+
+// État de chargement combiné
+const loading = computed(() => isCreating.value || isUpdating.value)
+
+const handleSubmit = () => {
+  if (props.show) {
+    executeUpdate()
+  } else {
+    executeCreate()
   }
 }
 

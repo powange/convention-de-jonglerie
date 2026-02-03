@@ -19,10 +19,9 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'itemsUpdated'])
 
 const { t } = useI18n()
-const toast = useToast()
 
 // État
-const loading = ref(false)
+const isLoadingData = ref(false)
 const availableItems = ref<any[]>([])
 const assignedItems = ref<any[]>([])
 const globalItems = ref<any[]>([]) // Articles globaux (pour tous les organisateurs)
@@ -48,7 +47,7 @@ const modalTitle = computed(() => {
 async function loadData() {
   if (!props.open) return
 
-  loading.value = true
+  isLoadingData.value = true
   try {
     // Charger tous les articles à restituer de l'édition
     const itemsResponse = await $fetch(
@@ -78,49 +77,33 @@ async function loadData() {
     }
   } catch (error) {
     console.error('Erreur lors du chargement des articles:', error)
-    toast.add({
-      title: t('common.error'),
-      description: t('gestion.organizers.error_loading_items'),
-      color: 'red',
-    })
   } finally {
-    loading.value = false
+    isLoadingData.value = false
   }
 }
 
-// Ajouter un article
-async function addItem() {
-  if (!selectedItemId.value) return
-
-  loading.value = true
-  try {
-    await $fetch(`/api/editions/${props.editionId}/ticketing/organizers/returnable-items`, {
-      method: 'POST',
-      body: {
-        returnableItemId: selectedItemId.value,
-        organizerId: props.organizer?.id ?? null,
-      },
-    })
-
-    toast.add({
-      title: t('common.success'),
-      description: t('gestion.organizers.item_added_success'),
-      color: 'green',
-    })
-
-    selectedItemId.value = null
-    await loadData()
-    emit('itemsUpdated')
-  } catch (error: any) {
-    console.error("Erreur lors de l'ajout de l'article:", error)
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('gestion.organizers.error_adding_item'),
-      color: 'red',
-    })
-  } finally {
-    loading.value = false
+// Action pour ajouter un article
+const { execute: executeAddItem, loading: isAdding } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/organizers/returnable-items`,
+  {
+    method: 'POST',
+    body: () => ({
+      returnableItemId: selectedItemId.value,
+      organizerId: props.organizer?.id ?? null,
+    }),
+    successMessage: { title: t('gestion.organizers.item_added_success') },
+    errorMessages: { default: t('gestion.organizers.error_adding_item') },
+    onSuccess: async () => {
+      selectedItemId.value = null
+      await loadData()
+      emit('itemsUpdated')
+    },
   }
+)
+
+function addItem() {
+  if (!selectedItemId.value) return
+  executeAddItem()
 }
 
 // Confirmation de suppression d'un article
@@ -132,40 +115,30 @@ function confirmRemoveItem(item: any) {
   deleteConfirmOpen.value = true
 }
 
-// Retirer un article
-async function removeItem() {
-  if (!itemToDelete.value) return
-
-  loading.value = true
-  try {
-    await $fetch(
-      `/api/editions/${props.editionId}/ticketing/organizers/returnable-items/${itemToDelete.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
-      title: t('common.success'),
-      description: t('gestion.organizers.item_removed_success'),
-      color: 'green',
-    })
-
-    deleteConfirmOpen.value = false
-    itemToDelete.value = null
-    await loadData()
-    emit('itemsUpdated')
-  } catch (error) {
-    console.error("Erreur lors de la suppression de l'article:", error)
-    toast.add({
-      title: t('common.error'),
-      description: t('gestion.organizers.error_removing_item'),
-      color: 'red',
-    })
-  } finally {
-    loading.value = false
+// Action pour retirer un article
+const { execute: executeRemoveItem, loading: isRemoving } = useApiAction(
+  () =>
+    `/api/editions/${props.editionId}/ticketing/organizers/returnable-items/${itemToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('gestion.organizers.item_removed_success') },
+    errorMessages: { default: t('gestion.organizers.error_removing_item') },
+    onSuccess: async () => {
+      deleteConfirmOpen.value = false
+      itemToDelete.value = null
+      await loadData()
+      emit('itemsUpdated')
+    },
   }
+)
+
+function removeItem() {
+  if (!itemToDelete.value) return
+  executeRemoveItem()
 }
+
+// État de chargement combiné
+const loading = computed(() => isLoadingData.value || isAdding.value || isRemoving.value)
 
 // Articles disponibles pour sélection (non encore assignés)
 const availableForSelection = computed(() => {

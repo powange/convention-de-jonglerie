@@ -152,6 +152,8 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
+const { t } = useI18n()
+
 const isOpen = computed({
   get: () => props.open,
   set: (value) => emit('update:open', value),
@@ -165,7 +167,6 @@ const form = ref({
 })
 
 const selectedTierIds = ref<number[]>([])
-const saving = ref(false)
 const loadingTiers = ref(false)
 const availableTiers = ref<Tier[]>([])
 
@@ -221,63 +222,53 @@ const loadTiers = async () => {
   }
 }
 
-const save = async () => {
-  saving.value = true
-  const toast = useToast()
+// Construit les données du formulaire pour l'API
+const buildFormData = () => ({
+  label: form.value.label,
+  type: form.value.type,
+  isRequired: form.value.isRequired,
+  values: form.value.type === 'ChoiceList' ? form.value.values.filter((v) => v.trim()) : undefined,
+  tierIds: selectedTierIds.value,
+})
 
-  try {
-    const data = {
-      label: form.value.label,
-      type: form.value.type,
-      isRequired: form.value.isRequired,
-      values:
-        form.value.type === 'ChoiceList' ? form.value.values.filter((v) => v.trim()) : undefined,
-      tierIds: selectedTierIds.value,
-    }
+// Callbacks communs
+const onSaveSuccess = () => {
+  isOpen.value = false
+  emit('refresh')
+}
 
-    if (props.customField) {
-      // Modification
-      await $fetch(
-        `/api/editions/${props.editionId}/ticketing/custom-fields/${props.customField.id}`,
-        {
-          method: 'PUT',
-          body: data,
-        }
-      )
+// Action pour créer un champ personnalisé
+const { execute: executeCreate, loading: isCreating } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/custom-fields`,
+  {
+    method: 'POST',
+    body: buildFormData,
+    successMessage: { title: t('ticketing.custom_fields.created') },
+    errorMessages: { default: t('ticketing.custom_fields.error_saving') },
+    onSuccess: onSaveSuccess,
+  }
+)
 
-      toast.add({
-        title: 'Champ modifié',
-        description: 'Le champ personnalisé a été modifié avec succès',
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } else {
-      // Création
-      await $fetch(`/api/editions/${props.editionId}/ticketing/custom-fields`, {
-        method: 'POST',
-        body: data,
-      })
+// Action pour mettre à jour un champ personnalisé
+const { execute: executeUpdate, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/custom-fields/${props.customField?.id}`,
+  {
+    method: 'PUT',
+    body: buildFormData,
+    successMessage: { title: t('ticketing.custom_fields.updated') },
+    errorMessages: { default: t('ticketing.custom_fields.error_saving') },
+    onSuccess: onSaveSuccess,
+  }
+)
 
-      toast.add({
-        title: 'Champ créé',
-        description: 'Le champ personnalisé a été créé avec succès',
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    }
+// État de chargement combiné
+const saving = computed(() => isCreating.value || isUpdating.value)
 
-    isOpen.value = false
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Erreur lors de la sauvegarde du champ:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de sauvegarder le champ personnalisé',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+const save = () => {
+  if (props.customField) {
+    executeUpdate()
+  } else {
+    executeCreate()
   }
 }
 

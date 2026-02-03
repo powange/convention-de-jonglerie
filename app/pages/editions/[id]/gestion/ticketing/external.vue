@@ -875,18 +875,15 @@ const loadExistingConfig = async () => {
   }
 }
 
-const loadHelloAssoTiers = async () => {
-  if (loadingTiers.value) return
-
-  loadingTiers.value = true
-  tiersLoaded.value = false
-  loadedTiers.value = []
-  loadedOptions.value = []
-  loadedCustomFields.value = []
-
-  try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/tiers`)
-
+// Action pour charger les tarifs HelloAsso
+const { execute: executeLoadTiers, loading: loadingTiers } = useApiAction<
+  never,
+  { tiers?: any[]; options?: any[] }
+>(`/api/editions/${editionId}/ticketing/helloasso/tiers`, {
+  method: 'GET',
+  silentSuccess: true, // Message dynamique géré dans onSuccess
+  errorMessages: { default: $t('ticketing.external.tiers_load_error') },
+  onSuccess: (response) => {
     loadedTiers.value = response.tiers || []
     loadedOptions.value = response.options || []
 
@@ -906,33 +903,34 @@ const loadHelloAssoTiers = async () => {
                 tiers: [],
               })
             }
-            // Ajouter le nom du tarif à la liste des tarifs concernés
             customFieldsMap.get(customField.id).tiers.push(tier.name)
           }
         }
       }
     }
     loadedCustomFields.value = Array.from(customFieldsMap.values())
-
     tiersLoaded.value = true
 
     toast.add({
-      title: 'Tarifs chargés',
-      description: `${response.tiers?.length || 0} tarif(s), ${response.options?.length || 0} option(s) et ${loadedCustomFields.value.length} champ(s) personnalisé(s) trouvé(s)`,
+      title: $t('ticketing.external.tiers_loaded'),
+      description: $t('ticketing.external.tiers_loaded_description', {
+        tiers: response.tiers?.length || 0,
+        options: response.options?.length || 0,
+        fields: loadedCustomFields.value.length,
+      }),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error: any) {
-    console.error('Failed to load tiers:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger les tarifs',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loadingTiers.value = false
-  }
+  },
+})
+
+const loadHelloAssoTiers = () => {
+  if (loadingTiers.value) return
+  tiersLoaded.value = false
+  loadedTiers.value = []
+  loadedOptions.value = []
+  loadedCustomFields.value = []
+  executeLoadTiers()
 }
 
 // Permissions calculées
@@ -984,8 +982,6 @@ const canSave = computed(() => {
   )
 })
 
-const saving = ref(false)
-const loadingTiers = ref(false)
 const tiersLoaded = ref(false)
 const loadedTiers = ref<any[]>([])
 const loadedOptions = ref<any[]>([])
@@ -1077,91 +1073,114 @@ const handleConfigTest = async (config: any) => {
   }
 }
 
-const saveHelloAssoConfig = async () => {
+// Construit le payload pour sauvegarder la config HelloAsso
+const buildHelloAssoConfigPayload = () => ({
+  provider: 'HELLOASSO',
+  helloAsso: {
+    clientId: helloAssoClientId.value,
+    clientSecret: helloAssoClientSecret.value,
+    organizationSlug: helloAssoOrganizationSlug.value,
+    formType: helloAssoFormType.value,
+    formSlug: helloAssoFormSlug.value,
+  },
+})
+
+// Action pour sauvegarder la config HelloAsso
+const { execute: executeSaveConfig, loading: saving } = useApiAction(
+  `/api/editions/${editionId}/ticketing/external`,
+  {
+    method: 'POST',
+    body: buildHelloAssoConfigPayload,
+    silentSuccess: true, // Message dynamique
+    errorMessages: { default: $t('ticketing.external.config_save_error') },
+    onSuccess: () => {
+      toast.add({
+        title: $t('ticketing.external.config_saved'),
+        description: $t('ticketing.external.config_saved_description', {
+          org: helloAssoOrganizationSlug.value,
+        }),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      hasExistingConfig.value = true
+      helloAssoClientSecret.value = ''
+    },
+  }
+)
+
+const saveHelloAssoConfig = () => {
   if (!canSave.value || saving.value) return
+  executeSaveConfig()
+}
 
-  saving.value = true
-
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
-      method: 'POST',
-      body: {
-        provider: 'HELLOASSO',
-        helloAsso: {
-          clientId: helloAssoClientId.value,
-          clientSecret: helloAssoClientSecret.value,
-          organizationSlug: helloAssoOrganizationSlug.value,
-          formType: helloAssoFormType.value,
-          formSlug: helloAssoFormSlug.value,
-        },
-      },
-    })
-
+// Action pour tester la connexion HelloAsso
+const { execute: executeTestConnection, loading: testing } = useApiAction<
+  ReturnType<typeof buildHelloAssoConfigPayload>['helloAsso'],
+  { form: { name: string; organizationName: string } }
+>(`/api/editions/${editionId}/ticketing/helloasso/test`, {
+  method: 'POST',
+  body: () => ({
+    clientId: helloAssoClientId.value,
+    clientSecret: helloAssoClientSecret.value,
+    organizationSlug: helloAssoOrganizationSlug.value,
+    formType: helloAssoFormType.value,
+    formSlug: helloAssoFormSlug.value,
+  }),
+  silentSuccess: true, // Message dynamique
+  silentError: true, // Message personnalisé
+  onSuccess: (result) => {
     toast.add({
-      title: 'Configuration enregistrée',
-      description: `HelloAsso configuré pour ${helloAssoOrganizationSlug.value}`,
+      title: $t('ticketing.external.connection_success'),
+      description: $t('ticketing.external.connection_success_description', {
+        name: result.form.name,
+        org: result.form.organizationName,
+      }),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-
-    // Marquer qu'une configuration existe maintenant
-    hasExistingConfig.value = true
-
-    // Effacer le client secret du formulaire (il ne sera plus retourné)
-    helloAssoClientSecret.value = ''
-  } catch (error: any) {
-    console.error('Failed to save config:', error)
+  },
+  onError: (error) => {
     toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de sauvegarder la configuration',
+      title: $t('ticketing.external.connection_failed'),
+      description: error.data?.message || $t('ticketing.external.connection_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
-  } finally {
-    saving.value = false
-  }
-}
+  },
+})
 
-const testing = ref(false)
-const disconnecting = ref(false)
-
-const testConnection = async () => {
+const testConnection = () => {
   if (!canSave.value || testing.value) return
-
-  testing.value = true
-
-  try {
-    const result = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/test`, {
-      method: 'POST',
-      body: {
-        clientId: helloAssoClientId.value,
-        clientSecret: helloAssoClientSecret.value,
-        organizationSlug: helloAssoOrganizationSlug.value,
-        formType: helloAssoFormType.value,
-        formSlug: helloAssoFormSlug.value,
-      },
-    })
-
-    toast.add({
-      title: 'Connexion réussie !',
-      description: `Formulaire trouvé : ${result.form.name} (${result.form.organizationName})`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Test connection error:', error)
-    toast.add({
-      title: 'Échec de la connexion',
-      description: error.data?.message || 'Impossible de se connecter à HelloAsso',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    testing.value = false
-  }
+  executeTestConnection()
 }
 
-const confirmDisconnect = async () => {
+// Action pour déconnecter HelloAsso
+const { execute: executeDisconnect, loading: disconnecting } = useApiAction(
+  `/api/editions/${editionId}/ticketing/external`,
+  {
+    method: 'DELETE',
+    successMessage: {
+      title: $t('ticketing.external.config_deleted'),
+      description: $t('ticketing.external.config_deleted_description'),
+    },
+    errorMessages: { default: $t('ticketing.external.config_delete_error') },
+    onSuccess: () => {
+      // Réinitialiser l'état
+      hasExistingConfig.value = false
+      tiersLoaded.value = false
+      loadedTiers.value = []
+      loadedOptions.value = []
+      // Réinitialiser les champs du formulaire
+      helloAssoClientId.value = ''
+      helloAssoClientSecret.value = ''
+      helloAssoOrganizationSlug.value = ''
+      helloAssoFormType.value = 'Event'
+      helloAssoFormSlug.value = ''
+    },
+  }
+)
+
+const confirmDisconnect = () => {
   if (disconnecting.value) return
 
   const confirmed = confirm(
@@ -1169,129 +1188,76 @@ const confirmDisconnect = async () => {
   )
 
   if (confirmed) {
-    await disconnectHelloAsso()
+    executeDisconnect()
   }
 }
 
-const disconnectHelloAsso = async () => {
-  if (disconnecting.value) return
-
-  disconnecting.value = true
-
-  try {
-    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
-      title: 'Configuration supprimée',
-      description: 'La billeterie HelloAsso a été désassociée avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Réinitialiser l'état
-    hasExistingConfig.value = false
-    tiersLoaded.value = false
-    loadedTiers.value = []
-    loadedOptions.value = []
-
-    // Réinitialiser les champs du formulaire
-    helloAssoClientId.value = ''
-    helloAssoClientSecret.value = ''
-    helloAssoOrganizationSlug.value = ''
-    helloAssoFormType.value = 'Event'
-    helloAssoFormSlug.value = ''
-  } catch (error: any) {
-    console.error('Failed to disconnect:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de supprimer la configuration',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    disconnecting.value = false
-  }
-}
-
-const loadingOrders = ref(false)
 const ordersLoaded = ref(false)
 const loadedOrders = ref<any[]>([])
 const ordersStats = ref({ totalOrders: 0, totalItems: 0 })
 
-const loadOrdersFromHelloAsso = async () => {
-  if (loadingOrders.value) return
-
-  loadingOrders.value = true
-  ordersLoaded.value = false
-  loadedOrders.value = []
-
-  try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/orders`)
-
+// Action pour charger les commandes depuis HelloAsso
+const { execute: executeLoadOrders, loading: loadingOrders } = useApiAction<
+  never,
+  { orders?: any[]; stats?: { totalOrders: number; totalItems: number } }
+>(`/api/editions/${editionId}/ticketing/helloasso/orders`, {
+  method: 'GET',
+  silentSuccess: true, // Message dynamique
+  errorMessages: { default: $t('ticketing.external.participants_load_error') },
+  onSuccess: (response) => {
     loadedOrders.value = response.orders || []
     ordersStats.value = response.stats || { totalOrders: 0, totalItems: 0 }
     ordersLoaded.value = true
 
     toast.add({
-      title: 'Participants chargés',
-      description: `${response.stats?.totalOrders || 0} commande(s) et ${response.stats?.totalItems || 0} participant(s) trouvé(s)`,
+      title: $t('ticketing.external.participants_loaded'),
+      description: $t('ticketing.external.participants_loaded_description', {
+        orders: response.stats?.totalOrders || 0,
+        items: response.stats?.totalItems || 0,
+      }),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error: any) {
-    console.error('Failed to load orders:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger les participants',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loadingOrders.value = false
-  }
+  },
+})
+
+const loadOrdersFromHelloAsso = () => {
+  if (loadingOrders.value) return
+  ordersLoaded.value = false
+  loadedOrders.value = []
+  executeLoadOrders()
 }
 
 const loadedCustomFields = ref<any[]>([])
 
 // JSON brut HelloAsso (admin only)
-const loadingRawJson = ref(false)
 const showRawJsonModal = ref(false)
 const rawJsonFormData = ref<string>('')
 const rawJsonOrdersData = ref<string>('')
 const rawJsonActiveTab = ref<'form' | 'orders'>('form')
 
-const loadRawHelloAssoJson = async () => {
-  if (loadingRawJson.value) return
-
-  loadingRawJson.value = true
-
-  try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/raw`)
-
+// Action pour charger le JSON brut HelloAsso
+const { execute: executeLoadRawJson, loading: loadingRawJson } = useApiAction<
+  never,
+  { form: unknown; orders: unknown }
+>(`/api/editions/${editionId}/ticketing/helloasso/raw`, {
+  method: 'GET',
+  successMessage: {
+    title: $t('ticketing.external.raw_json_loaded'),
+    description: $t('ticketing.external.raw_json_loaded_description'),
+  },
+  errorMessages: { default: $t('ticketing.external.raw_json_load_error') },
+  onSuccess: (response) => {
     rawJsonFormData.value = JSON.stringify(response.form, null, 2)
     rawJsonOrdersData.value = JSON.stringify(response.orders, null, 2)
     rawJsonActiveTab.value = 'form'
     showRawJsonModal.value = true
+  },
+})
 
-    toast.add({
-      title: 'JSON brut chargé',
-      description: 'Les données brutes HelloAsso ont été récupérées',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Failed to load raw JSON:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger les données brutes',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loadingRawJson.value = false
-  }
+const loadRawHelloAssoJson = () => {
+  if (loadingRawJson.value) return
+  executeLoadRawJson()
 }
 
 const currentRawJson = computed(() =>
@@ -1302,16 +1268,16 @@ const copyRawJson = async () => {
   try {
     await navigator.clipboard.writeText(currentRawJson.value)
     toast.add({
-      title: 'Copié !',
-      description: 'Le JSON a été copié dans le presse-papiers',
+      title: $t('ticketing.external.json_copied'),
+      description: $t('ticketing.external.json_copied_description'),
       icon: 'i-heroicons-clipboard-document-check',
       color: 'success',
     })
   } catch (error) {
     console.error('Failed to copy:', error)
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de copier dans le presse-papiers',
+      title: $t('common.error'),
+      description: $t('ticketing.external.json_copy_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

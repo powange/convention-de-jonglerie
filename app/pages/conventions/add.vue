@@ -26,7 +26,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
-import type { ConventionFormData, HttpError } from '~/types'
+import type { ConventionFormData } from '~/types'
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -38,9 +38,30 @@ const authStore = useAuthStore()
 const toast = useToast()
 const { t } = useI18n()
 
-const loading = ref(false)
+// Stockage temporaire des données du formulaire pour useApiAction
+const pendingFormData = ref<ConventionFormData | null>(null)
 
-const handleAddConvention = async (formData: ConventionFormData) => {
+// Action pour créer une convention
+const { execute: executeCreate, loading } = useApiAction<ConventionFormData, { name: string }>(
+  '/api/conventions',
+  {
+    method: 'POST',
+    body: () => pendingFormData.value!,
+    errorMessages: { default: t('errors.convention_creation_error') },
+    silentSuccess: true, // On gère le toast manuellement pour avoir le nom
+    onSuccess: (convention) => {
+      toast.add({
+        title: t('messages.convention_created'),
+        description: t('messages.convention_created_desc', { name: convention.name }),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      router.push('/my-conventions')
+    },
+  }
+)
+
+const handleAddConvention = (formData: ConventionFormData) => {
   if (!authStore.user) {
     toast.add({
       title: t('errors.authentication_error'),
@@ -50,41 +71,8 @@ const handleAddConvention = async (formData: ConventionFormData) => {
     })
     return
   }
-
-  loading.value = true
-
-  try {
-    // Créer la convention (l'upload d'image se fait automatiquement via ImageUpload)
-    const convention = await $fetch('/api/conventions', {
-      method: 'POST',
-      body: formData,
-    })
-
-    toast.add({
-      title: t('messages.convention_created'),
-      description: t('messages.convention_created_desc', { name: convention.name }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Rediriger vers la page des conventions de l'utilisateur
-    router.push('/my-conventions')
-  } catch (error: unknown) {
-    console.error('Error creating convention:', error)
-
-    const httpError = error as HttpError
-    const errorMessage =
-      httpError.data?.message || httpError.message || t('errors.convention_creation_error')
-
-    toast.add({
-      title: t('errors.creation_error'),
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
+  pendingFormData.value = formData
+  executeCreate()
 }
 
 const handleCancel = () => {

@@ -320,6 +320,7 @@
       "no_tiers_available": "No pricing available",
       "no_validation_yet": "No validation yet",
       "order": "Order",
+      "order_created": "Order created successfully",
       "order_id": "Order ID",
       "organization_slug_label": "Organization slug",
       "organization_slug_placeholder": "e.g.: juggling-convention",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Cannot publish reply",
     "cannot_remove_favorite": "Cannot remove from favorites",
     "city_too_long": "City cannot exceed {max} characters",
+    "conflict": "Conflict with existing data",
     "content_required": "Content is required",
     "content_too_long": "Content cannot exceed {max} characters",
     "convention_creation_error": "An error occurred while creating the convention",
@@ -888,6 +890,7 @@
     "invalid_email": "Invalid email",
     "invalid_file_type": "Invalid file type. Accepted formats: {types}",
     "invalid_phone_number": "Invalid phone number",
+    "invalid_request": "Invalid request",
     "loading_error": "Loading error",
     "login_failed": "Login failed",
     "login_required_convention": "You must be logged in to create a convention",
@@ -909,7 +912,8 @@
     "status_update_failed": "Failed to update status",
     "update_error": "Update error",
     "update_organizer_error": "Error updating organizer",
-    "username_min_3_chars": "Username must contain at least 3 characters"
+    "username_min_3_chars": "Username must contain at least 3 characters",
+    "validation_error": "Validation error"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. All rights reserved.",

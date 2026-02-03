@@ -63,12 +63,43 @@
       "title": "Räknare",
       "token_regenerated": "Token framgångsrikt regenererad"
     },
+    "custom_fields": {
+      "created": "Anpassat fält skapat framgångsrikt",
+      "error_saving": "Kan inte spara anpassat fält",
+      "updated": "Anpassat fält uppdaterat framgångsrikt"
+    },
+    "external": {
+      "config_delete_error": "Kan inte ta bort konfiguration",
+      "config_deleted": "Konfiguration borttagen",
+      "config_deleted_description": "HelloAsso biljettförsäljning har kopplats bort",
+      "config_save_error": "Kan inte spara konfiguration",
+      "config_saved": "Konfiguration sparad",
+      "config_saved_description": "HelloAsso konfigurerat för {org}",
+      "connection_error": "Kan inte ansluta till HelloAsso",
+      "connection_failed": "Anslutning misslyckades",
+      "connection_success": "Anslutning lyckades!",
+      "connection_success_description": "Formulär hittat: {name} ({org})",
+      "json_copied": "Kopierat!",
+      "json_copied_description": "JSON har kopierats till urklipp",
+      "json_copy_error": "Kan inte kopiera till urklipp",
+      "participants_load_error": "Kan inte ladda deltagare",
+      "participants_loaded": "Deltagare laddade",
+      "participants_loaded_description": "{orders} beställning(ar) och {items} deltagare hittade",
+      "raw_json_load_error": "Kan inte ladda rådata",
+      "raw_json_loaded": "Rå JSON laddad",
+      "raw_json_loaded_description": "HelloAsso rådata har hämtats",
+      "tiers_load_error": "Kan inte ladda priser",
+      "tiers_loaded": "Priser laddade",
+      "tiers_loaded_description": "{tiers} pris(er), {options} alternativ och {fields} anpassade fält hittade"
+    },
     "my_ticket": {
       "how_to_use_description": "Visa upp denna QR-kod vid entrén för att validera din biljett.",
       "how_to_use_title": "Så här använder du denna QR-kod",
       "logo_alt": "HelloAsso"
     },
     "options": {
+      "created": "Alternativ skapat framgångsrikt",
+      "error_saving": "Kan inte spara alternativ",
       "list": {
         "loading": "Laddar...",
         "logo_alt": "HelloAsso",
@@ -89,7 +120,9 @@
         "quotas_placeholder": "Välja kvoter",
         "title": "HejAsso-alternativet",
         "type_label": "Typ av option"
-      }
+      },
+      "name_required": "Alternativnamn krävs",
+      "updated": "Alternativ uppdaterat framgångsrikt"
     },
     "orders": {
       "cancel_order": "Avbryt beställning",
@@ -100,10 +133,18 @@
       "delete_order": "Ta bort kommando",
       "delete_order_confirm": "Är du säker på att du vill ta bort det här kommandot?",
       "delete_order_confirm_message": "Denna åtgärd raderar ordern och alla tillhörande biljetter permanent från databasen. Denna åtgärd kan inte ångras.",
-      "delete_order_error": "Fel vid borttagning av order",
       "deleting_order": "Radering pågår...",
+      "entry_invalidated": "Inträde ogiltigförklarat",
+      "entry_invalidated_description": "Biljett har markerats som ej validerad",
+      "entry_validated_description": "Biljett har validerats framgångsrikt",
+      "entry_validated_success": "Inträde validerat",
+      "invalidate_entry_error": "Fel vid ogiltigförklaring av inträde",
       "order_canceled": "Beställningen avbruten",
-      "order_deleted": "Order borttagen"
+      "order_deleted": "Order borttagen",
+      "payment_method_error": "Fel vid uppdatering av betalningsmetod",
+      "payment_method_updated": "Betalningsmetod inställd",
+      "payment_method_updated_description": "Betalningsmetod har sparats framgångsrikt",
+      "validate_entry_error": "Fel vid validering av inträde"
     },
     "participant": {
       "entry_validated": "Posten är redan validerad",
@@ -128,19 +169,33 @@
       "selectMethod": "Välj betalningsmetod"
     },
     "quotas": {
+      "created": "Kvot skapad framgångsrikt",
+      "deleted": "Kvot borttagen framgångsrikt",
+      "error_deleting": "Kan inte ta bort kvot",
+      "error_reordering": "Kan inte uppdatera kvotordning",
+      "error_saving": "Kan inte spara kvot",
+      "error_updating": "Kan inte uppdatera kvot",
       "list": {
+        "delete_button": "Ta bort",
+        "delete_confirm": "Är du säker på att du vill ta bort kvoten '{name}'?",
+        "delete_title": "Ta bort kvot",
+        "description": "Definiera kvoter här för att begränsa tillgången till vissa tjänster (föreställningar, aktiviteter, inträden osv.)",
         "description_label": "beskrivning",
         "description_placeholder": "Beskrivning (valfritt)",
+        "drag_tooltip": "Dra för att ordna om",
         "loading": "Laddar...",
         "name_placeholder": "Titel på kvot",
         "title": "Hantering av kvoter"
       },
+      "order_updated": "Kvotordning uppdaterad",
+      "quantity_min": "Antal måste vara minst 1",
       "stats": {
         "exceeded": "ÖVERRIDA",
         "title": "Kvotstatistik",
         "used": "Begagnad",
         "validated": "Validerad"
-      }
+      },
+      "title_required": "Titel krävs"
     },
     "returnable_items": {
       "list": {
@@ -165,6 +220,8 @@
       "volunteers": "Volontärer"
     },
     "tiers": {
+      "created": "Pris skapat framgångsrikt",
+      "error_saving": "Kan inte spara pris",
       "list": {
         "drag_to_reorder": "Dra för att ändra ordning",
         "inactive": "Inaktiv",
@@ -197,7 +254,9 @@
         "returnable_items_placeholder": "Välj objekt",
         "status_label": "Status",
         "title": "HelloAsso pris"
-      }
+      },
+      "name_required": "Prisnamn krävs",
+      "updated": "Pris uppdaterat framgångsrikt"
     }
   }
 }

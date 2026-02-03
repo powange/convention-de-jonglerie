@@ -94,7 +94,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const toast = useToast()
 const { t } = useI18n()
 const authStore = useAuthStore()
 
@@ -103,7 +102,6 @@ definePageMeta({
   middleware: 'authenticated',
 })
 
-const loading = ref(false)
 const selectedCategories = ref<string[]>([])
 
 const categoryItems = computed(() => [
@@ -124,39 +122,29 @@ const categoryItems = computed(() => [
   },
 ])
 
-const saveCategories = async () => {
-  loading.value = true
-  try {
-    const updatedUser = await $fetch('/api/profile/categories', {
-      method: 'PUT',
-      body: {
-        isVolunteer: selectedCategories.value.includes('volunteer'),
-        isArtist: selectedCategories.value.includes('artist'),
-        isOrganizer: selectedCategories.value.includes('organizer'),
-      },
-    })
+// Construit le payload pour l'API
+const buildPayload = () => ({
+  isVolunteer: selectedCategories.value.includes('volunteer'),
+  isArtist: selectedCategories.value.includes('artist'),
+  isOrganizer: selectedCategories.value.includes('organizer'),
+})
 
+// Action pour sauvegarder les catégories
+const { execute: executeSave, loading } = useApiAction('/api/profile/categories', {
+  method: 'PUT',
+  body: buildPayload,
+  successMessage: { title: t('profile.user_categories.save_success') },
+  errorMessages: { default: t('profile.user_categories.save_error') },
+  onSuccess: async (updatedUser) => {
     // Mettre à jour le store
     authStore.updateUser(updatedUser)
-
-    toast.add({
-      title: t('profile.user_categories.save_success'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
     // Rediriger vers la destination finale ou la page d'accueil
     await redirectToFinalDestination()
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde des catégories:', error)
-    toast.add({
-      title: t('profile.user_categories.save_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
+  },
+})
+
+const saveCategories = () => {
+  executeSave()
 }
 
 const skipCategories = async () => {

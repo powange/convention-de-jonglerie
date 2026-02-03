@@ -164,11 +164,9 @@ const emit = defineEmits<{
 
 // i18n et utilitaires
 const { t } = useI18n()
-const toast = useToast()
 const { formatForDisplay } = useDatetime()
 
 // État
-const loading = ref(false)
 const delayMinutes = ref<number | null>(null)
 
 // Computed
@@ -244,70 +242,47 @@ const close = () => {
   isOpen.value = false
 }
 
-const saveDelay = async () => {
-  if (!props.timeSlot?.id || delayMinutes.value === null) return
-
-  try {
-    loading.value = true
-    await $fetch(`/api/editions/${props.editionId}/volunteer-time-slots/${props.timeSlot.id}`, {
-      method: 'PUT',
-      body: {
-        delayMinutes: delayMinutes.value,
-      },
-    })
-
-    toast.add({
-      title: t('edition.volunteers.delay_saved'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    emit('refresh')
-    close()
-  } catch (error: any) {
-    console.error('Erreur lors de la sauvegarde du retard:', error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: error.data?.message || error.message || 'Erreur lors de la sauvegarde',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
+// Callback commun après succès
+const onSuccess = () => {
+  emit('refresh')
+  close()
 }
 
-const removeDelay = async () => {
-  if (!props.timeSlot?.id) return
-
-  try {
-    loading.value = true
-    await $fetch(`/api/editions/${props.editionId}/volunteer-time-slots/${props.timeSlot.id}`, {
-      method: 'PUT',
-      body: {
-        delayMinutes: null,
-      },
-    })
-
-    toast.add({
-      title: t('edition.volunteers.delay_removed'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    emit('refresh')
-    close()
-  } catch (error: any) {
-    console.error('Erreur lors de la suppression du retard:', error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: error.data?.message || error.message || 'Erreur lors de la suppression',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+// Action pour sauvegarder le retard
+const { execute: executeSaveDelay, loading: isSaving } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteer-time-slots/${props.timeSlot?.id}`,
+  {
+    method: 'PUT',
+    body: () => ({ delayMinutes: delayMinutes.value }),
+    successMessage: { title: t('edition.volunteers.delay_saved') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess,
   }
+)
+
+// Action pour supprimer le retard
+const { execute: executeRemoveDelay, loading: isRemoving } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteer-time-slots/${props.timeSlot?.id}`,
+  {
+    method: 'PUT',
+    body: () => ({ delayMinutes: null }),
+    successMessage: { title: t('edition.volunteers.delay_removed') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess,
+  }
+)
+
+// État de chargement combiné
+const loading = computed(() => isSaving.value || isRemoving.value)
+
+const saveDelay = () => {
+  if (!props.timeSlot?.id || delayMinutes.value === null) return
+  executeSaveDelay()
+}
+
+const removeDelay = () => {
+  if (!props.timeSlot?.id) return
+  executeRemoveDelay()
 }
 
 // Initialiser le retard lors de l'ouverture

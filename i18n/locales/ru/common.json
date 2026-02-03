@@ -320,6 +320,7 @@
       "no_tiers_available": "Тарифы недоступны",
       "no_validation_yet": "Проверки пока нет",
       "order": "Заказ",
+      "order_created": "Заказ успешно создан",
       "order_id": "ID заказа",
       "organization_slug_label": "Slug организации",
       "organization_slug_placeholder": "напр.: жонглирование-конвенция",
@@ -856,6 +857,7 @@
     "cannot_publish_reply": "Невозможно опубликовать ответ",
     "cannot_remove_favorite": "Невозможно удалить из избранных",
     "city_too_long": "Город не может превышать {max} символов",
+    "conflict": "Конфликт с существующими данными",
     "content_required": "Содержимое обязательно",
     "content_too_long": "Содержимое не может превышать {max} символов",
     "convention_creation_error": "Произошла ошибка при создании конвенции",
@@ -888,6 +890,7 @@
     "invalid_email": "Недействительный email",
     "invalid_file_type": "Недопустимый тип файла. Принятые форматы: {types}",
     "invalid_phone_number": "Недействительный номер телефона",
+    "invalid_request": "Неверный запрос",
     "loading_error": "Ошибка загрузки",
     "login_failed": "Неудача входа",
     "login_required_convention": "Вы должны войти для создания конвенции",
@@ -909,7 +912,8 @@
     "status_update_failed": "Не удалось обновить статус",
     "update_error": "Ошибка обновления",
     "update_organizer_error": "Ошибка обновления сотрудника",
-    "username_min_3_chars": "Имя пользователя должно содержать минимум 3 символа"
+    "username_min_3_chars": "Имя пользователя должно содержать минимум 3 символа",
+    "validation_error": "Ошибка валидации"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Все права защищены.",

@@ -207,7 +207,6 @@ const state = reactive({
   confirmPassword: '',
 })
 
-const loading = ref(false)
 const invalidToken = ref(false)
 const passwordReset = ref(false)
 
@@ -302,44 +301,36 @@ onMounted(async () => {
   }
 })
 
-const handleSubmit = async () => {
-  loading.value = true
-
-  try {
-    await $fetch('/api/auth/reset-password', {
-      method: 'POST',
-      body: {
-        token: token.value,
-        newPassword: state.newPassword,
-      },
-    })
-
+// Action pour réinitialiser le mot de passe
+const { execute: executeReset, loading } = useApiAction('/api/auth/reset-password', {
+  method: 'POST',
+  body: () => ({
+    token: token.value,
+    newPassword: state.newPassword,
+  }),
+  successMessage: {
+    title: t('common.success'),
+    description: t('auth.password_reset_description'),
+  },
+  errorMessages: { default: t('errors.server_error') },
+  onSuccess: () => {
     passwordReset.value = true
-
-    toast.add({
-      title: t('common.success'),
-      description: t('auth.password_reset_description'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
+  },
+  onError: (error) => {
+    // Si le token est invalide ou expiré, afficher le message d'erreur spécifique
+    const message = error.data?.message || ''
     if (
-      error.data?.message?.includes('invalide') ||
-      error.data?.message?.includes('expiré') ||
-      error.data?.message?.includes('invalid') ||
-      error.data?.message?.includes('expired')
+      message.includes('invalide') ||
+      message.includes('expiré') ||
+      message.includes('invalid') ||
+      message.includes('expired')
     ) {
       invalidToken.value = true
-    } else {
-      toast.add({
-        title: t('common.error'),
-        description: error.data?.message || t('errors.server_error'),
-        icon: 'i-heroicons-x-circle',
-        color: 'error',
-      })
     }
-  } finally {
-    loading.value = false
-  }
+  },
+})
+
+const handleSubmit = () => {
+  executeReset()
 }
 </script>

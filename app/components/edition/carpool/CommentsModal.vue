@@ -109,7 +109,25 @@ const { t } = useI18n()
 const loading = ref(false)
 const comments = ref<Comment[]>([])
 const newComment = ref('')
-const isAddingComment = ref(false)
+
+// Action pour ajouter un commentaire
+const { execute: executeAddComment, loading: isAddingComment } = useApiAction(
+  () =>
+    props.type === 'offer'
+      ? `/api/carpool-offers/${props.id}/comments`
+      : `/api/carpool-requests/${props.id}/comments`,
+  {
+    method: 'POST',
+    body: () => ({ content: newComment.value }),
+    successMessage: { title: t('messages.comment_added') },
+    errorMessages: { default: t('errors.cannot_add_comment') },
+    onSuccess: async () => {
+      newComment.value = ''
+      await loadComments()
+      emit('comment-added')
+    },
+  }
+)
 
 // Charger le nombre de commentaires au montage
 onMounted(async () => {
@@ -145,39 +163,11 @@ const loadComments = async () => {
   }
 }
 
-const addComment = async () => {
+const addComment = () => {
   // Nettoyer le commentaire et vérifier qu'il n'est pas vide
   newComment.value = newComment.value.trim()
   if (!newComment.value) return
 
-  isAddingComment.value = true
-  try {
-    const endpoint =
-      props.type === 'offer'
-        ? `/api/carpool-offers/${props.id}/comments`
-        : `/api/carpool-requests/${props.id}/comments`
-
-    await $fetch(endpoint, {
-      method: 'POST',
-      body: { content: newComment.value },
-    })
-
-    newComment.value = ''
-    await loadComments() // Recharger les commentaires
-    emit('comment-added')
-    toast.add({
-      title: t('messages.comment_added'),
-      color: 'success',
-    })
-  } catch (error) {
-    console.error("Erreur lors de l'ajout du commentaire:", error)
-    toast.add({
-      title: t('common.error'),
-      description: t('errors.cannot_add_comment'),
-      color: 'error',
-    })
-  } finally {
-    isAddingComment.value = false
-  }
+  executeAddComment()
 }
 </script>
