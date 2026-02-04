@@ -57,12 +57,10 @@ export default wrapApiHandler(
     // Un chevauchement existe si :
     // - La date de début existante <= la date de fin nouvelle ET
     // - La date de fin existante >= la date de début nouvelle
+    // Note: MySQL utilise une collation insensible à la casse par défaut
     const overlappingEditions = await prisma.edition.findMany({
       where: {
-        country: {
-          equals: validatedData.country,
-          mode: 'insensitive', // Comparaison insensible à la casse
-        },
+        country: validatedData.country,
         AND: [
           {
             startDate: {
