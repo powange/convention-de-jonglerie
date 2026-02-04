@@ -319,7 +319,13 @@
           <UAlert v-else icon="i-heroicons-x-circle" color="error" variant="solid">
             <template #title>{{ $t('admin.import.import_error') }}</template>
             <template #description>
-              {{ importResult.error }}
+              <div>{{ importResult.error }}</div>
+              <!-- Afficher les détails des erreurs de validation si disponibles -->
+              <ul v-if="importResult.validationErrors" class="mt-2 list-disc list-inside text-sm">
+                <li v-for="(message, field) in importResult.validationErrors" :key="field">
+                  <strong>{{ field }}:</strong> {{ message }}
+                </li>
+              </ul>
             </template>
           </UAlert>
         </div>
@@ -663,14 +669,22 @@ const performImport = async () => {
       color: 'success',
     })
   } catch (error: any) {
+    // Récupérer les erreurs de validation détaillées si disponibles
+    const validationErrors = error?.data?.data?.errors
+    const errorMessage = error?.data?.message || t('admin.import.import_failed')
+
     importResult.value = {
       success: false,
-      error: error?.data?.message || t('admin.import.import_failed'),
+      error: errorMessage,
+      validationErrors: validationErrors || null,
     }
 
+    // Toast avec message principal
     toast.add({
       title: t('common.error'),
-      description: importResult.value.error,
+      description: validationErrors
+        ? `${errorMessage} (${Object.keys(validationErrors).length} ${t('admin.import.field_errors')})`
+        : errorMessage,
       color: 'error',
     })
   } finally {

@@ -243,6 +243,7 @@
       "import_another": "Importer une autre",
       "import_error": "Erreur d'import",
       "import_failed": "L'import a échoué",
+      "field_errors": "erreur(s) de champ",
       "import_success": "Import réussi !",
       "import_success_message": "La convention et l'édition ont été importées avec succès.",
       "import_success_toast": "Les données ont été importées dans la base de données",
