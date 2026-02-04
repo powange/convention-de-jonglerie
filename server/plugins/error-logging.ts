@@ -1,8 +1,8 @@
 import { readBody } from 'h3'
 
-import { logApiError } from '../utils/error-logger'
-
 import type { NitroApp } from 'nitropack'
+
+import { logApiError } from '#server/utils/error-logger'
 
 export default async function errorLoggingPlugin(nitroApp: NitroApp) {
   // Intercepter toutes les erreurs non gérées dans les routes API
