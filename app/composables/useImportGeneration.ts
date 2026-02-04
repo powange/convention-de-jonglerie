@@ -13,6 +13,17 @@ import type { StepHistoryEntry, SubStepEntry } from '~/composables/useElapsedTim
 export type GenerationMethod = 'simple' | 'agent'
 
 /**
+ * Provider IA disponible
+ */
+export interface AIProvider {
+  id: string
+  name: string
+  description: string
+  icon: string
+  isDefault: boolean
+}
+
+/**
  * Résultat de la génération SSE
  */
 export interface GenerationResult {
@@ -63,6 +74,11 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const generating = ref(false)
   const generateError = ref('')
   const generationMethod = ref<GenerationMethod>('simple')
+
+  // État des providers IA
+  const availableProviders = ref<AIProvider[]>([])
+  const selectedProvider = ref<string | null>(null)
+  const loadingProviders = ref(false)
 
   // État des étapes
   const currentStep = ref('')
@@ -141,16 +157,42 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   }
 
   /**
+   * Charge les providers IA disponibles depuis l'API
+   */
+  const loadProviders = async (): Promise<void> => {
+    if (loadingProviders.value) return
+
+    loadingProviders.value = true
+    try {
+      const response = await $fetch<{ providers: AIProvider[]; defaultProvider: string | null }>(
+        '/api/admin/ai-providers'
+      )
+      availableProviders.value = response.providers
+      // Sélectionner le provider par défaut si aucun n'est sélectionné
+      if (!selectedProvider.value && response.defaultProvider) {
+        selectedProvider.value = response.defaultProvider
+      }
+    } catch (error) {
+      console.error('[useImportGeneration] Erreur chargement providers:', error)
+      availableProviders.value = []
+    } finally {
+      loadingProviders.value = false
+    }
+  }
+
+  /**
    * Génère le JSON via SSE (Server-Sent Events)
    *
    * @param urls - Liste des URLs à traiter
    * @param method - Méthode de génération ('direct' ou 'agent')
    * @param previewedImageUrl - URL d'image prévisualisée (optionnel)
+   * @param provider - Provider IA à utiliser (optionnel)
    */
   const generateWithSSE = (
     urls: string[],
     method: 'direct' | 'agent',
-    previewedImageUrl?: string
+    previewedImageUrl?: string,
+    provider?: string
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
       const encodedUrls = urls.map((url) => encodeURIComponent(url)).join(',')
@@ -159,6 +201,9 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       let sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
       if (previewedImageUrl) {
         sseUrl += `&previewedImageUrl=${encodeURIComponent(previewedImageUrl)}`
+      }
+      if (provider) {
+        sseUrl += `&provider=${encodeURIComponent(provider)}`
       }
 
       // withCredentials: true pour envoyer les cookies de session
@@ -305,9 +350,10 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     try {
       generating.value = true
 
-      // Utiliser SSE
+      // Utiliser SSE avec le provider sélectionné
       const method = generationMethod.value === 'agent' ? 'agent' : 'direct'
-      const result = await generateWithSSE(urls, method, previewedImageUrl)
+      const provider = selectedProvider.value || undefined
+      const result = await generateWithSSE(urls, method, previewedImageUrl, provider)
 
       if (generationMethod.value === 'agent') {
         agentResult.value = result
@@ -335,6 +381,11 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     agentPagesVisited,
     agentResult,
 
+    // Providers IA
+    availableProviders,
+    selectedProvider,
+    loadingProviders,
+
     // Timer
     currentElapsedTime,
     formatMs,
@@ -351,5 +402,6 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     // Actions
     generate,
     resetState,
+    loadProviders,
   }
 }

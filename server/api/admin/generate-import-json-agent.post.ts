@@ -639,6 +639,8 @@ export interface AgentExplorationOptions {
   onProgress?: ProgressCallback
   /** Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente) */
   previewedImageUrl?: string
+  /** Provider IA à utiliser (optionnel, utilise la config serveur par défaut) */
+  provider?: 'lmstudio' | 'anthropic' | 'ollama'
 }
 
 /**
@@ -648,7 +650,7 @@ export async function runAgentExploration(
   urls: string[],
   options: AgentExplorationOptions = {}
 ): Promise<AgentGenerateResult> {
-  const { taskId, onProgress, previewedImageUrl } = options
+  const { taskId, onProgress, previewedImageUrl, provider } = options
 
   // Helper pour envoyer les événements de progression (polling + SSE)
   const notifyStep = (
@@ -677,10 +679,16 @@ export async function runAgentExploration(
   }
 
   // Récupérer la config IA effective (lit process.env en priorité)
-  const configToUse = getEffectiveAIConfig()
+  const effectiveConfig = getEffectiveAIConfig()
+
+  // Provider IA à utiliser (paramètre > config serveur > défaut)
+  const aiProvider = provider || effectiveConfig.aiProvider || 'lmstudio'
+  console.log(`[AGENT] Provider IA sélectionné: ${aiProvider}`)
+
+  // Créer une config avec le provider potentiellement overridé
+  const configToUse = { ...effectiveConfig, aiProvider }
 
   // Calculer les limites de contenu dynamiquement selon le context length du modèle
-  const aiProvider = configToUse.aiProvider || 'lmstudio'
   const dynamicMaxContent = await getMaxContentSizeForProvider(
     aiProvider,
     configToUse.lmstudioBaseUrl

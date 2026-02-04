@@ -119,6 +119,8 @@ export interface GenerateImportOptions {
   onProgress?: ProgressCallback
   /** Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente) */
   previewedImageUrl?: string
+  /** Provider IA à utiliser (optionnel, utilise la config serveur par défaut) */
+  provider?: 'lmstudio' | 'anthropic' | 'ollama'
 }
 
 /**
@@ -134,7 +136,7 @@ export async function generateImportJson(
   urls: string[],
   options: GenerateImportOptions = {}
 ): Promise<GenerateImportResult> {
-  const { taskId, onProgress, previewedImageUrl } = options
+  const { taskId, onProgress, previewedImageUrl, provider } = options
   // Récupérer la config IA effective (lit process.env en priorité)
   const effectiveConfig = getEffectiveAIConfig()
 
@@ -222,8 +224,9 @@ export async function generateImportJson(
   // Stocker les images OG trouvées pour les injecter plus tard (l'IA peut halluciner les URLs)
   const foundOgImages: string[] = []
 
-  // Budget de contenu adapté dynamiquement selon le context length du modèle
-  const aiProvider = effectiveConfig.aiProvider || 'lmstudio'
+  // Provider IA à utiliser (paramètre > config serveur > défaut)
+  const aiProvider = provider || effectiveConfig.aiProvider || 'lmstudio'
+  console.log(`[GENERATE-IMPORT] Provider IA sélectionné: ${aiProvider}`)
   const dynamicMaxContent = await getMaxContentSizeForProvider(
     aiProvider,
     effectiveConfig.lmstudioBaseUrl

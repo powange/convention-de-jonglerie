@@ -13,6 +13,8 @@ const querySchema = z.object({
   urls: z.string().min(1), // URLs séparées par des virgules
   // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
   previewedImageUrl: z.string().url().optional(),
+  // Provider IA à utiliser (optionnel, utilise la config serveur par défaut)
+  provider: z.enum(['lmstudio', 'anthropic', 'ollama']).optional(),
 })
 
 /**
@@ -32,7 +34,7 @@ export default wrapApiHandler(
 
     // Récupérer et valider les paramètres query
     const query = getQuery(event)
-    const { method, urls: urlsString, previewedImageUrl } = querySchema.parse(query)
+    const { method, urls: urlsString, previewedImageUrl, provider } = querySchema.parse(query)
 
     // Parser les URLs
     const urls = urlsString
@@ -66,7 +68,9 @@ export default wrapApiHandler(
       }
     }
 
-    console.log(`[GENERATE-STREAM] Démarrage SSE: method=${method}, urls=${urls.length}`)
+    console.log(
+      `[GENERATE-STREAM] Démarrage SSE: method=${method}, urls=${urls.length}, provider=${provider || 'default'}`
+    )
 
     // Configurer les headers SSE
     setHeader(event, 'Content-Type', 'text/event-stream')
@@ -154,11 +158,11 @@ export default wrapApiHandler(
             if (method === 'direct') {
               // Extraction Directe (ED)
               console.log('[GENERATE-STREAM] Lancement ED...')
-              result = await generateImportJson(urls, { onProgress, previewedImageUrl })
+              result = await generateImportJson(urls, { onProgress, previewedImageUrl, provider })
             } else {
               // Exploration Intelligente (EI)
               console.log('[GENERATE-STREAM] Lancement EI...')
-              result = await runAgentExploration(urls, { onProgress, previewedImageUrl })
+              result = await runAgentExploration(urls, { onProgress, previewedImageUrl, provider })
             }
 
             // Ne pas envoyer si le client s'est déconnecté

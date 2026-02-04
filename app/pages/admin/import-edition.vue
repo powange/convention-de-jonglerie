@@ -51,6 +51,21 @@
           <URadioGroup v-model="generationMethod" :items="generationMethodItems" variant="card" />
         </UFormField>
 
+        <!-- Choix du provider IA -->
+        <UFormField
+          v-if="availableProviders.length > 1"
+          :label="$t('admin.import.ai_provider')"
+          :hint="$t('admin.import.ai_provider_hint')"
+        >
+          <USelect
+            v-model="selectedProvider"
+            :items="providerItems"
+            :loading="loadingProviders"
+            :placeholder="$t('admin.import.ai_provider_placeholder')"
+            class="w-full max-w-md"
+          />
+        </UFormField>
+
         <div class="flex gap-3">
           <UButton
             color="warning"
@@ -348,7 +363,17 @@ const {
   currentStepIconClass,
   getHostname,
   generate,
+  // Providers IA
+  availableProviders,
+  selectedProvider,
+  loadingProviders,
+  loadProviders,
 } = useImportGeneration()
+
+// Charger les providers au montage
+onMounted(() => {
+  loadProviders()
+})
 
 // Validation des URLs pour le test
 const { parseAndValidateUrls } = useUrlValidation()
@@ -386,6 +411,15 @@ const generationMethodItems = computed(() => [
     value: 'agent',
   },
 ])
+
+// Items pour le select des providers IA
+const providerItems = computed(() =>
+  availableProviders.value.map((provider) => ({
+    label: provider.name + (provider.isDefault ? ` (${t('common.default')})` : ''),
+    value: provider.id,
+    icon: provider.icon,
+  }))
+)
 
 // Items pour le select des résultats de test
 const testResultItems = computed(() =>
