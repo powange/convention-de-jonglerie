@@ -51,9 +51,9 @@
       "pending_operations": "{count} operação(ões) pendente(s) | {count} operação pendente | {count} operações pendentes",
       "qr_code_description": "Partilhe este código QR para permitir que outros se juntem a este contador",
       "qr_code_title": "Código QR de partilha",
-      "regenerate_token": "Regenerar token",
-      "regenerate_token_error": "Erro ao regenerar token",
-      "regenerate_token_warning": "Atenção: regenerar o token invalidará o link de compartilhamento antigo e o código QR atual. Todos os usuários precisarão usar o novo link para acessar o contador.",
+      "regenerate_token": "Regenerar link",
+      "regenerate_token_error": "Erro ao regenerar link",
+      "regenerate_token_warning": "Atenção: regenerar o link invalidará o link de compartilhamento antigo e o código QR atual. Todos os usuários precisarão usar o novo link para acessar o contador.",
       "reset": "Reiniciar",
       "reset_confirmation": "Tem certeza de que deseja reiniciar este contador para 0?",
       "reset_counter": "Reiniciar contador",
@@ -61,7 +61,7 @@
       "step": "Incremento",
       "syncing": "Sincronizando...",
       "title": "Contadores",
-      "token_regenerated": "Token regenerado com sucesso"
+      "token_regenerated": "Link regenerado com sucesso"
     },
     "custom_fields": {
       "created": "Campo personalizado criado com sucesso",

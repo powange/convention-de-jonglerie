@@ -51,9 +51,9 @@
       "pending_operations": "{count} pending operation(s) | {count} pending operation | {count} pending operations",
       "qr_code_description": "Share this QR code to allow others to join this counter",
       "qr_code_title": "Sharing QR Code",
-      "regenerate_token": "Regenerate token",
-      "regenerate_token_error": "Error regenerating token",
-      "regenerate_token_warning": "Warning: regenerating the token will invalidate the old sharing link and the current QR code. All users will need to use the new link to access the counter.",
+      "regenerate_token": "Regenerate link",
+      "regenerate_token_error": "Error regenerating link",
+      "regenerate_token_warning": "Warning: regenerating the link will invalidate the old sharing link and the current QR code. All users will need to use the new link to access the counter.",
       "reset": "Reset",
       "reset_confirmation": "Are you sure you want to reset this counter to 0?",
       "reset_counter": "Reset counter",
@@ -61,7 +61,7 @@
       "step": "Increment",
       "syncing": "Syncing...",
       "title": "Counters",
-      "token_regenerated": "Token successfully regenerated"
+      "token_regenerated": "Link successfully regenerated"
     },
     "custom_fields": {
       "created": "Custom field created successfully",

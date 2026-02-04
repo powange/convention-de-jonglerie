@@ -51,9 +51,9 @@
       "pending_operations": "{count} väntande operation(er) | {count} väntande operation | {count} väntande operationer",
       "qr_code_description": "Dela denna QR-kod för att låta andra gå med i denna räknare",
       "qr_code_title": "Delnings-QR-kod",
-      "regenerate_token": "Regenerera token",
-      "regenerate_token_error": "Fel vid regenerering av token",
-      "regenerate_token_warning": "Varning: regenerering av token kommer att ogiltigförklara den gamla delningslänken och den aktuella QR-koden. Alla användare måste använda den nya länken för att komma åt räknaren.",
+      "regenerate_token": "Regenerera länk",
+      "regenerate_token_error": "Fel vid regenerering av länk",
+      "regenerate_token_warning": "Varning: regenerering av länken kommer att ogiltigförklara den gamla delningslänken och den aktuella QR-koden. Alla användare måste använda den nya länken för att komma åt räknaren.",
       "reset": "Återställ",
       "reset_confirmation": "Är du säker på att du vill återställa denna räknare till 0?",
       "reset_counter": "Återställ räknare",
@@ -61,7 +61,7 @@
       "step": "Steg",
       "syncing": "Synkroniserar...",
       "title": "Räknare",
-      "token_regenerated": "Token framgångsrikt regenererad"
+      "token_regenerated": "Länk framgångsrikt regenererad"
     },
     "custom_fields": {
       "created": "Anpassat fält skapat framgångsrikt",

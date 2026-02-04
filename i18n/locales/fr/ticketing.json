@@ -51,9 +51,9 @@
       "pending_operations": "{count} opération(s) en attente | {count} opération en attente | {count} opérations en attente",
       "qr_code_description": "Partagez ce QR code pour permettre à d'autres personnes de rejoindre ce compteur",
       "qr_code_title": "QR Code de partage",
-      "regenerate_token": "Régénérer le token",
-      "regenerate_token_error": "Erreur lors de la régénération du token",
-      "regenerate_token_warning": "Attention : régénérer le token invalidera l'ancien lien de partage et le QR code actuel. Tous les utilisateurs devront utiliser le nouveau lien pour accéder au compteur.",
+      "regenerate_token": "Régénérer le lien",
+      "regenerate_token_error": "Erreur lors de la régénération du lien",
+      "regenerate_token_warning": "Attention : régénérer le lien invalidera l'ancien lien de partage et le QR code actuel. Tous les utilisateurs devront utiliser le nouveau lien pour accéder au compteur.",
       "reset": "Réinitialiser",
       "reset_confirmation": "Êtes-vous sûr de vouloir réinitialiser ce compteur à 0 ?",
       "reset_counter": "Réinitialiser le compteur",
@@ -61,7 +61,7 @@
       "step": "Incrément",
       "syncing": "Synchronisation en cours...",
       "title": "Compteurs",
-      "token_regenerated": "Token régénéré avec succès"
+      "token_regenerated": "Lien régénéré avec succès"
     },
     "custom_fields": {
       "created": "Champ personnalisé créé avec succès",

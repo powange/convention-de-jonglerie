@@ -51,9 +51,9 @@
       "pending_operations": "{count} afventende operation(er) | {count} afventende operation | {count} afventende operationer",
       "qr_code_description": "Del denne QR-kode for at give andre mulighed for at deltage i denne tæller",
       "qr_code_title": "Delings QR-kode",
-      "regenerate_token": "Regenerer token",
-      "regenerate_token_error": "Fejl ved regenerering af token",
-      "regenerate_token_warning": "Advarsel: Regenerering af token vil ugyldiggøre det gamle delingslink og den aktuelle QR-kode. Alle brugere skal bruge det nye link for at få adgang til tælleren.",
+      "regenerate_token": "Regenerer link",
+      "regenerate_token_error": "Fejl ved regenerering af link",
+      "regenerate_token_warning": "Advarsel: Regenerering af link vil ugyldiggøre det gamle delingslink og den aktuelle QR-kode. Alle brugere skal bruge det nye link for at få adgang til tælleren.",
       "reset": "Nulstil",
       "reset_confirmation": "Er du sikker på, at du vil nulstille denne tæller til 0?",
       "reset_counter": "Nulstil tæller",
@@ -61,7 +61,7 @@
       "step": "Trin",
       "syncing": "Synkroniserer...",
       "title": "Tællere",
-      "token_regenerated": "Token regenereret med succes"
+      "token_regenerated": "Link regenereret med succes"
     },
     "custom_fields": {
       "created": "Brugerdefineret felt oprettet med succes",

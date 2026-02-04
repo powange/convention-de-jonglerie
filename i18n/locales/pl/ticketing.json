@@ -51,9 +51,9 @@
       "pending_operations": "{count} oczekująca(-e) operacja(-e) | {count} oczekująca operacja | {count} oczekujących operacji",
       "qr_code_description": "Udostępnij ten kod QR, aby umożliwić innym dołączenie do tego licznika",
       "qr_code_title": "Kod QR do udostępniania",
-      "regenerate_token": "Regeneruj token",
-      "regenerate_token_error": "Błąd podczas regeneracji tokenu",
-      "regenerate_token_warning": "Uwaga: regeneracja tokenu unieważni stary link udostępniania i aktualny kod QR. Wszyscy użytkownicy będą musieli użyć nowego linku, aby uzyskać dostęp do licznika.",
+      "regenerate_token": "Regeneruj link",
+      "regenerate_token_error": "Błąd podczas regeneracji linku",
+      "regenerate_token_warning": "Uwaga: regeneracja linku unieważni stary link udostępniania i aktualny kod QR. Wszyscy użytkownicy będą musieli użyć nowego linku, aby uzyskać dostęp do licznika.",
       "reset": "Resetuj",
       "reset_confirmation": "Czy na pewno chcesz zresetować ten licznik do 0?",
       "reset_counter": "Resetuj licznik",
@@ -61,7 +61,7 @@
       "step": "Przyrost",
       "syncing": "Synchronizacja...",
       "title": "Liczniki",
-      "token_regenerated": "Token pomyślnie zregenerowany"
+      "token_regenerated": "Link pomyślnie zregenerowany"
     },
     "custom_fields": {
       "created": "Pole niestandardowe utworzone pomyślnie",
