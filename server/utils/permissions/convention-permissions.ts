@@ -1,9 +1,9 @@
-import { ORGANIZER_RIGHTS } from '@@/server/constants/permissions'
-import { canManageOrganizers } from '@@/server/utils/organizer-management'
-
+import type { OrganizerRight } from '#server/constants/permissions'
 import type { UserForPermissions } from './types'
-import type { OrganizerRight } from '@@/server/constants/permissions'
 import type { User, Convention, ConventionOrganizer } from '@prisma/client'
+
+import { ORGANIZER_RIGHTS } from '#server/constants/permissions'
+import { canManageOrganizers } from '#server/utils/organizer-management'
 
 /**
  * Type pour une convention avec ses organisateurs
@@ -30,7 +30,7 @@ export interface ConventionPermissionOptions {
 }
 
 /**
- * @deprecated Importez OrganizerRight depuis @@/server/constants/permissions
+ * @deprecated Importez OrganizerRight depuis #server/constants/permissions
  * Ce type est conservé pour rétrocompatibilité mais ne devrait plus être utilisé
  */
 export type ConventionRight = OrganizerRight

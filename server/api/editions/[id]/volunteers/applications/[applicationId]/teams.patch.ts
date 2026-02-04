@@ -1,12 +1,13 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   assignVolunteerToTeams,
   resolveTeamIdentifiers,
-} from '@@/server/utils/editions/volunteers/teams'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/editions/volunteers/teams'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   teams: z.array(z.string()), // Noms ou IDs des équipes pour l'assignation

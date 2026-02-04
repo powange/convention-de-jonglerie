@@ -1,13 +1,13 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import type { Prisma } from '@prisma/client'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   getEditionWithPermissions,
   canManageArtists,
-} from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { showApplicationStatusSchema } from '@@/server/utils/validation-schemas'
-
-import type { Prisma } from '@prisma/client'
+} from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { showApplicationStatusSchema } from '#server/utils/validation-schemas'
 
 /**
  * Met à jour le statut d'une candidature de spectacle

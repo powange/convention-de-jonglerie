@@ -1,10 +1,11 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { NotificationHelpers } from '@@/server/utils/notification-service'
-import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
-import { sanitizeEmail } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import { setUserSession } from '#imports'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { NotificationHelpers } from '#server/utils/notification-service'
+import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
+import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),

@@ -1,7 +1,8 @@
-import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { NotificationService } from '@@/server/utils/notification-service'
 import { z } from 'zod'
+
+import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { NotificationService } from '#server/utils/notification-service'
 
 const querySchema = z.object({
   isRead: z

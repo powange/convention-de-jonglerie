@@ -1,7 +1,7 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
-import { validatePagination } from '@@/server/utils/validation-helpers'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
+import { notificationStreamManager } from '#server/utils/notification-stream-manager'
+import { validatePagination } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

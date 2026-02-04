@@ -1,7 +1,8 @@
-import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { checkArtistApplicationConversationAccess } from '@@/server/utils/show-application-helpers'
 import { z } from 'zod'
+
+import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { checkArtistApplicationConversationAccess } from '#server/utils/show-application-helpers'
 
 const querySchema = z.object({
   limit: z

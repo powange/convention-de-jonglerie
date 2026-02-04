@@ -1,13 +1,14 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
-import { sanitizeString } from '@@/server/utils/validation-helpers'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { getEmailHash } from '#server/utils/email-hash'
+import { sanitizeString } from '#server/utils/validation-helpers'
 import {
   updateProfileSchema,
   validateAndSanitize,
   handleValidationError,
-} from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
+} from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

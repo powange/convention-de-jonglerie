@@ -162,7 +162,7 @@ Marque un log comme résolu/non résolu.
 Pour logger une erreur manuellement dans votre code :
 
 ```typescript
-import { logApiError } from '@@/server/utils/error-logger'
+import { logApiError } from '#server/utils/error-logger'
 
 try {
   // Votre code qui peut échouer
@@ -181,7 +181,7 @@ try {
 Utiliser le wrapper pour capturer automatiquement :
 
 ```typescript
-import { withErrorLogging } from '@@/server/utils/error-logger'
+import { withErrorLogging } from '#server/utils/error-logger'
 
 export default defineEventHandler(
   withErrorLogging(async (event) => {

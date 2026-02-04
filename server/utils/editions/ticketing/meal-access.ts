@@ -2,7 +2,7 @@
  * Utilitaires pour gérer les accès repas des participants
  */
 
-import type { PrismaTransaction } from '@@/server/types/prisma-helpers'
+import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 /**
  * Crée les accès repas pour un orderItem basé sur une option

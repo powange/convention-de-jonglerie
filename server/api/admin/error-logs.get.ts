@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { validatePagination } from '@@/server/utils/validation-helpers'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
+import { validatePagination } from '#server/utils/validation-helpers'
 
 const DEFAULT_PAGE_SIZE = 20
 

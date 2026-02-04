@@ -342,7 +342,7 @@ export const ALL_ORGANIZER_RIGHTS = Object.values(ORGANIZER_RIGHTS)
 
 ```typescript
 // server/utils/api-helpers.ts
-export { isHttpError } from '@@/server/types/prisma-helpers'
+export { isHttpError } from '#server/types/prisma-helpers'
 ```
 
 **Effort** : 30 minutes

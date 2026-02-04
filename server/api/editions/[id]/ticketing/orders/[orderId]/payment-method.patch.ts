@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   paymentMethod: z.enum(['cash', 'card', 'check']),

@@ -1,7 +1,8 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { encrypt } from '@@/server/utils/encryption'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
 import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { encrypt } from '#server/utils/encryption'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
 const bodySchema = z.object({
   provider: z.enum(['HELLOASSO', 'BILLETWEB', 'WEEZEVENT', 'OTHER']),

@@ -36,8 +36,8 @@ const countries = await prisma.edition.findMany({
 **Caching côté serveur (1 heure)** :
 
 ```typescript
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { prisma } from '#server/utils/prisma'
 
 export default wrapApiHandler(
   async (_event) => {
@@ -142,7 +142,7 @@ export default wrapApiHandler(
 **Caching côté serveur (24 heures)** :
 
 ```typescript
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async () => {
@@ -252,8 +252,8 @@ const editions = await prisma.edition.findMany({
 **Caching côté serveur (6 heures avec invalidation)** :
 
 ```typescript
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { prisma } from '@@/server/utils/prisma'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { prisma } from '#server/utils/prisma'
 
 export default wrapApiHandler(
   async () => {

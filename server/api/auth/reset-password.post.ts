@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
-import { passwordSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
+import { passwordSchema } from '#server/utils/validation-schemas'
 
 const resetPasswordSchema = z.object({
   token: z.string(),

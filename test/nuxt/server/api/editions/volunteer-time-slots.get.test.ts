@@ -9,7 +9,7 @@ vi.mock('../../../../../server/utils/permissions/volunteer-permissions', () => (
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
-} from '@@/server/utils/permissions/volunteer-permissions'
+} from '#server/utils/permissions/volunteer-permissions'
 import handler from '../../../../../server/api/editions/[id]/volunteer-time-slots/index.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

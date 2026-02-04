@@ -1,4 +1,4 @@
-import { canManageTicketing } from '@@/server/utils/permissions/edition-permissions'
+import { canManageTicketing } from '#server/utils/permissions/edition-permissions'
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)

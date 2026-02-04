@@ -1,12 +1,13 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   scrapeFacebookEvent,
   type FacebookScraperResult,
-} from '@@/server/utils/facebook-event-scraper'
-import { BROWSER_HEADERS, fetchWithTimeout } from '@@/server/utils/fetch-helpers'
-import { extractWebContent, type WebContentExtraction } from '@@/server/utils/web-content-extractor'
-import { z } from 'zod'
+} from '#server/utils/facebook-event-scraper'
+import { BROWSER_HEADERS, fetchWithTimeout } from '#server/utils/fetch-helpers'
+import { extractWebContent, type WebContentExtraction } from '#server/utils/web-content-extractor'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),

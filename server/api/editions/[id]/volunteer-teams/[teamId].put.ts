@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateTeamSchema = z.object({
   name: z.string().min(1, "Le nom de l'équipe est requis").max(100).optional(),

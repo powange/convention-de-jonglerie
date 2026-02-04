@@ -1,5 +1,5 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 /**
  * API Admin - Statistiques des notifications

@@ -1,6 +1,6 @@
-import { requiresEmergencyContact } from '@@/server/utils/allergy-severity'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { requiresEmergencyContact } from '#server/utils/allergy-severity'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   volunteerApplicationBodySchema,
   processPhoneLogic,
@@ -8,10 +8,10 @@ import {
   validateRequiredFields,
   validateAvailability,
   validateTeamPreferences,
-} from '@@/server/utils/editions/volunteers/applications'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { generateVolunteerQrCodeToken } from '@@/server/utils/token-generator'
-import { sanitizeString, validateEditionId } from '@@/server/utils/validation-helpers'
+} from '#server/utils/editions/volunteers/applications'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
+import { sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -223,7 +223,7 @@ export default wrapApiHandler(
     // Envoyer une notification de confirmation de candidature
     try {
       const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
-      const { NotificationHelpers } = await import('@@/server/utils/notification-service')
+      const { NotificationHelpers } = await import('#server/utils/notification-service')
       await NotificationHelpers.volunteerApplicationSubmitted(
         authenticatedUser.id,
         editionName,

@@ -1,6 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 
 const bodySchema = z.object({
   userId: z.number().int().positive(),

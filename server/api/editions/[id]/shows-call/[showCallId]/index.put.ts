@@ -1,11 +1,12 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   getEditionWithPermissions,
   canManageArtists,
-} from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 const updateShowCallSchema = z.object({
   name: z.string().min(1, 'Le nom est requis').max(100, 'Le nom est trop long').optional(),

@@ -1,8 +1,5 @@
-import { ORGANIZER_RIGHTS } from '@@/server/constants/permissions'
-import { checkAdminMode } from '@@/server/utils/organizer-management'
-
+import type { OrganizerRight } from '#server/constants/permissions'
 import type { UserForPermissions } from './types'
-import type { OrganizerRight } from '@@/server/constants/permissions'
 import type {
   User,
   Edition,
@@ -10,6 +7,9 @@ import type {
   ConventionOrganizer,
   EditionOrganizerPermission,
 } from '@prisma/client'
+
+import { ORGANIZER_RIGHTS } from '#server/constants/permissions'
+import { checkAdminMode } from '#server/utils/organizer-management'
 
 /**
  * Type pour une édition avec ses relations nécessaires aux permissions
@@ -34,7 +34,7 @@ export interface EditionPermissionOptions {
 }
 
 /**
- * @deprecated Importez OrganizerRight depuis @@/server/constants/permissions
+ * @deprecated Importez OrganizerRight depuis #server/constants/permissions
  * Ce type est conservé pour rétrocompatibilité mais ne devrait plus être utilisé
  */
 export type { OrganizerRight }

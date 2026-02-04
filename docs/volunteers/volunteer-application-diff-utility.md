@@ -16,7 +16,7 @@ L'utilitaire `volunteer-application-diff.ts` fournit des fonctions pour comparer
 Compare les données avant/après modification et génère un rapport détaillé des changements.
 
 ```typescript
-import { compareApplicationChanges } from '@@/server/utils/volunteer-application-diff'
+import { compareApplicationChanges } from '#server/utils/volunteer-application-diff'
 
 const changes = await compareApplicationChanges(
   {
@@ -51,7 +51,7 @@ const changes = await compareApplicationChanges(
 Vérifie rapidement si des données ont été modifiées sans analyser les détails.
 
 ```typescript
-import { hasApplicationDataChanges } from '@@/server/utils/volunteer-application-diff'
+import { hasApplicationDataChanges } from '#server/utils/volunteer-application-diff'
 
 const hasChanges = hasApplicationDataChanges({
   teamPreferences: ['team1'],

@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
  * Récupère la candidature de bénévolat de l'utilisateur connecté pour une édition

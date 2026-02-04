@@ -1,11 +1,12 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import {
   calculateReturnableItemsForTicket,
   returnableItemsIncludes,
-} from '@@/server/utils/ticketing/returnable-items'
-import { sanitizeEmail } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/ticketing/returnable-items'
+import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   searchTerm: z.string().min(1),

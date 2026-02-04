@@ -1,11 +1,12 @@
-import { isHttpError } from '@@/server/types/api'
 import { z } from 'zod'
 
 import { isApiError, toApiError } from './errors'
 import { handleValidationError } from './validation-schemas'
 
-import type { ApiSuccessResponse, ApiPaginatedResponse } from '@@/server/types/api'
+import type { ApiSuccessResponse, ApiPaginatedResponse } from '#server/types/api'
 import type { H3Event, EventHandlerRequest } from 'h3'
+
+import { isHttpError } from '#server/types/api'
 
 /**
  * Options pour le wrapper d'API

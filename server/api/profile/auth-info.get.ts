@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 
 function getAuthProviderLabel(provider: string): string {
   switch (provider) {

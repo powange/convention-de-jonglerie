@@ -5,7 +5,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
   canManageOrganizers: vi.fn(),
 }))
 
-import { canManageOrganizers } from '@@/server/utils/organizer-management'
+import { canManageOrganizers } from '#server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].patch'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

@@ -1,16 +1,17 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
-import { getEmailHash } from '@@/server/utils/email-hash'
+import bcrypt from 'bcryptjs'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
+import { getEmailHash } from '#server/utils/email-hash'
 import {
   sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
-} from '@@/server/utils/emailService'
-import { registerRateLimiter } from '@@/server/utils/rate-limiter'
-import { sanitizeEmail, sanitizeString } from '@@/server/utils/validation-helpers'
-import { registerSchema } from '@@/server/utils/validation-schemas'
-import bcrypt from 'bcryptjs'
+} from '#server/utils/emailService'
+import { registerRateLimiter } from '#server/utils/rate-limiter'
+import { sanitizeEmail, sanitizeString } from '#server/utils/validation-helpers'
+import { registerSchema } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

@@ -1,7 +1,8 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { messengerUnreadService } from '@@/server/utils/messenger-unread-service'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { messengerUnreadService } from '#server/utils/messenger-unread-service'
 
 const bodySchema = z.object({
   messageId: z.string(),

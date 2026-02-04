@@ -1,9 +1,10 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
-import { userBasicSelect, userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
-import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { userBasicSelect, userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 
 const assignVolunteerSchema = z.object({
   userId: z.number().int().positive(),

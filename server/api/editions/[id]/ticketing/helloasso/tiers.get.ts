@@ -1,7 +1,7 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { getHelloAssoTiersAndOptions } from '@@/server/utils/editions/ticketing/helloasso'
-import { decrypt } from '@@/server/utils/encryption'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { requireAuth } from '#server/utils/auth-utils'
+import { getHelloAssoTiersAndOptions } from '#server/utils/editions/ticketing/helloasso'
+import { decrypt } from '#server/utils/encryption'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {

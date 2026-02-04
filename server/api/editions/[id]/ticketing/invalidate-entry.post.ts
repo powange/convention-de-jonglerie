@@ -1,6 +1,7 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
   participantId: z.number(),
@@ -53,7 +54,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           broadcastToEditionSSE(editionId, {
             type: 'entry-invalidated',
             editionId,
@@ -94,7 +95,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           broadcastToEditionSSE(editionId, {
             type: 'entry-invalidated',
             editionId,
@@ -135,7 +136,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           broadcastToEditionSSE(editionId, {
             type: 'entry-invalidated',
             editionId,
@@ -177,7 +178,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           broadcastToEditionSSE(editionId, {
             type: 'entry-invalidated',
             editionId,

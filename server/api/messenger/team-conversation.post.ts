@@ -1,4 +1,4 @@
-import { ensureVolunteerConversations } from '@@/server/utils/messenger-helpers'
+import { ensureVolunteerConversations } from '#server/utils/messenger-helpers'
 
 /**
  * POST /api/messenger/team-conversation

@@ -1,9 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canEditWorkshop } from '@@/server/utils/permissions/workshop-permissions'
-import { buildUpdateData, fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
-import { updateWorkshopSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canEditWorkshop } from '#server/utils/permissions/workshop-permissions'
+import { buildUpdateData, fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { updateWorkshopSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

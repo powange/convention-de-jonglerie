@@ -1,8 +1,9 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateResourceId } from '#server/utils/validation-helpers'
 
 const updateProfilePictureSchema = z.object({
   profilePicture: z.string().min(1, 'Chemin de fichier requis').nullable(),

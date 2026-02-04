@@ -1,6 +1,7 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { handleValidationError } from '#server/utils/validation-schemas'
 
 const paramsSchema = z.object({
   id: z.string().transform(Number),

@@ -1,5 +1,5 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { deduplicateCountries } from '@@/server/utils/countries'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { deduplicateCountries } from '#server/utils/countries'
 
 export default wrapApiHandler(
   async (event) => {

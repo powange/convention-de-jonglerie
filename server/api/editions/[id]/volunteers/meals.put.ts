@@ -1,11 +1,8 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import {
-  isVolunteerEligibleForMeal,
-  isArtistEligibleForMeal,
-} from '@@/server/utils/volunteer-meals'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { isVolunteerEligibleForMeal, isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
 
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)

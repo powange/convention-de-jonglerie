@@ -1,12 +1,13 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   addCounterConnection,
   counterStreamManager,
   getActiveCounterConnections,
-} from '@@/server/utils/ticketing-counter-sse'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/ticketing-counter-sse'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

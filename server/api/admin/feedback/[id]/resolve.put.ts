@@ -1,9 +1,10 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
-import { validateAndSanitize } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateResourceId } from '#server/utils/validation-helpers'
+import { validateAndSanitize } from '#server/utils/validation-schemas'
 
 const resolveSchema = z.object({
   resolved: z.boolean(),

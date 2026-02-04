@@ -1,5 +1,6 @@
-import { firebaseAdmin } from '@@/server/utils/firebase-admin'
 import { z } from 'zod'
+
+import { firebaseAdmin } from '#server/utils/firebase-admin'
 
 const testFirebaseSchema = z.object({
   token: z.string().min(1, 'Token FCM requis'),

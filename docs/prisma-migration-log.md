@@ -282,7 +282,7 @@ Commande : `npm run check:prisma-selects`
 
 ```typescript
 // ✅ Bon
-import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
+import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 
 const user = await prisma.user.findUnique({
   select: userBasicSelect,

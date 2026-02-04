@@ -1,13 +1,14 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { userAdminSelect } from '@@/server/utils/prisma-select-helpers'
+import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { userAdminSelect } from '#server/utils/prisma-select-helpers'
 import {
   validateUserId,
   checkEmailUniqueness,
   checkPseudoUniqueness,
-} from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/validation-helpers'
 
 const updateUserSchema = z.object({
   email: z.string().email('Email invalide'),

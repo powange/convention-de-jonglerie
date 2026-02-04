@@ -11,7 +11,7 @@ import {
   addConventionOrganizer,
   checkAdminMode,
   findUserByPseudoOrEmail,
-} from '@@/server/utils/organizer-management'
+} from '#server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

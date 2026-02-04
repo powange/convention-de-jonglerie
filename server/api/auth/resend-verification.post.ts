@@ -1,14 +1,15 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
-} from '@@/server/utils/emailService'
-import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
-import { emailRateLimiter } from '@@/server/utils/rate-limiter'
-import { sanitizeEmail } from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/emailService'
+import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
+import { emailRateLimiter } from '#server/utils/rate-limiter'
+import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const resendVerificationSchema = z.object({
   email: z.string().email('Adresse email invalide'),

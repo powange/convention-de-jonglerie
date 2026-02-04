@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { deleteProfilePicture } from '@@/server/utils/image-deletion'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { deleteProfilePicture } from '#server/utils/image-deletion'
 
 export default wrapApiHandler(
   async (event) => {

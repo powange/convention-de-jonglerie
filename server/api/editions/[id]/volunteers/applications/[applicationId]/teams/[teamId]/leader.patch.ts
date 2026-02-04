@@ -1,14 +1,15 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { getVolunteerTeamById, setTeamLeader } from '@@/server/utils/editions/volunteers/teams'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
-import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { getVolunteerTeamById, setTeamLeader } from '#server/utils/editions/volunteers/teams'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import {
   validateEditionId,
   validateResourceId,
   validateStringId,
-} from '@@/server/utils/validation-helpers'
-import { z } from 'zod'
+} from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   isLeader: z.boolean(),

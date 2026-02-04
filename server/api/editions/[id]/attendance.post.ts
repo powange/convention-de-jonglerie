@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

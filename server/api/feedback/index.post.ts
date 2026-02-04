@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { getRequestIP } from 'h3'
 import { z } from 'zod'
 
 import type { FeedbackType } from '@prisma/client'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 const feedbackSchema = z.object({
   type: z.enum(['bug', 'feature', 'general', 'other']),

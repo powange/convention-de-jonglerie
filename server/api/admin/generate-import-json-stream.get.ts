@@ -1,12 +1,13 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { sendErrorEvent, sendResultEvent } from '@@/server/utils/import-generation-sse'
 import { z } from 'zod'
 
 import { runAgentExploration } from './generate-import-json-agent.post'
 import { generateImportJson } from './generate-import-json.post'
 
-import type { ImportGenerationEvent } from '@@/server/utils/import-generation-sse'
+import type { ImportGenerationEvent } from '#server/utils/import-generation-sse'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { sendErrorEvent, sendResultEvent } from '#server/utils/import-generation-sse'
 
 const querySchema = z.object({
   method: z.enum(['direct', 'agent']).default('direct'),

@@ -1,6 +1,7 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { DateTime } from 'luxon'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {

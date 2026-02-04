@@ -1,8 +1,9 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateUserId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateUserId } from '#server/utils/validation-helpers'
 
 const promoteUserSchema = z.object({
   isGlobalAdmin: z.boolean(),

@@ -1,9 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
-} from '@@/server/utils/permissions/volunteer-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+} from '#server/utils/permissions/volunteer-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

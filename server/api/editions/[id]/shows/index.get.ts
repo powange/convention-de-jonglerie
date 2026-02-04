@@ -1,7 +1,7 @@
-import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

@@ -1,12 +1,12 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
-
 import {
   editionPostCommentSchema,
   validateAndSanitize,
 } from '../../../../../../../server/utils/validation-schemas'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { hasEditionEditPermission } from '#server/utils/permissions/permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

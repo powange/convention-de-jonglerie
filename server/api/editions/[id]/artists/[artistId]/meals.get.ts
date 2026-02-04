@@ -1,11 +1,11 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import {
   getAvailableMealsOnArrival,
   getAvailableMealsOnDeparture,
-} from '@@/server/utils/volunteer-meals'
+} from '#server/utils/volunteer-meals'
 
 export default wrapApiHandler(
   async (event) => {

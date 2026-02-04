@@ -1,8 +1,9 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { updateUserInfo } from '@@/server/utils/editions/ticketing/user-info-update'
-import { NotificationService } from '@@/server/utils/notification-service'
-import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { updateUserInfo } from '#server/utils/editions/ticketing/user-info-update'
+import { NotificationService } from '#server/utils/notification-service'
+import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
@@ -167,7 +168,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           for (const participantId of body.participantIds) {
             broadcastToEditionSSE(editionId, {
               type: 'entry-validated',
@@ -277,7 +278,7 @@ export default wrapApiHandler(
             const shows = artist.shows.map((showArtist) => showArtist.show.title)
 
             // Envoyer une notification à chaque responsable artiste
-            const { NotificationHelpers } = await import('@@/server/utils/notification-service')
+            const { NotificationHelpers } = await import('#server/utils/notification-service')
             for (const manager of artistManagers) {
               await NotificationHelpers.artistArrival(
                 manager.userId,
@@ -298,7 +299,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           for (const participantId of body.participantIds) {
             broadcastToEditionSSE(editionId, {
               type: 'entry-validated',
@@ -365,7 +366,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           for (const participantId of body.participantIds) {
             broadcastToEditionSSE(editionId, {
               type: 'entry-validated',
@@ -455,7 +456,7 @@ export default wrapApiHandler(
 
         // Notifier via SSE
         try {
-          const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
           for (const participantId of body.participantIds) {
             broadcastToEditionSSE(editionId, {
               type: 'entry-validated',

@@ -35,7 +35,7 @@ const offer = await prisma.carpoolOffer.update({
 **Après** : Utilisation de helpers réutilisables
 
 ```typescript
-import { userBasicSelect, carpoolOfferInclude } from '@@/server/utils/prisma-select-helpers'
+import { userBasicSelect, carpoolOfferInclude } from '#server/utils/prisma-select-helpers'
 
 const user = await prisma.user.findUnique({
   where: { id },
@@ -119,7 +119,7 @@ import {
   userBasicSelect,
   userWithProfileSelect,
   editionListInclude,
-} from '@@/server/utils/prisma-select-helpers'
+} from '#server/utils/prisma-select-helpers'
 ```
 
 ### 2. Utilisation avec `select`
@@ -164,7 +164,7 @@ const offers = await prisma.carpoolOffer.findMany({
 ### 4. Utilisation avec typage
 
 ```typescript
-import type { UserBasic, EditionList } from '@@/server/utils/prisma-select-helpers'
+import type { UserBasic, EditionList } from '#server/utils/prisma-select-helpers'
 
 // Le type est automatiquement inféré
 const user: UserBasic = await prisma.user.findUnique({
@@ -216,7 +216,7 @@ const editions = await prisma.edition.findMany({
 **Après** :
 
 ```typescript
-import { editionListSelect, editionListInclude } from '@@/server/utils/prisma-select-helpers'
+import { editionListSelect, editionListInclude } from '#server/utils/prisma-select-helpers'
 
 const editions = await prisma.edition.findMany({
   select: editionListSelect,
@@ -250,7 +250,7 @@ const updatedOffer = await prisma.carpoolOffer.update({
 **Après** :
 
 ```typescript
-import { carpoolOfferInclude } from '@@/server/utils/prisma-select-helpers'
+import { carpoolOfferInclude } from '#server/utils/prisma-select-helpers'
 
 const updatedOffer = await prisma.carpoolOffer.update({
   where: { id: offerId },
@@ -279,7 +279,7 @@ const organizers = await prisma.conventionOrganizer.findMany({
 **Après** :
 
 ```typescript
-import { organizerWithUserInclude } from '@@/server/utils/prisma-select-helpers'
+import { organizerWithUserInclude } from '#server/utils/prisma-select-helpers'
 
 const organizers = await prisma.conventionOrganizer.findMany({
   include: organizerWithUserInclude,
@@ -311,7 +311,7 @@ const applications = await prisma.editionVolunteerApplication.findMany({
 **Après** :
 
 ```typescript
-import { volunteerApplicationInclude } from '@@/server/utils/prisma-select-helpers'
+import { volunteerApplicationInclude } from '#server/utils/prisma-select-helpers'
 
 const applications = await prisma.editionVolunteerApplication.findMany({
   include: volunteerApplicationInclude,
@@ -409,7 +409,7 @@ Ajouter au `package.json` :
 
 ```typescript
 // ✅ Bon
-import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
+import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 
 // ❌ Mauvais - duplication
 const select = { id: true, pseudo: true }
@@ -436,7 +436,7 @@ select: {
 
 ```typescript
 // ✅ Bon - type automatique
-import type { UserBasic } from '@@/server/utils/prisma-select-helpers'
+import type { UserBasic } from '#server/utils/prisma-select-helpers'
 
 const user: UserBasic = await prisma.user.findUnique({
   select: userBasicSelect,

@@ -314,7 +314,7 @@ import {
   getHelloAssoForm,
   testHelloAssoConnection,
   getHelloAssoTiersAndOptions,
-} from '@@/server/utils/editions/ticketing/helloasso'
+} from '#server/utils/editions/ticketing/helloasso'
 
 // Obtenir un token OAuth2
 const token = await getHelloAssoAccessToken({
@@ -349,7 +349,7 @@ const data = await getHelloAssoTiersAndOptions(
 Le `clientSecret` HelloAsso est chiffré avant d'être stocké en base de données :
 
 ```typescript
-import { encrypt, decrypt } from '@@/server/utils/encryption'
+import { encrypt, decrypt } from '#server/utils/encryption'
 
 // Chiffrer un secret
 const encrypted = encrypt('my-secret-value')

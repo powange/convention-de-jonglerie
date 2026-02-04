@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { getHelloAssoAccessToken } from '@@/server/utils/editions/ticketing/helloasso'
-import { decrypt } from '@@/server/utils/encryption'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { getHelloAssoAccessToken } from '#server/utils/editions/ticketing/helloasso'
+import { decrypt } from '#server/utils/encryption'
 
 const HELLOASSO_API_URL = process.env.HELLOASSO_API_URL || 'https://api.helloasso.com'
 

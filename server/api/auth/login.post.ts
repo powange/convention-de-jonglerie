@@ -1,10 +1,11 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { authRateLimiter } from '@@/server/utils/rate-limiter'
-import { sanitizeString } from '@@/server/utils/validation-helpers'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
 import { setUserSession } from '#imports'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { authRateLimiter } from '#server/utils/rate-limiter'
+import { sanitizeString } from '#server/utils/validation-helpers'
 
 // Schéma de validation pour le login
 const loginSchema = z.object({

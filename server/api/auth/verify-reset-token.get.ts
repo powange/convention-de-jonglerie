@@ -1,4 +1,4 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {

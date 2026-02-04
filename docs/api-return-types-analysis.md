@@ -342,7 +342,7 @@ export type ProfileStatsResponse = {
 
 ```typescript
 // server/api/editions/index.get.ts
-import type { GetEditionsResponse } from '@@/server/types/api-responses'
+import type { GetEditionsResponse } from '#server/types/api-responses'
 
 export default wrapApiHandler<GetEditionsResponse>(
   async (event) => {
@@ -508,7 +508,7 @@ export type ProfileStatsResponse = {
 }
 
 // server/api/profile/stats.get.ts
-import type { ProfileStatsResponse } from '@@/server/types/api-responses'
+import type { ProfileStatsResponse } from '#server/types/api-responses'
 
 export default wrapApiHandler<ProfileStatsResponse>(
   async (event): Promise<ProfileStatsResponse> => {
@@ -551,7 +551,7 @@ export type PinPostResponse = ApiSuccessResponse<{
 }>
 
 // server/api/editions/[id]/posts/[postId]/pin.patch.ts
-import type { PinPostResponse } from '@@/server/types/api-responses'
+import type { PinPostResponse } from '#server/types/api-responses'
 
 export default wrapApiHandler<PinPostResponse>(
   async (event): Promise<PinPostResponse> => {
@@ -595,7 +595,7 @@ export type EditionListItem = Pick<
 export type GetEditionsResponse = ApiPaginatedResponse<EditionListItem>
 
 // server/api/editions/index.get.ts
-import type { GetEditionsResponse } from '@@/server/types/api-responses'
+import type { GetEditionsResponse } from '#server/types/api-responses'
 
 export default wrapApiHandler<GetEditionsResponse>(
   async (event): Promise<GetEditionsResponse> => {

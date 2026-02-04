@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { optionalAuth } from '@@/server/utils/auth-utils'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { optionalAuth } from '#server/utils/auth-utils'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

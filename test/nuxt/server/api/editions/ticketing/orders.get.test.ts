@@ -5,7 +5,7 @@ vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => 
   canAccessEditionData: vi.fn(),
 }))
 
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import handler from '../../../../../../server/api/editions/[id]/ticketing/orders.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

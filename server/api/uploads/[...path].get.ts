@@ -2,8 +2,9 @@ import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
 import { join } from 'path'
 
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
 import { sendStream } from 'h3'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {

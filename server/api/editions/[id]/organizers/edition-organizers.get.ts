@@ -1,5 +1,5 @@
-import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
-import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
+import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 
 export default wrapApiHandler(
   async (event) => {

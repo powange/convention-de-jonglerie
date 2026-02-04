@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -22,7 +22,7 @@ export default wrapApiHandler(
     // Vérification de sécurité : seuls les admins peuvent uploader pour d'autres utilisateurs
     if (targetUserId !== user.id) {
       // Vérifier que l'utilisateur connecté est un admin
-      const { prisma } = await import('@@/server/utils/prisma')
+      const { prisma } = await import('#server/utils/prisma')
       const currentUser = await fetchResourceOrFail<{ isGlobalAdmin: boolean }>(
         prisma.user,
         user.id,

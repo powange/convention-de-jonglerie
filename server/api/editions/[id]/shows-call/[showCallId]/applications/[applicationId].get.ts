@@ -1,10 +1,10 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   getEditionWithPermissions,
   canManageArtists,
-} from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+} from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
  * Récupère les détails d'une candidature de spectacle

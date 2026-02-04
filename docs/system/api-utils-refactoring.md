@@ -383,7 +383,7 @@ select: {
 **Après :**
 
 ```typescript
-import { USER_ADMIN_SELECT } from '@@/server/utils/prisma-selects'
+import { USER_ADMIN_SELECT } from '#server/utils/prisma-selects'
 
 select: USER_ADMIN_SELECT
 ```
@@ -436,10 +436,10 @@ select: USER_ADMIN_SELECT
 Voici un exemple complet montrant l'utilisation de plusieurs utilitaires :
 
 ```typescript
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { EDITION_DETAIL_SELECT } from '@@/server/utils/prisma-selects'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { EDITION_DETAIL_SELECT } from '#server/utils/prisma-selects'
 
 export default wrapApiHandler(
   async (event) => {

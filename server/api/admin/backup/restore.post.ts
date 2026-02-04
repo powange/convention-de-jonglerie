@@ -3,7 +3,7 @@ import { readFile, writeFile, mkdir, rm } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
 
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {

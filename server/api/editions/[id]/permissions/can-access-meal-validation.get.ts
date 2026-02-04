@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessMealValidation } from '@@/server/utils/permissions/meal-validation-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessMealValidation } from '#server/utils/permissions/meal-validation-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
  * Endpoint pour vérifier si un utilisateur peut accéder à la validation des repas

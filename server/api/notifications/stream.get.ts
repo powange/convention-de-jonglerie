@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { notificationStreamManager } from '#server/utils/notification-stream-manager'
 
 export default wrapApiHandler(
   async (event) => {

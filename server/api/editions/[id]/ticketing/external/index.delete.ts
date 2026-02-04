@@ -1,5 +1,5 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
 export default wrapApiHandler(
   async (event) => {

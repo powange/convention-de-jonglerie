@@ -5,7 +5,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
   updateOrganizerRights: vi.fn(),
 }))
 
-import { updateOrganizerRights } from '@@/server/utils/organizer-management'
+import { updateOrganizerRights } from '#server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].put'
 
 const mockUpdateRole = updateOrganizerRights as ReturnType<typeof vi.fn>

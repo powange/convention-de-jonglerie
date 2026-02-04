@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { conversationPresenceService } from '@@/server/utils/conversation-presence-service'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { conversationPresenceService } from '#server/utils/conversation-presence-service'
 
 /**
  * GET /api/messenger/conversations/[conversationId]/presence

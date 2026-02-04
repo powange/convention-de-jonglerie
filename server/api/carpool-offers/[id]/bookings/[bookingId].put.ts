@@ -1,9 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { NotificationHelpers, safeNotify } from '@@/server/utils/notification-service'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { userWithProfileSelect } from '@@/server/utils/prisma-select-helpers'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { userWithProfileSelect } from '#server/utils/prisma-select-helpers'
+import { validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

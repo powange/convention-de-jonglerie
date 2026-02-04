@@ -1,14 +1,14 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { invalidateEditionCache } from '@@/server/utils/cache-helpers'
-import { normalizeDateToISO } from '@@/server/utils/date-helpers'
-import { handleFileUpload } from '@@/server/utils/file-helpers'
-import { geocodeEdition } from '@@/server/utils/geocoding'
-import { getEditionForEdit } from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { updateEditionSchema } from '@@/server/utils/validation-schemas'
-
 import type { Prisma } from '@prisma/client'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { invalidateEditionCache } from '#server/utils/cache-helpers'
+import { normalizeDateToISO } from '#server/utils/date-helpers'
+import { handleFileUpload } from '#server/utils/file-helpers'
+import { geocodeEdition } from '#server/utils/geocoding'
+import { getEditionForEdit } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { updateEditionSchema } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

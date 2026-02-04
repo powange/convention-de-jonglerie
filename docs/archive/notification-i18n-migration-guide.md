@@ -104,7 +104,7 @@ npx prisma migrate dev --name remove-old-notification-fields
 ### Pour les Notifications Système (Traductions)
 
 ```typescript
-import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { NotificationHelpers } from '#server/utils/notification-service'
 
 // Notification de bienvenue (traduite)
 await NotificationHelpers.welcome(userId)
@@ -122,7 +122,7 @@ await NotificationHelpers.carpoolBookingReceived(
 ### Pour les Notifications Custom (Texte Libre)
 
 ```typescript
-import { NotificationService } from '@@/server/utils/notification-service'
+import { NotificationService } from '#server/utils/notification-service'
 
 // Notification custom de l'organisateur (texte libre)
 await NotificationService.create({

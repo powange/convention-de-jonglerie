@@ -1,8 +1,9 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getCountryVariants } from '@@/server/utils/countries'
-import { conventionBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { getCountryVariants } from '#server/utils/countries'
+import { conventionBasicSelect } from '#server/utils/prisma-select-helpers'
 
 /**
  * Schéma de validation pour la vérification de doublons

@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { canCreateWorkshop } from '@@/server/utils/permissions/workshop-permissions'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { canCreateWorkshop } from '#server/utils/permissions/workshop-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

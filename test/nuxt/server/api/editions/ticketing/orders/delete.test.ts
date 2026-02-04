@@ -6,12 +6,12 @@ import handler from '../../../../../../../server/api/editions/[id]/ticketing/ord
 const prismaMock = (globalThis as any).prisma
 
 // Mock de canAccessEditionData pour autoriser l'accès
-vi.mock('@@/server/utils/permissions/edition-permissions', () => ({
+vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canAccessEditionData: vi.fn().mockResolvedValue(true),
 }))
 
 // Mock de requireAuth pour simuler un utilisateur authentifié
-vi.mock('@@/server/utils/auth-utils', () => ({
+vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn(() => ({ id: 1, email: 'admin@test.com' })),
 }))
 

@@ -5,7 +5,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
   canAccessConvention: vi.fn(),
 }))
 
-import { canAccessConvention } from '@@/server/utils/organizer-management'
+import { canAccessConvention } from '#server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/editions.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts

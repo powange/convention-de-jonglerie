@@ -1,10 +1,11 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import {
   calculateReturnableItemsForTicket,
   returnableItemsIncludes,
-} from '@@/server/utils/ticketing/returnable-items'
-import { z } from 'zod'
+} from '#server/utils/ticketing/returnable-items'
 
 const bodySchema = z.object({
   qrCode: z.string().min(1),

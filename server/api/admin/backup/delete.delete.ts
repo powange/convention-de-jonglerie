@@ -1,7 +1,7 @@
 import { unlink } from 'fs/promises'
 import path from 'path'
 
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {

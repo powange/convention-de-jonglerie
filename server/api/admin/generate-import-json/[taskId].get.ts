@@ -1,8 +1,8 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getTask } from '@@/server/utils/async-tasks'
-
 import type { GenerateImportResult } from '../generate-import-json.post'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { getTask } from '#server/utils/async-tasks'
 
 /**
  * GET /api/admin/generate-import-json/[taskId]

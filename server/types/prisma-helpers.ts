@@ -1,9 +1,9 @@
-import type { PartialOrganizerPermissions } from '@@/server/constants/permissions'
+import type { PartialOrganizerPermissions } from '#server/constants/permissions'
 import type { Prisma } from '@prisma/client'
 
 // Réexporter HttpError et isHttpError depuis api.ts pour rétrocompatibilité
-export type { HttpError } from '@@/server/types/api'
-export { isHttpError } from '@@/server/types/api'
+export type { HttpError } from '#server/types/api'
+export { isHttpError } from '#server/types/api'
 
 /**
  * Type pour les transactions Prisma

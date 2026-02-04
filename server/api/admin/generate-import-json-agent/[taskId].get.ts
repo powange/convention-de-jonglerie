@@ -1,8 +1,8 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getTask } from '@@/server/utils/async-tasks'
-
 import type { AgentGenerateResult } from '../generate-import-json-agent.post'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { getTask } from '#server/utils/async-tasks'
 
 const DEFAULT_MAX_ITERATIONS = 8
 

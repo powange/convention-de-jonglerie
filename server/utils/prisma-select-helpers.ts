@@ -7,7 +7,7 @@
  *
  * Usage:
  * ```typescript
- * import { userBasicSelect, userWithProfileSelect } from '@@/server/utils/prisma-select-helpers'
+ * import { userBasicSelect, userWithProfileSelect } from '#server/utils/prisma-select-helpers'
  *
  * const users = await prisma.user.findMany({
  *   select: userBasicSelect

@@ -1,8 +1,8 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { checkAdminMode } from '@@/server/utils/organizer-management'
-
 import type { Prisma } from '@prisma/client'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { checkAdminMode } from '#server/utils/organizer-management'
 
 export default wrapApiHandler(
   async (event) => {

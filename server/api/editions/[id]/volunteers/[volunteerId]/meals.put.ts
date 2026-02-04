@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
@@ -98,7 +98,7 @@ export default wrapApiHandler(async (event) => {
   })
 
   // Import de la fonction d'éligibilité
-  const { isVolunteerEligibleForMeal } = await import('@@/server/utils/volunteer-meals')
+  const { isVolunteerEligibleForMeal } = await import('#server/utils/volunteer-meals')
 
   // Formater les repas avec les sélections du bénévole et l'éligibilité
   const formattedMeals = meals.map((meal) => {

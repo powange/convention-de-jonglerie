@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { unifiedPushService } from '@@/server/utils/unified-push-service'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { unifiedPushService } from '#server/utils/unified-push-service'
 
 export default wrapApiHandler(
   async (event) => {

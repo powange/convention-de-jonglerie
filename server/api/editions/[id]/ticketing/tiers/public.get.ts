@@ -1,4 +1,4 @@
-import { applyCustomName } from '@@/server/utils/editions/ticketing/tiers'
+import { applyCustomName } from '#server/utils/editions/ticketing/tiers'
 
 /**
  * Route publique pour récupérer les tarifs actifs d'une édition

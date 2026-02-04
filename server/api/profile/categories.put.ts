@@ -1,11 +1,12 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   categoriesUpdateSchema,
   validateAndSanitize,
   handleValidationError,
-} from '@@/server/utils/validation-schemas'
-import { z } from 'zod'
+} from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

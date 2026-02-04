@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { getEffectiveAIConfig } from '@@/server/utils/ai-config'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { getEffectiveAIConfig } from '#server/utils/ai-config'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 
 /**
  * Provider IA disponible

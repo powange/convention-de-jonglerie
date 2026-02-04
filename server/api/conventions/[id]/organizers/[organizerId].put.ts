@@ -1,13 +1,14 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { updateOrganizerRights } from '@@/server/utils/organizer-management'
-import { validateConventionId, validateResourceId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
 
 import type {
   OrganizerWithPermissions,
   OrganizerPermissionSnapshot,
-} from '@@/server/types/prisma-helpers'
+} from '#server/types/prisma-helpers'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { updateOrganizerRights } from '#server/utils/organizer-management'
+import { validateConventionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateRightsSchema = z.object({
   rights: z

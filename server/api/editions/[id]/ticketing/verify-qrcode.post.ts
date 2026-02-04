@@ -1,7 +1,8 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { findTicketByQRCode } from '@@/server/utils/editions/ticketing/helloasso'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { findTicketByQRCode } from '#server/utils/editions/ticketing/helloasso'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   clientId: z.string().min(1),

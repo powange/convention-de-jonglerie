@@ -1,5 +1,5 @@
-import { syncOrganizersGroupParticipants } from '@@/server/utils/messenger-helpers'
-import { canManageEditionOrganizers } from '@@/server/utils/permissions/edition-permissions'
+import { syncOrganizersGroupParticipants } from '#server/utils/messenger-helpers'
+import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {

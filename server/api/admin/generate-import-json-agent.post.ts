@@ -1,48 +1,49 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { z } from 'zod'
+
+import { generateImportJson } from './generate-import-json.post'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
   AI_TIMEOUTS,
   getEffectiveAIConfig,
   getMaxContentSizeForProvider,
-} from '@@/server/utils/ai-config'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
+} from '#server/utils/ai-config'
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   createTask,
   runTaskInBackground,
   updateTaskMetadata,
   updateTaskStatus,
-} from '@@/server/utils/async-tasks'
+} from '#server/utils/async-tasks'
 import {
   extractEditionFeatures,
   mergeFeaturesIntoJson,
-} from '@@/server/utils/edition-features-extractor'
+} from '#server/utils/edition-features-extractor'
 import {
   scrapeFacebookEvent,
   facebookEventToImportJson,
   type FacebookScraperResult,
-} from '@@/server/utils/facebook-event-scraper'
-import { BROWSER_HEADERS, fetchWithTimeout } from '@@/server/utils/fetch-helpers'
+} from '#server/utils/facebook-event-scraper'
+import { BROWSER_HEADERS, fetchWithTimeout } from '#server/utils/fetch-helpers'
 import {
   type ProgressCallback,
   sendProgressEvent,
   sendStepEvent,
   sendUrlFetchedEvent,
-} from '@@/server/utils/import-generation-sse'
+} from '#server/utils/import-generation-sse'
 import {
   generateAgentSystemPrompt,
   generateCompactAgentSystemPrompt,
   generateForceGenerationPrompt,
   PROMPT_COMPLETE_PREFILLED_JSON,
-} from '@@/server/utils/import-json-schema'
+} from '#server/utils/import-json-schema'
 import {
   isJugglingEdgeEventUrl,
   scrapeJugglingEdgeEvent,
   jugglingEdgeEventToImportJson,
   formatJugglingEdgeDataAsContent,
-} from '@@/server/utils/jugglingedge-scraper'
-import { extractWebContent, formatExtractionForAI } from '@@/server/utils/web-content-extractor'
-import { z } from 'zod'
-
-import { generateImportJson } from './generate-import-json.post'
+} from '#server/utils/jugglingedge-scraper'
+import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),

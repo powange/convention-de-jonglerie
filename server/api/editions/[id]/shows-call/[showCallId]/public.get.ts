@@ -1,5 +1,5 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
  * Récupère les informations publiques d'un appel à spectacles

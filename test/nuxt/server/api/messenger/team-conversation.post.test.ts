@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { ensureVolunteerConversations } from '@@/server/utils/messenger-helpers'
+import { ensureVolunteerConversations } from '#server/utils/messenger-helpers'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

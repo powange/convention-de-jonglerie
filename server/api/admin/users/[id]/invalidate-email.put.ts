@@ -1,15 +1,15 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import {
   sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
-} from '@@/server/utils/emailService'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { userAdminSelect } from '@@/server/utils/prisma-select-helpers'
-import { validateUserId } from '@@/server/utils/validation-helpers'
+} from '#server/utils/emailService'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { userAdminSelect } from '#server/utils/prisma-select-helpers'
+import { validateUserId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

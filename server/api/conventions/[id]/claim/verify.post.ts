@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateConventionId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateConventionId } from '#server/utils/validation-helpers'
 
 const verifyClaimSchema = z.object({
   code: z.string().min(6).max(6),

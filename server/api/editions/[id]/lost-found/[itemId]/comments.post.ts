@@ -1,10 +1,10 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   sanitizeString,
   validateEditionId,
   validateResourceId,
-} from '@@/server/utils/validation-helpers'
+} from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

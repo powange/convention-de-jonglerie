@@ -1,12 +1,12 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import type { ConventionArchiveSnapshot } from '#server/types/prisma-helpers'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   getConventionForDelete,
   shouldArchiveInsteadOfDelete,
-} from '@@/server/utils/permissions/convention-permissions'
-import { validateConventionId } from '@@/server/utils/validation-helpers'
-
-import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'
+} from '#server/utils/permissions/convention-permissions'
+import { validateConventionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

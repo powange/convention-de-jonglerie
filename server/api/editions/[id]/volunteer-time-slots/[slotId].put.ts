@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
-import { validateEditionId, validateStringId } from '@@/server/utils/validation-helpers'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 
 const updateTimeSlotSchema = z
   .object({

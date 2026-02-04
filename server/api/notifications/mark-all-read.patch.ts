@@ -1,7 +1,8 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { NotificationService } from '@@/server/utils/notification-service'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { NotificationService } from '#server/utils/notification-service'
 
 const bodySchema = z.object({
   category: z.string().optional(),

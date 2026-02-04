@@ -1,9 +1,10 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { NotificationService, NotificationHelpers } from '@@/server/utils/notification-service'
-import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
-import { fetchResourceByFieldOrFail } from '@@/server/utils/prisma-helpers'
 import { z } from 'zod'
+
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { NotificationService, NotificationHelpers } from '#server/utils/notification-service'
+import { notificationStreamManager } from '#server/utils/notification-stream-manager'
+import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 
 const bodySchema = z.object({
   type: z.enum([

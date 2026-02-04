@@ -5,7 +5,7 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
   deleteConventionOrganizer: vi.fn(),
 }))
 
-import { deleteConventionOrganizer } from '@@/server/utils/organizer-management'
+import { deleteConventionOrganizer } from '#server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers/[organizerId].delete'
 
 const mockDeleteOrganizer = deleteConventionOrganizer as ReturnType<typeof vi.fn>

@@ -1,11 +1,11 @@
-import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { userWithNameSelect } from '@@/server/utils/prisma-select-helpers'
-import { validateEditionId, validatePagination } from '@@/server/utils/validation-helpers'
-
-import type { VolunteerApplicationWhereInput } from '@@/server/types/prisma-helpers'
+import type { VolunteerApplicationWhereInput } from '#server/types/prisma-helpers'
 import type { Prisma } from '@prisma/client'
+
+import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 
 const DEFAULT_PAGE_SIZE = 20
 

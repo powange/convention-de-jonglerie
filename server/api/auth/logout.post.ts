@@ -1,6 +1,6 @@
-import { wrapApiHandler, createSuccessResponse } from '@@/server/utils/api-helpers'
-
 import { clearUserSession } from '#imports'
+
+import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {

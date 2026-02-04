@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { getImpersonationCookie } from '@@/server/utils/impersonation-helpers'
-
 import { requireUserSession } from '#imports'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { getImpersonationCookie } from '#server/utils/impersonation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

@@ -1,9 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { handleFileUpload } from '@@/server/utils/file-helpers'
-import { getConventionForEdit } from '@@/server/utils/permissions/convention-permissions'
-import { validateConventionId } from '@@/server/utils/validation-helpers'
-import { updateConventionSchema, validateAndSanitize } from '@@/server/utils/validation-schemas'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { handleFileUpload } from '#server/utils/file-helpers'
+import { getConventionForEdit } from '#server/utils/permissions/convention-permissions'
+import { validateConventionId } from '#server/utils/validation-helpers'
+import { updateConventionSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

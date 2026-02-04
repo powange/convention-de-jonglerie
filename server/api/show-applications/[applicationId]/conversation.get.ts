@@ -1,6 +1,6 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { requireShowApplicationAccess } from '@@/server/utils/show-application-helpers'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { requireShowApplicationAccess } from '#server/utils/show-application-helpers'
 
 /**
  * GET /api/show-applications/[applicationId]/conversation

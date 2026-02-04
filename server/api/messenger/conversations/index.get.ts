@@ -1,8 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { ensureOrganizersGroupConversation } from '@@/server/utils/messenger-helpers'
-import { checkAdminMode } from '@@/server/utils/organizer-management'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { ensureOrganizersGroupConversation } from '#server/utils/messenger-helpers'
+import { checkAdminMode } from '#server/utils/organizer-management'
 
 const querySchema = z.object({
   editionId: z.string().transform((val) => parseInt(val, 10)),

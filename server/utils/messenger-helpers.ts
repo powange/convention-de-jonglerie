@@ -1,4 +1,4 @@
-import type { PrismaTransaction } from '@@/server/types/prisma-helpers'
+import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 /**
  * Crée ou récupère les conversations pour un bénévole assigné à une équipe

@@ -1,6 +1,7 @@
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { z } from 'zod'
+
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
 const createQuotaSchema = z.object({
   title: z.string().min(1, 'Le titre est obligatoire'),

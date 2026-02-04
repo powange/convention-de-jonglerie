@@ -1,7 +1,7 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireGlobalAdmin } from '@@/server/utils/auth-utils'
-
 import type { ServerFile } from 'nuxt-file-storage'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireGlobalAdmin } from '#server/utils/auth-utils'
 
 interface RequestBody {
   files: ServerFile[]

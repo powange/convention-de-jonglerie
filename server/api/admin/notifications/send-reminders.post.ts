@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { NotificationHelpers } from '#server/utils/notification-service'
 
 export default wrapApiHandler(
   async (event) => {

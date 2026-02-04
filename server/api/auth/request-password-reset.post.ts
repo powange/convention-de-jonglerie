@@ -1,9 +1,10 @@
 import { randomBytes } from 'node:crypto'
 
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
-import { sendEmail, generatePasswordResetEmailHtml } from '@@/server/utils/emailService'
 import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
+import { sendEmail, generatePasswordResetEmailHtml } from '#server/utils/emailService'
 
 const requestPasswordResetSchema = z.object({
   email: z.string().email(),

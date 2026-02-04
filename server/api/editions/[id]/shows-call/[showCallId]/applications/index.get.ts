@@ -1,12 +1,12 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import type { Prisma } from '@prisma/client'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   getEditionWithPermissions,
   canManageArtists,
-} from '@@/server/utils/permissions/edition-permissions'
-import { validateEditionId, validatePagination } from '@@/server/utils/validation-helpers'
-
-import type { Prisma } from '@prisma/client'
+} from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 
 /**
  * Liste les candidatures d'un appel à spectacles

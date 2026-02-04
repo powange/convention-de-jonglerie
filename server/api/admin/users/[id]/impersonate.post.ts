@@ -1,9 +1,9 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { setImpersonationCookie } from '@@/server/utils/impersonation-helpers'
-import { fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateResourceId } from '@@/server/utils/validation-helpers'
-
 import { getUserSession, setUserSession } from '#imports'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { setImpersonationCookie } from '#server/utils/impersonation-helpers'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

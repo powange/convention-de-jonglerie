@@ -93,7 +93,7 @@ throw new InternalServerError('Erreur lors de la connexion à la base de donnée
 ### Exemple basique
 
 ```typescript
-import { wrapApiHandler, NotFoundError, ForbiddenError } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, NotFoundError, ForbiddenError } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -121,7 +121,7 @@ export default wrapApiHandler(
 ### Exemple avec validation métier
 
 ```typescript
-import { wrapApiHandler, BadRequestError, ValidationError } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, BadRequestError, ValidationError } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(async (event) => {
   const body = await readBody(event)
@@ -153,7 +153,7 @@ export default wrapApiHandler(async (event) => {
 ### Exemple avec gestion d'erreur personnalisée
 
 ```typescript
-import { wrapApiHandler, ConflictError, InternalServerError } from '@@/server/utils/api-helpers'
+import { wrapApiHandler, ConflictError, InternalServerError } from '#server/utils/api-helpers'
 
 export default wrapApiHandler(async (event) => {
   try {
@@ -315,7 +315,7 @@ Les deux syntaxes continuent de fonctionner grâce à `wrapApiHandler` qui gère
 Exemple de test avec les nouvelles classes d'erreur :
 
 ```typescript
-import { NotFoundError, ForbiddenError } from '@@/server/utils/api-helpers'
+import { NotFoundError, ForbiddenError } from '#server/utils/api-helpers'
 
 describe('API Endpoint', () => {
   it("devrait lancer NotFoundError si la convention n'existe pas", async () => {

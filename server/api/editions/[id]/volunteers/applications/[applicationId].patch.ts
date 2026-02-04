@@ -1,27 +1,27 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   volunteerApplicationPatchSchema,
   validateAllergiesUpdate,
   buildVolunteerApplicationUpdateData,
   getUserUpdateData,
-} from '@@/server/utils/editions/volunteers/applications'
+} from '#server/utils/editions/volunteers/applications'
 import {
   NotificationService,
   NotificationHelpers,
   safeNotify,
-} from '@@/server/utils/notification-service'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
-import { userBasicSelect } from '@@/server/utils/prisma-select-helpers'
-import { validateEditionId, validateResourceId } from '@@/server/utils/validation-helpers'
+} from '#server/utils/notification-service'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { userBasicSelect } from '#server/utils/prisma-select-helpers'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import {
   compareApplicationChanges,
   hasApplicationDataChanges,
-} from '@@/server/utils/volunteer-application-diff'
+} from '#server/utils/volunteer-application-diff'
 import {
   createVolunteerMealSelections,
   deleteVolunteerMealSelections,
-} from '@@/server/utils/volunteer-meals'
+} from '#server/utils/volunteer-meals'
 
 export default wrapApiHandler(
   async (event) => {

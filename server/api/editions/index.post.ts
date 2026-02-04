@@ -1,15 +1,12 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { invalidateEditionCache } from '@@/server/utils/cache-helpers'
-import { normalizeDateToISO } from '@@/server/utils/date-helpers'
-import { geocodeEdition } from '@@/server/utils/geocoding'
-import {
-  moveTempImageToEdition,
-  moveTempImageFromPlaceholder,
-} from '@@/server/utils/move-temp-image'
-import { getConventionForEditionCreation } from '@@/server/utils/permissions/convention-permissions'
-import { editionWithFavoritesInclude } from '@@/server/utils/prisma-select-helpers'
-import { editionSchema } from '@@/server/utils/validation-schemas'
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { invalidateEditionCache } from '#server/utils/cache-helpers'
+import { normalizeDateToISO } from '#server/utils/date-helpers'
+import { geocodeEdition } from '#server/utils/geocoding'
+import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '#server/utils/move-temp-image'
+import { getConventionForEditionCreation } from '#server/utils/permissions/convention-permissions'
+import { editionWithFavoritesInclude } from '#server/utils/prisma-select-helpers'
+import { editionSchema } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {

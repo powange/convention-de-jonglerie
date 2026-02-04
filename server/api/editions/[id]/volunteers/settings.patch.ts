@@ -1,12 +1,13 @@
-import { wrapApiHandler } from '@@/server/utils/api-helpers'
-import { requireAuth } from '@@/server/utils/auth-utils'
-import { canManageEditionVolunteers } from '@@/server/utils/organizer-management'
-import { buildUpdateData, fetchResourceOrFail } from '@@/server/utils/prisma-helpers'
-import { validateEditionId } from '@@/server/utils/validation-helpers'
-import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
 
-import type { EditionUpdateInput } from '@@/server/types/prisma-helpers'
+import type { EditionUpdateInput } from '#server/types/prisma-helpers'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { buildUpdateData, fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { handleValidationError } from '#server/utils/validation-schemas'
 
 const bodySchema = z
   .object({

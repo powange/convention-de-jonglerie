@@ -304,7 +304,6 @@ import { getCountryCode } from '~/utils/countries'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
-
 const { t } = useI18n()
 const { translateCountryName } = useCountryTranslation()
 
