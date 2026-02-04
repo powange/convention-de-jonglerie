@@ -6,6 +6,8 @@ import type { Convention, Edition, User } from '~/app/types'
 import { deleteFromBothLocations } from './copy-to-output'
 import { getConventionForEdit } from './permissions/convention-permissions'
 
+import { isHttpError } from '#server/types/api'
+
 export interface ImageDeletionOptions {
   entityType: 'convention' | 'edition' | 'user'
   entityId: number
@@ -232,7 +234,7 @@ export async function handleImageDeletion(
       entity: updatedEntity,
     }
   } catch (error: unknown) {
-    if (error && typeof error === 'object' && 'statusCode' in error) {
+    if (isHttpError(error)) {
       throw error
     }
 

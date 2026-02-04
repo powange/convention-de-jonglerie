@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { isHttpError } from '#server/types/api'
 import { syncOrganizersGroupParticipants } from '#server/utils/messenger-helpers'
 import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
@@ -175,7 +176,7 @@ export default wrapApiHandler(
       }
     } catch (error: unknown) {
       // Si c'est déjà une erreur HTTP, la relancer
-      if (error && typeof error === 'object' && 'statusCode' in error) {
+      if (isHttpError(error)) {
         throw error
       }
 

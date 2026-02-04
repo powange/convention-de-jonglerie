@@ -118,12 +118,19 @@
       "WebFetch(domain:www.npmjs.com)",
       "Bash(docker restart:*)",
       "Bash(git check-ignore:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "WebFetch(domain:h3.unjs.io)",
+      "WebFetch(domain:v1.h3.dev)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner",
+    "Prisma-Remote"
+  ]
 }

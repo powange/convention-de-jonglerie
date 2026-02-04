@@ -4,6 +4,8 @@ import { carpoolUserSelect } from './prisma-select-helpers'
 
 import type { H3Event } from 'h3'
 
+import { isHttpError } from '#server/types/api'
+
 export type CommentEntityType = 'carpoolOffer' | 'carpoolRequest'
 
 export interface CommentConfig {
@@ -51,13 +53,13 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
 
     // emailHash est déjà présent via le select
     return comments
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(
       `Erreur lors de la récupération des commentaires pour ${config.entityType}:`,
       error
     )
 
-    if (error.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 
@@ -138,10 +140,10 @@ export async function createCommentForEntity(
     })
 
     return comment
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Erreur lors de la création du commentaire pour ${config.entityType}:`, error)
 
-    if (error.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 
@@ -202,10 +204,10 @@ export async function deleteCommentForEntity(
       success: true,
       message: 'Commentaire supprimé avec succès',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Erreur lors de la suppression du commentaire:`, error)
 
-    if (error.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 
