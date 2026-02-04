@@ -131,7 +131,7 @@ if (error.value) {
   console.error('Failed to fetch edition:', error.value)
   throw createError({
     statusCode: error.value.statusCode || 404,
-    statusMessage: error.value.statusMessage || 'Edition not found',
+    statusText: error.value.statusMessage || 'Edition not found',
   })
 }
 

@@ -45,7 +45,7 @@ export default wrapApiHandler(
 
       throw createError({
         status: 500,
-        statusMessage: 'Erreur lors de la lecture des sauvegardes: ' + error.message,
+        statusText: 'Erreur lors de la lecture des sauvegardes: ' + error.message,
       })
     }
   },

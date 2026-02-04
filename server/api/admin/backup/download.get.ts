@@ -14,7 +14,7 @@ export default wrapApiHandler(
     if (!filename || (!filename.endsWith('.sql') && !filename.endsWith('.tar.gz'))) {
       throw createError({
         status: 400,
-        statusMessage: 'Nom de fichier invalide',
+        statusText: 'Nom de fichier invalide',
       })
     }
 
@@ -37,7 +37,7 @@ export default wrapApiHandler(
       if (fileError.code === 'ENOENT') {
         throw createError({
           status: 404,
-          statusMessage: 'Fichier de sauvegarde non trouvé',
+          statusText: 'Fichier de sauvegarde non trouvé',
         })
       }
       throw fileError

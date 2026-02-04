@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
   if (!edition) {
     throw createError({
       status: 404,
-      statusMessage: 'Édition non trouvée',
+      statusText: 'Édition non trouvée',
     })
   }
 
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
   if (!isAuthor && !isOrganizer && !user.isGlobalAdmin) {
     throw createError({
       status: 403,
-      statusMessage: "Vous n'avez pas les permissions nécessaires",
+      statusText: "Vous n'avez pas les permissions nécessaires",
     })
   }
 

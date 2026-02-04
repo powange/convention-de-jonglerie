@@ -515,7 +515,7 @@ async function fetchAndExtractContent(
   try {
     if (taskId) {
       updateTaskMetadata(taskId, {
-        statusMessage: `Exploration: ${new URL(url).hostname}${new URL(url).pathname.substring(0, 30)}...`,
+        statusText: `Exploration: ${new URL(url).hostname}${new URL(url).pathname.substring(0, 30)}...`,
       })
     }
 
@@ -732,7 +732,7 @@ export async function runAgentExploration(
   if (taskId) {
     updateTaskMetadata(taskId, {
       phase: 'initial',
-      statusMessage: `Phase 1: Exploration des ${urls.length} URLs fournies...`,
+      statusText: `Phase 1: Exploration des ${urls.length} URLs fournies...`,
     })
   }
 
@@ -746,7 +746,7 @@ export async function runAgentExploration(
       updateTaskStatus(taskId, 'processing', progressPercent)
       updateTaskMetadata(taskId, {
         pagesVisited: visitedUrls.length,
-        statusMessage: `Exploration ${i + 1}/${urls.length}: ${new URL(url).hostname}...`,
+        statusText: `Exploration ${i + 1}/${urls.length}: ${new URL(url).hostname}...`,
       })
     }
     notifyProgress(i, urls.length, url)
@@ -805,7 +805,7 @@ export async function runAgentExploration(
     if (taskId) {
       updateTaskMetadata(taskId, {
         phase: 'external_links',
-        statusMessage: `Exploration des liens externes (${externalLinksToExplore.length})...`,
+        statusText: `Exploration des liens externes (${externalLinksToExplore.length})...`,
       })
     }
 
@@ -829,7 +829,7 @@ export async function runAgentExploration(
         updateTaskStatus(taskId, 'processing', progressPercent)
         updateTaskMetadata(taskId, {
           pagesVisited: visitedUrls.length,
-          statusMessage: `Exploration lien externe ${i + 1}/${externalLinksToExplore.length}: ${new URL(extUrl).hostname}...`,
+          statusText: `Exploration lien externe ${i + 1}/${externalLinksToExplore.length}: ${new URL(extUrl).hostname}...`,
         })
       }
       notifyProgress(visitedUrls.length, MAX_AGENT_ITERATIONS, extUrl)
@@ -872,7 +872,7 @@ export async function runAgentExploration(
     updateTaskMetadata(taskId, {
       phase: 'analysis',
       pagesVisited: visitedUrls.length,
-      statusMessage: 'Analyse du contenu et recherche de pages supplémentaires...',
+      statusText: 'Analyse du contenu et recherche de pages supplémentaires...',
     })
   }
 
@@ -926,7 +926,7 @@ INSTRUCTIONS:
         pagesVisited: visitedUrls.length,
         currentIteration: iteration,
         maxIterations: maxAdditionalIterations,
-        statusMessage: `Exploration supplémentaire ${iteration}/${maxAdditionalIterations} - ${visitedUrls.length} page(s) au total`,
+        statusText: `Exploration supplémentaire ${iteration}/${maxAdditionalIterations} - ${visitedUrls.length} page(s) au total`,
       })
     }
     notifyProgress(visitedUrls.length, MAX_AGENT_ITERATIONS)
@@ -1048,7 +1048,7 @@ INSTRUCTIONS:
     if (taskId) {
       updateTaskMetadata(taskId, {
         phase: 'generation',
-        statusMessage: 'Génération du JSON final...',
+        statusText: 'Génération du JSON final...',
       })
     }
 
@@ -1114,7 +1114,7 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
         if (taskId) {
           updateTaskMetadata(taskId, {
             phase: 'fallback',
-            statusMessage: 'Utilisation de la méthode de génération simple...',
+            statusText: 'Utilisation de la méthode de génération simple...',
           })
         }
 
@@ -1145,7 +1145,7 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
     updateTaskStatus(taskId, 'processing', 90)
     updateTaskMetadata(taskId, {
       phase: 'enrichment',
-      statusMessage: 'Enrichissement du JSON...',
+      statusText: 'Enrichissement du JSON...',
     })
   }
 
@@ -1254,7 +1254,7 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
       console.log('[AGENT] Extraction des caractéristiques via IA...')
       if (taskId) {
         updateTaskMetadata(taskId, {
-          statusMessage: 'Détection des services (camping, restauration, spectacles...)',
+          statusText: 'Détection des services (camping, restauration, spectacles...)',
         })
       }
 
@@ -1288,7 +1288,7 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
     updateTaskStatus(taskId, 'processing', 100)
     updateTaskMetadata(taskId, {
       phase: 'completed',
-      statusMessage: 'Génération terminée',
+      statusText: 'Génération terminée',
     })
   }
 

@@ -23,7 +23,7 @@ export default wrapApiHandler(
       if (!form || form.length === 0) {
         throw createError({
           status: 400,
-          statusMessage: 'Aucun fichier fourni',
+          statusText: 'Aucun fichier fourni',
         })
       }
 
@@ -33,7 +33,7 @@ export default wrapApiHandler(
       if (!fileData.data) {
         throw createError({
           status: 400,
-          statusMessage: 'Fichier invalide',
+          statusText: 'Fichier invalide',
         })
       }
 
@@ -58,7 +58,7 @@ export default wrapApiHandler(
         if (!sqlFile) {
           throw createError({
             status: 400,
-            statusMessage: "Aucun fichier SQL trouvé dans l'archive",
+            statusText: "Aucun fichier SQL trouvé dans l'archive",
           })
         }
 
@@ -68,7 +68,7 @@ export default wrapApiHandler(
       } else {
         throw createError({
           status: 400,
-          statusMessage: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
+          statusText: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
         })
       }
     } else {
@@ -79,7 +79,7 @@ export default wrapApiHandler(
       if (!filename) {
         throw createError({
           status: 400,
-          statusMessage: 'Nom de fichier manquant',
+          statusText: 'Nom de fichier manquant',
         })
       }
 
@@ -102,7 +102,7 @@ export default wrapApiHandler(
         if (!sqlFile) {
           throw createError({
             status: 400,
-            statusMessage: "Aucun fichier SQL trouvé dans l'archive",
+            statusText: "Aucun fichier SQL trouvé dans l'archive",
           })
         }
 
@@ -112,7 +112,7 @@ export default wrapApiHandler(
       } else {
         throw createError({
           status: 400,
-          statusMessage: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
+          statusText: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
         })
       }
     }
@@ -122,7 +122,7 @@ export default wrapApiHandler(
     if (!databaseUrl) {
       throw createError({
         status: 500,
-        statusMessage: 'Configuration de base de données manquante',
+        statusText: 'Configuration de base de données manquante',
       })
     }
 

@@ -20,7 +20,7 @@ export default wrapApiHandler(async (event) => {
   if (!allowed) {
     throw createError({
       status: 403,
-      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+      statusText: 'Droits insuffisants pour gérer les bénévoles',
     })
   }
 
@@ -39,7 +39,7 @@ export default wrapApiHandler(async (event) => {
   if (!edition) {
     throw createError({
       status: 404,
-      statusMessage: 'Édition non trouvée',
+      statusText: 'Édition non trouvée',
     })
   }
 

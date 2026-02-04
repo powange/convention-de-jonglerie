@@ -30,7 +30,7 @@ export default wrapApiHandler(
     if (!databaseUrl) {
       throw createError({
         status: 500,
-        statusMessage: 'Configuration de base de données manquante',
+        statusText: 'Configuration de base de données manquante',
       })
     }
 
