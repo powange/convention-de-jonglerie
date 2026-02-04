@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 
@@ -200,7 +201,7 @@ export default wrapApiHandler(
       }
     } catch (error: unknown) {
       console.error('Invalidate entry error:', error)
-      if (error.statusCode) throw error
+      if (isHttpError(error)) throw error
       throw createError({
         status: 500,
         message: "Erreur lors de la dévalidation de l'entrée",

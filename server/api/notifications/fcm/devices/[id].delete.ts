@@ -1,3 +1,5 @@
+import { isHttpError } from '#server/types/api'
+
 /**
  * DELETE /api/notifications/fcm/devices/[id]
  * Supprime un appareil enregistré pour les notifications push
@@ -48,8 +50,8 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Appareil supprimé',
     }
-  } catch (error: any) {
-    if (error.statusCode) throw error
+  } catch (error: unknown) {
+    if (isHttpError(error)) throw error
 
     console.error('[FCM Delete Device] Erreur:', error)
     throw createError({

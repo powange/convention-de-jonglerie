@@ -1,3 +1,4 @@
+import { isHttpError } from '#server/types/api'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
@@ -77,7 +78,7 @@ export default wrapApiHandler(
       }
     } catch (error: unknown) {
       console.error('Delete order error:', error)
-      if ((error as { statusCode?: number }).statusCode) throw error
+      if (isHttpError(error)) throw error
       throw createError({
         status: 500,
         message: "Erreur lors de l'annulation ou de la suppression de la commande",
