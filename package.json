@@ -113,7 +113,7 @@
     "md5": "^2.3.0",
     "node-cron": "^3.0.3",
     "nodemailer": "^7.0.5",
-    "nuxt": "^4.2.0",
+    "nuxt": "^4.3.0",
     "nuxt-auth-utils": "^0.5.23",
     "nuxt-qrcode": "^0.4.8",
     "pinia": "^3.0.3",
