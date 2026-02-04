@@ -52,8 +52,7 @@ jobs:
             node_modules
             ~/.npm
           key: ${{ steps.cache-keys.outputs.deps }}
-          restore-keys: |
-            ${{ runner.os }}-deps-
+          # Pas de restore-keys pour éviter les caches incompatibles avec le lockfile
 
       - name: Cache Prisma client
         id: cache-prisma
