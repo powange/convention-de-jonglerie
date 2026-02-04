@@ -217,7 +217,6 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
-const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { formatDateTime } = useDateFormat()
@@ -301,26 +300,19 @@ const confirmDeleteShow = (show: any) => {
 }
 
 // Supprimer le spectacle
-const deleteShow = async () => {
-  if (!showToDelete.value) return
-
-  try {
-    await $fetch(`/api/editions/${editionId.value}/shows/${showToDelete.value.id}`, {
-      method: 'DELETE',
-    })
-    toast.add({
-      title: t('gestion.shows.show_deleted'),
-      color: 'success',
-    })
-    await fetchShows()
-  } catch (error) {
-    console.error('Error deleting show:', error)
-    toast.add({
-      title: t('gestion.shows.error_delete'),
-      color: 'error',
-    })
-  } finally {
-    showToDelete.value = null
+const { execute: deleteShow, loading: _deletingShow } = useApiAction(
+  () => `/api/editions/${editionId.value}/shows/${showToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('gestion.shows.show_deleted') },
+    errorMessages: { default: t('gestion.shows.error_delete') },
+    onSuccess: () => {
+      showToDelete.value = null
+      fetchShows()
+    },
+    onError: () => {
+      showToDelete.value = null
+    },
   }
-}
+)
 </script>

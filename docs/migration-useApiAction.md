@@ -211,25 +211,21 @@ const { execute: deleteItem, isLoading } = useApiActionById((id) => `/api/items/
 
 ---
 
-## Fichiers restants à migrer
+## Fichiers non migrables
 
-### Pages principales
+Ces fichiers ont été analysés mais ne sont pas de bons candidats pour la migration vers `useApiAction` :
 
-- `app/pages/editions/[id]/workshops.vue` - saveWorkshop, deleteWorkshop, toggleFavorite (logique complexe)
-- `app/pages/editions/[id]/commentaires.vue`
-- `app/pages/editions/[id]/lost-found.vue`
+### Patterns trop complexes
 
-### Pages de gestion
+| Fichier                                     | Raison                                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| `app/pages/editions/[id]/workshops.vue`     | Logique créer/modifier conditionnelle, `confirm()` natif, updates optimistes   |
+| `app/pages/editions/[id]/commentaires.vue`  | Mises à jour locales des données après succès, plusieurs paramètres dynamiques |
+| `app/pages/editions/[id]/lost-found.vue`    | Mises à jour locales des données après succès, plusieurs paramètres dynamiques |
+| `app/pages/admin/index.vue`                 | Logique de redirection 401 personnalisée, valeurs par défaut en cas d'erreur   |
+| `app/components/feedback/FeedbackModal.vue` | Loading doit commencer avant l'appel API (validation reCAPTCHA)                |
 
-- `app/pages/editions/[id]/gestion/artists/index.vue`
-- `app/pages/editions/[id]/gestion/artists/shows.vue`
-- `app/pages/admin/index.vue` - loadStats, loadRecentActivity (chargements silencieux)
-
-### Composants
-
-- `app/components/feedback/FeedbackModal.vue` _(attention: reCAPTCHA)_
-
-### Non migrables (composables dédiés)
+### Composables dédiés
 
 - `app/components/edition/volunteer/planning/TeamManagement.vue` - utilise `useVolunteerTeams`
 
@@ -281,15 +277,27 @@ Pour chaque fichier à migrer :
 | `app/pages/conventions/add.vue`                            | 2026-02-03 | handleAddConvention                                                        |
 | `app/pages/editions/[id]/volunteers/.../confirm.vue`       | 2026-02-03 | confirmReading                                                             |
 | `app/pages/admin/feedback.vue`                             | 2026-02-03 | resolveFeedback                                                            |
+| `app/pages/editions/[id]/gestion/artists/index.vue`        | 2026-02-04 | deleteArtist                                                               |
+| `app/pages/editions/[id]/gestion/artists/shows.vue`        | 2026-02-04 | deleteShow                                                                 |
 
 ---
 
 ## Notes importantes
 
-1. **Ne pas migrer** les cas où le loading doit commencer avant l'appel API (ex: validation reCAPTCHA dans `FeedbackModal.vue`)
+1. **Cas idéaux pour `useApiAction`** :
+   - Actions simples avec un seul endpoint
+   - Résultat = toast + refresh (pas de mise à jour locale des données)
+   - Pas de logique conditionnelle complexe (créer vs modifier)
+   - Pas d'updates optimistes
 
-2. **Toujours utiliser `() => formData`** pour le body si les données sont dynamiques au moment de l'appel
+2. **Ne pas migrer** les cas où :
+   - Le loading doit commencer avant l'appel API (ex: validation reCAPTCHA)
+   - Plusieurs paramètres dynamiques sont passés à la fonction
+   - La logique post-succès modifie localement les données (sans refresh)
+   - Une logique de rollback est nécessaire (updates optimistes)
 
-3. **Combiner les loading** avec `computed()` quand plusieurs actions partagent le même bouton
+3. **Toujours utiliser `() => formData`** pour le body si les données sont dynamiques au moment de l'appel
 
-4. **Ajouter les clés i18n** manquantes dans le bon fichier de traduction français
+4. **Combiner les loading** avec `computed()` quand plusieurs actions partagent le même bouton
+
+5. **Ajouter les clés i18n** manquantes dans le bon fichier de traduction français

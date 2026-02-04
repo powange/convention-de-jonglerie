@@ -428,7 +428,6 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
-const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { formatDateTime } = useDateFormat()
@@ -510,28 +509,21 @@ const confirmDeleteArtist = (artist: any) => {
 }
 
 // Supprimer l'artiste
-const deleteArtist = async () => {
-  if (!artistToDelete.value) return
-
-  try {
-    await $fetch(`/api/editions/${editionId.value}/artists/${artistToDelete.value.id}`, {
-      method: 'DELETE',
-    })
-    toast.add({
-      title: t('artists.artist_deleted'),
-      color: 'success',
-    })
-    await fetchArtists()
-  } catch (error) {
-    console.error('Error deleting artist:', error)
-    toast.add({
-      title: t('artists.error_delete'),
-      color: 'error',
-    })
-  } finally {
-    artistToDelete.value = null
+const { execute: deleteArtist, loading: _deletingArtist } = useApiAction(
+  () => `/api/editions/${editionId.value}/artists/${artistToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('artists.artist_deleted') },
+    errorMessages: { default: t('artists.error_delete') },
+    onSuccess: () => {
+      artistToDelete.value = null
+      fetchArtists()
+    },
+    onError: () => {
+      artistToDelete.value = null
+    },
   }
-}
+)
 
 // Ouvrir le modal de gestion des repas
 const openMealsModal = (artist: any) => {
