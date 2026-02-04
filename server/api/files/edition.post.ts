@@ -11,14 +11,14 @@ export default wrapApiHandler(
     // Validation basique
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucun fichier fourni',
       })
     }
 
     if (!body.metadata?.entityId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID d'édition requis",
       })
     }
@@ -35,7 +35,7 @@ export default wrapApiHandler(
       editionId = parseInt(entityId)
       if (isNaN(editionId)) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: "ID d'édition invalide",
         })
       }
@@ -56,14 +56,14 @@ export default wrapApiHandler(
 
       if (!edition) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Édition introuvable',
         })
       }
 
       if (!canEditEdition(edition, user)) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Vous n'avez pas les droits pour modifier cette édition",
         })
       }
@@ -126,7 +126,7 @@ export default wrapApiHandler(
       }
     } else {
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Échec de l'upload de tous les fichiers",
       })
     }

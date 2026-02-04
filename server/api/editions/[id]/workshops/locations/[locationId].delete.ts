@@ -35,7 +35,7 @@ export default wrapApiHandler(
 
     if (!location) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Lieu non trouvé',
       })
     }
@@ -44,7 +44,7 @@ export default wrapApiHandler(
     const hasPermission = canEditEdition(location.edition, user)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'êtes pas autorisé à gérer les lieux de cette édition",
       })
     }

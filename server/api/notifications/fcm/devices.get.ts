@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   if (!session.user?.id) {
     throw createError({
-      statusCode: 401,
+      status: 401,
       message: 'Non authentifié',
     })
   }
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     console.error('[FCM Devices] Erreur:', error)
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: 'Erreur lors de la récupération des appareils',
     })
   }

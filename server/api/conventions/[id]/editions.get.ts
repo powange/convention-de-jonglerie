@@ -10,7 +10,7 @@ export default wrapApiHandler(
 
     const canAccess = await canAccessConvention(conventionId, user.id, event)
     if (!canAccess) {
-      throw createError({ statusCode: 403, message: 'Accès refusé' })
+      throw createError({ status: 403, message: 'Accès refusé' })
     }
 
     const editions = await prisma.edition.findMany({

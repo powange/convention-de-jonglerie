@@ -27,7 +27,7 @@ export default wrapApiHandler(async (event) => {
     })
 
     if (leaderAssignments.length === 0) {
-      throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+      throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 
     isTeamLeader = true

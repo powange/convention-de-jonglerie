@@ -9,7 +9,7 @@ export default wrapApiHandler(
 
     const logId = getRouterParam(event, 'id')
     if (!logId) {
-      throw createError({ statusCode: 400, message: 'ID du log requis' })
+      throw createError({ status: 400, message: 'ID du log requis' })
     }
 
     // Récupération du log avec tous les détails
@@ -18,7 +18,7 @@ export default wrapApiHandler(
       select: {
         id: true,
         message: true,
-        statusCode: true,
+        status: true,
         stack: true,
         errorType: true,
         method: true,

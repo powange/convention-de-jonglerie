@@ -19,7 +19,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -30,7 +30,7 @@ export default wrapApiHandler(
 
       if (!user) {
         throw createError({
-          statusCode: 401,
+          status: 401,
           message: 'Authentification requise',
         })
       }

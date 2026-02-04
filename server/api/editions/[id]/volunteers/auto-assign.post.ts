@@ -60,14 +60,14 @@ export default wrapApiHandler(async (event) => {
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       statusMessage: 'Édition non trouvée',
     })
   }
 
   if (!(await canManageEditionVolunteers(editionId, user.id, event))) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       statusMessage: 'Droits insuffisants pour gérer les bénévoles',
     })
   }

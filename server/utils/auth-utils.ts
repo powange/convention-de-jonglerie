@@ -16,7 +16,7 @@ export type AuthenticatedUser = Pick<User, 'id' | 'email' | 'pseudo' | 'isGlobal
 export function requireAuth(event: any): AuthenticatedUser {
   if (!event.context.user) {
     throw createError({
-      statusCode: 401,
+      status: 401,
       message: 'Unauthorized',
     })
   }
@@ -35,7 +35,7 @@ export function requireGlobalAdmin(event: any): AuthenticatedUser {
 
   if (!user.isGlobalAdmin) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Accès réservé aux administrateurs',
     })
   }
@@ -80,7 +80,7 @@ export function requireUserOrGlobalAdmin(event: any, userId: number): Authentica
 
   if (user.id !== userId && !user.isGlobalAdmin) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Accès non autorisé',
     })
   }
@@ -138,7 +138,7 @@ export function requireResourceOwner<T extends OwnedResource>(
   }
 
   throw createError({
-    statusCode: 403,
+    status: 403,
     message: errorMessage,
   })
 }

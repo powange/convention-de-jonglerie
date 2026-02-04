@@ -21,7 +21,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour modifier ces données',
       })
 
@@ -50,7 +50,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Failed to update quotas positions:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la mise à jour des positions',
       })
     }

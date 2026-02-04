@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   if (!editionId || isNaN(editionId)) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: "ID d'édition invalide",
     })
   }
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Edition not found',
     })
   }
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
   // Vérifier les permissions
   if (!canManageTicketing(edition, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas les droits pour consulter ces statistiques",
     })
   }

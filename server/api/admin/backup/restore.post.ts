@@ -22,7 +22,7 @@ export default wrapApiHandler(
       const form = await readMultipartFormData(event)
       if (!form || form.length === 0) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           statusMessage: 'Aucun fichier fourni',
         })
       }
@@ -32,7 +32,7 @@ export default wrapApiHandler(
 
       if (!fileData.data) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           statusMessage: 'Fichier invalide',
         })
       }
@@ -57,7 +57,7 @@ export default wrapApiHandler(
 
         if (!sqlFile) {
           throw createError({
-            statusCode: 400,
+            status: 400,
             statusMessage: "Aucun fichier SQL trouvé dans l'archive",
           })
         }
@@ -67,7 +67,7 @@ export default wrapApiHandler(
         sqlContent = fileData.data.toString('utf8')
       } else {
         throw createError({
-          statusCode: 400,
+          status: 400,
           statusMessage: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
         })
       }
@@ -78,7 +78,7 @@ export default wrapApiHandler(
 
       if (!filename) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           statusMessage: 'Nom de fichier manquant',
         })
       }
@@ -101,7 +101,7 @@ export default wrapApiHandler(
 
         if (!sqlFile) {
           throw createError({
-            statusCode: 400,
+            status: 400,
             statusMessage: "Aucun fichier SQL trouvé dans l'archive",
           })
         }
@@ -111,7 +111,7 @@ export default wrapApiHandler(
         sqlContent = await readFile(backupPath, 'utf8')
       } else {
         throw createError({
-          statusCode: 400,
+          status: 400,
           statusMessage: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
         })
       }
@@ -121,7 +121,7 @@ export default wrapApiHandler(
     const databaseUrl = process.env.DATABASE_URL
     if (!databaseUrl) {
       throw createError({
-        statusCode: 500,
+        status: 500,
         statusMessage: 'Configuration de base de données manquante',
       })
     }

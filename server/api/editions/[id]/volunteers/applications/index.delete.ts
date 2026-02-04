@@ -11,9 +11,9 @@ export default wrapApiHandler(
       where: { editionId_userId: { editionId, userId: user.id } },
       select: { id: true, status: true },
     })
-    if (!app) throw createError({ statusCode: 404, message: 'Candidature introuvable' })
+    if (!app) throw createError({ status: 404, message: 'Candidature introuvable' })
     if (app.status !== 'PENDING')
-      throw createError({ statusCode: 400, message: 'Impossible de retirer cette candidature' })
+      throw createError({ status: 400, message: 'Impossible de retirer cette candidature' })
 
     await prisma.editionVolunteerApplication.delete({ where: { id: app.id } })
     return createSuccessResponse(null)

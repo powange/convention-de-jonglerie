@@ -21,7 +21,7 @@ export default wrapApiHandler(
 
     if (!files || files.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucun fichier fourni',
       })
     }
@@ -32,7 +32,7 @@ export default wrapApiHandler(
 
     if (!targetEditionId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID d'édition requis pour les objets trouvés",
       })
     }
@@ -51,7 +51,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition introuvable',
       })
     }
@@ -59,7 +59,7 @@ export default wrapApiHandler(
     // Vérifier les permissions pour modifier cette édition
     if (!canEditEdition(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas les droits pour ajouter des objets trouvés à cette édition",
       })
     }

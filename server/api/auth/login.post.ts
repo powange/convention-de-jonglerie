@@ -47,7 +47,7 @@ export default wrapApiHandler(
 
     if (!user) {
       throw createError({
-        statusCode: 401,
+        status: 401,
         message: 'Identifiants invalides',
       })
     }
@@ -56,7 +56,7 @@ export default wrapApiHandler(
 
     if (!isPasswordValid) {
       throw createError({
-        statusCode: 401,
+        status: 401,
         message: 'Identifiants invalides',
       })
     }
@@ -64,7 +64,7 @@ export default wrapApiHandler(
     // Vérifier si l'email est vérifié
     if (!user.isEmailVerified) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Email non vérifié. Veuillez vérifier votre email avant de vous connecter.',
         data: {
           requiresEmailVerification: true,

@@ -10,7 +10,7 @@
  */
 export class ApiError extends Error {
   constructor(
-    public statusCode: number,
+    public status: number,
     message: string,
     public operationName?: string
   ) {

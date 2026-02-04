@@ -26,7 +26,7 @@ export default wrapApiHandler(
 
     if (!timeSlot) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Créneau non trouvé ou n'appartient pas à cette édition",
       })
     }

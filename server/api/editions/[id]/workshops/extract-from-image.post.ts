@@ -24,7 +24,7 @@ export default wrapApiHandler(
 
     if (!edition.workshopsEnabled) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Les workshops ne sont pas activés pour cette édition',
       })
     }
@@ -32,7 +32,7 @@ export default wrapApiHandler(
     // Vérifier que l'utilisateur peut éditer cette édition
     if (!canEditEdition(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           'Seuls les organisateurs et super admins peuvent importer des workshops depuis une image',
       })
@@ -44,7 +44,7 @@ export default wrapApiHandler(
 
     if (!image || typeof image !== 'string') {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Image manquante ou invalide',
       })
     }
@@ -53,7 +53,7 @@ export default wrapApiHandler(
     const base64Match = image.match(/^data:image\/(png|jpg|jpeg|gif|webp);base64,(.+)$/)
     if (!base64Match) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "Format d'image invalide. Utilisez une image encodée en base64",
       })
     }
@@ -117,7 +117,7 @@ Exemple de réponse attendue :
     // Valider la structure de la réponse
     if (!parsedResponse.workshops || !Array.isArray(parsedResponse.workshops)) {
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Format de réponse invalide de l'IA",
       })
     }

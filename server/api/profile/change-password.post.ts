@@ -36,7 +36,7 @@ export default wrapApiHandler(
       // L'utilisateur a déjà un mot de passe, il faut le vérifier
       if (!currentPassword) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Mot de passe actuel requis',
         })
       }
@@ -48,7 +48,7 @@ export default wrapApiHandler(
 
       if (!isCurrentPasswordValid) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Mot de passe actuel incorrect',
         })
       }

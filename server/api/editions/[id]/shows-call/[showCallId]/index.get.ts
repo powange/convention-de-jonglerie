@@ -18,7 +18,7 @@ export default wrapApiHandler(
 
     if (isNaN(showCallId)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID de l'appel à spectacles invalide",
       })
     }
@@ -30,14 +30,14 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
 
     if (!canManageArtists(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas les droits pour voir cet appel à spectacles",
       })
     }
@@ -52,7 +52,7 @@ export default wrapApiHandler(
 
     if (!showCall) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Appel à spectacles non trouvé',
       })
     }

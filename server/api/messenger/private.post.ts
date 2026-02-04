@@ -20,7 +20,7 @@ export default wrapApiHandler(
     // Vérifier qu'on ne crée pas une conversation avec soi-même
     if (userId === currentUser.id) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Vous ne pouvez pas créer une conversation avec vous-même',
       })
     }
@@ -33,7 +33,7 @@ export default wrapApiHandler(
 
     if (!targetUser) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Utilisateur non trouvé',
       })
     }

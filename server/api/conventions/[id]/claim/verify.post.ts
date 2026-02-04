@@ -27,7 +27,7 @@ export default wrapApiHandler(
 
     if (convention.authorId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Cette convention a déjà un créateur',
       })
     }
@@ -44,7 +44,7 @@ export default wrapApiHandler(
 
     if (!claimRequest) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Aucune demande de revendication trouvée',
       })
     }
@@ -52,7 +52,7 @@ export default wrapApiHandler(
     // Vérifier que le code n'a pas expiré
     if (claimRequest.expiresAt < new Date()) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Le code de vérification a expiré',
       })
     }
@@ -60,7 +60,7 @@ export default wrapApiHandler(
     // Vérifier le code
     if (claimRequest.code !== code) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Code de vérification incorrect',
       })
     }

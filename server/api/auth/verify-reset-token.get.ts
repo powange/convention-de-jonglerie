@@ -7,7 +7,7 @@ export default wrapApiHandler(
 
     if (!token) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Token manquant',
       })
     }

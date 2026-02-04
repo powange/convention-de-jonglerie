@@ -33,7 +33,7 @@ export default wrapApiHandler(
     const hasPermission = await canEditWorkshop(user.id, workshopId)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           "Vous n'êtes pas autorisé à modifier ce workshop. Seuls le créateur ou les organisateurs peuvent le faire.",
       })

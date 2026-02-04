@@ -29,7 +29,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           "Droits insuffisants pour accéder à cette fonctionnalité - vous devez être gestionnaire ou en créneau actif de contrôle d'accès",
       })
@@ -482,7 +482,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Database validate entry error:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la validation des entrées',
       })
     }

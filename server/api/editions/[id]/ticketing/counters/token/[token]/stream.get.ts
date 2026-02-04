@@ -30,7 +30,7 @@ export default wrapApiHandler(
 
     if (!counter) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Compteur introuvable',
       })
     }

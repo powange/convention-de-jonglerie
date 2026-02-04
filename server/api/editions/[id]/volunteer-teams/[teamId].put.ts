@@ -43,7 +43,7 @@ export default wrapApiHandler(
 
     if (!existingTeam) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Équipe non trouvée ou n'appartient pas à cette édition",
       })
     }
@@ -60,7 +60,7 @@ export default wrapApiHandler(
 
       if (nameConflict) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Une équipe avec ce nom existe déjà pour cette édition',
         })
       }

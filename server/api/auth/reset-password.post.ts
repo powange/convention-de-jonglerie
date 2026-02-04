@@ -21,7 +21,7 @@ export default wrapApiHandler(
       {
         include: { user: true },
         errorMessage: 'Token de réinitialisation invalide',
-        statusCode: 400,
+        status: 400,
       }
     )
 
@@ -32,7 +32,7 @@ export default wrapApiHandler(
 
     if (nowUTC.getTime() > expiresAtUTC.getTime()) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Le token de réinitialisation a expiré',
       })
     }
@@ -40,7 +40,7 @@ export default wrapApiHandler(
     // Vérifier si le token a déjà été utilisé
     if (resetToken.used) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Ce token a déjà été utilisé',
       })
     }

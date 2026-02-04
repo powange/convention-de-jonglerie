@@ -11,7 +11,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les articles à restituer',
       })
 
@@ -25,7 +25,7 @@ export default wrapApiHandler(
 
     if (!item) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Association introuvable',
       })
     }

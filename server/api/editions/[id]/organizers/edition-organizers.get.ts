@@ -39,7 +39,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Edition not found',
       })
     }
@@ -47,7 +47,7 @@ export default wrapApiHandler(
     // Vérifier les permissions
     if (!canManageEditionOrganizers(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas les droits pour gérer les organisateurs",
       })
     }
@@ -112,7 +112,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Database error fetching edition organizers:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Erreur lors de la récupération des organisateurs de l'édition",
       })
     }

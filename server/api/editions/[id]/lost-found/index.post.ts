@@ -27,7 +27,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -37,7 +37,7 @@ export default wrapApiHandler(
     const start = new Date(edition.startDate)
     if (now < start) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Les objets trouvés ne peuvent pas être ajoutés avant le début de l'édition",
       })
     }
@@ -46,7 +46,7 @@ export default wrapApiHandler(
     const hasPermission = await hasEditionEditPermission(userId, editionId)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Vous devez être organisateur pour ajouter un objet trouvé',
       })
     }
@@ -55,7 +55,7 @@ export default wrapApiHandler(
     const description = sanitizeString(body.description)
     if (!description) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'La description est requise',
       })
     }

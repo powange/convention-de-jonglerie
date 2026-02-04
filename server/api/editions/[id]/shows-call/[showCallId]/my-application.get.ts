@@ -14,7 +14,7 @@ export default wrapApiHandler(
 
     if (isNaN(showCallId)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID de l'appel à spectacles invalide",
       })
     }

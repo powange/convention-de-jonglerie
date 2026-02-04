@@ -17,7 +17,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           "Droits insuffisants pour accéder à cette fonctionnalité - vous devez être gestionnaire ou en créneau actif de contrôle d'accès",
       })
@@ -37,7 +37,7 @@ export default wrapApiHandler(
 
         if (!application) {
           throw createError({
-            statusCode: 404,
+            status: 404,
             message: 'Bénévole introuvable',
           })
         }
@@ -78,7 +78,7 @@ export default wrapApiHandler(
 
         if (!artist) {
           throw createError({
-            statusCode: 404,
+            status: 404,
             message: 'Artiste introuvable',
           })
         }
@@ -119,7 +119,7 @@ export default wrapApiHandler(
 
         if (!editionOrganizer) {
           throw createError({
-            statusCode: 404,
+            status: 404,
             message: 'Organisateur introuvable',
           })
         }
@@ -162,7 +162,7 @@ export default wrapApiHandler(
 
         if (!orderItem) {
           throw createError({
-            statusCode: 404,
+            status: 404,
             message: 'Participant introuvable',
           })
         }
@@ -201,7 +201,7 @@ export default wrapApiHandler(
       console.error('Invalidate entry error:', error)
       if (error.statusCode) throw error
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Erreur lors de la dévalidation de l'entrée",
       })
     }

@@ -67,13 +67,13 @@ export default wrapApiHandler(
 
       if (!userToAdd) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Utilisateur introuvable avec ce pseudo ou cet email',
         })
       }
     } else {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'userIdentifier ou userId est requis',
       })
     }
@@ -82,7 +82,7 @@ export default wrapApiHandler(
     const isAdminMode = await checkAdminMode(user.id, event)
     if (userToAdd.id === user.id && !isAdminMode) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Vous ne pouvez pas vous ajouter comme organisateur',
       })
     }

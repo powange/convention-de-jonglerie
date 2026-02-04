@@ -15,7 +15,7 @@ export default wrapApiHandler(
 
     if (isNaN(showCallId)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID de l'appel à spectacles invalide",
       })
     }
@@ -28,7 +28,7 @@ export default wrapApiHandler(
 
     if (!userData?.isArtist) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           'Vous devez avoir la catégorie "Artiste" activée dans votre profil pour candidater',
       })
@@ -41,7 +41,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -56,7 +56,7 @@ export default wrapApiHandler(
 
     if (!showCall) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Appel à spectacles non trouvé',
       })
     }
@@ -64,7 +64,7 @@ export default wrapApiHandler(
     // Vérifier que l'appel est ouvert
     if (!showCall.isOpen) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "L'appel à spectacles n'est pas ouvert",
       })
     }
@@ -72,7 +72,7 @@ export default wrapApiHandler(
     // Vérifier le mode
     if (showCall.mode === 'EXTERNAL') {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message:
           "Les candidatures se font via un formulaire externe. Veuillez utiliser l'URL fournie.",
         data: {
@@ -84,7 +84,7 @@ export default wrapApiHandler(
     // Vérifier la date limite
     if (showCall.deadline && new Date() > new Date(showCall.deadline)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'La date limite de candidature est dépassée',
       })
     }
@@ -101,7 +101,7 @@ export default wrapApiHandler(
 
     if (existingApplication) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Vous avez déjà soumis une candidature pour cet appel à spectacles',
       })
     }

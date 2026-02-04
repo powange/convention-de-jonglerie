@@ -18,14 +18,14 @@ export default wrapApiHandler(
 
     if (convention.authorId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Cette convention a déjà un créateur',
       })
     }
 
     if (!convention.email) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "Cette convention n'a pas d'email de contact configuré",
       })
     }

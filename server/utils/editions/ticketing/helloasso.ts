@@ -107,7 +107,7 @@ export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials)
     // Utiliser createError si disponible (contexte Nitro), sinon lancer une erreur standard
     if (typeof createError !== 'undefined') {
       throw createError({
-        statusCode: 401,
+        status: 401,
         message: 'Identifiants HelloAsso invalides',
       })
     } else {
@@ -147,14 +147,14 @@ export async function getHelloAssoForm(
       if (statusCode === 401) {
         const error =
           typeof createError !== 'undefined'
-            ? createError({ statusCode: 401, message: "Token d'accès invalide ou expiré" })
+            ? createError({ status: 401, message: "Token d'accès invalide ou expiré" })
             : new Error("Token d'accès invalide ou expiré")
         throw error
       } else if (statusCode === 404) {
         const error =
           typeof createError !== 'undefined'
             ? createError({
-                statusCode: 404,
+                status: 404,
                 message:
                   'Formulaire introuvable. Vérifiez que le formulaire est publié et que les paramètres (slug organisation, type, slug formulaire) sont corrects.',
               })
@@ -164,7 +164,7 @@ export async function getHelloAssoForm(
         const error =
           typeof createError !== 'undefined'
             ? createError({
-                statusCode: 403,
+                status: 403,
                 message:
                   'Accès refusé. Vérifiez que votre client API a le privilège "AccessPublicData".',
               })
@@ -415,20 +415,20 @@ async function fetchOrdersPageFromHelloAsso(
       if (statusCode === 401) {
         const error =
           typeof createError !== 'undefined'
-            ? createError({ statusCode: 401, message: "Token d'accès invalide ou expiré" })
+            ? createError({ status: 401, message: "Token d'accès invalide ou expiré" })
             : new Error("Token d'accès invalide ou expiré")
         throw error
       } else if (statusCode === 404) {
         const error =
           typeof createError !== 'undefined'
-            ? createError({ statusCode: 404, message: 'Formulaire introuvable' })
+            ? createError({ status: 404, message: 'Formulaire introuvable' })
             : new Error('Formulaire introuvable')
         throw error
       } else if (statusCode === 403) {
         const error =
           typeof createError !== 'undefined'
             ? createError({
-                statusCode: 403,
+                status: 403,
                 message: 'Accès refusé. Vérifiez les permissions de votre client API',
               })
             : new Error('Accès refusé. Vérifiez les permissions de votre client API')

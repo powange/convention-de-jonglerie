@@ -19,7 +19,7 @@ export default wrapApiHandler(
 
     if (!post) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Post non trouvé ou vous n'êtes pas autorisé à le supprimer",
       })
     }

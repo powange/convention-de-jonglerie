@@ -21,7 +21,7 @@ export default wrapApiHandler(
 
     if (!lostFoundItem) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Objet trouvé non trouvé',
       })
     }
@@ -30,7 +30,7 @@ export default wrapApiHandler(
     const hasPermission = await hasEditionEditPermission(userId, editionId)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous devez être organisateur pour modifier le statut d'un objet trouvé",
       })
     }

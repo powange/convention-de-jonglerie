@@ -20,7 +20,7 @@ export default wrapApiHandler(
 
     if (!taskId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'taskId manquant',
       })
     }
@@ -30,7 +30,7 @@ export default wrapApiHandler(
 
     if (!task) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Tâche non trouvée ou expirée',
       })
     }

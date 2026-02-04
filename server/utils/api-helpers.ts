@@ -59,7 +59,7 @@ export function wrapApiHandler<T = any>(
       // 2. Erreurs ApiError (nos classes personnalisées) - convertir en erreur h3
       if (isApiError(error)) {
         throw createError({
-          statusCode: error.statusCode,
+          status: error.statusCode,
           message: error.message,
         })
       }
@@ -82,7 +82,7 @@ export function wrapApiHandler<T = any>(
       // Convertir en ApiError puis en erreur h3
       const apiError = toApiError(error, defaultErrorMessage)
       throw createError({
-        statusCode: apiError.statusCode,
+        status: apiError.statusCode,
         message: apiError.message,
       })
     }
@@ -104,7 +104,7 @@ export function handlePrismaError(error: unknown, context?: string): never {
         const field = Array.isArray(target) ? target[0] : 'champ'
         // Convertir en erreur h3 (pour rester compatible)
         throw createError({
-          statusCode: 409,
+          status: 409,
           message: `Ce ${field} est déjà utilisé`,
         })
       }
@@ -112,7 +112,7 @@ export function handlePrismaError(error: unknown, context?: string): never {
       case 'P2025': {
         // Enregistrement non trouvé
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: context ? `${context} introuvable` : 'Ressource introuvable',
         })
       }
@@ -120,7 +120,7 @@ export function handlePrismaError(error: unknown, context?: string): never {
       case 'P2003': {
         // Contrainte de clé étrangère violée
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Référence invalide',
         })
       }
@@ -129,7 +129,7 @@ export function handlePrismaError(error: unknown, context?: string): never {
         // Erreur Prisma inconnue - logger et relancer comme 500
         console.error('Erreur Prisma non gérée:', prismaError.code, prismaError)
         throw createError({
-          statusCode: 500,
+          status: 500,
           message: 'Erreur de base de données',
         })
     }

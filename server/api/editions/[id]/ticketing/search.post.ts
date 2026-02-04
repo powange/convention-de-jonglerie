@@ -21,7 +21,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
@@ -797,7 +797,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Database search error:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la recherche de billets',
       })
     }

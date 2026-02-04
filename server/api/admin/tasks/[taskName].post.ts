@@ -19,7 +19,7 @@ export default wrapApiHandler(
 
     if (!taskName || !availableTasks.includes(taskName)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: `Tâche invalide. Tâches disponibles: ${availableTasks.join(', ')}`,
       })
     }

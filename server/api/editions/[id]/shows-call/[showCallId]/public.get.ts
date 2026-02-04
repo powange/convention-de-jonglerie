@@ -12,7 +12,7 @@ export default wrapApiHandler(
 
     if (isNaN(showCallId)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID de l'appel à spectacles invalide",
       })
     }
@@ -31,7 +31,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -39,7 +39,7 @@ export default wrapApiHandler(
     // Si l'édition n'est pas publiée, ne pas exposer l'appel à spectacles
     if (edition.status === 'OFFLINE') {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non disponible',
       })
     }
@@ -54,7 +54,7 @@ export default wrapApiHandler(
 
     if (!showCall) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Appel à spectacles non trouvé',
       })
     }

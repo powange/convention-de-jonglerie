@@ -16,7 +16,7 @@ export default wrapApiHandler(
     const requestId = body?.requestId ? Number(body.requestId) : undefined
 
     if (!seats || seats < 1 || seats > 8) {
-      throw createError({ statusCode: 400, message: 'Nombre de places invalide' })
+      throw createError({ status: 400, message: 'Nombre de places invalide' })
     }
 
     // Récupérer l'offre et vérifier droits/capacité
@@ -31,7 +31,7 @@ export default wrapApiHandler(
     // Le créateur ne peut pas réserver sur sa propre offre
     if (offer.userId === user.id) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Impossible de réserver votre propre offre',
       })
     }
@@ -42,7 +42,7 @@ export default wrapApiHandler(
         errorMessage: 'Demande invalide',
       })
       if (req.userId !== user.id || req.editionId !== offer.editionId) {
-        throw createError({ statusCode: 400, message: 'Demande invalide' })
+        throw createError({ status: 400, message: 'Demande invalide' })
       }
     }
 
@@ -52,7 +52,7 @@ export default wrapApiHandler(
       .reduce((sum, b) => sum + (b.seats || 0), 0)
 
     if (acceptedSeats + seats > offer.availableSeats) {
-      throw createError({ statusCode: 400, message: 'Plus assez de places disponibles' })
+      throw createError({ status: 400, message: 'Plus assez de places disponibles' })
     }
 
     // Option: éviter multi-PENDING du même utilisateur sur la même offre
@@ -60,7 +60,7 @@ export default wrapApiHandler(
       where: { carpoolOfferId: offerId, requesterId: user.id, status: 'PENDING' },
     })
     if (existingPending) {
-      throw createError({ statusCode: 400, message: 'Une réservation en attente existe déjà' })
+      throw createError({ status: 400, message: 'Une réservation en attente existe déjà' })
     }
 
     const booking = await prisma.carpoolBooking.create({

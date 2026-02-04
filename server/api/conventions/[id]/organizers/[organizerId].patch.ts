@@ -48,14 +48,14 @@ export default wrapApiHandler(
       return { success: true, unchanged: true }
 
     const canManage = await canManageOrganizers(conventionId, user.id, event)
-    if (!canManage) throw createError({ statusCode: 403, message: 'Permission insuffisante' })
+    if (!canManage) throw createError({ status: 403, message: 'Permission insuffisante' })
 
     const organizer = await fetchResourceOrFail(prisma.conventionOrganizer, organizerId, {
       errorMessage: 'Organisateur introuvable',
       include: { perEditionPermissions: true },
     })
     if (organizer.conventionId !== conventionId)
-      throw createError({ statusCode: 404, message: 'Organisateur introuvable' })
+      throw createError({ status: 404, message: 'Organisateur introuvable' })
 
     const beforeSnapshot: OrganizerPermissionSnapshot = {
       title: organizer.title,

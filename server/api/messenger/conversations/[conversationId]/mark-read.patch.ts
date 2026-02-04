@@ -30,7 +30,7 @@ export default wrapApiHandler(
 
     if (!participant) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas accès à cette conversation",
       })
     }
@@ -46,7 +46,7 @@ export default wrapApiHandler(
 
     if (!message) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Message introuvable dans cette conversation',
       })
     }

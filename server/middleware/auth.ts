@@ -159,7 +159,7 @@ export default defineEventHandler(async (event) => {
       event.context.user = session.user
       return
     }
-    throw createError({ statusCode: 401, message: 'Unauthorized' })
+    throw createError({ status: 401, message: 'Unauthorized' })
   }
 
   // --- Page Routes (not API routes) --- //

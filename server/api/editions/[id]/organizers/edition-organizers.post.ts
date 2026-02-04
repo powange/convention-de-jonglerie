@@ -48,7 +48,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Edition not found',
       })
     }
@@ -56,7 +56,7 @@ export default wrapApiHandler(
     // Vérifier les permissions
     if (!canManageEditionOrganizers(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas les droits pour gérer les organisateurs",
       })
     }
@@ -72,7 +72,7 @@ export default wrapApiHandler(
 
       if (!conventionOrganizer) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: "Cet organisateur n'appartient pas à cette convention",
         })
       }
@@ -89,7 +89,7 @@ export default wrapApiHandler(
 
       if (existingEditionOrganizer) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Cet organisateur est déjà présent sur cette édition',
         })
       }
@@ -115,7 +115,7 @@ export default wrapApiHandler(
 
       if (!isUnique) {
         throw createError({
-          statusCode: 500,
+          status: 500,
           message: 'Impossible de générer un token unique',
         })
       }
@@ -180,7 +180,7 @@ export default wrapApiHandler(
 
       console.error('Database error adding organizer to edition:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Erreur lors de l'ajout de l'organisateur à l'édition",
       })
     }

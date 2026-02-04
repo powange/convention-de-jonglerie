@@ -24,7 +24,7 @@ export default wrapApiHandler(
 
     if (!post) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Post non trouvé',
       })
     }
@@ -33,7 +33,7 @@ export default wrapApiHandler(
     const hasPermission = await hasEditionEditPermission(user.id, editionId)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Vous devez être organisateur pour commenter sur cette édition',
       })
     }

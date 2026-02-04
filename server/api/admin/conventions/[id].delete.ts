@@ -11,7 +11,7 @@ export default wrapApiHandler(
     // Vérifier que l'utilisateur est admin global
     if (!user.isGlobalAdmin) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           'Droits insuffisants - seuls les admins globaux peuvent supprimer définitivement des conventions',
       })

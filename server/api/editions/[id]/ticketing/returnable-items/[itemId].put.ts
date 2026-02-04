@@ -17,7 +17,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour modifier ces données',
       })
 
@@ -26,7 +26,7 @@ export default wrapApiHandler(
 
     if (!validation.success) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: validation.error.errors[0].message,
       })
     }

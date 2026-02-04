@@ -22,7 +22,7 @@ export default wrapApiHandler(
 
     if (!files || files.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucun fichier fourni',
       })
     }
@@ -43,14 +43,14 @@ export default wrapApiHandler(
 
       if (!convention) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Convention introuvable',
         })
       }
 
       if (!canEditConvention(convention, user)) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Vous n'avez pas les droits pour modifier cette convention",
         })
       }

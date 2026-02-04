@@ -17,7 +17,7 @@ export default wrapApiHandler(async (event) => {
 
   if (!teamId) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Equipe invalide',
     })
   }
@@ -37,7 +37,7 @@ export default wrapApiHandler(async (event) => {
 
   if (!leaderAssignment) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Vous devez être leader de cette équipe pour voir ses membres',
     })
   }

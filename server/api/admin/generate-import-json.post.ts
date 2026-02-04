@@ -478,7 +478,7 @@ async function callLMStudioComplete(
 
   if (!response.ok) {
     const error = await response.text()
-    throw createError({ statusCode: 503, message: `Erreur LM Studio: ${error}` })
+    throw createError({ status: 503, message: `Erreur LM Studio: ${error}` })
   }
 
   const data = await response.json()
@@ -486,13 +486,13 @@ async function callLMStudioComplete(
 
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
-    throw createError({ statusCode: 500, message: "L'IA n'a pas généré de JSON valide" })
+    throw createError({ status: 500, message: "L'IA n'a pas généré de JSON valide" })
   }
 
   try {
     JSON.parse(jsonMatch[0])
   } catch {
-    throw createError({ statusCode: 500, message: "Le JSON généré par l'IA n'est pas valide" })
+    throw createError({ status: 500, message: "Le JSON généré par l'IA n'est pas valide" })
   }
 
   return jsonMatch[0]
@@ -524,7 +524,7 @@ async function callAnthropicComplete(apiKey: string, userPrompt: string): Promis
 
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
-    throw createError({ statusCode: 500, message: "L'IA n'a pas généré de JSON valide" })
+    throw createError({ status: 500, message: "L'IA n'a pas généré de JSON valide" })
   }
 
   return jsonMatch[0]
@@ -549,7 +549,7 @@ async function callOllamaComplete(
   })
 
   if (!response.ok) {
-    throw createError({ statusCode: 503, message: `Erreur Ollama: ${response.statusText}` })
+    throw createError({ status: 503, message: `Erreur Ollama: ${response.statusText}` })
   }
 
   const data = await response.json()
@@ -557,7 +557,7 @@ async function callOllamaComplete(
 
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
-    throw createError({ statusCode: 500, message: "L'IA n'a pas généré de JSON valide" })
+    throw createError({ status: 500, message: "L'IA n'a pas généré de JSON valide" })
   }
 
   return jsonMatch[0]
@@ -639,12 +639,12 @@ async function callLMStudio(
   } catch (error: any) {
     if (error.name === 'AbortError') {
       throw createError({
-        statusCode: 504,
+        status: 504,
         message: `Timeout LM Studio: le modèle n'a pas répondu dans les ${AI_TIMEOUTS.LLM_REQUEST / 1000} secondes. Essayez avec moins d'URLs ou un modèle plus rapide.`,
       })
     }
     throw createError({
-      statusCode: 503,
+      status: 503,
       message: `Erreur de connexion à LM Studio: ${error.message}. Vérifiez que LM Studio est démarré.`,
     })
   }
@@ -652,7 +652,7 @@ async function callLMStudio(
   if (!response.ok) {
     const error = await response.text()
     throw createError({
-      statusCode: 503,
+      status: 503,
       message: `Erreur LM Studio: ${error}. Vérifiez que LM Studio est démarré avec un modèle chargé.`,
     })
   }
@@ -664,7 +664,7 @@ async function callLMStudio(
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: "L'IA n'a pas généré de JSON valide",
     })
   }
@@ -674,7 +674,7 @@ async function callLMStudio(
     JSON.parse(jsonMatch[0])
   } catch {
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: "Le JSON généré par l'IA n'est pas valide",
     })
   }
@@ -717,7 +717,7 @@ async function callAnthropic(apiKey: string, content: string): Promise<string> {
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: "L'IA n'a pas généré de JSON valide",
     })
   }
@@ -743,7 +743,7 @@ async function callOllama(baseUrl: string, model: string, content: string): Prom
 
   if (!response.ok) {
     throw createError({
-      statusCode: 503,
+      status: 503,
       message: `Erreur Ollama: ${response.statusText}`,
     })
   }
@@ -754,7 +754,7 @@ async function callOllama(baseUrl: string, model: string, content: string): Prom
   const jsonMatch = responseText.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: "L'IA n'a pas généré de JSON valide",
     })
   }

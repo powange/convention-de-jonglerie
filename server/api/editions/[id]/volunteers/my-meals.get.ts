@@ -31,14 +31,14 @@ export default wrapApiHandler(async (event) => {
 
   if (!volunteer) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: "Vous n'êtes pas bénévole pour cette édition",
     })
   }
 
   if (volunteer.status !== 'ACCEPTED') {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Votre candidature n'a pas encore été acceptée",
     })
   }

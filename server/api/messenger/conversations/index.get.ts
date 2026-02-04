@@ -77,7 +77,7 @@ export default wrapApiHandler(
 
     if (!hasAccess) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas accès aux conversations de cette édition",
       })
     }

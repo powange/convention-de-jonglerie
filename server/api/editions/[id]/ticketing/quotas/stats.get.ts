@@ -12,7 +12,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à ces données',
       })
 
@@ -22,7 +22,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Failed to fetch quota stats:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la récupération des statistiques des quotas',
       })
     }

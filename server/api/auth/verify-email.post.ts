@@ -34,14 +34,14 @@ export default wrapApiHandler(
 
     if (user.isEmailVerified) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Email déjà vérifié',
       })
     }
 
     if (!user.emailVerificationCode || !user.verificationCodeExpiry) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucun code de vérification actif',
       })
     }
@@ -49,7 +49,7 @@ export default wrapApiHandler(
     // Vérifier l'expiration
     if (new Date() > user.verificationCodeExpiry) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Code de vérification expiré',
       })
     }
@@ -57,7 +57,7 @@ export default wrapApiHandler(
     // Vérifier le code
     if (user.emailVerificationCode !== validatedData.code) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Code de vérification incorrect',
       })
     }

@@ -22,14 +22,14 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
 
     if (!canManageArtists(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas les droits pour gérer les appels à spectacles de cette édition",
       })
     }

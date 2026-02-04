@@ -19,7 +19,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour modifier ces données',
       })
 
@@ -29,12 +29,12 @@ export default wrapApiHandler(
     })
 
     if (!existingQuota) {
-      throw createError({ statusCode: 404, message: 'Quota introuvable' })
+      throw createError({ status: 404, message: 'Quota introuvable' })
     }
 
     if (existingQuota.editionId !== editionId) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Ce quota n'appartient pas à cette édition",
       })
     }
@@ -44,7 +44,7 @@ export default wrapApiHandler(
 
     if (!validation.success) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: validation.error.errors[0].message,
       })
     }
@@ -63,7 +63,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Failed to update quota:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la modification du quota',
       })
     }

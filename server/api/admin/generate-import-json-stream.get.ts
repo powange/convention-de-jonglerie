@@ -42,14 +42,14 @@ export default wrapApiHandler(
 
     if (urls.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Au moins une URL est requise',
       })
     }
 
     if (urls.length > 5) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Maximum 5 URLs autorisées',
       })
     }
@@ -60,7 +60,7 @@ export default wrapApiHandler(
         new URL(url)
       } catch {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: `URL invalide: ${url}`,
         })
       }

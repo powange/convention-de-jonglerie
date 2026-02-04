@@ -15,7 +15,7 @@ export default wrapApiHandler(async (event) => {
   const allowed = await canAccessEditionData(editionId, user.id, event)
   if (!allowed)
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droits insuffisants pour modifier ces données',
     })
 
@@ -24,7 +24,7 @@ export default wrapApiHandler(async (event) => {
   // Valider le body
   if (!body.meals || !Array.isArray(body.meals)) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Format de données invalide',
     })
   }
@@ -33,7 +33,7 @@ export default wrapApiHandler(async (event) => {
   for (const meal of body.meals) {
     if (meal.returnableItemIds !== undefined && !Array.isArray(meal.returnableItemIds)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'returnableItemIds doit être un tableau',
       })
     }
@@ -59,7 +59,7 @@ export default wrapApiHandler(async (event) => {
   const updatePromises = body.meals.map((meal: any) => {
     if (!meal.id) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'ID de repas manquant',
       })
     }
@@ -234,7 +234,7 @@ export default wrapApiHandler(async (event) => {
 
     if (!meal.id) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'ID de repas manquant',
       })
     }

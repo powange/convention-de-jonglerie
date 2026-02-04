@@ -21,7 +21,7 @@ export default wrapApiHandler(
 
     if (!config || !config.helloAssoConfig) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Configuration HelloAsso introuvable',
       })
     }
@@ -73,7 +73,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Failed to fetch raw HelloAsso data:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la récupération des données HelloAsso',
       })
     }

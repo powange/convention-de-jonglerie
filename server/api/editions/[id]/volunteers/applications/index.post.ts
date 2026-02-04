@@ -39,27 +39,27 @@ export default wrapApiHandler(
       errorMessage: 'Edition introuvable',
     })
     if (!edition.volunteersOpen)
-      throw createError({ statusCode: 400, message: 'Recrutement fermé' })
+      throw createError({ status: 400, message: 'Recrutement fermé' })
 
     // Vérifier candidature existante
     const existing = await prisma.editionVolunteerApplication.findUnique({
       where: { editionId_userId: { editionId, userId: authenticatedUser.id } },
       select: { id: true },
     })
-    if (existing) throw createError({ statusCode: 409, message: 'Déjà candidat' })
+    if (existing) throw createError({ status: 409, message: 'Déjà candidat' })
 
     // Téléphone requis : si pas déjà défini dans user et pas fourni -> erreur
     const user = await prisma.user.findUnique({
       where: { id: authenticatedUser.id },
       select: { phone: true, nom: true, prenom: true },
     })
-    if (!user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+    if (!user) throw createError({ status: 401, message: 'Non authentifié' })
 
     // Validation des champs requis
     const missing = validateRequiredFields(user, parsed, edition)
     if (missing.length) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: `${missing.join(', ')} requis${missing.length > 1 ? ' sont' : ' est'}`,
       })
     }
@@ -68,7 +68,7 @@ export default wrapApiHandler(
     const availabilityErrors = validateAvailability(parsed)
     if (availabilityErrors.length) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: availabilityErrors[0],
       })
     }
@@ -81,7 +81,7 @@ export default wrapApiHandler(
     )
     if (teamErrors.length) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: teamErrors[0],
       })
     }
@@ -116,7 +116,7 @@ export default wrapApiHandler(
 
     if (!isUnique) {
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Impossible de générer un token unique',
       })
     }

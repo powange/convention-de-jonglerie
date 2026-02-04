@@ -14,7 +14,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
@@ -29,7 +29,7 @@ export default wrapApiHandler(
 
       if (!order) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Commande non trouvée',
         })
       }
@@ -37,7 +37,7 @@ export default wrapApiHandler(
       // Vérifier que la commande appartient à l'édition
       if (order.editionId !== editionId) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Cette commande n'appartient pas à cette édition",
         })
       }
@@ -45,7 +45,7 @@ export default wrapApiHandler(
       // Vérifier que la commande n'est PAS de HelloAsso (ou d'un autre provider externe)
       if (order.externalTicketingId !== null) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message:
             "Impossible d'annuler ou supprimer une commande provenant d'une billetterie externe. Veuillez annuler la commande directement sur la plateforme externe.",
         })
@@ -79,7 +79,7 @@ export default wrapApiHandler(
       console.error('Delete order error:', error)
       if ((error as { statusCode?: number }).statusCode) throw error
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Erreur lors de l'annulation ou de la suppression de la commande",
       })
     }

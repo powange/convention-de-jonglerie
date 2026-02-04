@@ -42,7 +42,7 @@ export async function requireShowApplicationAccess(
 
   if (isNaN(applicationId)) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'ID de candidature invalide',
     })
   }
@@ -68,7 +68,7 @@ export async function requireShowApplicationAccess(
 
   if (!application) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Candidature introuvable',
     })
   }
@@ -118,7 +118,7 @@ export async function requireShowApplicationAccess(
 
   if (!isArtist && !isOrganizer && !isAdminMode) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Accès non autorisé',
     })
   }
@@ -173,7 +173,7 @@ export async function checkArtistApplicationConversationAccess(
   // Si ce n'est pas une conversation ARTIST_APPLICATION, refuser l'accès
   if (conversation?.type !== 'ARTIST_APPLICATION' || !conversation.showApplication) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas accès à cette conversation",
     })
   }
@@ -220,7 +220,7 @@ export async function checkArtistApplicationConversationAccess(
 
   if (!isArtist && !isOrganizer && !isAdminMode) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas accès à cette conversation",
     })
   }

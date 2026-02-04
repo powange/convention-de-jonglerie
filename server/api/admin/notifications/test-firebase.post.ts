@@ -26,7 +26,7 @@ export default wrapApiHandler(
     // Vérifier que Firebase Admin est disponible
     if (!firebaseAdmin.isInitialized()) {
       throw createError({
-        statusCode: 503,
+        status: 503,
         message:
           'Firebase Admin SDK non configuré. Veuillez configurer FIREBASE_SERVICE_ACCOUNT dans .env',
       })
@@ -50,13 +50,13 @@ export default wrapApiHandler(
       // Vérifier si le token est invalide
       if (result.invalidTokens.length > 0) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Token FCM invalide ou expiré',
         })
       }
 
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Échec de l'envoi de la notification Firebase",
       })
     }

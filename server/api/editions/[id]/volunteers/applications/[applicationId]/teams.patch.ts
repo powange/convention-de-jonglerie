@@ -22,7 +22,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
@@ -36,12 +36,12 @@ export default wrapApiHandler(
       },
     })
     if (!application || application.editionId !== editionId)
-      throw createError({ statusCode: 404, message: 'Candidature introuvable' })
+      throw createError({ status: 404, message: 'Candidature introuvable' })
 
     // Vérifier que le bénévole est en attente ou accepté (pas rejeté)
     if (application.status === 'REJECTED')
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
       })
 
@@ -71,7 +71,7 @@ export default wrapApiHandler(
       // Si c'est une erreur de notre util, la propager avec le bon format
       if (error.message?.includes('introuvable')) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: error.message,
         })
       }

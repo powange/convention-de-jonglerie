@@ -15,7 +15,7 @@ export default wrapApiHandler(
 
     const logId = getRouterParam(event, 'id')
     if (!logId) {
-      throw createError({ statusCode: 400, message: 'ID du log requis' })
+      throw createError({ status: 400, message: 'ID du log requis' })
     }
 
     const body = await readBody(event).catch(() => ({}))

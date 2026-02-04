@@ -20,7 +20,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
@@ -561,7 +561,7 @@ export default wrapApiHandler(
 
         if (!config || !config.helloAssoConfig) {
           throw createError({
-            statusCode: 404,
+            status: 404,
             message: 'Configuration HelloAsso introuvable',
           })
         }
@@ -656,7 +656,7 @@ export default wrapApiHandler(
     } catch (error: unknown) {
       console.error('Database verify QR code error:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la recherche du billet',
       })
     }

@@ -48,7 +48,7 @@ export default wrapApiHandler(async (event) => {
     })
 
     if (leaderAssignments.length === 0) {
-      throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+      throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 
     isTeamLeader = true
@@ -63,7 +63,7 @@ export default wrapApiHandler(async (event) => {
   if (isTeamLeader) {
     if (targetType !== 'teams' || !selectedTeams || selectedTeams.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "Les responsables d'équipe doivent cibler des équipes spécifiques",
       })
     }
@@ -72,7 +72,7 @@ export default wrapApiHandler(async (event) => {
     const invalidTeams = selectedTeams.filter((team) => !leaderTeamNames.includes(team))
     if (invalidTeams.length > 0) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: `Vous n'êtes pas responsable de ces équipes : ${invalidTeams.join(', ')}`,
       })
     }
@@ -120,7 +120,7 @@ export default wrapApiHandler(async (event) => {
   })
 
   if (volunteers.length === 0) {
-    throw createError({ statusCode: 400, message: 'Aucun bénévole trouvé avec ces critères' })
+    throw createError({ status: 400, message: 'Aucun bénévole trouvé avec ces critères' })
   }
 
   // Utiliser le nom de l'édition si disponible, sinon le nom de la convention

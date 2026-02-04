@@ -10,7 +10,7 @@ export default wrapApiHandler(
 
     // Vérifier les permissions de lecture (inclut le mode admin)
     const canAccess = await canAccessConvention(conventionId, user.id, event)
-    if (!canAccess) throw createError({ statusCode: 403, message: 'Accès refusé' })
+    if (!canAccess) throw createError({ status: 403, message: 'Accès refusé' })
 
     const history = await prisma.organizerPermissionHistory.findMany({
       where: { conventionId },

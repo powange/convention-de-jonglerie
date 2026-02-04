@@ -19,7 +19,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Droits insuffisants pour modifier les notes de l'organisateur",
       })
     }
@@ -36,7 +36,7 @@ export default wrapApiHandler(
 
     if (!artist) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Artiste introuvable pour cette édition',
       })
     }

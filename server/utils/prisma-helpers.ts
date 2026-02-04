@@ -29,7 +29,7 @@ export interface FetchResourceOptions<T = any> {
  * Élimine le pattern répétitif :
  * ```
  * const resource = await prisma.xxx.findUnique({ where: { id } })
- * if (!resource) throw createError({ statusCode: 404, message: '...' })
+ * if (!resource) throw createError({ status: 404, message: '...' })
  * ```
  *
  * @param model - Le modèle Prisma (ex: prisma.user, prisma.convention)
@@ -293,7 +293,7 @@ export async function assertResourceExists(
 
   if (!exists) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: errorMessage,
     })
   }
@@ -322,7 +322,7 @@ export async function assertResourcesExist(
 
   if (found.length !== ids.length) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: errorMessage,
     })
   }

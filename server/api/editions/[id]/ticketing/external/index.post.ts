@@ -26,7 +26,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour configurer la billeterie',
       })
 
@@ -38,7 +38,7 @@ export default wrapApiHandler(
       select: { id: true },
     })
 
-    if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
+    if (!edition) throw createError({ status: 404, message: 'Edition introuvable' })
 
     // Vérifier si une configuration existe déjà
     const existingConfig = await prisma.externalTicketing.findUnique({
@@ -50,7 +50,7 @@ export default wrapApiHandler(
     if (body.provider === 'HELLOASSO') {
       if (!body.helloAsso) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Configuration HelloAsso requise',
         })
       }
@@ -146,7 +146,7 @@ export default wrapApiHandler(
 
     // Autres providers (à implémenter)
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Provider non supporté pour le moment',
     })
   },

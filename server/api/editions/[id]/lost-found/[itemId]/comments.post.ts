@@ -25,7 +25,7 @@ export default wrapApiHandler(
 
     if (!lostFoundItem) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Objet trouvé non trouvé',
       })
     }
@@ -34,7 +34,7 @@ export default wrapApiHandler(
     const content = sanitizeString(body.content)
     if (!content) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Le contenu du commentaire est requis',
       })
     }

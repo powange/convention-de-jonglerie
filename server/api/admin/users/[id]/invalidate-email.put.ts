@@ -27,7 +27,7 @@ export default wrapApiHandler(
     // Vérifier que l'email est actuellement vérifié
     if (!existingUser.isEmailVerified) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "L'email de cet utilisateur n'est pas vérifié",
       })
     }

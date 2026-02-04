@@ -9,7 +9,7 @@ export default wrapApiHandler(
 
     if (!notificationId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'ID de notification requis',
       })
     }
@@ -25,7 +25,7 @@ export default wrapApiHandler(
       // Vérifier si c'est une erreur de permission (notification non trouvée)
       if (error.code === 'P2025') {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Notification non trouvée ou accès refusé',
         })
       }

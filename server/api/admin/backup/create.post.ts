@@ -29,7 +29,7 @@ export default wrapApiHandler(
     const databaseUrl = process.env.DATABASE_URL
     if (!databaseUrl) {
       throw createError({
-        statusCode: 500,
+        status: 500,
         statusMessage: 'Configuration de base de données manquante',
       })
     }

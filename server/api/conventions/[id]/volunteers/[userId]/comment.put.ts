@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       statusMessage: 'Édition non trouvée',
     })
   }
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
 
   if (!isAuthor && !isOrganizer && !user.isGlobalAdmin) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       statusMessage: "Vous n'avez pas les permissions nécessaires",
     })
   }
@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
 
   if (!volunteer) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       statusMessage: 'Bénévole non trouvé',
     })
   }

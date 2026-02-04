@@ -36,7 +36,7 @@ export default wrapApiHandler(async (event) => {
 
     if (leaderAssignments.length === 0) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à ces données',
       })
     }

@@ -25,7 +25,7 @@ export default wrapApiHandler(
 
     if (!comment || comment.editionPost.editionId !== editionId) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Commentaire non trouvé ou vous n'êtes pas autorisé à le supprimer",
       })
     }

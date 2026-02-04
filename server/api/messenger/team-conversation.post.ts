@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   if (!editionId || !teamId) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: "L'ID de l'édition et l'ID de l'équipe sont requis",
     })
   }
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
   if (!teamAssignment) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'êtes pas membre de cette équipe",
     })
   }
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
 
     if (!teamGroupConversation) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "La conversation de l'équipe n'a pas pu être créée",
       })
     }
@@ -87,7 +87,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     console.error('Erreur lors de la création de la conversation:', error)
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: error.message || "Erreur lors de la création de la conversation de l'équipe",
     })
   }

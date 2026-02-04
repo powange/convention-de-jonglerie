@@ -148,7 +148,7 @@ export default wrapApiHandler(
 
     if (existingEdition) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Une édition existe déjà pour cette convention avec ces dates et cette ville',
       })
     }

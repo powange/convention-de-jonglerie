@@ -17,7 +17,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
     // Récupérer l'ID depuis les params et le parser en nombre
     const rawId = (event.context as any)?.params?.id
     if (!rawId) {
-      throw createError({ statusCode: 400, message: 'ID manquant' })
+      throw createError({ status: 400, message: 'ID manquant' })
     }
 
     const parsedId = parseInt(rawId)
@@ -26,7 +26,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
         config.entityType === 'carpoolOffer'
           ? "ID de l'offre invalide"
           : 'ID de la demande invalide'
-      throw createError({ statusCode: 400, message: msg })
+      throw createError({ status: 400, message: msg })
     }
 
     // Construire la requête where dynamiquement (avec ID numérique)
@@ -62,7 +62,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
     }
 
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: 'Erreur serveur',
     })
   }
@@ -76,19 +76,19 @@ export async function createCommentForEntity(
     // Vérification de l'authentification si requise
     if (config.requireAuth && !event.context.user) {
       throw createError({
-        statusCode: 401,
+        status: 401,
         message: 'Authentification requise',
       })
     }
 
     const rawId = getRouterParam(event, 'id')
     if (!rawId) {
-      throw createError({ statusCode: 400, message: 'ID manquant' })
+      throw createError({ status: 400, message: 'ID manquant' })
     }
 
     const parsedId = parseInt(rawId)
     if (isNaN(parsedId)) {
-      throw createError({ statusCode: 400, message: 'ID manquant' })
+      throw createError({ status: 400, message: 'ID manquant' })
     }
 
     // Vérifier que la ressource parente existe
@@ -104,14 +104,14 @@ export async function createCommentForEntity(
         config.entityType === 'carpoolOffer'
           ? 'Offre de covoiturage non trouvée'
           : 'Demande de covoiturage non trouvée'
-      throw createError({ statusCode: 404, message: errorMsg })
+      throw createError({ status: 404, message: errorMsg })
     }
 
     const body = await readBody(event)
 
     if (!body.content || !body.content.trim()) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Le contenu du commentaire est requis',
       })
     }
@@ -146,7 +146,7 @@ export async function createCommentForEntity(
     }
 
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: 'Erreur lors de la création du commentaire',
     })
   }
@@ -160,19 +160,19 @@ export async function deleteCommentForEntity(
     // Vérification de l'authentification
     if (config.requireAuth && !event.context.user) {
       throw createError({
-        statusCode: 401,
+        status: 401,
         message: 'Authentification requise',
       })
     }
 
     const commentIdRaw = getRouterParam(event, 'commentId')
     if (!commentIdRaw) {
-      throw createError({ statusCode: 400, message: 'ID du commentaire manquant' })
+      throw createError({ status: 400, message: 'ID du commentaire manquant' })
     }
 
     const commentId = parseInt(commentIdRaw)
     if (isNaN(commentId)) {
-      throw createError({ statusCode: 400, message: 'ID du commentaire manquant' })
+      throw createError({ status: 400, message: 'ID du commentaire manquant' })
     }
 
     // Vérifier que le commentaire existe et appartient à l'utilisateur
@@ -183,14 +183,14 @@ export async function deleteCommentForEntity(
 
     if (!comment) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Commentaire non trouvé',
       })
     }
 
     if (comment.userId !== event.context.user?.id) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Vous ne pouvez supprimer que vos propres commentaires',
       })
     }
@@ -210,7 +210,7 @@ export async function deleteCommentForEntity(
     }
 
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: 'Erreur lors de la suppression du commentaire',
     })
   }

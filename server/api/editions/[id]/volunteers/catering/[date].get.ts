@@ -9,12 +9,12 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
   const targetDate = getRouterParam(event, 'date') || ''
 
-  if (!targetDate) throw createError({ statusCode: 400, message: 'Date invalide' })
+  if (!targetDate) throw createError({ status: 400, message: 'Date invalide' })
 
   const allowed = await canAccessEditionData(editionId, user.id, event)
   if (!allowed) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droits insuffisants pour accéder à ces données',
     })
   }

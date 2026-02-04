@@ -163,7 +163,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
 
   if (!existingTier) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Tarif introuvable',
     })
   }
@@ -246,7 +246,7 @@ export async function deleteTier(tierId: number, editionId: number) {
 
   if (!existingTier) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Tarif introuvable',
     })
   }
@@ -254,7 +254,7 @@ export async function deleteTier(tierId: number, editionId: number) {
   // Vérifier que ce n'est pas un tarif HelloAsso (non supprimable)
   if (existingTier.helloAssoTierId !== null) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Impossible de supprimer un tarif synchronisé depuis HelloAsso',
     })
   }

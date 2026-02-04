@@ -183,7 +183,7 @@ export default wrapApiHandler(async (event) => {
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
   if (!allowed)
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droits insuffisants pour gérer les bénévoles',
     })
 
@@ -201,7 +201,7 @@ export default wrapApiHandler(async (event) => {
 
   if (existingUser) {
     throw createError({
-      statusCode: 409,
+      status: 409,
       message:
         "Cet email est déjà utilisé. Veuillez rechercher l'utilisateur existant dans la liste.",
     })
@@ -280,7 +280,7 @@ export default wrapApiHandler(async (event) => {
 
   if (!isUnique) {
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: 'Impossible de générer un token unique',
     })
   }

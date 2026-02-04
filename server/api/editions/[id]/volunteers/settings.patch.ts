@@ -137,7 +137,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
@@ -148,7 +148,7 @@ export default wrapApiHandler(
         !parsed.externalUrl
       ) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'URL externe requise pour le mode EXTERNAL',
         })
       }

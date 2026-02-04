@@ -19,7 +19,7 @@ export default wrapApiHandler(
 
     if (!workshop) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Workshop non trouvé',
       })
     }
@@ -28,7 +28,7 @@ export default wrapApiHandler(
     const hasPermission = await canEditWorkshop(user.id, workshopId)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           "Vous n'êtes pas autorisé à supprimer ce workshop. Seuls le créateur ou les organisateurs peuvent le faire.",
       })

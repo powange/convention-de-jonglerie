@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   if (!session.user?.id) {
     throw createError({
-      statusCode: 401,
+      status: 401,
       message: 'Non authentifié',
     })
   }
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
   if (!token || typeof token !== 'string') {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Token FCM requis',
     })
   }
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     console.error('[FCM Subscribe] Erreur:', error)
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: "Erreur lors de l'enregistrement du token FCM",
     })
   }

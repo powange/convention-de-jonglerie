@@ -17,7 +17,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les articles à restituer',
       })
 
@@ -34,7 +34,7 @@ export default wrapApiHandler(
 
       if (!returnableItem) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Article à restituer introuvable',
         })
       }
@@ -50,7 +50,7 @@ export default wrapApiHandler(
 
         if (!team) {
           throw createError({
-            statusCode: 404,
+            status: 404,
             message: 'Équipe introuvable',
           })
         }
@@ -70,7 +70,7 @@ export default wrapApiHandler(
       if (existing) {
         const scope = body.teamId ? 'cette équipe' : 'tous les bénévoles'
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: `Cet article est déjà associé à ${scope}`,
         })
       }
@@ -110,7 +110,7 @@ export default wrapApiHandler(
       console.error("Erreur lors de l'ajout de l'article pour bénévoles:", error)
       if (error.statusCode) throw error
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Erreur lors de l'ajout de l'article",
       })
     }

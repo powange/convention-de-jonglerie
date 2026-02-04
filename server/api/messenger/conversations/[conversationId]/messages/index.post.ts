@@ -89,7 +89,7 @@ export default wrapApiHandler(
 
     if (!participant) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas accès à cette conversation",
       })
     }
@@ -105,7 +105,7 @@ export default wrapApiHandler(
 
       if (!replyToMessage) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: "Le message auquel vous tentez de répondre n'existe pas dans cette conversation",
         })
       }

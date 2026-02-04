@@ -8,7 +8,7 @@ export default wrapApiHandler(
     // Vérifier que l'utilisateur est super admin
     if (!user.isGlobalAdmin) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Accès réservé aux super administrateurs',
       })
     }

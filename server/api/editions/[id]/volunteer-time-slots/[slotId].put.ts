@@ -58,7 +58,7 @@ export default wrapApiHandler(
 
     if (!existingSlot) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Créneau non trouvé ou n'appartient pas à cette édition",
       })
     }
@@ -74,7 +74,7 @@ export default wrapApiHandler(
 
       if (!team) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: "Équipe non trouvée ou n'appartient pas à cette édition",
         })
       }
@@ -88,7 +88,7 @@ export default wrapApiHandler(
 
       if (!edition) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Édition non trouvée',
         })
       }
@@ -109,7 +109,7 @@ export default wrapApiHandler(
 
       if (newStartDateTime < editionStart || newEndDateTime > editionEnd) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: "Le créneau doit être dans la période de l'édition",
         })
       }

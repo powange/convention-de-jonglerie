@@ -26,7 +26,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
@@ -44,11 +44,11 @@ export default wrapApiHandler(
     })
 
     if (!application || application.editionId !== editionId)
-      throw createError({ statusCode: 404, message: 'Candidature introuvable' })
+      throw createError({ status: 404, message: 'Candidature introuvable' })
 
     if (application.status !== 'ACCEPTED')
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Seuls les bénévoles acceptés peuvent être responsables',
       })
 
@@ -56,7 +56,7 @@ export default wrapApiHandler(
     const team = await getVolunteerTeamById(teamId)
 
     if (!team || team.editionId !== editionId)
-      throw createError({ statusCode: 404, message: 'Équipe introuvable' })
+      throw createError({ status: 404, message: 'Équipe introuvable' })
 
     try {
       // Mettre à jour le statut de leader
@@ -78,7 +78,7 @@ export default wrapApiHandler(
       // Si l'assignation n'existe pas, Prisma lancera une erreur
       if (error.code === 'P2025') {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: "Le bénévole n'est pas assigné à cette équipe",
         })
       }

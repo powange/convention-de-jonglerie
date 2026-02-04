@@ -99,7 +99,7 @@ export default wrapApiHandler(
 
       default:
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Type de notification de test non reconnu',
         })
     }

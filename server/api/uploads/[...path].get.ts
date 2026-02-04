@@ -12,7 +12,7 @@ export default wrapApiHandler(
 
     if (!path) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Invalid path',
       })
     }
@@ -20,7 +20,7 @@ export default wrapApiHandler(
     // Vérifier les tentatives de path traversal AVANT la normalisation
     if (path.includes('..') || path.includes('//')) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Access denied',
       })
     }
@@ -34,7 +34,7 @@ export default wrapApiHandler(
 
     if (!normalizedPath.startsWith(uploadsDir)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Access denied',
       })
     }
@@ -47,7 +47,7 @@ export default wrapApiHandler(
       }
     } catch {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'File not found',
       })
     }

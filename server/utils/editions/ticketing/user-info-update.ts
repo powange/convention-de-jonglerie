@@ -32,7 +32,7 @@ export async function updateUserInfo(userIds: number[], userInfo: UserInfoUpdate
 
     if (existingUser) {
       throw createError({
-        statusCode: 409,
+        status: 409,
         message: `L'email ${userInfo.email} est déjà utilisé par un autre utilisateur`,
       })
     }

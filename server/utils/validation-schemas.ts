@@ -455,7 +455,7 @@ export function handleValidationError(error: z.ZodError) {
   )
 
   throw createError({
-    statusCode: 400,
+    status: 400,
     message: 'Données invalides',
     data: {
       errors: formattedErrors,

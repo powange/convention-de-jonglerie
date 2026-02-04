@@ -87,7 +87,7 @@ export default wrapApiHandler(
       const user = optionalAuth(event)
       if (!user) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Edition not found',
         })
       }
@@ -104,7 +104,7 @@ export default wrapApiHandler(
 
       if (!isAdminMode && !isCreator && !isConventionAuthor && !isOrganizer && !isOrphanEdition) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Edition not found',
         })
       }

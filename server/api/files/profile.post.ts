@@ -11,7 +11,7 @@ export default wrapApiHandler(
     // Validation basique
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucun fichier fourni',
       })
     }
@@ -34,7 +34,7 @@ export default wrapApiHandler(
 
       if (!currentUser.isGlobalAdmin) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Accès refusé - Droits administrateur requis pour modifier d'autres profils",
         })
       }
@@ -110,7 +110,7 @@ export default wrapApiHandler(
       }
     } else {
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Échec de l'upload de tous les fichiers",
       })
     }

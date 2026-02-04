@@ -34,7 +34,7 @@ export default wrapApiHandler(
     const allergiesErrors = validateAllergiesUpdate(parsed)
     if (allergiesErrors.length) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: allergiesErrors[0],
       })
     }
@@ -42,7 +42,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
@@ -104,7 +104,7 @@ export default wrapApiHandler(
       },
     })
     if (!application || application.editionId !== editionId)
-      throw createError({ statusCode: 404, message: 'Candidature introuvable' })
+      throw createError({ status: 404, message: 'Candidature introuvable' })
 
     // Si on modifie les données de la candidature (sans changer le statut)
     if (parsed.status === undefined && hasApplicationDataChanges(parsed)) {
@@ -115,7 +115,7 @@ export default wrapApiHandler(
           where: { id: application.user.id },
           select: { phone: true, nom: true, prenom: true },
         })
-        if (!user) throw createError({ statusCode: 404, message: 'Utilisateur introuvable' })
+        if (!user) throw createError({ status: 404, message: 'Utilisateur introuvable' })
       }
 
       // Comparer les données avant/après pour détecter les modifications
@@ -223,10 +223,10 @@ export default wrapApiHandler(
 
     // Sinon, gestion classique du changement de statut
     const target = parsed.status
-    if (!target) throw createError({ statusCode: 400, message: 'Statut requis' })
+    if (!target) throw createError({ status: 400, message: 'Statut requis' })
 
     if (target === application.status)
-      throw createError({ statusCode: 400, message: 'Statut identique' })
+      throw createError({ status: 400, message: 'Statut identique' })
 
     // Règles de transition :
     // PENDING -> ACCEPTED/REJECTED (décision)
@@ -239,7 +239,7 @@ export default wrapApiHandler(
     ) {
       // ok
     } else {
-      throw createError({ statusCode: 400, message: 'Transition interdite' })
+      throw createError({ status: 400, message: 'Transition interdite' })
     }
 
     // Mettre à jour le statut et la note d'acceptation

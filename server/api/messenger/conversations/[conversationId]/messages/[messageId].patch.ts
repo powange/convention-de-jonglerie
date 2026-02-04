@@ -32,7 +32,7 @@ export default wrapApiHandler(
 
     if (!message) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Message non trouvé ou vous n'êtes pas autorisé à le modifier",
       })
     }
@@ -40,7 +40,7 @@ export default wrapApiHandler(
     // Si le message est déjà supprimé, interdire la modification
     if (message.deletedAt) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Impossible de modifier un message supprimé',
       })
     }

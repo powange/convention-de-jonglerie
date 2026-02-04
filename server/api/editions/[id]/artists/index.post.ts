@@ -59,7 +59,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -67,7 +67,7 @@ export default wrapApiHandler(
     const hasPermission = canEditEdition(edition, user)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
       })
     }
@@ -81,7 +81,7 @@ export default wrapApiHandler(
     if (!targetUserId) {
       if (!validatedData.email || !validatedData.prenom || !validatedData.nom) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Email, prénom et nom sont requis pour créer un nouvel utilisateur',
         })
       }
@@ -122,7 +122,7 @@ export default wrapApiHandler(
 
     if (existingArtist) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Cet utilisateur est déjà artiste pour cette édition',
       })
     }
@@ -148,7 +148,7 @@ export default wrapApiHandler(
 
     if (!isUnique) {
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Impossible de générer un token unique',
       })
     }

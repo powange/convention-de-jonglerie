@@ -14,7 +14,7 @@ export default wrapApiHandler(
 
     if (!impersonation?.active) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "Aucune session d'impersonation active",
       })
     }

@@ -32,7 +32,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
@@ -49,7 +49,7 @@ export default wrapApiHandler(
 
     if (!customField) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Custom field introuvable',
       })
     }
@@ -77,7 +77,7 @@ export default wrapApiHandler(
 
           if (!existingTier) {
             throw createError({
-              statusCode: 404,
+              status: 404,
               message: `Tarif ${tierId} introuvable`,
             })
           }
@@ -114,7 +114,7 @@ export default wrapApiHandler(
 
           if (!existingQuota) {
             throw createError({
-              statusCode: 404,
+              status: 404,
               message: `Quota ${quota.quotaId} introuvable`,
             })
           }
@@ -142,7 +142,7 @@ export default wrapApiHandler(
 
           if (!existingItem) {
             throw createError({
-              statusCode: 404,
+              status: 404,
               message: `Article ${item.returnableItemId} introuvable`,
             })
           }

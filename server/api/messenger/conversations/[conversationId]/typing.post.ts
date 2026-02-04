@@ -18,7 +18,7 @@ export default wrapApiHandler(
 
     if (!conversationId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'ID de conversation manquant',
       })
     }
@@ -28,7 +28,7 @@ export default wrapApiHandler(
 
     if (!parse.success) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Données invalides',
       })
     }
@@ -63,7 +63,7 @@ export default wrapApiHandler(
 
     if (!participant) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Accès refusé',
       })
     }

@@ -60,7 +60,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -68,7 +68,7 @@ export default wrapApiHandler(
     const hasPermission = canEditEdition(edition, user)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
       })
     }
@@ -91,7 +91,7 @@ export default wrapApiHandler(
 
     if (!existingArtist) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Artiste non trouvé',
       })
     }
@@ -109,7 +109,7 @@ export default wrapApiHandler(
     // Si des modifications d'utilisateur sont demandées, vérifier que authProvider = MANUAL
     if (hasUserUpdates && existingArtist.user.authProvider !== 'MANUAL') {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message:
           "Les informations de l'utilisateur ne peuvent être modifiées que pour les utilisateurs créés manuellement",
       })

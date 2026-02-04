@@ -14,7 +14,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
     }
@@ -37,7 +37,7 @@ export default wrapApiHandler(
 
     if (!application) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Candidature introuvable',
       })
     }
@@ -45,7 +45,7 @@ export default wrapApiHandler(
     // Vérifier que la candidature appartient bien à cette édition
     if (application.editionId !== editionId) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Cette candidature n'appartient pas à cette édition",
       })
     }
@@ -53,7 +53,7 @@ export default wrapApiHandler(
     // Vérifier que la candidature a été ajoutée manuellement
     if (application.source !== 'MANUAL') {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Seules les candidatures ajoutées manuellement peuvent être supprimées',
       })
     }

@@ -15,7 +15,7 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const action = body?.action as 'ACCEPT' | 'REJECT' | 'CANCEL'
     if (!action) {
-      throw createError({ statusCode: 400, message: 'Action manquante' })
+      throw createError({ status: 400, message: 'Action manquante' })
     }
 
     // Récupérer l'offre et la réservation
@@ -28,7 +28,7 @@ export default wrapApiHandler(
       errorMessage: 'Réservation introuvable',
     })
     if (booking.carpoolOfferId !== offerId) {
-      throw createError({ statusCode: 404, message: 'Réservation introuvable' })
+      throw createError({ status: 404, message: 'Réservation introuvable' })
     }
 
     // Droits:
@@ -36,15 +36,15 @@ export default wrapApiHandler(
     // - CANCEL: le demandeur de la réservation
     const userId = user.id
     if ((action === 'ACCEPT' || action === 'REJECT') && offer.userId !== userId) {
-      throw createError({ statusCode: 403, message: 'Action non autorisée' })
+      throw createError({ status: 403, message: 'Action non autorisée' })
     }
     if (action === 'CANCEL' && booking.requesterId !== userId) {
-      throw createError({ statusCode: 403, message: 'Annulation non autorisée' })
+      throw createError({ status: 403, message: 'Annulation non autorisée' })
     }
 
     // Transitions de statut
     if (booking.status !== 'PENDING' && action !== 'CANCEL') {
-      throw createError({ statusCode: 400, message: 'Réservation déjà traitée' })
+      throw createError({ status: 400, message: 'Réservation déjà traitée' })
     }
 
     let newStatus = booking.status
@@ -54,7 +54,7 @@ export default wrapApiHandler(
         .filter((b) => b.status === 'ACCEPTED' && b.id !== booking.id)
         .reduce((sum, b) => sum + (b.seats || 0), 0)
       if (acceptedSeats + booking.seats > offer.availableSeats) {
-        throw createError({ statusCode: 400, message: 'Plus assez de places disponibles' })
+        throw createError({ status: 400, message: 'Plus assez de places disponibles' })
       }
       newStatus = 'ACCEPTED'
     } else if (action === 'REJECT') {

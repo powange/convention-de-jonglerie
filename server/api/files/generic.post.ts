@@ -20,7 +20,7 @@ export default wrapApiHandler(
 
     if (!files || files.length === 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucun fichier fourni',
       })
     }

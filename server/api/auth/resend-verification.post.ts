@@ -39,7 +39,7 @@ export default wrapApiHandler(
 
     if (user.isEmailVerified) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Email déjà vérifié',
       })
     }

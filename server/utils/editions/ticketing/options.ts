@@ -39,7 +39,7 @@ export async function createOption(editionId: number, data: OptionData) {
 
   if (!externalTicketing) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Aucune configuration de billeterie externe trouvée',
     })
   }
@@ -88,7 +88,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
 
   if (!existingOption) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Option non trouvée',
     })
   }
@@ -171,7 +171,7 @@ export async function deleteOption(optionId: number, editionId: number) {
 
   if (!existingOption) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Option non trouvée',
     })
   }
@@ -179,7 +179,7 @@ export async function deleteOption(optionId: number, editionId: number) {
   // Ne pas permettre la suppression d'une option HelloAsso
   if (existingOption.helloAssoOptionId !== null) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Les options HelloAsso ne peuvent pas être supprimées',
     })
   }

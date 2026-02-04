@@ -16,7 +16,7 @@ export default wrapApiHandler(
     // Empêcher l'auto-modification
     if (userId === adminUser.id) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Vous ne pouvez pas modifier vos propres droits administrateur',
       })
     }

@@ -20,7 +20,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
@@ -34,7 +34,7 @@ export default wrapApiHandler(
 
       if (!order) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Commande non trouvée',
         })
       }
@@ -42,7 +42,7 @@ export default wrapApiHandler(
       // Vérifier que la commande appartient à l'édition
       if (order.editionId !== editionId) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Cette commande n'appartient pas à cette édition",
         })
       }
@@ -50,7 +50,7 @@ export default wrapApiHandler(
       // Vérifier que la commande est bien payée
       if (order.status !== 'Processed' && order.status !== 'Onsite') {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Seules les commandes payées peuvent avoir une méthode de paiement définie',
         })
       }
@@ -72,7 +72,7 @@ export default wrapApiHandler(
       console.error('Update payment method error:', error)
       if ((error as { statusCode?: number }).statusCode) throw error
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Erreur lors de la mise à jour de la méthode de paiement',
       })
     }

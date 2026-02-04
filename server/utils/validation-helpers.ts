@@ -73,7 +73,7 @@ export function validateResourceId(
 
   if (!rawId) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: RESOURCE_MESSAGES[resourceType],
     })
   }
@@ -82,7 +82,7 @@ export function validateResourceId(
 
   if (isNaN(id) || id <= 0) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: RESOURCE_MESSAGES[resourceType],
     })
   }
@@ -135,7 +135,7 @@ export function validateStringId(
 
   if (!id || typeof id !== 'string' || id.trim() === '') {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: RESOURCE_MESSAGES[resourceType],
     })
   }
@@ -169,7 +169,7 @@ export async function checkUniqueness<T extends Record<string, any>>(
 
   if (existing && (!excludeId || (existing as any).id !== excludeId)) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: errorMessage || `Ce ${field} est déjà utilisé`,
     })
   }
@@ -239,7 +239,7 @@ export function validateDateRange(
 
   if (start > end) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'La date de fin doit être postérieure ou égale à la date de début',
       data: { field: fieldName },
     })

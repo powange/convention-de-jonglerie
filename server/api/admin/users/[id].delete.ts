@@ -47,7 +47,7 @@ export default wrapApiHandler(
 
     if (!reason || !DELETION_REASONS[reason as keyof typeof DELETION_REASONS]) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Raison de suppression invalide',
       })
     }
@@ -57,7 +57,7 @@ export default wrapApiHandler(
     // Empêcher l'auto-suppression
     if (userIdToDelete === adminUser.id) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Impossible de supprimer son propre compte',
       })
     }
@@ -78,7 +78,7 @@ export default wrapApiHandler(
     // Empêcher la suppression d'autres super admins (sécurité supplémentaire)
     if (userToDelete.isGlobalAdmin) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Impossible de supprimer un super administrateur',
       })
     }

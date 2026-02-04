@@ -11,7 +11,7 @@ export default wrapApiHandler(
     const body = await readBody(event).catch(() => ({}))
     const parse = checkEmailSchema.safeParse(body)
     if (!parse.success) {
-      throw createError({ statusCode: 400, message: 'Invalid email' })
+      throw createError({ status: 400, message: 'Invalid email' })
     }
 
     const { email, excludeUserIds } = parse.data

@@ -35,7 +35,7 @@ export default wrapApiHandler(
 
     if (!assignment) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Assignation non trouvée',
       })
     }

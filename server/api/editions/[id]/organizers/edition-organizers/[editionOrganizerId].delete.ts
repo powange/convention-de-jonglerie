@@ -10,7 +10,7 @@ export default wrapApiHandler(
 
     if (!editionOrganizerId || isNaN(editionOrganizerId)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID d'EditionOrganizer invalide",
       })
     }
@@ -47,7 +47,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Edition not found',
       })
     }
@@ -55,7 +55,7 @@ export default wrapApiHandler(
     // Vérifier les permissions
     if (!canManageEditionOrganizers(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas les droits pour gérer les organisateurs",
       })
     }
@@ -71,7 +71,7 @@ export default wrapApiHandler(
 
       if (!editionOrganizer) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'EditionOrganizer introuvable',
         })
       }
@@ -98,7 +98,7 @@ export default wrapApiHandler(
 
       console.error('Database error removing organizer from edition:', error)
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: "Erreur lors de la suppression de l'organisateur de l'édition",
       })
     }

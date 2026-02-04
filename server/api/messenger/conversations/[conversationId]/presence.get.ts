@@ -22,7 +22,7 @@ export default wrapApiHandler(
 
     if (!participant) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'avez pas accès à cette conversation",
       })
     }

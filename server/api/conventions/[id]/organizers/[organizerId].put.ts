@@ -48,7 +48,7 @@ export default wrapApiHandler(
     // Empêcher une mise à jour vide (aucun champ fourni)
     if (!rights && (title === undefined || title === null) && !perEdition) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Aucune donnée à mettre à jour',
       })
     }
@@ -124,7 +124,7 @@ export default wrapApiHandler(
 
     if (!updatedOrganizer) {
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: 'Échec de la mise à jour du organisateur',
       })
     }

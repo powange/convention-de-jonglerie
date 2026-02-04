@@ -18,7 +18,7 @@ export default wrapApiHandler(
 
     if (!edition.workshopsEnabled) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Les workshops ne sont pas activés pour cette édition',
       })
     }

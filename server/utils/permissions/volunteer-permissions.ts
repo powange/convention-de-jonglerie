@@ -39,7 +39,7 @@ export async function requireVolunteerManagementAccess(
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Édition non trouvée',
     })
   }
@@ -70,7 +70,7 @@ export async function requireVolunteerManagementAccess(
   }
 
   throw createError({
-    statusCode: 403,
+    status: 403,
     message: 'Accès non autorisé - permissions de gestion des bénévoles requises',
   })
 }
@@ -115,7 +115,7 @@ export async function requireVolunteerReadAccess(
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Édition non trouvée',
     })
   }
@@ -138,7 +138,7 @@ export async function requireVolunteerReadAccess(
   }
 
   throw createError({
-    statusCode: 403,
+    status: 403,
     message: 'Accès non autorisé',
   })
 }
@@ -186,7 +186,7 @@ export async function requireVolunteerPlanningAccess(
     return await requireVolunteerReadAccess(event, editionId)
   } catch {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Accès non autorisé - vous devez être bénévole accepté ou gestionnaire',
     })
   }

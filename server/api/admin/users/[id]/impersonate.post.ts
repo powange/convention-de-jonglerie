@@ -11,14 +11,14 @@ export default wrapApiHandler(
     const session = await getUserSession(event)
     if (!session?.user) {
       throw createError({
-        statusCode: 401,
+        status: 401,
         message: 'Non authentifié',
       })
     }
 
     if (!session.user.isGlobalAdmin) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Accès refusé. Seuls les super administrateurs peuvent utiliser cette fonction.',
       })
     }
@@ -33,7 +33,7 @@ export default wrapApiHandler(
     // Ne pas permettre l'impersonation d'un autre super admin
     if (targetUser.isGlobalAdmin) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Impossible de se connecter en tant qu'un autre super administrateur",
       })
     }

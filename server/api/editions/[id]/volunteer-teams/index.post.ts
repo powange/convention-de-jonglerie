@@ -38,7 +38,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -53,7 +53,7 @@ export default wrapApiHandler(
 
     if (existingTeam) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Une équipe avec ce nom existe déjà pour cette édition',
       })
     }

@@ -18,7 +18,7 @@ export default wrapApiHandler(
 
     if (!workshop) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Workshop non trouvé',
       })
     }

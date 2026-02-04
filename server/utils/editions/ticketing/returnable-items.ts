@@ -38,12 +38,12 @@ export async function updateReturnableItem(
   })
 
   if (!existingItem) {
-    throw createError({ statusCode: 404, message: 'Item introuvable' })
+    throw createError({ status: 404, message: 'Item introuvable' })
   }
 
   if (existingItem.editionId !== editionId) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Cet item n'appartient pas à cette édition",
     })
   }
@@ -66,12 +66,12 @@ export async function deleteReturnableItem(itemId: number, editionId: number) {
   })
 
   if (!existingItem) {
-    throw createError({ statusCode: 404, message: 'Item introuvable' })
+    throw createError({ status: 404, message: 'Item introuvable' })
   }
 
   if (existingItem.editionId !== editionId) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Cet item n'appartient pas à cette édition",
     })
   }

@@ -24,7 +24,7 @@ export default wrapApiHandler(
 
     if (!edition) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non trouvée',
       })
     }
@@ -32,7 +32,7 @@ export default wrapApiHandler(
     // Si l'édition n'est pas publiée, ne pas exposer les appels
     if (edition.status === 'OFFLINE') {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Édition non disponible',
       })
     }

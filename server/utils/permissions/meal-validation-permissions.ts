@@ -119,7 +119,7 @@ export async function requireMealValidationAccess(
 
   if (!hasAccess) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message:
         "Accès non autorisé - vous devez être leader d'une équipe de validation des repas ou en créneau actif (±15 minutes)",
     })

@@ -41,7 +41,7 @@ export default wrapApiHandler(
     const hasPermission = canEditEdition(edition, user)
     if (!hasPermission) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: "Vous n'êtes pas autorisé à gérer les spectacles de cette édition",
       })
     }
@@ -56,7 +56,7 @@ export default wrapApiHandler(
 
     if (!existingShow) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Spectacle non trouvé',
       })
     }

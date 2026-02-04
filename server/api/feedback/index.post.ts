@@ -39,7 +39,7 @@ export default wrapApiHandler(
     if (!isAuthenticated) {
       if (!captchaToken) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Captcha requis pour les utilisateurs non connectés',
         })
       }
@@ -58,7 +58,7 @@ export default wrapApiHandler(
         const recaptchaSecret = process.env.NUXT_RECAPTCHA_SECRET_KEY || config.recaptchaSecretKey
         if (!recaptchaSecret) {
           throw createError({
-            statusCode: 500,
+            status: 500,
             message: 'Configuration du captcha manquante',
           })
         }
@@ -102,21 +102,21 @@ export default wrapApiHandler(
             .toString()
             .trim()
           if (!verification?.success) {
-            throw createError({ statusCode: 400, message: 'Captcha invalide' })
+            throw createError({ status: 400, message: 'Captcha invalide' })
           }
           if (verification?.action && verification.action !== 'feedback') {
-            throw createError({ statusCode: 400, message: 'Captcha action invalide' })
+            throw createError({ status: 400, message: 'Captcha action invalide' })
           }
           if (typeof verification?.score === 'number' && verification.score < minScore) {
-            throw createError({ statusCode: 400, message: 'Captcha score insuffisant' })
+            throw createError({ status: 400, message: 'Captcha score insuffisant' })
           }
           if (expectedHost && verification?.hostname && verification.hostname !== expectedHost) {
-            throw createError({ statusCode: 400, message: 'Captcha hostname invalide' })
+            throw createError({ status: 400, message: 'Captcha hostname invalide' })
           }
         } catch (error) {
           console.error('Erreur lors de la vérification du captcha:', error)
           throw createError({
-            statusCode: 400,
+            status: 400,
             message: 'Erreur lors de la vérification du captcha',
           })
         }
@@ -125,7 +125,7 @@ export default wrapApiHandler(
       // Vérifier que le nom est fourni pour les utilisateurs non connectés (email optionnel)
       if (!name) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Le nom est requis pour les utilisateurs non connectés',
         })
       }

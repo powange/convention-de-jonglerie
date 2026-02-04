@@ -67,7 +67,7 @@ export function createRateLimiter(config: RateLimitConfig) {
       const retryAfter = Math.ceil((record.resetTime - now) / 1000)
 
       throw createError({
-        statusCode: 429,
+        status: 429,
         message: message,
         data: {
           retryAfter, // Temps en secondes avant de pouvoir réessayer

@@ -9,7 +9,7 @@ export default wrapApiHandler(async (event) => {
   const groupId = getRouterParam(event, 'groupId')
 
   if (!groupId) {
-    throw createError({ statusCode: 400, message: 'ID de groupe requis' })
+    throw createError({ status: 400, message: 'ID de groupe requis' })
   }
 
   // Récupérer le groupe de notifications
@@ -42,7 +42,7 @@ export default wrapApiHandler(async (event) => {
   })
 
   if (!notificationGroup) {
-    throw createError({ statusCode: 404, message: 'Notification introuvable' })
+    throw createError({ status: 404, message: 'Notification introuvable' })
   }
 
   // Vérifier que l'utilisateur est un bénévole accepté de cette édition
@@ -55,7 +55,7 @@ export default wrapApiHandler(async (event) => {
   })
 
   if (!volunteerApplication) {
-    throw createError({ statusCode: 403, message: 'Accès non autorisé' })
+    throw createError({ status: 403, message: 'Accès non autorisé' })
   }
 
   const confirmation =

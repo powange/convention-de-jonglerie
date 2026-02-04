@@ -195,14 +195,14 @@ export async function getEditionForEdit(
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Edition not found',
     })
   }
 
   if (!canEditEdition(edition, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas les droits pour modifier cette édition",
     })
   }
@@ -228,14 +228,14 @@ export async function getEditionForDelete(
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Edition not found',
     })
   }
 
   if (!canDeleteEdition(edition, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas les droits pour supprimer cette édition",
     })
   }
@@ -261,14 +261,14 @@ export async function getEditionForStatusManagement(
 
   if (!edition) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Edition not found',
     })
   }
 
   if (!canManageEditionStatus(edition, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas la permission de modifier le statut de cette édition",
     })
   }

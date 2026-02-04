@@ -11,7 +11,7 @@ export default wrapApiHandler(
     const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour supprimer la configuration de billeterie',
       })
 
@@ -22,7 +22,7 @@ export default wrapApiHandler(
     })
 
     if (!existingConfig) {
-      throw createError({ statusCode: 404, message: 'Aucune configuration de billeterie trouvée' })
+      throw createError({ status: 404, message: 'Aucune configuration de billeterie trouvée' })
     }
 
     // Supprimer la configuration HelloAsso si elle existe

@@ -47,7 +47,7 @@ export default wrapApiHandler(
 
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Cette adresse email est déjà utilisée par un autre utilisateur',
         })
       }
@@ -61,7 +61,7 @@ export default wrapApiHandler(
 
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
-          statusCode: 400,
+          status: 400,
           message: 'Ce pseudo est déjà utilisé par un autre utilisateur',
         })
       }

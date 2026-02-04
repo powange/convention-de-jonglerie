@@ -70,7 +70,7 @@ export default wrapApiHandler(
       if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
         // Unique constraint failed
         throw createError({
-          statusCode: 409,
+          status: 409,
           message: 'Email ou pseudo déjà utilisé',
         })
       }

@@ -65,7 +65,7 @@ export default wrapApiHandler(
     // Vérifier les permissions
     if (!canManageTicketing(edition, user)) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour gérer la billetterie',
       })
     }

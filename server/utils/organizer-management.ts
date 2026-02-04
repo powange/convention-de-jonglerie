@@ -55,7 +55,7 @@ export async function checkUserConventionPermission(
 
   if (!convention) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Convention introuvable',
     })
   }
@@ -229,7 +229,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
 
   if (!canManage) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Seuls les administrateurs peuvent ajouter des organisateurs',
     })
   }
@@ -242,7 +242,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
 
   if (!userToAdd) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Utilisateur introuvable',
     })
   }
@@ -354,7 +354,7 @@ export async function deleteConventionOrganizer(
 
   if (!canManage) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Seuls les administrateurs peuvent retirer des organisateurs',
     })
   }
@@ -371,7 +371,7 @@ export async function deleteConventionOrganizer(
 
   if (!organizer || organizer.conventionId !== conventionId) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Organisateur introuvable',
     })
   }
@@ -380,7 +380,7 @@ export async function deleteConventionOrganizer(
   const isAdminMode = await checkAdminMode(userId, event)
   if (organizer.userId === userId && !isAdminMode) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Vous ne pouvez pas vous retirer vous-même des organisateurs',
     })
   }
@@ -481,12 +481,12 @@ export async function updateOrganizerRights(params: {
 }) {
   const { conventionId, organizerId, userId, rights, title, perEdition } = params
   const canManage = await canManageOrganizers(conventionId, userId)
-  if (!canManage) throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+  if (!canManage) throw createError({ status: 403, message: 'Droits insuffisants' })
   const organizer = await prisma.conventionOrganizer.findUnique({
     where: { id: organizerId },
   })
   if (!organizer || organizer.conventionId !== conventionId)
-    throw createError({ statusCode: 404, message: 'Organisateur introuvable' })
+    throw createError({ status: 404, message: 'Organisateur introuvable' })
   return prisma.$transaction(async (tx: PrismaTransaction) => {
     await tx.conventionOrganizer.update({
       where: { id: organizerId },

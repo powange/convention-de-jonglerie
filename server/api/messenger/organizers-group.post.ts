@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   if (!editionId) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: "L'ID de l'édition est requis",
     })
   }
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   if (!isOrganizer) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'êtes pas organisateur de cette édition",
     })
   }
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     console.error('Erreur lors de la création de la conversation organisateurs:', error)
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: error.message || 'Erreur lors de la création de la conversation',
     })
   }

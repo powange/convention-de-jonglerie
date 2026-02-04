@@ -85,7 +85,7 @@ export default wrapApiHandler(
 
       if (!convention) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Convention introuvable',
         })
       }
@@ -96,7 +96,7 @@ export default wrapApiHandler(
 
       if (!canChangeConvention) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Vous ne pouvez assigner des éditions qu'aux conventions que vous gérez",
         })
       }

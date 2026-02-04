@@ -15,7 +15,7 @@ export default wrapApiHandler(
 
     if (isNaN(showCallId)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: "ID de l'appel à spectacles invalide",
       })
     }
@@ -30,7 +30,7 @@ export default wrapApiHandler(
 
     if (!showCall) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Appel à spectacles non trouvé',
       })
     }
@@ -47,7 +47,7 @@ export default wrapApiHandler(
 
     if (!existingApplication) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Candidature non trouvée',
       })
     }
@@ -55,7 +55,7 @@ export default wrapApiHandler(
     // Vérifier que la candidature est en attente
     if (existingApplication.status !== 'PENDING') {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Vous ne pouvez modifier votre candidature que si elle est en attente',
       })
     }
@@ -63,7 +63,7 @@ export default wrapApiHandler(
     // Vérifier que l'appel est toujours ouvert
     if (!showCall.isOpen) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message:
           "L'appel à spectacles n'est plus ouvert, vous ne pouvez plus modifier votre candidature",
       })
@@ -72,7 +72,7 @@ export default wrapApiHandler(
     // Vérifier la date limite
     if (showCall.deadline && new Date() > new Date(showCall.deadline)) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'La date limite est dépassée, vous ne pouvez plus modifier votre candidature',
       })
     }

@@ -149,14 +149,14 @@ export async function getConventionForEdit(
 
   if (!convention) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Convention introuvable',
     })
   }
 
   if (!canEditConvention(convention, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Vous n'avez pas les droits pour modifier cette convention",
     })
   }
@@ -179,14 +179,14 @@ export async function getConventionForDelete(
 
   if (!convention) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Convention introuvable',
     })
   }
 
   if (!canDeleteConvention(convention, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droit insuffisant pour supprimer cette convention',
     })
   }
@@ -209,14 +209,14 @@ export async function getConventionForArchive(
 
   if (!convention) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Convention introuvable',
     })
   }
 
   if (!canArchiveConvention(convention, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droit insuffisant',
     })
   }
@@ -238,7 +238,7 @@ export async function getConventionForOrganizerManagement(
 
   if (!convention) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Convention introuvable',
     })
   }
@@ -246,7 +246,7 @@ export async function getConventionForOrganizerManagement(
   const canManage = await canManageOrganizers(conventionId, user.id)
   if (!canManage) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droits insuffisants pour gérer les organisateurs',
     })
   }
@@ -290,7 +290,7 @@ export async function getConventionForEditionCreation(
 
   if (!convention) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: 'Convention introuvable',
     })
   }
@@ -298,14 +298,14 @@ export async function getConventionForEditionCreation(
   // Vérifier que la convention n'est pas archivée
   if (convention.isArchived) {
     throw createError({
-      statusCode: 409,
+      status: 409,
       message: "Convention archivée: création d'édition impossible",
     })
   }
 
   if (!canCreateEdition(convention, user)) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: 'Droit insuffisant pour créer une édition',
     })
   }

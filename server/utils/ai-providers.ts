@@ -87,7 +87,7 @@ export class AnthropicProvider implements AIProvider {
         error.error?.message?.includes('credit balance')
       ) {
         throw createError({
-          statusCode: 503,
+          status: 503,
           message:
             "Le service d'extraction par IA (Anthropic) est temporairement indisponible (crédits insuffisants).",
         })
@@ -95,14 +95,14 @@ export class AnthropicProvider implements AIProvider {
 
       if (error.status === 401) {
         throw createError({
-          statusCode: 503,
+          status: 503,
           message: "Le service d'extraction par IA (Anthropic) est mal configuré.",
         })
       }
 
       if (error.status === 429) {
         throw createError({
-          statusCode: 429,
+          status: 429,
           message:
             "Trop de requêtes d'extraction (Anthropic). Veuillez réessayer dans quelques instants.",
         })
@@ -162,7 +162,7 @@ export class OllamaProvider implements AIProvider {
     } catch (error: any) {
       if (error.code === 'ECONNREFUSED' || error.message?.includes('fetch failed')) {
         throw createError({
-          statusCode: 503,
+          status: 503,
           message:
             "Le service d'extraction par IA (Ollama) n'est pas accessible. Vérifiez qu'Ollama est démarré.",
         })
@@ -308,7 +308,7 @@ export class LMStudioProvider implements AIProvider {
       if (error.code === 'ECONNREFUSED' || error.message?.includes('fetch failed')) {
         console.error('[LM Studio] Service non accessible. Vérifiez que LM Studio est démarré.')
         throw createError({
-          statusCode: 503,
+          status: 503,
           message:
             "Le service d'extraction par IA (LM Studio) n'est pas accessible. Vérifiez que LM Studio est démarré et qu'un modèle vision est chargé.",
         })
@@ -317,7 +317,7 @@ export class LMStudioProvider implements AIProvider {
       if (error.message?.includes('API error')) {
         console.error('[LM Studio] Erreur API:', error.message)
         throw createError({
-          statusCode: 503,
+          status: 503,
           message: `Erreur LM Studio : ${error.message}. Assurez-vous qu'un modèle avec support vision (comme LLaVA) est chargé.`,
         })
       }
@@ -352,7 +352,7 @@ export function createAIProvider(config: {
     case 'anthropic':
       if (!config.anthropicApiKey) {
         throw createError({
-          statusCode: 500,
+          status: 500,
           message: 'Clé API Anthropic non configurée',
         })
       }
@@ -366,7 +366,7 @@ export function createAIProvider(config: {
 
     default:
       throw createError({
-        statusCode: 500,
+        status: 500,
         message: `Provider IA non supporté: ${provider}`,
       })
   }

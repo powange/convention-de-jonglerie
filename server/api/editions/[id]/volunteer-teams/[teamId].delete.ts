@@ -32,7 +32,7 @@ export default wrapApiHandler(
 
     if (!existingTeam) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Équipe non trouvée ou n'appartient pas à cette édition",
       })
     }
@@ -40,7 +40,7 @@ export default wrapApiHandler(
     // Vérifier s'il y a des créneaux assignés à cette équipe
     if (existingTeam._count.timeSlots > 0) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Impossible de supprimer une équipe avec des créneaux assignés',
       })
     }

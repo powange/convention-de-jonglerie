@@ -10,7 +10,7 @@ export default wrapApiHandler(async (event) => {
   // Valider le body
   if (!body.selections || !Array.isArray(body.selections)) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: 'Format de données invalide',
     })
   }
@@ -31,14 +31,14 @@ export default wrapApiHandler(async (event) => {
 
   if (!volunteer) {
     throw createError({
-      statusCode: 404,
+      status: 404,
       message: "Vous n'êtes pas bénévole pour cette édition",
     })
   }
 
   if (volunteer.status !== 'ACCEPTED') {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message: "Votre candidature n'a pas encore été acceptée",
     })
   }
@@ -47,7 +47,7 @@ export default wrapApiHandler(async (event) => {
   const updatePromises = body.selections.map((selection: any) => {
     if (!selection.selectionId) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'ID de sélection manquant',
       })
     }

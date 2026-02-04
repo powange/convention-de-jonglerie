@@ -18,7 +18,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
     if (!allowed) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour effectuer cette action',
       })
     }
@@ -41,7 +41,7 @@ export default wrapApiHandler(
 
     if (!meal) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Repas non trouvé',
       })
     }
@@ -64,7 +64,7 @@ export default wrapApiHandler(
         selection.mealId !== mealId
       ) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Sélection de repas non trouvée',
         })
       }
@@ -85,7 +85,7 @@ export default wrapApiHandler(
 
       if (!selection || selection.artist.editionId !== editionId || selection.mealId !== mealId) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Sélection de repas non trouvée',
         })
       }
@@ -110,7 +110,7 @@ export default wrapApiHandler(
 
       if (!orderItem || orderItem.order.editionId !== editionId) {
         throw createError({
-          statusCode: 404,
+          status: 404,
           message: 'Participant non trouvé',
         })
       }
@@ -134,7 +134,7 @@ export default wrapApiHandler(
 
       if (!hasAccess) {
         throw createError({
-          statusCode: 403,
+          status: 403,
           message: "Ce participant n'a pas accès à ce repas",
         })
       }

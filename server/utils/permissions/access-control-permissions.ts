@@ -74,7 +74,7 @@ export async function requireActiveAccessControlVolunteer(
 
   if (!isActive) {
     throw createError({
-      statusCode: 403,
+      status: 403,
       message:
         "Accès non autorisé - vous devez être en créneau actif de contrôle d'accès (±15 minutes)",
     })

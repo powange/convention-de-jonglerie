@@ -36,7 +36,7 @@ export default wrapApiHandler(
     const allowed = await canAccessEditionData(editionId, user.id, event)
     if (!allowed)
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
@@ -52,7 +52,7 @@ export default wrapApiHandler(
 
     if (!existingCustomField) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Custom field introuvable',
       })
     }
@@ -60,7 +60,7 @@ export default wrapApiHandler(
     // Vérifier qu'il ne vient pas de HelloAsso (non modifiable)
     if (existingCustomField.helloAssoCustomFieldId !== null) {
       throw createError({
-        statusCode: 403,
+        status: 403,
         message: 'Les custom fields synchronisés depuis HelloAsso ne peuvent pas être modifiés',
       })
     }

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   if (!session.user?.id) {
     throw createError({
-      statusCode: 401,
+      status: 401,
       message: 'Non authentifié',
     })
   }
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   if (!deviceId) {
     throw createError({
-      statusCode: 400,
+      status: 400,
       message: "ID de l'appareil requis",
     })
   }
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
     if (!device) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: 'Appareil non trouvé',
       })
     }
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
     console.error('[FCM Delete Device] Erreur:', error)
     throw createError({
-      statusCode: 500,
+      status: 500,
       message: "Erreur lors de la suppression de l'appareil",
     })
   }

@@ -72,7 +72,7 @@ export default wrapApiHandler(
 
     // Filtre par code de statut HTTP
     if (statusCodeFilter) {
-      conditions.push({ statusCode: statusCodeFilter })
+      conditions.push({ status: statusCodeFilter })
     }
 
     // Filtre par chemin d'API
@@ -114,7 +114,7 @@ export default wrapApiHandler(
     if (sortField === 'createdAt') {
       orderBy.push({ createdAt: sortDir })
     } else if (sortField === 'statusCode') {
-      orderBy.push({ statusCode: sortDir })
+      orderBy.push({ status: sortDir })
     } else if (sortField === 'path') {
       orderBy.push({ path: sortDir })
     } else {
@@ -135,7 +135,7 @@ export default wrapApiHandler(
         select: {
           id: true,
           message: true,
-          statusCode: true,
+          status: true,
           errorType: true,
           method: true,
           path: true,
@@ -179,7 +179,7 @@ export default wrapApiHandler(
         select: {
           id: true,
           message: true,
-          statusCode: true,
+          status: true,
           errorType: true,
           method: true,
           path: true,

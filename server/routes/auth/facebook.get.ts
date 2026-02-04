@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
   const sentState = query.state
   const cookieState = getCookie(event, 'oauth_state_fb')
   if (!sentState || !cookieState || sentState !== cookieState) {
-    throw createError({ statusCode: 400, message: 'Invalid OAuth state' })
+    throw createError({ status: 400, message: 'Invalid OAuth state' })
   }
 
   // Échanger le code contre un access_token

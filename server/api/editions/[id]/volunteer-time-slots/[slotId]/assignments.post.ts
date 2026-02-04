@@ -41,7 +41,7 @@ export default wrapApiHandler(
 
     if (!timeSlot) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message: "Créneau non trouvé ou n'appartient pas à cette édition",
       })
     }
@@ -57,7 +57,7 @@ export default wrapApiHandler(
 
     if (!application) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Bénévole non trouvé ou candidature non acceptée pour cette édition',
       })
     }
@@ -65,7 +65,7 @@ export default wrapApiHandler(
     // Vérifier que le créneau n'est pas déjà complet
     if (timeSlot._count.assignments >= timeSlot.maxVolunteers) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Ce créneau est déjà complet',
       })
     }
@@ -82,7 +82,7 @@ export default wrapApiHandler(
 
     if (existingAssignment) {
       throw createError({
-        statusCode: 400,
+        status: 400,
         message: 'Ce bénévole est déjà assigné à ce créneau',
       })
     }
