@@ -178,8 +178,8 @@ jobs:
           path: server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
 
-      - name: Generate Prisma Client (if cache miss)
-        if: steps.cache-prisma.outputs.cache-hit != 'true'
+      - name: Generate Prisma Client
+        # Toujours régénérer pour éviter les incohérences avec le cache des node_modules
         run: npx prisma generate
 
       - name: Build application
