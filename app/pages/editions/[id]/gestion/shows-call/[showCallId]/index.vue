@@ -494,7 +494,7 @@ const fetchSettings = async () => {
     initialized.value = true
   } catch (error: any) {
     console.error('Error fetching show call settings:', error)
-    if (error?.statusCode === 404) {
+    if (error?.statusCode === 404 || error?.status === 404) {
       showCall.value = null
     }
   }

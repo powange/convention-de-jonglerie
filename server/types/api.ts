@@ -62,23 +62,21 @@ export type ApiDataResponse<T = unknown> = ApiSuccessResponse<T> | ApiPaginatedR
 
 /**
  * Type pour les erreurs HTTP avec code de statut
- * Extension de l'objet Error standard avec un statusCode
+ * Extension de l'objet Error standard avec status (Nuxt 5) ou statusCode (legacy)
  */
 export interface HttpError extends Error {
-  statusCode: number
+  status?: number
+  statusCode?: number
   data?: unknown
 }
 
 /**
  * Type guard pour vérifier si une erreur est une HttpError
  * @param error - L'erreur à vérifier
- * @returns true si l'erreur a un statusCode numérique
+ * @returns true si l'erreur a un status ou statusCode numérique
  */
 export function isHttpError(error: unknown): error is HttpError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'statusCode' in error &&
-    typeof (error as HttpError).statusCode === 'number'
-  )
+  if (typeof error !== 'object' || error === null) return false
+  const err = error as Record<string, unknown>
+  return typeof err.status === 'number' || typeof err.statusCode === 'number'
 }

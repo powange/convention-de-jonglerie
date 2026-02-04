@@ -678,8 +678,8 @@ const { data: tiers } = await useFetch<any[]>(`/api/editions/${editionId}/ticket
 if (error.value) {
   console.error('Failed to fetch edition:', error.value)
   throw createError({
-    statusCode: error.value.statusCode || 404,
-    statusText: error.value.statusMessage || 'Edition not found',
+    status: error.value.status || error.value.statusCode || 404,
+    statusText: error.value.statusText || error.value.statusMessage || 'Edition not found',
   })
 }
 

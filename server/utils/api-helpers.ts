@@ -51,17 +51,18 @@ export function wrapApiHandler<T = any>(
     try {
       return await handler(event)
     } catch (error: unknown) {
-      // 1. Erreurs HTTP (h3) - les relancer directement
-      if (isHttpError(error)) {
-        throw error
-      }
-
-      // 2. Erreurs ApiError (nos classes personnalisées) - convertir en erreur h3
+      // 1. Erreurs ApiError (nos classes personnalisées) - convertir en erreur h3
+      // Note: Vérifier ApiError AVANT HttpError car isHttpError matche aussi les objets avec status
       if (isApiError(error)) {
         throw createError({
-          status: error.statusCode,
+          status: error.status,
           message: error.message,
         })
+      }
+
+      // 2. Erreurs HTTP (h3) - les relancer directement
+      if (isHttpError(error)) {
+        throw error
       }
 
       // 3. Erreurs Zod - transformer en erreur 400
@@ -72,7 +73,7 @@ export function wrapApiHandler<T = any>(
       // 4. Erreurs génériques - logger et transformer en 500
       const isUserError = isHttpError(error) || isApiError(error)
       const shouldLog =
-        !silentErrors && (!isUserError || (isApiError(error) && error.statusCode >= 500))
+        !silentErrors && (!isUserError || (isApiError(error) && error.status >= 500))
 
       if (shouldLog) {
         const prefix = operationName ? `[${operationName}]` : ''
@@ -82,7 +83,7 @@ export function wrapApiHandler<T = any>(
       // Convertir en ApiError puis en erreur h3
       const apiError = toApiError(error, defaultErrorMessage)
       throw createError({
-        status: apiError.statusCode,
+        status: apiError.status,
         message: apiError.message,
       })
     }

@@ -38,8 +38,7 @@ export default wrapApiHandler(
       },
       errorMessage: 'Edition introuvable',
     })
-    if (!edition.volunteersOpen)
-      throw createError({ status: 400, message: 'Recrutement fermé' })
+    if (!edition.volunteersOpen) throw createError({ status: 400, message: 'Recrutement fermé' })
 
     // Vérifier candidature existante
     const existing = await prisma.editionVolunteerApplication.findUnique({

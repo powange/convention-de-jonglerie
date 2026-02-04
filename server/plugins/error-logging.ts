@@ -13,7 +13,7 @@ export default async function errorLoggingPlugin(nitroApp: NitroApp) {
     }
 
     // Éviter de logger certaines erreurs "normales"
-    const statusCode = (error as any).statusCode || 500
+    const statusCode = (error as any).status || (error as any).statusCode || 500
 
     // Ne pas logger les 401 (non authentifié) et les 404 sauf si c'est vraiment une erreur
     if (statusCode === 401) return

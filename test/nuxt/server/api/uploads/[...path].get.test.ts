@@ -56,11 +56,21 @@ describe('/api/uploads/[...path] GET - Security Tests', () => {
     mockSetHeader.mockReset()
     g.getRouterParam = vi.fn()
     global.createError = vi.fn(
-      (options: { message?: string; statusMessage?: string; statusCode?: number }) => {
-        const error = new Error(options.message || options.statusMessage) as Error & {
+      (options: {
+        message?: string
+        statusMessage?: string
+        statusText?: string
+        status?: number
+        statusCode?: number
+      }) => {
+        const error = new Error(
+          options.message || options.statusText || options.statusMessage
+        ) as Error & {
+          status?: number
           statusCode?: number
         }
-        error.statusCode = options.statusCode
+        error.status = options.status || options.statusCode
+        error.statusCode = options.status || options.statusCode
         throw error
       }
     )

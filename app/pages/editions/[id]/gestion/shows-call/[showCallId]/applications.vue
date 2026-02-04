@@ -573,7 +573,7 @@ const fetchShowCall = async () => {
     showCall.value = response
   } catch (error: any) {
     console.error('Error fetching show call:', error)
-    if (error?.statusCode === 404) {
+    if (error?.statusCode === 404 || error?.status === 404) {
       showCall.value = null
     }
   } finally {

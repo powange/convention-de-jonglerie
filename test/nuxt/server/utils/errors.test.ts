@@ -15,10 +15,10 @@ import {
 
 describe('errors', () => {
   describe('ApiError', () => {
-    it('devrait créer une erreur avec statusCode et message', () => {
+    it('devrait créer une erreur avec status et message', () => {
       const error = new ApiError(400, 'Test error')
 
-      expect(error.statusCode).toBe(400)
+      expect(error.status).toBe(400)
       expect(error.message).toBe('Test error')
       expect(error.name).toBe('ApiError')
       expect(error).toBeInstanceOf(Error)
@@ -35,7 +35,7 @@ describe('errors', () => {
     it('devrait créer une erreur 400 avec message par défaut', () => {
       const error = new BadRequestError()
 
-      expect(error.statusCode).toBe(400)
+      expect(error.status).toBe(400)
       expect(error.message).toBe('Requête invalide')
       expect(error.name).toBe('BadRequestError')
     })
@@ -43,7 +43,7 @@ describe('errors', () => {
     it('devrait accepter un message personnalisé', () => {
       const error = new BadRequestError('Données invalides')
 
-      expect(error.statusCode).toBe(400)
+      expect(error.status).toBe(400)
       expect(error.message).toBe('Données invalides')
     })
   })
@@ -52,7 +52,7 @@ describe('errors', () => {
     it('devrait créer une erreur 401 avec message par défaut', () => {
       const error = new UnauthorizedError()
 
-      expect(error.statusCode).toBe(401)
+      expect(error.status).toBe(401)
       expect(error.message).toBe('Authentification requise')
       expect(error.name).toBe('UnauthorizedError')
     })
@@ -68,7 +68,7 @@ describe('errors', () => {
     it('devrait créer une erreur 403 avec message par défaut', () => {
       const error = new ForbiddenError()
 
-      expect(error.statusCode).toBe(403)
+      expect(error.status).toBe(403)
       expect(error.message).toBe('Action non autorisée')
       expect(error.name).toBe('ForbiddenError')
     })
@@ -84,7 +84,7 @@ describe('errors', () => {
     it('devrait créer une erreur 404 avec le nom de la ressource', () => {
       const error = new NotFoundError('Utilisateur')
 
-      expect(error.statusCode).toBe(404)
+      expect(error.status).toBe(404)
       expect(error.message).toBe('Utilisateur non trouvé(e)')
       expect(error.name).toBe('NotFoundError')
     })
@@ -100,7 +100,7 @@ describe('errors', () => {
     it('devrait créer une erreur 409 avec le message fourni', () => {
       const error = new ConflictError('Cette email est déjà utilisée')
 
-      expect(error.statusCode).toBe(409)
+      expect(error.status).toBe(409)
       expect(error.message).toBe('Cette email est déjà utilisée')
       expect(error.name).toBe('ConflictError')
     })
@@ -110,7 +110,7 @@ describe('errors', () => {
     it('devrait créer une erreur 422 avec message', () => {
       const error = new ValidationError('Validation échouée')
 
-      expect(error.statusCode).toBe(422)
+      expect(error.status).toBe(422)
       expect(error.message).toBe('Validation échouée')
       expect(error.name).toBe('ValidationError')
       expect(error.errors).toBeUndefined()
@@ -131,7 +131,7 @@ describe('errors', () => {
     it('devrait créer une erreur 500 avec message par défaut', () => {
       const error = new InternalServerError()
 
-      expect(error.statusCode).toBe(500)
+      expect(error.status).toBe(500)
       expect(error.message).toBe('Erreur serveur interne')
       expect(error.name).toBe('InternalServerError')
     })
@@ -163,7 +163,7 @@ describe('errors', () => {
     })
 
     it('devrait retourner false pour les objets simples', () => {
-      expect(isApiError({ statusCode: 400, message: 'test' })).toBe(false)
+      expect(isApiError({ status: 400, message: 'test' })).toBe(false)
     })
 
     it('devrait retourner false pour null/undefined', () => {
@@ -193,7 +193,7 @@ describe('errors', () => {
       const result = toApiError(original)
 
       expect(result).toBeInstanceOf(InternalServerError)
-      expect(result.statusCode).toBe(500)
+      expect(result.status).toBe(500)
       expect(result.message).toBe('Erreur serveur interne')
     })
 
@@ -206,19 +206,19 @@ describe('errors', () => {
     })
 
     it('devrait convertir les objets simples en InternalServerError', () => {
-      const original = { statusCode: 400, message: 'Not an ApiError' }
+      const original = { status: 400, message: 'Not an ApiError' }
 
       const result = toApiError(original)
 
       expect(result).toBeInstanceOf(InternalServerError)
-      expect(result.statusCode).toBe(500)
+      expect(result.status).toBe(500)
     })
 
     it('devrait convertir null en InternalServerError', () => {
       const result = toApiError(null)
 
       expect(result).toBeInstanceOf(InternalServerError)
-      expect(result.statusCode).toBe(500)
+      expect(result.status).toBe(500)
     })
 
     it('devrait convertir undefined en InternalServerError', () => {
@@ -231,7 +231,7 @@ describe('errors', () => {
       const result = toApiError('An error occurred')
 
       expect(result).toBeInstanceOf(InternalServerError)
-      expect(result.statusCode).toBe(500)
+      expect(result.status).toBe(500)
     })
   })
 

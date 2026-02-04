@@ -353,7 +353,7 @@ const createUserAndAdd = async () => {
     console.error('Create user and add volunteer error:', err)
 
     // Gestion des erreurs spécifiques
-    if (err.statusCode === 409) {
+    if (err.statusCode === 409 || err.status === 409) {
       error.value = t('edition.volunteers.email_already_exists_suggest_search')
     } else {
       error.value = err.data?.message || t('edition.volunteers.create_error')

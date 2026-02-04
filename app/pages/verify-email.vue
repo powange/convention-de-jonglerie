@@ -383,7 +383,7 @@ const handleVerification = async () => {
     const error = e as HttpError
     hasError.value = true
 
-    if (error.statusCode === 400) {
+    if (error.statusCode === 400 || error.status === 400) {
       if (error.message?.includes('expired') || error.message?.includes('expiré')) {
         errorMessage.value = t('auth.code_expired')
       } else if (error.message?.includes('incorrect')) {
