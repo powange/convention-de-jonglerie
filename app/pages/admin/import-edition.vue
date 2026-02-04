@@ -409,7 +409,8 @@ const exampleJson = `{
   "convention": {
     "name": "Convention Internationale de Jonglerie",
     "email": "contact@convention-jonglerie.org",
-    "description": "La plus grande convention de jonglerie d'Europe"
+    "description": "La plus grande convention de jonglerie d'Europe",
+    "logo": "https://example.com/logo.png"
   },
   "edition": {
     "name": "CIJ 2025 - Paris",
@@ -425,10 +426,12 @@ const exampleJson = `{
     "postalCode": "75015",
     "latitude": 48.8566,
     "longitude": 2.3522,
+    "imageUrl": "https://example.com/affiche-cij2025.jpg",
     "ticketingUrl": "https://tickets.cij2025.fr",
     "facebookUrl": "https://facebook.com/cij2025",
     "instagramUrl": "https://instagram.com/cij2025",
     "officialWebsiteUrl": "https://www.cij2025.fr",
+    "status": "PUBLISHED",
     "hasFoodTrucks": true,
     "hasKidsZone": true,
     "acceptsPets": false,
@@ -452,7 +455,10 @@ const exampleJson = `{
     "hasCreditCardPayment": true,
     "hasAfjTokenPayment": false,
     "hasATM": true,
-    "hasLongShow": true
+    "hasLongShow": true,
+    "volunteersOpen": false,
+    "volunteersDescription": "Rejoignez notre équipe de bénévoles !",
+    "volunteersExternalUrl": ""
   }
 }`
 

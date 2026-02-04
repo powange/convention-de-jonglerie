@@ -18,7 +18,7 @@ export default wrapApiHandler(
       select: {
         id: true,
         message: true,
-        status: true,
+        statusCode: true,
         stack: true,
         errorType: true,
         method: true,
