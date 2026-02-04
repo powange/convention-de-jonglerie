@@ -155,5 +155,34 @@ export function translateToEnglish(countryName: string): string {
   return countryName
 }
 
+/**
+ * Déduplique une liste de noms de pays en utilisant le code ISO comme clé unique.
+ * Retourne les noms français normalisés, triés alphabétiquement.
+ *
+ * @param countryNames - Liste de noms de pays (potentiellement avec doublons/variantes)
+ * @returns Liste de noms de pays français uniques, triée
+ */
+export function deduplicateCountries(countryNames: string[]): string[] {
+  const uniqueByCode = new Map<string, string>()
+
+  for (const name of countryNames) {
+    if (!name) continue
+
+    const code = findCountryCode(name)
+    if (code) {
+      // Utiliser le code ISO comme clé, stocker le nom français
+      if (!uniqueByCode.has(code)) {
+        const frenchName = countries.getName(code, 'fr') || name
+        uniqueByCode.set(code, frenchName)
+      }
+    } else {
+      // Pays non reconnu : garder le nom original comme clé
+      uniqueByCode.set(name, name)
+    }
+  }
+
+  return Array.from(uniqueByCode.values()).sort((a, b) => a.localeCompare(b, 'fr'))
+}
+
 // Alias pour compatibilité
 export const normalizeCountryName = translateToFrench

@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { deduplicateCountries } from '@@/server/utils/countries'
 
 export default wrapApiHandler(
   async (event) => {
@@ -130,18 +131,17 @@ export default wrapApiHandler(
     }
 
     // Requête DB pour obtenir les pays distincts
-    const countries = await prisma.edition.findMany({
+    const countriesResult = await prisma.edition.findMany({
       where: finalWhere,
       select: {
         country: true,
       },
       distinct: ['country'],
-      orderBy: {
-        country: 'asc',
-      },
     })
 
-    return countries.map((c) => c.country).filter(Boolean)
+    // Dédupliquer les pays par code ISO et retourner les noms français
+    const rawCountries = countriesResult.map((c) => c.country).filter(Boolean) as string[]
+    return deduplicateCountries(rawCountries)
   },
   { operationName: 'GetCountries' }
 )
