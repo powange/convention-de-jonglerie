@@ -222,6 +222,7 @@
                   </UButton>
                 </div>
                 <UButton
+                  v-if="canManageCounter"
                   variant="outline"
                   color="warning"
                   block
@@ -290,6 +291,7 @@
 
         <!-- Modal de confirmation de régénération du token -->
         <ConfirmModal
+          v-if="canManageCounter"
           v-model="showRegenerateModal"
           :title="$t('ticketing.counters.regenerate_token')"
           :description="$t('ticketing.counters.regenerate_token_warning')"
@@ -361,6 +363,12 @@ const counterUrl = computed(() => {
 const canAccess = computed(() => {
   // Vérifier que l'utilisateur est authentifié
   return !!authStore.user?.id
+})
+
+// Vérifier si l'utilisateur peut gérer le compteur (régénérer le token)
+const canManageCounter = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canEditEdition(edition.value, authStore.user.id)
 })
 
 const formatDateTime = (dateString: string) => {
