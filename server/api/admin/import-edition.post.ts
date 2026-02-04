@@ -55,8 +55,8 @@ const importSchema = z.object({
     timezone: z.string().nullable().optional(), // Fuseau horaire IANA (ex: "Europe/Paris")
     country: z.string().min(1),
     postalCode: z.string().min(1),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
+    latitude: z.number().nullable().optional(),
+    longitude: z.number().nullable().optional(),
     ticketingUrl: z.string().url().or(z.literal('')).nullable().optional(),
     facebookUrl: z.string().url().or(z.literal('')).nullable().optional(),
     instagramUrl: z.string().url().or(z.literal('')).nullable().optional(),
