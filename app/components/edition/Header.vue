@@ -26,7 +26,11 @@
                 <div
                   class="flex flex-col sm:flex-row sm:items-center sm:gap-4 mt-2 text-gray-500 text-sm sm:text-base"
                 >
-                  <span>{{ edition.city }}, {{ edition.country }}</span>
+                  <span class="inline-flex items-center gap-1">
+                    {{ edition.city }},
+                    <FlagIcon :code="getCountryCode(edition.country)" size="sm" />
+                    {{ translateCountryName(edition.country) }}
+                  </span>
                   <span class="hidden sm:inline">•</span>
                   <span>{{ formatDateRange(edition.startDate, edition.endDate) }}</span>
                 </div>
@@ -296,10 +300,13 @@ import { useEditionStore } from '~/stores/editions'
 import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import type { Edition } from '~/types'
 import { getCalendarOptions, type CalendarEventData } from '~/utils/calendar'
+import { getCountryCode } from '~/utils/countries'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
+
 const { t } = useI18n()
+const { translateCountryName } = useCountryTranslation()
 
 const { getImageUrl } = useImageUrl()
 

@@ -69,7 +69,9 @@
                 :code="selectedEdition.country"
                 class="ml-0"
               />
-              <span v-if="selectedEdition.country">{{ selectedEdition.country }}</span>
+              <span v-if="selectedEdition.country">{{
+                translateCountryName(selectedEdition.country)
+              }}</span>
             </div>
           </div>
 
@@ -126,6 +128,7 @@ interface EditionLike {
 
 const props = defineProps<{ editions: EditionLike[] }>()
 const { t, locale } = useI18n()
+const { translateCountryName } = useCountryTranslation()
 
 const editionsRef = toRef(props, 'editions')
 

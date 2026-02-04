@@ -136,12 +136,14 @@ describe('/api/editions GET', () => {
     const mockEvent = {}
     await handler(mockEvent as any)
 
-    expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: {
-        country: { in: ['France', 'Belgium'] },
-        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
-      },
-    })
+    // Vérifie que la requête inclut les pays demandés avec leurs variantes (i18n-iso-countries)
+    expect(prismaMock.edition.count).toHaveBeenCalled()
+    const callArgs = prismaMock.edition.count.mock.calls[0][0] as { where: { country: { in: string[] } } }
+    expect(callArgs.where.country.in).toContain('France')
+    expect(callArgs.where.country.in).toContain('Belgium')
+    // Les variantes multilingues sont également incluses (ex: Frankreich, Belgique)
+    expect(callArgs.where.country.in.length).toBeGreaterThan(2)
+    expect(callArgs.where.status).toEqual({ in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] })
   })
 
   it('devrait filtrer par dates', async () => {

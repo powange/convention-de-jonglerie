@@ -99,6 +99,7 @@ interface Props {
 const props = defineProps<Props>()
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
+const { translateCountryName } = useCountryTranslation()
 
 // Références
 const mapContainer = ref<HTMLElement | null>(null)
@@ -157,7 +158,7 @@ const createMarkers = (): MapMarker[] => {
           <h4 class="font-semibold text-gray-900 text-sm">${getEditionDisplayName(edition)}</h4>
           <span class="text-yellow-500 text-sm" title="${t('common.favorite')}">★</span>
         </div>
-        <p class="text-xs text-gray-600 mb-1">${edition.city}, ${edition.country}</p>
+        <p class="text-xs text-gray-600 mb-1">${edition.city}, ${translateCountryName(edition.country)}</p>
   <p class="text-xs text-gray-500 mb-2">${formatDateRangeLocal(edition.startDate, edition.endDate)}</p>
         <a href="/editions/${edition.id}" class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

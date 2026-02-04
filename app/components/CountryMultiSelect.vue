@@ -5,7 +5,7 @@
       :items="data || []"
       multiple
       :placeholder="dynamicPlaceholder"
-      :loading="pending"
+      :loading="status === 'pending'"
       searchable
       :searchable-placeholder="$t('components.country_select.search_country_placeholder')"
       value-attribute="value"
@@ -34,15 +34,16 @@ import { getCountryCode } from '~/utils/countries'
 interface Props {
   modelValue: string[]
   placeholder?: string
+  /** Filtres à appliquer pour filtrer la liste des pays disponibles */
+  filters?: Record<string, unknown>
 }
 
 const { t } = useI18n()
-// define props puis appliquer défaut dynamiquement après (pas de computed inline qui capture $t avant useI18n)
 const props = defineProps<Props>()
+
 const propsWithDefaults = computed(() => ({
   placeholder: t('components.country_multi_select.placeholder'),
   ...props,
-  // si l'utilisateur a fourni une valeur, elle est déjà dans props
 }))
 
 // Utiliser la traduction dynamiquement pour le placeholder
@@ -54,8 +55,33 @@ const emit = defineEmits<{
 
 const selectedCountries = ref<string[]>([])
 
-// Utiliser useFetch qui est plus adapté pour Nuxt
-const { data: rawCountries, pending } = await useFetch<string[]>('/api/countries')
+// Construire les query params à partir des filtres (sauf countries)
+const queryParams = computed(() => {
+  if (!props.filters) return {}
+
+  const params: Record<string, string> = {}
+
+  // Copier tous les filtres sauf countries
+  for (const [key, value] of Object.entries(props.filters)) {
+    if (key === 'countries') continue // Ne pas inclure le filtre pays lui-même
+
+    if (typeof value === 'boolean') {
+      if (value) params[key] = 'true'
+    } else if (typeof value === 'string' && value) {
+      params[key] = value
+    } else if (Array.isArray(value) && value.length > 0) {
+      params[key] = JSON.stringify(value)
+    }
+  }
+
+  return params
+})
+
+// Utiliser useFetch avec les filtres comme dépendances
+const { data: rawCountries, status } = useFetch<string[]>('/api/countries', {
+  query: queryParams,
+  watch: [queryParams], // Rafraîchir quand les filtres changent
+})
 
 // Transformer les pays en objets avec icônes
 const data = computed(() => {

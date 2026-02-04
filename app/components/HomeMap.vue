@@ -113,6 +113,7 @@ const authStore = useAuthStore()
 const favoritesStore = useFavoritesEditionsStore()
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
+const { translateCountryName } = useCountryTranslation()
 
 // Initialiser les favoris si l'utilisateur est authentifié
 if (authStore.isAuthenticated) {
@@ -179,7 +180,7 @@ const createMarkers = (): MapMarker[] => {
           <h4 class="font-semibold text-gray-900">${getEditionDisplayName(edition)}</h4>
           ${isFav ? `<span class="text-yellow-500" title="${t('common.favorite')}">★</span>` : ''}
         </div>
-        <p class="text-sm text-gray-600 mb-1">${edition.city}, ${edition.country}</p>
+        <p class="text-sm text-gray-600 mb-1">${edition.city}, ${translateCountryName(edition.country)}</p>
   <p class="text-xs text-gray-500 mb-3">${formatDateRangeLocal(edition.startDate, edition.endDate)}</p>
         ${edition.description ? `<p class="text-xs text-gray-600 mb-3 line-clamp-2">${edition.description}</p>` : ''}
         <a href="/editions/${edition.id}" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium">

@@ -107,6 +107,7 @@
     "flag-icons": "^7.5.0",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",
+    "i18n-iso-countries": "^7.14.0",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "luxon": "^3.5.0",

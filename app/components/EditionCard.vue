@@ -45,7 +45,7 @@
         <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
         {{ edition.city }},
         <FlagIcon :code="getCountryCode(edition.country)" size="sm" class="mx-1" />
-        {{ edition.country }}
+        {{ translateCountryName(edition.country) }}
       </p>
     </div>
 
@@ -99,6 +99,7 @@ const { getStatusColor, getStatusText } = useEditionStatus()
 const { getTranslatedServices } = useTranslatedConventionServices()
 const { getImageUrl } = useImageUrl()
 const { t } = useI18n()
+const { translateCountryName } = useCountryTranslation()
 // const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
 
 // Computed pour l'URL de l'image à afficher (édition en priorité, sinon convention)

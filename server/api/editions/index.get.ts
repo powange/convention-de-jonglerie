@@ -1,4 +1,5 @@
 import { wrapApiHandler, createPaginatedResponse } from '@@/server/utils/api-helpers'
+import { getCountryVariants } from '@@/server/utils/countries'
 import { editionListSelect } from '@@/server/utils/prisma-select-helpers'
 
 // import type { Edition } from '~/types';
@@ -106,6 +107,7 @@ export default wrapApiHandler(
     }
 
     // Filtre par pays (support multiselect)
+    // Inclut les variantes de chaque pays (ex: "Suisse" inclut aussi "Switzerland")
     if (countries) {
       let countryList: string[] = []
 
@@ -132,12 +134,19 @@ export default wrapApiHandler(
         )
       }
 
-      // Filtrer les valeurs vides et les doublons
-      countryList = [...new Set(countryList.filter(Boolean))]
+      // Filtrer les valeurs vides
+      countryList = countryList.filter(Boolean)
 
-      if (countryList.length > 0) {
+      // Étendre chaque pays avec ses variantes (français/anglais)
+      // Ex: ["Suisse"] → ["Suisse", "Switzerland"]
+      const expandedCountryList = countryList.flatMap((country) => getCountryVariants(country))
+
+      // Supprimer les doublons
+      const uniqueCountries = [...new Set(expandedCountryList)]
+
+      if (uniqueCountries.length > 0) {
         where.country = {
-          in: countryList,
+          in: uniqueCountries,
         }
       }
     }

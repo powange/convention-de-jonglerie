@@ -1,5 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 import { wrapApiHandler } from '@@/server/utils/api-helpers'
+import { getCountryVariants } from '@@/server/utils/countries'
 import { conventionBasicSelect } from '@@/server/utils/prisma-select-helpers'
 import { z } from 'zod'
 
@@ -53,14 +54,17 @@ export default wrapApiHandler(
     const startDate = new Date(validatedData.startDate)
     const endDate = new Date(validatedData.endDate)
 
+    // Obtenir toutes les variantes du pays (ex: "Switzerland" → ["Switzerland", "Suisse"])
+    const countryVariants = getCountryVariants(validatedData.country)
+
     // Rechercher les éditions qui chevauchent la période dans le même pays
     // Un chevauchement existe si :
     // - La date de début existante <= la date de fin nouvelle ET
     // - La date de fin existante >= la date de début nouvelle
-    // Note: MySQL utilise une collation insensible à la casse par défaut
+    // Note: Recherche dans toutes les variantes du pays (français/anglais)
     const overlappingEditions = await prisma.edition.findMany({
       where: {
-        country: validatedData.country,
+        country: { in: countryVariants },
         AND: [
           {
             startDate: {

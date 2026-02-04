@@ -26,6 +26,7 @@
         <CountryMultiSelect
           :model-value="filters.countries"
           :placeholder="$t('forms.placeholders.select_countries')"
+          :filters="filters"
           @update:model-value="updateFilter('countries', $event)"
         />
       </UFormField>
