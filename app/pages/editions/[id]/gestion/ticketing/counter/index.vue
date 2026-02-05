@@ -166,10 +166,6 @@ import { useTicketingCountersList } from '~/composables/useTicketingCounter'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()

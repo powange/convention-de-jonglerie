@@ -434,7 +434,6 @@ import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallBasic, ShowApplication, ShowApplicationStatus } from '~/types'
 
 definePageMeta({
-  layout: 'edition-dashboard',
   middleware: ['authenticated'],
 })
 

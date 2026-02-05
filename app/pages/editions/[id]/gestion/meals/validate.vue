@@ -415,10 +415,6 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDate } from '~/utils/meals'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

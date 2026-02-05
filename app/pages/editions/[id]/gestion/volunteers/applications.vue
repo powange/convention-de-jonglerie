@@ -639,10 +639,6 @@ import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 // Utiliser le composable pour obtenir la configuration des bénévoles
 const { getParticipantTypeConfig } = useParticipantTypes()
 const volunteerConfig = getParticipantTypeConfig('volunteer')

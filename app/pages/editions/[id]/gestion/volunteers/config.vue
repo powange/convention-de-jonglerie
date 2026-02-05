@@ -154,7 +154,6 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 definePageMeta({
-  layout: 'edition-dashboard',
   middleware: ['authenticated'],
 })
 

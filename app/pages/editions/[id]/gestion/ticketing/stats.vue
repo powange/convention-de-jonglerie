@@ -478,10 +478,6 @@ const PurchaseChart = defineAsyncComponent(
   () => import('~/components/ticketing/stats/PurchaseChart.vue')
 )
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 // Utiliser le composable pour obtenir les configurations des types de participants
 const { getParticipantTypeConfig } = useParticipantTypes()
 const ticketConfig = getParticipantTypeConfig('ticket')

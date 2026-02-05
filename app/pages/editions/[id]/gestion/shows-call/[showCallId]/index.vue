@@ -368,7 +368,6 @@ import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCall } from '~/types'
 
 definePageMeta({
-  layout: 'edition-dashboard',
   middleware: ['authenticated'],
 })
 

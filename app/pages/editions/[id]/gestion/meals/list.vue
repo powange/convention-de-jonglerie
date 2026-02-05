@@ -261,10 +261,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

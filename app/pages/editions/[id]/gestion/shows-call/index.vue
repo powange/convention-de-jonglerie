@@ -237,7 +237,6 @@ import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallWithStats } from '~/types'
 
 definePageMeta({
-  layout: 'edition-dashboard',
   middleware: ['authenticated'],
 })
 

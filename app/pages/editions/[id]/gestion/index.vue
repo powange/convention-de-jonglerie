@@ -420,10 +420,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const router = useRouter()

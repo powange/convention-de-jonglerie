@@ -167,10 +167,6 @@ import { useEditionStore } from '~/stores/editions'
 import { fetchOptions } from '~/utils/ticketing/options'
 import { fetchTiers } from '~/utils/ticketing/tiers'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()

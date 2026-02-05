@@ -379,6 +379,11 @@ export default defineNuxtConfig({
       exclude: ['node-cron', '@prisma/client'],
     },
   },
+  // Layouts centralisés par route
+  routeRules: {
+    '/editions/*/gestion/**': { appLayout: 'edition-dashboard' },
+  },
+
   experimental: {
     appManifest: false,
     // Améliorer les performances avec la lazy hydration

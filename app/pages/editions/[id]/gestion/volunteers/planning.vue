@@ -138,10 +138,6 @@ import {
   calculateVolunteersStatsIndividual,
 } from '~/utils/volunteer-stats'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const { t } = useI18n()
 const route = useRoute()
 const editionStore = useEditionStore()

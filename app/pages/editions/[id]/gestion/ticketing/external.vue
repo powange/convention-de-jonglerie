@@ -797,10 +797,6 @@ import { useEditionStore } from '~/stores/editions'
 
 import type { TabsItem } from '@nuxt/ui'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

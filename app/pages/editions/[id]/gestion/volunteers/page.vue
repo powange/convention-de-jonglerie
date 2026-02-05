@@ -118,10 +118,6 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { markdownToHtml } from '~/utils/markdown'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

@@ -1385,10 +1385,6 @@ import {
 } from '~/utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '~/utils/ticketing/tiers'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

@@ -429,10 +429,6 @@ import { summarizeRights } from '~/utils/organizerRights'
 
 import type { TableColumn } from '@nuxt/ui'
 
-definePageMeta({
-  layout: 'edition-dashboard',
-})
-
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

@@ -211,7 +211,6 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'edition-dashboard',
   middleware: ['authenticated'],
 })
 
