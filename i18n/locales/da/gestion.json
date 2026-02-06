@@ -9,6 +9,8 @@
     "delete_edition": "Slet redigering",
     "edit_edition": "Modificer redigering",
     "infos": {
+      "delete_description": "Slet denne udgave og alle dens data permanent",
+      "edit_description": "Rediger datoer, sted og oplysninger om udgaven",
       "map_description": "Definer zonerne på områdekortet",
       "title": "Information"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Tegn en zone",
       "edit_marker": "Rediger vartegn",
       "edit_zone": "Rediger zone",
-      "export_kml": "Eksporter KML",
       "hide_item": "Skjul på kortet",
       "map_public": "Gør kortet offentligt",
       "map_public_error": "Fejl ved opdatering",
@@ -39,6 +40,7 @@
       "marker_save_success": "Vartegnet blev gemt",
       "marker_type": "Type vartegn",
       "no_items": "Ingen zoner eller vartegn defineret",
+      "open_in_maps": "Åbn i navigationsapp",
       "place_marker": "Placer et vartegn",
       "save_success": "Zonen blev gemt",
       "show_item": "Vis på kortet",

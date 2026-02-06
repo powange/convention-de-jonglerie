@@ -32,7 +32,7 @@
         class="grid grid-cols-1 gap-6 lg:grid-cols-3"
       >
         <!-- Carte -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2 relative z-0">
           <UCard>
             <div ref="mapContainerRef" class="h-[500px] w-full rounded-lg" />
           </UCard>
@@ -42,19 +42,9 @@
         <div class="space-y-4">
           <UCard>
             <template #header>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-layers" class="h-5 w-5" />
-                  <h2 class="font-semibold">{{ $t('gestion.map.zones_list') || 'Zones' }}</h2>
-                </div>
-                <UButton
-                  icon="i-lucide-download"
-                  size="xs"
-                  color="neutral"
-                  variant="ghost"
-                  :label="$t('gestion.map.export_kml')"
-                  @click="downloadKml"
-                />
+              <div class="flex items-center gap-2">
+                <UIcon name="i-lucide-layers" class="h-5 w-5" />
+                <h2 class="font-semibold">{{ $t('gestion.map.zones_list') || 'Zones' }}</h2>
               </div>
             </template>
 
@@ -214,16 +204,6 @@ const handleToggleVisibility = (item: {
       hideMarker(item.id)
     }
   }
-}
-
-// Télécharger le fichier KML
-const downloadKml = () => {
-  const link = document.createElement('a')
-  link.href = `/api/editions/${editionId.value}/export.kml`
-  link.download = ''
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 </script>
 

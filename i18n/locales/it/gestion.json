@@ -9,6 +9,8 @@
     "delete_edition": "Cancella modifica",
     "edit_edition": "Modificare l'editing",
     "infos": {
+      "delete_description": "Eliminare definitivamente questa edizione e tutti i suoi dati",
+      "edit_description": "Modificare le date, il luogo e le informazioni dell'edizione",
       "map_description": "Definisci le zone sulla mappa del sito",
       "title": "Informazioni"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Disegna una zona",
       "edit_marker": "Modifica punto di riferimento",
       "edit_zone": "Modifica zona",
-      "export_kml": "Esporta KML",
       "hide_item": "Nascondi sulla mappa",
       "map_public": "Rendi la mappa pubblica",
       "map_public_error": "Errore durante l'aggiornamento",
@@ -39,6 +40,7 @@
       "marker_save_success": "Punto di riferimento salvato con successo",
       "marker_type": "Tipo di punto di riferimento",
       "no_items": "Nessuna zona o punto di riferimento definito",
+      "open_in_maps": "Apri nell'app di navigazione",
       "place_marker": "Posiziona un punto di riferimento",
       "save_success": "Zona salvata con successo",
       "show_item": "Mostra sulla mappa",

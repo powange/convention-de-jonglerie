@@ -334,6 +334,8 @@ const {
 
 // Ajouter les zones à la carte quand elles sont chargées ET que la carte est prête
 // Note: addZones vérifie déjà les doublons via polygons.value.has(zone.id)
+// deep: true nécessaire car [zones, map] fait une comparaison superficielle de .value
+// et push() ne change pas la référence du tableau
 watch(
   [zones, map],
   ([newZones, newMap]) => {
@@ -351,7 +353,7 @@ watch(
       )
     }
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 // Ajouter les markers à la carte quand ils sont chargés ET que la carte est prête
@@ -374,7 +376,7 @@ watch(
       )
     }
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 // Flag pour ne centrer la carte qu'une seule fois
@@ -573,7 +575,6 @@ const handleSaveZone = async (data: {
 }
 
 :deep(.leaflet-tile-pane) {
-  z-index: 200 !important;
   opacity: 1 !important;
   visibility: visible !important;
 }

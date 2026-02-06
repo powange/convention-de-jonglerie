@@ -9,6 +9,8 @@
     "delete_edition": "Radera redigera",
     "edit_edition": "Ändra redigering",
     "infos": {
+      "delete_description": "Ta bort denna upplaga och all dess data permanent",
+      "edit_description": "Redigera datum, plats och information om upplagan",
       "map_description": "Definiera zonerna på områdeskartan",
       "title": "Information"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Rita en zon",
       "edit_marker": "Redigera landmärke",
       "edit_zone": "Redigera zon",
-      "export_kml": "Exportera KML",
       "hide_item": "Dölj på kartan",
       "map_public": "Gör kartan offentlig",
       "map_public_error": "Fel vid uppdatering",
@@ -39,6 +40,7 @@
       "marker_save_success": "Landmärket har sparats",
       "marker_type": "Typ av landmärke",
       "no_items": "Inga zoner eller landmärken definierade",
+      "open_in_maps": "Öppna i navigeringsapp",
       "place_marker": "Placera ett landmärke",
       "save_success": "Zonen har sparats",
       "show_item": "Visa på kartan",

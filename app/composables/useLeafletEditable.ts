@@ -1,4 +1,5 @@
 import type { EditableMap, EditablePolygon, EditTools } from '~/types/leaflet-global'
+import { escapeHtml } from '~/utils/mapMarkers'
 
 import type { Marker, LatLngExpression, TileLayer, LeafletMouseEvent } from 'leaflet'
 import type { Ref } from 'vue'
@@ -34,18 +35,6 @@ export interface UseLeafletEditableOptions {
   onPolygonEdited?: (zoneId: number, coordinates: [number, number][]) => void
   onMarkerCreated?: (latitude: number, longitude: number) => void
   onMarkerMoved?: (markerId: number, latitude: number, longitude: number) => void
-}
-
-// Fonction pour échapper le HTML et prévenir les attaques XSS
-const escapeHtml = (str: string): string => {
-  const htmlEscapes: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  }
-  return str.replace(/[&<>"']/g, (char) => htmlEscapes[char] || char)
 }
 
 // Note: Les icônes SVG et couleurs sont centralisées dans shared/utils/zone-types.ts (auto-importé)

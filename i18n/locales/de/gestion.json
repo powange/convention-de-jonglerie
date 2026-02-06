@@ -9,6 +9,8 @@
     "delete_edition": "Ausgabe löschen",
     "edit_edition": "Bearbeiten der Ausgabe",
     "infos": {
+      "delete_description": "Diese Ausgabe und alle zugehörigen Daten endgültig löschen",
+      "edit_description": "Daten, Ort und Informationen der Ausgabe bearbeiten",
       "map_description": "Zonen auf der Geländekarte definieren",
       "title": "Informationen"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Zone zeichnen",
       "edit_marker": "Orientierungspunkt bearbeiten",
       "edit_zone": "Zone bearbeiten",
-      "export_kml": "KML exportieren",
       "hide_item": "Auf der Karte ausblenden",
       "map_public": "Karte öffentlich machen",
       "map_public_error": "Fehler beim Aktualisieren",
@@ -39,6 +40,7 @@
       "marker_save_success": "Orientierungspunkt erfolgreich gespeichert",
       "marker_type": "Art des Orientierungspunkts",
       "no_items": "Keine Zonen oder Orientierungspunkte definiert",
+      "open_in_maps": "In der Navigations-App öffnen",
       "place_marker": "Orientierungspunkt platzieren",
       "save_success": "Zone erfolgreich gespeichert",
       "show_item": "Auf der Karte anzeigen",

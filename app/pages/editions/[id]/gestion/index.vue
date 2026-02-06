@@ -52,32 +52,6 @@
           </div>
         </UCard>
 
-        <!-- Actions de gestion -->
-        <UCard v-if="hasManagementActions">
-          <div class="space-y-4">
-            <h2 class="text-lg font-semibold">{{ $t('common.actions') }}</h2>
-            <div class="flex flex-wrap gap-2">
-              <UButton
-                v-if="canEdit"
-                icon="i-heroicons-pencil"
-                color="warning"
-                :to="`/editions/${edition.id}/edit`"
-              >
-                {{ $t('gestion.edit_edition') }}
-              </UButton>
-              <UButton
-                v-if="canDelete"
-                icon="i-heroicons-trash"
-                color="error"
-                variant="soft"
-                @click="deleteEdition(edition.id)"
-              >
-                {{ $t('gestion.delete_edition') }}
-              </UButton>
-            </div>
-          </div>
-        </UCard>
-
         <!-- Informations -->
         <UCard v-if="canEdit">
           <div class="space-y-4">
@@ -87,6 +61,15 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Modifier l'édition -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/edit`"
+                icon="i-heroicons-pencil"
+                :title="$t('gestion.edit_edition')"
+                :description="$t('gestion.infos.edit_description')"
+                color="warning"
+              />
+
               <!-- Carte du site -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/map`"
@@ -95,9 +78,35 @@
                 :description="$t('gestion.infos.map_description')"
                 color="blue"
               />
+
+              <!-- Supprimer l'édition -->
+              <ManagementNavigationCard
+                v-if="canDelete"
+                icon="i-heroicons-trash"
+                :title="$t('gestion.delete_edition')"
+                :description="$t('gestion.infos.delete_description')"
+                color="error"
+                @click="showDeleteConfirm = true"
+              />
             </div>
           </div>
         </UCard>
+
+        <!-- Modal de confirmation de suppression -->
+        <UiConfirmModal
+          v-model="showDeleteConfirm"
+          :title="$t('gestion.delete_edition')"
+          :description="$t('gestion.confirm_delete_edition')"
+          :confirm-label="$t('common.delete')"
+          confirm-color="error"
+          icon-name="i-heroicons-trash"
+          icon-color="text-red-500"
+          :loading="deletingEdition"
+          require-name-confirmation
+          :expected-name="editionDisplayName"
+          @confirm="confirmDeleteEdition"
+          @cancel="showDeleteConfirm = false"
+        />
 
         <!-- Organisateurs -->
         <UCard v-if="canManageOrganizers">
@@ -440,6 +449,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { getEditionDisplayName } from '~/utils/editionName'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -450,6 +460,9 @@ const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+const editionDisplayName = computed(() =>
+  edition.value ? getEditionDisplayName(edition.value) : ''
+)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -539,11 +552,6 @@ const canAccessMealValidation = ref(false)
 // État pour vérifier si l'utilisateur est team leader
 const isTeamLeaderValue = ref(false)
 
-// Vérifier s'il y a des actions de gestion disponibles
-const hasManagementActions = computed(() => {
-  return canEdit.value || canDelete.value
-})
-
 // Gestion du statut de l'édition
 const localStatus = ref<'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'>(
   edition.value?.status || 'OFFLINE'
@@ -574,23 +582,31 @@ const hasStatusChanged = computed(() => {
 // Options de statut depuis le composable partagé
 const { statusOptions } = useEditionStatus()
 
-const deleteEdition = async (id: number) => {
-  if (confirm(t('gestion.confirm_delete_edition'))) {
-    try {
-      await editionStore.deleteEdition(id)
-      toast.add({
-        title: t('messages.edition_deleted'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-      router.push('/')
-    } catch (e: any) {
-      toast.add({
-        title: e?.message || t('errors.edition_deletion_failed'),
-        icon: 'i-heroicons-x-circle',
-        color: 'error',
-      })
-    }
+// Suppression d'édition avec modal de confirmation
+const showDeleteConfirm = ref(false)
+const deletingEdition = ref(false)
+
+const confirmDeleteEdition = async () => {
+  if (!edition.value) return
+
+  deletingEdition.value = true
+  try {
+    await editionStore.deleteEdition(edition.value.id)
+    showDeleteConfirm.value = false
+    toast.add({
+      title: t('messages.edition_deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+    router.push('/')
+  } catch (e: any) {
+    toast.add({
+      title: e?.message || t('errors.edition_deletion_failed'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    deletingEdition.value = false
   }
 }
 

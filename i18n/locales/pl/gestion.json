@@ -9,6 +9,8 @@
     "delete_edition": "Usuń edycję",
     "edit_edition": "Modyfikacja edycji",
     "infos": {
+      "delete_description": "Trwale usuń tę edycję i wszystkie jej dane",
+      "edit_description": "Zmień daty, miejsce i informacje o edycji",
       "map_description": "Zdefiniuj strefy na mapie terenu",
       "title": "Informacje"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Narysuj strefę",
       "edit_marker": "Edytuj punkt orientacyjny",
       "edit_zone": "Edytuj strefę",
-      "export_kml": "Eksportuj KML",
       "hide_item": "Ukryj na mapie",
       "map_public": "Ustaw mapę jako publiczną",
       "map_public_error": "Błąd podczas aktualizacji",
@@ -39,6 +40,7 @@
       "marker_save_success": "Punkt orientacyjny zapisany pomyślnie",
       "marker_type": "Typ punktu orientacyjnego",
       "no_items": "Brak zdefiniowanych stref lub punktów orientacyjnych",
+      "open_in_maps": "Otwórz w aplikacji nawigacyjnej",
       "place_marker": "Umieść punkt orientacyjny",
       "save_success": "Strefa zapisana pomyślnie",
       "show_item": "Pokaż na mapie",

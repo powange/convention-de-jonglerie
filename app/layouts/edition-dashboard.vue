@@ -213,6 +213,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-lucide-info',
       children: [
         {
+          label: t('gestion.edit_edition'),
+          icon: 'i-heroicons-pencil',
+          to: `/editions/${editionId.value}/edit`,
+        },
+        {
           label: t('gestion.map.title'),
           icon: 'i-lucide-map',
           to: `/editions/${editionId.value}/gestion/map`,

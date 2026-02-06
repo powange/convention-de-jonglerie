@@ -9,6 +9,8 @@
     "delete_edition": "Smazat upravit",
     "edit_edition": "Úprava úprav",
     "infos": {
+      "delete_description": "Trvale smazat tuto edici a všechna její data",
+      "edit_description": "Upravit data, místo a informace o edici",
       "map_description": "Definovat zóny na mapě areálu",
       "title": "Informace"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Nakreslit zónu",
       "edit_marker": "Upravit orientační bod",
       "edit_zone": "Upravit zónu",
-      "export_kml": "Exportovat KML",
       "hide_item": "Skrýt na mapě",
       "map_public": "Zveřejnit mapu",
       "map_public_error": "Chyba při aktualizaci",
@@ -39,6 +40,7 @@
       "marker_save_success": "Orientační bod byl úspěšně uložen",
       "marker_type": "Typ orientačního bodu",
       "no_items": "Žádné zóny ani orientační body nejsou definovány",
+      "open_in_maps": "Otevřít v navigační aplikaci",
       "place_marker": "Umístit orientační bod",
       "save_success": "Zóna byla úspěšně uložena",
       "show_item": "Zobrazit na mapě",

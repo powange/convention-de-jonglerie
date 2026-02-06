@@ -9,6 +9,8 @@
     "delete_edition": "Delete edit",
     "edit_edition": "Modify editing",
     "infos": {
+      "delete_description": "Permanently delete this edition and all its data",
+      "edit_description": "Edit the dates, location and information of the edition",
       "map_description": "Define zones on the site map",
       "title": "Information"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Draw a zone",
       "edit_marker": "Edit landmark",
       "edit_zone": "Edit zone",
-      "export_kml": "Export KML",
       "hide_item": "Hide on map",
       "map_public": "Make map public",
       "map_public_error": "Error updating",
@@ -39,6 +40,7 @@
       "marker_save_success": "Landmark saved successfully",
       "marker_type": "Landmark type",
       "no_items": "No zones or landmarks defined",
+      "open_in_maps": "Open in navigation app",
       "place_marker": "Place a landmark",
       "save_success": "Zone saved successfully",
       "show_item": "Show on map",

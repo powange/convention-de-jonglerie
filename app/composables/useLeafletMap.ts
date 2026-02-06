@@ -36,19 +36,19 @@ export const useLeafletMap = (
     }
 
     if (start.getTime() === end.getTime()) {
-      return start.toLocaleDateString('fr-FR', options)
+      return start.toLocaleDateString('fr', options)
     }
 
     if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-      return `${start.getDate()} - ${end.toLocaleDateString('fr-FR', options)}`
+      return `${start.getDate()} - ${end.toLocaleDateString('fr', options)}`
     }
 
     if (start.getFullYear() === end.getFullYear()) {
       const startOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' }
-      return `${start.toLocaleDateString('fr-FR', startOptions)} - ${end.toLocaleDateString('fr-FR', options)}`
+      return `${start.toLocaleDateString('fr', startOptions)} - ${end.toLocaleDateString('fr', options)}`
     }
 
-    return `${start.toLocaleDateString('fr-FR', options)} - ${end.toLocaleDateString('fr-FR', options)}`
+    return `${start.toLocaleDateString('fr', options)} - ${end.toLocaleDateString('fr', options)}`
   }
 
   const loadLeaflet = async () => {

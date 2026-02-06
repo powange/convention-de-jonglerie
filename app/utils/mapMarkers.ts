@@ -1,5 +1,17 @@
 // Utilitaires pour créer des marqueurs de carte personnalisés
 
+// Échappe les caractères HTML pour prévenir les injections XSS dans les popups
+export function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }
+  return text.replace(/[&<>"']/g, (char) => map[char])
+}
+
 export interface MarkerOptions {
   isUpcoming: boolean
   isOngoing: boolean
@@ -35,9 +47,8 @@ export function createCustomMarkerIcon(L: unknown, options: MarkerOptions): unkn
     </svg>
   `
 
-  // Encoder le SVG en base64
-  const svgBlob = new Blob([svgIcon], { type: 'image/svg+xml' })
-  const svgUrl = URL.createObjectURL(svgBlob)
+  // Encoder le SVG en data URI (évite les fuites mémoire de URL.createObjectURL)
+  const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgIcon)}`
 
   return (L as any).icon({
     iconUrl: svgUrl,

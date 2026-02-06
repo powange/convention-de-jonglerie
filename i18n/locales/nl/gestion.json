@@ -9,6 +9,8 @@
     "delete_edition": "Bewerken verwijderen",
     "edit_edition": "Bewerken aanpassen",
     "infos": {
+      "delete_description": "Deze editie en alle bijbehorende gegevens definitief verwijderen",
+      "edit_description": "De datums, locatie en informatie van de editie bewerken",
       "map_description": "Zones op de plattegrond definiëren",
       "title": "Informatie"
     },
@@ -26,7 +28,6 @@
       "draw_polygon": "Een zone tekenen",
       "edit_marker": "Oriëntatiepunt bewerken",
       "edit_zone": "Zone bewerken",
-      "export_kml": "KML exporteren",
       "hide_item": "Verbergen op de kaart",
       "map_public": "Kaart openbaar maken",
       "map_public_error": "Fout bij bijwerken",
@@ -39,6 +40,7 @@
       "marker_save_success": "Oriëntatiepunt succesvol opgeslagen",
       "marker_type": "Type oriëntatiepunt",
       "no_items": "Geen zones of oriëntatiepunten gedefinieerd",
+      "open_in_maps": "Openen in navigatie-app",
       "place_marker": "Een oriëntatiepunt plaatsen",
       "save_success": "Zone succesvol opgeslagen",
       "show_item": "Tonen op de kaart",

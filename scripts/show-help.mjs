@@ -104,8 +104,29 @@ const sections = [
         desc: 'Résumé uniquement',
       },
       {
+        name: 'check-translations -- -l',
+        desc: 'Résultats pour une seule langue',
+        requiresArg: '<locale>',
+      },
+      {
         name: 'check-translations -- -f --fill-mode todo',
-        desc: 'Marque les clés à traduire avec [TODO]',
+        desc: 'Marque les clés manquantes avec [TODO]',
+      },
+      {
+        name: 'check-translations -- -f',
+        desc: 'Copie les clés manquantes depuis la référence',
+      },
+      {
+        name: 'check-translations -- --refill --fill-mode todo',
+        desc: 'Remarque aussi les valeurs identiques à la ref comme [TODO]',
+      },
+      {
+        name: 'check-translations -- -p',
+        desc: 'Supprime les clés en trop (prune)',
+      },
+      {
+        name: 'check-translations -- --fix-structure',
+        desc: 'Réorganise les clés mal placées vers les bons fichiers',
       },
       {
         name: 'check-i18n-vars',

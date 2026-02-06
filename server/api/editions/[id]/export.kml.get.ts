@@ -195,7 +195,7 @@ export default wrapApiHandler(
     const filename = `carte-${editionName.toLowerCase().replace(/[^a-z0-9]/gi, '-')}.kml`
 
     setHeader(event, 'Content-Type', 'application/vnd.google-earth.kml+xml')
-    setHeader(event, 'Content-Disposition', `attachment; filename="${filename}"`)
+    setHeader(event, 'Content-Disposition', `inline; filename="${filename}"`)
 
     return kml
   },

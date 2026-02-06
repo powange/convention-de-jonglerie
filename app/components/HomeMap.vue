@@ -69,7 +69,7 @@
       </div>
 
       <!-- Conteneur de la carte -->
-      <div class="relative">
+      <div class="relative z-0">
         <div
           ref="mapContainer"
           class="h-[600px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
@@ -97,12 +97,11 @@
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '~/composables/useLeafletMap'
+import type { PopupBuilderContext } from '~/composables/useMapMarkers'
 import { useAuthStore } from '~/stores/auth'
 import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import type { Edition } from '~/types'
-import { getEditionDisplayName } from '~/utils/editionName'
-import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers'
+import { escapeHtml } from '~/utils/mapMarkers'
 
 interface Props {
   editions: Edition[]
@@ -111,29 +110,10 @@ interface Props {
 const props = defineProps<Props>()
 const authStore = useAuthStore()
 const favoritesStore = useFavoritesEditionsStore()
-const { t } = useI18n()
-const { getImageUrl } = useImageUrl()
-const { translateCountryName } = useCountryTranslation()
 
 // Initialiser les favoris si l'utilisateur est authentifié
 if (authStore.isAuthenticated) {
   favoritesStore.ensureInitialized()
-}
-
-// Utilitaire local pour éviter une dépendance circulaire avec mapUtils
-const formatDateRangeLocal = (startDate: string, endDate: string) => {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
-  if (start.getTime() === end.getTime()) return start.toLocaleDateString('fr-FR', options)
-  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-    return `${start.getDate()} - ${end.toLocaleDateString('fr-FR', options)}`
-  }
-  if (start.getFullYear() === end.getFullYear()) {
-    const startOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' }
-    return `${start.toLocaleDateString('fr-FR', startOptions)} - ${end.toLocaleDateString('fr-FR', options)}`
-  }
-  return `${start.toLocaleDateString('fr-FR', options)} - ${end.toLocaleDateString('fr-FR', options)}`
 }
 
 // Références
@@ -150,120 +130,32 @@ const isFavorited = (edition: Edition): boolean => {
   return favoritesStore.isFavorite(edition.id)
 }
 
-// Fonction helper pour obtenir l'URL complète de l'image d'édition
-const getEditionImageUrl = (edition: Edition): string => {
-  return getImageUrl(edition.imageUrl, 'edition', edition.id) || ''
-}
+// Popup builder HomeMap : grand format, avec description
+const buildPopup = (ctx: PopupBuilderContext, isFav: boolean): string => `
+  <div class="p-3 min-w-[250px]">
+    ${ctx.imageUrl ? `<img src="${escapeHtml(ctx.imageUrl)}" alt="${ctx.name}" class="w-full h-32 object-cover rounded mb-3">` : ''}
+    <div class="flex items-start justify-between gap-2 mb-2">
+      <h4 class="font-semibold text-gray-900">${ctx.name}</h4>
+      ${isFav ? `<span class="text-yellow-500" title="${escapeHtml(ctx.t('common.favorite'))}">★</span>` : ''}
+    </div>
+    <p class="text-sm text-gray-600 mb-1">${ctx.city}, ${ctx.country}</p>
+    <p class="text-xs text-gray-500 mb-3">${ctx.dateRange}</p>
+    ${ctx.description ? `<p class="text-xs text-gray-600 mb-3 line-clamp-2">${ctx.description}</p>` : ''}
+    <a href="${ctx.detailUrl}" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+      ${ctx.t('common.view_details')}
+    </a>
+  </div>
+`
 
-// Fonction pour créer les marqueurs (appelée quand Leaflet est disponible)
-const createMarkers = (): MapMarker[] => {
-  if (!import.meta.client || !(window as any).L) return []
-
-  return editionsWithCoordinates.value.map((edition) => {
-    const isFav = isFavorited(edition)
-    const status = getEditionStatus(edition.startDate, edition.endDate)
-    const Lany = (window as any).L as any
-
-    // Créer l'icône personnalisée
-    const icon = createCustomMarkerIcon(Lany, {
-      isUpcoming: status.isUpcoming,
-      isOngoing: status.isOngoing,
-      isFavorite: isFav,
-    })
-
-    // Créer le contenu du popup
-    const imageUrl = getEditionImageUrl(edition)
-    const popupContent = `
-      <div class="p-3 min-w-[250px]">
-        ${imageUrl ? `<img src="${imageUrl}" alt="${getEditionDisplayName(edition)}" class="w-full h-32 object-cover rounded mb-3">` : ''}
-        <div class="flex items-start justify-between gap-2 mb-2">
-          <h4 class="font-semibold text-gray-900">${getEditionDisplayName(edition)}</h4>
-          ${isFav ? `<span class="text-yellow-500" title="${t('common.favorite')}">★</span>` : ''}
-        </div>
-        <p class="text-sm text-gray-600 mb-1">${edition.city}, ${translateCountryName(edition.country)}</p>
-  <p class="text-xs text-gray-500 mb-3">${formatDateRangeLocal(edition.startDate, edition.endDate)}</p>
-        ${edition.description ? `<p class="text-xs text-gray-600 mb-3 line-clamp-2">${edition.description}</p>` : ''}
-        <a href="/editions/${edition.id}" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-          ${t('common.view_details')}
-        </a>
-      </div>
-    `
-
-    return {
-      id: edition.id,
-      position: [edition.latitude!, edition.longitude!] as [number, number],
-      popupContent,
-      icon,
-    }
-  })
-}
-
-// Utiliser le composable uniquement côté client (sans marqueurs initiaux)
-const mapUtils = import.meta.client
-  ? useLeafletMap(mapContainer, {
-      center: [46.603354, 1.888334],
-      zoom: 6,
-      markers: [], // Pas de marqueurs initiaux
-    })
-  : {
-      isLoading: ref(false),
-      formatDateRange: (_start: string, _end: string) => '',
-      // no-op stubs to align types during SSR
-      addMarkers: (_m: MapMarker[]) => {},
-      clearMarkers: () => {},
-      updateMarkers: (_m: MapMarker[]) => {},
-      fitBounds: (_b: any, _o?: any) => {},
-      setView: (_c: any, _z?: number) => {},
-    }
-
-const { isLoading } = mapUtils
-
-// Fonction pour vérifier et ajouter les marqueurs
-const tryAddMarkers = () => {
-  if ((window as any).L && editionsWithCoordinates.value.length > 0) {
-    const markers = createMarkers()
-    if (markers.length > 0 && mapUtils.updateMarkers) {
-      mapUtils.updateMarkers(markers)
-
-      // Ajuster la vue pour montrer tous les marqueurs
-      if (mapUtils.fitBounds) {
-        const Lany = (window as any).L as any
-        const bounds = markers.map((m) => m.position)
-        const leafletBounds = Lany.latLngBounds(bounds)
-        mapUtils.fitBounds(leafletBounds.pad(0.1))
-      }
-      return true
-    }
-  }
-  return false
-}
-
-// Polling pour détecter quand Leaflet est disponible
-if (import.meta.client) {
-  const checkLeafletInterval = setInterval(() => {
-    if ((window as any).L) {
-      if (tryAddMarkers()) {
-        clearInterval(checkLeafletInterval)
-      }
-    }
-  }, 100) // Vérifier toutes les 100ms
-
-  // Nettoyer l'interval après 10 secondes pour éviter les fuites mémoire
-  setTimeout(() => {
-    clearInterval(checkLeafletInterval)
-  }, 10000)
-
-  // Watcher pour les changements d'éditions (filtres, etc.)
-  watch(editionsWithCoordinates, () => {
-    // Seulement si Leaflet est disponible
-    if ((window as any).L) {
-      tryAddMarkers()
-    }
-  })
-}
+const { isLoading } = useMapMarkers({
+  mapContainer,
+  editions: editionsWithCoordinates,
+  popupBuilder: buildPopup,
+  isFavorite: isFavorited,
+})
 </script>
 
 <style scoped>
