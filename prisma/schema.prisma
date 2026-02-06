@@ -147,6 +147,7 @@ model Edition {
   ticketingAllowAnonymousOrders     Boolean                          @default(false)
   workshopsEnabled                  Boolean                          @default(false)
   workshopLocationsFreeInput        Boolean                          @default(false)
+  mapPublic                         Boolean                          @default(false)
   carpoolOffers                     CarpoolOffer[]
   carpoolRequests                   CarpoolRequest[]
   convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
@@ -179,6 +180,8 @@ model Edition {
   editionOrganizers                 EditionOrganizer[]
   conversations                     Conversation[]
   showCalls                         EditionShowCall[]
+  zones                             EditionZone[]
+  markers                           EditionMarker[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -618,6 +621,56 @@ enum EditionStatus {
   PUBLISHED // Publié - en ligne et visible
   OFFLINE   // Hors ligne - complet mais désactivé/caché
   CANCELLED // Annulé - convention annulée
+}
+
+enum EditionZoneType {
+  CAMPING
+  PARKING
+  SHOWS
+  WORKSHOPS
+  FOOD
+  MARKET
+  ENTRANCE
+  TOILETS
+  INFO
+  OTHER
+}
+
+// ========== ZONES DE CARTE ÉDITION ==========
+
+model EditionZone {
+  id          Int             @id @default(autoincrement())
+  edition     Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   Int
+  name        String          @db.VarChar(100)
+  description String?         @db.Text
+  color       String          @db.VarChar(7) // Format #RRGGBB
+  coordinates Json            // GeoJSON polygon coordinates
+  zoneType    EditionZoneType @default(OTHER)
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([editionId])
+}
+
+// ========== POINTS DE REPÈRE CARTE ÉDITION ==========
+
+model EditionMarker {
+  id          Int             @id @default(autoincrement())
+  edition     Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   Int
+  name        String          @db.VarChar(100)
+  description String?         @db.Text
+  latitude    Float           // Coordonnée latitude
+  longitude   Float           // Coordonnée longitude
+  markerType  EditionZoneType @default(OTHER)
+  color       String?         @db.VarChar(7) // Couleur personnalisée (format #RRGGBB), null = couleur du type
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([editionId])
 }
 
 // ========== LOGS D'ERREURS ==========

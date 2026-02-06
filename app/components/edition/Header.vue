@@ -133,6 +133,21 @@
         </NuxtLink>
 
         <NuxtLink
+          v-if="mapTabVisible"
+          :to="`/editions/${edition.id}/map`"
+          :class="[
+            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'map'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          :title="t('gestion.map.title')"
+        >
+          <UIcon name="i-lucide-map" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
+          <span class="hidden sm:inline">{{ t('gestion.map.title') }}</span>
+        </NuxtLink>
+
+        <NuxtLink
           :to="`/editions/${edition.id}/commentaires`"
           :class="[
             'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
@@ -320,6 +335,7 @@ interface Props {
     | 'volunteers'
     | 'workshops'
     | 'shows-call'
+    | 'map'
 }
 
 const props = defineProps<Props>()
@@ -400,6 +416,12 @@ const showsCallTabVisible = computed<boolean>(() => {
   if (!hasShowCalls.value) return false
   if (!authStore.isAuthenticated) return false
   return authStore.isArtist
+})
+
+// Visibilité onglet carte: visible si mapPublic est activé et l'édition a des coordonnées définies
+const mapTabVisible = computed<boolean>(() => {
+  if (!props.edition) return false
+  return !!(props.edition.mapPublic && props.edition.latitude && props.edition.longitude)
 })
 
 // Gestion des favoris - Initialisation automatique si utilisateur connecté
@@ -528,6 +550,7 @@ const getPageTitle = (page: string) => {
     details: t('edition.about_this_edition'),
     commentaires: t('edition.posts'),
     carpool: t('edition.carpool'),
+    map: t('gestion.map.title'),
     'lost-found': t('edition.lost_found'),
     volunteers: t('edition.volunteers.title'),
     workshops: 'Workshops',

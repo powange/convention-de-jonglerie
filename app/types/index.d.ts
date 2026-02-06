@@ -76,6 +76,7 @@ export interface Edition {
   hasAccessibility: boolean
   hasWorkshops: boolean
   workshopsEnabled?: boolean
+  mapPublic?: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean

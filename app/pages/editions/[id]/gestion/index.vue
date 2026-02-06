@@ -78,6 +78,27 @@
           </div>
         </UCard>
 
+        <!-- Informations -->
+        <UCard v-if="canEdit">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-info" class="text-blue-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.infos.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Carte du site -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/map`"
+                icon="i-lucide-map"
+                :title="$t('gestion.map.title')"
+                :description="$t('gestion.infos.map_description')"
+                color="blue"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Organisateurs -->
         <UCard v-if="canManageOrganizers">
           <div class="space-y-4">

@@ -59,6 +59,7 @@ services:
       - ./app:/app/app:cached
       - ./i18n:/app/i18n:cached
       - ./server:/app/server:cached
+      - ./shared:/app/shared:cached
       - ./test:/app/test:cached
       - ./scripts:/app/scripts:cached
       - ./prisma:/app/prisma:cached

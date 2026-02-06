@@ -536,3 +536,52 @@ export type EditionPostWithAuthor = Prisma.EditionPostGetPayload<{
 export type EditionPostCommentWithAuthor = Prisma.EditionPostCommentGetPayload<{
   include: typeof editionPostCommentInclude
 }>
+
+// ============================================================================
+// SÉLECTIONS ZONES DE CARTE
+// ============================================================================
+
+/**
+ * Sélection complète pour une zone de carte d'édition
+ * Utilisée pour l'affichage des zones sur la carte
+ */
+export const editionZoneSelect = {
+  id: true,
+  name: true,
+  description: true,
+  color: true,
+  coordinates: true,
+  zoneType: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.EditionZoneSelect
+
+export type EditionZone = Prisma.EditionZoneGetPayload<{
+  select: typeof editionZoneSelect
+}>
+
+// ============================================================================
+// SÉLECTIONS POINTS DE REPÈRE
+// ============================================================================
+
+/**
+ * Sélection complète pour un point de repère d'édition
+ * Utilisée pour l'affichage des marqueurs sur la carte
+ */
+export const editionMarkerSelect = {
+  id: true,
+  name: true,
+  description: true,
+  latitude: true,
+  longitude: true,
+  markerType: true,
+  color: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.EditionMarkerSelect
+
+export type EditionMarker = Prisma.EditionMarkerGetPayload<{
+  select: typeof editionMarkerSelect
+}>

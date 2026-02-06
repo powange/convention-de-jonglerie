@@ -14,6 +14,7 @@ const createModelMock = () => ({
   count: vi.fn(),
   groupBy: vi.fn(),
   upsert: vi.fn(),
+  aggregate: vi.fn(),
 })
 
 export const prismaMock = {
@@ -71,6 +72,10 @@ export const prismaMock = {
   // Modèles appel à spectacles
   editionShowCall: createModelMock(),
   showApplication: createModelMock(),
+
+  // Modèles carte (zones et marqueurs)
+  editionZone: createModelMock(),
+  editionMarker: createModelMock(),
 
   // Méthodes Prisma
   $connect: vi.fn(),

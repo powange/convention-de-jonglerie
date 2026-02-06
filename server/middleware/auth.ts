@@ -127,6 +127,10 @@ export default defineEventHandler(async (event) => {
   const isPublicShowCallDetail =
     path.match(/^\/api\/editions\/\d+\/shows-call\/\d+\/public$/) && requestMethod === 'GET'
 
+  // Public GET routes pour les zones et marqueurs de la carte
+  const isPublicZones = path.match(/^\/api\/editions\/\d+\/zones$/) && requestMethod === 'GET'
+  const isPublicMarkers = path.match(/^\/api\/editions\/\d+\/markers$/) && requestMethod === 'GET'
+
   if (
     isPublicCarpoolOffers ||
     isPublicCarpoolRequests ||
@@ -137,7 +141,9 @@ export default defineEventHandler(async (event) => {
     isPublicVolunteersSettings ||
     isPublicTiers ||
     isPublicShowCalls ||
-    isPublicShowCallDetail
+    isPublicShowCallDetail ||
+    isPublicZones ||
+    isPublicMarkers
   ) {
     // Ces routes sont publiques, mais on hydrate tout de même la session si présente
     // pour permettre un rendu conditionnel côté API (ex: téléphone visible si réservation ACCEPTED)

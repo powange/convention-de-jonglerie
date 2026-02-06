@@ -206,6 +206,23 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   // Deuxième section : Modules de gestion
   const managementSection: NavigationMenuItem[] = []
 
+  // Informations
+  if (canEdit.value) {
+    managementSection.push({
+      label: t('gestion.infos.title'),
+      icon: 'i-lucide-info',
+      children: [
+        {
+          label: t('gestion.map.title'),
+          icon: 'i-lucide-map',
+          to: `/editions/${editionId.value}/gestion/map`,
+        },
+      ],
+      value: 'infos',
+      defaultOpen: isAccordionOpen('map'),
+    })
+  }
+
   // Organisateurs
   if (canManageOrganizers.value) {
     managementSection.push({

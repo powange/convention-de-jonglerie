@@ -93,6 +93,11 @@ export default defineConfig({
                 'test/__mocks__/app-manifest.ts'
               ),
             },
+            // Alias pour #shared (constants partagées entre app et server)
+            {
+              find: /^#shared\/(.*)$/,
+              replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), 'shared') + '/$1',
+            },
           ],
         },
         test: {
