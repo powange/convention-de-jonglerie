@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Administratie",
     "breadcrumb": "Kruimelpad",
+    "dark_mode": "Donkere modus",
     "disable_admin_mode": "Beheerdersmodus uitschakelen",
     "discover_editions": "Ontdek edities",
     "enable_admin_mode": "Beheerdersmodus inschakelen",
+    "language": "Taal",
+    "light_mode": "Lichte modus",
     "loading_favorites": "Je favorieten laden...",
     "login": "Inloggen",
     "logout": "Uitloggen",

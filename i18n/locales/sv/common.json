@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Brödsmulespår",
+    "dark_mode": "Mörkt läge",
     "disable_admin_mode": "Avaktivera adminläge",
     "discover_editions": "Upptäck utgåvor",
     "enable_admin_mode": "Aktivera adminläge",
+    "language": "Språk",
+    "light_mode": "Ljust läge",
     "loading_favorites": "Ladda dina favoriter...",
     "login": "Anslutning",
     "logout": "Frånkoppling",

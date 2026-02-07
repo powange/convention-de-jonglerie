@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Verwaltung",
     "breadcrumb": "Brotkrümelnavigation",
+    "dark_mode": "Dunkelmodus",
     "disable_admin_mode": "Admin-Modus deaktivieren",
     "discover_editions": "Auflagen entdecken",
     "enable_admin_mode": "Admin-Modus aktivieren",
+    "language": "Sprache",
+    "light_mode": "Hellmodus",
     "loading_favorites": "Lade deine Favoriten...",
     "login": "Anmeldung",
     "logout": "Abmeldung",

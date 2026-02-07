@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Administração",
     "breadcrumb": "Breadcrumb",
+    "dark_mode": "Modo escuro",
     "disable_admin_mode": "Desativar modo admin",
     "discover_editions": "Descobrir edições",
     "enable_admin_mode": "Ativar modo admin",
+    "language": "Idioma",
+    "light_mode": "Modo claro",
     "loading_favorites": "A carregar os seus favoritos...",
     "login": "Iniciar Sessão",
     "logout": "Terminar Sessão",

@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Администрирование",
     "breadcrumb": "Хлебные крошки",
+    "dark_mode": "Тёмный режим",
     "disable_admin_mode": "Отключить режим администратора",
     "discover_editions": "Откройте издания",
     "enable_admin_mode": "Включить режим администратора",
+    "language": "Язык",
+    "light_mode": "Светлый режим",
     "loading_favorites": "Загрузка ваших избранных...",
     "login": "Войти",
     "logout": "Выйти",

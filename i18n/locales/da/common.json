@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Brødkrumme",
+    "dark_mode": "Mørk tilstand",
     "disable_admin_mode": "Deaktiver admin-tilstand",
     "discover_editions": "Opdag udgaver",
     "enable_admin_mode": "Aktiver admin-tilstand",
+    "language": "Sprog",
+    "light_mode": "Lys tilstand",
     "loading_favorites": "Indlæser dine favoritter...",
     "login": "Log ind",
     "logout": "Log ud",

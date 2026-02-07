@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Administracja",
     "breadcrumb": "Okruszki nawigacyjne",
+    "dark_mode": "Tryb ciemny",
     "disable_admin_mode": "Wyłącz tryb administratora",
     "discover_editions": "Odkryj edycje",
     "enable_admin_mode": "Włącz tryb administratora",
+    "language": "Język",
+    "light_mode": "Tryb jasny",
     "loading_favorites": "Ładowanie ulubionych...",
     "login": "Logowanie",
     "logout": "Wyloguj",

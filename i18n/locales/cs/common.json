@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Správa",
     "breadcrumb": "Drobková stezka",
+    "dark_mode": "Tmavý režim",
     "disable_admin_mode": "Deaktivace režimu správce",
     "discover_editions": "Objevte edice",
     "enable_admin_mode": "Aktivace režimu správce",
+    "language": "Jazyk",
+    "light_mode": "Světlý režim",
     "loading_favorites": "Načítání oblíbených položek...",
     "login": "Připojení",
     "logout": "Odpojení",

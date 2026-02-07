@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Amministrazione",
     "breadcrumb": "Breadcrumb",
+    "dark_mode": "Modalità scura",
     "disable_admin_mode": "Disattiva modalità admin",
     "discover_editions": "Scopri edizioni",
     "enable_admin_mode": "Attiva modalità admin",
+    "language": "Lingua",
+    "light_mode": "Modalità chiara",
     "loading_favorites": "Caricamento dei tuoi preferiti...",
     "login": "Accesso",
     "logout": "Disconnessione",
