@@ -59,12 +59,18 @@
 
               <template #left>
                 <!-- Nom de la convention + édition -->
-                <div v-if="edition" class="flex items-center gap-2">
+                <div v-if="edition" class="flex items-center gap-3">
                   <img
-                    v-if="edition.convention?.logo"
+                    v-if="edition.imageUrl"
+                    :src="getImageUrl(edition.imageUrl, 'edition', edition.id)"
+                    :alt="getEditionDisplayName(edition)"
+                    class="h-10 w-auto rounded object-contain"
+                  />
+                  <img
+                    v-else-if="edition.convention?.logo"
                     :src="getImageUrl(edition.convention.logo, 'convention', edition.convention.id)"
                     :alt="edition.convention.name"
-                    class="h-8 w-8 rounded object-cover self-center"
+                    class="h-8 w-8 rounded object-cover"
                   />
                   <div class="flex flex-col">
                     <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
