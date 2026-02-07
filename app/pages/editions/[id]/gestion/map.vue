@@ -37,7 +37,7 @@
           </p>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
           <!-- Toggle publication carte -->
           <USwitch
             v-model="mapPublic"
@@ -46,7 +46,7 @@
             @update:model-value="handleMapPublicChange"
           />
 
-          <div class="flex gap-2">
+          <div class="flex flex-col sm:flex-row gap-2">
             <!-- Zone drawing buttons -->
             <UButton
               v-if="!isDrawing && !isPlacingMarker"
