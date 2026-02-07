@@ -17,15 +17,18 @@ export default wrapApiHandler(
 
     // Construire les conditions de recherche et de filtrage
     const searchConditions: Record<string, unknown> = {}
+    const andConditions: Record<string, unknown>[] = []
 
     // Filtrage par recherche textuelle
     if (search) {
-      searchConditions.OR = [
-        { email: { contains: search } },
-        { pseudo: { contains: search } },
-        { nom: { contains: search } },
-        { prenom: { contains: search } },
-      ]
+      andConditions.push({
+        OR: [
+          { email: { contains: search } },
+          { pseudo: { contains: search } },
+          { nom: { contains: search } },
+          { prenom: { contains: search } },
+        ],
+      })
     }
 
     // Filtrage par statut admin
@@ -42,6 +45,25 @@ export default wrapApiHandler(
       searchConditions.isEmailVerified = true
     } else if (emailFilter === 'unverified') {
       searchConditions.isEmailVerified = false
+    }
+
+    // Filtrage par catégories (volunteer, artist, organizer)
+    // OR entre les catégories sélectionnées (ex: bénévole OU artiste)
+    const categoriesParam = (query.categories as string) || ''
+    if (categoriesParam) {
+      const categories = categoriesParam.split(',')
+      const categoryConditions: Record<string, boolean>[] = []
+      if (categories.includes('volunteer')) categoryConditions.push({ isVolunteer: true })
+      if (categories.includes('artist')) categoryConditions.push({ isArtist: true })
+      if (categories.includes('organizer')) categoryConditions.push({ isOrganizer: true })
+      if (categoryConditions.length > 0) {
+        andConditions.push({ OR: categoryConditions })
+      }
+    }
+
+    // Combiner les conditions AND si nécessaire
+    if (andConditions.length > 0) {
+      searchConditions.AND = andConditions
     }
 
     // Filtrage par utilisateurs en ligne uniquement
@@ -78,6 +100,9 @@ export default wrapApiHandler(
           updatedAt: true,
           lastLoginAt: true,
           profilePicture: true,
+          isVolunteer: true,
+          isArtist: true,
+          isOrganizer: true,
           _count: {
             select: {
               createdConventions: true,

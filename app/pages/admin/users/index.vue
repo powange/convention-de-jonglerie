@@ -85,11 +85,30 @@
       </div>
 
       <!-- Filtres supplémentaires -->
-      <div class="flex flex-col sm:flex-row gap-4">
+      <div class="flex flex-col sm:flex-row gap-4 flex-wrap">
         <!-- Checkbox utilisateurs en ligne -->
         <UCheckbox
           v-model="onlineFilter"
           :label="t('admin.show_online_users_only')"
+          class="flex items-center"
+        />
+
+        <USeparator orientation="vertical" class="hidden sm:block h-5 self-center" />
+
+        <!-- Filtres par catégorie -->
+        <UCheckbox
+          v-model="categoryFilters.volunteer"
+          :label="t('common.volunteer')"
+          class="flex items-center"
+        />
+        <UCheckbox
+          v-model="categoryFilters.artist"
+          :label="t('common.artist')"
+          class="flex items-center"
+        />
+        <UCheckbox
+          v-model="categoryFilters.organizer"
+          :label="t('common.organizer')"
           class="flex items-center"
         />
       </div>
@@ -175,6 +194,9 @@ interface AdminUserWithConnection extends AdminUser {
   isConnected: boolean
   authProvider?: string
   lastLoginAt?: string | null
+  isVolunteer: boolean
+  isArtist: boolean
+  isOrganizer: boolean
 }
 
 interface PaginationData {
@@ -222,6 +244,11 @@ const emailFilter = ref('all')
 const sortOption = ref('createdAt:desc')
 const currentPage = ref(1)
 const onlineFilter = ref(false)
+const categoryFilters = reactive({
+  volunteer: false,
+  artist: false,
+  organizer: false,
+})
 
 // État pour le modal de suppression
 const userToDelete = ref<AdminUserWithConnection | null>(null)
@@ -333,6 +360,44 @@ const columns = [
         },
         () => (user.isGlobalAdmin ? t('admin.super_admin') : t('admin.user'))
       )
+    },
+  },
+  {
+    accessorKey: 'categories',
+    header: t('admin.categories'),
+    cell: ({ row }: { row: any }) => {
+      const user = row.original as AdminUserWithConnection
+      const badges: any[] = []
+
+      if (user.isVolunteer) {
+        badges.push(
+          h(resolveComponent('UBadge'), { color: 'success', variant: 'soft', size: 'xs' }, () =>
+            t('common.volunteer')
+          )
+        )
+      }
+
+      if (user.isArtist) {
+        badges.push(
+          h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () =>
+            t('common.artist')
+          )
+        )
+      }
+
+      if (user.isOrganizer) {
+        badges.push(
+          h(resolveComponent('UBadge'), { color: 'info', variant: 'soft', size: 'xs' }, () =>
+            t('common.organizer')
+          )
+        )
+      }
+
+      if (badges.length === 0) {
+        return h('span', { class: 'text-gray-400 text-sm' }, t('admin.no_category'))
+      }
+
+      return h('div', { class: 'flex flex-wrap gap-1' }, badges)
     },
   },
   {
@@ -874,15 +939,26 @@ const fetchUsers = async () => {
   try {
     const [sortBy, sortOrder] = sortOption.value.split(':')
 
-    const params = {
-      page: currentPage.value,
-      limit: pagination.value.limit,
+    // Construire la liste des catégories sélectionnées
+    const selectedCategories = [
+      ...(categoryFilters.volunteer ? ['volunteer'] : []),
+      ...(categoryFilters.artist ? ['artist'] : []),
+      ...(categoryFilters.organizer ? ['organizer'] : []),
+    ]
+
+    const params: Record<string, string> = {
+      page: currentPage.value.toString(),
+      limit: pagination.value.limit.toString(),
       search: searchQuery.value,
       sortBy,
       sortOrder,
       adminFilter: adminFilter.value,
       emailFilter: emailFilter.value,
       onlineOnly: onlineFilter.value.toString(),
+    }
+
+    if (selectedCategories.length > 0) {
+      params.categories = selectedCategories.join(',')
     }
 
     const data = await $fetch<UsersApiResponse>('/api/admin/users', {
@@ -949,6 +1025,12 @@ watch(sortOption, () => {
 
 // Réinitialiser la page et refetch quand on change le filtre online
 watch(onlineFilter, () => {
+  currentPage.value = 1
+  fetchUsers()
+})
+
+// Réinitialiser la page et refetch quand on change les filtres de catégories
+watch(categoryFilters, () => {
   currentPage.value = 1
   fetchUsers()
 })

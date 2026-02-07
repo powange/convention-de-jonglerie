@@ -48,11 +48,15 @@ const colors = {
 const args = process.argv.slice(2)
 
 if (args.includes('--help') || args.includes('-h')) {
-  console.log(`${colors.blue}${colors.bold}=== AIDE - GÉNÉRATION DES FICHIERS TODO ===${colors.reset}\n`)
+  console.log(
+    `${colors.blue}${colors.bold}=== AIDE - GÉNÉRATION DES FICHIERS TODO ===${colors.reset}\n`
+  )
   console.log(`${colors.bold}Usage:${colors.reset}`)
   console.log(`  node scripts/translation/generate-todo-files.js [fichier]\n`)
   console.log(`${colors.bold}Arguments:${colors.reset}`)
-  console.log(`  fichier    Chemin du fichier consolidé (défaut: scripts/translation/translations-all.json)\n`)
+  console.log(
+    `  fichier    Chemin du fichier consolidé (défaut: scripts/translation/translations-all.json)\n`
+  )
   console.log(`${colors.bold}Format du fichier d'entrée:${colors.reset}`)
   console.log(`  {`)
   console.log(`    "en": { "clé": "traduction", ... },`)
@@ -64,7 +68,8 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(0)
 }
 
-const inputFile = args.find((a) => !a.startsWith('-')) || path.join(__dirname, 'translations-all.json')
+const inputFile =
+  args.find((a) => !a.startsWith('-')) || path.join(__dirname, 'translations-all.json')
 const inputPath = path.isAbsolute(inputFile) ? inputFile : path.resolve(process.cwd(), inputFile)
 
 // Vérifier que le fichier existe
@@ -95,7 +100,9 @@ console.log(`${colors.cyan}Fichier source: ${inputPath}${colors.reset}`)
 const langs = Object.keys(consolidated).filter((lang) => lang !== REFERENCE_LANG)
 
 if (langs.length === 0) {
-  console.error(`${colors.red}❌ Aucune langue trouvée dans le fichier (la langue de référence '${REFERENCE_LANG}' est exclue)${colors.reset}`)
+  console.error(
+    `${colors.red}❌ Aucune langue trouvée dans le fichier (la langue de référence '${REFERENCE_LANG}' est exclue)${colors.reset}`
+  )
   process.exit(1)
 }
 
@@ -132,7 +139,9 @@ for (const lang of langs) {
   }
 
   if (emptyCount > 0) {
-    console.log(`${colors.yellow}⚠ ${lang}: ${emptyCount} traduction(s) vide(s) ignorée(s)${colors.reset}`)
+    console.log(
+      `${colors.yellow}⚠ ${lang}: ${emptyCount} traduction(s) vide(s) ignorée(s)${colors.reset}`
+    )
   }
 
   if (Object.keys(validTranslations).length === 0) {
@@ -164,7 +173,9 @@ if (totalFiles > 0) {
 if (totalFiles > 0) {
   try {
     fs.unlinkSync(inputPath)
-    console.log(`\n${colors.cyan}🧹 Fichier source supprimé: ${path.basename(inputPath)}${colors.reset}`)
+    console.log(
+      `\n${colors.cyan}🧹 Fichier source supprimé: ${path.basename(inputPath)}${colors.reset}`
+    )
   } catch {
     // Pas grave si la suppression échoue
   }
