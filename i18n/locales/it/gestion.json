@@ -344,6 +344,7 @@
       "title": "Biglietti"
     },
     "title": "Gestione",
+    "view_edition": "Vedi l'edizione",
     "volunteers": {
       "action_add_comment": "Aggiungi commento",
       "applications_description": "Visualizzazione ed elaborazione delle domande",

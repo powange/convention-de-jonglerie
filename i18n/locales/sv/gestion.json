@@ -344,6 +344,7 @@
       "title": "Biljetter"
     },
     "title": "Hantering",
+    "view_edition": "Visa upplagan",
     "volunteers": {
       "action_add_comment": "Lägg till kommentar",
       "applications_description": "Visning och behandling av ansökningar",

@@ -344,6 +344,7 @@
       "title": "Billetter"
     },
     "title": "Administration",
+    "view_edition": "Se udgaven",
     "volunteers": {
       "action_add_comment": "Tilføj kommentar",
       "applications_description": "Visning og behandling af ansøgninger",

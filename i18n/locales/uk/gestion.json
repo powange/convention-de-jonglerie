@@ -344,6 +344,7 @@
       "title": "Квитки"
     },
     "title": "Керування",
+    "view_edition": "Переглянути випуск",
     "volunteers": {
       "action_add_comment": "Додати коментар",
       "applications_description": "Перегляд та обробка заявок",

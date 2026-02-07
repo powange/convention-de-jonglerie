@@ -27,18 +27,18 @@
           <template #footer="{ collapsed }">
             <UButton
               v-if="!collapsed"
-              icon="i-heroicons-question-mark-circle"
+              icon="i-heroicons-arrow-left"
               variant="ghost"
               color="neutral"
               block
               size="sm"
               :to="`/editions/${editionId}`"
             >
-              {{ $t('common.help') }}
+              {{ $t('gestion.view_edition') }}
             </UButton>
             <UButton
               v-else
-              icon="i-heroicons-question-mark-circle"
+              icon="i-heroicons-arrow-left"
               variant="ghost"
               color="neutral"
               square
@@ -66,29 +66,19 @@
                     :alt="edition.convention.name"
                     class="h-8 w-8 rounded object-cover self-center"
                   />
-                  <div class="flex flex-col gap-1">
+                  <div class="flex flex-col">
                     <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">{{
                       getEditionDisplayName(edition)
                     }}</span>
-                    <!-- Bouton Retour -->
-                    <UButton
-                      icon="i-heroicons-arrow-left"
-                      variant="ghost"
-                      size="sm"
-                      :to="`/editions/${editionId}`"
-                      class="-ml-2"
-                    >
-                      {{ $t('common.back') }}
-                    </UButton>
                   </div>
                 </div>
               </template>
 
               <template #right>
                 <ClientOnly>
-                  <!-- Sélecteur de langue -->
-                  <UiSelectLanguage />
+                  <!-- Sélecteur de langue (masqué sur mobile, déjà dans le menu) -->
+                  <UiSelectLanguage class="hidden sm:block" />
 
                   <UserAuthSection />
                 </ClientOnly>

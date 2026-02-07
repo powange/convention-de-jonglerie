@@ -344,6 +344,7 @@
       "title": "Entradas"
     },
     "title": "Gestión",
+    "view_edition": "Ver la edición",
     "volunteers": {
       "action_add_comment": "Agregar comentario",
       "applications_description": "Visualización y tramitación de solicitudes",

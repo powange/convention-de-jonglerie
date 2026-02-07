@@ -344,6 +344,7 @@
       "title": "Tickets"
     },
     "title": "Management",
+    "view_edition": "View edition",
     "volunteers": {
       "action_add_comment": "Add comment",
       "applications_description": "Viewing and processing applications",

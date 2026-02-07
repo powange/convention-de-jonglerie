@@ -344,6 +344,7 @@
       "title": "Eintrittskarten"
     },
     "title": "Verwaltung",
+    "view_edition": "Ausgabe ansehen",
     "volunteers": {
       "action_add_comment": "Kommentar hinzufügen",
       "applications_description": "Bewerbungen einsehen und bearbeiten",
