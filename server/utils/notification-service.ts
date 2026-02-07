@@ -7,7 +7,7 @@ import {
 } from './notification-preferences'
 import { notificationStreamManager } from './notification-stream-manager'
 import { translateServerSide } from './server-i18n'
-import { unifiedPushService } from './unified-push-service'
+import { unifiedPushService, type PushNotificationData } from './unified-push-service'
 
 import type { NotificationType } from '@prisma/client'
 
@@ -155,7 +155,7 @@ export const NotificationService = {
       // Traduire la notification pour le push selon la langue préférée de l'utilisateur
       const userLang = notification.user.preferredLanguage || 'fr'
 
-      const pushData = {
+      const pushData: PushNotificationData = {
         title: notification.titleKey
           ? translateServerSide(
               notification.titleKey,
@@ -163,17 +163,15 @@ export const NotificationService = {
               userLang
             )
           : notification.titleText || '',
-        body: notification.messageKey
+        message: notification.messageKey
           ? translateServerSide(
               notification.messageKey,
               notification.translationParams || {},
               userLang
             )
           : notification.messageText || '',
-        data: {
-          url: notification.actionUrl,
-          notificationId: notification.id,
-        },
+        url: notification.actionUrl || '/',
+        id: notification.id,
       }
 
       const pushSent = await unifiedPushService.sendToUser(notification.userId, pushData)

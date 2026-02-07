@@ -4,7 +4,7 @@ import { firebaseAdmin } from './firebase-admin'
  * Service de notifications push via Firebase Cloud Messaging (FCM)
  */
 
-interface PushNotificationData {
+export interface PushNotificationData {
   title: string
   message: string
   icon?: string

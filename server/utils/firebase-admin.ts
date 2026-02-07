@@ -154,6 +154,7 @@ class FirebaseAdminService {
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
           const error = resp.error
+          console.error(`[Firebase Admin] Token ${idx} erreur: ${error?.code} - ${error?.message}`)
           // Codes d'erreur indiquant un token invalide ou expiré
           if (
             error?.code === 'messaging/invalid-registration-token' ||
