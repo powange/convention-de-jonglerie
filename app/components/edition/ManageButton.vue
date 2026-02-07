@@ -4,9 +4,9 @@
       v-if="canAccess"
       :to="`/editions/${edition.id}/gestion`"
       icon="i-heroicons-cog-6-tooth"
-      variant="ghost"
-      size="sm"
-      color="neutral"
+      :variant="variant"
+      :size="size"
+      :color="color"
     >
       {{ $t('edition.management') }}
     </UButton>
@@ -22,9 +22,16 @@ import type { Edition } from '~/types'
 
 interface Props {
   edition: Edition
+  variant?: 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  color?: 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  variant: 'ghost',
+  size: 'sm',
+  color: 'neutral',
+})
 
 const authStore = useAuthStore()
 const editionStore = useEditionStore()

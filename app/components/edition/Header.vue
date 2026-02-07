@@ -2,7 +2,7 @@
   <div class="mb-6">
     <!-- En-tête avec le nom de l'édition -->
     <div class="mb-4">
-      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div class="flex items-start gap-4">
           <div v-if="edition.convention?.logo" class="flex-shrink-0">
             <img
@@ -20,69 +20,48 @@
             <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
           </div>
           <div class="flex-1">
-            <div class="flex items-start justify-between sm:block">
-              <div>
-                <h1 class="text-2xl sm:text-3xl font-bold">{{ getEditionDisplayName(edition) }}</h1>
-                <div
-                  class="flex flex-col sm:flex-row sm:items-center sm:gap-4 mt-2 text-gray-500 text-sm sm:text-base"
-                >
-                  <span class="inline-flex items-center gap-1">
-                    {{ edition.city }},
-                    <FlagIcon :code="getCountryCode(edition.country)" size="sm" />
-                    {{ translateCountryName(edition.country) }}
-                  </span>
-                  <span class="hidden sm:inline">•</span>
-                  <span>{{ formatDateRange(edition.startDate, edition.endDate) }}</span>
-                </div>
-
-                <!-- Boutons actions -->
-                <div class="mt-3 flex flex-wrap gap-2">
-                  <UButton
-                    variant="ghost"
-                    size="sm"
-                    icon="i-heroicons-information-circle"
-                    color="info"
-                    @click="showConventionModal = true"
-                  >
-                    {{ $t('edition.learn_more_about_convention') }}
-                  </UButton>
-
-                  <UDropdownMenu :items="calendarOptions">
-                    <UButton
-                      variant="ghost"
-                      size="sm"
-                      icon="material-symbols:calendar-add-on"
-                      color="neutral"
-                    >
-                      {{ $t('calendar.add_to_calendar') }}
-                    </UButton>
-                  </UDropdownMenu>
-
-                  <EditionManageButton :edition="edition" />
-                </div>
-              </div>
-
-              <!-- Actions mobile -->
+            <div class="flex items-start justify-between gap-1">
+              <h1 class="text-2xl md:text-3xl font-bold">{{ getEditionDisplayName(edition) }}</h1>
               <ClientOnly>
-                <div v-if="authStore.isAuthenticated" class="sm:hidden flex items-center gap-2">
-                  <!-- Bouton favori mobile -->
-                  <UButton
-                    :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-                    :color="isFavorited ? 'warning' : 'neutral'"
-                    variant="ghost"
-                    size="sm"
-                    class="flex-shrink-0"
-                    @click="toggleFavorite"
-                  />
-                </div>
+                <UButton
+                  v-if="authStore.isAuthenticated"
+                  :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                  :color="isFavorited ? 'warning' : 'neutral'"
+                  variant="ghost"
+                  size="sm"
+                  class="shrink-0 md:hidden"
+                  @click="toggleFavorite"
+                />
               </ClientOnly>
+            </div>
+            <div
+              class="flex flex-col md:flex-row md:items-center md:gap-4 mt-2 text-gray-500 text-sm md:text-base"
+            >
+              <span class="inline-flex items-center gap-1">
+                {{ edition.city }},
+                <FlagIcon :code="getCountryCode(edition.country)" size="sm" />
+                {{ translateCountryName(edition.country) }}
+              </span>
+              <span class="hidden md:inline">•</span>
+              <span class="inline-flex items-center gap-1">
+                {{ formatDateRange(edition.startDate, edition.endDate) }}
+                <UDropdownMenu :items="calendarOptions">
+                  <UButton
+                    variant="ghost"
+                    size="xs"
+                    icon="material-symbols:calendar-add-on"
+                    color="neutral"
+                    :title="$t('calendar.add_to_calendar')"
+                  />
+                </UDropdownMenu>
+              </span>
             </div>
           </div>
         </div>
 
         <!-- Actions desktop -->
         <ClientOnly>
-          <div v-if="authStore.isAuthenticated" class="hidden sm:flex gap-3">
+          <div v-if="authStore.isAuthenticated" class="hidden md:flex gap-3">
             <!-- Bouton revendication -->
 
             <!-- Modale de revendication -->
@@ -105,18 +84,33 @@
           </div>
         </ClientOnly>
       </div>
+
+      <!-- Boutons actions (hors du conteneur logo pour pleine largeur mobile) -->
+      <div class="mt-2 md:mt-3 md:ml-20 flex flex-wrap gap-2">
+        <UButton
+          variant="ghost"
+          size="sm"
+          icon="i-heroicons-information-circle"
+          color="info"
+          @click="showConventionModal = true"
+        >
+          {{ $t('edition.learn_more_about_convention') }}
+        </UButton>
+
+        <EditionManageButton :edition="edition" variant="soft" size="sm" color="primary" />
+      </div>
     </div>
 
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
       <nav
-        class="flex justify-center sm:justify-start space-x-2 sm:space-x-8"
+        class="flex justify-center md:justify-start space-x-2 md:space-x-8"
         :aria-label="$t('navigation.tabs')"
       >
         <NuxtLink
           :to="`/editions/${edition.id}`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'details'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
@@ -125,32 +119,32 @@
         >
           <UIcon
             name="i-heroicons-information-circle"
-            :class="['sm:mr-1']"
+            :class="['md:mr-1']"
             size="24"
-            class="sm:!w-4 sm:!h-4"
+            class="md:w-4! md:h-4!"
           />
-          <span class="hidden sm:inline">{{ t('edition.about_this_edition') }}</span>
+          <span class="hidden md:inline">{{ t('edition.about_this_edition') }}</span>
         </NuxtLink>
 
         <NuxtLink
           v-if="mapTabVisible"
           :to="`/editions/${edition.id}/map`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'map'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
           :title="t('gestion.map.title')"
         >
-          <UIcon name="i-lucide-map" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">{{ t('gestion.map.title') }}</span>
+          <UIcon name="i-lucide-map" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
+          <span class="hidden md:inline">{{ t('gestion.map.title') }}</span>
         </NuxtLink>
 
         <NuxtLink
           :to="`/editions/${edition.id}/commentaires`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'commentaires'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
@@ -159,32 +153,32 @@
         >
           <UIcon
             name="i-heroicons-chat-bubble-left-right"
-            :class="['sm:mr-1']"
+            :class="['md:mr-1']"
             size="24"
-            class="sm:!w-4 sm:!h-4"
+            class="md:w-4! md:h-4!"
           />
-          <span class="hidden sm:inline">{{ t('edition.posts') }}</span>
+          <span class="hidden md:inline">{{ t('edition.posts') }}</span>
         </NuxtLink>
 
         <NuxtLink
           :to="`/editions/${edition.id}/carpool`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'carpool'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
           :title="t('edition.carpool')"
         >
-          <UIcon name="i-heroicons-truck" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">{{ t('edition.carpool') }}</span>
+          <UIcon name="i-heroicons-truck" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
+          <span class="hidden md:inline">{{ t('edition.carpool') }}</span>
         </NuxtLink>
 
         <NuxtLink
           v-if="volunteersTabVisible"
           :to="`/editions/${edition.id}/volunteers`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'volunteers'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
@@ -193,18 +187,18 @@
         >
           <UIcon
             name="i-heroicons-hand-raised"
-            :class="['sm:mr-1']"
+            :class="['md:mr-1']"
             size="24"
-            class="sm:!w-4 sm:!h-4"
+            class="md:w-4! md:h-4!"
           />
-          <span class="hidden sm:inline">{{ t('edition.volunteers.title') }}</span>
+          <span class="hidden md:inline">{{ t('edition.volunteers.title') }}</span>
         </NuxtLink>
 
         <NuxtLink
           v-if="workshopsTabVisible"
           :to="`/editions/${edition.id}/workshops`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'workshops'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
@@ -213,18 +207,18 @@
         >
           <UIcon
             name="i-heroicons-academic-cap"
-            :class="['sm:mr-1']"
+            :class="['md:mr-1']"
             size="24"
-            class="sm:!w-4 sm:!h-4"
+            class="md:w-4! md:h-4!"
           />
-          <span class="hidden sm:inline">Workshops</span>
+          <span class="hidden md:inline">Workshops</span>
         </NuxtLink>
 
         <NuxtLink
           v-if="hasEditionStarted"
           :to="`/editions/${edition.id}/lost-found`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'lost-found'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
@@ -233,18 +227,18 @@
         >
           <UIcon
             name="i-heroicons-magnifying-glass"
-            :class="['sm:mr-1']"
+            :class="['md:mr-1']"
             size="24"
-            class="sm:!w-4 sm:!h-4"
+            class="md:w-4! md:h-4!"
           />
-          <span class="hidden sm:inline">{{ t('edition.lost_found') }}</span>
+          <span class="hidden md:inline">{{ t('edition.lost_found') }}</span>
         </NuxtLink>
 
         <NuxtLink
           v-if="showsCallTabVisible"
           :to="`/editions/${edition.id}/shows-call`"
           :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
             currentPage === 'shows-call'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
@@ -253,16 +247,16 @@
         >
           <UIcon
             name="i-heroicons-megaphone"
-            :class="['sm:mr-1']"
+            :class="['md:mr-1']"
             size="24"
-            class="sm:!w-4 sm:!h-4"
+            class="md:w-4! md:h-4!"
           />
-          <span class="hidden sm:inline">{{ t('shows_call.title') }}</span>
+          <span class="hidden md:inline">{{ t('shows_call.title') }}</span>
         </NuxtLink>
       </nav>
 
       <!-- Titre de la page courante sur mobile -->
-      <div class="sm:hidden text-center py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div class="md:hidden text-center py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
         {{ getPageTitle(currentPage) }}
       </div>
     </div>
