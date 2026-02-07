@@ -3,11 +3,12 @@
     <UButton
       color="neutral"
       variant="ghost"
-      size="xs"
-      class="sm:!size-sm"
+      :size="showLabel ? 'sm' : 'xs'"
+      :class="showLabel ? '' : 'sm:size-sm!'"
       :title="$t('footer.language_selector')"
     >
       <span v-if="currentLanguageFlag" :class="currentLanguageFlag" class="w-4 h-3" />
+      <span v-if="showLabel" class="text-sm">{{ currentLanguageName }}</span>
     </UButton>
 
     <!-- Slots pour les drapeaux de chaque langue -->
@@ -22,11 +23,19 @@ import { translationLoaders, getTranslationsToLoad } from '~/utils/translation-l
 
 import { languageCodeToFlag } from '~~/app/utils/locales'
 
+withDefaults(defineProps<{ showLabel?: boolean }>(), { showLabel: false })
+
 const { locale, locales, setLocale } = useI18n()
 
 // Langue courante avec son drapeau
 const currentLanguageFlag = computed(() => {
   return languageCodeToFlag(locale.value)
+})
+
+// Nom de la langue courante
+const currentLanguageName = computed(() => {
+  const lang = locales.value.find((l) => l.code === locale.value)
+  return lang?.name || locale.value
 })
 
 // Configuration des items du dropdown de langues

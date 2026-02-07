@@ -3,7 +3,13 @@
 
 :root {
   --ui-container: --spacing(4) auto;
-  --ui-header-height: --spacing(25);
+  --ui-header-height: --spacing(16);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --ui-header-height: --spacing(25);
+  }
 }
 
 /* Thème Midnight Circus - Override pour le mode sombre */

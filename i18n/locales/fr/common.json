@@ -973,9 +973,12 @@
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Fil d'Ariane",
+    "dark_mode": "Mode sombre",
     "disable_admin_mode": "Désactiver le mode admin",
     "discover_editions": "Découvrir des éditions",
     "enable_admin_mode": "Activer le mode admin",
+    "language": "Langue",
+    "light_mode": "Mode clair",
     "loading_favorites": "Chargement de vos favoris...",
     "login": "Connexion",
     "logout": "Déconnexion",

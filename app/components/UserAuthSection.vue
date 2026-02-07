@@ -1,46 +1,173 @@
 <template>
   <!-- Dropdown utilisateur ou boutons connexion -->
   <div :key="`auth-section-${authKey}`">
-    <UDropdownMenu
-      v-if="authStore.isAuthenticated && authStore.user"
-      :items="userMenuItems"
-      :content="{
-        align: 'end',
-        side: 'bottom',
-        sideOffset: 8,
-      }"
-    >
-      <UButton variant="ghost" color="neutral" class="rounded-full">
-        <div class="flex items-center gap-2">
-          <div class="relative flex-shrink-0">
+    <template v-if="authStore.isAuthenticated && authStore.user">
+      <!-- Desktop : Dropdown menu -->
+      <UDropdownMenu
+        v-if="isDesktop"
+        :items="userMenuItems"
+        :content="{
+          align: 'end',
+          side: 'bottom',
+          sideOffset: 8,
+        }"
+      >
+        <UButton variant="ghost" color="neutral" class="rounded-full">
+          <div class="flex items-center gap-2">
+            <div class="relative shrink-0">
+              <UiUserAvatar :user="authStore.user" size="md" border />
+            </div>
+            <div class="flex flex-col items-start">
+              <span class="text-sm font-medium">{{ displayName }}</span>
+              <UBadge
+                v-if="authStore.isAdminModeActive"
+                color="warning"
+                variant="soft"
+                size="xs"
+                class="px-1"
+              >
+                Admin
+              </UBadge>
+            </div>
+            <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-muted shrink-0" />
+          </div>
+        </UButton>
+      </UDropdownMenu>
+
+      <!-- Mobile : Drawer depuis le bas -->
+      <UDrawer v-else v-model:open="drawerOpen">
+        <UButton variant="ghost" color="neutral" class="rounded-full">
+          <div class="relative shrink-0">
             <UiUserAvatar :user="authStore.user" size="md" border />
-            <!-- Badge Admin en mobile (sur l'avatar) -->
             <UBadge
               v-if="authStore.isAdminModeActive"
               color="warning"
               variant="soft"
               size="xs"
-              class="absolute -top-1 -right-1 px-1 sm:hidden bg-opacity-100 backdrop-blur-sm"
+              class="absolute -top-1 -right-1 px-1"
             >
-              👑
+              A
             </UBadge>
           </div>
-          <div class="hidden sm:flex flex-col items-start">
-            <span class="text-sm font-medium">{{ displayName }}</span>
+        </UButton>
+
+        <template #header>
+          <div class="flex items-center gap-3">
+            <UiUserAvatar :user="authStore.user" size="lg" border />
+            <div class="flex flex-col">
+              <span class="text-base font-semibold">{{ displayName }}</span>
+              <span class="text-sm text-muted">{{ authStore.user.email }}</span>
+            </div>
             <UBadge
               v-if="authStore.isAdminModeActive"
               color="warning"
               variant="soft"
-              size="xs"
-              class="px-1"
+              size="sm"
+              class="ml-auto"
             >
-              👑 Admin
+              Admin
             </UBadge>
           </div>
-          <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400 flex-shrink-0" />
-        </div>
-      </UButton>
-    </UDropdownMenu>
+        </template>
+
+        <template #body>
+          <nav class="flex flex-col gap-1">
+            <NuxtLink
+              v-for="item in drawerMenuItems"
+              :key="item.label"
+              :to="item.to"
+              class="flex items-center gap-3 px-3 py-3 rounded-lg text-highlighted hover:bg-elevated transition-colors"
+              @click="drawerOpen = false"
+            >
+              <UIcon :name="item.icon" class="w-5 h-5 text-muted shrink-0" />
+              <span class="text-sm font-medium">{{ item.label }}</span>
+              <UBadge
+                v-if="item.badge"
+                color="error"
+                variant="solid"
+                size="xs"
+                :label="String(item.badge)"
+                class="ml-auto"
+              />
+            </NuxtLink>
+
+            <!-- Section admin -->
+            <template v-if="authStore.user?.isGlobalAdmin">
+              <USeparator class="my-1" />
+              <NuxtLink
+                to="/admin"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg text-highlighted hover:bg-elevated transition-colors"
+                @click="drawerOpen = false"
+              >
+                <UIcon name="i-heroicons-squares-2x2" class="w-5 h-5 text-muted shrink-0" />
+                <span class="text-sm font-medium">{{ $t('navigation.admin') }}</span>
+              </NuxtLink>
+              <button
+                class="flex items-center gap-3 px-3 py-3 rounded-lg text-highlighted hover:bg-elevated transition-colors w-full text-left"
+                @click="onToggleAdminMode"
+              >
+                <UIcon
+                  :name="
+                    isAdminModeActive
+                      ? 'i-heroicons-shield-exclamation'
+                      : 'i-heroicons-shield-check'
+                  "
+                  class="w-5 h-5 text-muted shrink-0"
+                />
+                <span class="text-sm font-medium">
+                  {{
+                    isAdminModeActive
+                      ? $t('navigation.disable_admin_mode')
+                      : $t('navigation.enable_admin_mode')
+                  }}
+                </span>
+                <UIcon
+                  :name="isAdminModeActive ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                  :class="['w-5 h-5 ml-auto', isAdminModeActive ? 'text-warning' : 'text-muted']"
+                />
+              </button>
+            </template>
+
+            <!-- Préférences (langue + mode sombre) -->
+            <USeparator class="my-1" />
+            <div class="flex items-center gap-3 px-3 py-3 rounded-lg text-highlighted">
+              <UIcon name="i-heroicons-language" class="w-5 h-5 text-muted shrink-0" />
+              <span class="text-sm font-medium">{{ $t('navigation.language') }}</span>
+              <div class="ml-auto">
+                <UiSelectLanguage show-label />
+              </div>
+            </div>
+            <button
+              class="flex items-center gap-3 px-3 py-3 rounded-lg text-highlighted hover:bg-elevated transition-colors w-full text-left"
+              @click="toggleColorMode"
+            >
+              <UIcon
+                :name="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'"
+                class="w-5 h-5 text-muted shrink-0"
+              />
+              <span class="text-sm font-medium">
+                {{ isDark ? $t('navigation.light_mode') : $t('navigation.dark_mode') }}
+              </span>
+              <UIcon
+                :name="isDark ? 'i-heroicons-sun' : 'i-heroicons-moon'"
+                class="w-5 h-5 ml-auto text-muted"
+              />
+            </button>
+
+            <!-- Déconnexion -->
+            <USeparator class="my-1" />
+            <NuxtLink
+              :to="`/logout?returnTo=${encodeURIComponent(useReturnTo().cleanReturnTo(route))}`"
+              class="flex items-center gap-3 px-3 py-3 rounded-lg text-error hover:bg-elevated transition-colors"
+              @click="drawerOpen = false"
+            >
+              <UIcon name="i-heroicons-arrow-right-on-rectangle" class="w-5 h-5 shrink-0" />
+              <span class="text-sm font-medium">{{ $t('navigation.logout') }}</span>
+            </NuxtLink>
+          </nav>
+        </template>
+      </UDrawer>
+    </template>
 
     <!-- Bouton connexion unique pour utilisateurs non connectés -->
     <UButton
@@ -56,6 +183,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useMediaQuery } from '@vueuse/core'
+
 import { useAuthStore } from '~/stores/auth'
 
 import type { DropdownMenuItem } from '@nuxt/ui'
@@ -66,28 +195,21 @@ const { t } = useI18n()
 const toast = useToast()
 const route = useRoute()
 
-// État réactif pour la taille d'écran
-const isMobile = ref(false)
+// Responsive : desktop si >= 768px (md breakpoint Tailwind)
+const isDesktop = useMediaQuery('(min-width: 768px)')
+
+// Mode clair/sombre
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
+const toggleColorMode = () => {
+  colorMode.preference = isDark.value ? 'light' : 'dark'
+}
+
+// État du drawer mobile
+const drawerOpen = ref(false)
 
 // Synchroniser avec le store
 const isAdminModeActive = computed(() => authStore.adminMode)
-
-// Utiliser nextTick pour s'assurer que nous sommes côté client après hydration
-onMounted(async () => {
-  await nextTick()
-
-  // Gérer le responsive avec les composables VueUse
-  const { width } = useWindowSize()
-
-  // Watcher réactif pour la taille d'écran
-  watch(
-    width,
-    (newWidth) => {
-      isMobile.value = newWidth < 768
-    },
-    { immediate: true }
-  )
-})
 
 // Statut de messagerie de l'utilisateur
 const messengerStatus = ref({
@@ -117,14 +239,10 @@ onMounted(() => {
   loadMessengerStatus()
 })
 
-// Configuration des items du dropdown utilisateur
-const userMenuItems = computed((): DropdownMenuItem[] => {
-  const items: DropdownMenuItem[] = [
-    {
-      label: t('navigation.profile'),
-      icon: 'i-heroicons-user',
-      to: '/profile',
-    },
+// Items de navigation partagés entre drawer mobile et dropdown desktop
+const baseNavItems = computed(() => {
+  const items: { label: string; icon: string; to: string; badge?: number }[] = [
+    { label: t('navigation.profile'), icon: 'i-heroicons-user', to: '/profile' },
     {
       label: t('navigation.my_conventions'),
       icon: 'i-heroicons-calendar-days',
@@ -132,7 +250,6 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
     },
   ]
 
-  // Ajouter les candidatures bénévoles seulement si l'utilisateur a la catégorie bénévole
   if (authStore.isVolunteer) {
     items.push({
       label: t('navigation.my_volunteer_applications'),
@@ -141,7 +258,6 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
     })
   }
 
-  // Ajouter les candidatures artiste seulement si l'utilisateur a la catégorie artiste
   if (authStore.isArtist) {
     items.push({
       label: t('navigation.my_artist_applications'),
@@ -150,7 +266,6 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
     })
   }
 
-  // Ajouter la messagerie si l'utilisateur a des conversations
   if (messengerStatus.value.hasConversations) {
     items.push({
       label: t('navigation.messenger'),
@@ -160,37 +275,32 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
     })
   }
 
-  // Ajouter les favoris en mobile
-  if (isMobile.value) {
-    items.push({
-      label: t('navigation.my_favorites'),
-      icon: 'i-heroicons-star',
-      to: '/favorites',
-    })
-  }
+  items.push({ label: t('navigation.my_favorites'), icon: 'i-heroicons-star', to: '/favorites' })
 
-  // Ajouter le dashboard admin si super admin
+  return items
+})
+
+// Items de navigation pour le drawer mobile
+const drawerMenuItems = computed(() => baseNavItems.value)
+
+// Configuration des items du dropdown utilisateur (desktop uniquement)
+const userMenuItems = computed((): DropdownMenuItem[] => {
+  const items: DropdownMenuItem[] = [...baseNavItems.value]
+
   if (authStore.user?.isGlobalAdmin) {
     items.push({ type: 'separator' as const })
-    items.push({
-      label: t('navigation.admin'),
-      icon: 'i-heroicons-squares-2x2',
-      to: '/admin',
-    })
-
+    items.push({ label: t('navigation.admin'), icon: 'i-heroicons-squares-2x2', to: '/admin' })
     items.push({
       label: isAdminModeActive.value
         ? t('navigation.disable_admin_mode')
         : t('navigation.enable_admin_mode'),
       icon: isAdminModeActive.value ? 'i-heroicons-shield-exclamation' : 'i-heroicons-shield-check',
-      // Utiliser une checkbox pour le mode admin
       type: 'checkbox' as const,
       checked: isAdminModeActive.value,
       onUpdateChecked: (checked: boolean) => toggleAdminMode(checked),
     })
   }
 
-  // Ajouter le séparateur et la déconnexion
   items.push({ type: 'separator' as const })
   items.push({
     label: t('navigation.logout'),
@@ -200,6 +310,12 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
 
   return items
 })
+
+// Basculer le mode admin depuis le drawer mobile (ferme le drawer)
+const onToggleAdminMode = () => {
+  toggleAdminMode(!isAdminModeActive.value)
+  drawerOpen.value = false
+}
 
 // Fonction pour basculer le mode admin
 const toggleAdminMode = (checked: boolean) => {
@@ -233,7 +349,6 @@ const authKey = ref(0)
 watch(
   () => authStore.isAuthenticated,
   () => {
-    // Incrémenter la clé pour forcer Vue à recréer complètement la section
     authKey.value++
   }
 )
