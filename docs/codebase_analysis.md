@@ -1,6 +1,6 @@
 # Analyse complète du Codebase - Convention de Jonglerie
 
-> Document généré automatiquement le 2026-02-06
+> Document mis à jour le 2026-02-07
 
 ## Table des matières
 
@@ -54,10 +54,11 @@
 | Composants Vue         | 131      |
 | Pages                  | 71       |
 | Endpoints API          | ~357     |
-| Modèles Prisma         | 76       |
+| Modèles Prisma         | 73       |
 | Enums Prisma           | 20       |
-| Migrations             | 100+     |
-| Composables            | 46       |
+| Fichiers schéma Prisma | 9        |
+| Migrations             | 136      |
+| Composables            | 48       |
 | Fichiers de tests      | 183      |
 | Langues supportées     | 13       |
 | Clés de traduction     | ~3 072   |
@@ -97,7 +98,7 @@ convention-de-jonglerie/
 │   │   ├── ui/             # Composants UI réutilisables (Avatar, DateTimePicker, ConfirmModal)
 │   │   ├── volunteers/     # Composants publics bénévoles
 │   │   └── workshops/      # Ateliers
-│   ├── composables/        # 46 composables Vue (logique réutilisable)
+│   ├── composables/        # 48 composables Vue (logique réutilisable)
 │   ├── config/             # Configuration app (app.config.ts)
 │   ├── layouts/            # 3 layouts (default, messenger, edition-dashboard)
 │   ├── middleware/          # 6 middlewares de navigation
@@ -142,7 +143,7 @@ convention-de-jonglerie/
 │   │   ├── shows-call/     # Appels à spectacles
 │   │   ├── uploads/        # Serveur de fichiers
 │   │   └── users/          # Gestion utilisateurs
-│   ├── constants/          # Constantes serveur
+│   ├── constants/          # Constantes serveur (public-routes, permissions)
 │   ├── emails/             # Templates d'emails (vue-email)
 │   ├── middleware/          # 3 middlewares serveur
 │   ├── plugins/            # 4 plugins serveur (scheduler, error-logging, etc.)
@@ -150,15 +151,24 @@ convention-de-jonglerie/
 │   ├── tasks/              # Tâches planifiées Nitro
 │   ├── templates/          # Templates divers
 │   ├── types/              # Types serveur
-│   └── utils/              # ~60 utilitaires serveur
+│   └── utils/              # ~81 utilitaires serveur
 │       ├── editions/       # Utils spécifiques éditions
 │       │   ├── ticketing/  # Logique billetterie
 │       │   └── volunteers/ # Logique bénévoles
 │       ├── permissions/    # Système de permissions granulaire
 │       └── ticketing/      # Utils billetterie
 ├── prisma/                 # Base de données
-│   ├── schema.prisma       # Schéma (1821 lignes, 76 modèles)
-│   └── migrations/         # 100+ migrations
+│   ├── schema/             # Schéma multi-fichiers (9 fichiers, 1856 lignes, 73 modèles)
+│   │   ├── schema.prisma   # Core (User, Convention, Edition, Organizers, Posts, Zones, Markers)
+│   │   ├── ticketing.prisma # Billetterie (21 modèles)
+│   │   ├── volunteer.prisma # Bénévoles (8 modèles)
+│   │   ├── artists.prisma  # Artistes et spectacles (6 modèles)
+│   │   ├── misc.prisma     # Divers (notifications, feedback, erreurs, objets trouvés)
+│   │   ├── meals.prisma    # Repas (7 modèles)
+│   │   ├── carpool.prisma  # Covoiturage (6 modèles)
+│   │   ├── messenger.prisma # Messagerie (3 modèles)
+│   │   └── workshops.prisma # Ateliers (3 modèles)
+│   └── migrations/         # 136 migrations
 ├── shared/                 # Code partagé app ↔ server
 │   └── utils/
 │       └── zone-types.ts   # Types de zones (couleurs, icônes)
@@ -204,9 +214,11 @@ convention-de-jonglerie/
 
 ### 3.2 Couche données (Prisma)
 
-**Schéma** : `prisma/schema.prisma` (1 821 lignes)
+**Schéma multi-fichiers** : `prisma/schema/` (9 fichiers, 1 856 lignes total)
 
-**76 modèles** organisés par domaine :
+Le schéma Prisma a été refactorisé en une architecture multi-fichiers par domaine métier (Prisma GA depuis v6.7.0). Le fichier principal `schema.prisma` contient le generator, le datasource, et les modèles core (User, Convention, Edition). Les modèles de domaines spécialisés sont dans des fichiers dédiés. Les références entre fichiers sont résolues automatiquement par Prisma.
+
+**73 modèles** organisés par domaine :
 
 #### Utilisateurs et Authentification
 - `User` — Modèle central avec email, pseudo, auth provider, rôles (isGlobalAdmin, isVolunteer, isArtist, isOrganizer)
@@ -302,7 +314,7 @@ convention-de-jonglerie/
 | `/shows-call/open`                            | Appels à spectacles ouverts                |
 | `/privacy-policy`                             | Politique de confidentialité               |
 
-#### Composables (46)
+#### Composables (48)
 
 | Composable                 | Rôle                                                    |
 | -------------------------- | ------------------------------------------------------- |
@@ -401,7 +413,7 @@ convention-de-jonglerie/
 
 | Middleware       | Rôle                                                                                     |
 | ---------------- | --------------------------------------------------------------------------------------- |
-| `auth.ts`        | Authentication gateway : routes publiques vs protégées, hydratation de `event.context.user` |
+| `auth.ts`        | Authentication gateway (44 lignes) : consomme la config déclarative `public-routes.ts`, hydratation de `event.context.user` |
 | `cache-headers`  | Headers de cache HTTP pour les assets statiques                                          |
 | `noindex`        | Header `X-Robots-Tag: noindex` pour staging/release                                      |
 
@@ -414,7 +426,7 @@ convention-de-jonglerie/
 | `countries`         | Chargement des données de pays côté serveur               |
 | `recaptcha-debug`   | Debug de la configuration reCAPTCHA                       |
 
-#### Utilitaires Serveur (~60 fichiers)
+#### Utilitaires Serveur (~81 fichiers)
 
 **Core :**
 - `prisma.ts` — Singleton Prisma Client avec MariaDB adapter
@@ -687,10 +699,12 @@ Les endpoints suivent le pattern de file-system routing de Nitro :
 
 ### Patterns d'authentification
 
-1. **Routes publiques** : listées explicitement dans `server/middleware/auth.ts` (GET conventions, éditions, posts, etc.)
-2. **Routes protégées** : toutes les routes `/api/*` non listées comme publiques requièrent une session
+Le middleware `auth.ts` utilise une **configuration déclarative** externalisée dans `server/constants/public-routes.ts`. Chaque route publique déclare un matcher (`path` exact, `pattern` regex, ou `prefix` startsWith), les méthodes HTTP autorisées, et un flag optionnel `hydrateSession`.
+
+1. **Routes publiques** : déclarées dans `server/constants/public-routes.ts` (config typée avec union discriminée `PublicRoute`)
+2. **Routes protégées** : toutes les routes `/api/*` non matchées requièrent une session (401)
 3. **Routes admin** : vérifient `isGlobalAdmin` en plus de l'authentification
-4. **Hydratation de session** : même sur les routes publiques, la session est hydratée si présente (pour les contenus conditionnels)
+4. **Hydratation de session** (`hydrateSession: true`) : sur les routes publiques, la session est chargée sans bloquer pour permettre un rendu conditionnel (ex: détail édition, posts, covoiturage)
 
 ---
 
@@ -707,9 +721,11 @@ Client (Vue/Nuxt)
 Server Middleware Pipeline
   ├── cache-headers.ts    → Headers de cache
   ├── noindex.ts          → X-Robots-Tag pour staging
-  └── auth.ts             → Authentication gateway
-        │                    ├── Routes publiques → pass-through
-        │                    ├── Routes protégées → session check → 401 si absent
+  └── auth.ts             → Authentication gateway (config déclarative)
+        │                    ├── publicRoutes.find() → matcher (path/pattern/prefix)
+        │                    ├── Route publique + hydrateSession → session optionnelle
+        │                    ├── Route publique sans hydrateSession → pass-through
+        │                    ├── Route protégée /api/* → session check → 401 si absent
         │                    └── Hydratation context.user
         ▼
 API Handler (server/api/**/*.ts)
@@ -718,9 +734,9 @@ API Handler (server/api/**/*.ts)
   │   ├── ApiError → createError(status, message)
   │   ├── ZodError → handleValidationError(400)
   │   └── Generic → toApiError(500)
-  ├── Permission check     → permissions/*.ts
+  ├── Permission check     → requireAuth() / requireGlobalAdmin() / permissions/*.ts
   ├── Validation Zod       → validation-schemas.ts
-  ├── Prisma queries       → prisma.ts (singleton)
+  ├── Prisma queries       → prisma.ts (singleton + select helpers)
   └── Response             → createSuccessResponse / createPaginatedResponse
 ```
 
@@ -850,7 +866,7 @@ Les composables encapsulent la logique métier complexe et utilisent `$fetch` / 
 | Technologie    | Version | Rôle                              |
 | -------------- | ------- | --------------------------------- |
 | MySQL          | 8.0     | SGBD relationnel                   |
-| Prisma         | 7.0.0   | ORM + migrations                   |
+| Prisma         | 7.0.0   | ORM + migrations + schéma multi-fichiers |
 | @prisma/adapter-mariadb | 7.0.0 | Adaptateur MariaDB driver  |
 
 ### Authentification & Sécurité
@@ -904,7 +920,7 @@ Les composables encapsulent la logique métier complexe et utilisent `$fetch` / 
 │  └──────┬───────┘  └───────┬───────┘  └────┬─────┘  └────────────┬───────────┘ │
 │         │                  │               │                      │              │
 │  ┌──────┴──────────────────┴───────────────┴──────────────────────┴──────────┐  │
-│  │                    46 Composables (logique réutilisable)                   │  │
+│  │                    48 Composables (logique réutilisable)                   │  │
 │  │  useApiAction │ useMapMarkers │ useLeafletEditable │ useMessenger │ ...    │  │
 │  └──────┬────────────────────────────────────────────────────────────────────┘  │
 │         │  $fetch / useApiAction                                                 │
@@ -917,7 +933,7 @@ Les composables encapsulent la logique métier complexe et utilisent `$fetch` / 
 │                                                                                  │
 │  ┌───────────────────────────────────────────────────────────────────────────┐  │
 │  │                    Server Middleware Pipeline                              │  │
-│  │  cache-headers → noindex → auth (public/protected routes)                 │  │
+│  │  cache-headers → noindex → auth (publicRoutes[] déclaratif)               │  │
 │  └────────────────────────────────────┬──────────────────────────────────────┘  │
 │                                       │                                          │
 │  ┌────────────────────────────────────┴──────────────────────────────────────┐  │
@@ -930,7 +946,7 @@ Les composables encapsulent la logique métier complexe et utilisent `$fetch` / 
 │  └────────────────────────────────────┬──────────────────────────────────────┘  │
 │                                       │                                          │
 │  ┌────────────────────────────────────┴──────────────────────────────────────┐  │
-│  │                      Server Utilities (~60)                               │  │
+│  │                      Server Utilities (~81)                               │  │
 │  │                                                                           │  │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │  │
 │  │  │  Permissions  │  │  API Helpers │  │  SSE Manager │  │  Email Svc   │ │  │
@@ -953,10 +969,11 @@ Les composables encapsulent la logique métier complexe et utilisent `$fetch` / 
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                            BASE DE DONNÉES (MySQL 8.0)                           │
 │                                                                                  │
-│  76 modèles │ 20 enums │ 100+ migrations │ 1821 lignes de schéma                │
+│  73 modèles │ 20 enums │ 136 migrations │ 1856 lignes de schéma (9 fichiers)    │
 │                                                                                  │
-│  Domaines: Users │ Conventions │ Editions │ Volunteers │ Ticketing │ Carpool     │
-│            Artists │ Shows │ Workshops │ Messenger │ Notifications │ Zones       │
+│  Domaines: schema (core) │ ticketing (21) │ volunteer (8) │ artists (6)         │
+│            meals (7)     │ carpool (6)    │ misc (6)      │ messenger (3)        │
+│            workshops (3)                                                          │
 └─────────────────────────────────────────────────────────────────────────────────┘
 
 Services externes :
@@ -975,20 +992,22 @@ Services externes :
 
 ### Points forts
 
-1. **Architecture cohérente** : Pattern full-stack Nuxt bien structuré, séparation claire entre app/ et server/
-2. **Système de permissions granulaire** : Modèle de droits flexible et extensible par convention et par édition
-3. **Couverture de tests solide** : 183 fichiers de tests, 4 niveaux (unit, nuxt, e2e, integration)
-4. **i18n mature** : 13 langues, lazy loading par domaine, outils de vérification
-5. **Sécurité** : Sessions scellées, rate limiting, reCAPTCHA, validation Zod, classes d'erreur standardisées
-6. **CI/CD** : Pipeline GitHub Actions avec cache agressif et tests parallélisés
-7. **Patterns réutilisables** : Composables bien factorisés, helpers Prisma standardisés, wrapApiHandler
-8. **Temps réel** : SSE pour notifications, messagerie et billetterie
+1. **Architecture cohérente** : Pattern full-stack Nuxt bien structuré, séparation claire entre app/ et server/, code 100% TypeScript
+2. **Schéma Prisma multi-fichiers** : Refactorisation d'un monolithe de 1 821 lignes vers 9 fichiers de domaine (1 856 lignes), améliorant significativement la maintenabilité
+3. **Routes publiques déclaratives** : Refactorisation du middleware auth (175 → 44 lignes) avec une configuration externalisée typée dans `server/constants/public-routes.ts`
+4. **Système de permissions granulaire** : Modèle de droits flexible et extensible par convention et par édition, avec 8 fichiers de résolution de permissions
+5. **Couverture de tests solide** : 183 fichiers de tests, ~1 950 tests, 4 niveaux (unit, nuxt, e2e, integration)
+6. **i18n mature** : 13 langues, lazy loading par domaine, 15 fichiers de domaine (fr), outils de vérification et de traduction
+7. **Sécurité** : Sessions scellées, rate limiting, reCAPTCHA v3, validation Zod, classes d'erreur standardisées, auth granulaire
+8. **CI/CD** : Pipeline GitHub Actions avec cache agressif, tests parallélisés, MySQL conditionnel
+9. **Patterns réutilisables** : 48 composables, Prisma select helpers (30+), `wrapApiHandler()`, `useApiAction`
+10. **Temps réel** : SSE pour notifications, messagerie, billetterie et import IA
+11. **IA multi-provider** : Support Anthropic Claude, Ollama et LM Studio pour l'import automatique d'éditions
 
 ### Axes d'amélioration
 
-1. **Taille du schéma Prisma** : 1 821 lignes dans un seul fichier. Prisma supporte désormais les schémas multi-fichiers, ce qui améliorerait la maintenabilité
-2. **Complexité du middleware auth** : Le fichier `server/middleware/auth.ts` (175 lignes) liste manuellement toutes les routes publiques avec des regex. Un système déclaratif (métadonnées de route) serait plus maintenable
-3. **Chargement Leaflet via CDN** : Le chargement dynamique par script tag est fragile. Un package npm avec import dynamique (`import('leaflet')`) serait plus robuste
-4. **Ratio code/tests des composants** : 131 composants vs ~20 tests de composants. Les composants complexes (formulaires, plannings) bénéficieraient de plus de couverture
-5. **Server utils volumeux** : ~60 fichiers utilitaires serveur. Certains pourraient être regroupés dans des modules cohérents (ex: toute la logique IA dans un sous-répertoire)
-6. **Format de dates** : `useDateFormat` côté client et `formatDateRange` dans `useLeafletMap` (code mort) — la déduplication récente de `useMapMarkers` est un bon exemple de factorisation à poursuivre
+1. **Taille du domaine billetterie** : 21 modèles Prisma dans `ticketing.prisma` (425 lignes) — c'est le domaine le plus complexe et potentiellement candidat à une subdivision
+2. **Chargement Leaflet via CDN** : Le chargement dynamique par script tag fonctionne mais un package npm avec import dynamique serait plus robuste et typesafe
+3. **Ratio code/tests des composants** : 131 composants vs tests limités dans `test/nuxt/components/` — les composants complexes (formulaires, plannings) bénéficieraient de plus de couverture
+4. **Server utils volumeux** : ~81 fichiers utilitaires serveur — certains pourraient être regroupés dans des modules plus cohérents (la logique IA est déjà bien organisée)
+5. **Nombre de migrations** : 136 migrations, ce qui peut ralentir les resets. Un squash périodique pourrait être envisagé
