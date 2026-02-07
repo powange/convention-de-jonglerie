@@ -1,0 +1,425 @@
+// =============================================================================
+// Billetterie — Configuration externe, tarifs, options, quotas, commandes,
+//               articles à restituer, champs personnalisés, compteurs
+// =============================================================================
+
+enum ExternalTicketingProvider {
+  HELLOASSO
+  BILLETWEB
+  WEEZEVENT
+  OTHER
+}
+
+enum ExternalTicketingStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model ExternalTicketing {
+  id         String                    @id @default(cuid())
+  editionId  Int                       @unique
+  provider   ExternalTicketingProvider
+  status     ExternalTicketingStatus   @default(ACTIVE)
+  lastSyncAt DateTime?
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
+
+  edition          Edition                    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  helloAssoConfig  HelloAssoConfig?
+  tiers            TicketingTier[]
+  options          TicketingOption[]
+  orders           TicketingOrder[]
+  tierCustomFields TicketingTierCustomField[]
+
+  @@index([editionId])
+  @@index([provider])
+  @@index([status])
+}
+
+model HelloAssoConfig {
+  id                  String   @id @default(cuid())
+  externalTicketingId String   @unique
+  clientId            String
+  clientSecret        String // Encrypted
+  organizationSlug    String
+  formType            String // Event, Membership, Donation, etc.
+  formSlug            String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+
+  @@index([externalTicketingId])
+}
+
+model TicketingTier {
+  id                  Int       @id @default(autoincrement())
+  externalTicketingId String? // Null si tarif manuel (non HelloAsso)
+  helloAssoTierId     Int? // ID du tarif dans HelloAsso, null si tarif manuel
+  editionId           Int // Toujours associé à une édition
+  name                String
+  customName          String? // Nom personnalisé (prioritaire sur name si défini)
+  description         String?   @db.Text
+  price               Int // Prix en centimes
+  minAmount           Int? // Montant minimum (pour tarifs libres)
+  maxAmount           Int? // Montant maximum (pour tarifs libres)
+  isActive            Boolean   @default(true)
+  position            Int       @default(0) // Pour l'ordre d'affichage
+  countAsParticipant  Boolean   @default(true) // Si ce tarif compte comme participant dans les stats
+  validFrom           DateTime? // Date de début de validité (optionnel)
+  validUntil          DateTime? // Date de fin de validité (optionnel)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quotas            TicketingTierQuota[]
+  returnableItems   TicketingTierReturnableItem[]
+  orderItems        TicketingOrderItem[]
+  customFields      TicketingTierCustomFieldAssociation[]
+  meals             TicketingTierMeal[]
+  options           TicketingTierOption[]
+
+  @@unique([externalTicketingId, helloAssoTierId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingQuota {
+  id          Int      @id @default(autoincrement())
+  editionId   Int
+  title       String
+  description String?  @db.Text
+  quantity    Int // Nombre (toujours positif)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  edition      Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers        TicketingTierQuota[]
+  options      TicketingOptionQuota[]
+  customFields TicketingTierCustomFieldQuota[]
+
+  @@index([editionId])
+}
+
+model TicketingReturnableItem {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition                           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers                             TicketingTierReturnableItem[]
+  options                           TicketingOptionReturnableItem[]
+  volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
+  customFields                      TicketingTierCustomFieldReturnableItem[]
+  shows                             ShowReturnableItem[]
+  meals                             VolunteerMealReturnableItem[]
+
+  @@index([editionId])
+}
+
+model EditionVolunteerReturnableItem {
+  id               Int      @id @default(autoincrement())
+  editionId        Int
+  returnableItemId Int
+  teamId           String? // NULL = global (tous les bénévoles), défini = équipe spécifique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  edition        Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  team           VolunteerTeam?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, returnableItemId, teamId])
+  @@index([editionId])
+  @@index([returnableItemId])
+  @@index([teamId])
+}
+
+model EditionOrganizerReturnableItem {
+  id               Int      @id @default(autoincrement())
+  editionId        Int
+  returnableItemId Int
+  organizerId      Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  edition   Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer EditionOrganizer? @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, returnableItemId, organizerId])
+  @@index([editionId])
+  @@index([returnableItemId])
+  @@index([organizerId])
+}
+
+model TicketingTierQuota {
+  id      Int @id @default(autoincrement())
+  tierId  Int
+  quotaId Int
+
+  tier  TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  quota TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, quotaId])
+  @@index([tierId])
+  @@index([quotaId])
+}
+
+model TicketingTierReturnableItem {
+  id               Int @id @default(autoincrement())
+  tierId           Int
+  returnableItemId Int
+
+  tier           TicketingTier           @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, returnableItemId])
+  @@index([tierId])
+  @@index([returnableItemId])
+}
+
+model TicketingTierOption {
+  id       Int @id @default(autoincrement())
+  tierId   Int
+  optionId Int
+
+  tier   TicketingTier   @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, optionId])
+  @@index([tierId])
+  @@index([optionId])
+}
+
+model TicketingOptionQuota {
+  id       Int @id @default(autoincrement())
+  optionId Int
+  quotaId  Int
+
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  quota  TicketingQuota  @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, quotaId])
+  @@index([optionId])
+  @@index([quotaId])
+}
+
+model TicketingOptionReturnableItem {
+  id               Int @id @default(autoincrement())
+  optionId         Int
+  returnableItemId Int
+
+  option         TicketingOption         @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, returnableItemId])
+  @@index([optionId])
+  @@index([returnableItemId])
+}
+
+model TicketingOption {
+  id                  Int      @id @default(autoincrement())
+  externalTicketingId String? // Null si option manuelle (non HelloAsso)
+  helloAssoOptionId   String? // ID de l'option dans HelloAsso, null si option manuelle
+  editionId           Int // Toujours associé à une édition
+  name                String
+  description         String?  @db.Text
+  type                String // TextInput, CheckBox, Select, etc.
+  isRequired          Boolean  @default(false)
+  choices             Json? // Array de choix pour les Select/MultipleChoice
+  price               Int? // Prix de l'option en centimes (null si pas de prix)
+  position            Int      @default(0) // Pour l'ordre d'affichage
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing   ExternalTicketing?              @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition             Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quotas              TicketingOptionQuota[]
+  returnableItems     TicketingOptionReturnableItem[]
+  orderItemSelections TicketingOrderItemOption[]
+  tiers               TicketingTierOption[]
+  meals               TicketingOptionMeal[]
+
+  @@unique([externalTicketingId, helloAssoOptionId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingOrder {
+  id                  Int     @id @default(autoincrement())
+  externalTicketingId String? // Nullable pour les commandes manuelles
+  helloAssoOrderId    Int? // Nullable pour les commandes manuelles
+  editionId           Int // Lien direct vers l'édition
+
+  // Informations du payeur
+  payerFirstName String
+  payerLastName  String
+  payerEmail     String
+
+  // Montant et statut
+  amount        Int     // Montant total en centimes
+  status        String  // Processed, Refunded, etc.
+  paymentMethod String? // Type de paiement : cash, card, check, null si non payé
+  checkNumber   String? // Numéro du chèque si paymentMethod = 'check'
+
+  // Date de la commande
+  orderDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition           Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?   @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  items             TicketingOrderItem[]
+
+  @@unique([externalTicketingId, helloAssoOrderId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+  @@index([payerEmail])
+}
+
+model TicketingOrderItem {
+  id              Int  @id @default(autoincrement())
+  orderId         Int // Lien vers TicketingOrder
+  helloAssoItemId Int? // Nullable pour les participants ajoutés manuellement
+  tierId          Int? // Lien vers le tarif HelloAsso
+
+  // Informations du participant (peut différer du payeur)
+  firstName String?
+  lastName  String?
+  email     String?
+
+  // Détails du billet
+  name   String? // Nom du tarif
+  type   String? // Type d'item HelloAsso (Donation, Payment, Membership, etc.)
+  amount Int // Prix payé en centimes
+  state  String // Processed, Refunded, etc.
+  qrCode String? // Code QR pour le contrôle d'accès
+
+  // Champs personnalisés (réponses aux custom fields)
+  customFields Json?
+
+  // Validation d'entrée
+  entryValidated   Boolean   @default(false)
+  entryValidatedAt DateTime?
+  entryValidatedBy Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order           TicketingOrder             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier            TicketingTier?             @relation(fields: [tierId], references: [id])
+  mealAccess      TicketingOrderItemMeal[]
+  selectedOptions TicketingOrderItemOption[]
+
+  @@index([orderId])
+  @@index([tierId])
+  @@index([helloAssoItemId])
+  @@index([email])
+  @@index([qrCode])
+  @@index([entryValidated])
+}
+
+model TicketingTierCustomField {
+  id                     Int      @id @default(autoincrement())
+  helloAssoCustomFieldId Int? // ID du custom field dans HelloAsso (null si manuel)
+  externalTicketingId    String? // Lien vers la configuration HelloAsso (null si manuel)
+  editionId              Int // Lien direct vers l'édition
+  label                  String   @db.Text
+  type                   String // YesNo, ChoiceList, TextInput, etc.
+  isRequired             Boolean  @default(false)
+  values                 Json? // Array de valeurs possibles (pour ChoiceList)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  externalTicketing ExternalTicketing?                       @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers             TicketingTierCustomFieldAssociation[]
+  quotas            TicketingTierCustomFieldQuota[]
+  returnableItems   TicketingTierCustomFieldReturnableItem[]
+
+  @@unique([externalTicketingId, helloAssoCustomFieldId])
+  @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingTierCustomFieldAssociation {
+  id            Int @id @default(autoincrement())
+  tierId        Int
+  customFieldId Int
+
+  tier        TicketingTier            @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, customFieldId])
+  @@index([tierId])
+  @@index([customFieldId])
+}
+
+// Association custom field -> quota (avec choix optionnel pour ChoiceList)
+model TicketingTierCustomFieldQuota {
+  id            Int     @id @default(autoincrement())
+  customFieldId Int
+  quotaId       Int
+  choiceValue   String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche le quota
+
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  quota       TicketingQuota           @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, quotaId, choiceValue])
+  @@index([customFieldId])
+  @@index([quotaId])
+}
+
+// Association custom field -> article à restituer (avec choix optionnel pour ChoiceList)
+model TicketingTierCustomFieldReturnableItem {
+  id               Int     @id @default(autoincrement())
+  customFieldId    Int
+  returnableItemId Int
+  choiceValue      String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la restitution
+
+  customField    TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, returnableItemId, choiceValue])
+  @@index([customFieldId])
+  @@index([returnableItemId])
+}
+
+// Options sélectionnées par les participants (extraOptions HelloAsso)
+model TicketingOrderItemOption {
+  id           Int      @id @default(autoincrement())
+  orderItemId  Int
+  optionId     Int
+  amount       Int      @default(0) // Prix payé pour cette option en centimes
+  customFields Json? // Réponses aux custom fields de l'option
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orderItem TicketingOrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  option    TicketingOption    @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([orderItemId, optionId])
+  @@index([orderItemId])
+  @@index([optionId])
+}
+
+model TicketingCounter {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  token     String   @unique @default(cuid())
+  value     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@index([editionId])
+  @@index([token])
+}

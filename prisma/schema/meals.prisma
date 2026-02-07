@@ -1,0 +1,138 @@
+// =============================================================================
+// Repas — Types de repas, sélections bénévoles/artistes, liens billetterie
+// =============================================================================
+
+enum VolunteerMealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+}
+
+enum VolunteerMealPhase {
+  SETUP
+  EVENT
+  TEARDOWN
+}
+
+model VolunteerMeal {
+  id        Int               @id @default(autoincrement())
+  editionId Int
+  date      DateTime          @db.Date
+  mealType  VolunteerMealType
+  enabled   Boolean           @default(true)
+  phases    Json              @default("[]")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  edition                Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  mealSelections         VolunteerMealSelection[]
+  artistMealSelections   ArtistMealSelection[]
+  returnableItems        VolunteerMealReturnableItem[]
+  tiers                  TicketingTierMeal[]
+  options                TicketingOptionMeal[]
+  participantValidations TicketingOrderItemMeal[]
+
+  @@unique([editionId, date, mealType])
+  @@index([editionId])
+  @@index([date])
+}
+
+model VolunteerMealSelection {
+  id          Int       @id @default(autoincrement())
+  volunteerId Int
+  mealId      Int
+  accepted    Boolean   @default(true)
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  volunteer EditionVolunteerApplication @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  meal      VolunteerMeal               @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([volunteerId, mealId])
+  @@index([volunteerId])
+  @@index([mealId])
+}
+
+model ArtistMealSelection {
+  id         Int       @id @default(autoincrement())
+  artistId   Int
+  mealId     Int
+  accepted   Boolean   @default(true)
+  afterShow  Boolean   @default(false)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  meal   VolunteerMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, mealId])
+  @@index([artistId])
+  @@index([mealId])
+}
+
+// Association repas -> articles à restituer
+model VolunteerMealReturnableItem {
+  id               Int      @id @default(autoincrement())
+  mealId           Int
+  returnableItemId Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  meal           VolunteerMeal           @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([mealId, returnableItemId])
+  @@index([mealId])
+  @@index([returnableItemId])
+}
+
+// Association tarif -> repas
+model TicketingTierMeal {
+  id        Int      @id @default(autoincrement())
+  tierId    Int
+  mealId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tier TicketingTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  meal VolunteerMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, mealId])
+  @@index([tierId])
+  @@index([mealId])
+}
+
+// Association option -> repas
+model TicketingOptionMeal {
+  id        Int      @id @default(autoincrement())
+  optionId  Int
+  mealId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  meal   VolunteerMeal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, mealId])
+  @@index([optionId])
+  @@index([mealId])
+}
+
+// Association participant -> repas (pour validation individuelle)
+model TicketingOrderItemMeal {
+  id          Int       @id @default(autoincrement())
+  orderItemId Int
+  mealId      Int
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  orderItem TicketingOrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  meal      VolunteerMeal      @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([orderItemId, mealId])
+  @@index([orderItemId])
+  @@index([mealId])
+}

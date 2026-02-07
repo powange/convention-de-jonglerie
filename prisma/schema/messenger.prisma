@@ -1,0 +1,76 @@
+// =============================================================================
+// Messagerie — Conversations, participants et messages
+// =============================================================================
+
+enum ConversationType {
+  TEAM_GROUP // Discussion de groupe d'équipe
+  TEAM_LEADER_PRIVATE // Conversation privée avec le responsable d'équipe
+  VOLUNTEER_TO_ORGANIZERS // Conversation entre un bénévole et les organisateurs ayant les droits de gestion des bénévoles
+  ORGANIZERS_GROUP // Discussion de groupe entre tous les organisateurs de l'édition
+  PRIVATE // Conversation privée 1-à-1 entre deux utilisateurs (non liée à une édition)
+  ARTIST_APPLICATION // Conversation entre un artiste candidat et les organisateurs
+}
+
+model Conversation {
+  id                String           @id @default(cuid())
+  editionId         Int? // Optionnel : NULL pour les conversations privées 1-à-1
+  teamId            String? // Optionnel : uniquement pour les conversations liées à une équipe
+  showApplicationId Int?             @unique // Optionnel : uniquement pour les conversations de candidature artiste
+  type              ConversationType
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  edition         Edition?                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  team            VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  showApplication ShowApplication?          @relation(fields: [showApplicationId], references: [id], onDelete: Cascade)
+  participants    ConversationParticipant[]
+  messages        Message[]
+
+  @@index([editionId])
+  @@index([teamId])
+  @@index([showApplicationId])
+  @@index([type])
+}
+
+model ConversationParticipant {
+  id                String    @id @default(cuid())
+  conversationId    String
+  userId            Int
+  joinedAt          DateTime  @default(now())
+  leftAt            DateTime? // NULL = toujours participant, non-NULL = a quitté
+  lastReadAt        DateTime? // Pour les badges "non lu" (deprecated, utiliser lastReadMessageId)
+  lastReadMessageId String? // ID du dernier message lu par ce participant
+
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        Message[]
+  lastReadMessage Message?     @relation("LastReadMessage", fields: [lastReadMessageId], references: [id], onDelete: SetNull)
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@index([leftAt])
+  @@index([lastReadMessageId])
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  participantId  String
+  content        String    @db.Text
+  replyToId      String? // ID du message auquel on répond (optionnel)
+  createdAt      DateTime  @default(now())
+  editedAt       DateTime?
+  deletedAt      DateTime? // Soft delete
+
+  conversation           Conversation              @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  participant            ConversationParticipant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  replyTo                Message?                  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies                Message[]                 @relation("MessageReplies")
+  lastReadByParticipants ConversationParticipant[] @relation("LastReadMessage")
+
+  @@index([conversationId])
+  @@index([participantId])
+  @@index([createdAt])
+  @@index([replyToId])
+}

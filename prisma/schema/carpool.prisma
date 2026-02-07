@@ -1,0 +1,123 @@
+// =============================================================================
+// Covoiturage — Offres, demandes, réservations et commentaires
+// =============================================================================
+
+enum CarpoolDirection {
+  TO_EVENT // Aller vers la convention
+  FROM_EVENT // Retour depuis la convention
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model CarpoolOffer {
+  id              Int                @id @default(autoincrement())
+  userId          Int
+  tripDate        DateTime
+  locationCity    String
+  locationAddress String
+  availableSeats  Int
+  direction       CarpoolDirection   @default(TO_EVENT)
+  description     String?            @db.Text
+  phoneNumber     String?
+  smokingAllowed  Boolean            @default(false)
+  petsAllowed     Boolean            @default(false)
+  musicAllowed    Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  editionId       Int
+  bookings        CarpoolBooking[]
+  comments        CarpoolComment[]
+  edition         Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passengers      CarpoolPassenger[]
+
+  @@index([editionId], map: "CarpoolOffer_editionId_fkey")
+  @@index([userId], map: "CarpoolOffer_userId_fkey")
+}
+
+model CarpoolRequest {
+  id           Int                     @id @default(autoincrement())
+  userId       Int
+  tripDate     DateTime
+  locationCity String
+  seatsNeeded  Int                     @default(1)
+  direction    CarpoolDirection        @default(TO_EVENT)
+  description  String?                 @db.Text
+  phoneNumber  String?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  editionId    Int
+  bookings     CarpoolBooking[]
+  edition      Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments     CarpoolRequestComment[]
+
+  @@index([editionId], map: "CarpoolRequest_editionId_fkey")
+  @@index([userId], map: "CarpoolRequest_userId_fkey")
+}
+
+model CarpoolComment {
+  id             Int          @id @default(autoincrement())
+  carpoolOfferId Int
+  userId         Int
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  carpoolOffer   CarpoolOffer @relation(fields: [carpoolOfferId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([carpoolOfferId], map: "CarpoolComment_carpoolOfferId_fkey")
+  @@index([userId], map: "CarpoolComment_userId_fkey")
+}
+
+model CarpoolRequestComment {
+  id               Int            @id @default(autoincrement())
+  carpoolRequestId Int
+  userId           Int
+  content          String         @db.Text
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  carpoolRequest   CarpoolRequest @relation(fields: [carpoolRequestId], references: [id], onDelete: Cascade)
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([carpoolRequestId], map: "CarpoolRequestComment_carpoolRequestId_fkey")
+  @@index([userId], map: "CarpoolRequestComment_userId_fkey")
+}
+
+model CarpoolPassenger {
+  id             Int          @id @default(autoincrement())
+  carpoolOfferId Int
+  userId         Int
+  addedAt        DateTime     @default(now())
+  addedById      Int
+  carpoolOffer   CarpoolOffer @relation(fields: [carpoolOfferId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([carpoolOfferId, userId])
+  @@index([carpoolOfferId], map: "CarpoolPassenger_carpoolOfferId_fkey")
+  @@index([userId], map: "CarpoolPassenger_userId_fkey")
+}
+
+model CarpoolBooking {
+  id             Int             @id @default(autoincrement())
+  carpoolOfferId Int
+  requestId      Int?
+  requesterId    Int
+  seats          Int
+  message        String?         @db.Text
+  status         BookingStatus   @default(PENDING)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  carpoolOffer   CarpoolOffer    @relation(fields: [carpoolOfferId], references: [id], onDelete: Cascade)
+  carpoolRequest CarpoolRequest? @relation(fields: [requestId], references: [id])
+  requester      User            @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+
+  @@index([carpoolOfferId], map: "CarpoolBooking_carpoolOfferId_fkey")
+  @@index([requesterId], map: "CarpoolBooking_requesterId_fkey")
+  @@index([requestId], map: "CarpoolBooking_requestId_fkey")
+}

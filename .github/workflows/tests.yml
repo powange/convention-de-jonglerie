@@ -41,7 +41,7 @@ jobs:
         id: cache-keys
         run: |
           echo "deps=${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma', 'prisma.config.ts') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema/**', 'prisma.config.ts') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
           echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('nuxt.config.ts', 'tsconfig.json', 'app.config.ts') }}" >> $GITHUB_OUTPUT
 
       - name: Cache Node dependencies

@@ -1,0 +1,185 @@
+// =============================================================================
+// Divers — Objets trouvés, feedback, logs d'erreurs, notifications, FCM
+// =============================================================================
+
+enum LostFoundStatus {
+  LOST
+  RETURNED
+}
+
+enum FeedbackType {
+  BUG
+  SUGGESTION
+  GENERAL
+  COMPLAINT
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+model LostFoundItem {
+  id          Int                @id @default(autoincrement())
+  editionId   Int
+  userId      Int
+  description String             @db.Text
+  imageUrl    String?
+  status      LostFoundStatus    @default(LOST)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  comments    LostFoundComment[]
+  edition     Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([editionId], map: "LostFoundItem_editionId_fkey")
+  @@index([userId], map: "LostFoundItem_userId_fkey")
+}
+
+model LostFoundComment {
+  id              Int           @id @default(autoincrement())
+  lostFoundItemId Int
+  userId          Int
+  content         String        @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  lostFoundItem   LostFoundItem @relation(fields: [lostFoundItemId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([lostFoundItemId], map: "LostFoundComment_lostFoundItemId_fkey")
+  @@index([userId], map: "LostFoundComment_userId_fkey")
+}
+
+model Feedback {
+  id         Int          @id @default(autoincrement())
+  type       FeedbackType
+  subject    String
+  message    String       @db.Text
+  email      String?
+  name       String?
+  userId     Int?
+  userAgent  String?      @db.Text
+  url        String?      @db.Text
+  resolved   Boolean      @default(false)
+  adminNotes String?      @db.Text
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  user       User?        @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "Feedback_userId_fkey")
+  @@index([type])
+  @@index([resolved])
+}
+
+// ========== LOGS D'ERREURS ==========
+
+model ApiErrorLog {
+  id String @id @default(cuid())
+
+  // Informations sur l'erreur
+  message    String  @db.Text
+  statusCode Int
+  stack      String? @db.LongText
+  errorType  String? // Type d'erreur (ValidationError, DatabaseError, etc.)
+
+  // Contexte de la requête
+  method    String // GET, POST, PUT, DELETE, etc.
+  url       String  @db.Text
+  path      String // URL path sans query params
+  userAgent String? @db.Text
+  ip        String?
+  referer   String? @db.Text // Page d'origine de la requête
+  origin    String? // Domaine d'origine
+
+  // Données de la requête
+  headers     Json? // Headers de la requête (sans données sensibles)
+  body        Json? // Corps de la requête (sans données sensibles)
+  queryParams Json? // Paramètres de requête
+
+  // Détails d'erreur SQL/Prisma (pour erreurs base de données)
+  prismaDetails Json? // Code d'erreur Prisma, détails MySQL, etc.
+
+  // Informations utilisateur
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
+
+  // Métadonnées
+  resolved   Boolean   @default(false) // Marqué comme résolu par un admin
+  resolvedBy Int?
+  resolvedAt DateTime?
+  adminNotes String?   @db.Text
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([statusCode])
+  @@index([path])
+  @@index([userId])
+  @@index([resolved])
+  @@index([resolved, createdAt]) // Index composite pour filtrer par resolved + tri par date
+}
+
+// ========== NOTIFICATIONS ==========
+
+model Notification {
+  id     String @id @default(cuid())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Contenu de la notification
+  type NotificationType
+
+  // SYSTÈME DE TRADUCTION (notifications système)
+  titleKey          String? // Clé de traduction pour le titre
+  messageKey        String? // Clé de traduction pour le message
+  translationParams Json? // Paramètres pour les traductions (noms, dates, etc.)
+  actionTextKey     String? // Clé de traduction pour le texte du bouton
+
+  // TEXTE LIBRE (notifications custom/orgas)
+  titleText   String? @db.Text // Texte libre pour le titre
+  messageText String? @db.Text // Texte libre pour le message
+  actionText  String? // Texte libre pour le bouton d'action
+
+  // Métadonnées pour le contexte
+  category   String? // 'edition', 'volunteer', 'system', etc.
+  entityType String? // Type d'entité liée (Edition, User, etc.)
+  entityId   String? // ID de l'entité liée
+
+  // États de lecture
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  // Actions optionnelles
+  actionUrl String? @db.Text // URL vers laquelle rediriger
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Index pour optimiser les requêtes
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([category])
+}
+
+model FcmToken {
+  id        String   @id @default(cuid())
+  userId    Int
+  token     String   @db.VarChar(500)
+  isActive  Boolean  @default(true)
+  deviceId  String?  @db.VarChar(100) // Identifiant unique de l'appareil (généré côté client, stocké en localStorage)
+  userAgent String?  @db.VarChar(500) // User-Agent du navigateur (informatif uniquement)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, token])
+  @@index([userId])
+  @@index([token])
+  @@index([deviceId])
+}

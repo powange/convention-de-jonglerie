@@ -1,0 +1,191 @@
+// =============================================================================
+// Artistes — Profils, spectacles, appels à candidatures et candidatures
+// =============================================================================
+
+enum ShowCallMode {
+  INTERNAL // Formulaire interne sur la plateforme
+  EXTERNAL // URL externe vers un autre formulaire
+}
+
+enum ShowApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model EditionArtist {
+  id                      Int               @id @default(autoincrement())
+  editionId               Int
+  userId                  Int
+  arrivalDateTime         String?
+  departureDateTime       String?
+  dietaryPreference       DietaryPreference @default(NONE)
+  allergies               String?           @db.Text
+  allergySeverity         AllergySeverity?
+  qrCodeToken             String?           @unique
+  entryValidated          Boolean           @default(false)
+  entryValidatedAt        DateTime?
+  entryValidatedBy        Int?
+  payment                 Decimal?          @db.Decimal(10, 2)
+  paymentPaid             Boolean           @default(false)
+  reimbursementMax        Decimal?          @db.Decimal(10, 2)
+  reimbursementActual     Decimal?          @db.Decimal(10, 2)
+  reimbursementActualPaid Boolean           @default(false)
+  organizerNotes          String?           @db.Text
+  accommodationAutonomous Boolean           @default(false)
+  accommodationProposal   String?           @db.Text
+  invoiceRequested        Boolean           @default(false)
+  invoiceProvided         Boolean           @default(false)
+  feeRequested            Boolean           @default(false)
+  feeProvided             Boolean           @default(false)
+  pickupRequired          Boolean           @default(false)
+  pickupLocation          String?
+  pickupResponsibleId     Int?
+  dropoffRequired         Boolean           @default(false)
+  dropoffLocation         String?
+  dropoffResponsibleId    Int?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  edition              Edition               @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entryValidatedByUser User?                 @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
+  pickupResponsible    User?                 @relation("ArtistPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
+  dropoffResponsible   User?                 @relation("ArtistDropoffResponsible", fields: [dropoffResponsibleId], references: [id], onDelete: SetNull)
+  shows                ShowArtist[]
+  mealSelections       ArtistMealSelection[]
+
+  @@unique([editionId, userId])
+  @@index([editionId])
+  @@index([userId])
+  @@index([entryValidatedBy])
+  @@index([pickupResponsibleId])
+  @@index([dropoffResponsibleId])
+  @@index([qrCodeToken])
+}
+
+model Show {
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  title         String
+  description   String?  @db.Text
+  startDateTime DateTime
+  duration      Int?
+  location      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  edition         Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  artists         ShowArtist[]
+  returnableItems ShowReturnableItem[]
+
+  @@index([editionId])
+  @@index([startDateTime])
+}
+
+model ShowArtist {
+  id        Int      @id @default(autoincrement())
+  showId    Int
+  artistId  Int
+  createdAt DateTime @default(now())
+
+  show   Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, artistId])
+  @@index([showId])
+  @@index([artistId])
+}
+
+model ShowReturnableItem {
+  id               Int      @id @default(autoincrement())
+  showId           Int
+  returnableItemId Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  show           Show                    @relation(fields: [showId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, returnableItemId])
+  @@index([showId])
+  @@index([returnableItemId])
+}
+
+// ========== APPEL À SPECTACLES ==========
+
+// Configuration de l'appel à spectacles sur une édition
+// Une édition peut avoir plusieurs appels (scène ouverte, gala, spectacles longs, etc.)
+model EditionShowCall {
+  id          Int           @id @default(autoincrement())
+  editionId   Int
+  name        String        // Nom de l'appel (ex: "Scène ouverte", "Gala", "Spectacles longs")
+  isOpen      Boolean       @default(false)
+  mode        ShowCallMode  @default(INTERNAL)
+  externalUrl String?
+  description String?       @db.Text
+  deadline    DateTime?
+  // Champs demandés (configurables par l'organisateur)
+  askPortfolioUrl   Boolean @default(true)
+  askVideoUrl       Boolean @default(true)
+  askTechnicalNeeds Boolean @default(true)
+  askAccommodation  Boolean @default(false)
+  askDepartureCity  Boolean @default(false) // Demander la ville de départ pour le défraiement
+  askSocialLinks    Boolean @default(false) // Demander les réseaux sociaux
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  edition      Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  applications ShowApplication[]
+
+  @@unique([editionId, name])
+  @@index([editionId])
+}
+
+// Candidature d'un artiste avec sa proposition de spectacle
+model ShowApplication {
+  id         Int                   @id @default(autoincrement())
+  showCallId Int
+  userId     Int
+  status     ShowApplicationStatus @default(PENDING)
+
+  // Infos artiste
+  artistName   String        // Nom de scène
+  artistBio    String?       @db.Text // Présentation de l'artiste
+  portfolioUrl String?       // Site web / portfolio
+  videoUrl     String?       // Lien vidéo de démonstration
+  socialLinks  String?       @db.Text // Liens réseaux sociaux (un par ligne)
+
+  // Infos spectacle proposé
+  showTitle                 String  // Titre du spectacle
+  showDescription           String  @db.Text // Description détaillée
+  showDuration              Int     // Durée en minutes
+  showCategory              String? // Type (jonglage, acrobatie, magie, etc.)
+  technicalNeeds            String? @db.Text // Besoins techniques (espace, son, lumière)
+  additionalPerformersCount Int     @default(0) // Nombre de personnes supplémentaires dans le spectacle
+  additionalPerformers      Json?   // Infos de contact des personnes supplémentaires [{lastName, firstName, email, phone}]
+
+  // Logistique
+  accommodationNeeded Boolean  @default(false)
+  accommodationNotes  String?  @db.Text
+  departureCity       String?  // Ville de départ pour le défraiement
+
+  // Gestion par les organisateurs
+  organizerNotes String?   @db.Text // Notes internes organisateurs
+  decidedAt      DateTime?
+  decidedById    Int?
+
+  // Traçabilité
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  showCall     EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy    User?           @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  conversation Conversation? // Conversation avec les organisateurs
+
+  @@unique([showCallId, userId])
+  @@index([showCallId])
+  @@index([userId])
+  @@index([status])
+}

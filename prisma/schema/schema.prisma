@@ -1,0 +1,445 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../server/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// =============================================================================
+// Utilisateur principal
+// =============================================================================
+
+model User {
+  id                                 Int                                 @id @default(autoincrement())
+  email                              String                              @unique
+  emailHash                          String
+  pseudo                             String                              @unique
+  nom                                String?
+  prenom                             String?
+  password                           String?
+  authProvider                       String                              @default("email") // "email", "google", "facebook"
+  createdAt                          DateTime                            @default(now())
+  updatedAt                          DateTime                            @updatedAt
+  lastLoginAt                        DateTime?
+  profilePicture                     String?
+  emailVerificationCode              String?
+  isEmailVerified                    Boolean                             @default(false)
+  verificationCodeExpiry             DateTime?
+  isGlobalAdmin                      Boolean                             @default(false)
+  phone                              String?
+  preferredLanguage                  String                              @default("fr")
+  notificationPreferences            Json?
+  isVolunteer                        Boolean                             @default(false)
+  isArtist                           Boolean                             @default(false)
+  isOrganizer                        Boolean                             @default(false)
+  carpoolBookings                    CarpoolBooking[]
+  carpoolComments                    CarpoolComment[]
+  carpoolOffers                      CarpoolOffer[]
+  carpoolPassengers                  CarpoolPassenger[]
+  carpoolRequests                    CarpoolRequest[]
+  carpoolRequestComments             CarpoolRequestComment[]
+  permissionHistoryActions           OrganizerPermissionHistory[]        @relation("OrganizerPermissionHistory_actor")
+  targetUserHistories                OrganizerPermissionHistory[]        @relation("OrganizerPermissionHistory_target")
+  createdConventions                 Convention[]
+  addedOrganizers                    ConventionOrganizer[]               @relation("AddedOrganizers")
+  organizations                      ConventionOrganizer[]
+  createdEditions                    Edition[]                           @relation("CreatedEditions")
+  editionPosts                       EditionPost[]
+  editionPostComments                EditionPostComment[]
+  volunteerApplications              EditionVolunteerApplication[]
+  manuallyAddedVolunteers            EditionVolunteerApplication[]       @relation("ManuallyAddedVolunteers")
+  feedbacks                          Feedback[]
+  apiErrorLogs                       ApiErrorLog[]
+  notifications                      Notification[]
+  lostFoundComments                  LostFoundComment[]
+  lostFoundItems                     LostFoundItem[]
+  passwordResetTokens                PasswordResetToken[]
+  favoriteEditions                   Edition[]                           @relation("FavoriteEditions")
+  attendingEditions                  Edition[]                           @relation("AttendingEditions")
+  fcmTokens                          FcmToken[]
+  volunteerNotificationGroups        VolunteerNotificationGroup[]
+  volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
+  volunteerAssignments               VolunteerAssignment[]               @relation("VolunteerAssignment_user")
+  assignedVolunteerSlots             VolunteerAssignment[]               @relation("VolunteerAssignment_assignedBy")
+  claimRequests                      ConventionClaimRequest[]
+  workshops                          Workshop[]
+  workshopFavorites                  WorkshopFavorite[]
+  artistProfiles                     EditionArtist[]
+  validatedArtistEntries             EditionArtist[]                     @relation("ArtistEntryValidator")
+  artistPickupResponsibilities       EditionArtist[]                     @relation("ArtistPickupResponsible")
+  artistDropoffResponsibilities      EditionArtist[]                     @relation("ArtistDropoffResponsible")
+  volunteerComments                  VolunteerComment[]
+  conversationParticipants           ConversationParticipant[]
+  showApplications                   ShowApplication[]
+  decidedShowApplications            ShowApplication[]           @relation("ShowApplicationDecider")
+}
+
+// =============================================================================
+// Éditions et Conventions
+// =============================================================================
+
+enum EditionStatus {
+  PLANNED   // Planifié - dates confirmées mais détails incomplets
+  PUBLISHED // Publié - en ligne et visible
+  OFFLINE   // Hors ligne - complet mais désactivé/caché
+  CANCELLED // Annulé - convention annulée
+}
+
+model Edition {
+  id                                Int                              @id @default(autoincrement())
+  name                              String?
+  description                       String?                          @db.Text
+  program                           String?                          @db.Text
+  createdAt                         DateTime                         @default(now())
+  updatedAt                         DateTime                         @updatedAt
+  creatorId                         Int? // Nullable pour éditions importées
+  endDate                           DateTime
+  startDate                         DateTime
+  addressLine1                      String
+  addressLine2                      String?
+  city                              String
+  country                           String
+  postalCode                        String
+  region                            String?
+  timezone                          String? // IANA timezone (ex: "Europe/Paris", "America/New_York")
+  latitude                          Float?
+  longitude                         Float?
+  facebookUrl                       String?
+  instagramUrl                      String?
+  ticketingUrl                      String?
+  acceptsPets                       Boolean                          @default(false)
+  hasFoodTrucks                     Boolean                          @default(false)
+  hasGym                            Boolean                          @default(false)
+  hasKidsZone                       Boolean                          @default(false)
+  hasTentCamping                    Boolean                          @default(false)
+  hasTruckCamping                   Boolean                          @default(false)
+  imageUrl                          String?
+  hasAccessibility                  Boolean                          @default(false)
+  hasAerialSpace                    Boolean                          @default(false)
+  hasCantine                        Boolean                          @default(false)
+  hasConcert                        Boolean                          @default(false)
+  hasFamilyCamping                  Boolean                          @default(false)
+  hasSleepingRoom                   Boolean                          @default(false)
+  hasFireSpace                      Boolean                          @default(false)
+  hasGala                           Boolean                          @default(false)
+  hasOpenStage                      Boolean                          @default(false)
+  hasShowers                        Boolean                          @default(false)
+  hasSlacklineSpace                 Boolean                          @default(false)
+  hasToilets                        Boolean                          @default(false)
+  hasWorkshops                      Boolean                          @default(false)
+  hasCashPayment                    Boolean                          @default(false)
+  hasCreditCardPayment              Boolean                          @default(false)
+  hasAfjTokenPayment                Boolean                          @default(false)
+  conventionId                      Int
+  hasATM                            Boolean                          @default(false)
+  hasLongShow                       Boolean                          @default(false)
+  status                            EditionStatus                    @default(OFFLINE)
+  volunteersDescription             String?                          @db.Text
+  volunteersOpen                    Boolean                          @default(false)
+  volunteersUpdatedAt               DateTime?
+  volunteersExternalUrl             String?
+  volunteersMode                    VolunteerMode                    @default(INTERNAL)
+  volunteersAskDiet                 Boolean                          @default(false)
+  volunteersAskAllergies            Boolean                          @default(false)
+  officialWebsiteUrl                String?
+  volunteersAskTimePreferences      Boolean                          @default(false)
+  volunteersAskTeamPreferences      Boolean                          @default(false)
+  volunteersAskPets                 Boolean                          @default(false)
+  volunteersAskMinors               Boolean                          @default(false)
+  volunteersAskVehicle              Boolean                          @default(false)
+  volunteersAskCompanion            Boolean                          @default(false)
+  volunteersAskAvoidList            Boolean                          @default(false)
+  volunteersAskSkills               Boolean                          @default(false)
+  volunteersAskExperience           Boolean                          @default(false)
+  volunteersAskEmergencyContact     Boolean                          @default(false)
+  volunteersTeardownEndDate         DateTime?
+  volunteersSetupStartDate          DateTime?
+  volunteersAskSetup                Boolean                          @default(false)
+  volunteersAskTeardown             Boolean                          @default(false)
+  ticketingAllowOnsiteRegistration  Boolean                          @default(true)
+  ticketingAllowAnonymousOrders     Boolean                          @default(false)
+  workshopsEnabled                  Boolean                          @default(false)
+  workshopLocationsFreeInput        Boolean                          @default(false)
+  mapPublic                         Boolean                          @default(false)
+  carpoolOffers                     CarpoolOffer[]
+  carpoolRequests                   CarpoolRequest[]
+  convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  creator                           User?                            @relation("CreatedEditions", fields: [creatorId], references: [id])
+  organizerPermissions              EditionOrganizerPermission[]
+  editionPosts                      EditionPost[]
+  volunteerApplications             EditionVolunteerApplication[]
+  lostFoundItems                    LostFoundItem[]
+  favoritedBy                       User[]                           @relation("FavoriteEditions")
+  attendingUsers                    User[]                           @relation("AttendingEditions")
+  volunteerNotificationGroups       VolunteerNotificationGroup[]
+  volunteerTeams                    VolunteerTeam[]
+  volunteerTimeSlots                VolunteerTimeSlot[]
+  externalTicketing                 ExternalTicketing?
+  tiers                             TicketingTier[]
+  ticketingQuotas                   TicketingQuota[]
+  returnableItems                   TicketingReturnableItem[]
+  options                           TicketingOption[]
+  orders                            TicketingOrder[]
+  volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
+  organizerTicketingReturnableItems EditionOrganizerReturnableItem[]
+  tierCustomFields                  TicketingTierCustomField[]
+  workshops                         Workshop[]
+  workshopLocations                 WorkshopLocation[]
+  artists                           EditionArtist[]
+  shows                             Show[]
+  volunteerMeals                    VolunteerMeal[]
+  ticketingCounters                 TicketingCounter[]
+  volunteerComments                 VolunteerComment[]
+  editionOrganizers                 EditionOrganizer[]
+  conversations                     Conversation[]
+  showCalls                         EditionShowCall[]
+  zones                             EditionZone[]
+  markers                           EditionMarker[]
+
+  @@index([creatorId], map: "Edition_creatorId_fkey")
+  @@index([conventionId], map: "Edition_conventionId_fkey")
+  @@index([status])
+}
+
+model Convention {
+  id                Int                          @id @default(autoincrement())
+  name              String
+  description       String?                      @db.Text
+  logo              String?
+  email             String? // Email pour revendication
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+  authorId          Int? // Nullable pour conventions importées
+  archivedAt        DateTime?
+  isArchived        Boolean                      @default(false)
+  permissionHistory OrganizerPermissionHistory[]
+  author            User?                        @relation(fields: [authorId], references: [id])
+  organizers        ConventionOrganizer[]
+  editions          Edition[]
+  claimRequests     ConventionClaimRequest[]
+
+  @@index([authorId], map: "Convention_authorId_fkey")
+}
+
+model ConventionClaimRequest {
+  id           String    @id @default(cuid())
+  conventionId Int
+  userId       Int
+  code         String    @unique // Code de vérification envoyé par email
+  expiresAt    DateTime // Expiration du code (ex: 1h)
+  isVerified   Boolean   @default(false)
+  verifiedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conventionId, userId]) // Un seul claim actif par convention/utilisateur
+  @@index([conventionId])
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
+}
+
+// =============================================================================
+// Organisateurs et permissions
+// =============================================================================
+
+enum OrganizerPermissionChangeType {
+  CREATED
+  RIGHTS_UPDATED
+  PER_EDITIONS_UPDATED
+  ARCHIVED
+  UNARCHIVED
+  REMOVED
+}
+
+model ConventionOrganizer {
+  id                    Int                          @id @default(autoincrement())
+  conventionId          Int
+  userId                Int
+  addedAt               DateTime                     @default(now())
+  addedById             Int
+  canAddEdition         Boolean                      @default(false)
+  canDeleteAllEditions  Boolean                      @default(false)
+  canDeleteConvention   Boolean                      @default(false)
+  canEditAllEditions    Boolean                      @default(false)
+  canEditConvention     Boolean                      @default(false)
+  canManageOrganizers   Boolean                      @default(false)
+  title                 String?
+  canManageVolunteers   Boolean                      @default(false)
+  canManageArtists      Boolean                      @default(false)
+  canManageMeals        Boolean                      @default(false)
+  canManageTicketing    Boolean                      @default(false)
+  addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
+  convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  perEditionPermissions EditionOrganizerPermission[]
+  editionOrganizers     EditionOrganizer[]
+
+  @@unique([conventionId, userId])
+  @@index([addedById], map: "ConventionOrganizer_addedById_fkey")
+  @@index([userId], map: "ConventionOrganizer_userId_fkey")
+}
+
+model EditionOrganizerPermission {
+  id                  Int                 @id @default(autoincrement())
+  organizerId         Int
+  editionId           Int
+  canEdit             Boolean             @default(false)
+  canDelete           Boolean             @default(false)
+  canManageVolunteers Boolean             @default(false)
+  canManageArtists    Boolean             @default(false)
+  canManageMeals      Boolean             @default(false)
+  canManageTicketing  Boolean             @default(false)
+  organizer           ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  edition             Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@unique([organizerId, editionId])
+  @@index([editionId])
+}
+
+model EditionOrganizer {
+  id               Int                              @id @default(autoincrement())
+  editionId        Int
+  organizerId      Int
+  qrCodeToken      String?                          @unique
+  entryValidated   Boolean                          @default(false)
+  entryValidatedAt DateTime?
+  entryValidatedBy Int?
+  createdAt        DateTime                         @default(now())
+  updatedAt        DateTime                         @updatedAt
+  edition          Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer        ConventionOrganizer              @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  returnableItems  EditionOrganizerReturnableItem[]
+
+  @@unique([editionId, organizerId])
+  @@index([editionId])
+  @@index([organizerId])
+  @@index([entryValidatedBy])
+  @@index([qrCodeToken])
+}
+
+model OrganizerPermissionHistory {
+  id           Int                           @id @default(autoincrement())
+  conventionId Int
+  actorId      Int
+  changeType   OrganizerPermissionChangeType
+  before       Json?
+  after        Json?
+  createdAt    DateTime                      @default(now())
+  targetUserId Int?
+  actor        User                          @relation("OrganizerPermissionHistory_actor", fields: [actorId], references: [id], onDelete: Cascade)
+  convention   Convention                    @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  targetUser   User?                         @relation("OrganizerPermissionHistory_target", fields: [targetUserId], references: [id])
+
+  @@index([conventionId])
+  @@index([actorId])
+  @@index([changeType])
+  @@index([targetUserId])
+}
+
+// =============================================================================
+// Publications et commentaires d'édition
+// =============================================================================
+
+model EditionPost {
+  id        Int                  @id @default(autoincrement())
+  editionId Int
+  userId    Int
+  content   String               @db.Text
+  pinned    Boolean              @default(false)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  edition   Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  EditionPostComment[]
+
+  @@index([editionId], map: "EditionPost_editionId_fkey")
+  @@index([userId], map: "EditionPost_userId_fkey")
+  @@index([pinned])
+}
+
+model EditionPostComment {
+  id            Int         @id @default(autoincrement())
+  editionPostId Int
+  userId        Int
+  content       String      @db.Text
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  editionPost   EditionPost @relation(fields: [editionPostId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([editionPostId], map: "EditionPostComment_editionPostId_fkey")
+  @@index([userId], map: "EditionPostComment_userId_fkey")
+}
+
+// =============================================================================
+// Authentification
+// =============================================================================
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "PasswordResetToken_userId_fkey")
+  @@index([token])
+}
+
+// =============================================================================
+// Zones et points de repère de la carte d'édition
+// =============================================================================
+
+enum EditionZoneType {
+  CAMPING
+  PARKING
+  SHOWS
+  WORKSHOPS
+  FOOD
+  MARKET
+  ENTRANCE
+  TOILETS
+  INFO
+  OTHER
+}
+
+model EditionZone {
+  id          Int             @id @default(autoincrement())
+  edition     Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   Int
+  name        String          @db.VarChar(100)
+  description String?         @db.Text
+  color       String          @db.VarChar(7) // Format #RRGGBB
+  coordinates Json            // GeoJSON polygon coordinates
+  zoneType    EditionZoneType @default(OTHER)
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([editionId])
+}
+
+model EditionMarker {
+  id          Int             @id @default(autoincrement())
+  edition     Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   Int
+  name        String          @db.VarChar(100)
+  description String?         @db.Text
+  latitude    Float           // Coordonnée latitude
+  longitude   Float           // Coordonnée longitude
+  markerType  EditionZoneType @default(OTHER)
+  color       String?         @db.VarChar(7) // Couleur personnalisée (format #RRGGBB), null = couleur du type
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([editionId])
+}
