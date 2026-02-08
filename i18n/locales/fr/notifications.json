@@ -61,6 +61,13 @@
     "loading": "Chargement des notifications...",
     "manage_description": "Gérez vos notifications et préférences",
     "none_found": "Aucune notification trouvée",
+    "organizer": {
+      "added": {
+        "action": "Voir la convention",
+        "message": "Vous avez été ajouté comme organisateur de la convention \"{conventionName}\".",
+        "title": "Vous êtes organisateur ! 🎪"
+      }
+    },
     "push": {
       "blocked": "Notifications bloquées dans les paramètres du navigateur",
       "description": "Recevez des notifications même lorsque l'application est fermée",

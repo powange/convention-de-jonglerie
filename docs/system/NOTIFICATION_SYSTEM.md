@@ -2,11 +2,11 @@
 
 ## Vue d'ensemble
 
-Le système de notifications de l'application permet d'informer les utilisateurs en temps réel des événements importants (candidatures de bénévolat, commentaires, objets trouvés, etc.). Il combine plusieurs technologies pour offrir une expérience optimale :
+Le système de notifications de l'application permet d'informer les utilisateurs en temps réel des événements importants (candidatures de bénévolat, covoiturage, arrivées d'artistes, messagerie, etc.). Il combine plusieurs technologies pour offrir une expérience optimale :
 
 - **Notifications en base de données** (persistantes)
 - **Notifications temps réel** via Server-Sent Events (SSE)
-- **Notifications push** (Progressive Web App)
+- **Notifications push** via Firebase Cloud Messaging (FCM)
 - **Notifications par email** (templates Vue Email)
 - **Fallback polling** en cas d'indisponibilité SSE
 
@@ -30,7 +30,8 @@ Le système de notifications de l'application permet d'informer les utilisateurs
 │  • /api/notifications/* (REST API)                           │
 │  • notification-service.ts (Business Logic)                  │
 │  • notification-stream-manager.ts (SSE Server)               │
-│  • push-notification-service.ts (Web Push)                   │
+│  • unified-push-service.ts (Firebase FCM)                    │
+│  • firebase-admin.ts (Firebase Admin SDK)                    │
 │  • emailService.ts + Templates Vue Email                     │
 └─────────────────────────────────────────────────────────────┘
                             ↕
@@ -39,6 +40,7 @@ Le système de notifications de l'application permet d'informer les utilisateurs
 ├─────────────────────────────────────────────────────────────┤
 │  • Notification (table principale)                           │
 │  • NotificationPreference (préférences utilisateur)          │
+│  • FcmToken (tokens Firebase par utilisateur)                │
 │  • User (informations utilisateur)                           │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -79,19 +81,17 @@ enum NotificationType {
 
 ### Catégories de notifications
 
-| Catégorie    | Description           | Exemples                        |
-| ------------ | --------------------- | ------------------------------- |
-| `system`     | Notifications système | Mise à jour, maintenance        |
-| `volunteer`  | Bénévolat             | Candidature acceptée/refusée    |
-| `comment`    | Commentaires          | Nouveau commentaire sur édition |
-| `lost_found` | Objets trouvés        | Objet déclaré trouvé/rendu      |
-| `carpool`    | Covoiturage           | Réservation, annulation         |
-| `ticketing`  | Billetterie           | Commande, rappel événement      |
-| `convention` | Conventions           | Nouvelle édition, modification  |
+| Catégorie   | Description           | Exemples                              |
+| ----------- | --------------------- | ------------------------------------- |
+| `system`    | Notifications système | Bienvenue, erreur système             |
+| `volunteer` | Bénévolat             | Candidature acceptée/refusée/modifiée |
+| `carpool`   | Covoiturage           | Réservation reçue/acceptée/annulée    |
+| `edition`   | Éditions              | Rappel d'événement                    |
+| `artist`    | Artistes              | Arrivée d'un artiste                  |
 
-### Types de notifications disponibles
+### Types de notifications (préférences utilisateur)
 
-Définis dans `notification-preferences.ts` :
+Définis dans `notification-preferences.ts`, ces types permettent à l'utilisateur de contrôler ses préférences par catégorie :
 
 ```typescript
 const NOTIFICATION_TYPES = [
@@ -99,14 +99,13 @@ const NOTIFICATION_TYPES = [
   'volunteer_application_rejected',
   'volunteer_application_modified',
   'volunteer_application_submitted',
-  'comment_on_edition',
-  'lost_item_claimed',
-  'lost_item_returned',
-  'carpool_booking_confirmed',
+  'volunteer_schedule',
+  'carpool_booking_received',
+  'carpool_booking_accepted',
+  'carpool_booking_rejected',
   'carpool_booking_cancelled',
-  'order_confirmation',
   'event_reminder',
-  'edition_published',
+  'artist_arrival',
   'system_announcement',
 ] as const
 ```
@@ -284,15 +283,22 @@ Fichier: `server/utils/notification-service.ts`
 ```typescript
 await NotificationService.create({
   userId: number,
-  type: NotificationType,
-  title: string,
-  message: string,
-  category: string,
-  entityType?: string,
+  type: NotificationType,           // INFO | SUCCESS | WARNING | ERROR
+  // Traductions i18n (prioritaire)
+  titleKey?: string,                // Clé i18n pour le titre
+  messageKey?: string,              // Clé i18n pour le message
+  translationParams?: Record<string, any>, // Paramètres de traduction
+  // Texte libre (fallback)
+  titleText?: string,               // Titre en texte brut
+  messageText?: string,             // Message en texte brut
+  // Métadonnées
+  category?: string,                // 'volunteer', 'carpool', 'edition', etc.
+  entityType?: string,              // 'Edition', 'User', 'CarpoolOffer', etc.
   entityId?: string,
   actionUrl?: string,
-  actionText?: string,
-  notificationType: string,
+  actionTextKey?: string,           // Clé i18n pour le bouton d'action
+  actionText?: string,              // Texte du bouton (fallback)
+  notificationType?: string,        // Pour filtrage par préférences utilisateur
 })
 ```
 
@@ -328,11 +334,57 @@ await NotificationService.getUnreadCount(userId, category?)
 
 ### NotificationHelpers
 
-Helpers pour créer des notifications typées selon les événements métier.
+Helpers pour créer des notifications typées selon les événements métier. Fichier : `server/utils/notification-service.ts`
 
-#### Exemples d'utilisation
+#### Inventaire complet des helpers
+
+| Helper                          | Déclencheur                             | Destinataire                     | Type    | Catégorie  |
+| ------------------------------- | --------------------------------------- | -------------------------------- | ------- | ---------- |
+| `welcome`                       | Vérification email réussie              | L'utilisateur inscrit            | SUCCESS | system     |
+| `newConvention`                 | Nouvelle convention créée               | Admin/organisateurs              | INFO    | convention |
+| `volunteerApplicationSubmitted` | Candidature bénévole envoyée            | Le bénévole                      | SUCCESS | volunteer  |
+| `volunteerAccepted`             | Candidature acceptée par organisateur   | Le bénévole                      | SUCCESS | volunteer  |
+| `volunteerRejected`             | Candidature refusée par organisateur    | Le bénévole                      | WARNING | volunteer  |
+| `volunteerBackToPending`        | Candidature remise en attente           | Le bénévole                      | INFO    | volunteer  |
+| `eventReminder`                 | Rappel J-3 / J-7 avant événement        | Utilisateurs favoris / bénévoles | INFO    | edition    |
+| `systemError`                   | Erreur système                          | Admin                            | ERROR   | system     |
+| `carpoolBookingReceived`        | Demande de réservation covoiturage      | Propriétaire de l'offre          | INFO    | carpool    |
+| `carpoolBookingAccepted`        | Réservation acceptée                    | Le passager                      | SUCCESS | carpool    |
+| `carpoolBookingRejected`        | Réservation refusée                     | Le passager                      | WARNING | carpool    |
+| `carpoolBookingCancelled`       | Annulation d'une réservation acceptée   | Propriétaire de l'offre          | INFO    | carpool    |
+| `artistArrival`                 | Artiste scanné à l'entrée (billetterie) | Gestionnaires artistes           | INFO    | artist     |
+| `organizerAdded`                | Utilisateur ajouté comme organisateur   | L'utilisateur ajouté             | INFO    | convention |
+
+#### Appels directs à NotificationService.create() (texte libre)
+
+En plus des helpers, certaines actions utilisent `NotificationService.create()` directement avec du texte libre :
+
+| Action                   | Déclencheur                               | Destinataire                         | Fichier                                 |
+| ------------------------ | ----------------------------------------- | ------------------------------------ | --------------------------------------- |
+| Arrivée bénévole         | Bénévole scanné à l'entrée                | Team leaders des équipes du bénévole | `validate-entry.post.ts`                |
+| Modification candidature | Organisateur modifie une candidature      | Le bénévole                          | `applications/[applicationId].patch.ts` |
+| Message organisateur     | Organisateur envoie un message custom     | Bénévoles sélectionnés / équipes     | `volunteers/notifications.post.ts`      |
+| Planning disponible      | Organisateur notifie les créneaux         | Bénévoles acceptés                   | `volunteers/notify-schedules.post.ts`   |
+| Notification admin       | Admin crée une notification personnalisée | Utilisateur ciblé                    | `admin/notifications/create.post.ts`    |
+
+> **Note :** La notification "arrivée bénévole" utilise du texte libre en français au lieu de clés i18n. Elle n'est pas traduite.
+
+#### Notifications push messagerie (hors NotificationService)
+
+La messagerie utilise directement `unifiedPushService.sendToUser()` sans passer par `NotificationService` :
+
+| Action          | Déclencheur                          | Destinataire                                  | Fichier                            |
+| --------------- | ------------------------------------ | --------------------------------------------- | ---------------------------------- |
+| Nouveau message | Message envoyé dans une conversation | Participants (sauf expéditeur et ceux actifs) | `messenger/messages/index.post.ts` |
+
+Le titre de la push varie selon le type de conversation (privée, groupe d'équipe, artiste, organisateurs, etc.).
+
+#### Exemples d'utilisation des helpers
 
 ```typescript
+// Bienvenue après vérification email
+await NotificationHelpers.welcome(userId)
+
 // Candidature de bénévolat acceptée
 await NotificationHelpers.volunteerAccepted(
   userId,
@@ -351,21 +403,34 @@ await NotificationHelpers.volunteerRejected(userId, editionName, editionId)
 // Candidature remise en attente
 await NotificationHelpers.volunteerBackToPending(userId, editionName, editionId)
 
-// Nouvel objet trouvé
-await NotificationHelpers.lostItemFound(userId, itemDescription, editionId)
+// Rappel d'événement (J-3 ou J-7)
+await NotificationHelpers.eventReminder(userId, editionName, editionId, daysUntil)
 
-// Objet réclamé
-await NotificationHelpers.lostItemClaimed(userId, itemDescription, editionId)
+// Erreur système
+await NotificationHelpers.systemError(userId, errorMessage)
 
-// Objet rendu
-await NotificationHelpers.lostItemReturned(userId, itemDescription, editionId)
+// Covoiturage - demande reçue
+await NotificationHelpers.carpoolBookingReceived(userId, requesterName, offerId, seats, note?)
 
-// Nouveau commentaire
-await NotificationHelpers.newComment(userId, editionName, editionId, commentAuthor)
+// Covoiturage - acceptée
+await NotificationHelpers.carpoolBookingAccepted(userId, ownerName, offerId, seats, city, date)
 
-// Rappel d'événement
-await NotificationHelpers.eventReminder(userId, eventName, eventDate, editionId)
+// Covoiturage - refusée
+await NotificationHelpers.carpoolBookingRejected(userId, ownerName, offerId, seats, city)
+
+// Covoiturage - annulée par passager
+await NotificationHelpers.carpoolBookingCancelled(userId, passengerName, offerId, seats, city, date)
+
+// Arrivée d'un artiste
+await NotificationHelpers.artistArrival(userId, artistName, editionId, artistId, shows?)
+
+// Utilisateur ajouté comme organisateur
+await NotificationHelpers.organizerAdded(userId, conventionName, conventionId)
 ```
+
+#### Helper non utilisé
+
+> **`newConvention`** : Ce helper est défini dans le code mais n'est appelé nulle part dans l'application.
 
 ## Préférences de notifications
 
@@ -701,68 +766,70 @@ watch(isConnected, (connected) => {
 })
 ```
 
-## Push Notifications (PWA)
+## Push Notifications (Firebase Cloud Messaging)
 
-### Service Worker
+### Architecture
 
-Les push notifications utilisent l'API Web Push avec un Service Worker.
+Les push notifications utilisent Firebase Cloud Messaging (FCM) avec un Service Worker.
 
-Fichier: `public/sw.js`
+**Fichiers principaux :**
 
-### Enregistrement de l'abonnement
+- `server/utils/firebase-admin.ts` : SDK Firebase Admin (envoi côté serveur)
+- `server/utils/unified-push-service.ts` : Service unifié d'envoi push
+- `public/firebase-messaging-sw.js` : Service Worker Firebase côté client
+
+### Enregistrement du token FCM
 
 ```typescript
-// 1. Demander la permission
-const permission = await Notification.requestPermission()
+// 1. Initialiser Firebase côté client
+const messaging = getMessaging(firebaseApp)
 
-// 2. Enregistrer le Service Worker
-const registration = await navigator.serviceWorker.register('/sw.js')
+// 2. Obtenir le token FCM
+const token = await getToken(messaging, { vapidKey: FIREBASE_VAPID_KEY })
 
-// 3. S'abonner aux notifications
-const subscription = await registration.pushManager.subscribe({
-  userVisibleOnly: true,
-  applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-})
-
-// 4. Envoyer l'abonnement au serveur
-await $fetch('/api/notifications/push/subscribe', {
+// 3. Enregistrer le token sur le serveur
+await $fetch('/api/notifications/fcm/register', {
   method: 'POST',
-  body: { subscription },
+  body: { token },
 })
 ```
 
-### Envoi de push notifications
+### UnifiedPushService
 
-Côté serveur: `server/utils/push-notification-service.ts`
+Côté serveur : `server/utils/unified-push-service.ts`
 
 ```typescript
-await pushNotificationService.sendNotification(userId, {
+// Envoyer à un utilisateur spécifique
+await unifiedPushService.sendToUser(userId, {
   title: 'Candidature acceptée !',
-  body: 'Votre candidature pour "JuggleCon 2025" a été acceptée',
-  icon: '/icon-192.png',
-  badge: '/badge-72.png',
-  data: {
-    url: '/my-volunteer-applications',
-    notificationId: 123,
-  },
+  message: 'Votre candidature pour "JuggleCon 2025" a été acceptée',
+  url: '/my-volunteer-applications',
+  type: 'success',
 })
+
+// Envoyer à plusieurs utilisateurs
+await unifiedPushService.sendToUsers(userIds, pushData)
+
+// Broadcast à tous les utilisateurs avec tokens FCM
+await unifiedPushService.sendToAll(pushData)
+
+// Tester l'envoi
+await unifiedPushService.testPush(userId)
 ```
 
-### Configuration VAPID
+**Gestion automatique des tokens :** Les tokens FCM invalides sont automatiquement supprimés de la base après un échec d'envoi.
+
+### Configuration Firebase
 
 Variables d'environnement nécessaires :
 
 ```bash
-VAPID_PUBLIC_KEY=your-public-key
-VAPID_PRIVATE_KEY=your-private-key
-VAPID_SUBJECT=mailto:your-email@example.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CLIENT_EMAIL=your-service-account@your-project.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ```
 
-Générer les clés VAPID :
-
-```bash
-npx web-push generate-vapid-keys
-```
+Le fichier de configuration client Firebase est dans `app/utils/firebase.ts`.
 
 ## Interface utilisateur
 
@@ -1006,7 +1073,20 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
    await NotificationService.create({ ... })
    ```
 
-2. **Respecter les types de notifications** définis dans `notification-preferences.ts`
+2. **Utiliser des clés i18n** plutôt que du texte libre pour permettre la traduction
+
+   ```typescript
+   // ✅ BON - clés i18n traduites automatiquement
+   titleKey: 'notifications.volunteer.application_accepted.title',
+   messageKey: 'notifications.volunteer.application_accepted.message',
+   translationParams: { editionName: 'JuggleCon 2025' },
+
+   // ⚠️ ACCEPTABLE - texte libre (non traduit)
+   titleText: 'Notification personnalisée',
+   messageText: 'Message de l\'organisateur',
+   ```
+
+3. **Respecter les types de notifications** définis dans `notification-preferences.ts`
 
    ```typescript
    // ✅ BON
@@ -1016,12 +1096,22 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
    notificationType: 'volunteer-accepted' // Non défini
    ```
 
-3. **Fournir des actionUrl et actionText pertinents**
+4. **Utiliser `safeNotify()`** pour ne pas bloquer l'opération principale si l'envoi échoue
+
+   ```typescript
+   // ✅ BON
+   await safeNotify(
+     () => NotificationHelpers.volunteerAccepted(userId, editionName, editionId),
+     'Notification acceptation bénévole'
+   )
+   ```
+
+5. **Fournir des actionUrl et actionTextKey pertinents**
 
    ```typescript
    // ✅ BON
    actionUrl: '/my-volunteer-applications',
-   actionText: 'Voir ma candidature',
+   actionTextKey: 'notifications.volunteer.application_accepted.action',
 
    // ❌ MAUVAIS
    actionUrl: '/',
@@ -1248,28 +1338,33 @@ connect()
 
 **Checklist:**
 
-1. ✅ Vérifier les clés VAPID
-2. ✅ Vérifier l'abonnement push
-   ```typescript
-   const subscription = await $fetch('/api/notifications/push/subscription')
-   ```
+1. ✅ Vérifier la configuration Firebase (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`)
+2. ✅ Vérifier que l'utilisateur a des tokens FCM actifs en base (`FcmToken`)
 3. ✅ Vérifier les permissions du navigateur
-4. ✅ Tester avec un outil externe (ex: web-push CLI)
+4. ✅ Vérifier les logs serveur pour les erreurs FCM (code d'erreur détaillé loggé)
+5. ✅ Tester avec l'endpoint admin `/api/admin/notifications/test`
 
-## Évolutions futures
+## Améliorations possibles
+
+### Notifications manquantes
+
+Actions métier qui ne déclenchent pas encore de notification :
+
+- **Changement de statut d'édition** : Quand une édition passe en PUBLISHED (pour les utilisateurs ayant favorisé la convention)
+- **Appel à spectacles publié** : Quand un nouvel appel à spectacles est ouvert (pour les artistes)
+- **Candidature artiste** : Soumission/acceptation/refus d'une candidature artiste
+- **Suppression de covoiturage** : Quand un propriétaire supprime une offre (pour les passagers acceptés)
+- **Assignation à une nouvelle équipe** : Quand un bénévole accepté est assigné à une équipe après coup
+- **Workshop créé/modifié** : Pour les participants inscrits
+
+### Problèmes techniques à corriger
+
+- **Notification "arrivée bénévole"** : Utilise du texte libre en français (`validate-entry.post.ts`) au lieu de clés i18n → non traduite
+- **Helper `newConvention`** : Défini mais jamais appelé nulle part dans le code
 
 ### Traduction des emails
 
-Actuellement, tous les emails sont en français. Prévu :
-
-```typescript
-// Utiliser preferredLanguage pour traduire
-const user = await prisma.user.findUnique({
-  select: { preferredLanguage: true },
-})
-
-const translatedTitle = t(user.preferredLanguage, 'notification.title.volunteer_accepted')
-```
+Actuellement, les notifications push sont traduites dans la langue préférée de l'utilisateur, mais les emails restent en français.
 
 ### Notifications groupées
 
@@ -1280,16 +1375,6 @@ Regrouper plusieurs notifications du même type :
 au lieu de 3 notifications séparées
 ```
 
-### Canaux personnalisés
-
-Permettre aux utilisateurs de créer des canaux personnalisés :
-
-```
-"Notifications urgentes uniquement"
-"Digest quotidien"
-"Temps réel pour tout"
-```
-
 ### Analytics
 
 Tracking des notifications :
@@ -1297,7 +1382,6 @@ Tracking des notifications :
 - Taux d'ouverture
 - Taux de clic sur les actions
 - Temps moyen avant lecture
-- Préférences les plus courantes
 
 ## Conclusion
 

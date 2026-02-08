@@ -785,4 +785,23 @@ export const NotificationHelpers = {
       notificationType: 'artist_arrival',
     })
   },
+
+  /**
+   * Notification quand un utilisateur est ajouté comme organisateur d'une convention
+   */
+  async organizerAdded(userId: number, conventionName: string, conventionId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.organizer.added.title',
+      messageKey: 'notifications.organizer.added.message',
+      translationParams: { conventionName },
+      actionTextKey: 'notifications.organizer.added.action',
+      category: 'convention',
+      entityType: 'Convention',
+      entityId: conventionId.toString(),
+      actionUrl: `/conventions/${conventionId}`,
+      notificationType: 'organizer_added',
+    })
+  },
 }

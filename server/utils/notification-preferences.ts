@@ -109,6 +109,9 @@ export const NotificationTypeMapping = {
   // Artistes
   artist_arrival: 'artistUpdates' as const,
 
+  // Organisateurs
+  organizer_added: 'conventionNews' as const,
+
   // Système
   system_notification: 'systemNotifications' as const,
   welcome: 'systemNotifications' as const,

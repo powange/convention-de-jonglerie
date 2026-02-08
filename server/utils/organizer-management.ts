@@ -1,6 +1,8 @@
 // Retrait de l'ancien enum de rôles; tout est géré par droits booléens
 // Removed unused types import (frontend types not needed server-side)
 
+import { NotificationHelpers, safeNotify } from './notification-service'
+
 import type {
   OrganizerPermissionSnapshot,
   OrganizerRemovalSnapshot,
@@ -248,7 +250,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
   }
 
   // Créer le organisateur
-  return await prisma.$transaction(async (tx: PrismaTransaction) => {
+  const result = await prisma.$transaction(async (tx: PrismaTransaction) => {
     const organizer = await tx.conventionOrganizer.create({
       data: {
         conventionId,
@@ -323,6 +325,24 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
     }
     return withPerEdition
   })
+
+  // Mettre à jour isOrganizer sur le profil utilisateur
+  await prisma.user.update({
+    where: { id: userToAddId },
+    data: { isOrganizer: true },
+  })
+
+  // Envoyer la notification à l'utilisateur ajouté
+  const convention = await prisma.convention.findUnique({
+    where: { id: conventionId },
+    select: { name: true },
+  })
+  await safeNotify(
+    () => NotificationHelpers.organizerAdded(userToAddId, convention?.name || '', conventionId),
+    'notification organisateur ajouté'
+  )
+
+  return result
 }
 
 /**
