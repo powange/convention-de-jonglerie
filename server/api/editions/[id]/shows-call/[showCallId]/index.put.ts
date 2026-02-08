@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import {
   getEditionWithPermissions,
   canManageArtists,
@@ -139,6 +140,28 @@ export default wrapApiHandler(
         }),
       },
     })
+
+    // Notifier tous les artistes si l'appel vient d'être ouvert
+    if (validatedData.isOpen === true && !existingShowCall.isOpen) {
+      const editionData = await prisma.edition.findUnique({
+        where: { id: editionId },
+        select: { name: true, convention: { select: { name: true } } },
+      })
+      const editionName = editionData?.name || editionData?.convention?.name || ''
+
+      const artists = await prisma.user.findMany({
+        where: { isArtist: true },
+        select: { id: true },
+      })
+
+      for (const artist of artists) {
+        await safeNotify(
+          () =>
+            NotificationHelpers.showCallOpened(artist.id, showCall.name, editionName, editionId),
+          'notification appel à spectacles ouvert'
+        )
+      }
+    }
 
     return {
       success: true,

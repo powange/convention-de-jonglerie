@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Vedi le mie candidature",
+        "message": "Il tuo spettacolo \"{showTitle}\" è stato selezionato per \"{editionName}\".",
+        "title": "Candidatura accettata! ✅"
+      },
+      "application_rejected": {
+        "action": "Vedi le mie candidature",
+        "message": "Il tuo spettacolo \"{showTitle}\" non è stato selezionato per \"{editionName}\".",
+        "title": "Candidatura non selezionata"
+      },
+      "application_submitted": {
+        "action": "Vedi le candidature",
+        "message": "{artistName} ha proposto lo spettacolo \"{showTitle}\" per \"{editionName}\".",
+        "title": "Nuova candidatura artista 🎪"
+      },
       "arrival": {
         "action": "Visualizza artisti",
         "message": "{artistName} ha appena scansionato il biglietto ed è arrivato alla convention.",
         "message_with_shows": "{artistName} ha appena scansionato il biglietto ed è arrivato alla convention.\n\nSpettacoli associati:\n• {shows}",
         "title": "Arrivo di un artista 🎭"
+      },
+      "show_call_opened": {
+        "action": "Vedi i bandi aperti",
+        "message": "Il bando \"{showCallName}\" per \"{editionName}\" è aperto. Proponi il tuo spettacolo!",
+        "title": "Nuovo bando per spettacoli 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "La convention \"{conventionName}\" è appena stata aggiunta alla piattaforma.",
         "title": "Nuova convention aggiunta"
       },
+      "published": {
+        "action": "Vedi l'edizione",
+        "message": "L'edizione \"{editionName}\" di {conventionName} è ora online.",
+        "title": "Nuova edizione pubblicata!"
+      },
       "reminder": {
         "action": "Vedi dettagli",
         "message": "L'edizione \"{editionName}\" inizia tra {daysUntil} giorno/i!",
@@ -61,6 +86,13 @@
     "loading": "Caricamento notifiche...",
     "manage_description": "Gestisci le tue notifiche e preferenze",
     "none_found": "Nessuna notifica trovata",
+    "organizer": {
+      "added": {
+        "action": "Vedi la convention",
+        "message": "Sei stato aggiunto come organizzatore della convention \"{conventionName}\".",
+        "title": "Sei organizzatore! 🎪"
+      }
+    },
     "push": {
       "blocked": "Notifiche bloccate nelle impostazioni del browser",
       "description": "Ricevi notifiche anche quando l'applicazione è chiusa",
@@ -96,6 +128,11 @@
         "action": "Vedi le mie candidature",
         "message": "La tua candidatura per \"{editionName}\" è stata inviata con successo. Gli organizzatori la esamineranno.",
         "title": "Candidatura inviata! 🎉"
+      },
+      "arrival": {
+        "action": "Vedi la pianificazione",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) ha appena scansionato il suo biglietto ed è arrivato alla convention - Squadra {teamName}",
+        "title": "Arrivo di un volontario 🎉"
       },
       "back_to_pending": {
         "action": "Vedi la mia candidatura",

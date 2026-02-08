@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Visa mina ansökningar",
+        "message": "Din föreställning \"{showTitle}\" har valts ut för \"{editionName}\".",
+        "title": "Ansökan godkänd! ✅"
+      },
+      "application_rejected": {
+        "action": "Visa mina ansökningar",
+        "message": "Din föreställning \"{showTitle}\" valdes inte ut för \"{editionName}\".",
+        "title": "Ansökan ej utvald"
+      },
+      "application_submitted": {
+        "action": "Visa ansökningar",
+        "message": "{artistName} har skickat in föreställningen \"{showTitle}\" för \"{editionName}\".",
+        "title": "Ny artistansökan 🎪"
+      },
       "arrival": {
         "action": "Visa artister",
         "message": "{artistName} har precis skannat sin biljett och anlänt till konventionen.",
         "message_with_shows": "{artistName} har precis skannat sin biljett och anlänt till konventionen.\n\nAssocierade föreställningar:\n• {shows}",
         "title": "Artistankomst 🎭"
+      },
+      "show_call_opened": {
+        "action": "Visa öppna utlysningar",
+        "message": "Utlysningen \"{showCallName}\" för \"{editionName}\" är öppen. Skicka in din föreställning!",
+        "title": "Ny utlysning för föreställningar 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "Konventionen \"{conventionName}\" har just lagts till i plattformen.",
         "title": "Nytt avtal tillagt"
       },
+      "published": {
+        "action": "Visa upplagan",
+        "message": "Upplagan \"{editionName}\" av {conventionName} är nu online.",
+        "title": "Ny upplaga publicerad!"
+      },
       "reminder": {
         "action": "Se mer information",
         "message": "Utgåvan \"{editionName}\" startar i {daysUntil} dag(ar) !",
@@ -61,6 +86,13 @@
     "loading": "Laddar meddelanden...",
     "manage_description": "Hantera dina meddelanden och preferenser",
     "none_found": "Ingen anmälan hittades",
+    "organizer": {
+      "added": {
+        "action": "Visa konventet",
+        "message": "Du har lagts till som arrangör för konventet \"{conventionName}\".",
+        "title": "Du är arrangör! 🎪"
+      }
+    },
     "push": {
       "blocked": "Blockerade meddelanden i webbläsarinställningarna",
       "description": "Få meddelanden även när applikationen är stängd",
@@ -96,6 +128,11 @@
         "action": "Se mina ansökningar",
         "message": "Din ansökan till \"{editionName}\" har skickats in. Arrangörerna kommer att granska den.",
         "title": "Ansökan skickad! 🎉"
+      },
+      "arrival": {
+        "action": "Visa schemat",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) har precis skannat sin biljett och anlänt till konventet - Team {teamName}",
+        "title": "Ankomst av en volontär 🎉"
       },
       "back_to_pending": {
         "action": "Se min ansökan",

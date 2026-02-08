@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Se mine ansøgninger",
+        "message": "Dit show \"{showTitle}\" er blevet udvalgt til \"{editionName}\".",
+        "title": "Ansøgning accepteret! ✅"
+      },
+      "application_rejected": {
+        "action": "Se mine ansøgninger",
+        "message": "Dit show \"{showTitle}\" blev ikke udvalgt til \"{editionName}\".",
+        "title": "Ansøgning ikke udvalgt"
+      },
+      "application_submitted": {
+        "action": "Se ansøgninger",
+        "message": "{artistName} har indsendt showet \"{showTitle}\" til \"{editionName}\".",
+        "title": "Ny kunstneransøgning 🎪"
+      },
       "arrival": {
         "action": "Se kunstnere",
         "message": "{artistName} har lige scannet sin billet og er ankommet til konventionen.",
         "message_with_shows": "{artistName} har lige scannet sin billet og er ankommet til konventionen.\n\nTilknyttede forestillinger:\n• {shows}",
         "title": "Ankomst af en kunstner 🎭"
+      },
+      "show_call_opened": {
+        "action": "Se åbne opslag",
+        "message": "Opslaget \"{showCallName}\" til \"{editionName}\" er åbent. Indsend dit show!",
+        "title": "Nyt opslag for shows 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "Festivalen \"{conventionName}\" er lige blevet tilføjet til platformen.",
         "title": "Ny festival tilføjet"
       },
+      "published": {
+        "action": "Se udgaven",
+        "message": "Udgaven \"{editionName}\" af {conventionName} er nu online.",
+        "title": "Ny udgave offentliggjort!"
+      },
       "reminder": {
         "action": "Se detaljer",
         "message": "Udgaven \"{editionName}\" starter om {daysUntil} dag(e)!",
@@ -61,6 +86,13 @@
     "loading": "Indlæser notifikationer...",
     "manage_description": "Administrer dine notifikationer og præferencer",
     "none_found": "Ingen notifikationer fundet",
+    "organizer": {
+      "added": {
+        "action": "Se konventionen",
+        "message": "Du er blevet tilføjet som arrangør af konventionen \"{conventionName}\".",
+        "title": "Du er arrangør! 🎪"
+      }
+    },
     "push": {
       "blocked": "Notifikationer blokeret i browserindstillinger",
       "description": "Modtag notifikationer selv når applikationen er lukket",
@@ -96,6 +128,11 @@
         "action": "Se mine ansøgninger",
         "message": "Din ansøgning til \"{editionName}\" er blevet indsendt. Arrangørerne vil gennemgå den.",
         "title": "Ansøgning indsendt! 🎉"
+      },
+      "arrival": {
+        "action": "Se planlægningen",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) har lige scannet sin billet og er ankommet til konventionen - Hold {teamName}",
+        "title": "Ankomst af en frivillig 🎉"
       },
       "back_to_pending": {
         "action": "Se min ansøgning",

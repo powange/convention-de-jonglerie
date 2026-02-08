@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Meine Bewerbungen ansehen",
+        "message": "Ihre Show \"{showTitle}\" wurde für \"{editionName}\" ausgewählt.",
+        "title": "Bewerbung angenommen! ✅"
+      },
+      "application_rejected": {
+        "action": "Meine Bewerbungen ansehen",
+        "message": "Ihre Show \"{showTitle}\" wurde für \"{editionName}\" nicht ausgewählt.",
+        "title": "Bewerbung nicht ausgewählt"
+      },
+      "application_submitted": {
+        "action": "Bewerbungen ansehen",
+        "message": "{artistName} hat die Show \"{showTitle}\" für \"{editionName}\" eingereicht.",
+        "title": "Neue Künstlerbewerbung 🎪"
+      },
       "arrival": {
         "action": "Künstler ansehen",
         "message": "{artistName} hat gerade sein Ticket gescannt und ist auf der Convention angekommen.",
         "message_with_shows": "{artistName} hat gerade sein Ticket gescannt und ist auf der Convention angekommen.\n\nZugehörige Vorstellungen:\n• {shows}",
         "title": "Ankunft eines Künstlers 🎭"
+      },
+      "show_call_opened": {
+        "action": "Offene Ausschreibungen ansehen",
+        "message": "Die Ausschreibung \"{showCallName}\" für \"{editionName}\" ist eröffnet. Reichen Sie Ihre Show ein!",
+        "title": "Neue Show-Ausschreibung 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "Die Convention \"{conventionName}\" wurde gerade zur Plattform hinzugefügt.",
         "title": "Neue Convention hinzugefügt"
       },
+      "published": {
+        "action": "Ausgabe ansehen",
+        "message": "Die Ausgabe \"{editionName}\" von {conventionName} ist jetzt online.",
+        "title": "Neue Ausgabe veröffentlicht!"
+      },
       "reminder": {
         "action": "Details ansehen",
         "message": "Die Edition \"{editionName}\" beginnt in {daysUntil} Tag(en)!",
@@ -61,6 +86,13 @@
     "loading": "Benachrichtigungen werden geladen...",
     "manage_description": "Verwalten Sie Ihre Benachrichtigungen und Einstellungen",
     "none_found": "Keine Benachrichtigungen gefunden",
+    "organizer": {
+      "added": {
+        "action": "Convention ansehen",
+        "message": "Sie wurden als Organisator der Convention \"{conventionName}\" hinzugefügt.",
+        "title": "Sie sind Organisator! 🎪"
+      }
+    },
     "push": {
       "blocked": "Benachrichtigungen in den Browsereinstellungen blockiert",
       "description": "Erhalten Sie Benachrichtigungen auch wenn die Anwendung geschlossen ist",
@@ -96,6 +128,11 @@
         "action": "Meine Bewerbungen ansehen",
         "message": "Ihre Bewerbung für \"{editionName}\" wurde erfolgreich eingereicht. Die Organisatoren werden sie prüfen.",
         "title": "Bewerbung eingereicht! 🎉"
+      },
+      "arrival": {
+        "action": "Planung ansehen",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) hat gerade sein Ticket gescannt und ist auf der Convention angekommen - Team {teamName}",
+        "title": "Ankunft eines Freiwilligen 🎉"
       },
       "back_to_pending": {
         "action": "Meine Bewerbung ansehen",

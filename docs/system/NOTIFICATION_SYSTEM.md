@@ -106,6 +106,11 @@ const NOTIFICATION_TYPES = [
   'carpool_booking_cancelled',
   'event_reminder',
   'artist_arrival',
+  'edition_published',
+  'show_call_opened',
+  'show_application_submitted',
+  'show_application_accepted',
+  'show_application_rejected',
   'system_announcement',
 ] as const
 ```
@@ -338,36 +343,39 @@ Helpers pour créer des notifications typées selon les événements métier. Fi
 
 #### Inventaire complet des helpers
 
-| Helper                          | Déclencheur                             | Destinataire                     | Type    | Catégorie  |
-| ------------------------------- | --------------------------------------- | -------------------------------- | ------- | ---------- |
-| `welcome`                       | Vérification email réussie              | L'utilisateur inscrit            | SUCCESS | system     |
-| `newConvention`                 | Nouvelle convention créée               | Admin/organisateurs              | INFO    | convention |
-| `volunteerApplicationSubmitted` | Candidature bénévole envoyée            | Le bénévole                      | SUCCESS | volunteer  |
-| `volunteerAccepted`             | Candidature acceptée par organisateur   | Le bénévole                      | SUCCESS | volunteer  |
-| `volunteerRejected`             | Candidature refusée par organisateur    | Le bénévole                      | WARNING | volunteer  |
-| `volunteerBackToPending`        | Candidature remise en attente           | Le bénévole                      | INFO    | volunteer  |
-| `eventReminder`                 | Rappel J-3 / J-7 avant événement        | Utilisateurs favoris / bénévoles | INFO    | edition    |
-| `systemError`                   | Erreur système                          | Admin                            | ERROR   | system     |
-| `carpoolBookingReceived`        | Demande de réservation covoiturage      | Propriétaire de l'offre          | INFO    | carpool    |
-| `carpoolBookingAccepted`        | Réservation acceptée                    | Le passager                      | SUCCESS | carpool    |
-| `carpoolBookingRejected`        | Réservation refusée                     | Le passager                      | WARNING | carpool    |
-| `carpoolBookingCancelled`       | Annulation d'une réservation acceptée   | Propriétaire de l'offre          | INFO    | carpool    |
-| `artistArrival`                 | Artiste scanné à l'entrée (billetterie) | Gestionnaires artistes           | INFO    | artist     |
-| `organizerAdded`                | Utilisateur ajouté comme organisateur   | L'utilisateur ajouté             | INFO    | convention |
+| Helper                          | Déclencheur                              | Destinataire                     | Type    | Catégorie  |
+| ------------------------------- | ---------------------------------------- | -------------------------------- | ------- | ---------- |
+| `welcome`                       | Vérification email réussie               | L'utilisateur inscrit            | SUCCESS | system     |
+| `newConvention`                 | Nouvelle convention créée                | Admin/organisateurs              | INFO    | convention |
+| `volunteerApplicationSubmitted` | Candidature bénévole envoyée             | Le bénévole                      | SUCCESS | volunteer  |
+| `volunteerAccepted`             | Candidature acceptée par organisateur    | Le bénévole                      | SUCCESS | volunteer  |
+| `volunteerRejected`             | Candidature refusée par organisateur     | Le bénévole                      | WARNING | volunteer  |
+| `volunteerBackToPending`        | Candidature remise en attente            | Le bénévole                      | INFO    | volunteer  |
+| `eventReminder`                 | Rappel J-3 / J-7 avant événement         | Utilisateurs favoris / bénévoles | INFO    | edition    |
+| `systemError`                   | Erreur système                           | Admin                            | ERROR   | system     |
+| `carpoolBookingReceived`        | Demande de réservation covoiturage       | Propriétaire de l'offre          | INFO    | carpool    |
+| `carpoolBookingAccepted`        | Réservation acceptée                     | Le passager                      | SUCCESS | carpool    |
+| `carpoolBookingRejected`        | Réservation refusée                      | Le passager                      | WARNING | carpool    |
+| `carpoolBookingCancelled`       | Annulation d'une réservation acceptée    | Propriétaire de l'offre          | INFO    | carpool    |
+| `artistArrival`                 | Artiste scanné à l'entrée (billetterie)  | Gestionnaires artistes           | INFO    | artist     |
+| `volunteerArrival`              | Bénévole scanné à l'entrée (billetterie) | Team leaders de ses équipes      | INFO    | volunteer  |
+| `organizerAdded`                | Utilisateur ajouté comme organisateur    | L'utilisateur ajouté             | INFO    | convention |
+| `editionPublished`              | Édition passe en statut PUBLISHED        | Utilisateurs ayant favorisé      | INFO    | edition    |
+| `showCallOpened`                | Appel à spectacles ouvert                | Tous les utilisateurs artistes   | INFO    | artist     |
+| `showApplicationSubmitted`      | Candidature artiste soumise              | Organisateurs (gestion artistes) | INFO    | artist     |
+| `showApplicationAccepted`       | Candidature artiste acceptée             | L'artiste                        | SUCCESS | artist     |
+| `showApplicationRejected`       | Candidature artiste refusée              | L'artiste                        | WARNING | artist     |
 
 #### Appels directs à NotificationService.create() (texte libre)
 
 En plus des helpers, certaines actions utilisent `NotificationService.create()` directement avec du texte libre :
 
-| Action                   | Déclencheur                               | Destinataire                         | Fichier                                 |
-| ------------------------ | ----------------------------------------- | ------------------------------------ | --------------------------------------- |
-| Arrivée bénévole         | Bénévole scanné à l'entrée                | Team leaders des équipes du bénévole | `validate-entry.post.ts`                |
-| Modification candidature | Organisateur modifie une candidature      | Le bénévole                          | `applications/[applicationId].patch.ts` |
-| Message organisateur     | Organisateur envoie un message custom     | Bénévoles sélectionnés / équipes     | `volunteers/notifications.post.ts`      |
-| Planning disponible      | Organisateur notifie les créneaux         | Bénévoles acceptés                   | `volunteers/notify-schedules.post.ts`   |
-| Notification admin       | Admin crée une notification personnalisée | Utilisateur ciblé                    | `admin/notifications/create.post.ts`    |
-
-> **Note :** La notification "arrivée bénévole" utilise du texte libre en français au lieu de clés i18n. Elle n'est pas traduite.
+| Action                   | Déclencheur                               | Destinataire                     | Fichier                                 |
+| ------------------------ | ----------------------------------------- | -------------------------------- | --------------------------------------- |
+| Modification candidature | Organisateur modifie une candidature      | Le bénévole                      | `applications/[applicationId].patch.ts` |
+| Message organisateur     | Organisateur envoie un message custom     | Bénévoles sélectionnés / équipes | `volunteers/notifications.post.ts`      |
+| Planning disponible      | Organisateur notifie les créneaux         | Bénévoles acceptés               | `volunteers/notify-schedules.post.ts`   |
+| Notification admin       | Admin crée une notification personnalisée | Utilisateur ciblé                | `admin/notifications/create.post.ts`    |
 
 #### Notifications push messagerie (hors NotificationService)
 
@@ -424,8 +432,26 @@ await NotificationHelpers.carpoolBookingCancelled(userId, passengerName, offerId
 // Arrivée d'un artiste
 await NotificationHelpers.artistArrival(userId, artistName, editionId, artistId, shows?)
 
+// Arrivée d'un bénévole
+await NotificationHelpers.volunteerArrival(userId, volunteerName, volunteerPseudo, teamName, editionId, applicationId)
+
 // Utilisateur ajouté comme organisateur
 await NotificationHelpers.organizerAdded(userId, conventionName, conventionId)
+
+// Édition publiée (notifier les favoris)
+await NotificationHelpers.editionPublished(userId, editionName, conventionName, editionId)
+
+// Appel à spectacles ouvert (notifier les artistes)
+await NotificationHelpers.showCallOpened(userId, showCallName, editionName, editionId)
+
+// Candidature artiste soumise (notifier les organisateurs)
+await NotificationHelpers.showApplicationSubmitted(userId, artistName, showTitle, editionName, editionId)
+
+// Candidature artiste acceptée
+await NotificationHelpers.showApplicationAccepted(userId, showTitle, editionName, editionId)
+
+// Candidature artiste refusée
+await NotificationHelpers.showApplicationRejected(userId, showTitle, editionName, editionId)
 ```
 
 #### Helper non utilisé
@@ -1350,16 +1376,12 @@ connect()
 
 Actions métier qui ne déclenchent pas encore de notification :
 
-- **Changement de statut d'édition** : Quand une édition passe en PUBLISHED (pour les utilisateurs ayant favorisé la convention)
-- **Appel à spectacles publié** : Quand un nouvel appel à spectacles est ouvert (pour les artistes)
-- **Candidature artiste** : Soumission/acceptation/refus d'une candidature artiste
 - **Suppression de covoiturage** : Quand un propriétaire supprime une offre (pour les passagers acceptés)
 - **Assignation à une nouvelle équipe** : Quand un bénévole accepté est assigné à une équipe après coup
 - **Workshop créé/modifié** : Pour les participants inscrits
 
 ### Problèmes techniques à corriger
 
-- **Notification "arrivée bénévole"** : Utilise du texte libre en français (`validate-entry.post.ts`) au lieu de clés i18n → non traduite
 - **Helper `newConvention`** : Défini mais jamais appelé nulle part dans le code
 
 ### Traduction des emails

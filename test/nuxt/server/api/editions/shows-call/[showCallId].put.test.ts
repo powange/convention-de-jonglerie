@@ -94,6 +94,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.editionShowCall.findFirst.mockResolvedValue(mockShowCall)
       prismaMock.editionShowCall.findUnique.mockResolvedValue(null) // Pas de doublon
+      prismaMock.user.findMany.mockResolvedValue([]) // Artistes pour notification
     })
 
     it("devrait mettre à jour le nom de l'appel", async () => {
@@ -321,6 +322,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       prismaMock.editionShowCall.findFirst.mockResolvedValue(mockShowCall)
       prismaMock.editionShowCall.findUnique.mockResolvedValue(null)
       prismaMock.editionShowCall.update.mockResolvedValue({ ...mockShowCall, isOpen: true })
+      prismaMock.user.findMany.mockResolvedValue([]) // Artistes pour notification
 
       global.readBody.mockResolvedValue({ isOpen: true })
       const mockEvent = { context: { user: adminUser } }

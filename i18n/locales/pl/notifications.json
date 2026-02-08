@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Zobacz moje kandydatury",
+        "message": "Twój spektakl \"{showTitle}\" został wybrany na \"{editionName}\".",
+        "title": "Kandydatura zaakceptowana! ✅"
+      },
+      "application_rejected": {
+        "action": "Zobacz moje kandydatury",
+        "message": "Twój spektakl \"{showTitle}\" nie został wybrany na \"{editionName}\".",
+        "title": "Kandydatura niewylosowana"
+      },
+      "application_submitted": {
+        "action": "Zobacz kandydatury",
+        "message": "{artistName} zgłosił spektakl \"{showTitle}\" na \"{editionName}\".",
+        "title": "Nowa kandydatura artysty 🎪"
+      },
       "arrival": {
         "action": "Zobacz artystów",
         "message": "{artistName} właśnie zeskanował bilet i przybył na konwencję.",
         "message_with_shows": "{artistName} właśnie zeskanował bilet i przybył na konwencję.\n\nPowiązane przedstawienia:\n• {shows}",
         "title": "Przyjazd artysty 🎭"
+      },
+      "show_call_opened": {
+        "action": "Zobacz otwarte nabory",
+        "message": "Nabór \"{showCallName}\" na \"{editionName}\" jest otwarty. Zgłoś swój spektakl!",
+        "title": "Nowy nabór na spektakle 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "Konwencja \"{conventionName}\" została właśnie dodana do platformy.",
         "title": "Dodano nową konwencję"
       },
+      "published": {
+        "action": "Zobacz edycję",
+        "message": "Edycja \"{editionName}\" {conventionName} jest teraz online.",
+        "title": "Nowa edycja opublikowana!"
+      },
       "reminder": {
         "action": "Zobacz szczegóły",
         "message": "Edycja \"{editionName}\" zaczyna się za {daysUntil} dzień/dni!",
@@ -61,6 +86,13 @@
     "loading": "Ładowanie powiadomień...",
     "manage_description": "Zarządzaj swoimi powiadomieniami i preferencjami",
     "none_found": "Nie znaleziono powiadomień",
+    "organizer": {
+      "added": {
+        "action": "Zobacz konwencję",
+        "message": "Zostałeś dodany jako organizator konwencji \"{conventionName}\".",
+        "title": "Jesteś organizatorem! 🎪"
+      }
+    },
     "push": {
       "blocked": "Powiadomienia zablokowane w ustawieniach przeglądarki",
       "description": "Otrzymuj powiadomienia nawet gdy aplikacja jest zamknięta",
@@ -96,6 +128,11 @@
         "action": "Zobacz moje zgłoszenia",
         "message": "Twoje zgłoszenie do \"{editionName}\" zostało wysłane pomyślnie. Organizatorzy je sprawdzą.",
         "title": "Zgłoszenie wysłane! 🎉"
+      },
+      "arrival": {
+        "action": "Zobacz harmonogram",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) właśnie zeskanował bilet i przybył na konwencję - Zespół {teamName}",
+        "title": "Przybycie wolontariusza 🎉"
       },
       "back_to_pending": {
         "action": "Zobacz moje zgłoszenie",

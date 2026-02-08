@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Mijn kandidaturen bekijken",
+        "message": "Uw voorstelling \"{showTitle}\" is geselecteerd voor \"{editionName}\".",
+        "title": "Kandidatuur geaccepteerd! ✅"
+      },
+      "application_rejected": {
+        "action": "Mijn kandidaturen bekijken",
+        "message": "Uw voorstelling \"{showTitle}\" is niet geselecteerd voor \"{editionName}\".",
+        "title": "Kandidatuur niet geselecteerd"
+      },
+      "application_submitted": {
+        "action": "Kandidaturen bekijken",
+        "message": "{artistName} heeft de voorstelling \"{showTitle}\" ingediend voor \"{editionName}\".",
+        "title": "Nieuwe artiestenkandidatuur 🎪"
+      },
       "arrival": {
         "action": "Bekijk artiesten",
         "message": "{artistName} heeft zojuist zijn ticket gescand en is aangekomen op de conventie.",
         "message_with_shows": "{artistName} heeft zojuist zijn ticket gescand en is aangekomen op de conventie.\n\nGekoppelde voorstellingen:\n• {shows}",
         "title": "Aankomst van een artiest 🎭"
+      },
+      "show_call_opened": {
+        "action": "Open oproepen bekijken",
+        "message": "De oproep \"{showCallName}\" voor \"{editionName}\" is geopend. Dien uw voorstelling in!",
+        "title": "Nieuwe oproep voor voorstellingen 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "De conventie \"{conventionName}\" is zojuist toegevoegd aan het platform.",
         "title": "Nieuwe conventie toegevoegd"
       },
+      "published": {
+        "action": "Editie bekijken",
+        "message": "De editie \"{editionName}\" van {conventionName} is nu online.",
+        "title": "Nieuwe editie gepubliceerd!"
+      },
       "reminder": {
         "action": "Bekijk details",
         "message": "De editie \"{editionName}\" begint over {daysUntil} dag(en)!",
@@ -61,6 +86,13 @@
     "loading": "Meldingen laden...",
     "manage_description": "Beheer je meldingen en voorkeuren",
     "none_found": "Geen meldingen gevonden",
+    "organizer": {
+      "added": {
+        "action": "Conventie bekijken",
+        "message": "U bent toegevoegd als organisator van de conventie \"{conventionName}\".",
+        "title": "U bent organisator! 🎪"
+      }
+    },
     "push": {
       "blocked": "Meldingen geblokkeerd in browserinstellingen",
       "description": "Ontvang meldingen zelfs wanneer de applicatie is gesloten",
@@ -96,6 +128,11 @@
         "action": "Bekijk mijn aanmeldingen",
         "message": "Je aanmelding voor \"{editionName}\" is succesvol ingediend. De organisatoren zullen deze beoordelen.",
         "title": "Aanmelding ingediend! 🎉"
+      },
+      "arrival": {
+        "action": "Planning bekijken",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) heeft zojuist zijn ticket gescand en is aangekomen op de conventie - Team {teamName}",
+        "title": "Aankomst van een vrijwilliger 🎉"
       },
       "back_to_pending": {
         "action": "Bekijk mijn aanmelding",

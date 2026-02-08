@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "View my applications",
+        "message": "Your show \"{showTitle}\" has been selected for \"{editionName}\".",
+        "title": "Application accepted! ✅"
+      },
+      "application_rejected": {
+        "action": "View my applications",
+        "message": "Your show \"{showTitle}\" was not selected for \"{editionName}\".",
+        "title": "Application not selected"
+      },
+      "application_submitted": {
+        "action": "View applications",
+        "message": "{artistName} submitted the show \"{showTitle}\" for \"{editionName}\".",
+        "title": "New artist application 🎪"
+      },
       "arrival": {
         "action": "View artists",
         "message": "{artistName} just scanned their ticket and arrived at the convention.",
         "message_with_shows": "{artistName} just scanned their ticket and arrived at the convention.\n\nAssociated shows:\n• {shows}",
         "title": "Artist arrival 🎭"
+      },
+      "show_call_opened": {
+        "action": "View open calls",
+        "message": "The call \"{showCallName}\" for \"{editionName}\" is now open. Submit your show!",
+        "title": "New call for shows 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "The convention \"{conventionName}\" has just been added to the platform.",
         "title": "New convention added"
       },
+      "published": {
+        "action": "View the edition",
+        "message": "The edition \"{editionName}\" of {conventionName} is now online.",
+        "title": "New edition published!"
+      },
       "reminder": {
         "action": "View details",
         "message": "The edition \"{editionName}\" starts in {daysUntil} day(s)!",
@@ -61,6 +86,13 @@
     "loading": "Loading notifications...",
     "manage_description": "Manage your notifications and preferences",
     "none_found": "No notifications found",
+    "organizer": {
+      "added": {
+        "action": "View the convention",
+        "message": "You have been added as an organizer of the convention \"{conventionName}\".",
+        "title": "You're an organizer! 🎪"
+      }
+    },
     "push": {
       "blocked": "Notifications blocked in browser settings",
       "description": "Receive notifications even when the application is closed",
@@ -96,6 +128,11 @@
         "action": "View my applications",
         "message": "Your application for \"{editionName}\" has been successfully submitted. The organizers will review it.",
         "title": "Application submitted! 🎉"
+      },
+      "arrival": {
+        "action": "View schedule",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) just scanned their ticket and arrived at the convention - Team {teamName}",
+        "title": "Volunteer arrival 🎉"
       },
       "back_to_pending": {
         "action": "View my application",

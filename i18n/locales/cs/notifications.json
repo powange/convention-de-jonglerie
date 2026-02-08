@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Zobrazit mé kandidatury",
+        "message": "Vaše představení \"{showTitle}\" bylo vybráno pro \"{editionName}\".",
+        "title": "Kandidatura přijata! ✅"
+      },
+      "application_rejected": {
+        "action": "Zobrazit mé kandidatury",
+        "message": "Vaše představení \"{showTitle}\" nebylo vybráno pro \"{editionName}\".",
+        "title": "Kandidatura nevybrána"
+      },
+      "application_submitted": {
+        "action": "Zobrazit kandidatury",
+        "message": "{artistName} přihlásil představení \"{showTitle}\" pro \"{editionName}\".",
+        "title": "Nová kandidatura umělce 🎪"
+      },
       "arrival": {
         "action": "Zobrazit umělce",
         "message": "{artistName} právě naskenoval lístek a dorazil na konvenci.",
         "message_with_shows": "{artistName} právě naskenoval lístek a dorazil na konvenci.\n\nSpojená představení:\n• {shows}",
         "title": "Příchod umělce 🎭"
+      },
+      "show_call_opened": {
+        "action": "Zobrazit otevřené výzvy",
+        "message": "Výzva \"{showCallName}\" pro \"{editionName}\" je otevřena. Přihlaste své představení!",
+        "title": "Nová výzva pro představení 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "Do platformy byla právě přidána konvence \"{conventionName}\".",
         "title": "Přidána nová dohoda"
       },
+      "published": {
+        "action": "Zobrazit edici",
+        "message": "Edice \"{editionName}\" {conventionName} je nyní online.",
+        "title": "Nová edice zveřejněna!"
+      },
       "reminder": {
         "action": "Viz podrobnosti",
         "message": "Edice \"{editionName}\" začíná za {daysUntil} den(y) !",
@@ -61,6 +86,13 @@
     "loading": "Načítání oznámení...",
     "manage_description": "Správa oznámení a předvoleb",
     "none_found": "Nebylo nalezeno žádné oznámení",
+    "organizer": {
+      "added": {
+        "action": "Zobrazit konvenci",
+        "message": "Byli jste přidáni jako organizátor konvence \"{conventionName}\".",
+        "title": "Jste organizátor! 🎪"
+      }
+    },
     "push": {
       "blocked": "Blokovaná oznámení v nastavení prohlížeče",
       "description": "Přijímání oznámení, i když je aplikace zavřená.",
@@ -96,6 +128,11 @@
         "action": "Podívejte se na mé aplikace",
         "message": "Vaše žádost o \"{editionName}\" byla úspěšně odeslána. Organizátoři ji prověří.",
         "title": "Přihláška odeslána! 🎉"
+      },
+      "arrival": {
+        "action": "Zobrazit rozvrh",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) právě naskenoval vstupenku a dorazil na konvenci - Tým {teamName}",
+        "title": "Příchod dobrovolníka 🎉"
       },
       "back_to_pending": {
         "action": "Viz moje žádost",

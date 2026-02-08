@@ -787,6 +787,33 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification quand un bénévole scanne son billet et arrive sur la convention
+   * Envoyée aux team leaders de ses équipes
+   */
+  async volunteerArrival(
+    userId: number,
+    volunteerName: string,
+    volunteerPseudo: string,
+    teamName: string,
+    editionId: number,
+    applicationId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.volunteer.arrival.title',
+      messageKey: 'notifications.volunteer.arrival.message',
+      translationParams: { volunteerName, volunteerPseudo, teamName },
+      actionTextKey: 'notifications.volunteer.arrival.action',
+      category: 'volunteer',
+      entityType: 'EditionVolunteerApplication',
+      entityId: applicationId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/volunteers/planning`,
+      notificationType: 'volunteer_arrival',
+    })
+  },
+
+  /**
    * Notification quand un utilisateur est ajouté comme organisateur d'une convention
    */
   async organizerAdded(userId: number, conventionName: string, conventionId: number) {
@@ -802,6 +829,127 @@ export const NotificationHelpers = {
       entityId: conventionId.toString(),
       actionUrl: `/conventions/${conventionId}`,
       notificationType: 'organizer_added',
+    })
+  },
+
+  /**
+   * Notification quand une édition passe en PUBLISHED (pour les utilisateurs ayant favorisé)
+   */
+  async editionPublished(
+    userId: number,
+    editionName: string,
+    conventionName: string,
+    editionId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.edition.published.title',
+      messageKey: 'notifications.edition.published.message',
+      translationParams: { editionName, conventionName },
+      actionTextKey: 'notifications.edition.published.action',
+      category: 'edition',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}`,
+      notificationType: 'edition_published',
+    })
+  },
+
+  /**
+   * Notification quand un appel à spectacles est ouvert (pour les artistes)
+   */
+  async showCallOpened(
+    userId: number,
+    showCallName: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.artist.show_call_opened.title',
+      messageKey: 'notifications.artist.show_call_opened.message',
+      translationParams: { showCallName, editionName },
+      actionTextKey: 'notifications.artist.show_call_opened.action',
+      category: 'artist',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/shows-call/open`,
+      notificationType: 'show_call_opened',
+    })
+  },
+
+  /**
+   * Notification quand une candidature artiste est soumise (pour les organisateurs)
+   */
+  async showApplicationSubmitted(
+    userId: number,
+    artistName: string,
+    showTitle: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.artist.application_submitted.title',
+      messageKey: 'notifications.artist.application_submitted.message',
+      translationParams: { artistName, showTitle, editionName },
+      actionTextKey: 'notifications.artist.application_submitted.action',
+      category: 'artist',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/artists/shows`,
+      notificationType: 'show_application_submitted',
+    })
+  },
+
+  /**
+   * Notification quand une candidature artiste est acceptée (pour l'artiste)
+   */
+  async showApplicationAccepted(
+    userId: number,
+    showTitle: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'SUCCESS',
+      titleKey: 'notifications.artist.application_accepted.title',
+      messageKey: 'notifications.artist.application_accepted.message',
+      translationParams: { showTitle, editionName },
+      actionTextKey: 'notifications.artist.application_accepted.action',
+      category: 'artist',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/my-artist-applications`,
+      notificationType: 'show_application_accepted',
+    })
+  },
+
+  /**
+   * Notification quand une candidature artiste est refusée (pour l'artiste)
+   */
+  async showApplicationRejected(
+    userId: number,
+    showTitle: string,
+    editionName: string,
+    editionId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'WARNING',
+      titleKey: 'notifications.artist.application_rejected.title',
+      messageKey: 'notifications.artist.application_rejected.message',
+      translationParams: { showTitle, editionName },
+      actionTextKey: 'notifications.artist.application_rejected.action',
+      category: 'artist',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/my-artist-applications`,
+      notificationType: 'show_application_rejected',
     })
   },
 }

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { updateUserInfo } from '#server/utils/editions/ticketing/user-info-update'
-import { NotificationService } from '#server/utils/notification-service'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
@@ -143,18 +143,18 @@ export default wrapApiHandler(
                   `${application.user.prenom || ''} ${application.user.nom || ''}`.trim() ||
                   application.user.pseudo
 
-                await NotificationService.create({
-                  userId: leader.application.userId,
-                  type: 'INFO',
-                  title: "Arrivée d'un bénévole 🎉",
-                  message: `${volunteerName} (@${application.user.pseudo}) vient de scanner son billet et est arrivé sur la convention - Équipe ${teamAssignment.team.name}`,
-                  category: 'volunteer',
-                  entityType: 'EditionVolunteerApplication',
-                  entityId: application.id.toString(),
-                  actionUrl: `/editions/${editionId}/gestion/volunteers/planning`,
-                  actionText: 'Voir le planning',
-                  notificationType: 'volunteer_arrival',
-                })
+                await safeNotify(
+                  () =>
+                    NotificationHelpers.volunteerArrival(
+                      leader.application.userId,
+                      volunteerName,
+                      application.user.pseudo,
+                      teamAssignment.team.name,
+                      editionId,
+                      application.id
+                    ),
+                  'notification arrivée bénévole'
+                )
               }
             }
           } catch (notifError) {

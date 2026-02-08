@@ -109,8 +109,17 @@ export const NotificationTypeMapping = {
   // Artistes
   artist_arrival: 'artistUpdates' as const,
 
+  // Éditions
+  edition_published: 'conventionNews' as const,
+
   // Organisateurs
   organizer_added: 'conventionNews' as const,
+
+  // Appels à spectacles et candidatures artiste
+  show_call_opened: 'artistUpdates' as const,
+  show_application_submitted: 'artistUpdates' as const,
+  show_application_accepted: 'artistUpdates' as const,
+  show_application_rejected: 'artistUpdates' as const,
 
   // Système
   system_notification: 'systemNotifications' as const,

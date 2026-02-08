@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Voir mes candidatures",
+        "message": "Votre spectacle \"{showTitle}\" a été retenu pour \"{editionName}\".",
+        "title": "Candidature acceptée ! ✅"
+      },
+      "application_rejected": {
+        "action": "Voir mes candidatures",
+        "message": "Votre spectacle \"{showTitle}\" n'a pas été retenu pour \"{editionName}\".",
+        "title": "Candidature non retenue"
+      },
+      "application_submitted": {
+        "action": "Voir les candidatures",
+        "message": "{artistName} a soumis le spectacle \"{showTitle}\" pour \"{editionName}\".",
+        "title": "Nouvelle candidature artiste 🎪"
+      },
       "arrival": {
         "action": "Voir les artistes",
         "message": "{artistName} vient de scanner son billet et est arrivé sur la convention.",
         "message_with_shows": "{artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
         "title": "Arrivée d'un artiste 🎭"
+      },
+      "show_call_opened": {
+        "action": "Voir les appels ouverts",
+        "message": "L'appel \"{showCallName}\" pour \"{editionName}\" est ouvert. Proposez votre spectacle !",
+        "title": "Nouvel appel à spectacles 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "La convention \"{conventionName}\" vient d'être ajoutée à la plateforme.",
         "title": "Nouvelle convention ajoutée"
       },
+      "published": {
+        "action": "Voir l'édition",
+        "message": "L'édition \"{editionName}\" de {conventionName} est maintenant en ligne.",
+        "title": "Nouvelle édition publiée !"
+      },
       "reminder": {
         "action": "Voir les détails",
         "message": "L'édition \"{editionName}\" commence dans {daysUntil} jour(s) !",
@@ -86,6 +111,11 @@
     "this_week": "Cette semaine",
     "unread": "Non lues",
     "volunteer": {
+      "arrival": {
+        "action": "Voir le planning",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) vient de scanner son billet et est arrivé sur la convention - Équipe {teamName}",
+        "title": "Arrivée d'un bénévole 🎉"
+      },
       "application_accepted": {
         "action": "Voir les détails",
         "message": "Votre candidature de bénévole pour \"{editionName}\" a été acceptée.",

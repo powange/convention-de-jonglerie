@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import {
   getEditionWithPermissions,
   canManageArtists,
@@ -131,6 +132,39 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // Notifier l'artiste si le statut change vers ACCEPTED ou REJECTED
+    if (validatedData.status !== application.status) {
+      const editionData = await prisma.edition.findUnique({
+        where: { id: editionId },
+        select: { name: true },
+      })
+      const editionName = editionData?.name || ''
+
+      if (validatedData.status === 'ACCEPTED') {
+        await safeNotify(
+          () =>
+            NotificationHelpers.showApplicationAccepted(
+              application.userId,
+              application.showTitle,
+              editionName,
+              editionId
+            ),
+          'candidature artiste acceptée'
+        )
+      } else if (validatedData.status === 'REJECTED') {
+        await safeNotify(
+          () =>
+            NotificationHelpers.showApplicationRejected(
+              application.userId,
+              application.showTitle,
+              editionName,
+              editionId
+            ),
+          'candidature artiste refusée'
+        )
+      }
+    }
 
     return {
       success: true,

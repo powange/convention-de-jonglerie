@@ -127,6 +127,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.editionShowCall.findFirst.mockResolvedValue(mockShowCall)
       prismaMock.showApplication.findUnique.mockResolvedValue(null) // Pas de candidature existante
+      prismaMock.convention.findFirst.mockResolvedValue(null)
+      prismaMock.editionOrganizerPermission.findMany.mockResolvedValue([])
     })
 
     it('devrait créer une candidature avec succès', async () => {
@@ -273,6 +275,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
 
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.convention.findFirst.mockResolvedValue(null)
+      prismaMock.editionOrganizerPermission.findMany.mockResolvedValue([])
     })
 
     it("devrait rejeter si l'appel est fermé", async () => {
@@ -560,6 +564,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.editionShowCall.findFirst.mockResolvedValue(mockShowCall)
       prismaMock.showApplication.findUnique.mockResolvedValue(null)
+      prismaMock.convention.findFirst.mockResolvedValue(null)
+      prismaMock.editionOrganizerPermission.findMany.mockResolvedValue([])
     })
 
     it('devrait accepter une candidature avec personnes supplémentaires valides', async () => {

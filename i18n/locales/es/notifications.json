@@ -1,11 +1,31 @@
 {
   "notifications": {
     "artist": {
+      "application_accepted": {
+        "action": "Ver mis candidaturas",
+        "message": "Su espectáculo \"{showTitle}\" ha sido seleccionado para \"{editionName}\".",
+        "title": "¡Candidatura aceptada! ✅"
+      },
+      "application_rejected": {
+        "action": "Ver mis candidaturas",
+        "message": "Su espectáculo \"{showTitle}\" no fue seleccionado para \"{editionName}\".",
+        "title": "Candidatura no seleccionada"
+      },
+      "application_submitted": {
+        "action": "Ver candidaturas",
+        "message": "{artistName} ha presentado el espectáculo \"{showTitle}\" para \"{editionName}\".",
+        "title": "Nueva candidatura de artista 🎪"
+      },
       "arrival": {
         "action": "Ver artistas",
         "message": "{artistName} acaba de escanear su boleto y ha llegado a la convención.",
         "message_with_shows": "{artistName} acaba de escanear su boleto y ha llegado a la convención.\n\nEspectáculos asociados:\n• {shows}",
         "title": "Llegada de un artista 🎭"
+      },
+      "show_call_opened": {
+        "action": "Ver convocatorias abiertas",
+        "message": "La convocatoria \"{showCallName}\" para \"{editionName}\" está abierta. ¡Proponga su espectáculo!",
+        "title": "Nueva convocatoria de espectáculos 🎭"
       }
     },
     "carpool": {
@@ -52,6 +72,11 @@
         "message": "La convención \"{conventionName}\" acaba de ser añadida a la plataforma.",
         "title": "Nueva convención añadida"
       },
+      "published": {
+        "action": "Ver la edición",
+        "message": "La edición \"{editionName}\" de {conventionName} ya está en línea.",
+        "title": "¡Nueva edición publicada!"
+      },
       "reminder": {
         "action": "Ver detalles",
         "message": "La edición \"{editionName}\" comienza en {daysUntil} día(s)!",
@@ -61,6 +86,13 @@
     "loading": "Cargando notificaciones...",
     "manage_description": "Gestiona tus notificaciones y preferencias",
     "none_found": "No se encontraron notificaciones",
+    "organizer": {
+      "added": {
+        "action": "Ver la convención",
+        "message": "Ha sido añadido como organizador de la convención \"{conventionName}\".",
+        "title": "¡Eres organizador! 🎪"
+      }
+    },
     "push": {
       "blocked": "Notificaciones bloqueadas en la configuración del navegador",
       "description": "Recibe notificaciones incluso cuando la aplicación está cerrada",
@@ -96,6 +128,11 @@
         "action": "Ver mis solicitudes",
         "message": "Tu solicitud para \"{editionName}\" ha sido enviada con éxito. Los organizadores la revisarán.",
         "title": "¡Solicitud enviada! 🎉"
+      },
+      "arrival": {
+        "action": "Ver la planificación",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) acaba de escanear su entrada y ha llegado a la convención - Equipo {teamName}",
+        "title": "Llegada de un voluntario 🎉"
       },
       "back_to_pending": {
         "action": "Ver mi solicitud",

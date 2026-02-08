@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { showApplicationSchema } from '#server/utils/validation-schemas'
 
@@ -156,6 +157,48 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // Notifier les organisateurs ayant le droit de gérer les artistes
+    const convention = await prisma.convention.findFirst({
+      where: { editions: { some: { id: editionId } } },
+      select: {
+        authorId: true,
+        organizers: {
+          where: { canManageArtists: true },
+          select: { userId: true },
+        },
+      },
+    })
+
+    const organizerIds = new Set<number>()
+    if (convention) {
+      organizerIds.add(convention.authorId)
+      convention.organizers.forEach((o) => organizerIds.add(o.userId))
+    }
+
+    // Vérifier aussi les permissions per-edition
+    const editionPerms = await prisma.editionOrganizerPermission.findMany({
+      where: { editionId, canManageArtists: true },
+      select: { organizer: { select: { userId: true } } },
+    })
+    editionPerms.forEach((p) => organizerIds.add(p.organizer.userId))
+
+    const editionName = edition.name || ''
+
+    for (const orgId of organizerIds) {
+      if (orgId === user.id) continue
+      await safeNotify(
+        () =>
+          NotificationHelpers.showApplicationSubmitted(
+            orgId,
+            validatedData.artistName,
+            validatedData.showTitle,
+            editionName,
+            editionId
+          ),
+        'notification candidature artiste soumise'
+      )
+    }
 
     return {
       success: true,
