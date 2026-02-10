@@ -11,7 +11,7 @@ import { sendErrorEvent, sendResultEvent } from '#server/utils/import-generation
 
 const querySchema = z.object({
   method: z.enum(['direct', 'agent']).default('direct'),
-  urls: z.string().min(1), // URLs séparées par des virgules
+  urls: z.string().min(1), // URLs séparées par des retours à la ligne (\n)
   // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
   previewedImageUrl: z.string().url().optional(),
   // Provider IA à utiliser (optionnel, utilise la config serveur par défaut)
@@ -24,9 +24,9 @@ const querySchema = z.object({
  *
  * Paramètres query:
  * - method: 'direct' (ED) ou 'agent' (EI)
- * - urls: URLs séparées par des virgules
+ * - urls: URLs encodées séparées par des retours à la ligne (\n)
  *
- * Exemple: /api/admin/generate-import-json-stream?method=direct&urls=https://example.com,https://example2.com
+ * Exemple: /api/admin/generate-import-json-stream?method=direct&urls=https%3A%2F%2Fexample.com%0Ahttps%3A%2F%2Fexample2.com
  */
 export default wrapApiHandler(
   async (event) => {
@@ -37,9 +37,9 @@ export default wrapApiHandler(
     const query = getQuery(event)
     const { method, urls: urlsString, previewedImageUrl, provider } = querySchema.parse(query)
 
-    // Parser les URLs
+    // Parser les URLs (séparées par \n pour éviter les conflits avec les virgules dans les URLs)
     const urls = urlsString
-      .split(',')
+      .split('\n')
       .map((url) => url.trim())
       .filter((url) => url.length > 0)
 

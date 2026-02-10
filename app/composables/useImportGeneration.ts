@@ -195,7 +195,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     provider?: string
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
-      const encodedUrls = urls.map((url) => encodeURIComponent(url)).join(',')
+      const encodedUrls = urls.map((url) => encodeURIComponent(url)).join('\n')
 
       // Construire l'URL SSE avec les paramètres
       let sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
