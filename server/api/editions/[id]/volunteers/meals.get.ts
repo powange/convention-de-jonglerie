@@ -29,14 +29,30 @@ export default wrapApiHandler(
     })
 
     // Déterminer la période complète (montage -> démontage)
-    const startDate = edition.volunteersSetupStartDate
+    const periodStart = edition.volunteersSetupStartDate
       ? new Date(edition.volunteersSetupStartDate)
       : new Date(edition.startDate)
-    const endDate = edition.volunteersTeardownEndDate
+    periodStart.setUTCHours(0, 0, 0, 0)
+
+    const periodEnd = edition.volunteersTeardownEndDate
       ? new Date(edition.volunteersTeardownEndDate)
       : new Date(edition.endDate)
+    periodEnd.setUTCHours(0, 0, 0, 0)
 
-    // Vérifier si des repas existent déjà
+    const editionStart = new Date(edition.startDate)
+    editionStart.setUTCHours(0, 0, 0, 0)
+    const editionEnd = new Date(edition.endDate)
+    editionEnd.setUTCHours(0, 0, 0, 0)
+
+    // Construire l'ensemble des dates attendues dans la période
+    const expectedDates = new Set<string>()
+    const cursor = new Date(periodStart)
+    while (cursor <= periodEnd) {
+      expectedDates.add(cursor.toISOString().split('T')[0])
+      cursor.setDate(cursor.getDate() + 1)
+    }
+
+    // Récupérer les repas existants
     const existingMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
       include: {
@@ -49,74 +65,62 @@ export default wrapApiHandler(
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    // Si des repas existent, les retourner directement
-    if (existingMeals.length > 0) {
-      return {
-        success: true,
-        meals: existingMeals,
-      }
-    }
+    // Identifier les dates existantes et les repas hors période
+    const existingDates = new Set<string>()
+    const mealsToDeleteIds: number[] = []
 
-    // Sinon, générer automatiquement les repas
-    const mealsToCreate: any[] = []
-    const currentDate = new Date(startDate)
-    currentDate.setUTCHours(0, 0, 0, 0)
-
-    const editionStart = new Date(edition.startDate)
-    editionStart.setUTCHours(0, 0, 0, 0)
-    const editionEnd = new Date(edition.endDate)
-    editionEnd.setUTCHours(0, 0, 0, 0)
-
-    while (currentDate <= endDate) {
-      const currentDateStr = currentDate.toISOString()
-
-      // Déterminer les phases (SETUP, EVENT, TEARDOWN)
-      // Par défaut, chaque repas est associé à une seule phase
-      let phases: string[]
-      if (currentDate < editionStart) {
-        phases = ['SETUP']
-      } else if (currentDate > editionEnd) {
-        phases = ['TEARDOWN']
+    for (const meal of existingMeals) {
+      const mealDateStr = new Date(meal.date).toISOString().split('T')[0]
+      if (expectedDates.has(mealDateStr)) {
+        existingDates.add(mealDateStr)
       } else {
-        phases = ['EVENT']
+        // Repas hors période → à supprimer
+        mealsToDeleteIds.push(meal.id)
       }
-
-      // Créer les 3 repas pour cette journée
-      mealsToCreate.push({
-        editionId,
-        date: currentDateStr,
-        mealType: 'BREAKFAST',
-        enabled: true,
-        phases,
-      })
-
-      mealsToCreate.push({
-        editionId,
-        date: currentDateStr,
-        mealType: 'LUNCH',
-        enabled: true,
-        phases,
-      })
-
-      mealsToCreate.push({
-        editionId,
-        date: currentDateStr,
-        mealType: 'DINNER',
-        enabled: true,
-        phases,
-      })
-
-      // Passer au jour suivant
-      currentDate.setDate(currentDate.getDate() + 1)
     }
 
-    // Créer tous les repas en base
-    await prisma.volunteerMeal.createMany({
-      data: mealsToCreate,
-    })
+    // Supprimer les repas hors période (cascade sur les sélections)
+    if (mealsToDeleteIds.length > 0) {
+      await prisma.volunteerMeal.deleteMany({
+        where: { id: { in: mealsToDeleteIds } },
+      })
+    }
 
-    // Récupérer les repas créés
-    const createdMeals = await prisma.volunteerMeal.findMany({
+    // Déterminer la phase par défaut pour une date
+    const getPhaseForDate = (dateStr: string): string[] => {
+      const date = new Date(dateStr)
+      date.setUTCHours(0, 0, 0, 0)
+      if (date < editionStart) return ['SETUP']
+      if (date > editionEnd) return ['TEARDOWN']
+      return ['EVENT']
+    }
+
+    // Créer les repas manquants pour les nouvelles dates
+    const mealsToCreate: any[] = []
+    for (const dateStr of expectedDates) {
+      if (!existingDates.has(dateStr)) {
+        const phases = getPhaseForDate(dateStr)
+        const dateISO = new Date(dateStr).toISOString()
+
+        mealsToCreate.push(
+          { editionId, date: dateISO, mealType: 'BREAKFAST', enabled: true, phases },
+          { editionId, date: dateISO, mealType: 'LUNCH', enabled: true, phases },
+          { editionId, date: dateISO, mealType: 'DINNER', enabled: true, phases }
+        )
+      }
+    }
+
+    if (mealsToCreate.length > 0) {
+      await prisma.volunteerMeal.createMany({ data: mealsToCreate })
+    }
+
+    // Si rien n'a changé, retourner les repas existants directement
+    if (mealsToDeleteIds.length === 0 && mealsToCreate.length === 0) {
+      return { success: true, meals: existingMeals }
+    }
+
+    // Sinon, récupérer la liste à jour
+    const updatedMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
       include: {
         returnableItems: {
@@ -130,7 +134,7 @@ export default wrapApiHandler(
 
     return {
       success: true,
-      meals: createdMeals,
+      meals: updatedMeals,
     }
   },
   { operationName: 'GetVolunteerMeals' }
