@@ -38,6 +38,7 @@
           <template #content>
             <UCalendar
               v-model="setupStartDate"
+              :placeholder="setupStartDatePlaceholder"
               :max-value="setupStartDateMaxValue"
               @update:model-value="handleSetupStartDateChange"
             />
@@ -72,6 +73,7 @@
           <template #content>
             <UCalendar
               v-model="teardownEndDate"
+              :placeholder="teardownEndDatePlaceholder"
               :min-value="setupEndDateMinValue"
               @update:model-value="handleTeardownEndDateChange"
             />
@@ -428,6 +430,17 @@ const setupStartDateMaxValue = computed(() => {
 const setupEndDateMinValue = computed(() => {
   if (!props.editionEndDate) return null
   return fromDate(new Date(props.editionEndDate), 'UTC')
+})
+
+// Placeholders pour afficher le bon mois quand aucune date n'est sélectionnée
+const setupStartDatePlaceholder = computed(() => {
+  if (!props.editionStartDate) return undefined
+  return toCalendarDate(fromDate(new Date(props.editionStartDate), 'UTC'))
+})
+
+const teardownEndDatePlaceholder = computed(() => {
+  if (!props.editionEndDate) return undefined
+  return toCalendarDate(fromDate(new Date(props.editionEndDate), 'UTC'))
 })
 
 // Fonctions de gestion des changements
