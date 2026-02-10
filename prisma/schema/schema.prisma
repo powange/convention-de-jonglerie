@@ -424,6 +424,8 @@ model EditionZone {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
+  shows Show[]
+
   @@index([editionId])
 }
 
@@ -440,6 +442,8 @@ model EditionMarker {
   order       Int             @default(0)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+
+  shows Show[]
 
   @@index([editionId])
 }

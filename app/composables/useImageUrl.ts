@@ -12,7 +12,7 @@ export const useImageUrl = () => {
    */
   const getImageUrl = (
     filename: string | null | undefined,
-    type: 'convention' | 'edition' | 'profile' | 'lost-found' = 'convention',
+    type: 'convention' | 'edition' | 'show' | 'profile' | 'lost-found' = 'convention',
     entityId?: number
   ): string | null => {
     if (!filename) {
@@ -37,6 +37,8 @@ export const useImageUrl = () => {
           : `/uploads/temp/${filename}`
       case 'edition':
         return entityId ? `/uploads/editions/${entityId}/${filename}` : `/uploads/temp/${filename}`
+      case 'show':
+        return entityId ? `/uploads/shows/${entityId}/${filename}` : `/uploads/temp/${filename}`
       case 'profile':
         return entityId ? `/uploads/profiles/${entityId}/${filename}` : `/uploads/temp/${filename}`
       case 'lost-found':

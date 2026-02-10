@@ -352,6 +352,9 @@ const upload = async () => {
       case 'edition':
         apiUrl = '/api/files/edition'
         break
+      case 'show':
+        apiUrl = '/api/files/show'
+        break
       case 'lost-found':
         apiUrl = '/api/files/lost-found'
         break

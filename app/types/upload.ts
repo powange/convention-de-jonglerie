@@ -18,7 +18,7 @@ export interface UploadOptions {
 
 export interface UploadEndpoint {
   /** Type d'endpoint d'upload */
-  type: 'convention' | 'edition' | 'lost-found' | 'profile' | 'generic'
+  type: 'convention' | 'edition' | 'show' | 'lost-found' | 'profile' | 'generic'
   /** ID de l'entité (requis pour convention, edition, lost-found) */
   id?: number | string
 }

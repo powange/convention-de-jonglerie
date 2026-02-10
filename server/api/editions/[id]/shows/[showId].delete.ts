@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { deleteOldFile } from '#server/utils/file-helpers'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -48,6 +49,11 @@ export default wrapApiHandler(
         status: 404,
         message: 'Spectacle non trouvé',
       })
+    }
+
+    // Supprimer l'image associée si elle existe
+    if (existingShow.imageUrl) {
+      await deleteOldFile(existingShow.imageUrl, showId, 'shows')
     }
 
     // Supprimer le spectacle (les associations avec les artistes seront supprimées en cascade)

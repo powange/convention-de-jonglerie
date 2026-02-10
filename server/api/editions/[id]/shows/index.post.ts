@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { handleFileUpload } from '#server/utils/file-helpers'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -12,6 +13,9 @@ const showSchema = z.object({
   startDateTime: z.string().datetime(),
   duration: z.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  zoneId: z.number().int().positive().optional().nullable(),
+  markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),
   returnableItemIds: z.array(z.number().int().positive()).optional().default([]),
 })
@@ -49,7 +53,7 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = showSchema.parse(body)
 
-    // Créer le spectacle
+    // Créer le spectacle (sans image pour obtenir l'ID)
     const show = await prisma.show.create({
       data: {
         editionId,
@@ -58,6 +62,8 @@ export default wrapApiHandler(
         startDateTime: new Date(validatedData.startDateTime),
         duration: validatedData.duration,
         location: validatedData.location,
+        zoneId: validatedData.zoneId || null,
+        markerId: validatedData.markerId || null,
         artists: {
           create: validatedData.artistIds.map((artistId) => ({
             artistId,
@@ -68,6 +74,20 @@ export default wrapApiHandler(
             returnableItemId,
           })),
         },
+      },
+    })
+
+    // Gérer l'image avec le helper centralisé
+    const finalImageFilename = await handleFileUpload(validatedData.imageUrl, null, {
+      resourceId: show.id,
+      resourceType: 'shows',
+    })
+
+    // Mettre à jour l'image si nécessaire
+    const updatedShow = await prisma.show.update({
+      where: { id: show.id },
+      data: {
+        imageUrl: finalImageFilename || null,
       },
       include: {
         artists: {
@@ -96,12 +116,28 @@ export default wrapApiHandler(
             },
           },
         },
+        zone: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            zoneType: true,
+          },
+        },
+        marker: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            markerType: true,
+          },
+        },
       },
     })
 
     return {
       success: true,
-      show,
+      show: updatedShow,
     }
   },
   { operationName: 'CreateShow' }

@@ -72,15 +72,22 @@ model Show {
   startDateTime DateTime
   duration      Int?
   location      String?
+  imageUrl      String?
+  zoneId        Int?
+  markerId      Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   edition         Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  zone            EditionZone?         @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker          EditionMarker?       @relation(fields: [markerId], references: [id], onDelete: SetNull)
   artists         ShowArtist[]
   returnableItems ShowReturnableItem[]
 
   @@index([editionId])
   @@index([startDateTime])
+  @@index([zoneId])
+  @@index([markerId])
 }
 
 model ShowArtist {

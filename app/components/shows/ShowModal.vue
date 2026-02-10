@@ -3,6 +3,26 @@
     <template #body>
       <form @submit.prevent="handleSubmit">
         <div class="space-y-4">
+          <!-- Image / Affiche -->
+          <UFormField :label="$t('gestion.shows.image')">
+            <UiImageUpload
+              v-model="formData.imageUrl"
+              :endpoint="uploadEndpoint"
+              :options="{
+                validation: {
+                  maxSize: 5 * 1024 * 1024,
+                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
+                },
+                resetAfterUpload: false,
+              }"
+              :alt="formData.title || $t('gestion.shows.image')"
+              :placeholder="$t('gestion.shows.image_placeholder')"
+              @uploaded="onImageUploaded"
+              @deleted="onImageDeleted"
+            />
+          </UFormField>
+
           <!-- Titre -->
           <UFormField :label="$t('gestion.shows.show_title')" required>
             <UInput
@@ -43,7 +63,17 @@
             />
           </UFormField>
 
-          <!-- Lieu -->
+          <!-- Zone ou point de repère -->
+          <UFormField :label="$t('gestion.shows.zone_or_marker')">
+            <USelect
+              v-model="selectedLocationRef"
+              :items="locationOptions"
+              :placeholder="$t('gestion.shows.select_zone_or_marker')"
+              class="w-full"
+            />
+          </UFormField>
+
+          <!-- Lieu (texte libre) -->
           <UFormField :label="$t('gestion.shows.location')">
             <UInput
               v-model="formData.location"
@@ -159,6 +189,8 @@ const title = computed(() =>
 
 const artists = ref<any[]>([])
 const returnableItems = ref<any[]>([])
+const zones = ref<any[]>([])
+const markers = ref<any[]>([])
 
 const formData = ref({
   title: '',
@@ -166,8 +198,80 @@ const formData = ref({
   startDateTime: '',
   duration: null as number | null,
   location: '',
+  imageUrl: null as string | null,
+  zoneId: null as number | null,
+  markerId: null as number | null,
   artistIds: [] as number[],
   returnableItemIds: [] as number[],
+})
+
+// Configuration pour l'upload d'image
+const uploadEndpoint = computed(() => ({
+  type: 'show' as const,
+  id: props.editionId,
+}))
+
+const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
+  if (result.success && result.imageUrl) {
+    formData.value.imageUrl = result.imageUrl
+  }
+}
+
+const onImageDeleted = () => {
+  formData.value.imageUrl = null
+}
+
+// Sélection combinée zone/marqueur
+// Format de la valeur : "zone:{id}" ou "marker:{id}" ou "" (aucun)
+const selectedLocationRef = computed({
+  get: () => {
+    if (formData.value.zoneId) return `zone:${formData.value.zoneId}`
+    if (formData.value.markerId) return `marker:${formData.value.markerId}`
+    return ''
+  },
+  set: (value: string) => {
+    if (!value) {
+      formData.value.zoneId = null
+      formData.value.markerId = null
+      return
+    }
+    const [type, id] = value.split(':')
+    if (type === 'zone') {
+      formData.value.zoneId = parseInt(id)
+      formData.value.markerId = null
+    } else if (type === 'marker') {
+      formData.value.markerId = parseInt(id)
+      formData.value.zoneId = null
+    }
+  },
+})
+
+// Options combinées zones + marqueurs pour le select
+const locationOptions = computed(() => {
+  const zoneItems = zones.value.map((zone) => ({
+    label: zone.name,
+    value: `zone:${zone.id}`,
+  }))
+
+  const markerItems = markers.value.map((marker) => ({
+    label: marker.name,
+    value: `marker:${marker.id}`,
+  }))
+
+  const groups: any[][] = []
+
+  if (zoneItems.length > 0) {
+    groups.push([{ label: t('gestion.shows.zones_group'), type: 'label' as const }, ...zoneItems])
+  }
+
+  if (markerItems.length > 0) {
+    groups.push([
+      { label: t('gestion.shows.markers_group'), type: 'label' as const },
+      ...markerItems,
+    ])
+  }
+
+  return groups
 })
 
 const artistOptions = computed(() => {
@@ -212,6 +316,26 @@ const fetchReturnableItems = async () => {
   }
 }
 
+// Charger les zones de l'édition
+const fetchZones = async () => {
+  try {
+    const response = await $fetch(`/api/editions/${props.editionId}/zones`)
+    zones.value = response.data?.zones || response.zones || []
+  } catch (error) {
+    console.error('Error fetching zones:', error)
+  }
+}
+
+// Charger les marqueurs de l'édition
+const fetchMarkers = async () => {
+  try {
+    const response = await $fetch(`/api/editions/${props.editionId}/markers`)
+    markers.value = response.data?.markers || response.markers || []
+  } catch (error) {
+    console.error('Error fetching markers:', error)
+  }
+}
+
 // Construit le payload pour l'API
 const buildPayload = () => {
   const localDate = parseDateTimeLocal(formData.value.startDateTime)
@@ -221,6 +345,9 @@ const buildPayload = () => {
     startDateTime: localDate.toISOString(),
     duration: formData.value.duration,
     location: formData.value.location || null,
+    imageUrl: formData.value.imageUrl,
+    zoneId: formData.value.zoneId,
+    markerId: formData.value.markerId,
     artistIds: formData.value.artistIds,
     returnableItemIds: formData.value.returnableItemIds,
   }
@@ -279,6 +406,9 @@ const resetForm = () => {
     startDateTime: '',
     duration: null,
     location: '',
+    imageUrl: null,
+    zoneId: null,
+    markerId: null,
     artistIds: [],
     returnableItemIds: [],
   }
@@ -303,6 +433,9 @@ watch(
         startDateTime: formattedDateTime,
         duration: newShow.duration || null,
         location: newShow.location || '',
+        imageUrl: newShow.imageUrl || null,
+        zoneId: newShow.zoneId || null,
+        markerId: newShow.markerId || null,
         artistIds: newShow.artists?.map((showArtist: any) => showArtist.artistId) || [],
         returnableItemIds: newShow.returnableItems?.map((item: any) => item.returnableItemId) || [],
       }
@@ -317,10 +450,11 @@ watch(
   () => props.modelValue,
   async (isOpen) => {
     if (isOpen) {
-      // Charger les artistes et items si pas encore chargés
       await Promise.all([
         artists.value.length === 0 ? fetchArtists() : Promise.resolve(),
         returnableItems.value.length === 0 ? fetchReturnableItems() : Promise.resolve(),
+        zones.value.length === 0 ? fetchZones() : Promise.resolve(),
+        markers.value.length === 0 ? fetchMarkers() : Promise.resolve(),
       ])
     }
   },

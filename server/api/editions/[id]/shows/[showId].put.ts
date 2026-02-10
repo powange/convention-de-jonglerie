@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { handleFileUpload } from '#server/utils/file-helpers'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -12,6 +13,9 @@ const updateShowSchema = z.object({
   startDateTime: z.string().datetime().optional(),
   duration: z.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  zoneId: z.number().int().positive().optional().nullable(),
+  markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
   returnableItemIds: z.array(z.number().int().positive()).optional(),
 })
@@ -74,6 +78,22 @@ export default wrapApiHandler(
       updateData.startDateTime = new Date(validatedData.startDateTime)
     if (validatedData.duration !== undefined) updateData.duration = validatedData.duration
     if (validatedData.location !== undefined) updateData.location = validatedData.location
+    if (validatedData.zoneId !== undefined) updateData.zoneId = validatedData.zoneId || null
+    if (validatedData.markerId !== undefined) updateData.markerId = validatedData.markerId || null
+
+    // Gérer l'image avec le helper centralisé
+    if (validatedData.imageUrl !== undefined) {
+      const finalImageFilename = await handleFileUpload(
+        validatedData.imageUrl,
+        existingShow.imageUrl,
+        {
+          resourceId: showId,
+          resourceType: 'shows',
+        }
+      )
+      updateData.imageUrl =
+        finalImageFilename !== undefined ? finalImageFilename : existingShow.imageUrl
+    }
 
     // Si des artistIds sont fournis, mettre à jour les associations
     if (validatedData.artistIds !== undefined) {
@@ -138,6 +158,22 @@ export default wrapApiHandler(
                 name: true,
               },
             },
+          },
+        },
+        zone: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            zoneType: true,
+          },
+        },
+        marker: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            markerType: true,
           },
         },
       },

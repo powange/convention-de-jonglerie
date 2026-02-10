@@ -111,13 +111,21 @@
                 class="hover:bg-gray-50 dark:hover:bg-gray-800/50"
               >
                 <td class="px-4 py-3 text-sm">
-                  <div>
-                    <div class="font-medium">{{ show.title }}</div>
-                    <div
-                      v-if="show.description"
-                      class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1"
-                    >
-                      {{ show.description }}
+                  <div class="flex items-center gap-3">
+                    <img
+                      v-if="show.imageUrl"
+                      :src="getShowImageUrl(show)"
+                      :alt="show.title"
+                      class="w-12 h-12 object-cover rounded-lg shrink-0"
+                    />
+                    <div>
+                      <div class="font-medium">{{ show.title }}</div>
+                      <div
+                        v-if="show.description"
+                        class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1"
+                      >
+                        {{ show.description }}
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -128,7 +136,33 @@
                   {{ show.duration ? `${show.duration} min` : '-' }}
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ show.location || '-' }}
+                  <div>
+                    <UBadge
+                      v-if="show.zone"
+                      :style="{ backgroundColor: show.zone.color + '20', color: show.zone.color }"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      <UIcon name="i-heroicons-map" class="mr-1" />
+                      {{ show.zone.name }}
+                    </UBadge>
+                    <UBadge
+                      v-else-if="show.marker"
+                      :style="{
+                        backgroundColor: (show.marker.color || '#6b7280') + '20',
+                        color: show.marker.color || '#6b7280',
+                      }"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      <UIcon name="i-heroicons-map-pin" class="mr-1" />
+                      {{ show.marker.name }}
+                    </UBadge>
+                    <span v-if="show.location" :class="{ 'mt-1 block': show.zone || show.marker }">
+                      {{ show.location }}
+                    </span>
+                    <span v-if="!show.zone && !show.marker && !show.location">-</span>
+                  </div>
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="show.artists && show.artists.length > 0" class="flex flex-wrap gap-1">
@@ -219,6 +253,11 @@ const { t } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { formatDateTime } = useDateFormat()
+const { getImageUrl } = useImageUrl()
+
+const getShowImageUrl = (show: any) => {
+  return getImageUrl(show.imageUrl, 'show', show.id)
+}
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))

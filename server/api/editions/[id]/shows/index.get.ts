@@ -45,6 +45,22 @@ export default wrapApiHandler(
             },
           },
         },
+        zone: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            zoneType: true,
+          },
+        },
+        marker: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            markerType: true,
+          },
+        },
       },
       orderBy: {
         startDateTime: 'asc',
