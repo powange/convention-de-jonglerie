@@ -101,9 +101,7 @@ describe('/api/editions/[id]/shows GET', () => {
 
       expect(result.success).toBe(true)
       expect(result.data.shows).toHaveLength(2)
-      expect(result.data.shows[0].zone).toEqual(
-        expect.objectContaining({ id: 1, name: 'Scène A' })
-      )
+      expect(result.data.shows[0].zone).toEqual(expect.objectContaining({ id: 1, name: 'Scène A' }))
       expect(result.data.shows[1].marker).toEqual(
         expect.objectContaining({ id: 1, name: 'Point Info' })
       )

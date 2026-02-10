@@ -153,12 +153,19 @@
       "Bash(node scripts/translation/generate-todo-files.js:*)",
       "Bash(/root/projets/convention-de-jonglerie/scripts/translation/translations-all.json << 'EOF'\n{\n  \"en\": {\n    \"navigation.dark_mode\": \"Dark mode\",\n    \"navigation.language\": \"Language\"\n  },\n  \"de\": {\n    \"navigation.dark_mode\": \"Dunkelmodus\",\n    \"navigation.language\": \"Sprache\"\n  }\n}\nEOF)",
       "mcp__nuxt-ui__search-components-by-category",
-      "Bash(do python3 -c \"\nimport json\npath = f''i18n/locales/{\"\"$lang\"\"}/notifications.json''\nwith open\\(path, ''r''\\) as f:\n    content = f.read\\(\\)\ncontent = content.replace\\(''\\(@{volunteerPseudo}\\)'', \"\"\\({''{\\\\\"\"@\\\\\"\"''}{volunteerPseudo}\\)\"\".replace\\(''{\"\"@\"\"'', \"\"{''@''\"\"\\)\\)\n# Simpler approach\nwith open\\(path, ''r''\\) as f:\n    content = f.read\\(\\)\nold = ''\\(@{volunteerPseudo}\\)''\nnew = \"\"\\({''@''}{volunteerPseudo}\\)\"\"\ncontent = content.replace\\(old, new\\)\nwith open\\(path, ''w''\\) as f:\n    f.write\\(content\\)\nprint\\(f''Fixed {\"\"$lang\"\"}''\\)\n\")"
+      "Bash(do python3 -c \"\nimport json\npath = f''i18n/locales/{\"\"$lang\"\"}/notifications.json''\nwith open\\(path, ''r''\\) as f:\n    content = f.read\\(\\)\ncontent = content.replace\\(''\\(@{volunteerPseudo}\\)'', \"\"\\({''{\\\\\"\"@\\\\\"\"''}{volunteerPseudo}\\)\"\".replace\\(''{\"\"@\"\"'', \"\"{''@''\"\"\\)\\)\n# Simpler approach\nwith open\\(path, ''r''\\) as f:\n    content = f.read\\(\\)\nold = ''\\(@{volunteerPseudo}\\)''\nnew = \"\"\\({''@''}{volunteerPseudo}\\)\"\"\ncontent = content.replace\\(old, new\\)\nwith open\\(path, ''w''\\) as f:\n    f.write\\(content\\)\nprint\\(f''Fixed {\"\"$lang\"\"}''\\)\n\")",
+      "Bash(npx eslint:*)",
+      "mcp__nuxt-ui__list-components"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner",
+    "Prisma-Remote"
+  ]
 }

@@ -15,6 +15,12 @@
           >
             {{ t('footer.privacy') }}
           </NuxtLink>
+          <NuxtLink
+            to="/guide"
+            class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          >
+            {{ t('footer.guide') }}
+          </NuxtLink>
           <UButton variant="ghost" color="neutral" size="sm" @click="openFeedbackModal">
             {{ t('footer.feedback') }}
           </UButton>

@@ -176,11 +176,10 @@ describe('/api/editions/[id]/shows POST', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockHandleFileUpload).toHaveBeenCalledWith(
-        '/uploads/temp/shows/1/image.jpg',
-        null,
-        { resourceId: 10, resourceType: 'shows' }
-      )
+      expect(mockHandleFileUpload).toHaveBeenCalledWith('/uploads/temp/shows/1/image.jpg', null, {
+        resourceId: 10,
+        resourceType: 'shows',
+      })
       expect(prismaMock.show.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ imageUrl: 'final_image.jpg' }),
