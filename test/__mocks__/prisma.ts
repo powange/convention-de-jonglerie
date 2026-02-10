@@ -73,6 +73,11 @@ export const prismaMock = {
   editionShowCall: createModelMock(),
   showApplication: createModelMock(),
 
+  // Modèles spectacles
+  show: createModelMock(),
+  showArtist: createModelMock(),
+  showReturnableItem: createModelMock(),
+
   // Modèles carte (zones et marqueurs)
   editionZone: createModelMock(),
   editionMarker: createModelMock(),
