@@ -918,8 +918,10 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Wszelkie prawa zastrzeżone.",
+    "discord": "Dołącz do nas na Discordzie",
     "facebook": "Śledź nas na Facebooku",
     "feedback": "Podziel się opinią",
+    "guide": "Przewodnik użytkownika",
     "language_selector": "Zmień język",
     "privacy": "Polityka Prywatności"
   },

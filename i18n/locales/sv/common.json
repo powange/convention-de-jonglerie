@@ -918,8 +918,10 @@
   },
   "footer": {
     "copyright": "{year} Jongleringskonvention. Alla rättigheter reserverade.",
+    "discord": "Gå med oss på Discord",
     "facebook": "Följ oss på Facebook",
     "feedback": "Skicka oss feedback",
+    "guide": "Användarguide",
     "language_selector": "Ändra språk",
     "privacy": "Integritetspolicy"
   },

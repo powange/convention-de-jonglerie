@@ -918,8 +918,10 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rettigheder forbeholdes.",
+    "discord": "Deltag med os på Discord",
     "facebook": "Følg os på Facebook",
     "feedback": "Giv os feedback",
+    "guide": "Brugervejledning",
     "language_selector": "Skift sprog",
     "privacy": "Privatlivspolitik"
   },

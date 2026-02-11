@@ -33,6 +33,15 @@
           >
             <UIcon name="i-simple-icons-facebook" class="w-5 h-5" />
           </NuxtLink>
+          <NuxtLink
+            to="https://discord.gg/DD8XnDVqzj"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1"
+            :title="t('footer.discord')"
+          >
+            <UIcon name="i-simple-icons-discord" class="w-5 h-5" />
+          </NuxtLink>
         </div>
       </div>
     </div>

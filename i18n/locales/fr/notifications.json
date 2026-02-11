@@ -111,11 +111,6 @@
     "this_week": "Cette semaine",
     "unread": "Non lues",
     "volunteer": {
-      "arrival": {
-        "action": "Voir le planning",
-        "message": "{volunteerName} ({'@'}{volunteerPseudo}) vient de scanner son billet et est arrivé sur la convention - Équipe {teamName}",
-        "title": "Arrivée d'un bénévole 🎉"
-      },
       "application_accepted": {
         "action": "Voir les détails",
         "message": "Votre candidature de bénévole pour \"{editionName}\" a été acceptée.",
@@ -133,6 +128,11 @@
         "action": "Voir mes candidatures",
         "message": "Votre candidature pour \"{editionName}\" a été envoyée avec succès. Les organisateurs vont l'examiner.",
         "title": "Candidature envoyée ! 🎉"
+      },
+      "arrival": {
+        "action": "Voir le planning",
+        "message": "{volunteerName} ({'@'}{volunteerPseudo}) vient de scanner son billet et est arrivé sur la convention - Équipe {teamName}",
+        "title": "Arrivée d'un bénévole 🎉"
       },
       "back_to_pending": {
         "action": "Voir ma candidature",

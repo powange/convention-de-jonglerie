@@ -918,8 +918,10 @@
   },
   "footer": {
     "copyright": "{year} Žonglérská konvence. Všechna práva vyhrazena.",
+    "discord": "Připojte se k nám na Discordu",
     "facebook": "Sledujte nás na Facebooku",
     "feedback": "Pošlete nám zpětnou vazbu",
+    "guide": "Uživatelská příručka",
     "language_selector": "Změna jazyka",
     "privacy": "Zásady ochrany osobních údajů"
   },

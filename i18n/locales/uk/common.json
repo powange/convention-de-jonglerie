@@ -918,8 +918,10 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Всі права захищені.",
+    "discord": "Приєднуйтесь до нас у Discord",
     "facebook": "Слідкуйте за нами у Facebook",
     "feedback": "Залишити відгук",
+    "guide": "Посібник користувача",
     "language_selector": "Змінити мову",
     "privacy": "Політика конфіденційності"
   },
