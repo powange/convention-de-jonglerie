@@ -3,6 +3,8 @@ import { z } from 'zod'
 
 import { setUserSession } from '#imports'
 
+import type { LoginResponse } from '#server/types/api-responses'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeString } from '#server/utils/validation-helpers'
@@ -14,7 +16,7 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional().default(false),
 })
 
-export default wrapApiHandler(
+export default wrapApiHandler<LoginResponse>(
   async (event) => {
     // Appliquer le rate limiting
     await authRateLimiter(event)

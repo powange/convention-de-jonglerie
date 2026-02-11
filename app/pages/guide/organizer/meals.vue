@@ -6,41 +6,66 @@
     </p>
 
     <div class="space-y-6">
-      <GuideSection icon="i-heroicons-cog-6-tooth" :title="t('sections.config.title')" color="orange">
+      <GuideSection
+        icon="i-heroicons-cog-6-tooth"
+        :title="t('sections.config.title')"
+        color="orange"
+      >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.config.intro') }}</p>
-        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">{{ t('sections.config.types.title') }}</h3>
+        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
+          {{ t('sections.config.types.title') }}
+        </h3>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.config.types.breakfast') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.types.breakfast')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.config.types.lunch') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.types.lunch')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.config.types.dinner') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.types.dinner')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.config.types.snack') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.types.snack')
+            }}</span>
           </li>
         </ul>
-        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">{{ t('sections.config.phases.title') }}</h3>
+        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
+          {{ t('sections.config.phases.title') }}
+        </h3>
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.config.phases.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.config.phases.setup.label') }}</strong> — {{ t('sections.config.phases.setup.desc') }}</span>
+            <span class="text-gray-600 dark:text-gray-400"
+              ><strong>{{ t('sections.config.phases.setup.label') }}</strong> —
+              {{ t('sections.config.phases.setup.desc') }}</span
+            >
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.config.phases.event.label') }}</strong> — {{ t('sections.config.phases.event.desc') }}</span>
+            <span class="text-gray-600 dark:text-gray-400"
+              ><strong>{{ t('sections.config.phases.event.label') }}</strong> —
+              {{ t('sections.config.phases.event.desc') }}</span
+            >
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.config.phases.teardown.label') }}</strong> — {{ t('sections.config.phases.teardown.desc') }}</span>
+            <span class="text-gray-600 dark:text-gray-400"
+              ><strong>{{ t('sections.config.phases.teardown.label') }}</strong> —
+              {{ t('sections.config.phases.teardown.desc') }}</span
+            >
           </li>
         </ul>
       </GuideSection>
@@ -50,7 +75,9 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.sync.volunteers') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.sync.volunteers')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
@@ -80,15 +107,21 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.validate.search') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.validate.search')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.validate.history') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.validate.history')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.validate.access') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.validate.access')
+            }}</span>
           </li>
         </ul>
       </GuideSection>

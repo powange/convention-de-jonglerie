@@ -1,10 +1,10 @@
+import type { GetEditionsResponse } from '#server/types/api-responses'
+
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { getCountryVariants } from '#server/utils/countries'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
 
-// import type { Edition } from '~/types';
-
-export default wrapApiHandler(
+export default wrapApiHandler<GetEditionsResponse>(
   async (event) => {
     const query = getQuery(event)
     const {

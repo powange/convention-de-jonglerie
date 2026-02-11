@@ -1,9 +1,11 @@
 import { requireUserSession } from '#imports'
 
+import type { SessionMeResponse } from '#server/types/api-responses'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { getImpersonationCookie } from '#server/utils/impersonation-helpers'
 
-export default wrapApiHandler(
+export default wrapApiHandler<SessionMeResponse>(
   async (event) => {
     const session = await requireUserSession(event)
     // Recharger les champs éventuellement manquants (telephone, profilePicture...)

@@ -13,27 +13,39 @@
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.intro') }}</p>
 
-        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">{{ t('sections.showCalls.create.title') }}</h3>
+        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
+          {{ t('sections.showCalls.create.title') }}
+        </h3>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.create.mode') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.showCalls.create.mode')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.create.name') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.showCalls.create.name')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.create.description') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.showCalls.create.description')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.create.deadline') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.showCalls.create.deadline')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.create.activate') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.showCalls.create.activate')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -47,23 +59,33 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.applications.list') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.applications.list')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.applications.details') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.applications.details')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.applications.accept') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.applications.accept')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.applications.reject') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.applications.reject')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.applications.notification') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.applications.notification')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -75,53 +97,69 @@
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.intro') }}</p>
 
-        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">{{ t('sections.shows.create.title') }}</h3>
+        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
+          {{ t('sections.shows.create.title') }}
+        </h3>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.create.titleField') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.create.titleField')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.create.description') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.create.description')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.create.image') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.create.image')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.create.dateTime') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.create.dateTime')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.create.duration') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.create.duration')
+            }}</span>
           </li>
         </ul>
 
-        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">{{ t('sections.shows.location.title') }}</h3>
+        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
+          {{ t('sections.shows.location.title') }}
+        </h3>
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.location.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.location.zone') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.location.zone')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.location.marker') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.location.marker')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.location.text') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.shows.location.text')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
 
-      <GuideSection
-        icon="i-heroicons-link"
-        :title="t('sections.artists.title')"
-        color="yellow"
-      >
+      <GuideSection icon="i-heroicons-link" :title="t('sections.artists.title')" color="yellow">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.artists.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
@@ -130,7 +168,9 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.artists.multiple') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.artists.multiple')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -144,15 +184,21 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.returnableItems.assign') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.returnableItems.assign')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.returnableItems.examples') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.returnableItems.examples')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.returnableItems.tracking') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.returnableItems.tracking')
+            }}</span>
           </li>
         </ul>
       </GuideSection>

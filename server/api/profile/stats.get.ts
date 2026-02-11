@@ -1,7 +1,9 @@
+import type { ProfileStatsResponse } from '#server/types/api-responses'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 
-export default wrapApiHandler(
+export default wrapApiHandler<ProfileStatsResponse>(
   async (event) => {
     // Vérifier l'authentification
     const user = requireAuth(event)

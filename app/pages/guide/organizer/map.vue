@@ -6,11 +6,7 @@
     </p>
 
     <div class="space-y-6">
-      <GuideSection
-        icon="i-heroicons-globe-alt"
-        :title="t('sections.publish.title')"
-        color="green"
-      >
+      <GuideSection icon="i-heroicons-globe-alt" :title="t('sections.publish.title')" color="green">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.publish.content') }}</p>
       </GuideSection>
 
@@ -44,11 +40,7 @@
         </ul>
       </GuideSection>
 
-      <GuideSection
-        icon="i-heroicons-map-pin"
-        :title="t('sections.markers.title')"
-        color="green"
-      >
+      <GuideSection icon="i-heroicons-map-pin" :title="t('sections.markers.title')" color="green">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.markers.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
@@ -69,7 +61,9 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.markers.dragDrop') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.markers.dragDrop')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -82,11 +76,7 @@
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.legend.content') }}</p>
       </GuideSection>
 
-      <GuideSection
-        icon="i-heroicons-link"
-        :title="t('sections.shows.title')"
-        color="green"
-      >
+      <GuideSection icon="i-heroicons-link" :title="t('sections.shows.title')" color="green">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.shows.content') }}</p>
       </GuideSection>
     </div>
@@ -104,7 +94,7 @@ useHead({
     {
       name: 'description',
       content:
-        "Guide organisateur : carte interactive, zones, marqueurs et plan du site pour votre convention.",
+        'Guide organisateur : carte interactive, zones, marqueurs et plan du site pour votre convention.',
     },
   ],
 })

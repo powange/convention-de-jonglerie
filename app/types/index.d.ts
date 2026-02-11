@@ -234,11 +234,8 @@ export interface ConventionFormData {
 }
 
 // Interface pour les statistiques du profil utilisateur
-export interface ProfileStats {
-  conventionsCreated: number
-  editionsFavorited: number
-  favoritesReceived: number
-}
+// Source de vérité : server/types/api-responses.ts (ProfileStatsResponse)
+export type { ProfileStats } from '#shared/types/api'
 
 // ========== APPEL À SPECTACLES ==========
 

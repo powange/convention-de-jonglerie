@@ -15,7 +15,9 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.create') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.workshops.create')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
@@ -23,11 +25,15 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.instructor') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.workshops.instructor')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.registration') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.workshops.registration')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -41,11 +47,15 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.activate') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.lostFound.activate')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.report') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.lostFound.report')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
@@ -53,7 +63,9 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.recover') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.lostFound.recover')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -67,33 +79,39 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.publications.create') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.publications.create')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.publications.content') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.publications.content')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.publications.visibility') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.publications.visibility')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
 
-      <GuideSection
-        icon="i-heroicons-truck"
-        :title="t('sections.carpooling.title')"
-        color="green"
-      >
+      <GuideSection icon="i-heroicons-truck" :title="t('sections.carpooling.title')" color="green">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.carpooling.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.carpooling.feature') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.carpooling.feature')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.carpooling.moderation') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.carpooling.moderation')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -111,8 +129,7 @@ useHead({
   meta: [
     {
       name: 'description',
-      content:
-        'Guide organisateur : workshops, objets trouvés, publications et covoiturage.',
+      content: 'Guide organisateur : workshops, objets trouvés, publications et covoiturage.',
     },
   ],
 })

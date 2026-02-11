@@ -24,15 +24,21 @@
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.discover.views.grid') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.discover.views.grid')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.discover.views.calendar') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.discover.views.calendar')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.discover.views.map') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.discover.views.map')
+            }}</span>
           </li>
         </ul>
 
@@ -42,11 +48,7 @@
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.discover.details.content') }}</p>
       </GuideSection>
 
-      <GuideSection
-        icon="i-heroicons-heart"
-        :title="t('sections.favorites.title')"
-        color="blue"
-      >
+      <GuideSection icon="i-heroicons-heart" :title="t('sections.favorites.title')" color="blue">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.favorites.content') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
@@ -70,17 +72,23 @@
         <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
           {{ t('sections.participate.attendance.title') }}
         </h3>
-        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.participate.attendance.content') }}</p>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ t('sections.participate.attendance.content') }}
+        </p>
 
         <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
           {{ t('sections.participate.carpool.title') }}
         </h3>
-        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.participate.carpool.content') }}</p>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ t('sections.participate.carpool.content') }}
+        </p>
 
         <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
           {{ t('sections.participate.posts.title') }}
         </h3>
-        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.participate.posts.content') }}</p>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ t('sections.participate.posts.content') }}
+        </p>
       </GuideSection>
 
       <GuideSection
@@ -100,11 +108,15 @@
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.profile.notifications') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.profile.notifications')
+            }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.profile.language') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.profile.language')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
