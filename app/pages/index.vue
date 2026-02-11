@@ -463,6 +463,11 @@ watch(
       editionStore.fetchEditions(filtersWithPage)
     }
 
+    // Rafraîchir aussi allEditions si on est en mode carte ou agenda
+    if (viewMode.value === 'map' || viewMode.value === 'agenda') {
+      editionStore.fetchAllEditions(newFilters)
+    }
+
     // Mettre à jour l'URL
     updateUrlFromFilters()
   },
