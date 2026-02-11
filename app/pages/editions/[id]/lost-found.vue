@@ -242,6 +242,7 @@ import { ref, computed, onMounted } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { getEditionDisplayName } from '~/utils/editionName'
 
 // Props et route
 const route = useRoute()
@@ -286,6 +287,24 @@ const newItem = ref({
 
 // Récupérer l'édition
 const edition = computed(() => editionStore.getEditionById(editionId.value))
+
+// Métadonnées SEO
+const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
+
+const seoTitle = computed(() => {
+  if (!edition.value) return t('edition.lost_found')
+  return `${t('edition.lost_found')} - ${editionName.value}`
+})
+
+const seoDescription = computed(() => {
+  if (!edition.value) return ''
+  return `${t('edition.lost_found')} - ${editionName.value}, ${edition.value.city || ''}`
+})
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+})
 
 // Vérifier début / fin de l'édition
 const hasEditionStarted = computed(() => {

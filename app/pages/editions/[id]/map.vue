@@ -68,12 +68,32 @@ import ZonesLegend from '~/components/edition/zones/ZonesLegend.vue'
 import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
 import { useEditionStore } from '~/stores/editions'
+import { getEditionDisplayName } from '~/utils/editionName'
 
 const route = useRoute()
+const { t } = useI18n()
 const editionStore = useEditionStore()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
+
+// Métadonnées SEO
+const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
+
+const seoTitle = computed(() => {
+  if (!edition.value) return t('edition.map')
+  return `${t('edition.map')} - ${editionName.value}`
+})
+
+const seoDescription = computed(() => {
+  if (!edition.value) return ''
+  return `${t('edition.map')} - ${editionName.value}, ${edition.value.city || ''}`
+})
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+})
 const loading = computed(() => editionStore.loading)
 
 // Zones
