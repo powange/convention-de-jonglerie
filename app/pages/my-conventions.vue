@@ -973,7 +973,7 @@ const deleteConvention = async (id: number) => {
   }
 }
 
-// Helpers de droits (auteur = super droit implicite)
+// Helpers de droits (auteur ou admin actif = super droit implicite)
 function currentUserId() {
   return authStore.user?.id
 }
@@ -984,23 +984,25 @@ function findCurrentCollab(convention: Convention) {
 }
 const isAuthor = (convention: Convention) =>
   currentUserId() && convention.authorId && convention.authorId === currentUserId()
+const hasFullAccess = (convention: Convention) =>
+  !!(isAuthor(convention) || authStore.isAdminModeActive)
 const canManageOrganizers = (convention: Convention) =>
-  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.manageOrganizers)
+  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.manageOrganizers)
 const canAddEdition = (convention: Convention) =>
-  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.addEdition)
+  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.addEdition)
 const canEditConvention = (convention: Convention) =>
-  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.editConvention)
+  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.editConvention)
 const canDeleteConvention = (convention: Convention) =>
-  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.deleteConvention)
+  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.deleteConvention)
 const canEditEdition = (convention: Convention, editionId: number) => {
-  if (isAuthor(convention)) return true
+  if (hasFullAccess(convention)) return true
   const collab = findCurrentCollab(convention)
   if (!collab) return false
   if (collab.rights?.editAllEditions) return true
   return (collab as any).perEdition?.some((p: any) => p.editionId === editionId && p.canEdit)
 }
 const canDeleteEdition = (convention: Convention, editionId: number) => {
-  if (isAuthor(convention)) return true
+  if (hasFullAccess(convention)) return true
   const collab = findCurrentCollab(convention)
   if (!collab) return false
   if (collab.rights?.deleteAllEditions) return true

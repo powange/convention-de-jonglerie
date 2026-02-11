@@ -974,7 +974,7 @@ async function main() {
 
         if (!existingBooking) {
           const status =
-            Math.random() > 0.2 ? 'CONFIRMED' : Math.random() > 0.5 ? 'PENDING' : 'CANCELLED'
+            Math.random() > 0.2 ? 'ACCEPTED' : Math.random() > 0.5 ? 'PENDING' : 'CANCELLED'
 
           await prisma.carpoolBooking.create({
             data: {
@@ -993,7 +993,7 @@ async function main() {
           carpoolBookingsCount++
 
           // Si confirmé, ajouter comme passager
-          if (status === 'CONFIRMED') {
+          if (status === 'ACCEPTED') {
             await prisma.carpoolPassenger.create({
               data: {
                 carpoolOfferId: offer.id,
@@ -1085,7 +1085,7 @@ async function main() {
   console.log('Ajout des feedbacks...')
   let feedbackCount = 0
 
-  const feedbackTypes = ['BUG', 'SUGGESTION', 'COMPLAINT', 'QUESTION', 'OTHER'] as const
+  const feedbackTypes = ['BUG', 'SUGGESTION', 'COMPLAINT', 'GENERAL'] as const
   const feedbackSubjects = {
     BUG: [
       "Erreur lors de la création d'une édition",
@@ -1104,12 +1104,13 @@ async function main() {
       'Délai de réponse trop long',
       'Interface pas intuitive',
     ],
-    QUESTION: [
+    GENERAL: [
       'Comment ajouter un organisateur ?',
       'Comment fonctionne le système de bénévolat ?',
       'Puis-je supprimer mon compte ?',
+      'Merci pour cette super app !',
+      'Question générale',
     ],
-    OTHER: ['Merci pour cette super app !', 'Question générale'],
   }
 
   const feedbackMessages = {
@@ -1127,11 +1128,11 @@ async function main() {
       "Ma convention a été supprimée sans que je sois prévenu. C'est inacceptable !",
       "J'attends une réponse depuis 2 semaines...",
     ],
-    QUESTION: [
+    GENERAL: [
       "Je ne trouve pas comment ajouter un organisateur à ma convention. Pouvez-vous m'aider ?",
       'Comment puis-je configurer le système de bénévolat pour mon édition ?',
+      'Bravo pour cette application, elle est vraiment bien faite !',
     ],
-    OTHER: ['Bravo pour cette application, elle est vraiment bien faite !'],
   }
 
   for (let i = 0; i < 15; i++) {
