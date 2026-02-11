@@ -9,24 +9,24 @@
       <GuideSection
         icon="i-heroicons-academic-cap"
         :title="t('sections.workshops.title')"
-        color="green"
+        color="indigo"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.create') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.info') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.instructor') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.workshops.registration') }}</span>
           </li>
         </ul>
@@ -35,24 +35,24 @@
       <GuideSection
         icon="i-heroicons-magnifying-glass-circle"
         :title="t('sections.lostFound.title')"
-        color="green"
+        color="amber"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.activate') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.report') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.list') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.lostFound.recover') }}</span>
           </li>
         </ul>

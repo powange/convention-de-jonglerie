@@ -27,7 +27,7 @@ const props = withDefaults(
   defineProps<{
     icon: string
     title: string
-    color?: 'blue' | 'amber' | 'green' | 'purple'
+    color?: 'blue' | 'amber' | 'green' | 'purple' | 'yellow' | 'orange' | 'indigo'
   }>(),
   {
     color: 'green',
@@ -54,6 +54,21 @@ const colorMap = {
     headerBg: 'bg-purple-50/50 dark:bg-purple-950/20',
     iconBg: 'bg-purple-100 dark:bg-purple-900/40',
     iconColor: 'text-purple-600 dark:text-purple-400',
+  },
+  yellow: {
+    headerBg: 'bg-yellow-50/50 dark:bg-yellow-950/20',
+    iconBg: 'bg-yellow-100 dark:bg-yellow-900/40',
+    iconColor: 'text-yellow-600 dark:text-yellow-400',
+  },
+  orange: {
+    headerBg: 'bg-orange-50/50 dark:bg-orange-950/20',
+    iconBg: 'bg-orange-100 dark:bg-orange-900/40',
+    iconColor: 'text-orange-600 dark:text-orange-400',
+  },
+  indigo: {
+    headerBg: 'bg-indigo-50/50 dark:bg-indigo-950/20',
+    iconBg: 'bg-indigo-100 dark:bg-indigo-900/40',
+    iconColor: 'text-indigo-600 dark:text-indigo-400',
   },
 }
 

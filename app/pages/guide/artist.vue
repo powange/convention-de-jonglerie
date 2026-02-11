@@ -9,24 +9,24 @@
       <GuideSection
         icon="i-heroicons-sparkles"
         :title="t('sections.activate.title')"
-        color="amber"
+        color="yellow"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.activate.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.activate.category') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.activate.stageName') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.activate.bio') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.activate.social') }}</span>
           </li>
         </ul>
@@ -35,20 +35,20 @@
       <GuideSection
         icon="i-heroicons-megaphone"
         :title="t('sections.showCalls.title')"
-        color="amber"
+        color="yellow"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.find') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.criteria') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.showCalls.deadline') }}</span>
           </li>
         </ul>
@@ -57,7 +57,7 @@
       <GuideSection
         icon="i-heroicons-paper-airplane"
         :title="t('sections.apply.title')"
-        color="amber"
+        color="yellow"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.apply.intro') }}</p>
 
@@ -67,19 +67,19 @@
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.apply.form.content') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.apply.form.showTitle') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.apply.form.description') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.apply.form.duration') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.apply.form.additionalArtists') }}</span>
           </li>
         </ul>
@@ -93,24 +93,24 @@
       <GuideSection
         icon="i-heroicons-clipboard-document-check"
         :title="t('sections.tracking.title')"
-        color="amber"
+        color="yellow"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.tracking.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.tracking.page') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.tracking.statuses') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.tracking.modify') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-amber-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.tracking.messaging') }}</span>
           </li>
         </ul>

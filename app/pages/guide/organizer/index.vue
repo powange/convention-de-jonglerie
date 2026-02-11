@@ -9,15 +9,16 @@
       <NuxtLink
         v-for="section in sections"
         :key="section.slug"
-        :to="`/guide/organisateur/${section.slug}`"
+        :to="`/guide/organizer/${section.slug}`"
         class="block group"
       >
         <UCard class="h-full transition-shadow group-hover:shadow-lg">
           <div class="flex flex-col items-center text-center gap-3 py-2">
             <div
-              class="w-12 h-12 rounded-full flex items-center justify-center bg-green-100 dark:bg-green-900/30"
+              class="w-12 h-12 rounded-full flex items-center justify-center"
+              :class="section.bgClass"
             >
-              <UIcon :name="section.icon" class="w-6 h-6 text-green-600 dark:text-green-400" />
+              <UIcon :name="section.icon" class="w-6 h-6" :class="section.iconClass" />
             </div>
             <div>
               <h2 class="text-base font-semibold mb-1">{{ section.title }}</h2>
@@ -57,48 +58,64 @@ const sections = computed(() => [
     title: t('sections.conventions.title'),
     description: t('sections.conventions.description'),
     icon: 'i-heroicons-calendar-days',
+    bgClass: 'bg-purple-100 dark:bg-purple-900/30',
+    iconClass: 'text-purple-600 dark:text-purple-400',
   },
   {
-    slug: 'organisateurs',
+    slug: 'organizers',
     title: t('sections.organizers.title'),
     description: t('sections.organizers.description'),
     icon: 'i-heroicons-user-group',
+    bgClass: 'bg-purple-100 dark:bg-purple-900/30',
+    iconClass: 'text-purple-600 dark:text-purple-400',
   },
   {
-    slug: 'benevoles',
+    slug: 'volunteers',
     title: t('sections.volunteers.title'),
     description: t('sections.volunteers.description'),
     icon: 'i-heroicons-hand-raised',
+    bgClass: 'bg-green-100 dark:bg-green-900/30',
+    iconClass: 'text-green-600 dark:text-green-400',
   },
   {
-    slug: 'artistes',
+    slug: 'artists',
     title: t('sections.artists.title'),
     description: t('sections.artists.description'),
     icon: 'i-heroicons-star',
+    bgClass: 'bg-yellow-100 dark:bg-yellow-900/30',
+    iconClass: 'text-yellow-600 dark:text-yellow-400',
   },
   {
-    slug: 'repas',
+    slug: 'meals',
     title: t('sections.meals.title'),
     description: t('sections.meals.description'),
-    icon: 'i-heroicons-cake',
+    icon: 'cbi:mealie',
+    bgClass: 'bg-orange-100 dark:bg-orange-900/30',
+    iconClass: 'text-orange-600 dark:text-orange-400',
   },
   {
-    slug: 'billetterie',
+    slug: 'ticketing',
     title: t('sections.ticketing.title'),
     description: t('sections.ticketing.description'),
     icon: 'i-heroicons-ticket',
+    bgClass: 'bg-blue-100 dark:bg-blue-900/30',
+    iconClass: 'text-blue-600 dark:text-blue-400',
   },
   {
-    slug: 'carte',
+    slug: 'map',
     title: t('sections.map.title'),
     description: t('sections.map.description'),
     icon: 'i-heroicons-map',
+    bgClass: 'bg-green-100 dark:bg-green-900/30',
+    iconClass: 'text-green-600 dark:text-green-400',
   },
   {
-    slug: 'autres',
+    slug: 'others',
     title: t('sections.other.title'),
     description: t('sections.other.description'),
     icon: 'i-heroicons-squares-plus',
+    bgClass: 'bg-green-100 dark:bg-green-900/30',
+    iconClass: 'text-green-600 dark:text-green-400',
   },
 ])
 </script>

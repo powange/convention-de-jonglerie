@@ -30,20 +30,20 @@ const emit = defineEmits<{
   navigate: []
 }>()
 
-const isOrganizerSection = computed(() => route.path.startsWith('/guide/organisateur'))
+const isOrganizerSection = computed(() => route.path.startsWith('/guide/organizer'))
 
 const items = computed<NavigationMenuItem[][]>(() => [
   [
     {
       label: t('nav.user'),
       icon: 'i-heroicons-user',
-      to: '/guide/utilisateur',
+      to: '/guide/user',
       onSelect: () => emit('navigate'),
     },
     {
       label: t('nav.artist'),
       icon: 'i-heroicons-star',
-      to: '/guide/artiste',
+      to: '/guide/artist',
       onSelect: () => emit('navigate'),
     },
     {
@@ -53,47 +53,47 @@ const items = computed<NavigationMenuItem[][]>(() => [
       children: [
         {
           label: t('nav.orgOverview'),
-          to: '/guide/organisateur',
+          to: '/guide/organizer',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.conventions'),
-          to: '/guide/organisateur/conventions',
+          to: '/guide/organizer/conventions',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.organizers'),
-          to: '/guide/organisateur/organisateurs',
+          to: '/guide/organizer/organizers',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.volunteers'),
-          to: '/guide/organisateur/benevoles',
+          to: '/guide/organizer/volunteers',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.artists'),
-          to: '/guide/organisateur/artistes',
+          to: '/guide/organizer/artists',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.meals'),
-          to: '/guide/organisateur/repas',
+          to: '/guide/organizer/meals',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.ticketing'),
-          to: '/guide/organisateur/billetterie',
+          to: '/guide/organizer/ticketing',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.map'),
-          to: '/guide/organisateur/carte',
+          to: '/guide/organizer/map',
           onSelect: () => emit('navigate'),
         },
         {
           label: t('nav.other'),
-          to: '/guide/organisateur/autres',
+          to: '/guide/organizer/others',
           onSelect: () => emit('navigate'),
         },
       ],
@@ -101,7 +101,7 @@ const items = computed<NavigationMenuItem[][]>(() => [
     {
       label: t('nav.volunteer'),
       icon: 'i-heroicons-hand-raised',
-      to: '/guide/benevole',
+      to: '/guide/volunteer',
       onSelect: () => emit('navigate'),
     },
   ],

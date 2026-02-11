@@ -6,101 +6,101 @@
     </p>
 
     <div class="space-y-6">
-      <GuideSection icon="i-heroicons-user-plus" :title="t('sections.add.title')" color="green">
+      <GuideSection icon="i-heroicons-user-plus" :title="t('sections.add.title')" color="purple">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.add.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.add.search') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.add.customTitle') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.add.notification') }}</span>
           </li>
         </ul>
       </GuideSection>
 
-      <GuideSection icon="i-heroicons-shield-check" :title="t('sections.conventionPerms.title')" color="green">
+      <GuideSection icon="i-heroicons-shield-check" :title="t('sections.conventionPerms.title')" color="purple">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.conventionPerms.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.editConvention.label') }}</strong> — {{ t('sections.conventionPerms.editConvention.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.deleteConvention.label') }}</strong> — {{ t('sections.conventionPerms.deleteConvention.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.manageOrganizers.label') }}</strong> — {{ t('sections.conventionPerms.manageOrganizers.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.manageVolunteers.label') }}</strong> — {{ t('sections.conventionPerms.manageVolunteers.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.addEdition.label') }}</strong> — {{ t('sections.conventionPerms.addEdition.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.editAllEditions.label') }}</strong> — {{ t('sections.conventionPerms.editAllEditions.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.deleteAllEditions.label') }}</strong> — {{ t('sections.conventionPerms.deleteAllEditions.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.manageMeals.label') }}</strong> — {{ t('sections.conventionPerms.manageMeals.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.conventionPerms.manageTicketing.label') }}</strong> — {{ t('sections.conventionPerms.manageTicketing.desc') }}</span>
           </li>
         </ul>
       </GuideSection>
 
-      <GuideSection icon="i-heroicons-key" :title="t('sections.editionPerms.title')" color="green">
+      <GuideSection icon="i-heroicons-key" :title="t('sections.editionPerms.title')" color="purple">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.editionPerms.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.editionPerms.manageArtists.label') }}</strong> — {{ t('sections.editionPerms.manageArtists.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.editionPerms.manageVolunteers.label') }}</strong> — {{ t('sections.editionPerms.manageVolunteers.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.editionPerms.manageShows.label') }}</strong> — {{ t('sections.editionPerms.manageShows.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.editionPerms.manageMap.label') }}</strong> — {{ t('sections.editionPerms.manageMap.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.editionPerms.manageTicketing.label') }}</strong> — {{ t('sections.editionPerms.manageTicketing.desc') }}</span>
           </li>
           <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400"><strong>{{ t('sections.editionPerms.manageMeals.label') }}</strong> — {{ t('sections.editionPerms.manageMeals.desc') }}</span>
           </li>
         </ul>
       </GuideSection>
 
-      <GuideSection icon="i-heroicons-map-pin" :title="t('sections.presence.title')" color="green">
+      <GuideSection icon="i-heroicons-map-pin" :title="t('sections.presence.title')" color="purple">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.presence.content') }}</p>
       </GuideSection>
 
-      <GuideSection icon="i-heroicons-clock" :title="t('sections.history.title')" color="green">
+      <GuideSection icon="i-heroicons-clock" :title="t('sections.history.title')" color="purple">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.history.content') }}</p>
       </GuideSection>
     </div>

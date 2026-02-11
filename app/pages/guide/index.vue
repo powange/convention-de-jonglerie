@@ -63,7 +63,7 @@ useHead({
 
 const roles = computed(() => [
   {
-    slug: 'utilisateur',
+    slug: 'user',
     title: t('roles.user.title'),
     description: t('roles.user.description'),
     icon: 'i-heroicons-user',
@@ -71,28 +71,28 @@ const roles = computed(() => [
     iconClass: 'text-blue-600 dark:text-blue-400',
   },
   {
-    slug: 'artiste',
+    slug: 'artist',
     title: t('roles.artist.title'),
     description: t('roles.artist.description'),
     icon: 'i-heroicons-star',
-    bgClass: 'bg-amber-100 dark:bg-amber-900/30',
-    iconClass: 'text-amber-600 dark:text-amber-400',
+    bgClass: 'bg-yellow-100 dark:bg-yellow-900/30',
+    iconClass: 'text-yellow-600 dark:text-yellow-400',
   },
   {
-    slug: 'organisateur',
+    slug: 'organizer',
     title: t('roles.organizer.title'),
     description: t('roles.organizer.description'),
-    icon: 'i-heroicons-building-office',
-    bgClass: 'bg-green-100 dark:bg-green-900/30',
-    iconClass: 'text-green-600 dark:text-green-400',
+    icon: 'i-heroicons-user-group',
+    bgClass: 'bg-purple-100 dark:bg-purple-900/30',
+    iconClass: 'text-purple-600 dark:text-purple-400',
   },
   {
-    slug: 'benevole',
+    slug: 'volunteer',
     title: t('roles.volunteer.title'),
     description: t('roles.volunteer.description'),
     icon: 'i-heroicons-hand-raised',
-    bgClass: 'bg-purple-100 dark:bg-purple-900/30',
-    iconClass: 'text-purple-600 dark:text-purple-400',
+    bgClass: 'bg-green-100 dark:bg-green-900/30',
+    iconClass: 'text-green-600 dark:text-green-400',
   },
 ])
 </script>

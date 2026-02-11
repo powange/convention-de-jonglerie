@@ -270,7 +270,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       )
     }
 
-    if (canManageVolunteers.value || isTeamLeader.value) {
+    if ((canManageVolunteers.value || isTeamLeader.value) && isVolunteersModeInternal.value) {
       volunteersChildren.push({
         label: t('edition.volunteers.volunteer_notifications'),
         to: `/editions/${editionId.value}/gestion/volunteers/notifications`,
@@ -386,7 +386,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Workshops
-  if (isOrganizer.value && edition.value?.workshopsEnabled) {
+  if (isOrganizer.value) {
     managementSection.push({
       label: t('gestion.workshops.title'),
       icon: 'i-heroicons-academic-cap',
@@ -396,17 +396,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
 
   // Objets trouvés
   if (!isTeamLeader.value || canEdit.value || canManageVolunteers.value) {
-    const hasEditionStarted = edition.value
-      ? new Date() >= new Date(edition.value.startDate)
-      : false
-
-    if (hasEditionStarted) {
-      managementSection.push({
-        label: t('edition.lost_found'),
-        icon: 'i-heroicons-magnifying-glass',
-        to: `/editions/${editionId.value}/gestion/lost-found`,
-      })
-    }
+    managementSection.push({
+      label: t('edition.lost_found'),
+      icon: 'i-heroicons-magnifying-glass',
+      to: `/editions/${editionId.value}/gestion/lost-found`,
+    })
   }
 
   if (managementSection.length > 0) {
