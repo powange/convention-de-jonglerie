@@ -5,7 +5,6 @@ import {
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -29,12 +28,17 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier les permissions pour commenter sur cette édition
-    const hasPermission = await canAccessEditionData(editionId, user.id, event)
-    if (!hasPermission) {
+    // Vérifier que le dernier commentaire n'est pas du même utilisateur (anti-spam)
+    const lastComment = await prisma.editionPostComment.findFirst({
+      where: { editionPostId: postId },
+      orderBy: { createdAt: 'desc' },
+      select: { userId: true },
+    })
+
+    if (lastComment?.userId === user.id) {
       throw createError({
-        status: 403,
-        message: 'Vous devez être organisateur pour commenter sur cette édition',
+        status: 429,
+        message: 'Vous ne pouvez pas poster deux commentaires consécutifs',
       })
     }
 

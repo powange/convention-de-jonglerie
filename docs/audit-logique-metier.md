@@ -56,35 +56,13 @@ await prisma.$transaction(async (tx) => {
 
 ---
 
-### 1.2 Billetterie - Double validation d'entree possible
+### 1.2 ~~Billetterie - Double validation d'entree possible~~ CORRIGE
 
-**Fichier** : `server/api/editions/[id]/ticketing/validate-entry.post.ts` (lignes 393-455)
+**Fichier** : `server/api/editions/[id]/ticketing/validate-entry.post.ts`
 
-**Probleme** : L'`updateMany` ne verifie pas `entryValidated: false` avant la mise a jour. Un billet peut etre valide plusieurs fois. Le meme probleme existe pour les artistes (ligne 196) et les benevoles (ligne 59).
+**Probleme** : L'`updateMany` ne verifiait pas `entryValidated: false` avant la mise a jour. Un billet pouvait etre valide plusieurs fois, ecrasant `entryValidatedAt` et envoyant des notifications en double.
 
-**Impact** :
-
-- `entryValidatedAt` ecrasee a chaque appel
-- Notifications SSE envoyees meme si aucune nouvelle validation
-- Statistiques faussees
-
-**Correction recommandee** :
-
-```typescript
-// Ajouter la condition entryValidated: false
-const result = await prisma.ticketingOrderItem.updateMany({
-  where: {
-    id: { in: body.participantIds },
-    order: { editionId },
-    entryValidated: false, // Empecher la double validation
-  },
-  data: {
-    entryValidated: true,
-    entryValidatedAt: new Date(),
-    entryValidatedBy: user.id,
-  },
-})
-```
+**Resolution** : Ajout de `entryValidated: false` dans le `where` des 4 `updateMany` (benevoles, artistes, organisateurs, billets). Les notifications SSE et push sont desormais conditionnees a `result.count > 0` pour eviter les envois inutiles.
 
 ---
 
@@ -192,13 +170,13 @@ Ajouter une validation custom : `reimbursementActual <= reimbursementMax`.
 
 ---
 
-### 2.2 Permissions - canEditAllEditions donne le droit de suppression
+### 2.2 ~~Permissions - canEditAllEditions donne le droit de suppression~~ CORRIGE
 
-**Fichier** : `server/utils/permissions/edition-permissions.ts` (ligne 129)
+**Fichier** : `server/utils/permissions/edition-permissions.ts`
 
-**Probleme** : Dans `canDeleteEdition()`, le droit `canEditAllEditions` est inclus dans la condition de suppression. Violation du principe du moindre privilege.
+**Probleme** : Dans `canDeleteEdition()`, le droit `canEditAllEditions` etait inclus dans la condition de suppression. Violation du principe du moindre privilege.
 
-**Correction recommandee** : Retirer `canEditAllEditions` de la condition de suppression.
+**Resolution** : `canEditAllEditions` retire de `canDeleteEdition()` et de `getEditionForDelete()`. Seuls `canDeleteAllEditions` et `canDeleteConvention` permettent la suppression. Tests mis a jour.
 
 ---
 
@@ -248,21 +226,20 @@ Ajouter un middleware ou une verification systematique du statut avant les actio
 
 ---
 
-### 2.6 Posts - Permissions incoherentes entre posts et commentaires
+### 2.6 ~~Posts - Permissions incoherentes entre posts et commentaires~~ CORRIGE
 
 **Fichiers** :
 
-- `server/api/editions/[id]/posts/index.post.ts` - Aucune verification de permissions
-- `server/api/editions/[id]/posts/[postId]/comments/index.post.ts` - Restreint aux organisateurs
-- `server/api/editions/[id]/posts/[postId]/index.delete.ts` - Seul l'auteur peut supprimer
+- `server/api/editions/[id]/posts/[postId]/comments/index.post.ts`
+- `server/api/editions/[id]/posts/[postId]/index.delete.ts`
+- `server/api/editions/[id]/posts/[postId]/comments/[commentId]/index.delete.ts`
 
-**Probleme** : N'importe quel utilisateur authentifie peut creer un post sur n'importe quelle edition, mais les commentaires sont restreints aux organisateurs. Les organisateurs ne peuvent pas supprimer des posts problematiques.
+**Probleme** : Les commentaires etaient restreints aux organisateurs alors que les posts etaient ouverts a tous. Les organisateurs ne pouvaient pas supprimer des posts ou commentaires problematiques.
 
-**Correction recommandee** :
-
-- Restreindre la creation de posts aux organisateurs ou participants (benevoles acceptes, detenteurs de billets)
-- Permettre aux organisateurs de supprimer des posts
-- Harmoniser les permissions posts/commentaires
+**Resolution** :
+- **Creation de commentaires** : La verification `canAccessEditionData` a ete retiree. Tous les utilisateurs authentifies peuvent commenter (aligne avec la creation de posts).
+- **Suppression de posts** : L'auteur peut supprimer son propre post. Les organisateurs peuvent moderer (supprimer n'importe quel post).
+- **Suppression de commentaires** : L'auteur peut supprimer son propre commentaire. Les organisateurs peuvent moderer (supprimer n'importe quel commentaire).
 
 ---
 
@@ -441,18 +418,18 @@ Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevo
 | #    | Domaine       | Probleme                                         | Severite |
 | ---- | ------------- | ------------------------------------------------ | -------- |
 | 1.1  | Billetterie   | Pas de validation de quotas en creation manuelle | CRITIQUE |
-| 1.2  | Billetterie   | Double validation d'entree possible              | CRITIQUE |
+| 1.2  | Billetterie   | ~~Double validation d'entree possible~~          | CORRIGE  |
 | 1.3  | Billetterie   | Billets rembourses validables                    | CRITIQUE |
 | 1.4  | Benevoles     | ~~Pas de nettoyage au rejet~~                    | CORRIGE  |
 | 1.5  | Benevoles     | Assignation equipes aux PENDING                  | CRITIQUE |
 | 1.6  | Repas         | Validation multiple possible                     | CRITIQUE |
 | 1.7  | Artistes      | Montants negatifs acceptes                       | CRITIQUE |
 | 2.1  | Permissions   | Deux systemes concurrents                        | MAJEUR   |
-| 2.2  | Permissions   | Edition = suppression                            | MAJEUR   |
+| 2.2  | Permissions   | ~~Edition = suppression~~                        | CORRIGE  |
 | 2.3  | Permissions   | ~~canManageOrganizers = statut edition~~         | CORRIGE  |
 | 2.4  | Permissions   | ~~canEditEdition au lieu de canManageArtists~~   | CORRIGE  |
 | 2.5  | Editions      | Pas de machine a etats                           | MAJEUR   |
-| 2.6  | Posts         | Permissions incoherentes posts/commentaires      | MAJEUR   |
+| 2.6  | Posts         | ~~Permissions incoherentes posts/commentaires~~  | CORRIGE  |
 | 2.7  | Messagerie    | ~~Conversation sans verif benevole~~             | CORRIGE  |
 | 2.8  | Benevoles     | Pas de validation chevauchements serveur         | MAJEUR   |
 | 2.9  | Billetterie   | Transition non atomique                          | MAJEUR   |

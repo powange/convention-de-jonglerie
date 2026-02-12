@@ -325,7 +325,6 @@ describe('/api/editions/[id] DELETE', () => {
                 OR: [
                   { canDeleteAllEditions: true },
                   { canDeleteConvention: true },
-                  { canEditAllEditions: true },
                 ],
               },
             },

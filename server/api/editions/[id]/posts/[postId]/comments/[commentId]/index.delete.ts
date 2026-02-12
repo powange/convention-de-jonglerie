@@ -1,5 +1,6 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -9,12 +10,11 @@ export default wrapApiHandler(
     const postId = validateResourceId(event, 'postId', 'post')
     const commentId = validateResourceId(event, 'commentId', 'commentaire')
 
-    // Vérifier que le commentaire existe et appartient à l'utilisateur
+    // Vérifier que le commentaire existe
     const comment = await prisma.editionPostComment.findFirst({
       where: {
         id: commentId,
         editionPostId: postId,
-        userId: user.id,
       },
       include: {
         editionPost: {
@@ -26,8 +26,20 @@ export default wrapApiHandler(
     if (!comment || comment.editionPost.editionId !== editionId) {
       throw createError({
         status: 404,
-        message: "Commentaire non trouvé ou vous n'êtes pas autorisé à le supprimer",
+        message: 'Commentaire non trouvé',
       })
+    }
+
+    // L'auteur peut supprimer son propre commentaire
+    // Les organisateurs peuvent modérer (supprimer n'importe quel commentaire)
+    if (comment.userId !== user.id) {
+      const isOrganizer = await canAccessEditionData(editionId, user.id, event)
+      if (!isOrganizer) {
+        throw createError({
+          status: 403,
+          message: "Vous n'êtes pas autorisé à supprimer ce commentaire",
+        })
+      }
     }
 
     // Supprimer le commentaire

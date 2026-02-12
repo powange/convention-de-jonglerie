@@ -81,7 +81,6 @@ describe('/api/editions/[id] DELETE', () => {
           {
             userId: 1,
             canDeleteAllEditions: true,
-            canEditAllEditions: true,
           },
         ],
       },
@@ -299,7 +298,6 @@ describe('/api/editions/[id] DELETE', () => {
                 OR: [
                   { canDeleteAllEditions: true },
                   { canDeleteConvention: true },
-                  { canEditAllEditions: true },
                 ],
               },
             },

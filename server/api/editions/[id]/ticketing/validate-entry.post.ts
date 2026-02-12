@@ -63,6 +63,7 @@ export default wrapApiHandler(
             },
             editionId: editionId,
             status: 'ACCEPTED',
+            entryValidated: false,
           },
           data: updateData,
         })
@@ -88,103 +89,106 @@ export default wrapApiHandler(
           await updateUserInfo(userIds, body.userInfo)
         }
 
-        // Envoyer des notifications aux responsables d'équipes
-        // Pour chaque bénévole validé
-        for (const applicationId of body.participantIds) {
-          try {
-            // Récupérer les informations du bénévole et ses équipes
-            const application = await prisma.editionVolunteerApplication.findUnique({
-              where: { id: applicationId },
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                    prenom: true,
-                    nom: true,
-                  },
-                },
-                teamAssignments: {
-                  include: {
-                    team: {
-                      select: {
-                        id: true,
-                        name: true,
-                        // Récupérer les leaders de l'équipe via ApplicationTeamAssignment
-                      },
+        // Envoyer des notifications uniquement si de nouvelles validations ont été effectuées
+        if (result.count > 0) {
+          // Envoyer des notifications aux responsables d'équipes
+          // Pour chaque bénévole validé
+          for (const applicationId of body.participantIds) {
+            try {
+              // Récupérer les informations du bénévole et ses équipes
+              const application = await prisma.editionVolunteerApplication.findUnique({
+                where: { id: applicationId },
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      pseudo: true,
+                      prenom: true,
+                      nom: true,
                     },
                   },
-                },
-              },
-            })
-
-            if (!application) continue
-
-            // Pour chaque équipe du bénévole
-            for (const teamAssignment of application.teamAssignments) {
-              // Trouver les leaders de cette équipe
-              const teamLeaders = await prisma.applicationTeamAssignment.findMany({
-                where: {
-                  teamId: teamAssignment.teamId,
-                  isLeader: true,
-                },
-                include: {
-                  application: {
-                    select: {
-                      userId: true,
+                  teamAssignments: {
+                    include: {
+                      team: {
+                        select: {
+                          id: true,
+                          name: true,
+                          // Récupérer les leaders de l'équipe via ApplicationTeamAssignment
+                        },
+                      },
                     },
                   },
                 },
               })
 
-              // Envoyer une notification à chaque leader
-              for (const leader of teamLeaders) {
-                const volunteerName =
-                  `${application.user.prenom || ''} ${application.user.nom || ''}`.trim() ||
-                  application.user.pseudo
+              if (!application) continue
 
-                await safeNotify(
-                  () =>
-                    NotificationHelpers.volunteerArrival(
-                      leader.application.userId,
-                      volunteerName,
-                      application.user.pseudo,
-                      teamAssignment.team.name,
-                      editionId,
-                      application.id
-                    ),
-                  'notification arrivée bénévole'
-                )
+              // Pour chaque équipe du bénévole
+              for (const teamAssignment of application.teamAssignments) {
+                // Trouver les leaders de cette équipe
+                const teamLeaders = await prisma.applicationTeamAssignment.findMany({
+                  where: {
+                    teamId: teamAssignment.teamId,
+                    isLeader: true,
+                  },
+                  include: {
+                    application: {
+                      select: {
+                        userId: true,
+                      },
+                    },
+                  },
+                })
+
+                // Envoyer une notification à chaque leader
+                for (const leader of teamLeaders) {
+                  const volunteerName =
+                    `${application.user.prenom || ''} ${application.user.nom || ''}`.trim() ||
+                    application.user.pseudo
+
+                  await safeNotify(
+                    () =>
+                      NotificationHelpers.volunteerArrival(
+                        leader.application.userId,
+                        volunteerName,
+                        application.user.pseudo,
+                        teamAssignment.team.name,
+                        editionId,
+                        application.id
+                      ),
+                    'notification arrivée bénévole'
+                  )
+                }
               }
+            } catch (notifError) {
+              // Ne pas bloquer la validation si l'envoi de notification échoue
+              console.error(
+                `Erreur lors de l'envoi de notification pour le bénévole ${applicationId}:`,
+                notifError
+              )
             }
-          } catch (notifError) {
-            // Ne pas bloquer la validation si l'envoi de notification échoue
-            console.error(
-              `Erreur lors de l'envoi de notification pour le bénévole ${applicationId}:`,
-              notifError
-            )
           }
-        }
 
-        // Notifier via SSE
-        try {
-          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
-          for (const participantId of body.participantIds) {
+          // Notifier via SSE
+          try {
+            const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
+            for (const participantId of body.participantIds) {
+              broadcastToEditionSSE(editionId, {
+                type: 'entry-validated',
+                editionId,
+                participantType: 'volunteer',
+                participantId,
+              })
+            }
+            // Notifier aussi que les stats ont changé
             broadcastToEditionSSE(editionId, {
-              type: 'entry-validated',
+              type: 'stats-updated',
               editionId,
-              participantType: 'volunteer',
-              participantId,
             })
+          } catch (sseError) {
+            console.error('[SSE] Failed to notify SSE clients:', sseError)
           }
-          // Notifier aussi que les stats ont changé
-          broadcastToEditionSSE(editionId, {
-            type: 'stats-updated',
-            editionId,
-          })
-        } catch (sseError) {
-          console.error('[SSE] Failed to notify SSE clients:', sseError)
-        }
+        } // fin if (result.count > 0)
 
         return {
           success: true,
@@ -199,6 +203,7 @@ export default wrapApiHandler(
               in: body.participantIds,
             },
             editionId: editionId,
+            entryValidated: false,
           },
           data: {
             entryValidated: true,
@@ -228,94 +233,97 @@ export default wrapApiHandler(
           await updateUserInfo(userIds, body.userInfo)
         }
 
-        // Envoyer des notifications aux responsables artistes
-        // Pour chaque artiste validé
-        for (const artistId of body.participantIds) {
-          try {
-            // Récupérer les informations de l'artiste et ses spectacles
-            const artist = await prisma.editionArtist.findUnique({
-              where: { id: artistId },
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                    prenom: true,
-                    nom: true,
+        // Envoyer des notifications uniquement si de nouvelles validations ont été effectuées
+        if (result.count > 0) {
+          // Envoyer des notifications aux responsables artistes
+          // Pour chaque artiste validé
+          for (const artistId of body.participantIds) {
+            try {
+              // Récupérer les informations de l'artiste et ses spectacles
+              const artist = await prisma.editionArtist.findUnique({
+                where: { id: artistId },
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      pseudo: true,
+                      prenom: true,
+                      nom: true,
+                    },
                   },
-                },
-                shows: {
-                  include: {
-                    show: {
-                      select: {
-                        id: true,
-                        title: true,
+                  shows: {
+                    include: {
+                      show: {
+                        select: {
+                          id: true,
+                          title: true,
+                        },
                       },
                     },
                   },
                 },
-              },
-            })
+              })
 
-            if (!artist) continue
+              if (!artist) continue
 
-            // Récupérer tous les organisateurs avec droits de gestion des artistes
-            const artistManagers = await prisma.editionOrganizer.findMany({
-              where: {
-                editionId: editionId,
-                canManageArtists: true,
-              },
-              select: {
-                userId: true,
-              },
-            })
+              // Récupérer tous les organisateurs avec droits de gestion des artistes
+              const artistManagers = await prisma.editionOrganizer.findMany({
+                where: {
+                  editionId: editionId,
+                  canManageArtists: true,
+                },
+                select: {
+                  userId: true,
+                },
+              })
 
-            // Construire le nom de l'artiste
-            const artistName =
-              `${artist.user.prenom || ''} ${artist.user.nom || ''}`.trim() || artist.user.pseudo
+              // Construire le nom de l'artiste
+              const artistName =
+                `${artist.user.prenom || ''} ${artist.user.nom || ''}`.trim() || artist.user.pseudo
 
-            // Construire la liste des spectacles
-            const shows = artist.shows.map((showArtist) => showArtist.show.title)
+              // Construire la liste des spectacles
+              const shows = artist.shows.map((showArtist) => showArtist.show.title)
 
-            // Envoyer une notification à chaque responsable artiste
-            const { NotificationHelpers } = await import('#server/utils/notification-service')
-            for (const manager of artistManagers) {
-              await NotificationHelpers.artistArrival(
-                manager.userId,
-                artistName,
-                editionId,
-                artist.id,
-                shows.length > 0 ? shows : undefined
+              // Envoyer une notification à chaque responsable artiste
+              const { NotificationHelpers } = await import('#server/utils/notification-service')
+              for (const manager of artistManagers) {
+                await NotificationHelpers.artistArrival(
+                  manager.userId,
+                  artistName,
+                  editionId,
+                  artist.id,
+                  shows.length > 0 ? shows : undefined
+                )
+              }
+            } catch (notifError) {
+              // Ne pas bloquer la validation si l'envoi de notification échoue
+              console.error(
+                `Erreur lors de l'envoi de notification pour l'artiste ${artistId}:`,
+                notifError
               )
             }
-          } catch (notifError) {
-            // Ne pas bloquer la validation si l'envoi de notification échoue
-            console.error(
-              `Erreur lors de l'envoi de notification pour l'artiste ${artistId}:`,
-              notifError
-            )
           }
-        }
 
-        // Notifier via SSE
-        try {
-          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
-          for (const participantId of body.participantIds) {
+          // Notifier via SSE
+          try {
+            const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
+            for (const participantId of body.participantIds) {
+              broadcastToEditionSSE(editionId, {
+                type: 'entry-validated',
+                editionId,
+                participantType: 'artist',
+                participantId,
+              })
+            }
+            // Notifier aussi que les stats ont changé
             broadcastToEditionSSE(editionId, {
-              type: 'entry-validated',
+              type: 'stats-updated',
               editionId,
-              participantType: 'artist',
-              participantId,
             })
+          } catch (sseError) {
+            console.error('[SSE] Failed to notify SSE clients:', sseError)
           }
-          // Notifier aussi que les stats ont changé
-          broadcastToEditionSSE(editionId, {
-            type: 'stats-updated',
-            editionId,
-          })
-        } catch (sseError) {
-          console.error('[SSE] Failed to notify SSE clients:', sseError)
-        }
+        } // fin if (result.count > 0)
 
         return {
           success: true,
@@ -331,6 +339,7 @@ export default wrapApiHandler(
               in: body.participantIds,
             },
             editionId: editionId,
+            entryValidated: false,
           },
           data: {
             entryValidated: true,
@@ -364,25 +373,27 @@ export default wrapApiHandler(
           await updateUserInfo(userIds, body.userInfo)
         }
 
-        // Notifier via SSE
-        try {
-          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
-          for (const participantId of body.participantIds) {
+        // Notifier via SSE uniquement si de nouvelles validations ont été effectuées
+        if (result.count > 0) {
+          try {
+            const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
+            for (const participantId of body.participantIds) {
+              broadcastToEditionSSE(editionId, {
+                type: 'entry-validated',
+                editionId,
+                participantType: 'organizer',
+                participantId,
+              })
+            }
+            // Notifier aussi que les stats ont changé
             broadcastToEditionSSE(editionId, {
-              type: 'entry-validated',
+              type: 'stats-updated',
               editionId,
-              participantType: 'organizer',
-              participantId,
             })
+          } catch (sseError) {
+            console.error('[SSE] Failed to notify SSE clients:', sseError)
           }
-          // Notifier aussi que les stats ont changé
-          broadcastToEditionSSE(editionId, {
-            type: 'stats-updated',
-            editionId,
-          })
-        } catch (sseError) {
-          console.error('[SSE] Failed to notify SSE clients:', sseError)
-        }
+        } // fin if (result.count > 0)
 
         return {
           success: true,
@@ -399,6 +410,7 @@ export default wrapApiHandler(
             order: {
               editionId: editionId,
             },
+            entryValidated: false,
           },
           data: {
             entryValidated: true,
@@ -454,25 +466,27 @@ export default wrapApiHandler(
           })
         }
 
-        // Notifier via SSE
-        try {
-          const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
-          for (const participantId of body.participantIds) {
+        // Notifier via SSE uniquement si de nouvelles validations ont été effectuées
+        if (result.count > 0) {
+          try {
+            const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
+            for (const participantId of body.participantIds) {
+              broadcastToEditionSSE(editionId, {
+                type: 'entry-validated',
+                editionId,
+                participantType: 'ticket',
+                participantId,
+              })
+            }
+            // Notifier aussi que les stats ont changé
             broadcastToEditionSSE(editionId, {
-              type: 'entry-validated',
+              type: 'stats-updated',
               editionId,
-              participantType: 'ticket',
-              participantId,
             })
+          } catch (sseError) {
+            console.error('[SSE] Failed to notify SSE clients:', sseError)
           }
-          // Notifier aussi que les stats ont changé
-          broadcastToEditionSSE(editionId, {
-            type: 'stats-updated',
-            editionId,
-          })
-        } catch (sseError) {
-          console.error('[SSE] Failed to notify SSE clients:', sseError)
-        }
+        } // fin if (result.count > 0)
 
         return {
           success: true,

@@ -126,7 +126,7 @@ export function canDeleteEdition(
     edition.convention.organizers?.some(
       (collab) =>
         collab.userId === user.id &&
-        (collab.canDeleteAllEditions || collab.canDeleteConvention || collab.canEditAllEditions)
+        (collab.canDeleteAllEditions || collab.canDeleteConvention)
     ) || false
 
   // Vérifier si l'utilisateur a des droits de suppression spécifiques à cette édition
@@ -221,7 +221,6 @@ export async function getEditionForDelete(
     requiredRights: [
       ORGANIZER_RIGHTS.DELETE_ALL_EDITIONS,
       ORGANIZER_RIGHTS.DELETE_CONVENTION,
-      ORGANIZER_RIGHTS.EDIT_ALL_EDITIONS,
     ],
   })
 
