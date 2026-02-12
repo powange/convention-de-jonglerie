@@ -103,6 +103,7 @@
       "volunteers": "Frivillige"
     },
     "organizers": {
+      "access_rights": "Adgangsrettigheder",
       "add_returnable_item": "Tilføj genstand",
       "add_to_edition_error": "Kan ikke tilføje organisator til udgaven",
       "added_to_edition": "Organisator tilføjet til udgaven med succes",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Er du sikker på, at du vil fjerne denne organisator fra udgaven?",
       "confirm_remove_item": "Er du sikker på, at du vil fjerne denne genstand?",
       "edit_organizer": "Rediger organisator",
+      "edit_organizer_description": "Konfigurer adgangsrettigheder og titel for denne arrangør for at administrere deres tilladelser på konventionen og dens udgaver.",
       "entry_not_validated": "Indtastning ikke valideret",
       "entry_validated": "Indtastning valideret",
       "error_adding_item": "Fejl ved tilføjelse af genstand",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Vælg genstand",
       "select_to_add": "Vælg en organisator at tilføje",
       "status": "Status",
-      "title": "Organisatorer"
+      "title": "Organisatorer",
+      "title_required": "Arrangørens titel er påkrævet"
     },
     "overview": "Oversigt",
     "shows": {

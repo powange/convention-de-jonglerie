@@ -103,6 +103,7 @@
       "volunteers": "Freiwillige"
     },
     "organizers": {
+      "access_rights": "Zugriffsrechte",
       "add_returnable_item": "Artikel hinzufügen",
       "add_to_edition_error": "Organisator kann nicht zur Edition hinzugefügt werden",
       "added_to_edition": "Organisator erfolgreich zur Edition hinzugefügt",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Sind Sie sicher, dass Sie diesen Organisator von der Edition entfernen möchten?",
       "confirm_remove_item": "Sind Sie sicher, dass Sie diesen Artikel entfernen möchten?",
       "edit_organizer": "Organisator bearbeiten",
+      "edit_organizer_description": "Konfigurieren Sie die Zugriffsrechte und den Titel dieses Organisators, um seine Berechtigungen für die Convention und ihre Ausgaben zu verwalten.",
       "entry_not_validated": "Eintrag nicht validiert",
       "entry_validated": "Eintrag validiert",
       "error_adding_item": "Fehler beim Hinzufügen des Artikels",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Artikel auswählen",
       "select_to_add": "Wählen Sie einen Organisator zum Hinzufügen aus",
       "status": "Status",
-      "title": "Organisatoren"
+      "title": "Organisatoren",
+      "title_required": "Der Titel des Organisators ist erforderlich"
     },
     "overview": "Übersicht",
     "shows": {

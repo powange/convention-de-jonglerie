@@ -103,6 +103,7 @@
       "volunteers": "Bénévoles"
     },
     "organizers": {
+      "access_rights": "Droits d'accès",
       "add_returnable_item": "Ajouter un article",
       "add_to_edition_error": "Impossible d'ajouter l'organisateur à l'édition",
       "added_to_edition": "Organisateur ajouté à l'édition avec succès",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Êtes-vous sûr de vouloir retirer cet organisateur de l'édition ?",
       "confirm_remove_item": "Êtes-vous sûr de vouloir retirer cet article ?",
       "edit_organizer": "Modifier l'organisateur",
+      "edit_organizer_description": "Configurez les droits d'accès et le titre de cet organisateur pour gérer ses permissions sur la convention et ses éditions.",
       "entry_not_validated": "Entrée non validée",
       "entry_validated": "Entrée validée",
       "error_adding_item": "Erreur lors de l'ajout de l'article",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Sélectionner un article",
       "select_to_add": "Sélectionner un organisateur à ajouter",
       "status": "Statut",
-      "title": "Organisateurs"
+      "title": "Organisateurs",
+      "title_required": "Le titre de l'organisateur est requis"
     },
     "overview": "Vue d'ensemble",
     "shows": {

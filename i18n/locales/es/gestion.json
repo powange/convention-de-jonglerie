@@ -103,6 +103,7 @@
       "volunteers": "Voluntarios"
     },
     "organizers": {
+      "access_rights": "Derechos de acceso",
       "add_returnable_item": "Añadir artículo",
       "add_to_edition_error": "No se puede agregar el organizador a la edición",
       "added_to_edition": "Organizador agregado exitosamente a la edición",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "¿Está seguro de que desea eliminar a este organizador de la edición?",
       "confirm_remove_item": "¿Está seguro de que desea eliminar este artículo?",
       "edit_organizer": "Editar organizador",
+      "edit_organizer_description": "Configure los derechos de acceso y el título de este organizador para gestionar sus permisos en la convención y sus ediciones.",
       "entry_not_validated": "Entrada no validada",
       "entry_validated": "Entrada validada",
       "error_adding_item": "Error al añadir artículo",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Seleccionar artículo",
       "select_to_add": "Seleccione un organizador para agregar",
       "status": "Estado",
-      "title": "Organizadores"
+      "title": "Organizadores",
+      "title_required": "El título del organizador es obligatorio"
     },
     "overview": "Vista general",
     "shows": {

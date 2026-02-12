@@ -103,6 +103,7 @@
       "volunteers": "Dobrovolníci"
     },
     "organizers": {
+      "access_rights": "Přístupová práva",
       "add_returnable_item": "Přidat položku",
       "add_to_edition_error": "Nelze přidat organizátora do edice",
       "added_to_edition": "Organizátor byl úspěšně přidán do edice",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Opravdu chcete odebrat tohoto organizátora z edice?",
       "confirm_remove_item": "Opravdu chcete odebrat tuto položku?",
       "edit_organizer": "Upravit organizátora",
+      "edit_organizer_description": "Nakonfigurujte přístupová práva a titul tohoto organizátora pro správu jeho oprávnění na konvenci a jejích edicích.",
       "entry_not_validated": "Vstup neověřen",
       "entry_validated": "Vstup ověřen",
       "error_adding_item": "Chyba při přidávání položky",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Vybrat položku",
       "select_to_add": "Vyberte organizátora k přidání",
       "status": "Stav",
-      "title": "Organizátoři"
+      "title": "Organizátoři",
+      "title_required": "Titul organizátora je povinný"
     },
     "overview": "Přehled",
     "shows": {

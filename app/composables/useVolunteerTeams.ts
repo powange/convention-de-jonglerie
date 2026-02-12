@@ -127,11 +127,6 @@ export function useVolunteerTeams(
     }
   }
 
-  // Ne plus charger automatiquement - le parent gère le chargement
-  // onMounted(() => {
-  //   fetchTeams()
-  // })
-
   return {
     // État
     teams: readonly(teams),

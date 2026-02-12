@@ -103,6 +103,7 @@
       "volunteers": "Volunteers"
     },
     "organizers": {
+      "access_rights": "Access rights",
       "add_returnable_item": "Add item",
       "add_to_edition_error": "Unable to add organizer to edition",
       "added_to_edition": "Organizer successfully added to edition",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Are you sure you want to remove this organizer from the edition?",
       "confirm_remove_item": "Are you sure you want to remove this item?",
       "edit_organizer": "Edit organizer",
+      "edit_organizer_description": "Configure the access rights and title of this organizer to manage their permissions on the convention and its editions.",
       "entry_not_validated": "Entry not validated",
       "entry_validated": "Entry validated",
       "error_adding_item": "Error adding item",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Select item",
       "select_to_add": "Select an organizer to add",
       "status": "Status",
-      "title": "Organizers"
+      "title": "Organizers",
+      "title_required": "Organizer title is required"
     },
     "overview": "Overview",
     "shows": {

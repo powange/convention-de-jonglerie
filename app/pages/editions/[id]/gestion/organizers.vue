@@ -329,49 +329,15 @@
     </UModal>
 
     <!-- Modal d'édition d'organisateur -->
-    <UModal
+    <ConventionOrganizerEditModal
       v-model:open="editOrganizerModalOpen"
-      :title="$t('gestion.organizers.edit_organizer')"
-      size="lg"
-    >
-      <template #body>
-        <div v-if="selectedOrganizer" class="space-y-4">
-          <!-- Info organisateur -->
-          <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UiUserAvatar :user="selectedOrganizer.user" size="md" />
-            <div>
-              <div class="font-medium">{{ selectedOrganizer.user?.pseudo }}</div>
-              <div class="text-sm text-gray-500">{{ selectedOrganizer.user?.email }}</div>
-            </div>
-          </div>
-
-          <!-- Configuration des droits -->
-          <div>
-            <OrganizerRightsFields
-              v-model="editOrganizerRights"
-              :editions="(conventionEditions || []) as any[]"
-              :convention-name="edition?.convention?.name"
-              size="sm"
-            />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex justify-between w-full">
-          <UButton color="error" variant="soft" @click="removeOrganizer">
-            {{ $t('common.remove') }}
-          </UButton>
-          <div class="flex gap-3">
-            <UButton variant="ghost" @click="closeEditOrganizerModal">
-              {{ $t('common.cancel') }}
-            </UButton>
-            <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
-              {{ $t('common.save') }}
-            </UButton>
-          </div>
-        </div>
-      </template>
-    </UModal>
+      :organizer="selectedOrganizer"
+      :convention="edition?.convention || null"
+      :editions="(conventionEditions || []) as any[]"
+      :loading="savingOrganizer"
+      @save="saveOrganizerChanges"
+      @delete="removeOrganizer"
+    />
 
     <!-- Modal d'historique -->
     <UModal
@@ -492,12 +458,6 @@ const newOrganizerRights = ref({
   perEdition: [],
 })
 
-const editOrganizerRights = ref({
-  rights: {},
-  title: '',
-  perEdition: [],
-})
-
 // Debounce pour la recherche d'utilisateurs
 const debouncedSearchTerm = useDebounce(newOrganizersearchTerm, 300)
 
@@ -562,11 +522,6 @@ const startAddingOrganizer = () => {
 
 const selectOrganizer = (organizer: any) => {
   selectedOrganizer.value = organizer
-  editOrganizerRights.value = {
-    rights: organizer.rights || {},
-    title: organizer.title || '',
-    perEdition: organizer.perEditionRights || [],
-  }
   editOrganizerModalOpen.value = true
 }
 
@@ -618,21 +573,23 @@ const addOrganizer = async () => {
   }
 }
 
-const saveOrganizerChanges = async () => {
+const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
   if (!selectedOrganizer.value || !edition.value) {
     return
   }
 
+  const { handleError } = useErrorHandler()
   savingOrganizer.value = true
+
   try {
     await $fetch(
       `/api/conventions/${edition.value.convention?.id}/organizers/${selectedOrganizer.value.id}`,
       {
         method: 'PATCH',
         body: {
-          rights: editOrganizerRights.value.rights,
-          title: editOrganizerRights.value.title,
-          perEdition: editOrganizerRights.value.perEdition,
+          rights: rights.rights,
+          title: rights.title,
+          perEdition: rights.perEdition,
         },
       }
     )
@@ -645,13 +602,10 @@ const saveOrganizerChanges = async () => {
 
     closeEditOrganizerModal()
     await editionStore.fetchEditionById(editionId, { force: true })
-  } catch (error: any) {
-    console.error('Error updating organizer:', error)
-    toast.add({
-      title: t('errors.update_organizer_error'),
-      description: error.data?.message || error.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
+  } catch (error: unknown) {
+    handleError(error, {
+      defaultTitleKey: 'errors.update_organizer_error',
+      logPrefix: 'Error updating organizer',
     })
   } finally {
     savingOrganizer.value = false

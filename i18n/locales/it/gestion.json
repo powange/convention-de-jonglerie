@@ -103,6 +103,7 @@
       "volunteers": "Volontari"
     },
     "organizers": {
+      "access_rights": "Diritti di accesso",
       "add_returnable_item": "Aggiungi articolo",
       "add_to_edition_error": "Impossibile aggiungere l'organizzatore all'edizione",
       "added_to_edition": "Organizzatore aggiunto con successo all'edizione",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Sei sicuro di voler rimuovere questo organizzatore dall'edizione?",
       "confirm_remove_item": "Sei sicuro di voler rimuovere questo articolo?",
       "edit_organizer": "Modifica organizzatore",
+      "edit_organizer_description": "Configura i diritti di accesso e il titolo di questo organizzatore per gestire i suoi permessi sulla convention e le sue edizioni.",
       "entry_not_validated": "Ingresso non convalidato",
       "entry_validated": "Ingresso convalidato",
       "error_adding_item": "Errore nell'aggiunta dell'articolo",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Seleziona articolo",
       "select_to_add": "Seleziona un organizzatore da aggiungere",
       "status": "Stato",
-      "title": "Organizzatori"
+      "title": "Organizzatori",
+      "title_required": "Il titolo dell'organizzatore è obbligatorio"
     },
     "overview": "Panoramica",
     "shows": {

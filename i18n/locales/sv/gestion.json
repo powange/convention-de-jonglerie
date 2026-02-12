@@ -103,6 +103,7 @@
       "volunteers": "Volontärer"
     },
     "organizers": {
+      "access_rights": "Åtkomsträttigheter",
       "add_returnable_item": "Lägg till artikel",
       "add_to_edition_error": "Kan inte lägga till arrangör i utgåvan",
       "added_to_edition": "Arrangör har lagts till i utgåvan",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Är du säker på att du vill ta bort denna arrangör från utgåvan?",
       "confirm_remove_item": "Är du säker på att du vill ta bort denna artikel?",
       "edit_organizer": "Redigera arrangör",
+      "edit_organizer_description": "Konfigurera åtkomsträttigheter och titel för denna arrangör för att hantera deras behörigheter på konventionen och dess utgåvor.",
       "entry_not_validated": "Inträde ej validerat",
       "entry_validated": "Inträde validerat",
       "error_adding_item": "Fel vid tillägg av artikel",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Välj artikel",
       "select_to_add": "Välj en arrangör att lägga till",
       "status": "Status",
-      "title": "Arrangörer"
+      "title": "Arrangörer",
+      "title_required": "Arrangörens titel är obligatorisk"
     },
     "overview": "Översikt",
     "shows": {

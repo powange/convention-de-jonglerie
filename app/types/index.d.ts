@@ -406,3 +406,11 @@ export interface EditionShowCallPublic extends EditionShowCallBasic {
 export interface ShowApplicationWithShowCallName extends ShowApplication {
   showCallName: string
 }
+
+// Exports des types organisateurs
+export type {
+  Organizer,
+  OrganizerRights,
+  OrganizerPerEditionRights,
+  OrganizerRightsFormData,
+} from './organizer'

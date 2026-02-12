@@ -170,11 +170,6 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
     }
   }
 
-  // Ne plus charger automatiquement - le parent gère le chargement
-  // onMounted(() => {
-  //   fetchTimeSlots()
-  // })
-
   return {
     // État
     timeSlots: readonly(timeSlots),

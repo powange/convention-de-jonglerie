@@ -103,6 +103,7 @@
       "volunteers": "Wolontariusze"
     },
     "organizers": {
+      "access_rights": "Prawa dostępu",
       "add_returnable_item": "Dodaj przedmiot",
       "add_to_edition_error": "Nie można dodać organizatora do edycji",
       "added_to_edition": "Organizator został pomyślnie dodany do edycji",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Czy na pewno chcesz usunąć tego organizatora z edycji?",
       "confirm_remove_item": "Czy na pewno chcesz usunąć ten przedmiot?",
       "edit_organizer": "Edytuj organizatora",
+      "edit_organizer_description": "Skonfiguruj prawa dostępu i tytuł tego organizatora, aby zarządzać jego uprawnieniami do konwencji i jej edycji.",
       "entry_not_validated": "Wejście niezatwierdzone",
       "entry_validated": "Wejście zatwierdzone",
       "error_adding_item": "Błąd podczas dodawania przedmiotu",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Wybierz przedmiot",
       "select_to_add": "Wybierz organizatora do dodania",
       "status": "Status",
-      "title": "Organizatorzy"
+      "title": "Organizatorzy",
+      "title_required": "Tytuł organizatora jest wymagany"
     },
     "overview": "Przegląd",
     "shows": {

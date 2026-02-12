@@ -216,47 +216,15 @@
     </div>
 
     <!-- Modal d'édition de organisateur -->
-    <UModal
+    <ConventionOrganizerEditModal
       v-model:open="editOrganizerModalOpen"
-      :title="selectedOrganizerForEdit ? $t('conventions.edit_organizer_rights') : ''"
-      size="lg"
-    >
-      <template #body>
-        <div v-if="selectedOrganizerForEdit && selectedConventionForEdit" class="space-y-4">
-          <!-- Informations du organisateur -->
-          <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UiUserAvatar :user="selectedOrganizerForEdit.user" size="md" />
-            <div>
-              <h4 class="font-medium">{{ selectedOrganizerForEdit.user?.pseudo || '' }}</h4>
-              <p v-if="selectedOrganizerForEdit.title" class="text-sm text-gray-500">
-                {{ selectedOrganizerForEdit.title }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Configuration des droits -->
-          <div>
-            <label class="block text-sm font-medium mb-2"> Droits du organisateur </label>
-            <OrganizerRightsFields
-              v-model="editOrganizerRights"
-              :editions="(selectedConventionForEdit.editions || []) as any[]"
-              :convention-name="selectedConventionForEdit.name"
-              size="sm"
-            />
-          </div>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeEditOrganizerModal">
-            {{ $t('common.cancel') }}
-          </UButton>
-          <UButton color="primary" :loading="savingOrganizer" @click="saveOrganizerChanges">
-            {{ $t('common.save') }}
-          </UButton>
-        </div>
-      </template>
-    </UModal>
+      :organizer="selectedOrganizerForEdit"
+      :convention="selectedConventionForEdit"
+      :editions="(selectedConventionForEdit?.editions || []) as any[]"
+      :loading="savingOrganizer"
+      @save="saveOrganizerChanges"
+      @delete="removeOrganizer"
+    />
 
     <!-- Modal d'ajout de organisateur -->
     <UModal v-model:open="addOrganizerModalOpen" :title="$t('conventions.add_organizer')" size="lg">
@@ -402,19 +370,6 @@ const myConventions = ref<Convention[]>([])
 const editOrganizerModalOpen = ref(false)
 const selectedConventionForEdit = ref<Convention | null>(null)
 const selectedOrganizerForEdit = ref<any>(null)
-const editOrganizerRights = ref<any>({
-  title: null,
-  rights: {
-    editConvention: false,
-    deleteConvention: false,
-    manageOrganizers: false,
-    manageVolunteers: false,
-    addEdition: false,
-    editAllEditions: false,
-    deleteAllEditions: false,
-  },
-  perEdition: [],
-})
 const savingOrganizer = ref(false)
 
 // Modal d'ajout de organisateur
@@ -751,14 +706,6 @@ const openEditOrganizerModal = (convention: Convention, organizer: any) => {
 
   selectedConventionForEdit.value = convention
   selectedOrganizerForEdit.value = organizer
-
-  // Charger les droits actuels du organisateur
-  editOrganizerRights.value = {
-    title: organizer.title || '',
-    rights: { ...organizer.rights },
-    perEdition: [...(organizer.perEdition || [])],
-  }
-
   editOrganizerModalOpen.value = true
 }
 
@@ -766,25 +713,14 @@ const closeEditOrganizerModal = () => {
   editOrganizerModalOpen.value = false
   selectedConventionForEdit.value = null
   selectedOrganizerForEdit.value = null
-  editOrganizerRights.value = {
-    title: null,
-    rights: {
-      editConvention: false,
-      deleteConvention: false,
-      manageOrganizers: false,
-      manageVolunteers: false,
-      addEdition: false,
-      editAllEditions: false,
-      deleteAllEditions: false,
-    },
-    perEdition: [],
-  }
 }
 
-const saveOrganizerChanges = async () => {
+const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
   if (!selectedOrganizerForEdit.value || !selectedConventionForEdit.value) {
     return
   }
+
+  const { handleError } = useErrorHandler()
 
   try {
     savingOrganizer.value = true
@@ -794,16 +730,15 @@ const saveOrganizerChanges = async () => {
       {
         method: 'PUT',
         body: {
-          rights: editOrganizerRights.value.rights,
-          title: editOrganizerRights.value.title,
-          perEdition: editOrganizerRights.value.perEdition || [],
+          rights: rights.rights,
+          title: rights.title,
+          perEdition: rights.perEdition || [],
         },
       }
     )
 
     toast.add({
-      title: 'Droits mis à jour',
-      description: 'Les droits du organisateur ont été modifiés avec succès',
+      title: t('gestion.organizers.organizer_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -812,13 +747,49 @@ const saveOrganizerChanges = async () => {
     closeEditOrganizerModal()
     await fetchMyConventions()
   } catch (error: unknown) {
-    const httpError = error as HttpError
-    console.error('Error updating organizer rights:', error)
+    handleError(error, {
+      defaultTitleKey: 'errors.update_organizer_error',
+      logPrefix: 'Error updating organizer rights',
+    })
+  } finally {
+    savingOrganizer.value = false
+  }
+}
+
+const removeOrganizer = async () => {
+  if (!selectedOrganizerForEdit.value || !selectedConventionForEdit.value) {
+    return
+  }
+
+  if (!confirm(t('gestion.organizers.confirm_remove'))) {
+    return
+  }
+
+  const { handleError } = useErrorHandler()
+
+  try {
+    savingOrganizer.value = true
+
+    await $fetch(
+      `/api/conventions/${selectedConventionForEdit.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
+      {
+        method: 'DELETE',
+      }
+    )
+
     toast.add({
-      title: 'Erreur lors de la mise à jour',
-      description: httpError.data?.message || httpError.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
+      title: t('gestion.organizers.organizer_removed'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer la modal et recharger les conventions
+    closeEditOrganizerModal()
+    await fetchMyConventions()
+  } catch (error: unknown) {
+    handleError(error, {
+      defaultTitleKey: 'errors.remove_organizer_error',
+      logPrefix: 'Error removing organizer',
     })
   } finally {
     savingOrganizer.value = false

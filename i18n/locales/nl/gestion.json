@@ -103,6 +103,7 @@
       "volunteers": "Vrijwilligers"
     },
     "organizers": {
+      "access_rights": "Toegangsrechten",
       "add_returnable_item": "Item toevoegen",
       "add_to_edition_error": "Kan organisator niet toevoegen aan editie",
       "added_to_edition": "Organisator succesvol toegevoegd aan editie",
@@ -115,6 +116,7 @@
       "confirm_remove_from_edition": "Weet u zeker dat u deze organisator van de editie wilt verwijderen?",
       "confirm_remove_item": "Weet u zeker dat u dit item wilt verwijderen?",
       "edit_organizer": "Organisator bewerken",
+      "edit_organizer_description": "Configureer de toegangsrechten en titel van deze organisator om hun rechten op de conventie en haar edities te beheren.",
       "entry_not_validated": "Invoer niet gevalideerd",
       "entry_validated": "Invoer gevalideerd",
       "error_adding_item": "Fout bij toevoegen van item",
@@ -149,7 +151,8 @@
       "select_returnable_item": "Item selecteren",
       "select_to_add": "Selecteer een organisator om toe te voegen",
       "status": "Status",
-      "title": "Organisatoren"
+      "title": "Organisatoren",
+      "title_required": "Titel van organisator is verplicht"
     },
     "overview": "Overzicht",
     "shows": {
