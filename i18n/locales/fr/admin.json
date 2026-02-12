@@ -416,6 +416,27 @@
     "view_profile": "Voir le profil",
     "view_profiles": "Voir les profils",
     "volunteer_reminders": "Rappels bénévoles",
-    "volunteers_count": "{count} bénévoles"
+    "volunteers_count": "{count} bénévoles",
+    "anonymize": {
+      "title": "Anonymisation des données",
+      "description": "Anonymiser les données personnelles de tous les utilisateurs (sauf super admins). Disponible uniquement en environnement de développement.",
+      "preserves_admins": "Préserve les super admins",
+      "confirm_title": "Confirmer l'anonymisation",
+      "confirm_message": "Êtes-vous sûr de vouloir anonymiser toutes les données personnelles des utilisateurs ?",
+      "warning": "Cette action est irréversible. Toutes les données personnelles (emails, noms, téléphones, motivations, etc.) seront remplacées par des données fictives.",
+      "scope_users": "Emails, pseudos, noms, prénoms, mots de passe, téléphones et photos de profil",
+      "scope_volunteers": "Candidatures bénévoles : motivations, allergies, contacts d'urgence, etc.",
+      "scope_artists": "Candidatures artistes : noms de scène, bios, liens, descriptions, etc.",
+      "scope_admins_safe": "Les comptes super administrateurs ne seront PAS anonymisés",
+      "confirm_button": "Anonymiser les données",
+      "success_title": "Anonymisation terminée",
+      "success_description": "Les données personnelles ont été anonymisées avec succès",
+      "error": "Erreur lors de l'anonymisation des données",
+      "result_title": "Résultat de l'anonymisation",
+      "result_success": "Anonymisation effectuée avec succès",
+      "users_count": "Utilisateurs anonymisés",
+      "volunteer_apps_count": "Candidatures bénévoles anonymisées",
+      "show_apps_count": "Candidatures artistes anonymisées"
+    }
   }
 }

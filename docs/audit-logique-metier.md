@@ -365,13 +365,16 @@ Les tokens de compteurs (`@default(cuid())`) n'ont pas de date d'expiration ni d
 
 ---
 
-### 3.11 Benevoles - Pas d'endpoint de suppression de candidature spontanee
+### ~~3.11 Benevoles - Pas d'endpoint de suppression de candidature spontanee~~
 
-**Fichier** : `server/api/editions/[id]/volunteers/applications/[applicationId].delete.ts` (lignes 54-59)
+**Statut** : CORRIGE (endpoints existants)
 
-Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevole souhaite retirer sa candidature spontanee (`source: 'APPLICATION'`), il n'y a pas d'endpoint pour cela (probleme RGPD potentiel).
+Deux endpoints permettent deja a un benevole de retirer sa candidature spontanee (`source: 'APPLICATION'`) tant qu'elle est en statut `PENDING` :
 
-**Correction recommandee** : Creer un endpoint `my-application.delete.ts` permettant a un utilisateur de supprimer sa candidature si elle n'est pas encore acceptee.
+- `applications/index.delete.ts` : retrait par l'utilisateur connecte (recherche par editionId + userId)
+- `applications/[applicationId]/index.delete.ts` : retrait par ID avec verification de propriete
+
+L'endpoint admin `[applicationId].delete.ts` reste correctement restreint aux candidatures `source: 'MANUAL'`.
 
 ---
 
@@ -406,7 +409,7 @@ Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevo
 | 3.8  | Billetterie   | Compteurs sans expiration                        | MOYEN    |
 | 3.9  | Billetterie   | ~~Stats comptent rembourses~~                    | CORRIGE  |
 | 3.10 | Conventions   | Convention orpheline possible                    | MOYEN    |
-| 3.11 | Benevoles     | Pas de suppression candidature spontanee         | MOYEN    |
+| 3.11 | Benevoles     | ~~Pas de suppression candidature spontanee~~     | CORRIGE  |
 
 ---
 

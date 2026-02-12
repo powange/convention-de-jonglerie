@@ -460,6 +460,38 @@
           </UCard>
         </NuxtLink>
 
+        <!-- Anonymisation des données (DEV uniquement) -->
+        <UCard
+          v-if="!runtimeConfig.public.isProduction"
+          class="hover:shadow-lg transition-shadow cursor-pointer border-2 border-red-300 dark:border-red-700"
+          @click="showAnonymizeModal = true"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                  <UIcon
+                    name="i-heroicons-eye-slash"
+                    class="h-6 w-6 text-red-600 dark:text-red-400"
+                  />
+                </div>
+                <h3 class="font-semibold text-lg">{{ $t('admin.anonymize.title') }}</h3>
+                <UBadge color="error" variant="soft" size="xs">DEV</UBadge>
+              </div>
+              <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                {{ $t('admin.anonymize.description') }}
+              </p>
+              <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-heroicons-shield-check" class="h-4 w-4" />
+                  {{ $t('admin.anonymize.preserves_admins') }}
+                </span>
+              </div>
+            </div>
+            <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+          </div>
+        </UCard>
+
         <UCard class="opacity-75 border-dashed border-2 border-gray-300 dark:border-gray-600">
           <div class="flex items-start justify-between">
             <div class="flex-1">
@@ -520,6 +552,77 @@
 
     <!-- Modal de configuration -->
     <AdminConfigModal v-model:open="showConfigModal" />
+
+    <!-- Modal de confirmation d'anonymisation -->
+    <UModal v-model:open="showAnonymizeModal" :title="$t('admin.anonymize.confirm_title')">
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('admin.anonymize.confirm_message') }}
+          </p>
+          <div
+            class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          >
+            <p class="text-red-700 dark:text-red-400 text-sm font-medium">
+              <UIcon name="i-heroicons-exclamation-triangle" class="h-4 w-4 inline mr-1" />
+              {{ $t('admin.anonymize.warning') }}
+            </p>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1 list-disc pl-5">
+            <li>{{ $t('admin.anonymize.scope_users') }}</li>
+            <li>{{ $t('admin.anonymize.scope_volunteers') }}</li>
+            <li>{{ $t('admin.anonymize.scope_artists') }}</li>
+            <li>{{ $t('admin.anonymize.scope_admins_safe') }}</li>
+          </ul>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="outline" @click="showAnonymizeModal = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="error" :loading="anonymizing" @click="executeAnonymization">
+            <UIcon name="i-heroicons-eye-slash" class="h-4 w-4" />
+            {{ $t('admin.anonymize.confirm_button') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Modal de résultat d'anonymisation -->
+    <UModal v-model:open="showAnonymizeResult" :title="$t('admin.anonymize.result_title')">
+      <template #body>
+        <div v-if="anonymizeResult" class="space-y-3">
+          <div class="flex items-center gap-2 text-green-600">
+            <UIcon name="i-heroicons-check-circle" class="h-5 w-5" />
+            <span class="font-medium">{{ $t('admin.anonymize.result_success') }}</span>
+          </div>
+          <div class="grid grid-cols-1 gap-2 text-sm">
+            <div class="flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+              <span>{{ $t('admin.anonymize.users_count') }}</span>
+              <span class="font-semibold">{{ anonymizeResult.usersAnonymized }}</span>
+            </div>
+            <div class="flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+              <span>{{ $t('admin.anonymize.volunteer_apps_count') }}</span>
+              <span class="font-semibold">{{
+                anonymizeResult.volunteerApplicationsAnonymized
+              }}</span>
+            </div>
+            <div class="flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+              <span>{{ $t('admin.anonymize.show_apps_count') }}</span>
+              <span class="font-semibold">{{ anonymizeResult.showApplicationsAnonymized }}</span>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end">
+          <UButton @click="showAnonymizeResult = false">
+            {{ $t('common.close') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -531,6 +634,7 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const toast = useToast()
+const runtimeConfig = useRuntimeConfig()
 
 // Métadonnées de la page
 const { t } = useI18n()
@@ -542,6 +646,18 @@ useSeoMeta({
 // État réactif
 const loading = ref(false)
 const showConfigModal = ref(false)
+
+// Anonymisation
+interface AnonymizeResult {
+  usersAnonymized: number
+  volunteerApplicationsAnonymized: number
+  showApplicationsAnonymized: number
+}
+const showAnonymizeModal = ref(false)
+const showAnonymizeResult = ref(false)
+const anonymizing = ref(false)
+const anonymizeResult = ref<AnonymizeResult | null>(null)
+
 const stats = ref({
   totalUsers: 0,
   newUsersThisMonth: 0,
@@ -600,6 +716,31 @@ const getActivityIconClass = (type: string) => {
     admin_promoted: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
   }
   return classes[type] || 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+}
+
+// Anonymisation des données utilisateurs
+const executeAnonymization = async () => {
+  anonymizing.value = true
+  try {
+    const response = await $fetch('/api/admin/anonymize-users', { method: 'POST' })
+    anonymizeResult.value = (response as any).data
+    showAnonymizeModal.value = false
+    showAnonymizeResult.value = true
+    toast.add({
+      color: 'success',
+      title: t('admin.anonymize.success_title'),
+      description: t('admin.anonymize.success_description'),
+    })
+    await refreshData()
+  } catch (error: any) {
+    toast.add({
+      color: 'error',
+      title: t('common.error'),
+      description: error?.data?.message || t('admin.anonymize.error'),
+    })
+  } finally {
+    anonymizing.value = false
+  }
 }
 
 // Fonction pour charger les statistiques
