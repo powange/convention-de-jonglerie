@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../../server/utils/permissions/permissions', () => ({
-  hasEditionEditPermission: vi.fn(),
+vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => ({
+  canAccessEditionData: vi.fn(),
 }))
 
-import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
+import { canAccessEditionData } from '../../../../../../server/utils/permissions/edition-permissions'
 import handler from '../../../../../../server/api/editions/[id]/lost-found/[itemId]/return.patch'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
-const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
+const mockHasPermission = canAccessEditionData as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -237,7 +237,7 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
         editionId: 123,
       },
     })
-    expect(mockHasPermission).toHaveBeenCalledWith(1, 123)
+    expect(mockHasPermission).toHaveBeenCalledWith(123, 1, expect.anything())
     expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 456 } })
     )

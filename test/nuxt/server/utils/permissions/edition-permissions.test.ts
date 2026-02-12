@@ -412,7 +412,7 @@ describe('edition-permissions', () => {
       expect(canManageEditionStatus(edition, user)).toBe(true)
     })
 
-    it('devrait autoriser un organisateur avec canManageOrganizers', () => {
+    it('ne devrait PAS autoriser un organisateur avec seulement canManageOrganizers', () => {
       const edition = createMockEdition({
         convention: {
           ...createMockEdition().convention,
@@ -437,7 +437,7 @@ describe('edition-permissions', () => {
       })
       const user = createMockUser({ id: 42 })
 
-      expect(canManageEditionStatus(edition, user)).toBe(true)
+      expect(canManageEditionStatus(edition, user)).toBe(false)
     })
 
     it('devrait refuser un utilisateur sans droits', () => {

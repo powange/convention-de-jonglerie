@@ -253,12 +253,16 @@ export default wrapApiHandler(
       updateData.acceptanceNote = parsed.note
     }
 
-    // Si on remet en attente, supprimer toutes les assignations d'équipes et les repas
-    if (target === 'PENDING') {
+    // Si on remet en attente ou on rejette, supprimer les assignations d'équipes, repas et validation d'entrée
+    if (target === 'PENDING' || target === 'REJECTED') {
       // Supprimer les relations avec les équipes
       updateData.teamAssignments = {
         deleteMany: {}, // Supprimer toutes les relations avec les équipes
       }
+      // Réinitialiser la validation d'entrée
+      updateData.entryValidated = false
+      updateData.entryValidatedAt = null
+      updateData.entryValidatedBy = null
       // Supprimer les sélections de repas
       await deleteVolunteerMealSelections(applicationId)
     }

@@ -155,12 +155,11 @@ export function canManageEditionStatus(
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est organisateur avec droits de gestion
+  // Vérifier si l'utilisateur est organisateur avec droits d'édition
   const hasManageRights =
     edition.convention.organizers?.some(
       (collab) =>
-        collab.userId === user.id &&
-        (collab.canEditAllEditions || collab.canEditConvention || collab.canManageOrganizers)
+        collab.userId === user.id && (collab.canEditAllEditions || collab.canEditConvention)
     ) || false
 
   return isCreator || isConventionAuthor || hasManageRights || isGlobalAdmin
@@ -252,11 +251,7 @@ export async function getEditionForStatusManagement(
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
-    requiredRights: [
-      ORGANIZER_RIGHTS.EDIT_ALL_EDITIONS,
-      ORGANIZER_RIGHTS.EDIT_CONVENTION,
-      ORGANIZER_RIGHTS.MANAGE_ORGANIZERS,
-    ],
+    requiredRights: [ORGANIZER_RIGHTS.EDIT_ALL_EDITIONS, ORGANIZER_RIGHTS.EDIT_CONVENTION],
   })
 
   if (!edition) {

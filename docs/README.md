@@ -63,6 +63,10 @@ Documentation des optimisations de performance :
 - **prisma-log-configuration.md** - Configuration des logs Prisma
 - **push-notifications-browser-support.md** - Support des push notifications
 
+### 🔍 Audits et analyses
+
+- **[audit-logique-metier.md](./audit-logique-metier.md)** - Audit complet de la logique metier (fevrier 2026) : 7 problemes critiques, 10 majeurs, 11 moyens
+
 ### 📦 [archive/](./archive/) - Archives (3 fichiers)
 
 Documentation historique et guides de migration terminés :

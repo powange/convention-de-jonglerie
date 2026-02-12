@@ -25,6 +25,7 @@ export default wrapApiHandler(
           state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
           order: {
             editionId: editionId,
+            status: { not: 'Refunded' },
           },
           tier: {
             countAsParticipant: true,
@@ -41,6 +42,7 @@ export default wrapApiHandler(
           state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
           order: {
             editionId: editionId,
+            status: { not: 'Refunded' },
           },
           tier: {
             countAsParticipant: true,
@@ -127,6 +129,7 @@ export default wrapApiHandler(
           state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
           order: {
             editionId: editionId,
+            status: { not: 'Refunded' },
           },
           tier: {
             countAsParticipant: true,

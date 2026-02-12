@@ -13,6 +13,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Vérifier que l'utilisateur est bien bénévole accepté de cette édition
+  const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
+    where: {
+      editionId,
+      userId: user.id,
+      status: 'ACCEPTED',
+    },
+  })
+
+  if (!volunteerApplication) {
+    throw createError({
+      status: 403,
+      message: "Vous n'êtes pas bénévole de cette édition",
+    })
+  }
+
   try {
     // Créer ou récupérer la conversation
     const conversationId = await ensureVolunteerToOrganizersConversation(editionId, user.id)

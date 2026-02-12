@@ -5,7 +5,7 @@ import {
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { hasEditionEditPermission } from '#server/utils/permissions/permissions'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -30,7 +30,7 @@ export default wrapApiHandler(
     }
 
     // Vérifier les permissions pour commenter sur cette édition
-    const hasPermission = await hasEditionEditPermission(user.id, editionId)
+    const hasPermission = await canAccessEditionData(editionId, user.id, event)
     if (!hasPermission) {
       throw createError({
         status: 403,
