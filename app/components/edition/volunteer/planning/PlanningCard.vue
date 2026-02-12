@@ -79,7 +79,7 @@
       <!-- Calendrier de planning -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <UiLazyFullCalendar
-          v-if="ready && calendarOptions && edition && internalTimeSlots.length > 0"
+          v-if="ready && calendarOptions && edition"
           ref="calendarRef"
           :options="calendarOptions"
           class="volunteer-planning-calendar"

@@ -1101,5 +1101,12 @@
     "name_min_3": "Navnet skal indeholde mindst 3 tegn",
     "phone_required": "Telefonnummer er påkrævet",
     "program_max_10000": "Programmet må ikke overstige 10000 tegn"
+  },
+  "volunteers": {
+    "confirm_delete_slot": "Er du sikker på, at du vil slette dette tidsrum?",
+    "loading_error": "Fejl ved indlæsning af planlægningsdata",
+    "slot_created": "Tidsrum oprettet",
+    "slot_deleted": "Tidsrum slettet",
+    "slot_updated": "Tidsrum opdateret"
   }
 }

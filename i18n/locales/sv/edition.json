@@ -120,6 +120,8 @@
     "edit_permissions": "Ändra behörigheter",
     "edit_permissions_desc": "Ändra konventioner enligt dina behörigheter",
     "editions": "Utgåvor",
+    "empty_state_description": "Organisera och hantera dina jongleringsevents. Skapa upplagor, koordinera dina team och samla din community.",
+    "empty_state_title": "Skapa din första convention",
     "features_card_subtitle": "Upptäck allt du kan göra genom att skapa eller samarbeta kring konventioner",
     "features_card_title": "Vad kan du göra?",
     "granular_rights": "Granulära rättigheter",

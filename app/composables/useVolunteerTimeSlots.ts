@@ -170,10 +170,10 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
     }
   }
 
-  // Charger automatiquement au montage
-  onMounted(() => {
-    fetchTimeSlots()
-  })
+  // Ne plus charger automatiquement - le parent gère le chargement
+  // onMounted(() => {
+  //   fetchTimeSlots()
+  // })
 
   return {
     // État

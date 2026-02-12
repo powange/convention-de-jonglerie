@@ -1101,5 +1101,12 @@
     "name_min_3": "Naam moet minstens 3 tekens bevatten",
     "phone_required": "Telefoonnummer is vereist",
     "program_max_10000": "Het programma mag niet meer dan 10000 tekens bevatten"
+  },
+  "volunteers": {
+    "confirm_delete_slot": "Weet je zeker dat je dit tijdslot wilt verwijderen?",
+    "loading_error": "Fout bij het laden van de planningsgegevens",
+    "slot_created": "Tijdslot aangemaakt",
+    "slot_deleted": "Tijdslot verwijderd",
+    "slot_updated": "Tijdslot bijgewerkt"
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="editionStore.loading">
+    <div v-if="initialLoading">
       <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
@@ -150,6 +150,7 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État du composant
 const refreshing = ref(false)
+const initialLoading = ref(true)
 
 // État des onglets de statistiques
 const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par défaut
@@ -729,15 +730,24 @@ const isOrganizer = computed(() => {
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
-  if (!edition.value) {
-    try {
-      await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
-    }
+  try {
+    await Promise.all([
+      edition.value ? Promise.resolve() : editionStore.fetchEditionById(editionId, { force: true }),
+      fetchAcceptedVolunteers(),
+      fetchTeams(),
+      fetchTimeSlots(),
+    ])
+  } catch (error) {
+    console.error('Failed to load planning data:', error)
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: t('edition.volunteers.loading_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    initialLoading.value = false
   }
-  // Charger les bénévoles acceptés pour les statistiques
-  await fetchAcceptedVolunteers()
 })
 
 // Métadonnées de la page

@@ -1101,5 +1101,12 @@
     "name_min_3": "Name must contain at least 3 characters",
     "phone_required": "Phone number is required",
     "program_max_10000": "The program cannot exceed 10000 characters"
+  },
+  "volunteers": {
+    "confirm_delete_slot": "Are you sure you want to delete this slot?",
+    "loading_error": "Error loading planning data",
+    "slot_created": "Slot created",
+    "slot_deleted": "Slot deleted",
+    "slot_updated": "Slot updated"
   }
 }

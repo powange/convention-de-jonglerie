@@ -1101,5 +1101,12 @@
     "name_min_3": "Název musí obsahovat alespoň 3 znaky",
     "phone_required": "Telefonní číslo je povinné",
     "program_max_10000": "Program nesmí překročit 10000 znaků"
+  },
+  "volunteers": {
+    "confirm_delete_slot": "Opravdu chcete smazat tento časový úsek?",
+    "loading_error": "Chyba při načítání dat plánování",
+    "slot_created": "Časový úsek vytvořen",
+    "slot_deleted": "Časový úsek smazán",
+    "slot_updated": "Časový úsek aktualizován"
   }
 }

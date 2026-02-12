@@ -127,10 +127,10 @@ export function useVolunteerTeams(
     }
   }
 
-  // Charger automatiquement au montage
-  onMounted(() => {
-    fetchTeams()
-  })
+  // Ne plus charger automatiquement - le parent gère le chargement
+  // onMounted(() => {
+  //   fetchTeams()
+  // })
 
   return {
     // État

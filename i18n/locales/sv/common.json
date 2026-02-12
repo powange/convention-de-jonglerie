@@ -1101,5 +1101,12 @@
     "name_min_3": "Namnet måste innehålla minst 3 tecken",
     "phone_required": "Telefonnumret är obligatoriskt",
     "program_max_10000": "Programmet får inte innehålla mer än 10000 tecken"
+  },
+  "volunteers": {
+    "confirm_delete_slot": "Är du säker på att du vill radera denna tidsslot?",
+    "loading_error": "Fel vid laddning av planeringsdata",
+    "slot_created": "Tidsslot skapad",
+    "slot_deleted": "Tidsslot raderad",
+    "slot_updated": "Tidsslot uppdaterad"
   }
 }

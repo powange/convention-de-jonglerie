@@ -120,6 +120,8 @@
     "edit_permissions": "Redigeringsrettigheder",
     "edit_permissions_desc": "Modificer konventioner i henhold til dine tilladelser",
     "editions": "Udgaver",
+    "empty_state_description": "Organiser og administrer dine jonglerevents. Opret udgaver, koordiner dine teams og saml dit fællesskab.",
+    "empty_state_title": "Opret din første convention",
     "features_card_subtitle": "Opdag alt, hvad du kan gøre ved at oprette eller samarbejde om konventioner",
     "features_card_title": "Hvad kan du gøre?",
     "granular_rights": "Granulære rettigheder",
