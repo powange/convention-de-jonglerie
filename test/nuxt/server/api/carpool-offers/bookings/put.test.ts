@@ -60,7 +60,14 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
   beforeEach(() => {
     prismaMock.carpoolOffer.findUnique.mockReset()
     prismaMock.carpoolBooking.findUnique.mockReset()
+    prismaMock.carpoolBooking.findMany.mockReset()
     prismaMock.carpoolBooking.update.mockReset()
+    prismaMock.$transaction.mockReset()
+    prismaMock.$queryRaw.mockReset()
+    // Par défaut, $transaction exécute le callback avec prismaMock
+    prismaMock.$transaction.mockImplementation(async (fn: any) => fn(prismaMock))
+    // Mock $queryRaw pour SELECT ... FOR UPDATE
+    prismaMock.$queryRaw.mockResolvedValue([])
     global.readBody = vi.fn()
     global.getRouterParam = vi
       .fn()
@@ -73,11 +80,14 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
       global.readBody.mockResolvedValue({ action: 'ACCEPT' })
       prismaMock.carpoolOffer.findUnique.mockResolvedValue(mockCarpoolOffer)
       prismaMock.carpoolBooking.findUnique.mockResolvedValue(mockBooking)
+      // Mock findMany pour la re-vérification dans la transaction
+      prismaMock.carpoolBooking.findMany.mockResolvedValue([{ seats: 1 }])
       prismaMock.carpoolBooking.update.mockResolvedValue(mockUpdatedBooking)
 
       const result = await handler(mockEvent as any)
 
       expect(result.status).toBe('ACCEPTED')
+      expect(prismaMock.$transaction).toHaveBeenCalled()
       expect(prismaMock.carpoolBooking.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 2 },
@@ -115,6 +125,8 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
       global.readBody.mockResolvedValue({ action: 'ACCEPT' })
       prismaMock.carpoolOffer.findUnique.mockResolvedValue(offerFullyBooked)
       prismaMock.carpoolBooking.findUnique.mockResolvedValue(mockBooking)
+      // Mock findMany pour la re-vérification dans la transaction (2 places occupées)
+      prismaMock.carpoolBooking.findMany.mockResolvedValue([{ seats: 2 }])
 
       await expect(handler(mockEvent as any)).rejects.toThrow('Plus assez de places disponibles')
     })

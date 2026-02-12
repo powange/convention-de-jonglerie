@@ -40,8 +40,7 @@ describe('/api/notifications/fcm/subscribe POST', () => {
       deviceId: 'device-123',
     })
     global.getHeader = vi.fn().mockReturnValue('Mozilla/5.0')
-    prismaMock.fcmToken.findUnique.mockResolvedValue(null)
-    prismaMock.fcmToken.create.mockResolvedValue(mockFcmToken)
+    prismaMock.fcmToken.upsert.mockResolvedValue(mockFcmToken)
   })
 
   it('devrait enregistrer un nouveau token FCM', async () => {
@@ -51,8 +50,19 @@ describe('/api/notifications/fcm/subscribe POST', () => {
 
     expect(result.success).toBe(true)
     expect(result.message).toBe('Token FCM enregistré')
-    expect(prismaMock.fcmToken.create).toHaveBeenCalledWith({
-      data: {
+    expect(prismaMock.fcmToken.upsert).toHaveBeenCalledWith({
+      where: {
+        userId_token: {
+          userId: 1,
+          token: 'fcm-token-abc123',
+        },
+      },
+      update: {
+        isActive: true,
+        deviceId: 'device-123',
+        userAgent: 'Mozilla/5.0',
+      },
+      create: {
         userId: 1,
         token: 'fcm-token-abc123',
         isActive: true,
@@ -62,18 +72,14 @@ describe('/api/notifications/fcm/subscribe POST', () => {
     })
   })
 
-  it('devrait mettre à jour un token existant', async () => {
-    prismaMock.fcmToken.findUnique.mockResolvedValue(mockFcmToken)
-    prismaMock.fcmToken.update.mockResolvedValue({ ...mockFcmToken, isActive: true })
-
+  it('devrait mettre à jour un token existant via upsert', async () => {
     const mockEvent = { node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.message).toBe('Token FCM déjà enregistré')
-    expect(prismaMock.fcmToken.update).toHaveBeenCalled()
-    expect(prismaMock.fcmToken.create).not.toHaveBeenCalled()
+    expect(result.message).toBe('Token FCM enregistré')
+    expect(prismaMock.fcmToken.upsert).toHaveBeenCalledTimes(1)
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -113,15 +119,20 @@ describe('/api/notifications/fcm/subscribe POST', () => {
 
     await handler(mockEvent as any)
 
-    expect(prismaMock.fcmToken.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        deviceId: null,
-      }),
-    })
+    expect(prismaMock.fcmToken.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          deviceId: undefined,
+        }),
+        create: expect.objectContaining({
+          deviceId: null,
+        }),
+      })
+    )
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    prismaMock.fcmToken.findUnique.mockRejectedValue(new Error('DB Error'))
+    prismaMock.fcmToken.upsert.mockRejectedValue(new Error('DB Error'))
 
     const mockEvent = { node: { req: {} } }
 

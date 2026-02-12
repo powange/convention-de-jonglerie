@@ -39,66 +39,74 @@ export default wrapApiHandler(
       })
     }
 
-    // Chercher une conversation privée existante entre ces deux utilisateurs
-    const existingConversation = await prisma.conversation.findFirst({
-      where: {
-        type: 'PRIVATE',
-        editionId: null,
-        AND: [
-          {
-            participants: {
-              some: {
-                userId: currentUser.id,
-                leftAt: null,
-              },
-            },
-          },
-          {
-            participants: {
-              some: {
-                userId: userId,
-                leftAt: null,
-              },
-            },
-          },
-        ],
-      },
-      include: {
-        participants: {
-          where: { leftAt: null },
-          select: { userId: true },
-        },
-      },
-    })
+    // Transaction avec verrouillage pessimiste pour éviter les doublons de conversations
+    const result = await prisma.$transaction(async (tx) => {
+      // Verrouiller les lignes utilisateurs en ordre croissant pour éviter les deadlocks
+      const [smallerId, largerId] =
+        currentUser.id < userId ? [currentUser.id, userId] : [userId, currentUser.id]
+      await tx.$queryRaw`SELECT id FROM User WHERE id = ${smallerId} FOR UPDATE`
+      await tx.$queryRaw`SELECT id FROM User WHERE id = ${largerId} FOR UPDATE`
 
-    // Si une conversation existe avec exactement ces 2 participants, la retourner
-    if (existingConversation && existingConversation.participants.length === 2) {
-      return {
-        success: true,
-        data: {
+      // Chercher une conversation privée existante entre ces deux utilisateurs
+      const existingConversation = await tx.conversation.findFirst({
+        where: {
+          type: 'PRIVATE',
+          editionId: null,
+          AND: [
+            {
+              participants: {
+                some: {
+                  userId: currentUser.id,
+                  leftAt: null,
+                },
+              },
+            },
+            {
+              participants: {
+                some: {
+                  userId: userId,
+                  leftAt: null,
+                },
+              },
+            },
+          ],
+        },
+        include: {
+          participants: {
+            where: { leftAt: null },
+            select: { userId: true },
+          },
+        },
+      })
+
+      // Si une conversation existe avec exactement ces 2 participants, la retourner
+      if (existingConversation && existingConversation.participants.length === 2) {
+        return {
           conversationId: existingConversation.id,
           created: false,
-        },
+        }
       }
-    }
 
-    // Sinon, créer une nouvelle conversation
-    const newConversation = await prisma.conversation.create({
-      data: {
-        type: 'PRIVATE',
-        editionId: null,
-        participants: {
-          create: [{ userId: currentUser.id }, { userId: userId }],
+      // Sinon, créer une nouvelle conversation
+      const newConversation = await tx.conversation.create({
+        data: {
+          type: 'PRIVATE',
+          editionId: null,
+          participants: {
+            create: [{ userId: currentUser.id }, { userId: userId }],
+          },
         },
-      },
+      })
+
+      return {
+        conversationId: newConversation.id,
+        created: true,
+      }
     })
 
     return {
       success: true,
-      data: {
-        conversationId: newConversation.id,
-        created: true,
-      },
+      data: result,
     }
   },
   { operationName: 'CreatePrivateConversation' }

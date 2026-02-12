@@ -237,6 +237,7 @@ Ajouter un middleware ou une verification systematique du statut avant les actio
 **Probleme** : Les commentaires etaient restreints aux organisateurs alors que les posts etaient ouverts a tous. Les organisateurs ne pouvaient pas supprimer des posts ou commentaires problematiques.
 
 **Resolution** :
+
 - **Creation de commentaires** : La verification `canAccessEditionData` a ete retiree. Tous les utilisateurs authentifies peuvent commenter (aligne avec la creation de posts).
 - **Suppression de posts** : L'auteur peut supprimer son propre post. Les organisateurs peuvent moderer (supprimer n'importe quel post).
 - **Suppression de commentaires** : L'auteur peut supprimer son propre commentaire. Les organisateurs peuvent moderer (supprimer n'importe quel commentaire).
@@ -313,33 +314,33 @@ Les sessions d'impersonation sont loguees en console mais pas en base de donnees
 
 ---
 
-### 3.2 FCM tokens - Race condition a l'enregistrement
+### 3.2 ~~FCM tokens - Race condition a l'enregistrement~~ CORRIGE
 
-**Fichier** : `server/api/notifications/fcm/subscribe.post.ts` (lignes 27-49)
+**Fichier** : `server/api/notifications/fcm/subscribe.post.ts`
 
-Pattern check-then-act au lieu d'un `upsert` atomique. Deux connexions simultanees avec le meme token peuvent creer des doublons ou des erreurs 500.
+**Probleme** : Pattern check-then-act (`findUnique` + `create`/`update`) au lieu d'un `upsert` atomique. Deux connexions simultanees avec le meme token pouvaient creer des doublons ou des erreurs 500.
 
-**Correction recommandee** : Utiliser `prisma.fcmToken.upsert()`.
-
----
-
-### 3.3 Conversations privees - Doublons possibles
-
-**Fichier** : `server/api/messenger/private.post.ts` (lignes 43-83)
-
-Pattern check-then-act : deux utilisateurs creant simultanement une conversation privee entre eux peuvent creer des doublons.
-
-**Correction recommandee** : Utiliser une contrainte unique composite ou un verrou optimiste.
+**Resolution** : Remplace par un seul `prisma.fcmToken.upsert()` atomique utilisant la contrainte unique `[userId, token]`. Tests mis a jour.
 
 ---
 
-### 3.4 Covoiturage - Race condition sur acceptation
+### 3.3 ~~Conversations privees - Doublons possibles~~ CORRIGE
 
-**Fichier** : `server/api/carpool-offers/[id]/bookings/[bookingId].put.ts` (lignes 51-59)
+**Fichier** : `server/api/messenger/private.post.ts`
 
-Deux acceptations simultanees peuvent toutes deux voir de la place et depasser la capacite.
+**Probleme** : Pattern check-then-act : deux utilisateurs creant simultanement une conversation privee entre eux pouvaient creer des doublons.
 
-**Correction recommandee** : Utiliser une transaction Prisma avec re-verification apres l'update.
+**Resolution** : La recherche et la creation de conversation sont encapsulees dans une transaction `$transaction` avec verrouillage pessimiste (`SELECT ... FOR UPDATE` sur les lignes User en ordre croissant pour eviter les deadlocks), garantissant l'atomicite de l'operation. Compatible MySQL (pas d'`isolationLevel: 'Serializable'` qui ne fonctionne pas correctement avec MySQL/Prisma).
+
+---
+
+### 3.4 ~~Covoiturage - Race condition sur acceptation~~ CORRIGE
+
+**Fichier** : `server/api/carpool-offers/[id]/bookings/[bookingId].put.ts`
+
+**Probleme** : Deux acceptations simultanees pouvaient toutes deux voir de la place et depasser la capacite.
+
+**Resolution** : L'action ACCEPT est encapsulee dans une transaction `$transaction` avec verrouillage pessimiste (`SELECT ... FOR UPDATE` sur la ligne CarpoolOffer pour serialiser les acceptations concurrentes). La capacite est re-verifiee sous verrou via `findMany` avant la mise a jour. Compatible MySQL. Tests mis a jour.
 
 ---
 
@@ -435,9 +436,9 @@ Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevo
 | 2.9  | Billetterie   | Transition non atomique                          | MAJEUR   |
 | 2.10 | Artistes      | ShowApplication sans lien Show                   | MAJEUR   |
 | 3.1  | Admin         | Impersonation sans audit trail                   | MOYEN    |
-| 3.2  | FCM           | Race condition tokens                            | MOYEN    |
-| 3.3  | Messagerie    | Doublons conversations privees                   | MOYEN    |
-| 3.4  | Covoiturage   | Race condition acceptation                       | MOYEN    |
+| 3.2  | FCM           | ~~Race condition tokens~~                        | CORRIGE  |
+| 3.3  | Messagerie    | ~~Doublons conversations privees~~               | CORRIGE  |
+| 3.4  | Covoiturage   | ~~Race condition acceptation~~                   | CORRIGE  |
 | 3.5  | Billetterie   | Dates validite non verifiees                     | MOYEN    |
 | 3.6  | Repas         | Repas organisateur sans verif statut             | MOYEN    |
 | 3.7  | Notifications | Email vs in-app desynchronises                   | MOYEN    |

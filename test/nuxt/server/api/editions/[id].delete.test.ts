@@ -322,10 +322,7 @@ describe('/api/editions/[id] DELETE', () => {
             organizers: {
               where: {
                 userId: 1,
-                OR: [
-                  { canDeleteAllEditions: true },
-                  { canDeleteConvention: true },
-                ],
+                OR: [{ canDeleteAllEditions: true }, { canDeleteConvention: true }],
               },
             },
           },

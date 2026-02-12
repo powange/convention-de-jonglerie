@@ -24,33 +24,20 @@ export default defineEventHandler(async (event) => {
   const userAgent = getHeader(event, 'user-agent') || null
 
   try {
-    // Vérifier si le token existe déjà
-    const existing = await prisma.fcmToken.findUnique({
+    // Upsert atomique pour éviter les race conditions
+    await prisma.fcmToken.upsert({
       where: {
         userId_token: {
           userId: session.user.id,
           token,
         },
       },
-    })
-
-    if (existing) {
-      // Mettre à jour le deviceId, User-Agent et réactiver si désactivé
-      await prisma.fcmToken.update({
-        where: { id: existing.id },
-        data: {
-          isActive: true,
-          deviceId: deviceId || existing.deviceId,
-          userAgent,
-        },
-      })
-
-      return { success: true, message: 'Token FCM déjà enregistré' }
-    }
-
-    // Créer le nouveau token
-    await prisma.fcmToken.create({
-      data: {
+      update: {
+        isActive: true,
+        deviceId: deviceId || undefined,
+        userAgent,
+      },
+      create: {
         userId: session.user.id,
         token,
         isActive: true,
@@ -58,8 +45,6 @@ export default defineEventHandler(async (event) => {
         userAgent,
       },
     })
-
-    console.log(`✅ [FCM] Token enregistré pour l'utilisateur ${session.user.id}`)
 
     return { success: true, message: 'Token FCM enregistré' }
   } catch (error: any) {

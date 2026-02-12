@@ -48,31 +48,56 @@ export default wrapApiHandler(
     }
 
     let newStatus = booking.status
-    if (action === 'ACCEPT') {
-      // Vérifier capacité restante sur ACCEPT
-      const acceptedSeats = offer.bookings
-        .filter((b) => b.status === 'ACCEPTED' && b.id !== booking.id)
-        .reduce((sum, b) => sum + (b.seats || 0), 0)
-      if (acceptedSeats + booking.seats > offer.availableSeats) {
-        throw createError({ status: 400, message: 'Plus assez de places disponibles' })
-      }
-      newStatus = 'ACCEPTED'
-    } else if (action === 'REJECT') {
+    if (action === 'REJECT') {
       newStatus = 'REJECTED'
     } else if (action === 'CANCEL') {
       // Annulation par le demandeur, quel que soit l'état (PENDING/ACCEPTED)
       newStatus = 'CANCELLED'
     }
 
-    const updated = await prisma.carpoolBooking.update({
-      where: { id: bookingId },
-      data: { status: newStatus },
-      include: {
-        requester: {
-          select: userWithProfileSelect,
+    let updated
+    if (action === 'ACCEPT') {
+      // Transaction avec verrouillage pessimiste pour éviter les race conditions sur la capacité
+      updated = await prisma.$transaction(async (tx) => {
+        // Verrouiller l'offre pour sérialiser les acceptations concurrentes
+        await tx.$queryRaw`SELECT id FROM CarpoolOffer WHERE id = ${offerId} FOR UPDATE`
+
+        // Re-vérifier la capacité sous verrou
+        const currentBookings = await tx.carpoolBooking.findMany({
+          where: {
+            carpoolOfferId: offerId,
+            status: 'ACCEPTED',
+            id: { not: bookingId },
+          },
+          select: { seats: true },
+        })
+
+        const acceptedSeats = currentBookings.reduce((sum, b) => sum + (b.seats || 0), 0)
+        if (acceptedSeats + booking.seats > offer.availableSeats) {
+          throw createError({ status: 400, message: 'Plus assez de places disponibles' })
+        }
+
+        return tx.carpoolBooking.update({
+          where: { id: bookingId },
+          data: { status: 'ACCEPTED' },
+          include: {
+            requester: {
+              select: userWithProfileSelect,
+            },
+          },
+        })
+      })
+    } else {
+      updated = await prisma.carpoolBooking.update({
+        where: { id: bookingId },
+        data: { status: newStatus },
+        include: {
+          requester: {
+            select: userWithProfileSelect,
+          },
         },
-      },
-    })
+      })
+    }
 
     // Envoyer notifications selon l'action
     if (action === 'ACCEPT' || action === 'REJECT') {
