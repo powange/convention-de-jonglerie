@@ -763,26 +763,26 @@ watch(
 
 // Validation du formulaire
 function validate(state: typeof formState) {
-  const errors: { path: string; message: string }[] = []
+  const errors: { name: string; message: string }[] = []
 
   // Informations personnelles obligatoires
   if (!state.lastName || state.lastName.trim().length < 2) {
     errors.push({
-      path: 'lastName',
+      name: 'lastName',
       message: t('shows_call.validation.last_name_required'),
     })
   }
 
   if (!state.firstName || state.firstName.trim().length < 2) {
     errors.push({
-      path: 'firstName',
+      name: 'firstName',
       message: t('shows_call.validation.first_name_required'),
     })
   }
 
   if (!state.phone || state.phone.trim().length < 6) {
     errors.push({
-      path: 'phone',
+      name: 'phone',
       message: t('shows_call.validation.phone_required'),
     })
   }
@@ -790,28 +790,28 @@ function validate(state: typeof formState) {
   // Informations artiste
   if (!state.artistName || state.artistName.length < 2) {
     errors.push({
-      path: 'artistName',
+      name: 'artistName',
       message: t('shows_call.validation.artist_name_required'),
     })
   }
 
   if (!state.showTitle || state.showTitle.length < 3) {
     errors.push({
-      path: 'showTitle',
+      name: 'showTitle',
       message: t('shows_call.validation.show_title_required'),
     })
   }
 
   if (!state.showDescription || state.showDescription.length < 20) {
     errors.push({
-      path: 'showDescription',
+      name: 'showDescription',
       message: t('shows_call.validation.show_description_required'),
     })
   }
 
   if (!state.showDuration || state.showDuration < 1) {
     errors.push({
-      path: 'showDuration',
+      name: 'showDuration',
       message: t('shows_call.validation.duration_required'),
     })
   }
@@ -819,7 +819,7 @@ function validate(state: typeof formState) {
   // Validation des personnes supplémentaires
   if (state.additionalPerformersCount === null || state.additionalPerformersCount === undefined) {
     errors.push({
-      path: 'additionalPerformersCount',
+      name: 'additionalPerformersCount',
       message: t('shows_call.validation.additional_performers_count_required'),
     })
   }
@@ -829,25 +829,25 @@ function validate(state: typeof formState) {
     state.additionalPerformers.forEach((performer, index) => {
       if (!performer.lastName || performer.lastName.trim().length < 2) {
         errors.push({
-          path: `additionalPerformers.${index}.lastName`,
+          name: `additionalPerformers.${index}.lastName`,
           message: t('shows_call.validation.performer_last_name_required'),
         })
       }
       if (!performer.firstName || performer.firstName.trim().length < 2) {
         errors.push({
-          path: `additionalPerformers.${index}.firstName`,
+          name: `additionalPerformers.${index}.firstName`,
           message: t('shows_call.validation.performer_first_name_required'),
         })
       }
       if (!performer.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(performer.email)) {
         errors.push({
-          path: `additionalPerformers.${index}.email`,
+          name: `additionalPerformers.${index}.email`,
           message: t('shows_call.validation.performer_email_required'),
         })
       }
       if (!performer.phone || performer.phone.trim().length < 6) {
         errors.push({
-          path: `additionalPerformers.${index}.phone`,
+          name: `additionalPerformers.${index}.phone`,
           message: t('shows_call.validation.performer_phone_required'),
         })
       }

@@ -128,6 +128,12 @@ export default wrapApiHandler(
             profilePicture: true,
           },
         },
+        show: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
       },
     })
 

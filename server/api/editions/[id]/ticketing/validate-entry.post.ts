@@ -401,6 +401,26 @@ export default wrapApiHandler(
           message: `${result.count} organisateur${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
         }
       } else {
+        // Vérifier si des billets appartiennent à des commandes remboursées
+        const refundedItems = await prisma.ticketingOrderItem.findMany({
+          where: {
+            id: { in: body.participantIds },
+            order: { editionId: editionId },
+            OR: [{ state: 'Refunded' }, { order: { status: 'Refunded' } }],
+          },
+          select: { id: true },
+        })
+
+        if (refundedItems.length > 0) {
+          throw createError({
+            status: 400,
+            message:
+              refundedItems.length === body.participantIds.length
+                ? 'Ce billet a été remboursé et ne peut pas être validé'
+                : `${refundedItems.length} billet(s) remboursé(s) ne peuvent pas être validés`,
+          })
+        }
+
         // Valider les billets en utilisant l'ID de OrderItem
         const result = await prisma.ticketingOrderItem.updateMany({
           where: {
@@ -437,33 +457,33 @@ export default wrapApiHandler(
           // Extraire les IDs uniques des commandes
           const orderIds = [...new Set(validatedItems.map((item) => item.orderId))]
 
-          // Mettre à jour le statut et la méthode de paiement des commandes de "Pending" à "Onsite"
-          await prisma.ticketingOrder.updateMany({
-            where: {
-              id: {
-                in: orderIds,
+          // Transaction atomique pour mettre à jour commandes et items ensemble
+          await prisma.$transaction([
+            prisma.ticketingOrder.updateMany({
+              where: {
+                id: {
+                  in: orderIds,
+                },
+                status: 'Pending',
               },
-              status: 'Pending',
-            },
-            data: {
-              status: 'Onsite',
-              paymentMethod: body.paymentMethod,
-              checkNumber: body.paymentMethod === 'check' ? body.checkNumber : null,
-            },
-          })
-
-          // Mettre à jour le statut des items de "Pending" à "Processed"
-          await prisma.ticketingOrderItem.updateMany({
-            where: {
-              id: {
-                in: body.participantIds,
+              data: {
+                status: 'Onsite',
+                paymentMethod: body.paymentMethod,
+                checkNumber: body.paymentMethod === 'check' ? body.checkNumber : null,
               },
-              state: 'Pending',
-            },
-            data: {
-              state: 'Processed',
-            },
-          })
+            }),
+            prisma.ticketingOrderItem.updateMany({
+              where: {
+                id: {
+                  in: body.participantIds,
+                },
+                state: 'Pending',
+              },
+              data: {
+                state: 'Processed',
+              },
+            }),
+          ])
         }
 
         // Notifier via SSE uniquement si de nouvelles validations ont été effectuées

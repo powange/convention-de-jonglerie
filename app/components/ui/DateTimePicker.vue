@@ -25,24 +25,18 @@
 
     <!-- Sélecteur d'heure -->
     <UFormField :label="timeLabel" :name="timeFieldName" :required="required">
-      <USelect
-        v-model="selectedTime"
-        :items="timeOptions"
-        :placeholder="timePlaceholder"
-        size="lg"
-        class="w-full"
-        clearable
-        @change="updateDateTime"
-      />
+      <UInputTime v-model="timeValue" :hour-cycle="24" size="lg" icon="i-heroicons-clock" />
     </UFormField>
   </div>
 </template>
 
 <script setup lang="ts">
-import { CalendarDate, getLocalTimeZone } from '@internationalized/date'
+import { CalendarDate, Time, getLocalTimeZone } from '@internationalized/date'
 import { watch, shallowRef } from 'vue'
 
 import { useDateTimePicker } from '~/composables/useDateTimePicker'
+
+import type { TimeValue } from 'reka-ui'
 
 interface Props {
   /** Valeur v-model au format ISO string */
@@ -57,14 +51,10 @@ interface Props {
   timeFieldName?: string
   /** Placeholder du bouton date */
   placeholder?: string
-  /** Placeholder du select heure */
-  timePlaceholder?: string
   /** Champ requis */
   required?: boolean
   /** Date minimum autorisée */
   minDate?: Date
-  /** Intervalle en minutes pour les options d'heure */
-  timeInterval?: number
 }
 
 const { t } = useI18n()
@@ -78,29 +68,38 @@ const timeFieldName = computed(() => props.timeFieldName || 'time')
 const placeholder = computed(
   () => props.placeholder || t('components.date_time_picker.placeholder')
 )
-const timePlaceholder = computed(() => props.timePlaceholder || 'Sélectionner une heure')
 const required = computed(() => props.required || false)
-const timeInterval = computed(() => props.timeInterval || 30)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
 // Utiliser le composable
-const {
-  calendarDate,
-  selectedTime,
-  combinedDateTime,
-  timeOptions,
-  displayDate,
-  updateDateTime,
-  setValue,
-} = useDateTimePicker({
-  initialValue: props.modelValue,
-  minDate: props.minDate,
-  timeInterval: timeInterval.value,
-  onChange: (isoString) => {
-    emit('update:modelValue', isoString)
+const { calendarDate, selectedTime, combinedDateTime, displayDate, updateDateTime, setValue } =
+  useDateTimePicker({
+    initialValue: props.modelValue,
+    minDate: props.minDate,
+    onChange: (isoString) => {
+      emit('update:modelValue', isoString)
+    },
+  })
+
+// Pont entre Time (UInputTime) et string "HH:mm" (composable)
+const timeValue = computed({
+  get: (): TimeValue | undefined => {
+    if (!selectedTime.value) return undefined
+    const [hours, minutes] = selectedTime.value.split(':').map(Number)
+    return new Time(hours, minutes)
+  },
+  set: (value: TimeValue | undefined) => {
+    if (value) {
+      const h = value.hour.toString().padStart(2, '0')
+      const m = value.minute.toString().padStart(2, '0')
+      selectedTime.value = `${h}:${m}`
+    } else {
+      selectedTime.value = undefined
+    }
+    updateDateTime()
   },
 })
 

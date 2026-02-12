@@ -150,6 +150,12 @@
                       | {{ application.showCategory }}
                     </span>
                   </p>
+                  <div v-if="application.show" class="mt-1">
+                    <UBadge color="warning" variant="subtle" size="sm">
+                      <UIcon name="i-heroicons-sparkles" class="mr-1" />
+                      {{ application.show.title }}
+                    </UBadge>
+                  </div>
                   <p class="text-xs text-gray-400 mt-1">
                     {{ $t('gestion.shows_call.submitted_at') }}
                     {{ formatDate(application.createdAt) }}
@@ -205,8 +211,12 @@
       </UCard>
     </div>
 
-    <!-- Modal de détails -->
-    <UModal v-model:open="showDetailsModal" :title="selectedApplication?.showTitle">
+    <!-- Drawer de détails -->
+    <UDrawer
+      v-model:open="showDetailsModal"
+      :title="selectedApplication?.showTitle"
+      direction="bottom"
+    >
       <template v-if="selectedApplication" #body>
         <div class="space-y-6">
           <!-- Statut actuel -->
@@ -365,6 +375,23 @@
             </div>
           </div>
 
+          <!-- Spectacle associé -->
+          <div class="space-y-3 border-t pt-4">
+            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
+              {{ $t('gestion.shows_call.linked_show') }}
+            </h4>
+            <UFormField :label="$t('gestion.shows_call.linked_show_select')">
+              <USelect
+                v-model="linkedShowId"
+                :items="showSelectItems"
+                :placeholder="$t('gestion.shows_call.linked_show_placeholder')"
+                :loading="loadingShows"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+
           <!-- Notes organisateur -->
           <div class="space-y-3 border-t pt-4">
             <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -403,6 +430,15 @@
 
           <div class="flex gap-2">
             <UButton
+              color="primary"
+              variant="soft"
+              icon="i-heroicons-document-check"
+              :loading="updatingStatus"
+              @click="saveApplicationDetails"
+            >
+              {{ $t('common.save') }}
+            </UButton>
+            <UButton
               v-if="selectedApplication?.status !== 'REJECTED'"
               color="error"
               variant="soft"
@@ -424,7 +460,7 @@
           </div>
         </div>
       </template>
-    </UModal>
+    </UDrawer>
   </div>
 </template>
 
@@ -467,7 +503,17 @@ const selectedApplication = ref<ShowApplication | null>(null)
 const organizerNotes = ref('')
 const updatingStatus = ref(false)
 
+// Spectacle associé
+const linkedShowId = ref<number | null>(null)
+const loadingShows = ref(false)
+const editionShows = ref<{ id: number; title: string }[]>([])
+
 const totalPages = computed(() => Math.ceil(total.value / pageSize))
+
+const showSelectItems = computed(() => [
+  { label: t('gestion.shows_call.linked_show_none'), value: null },
+  ...editionShows.value.map((s) => ({ label: s.title, value: s.id })),
+])
 
 const statusOptions = computed(() => [
   { value: null, label: t('gestion.shows_call.filter_all') },
@@ -562,6 +608,21 @@ const getActionItems = (application: ShowApplication) => [
   ],
 ]
 
+// Charger les spectacles de l'édition
+const fetchEditionShows = async () => {
+  loadingShows.value = true
+  try {
+    const response = await $fetch<{ data: { shows: { id: number; title: string }[] } }>(
+      `/api/editions/${editionId}/shows`
+    )
+    editionShows.value = response.data?.shows || []
+  } catch (error) {
+    console.error('Error fetching shows:', error)
+  } finally {
+    loadingShows.value = false
+  }
+}
+
 // Fetch show call info
 const fetchShowCall = async () => {
   loadingShowCall.value = true
@@ -624,6 +685,10 @@ const openApplicationDetails = async (application: ShowApplication) => {
     )
     selectedApplication.value = details
     organizerNotes.value = details.organizerNotes || ''
+    linkedShowId.value = details.showId ?? null
+    if (editionShows.value.length === 0) {
+      fetchEditionShows()
+    }
     showDetailsModal.value = true
   } catch (error) {
     console.error('Error fetching application details:', error)
@@ -660,6 +725,40 @@ const quickUpdateStatus = async (application: ShowApplication, status: ShowAppli
   }
 }
 
+// Enregistrer les notes et le spectacle associé sans changer le statut
+const saveApplicationDetails = async () => {
+  if (!selectedApplication.value) return
+
+  updatingStatus.value = true
+  try {
+    await $fetch(
+      `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value.id}`,
+      {
+        method: 'PATCH',
+        body: {
+          organizerNotes: organizerNotes.value || null,
+          showId: linkedShowId.value,
+        },
+      }
+    )
+
+    toast.add({
+      title: t('common.saved'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+
+    await fetchApplications()
+  } catch (error: any) {
+    toast.add({
+      title: error?.data?.message || t('common.error'),
+      color: 'error',
+    })
+  } finally {
+    updatingStatus.value = false
+  }
+}
+
 // Mise à jour du statut depuis la modal
 const updateApplicationStatus = async (status: ShowApplicationStatus) => {
   if (!selectedApplication.value) return
@@ -673,6 +772,7 @@ const updateApplicationStatus = async (status: ShowApplicationStatus) => {
         body: {
           status,
           organizerNotes: organizerNotes.value || null,
+          showId: linkedShowId.value,
         },
       }
     )

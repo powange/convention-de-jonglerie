@@ -7,13 +7,11 @@ export interface UseDateTimePickerOptions {
   minDate?: Date
   /** Fonction appelée quand la valeur change */
   onChange?: (isoString: string) => void
-  /** Intervalle en minutes pour les options d'heure (défaut: 30) */
-  timeInterval?: number
 }
 
 export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
   const { locale } = useI18n()
-  const { initialValue, minDate, onChange, timeInterval = 30 } = options
+  const { initialValue, minDate, onChange } = options
 
   // Variables réactives avec watcher pour protection
   const calendarDate = ref<Date | null>(null)
@@ -28,19 +26,6 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
         calendarDate.value = null
       })
     }
-  })
-
-  // Options d'heures générées
-  const timeOptions = computed(() => {
-    const times = []
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += timeInterval) {
-        const h = hour.toString().padStart(2, '0')
-        const m = minute.toString().padStart(2, '0')
-        times.push(`${h}:${m}`)
-      }
-    }
-    return times
   })
 
   // Texte d'affichage pour la date
@@ -164,7 +149,6 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
     combinedDateTime,
 
     // Computed
-    timeOptions,
     displayDate,
 
     // Fonctions

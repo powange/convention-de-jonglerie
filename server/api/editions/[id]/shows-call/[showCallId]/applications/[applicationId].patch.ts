@@ -77,28 +77,64 @@ export default wrapApiHandler(
     const validatedData = showApplicationStatusSchema.parse(body)
 
     // Préparer les données de mise à jour
-    const updateData: Prisma.ShowApplicationUpdateInput = {
-      status: validatedData.status,
-    }
+    const updateData: Prisma.ShowApplicationUpdateInput = {}
 
-    // Si le statut change vers ACCEPTED ou REJECTED, enregistrer qui a pris la décision
-    if (
-      validatedData.status !== application.status &&
-      (validatedData.status === 'ACCEPTED' || validatedData.status === 'REJECTED')
-    ) {
-      updateData.decidedAt = new Date()
-      updateData.decidedById = user.id
-    }
+    // Mettre à jour le statut si fourni
+    if (validatedData.status) {
+      updateData.status = validatedData.status
 
-    // Si on repasse en PENDING, effacer les informations de décision
-    if (validatedData.status === 'PENDING') {
-      updateData.decidedAt = null
-      updateData.decidedById = null
+      // Si le statut change vers ACCEPTED ou REJECTED, enregistrer qui a pris la décision
+      if (
+        validatedData.status !== application.status &&
+        (validatedData.status === 'ACCEPTED' || validatedData.status === 'REJECTED')
+      ) {
+        updateData.decidedAt = new Date()
+        updateData.decidedById = user.id
+      }
+
+      // Si on repasse en PENDING, effacer les informations de décision
+      if (validatedData.status === 'PENDING') {
+        updateData.decidedAt = null
+        updateData.decidedById = null
+      }
     }
 
     // Mettre à jour les notes organisateur si fournies
     if (validatedData.organizerNotes !== undefined) {
       updateData.organizerNotes = validatedData.organizerNotes
+    }
+
+    // Associer ou dissocier un spectacle
+    if (validatedData.showId !== undefined) {
+      if (validatedData.showId !== null) {
+        // Vérifier que le spectacle existe et appartient à la même édition
+        const show = await prisma.show.findFirst({
+          where: { id: validatedData.showId, editionId },
+        })
+        if (!show) {
+          throw createError({
+            status: 404,
+            message: 'Spectacle non trouvé dans cette édition',
+          })
+        }
+
+        // Vérifier que le spectacle n'est pas déjà lié à une autre candidature
+        const existingLink = await prisma.showApplication.findFirst({
+          where: {
+            showId: validatedData.showId,
+            id: { not: applicationId },
+          },
+        })
+        if (existingLink) {
+          throw createError({
+            status: 400,
+            message: 'Ce spectacle est déjà associé à une autre candidature',
+          })
+        }
+      }
+      updateData.show = validatedData.showId
+        ? { connect: { id: validatedData.showId } }
+        : { disconnect: true }
     }
 
     // Mettre à jour la candidature
@@ -130,11 +166,17 @@ export default wrapApiHandler(
             profilePicture: true,
           },
         },
+        show: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
       },
     })
 
     // Notifier l'artiste si le statut change vers ACCEPTED ou REJECTED
-    if (validatedData.status !== application.status) {
+    if (validatedData.status && validatedData.status !== application.status) {
       const editionData = await prisma.edition.findUnique({
         where: { id: editionId },
         select: { name: true },

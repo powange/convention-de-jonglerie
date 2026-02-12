@@ -83,6 +83,7 @@ model Show {
   marker          EditionMarker?       @relation(fields: [markerId], references: [id], onDelete: SetNull)
   artists         ShowArtist[]
   returnableItems ShowReturnableItem[]
+  application     ShowApplication?
 
   @@index([editionId])
   @@index([startDateTime])
@@ -182,6 +183,9 @@ model ShowApplication {
   decidedAt      DateTime?
   decidedById    Int?
 
+  // Lien vers le spectacle créé (rempli quand l'organisateur associe un spectacle)
+  showId Int? @unique
+
   // Traçabilité
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -189,6 +193,7 @@ model ShowApplication {
   showCall     EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   decidedBy    User?           @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  show         Show?           @relation(fields: [showId], references: [id], onDelete: SetNull)
   conversation Conversation? // Conversation avec les organisateurs
 
   @@unique([showCallId, userId])

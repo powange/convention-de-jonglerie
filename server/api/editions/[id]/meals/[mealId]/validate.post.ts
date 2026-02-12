@@ -130,6 +130,14 @@ export default wrapApiHandler(
         })
       }
 
+      // Vérifier si le billet ou la commande a été remboursé
+      if (orderItem.state === 'Refunded' || orderItem.order.status === 'Refunded') {
+        throw createError({
+          status: 400,
+          message: 'Ce billet a été remboursé et ne peut pas être utilisé pour valider un repas',
+        })
+      }
+
       // Vérifier que le tarif ou les options du participant donnent accès à ce repas
       // Utiliser les relations déjà chargées avec le meal
       const mealTierIds = new Set(meal.tiers.map((t) => t.tierId))

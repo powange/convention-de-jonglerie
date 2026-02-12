@@ -66,28 +66,17 @@ await prisma.$transaction(async (tx) => {
 
 ---
 
-### 1.3 Billetterie - Billets rembourses toujours validables
+### 1.3 ~~Billetterie - Billets rembourses toujours validables~~ CORRIGE
 
-**Fichier** : `server/api/editions/[id]/ticketing/verify.post.ts` (lignes 570-591)
+**Fichier** : `server/api/editions/[id]/ticketing/validate-entry.post.ts` et `server/api/editions/[id]/meals/[mealId]/validate.post.ts`
 
-**Probleme** : La recherche par QR code ne filtre pas les commandes remboursees. L'interface retourne `isRefunded: true` (ligne 598) mais la validation reste possible.
+**Probleme** : La recherche par QR code ne filtre pas les commandes remboursees. L'interface retourne `isRefunded: true` mais la validation d'entree et de repas restait possible cote serveur.
 
-**Impact** : Un billet rembourse peut etre scanne et valide pour l'entree.
+**Resolution** : Ajout d'une verification cote serveur dans les deux endpoints de validation :
 
-**Correction recommandee** :
-
-```typescript
-const orderItem = await prisma.ticketingOrderItem.findFirst({
-  where: {
-    qrCode: body.qrCode,
-    state: { in: ['Processed', 'Pending'] },
-    order: {
-      editionId,
-      status: { notIn: ['Refunded'] },
-    },
-  },
-})
-```
+- `validate-entry.post.ts` : Avant de valider les billets, verifie si les items ou la commande ont le statut `Refunded`. Si c'est le cas, une erreur 400 est renvoyee avec un message explicite.
+- `validate.post.ts` : Pour les participants (type `participant`), verifie le statut de remboursement de l'item et de la commande avant d'autoriser la validation du repas.
+  Le frontend (deja en place) affiche l'alerte de remboursement et desactive le bouton de validation.
 
 ---
 
@@ -249,30 +238,23 @@ Mais il ne verifie PAS les chevauchements temporels avec d'autres creneaux. Un b
 
 ---
 
-### 2.9 Billetterie - Transition de statut non atomique
+### 2.9 ~~Billetterie - Transition de statut non atomique~~ CORRIGE
 
-**Fichier** : `server/api/editions/[id]/ticketing/validate-entry.post.ts` (lignes 429-454)
+**Fichier** : `server/api/editions/[id]/ticketing/validate-entry.post.ts`
 
 **Probleme** : La mise a jour du statut de commande et des items se fait en deux requetes separees. En cas d'erreur sur la seconde, la commande est `Onsite` mais les items restent `Pending`.
 
-**Correction recommandee** :
-
-```typescript
-await prisma.$transaction([
-  prisma.ticketingOrder.updateMany({ where: { id: { in: orderIds }, status: 'Pending' }, data: { status: 'Onsite', ... } }),
-  prisma.ticketingOrderItem.updateMany({ where: { id: { in: body.participantIds }, state: 'Pending' }, data: { state: 'Processed' } }),
-])
-```
+**Resolution** : Les deux `updateMany` (commande → `Onsite` et items → `Processed`) sont maintenant regroupes dans un `prisma.$transaction([...])` pour garantir l'atomicite.
 
 ---
 
-### 2.10 Artistes - ShowApplication sans lien avec Show
+### 2.10 ~~Artistes - ShowApplication sans lien avec Show~~ CORRIGE
 
-**Fichier** : `prisma/schema/artists.prisma`
+**Fichier** : `prisma/schema/artists.prisma`, `server/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId].patch.ts`
 
 **Probleme** : Aucun lien relationnel entre `ShowApplication` (candidature) et `Show` (spectacle cree). Apres acceptation d'une candidature, l'organisateur doit manuellement creer le spectacle. Risque d'oubli, pas de tracabilite.
 
-**Correction recommandee** : Ajouter un champ `showId` nullable dans `ShowApplication` ou creer un endpoint de conversion automatique candidature -> spectacle.
+**Resolution** : Ajout d'un champ `showId` nullable unique dans `ShowApplication` avec relation vers `Show`. L'endpoint PATCH accepte desormais un `showId` optionnel pour associer/dissocier un spectacle a une candidature (avec verification que le spectacle appartient a la meme edition). Les endpoints de lecture (GET liste et detail) retournent le spectacle associe.
 
 ---
 
@@ -399,7 +381,7 @@ Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevo
 | ---- | ------------- | ------------------------------------------------ | -------- |
 | 1.1  | Billetterie   | Pas de validation de quotas en creation manuelle | CRITIQUE |
 | 1.2  | Billetterie   | ~~Double validation d'entree possible~~          | CORRIGE  |
-| 1.3  | Billetterie   | Billets rembourses validables                    | CRITIQUE |
+| 1.3  | Billetterie   | ~~Billets rembourses validables~~                | CORRIGE  |
 | 1.4  | Benevoles     | ~~Pas de nettoyage au rejet~~                    | CORRIGE  |
 | 1.5  | Benevoles     | Assignation equipes aux PENDING                  | CRITIQUE |
 | 1.6  | Repas         | ~~Validation multiple possible~~                 | CORRIGE  |
@@ -412,8 +394,8 @@ Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevo
 | 2.6  | Posts         | ~~Permissions incoherentes posts/commentaires~~  | CORRIGE  |
 | 2.7  | Messagerie    | ~~Conversation sans verif benevole~~             | CORRIGE  |
 | 2.8  | Benevoles     | Pas de validation chevauchements serveur         | MAJEUR   |
-| 2.9  | Billetterie   | Transition non atomique                          | MAJEUR   |
-| 2.10 | Artistes      | ShowApplication sans lien Show                   | MAJEUR   |
+| 2.9  | Billetterie   | ~~Transition non atomique~~                      | CORRIGE  |
+| 2.10 | Artistes      | ~~ShowApplication sans lien Show~~               | CORRIGE  |
 | 3.1  | Admin         | Impersonation sans audit trail                   | MOYEN    |
 | 3.2  | FCM           | ~~Race condition tokens~~                        | CORRIGE  |
 | 3.3  | Messagerie    | ~~Doublons conversations privees~~               | CORRIGE  |

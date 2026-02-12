@@ -662,14 +662,17 @@ export const showApplicationSchema = z
     }
   )
 
-// Schéma pour la mise à jour du statut d'une candidature
+// Schéma pour la mise à jour d'une candidature (statut, notes, spectacle associé)
 export const showApplicationStatusSchema = z.object({
-  status: z.enum(['PENDING', 'ACCEPTED', 'REJECTED'], {
-    message: 'Statut invalide',
-  }),
+  status: z
+    .enum(['PENDING', 'ACCEPTED', 'REJECTED'], {
+      message: 'Statut invalide',
+    })
+    .optional(),
   organizerNotes: z
     .string()
     .max(3000, 'Les notes ne peuvent pas dépasser 3000 caractères')
     .nullable()
     .optional(),
+  showId: z.number().int().positive().nullable().optional(),
 })

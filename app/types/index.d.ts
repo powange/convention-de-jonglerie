@@ -315,6 +315,10 @@ export interface ShowApplication {
   createdAt: string
   updatedAt: string
 
+  // Lien vers le spectacle créé
+  showId?: number | null
+  show?: { id: number; title: string } | null
+
   // Relations (optionnelles selon le contexte)
   user?: PublicUser
   decidedBy?: PublicUser | null

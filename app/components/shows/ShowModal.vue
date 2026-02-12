@@ -44,14 +44,13 @@
           </UFormField>
 
           <!-- Date et heure -->
-          <UFormField :label="$t('gestion.shows.start_datetime')" required>
-            <UInput
-              v-model="formData.startDateTime"
-              type="datetime-local"
-              :placeholder="$t('gestion.shows.start_datetime')"
-              required
-            />
-          </UFormField>
+          <UiDateTimePicker
+            v-model="formData.startDateTime"
+            :date-label="$t('gestion.shows.start_date')"
+            :time-label="$t('gestion.shows.start_time')"
+            :placeholder="$t('gestion.shows.start_datetime')"
+            required
+          />
 
           <!-- Durée -->
           <UFormField :label="$t('gestion.shows.duration')">
@@ -177,6 +176,16 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const editionStore = useEditionStore()
+
+const edition = computed(() => editionStore.getEditionById(props.editionId))
+
+// Date par défaut : premier jour de l'édition à 10h00
+const defaultStartDateTime = computed(() => {
+  if (!edition.value?.startDate) return ''
+  const date = new Date(edition.value.startDate)
+  return formatDateTimeLocal(date)
+})
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -403,7 +412,7 @@ const resetForm = () => {
   formData.value = {
     title: '',
     description: '',
-    startDateTime: '',
+    startDateTime: defaultStartDateTime.value,
     duration: null,
     location: '',
     imageUrl: null,
