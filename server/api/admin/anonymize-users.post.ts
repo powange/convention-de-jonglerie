@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
@@ -6,8 +5,10 @@ import { getEmailHash } from '#server/utils/email-hash'
 
 export default wrapApiHandler(
   async (event) => {
-    // Protection : environnement non-production uniquement
-    if (process.env.NODE_ENV === 'production') {
+    // Protection : bloqué en production réelle (NUXT_ENV absent)
+    // Autorisé en dev (pas de NUXT_ENV) et release/staging (NUXT_ENV='release'/'staging')
+    const nuxtEnv = process.env.NUXT_ENV
+    if (process.env.NODE_ENV === 'production' && !nuxtEnv) {
       throw createError({
         status: 403,
         message: "L'anonymisation n'est pas disponible en production",
@@ -86,11 +87,20 @@ export default wrapApiHandler(
               socialLinks: null,
               showDescription: 'Description anonymisée',
               technicalNeeds: null,
-              additionalPerformers: Prisma.DbNull,
               accommodationNotes: null,
               departureCity: null,
             },
           })
+        }
+
+        // Nullifier le champ JSON additionalPerformers via raw SQL
+        // (Prisma.DbNull non importable dans le build Nitro de production)
+        if (showApplications.length > 0) {
+          const placeholders = showApplications.map(() => '?').join(',')
+          await tx.$executeRawUnsafe(
+            `UPDATE ShowApplication SET additionalPerformers = NULL WHERE id IN (${placeholders})`,
+            ...showApplications.map((s) => s.id)
+          )
         }
 
         return {

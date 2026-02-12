@@ -462,7 +462,7 @@
 
         <!-- Anonymisation des données (DEV uniquement) -->
         <UCard
-          v-if="!runtimeConfig.public.isProduction"
+          v-if="!isRealProduction"
           class="hover:shadow-lg transition-shadow cursor-pointer border-2 border-red-300 dark:border-red-700"
           @click="showAnonymizeModal = true"
         >
@@ -634,7 +634,7 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const toast = useToast()
-const runtimeConfig = useRuntimeConfig()
+const isRealProduction = useState<boolean>('isRealProduction', () => true)
 
 // Métadonnées de la page
 const { t } = useI18n()
