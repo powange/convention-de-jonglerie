@@ -144,6 +144,8 @@
     "manage_volunteers_desc": "Coordonner les équipes de bénévoles et leurs candidatures",
     "no_conventions": "Aucune convention créée",
     "no_conventions_description": "Les conventions vous permettront de regrouper plusieurs éditions.",
+    "empty_state_title": "Créez votre première convention",
+    "empty_state_description": "Organisez et gérez vos événements de jonglerie. Créez des éditions, coordonnez vos équipes et rassemblez votre communauté.",
     "no_description": "Aucune description",
     "no_description_available": "Aucune description disponible",
     "no_editions": "Aucune édition pour cette convention",

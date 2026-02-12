@@ -1,6 +1,6 @@
 <template>
   <UCard
-    class="bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 border-primary-200 dark:border-primary-700"
+    class="bg-linear-to-br from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 border-primary-200 dark:border-primary-700"
   >
     <template #header>
       <div class="flex items-center gap-3">

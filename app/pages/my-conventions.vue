@@ -31,15 +31,44 @@
         <p>{{ $t('common.loading') }}</p>
       </div>
 
-      <div v-else-if="myConventions.length === 0" class="space-y-6">
-        <div class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p class="text-gray-500 mb-2">{{ $t('conventions.no_conventions') }}</p>
-          <p class="text-sm text-gray-400">{{ $t('conventions.no_conventions_description') }}</p>
+      <div v-else-if="myConventions.length === 0" class="py-12">
+        <!-- Hero Empty State -->
+        <div class="max-w-2xl mx-auto text-center mb-12">
+          <!-- Icon simple -->
+          <div class="flex justify-center mb-8">
+            <div
+              class="w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-2xl flex items-center justify-center"
+            >
+              <UIcon
+                name="i-heroicons-building-library"
+                class="text-primary-600 dark:text-primary-400"
+                size="40"
+              />
+            </div>
+          </div>
+
+          <!-- Titre et description -->
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            {{ $t('conventions.empty_state_title') }}
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
+            {{ $t('conventions.empty_state_description') }}
+          </p>
+
+          <!-- CTA Bouton -->
+          <UButton
+            color="primary"
+            size="lg"
+            icon="i-heroicons-plus"
+            :label="$t('conventions.create_first_convention')"
+            to="/conventions/add"
+          />
         </div>
 
-        <!-- Card explicative des fonctionnalités -->
-        <ConventionsFeaturesCard />
+        <!-- Features Card -->
+        <div class="max-w-4xl mx-auto">
+          <ConventionsFeaturesCard :show-footer="false" />
+        </div>
       </div>
 
       <div v-else class="space-y-4 mb-8">
