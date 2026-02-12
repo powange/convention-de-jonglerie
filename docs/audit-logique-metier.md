@@ -119,44 +119,23 @@ if (application.status !== 'ACCEPTED')
 
 ---
 
-### 1.6 Repas - Validation multiple possible (fraude)
+### 1.6 ~~Repas - Validation multiple possible (fraude)~~ CORRIGE
 
 **Fichier** : `server/api/editions/[id]/meals/[mealId]/validate.post.ts`
 
 **Probleme** : La validation ne verifie pas si `consumedAt` est deja rempli avant la mise a jour. Un QR code peut etre scanne plusieurs fois.
 
-- Benevoles (lignes 74-77) : `update({ data: { consumedAt: now } })` sans verification
-- Artistes (lignes 95-98) : idem
-- Participants (lignes 144-159) : `upsert` permet l'ecrasement
-
-**Correction recommandee** :
-
-```typescript
-const selection = await prisma.volunteerMealSelection.findUnique({
-  where: { id: validatedData.id },
-})
-if (selection.consumedAt) {
-  throw createError({ status: 400, message: 'Ce repas a deja ete valide' })
-}
-```
+**Resolution** : Ajout d'une verification `consumedAt` avant la mise a jour pour les 3 types (benevoles, artistes, participants). Si le repas a deja ete valide, une erreur 400 est renvoyee. Pour les participants, le `findUnique` est effectue avant l'`upsert` pour detecter les doublons.
 
 ---
 
-### 1.7 Artistes - Montants financiers non valides
+### 1.7 ~~Artistes - Montants financiers non valides~~ CORRIGE
 
-**Fichier** : `server/api/editions/[id]/artists/[artistId].put.ts` (lignes 15-19)
+**Fichier** : `server/api/editions/[id]/artists/[artistId].put.ts`
 
 **Probleme** : Les champs `payment`, `reimbursementMax`, `reimbursementActual` acceptent des valeurs negatives et il n'y a pas de verification que `reimbursementActual <= reimbursementMax`.
 
-**Correction recommandee** :
-
-```typescript
-payment: z.number().nonnegative().max(100000).optional().nullable(),
-reimbursementMax: z.number().nonnegative().max(100000).optional().nullable(),
-reimbursementActual: z.number().nonnegative().max(100000).optional().nullable(),
-```
-
-Ajouter une validation custom : `reimbursementActual <= reimbursementMax`.
+**Resolution** : Ajout de `.nonnegative().max(100000)` sur les 3 champs financiers. Ajout d'un `.refine()` Zod pour la validation croisee dans le schema, et d'une verification supplementaire contre les valeurs en base pour le cas ou un seul champ est mis a jour.
 
 ---
 
@@ -423,8 +402,8 @@ Seules les candidatures `source: 'MANUAL'` peuvent etre supprimees. Si un benevo
 | 1.3  | Billetterie   | Billets rembourses validables                    | CRITIQUE |
 | 1.4  | Benevoles     | ~~Pas de nettoyage au rejet~~                    | CORRIGE  |
 | 1.5  | Benevoles     | Assignation equipes aux PENDING                  | CRITIQUE |
-| 1.6  | Repas         | Validation multiple possible                     | CRITIQUE |
-| 1.7  | Artistes      | Montants negatifs acceptes                       | CRITIQUE |
+| 1.6  | Repas         | ~~Validation multiple possible~~                 | CORRIGE  |
+| 1.7  | Artistes      | ~~Montants negatifs acceptes~~                   | CORRIGE  |
 | 2.1  | Permissions   | Deux systemes concurrents                        | MAJEUR   |
 | 2.2  | Permissions   | ~~Edition = suppression~~                        | CORRIGE  |
 | 2.3  | Permissions   | ~~canManageOrganizers = statut edition~~         | CORRIGE  |

@@ -6,35 +6,45 @@ import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
-const updateArtistSchema = z.object({
-  arrivalDateTime: z.string().optional().nullable(),
-  departureDateTime: z.string().optional().nullable(),
-  dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
-  allergies: z.string().optional().nullable(),
-  allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
-  payment: z.number().optional().nullable(),
-  paymentPaid: z.boolean().optional(),
-  reimbursementMax: z.number().optional().nullable(),
-  reimbursementActual: z.number().optional().nullable(),
-  reimbursementActualPaid: z.boolean().optional(),
-  accommodationAutonomous: z.boolean().optional(),
-  accommodationProposal: z.string().optional().nullable(),
-  invoiceRequested: z.boolean().optional(),
-  invoiceProvided: z.boolean().optional(),
-  feeRequested: z.boolean().optional(),
-  feeProvided: z.boolean().optional(),
-  pickupRequired: z.boolean().optional(),
-  pickupLocation: z.string().optional().nullable(),
-  pickupResponsibleId: z.number().int().positive().optional().nullable(),
-  dropoffRequired: z.boolean().optional(),
-  dropoffLocation: z.string().optional().nullable(),
-  dropoffResponsibleId: z.number().int().positive().optional().nullable(),
-  // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
-  userEmail: z.string().email().optional(),
-  userPrenom: z.string().min(1).optional(),
-  userNom: z.string().min(1).optional(),
-  userPhone: z.string().optional().nullable(),
-})
+const updateArtistSchema = z
+  .object({
+    arrivalDateTime: z.string().optional().nullable(),
+    departureDateTime: z.string().optional().nullable(),
+    dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
+    allergies: z.string().optional().nullable(),
+    allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
+    payment: z.number().nonnegative().max(100000).optional().nullable(),
+    paymentPaid: z.boolean().optional(),
+    reimbursementMax: z.number().nonnegative().max(100000).optional().nullable(),
+    reimbursementActual: z.number().nonnegative().max(100000).optional().nullable(),
+    reimbursementActualPaid: z.boolean().optional(),
+    accommodationAutonomous: z.boolean().optional(),
+    accommodationProposal: z.string().optional().nullable(),
+    invoiceRequested: z.boolean().optional(),
+    invoiceProvided: z.boolean().optional(),
+    feeRequested: z.boolean().optional(),
+    feeProvided: z.boolean().optional(),
+    pickupRequired: z.boolean().optional(),
+    pickupLocation: z.string().optional().nullable(),
+    pickupResponsibleId: z.number().int().positive().optional().nullable(),
+    dropoffRequired: z.boolean().optional(),
+    dropoffLocation: z.string().optional().nullable(),
+    dropoffResponsibleId: z.number().int().positive().optional().nullable(),
+    // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
+    userEmail: z.string().email().optional(),
+    userPrenom: z.string().min(1).optional(),
+    userNom: z.string().min(1).optional(),
+    userPhone: z.string().optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.reimbursementActual != null && data.reimbursementMax != null) {
+        return data.reimbursementActual <= data.reimbursementMax
+      }
+      return true
+    },
+    { message: 'Le remboursement réel ne peut pas dépasser le maximum autorisé' }
+  )
 
 export default wrapApiHandler(
   async (event) => {
@@ -99,6 +109,30 @@ export default wrapApiHandler(
 
     const body = await readBody(event)
     const validatedData = updateArtistSchema.parse(body)
+
+    // Vérification croisée remboursement vs valeur en base
+    // undefined = non fourni (garder la valeur existante), null = effacement explicite
+    const effectiveMax =
+      validatedData.reimbursementMax !== undefined
+        ? validatedData.reimbursementMax
+        : existingArtist.reimbursementMax
+    const effectiveActual =
+      validatedData.reimbursementActual !== undefined
+        ? validatedData.reimbursementActual
+        : existingArtist.reimbursementActual
+    if (effectiveActual != null && effectiveMax != null && effectiveActual > effectiveMax) {
+      throw createError({
+        status: 400,
+        message: 'Le remboursement réel ne peut pas dépasser le maximum autorisé',
+      })
+    }
+    if (effectiveMax == null && effectiveActual != null) {
+      throw createError({
+        status: 400,
+        message:
+          "Le remboursement maximum ne peut pas être supprimé tant qu'un remboursement réel est enregistré",
+      })
+    }
 
     // Vérifier si des modifications d'utilisateur sont demandées
     const hasUserUpdates =

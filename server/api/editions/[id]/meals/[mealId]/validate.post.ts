@@ -70,11 +70,18 @@ export default wrapApiHandler(
         })
       }
 
-      // Mettre à jour la date de consommation
-      await prisma.volunteerMealSelection.update({
-        where: { id: validatedData.id },
+      // Mise à jour atomique : ne met à jour que si consumedAt est null
+      const result = await prisma.volunteerMealSelection.updateMany({
+        where: { id: validatedData.id, consumedAt: null },
         data: { consumedAt: now },
       })
+
+      if (result.count === 0) {
+        throw createError({
+          status: 400,
+          message: 'Ce repas a déjà été validé',
+        })
+      }
     } else if (validatedData.type === 'artist') {
       // Vérifier que la sélection existe
       const selection = await prisma.artistMealSelection.findUnique({
@@ -91,11 +98,18 @@ export default wrapApiHandler(
         })
       }
 
-      // Mettre à jour la date de consommation
-      await prisma.artistMealSelection.update({
-        where: { id: validatedData.id },
+      // Mise à jour atomique : ne met à jour que si consumedAt est null
+      const result = await prisma.artistMealSelection.updateMany({
+        where: { id: validatedData.id, consumedAt: null },
         data: { consumedAt: now },
       })
+
+      if (result.count === 0) {
+        throw createError({
+          status: 400,
+          message: 'Ce repas a déjà été validé',
+        })
+      }
     } else if (validatedData.type === 'participant') {
       // L'id correspond à un orderItemId
       const orderItem = await prisma.ticketingOrderItem.findUnique({
@@ -140,23 +154,37 @@ export default wrapApiHandler(
         })
       }
 
-      // Créer ou mettre à jour la validation de repas
-      await prisma.ticketingOrderItemMeal.upsert({
+      // Mise à jour atomique : ne met à jour que si consumedAt est null
+      const result = await prisma.ticketingOrderItemMeal.updateMany({
         where: {
-          orderItemId_mealId: {
-            orderItemId: validatedData.id,
-            mealId,
-          },
-        },
-        create: {
           orderItemId: validatedData.id,
           mealId,
-          consumedAt: now,
+          consumedAt: null,
         },
-        update: {
-          consumedAt: now,
-        },
+        data: { consumedAt: now },
       })
+
+      if (result.count === 0) {
+        // Soit l'enregistrement n'existe pas encore, soit déjà consommé
+        try {
+          await prisma.ticketingOrderItemMeal.create({
+            data: {
+              orderItemId: validatedData.id,
+              mealId,
+              consumedAt: now,
+            },
+          })
+        } catch (error: any) {
+          // P2002 = contrainte unique violée → l'enregistrement existe avec consumedAt déjà renseigné
+          if (error.code === 'P2002') {
+            throw createError({
+              status: 400,
+              message: 'Ce repas a déjà été validé',
+            })
+          }
+          throw error
+        }
+      }
     }
 
     return {
