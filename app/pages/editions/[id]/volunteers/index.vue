@@ -217,13 +217,13 @@
             <div
               v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && !myApplication"
             >
-              <div
+              <UAlert
                 v-if="!volunteersInfo?.open"
-                class="text-sm text-gray-500 flex items-center gap-2"
-              >
-                <UIcon name="i-heroicons-lock-closed" />
-                {{ t('edition.volunteers.closed_message') }}
-              </div>
+                color="warning"
+                variant="subtle"
+                icon="i-heroicons-lock-closed"
+                :title="t('edition.volunteers.closed_message')"
+              />
               <div v-else>
                 <UCard
                   variant="subtle"
