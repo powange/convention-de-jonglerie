@@ -149,6 +149,68 @@ export interface ConventionWithOrganizers extends Convention {
   organizers?: ConventionOrganizerWithRights[]
 }
 
+// ========== TYPES DASHBOARD MY-CONVENTIONS ==========
+
+/** Élément léger retourné par GET /api/conventions/my-conventions */
+export interface ConventionListItem {
+  id: number
+  name: string
+  logo: string | null
+  description: string | null
+  email: string | null
+  createdAt: string
+  authorId: number | null
+  _count: { editions: number }
+  currentUserRights: OrganizerRights | null
+}
+
+/** Édition retournée par GET /api/conventions/:id/dashboard */
+export interface DashboardEdition {
+  id: number
+  name: string | null
+  startDate: string
+  endDate: string
+  city: string | null
+  country: string | null
+  imageUrl: string | null
+  status: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
+  _count: {
+    volunteerApplications: number
+    artists: number
+    editionOrganizers: number
+    ticketingParticipants: number
+  }
+}
+
+/** Droits par édition retournés par le dashboard */
+export interface DashboardPerEditionPermission {
+  editionId: number
+  canEdit: boolean
+  canDelete: boolean
+  canManageVolunteers: boolean
+}
+
+/** Organisateur retourné par GET /api/conventions/:id/dashboard */
+export interface DashboardOrganizer {
+  id: number
+  title: string | null
+  addedAt: string
+  user: {
+    id: number
+    pseudo: string
+    profilePicture: string | null
+    emailHash: string | null
+  }
+  rights: OrganizerRights
+  perEdition: DashboardPerEditionPermission[]
+}
+
+/** Réponse complète de GET /api/conventions/:id/dashboard */
+export interface ConventionDashboardResponse {
+  editions: DashboardEdition[]
+  organizers: DashboardOrganizer[]
+}
+
 // Interface pour les objets qui ont seulement des dates (pour les composables)
 export interface HasDates {
   startDate: string

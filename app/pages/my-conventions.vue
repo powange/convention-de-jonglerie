@@ -5,7 +5,6 @@
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center gap-3">
           <h2 class="text-2xl font-bold">{{ $t('navigation.my_conventions') }}</h2>
-          <!-- Debug: afficher toujours l'icône pour tester -->
           <UButton
             icon="i-heroicons-question-mark-circle"
             size="xs"
@@ -14,7 +13,6 @@
             :ui="{ rounded: 'rounded-full' }"
             @click="openFeaturesModal"
           />
-          <!-- Debug: afficher le nombre de conventions -->
           <span class="text-xs text-gray-500">({{ myConventions.length }} conventions)</span>
         </div>
         <UButton
@@ -34,7 +32,6 @@
       <div v-else-if="myConventions.length === 0" class="py-12">
         <!-- Hero Empty State -->
         <div class="max-w-2xl mx-auto text-center mb-12">
-          <!-- Icon simple -->
           <div class="flex justify-center mb-8">
             <div
               class="w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-2xl flex items-center justify-center"
@@ -47,7 +44,6 @@
             </div>
           </div>
 
-          <!-- Titre et description -->
           <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             {{ $t('conventions.empty_state_title') }}
           </h2>
@@ -55,7 +51,6 @@
             {{ $t('conventions.empty_state_description') }}
           </p>
 
-          <!-- CTA Bouton -->
           <UButton
             color="primary"
             size="lg"
@@ -71,147 +66,47 @@
         </div>
       </div>
 
-      <div v-else class="space-y-4 mb-8">
-        <UCard
-          v-for="convention in myConventions"
-          :key="convention.id"
-          class="hover:shadow-lg transition-shadow w-full"
-          variant="subtle"
-        >
-          <template #header>
-            <div class="flex items-center justify-between w-full">
-              <div class="flex items-center gap-3">
-                <div v-if="convention.logo" class="flex-shrink-0">
-                  <img
-                    :src="getImageUrl(convention.logo, 'convention', convention.id) || ''"
-                    :alt="convention.name"
-                    class="w-12 h-12 object-cover rounded-lg"
-                  />
-                </div>
-                <div
-                  v-else
-                  class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
-                >
-                  <UIcon name="i-heroicons-building-library" class="text-gray-400" size="20" />
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-semibold">{{ convention.name }}</h3>
-                  <p class="text-xs text-gray-500">
-                    {{ $t('conventions.created_at') }}
-                    {{ formatCreatedDate(convention.createdAt) }}
-                  </p>
-                </div>
-              </div>
-              <UDropdownMenu :items="getConventionActions(convention)">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal"
-                  size="xs"
-                />
-              </UDropdownMenu>
-            </div>
+      <!-- Contenu principal -->
+      <div v-else>
+        <!-- Sélecteur de convention -->
+        <ConventionSelector v-model="selectedConventionId" :conventions="myConventions" />
+
+        <!-- Convention sélectionnée -->
+        <template v-if="selectedListItem">
+          <!-- Détails -->
+          <ConventionDetails
+            :convention="selectedListItem"
+            :can-edit="canEditConvention(selectedListItem)"
+            :can-delete="canDeleteConvention(selectedListItem)"
+            @edit="navigateTo(`/conventions/${selectedListItem!.id}/edit`)"
+            @delete="deleteConvention(selectedListItem!.id)"
+          />
+
+          <!-- Chargement du détail -->
+          <div v-if="detailLoading" class="text-center py-8">
+            <p>{{ $t('common.loading') }}</p>
+          </div>
+
+          <!-- Éditions + Organisateurs (une fois le détail chargé) -->
+          <template v-else-if="conventionDetail?.conventionId === selectedListItem.id">
+            <ConventionEditionsGrid
+              :editions="conventionDetail.editions ?? []"
+              :convention="mergedConvention!"
+              :can-add-edition="canAddEdition(selectedListItem)"
+              @status-change="updateEditionStatus"
+              @delete="deleteEdition"
+            />
+
+            <ConventionOrganizersSection
+              :organizers="conventionDetail.organizers ?? []"
+              :convention="mergedConvention!"
+              :can-manage="canManageOrganizers(selectedListItem)"
+              @edit-organizer="openEditOrganizerModal($event)"
+              @add-organizer="openAddOrganizerModal()"
+              @show-history="openHistoryModal()"
+            />
           </template>
-
-          <!-- Email de contact -->
-          <a
-            v-if="convention.email"
-            :href="`mailto:${convention.email}`"
-            class="text-primary-600 hover:text-primary-700 hover:underline"
-          >
-            {{ convention.email }}
-          </a>
-
-          <p
-            v-if="convention.description"
-            class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4"
-          >
-            {{ convention.description }}
-          </p>
-          <p v-else class="text-sm text-gray-400 italic mb-4">
-            {{ $t('conventions.no_description') }}
-          </p>
-
-          <!-- Section organisateurs -->
-          <div class="mb-4">
-            <div class="flex items-center justify-between mb-2">
-              <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ $t('conventions.organizers') }} ({{ convention.organizers?.length || 0 }})
-              </h4>
-              <div v-if="canManageOrganizers(convention)" class="flex gap-2">
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  icon="i-heroicons-clock"
-                  @click="openHistoryModal(convention)"
-                >
-                  {{ $t('conventions.history.title') }}
-                </UButton>
-                <UButton
-                  size="xs"
-                  variant="outline"
-                  icon="i-heroicons-plus"
-                  @click="openAddOrganizerModal(convention)"
-                >
-                  {{ $t('common.add') }}
-                </UButton>
-              </div>
-            </div>
-            <div v-if="convention.organizers && convention.organizers.length > 0">
-              <div class="flex flex-wrap gap-3">
-                <div
-                  v-for="organizer in convention.organizers"
-                  :key="organizer.id"
-                  class="bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  @click="openEditOrganizerModal(convention, organizer)"
-                >
-                  <UiUserDisplay :user="organizer.user" size="xs">
-                    <template v-if="organizer.title" #datetime>
-                      <span class="text-xs text-gray-600 dark:text-gray-400">
-                        {{ organizer.title }}
-                      </span>
-                    </template>
-                  </UiUserDisplay>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section éditions -->
-          <div class="mt-4">
-            <div class="flex items-center justify-between mb-3">
-              <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ $t('conventions.editions') }} ({{ convention.editions?.length || 0 }})
-              </h4>
-              <UButton
-                v-if="canAddEdition(convention)"
-                size="sm"
-                variant="outline"
-                icon="i-heroicons-plus"
-                :to="`/conventions/${convention.id}/editions/add`"
-              >
-                {{ $t('conventions.add_edition') }}
-              </UButton>
-            </div>
-
-            <!-- Tableau des éditions -->
-            <div v-if="convention.editions && convention.editions.length > 0">
-              <div class="overflow-x-auto">
-                <UTable
-                  :data="convention.editions as any"
-                  :columns="getEditionsColumns()"
-                  @select="onEditionAction"
-                />
-              </div>
-            </div>
-
-            <!-- Message quand pas d'éditions -->
-            <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">{{ $t('conventions.no_editions') }}</p>
-            </div>
-          </div>
-        </UCard>
+        </template>
       </div>
     </div>
 
@@ -219,8 +114,8 @@
     <ConventionOrganizerEditModal
       v-model:open="editOrganizerModalOpen"
       :organizer="selectedOrganizerForEdit"
-      :convention="selectedConventionForEdit"
-      :editions="(selectedConventionForEdit?.editions || []) as any[]"
+      :convention="mergedConvention"
+      :editions="conventionDetail?.editions ?? []"
       :loading="savingOrganizer"
       @save="saveOrganizerChanges"
       @delete="removeOrganizer"
@@ -229,7 +124,7 @@
     <!-- Modal d'ajout de organisateur -->
     <UModal v-model:open="addOrganizerModalOpen" :title="$t('conventions.add_organizer')" size="lg">
       <template #body>
-        <div v-if="selectedConventionForAdd" class="space-y-4">
+        <div v-if="selectedListItem" class="space-y-4">
           <div class="space-y-3">
             <!-- Recherche utilisateur -->
             <div>
@@ -248,8 +143,8 @@
               <label class="block text-sm font-medium mb-2"> Droits du organisateur </label>
               <OrganizerRightsFields
                 v-model="newOrganizerRights"
-                :editions="(selectedConventionForAdd.editions || []) as any[]"
-                :convention-name="selectedConventionForAdd.name"
+                :editions="conventionDetail?.editions ?? []"
+                :convention-name="selectedListItem.name"
                 size="sm"
               />
             </div>
@@ -275,20 +170,20 @@
     <UModal
       v-model:open="historyModalOpen"
       :title="
-        selectedConventionForHistory
-          ? $t('conventions.history.title_full', { name: selectedConventionForHistory.name })
+        selectedListItem
+          ? $t('conventions.history.title_full', { name: selectedListItem.name })
           : ''
       "
       size="lg"
     >
       <template #body>
-        <div v-if="selectedConventionForHistory">
-          <ConventionOrganizerHistory :convention-id="selectedConventionForHistory.id" />
+        <div v-if="selectedListItem">
+          <ConventionOrganizerHistory :convention-id="selectedListItem.id" />
         </div>
       </template>
       <template #footer>
         <div class="flex justify-end">
-          <UButton variant="ghost" @click="closeHistoryModal">
+          <UButton variant="ghost" @click="historyModalOpen = false">
             {{ $t('common.close') }}
           </UButton>
         </div>
@@ -333,25 +228,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, h, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
-import type { Convention, HttpError, Edition } from '~/types'
+import type {
+  HttpError,
+  ConventionListItem,
+  DashboardEdition,
+  DashboardOrganizer,
+  ConventionDashboardResponse,
+} from '~/types'
+import type { OrganizerRightsFormData } from '~/types/organizer'
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 
 // Charger les traductions du fichier edition.json pour les clés edition.*
 await useLazyI18n('edition')
-
-const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
-const USelect = resolveComponent('USelect')
-
-// Type pour les paramètres des cellules du tableau
-interface TableCellParams {
-  row: {
-    original: Edition
-  }
-}
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -360,25 +251,104 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const toast = useToast()
-const { getImageUrl } = useImageUrl()
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
+// Détail chargé pour une convention
+interface ConventionDetailData {
+  conventionId: number
+  editions: DashboardEdition[]
+  organizers: DashboardOrganizer[]
+}
+
+// État de la liste (chargement léger)
 const conventionsLoading = ref(true)
-const myConventions = ref<Convention[]>([])
+const myConventions = ref<ConventionListItem[]>([])
+
+// État du détail (chargement à la sélection)
+const detailLoading = ref(false)
+const conventionDetail = ref<ConventionDetailData | null>(null)
+
+// Sélection de convention
+const selectedConventionId = ref<number | null>(null)
+
+const selectedListItem = computed(
+  () => myConventions.value.find((c) => c.id === selectedConventionId.value) || null
+)
+
+// Convention fusionnée (liste + détail) pour les composants enfants
+const mergedConvention = computed<
+  (ConventionListItem & { editions?: DashboardEdition[]; organizers?: DashboardOrganizer[] }) | null
+>(() => {
+  const listItem = selectedListItem.value
+  if (!listItem) return null
+  const detail = conventionDetail.value
+  if (!detail || detail.conventionId !== listItem.id) {
+    return listItem
+  }
+  return {
+    ...listItem,
+    editions: detail.editions,
+    organizers: detail.organizers,
+  }
+})
+
+// Auto-sélection au chargement
+watch(
+  myConventions,
+  (conventions) => {
+    if (conventions.length > 0 && !selectedConventionId.value) {
+      const urlId = Number(route.query.convention)
+      if (urlId && conventions.find((c) => c.id === urlId)) {
+        selectedConventionId.value = urlId
+      } else {
+        selectedConventionId.value = conventions[0].id
+      }
+    }
+    // Vérifier que la convention sélectionnée existe encore
+    if (
+      selectedConventionId.value &&
+      !conventions.find((c) => c.id === selectedConventionId.value)
+    ) {
+      selectedConventionId.value = conventions.length > 0 ? conventions[0].id : null
+    }
+  },
+  { immediate: true }
+)
+
+// Charger le détail et persister la sélection dans l'URL
+watch(selectedConventionId, async (id) => {
+  if (id) {
+    router.replace({ query: { ...route.query, convention: id.toString() } })
+    await fetchConventionDetail(id)
+  } else {
+    conventionDetail.value = null
+  }
+})
 
 // Modal d'édition de organisateur
 const editOrganizerModalOpen = ref(false)
-const selectedConventionForEdit = ref<Convention | null>(null)
-const selectedOrganizerForEdit = ref<any>(null)
+const selectedOrganizerForEdit = ref<DashboardOrganizer | null>(null)
 const savingOrganizer = ref(false)
 
 // Modal d'ajout de organisateur
 const addOrganizerModalOpen = ref(false)
-const selectedConventionForAdd = ref<Convention | null>(null)
-const newOrganizerUser = ref<any>(null)
+
+interface SearchedUser {
+  id: number
+  label: string
+  pseudo: string
+  email: string
+  emailHash: string | null
+  profilePicture: string | null
+  isRealUser: boolean
+}
+
+const newOrganizerUser = ref<SearchedUser | null>(null)
 const newOrganizersearchTerm = ref('')
-const newOrganizerRights = ref<any>({
-  title: null,
+const newOrganizerRights = ref<OrganizerRightsFormData>({
+  title: '',
   rights: {
     editConvention: false,
     deleteConvention: false,
@@ -392,7 +362,7 @@ const newOrganizerRights = ref<any>({
 })
 
 // Variables pour la recherche d'utilisateurs (réutilisées du UserSelector)
-const searchedUsers = ref<any[]>([])
+const searchedUsers = ref<SearchedUser[]>([])
 const searchingUsers = ref(false)
 
 // Watcher pour la recherche d'utilisateurs
@@ -413,6 +383,16 @@ watch(newOrganizersearchTerm, (newValue) => {
   }, 300)
 })
 
+interface UserSearchResult {
+  id: number
+  pseudo: string | null
+  prenom: string | null
+  nom: string | null
+  email: string
+  emailHash: string | null
+  profilePicture: string | null
+}
+
 const searchUsers = async (email: string) => {
   // Validation basique d'email
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -422,14 +402,14 @@ const searchUsers = async (email: string) => {
 
   try {
     searchingUsers.value = true
-    const response = await $fetch<{ users: any[] }>('/api/users/search', {
+    const response = await $fetch<{ users: UserSearchResult[] }>('/api/users/search', {
       query: { emailExact: email },
     })
 
     searchedUsers.value = response.users.map((user) => ({
       id: user.id,
-      label: user.pseudo || `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email,
-      pseudo: user.pseudo || `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email,
+      label: user.pseudo || `${user.prenom ?? ''} ${user.nom ?? ''}`.trim() || user.email,
+      pseudo: user.pseudo || `${user.prenom ?? ''} ${user.nom ?? ''}`.trim() || user.email,
       email: user.email,
       emailHash: user.emailHash,
       profilePicture: user.profilePicture,
@@ -448,253 +428,23 @@ const showFeaturesModal = ref(false)
 
 // Modal de suppression d'édition
 const deleteEditionModalOpen = ref(false)
-const editionToDelete = ref<Edition | null>(null)
+const editionToDelete = ref<DashboardEdition | null>(null)
 const deletingEdition = ref(false)
 
 // Historique des organisateurs
 const historyModalOpen = ref(false)
-const selectedConventionForHistory = ref<Convention | null>(null)
 
 function openFeaturesModal() {
-  console.log('Opening features modal', showFeaturesModal.value)
   showFeaturesModal.value = true
-  console.log('Modal state after:', showFeaturesModal.value)
 }
 
-function openHistoryModal(convention: Convention) {
-  selectedConventionForHistory.value = convention
+function openHistoryModal() {
   historyModalOpen.value = true
 }
 
-function closeHistoryModal() {
-  historyModalOpen.value = false
-  selectedConventionForHistory.value = null
-}
-
-// Utiliser le composable pour formater les dates
-const { formatDateTime } = useDateFormat()
-
-// Utiliser le composable pour le statut des éditions
-const { getStatusColor, getStatusText, statusOptions: editionStatusOptions } = useEditionStatus()
-
-// Actions pour les conventions
-const getConventionActions = (convention: Convention) => {
-  const actions = []
-
-  if (canEditConvention(convention)) {
-    actions.push({
-      label: t('conventions.edit'),
-      icon: 'i-heroicons-pencil',
-      to: `/conventions/${convention.id}/edit`,
-    })
-  }
-
-  if (canDeleteConvention(convention)) {
-    actions.push({
-      label: t('conventions.delete'),
-      icon: 'i-heroicons-trash',
-      color: 'error' as const,
-      onSelect: () => deleteConvention(convention.id),
-    })
-  }
-
-  return [actions]
-}
-
-// Colonnes pour le tableau des éditions
-const getEditionsColumns = () => [
-  {
-    accessorKey: 'name',
-    header: t('common.name'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      // Récupérer la convention depuis le contexte parent
-      const convention = myConventions.value.find((conv) =>
-        conv.editions?.some((ed) => ed.id === edition.id)
-      )
-      const displayName = getEditionDisplayNameWithConvention(edition, convention)
-
-      return h('div', { class: 'flex items-center gap-2' }, [
-        edition.imageUrl
-          ? h('img', {
-              src: getImageUrl(edition.imageUrl, 'edition', edition.id),
-              alt: displayName,
-              class: 'w-10 h-10 object-cover rounded flex-shrink-0',
-            })
-          : h(
-              'div',
-              {
-                class:
-                  'w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0',
-              },
-              [
-                h('UIcon', {
-                  name: 'i-heroicons-calendar-days',
-                  class: 'text-gray-400',
-                  size: '20',
-                }),
-              ]
-            ),
-        h('span', { class: 'font-medium text-sm' }, displayName),
-      ])
-    },
-  },
-  {
-    accessorKey: 'dates',
-    header: t('common.dates'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      return h('div', { class: 'text-sm' }, [
-        h('div', {}, formatDateTime(edition.startDate)),
-        h('div', { class: 'text-gray-400 text-xs' }, formatDateTime(edition.endDate)),
-      ])
-    },
-  },
-  {
-    accessorKey: 'location',
-    header: t('common.location'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      return h('div', { class: 'text-sm' }, [
-        h('div', {}, edition.city),
-        h('div', { class: 'text-gray-400 text-xs' }, edition.country),
-      ])
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: t('common.status'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      return h(
-        UBadge,
-        {
-          color: getStatusColor(edition),
-          variant: 'subtle',
-          size: 'md',
-        },
-        () => getStatusText(edition)
-      )
-    },
-  },
-  {
-    accessorKey: 'volunteers',
-    header: t('edition.volunteers.title'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      const count = (edition as any)._count?.volunteerApplications || 0
-      return h('div', { class: 'flex items-center gap-1 text-sm' }, [
-        h('UIcon', { name: 'i-heroicons-hand-raised', class: 'w-4 h-4 text-primary-600' }),
-        h('span', {}, count.toString()),
-      ])
-    },
-  },
-  {
-    accessorKey: 'participants',
-    header: t('common.participants'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      const count = (edition as any)._count?.ticketingParticipants || 0
-      return h('div', { class: 'flex items-center gap-1 text-sm' }, [
-        h('UIcon', { name: 'i-heroicons-user-group', class: 'w-4 h-4 text-success-600' }),
-        h('span', {}, count.toString()),
-      ])
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: t('edition.status_label'),
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      const convention = myConventions.value.find((conv) =>
-        conv.editions?.some((ed) => ed.id === edition.id)
-      )
-      const allowed = convention && canEditEdition(convention, edition.id)
-      return h('div', { class: 'flex justify-center' }, [
-        h(USelect, {
-          modelValue: edition.status,
-          items: editionStatusOptions.value,
-          valueKey: 'value',
-          size: 'xs',
-          disabled: !allowed,
-          ui: { content: 'min-w-fit' },
-          'onUpdate:modelValue': (value: string) =>
-            allowed &&
-            updateEditionStatus(
-              edition.id,
-              value as 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
-            ),
-        }),
-      ])
-    },
-  },
-  {
-    id: 'actions',
-    cell: ({ row }: TableCellParams) => {
-      const edition = row.original
-      const convention = myConventions.value.find((conv) =>
-        conv.editions?.some((ed) => ed.id === edition.id)
-      )
-      const canEdit = convention && canEditEdition(convention, edition.id)
-      const canDelete = convention && canDeleteEdition(convention, edition.id)
-
-      const actions: any[] = [
-        {
-          label: t('common.view'),
-          icon: 'i-heroicons-eye',
-          to: `/editions/${edition.id}`,
-        },
-      ]
-
-      if (canEdit) {
-        actions.push({
-          label: t('common.edit'),
-          icon: 'i-heroicons-pencil',
-          to: `/editions/${edition.id}/edit`,
-        })
-      }
-
-      if (canDelete) {
-        actions.push({
-          label: t('common.delete'),
-          icon: 'i-heroicons-trash',
-          color: 'error' as const,
-          onSelect: () => deleteEdition(edition.id),
-        })
-      }
-
-      return h(
-        resolveComponent('UDropdownMenu'),
-        {
-          items: [actions],
-        },
-        {
-          default: () =>
-            h(resolveComponent('UButton'), {
-              color: 'neutral',
-              variant: 'ghost',
-              icon: 'i-heroicons-ellipsis-horizontal',
-              size: 'xs',
-            }),
-        }
-      )
-    },
-  },
-]
-
-// Gestionnaire d'événement pour les actions
-const onEditionAction = (_action: unknown) => {
-  // Cette fonction est appelée automatiquement par UTable
-}
-
-// Computed pour optimiser les calculs
-const formatCreatedDate = computed(() => {
-  return (dateString: string) => new Date(dateString).toLocaleDateString()
-})
-
 // Fonctions pour gérer les organisateurs
-const openEditOrganizerModal = (convention: Convention, organizer: any) => {
-  if (!canManageOrganizers(convention)) {
+const openEditOrganizerModal = (organizer: DashboardOrganizer) => {
+  if (!selectedListItem.value || !canManageOrganizers(selectedListItem.value)) {
     toast.add({
       title: 'Action non autorisée',
       description: "Vous n'avez pas les droits pour modifier ce organisateur",
@@ -704,19 +454,17 @@ const openEditOrganizerModal = (convention: Convention, organizer: any) => {
     return
   }
 
-  selectedConventionForEdit.value = convention
   selectedOrganizerForEdit.value = organizer
   editOrganizerModalOpen.value = true
 }
 
 const closeEditOrganizerModal = () => {
   editOrganizerModalOpen.value = false
-  selectedConventionForEdit.value = null
   selectedOrganizerForEdit.value = null
 }
 
 const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
-  if (!selectedOrganizerForEdit.value || !selectedConventionForEdit.value) {
+  if (!selectedOrganizerForEdit.value || !selectedListItem.value) {
     return
   }
 
@@ -726,7 +474,7 @@ const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
     savingOrganizer.value = true
 
     await $fetch(
-      `/api/conventions/${selectedConventionForEdit.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
+      `/api/conventions/${selectedListItem.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
       {
         method: 'PUT',
         body: {
@@ -743,9 +491,8 @@ const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
       color: 'success',
     })
 
-    // Fermer la modal et recharger les conventions
     closeEditOrganizerModal()
-    await fetchMyConventions()
+    await fetchConventionDetail(selectedListItem.value.id)
   } catch (error: unknown) {
     handleError(error, {
       defaultTitleKey: 'errors.update_organizer_error',
@@ -757,7 +504,7 @@ const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
 }
 
 const removeOrganizer = async () => {
-  if (!selectedOrganizerForEdit.value || !selectedConventionForEdit.value) {
+  if (!selectedOrganizerForEdit.value || !selectedListItem.value) {
     return
   }
 
@@ -771,7 +518,7 @@ const removeOrganizer = async () => {
     savingOrganizer.value = true
 
     await $fetch(
-      `/api/conventions/${selectedConventionForEdit.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
+      `/api/conventions/${selectedListItem.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
       {
         method: 'DELETE',
       }
@@ -783,9 +530,8 @@ const removeOrganizer = async () => {
       color: 'success',
     })
 
-    // Fermer la modal et recharger les conventions
     closeEditOrganizerModal()
-    await fetchMyConventions()
+    await fetchConventionDetail(selectedListItem.value.id)
   } catch (error: unknown) {
     handleError(error, {
       defaultTitleKey: 'errors.remove_organizer_error',
@@ -796,13 +542,12 @@ const removeOrganizer = async () => {
   }
 }
 
-const openAddOrganizerModal = (convention: Convention) => {
-  selectedConventionForAdd.value = convention
+const openAddOrganizerModal = () => {
   // Réinitialiser les valeurs
   newOrganizerUser.value = null
   newOrganizersearchTerm.value = ''
   newOrganizerRights.value = {
-    title: null,
+    title: '',
     rights: {
       editConvention: false,
       deleteConvention: false,
@@ -820,19 +565,18 @@ const openAddOrganizerModal = (convention: Convention) => {
 
 const closeAddOrganizerModal = () => {
   addOrganizerModalOpen.value = false
-  selectedConventionForAdd.value = null
   newOrganizerUser.value = null
   newOrganizersearchTerm.value = ''
   searchedUsers.value = []
 }
 
 const addOrganizer = async () => {
-  if (!newOrganizerUser.value || !selectedConventionForAdd.value) {
+  if (!newOrganizerUser.value || !selectedListItem.value) {
     return
   }
 
   try {
-    await $fetch(`/api/conventions/${selectedConventionForAdd.value.id}/organizers`, {
+    await $fetch(`/api/conventions/${selectedListItem.value.id}/organizers`, {
       method: 'POST',
       body: {
         userId: newOrganizerUser.value.id,
@@ -848,9 +592,8 @@ const addOrganizer = async () => {
       color: 'success',
     })
 
-    // Fermer la modal et recharger les conventions
     closeAddOrganizerModal()
-    await fetchMyConventions()
+    await fetchConventionDetail(selectedListItem.value.id)
   } catch (error: unknown) {
     const httpError = error as HttpError
     console.error('Error adding organizer:', error)
@@ -863,11 +606,9 @@ const addOrganizer = async () => {
   }
 }
 
-const deleteEdition = async (id: number) => {
-  // Trouver l'édition à supprimer pour l'afficher dans le modal
-  const edition = myConventions.value
-    .flatMap((conv) => conv.editions || [])
-    .find((ed) => ed.id === id)
+const deleteEdition = (id: number) => {
+  // Trouver l'édition dans le détail
+  const edition = conventionDetail.value?.editions?.find((ed) => ed.id === id)
 
   if (edition) {
     editionToDelete.value = edition
@@ -882,7 +623,7 @@ const cancelDeleteEdition = () => {
 }
 
 const confirmDeleteEdition = async () => {
-  if (!editionToDelete.value) return
+  if (!editionToDelete.value || !selectedListItem.value) return
 
   try {
     deletingEdition.value = true
@@ -897,9 +638,9 @@ const confirmDeleteEdition = async () => {
       color: 'success',
     })
 
-    // Fermer le modal et recharger les conventions
     cancelDeleteEdition()
-    await fetchMyConventions()
+    // Recharger le détail ET la liste (pour mettre à jour le compteur d'éditions)
+    await Promise.all([fetchConventionDetail(selectedListItem.value.id), fetchConventionsList()])
   } catch (e: unknown) {
     const error = e as HttpError
     toast.add({
@@ -912,24 +653,12 @@ const confirmDeleteEdition = async () => {
   }
 }
 
-// Fonction pour récupérer les conventions de l'utilisateur
-const fetchMyConventions = async () => {
+// Fonctions de fetch
+const fetchConventionsList = async () => {
   try {
     conventionsLoading.value = true
-
-    const data = await $fetch<Convention[]>('/api/conventions/my-conventions')
-
+    const data = await $fetch<ConventionListItem[]>('/api/conventions/my-conventions')
     myConventions.value = data || []
-
-    // Mettre à jour la convention sélectionnée si la modal est ouverte
-    if (selectedConventionForEdit.value && editOrganizerModalOpen.value) {
-      const updatedConvention = myConventions.value.find(
-        (c) => c.id === selectedConventionForEdit.value!.id
-      )
-      if (updatedConvention) {
-        selectedConventionForEdit.value = updatedConvention
-      }
-    }
   } catch (error) {
     console.error('Error fetching conventions:', error)
     toast.add({
@@ -940,6 +669,34 @@ const fetchMyConventions = async () => {
     })
   } finally {
     conventionsLoading.value = false
+  }
+}
+
+// Guard contre les réponses périmées lors de changements rapides de sélection
+let currentDetailRequestId = 0
+
+const fetchConventionDetail = async (id: number) => {
+  const requestId = ++currentDetailRequestId
+  try {
+    detailLoading.value = true
+    const data = await $fetch<ConventionDashboardResponse>(`/api/conventions/${id}/dashboard`)
+    // Ignorer la réponse si une autre requête a été lancée entre-temps
+    if (requestId !== currentDetailRequestId) return
+    conventionDetail.value = { conventionId: id, ...data }
+  } catch (error) {
+    if (requestId !== currentDetailRequestId) return
+    console.error('Error fetching convention detail:', error)
+    toast.add({
+      title: t('common.error'),
+      description: t('conventions.cannot_load_conventions'),
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'error',
+    })
+    conventionDetail.value = null
+  } finally {
+    if (requestId === currentDetailRequestId) {
+      detailLoading.value = false
+    }
   }
 }
 
@@ -958,8 +715,10 @@ const deleteConvention = async (id: number) => {
         color: 'success',
       })
 
-      // Recharger la liste des conventions
-      await fetchMyConventions()
+      // Recharger la liste (l'auto-sélection gèrera le reste)
+      selectedConventionId.value = null
+      conventionDetail.value = null
+      await fetchConventionsList()
     } catch (error: unknown) {
       const httpError = error as HttpError
       console.error('Error deleting convention:', error)
@@ -973,48 +732,28 @@ const deleteConvention = async (id: number) => {
   }
 }
 
-// Helpers de droits (auteur ou admin actif = super droit implicite)
-function currentUserId() {
-  return authStore.user?.id
-}
-function findCurrentCollab(convention: Convention) {
-  const uid = currentUserId()
-  if (!uid) return undefined
-  return convention.organizers?.find((c: any) => c.user.id === uid)
-}
-const isAuthor = (convention: Convention) =>
-  currentUserId() && convention.authorId && convention.authorId === currentUserId()
-const hasFullAccess = (convention: Convention) =>
-  !!(isAuthor(convention) || authStore.isAdminModeActive)
-const canManageOrganizers = (convention: Convention) =>
-  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.manageOrganizers)
-const canAddEdition = (convention: Convention) =>
-  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.addEdition)
-const canEditConvention = (convention: Convention) =>
-  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.editConvention)
-const canDeleteConvention = (convention: Convention) =>
-  !!(hasFullAccess(convention) || findCurrentCollab(convention)?.rights?.deleteConvention)
-const canEditEdition = (convention: Convention, editionId: number) => {
-  if (hasFullAccess(convention)) return true
-  const collab = findCurrentCollab(convention)
-  if (!collab) return false
-  if (collab.rights?.editAllEditions) return true
-  return (collab as any).perEdition?.some((p: any) => p.editionId === editionId && p.canEdit)
-}
-const canDeleteEdition = (convention: Convention, editionId: number) => {
-  if (hasFullAccess(convention)) return true
-  const collab = findCurrentCollab(convention)
-  if (!collab) return false
-  if (collab.rights?.deleteAllEditions) return true
-  return (collab as any).perEdition?.some((p: any) => p.editionId === editionId && p.canDelete)
-}
+// Helpers de droits (utilise currentUserRights du serveur)
+const hasFullAccess = (conv: ConventionListItem) =>
+  !!(
+    (authStore.user?.id && conv.authorId && conv.authorId === authStore.user.id) ||
+    authStore.isAdminModeActive
+  )
+
+const canManageOrganizers = (conv: ConventionListItem) =>
+  !!(hasFullAccess(conv) || conv.currentUserRights?.manageOrganizers)
+
+const canAddEdition = (conv: ConventionListItem) =>
+  !!(hasFullAccess(conv) || conv.currentUserRights?.addEdition)
+
+const canEditConvention = (conv: ConventionListItem) =>
+  !!(hasFullAccess(conv) || conv.currentUserRights?.editConvention)
+
+const canDeleteConvention = (conv: ConventionListItem) =>
+  !!(hasFullAccess(conv) || conv.currentUserRights?.deleteConvention)
 
 // Fonction pour obtenir le nom d'affichage d'une édition
-const getEditionDisplayName = (edition: Edition) => {
-  const convention = myConventions.value.find((conv) =>
-    conv.editions?.some((ed) => ed.id === edition.id)
-  )
-  return getEditionDisplayNameWithConvention(edition, convention)
+const getEditionDisplayName = (edition: DashboardEdition) => {
+  return getEditionDisplayNameWithConvention(edition, selectedListItem.value!)
 }
 
 // Update edition status
@@ -1022,6 +761,8 @@ const updateEditionStatus = async (
   editionId: number,
   status: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
 ) => {
+  if (!selectedListItem.value) return
+
   try {
     await $fetch(`/api/editions/${editionId}/status`, {
       method: 'PATCH',
@@ -1034,8 +775,7 @@ const updateEditionStatus = async (
       color: 'success',
     })
 
-    // Reload conventions to update the status
-    await fetchMyConventions()
+    await fetchConventionDetail(selectedListItem.value.id)
   } catch (error) {
     console.error('Failed to update edition status:', error)
     toast.add({
@@ -1053,7 +793,7 @@ onMounted(async () => {
     return
   }
 
-  // Charger les conventions
-  await fetchMyConventions()
+  // Charger la liste des conventions
+  await fetchConventionsList()
 })
 </script>

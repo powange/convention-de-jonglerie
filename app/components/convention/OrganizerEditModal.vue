@@ -57,7 +57,7 @@
 
           <OrganizerRightsFields
             v-model="localRights"
-            :editions="editions as any[]"
+            :editions="editions"
             :convention-name="convention?.name"
             size="sm"
           />
@@ -89,13 +89,43 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-import type { Convention, Organizer, OrganizerRightsFormData, Edition } from '~/types'
+import type { OrganizerRights, OrganizerRightsFormData } from '~/types'
+
+/** Shape minimale d'un organisateur acceptée par ce modal */
+interface OrganizerEditData {
+  id: number
+  user: {
+    id: number
+    pseudo: string
+    email?: string | null
+    profilePicture?: string | null
+    emailHash?: string | null
+  }
+  title: string | null
+  rights?: OrganizerRights
+  perEdition?: {
+    editionId: number
+    canEdit?: boolean
+    canDelete?: boolean
+    canManageVolunteers?: boolean
+  }[]
+  perEditionRights?: {
+    editionId: number
+    rights: { canEdit?: boolean; canDelete?: boolean; canManageVolunteers?: boolean }
+  }[]
+}
+
+/** Shape minimale d'une édition acceptée par ce modal */
+interface EditionMinimal {
+  id: number
+  name?: string | null
+}
 
 interface Props {
   open: boolean
-  organizer: Organizer | null
-  convention: Convention | null
-  editions?: Edition[]
+  organizer: OrganizerEditData | null
+  convention: { id: number; name: string } | null
+  editions?: EditionMinimal[]
   loading?: boolean
 }
 
@@ -140,10 +170,12 @@ watch(
   () => props.organizer,
   (newOrganizer) => {
     if (newOrganizer) {
+      // perEdition (dashboard format) ou perEditionRights (organizer format)
+      const rawPerEdition = newOrganizer.perEdition ?? newOrganizer.perEditionRights ?? []
       localRights.value = {
         rights: newOrganizer.rights ? { ...newOrganizer.rights } : {},
-        title: newOrganizer.title || '',
-        perEdition: [...(newOrganizer.perEditionRights || newOrganizer.perEdition || [])],
+        title: newOrganizer.title ?? '',
+        perEdition: [...rawPerEdition],
       }
     }
   },
