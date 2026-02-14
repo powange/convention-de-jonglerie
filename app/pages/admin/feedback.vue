@@ -449,7 +449,7 @@ const pagination = ref({
 const filters = reactive({
   search: '',
   type: '',
-  resolved: '',
+  resolved: 'false',
 })
 
 // Options pour les filtres
