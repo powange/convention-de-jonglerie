@@ -35,6 +35,7 @@
     "api_path": "Ruta API...",
     "archive": "Archivar",
     "archive_convention": "Archivar convención",
+    "archive_error": "Error durante la operación de archivado",
     "auth_provider_email": "Email",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "La base de datos se ha restaurado con éxito desde la copia de seguridad",
     "backup_restore_warning": "Esta acción es irreversible. Todos los datos actuales se perderán.",
     "backup_restoring": "Restaurando...",
-    "can_edit": "Edición",
-    "can_manage_editions": "Ediciones",
-    "can_manage_volunteers": "Voluntarios",
     "cannot_load_activity": "No se puede cargar la actividad reciente",
     "cannot_load_stats": "No se pueden cargar las estadísticas",
     "cannot_load_users": "No se pueden cargar los usuarios",
-    "carpool_offers_count": "{count} coches compartidos",
     "categories": "Categorías",
     "change_profile_picture": "Cambiar foto de perfil",
     "change_profile_picture_description": "Subir o modificar la foto de perfil de este usuario",
@@ -110,8 +107,8 @@
     "conventions_count": "convención(es)",
     "conventions_management": "Gestión de convenciones",
     "conventions_management_description": "Ver todas las convenciones y sus ediciones",
+    "copy_error": "Error al copiar al portapapeles",
     "created_at": "Creado el",
-    "created_by": "Creado por",
     "cron_management": "Gestión de Tareas Automatizadas",
     "cron_management_description": "Gestionar y ejecutar tareas programadas (cron jobs)",
     "cron_system_active": "El sistema de tareas automatizadas está activo",
@@ -151,6 +148,7 @@
     "execute_tasks": "Ejecutar manualmente",
     "executing": "En curso...",
     "execution_time": "Tiempo de ejecución",
+    "export_error": "Error durante la exportación",
     "export_format_description": "Este JSON está formateado para ser reimportado a través de la página de importación de ediciones.",
     "export_format_title": "Formato de exportación",
     "export_json_description": "JSON formateado para importación de ediciones",
@@ -362,7 +360,6 @@
     "notifications_sent": "Notificaciones enviadas",
     "oldest_first": "Más antiguos primero",
     "organizers": "Colaboradores",
-    "organizers_count": "{count} colaboradores",
     "original_user": "Usuario original",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Seleccione un motivo de eliminación",
     "show_online_users_only": "Mostrar solo usuarios en línea",
     "slots_processed": "Franjas procesadas",
+    "sort": {
+      "created_asc": "Creación (antiguo)",
+      "created_desc": "Creación (reciente)",
+      "editions_asc": "Número de ediciones (ascendente)",
+      "editions_desc": "Número de ediciones (descendente)",
+      "name_asc": "Nombre (A-Z)",
+      "name_desc": "Nombre (Z-A)",
+      "updated_asc": "Modificación (antiguo)",
+      "updated_desc": "Modificación (reciente)"
+    },
     "stop_impersonation": "Volver a mi cuenta",
     "stop_impersonation_error": "Error al detener la suplantación",
     "success": "Éxito",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Ver todas las convenciones",
     "view_profile": "Ver perfil",
     "view_profiles": "Ver perfiles",
-    "volunteer_reminders": "Recordatorios de voluntarios",
-    "volunteers_count": "{count} voluntarios"
+    "volunteer_reminders": "Recordatorios de voluntarios"
   }
 }

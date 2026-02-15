@@ -35,6 +35,7 @@
     "api_path": "API-pad...",
     "archive": "Archiveren",
     "archive_convention": "Conventie archiveren",
+    "archive_error": "Fout bij archiveringbewerking",
     "auth_provider_email": "E-mail",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Database is succesvol hersteld vanuit de backup",
     "backup_restore_warning": "Deze actie is onomkeerbaar. Alle huidige gegevens gaan verloren.",
     "backup_restoring": "Herstellen...",
-    "can_edit": "Bewerken",
-    "can_manage_editions": "Edities",
-    "can_manage_volunteers": "Vrijwilligers",
     "cannot_load_activity": "Kan recente activiteit niet laden",
     "cannot_load_stats": "Kan statistieken niet laden",
     "cannot_load_users": "Kan gebruikers niet laden",
-    "carpool_offers_count": "{count} carpools",
     "categories": "Categorieën",
     "change_profile_picture": "Profielfoto wijzigen",
     "change_profile_picture_description": "Upload of wijzig de profielfoto van deze gebruiker",
@@ -110,8 +107,8 @@
     "conventions_count": "conventie(s)",
     "conventions_management": "Beheer van conventies",
     "conventions_management_description": "Bekijk alle conventies en hun edities",
+    "copy_error": "Fout bij kopiëren naar klembord",
     "created_at": "Gemaakt op",
-    "created_by": "Gemaakt door",
     "cron_management": "Beheer van Geautomatiseerde Taken",
     "cron_management_description": "Beheer en voer geplande taken uit (cron-taken)",
     "cron_system_active": "Het geautomatiseerde takensysteem is actief",
@@ -151,6 +148,7 @@
     "execute_tasks": "Handmatig uitvoeren",
     "executing": "Bezig...",
     "execution_time": "Uitvoeringstijd",
+    "export_error": "Fout bij exporteren",
     "export_format_description": "Deze JSON is geformatteerd voor herimport via de editie-importpagina.",
     "export_format_title": "Exportformaat",
     "export_json_description": "JSON geformatteerd voor editie-import",
@@ -362,7 +360,6 @@
     "notifications_sent": "Meldingen verzonden",
     "oldest_first": "Oudste eerst",
     "organizers": "Medewerkers",
-    "organizers_count": "{count} medewerkers",
     "original_user": "Oorspronkelijke gebruiker",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Selecteer een reden voor verwijdering",
     "show_online_users_only": "Alleen online gebruikers tonen",
     "slots_processed": "Verwerkte tijdsloten",
+    "sort": {
+      "created_asc": "Aanmaakdatum (oud)",
+      "created_desc": "Aanmaakdatum (nieuw)",
+      "editions_asc": "Aantal uitgaven (oplopend)",
+      "editions_desc": "Aantal uitgaven (aflopend)",
+      "name_asc": "Naam (A-Z)",
+      "name_desc": "Naam (Z-A)",
+      "updated_asc": "Wijziging (oud)",
+      "updated_desc": "Wijziging (nieuw)"
+    },
     "stop_impersonation": "Terug naar mijn account",
     "stop_impersonation_error": "Fout bij het stoppen van imitatie",
     "success": "Succes",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Alle conventies bekijken",
     "view_profile": "Profiel bekijken",
     "view_profiles": "Profielen bekijken",
-    "volunteer_reminders": "Vrijwilligersherinneringen",
-    "volunteers_count": "{count} vrijwilligers"
+    "volunteer_reminders": "Vrijwilligersherinneringen"
   }
 }

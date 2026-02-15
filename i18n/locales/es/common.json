@@ -108,7 +108,6 @@
     "last_name": "Apellido",
     "link_copied": "Enlace copiado",
     "loading": "Cargando...",
-    "location": "Ubicación",
     "logo": "Logo",
     "lunch": "Almuerzo",
     "manage": "Gestionar",
@@ -1101,12 +1100,5 @@
     "name_min_3": "El nombre debe contener al menos 3 caracteres",
     "phone_required": "El número de teléfono es requerido",
     "program_max_10000": "El programa no puede exceder 10000 caracteres"
-  },
-  "volunteers": {
-    "confirm_delete_slot": "¿Estás seguro de que quieres eliminar esta franja horaria?",
-    "loading_error": "Error al cargar los datos de planificación",
-    "slot_created": "Franja horaria creada",
-    "slot_deleted": "Franja horaria eliminada",
-    "slot_updated": "Franja horaria actualizada"
   }
 }

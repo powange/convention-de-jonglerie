@@ -35,6 +35,7 @@
     "api_path": "API-Pfad...",
     "archive": "Archivieren",
     "archive_convention": "Konvention archivieren",
+    "archive_error": "Fehler beim Archivierungsvorgang",
     "auth_provider_email": "E-Mail",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Die Datenbank wurde erfolgreich aus dem Backup wiederhergestellt",
     "backup_restore_warning": "Diese Aktion ist unumkehrbar. Alle aktuellen Daten gehen verloren.",
     "backup_restoring": "Wiederherstellung läuft...",
-    "can_edit": "Bearbeitung",
-    "can_manage_editions": "Ausgaben",
-    "can_manage_volunteers": "Freiwillige",
     "cannot_load_activity": "Aktuelle Aktivität kann nicht geladen werden",
     "cannot_load_stats": "Statistiken können nicht geladen werden",
     "cannot_load_users": "Benutzer können nicht geladen werden",
-    "carpool_offers_count": "{count} Fahrgemeinschaften",
     "categories": "Kategorien",
     "change_profile_picture": "Profilbild ändern",
     "change_profile_picture_description": "Profilbild dieses Benutzers hochladen oder ändern",
@@ -110,8 +107,8 @@
     "conventions_count": "Convention(s)",
     "conventions_management": "Verwaltung der Conventions",
     "conventions_management_description": "Alle Conventions und ihre Ausgaben einsehen",
+    "copy_error": "Fehler beim Kopieren in die Zwischenablage",
     "created_at": "Erstellt am",
-    "created_by": "Erstellt von",
     "cron_management": "Verwaltung automatischer Aufgaben",
     "cron_management_description": "Geplante Aufgaben verwalten und ausführen (Cron-Jobs)",
     "cron_system_active": "Das System für automatische Aufgaben ist aktiv",
@@ -151,6 +148,7 @@
     "execute_tasks": "Manuell ausführen",
     "executing": "Wird ausgeführt...",
     "execution_time": "Ausführungszeit",
+    "export_error": "Fehler beim Export",
     "export_format_description": "Diese JSON ist formatiert für den Re-Import über die Editions-Import-Seite.",
     "export_format_title": "Export-Format",
     "export_json_description": "JSON formatiert für Editions-Import",
@@ -362,7 +360,6 @@
     "notifications_sent": "Benachrichtigungen gesendet",
     "oldest_first": "Älteste zuerst",
     "organizers": "Mitarbeiter",
-    "organizers_count": "{count} Mitarbeiter",
     "original_user": "Ursprünglicher Benutzer",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Wählen Sie einen Löschungsgrund",
     "show_online_users_only": "Nur Online-Benutzer anzeigen",
     "slots_processed": "Verarbeitete Zeitfenster",
+    "sort": {
+      "created_asc": "Erstellung (älteste)",
+      "created_desc": "Erstellung (neueste)",
+      "editions_asc": "Anzahl Ausgaben (aufsteigend)",
+      "editions_desc": "Anzahl Ausgaben (absteigend)",
+      "name_asc": "Name (A-Z)",
+      "name_desc": "Name (Z-A)",
+      "updated_asc": "Änderung (älteste)",
+      "updated_desc": "Änderung (neueste)"
+    },
     "stop_impersonation": "Zurück zu meinem Konto",
     "stop_impersonation_error": "Fehler beim Stoppen der Personifikation",
     "success": "Erfolg",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Alle Conventions anzeigen",
     "view_profile": "Profil anzeigen",
     "view_profiles": "Profile anzeigen",
-    "volunteer_reminders": "Freiwilligen-Erinnerungen",
-    "volunteers_count": "{count} Freiwillige"
+    "volunteer_reminders": "Freiwilligen-Erinnerungen"
   }
 }

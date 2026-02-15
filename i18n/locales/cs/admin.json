@@ -35,6 +35,7 @@
     "api_path": "Chemin API...",
     "archive": "Archiv",
     "archive_convention": "Archivovat dohodu",
+    "archive_error": "Chyba během operace archivace",
     "auth_provider_email": "E-mail",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Databáze byla úspěšně obnovena ze zálohy.",
     "backup_restore_warning": "Tato akce je nevratná. Všechna aktuální data budou ztracena.",
     "backup_restoring": "Probíhá restaurování...",
-    "can_edit": "Edice",
-    "can_manage_editions": "Vydal",
-    "can_manage_volunteers": "Dobrovolníci",
     "cannot_load_activity": "Nelze načíst poslední aktivitu",
     "cannot_load_stats": "Nelze načíst statistiky",
     "cannot_load_users": "Nelze načíst uživatele",
-    "carpool_offers_count": "{count} carpools",
     "categories": "Kategorie",
     "change_profile_picture": "Změna profilové fotografie",
     "change_profile_picture_description": "Stažení nebo úprava profilové fotografie tohoto uživatele",
@@ -110,8 +107,8 @@
     "conventions_count": "dohoda(y)",
     "conventions_management": "Správa dohod",
     "conventions_management_description": "Zobrazit všechny sjezdy a jejich vydání",
+    "copy_error": "Chyba při kopírování do schránky",
     "created_at": "Vytvořeno dne",
-    "created_by": "Vytvořil",
     "cron_management": "Automatizovaná správa úkolů",
     "cron_management_description": "Správa a spouštění naplánovaných úloh (úloh cron)",
     "cron_system_active": "Systém automatizovaných úkolů je aktivní",
@@ -151,6 +148,7 @@
     "execute_tasks": "Ruční spuštění",
     "executing": "Probíhá...",
     "execution_time": "Doba provedení",
+    "export_error": "Chyba při exportu",
     "export_format_description": "Tento JSON je naformátován tak, aby jej bylo možné znovu importovat prostřednictvím stránky pro úpravu importu.",
     "export_format_title": "Formát exportu",
     "export_json_description": "JSON naformátovaný pro úpravu importu",
@@ -362,7 +360,6 @@
     "notifications_sent": "Odeslaná oznámení",
     "oldest_first": "Nejdříve starší",
     "organizers": "Zaměstnanci",
-    "organizers_count": "{count} zaměstnanců",
     "original_user": "Původní uživatel",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Vyberte si důvod",
     "show_online_users_only": "Zobrazit pouze online uživatele",
     "slots_processed": "Ošetřené sloty",
+    "sort": {
+      "created_asc": "Vytvoření (nejstarší)",
+      "created_desc": "Vytvoření (nejnovější)",
+      "editions_asc": "Počet edic (vzestupně)",
+      "editions_desc": "Počet edic (sestupně)",
+      "name_asc": "Název (A-Z)",
+      "name_desc": "Název (Z-A)",
+      "updated_asc": "Úprava (nejstarší)",
+      "updated_desc": "Úprava (nejnovější)"
+    },
     "stop_impersonation": "Zpět na můj účet",
     "stop_impersonation_error": "Chyba při zastavení zosobnění",
     "success": "Úspěch",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Zobrazit všechny dohody",
     "view_profile": "Zobrazit profil",
     "view_profiles": "Zobrazit profily",
-    "volunteer_reminders": "Připomínky pro dobrovolníky",
-    "volunteers_count": "{count} dobrovolníků"
+    "volunteer_reminders": "Připomínky pro dobrovolníky"
   }
 }

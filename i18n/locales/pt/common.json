@@ -108,7 +108,6 @@
     "last_name": "Apelido",
     "link_copied": "Link copiado",
     "loading": "A carregar...",
-    "location": "Local",
     "logo": "Logo",
     "lunch": "Almoço",
     "manage": "Gerir",
@@ -1101,12 +1100,5 @@
     "name_min_3": "O nome deve conter pelo menos 3 caracteres",
     "phone_required": "O número de telefone é obrigatório",
     "program_max_10000": "O programa não pode exceder 10000 caracteres"
-  },
-  "volunteers": {
-    "confirm_delete_slot": "Tem certeza de que deseja excluir este horário?",
-    "loading_error": "Erro ao carregar dados de planejamento",
-    "slot_created": "Horário criado",
-    "slot_deleted": "Horário excluído",
-    "slot_updated": "Horário atualizado"
   }
 }

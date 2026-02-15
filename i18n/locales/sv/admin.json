@@ -35,6 +35,7 @@
     "api_path": "Chemin API...",
     "archive": "Arkiv",
     "archive_convention": "Arkivera avtalet",
+    "archive_error": "Fel under arkiveringsoperation",
     "auth_provider_email": "E-post",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Databasen har framgångsrikt återställts från säkerhetskopian",
     "backup_restore_warning": "Denna åtgärd är irreversibel. All aktuell data kommer att gå förlorad.",
     "backup_restoring": "Restaurering pågår...",
-    "can_edit": "Utgåva",
-    "can_manage_editions": "Publicerad av",
-    "can_manage_volunteers": "Volontärer",
     "cannot_load_activity": "Går inte att ladda senaste aktivitet",
     "cannot_load_stats": "Det går inte att ladda statistik",
     "cannot_load_users": "Det går inte att ladda användare",
-    "carpool_offers_count": "{count} bilpooler",
     "categories": "Kategorier",
     "change_profile_picture": "Ändra profilbild",
     "change_profile_picture_description": "Ladda ner eller ändra den här användarens profilfoto",
@@ -110,8 +107,8 @@
     "conventions_count": "convention(s)",
     "conventions_management": "Avtalshantering",
     "conventions_management_description": "Se alla kongresser och deras utgåvor",
+    "copy_error": "Fel vid kopiering till urklipp",
     "created_at": "Skapad på",
-    "created_by": "Skapad av",
     "cron_management": "Automatiserad uppgiftshantering",
     "cron_management_description": "Hantera och köra schemalagda uppgifter (cron-jobb)",
     "cron_system_active": "Det automatiska uppgiftssystemet är aktivt",
@@ -151,6 +148,7 @@
     "execute_tasks": "Kör manuellt",
     "executing": "Pågående...",
     "execution_time": "Exekveringstid",
+    "export_error": "Fel under export",
     "export_format_description": "Denna JSON är formaterad så att den kan återimporteras via sidan för redigering av import.",
     "export_format_title": "Exportformat",
     "export_json_description": "JSON-formaterad för importredigering",
@@ -362,7 +360,6 @@
     "notifications_sent": "Meddelanden skickas",
     "oldest_first": "Äldre först",
     "organizers": "Anställda",
-    "organizers_count": "{count} anställda",
     "original_user": "Ursprunglig användare",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Välj en anledning",
     "show_online_users_only": "Visa endast online-användare",
     "slots_processed": "Slots behandlade",
+    "sort": {
+      "created_asc": "Skapelse (äldsta)",
+      "created_desc": "Skapelse (nyaste)",
+      "editions_asc": "Antal utgåvor (stigande)",
+      "editions_desc": "Antal utgåvor (fallande)",
+      "name_asc": "Namn (A-Z)",
+      "name_desc": "Namn (Z-A)",
+      "updated_asc": "Ändring (äldsta)",
+      "updated_desc": "Ändring (nyaste)"
+    },
     "stop_impersonation": "Tillbaka till mitt konto",
     "stop_impersonation_error": "Fel vid stopp av personifiering",
     "success": "Framgång",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Se alla avtal",
     "view_profile": "Visa profil",
     "view_profiles": "Visa profiler",
-    "volunteer_reminders": "Påminnelser om volontärarbete",
-    "volunteers_count": "{count} volontärer"
+    "volunteer_reminders": "Påminnelser om volontärarbete"
   }
 }

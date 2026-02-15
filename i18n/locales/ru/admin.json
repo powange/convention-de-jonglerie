@@ -35,6 +35,7 @@
     "api_path": "Путь API...",
     "archive": "Архивировать",
     "archive_convention": "Архивировать конвенцию",
+    "archive_error": "Ошибка при архивировании",
     "auth_provider_email": "Email",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "База данных была успешно восстановлена из резервной копии",
     "backup_restore_warning": "Это действие необратимо. Все текущие данные будут потеряны.",
     "backup_restoring": "Восстановление...",
-    "can_edit": "Редактирование",
-    "can_manage_editions": "Издания",
-    "can_manage_volunteers": "Волонтёры",
     "cannot_load_activity": "Невозможно загрузить недавнюю активность",
     "cannot_load_stats": "Невозможно загрузить статистику",
     "cannot_load_users": "Невозможно загрузить пользователей",
-    "carpool_offers_count": "{count} поездок",
     "categories": "Категории",
     "change_profile_picture": "Изменить фото профиля",
     "change_profile_picture_description": "Загрузить или изменить фото профиля этого пользователя",
@@ -110,8 +107,8 @@
     "conventions_count": "конвенция(й)",
     "conventions_management": "Управление конвенциями",
     "conventions_management_description": "Просмотр всех конвенций и их изданий",
+    "copy_error": "Ошибка при копировании в буфер обмена",
     "created_at": "Создано",
-    "created_by": "Создано",
     "cron_management": "Управление автоматизированными задачами",
     "cron_management_description": "Управление и выполнение запланированных задач (cron jobs)",
     "cron_system_active": "Система автоматизированных задач активна",
@@ -151,6 +148,7 @@
     "execute_tasks": "Выполнить вручную",
     "executing": "Выполняется...",
     "execution_time": "Время выполнения",
+    "export_error": "Ошибка при экспорте",
     "export_format_description": "Этот JSON отформатирован для повторного импорта через страницу импорта изданий.",
     "export_format_title": "Формат экспорта",
     "export_json_description": "JSON отформатированный для импорта изданий",
@@ -362,7 +360,6 @@
     "notifications_sent": "Уведомления отправлены",
     "oldest_first": "Старейшие сначала",
     "organizers": "Сотрудники",
-    "organizers_count": "{count} сотрудников",
     "original_user": "Исходный пользователь",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Выберите причину удаления",
     "show_online_users_only": "Показать только пользователей онлайн",
     "slots_processed": "Обработанные слоты",
+    "sort": {
+      "created_asc": "Создание (старое)",
+      "created_desc": "Создание (новое)",
+      "editions_asc": "Количество выпусков (возрастание)",
+      "editions_desc": "Количество выпусков (убывание)",
+      "name_asc": "Название (A-Z)",
+      "name_desc": "Название (Z-A)",
+      "updated_asc": "Изменение (старое)",
+      "updated_desc": "Изменение (новое)"
+    },
     "stop_impersonation": "Вернуться к моей учетной записи",
     "stop_impersonation_error": "Ошибка при остановке олицетворения",
     "success": "Успех",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Просмотреть все конвенции",
     "view_profile": "Просмотреть профиль",
     "view_profiles": "Просмотреть профили",
-    "volunteer_reminders": "Напоминания волонтерам",
-    "volunteers_count": "{count} волонтеров"
+    "volunteer_reminders": "Напоминания волонтерам"
   }
 }

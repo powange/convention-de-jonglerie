@@ -108,7 +108,6 @@
     "last_name": "Nachname",
     "link_copied": "Link kopiert",
     "loading": "Laden...",
-    "location": "Ort",
     "logo": "Logo",
     "lunch": "Mittagessen",
     "manage": "Verwalten",
@@ -1101,12 +1100,5 @@
     "name_min_3": "Name muss mindestens 3 Zeichen enthalten",
     "phone_required": "Telefonnummer ist erforderlich",
     "program_max_10000": "Das Programm darf 10000 Zeichen nicht überschreiten"
-  },
-  "volunteers": {
-    "confirm_delete_slot": "Möchten Sie dieses Zeitslot wirklich löschen?",
-    "loading_error": "Fehler beim Laden der Planungsdaten",
-    "slot_created": "Zeitslot erstellt",
-    "slot_deleted": "Zeitslot gelöscht",
-    "slot_updated": "Zeitslot aktualisiert"
   }
 }

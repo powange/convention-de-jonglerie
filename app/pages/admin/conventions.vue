@@ -87,20 +87,10 @@
             v-model="searchQuery"
             :placeholder="$t('admin.search_conventions_placeholder')"
             icon="i-heroicons-magnifying-glass"
-            size="sm"
           />
         </div>
-        <USelect v-model="sortBy" :items="sortOptions" size="sm" class="w-56" />
-        <USelect v-model="archivedFilter" :items="archivedFilterOptions" size="sm" class="w-48" />
-        <UButton
-          :icon="compactView ? 'i-heroicons-list-bullet' : 'i-heroicons-squares-2x2'"
-          color="neutral"
-          variant="soft"
-          size="sm"
-          @click="compactView = !compactView"
-        >
-          {{ compactView ? 'Vue détaillée' : 'Vue compacte' }}
-        </UButton>
+        <USelect v-model="sortBy" :items="sortOptions" class="w-56" />
+        <USelect v-model="archivedFilter" :items="archivedFilterOptions" class="w-48" />
       </div>
     </div>
 
@@ -119,12 +109,12 @@
       />
     </div>
 
-    <!-- Vue compacte -->
-    <div v-else-if="compactView" class="space-y-3">
-      <div
+    <div v-else class="space-y-3">
+      <UCard
         v-for="convention in sortedConventions"
         :key="convention.id"
-        class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+        variant="subtle"
+        :ui="{ root: 'overflow-hidden hover:shadow-md transition-shadow', body: 'p-0' }"
       >
         <div
           class="px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
@@ -162,8 +152,7 @@
                   </UBadge>
                 </div>
                 <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {{ formatAuthorName(convention.author) }} • {{ $t('admin.created_at') }}
-                  {{ formatDate(convention.createdAt) }}
+                  {{ $t('admin.created_at') }} {{ formatDate(convention.createdAt) }}
                   <span v-if="convention.updatedAt !== convention.createdAt">
                     • {{ $t('admin.updated_at') }} {{ formatDate(convention.updatedAt) }}
                   </span>
@@ -171,12 +160,12 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-3 ml-4 flex-shrink-0">
-              <UBadge color="primary" variant="soft" size="sm">
+            <div class="flex items-center gap-3 ml-4 shrink-0">
+              <UBadge color="primary" variant="soft" size="md">
                 {{ (convention as any)._count?.editions || 0 }}
                 {{ $t('admin.editions').toLowerCase() }}
               </UBadge>
-              <UBadge color="neutral" variant="soft" size="sm">
+              <UBadge color="neutral" variant="soft" size="md">
                 {{ (convention as any)._count?.organizers || 0 }}
                 {{ $t('admin.organizers').toLowerCase() }}
               </UBadge>
@@ -280,73 +269,77 @@
               <div v-if="convention.editions.length === 0" class="text-center py-4 text-gray-500">
                 {{ $t('admin.no_editions') }}
               </div>
-              <div v-else class="grid gap-3">
-                <div
+              <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                <UCard
                   v-for="edition in convention.editions"
                   :key="edition.id"
-                  class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-900 hover:shadow-sm transition-shadow"
+                  variant="outline"
+                  :ui="{
+                    root: 'overflow-hidden hover:shadow-sm transition-shadow',
+                    body: 'flex gap-0 p-0',
+                  }"
                 >
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                      <div v-if="edition.imageUrl" class="w-12 h-12 flex-shrink-0">
-                        <img
-                          :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
-                          :alt="edition.name || convention.name"
-                          class="w-12 h-12 object-cover rounded-lg"
-                        />
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                          <h6 class="font-medium text-sm truncate">
-                            {{ edition.name || convention.name }}
-                          </h6>
-                          <UBadge
-                            :color="
-                              edition.status === 'PUBLISHED'
-                                ? 'success'
-                                : edition.status === 'PLANNED'
-                                  ? 'warning'
-                                  : edition.status === 'CANCELLED'
-                                    ? 'error'
-                                    : 'neutral'
-                            "
-                            variant="soft"
-                            size="xs"
-                          >
-                            {{ $t(`edition.status.${edition.status?.toLowerCase()}`) }}
-                          </UBadge>
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          <UIcon name="i-heroicons-calendar-days" class="w-3 h-3 inline" />
-                          {{ formatDateRange(edition.startDate, edition.endDate) }} •
-                          <UIcon name="i-heroicons-map-pin" class="w-3 h-3 inline" />
-                          {{ edition.city }}, {{ edition.country }}
-                        </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {{ $t('admin.created_at') }} {{ formatDate(edition.createdAt) }}
-                          <span v-if="edition.updatedAt !== edition.createdAt">
-                            • {{ $t('admin.updated_at') }} {{ formatDate(edition.updatedAt) }}
-                          </span>
-                        </p>
-                      </div>
+                  <div class="flex">
+                    <!-- Image de l'édition -->
+                    <div v-if="edition.imageUrl" class="w-24 shrink-0 overflow-hidden">
+                      <img
+                        :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
+                        :alt="edition.name || convention.name"
+                        class="w-full h-full object-cover"
+                      />
                     </div>
 
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                      <UBadge color="primary" variant="soft" size="xs">
-                        <UIcon name="i-heroicons-hand-raised" class="w-3 h-3" />
-                        {{ (edition as any)._count?.volunteerApplications || 0 }}
-                      </UBadge>
-                      <UBadge color="green" variant="soft" size="xs">
-                        <UIcon name="i-heroicons-truck" class="w-3 h-3" />
-                        {{ (edition as any)._count?.carpoolOffers || 0 }}
-                      </UBadge>
-                      <div class="flex gap-1">
+                    <div class="p-3 min-w-0 flex-1">
+                      <!-- Nom et statut -->
+                      <div class="flex items-center gap-2 flex-wrap mb-2">
+                        <h6 class="font-medium truncate">
+                          {{ edition.name || convention.name }}
+                        </h6>
+                        <UBadge
+                          :color="getEditionStatusColor(edition.status)"
+                          variant="soft"
+                          size="sm"
+                        >
+                          {{ $t(`edition.status.${edition.status?.toLowerCase()}`) }}
+                        </UBadge>
+                      </div>
+
+                      <!-- Infos -->
+                      <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                        <p class="flex items-center gap-1">
+                          <UIcon name="i-heroicons-calendar-days" class="w-4 h-4 shrink-0" />
+                          {{ formatDateRange(edition.startDate, edition.endDate) }}
+                        </p>
+                        <p class="flex items-center gap-1">
+                          <UIcon name="i-heroicons-map-pin" class="w-4 h-4 shrink-0" />
+                          {{ edition.city }},
+                          <FlagIcon :code="getCountryCode(edition.country)" />
+                          {{ edition.country }}
+                        </p>
+                      </div>
+
+                      <!-- Compteurs -->
+                      <div class="flex items-center gap-2 mt-2">
+                        <UBadge color="primary" variant="soft" size="sm">
+                          <UIcon name="i-heroicons-hand-raised" class="w-4 h-4" />
+                          {{ (edition as any)._count?.volunteerApplications || 0 }}
+                        </UBadge>
+                        <UBadge color="green" variant="soft" size="sm">
+                          <UIcon name="i-heroicons-truck" class="w-4 h-4" />
+                          {{ (edition as any)._count?.carpoolOffers || 0 }}
+                        </UBadge>
+                      </div>
+
+                      <!-- Actions -->
+                      <div
+                        class="flex items-center gap-1 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800"
+                      >
                         <UButton
                           :to="`/editions/${edition.id}`"
                           color="neutral"
                           variant="ghost"
                           icon="i-heroicons-eye"
-                          size="xs"
+                          size="sm"
                           :title="$t('common.view')"
                         />
                         <UButton
@@ -354,7 +347,7 @@
                           color="neutral"
                           variant="ghost"
                           icon="i-heroicons-cog-6-tooth"
-                          size="xs"
+                          size="sm"
                           :title="$t('common.manage')"
                         />
                         <UDropdownMenu :items="getDropdownItems(edition.id)">
@@ -362,319 +355,21 @@
                             color="neutral"
                             variant="ghost"
                             icon="i-heroicons-ellipsis-horizontal"
-                            size="xs"
+                            size="sm"
                           />
                         </UDropdownMenu>
                       </div>
                     </div>
                   </div>
-                </div>
+                </UCard>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </UCard>
 
       <!-- État vide -->
       <div v-if="sortedConventions.length === 0" class="text-center py-12">
-        <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400" />
-        <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
-          {{ $t('admin.no_conventions_found') }}
-        </h3>
-        <p class="mt-1 text-sm text-gray-500">
-          {{
-            debouncedSearchQuery
-              ? $t('admin.no_conventions_search')
-              : $t('admin.no_conventions_yet')
-          }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Vue détaillée (ancienne) -->
-    <div v-else class="space-y-6">
-      <div
-        v-for="convention in sortedConventions"
-        :key="convention.id"
-        class="border rounded-lg overflow-hidden"
-      >
-        <!-- En-tête de la convention -->
-        <div class="bg-gray-50 dark:bg-gray-800 px-6 py-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <div v-if="convention.logo" class="w-12 h-12">
-                <img
-                  :src="getImageUrl(convention.logo, 'convention', convention.id) || ''"
-                  :alt="convention.name"
-                  class="w-12 h-12 object-cover rounded-lg"
-                />
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold flex items-center gap-2">
-                  {{ convention.name }}
-                  <UBadge
-                    v-if="(convention as any).isArchived"
-                    color="warning"
-                    variant="soft"
-                    size="xs"
-                  >
-                    {{ $t('common.archived') }}
-                  </UBadge>
-                </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ $t('admin.created_by') }} {{ formatAuthorName(convention.author) }} •
-                  {{ $t('admin.created_at') }} {{ formatDate(convention.createdAt) }}
-                  <span v-if="convention.updatedAt !== convention.createdAt">
-                    • {{ $t('admin.updated_at') }} {{ formatDate(convention.updatedAt) }}
-                  </span>
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <UBadge color="primary" variant="soft">
-                {{
-                  $t('admin.editions_count', { count: (convention as any)._count?.editions || 0 })
-                }}
-              </UBadge>
-              <UBadge color="neutral" variant="soft">
-                {{
-                  $t('admin.organizers_count', {
-                    count: (convention as any)._count?.organizers || 0,
-                  })
-                }}
-              </UBadge>
-              <UDropdownMenu
-                :items="[
-                  [
-                    {
-                      label: $t('common.edit'),
-                      icon: 'i-heroicons-pencil-square',
-                      to: `/conventions/${convention.id}/edit`,
-                    },
-                  ],
-                  [
-                    ...((convention as any).isArchived
-                      ? [
-                          {
-                            label: $t('admin.unarchive_convention'),
-                            icon: 'i-heroicons-arrow-up-tray',
-                            color: 'success',
-                            onSelect: () =>
-                              toggleArchiveConvention(
-                                convention.id,
-                                (convention as any).isArchived
-                              ),
-                          },
-                        ]
-                      : [
-                          {
-                            label: $t('admin.archive_convention'),
-                            icon: 'i-heroicons-archive-box',
-                            color: 'warning',
-                            onSelect: () =>
-                              toggleArchiveConvention(
-                                convention.id,
-                                (convention as any).isArchived
-                              ),
-                          },
-                        ]),
-                    {
-                      label: $t('admin.pages.conventions.delete_convention_permanently'),
-                      icon: 'i-heroicons-trash',
-                      color: 'error',
-                      onSelect: () => deleteConventionPermanently(convention as any),
-                    },
-                  ],
-                ]"
-              >
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal"
-                  size="xs"
-                />
-              </UDropdownMenu>
-            </div>
-          </div>
-
-          <div v-if="convention.description" class="mt-3">
-            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-              {{ convention.description }}
-            </p>
-          </div>
-
-          <!-- Liste des organisateurs -->
-          <div v-if="convention.organizers.length > 0" class="mt-4">
-            <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-              {{ $t('admin.organizers') }} ({{ convention.organizers.length }})
-            </h5>
-            <div class="flex flex-wrap gap-2">
-              <div
-                v-for="organizer in convention.organizers"
-                :key="organizer.id"
-                class="flex items-center gap-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2"
-              >
-                <UiUserAvatar :user="organizer.user" size="xs" />
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {{ formatAuthorName(organizer.user) }}
-                  </div>
-                  <div class="flex items-center gap-1 text-xs text-gray-500">
-                    <UBadge v-if="(organizer as any).canEdit" color="info" variant="soft" size="xs">
-                      {{ $t('admin.can_edit') }}
-                    </UBadge>
-                    <UBadge
-                      v-if="organizer.canManageVolunteers"
-                      color="success"
-                      variant="soft"
-                      size="xs"
-                    >
-                      {{ $t('admin.can_manage_volunteers') }}
-                    </UBadge>
-                    <UBadge
-                      v-if="(organizer as any).canManageEditions"
-                      color="primary"
-                      variant="soft"
-                      size="xs"
-                    >
-                      {{ $t('admin.can_manage_editions') }}
-                    </UBadge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Éditions de la convention -->
-        <div class="p-6">
-          <div v-if="convention.editions.length === 0" class="text-center py-8 text-gray-500">
-            {{ $t('admin.no_editions') }}
-          </div>
-
-          <div v-else class="space-y-4">
-            <h4 class="font-medium text-gray-900 dark:text-white mb-4">
-              {{ $t('admin.editions') }} ({{ convention.editions.length }})
-            </h4>
-
-            <div class="grid gap-4">
-              <div
-                v-for="edition in convention.editions"
-                :key="edition.id"
-                class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              >
-                <div class="flex items-start justify-between">
-                  <div class="flex items-start gap-3 flex-1">
-                    <div v-if="edition.imageUrl" class="w-16 h-16 flex-shrink-0">
-                      <img
-                        :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
-                        :alt="edition.name || convention.name"
-                        class="w-16 h-16 object-cover rounded-lg"
-                      />
-                    </div>
-                    <div class="flex-1">
-                      <div class="flex items-center gap-2">
-                        <h5 class="font-medium">
-                          {{ edition.name || convention.name }}
-                        </h5>
-                        <UBadge
-                          :color="
-                            edition.status === 'PUBLISHED'
-                              ? 'success'
-                              : edition.status === 'PLANNED'
-                                ? 'warning'
-                                : edition.status === 'CANCELLED'
-                                  ? 'error'
-                                  : 'neutral'
-                          "
-                          variant="soft"
-                          size="xs"
-                        >
-                          {{ $t(`edition.status.${edition.status?.toLowerCase()}`) }}
-                        </UBadge>
-                      </div>
-
-                      <div class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <div class="flex items-center gap-4">
-                          <span class="flex items-center gap-1">
-                            <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
-                            {{ formatDateRange(edition.startDate, edition.endDate) }}
-                          </span>
-                          <span class="flex items-center gap-1">
-                            <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
-                            {{ edition.city }}, {{ edition.country }}
-                          </span>
-                        </div>
-
-                        <p class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-user" class="w-4 h-4" />
-                          {{ $t('admin.created_by') }} {{ formatAuthorName(edition.creator) }}
-                        </p>
-                        <p class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-clock" class="w-4 h-4" />
-                          {{ $t('admin.created_at') }} {{ formatDate(edition.createdAt) }}
-                          <span v-if="edition.updatedAt !== edition.createdAt">
-                            • {{ $t('admin.updated_at') }} {{ formatDate(edition.updatedAt) }}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col items-end gap-2 ml-4">
-                    <div class="flex items-center gap-3">
-                      <div class="flex items-center gap-1.5">
-                        <UIcon name="i-heroicons-hand-raised" class="w-4 h-4 text-primary-500" />
-                        <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">
-                          {{ (edition as any)._count?.volunteerApplications || 0 }}
-                        </span>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">
-                          {{
-                            $t('admin.volunteers_count', {
-                              count: (edition as any)._count?.volunteerApplications || 0,
-                            })
-                              .split(' ')
-                              .slice(1)
-                              .join(' ')
-                          }}
-                        </span>
-                      </div>
-                      <div class="flex items-center gap-1.5">
-                        <UIcon name="i-heroicons-truck" class="w-4 h-4 text-green-500" />
-                        <span class="text-lg font-semibold text-green-600 dark:text-green-400">
-                          {{ (edition as any)._count?.carpoolOffers || 0 }}
-                        </span>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">
-                          {{
-                            $t('admin.carpool_offers_count', {
-                              count: (edition as any)._count?.carpoolOffers || 0,
-                            })
-                              .split(' ')
-                              .slice(1)
-                              .join(' ')
-                          }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <UDropdownMenu :items="getDropdownItems(edition.id)">
-                      <UButton
-                        color="neutral"
-                        variant="ghost"
-                        icon="i-heroicons-ellipsis-horizontal"
-                        size="xs"
-                      />
-                    </UDropdownMenu>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- État vide -->
-      <div v-if="filteredConventions.length === 0" class="text-center py-12">
         <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400" />
         <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
           {{ $t('admin.no_conventions_found') }}
@@ -719,12 +414,12 @@
             variant="soft"
             @click="copyToClipboard"
           >
-            {{ copied ? 'Copié !' : 'Copier' }}
+            {{ copied ? $t('common.copied') : $t('common.copy') }}
           </UButton>
 
           <div v-if="exportError" class="mt-4">
             <UAlert icon="i-heroicons-exclamation-triangle" color="error" variant="soft">
-              <template #title>Erreur d'export</template>
+              <template #title>{{ $t('admin.export_error') }}</template>
               <template #description>{{ exportError }}</template>
             </UAlert>
           </div>
@@ -799,7 +494,6 @@ const searchQuery = ref('')
 const debouncedSearchQuery = useDebounce(searchQuery, 300)
 const archivedFilter = ref('all')
 const sortBy = ref('name-asc')
-const compactView = ref(true)
 const expandedConventions = ref<number[]>([])
 
 // État pour l'export JSON
@@ -817,12 +511,14 @@ const archivedFilterOptions = computed(() => [
 
 // Options de tri
 const sortOptions = computed(() => [
-  { label: 'Nom (A-Z)', value: 'name-asc' },
-  { label: 'Nom (Z-A)', value: 'name-desc' },
-  { label: 'Date création (récent)', value: 'date-desc' },
-  { label: 'Date création (ancien)', value: 'date-asc' },
-  { label: 'Nb éditions (décroissant)', value: 'editions-desc' },
-  { label: 'Nb éditions (croissant)', value: 'editions-asc' },
+  { label: t('admin.sort.name_asc'), value: 'name-asc' },
+  { label: t('admin.sort.name_desc'), value: 'name-desc' },
+  { label: t('admin.sort.created_desc'), value: 'date-desc' },
+  { label: t('admin.sort.created_asc'), value: 'date-asc' },
+  { label: t('admin.sort.updated_desc'), value: 'updated-desc' },
+  { label: t('admin.sort.updated_asc'), value: 'updated-asc' },
+  { label: t('admin.sort.editions_desc'), value: 'editions-desc' },
+  { label: t('admin.sort.editions_asc'), value: 'editions-asc' },
 ])
 
 // Récupération des données
@@ -895,6 +591,14 @@ const sortedConventions = computed(() => {
       return conventions.sort(
         (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       )
+    case 'updated-desc':
+      return conventions.sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )
+    case 'updated-asc':
+      return conventions.sort(
+        (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      )
     case 'editions-desc':
       return conventions.sort(
         (a, b) => ((b as any)._count?.editions || 0) - ((a as any)._count?.editions || 0)
@@ -909,16 +613,17 @@ const sortedConventions = computed(() => {
 })
 
 // Fonctions utilitaires
-const formatAuthorName = (
-  author: { prenom?: string | null; nom?: string | null; pseudo?: string } | null | undefined
-) => {
-  if (!author) {
-    return 'Auteur inconnu'
+const getEditionStatusColor = (status: string) => {
+  switch (status) {
+    case 'PUBLISHED':
+      return 'success'
+    case 'PLANNED':
+      return 'warning'
+    case 'CANCELLED':
+      return 'error'
+    default:
+      return 'neutral'
   }
-  if (author.prenom && author.nom) {
-    return `${author.prenom} ${author.nom} (${author.pseudo})`
-  }
-  return author.pseudo || 'Utilisateur anonyme'
 }
 
 const formatDate = (date: string | Date) => {
@@ -994,7 +699,7 @@ const executeToggleArchive = async () => {
     console.error("Erreur lors de l'archivage:", error)
     useToast().add({
       title: t('common.error'),
-      description: "Erreur lors de l'opération",
+      description: t('admin.archive_error'),
       color: 'error',
     })
   } finally {
@@ -1043,8 +748,6 @@ const executeDeleteConvention = async () => {
 
 // Fonction pour exporter une édition en JSON
 const exportEdition = async (editionId: number) => {
-  console.log('exportEdition appelée avec ID:', editionId)
-
   try {
     exportedJson.value = ''
     exportError.value = ''
@@ -1056,8 +759,7 @@ const exportEdition = async (editionId: number) => {
 
     exportedJson.value = JSON.stringify(data, null, 2)
   } catch (error: any) {
-    exportError.value =
-      error?.data?.message || error?.message || "Erreur lors de l'export de l'édition"
+    exportError.value = error?.data?.message || error?.message || t('admin.export_error')
   }
 }
 
@@ -1071,7 +773,7 @@ const copyToClipboard = async () => {
     }, 2000)
   } catch (error) {
     console.error('Erreur lors de la copie:', error)
-    alert('Erreur lors de la copie dans le presse-papiers')
+    useToast().add({ title: t('admin.copy_error'), color: 'error' })
   }
 }
 
@@ -1097,7 +799,7 @@ const getDropdownItems = (editionId: number) => {
     ],
     [
       {
-        label: 'Exporter JSON',
+        label: t('admin.export_json_title'),
         icon: 'i-heroicons-arrow-down-tray',
         onSelect: () => exportEdition(editionId),
       },

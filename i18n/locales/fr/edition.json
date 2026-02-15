@@ -116,10 +116,11 @@
     "created_at": "Créé le",
     "delete": "Supprimer la convention",
     "edit": "Modifier la convention",
-    "edit_organizer_rights": "Modifier les droits de l'organisateur",
     "edit_permissions": "Modifier les permissions",
     "edit_permissions_desc": "Modifier les conventions selon vos permissions",
     "editions": "Éditions",
+    "empty_state_description": "Organisez et gérez vos événements de jonglerie. Créez des éditions, coordonnez vos équipes et rassemblez votre communauté.",
+    "empty_state_title": "Créez votre première convention",
     "features_card_subtitle": "Découvrez tout ce que vous pouvez faire en créant ou en collaborant sur des conventions",
     "features_card_title": "Que pouvez-vous faire ?",
     "granular_rights": "Droits granulaires",
@@ -142,10 +143,6 @@
     "manage_organizers_desc": "Inviter et gérer les membres de votre équipe organisatrice",
     "manage_volunteers": "Gérer les bénévoles",
     "manage_volunteers_desc": "Coordonner les équipes de bénévoles et leurs candidatures",
-    "no_conventions": "Aucune convention créée",
-    "no_conventions_description": "Les conventions vous permettront de regrouper plusieurs éditions.",
-    "empty_state_title": "Créez votre première convention",
-    "empty_state_description": "Organisez et gérez vos événements de jonglerie. Créez des éditions, coordonnez vos équipes et rassemblez votre communauté.",
     "no_description": "Aucune description",
     "no_description_available": "Aucune description disponible",
     "no_editions": "Aucune édition pour cette convention",
@@ -164,12 +161,5 @@
     "manage_description": "Gérer les organisateurs et leurs droits pour cette édition",
     "rights": "Droits",
     "title": "Organisateurs"
-  },
-  "volunteers": {
-    "loading_error": "Erreur lors du chargement des données de planning",
-    "slot_updated": "Créneau mis à jour",
-    "slot_deleted": "Créneau supprimé",
-    "slot_created": "Créneau créé",
-    "confirm_delete_slot": "Êtes-vous sûr de vouloir supprimer ce créneau ?"
   }
 }

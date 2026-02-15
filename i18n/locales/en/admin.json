@@ -35,6 +35,7 @@
     "api_path": "API Path...",
     "archive": "Archive",
     "archive_convention": "Archive convention",
+    "archive_error": "Error during archiving operation",
     "auth_provider_email": "Email",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Database has been successfully restored from backup",
     "backup_restore_warning": "This action is irreversible. All current data will be lost.",
     "backup_restoring": "Restoring...",
-    "can_edit": "Edit",
-    "can_manage_editions": "Editions",
-    "can_manage_volunteers": "Volunteers",
     "cannot_load_activity": "Cannot load recent activity",
     "cannot_load_stats": "Cannot load statistics",
     "cannot_load_users": "Cannot load users",
-    "carpool_offers_count": "{count} carpools",
     "categories": "Categories",
     "change_profile_picture": "Change profile picture",
     "change_profile_picture_description": "Upload or modify this user's profile picture",
@@ -110,8 +107,8 @@
     "conventions_count": "convention(s)",
     "conventions_management": "Conventions management",
     "conventions_management_description": "View all conventions and their editions",
+    "copy_error": "Error copying to clipboard",
     "created_at": "Created on",
-    "created_by": "Created by",
     "cron_management": "Automated Tasks Management",
     "cron_management_description": "Manage and execute scheduled tasks (cron jobs)",
     "cron_system_active": "The automated tasks system is active",
@@ -151,6 +148,7 @@
     "execute_tasks": "Execute manually",
     "executing": "Running...",
     "execution_time": "Execution time",
+    "export_error": "Error during export",
     "export_format_description": "This JSON is formatted for re-import via the edition import page.",
     "export_format_title": "Export format",
     "export_json_description": "JSON formatted for edition import",
@@ -362,7 +360,6 @@
     "notifications_sent": "Notifications sent",
     "oldest_first": "Oldest first",
     "organizers": "Organizers",
-    "organizers_count": "{count} organizers",
     "original_user": "Original user",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Choose a reason",
     "show_online_users_only": "Show online users only",
     "slots_processed": "Slots processed",
+    "sort": {
+      "created_asc": "Creation (oldest)",
+      "created_desc": "Creation (newest)",
+      "editions_asc": "Number of editions (ascending)",
+      "editions_desc": "Number of editions (descending)",
+      "name_asc": "Name (A-Z)",
+      "name_desc": "Name (Z-A)",
+      "updated_asc": "Modification (oldest)",
+      "updated_desc": "Modification (newest)"
+    },
     "stop_impersonation": "Return to my account",
     "stop_impersonation_error": "Error stopping impersonation",
     "success": "Success",
@@ -436,7 +443,6 @@
     "view_all_conventions": "View all conventions",
     "view_profile": "View profile",
     "view_profiles": "View profiles",
-    "volunteer_reminders": "Volunteer reminders",
-    "volunteers_count": "{count} volunteers"
+    "volunteer_reminders": "Volunteer reminders"
   }
 }

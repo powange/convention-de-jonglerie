@@ -108,7 +108,6 @@
     "last_name": "Nazwisko",
     "link_copied": "Link skopiowany",
     "loading": "Ładowanie...",
-    "location": "Lokalizacja",
     "logo": "Logo",
     "lunch": "Lunch",
     "manage": "Zarządzaj",
@@ -1101,12 +1100,5 @@
     "name_min_3": "Nazwa musi zawierać co najmniej 3 znaki",
     "phone_required": "Numer telefonu jest wymagany",
     "program_max_10000": "Program nie może przekraczać 10000 znaków"
-  },
-  "volunteers": {
-    "confirm_delete_slot": "Czy na pewno chcesz usunąć ten przedział czasowy?",
-    "loading_error": "Błąd podczas ładowania danych planowania",
-    "slot_created": "Przedział czasowy utworzony",
-    "slot_deleted": "Przedział czasowy usunięty",
-    "slot_updated": "Przedział czasowy zaktualizowany"
   }
 }

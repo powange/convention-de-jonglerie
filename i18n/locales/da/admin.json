@@ -35,6 +35,7 @@
     "api_path": "API-sti...",
     "archive": "Arkiver",
     "archive_convention": "Arkiver konvention",
+    "archive_error": "Fejl under arkiveringshandling",
     "auth_provider_email": "Email",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Databasen er blevet gendannet med succes fra backup",
     "backup_restore_warning": "Denne handling er irreversibel. Alle nuværende data vil gå tabt.",
     "backup_restoring": "Gendanner...",
-    "can_edit": "Redigering",
-    "can_manage_editions": "Udgaver",
-    "can_manage_volunteers": "Frivillige",
     "cannot_load_activity": "Kan ikke indlæse seneste aktivitet",
     "cannot_load_stats": "Kan ikke indlæse statistikker",
     "cannot_load_users": "Kan ikke indlæse brugere",
-    "carpool_offers_count": "{count} samkørsler",
     "categories": "Kategorier",
     "change_profile_picture": "Skift profilbillede",
     "change_profile_picture_description": "Upload eller ændr denne brugers profilbillede",
@@ -110,8 +107,8 @@
     "conventions_count": "konvention(er)",
     "conventions_management": "Administration af konventioner",
     "conventions_management_description": "Se alle konventioner og deres udgaver",
+    "copy_error": "Fejl ved kopiering til udklipsholder",
     "created_at": "Oprettet den",
-    "created_by": "Oprettet af",
     "cron_management": "Håndtering af Automatiske Opgaver",
     "cron_management_description": "Administrer og kør planlagte opgaver (cron jobs)",
     "cron_system_active": "Systemet til automatiske opgaver er aktivt",
@@ -151,6 +148,7 @@
     "execute_tasks": "Kør manuelt",
     "executing": "Kører...",
     "execution_time": "Udførelsestid",
+    "export_error": "Fejl ved eksport",
     "export_format_description": "Denne JSON er formateret til genimport via editionsimportsiden.",
     "export_format_title": "Eksportformat",
     "export_json_description": "JSON formateret til editionsimport",
@@ -362,7 +360,6 @@
     "notifications_sent": "Notifikationer sendt",
     "oldest_first": "Ældste først",
     "organizers": "Samarbejdspartnere",
-    "organizers_count": "{count} samarbejdspartnere",
     "original_user": "Oprindelig bruger",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Vælg en årsag til sletning",
     "show_online_users_only": "Vis kun onlinebrugere",
     "slots_processed": "Behandlede tidsrum",
+    "sort": {
+      "created_asc": "Oprettelse (ældste)",
+      "created_desc": "Oprettelse (nyeste)",
+      "editions_asc": "Antal udgaver (stigende)",
+      "editions_desc": "Antal udgaver (faldende)",
+      "name_asc": "Navn (A-Z)",
+      "name_desc": "Navn (Z-A)",
+      "updated_asc": "Ændring (ældste)",
+      "updated_desc": "Ændring (nyeste)"
+    },
     "stop_impersonation": "Tilbage til min konto",
     "stop_impersonation_error": "Fejl ved stop af impersonifikation",
     "success": "Succes",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Se alle konventioner",
     "view_profile": "Se profil",
     "view_profiles": "Se profiler",
-    "volunteer_reminders": "Frivillig påmindelser",
-    "volunteers_count": "{count} frivillige"
+    "volunteer_reminders": "Frivillig påmindelser"
   }
 }

@@ -35,6 +35,7 @@
     "api_path": "Шлях API...",
     "archive": "Архівувати",
     "archive_convention": "Архівувати конвенцію",
+    "archive_error": "Помилка під час операції архівування",
     "auth_provider_email": "Email",
     "auth_provider_facebook": "Facebook",
     "auth_provider_google": "Google",
@@ -69,13 +70,9 @@
     "backup_restore_success_description": "Базу даних було успішно відновлено з резервної копії",
     "backup_restore_warning": "Ця дія незворотна. Усі поточні дані будуть втрачені.",
     "backup_restoring": "Відновлення...",
-    "can_edit": "Редагування",
-    "can_manage_editions": "Видання",
-    "can_manage_volunteers": "Волонтери",
     "cannot_load_activity": "Неможливо завантажити нещодавню активність",
     "cannot_load_stats": "Неможливо завантажити статистику",
     "cannot_load_users": "Неможливо завантажити користувачів",
-    "carpool_offers_count": "{count} поїздок",
     "categories": "Категорії",
     "change_profile_picture": "Змінити фото профілю",
     "change_profile_picture_description": "Завантажити або змінити фото профілю цього користувача",
@@ -110,8 +107,8 @@
     "conventions_count": "конвенція(ї)",
     "conventions_management": "Управління конвенціями",
     "conventions_management_description": "Переглянути всі конвенції та їх видання",
+    "copy_error": "Помилка при копіюванні до буфера обміну",
     "created_at": "Створено",
-    "created_by": "Створено",
     "cron_management": "Керування автоматизованими завданнями",
     "cron_management_description": "Керування та виконання запланованих завдань (cron jobs)",
     "cron_system_active": "Система автоматизованих завдань активна",
@@ -151,6 +148,7 @@
     "execute_tasks": "Виконати вручну",
     "executing": "Виконується...",
     "execution_time": "Час виконання",
+    "export_error": "Помилка при експорті",
     "export_format_description": "Цей JSON відформатований для повторного імпорту через сторінку імпорту видань.",
     "export_format_title": "Формат експорту",
     "export_json_description": "JSON відформатований для імпорту видань",
@@ -362,7 +360,6 @@
     "notifications_sent": "Сповіщення надіслано",
     "oldest_first": "Спочатку старі",
     "organizers": "Співробітники",
-    "organizers_count": "{count} співробітників",
     "original_user": "Оригінальний користувач",
     "pages": {
       "conventions": {
@@ -395,6 +392,16 @@
     "select_deletion_reason": "Виберіть причину видалення",
     "show_online_users_only": "Показати лише користувачів онлайн",
     "slots_processed": "Оброблені слоти",
+    "sort": {
+      "created_asc": "Створення (старе)",
+      "created_desc": "Створення (нове)",
+      "editions_asc": "Кількість видань (за зростанням)",
+      "editions_desc": "Кількість видань (за спаданням)",
+      "name_asc": "Назва (A-Z)",
+      "name_desc": "Назва (Z-A)",
+      "updated_asc": "Зміна (старе)",
+      "updated_desc": "Зміна (нове)"
+    },
     "stop_impersonation": "Повернутися до мого облікового запису",
     "stop_impersonation_error": "Помилка при зупинці уособлення",
     "success": "Успіх",
@@ -436,7 +443,6 @@
     "view_all_conventions": "Переглянути всі конвенції",
     "view_profile": "Переглянути профіль",
     "view_profiles": "Переглянути профілі",
-    "volunteer_reminders": "Нагадування волонтерам",
-    "volunteers_count": "{count} волонтерів"
+    "volunteer_reminders": "Нагадування волонтерам"
   }
 }
