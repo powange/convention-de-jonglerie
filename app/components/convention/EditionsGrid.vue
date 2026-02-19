@@ -145,7 +145,7 @@ const emit = defineEmits<{
     editionId: number,
     status: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
   ): void
-  (e: 'delete', editionId: number): void
+  (e: 'delete' | 'duplicate', editionId: number): void
 }>()
 
 const { t } = useI18n()
@@ -223,6 +223,14 @@ const getEditionActions = (edition: DashboardEdition) => {
       label: t('common.manage'),
       icon: 'i-heroicons-cog-6-tooth',
       to: `/editions/${edition.id}/gestion`,
+    })
+  }
+
+  if (canEditEdition(edition.id) && props.canAddEdition) {
+    actions.push({
+      label: t('conventions.duplicate_edition'),
+      icon: 'i-heroicons-document-duplicate',
+      onSelect: () => emit('duplicate', edition.id),
     })
   }
 

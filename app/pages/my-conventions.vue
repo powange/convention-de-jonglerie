@@ -95,6 +95,7 @@
               :can-add-edition="canAddEdition(selectedListItem)"
               @status-change="updateEditionStatus"
               @delete="deleteEdition"
+              @duplicate="duplicateEdition"
             />
 
             <ConventionOrganizersSection
@@ -754,6 +755,37 @@ const canDeleteConvention = (conv: ConventionListItem) =>
 // Fonction pour obtenir le nom d'affichage d'une édition
 const getEditionDisplayName = (edition: DashboardEdition) => {
   return getEditionDisplayNameWithConvention(edition, selectedListItem.value!)
+}
+
+// Duplication d'édition
+const duplicatingEdition = ref(false)
+const duplicateEdition = async (editionId: number) => {
+  if (!selectedListItem.value || duplicatingEdition.value) return
+
+  duplicatingEdition.value = true
+  try {
+    const newEdition = await $fetch<{ id: number }>(`/api/editions/${editionId}/duplicate`, {
+      method: 'POST',
+    })
+
+    toast.add({
+      title: t('conventions.edition_duplicated'),
+      description: t('conventions.edition_duplicated_desc'),
+      icon: 'i-heroicons-document-duplicate',
+      color: 'success',
+    })
+
+    await navigateTo(`/editions/${newEdition.id}/edit`)
+  } catch (error) {
+    console.error('Failed to duplicate edition:', error)
+    toast.add({
+      title: t('conventions.duplication_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    duplicatingEdition.value = false
+  }
 }
 
 // Update edition status
