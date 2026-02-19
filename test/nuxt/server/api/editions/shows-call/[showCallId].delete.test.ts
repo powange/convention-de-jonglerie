@@ -34,7 +34,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] DELETE', () => {
     id: 1,
     editionId: 1,
     name: 'Appel principal',
-    isOpen: true,
+    visibility: 'PUBLIC',
     mode: 'INTERNAL',
     externalUrl: null,
     description: "Description de l'appel",

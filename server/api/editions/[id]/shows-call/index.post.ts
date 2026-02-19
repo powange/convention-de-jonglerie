@@ -14,12 +14,13 @@ const createShowCallSchema = z.object({
   mode: z.enum(['INTERNAL', 'EXTERNAL']).default('INTERNAL'),
   externalUrl: z.string().url('URL invalide').optional().nullable(),
   deadline: z.string().datetime().optional().nullable(),
-  isOpen: z.boolean().default(false),
+  visibility: z.enum(['OFFLINE', 'CLOSED', 'PRIVATE', 'PUBLIC']).default('OFFLINE'),
   askPortfolioUrl: z.boolean().default(true),
   askVideoUrl: z.boolean().default(true),
   askTechnicalNeeds: z.boolean().default(true),
   askAccommodation: z.boolean().default(false),
   askDepartureCity: z.boolean().default(false),
+  askSocialLinks: z.boolean().default(false),
 })
 
 /**
@@ -55,7 +56,12 @@ export default wrapApiHandler(
     const validatedData = createShowCallSchema.parse(body)
 
     // Vérifier la cohérence des données
-    if (validatedData.mode === 'EXTERNAL' && validatedData.isOpen && !validatedData.externalUrl) {
+    if (
+      validatedData.mode === 'EXTERNAL' &&
+      validatedData.visibility !== 'CLOSED' &&
+      validatedData.visibility !== 'OFFLINE' &&
+      !validatedData.externalUrl
+    ) {
       throw createError({
         status: 400,
         message: "L'URL externe est requise lorsque le mode est EXTERNAL et l'appel est ouvert",
@@ -88,7 +94,7 @@ export default wrapApiHandler(
         mode: validatedData.mode,
         externalUrl: validatedData.externalUrl || null,
         deadline: validatedData.deadline ? new Date(validatedData.deadline) : null,
-        isOpen: validatedData.isOpen,
+        visibility: validatedData.visibility,
         askPortfolioUrl: validatedData.askPortfolioUrl,
         askVideoUrl: validatedData.askVideoUrl,
         askTechnicalNeeds: validatedData.askTechnicalNeeds,

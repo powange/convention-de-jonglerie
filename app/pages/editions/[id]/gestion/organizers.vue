@@ -562,6 +562,8 @@ const addOrganizer = async () => {
     cancelEditing()
     // Recharger l'édition pour mettre à jour la liste des organisateurs
     await editionStore.fetchEditionById(editionId, { force: true })
+    // Recharger les organisateurs disponibles pour le select de la seconde card
+    await loadEditionOrganizers()
   } catch (error: any) {
     console.error('Error adding organizer:', error)
     toast.add({
@@ -602,6 +604,7 @@ const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
 
     closeEditOrganizerModal()
     await editionStore.fetchEditionById(editionId, { force: true })
+    await loadEditionOrganizers()
   } catch (error: unknown) {
     handleError(error, {
       defaultTitleKey: 'errors.update_organizer_error',
@@ -637,6 +640,7 @@ const removeOrganizer = async () => {
 
     closeEditOrganizerModal()
     await editionStore.fetchEditionById(editionId, { force: true })
+    await loadEditionOrganizers()
   } catch (error: any) {
     console.error('Error removing organizer:', error)
     toast.add({

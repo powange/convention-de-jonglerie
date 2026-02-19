@@ -34,7 +34,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
     id: 1,
     editionId: 1,
     name: 'Appel principal',
-    isOpen: false,
+    visibility: 'CLOSED',
     mode: 'INTERNAL',
     externalUrl: null,
     description: "Description de l'appel",
@@ -115,16 +115,16 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
     })
 
     it("devrait mettre à jour l'état d'ouverture", async () => {
-      const updatedShowCall = { ...mockShowCall, isOpen: true }
+      const updatedShowCall = { ...mockShowCall, visibility: 'PUBLIC' }
       prismaMock.editionShowCall.update.mockResolvedValue(updatedShowCall)
 
-      global.readBody.mockResolvedValue({ isOpen: true })
+      global.readBody.mockResolvedValue({ visibility: 'PUBLIC' })
       const mockEvent = { context: { user: mockUser } }
 
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.showCall.isOpen).toBe(true)
+      expect(result.showCall.visibility).toBe('PUBLIC')
     })
 
     it('devrait mettre à jour la description', async () => {
@@ -145,14 +145,14 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
         ...mockShowCall,
         mode: 'EXTERNAL',
         externalUrl: 'https://external-form.com',
-        isOpen: true,
+        visibility: 'PUBLIC',
       }
       prismaMock.editionShowCall.update.mockResolvedValue(updatedShowCall)
 
       global.readBody.mockResolvedValue({
         mode: 'EXTERNAL',
         externalUrl: 'https://external-form.com',
-        isOpen: true,
+        visibility: 'PUBLIC',
       })
       const mockEvent = { context: { user: mockUser } }
 
@@ -214,7 +214,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
     it('devrait rejeter si mode EXTERNAL est ouvert sans URL externe', async () => {
       global.readBody.mockResolvedValue({
         mode: 'EXTERNAL',
-        isOpen: true,
+        visibility: 'PUBLIC',
         externalUrl: null,
       })
 
@@ -321,10 +321,10 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       prismaMock.edition.findUnique.mockResolvedValue(editionWithoutPermission)
       prismaMock.editionShowCall.findFirst.mockResolvedValue(mockShowCall)
       prismaMock.editionShowCall.findUnique.mockResolvedValue(null)
-      prismaMock.editionShowCall.update.mockResolvedValue({ ...mockShowCall, isOpen: true })
+      prismaMock.editionShowCall.update.mockResolvedValue({ ...mockShowCall, visibility: 'PUBLIC' })
       prismaMock.user.findMany.mockResolvedValue([]) // Artistes pour notification
 
-      global.readBody.mockResolvedValue({ isOpen: true })
+      global.readBody.mockResolvedValue({ visibility: 'PUBLIC' })
       const mockEvent = { context: { user: adminUser } }
 
       const result = await handler(mockEvent as any)

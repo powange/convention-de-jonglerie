@@ -44,7 +44,7 @@ describe('/api/user/show-applications GET', () => {
   const mockShowCall = {
     id: 1,
     name: 'Appel à spectacles principal',
-    isOpen: true,
+    visibility: 'PUBLIC',
     deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     edition: mockEdition,
   }
@@ -150,7 +150,7 @@ describe('/api/user/show-applications GET', () => {
       expect(result[0].showCall).toMatchObject({
         id: mockShowCall.id,
         name: mockShowCall.name,
-        isOpen: mockShowCall.isOpen,
+        visibility: mockShowCall.visibility,
         deadline: mockShowCall.deadline,
       })
     })

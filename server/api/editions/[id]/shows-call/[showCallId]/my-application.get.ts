@@ -50,7 +50,7 @@ export default wrapApiHandler(
       showCall: {
         id: showCall.id,
         name: showCall.name,
-        isOpen: showCall.isOpen,
+        visibility: showCall.visibility,
         mode: showCall.mode,
         externalUrl: showCall.externalUrl,
         description: showCall.description,

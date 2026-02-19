@@ -62,8 +62,8 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que l'appel est ouvert
-    if (!showCall.isOpen) {
+    // Vérifier que l'appel est ouvert (PRIVATE ou PUBLIC)
+    if (showCall.visibility !== 'PRIVATE' && showCall.visibility !== 'PUBLIC') {
       throw createError({
         status: 400,
         message: "L'appel à spectacles n'est pas ouvert",

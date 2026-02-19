@@ -16,7 +16,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application GET', () => 
     id: 1,
     editionId: 1,
     name: 'Appel à spectacles principal',
-    isOpen: true,
+    visibility: 'PUBLIC',
     mode: 'INTERNAL',
     externalUrl: null,
     description: "Description de l'appel",

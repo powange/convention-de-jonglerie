@@ -36,12 +36,18 @@
           <UIcon name="i-heroicons-chevron-right" />
           <span>{{ showCall.name }}</span>
         </div>
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-cog-6-tooth" class="text-amber-500" />
-              {{ showCall.name }}
-            </h1>
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-cog-6-tooth" class="text-amber-500 shrink-0" />
+              <UInput
+                v-model="nameLocal"
+                variant="subtle"
+                :disabled="saving"
+                :ui="{ base: 'text-2xl font-bold' }"
+                class="flex-1 min-w-0"
+              />
+            </div>
             <p class="text-gray-600 dark:text-gray-400 mt-1">
               {{ $t('gestion.shows_call.config_description') }}
             </p>
@@ -61,24 +67,48 @@
 
       <!-- Contenu de la page -->
       <div class="space-y-6">
-        <!-- Nom de l'appel -->
+        <!-- Visibilité de l'appel -->
         <UCard>
           <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-pencil" class="text-amber-500" />
-              <h2 class="text-lg font-semibold">
-                {{ $t('gestion.shows_call.name_section') }}
-              </h2>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-eye" class="text-amber-500" />
+                <h2 class="text-lg font-semibold">
+                  {{ $t('gestion.shows_call.visibility_label') }}
+                </h2>
+              </div>
+              <UBadge :color="getVisibilityColor(visibilityLocal)" variant="soft">
+                {{ getVisibilityLabel(visibilityLocal) }}
+              </UBadge>
             </div>
 
-            <UFormField :label="$t('gestion.shows_call.name_label')" :error="fieldErrors.name">
-              <UInput
-                v-model="nameLocal"
-                :placeholder="$t('gestion.shows_call.name_placeholder')"
-                :disabled="saving"
-                class="w-full max-w-md"
-              />
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('gestion.shows_call.visibility_description') }}
+            </p>
+
+            <UFormField>
+              <URadioGroup v-model="visibilityLocal" :items="visibilityItems" :disabled="saving" />
             </UFormField>
+
+            <!-- Lien à partager (visible si l'appel est ouvert) -->
+            <div
+              v-if="visibilityLocal === 'PRIVATE' || visibilityLocal === 'PUBLIC'"
+              class="flex items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
+              <UIcon name="i-heroicons-link" class="text-gray-400 shrink-0" />
+              <span class="text-sm text-gray-600 dark:text-gray-400 truncate flex-1">
+                {{ showCallPublicUrl }}
+              </span>
+              <UButton
+                :color="linkCopied ? 'success' : 'neutral'"
+                variant="soft"
+                size="xs"
+                :icon="linkCopied ? 'i-heroicons-check' : 'i-heroicons-clipboard-document'"
+                @click="copyShowCallLink"
+              >
+                {{ linkCopied ? $t('common.link_copied') : $t('common.copy_link') }}
+              </UButton>
+            </div>
           </div>
         </UCard>
 
@@ -145,42 +175,6 @@
               </div>
             </div>
 
-            <!-- Ouverture de l'appel -->
-            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium text-gray-900 dark:text-white">
-                    {{ $t('gestion.shows_call.open_label') }}
-                  </h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $t('gestion.shows_call.open_description') }}
-                  </p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <UBadge :color="isOpenLocal ? 'success' : 'neutral'" variant="soft">
-                    {{ isOpenLocal ? $t('common.active') : $t('common.inactive') }}
-                  </UBadge>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3">
-                <USwitch v-model="isOpenLocal" :disabled="saving" color="primary" />
-                <span
-                  :class="
-                    isOpenLocal
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-gray-600 dark:text-gray-400'
-                  "
-                >
-                  {{
-                    isOpenLocal
-                      ? $t('gestion.shows_call.open_active')
-                      : $t('gestion.shows_call.open_inactive')
-                  }}
-                </span>
-              </div>
-            </div>
-
             <!-- Date limite -->
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div>
@@ -214,13 +208,7 @@
               </div>
 
               <UFormField :error="fieldErrors.description">
-                <UTextarea
-                  v-model="descriptionLocal"
-                  :placeholder="$t('gestion.shows_call.description_placeholder')"
-                  :disabled="saving"
-                  :rows="4"
-                  class="w-full"
-                />
+                <MinimalMarkdownEditor v-model="descriptionLocal" :disabled="saving" />
               </UFormField>
             </div>
           </div>
@@ -365,7 +353,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import type { EditionShowCall } from '~/types'
+import type { EditionShowCall, ShowCallVisibility } from '~/types'
 
 definePageMeta({
   middleware: ['authenticated'],
@@ -388,7 +376,7 @@ const { data: edition, pending: loading } = await useFetch(`/api/editions/${edit
 // Variables locales
 const showCall = ref<EditionShowCall | null>(null)
 const nameLocal = ref('')
-const isOpenLocal = ref(false)
+const visibilityLocal = ref<ShowCallVisibility>('OFFLINE')
 const modeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const externalUrlLocal = ref('')
 const descriptionLocal = ref('')
@@ -403,11 +391,39 @@ const askSocialLinksLocal = ref(false)
 const saving = ref(false)
 const fieldErrors = ref<Record<string, string>>({})
 const initialized = ref(false)
+const linkCopied = ref(false)
+
+// URL publique de l'appel à spectacles
+const requestUrl = useRequestURL()
+const showCallPublicUrl = computed(() => {
+  return `${requestUrl.origin}/editions/${editionId}/shows-call/${showCallId}`
+})
+
+async function copyShowCallLink() {
+  try {
+    await navigator.clipboard.writeText(showCallPublicUrl.value)
+    linkCopied.value = true
+    toast.add({
+      title: t('common.link_copied'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+    setTimeout(() => {
+      linkCopied.value = false
+    }, 3000)
+  } catch {
+    toast.add({
+      title: t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
 
 // État initial pour détecter les changements
 const initialState = ref({
   name: '',
-  isOpen: false,
+  visibility: 'OFFLINE' as ShowCallVisibility,
   mode: 'INTERNAL' as 'INTERNAL' | 'EXTERNAL',
   externalUrl: '',
   description: '',
@@ -425,7 +441,7 @@ const hasChanges = computed(() => {
   if (!initialized.value) return false
   return (
     nameLocal.value !== initialState.value.name ||
-    isOpenLocal.value !== initialState.value.isOpen ||
+    visibilityLocal.value !== initialState.value.visibility ||
     modeLocal.value !== initialState.value.mode ||
     externalUrlLocal.value !== initialState.value.externalUrl ||
     descriptionLocal.value !== initialState.value.description ||
@@ -443,6 +459,57 @@ const modeItems = computed(() => [
   { value: 'INTERNAL', label: t('gestion.shows_call.mode_internal') },
   { value: 'EXTERNAL', label: t('gestion.shows_call.mode_external') },
 ])
+
+const visibilityItems = computed(() => [
+  {
+    value: 'OFFLINE',
+    label: t('gestion.shows_call.visibility_offline'),
+    description: t('gestion.shows_call.visibility_offline_desc'),
+  },
+  {
+    value: 'CLOSED',
+    label: t('gestion.shows_call.visibility_closed'),
+    description: t('gestion.shows_call.visibility_closed_desc'),
+  },
+  {
+    value: 'PRIVATE',
+    label: t('gestion.shows_call.visibility_private'),
+    description: t('gestion.shows_call.visibility_private_desc'),
+  },
+  {
+    value: 'PUBLIC',
+    label: t('gestion.shows_call.visibility_public'),
+    description: t('gestion.shows_call.visibility_public_desc'),
+  },
+])
+
+const getVisibilityColor = (
+  visibility: ShowCallVisibility
+): 'success' | 'warning' | 'neutral' | 'error' => {
+  switch (visibility) {
+    case 'PUBLIC':
+      return 'success'
+    case 'PRIVATE':
+      return 'warning'
+    case 'OFFLINE':
+      return 'error'
+    default:
+      return 'neutral'
+  }
+}
+
+const getVisibilityLabel = (visibility: ShowCallVisibility): string => {
+  switch (visibility) {
+    case 'PUBLIC':
+      return t('gestion.shows_call.visibility_public')
+    case 'PRIVATE':
+      return t('gestion.shows_call.visibility_private')
+    case 'OFFLINE':
+      return t('gestion.shows_call.visibility_offline')
+    default:
+      return t('gestion.shows_call.visibility_closed')
+  }
+}
 
 // Permissions
 const canEdit = computed(() => {
@@ -468,7 +535,7 @@ const fetchSettings = async () => {
     )
     showCall.value = response
     nameLocal.value = response.name
-    isOpenLocal.value = response.isOpen ?? false
+    visibilityLocal.value = response.visibility ?? 'OFFLINE'
     modeLocal.value = response.mode ?? 'INTERNAL'
     externalUrlLocal.value = response.externalUrl ?? ''
     descriptionLocal.value = response.description ?? ''
@@ -503,7 +570,7 @@ const fetchSettings = async () => {
 const updateInitialState = () => {
   initialState.value = {
     name: nameLocal.value,
-    isOpen: isOpenLocal.value,
+    visibility: visibilityLocal.value,
     mode: modeLocal.value,
     externalUrl: externalUrlLocal.value,
     description: descriptionLocal.value,
@@ -527,7 +594,7 @@ const persistSettings = async () => {
   try {
     const body: any = {
       name: nameLocal.value.trim(),
-      isOpen: isOpenLocal.value,
+      visibility: visibilityLocal.value,
       mode: modeLocal.value,
       description: descriptionLocal.value || null,
       deadline: deadlineLocal.value ? new Date(deadlineLocal.value).toISOString() : null,

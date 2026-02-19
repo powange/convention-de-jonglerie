@@ -297,12 +297,18 @@
               <!-- Statut de l'appel -->
               <div class="flex items-center gap-2 text-sm">
                 <UBadge
-                  :color="application.showCall.isOpen ? 'success' : 'neutral'"
+                  :color="
+                    application.showCall.visibility === 'PUBLIC' ||
+                    application.showCall.visibility === 'PRIVATE'
+                      ? 'success'
+                      : 'neutral'
+                  "
                   variant="soft"
                   size="sm"
                 >
                   {{
-                    application.showCall.isOpen
+                    application.showCall.visibility === 'PUBLIC' ||
+                    application.showCall.visibility === 'PRIVATE'
                       ? $t('pages.artists.call_open')
                       : $t('pages.artists.call_closed')
                   }}
@@ -333,7 +339,11 @@
                   </UButton>
 
                   <UButton
-                    v-if="application.status === 'PENDING' && application.showCall.isOpen"
+                    v-if="
+                      (application.status === 'PENDING' &&
+                        application.showCall.visibility === 'PUBLIC') ||
+                      application.showCall.visibility === 'PRIVATE'
+                    "
                     :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply?edit=${application.id}`"
                     size="sm"
                     color="info"
@@ -440,7 +450,11 @@
                   square
                 />
                 <UButton
-                  v-if="application.status === 'PENDING' && application.showCall.isOpen"
+                  v-if="
+                    (application.status === 'PENDING' &&
+                      application.showCall.visibility === 'PUBLIC') ||
+                    application.showCall.visibility === 'PRIVATE'
+                  "
                   :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply?edit=${application.id}`"
                   size="xs"
                   color="info"

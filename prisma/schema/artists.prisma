@@ -7,6 +7,13 @@ enum ShowCallMode {
   EXTERNAL // URL externe vers un autre formulaire
 }
 
+enum ShowCallVisibility {
+  OFFLINE // Hors ligne, invisible partout (pages publiques, listes)
+  CLOSED  // Fermé, pas de candidature possible mais visible
+  PRIVATE // Ouvert aux candidatures via lien direct uniquement
+  PUBLIC  // Ouvert et listé partout
+}
+
 enum ShowApplicationStatus {
   PENDING
   ACCEPTED
@@ -128,7 +135,7 @@ model EditionShowCall {
   id          Int           @id @default(autoincrement())
   editionId   Int
   name        String        // Nom de l'appel (ex: "Scène ouverte", "Gala", "Spectacles longs")
-  isOpen      Boolean       @default(false)
+  visibility  ShowCallVisibility @default(OFFLINE)
   mode        ShowCallMode  @default(INTERNAL)
   externalUrl String?
   description String?       @db.Text

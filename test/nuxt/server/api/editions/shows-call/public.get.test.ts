@@ -18,7 +18,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/public GET', () => {
     id: 1,
     editionId: 1,
     name: 'Appel à spectacles principal',
-    isOpen: true,
+    visibility: 'PUBLIC',
     mode: 'INTERNAL',
     externalUrl: null,
     description: "Description de l'appel à spectacles",
@@ -52,7 +52,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/public GET', () => {
       expect(result).toMatchObject({
         id: mockShowCall.id,
         name: mockShowCall.name,
-        isOpen: mockShowCall.isOpen,
+        visibility: mockShowCall.visibility,
         mode: mockShowCall.mode,
         externalUrl: mockShowCall.externalUrl,
         description: mockShowCall.description,
@@ -97,7 +97,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/public GET', () => {
 
   describe('Appel fermé', () => {
     it("devrait retourner les infos même si l'appel est fermé", async () => {
-      const closedShowCall = { ...mockShowCall, isOpen: false }
+      const closedShowCall = { ...mockShowCall, visibility: 'CLOSED' }
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.editionShowCall.findFirst.mockResolvedValue(closedShowCall)
 
@@ -105,7 +105,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/public GET', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.isOpen).toBe(false)
+      expect(result.visibility).toBe('CLOSED')
     })
   })
 

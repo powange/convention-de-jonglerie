@@ -69,8 +69,8 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
                   {{ showCall.name }}
                 </h3>
-                <UBadge :color="showCall.isOpen ? 'success' : 'neutral'" variant="soft" size="sm">
-                  {{ showCall.isOpen ? $t('common.active') : $t('common.inactive') }}
+                <UBadge :color="getVisibilityColor(showCall.visibility)" variant="soft" size="sm">
+                  {{ getVisibilityLabel(showCall.visibility) }}
                 </UBadge>
                 <UBadge
                   :color="showCall.mode === 'INTERNAL' ? 'primary' : 'warning'"
@@ -234,7 +234,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import type { EditionShowCallWithStats } from '~/types'
+import type { EditionShowCallWithStats, ShowCallVisibility } from '~/types'
 
 definePageMeta({
   middleware: ['authenticated'],
@@ -299,6 +299,35 @@ const fetchShowCalls = async () => {
     })
   } finally {
     showCallsLoading.value = false
+  }
+}
+
+// Couleur et label de visibilité
+const getVisibilityColor = (
+  visibility: ShowCallVisibility
+): 'success' | 'warning' | 'neutral' | 'error' => {
+  switch (visibility) {
+    case 'PUBLIC':
+      return 'success'
+    case 'PRIVATE':
+      return 'warning'
+    case 'OFFLINE':
+      return 'error'
+    default:
+      return 'neutral'
+  }
+}
+
+const getVisibilityLabel = (visibility: ShowCallVisibility): string => {
+  switch (visibility) {
+    case 'PUBLIC':
+      return t('gestion.shows_call.visibility_public')
+    case 'PRIVATE':
+      return t('gestion.shows_call.visibility_private')
+    case 'OFFLINE':
+      return t('gestion.shows_call.visibility_offline')
+    default:
+      return t('gestion.shows_call.visibility_closed')
   }
 }
 

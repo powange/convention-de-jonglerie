@@ -26,7 +26,7 @@ describe('/api/shows-call/open GET', () => {
   const mockShowCall = {
     id: 1,
     name: 'Appel à spectacles principal',
-    isOpen: true,
+    visibility: 'PUBLIC',
     mode: 'INTERNAL',
     externalUrl: null,
     description: "Description de l'appel à spectacles",
@@ -55,7 +55,7 @@ describe('/api/shows-call/open GET', () => {
       expect(result.showCalls[0]).toMatchObject({
         id: mockShowCall.id,
         name: mockShowCall.name,
-        isOpen: mockShowCall.isOpen,
+        visibility: mockShowCall.visibility,
         mode: mockShowCall.mode,
       })
     })
@@ -73,7 +73,7 @@ describe('/api/shows-call/open GET', () => {
   })
 
   describe('Filtrage des appels', () => {
-    it('devrait filtrer uniquement les appels ouverts (isOpen: true)', async () => {
+    it('devrait filtrer uniquement les appels ouverts (visibility: PUBLIC)', async () => {
       prismaMock.editionShowCall.findMany.mockResolvedValue([mockShowCall])
 
       const mockEvent = { context: {} }
@@ -83,7 +83,7 @@ describe('/api/shows-call/open GET', () => {
       expect(prismaMock.editionShowCall.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            isOpen: true,
+            visibility: 'PUBLIC',
           }),
         })
       )

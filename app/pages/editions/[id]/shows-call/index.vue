@@ -86,8 +86,20 @@
                     <UBadge v-if="call.mode === 'EXTERNAL'" color="info" variant="soft" size="xs">
                       {{ t('gestion.shows_call.mode_external_badge') }}
                     </UBadge>
-                    <UBadge :color="call.isOpen ? 'success' : 'neutral'" variant="soft" size="xs">
-                      {{ call.isOpen ? t('shows_call.open') : t('shows_call.closed') }}
+                    <UBadge
+                      :color="
+                        call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
+                          ? 'success'
+                          : 'neutral'
+                      "
+                      variant="soft"
+                      size="xs"
+                    >
+                      {{
+                        call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
+                          ? t('shows_call.open')
+                          : t('shows_call.closed')
+                      }}
                     </UBadge>
                   </div>
                 </div>
@@ -131,7 +143,11 @@
                 <div class="pt-2">
                   <!-- Mode externe : lien vers URL externe -->
                   <UButton
-                    v-if="call.mode === 'EXTERNAL' && call.externalUrl && call.isOpen"
+                    v-if="
+                      call.mode === 'EXTERNAL' &&
+                      call.externalUrl &&
+                      (call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE')
+                    "
                     :to="call.externalUrl"
                     target="_blank"
                     color="primary"
@@ -143,7 +159,11 @@
 
                   <!-- Mode interne : lien vers formulaire -->
                   <UButton
-                    v-else-if="call.mode === 'INTERNAL' && call.isOpen && authStore.isArtist"
+                    v-else-if="
+                      call.mode === 'INTERNAL' &&
+                      (call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE') &&
+                      authStore.isArtist
+                    "
                     :to="`/editions/${editionId}/shows-call/${call.id}/apply`"
                     color="primary"
                     icon="i-heroicons-pencil-square"
@@ -163,7 +183,7 @@
 
                   <!-- Appel fermé -->
                   <UButton
-                    v-else-if="!call.isOpen"
+                    v-else-if="call.visibility === 'CLOSED'"
                     color="neutral"
                     variant="soft"
                     icon="i-heroicons-lock-closed"
@@ -339,7 +359,7 @@ function hasApplied(showCallId: number): boolean {
 function canEditApplication(showCallId: number): boolean {
   const call = showCalls.value.find((c) => c.id === showCallId)
   if (!call) return false
-  if (!call.isOpen) return false
+  if (call.visibility === 'CLOSED' || call.visibility === 'OFFLINE') return false
   if (call.deadline && new Date() > new Date(call.deadline)) return false
   return true
 }

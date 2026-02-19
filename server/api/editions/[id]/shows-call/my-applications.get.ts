@@ -25,7 +25,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             name: true,
-            isOpen: true,
+            visibility: true,
             deadline: true,
           },
         },
@@ -40,7 +40,7 @@ export default wrapApiHandler(
       id: app.id,
       showCallId: app.showCallId,
       showCallName: app.showCall.name,
-      showCallIsOpen: app.showCall.isOpen,
+      showCallVisibility: app.showCall.visibility,
       showCallDeadline: app.showCall.deadline,
       userId: app.userId,
       status: app.status,

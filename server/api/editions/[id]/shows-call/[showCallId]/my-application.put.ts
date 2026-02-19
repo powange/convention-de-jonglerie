@@ -60,8 +60,8 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que l'appel est toujours ouvert
-    if (!showCall.isOpen) {
+    // Vérifier que l'appel est toujours ouvert (PRIVATE ou PUBLIC)
+    if (showCall.visibility !== 'PRIVATE' && showCall.visibility !== 'PUBLIC') {
       throw createError({
         status: 400,
         message:

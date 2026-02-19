@@ -26,7 +26,7 @@ export default wrapApiHandler(
           select: {
             id: true,
             name: true,
-            isOpen: true,
+            visibility: true,
             deadline: true,
             edition: {
               select: {

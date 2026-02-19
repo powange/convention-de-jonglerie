@@ -70,7 +70,9 @@
 
       <!-- Appel fermé -->
       <UAlert
-        v-else-if="showCall && !showCall.isOpen"
+        v-else-if="
+          showCall && (showCall.visibility === 'CLOSED' || showCall.visibility === 'OFFLINE')
+        "
         icon="i-heroicons-lock-closed"
         color="warning"
         variant="soft"
@@ -158,7 +160,11 @@
       <!-- Formulaire de candidature (création ou modification) -->
       <template
         v-else-if="
-          showCall && showCall.isOpen && authStore.isArtist && (!hasAlreadyApplied || isEditMode)
+          showCall &&
+          showCall.visibility !== 'CLOSED' &&
+          showCall.visibility !== 'OFFLINE' &&
+          authStore.isArtist &&
+          (!hasAlreadyApplied || isEditMode)
         "
       >
         <!-- En-tête -->
@@ -182,8 +188,10 @@
           </template>
 
           <!-- Description de l'appel -->
-          <div v-if="showCall.description" class="prose prose-sm max-w-none mb-4">
-            <p class="text-gray-600 dark:text-gray-400">{{ showCall.description }}</p>
+          <div v-if="descriptionHtml" class="prose prose-sm dark:prose-invert max-w-none mb-4">
+            <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-html="descriptionHtml" />
           </div>
 
           <!-- Date limite -->
@@ -589,6 +597,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition, EditionShowCallPublic, ShowApplication } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { markdownToHtml } from '~/utils/markdown'
 
 import type { FormSubmitEvent } from '@nuxt/ui'
 
@@ -735,6 +744,23 @@ const isDeadlinePassed = computed(() => {
   if (!showCall.value?.deadline) return false
   return new Date() > new Date(showCall.value.deadline)
 })
+
+// Rendu markdown de la description
+const descriptionHtml = ref('')
+
+async function renderDescription() {
+  if (!showCall.value?.description) {
+    descriptionHtml.value = ''
+    return
+  }
+  try {
+    descriptionHtml.value = await markdownToHtml(showCall.value.description)
+  } catch {
+    descriptionHtml.value = ''
+  }
+}
+
+watch(() => showCall.value?.description, renderDescription, { immediate: true })
 
 // Synchroniser le tableau additionalPerformers avec le nombre
 watch(

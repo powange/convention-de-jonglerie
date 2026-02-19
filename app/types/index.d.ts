@@ -304,6 +304,9 @@ export type { ProfileStats } from '#shared/types/api'
 // Types pour le mode d'appel à spectacles
 export type ShowCallMode = 'INTERNAL' | 'EXTERNAL'
 
+// Types pour la visibilité de l'appel à spectacles
+export type ShowCallVisibility = 'OFFLINE' | 'CLOSED' | 'PRIVATE' | 'PUBLIC'
+
 // Types pour le statut des candidatures
 export type ShowApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
 
@@ -311,7 +314,7 @@ export type ShowApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
 export interface EditionShowCall {
   id: number
   editionId: number
-  isOpen: boolean
+  visibility: ShowCallVisibility
   mode: ShowCallMode
   externalUrl?: string | null
   description?: string | null
@@ -388,7 +391,7 @@ export interface ShowApplication {
 
 // Formulaire de configuration de l'appel à spectacles
 export interface ShowCallSettingsFormData {
-  isOpen: boolean
+  visibility: ShowCallVisibility
   mode: ShowCallMode
   externalUrl?: string | null
   description?: string | null
@@ -447,7 +450,7 @@ export interface EditionShowCallWithStats extends EditionShowCall {
 export interface EditionShowCallBasic {
   id: number
   name: string
-  isOpen: boolean
+  visibility: ShowCallVisibility
   mode: ShowCallMode
   externalUrl?: string | null
   description?: string | null

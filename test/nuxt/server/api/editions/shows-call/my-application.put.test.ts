@@ -19,7 +19,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
     id: 1,
     editionId: 1,
     name: 'Appel à spectacles principal',
-    isOpen: true,
+    visibility: 'PUBLIC',
     mode: 'INTERNAL',
     externalUrl: null,
     description: "Description de l'appel",
@@ -237,7 +237,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
     })
 
     it("devrait rejeter si l'appel est fermé", async () => {
-      const closedShowCall = { ...mockShowCall, isOpen: false }
+      const closedShowCall = { ...mockShowCall, visibility: 'CLOSED' }
       prismaMock.editionShowCall.findFirst.mockResolvedValue(closedShowCall)
       prismaMock.showApplication.findUnique.mockResolvedValue(mockExistingApplication)
 

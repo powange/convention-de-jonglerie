@@ -532,7 +532,9 @@ export const updateWorkshopSchema = workshopBaseSchema.partial()
 
 // Schéma de configuration de l'appel à spectacles
 export const showCallSettingsSchema = z.object({
-  isOpen: z.boolean(),
+  visibility: z.enum(['OFFLINE', 'CLOSED', 'PRIVATE', 'PUBLIC'], {
+    message: 'Visibilité invalide',
+  }),
   mode: z.enum(['INTERNAL', 'EXTERNAL'], {
     message: 'Mode invalide',
   }),

@@ -15,7 +15,7 @@ const updateShowCallSchema = z.object({
   mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
   externalUrl: z.string().url('URL invalide').optional().nullable(),
   deadline: z.string().datetime().optional().nullable(),
-  isOpen: z.boolean().optional(),
+  visibility: z.enum(['OFFLINE', 'CLOSED', 'PRIVATE', 'PUBLIC']).optional(),
   askPortfolioUrl: z.boolean().optional(),
   askVideoUrl: z.boolean().optional(),
   askTechnicalNeeds: z.boolean().optional(),
@@ -81,10 +81,15 @@ export default wrapApiHandler(
 
     // Déterminer les valeurs finales pour la vérification de cohérence
     const finalMode = validatedData.mode ?? existingShowCall.mode
-    const finalIsOpen = validatedData.isOpen ?? existingShowCall.isOpen
+    const finalVisibility = validatedData.visibility ?? existingShowCall.visibility
     const finalExternalUrl = validatedData.externalUrl ?? existingShowCall.externalUrl
 
-    if (finalMode === 'EXTERNAL' && finalIsOpen && !finalExternalUrl) {
+    if (
+      finalMode === 'EXTERNAL' &&
+      finalVisibility !== 'CLOSED' &&
+      finalVisibility !== 'OFFLINE' &&
+      !finalExternalUrl
+    ) {
       throw createError({
         status: 400,
         message: "L'URL externe est requise lorsque le mode est EXTERNAL et l'appel est ouvert",
@@ -121,7 +126,7 @@ export default wrapApiHandler(
         ...(validatedData.deadline !== undefined && {
           deadline: validatedData.deadline ? new Date(validatedData.deadline) : null,
         }),
-        ...(validatedData.isOpen !== undefined && { isOpen: validatedData.isOpen }),
+        ...(validatedData.visibility !== undefined && { visibility: validatedData.visibility }),
         ...(validatedData.askPortfolioUrl !== undefined && {
           askPortfolioUrl: validatedData.askPortfolioUrl,
         }),
@@ -141,8 +146,8 @@ export default wrapApiHandler(
       },
     })
 
-    // Notifier tous les artistes si l'appel vient d'être ouvert
-    if (validatedData.isOpen === true && !existingShowCall.isOpen) {
+    // Notifier tous les artistes si l'appel vient d'être rendu public
+    if (validatedData.visibility === 'PUBLIC' && existingShowCall.visibility !== 'PUBLIC') {
       const editionData = await prisma.edition.findUnique({
         where: { id: editionId },
         select: { name: true, convention: { select: { name: true } } },

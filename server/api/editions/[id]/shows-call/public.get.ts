@@ -37,16 +37,16 @@ export default wrapApiHandler(
       })
     }
 
-    // Récupérer tous les appels à spectacles qui sont ouverts ou ont une description
+    // Récupérer les appels publics ou fermés avec description (exclure les PRIVATE)
     const showCalls = await prisma.editionShowCall.findMany({
       where: {
         editionId,
-        OR: [{ isOpen: true }, { description: { not: null } }],
+        OR: [{ visibility: 'PUBLIC' }, { visibility: 'CLOSED', description: { not: null } }],
       },
       select: {
         id: true,
         name: true,
-        isOpen: true,
+        visibility: true,
         mode: true,
         externalUrl: true,
         description: true,
@@ -57,15 +57,22 @@ export default wrapApiHandler(
         askAccommodation: true,
       },
       orderBy: [
-        { isOpen: 'desc' }, // Ouverts en premier
-        { deadline: 'asc' }, // Puis par date limite
+        { visibility: 'asc' }, // CLOSED < PRIVATE < PUBLIC — PUBLIC en dernier alphabétiquement mais on trie ensuite
+        { deadline: 'asc' },
         { name: 'asc' },
       ],
     })
 
+    // Trier : PUBLIC en premier, puis CLOSED
+    const sorted = showCalls.sort((a, b) => {
+      if (a.visibility === 'PUBLIC' && b.visibility !== 'PUBLIC') return -1
+      if (a.visibility !== 'PUBLIC' && b.visibility === 'PUBLIC') return 1
+      return 0
+    })
+
     return {
-      showCalls,
-      hasOpenCalls: showCalls.some((sc) => sc.isOpen),
+      showCalls: sorted,
+      hasOpenCalls: sorted.some((sc) => sc.visibility === 'PUBLIC'),
     }
   },
   { operationName: 'GetPublicShowCalls' }

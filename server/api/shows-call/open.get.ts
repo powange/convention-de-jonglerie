@@ -7,13 +7,13 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
  */
 export default wrapApiHandler(
   async () => {
-    // Récupérer tous les appels à spectacles ouverts
+    // Récupérer tous les appels à spectacles publics
     // sur des éditions publiées et dont la date de fin n'est pas passée
     const now = new Date()
 
     const showCalls = await prisma.editionShowCall.findMany({
       where: {
-        isOpen: true,
+        visibility: 'PUBLIC',
         edition: {
           status: 'PUBLISHED',
           endDate: {
@@ -24,7 +24,7 @@ export default wrapApiHandler(
       select: {
         id: true,
         name: true,
-        isOpen: true,
+        visibility: true,
         mode: true,
         externalUrl: true,
         description: true,
