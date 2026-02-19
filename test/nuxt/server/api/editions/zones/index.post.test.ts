@@ -35,7 +35,7 @@ describe('API Zones - Création (POST)', () => {
       [48.8576, 2.3532],
       [48.8586, 2.3512],
     ],
-    zoneType: 'CAMPING',
+    zoneTypes: ['CAMPING'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -65,7 +65,7 @@ describe('API Zones - Création (POST)', () => {
         [48.8576, 2.3532],
         [48.8586, 2.3512],
       ],
-      zoneType: 'CAMPING',
+      zoneTypes: ['CAMPING'],
     }
 
     prismaMock.editionZone.count.mockResolvedValue(0)
@@ -87,7 +87,7 @@ describe('API Zones - Création (POST)', () => {
         description: zoneData.description,
         color: zoneData.color,
         coordinates: zoneData.coordinates,
-        zoneType: zoneData.zoneType,
+        zoneTypes: zoneData.zoneTypes,
         order: 0,
       }),
       select: expect.any(Object),
@@ -204,7 +204,7 @@ describe('API Zones - Création (POST)', () => {
   it('devrait utiliser le type OTHER par défaut', async () => {
     prismaMock.editionZone.count.mockResolvedValue(0)
     prismaMock.editionZone.aggregate.mockResolvedValue({ _max: { order: null } })
-    prismaMock.editionZone.create.mockResolvedValue({ ...mockZone, zoneType: 'OTHER' })
+    prismaMock.editionZone.create.mockResolvedValue({ ...mockZone, zoneTypes: ['OTHER'] })
 
     global.readBody.mockResolvedValue({
       name: 'Zone Test',
@@ -214,17 +214,80 @@ describe('API Zones - Création (POST)', () => {
         [48.8576, 2.3532],
         [48.8586, 2.3512],
       ],
-      // Pas de zoneType spécifié
+      // Pas de zoneTypes spécifié
     })
 
     await zonesPostHandler(mockEvent as any)
 
     expect(prismaMock.editionZone.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        zoneType: 'OTHER',
+        zoneTypes: ['OTHER'],
       }),
       select: expect.any(Object),
     })
+  })
+
+  it('devrait accepter plusieurs types de zone', async () => {
+    prismaMock.editionZone.count.mockResolvedValue(0)
+    prismaMock.editionZone.aggregate.mockResolvedValue({ _max: { order: null } })
+    prismaMock.editionZone.create.mockResolvedValue({
+      ...mockZone,
+      zoneTypes: ['CAMPING', 'FOOD', 'TOILETS'],
+    })
+
+    global.readBody.mockResolvedValue({
+      name: 'Zone Multi-Services',
+      color: '#ff0000',
+      coordinates: [
+        [48.8566, 2.3522],
+        [48.8576, 2.3532],
+        [48.8586, 2.3512],
+      ],
+      zoneTypes: ['CAMPING', 'FOOD', 'TOILETS'],
+    })
+
+    await zonesPostHandler(mockEvent as any)
+
+    expect(prismaMock.editionZone.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        zoneTypes: ['CAMPING', 'FOOD', 'TOILETS'],
+      }),
+      select: expect.any(Object),
+    })
+  })
+
+  it('devrait rejeter un type de zone invalide', async () => {
+    prismaMock.editionZone.count.mockResolvedValue(0)
+
+    global.readBody.mockResolvedValue({
+      name: 'Zone Test',
+      color: '#ff0000',
+      coordinates: [
+        [48.8566, 2.3522],
+        [48.8576, 2.3532],
+        [48.8586, 2.3512],
+      ],
+      zoneTypes: ['INVALID_TYPE'],
+    })
+
+    await expect(zonesPostHandler(mockEvent as any)).rejects.toThrow()
+  })
+
+  it('devrait rejeter un tableau de types vide', async () => {
+    prismaMock.editionZone.count.mockResolvedValue(0)
+
+    global.readBody.mockResolvedValue({
+      name: 'Zone Test',
+      color: '#ff0000',
+      coordinates: [
+        [48.8566, 2.3522],
+        [48.8576, 2.3532],
+        [48.8586, 2.3512],
+      ],
+      zoneTypes: [],
+    })
+
+    await expect(zonesPostHandler(mockEvent as any)).rejects.toThrow()
   })
 
   it("devrait retourner 400 si l'ID est invalide", async () => {

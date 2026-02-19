@@ -31,7 +31,7 @@ describe('API Markers - Suppression (DELETE)', () => {
     description: 'Entrée du site',
     latitude: 48.8566,
     longitude: 2.3522,
-    markerType: 'ENTRANCE',
+    markerTypes: ['ENTRANCE'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),

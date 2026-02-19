@@ -8,6 +8,11 @@ import { z } from 'zod'
 export const zoneTypeSchema = z.enum(EDITION_ZONE_TYPES)
 
 /**
+ * Schéma Zod pour un tableau de types de zone (au moins 1 type requis)
+ */
+export const zoneTypesArraySchema = z.array(zoneTypeSchema).min(1)
+
+/**
  * Schéma Zod pour la création d'une zone
  */
 export const createZoneSchema = z.object({
@@ -15,7 +20,7 @@ export const createZoneSchema = z.object({
   description: z.string().optional().nullable(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)'),
   coordinates: z.array(z.array(z.number()).length(2)).min(ZONE_LIMITS.MIN_POLYGON_POINTS),
-  zoneType: zoneTypeSchema.default('OTHER'),
+  zoneTypes: zoneTypesArraySchema.default(['OTHER']),
 })
 
 /**
@@ -32,7 +37,7 @@ export const updateZoneSchema = z.object({
     .array(z.array(z.number()).length(2))
     .min(ZONE_LIMITS.MIN_POLYGON_POINTS)
     .optional(),
-  zoneType: zoneTypeSchema.optional(),
+  zoneTypes: zoneTypesArraySchema.optional(),
 })
 
 /**
@@ -43,7 +48,7 @@ export const createMarkerSchema = z.object({
   description: z.string().optional().nullable(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  markerType: zoneTypeSchema.default('OTHER'),
+  markerTypes: zoneTypesArraySchema.default(['OTHER']),
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)')
@@ -59,7 +64,7 @@ export const updateMarkerSchema = z.object({
   description: z.string().optional().nullable(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
-  markerType: zoneTypeSchema.optional(),
+  markerTypes: zoneTypesArraySchema.optional(),
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)')

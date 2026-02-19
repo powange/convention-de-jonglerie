@@ -33,6 +33,20 @@ export const useDateFormat = () => {
   }
 
   /**
+   * Formate une date en format long (ex: "Mercredi 19 février 2026")
+   */
+  const formatDateFull = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(locale.value, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'Europe/Paris',
+    })
+  }
+
+  /**
    * Formate une date avec le nom court du jour
    */
   const formatDateWithWeekday = (dateString: string) => {
@@ -152,6 +166,7 @@ export const useDateFormat = () => {
   return {
     formatDateTime,
     formatDate,
+    formatDateFull,
     formatDateWithWeekday,
     formatDateTimeWithWeekday,
     formatDateTimeRange,

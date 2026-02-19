@@ -4,7 +4,7 @@ export interface EditionMarker {
   description: string | null
   latitude: number
   longitude: number
-  markerType: string
+  markerTypes: string[]
   color: string | null
   order: number
   createdAt: string
@@ -16,7 +16,7 @@ export interface CreateMarkerData {
   description?: string | null
   latitude: number
   longitude: number
-  markerType?: string
+  markerTypes?: string[]
   color?: string | null
 }
 
@@ -25,7 +25,7 @@ export interface UpdateMarkerData {
   description?: string | null
   latitude?: number
   longitude?: number
-  markerType?: string
+  markerTypes?: string[]
   color?: string | null
 }
 

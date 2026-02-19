@@ -407,23 +407,24 @@ enum EditionZoneType {
   MARKET
   ENTRANCE
   TOILETS
+  SHOWER
   INFO
   GYM
   OTHER
 }
 
 model EditionZone {
-  id          Int             @id @default(autoincrement())
-  edition     Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  edition     Edition  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   editionId   Int
-  name        String          @db.VarChar(100)
-  description String?         @db.Text
-  color       String          @db.VarChar(7) // Format #RRGGBB
-  coordinates Json            // GeoJSON polygon coordinates
-  zoneType    EditionZoneType @default(OTHER)
-  order       Int             @default(0)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  color       String   @db.VarChar(7) // Format #RRGGBB
+  coordinates Json     // GeoJSON polygon coordinates
+  zoneTypes   Json     @default("[\"OTHER\"]") // JSON array of EditionZoneType values
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   shows Show[]
 
@@ -431,18 +432,18 @@ model EditionZone {
 }
 
 model EditionMarker {
-  id          Int             @id @default(autoincrement())
-  edition     Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  edition     Edition  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   editionId   Int
-  name        String          @db.VarChar(100)
-  description String?         @db.Text
-  latitude    Float           // Coordonnée latitude
-  longitude   Float           // Coordonnée longitude
-  markerType  EditionZoneType @default(OTHER)
-  color       String?         @db.VarChar(7) // Couleur personnalisée (format #RRGGBB), null = couleur du type
-  order       Int             @default(0)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  latitude    Float    // Coordonnée latitude
+  longitude   Float    // Coordonnée longitude
+  markerTypes Json     @default("[\"OTHER\"]") // JSON array of EditionZoneType values
+  color       String?  @db.VarChar(7) // Couleur personnalisée (format #RRGGBB), null = couleur du type
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   shows Show[]
 

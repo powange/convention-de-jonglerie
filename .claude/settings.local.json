@@ -158,7 +158,10 @@
       "mcp__nuxt-ui__list-components",
       "Bash(git mv:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx nuxi typecheck:*)"
+      "Bash(npx nuxi typecheck:*)",
+      "Bash(npx prettier:*)",
+      "WebFetch(domain:lucide.dev)",
+      "WebFetch(domain:unpkg.com)"
     ],
     "deny": [],
     "ask": [],

@@ -44,7 +44,7 @@ export default wrapApiHandler(
         description: data.description,
         color: data.color,
         coordinates: data.coordinates,
-        zoneType: data.zoneType,
+        zoneTypes: data.zoneTypes,
       },
       select: editionZoneSelect,
     })

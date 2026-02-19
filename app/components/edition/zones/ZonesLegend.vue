@@ -9,7 +9,7 @@ interface LegendItem {
   id: number
   name: string
   description: string | null
-  type: string // zoneType ou markerType
+  type: string // type principal (premier élément de zoneTypes/markerTypes)
   color?: string // Seulement pour les zones
   itemType: 'zone' | 'marker'
   order: number
@@ -62,41 +62,49 @@ interface LegendGroup {
 }
 
 const legendGroups = computed<LegendGroup[]>(() => {
-  const items: LegendItem[] = []
+  // Grouper par type — un item avec plusieurs types apparaît dans chaque groupe
+  const groupMap = new Map<string, LegendItem[]>()
+
+  const addToGroup = (type: string, item: LegendItem) => {
+    const group = groupMap.get(type)
+    if (group) {
+      // Éviter les doublons (même id + itemType)
+      if (!group.some((g) => g.id === item.id && g.itemType === item.itemType)) {
+        group.push(item)
+      }
+    } else {
+      groupMap.set(type, [item])
+    }
+  }
 
   props.zones.forEach((zone) => {
-    items.push({
+    const item: LegendItem = {
       id: zone.id,
       name: zone.name,
       description: zone.description,
-      type: zone.zoneType,
+      type: zone.zoneTypes[0] || 'OTHER',
       color: zone.color,
       itemType: 'zone',
       order: zone.order,
-    })
+    }
+    for (const type of zone.zoneTypes) {
+      addToGroup(type, item)
+    }
   })
 
   props.markers.forEach((marker) => {
-    items.push({
+    const item: LegendItem = {
       id: marker.id,
       name: marker.name,
       description: marker.description,
-      type: marker.markerType,
+      type: marker.markerTypes[0] || 'OTHER',
       itemType: 'marker',
       order: marker.order,
-    })
-  })
-
-  // Grouper par type
-  const groupMap = new Map<string, LegendItem[]>()
-  for (const item of items) {
-    const group = groupMap.get(item.type)
-    if (group) {
-      group.push(item)
-    } else {
-      groupMap.set(item.type, [item])
     }
-  }
+    for (const type of marker.markerTypes) {
+      addToGroup(type, item)
+    }
+  })
 
   // Trier les items dans chaque groupe par ordre
   // Trier les groupes par le plus petit ordre de leurs items

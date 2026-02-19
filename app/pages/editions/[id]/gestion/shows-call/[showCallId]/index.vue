@@ -187,11 +187,11 @@
               </div>
 
               <UFormField :error="fieldErrors.deadline">
-                <UInput
+                <UiDateTimePicker
                   v-model="deadlineLocal"
-                  type="datetime-local"
-                  :disabled="saving"
-                  class="w-full max-w-xs"
+                  :date-label="$t('gestion.shows_call.deadline_date')"
+                  :time-label="$t('gestion.shows_call.deadline_time')"
+                  :placeholder="$t('gestion.shows_call.deadline_label')"
                 />
               </UFormField>
             </div>
@@ -354,6 +354,7 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCall, ShowCallVisibility } from '~/types'
+import { formatDateTimeLocal } from '~/utils/date'
 
 definePageMeta({
   middleware: ['authenticated'],
@@ -546,10 +547,10 @@ const fetchSettings = async () => {
     askDepartureCityLocal.value = response.askDepartureCity ?? false
     askSocialLinksLocal.value = response.askSocialLinks ?? false
 
-    // Formater la date pour l'input datetime-local
+    // Formater la date pour le DateTimePicker
     if (response.deadline) {
       const date = new Date(response.deadline)
-      deadlineLocal.value = date.toISOString().slice(0, 16)
+      deadlineLocal.value = formatDateTimeLocal(date)
     } else {
       deadlineLocal.value = ''
     }

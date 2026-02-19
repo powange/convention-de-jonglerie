@@ -35,7 +35,7 @@ describe('API Zones - Suppression (DELETE)', () => {
       [48.8576, 2.3532],
       [48.8586, 2.3512],
     ],
-    zoneType: 'CAMPING',
+    zoneTypes: ['CAMPING'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),

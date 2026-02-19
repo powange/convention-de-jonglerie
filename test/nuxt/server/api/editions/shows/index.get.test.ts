@@ -43,7 +43,7 @@ describe('/api/editions/[id]/shows GET', () => {
         returnableItem: { id: 1, name: 'Balle de jonglage' },
       },
     ],
-    zone: { id: 1, name: 'Scène A', color: '#ff0000', zoneType: 'STAGE' },
+    zone: { id: 1, name: 'Scène A', color: '#ff0000', zoneTypes: ['STAGE'] },
     marker: null,
   }
 
@@ -61,7 +61,7 @@ describe('/api/editions/[id]/shows GET', () => {
     artists: [],
     returnableItems: [],
     zone: null,
-    marker: { id: 1, name: 'Point Info', color: '#00ff00', markerType: 'INFO' },
+    marker: { id: 1, name: 'Point Info', color: '#00ff00', markerTypes: ['INFO'] },
   }
 
   beforeEach(() => {

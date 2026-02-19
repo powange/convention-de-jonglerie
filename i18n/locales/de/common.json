@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Kommentar hinzufügen...",
     "add_lost_item": "Fundsache hinzufügen",
     "artist_space": "Mein Künstlerbereich",
+    "artists": {
+      "title": "Künstler"
+    },
     "cancelled_edition": "Abgesagte Ausgabe",
     "cancelled_edition_message": "Diese Ausgabe wurde abgesagt",
     "cannot_add_comment": "Kommentar kann nicht hinzugefügt werden",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Fundsachen öffnen sobald die Auflage beginnt.",
     "lost_item_added": "Fundsache hinzugefügt",
     "management": "Verwaltung",
+    "map": "Karte",
     "mark_as_lost": "Als verloren markieren",
     "mark_as_returned": "Als zurückgegeben markieren",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Ungültige Dauer",
       "last_name": "Nachname",
       "last_name_placeholder": "Ihr Nachname",
+      "loading_error": "Fehler beim Laden der Freiwilligen",
       "login_prompt": "Melden Sie sich an, um sich als Freiwilliger zu bewerben.",
       "manage_assignments": "Zugewiesene Freiwillige",
       "manage_assignments_description": "Freiwillige verwalten, die diesem Zeitfenster zugewiesen sind",

@@ -15,7 +15,7 @@ interface Emits {
       name: string
       description: string | null
       color: string
-      zoneType: string
+      zoneTypes: string[]
     }
   ): void
 }
@@ -48,7 +48,7 @@ const form = reactive({
   name: '',
   description: '',
   color: defaultColors[0]!,
-  zoneType: 'OTHER',
+  zoneTypes: ['OTHER'] as string[],
 })
 
 // Remplir le formulaire avec les données de la zone si elle existe
@@ -60,20 +60,20 @@ watch(
         form.name = props.zone.name
         form.description = props.zone.description || ''
         form.color = props.zone.color
-        form.zoneType = props.zone.zoneType
+        form.zoneTypes = [...props.zone.zoneTypes]
       } else {
         // Reset pour une nouvelle zone
         form.name = ''
         form.description = ''
         form.color = defaultColors[Math.floor(Math.random() * defaultColors.length)]!
-        form.zoneType = 'OTHER'
+        form.zoneTypes = ['OTHER']
       }
     }
   },
   { immediate: true }
 )
 
-const isValid = computed(() => form.name.trim().length > 0)
+const isValid = computed(() => form.name.trim().length > 0 && form.zoneTypes.length > 0)
 
 const handleSave = () => {
   if (!isValid.value) return
@@ -82,7 +82,7 @@ const handleSave = () => {
     name: form.name.trim(),
     description: form.description.trim() || null,
     color: form.color,
-    zoneType: form.zoneType,
+    zoneTypes: form.zoneTypes,
   })
 }
 
@@ -120,11 +120,12 @@ const modalTitle = computed(() =>
           />
         </UFormField>
 
-        <UFormField :label="t('gestion.map.zone_type')">
+        <UFormField :label="t('gestion.map.zone_types')">
           <USelect
-            v-model="form.zoneType"
+            v-model="form.zoneTypes"
+            multiple
             :items="zoneTypes"
-            :icon="getZoneTypeIcon(form.zoneType)"
+            :icon="form.zoneTypes.length > 0 ? getZoneTypeIcon(form.zoneTypes[0]) : undefined"
             class="w-full"
           />
         </UFormField>

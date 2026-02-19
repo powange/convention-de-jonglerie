@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Ajouter un commentaire...",
     "add_lost_item": "Ajouter un objet trouvé",
     "artist_space": "Mon espace artiste",
+    "artists": {
+      "title": "Artistes"
+    },
     "cancelled_edition": "Édition annulée",
     "cancelled_edition_message": "Cette édition a été annulée",
     "cannot_add_comment": "Impossible d'ajouter le commentaire",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Les objets trouvés seront disponibles au début de l'édition.",
     "lost_item_added": "Objet trouvé ajouté",
     "management": "Gestion",
+    "map": "Carte",
     "mark_as_lost": "Marquer comme perdu",
     "mark_as_returned": "Marquer comme restitué",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Durée invalide",
       "last_name": "Nom",
       "last_name_placeholder": "Votre nom",
+      "loading_error": "Erreur de chargement des bénévoles",
       "login_prompt": "Connectez-vous pour postuler comme bénévole.",
       "manage_assignments": "Bénévoles assignés",
       "manage_assignments_description": "Gérer les bénévoles assignés à ce créneau",

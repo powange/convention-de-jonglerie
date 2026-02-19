@@ -14,7 +14,7 @@ interface Emits {
     data: {
       name: string
       description: string | null
-      markerType: string
+      markerTypes: string[]
       color: string
     }
   ): void
@@ -47,7 +47,7 @@ const defaultColors = [
 const form = reactive({
   name: '',
   description: '',
-  markerType: 'OTHER',
+  markerTypes: ['OTHER'] as string[],
   color: defaultColors[0]!,
 })
 
@@ -59,13 +59,13 @@ watch(
       if (props.marker) {
         form.name = props.marker.name
         form.description = props.marker.description || ''
-        form.markerType = props.marker.markerType
+        form.markerTypes = [...props.marker.markerTypes]
         form.color = props.marker.color || defaultColors[0]!
       } else {
         // Reset pour un nouveau marqueur
         form.name = ''
         form.description = ''
-        form.markerType = 'OTHER'
+        form.markerTypes = ['OTHER']
         form.color = defaultColors[0]!
       }
     }
@@ -73,7 +73,7 @@ watch(
   { immediate: true }
 )
 
-const isValid = computed(() => form.name.trim().length > 0)
+const isValid = computed(() => form.name.trim().length > 0 && form.markerTypes.length > 0)
 
 const handleSave = () => {
   if (!isValid.value) return
@@ -81,7 +81,7 @@ const handleSave = () => {
   emit('save', {
     name: form.name.trim(),
     description: form.description.trim() || null,
-    markerType: form.markerType,
+    markerTypes: form.markerTypes,
     color: form.color,
   })
 }
@@ -120,11 +120,12 @@ const modalTitle = computed(() =>
           />
         </UFormField>
 
-        <UFormField :label="t('gestion.map.marker_type')">
+        <UFormField :label="t('gestion.map.marker_types')">
           <USelect
-            v-model="form.markerType"
+            v-model="form.markerTypes"
+            multiple
             :items="markerTypes"
-            :icon="getZoneTypeIcon(form.markerType)"
+            :icon="form.markerTypes.length > 0 ? getZoneTypeIcon(form.markerTypes[0]) : undefined"
             class="w-full"
           />
         </UFormField>

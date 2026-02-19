@@ -5,6 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const showSchema = z.object({
@@ -116,22 +117,7 @@ export default wrapApiHandler(
             },
           },
         },
-        zone: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-            zoneType: true,
-          },
-        },
-        marker: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-            markerType: true,
-          },
-        },
+        ...showZoneMarkerInclude,
       },
     })
 

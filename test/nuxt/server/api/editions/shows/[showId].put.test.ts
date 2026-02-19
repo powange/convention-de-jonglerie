@@ -138,7 +138,7 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
         ...mockUpdatedShow,
         zoneId: 5,
         markerId: null,
-        zone: { id: 5, name: 'Scène B', color: '#00ff00', zoneType: 'STAGE' },
+        zone: { id: 5, name: 'Scène B', color: '#00ff00', zoneTypes: ['STAGE'] },
       })
 
       global.readBody.mockResolvedValue({ zoneId: 5, markerId: null })

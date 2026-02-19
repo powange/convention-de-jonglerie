@@ -59,6 +59,10 @@ export function getTranslationsToLoad(path: string): string[] {
       translations: ['artists'],
     },
     {
+      pattern: /^\/editions\/\d+\/artist-space/,
+      translations: ['artists'],
+    },
+    {
       pattern: /^\/editions\/\d+\/workshops/,
       translations: ['workshops'],
     },

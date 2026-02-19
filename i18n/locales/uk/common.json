@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Додати коментар...",
     "add_lost_item": "Додати загублений предмет",
     "artist_space": "Мій простір артиста",
+    "artists": {
+      "title": "Артисти"
+    },
     "cancelled_edition": "Скасоване видання",
     "cancelled_edition_message": "Це видання було скасовано",
     "cannot_add_comment": "Неможливо додати коментар",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Загублені та знайдені відкриються, коли видання розпочнеться.",
     "lost_item_added": "Загублений предмет додано",
     "management": "Управління",
+    "map": "Карта",
     "mark_as_lost": "Позначити як загублене",
     "mark_as_returned": "Позначити як повернуте",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Недійсна тривалість",
       "last_name": "Прізвище",
       "last_name_placeholder": "Ваше прізвище",
+      "loading_error": "Помилка завантаження волонтерів",
       "login_prompt": "Увійдіть, щоб подати заявку волонтера.",
       "manage_assignments": "Призначені волонтери",
       "manage_assignments_description": "Керувати волонтерами, призначеними на цей слот",

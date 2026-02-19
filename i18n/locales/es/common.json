@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Agregar un comentario...",
     "add_lost_item": "Agregar objeto perdido",
     "artist_space": "Mi espacio de artista",
+    "artists": {
+      "title": "Artistas"
+    },
     "cancelled_edition": "Edición cancelada",
     "cancelled_edition_message": "Esta edición ha sido cancelada",
     "cannot_add_comment": "No se puede agregar el comentario",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Objetos perdidos disponible cuando la edición comience.",
     "lost_item_added": "Objeto perdido agregado",
     "management": "Gestión",
+    "map": "Mapa",
     "mark_as_lost": "Marcar como perdido",
     "mark_as_returned": "Marcar como devuelto",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Duración inválida",
       "last_name": "Apellido",
       "last_name_placeholder": "Su apellido",
+      "loading_error": "Error al cargar los voluntarios",
       "login_prompt": "Inicia sesión para postularte como voluntario.",
       "manage_assignments": "Voluntarios asignados",
       "manage_assignments_description": "Gestionar voluntarios asignados a este turno",

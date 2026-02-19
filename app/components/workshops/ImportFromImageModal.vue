@@ -143,18 +143,21 @@
                   </UFormField>
 
                   <!-- Date et heure -->
-                  <div class="grid grid-cols-2 gap-3">
-                    <UFormField :label="$t('workshops.start_datetime')" required>
-                      <UInput
-                        v-model="workshop.startDateTime"
-                        type="datetime-local"
-                        class="w-full"
-                      />
-                    </UFormField>
-
-                    <UFormField :label="$t('workshops.end_datetime')" required>
-                      <UInput v-model="workshop.endDateTime" type="datetime-local" class="w-full" />
-                    </UFormField>
+                  <div class="space-y-3">
+                    <UiDateTimePicker
+                      v-model="workshop.startDateTime"
+                      :date-label="$t('workshops.start_date')"
+                      :time-label="$t('workshops.start_time')"
+                      :placeholder="$t('workshops.start_datetime')"
+                      required
+                    />
+                    <UiDateTimePicker
+                      v-model="workshop.endDateTime"
+                      :date-label="$t('workshops.end_date')"
+                      :time-label="$t('workshops.end_time')"
+                      :placeholder="$t('workshops.end_datetime')"
+                      required
+                    />
                   </div>
 
                   <!-- Nombre max de participants et lieu -->

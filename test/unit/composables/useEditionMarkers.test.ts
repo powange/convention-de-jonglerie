@@ -43,7 +43,7 @@ describe('useEditionMarkers', () => {
       description: 'Entrée du site',
       latitude: 48.8566,
       longitude: 2.3522,
-      markerType: 'ENTRANCE',
+      markerTypes: ['ENTRANCE'],
       order: 0,
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',
@@ -54,7 +54,7 @@ describe('useEditionMarkers', () => {
       description: 'Accueil et informations',
       latitude: 48.8576,
       longitude: 2.3532,
-      markerType: 'INFO',
+      markerTypes: ['INFO'],
       order: 1,
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',
@@ -161,7 +161,7 @@ describe('useEditionMarkers', () => {
         name: 'Nouveau Marker',
         latitude: 48.8566,
         longitude: 2.3522,
-        markerType: 'ENTRANCE',
+        markerTypes: ['ENTRANCE'],
       })
 
       expect(mockFetch).toHaveBeenLastCalledWith('/api/editions/1/markers', {

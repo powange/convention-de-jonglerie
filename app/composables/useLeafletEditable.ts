@@ -12,7 +12,7 @@ export interface EditionZoneData {
   description?: string | null
   color: string
   coordinates: [number, number][]
-  zoneType: string
+  zoneTypes: string[]
   order?: number
 }
 
@@ -22,7 +22,7 @@ export interface EditionMarkerData {
   description?: string | null
   latitude: number
   longitude: number
-  markerType: string
+  markerTypes: string[]
   color?: string | null
   order?: number
 }
@@ -174,6 +174,8 @@ export const useLeafletEditable = (
         attribution:
           '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         zIndex: 1,
+        maxZoom: 22,
+        maxNativeZoom: 19,
       }).addTo(leafletMapInstance)
 
       // S'assurer que le tile pane a le bon z-index
@@ -227,7 +229,7 @@ export const useLeafletEditable = (
     polygons.value.set(zone.id, polygon)
 
     // Ajouter une icône de type au centre de la zone
-    const zoneIcon = getZoneIcon(zone.zoneType, zone.color)
+    const zoneIcon = getZoneIcon(zone.zoneTypes, zone.color)
     if (zoneIcon) {
       const center = polygon.getBounds().getCenter()
       const iconMarker = window.L.marker(center, {
@@ -288,14 +290,14 @@ export const useLeafletEditable = (
     }
   }
 
-  const updateZoneIcon = (zoneId: number, zoneType: string, color: string) => {
+  const updateZoneIcon = (zoneId: number, zoneTypes: string[], color: string) => {
     const iconMarker = zoneIconMarkers.value.get(zoneId)
     const polygon = polygons.value.get(zoneId)
     if (iconMarker && polygon && map.value) {
       map.value.removeLayer(iconMarker)
       zoneIconMarkers.value.delete(zoneId)
 
-      const newIcon = getZoneIcon(zoneType, color)
+      const newIcon = getZoneIcon(zoneTypes, color)
       if (newIcon) {
         const center = polygon.getBounds().getCenter()
         const newIconMarker = window.L.marker(center, {
@@ -439,33 +441,37 @@ export const useLeafletEditable = (
   // FONCTIONS POUR LES MARQUEURS
   // ============================================================================
 
-  const getZoneIcon = (zoneType: string, color: string) => {
+  const getZoneIcon = (zoneTypes: string[], color: string) => {
     const L = window.L
-    if (!L) return null
+    if (!L || zoneTypes.length === 0) return null
 
-    const svgIcon = getZoneTypeSvgIcon(zoneType)
+    const iconsHtml = zoneTypes.map((type) => getZoneTypeSvgIcon(type)).join('')
+    const iconCount = zoneTypes.length
+    const width = iconCount === 1 ? 28 : 20 * iconCount + 8
 
     return L.divIcon({
       className: 'zone-icon',
-      html: `<div class="zone-icon-inner" style="border-color: ${color}; color: ${color};">${svgIcon}</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
+      html: `<div class="zone-icon-inner" style="border-color: ${color}; color: ${color};">${iconsHtml}</div>`,
+      iconSize: [width, 28],
+      iconAnchor: [width / 2, 14],
     })
   }
 
-  const getMarkerIcon = (markerType: string, customColor?: string | null) => {
+  const getMarkerIcon = (markerTypes: string[], customColor?: string | null) => {
     const L = window.L
-    if (!L) return null
+    if (!L || markerTypes.length === 0) return null
 
-    // Utiliser la couleur personnalisée si définie, sinon la couleur du type
-    const color = customColor || getZoneTypeColor(markerType)
-    const svgIcon = getZoneTypeSvgIcon(markerType)
+    // Utiliser la couleur personnalisée si définie, sinon la couleur du premier type
+    const color = customColor || getZoneTypeColor(markerTypes[0])
+    const iconsHtml = markerTypes.map((type) => getZoneTypeSvgIcon(type)).join('')
+    const iconCount = markerTypes.length
+    const width = iconCount === 1 ? 32 : 22 * iconCount + 10
 
     return L.divIcon({
       className: 'custom-marker-icon',
-      html: `<div class="marker-icon" style="border-color: ${color}; color: ${color};">${svgIcon}</div>`,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
+      html: `<div class="marker-icon" style="border-color: ${color}; color: ${color};">${iconsHtml}</div>`,
+      iconSize: [width, 32],
+      iconAnchor: [width / 2, 32],
       popupAnchor: [0, -32],
     })
   }
@@ -478,7 +484,7 @@ export const useLeafletEditable = (
       return
     }
 
-    const icon = getMarkerIcon(marker.markerType, marker.color)
+    const icon = getMarkerIcon(marker.markerTypes, marker.color)
 
     const leafletMarker = window.L.marker([marker.latitude, marker.longitude], {
       icon,
@@ -522,10 +528,14 @@ export const useLeafletEditable = (
     }
   }
 
-  const updateMarkerIcon = (markerId: number, markerType: string, customColor?: string | null) => {
+  const updateMarkerIcon = (
+    markerId: number,
+    markerTypes: string[],
+    customColor?: string | null
+  ) => {
     const marker = leafletMarkers.value.get(markerId)
     if (marker) {
-      const icon = getMarkerIcon(markerType, customColor)
+      const icon = getMarkerIcon(markerTypes, customColor)
       if (icon) {
         marker.setIcon(icon)
       }

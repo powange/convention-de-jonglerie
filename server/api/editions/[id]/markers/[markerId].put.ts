@@ -44,7 +44,7 @@ export default wrapApiHandler(
         description: data.description,
         latitude: data.latitude,
         longitude: data.longitude,
-        markerType: data.markerType,
+        markerTypes: data.markerTypes,
         color: data.color,
       },
       select: editionMarkerSelect,

@@ -35,6 +35,15 @@ const EXCLUDED_FILES = [
   // Ajouter d'autres fichiers ici si nécessaire
 ]
 
+/**
+ * Détecte si un fichier Vue utilise useI18n({ useScope: 'local' })
+ * Ces fichiers ont leurs traductions intégrées dans des blocs <i18n>
+ * et leurs appels t() ne doivent pas être analysés comme des clés globales.
+ */
+function usesLocalScope(content) {
+  return /useI18n\(\s*\{\s*useScope:\s*['"]local['"]\s*\}/.test(content)
+}
+
 // Dossiers à exclure de l'analyse (patterns)
 const EXCLUDED_DIRS = [
   'server/generated/', // Fichiers générés par Prisma
@@ -251,6 +260,12 @@ function extractI18nKeysFromFile(filePath) {
   const originalContent = fs.readFileSync(filePath, 'utf8')
   let content = originalContent
   const keys = new Map() // Map<key, {line: number}>
+
+  // Ignorer les fichiers Vue qui utilisent useI18n({ useScope: 'local' })
+  // Leurs appels t() référencent des traductions locales (<i18n> bloc), pas des clés globales
+  if (filePath.endsWith('.vue') && usesLocalScope(originalContent)) {
+    return keys
+  }
 
   // Pour les fichiers Vue, prétraiter le contenu pour exclure les directives et interpolations
   if (filePath.endsWith('.vue')) {
@@ -616,6 +631,17 @@ async function main() {
   const vueFiles = allFiles.filter((file) => file.endsWith('.vue'))
   const tsFiles = allFiles.filter((file) => file.endsWith('.ts'))
   const jsFiles = allFiles.filter((file) => file.endsWith('.js'))
+
+  // Compter les fichiers Vue avec scope local (exclus de l'analyse des clés)
+  const localScopeFiles = vueFiles.filter((file) => {
+    const content = fs.readFileSync(file, 'utf8')
+    return usesLocalScope(content)
+  })
+  if (localScopeFiles.length > 0) {
+    console.log(
+      `${YELLOW}ℹ️  ${localScopeFiles.length} fichier(s) Vue avec useScope: 'local' (clés i18n ignorées)${RESET}`
+    )
+  }
 
   console.log(
     `${CYAN}Analyse de ${allFiles.length} fichiers (${vueFiles.length} Vue, ${tsFiles.length} TS, ${jsFiles.length} JS)...${RESET}\n`

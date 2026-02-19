@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Aggiungi un commento...",
     "add_lost_item": "Aggiungi oggetto smarrito",
     "artist_space": "Il mio spazio artista",
+    "artists": {
+      "title": "Artisti"
+    },
     "cancelled_edition": "Edizione annullata",
     "cancelled_edition_message": "Questa edizione è stata annullata",
     "cannot_add_comment": "Impossibile aggiungere il commento",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Oggetti smarriti disponibile all'inizio dell'edizione.",
     "lost_item_added": "Oggetto smarrito aggiunto",
     "management": "Gestione",
+    "map": "Mappa",
     "mark_as_lost": "Segna come smarrito",
     "mark_as_returned": "Segna come restituito",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Durata non valida",
       "last_name": "Cognome",
       "last_name_placeholder": "Il vostro cognome",
+      "loading_error": "Errore nel caricamento dei volontari",
       "login_prompt": "Accedi per candidarti come volontario.",
       "manage_assignments": "Volontari assegnati",
       "manage_assignments_description": "Gestisci i volontari assegnati a questo slot",

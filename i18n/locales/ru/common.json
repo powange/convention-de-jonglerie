@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Добавить комментарий...",
     "add_lost_item": "Добавить потерянную вещь",
     "artist_space": "Моё пространство артиста",
+    "artists": {
+      "title": "Артисты"
+    },
     "cancelled_edition": "Отмененное издание",
     "cancelled_edition_message": "Это издание было отменено",
     "cannot_add_comment": "Невозможно добавить комментарий",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Потерянные вещи откроются, когда издание начнется.",
     "lost_item_added": "Потерянная вещь добавлена",
     "management": "Управление",
+    "map": "Карта",
     "mark_as_lost": "Отметить как потерянное",
     "mark_as_returned": "Отметить как возвращенное",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Неверная продолжительность",
       "last_name": "Фамилия",
       "last_name_placeholder": "Ваша фамилия",
+      "loading_error": "Ошибка загрузки волонтёров",
       "login_prompt": "Войдите, чтобы подать заявку волонтёра.",
       "manage_assignments": "Назначенные волонтеры",
       "manage_assignments_description": "Управление волонтерами, назначенными на этот слот",

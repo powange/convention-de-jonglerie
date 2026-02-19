@@ -4,7 +4,7 @@ export interface EditionZone {
   description: string | null
   color: string
   coordinates: [number, number][]
-  zoneType: string
+  zoneTypes: string[]
   order: number
   createdAt: string
   updatedAt: string
@@ -15,7 +15,7 @@ export interface CreateZoneData {
   description?: string | null
   color: string
   coordinates: [number, number][]
-  zoneType?: string
+  zoneTypes?: string[]
 }
 
 export interface UpdateZoneData {
@@ -23,7 +23,7 @@ export interface UpdateZoneData {
   description?: string | null
   color?: string
   coordinates?: [number, number][]
-  zoneType?: string
+  zoneTypes?: string[]
 }
 
 export const useEditionZones = (editionId: Ref<number | undefined>) => {

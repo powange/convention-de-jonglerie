@@ -1,6 +1,7 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -45,22 +46,7 @@ export default wrapApiHandler(
             },
           },
         },
-        zone: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-            zoneType: true,
-          },
-        },
-        marker: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-            markerType: true,
-          },
-        },
+        ...showZoneMarkerInclude,
       },
       orderBy: {
         startDateTime: 'asc',

@@ -47,7 +47,7 @@ describe('useEditionZones', () => {
         [48.8576, 2.3532],
         [48.8586, 2.3512],
       ],
-      zoneType: 'CAMPING',
+      zoneTypes: ['CAMPING'],
       order: 0,
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',
@@ -62,7 +62,7 @@ describe('useEditionZones', () => {
         [48.8606, 2.3552],
         [48.8616, 2.3522],
       ],
-      zoneType: 'SHOWS',
+      zoneTypes: ['SHOWS'],
       order: 1,
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',
@@ -178,7 +178,7 @@ describe('useEditionZones', () => {
           [48.8576, 2.3532],
           [48.8586, 2.3512],
         ],
-        zoneType: 'CAMPING',
+        zoneTypes: ['CAMPING'],
       })
 
       expect(mockFetch).toHaveBeenLastCalledWith('/api/editions/1/zones', {

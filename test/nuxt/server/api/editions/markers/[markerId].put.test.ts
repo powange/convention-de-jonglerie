@@ -31,7 +31,7 @@ describe('API Markers - Mise à jour (PUT)', () => {
     description: 'Entrée du site',
     latitude: 48.8566,
     longitude: 2.3522,
-    markerType: 'ENTRANCE',
+    markerTypes: ['ENTRANCE'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -177,13 +177,13 @@ describe('API Markers - Mise à jour (PUT)', () => {
     prismaMock.editionMarker.findFirst.mockResolvedValue(mockMarker)
     prismaMock.editionMarker.update.mockResolvedValue({
       ...mockMarker,
-      markerType: 'INFO',
+      markerTypes: ['INFO'],
     })
-    global.readBody.mockResolvedValue({ markerType: 'INFO' })
+    global.readBody.mockResolvedValue({ markerTypes: ['INFO'] })
 
     const result = await markersPutHandler(mockEvent as any)
 
-    expect(result.marker.markerType).toBe('INFO')
+    expect(result.marker.markerTypes).toEqual(['INFO'])
   })
 
   it("devrait retourner 400 si l'ID de marker est invalide", async () => {

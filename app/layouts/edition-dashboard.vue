@@ -74,9 +74,12 @@
                   />
                   <div class="flex flex-col">
                     <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                      getEditionDisplayName(edition)
-                    }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ getEditionDisplayName(edition) }}
+                      <template v-if="edition.startDate && edition.endDate">
+                        &mdash; {{ formatDateRange(edition.startDate, edition.endDate) }}
+                      </template>
+                    </span>
                   </div>
                 </div>
               </template>
@@ -116,6 +119,7 @@ const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
+const { formatDateRange } = useDateFormat()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))

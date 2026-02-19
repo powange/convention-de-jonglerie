@@ -248,26 +248,23 @@
             </div>
 
             <!-- Dates et heures -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <UFormField label="Date et heure de début" required>
-                <UInput
-                  v-model="formData.startDateTime"
-                  type="datetime-local"
-                  icon="i-heroicons-play"
-                  :min="editionDateTimeMin"
-                  :max="editionDateTimeMax"
-                  @change="onStartDateChange"
-                />
-              </UFormField>
-              <UFormField label="Date et heure de fin" required>
-                <UInput
-                  v-model="formData.endDateTime"
-                  type="datetime-local"
-                  icon="i-heroicons-stop"
-                  :min="editionDateTimeMin"
-                  :max="editionDateTimeMax"
-                />
-              </UFormField>
+            <div class="space-y-4">
+              <UiDateTimePicker
+                v-model="formData.startDateTime"
+                :date-label="$t('workshops.start_date')"
+                :time-label="$t('workshops.start_time')"
+                :placeholder="$t('workshops.start_datetime')"
+                :min-date="editionStartDate"
+                required
+              />
+              <UiDateTimePicker
+                v-model="formData.endDateTime"
+                :date-label="$t('workshops.end_date')"
+                :time-label="$t('workshops.end_time')"
+                :placeholder="$t('workshops.end_datetime')"
+                :min-date="editionStartDate"
+                required
+              />
             </div>
 
             <!-- Raccourcis durée -->
@@ -512,17 +509,10 @@ const dateValidationError = computed(() => {
   return null
 })
 
-// Dates min et max pour le date picker (basées sur les dates de l'édition)
-const editionDateTimeMin = computed(() => {
-  if (!edition.value) return undefined
-  // Convertir la date de début de l'édition au format datetime-local
-  return new Date(edition.value.startDate).toISOString().slice(0, 16)
-})
-
-const editionDateTimeMax = computed(() => {
-  if (!edition.value) return undefined
-  // Convertir la date de fin de l'édition au format datetime-local
-  return new Date(edition.value.endDate).toISOString().slice(0, 16)
+// Date minimum pour le DateTimePicker (début de l'édition)
+const editionStartDate = computed(() => {
+  if (!edition.value?.startDate) return undefined
+  return new Date(edition.value.startDate)
 })
 
 // Durée rapide
@@ -565,13 +555,15 @@ const calculatedDuration = computed(() => {
   }
 })
 
-// Gérer le changement de date de début
-const onStartDateChange = () => {
-  // Si la date de fin n'est pas définie ou est avant la date de début, l'ajuster
-  if (!formData.value.endDateTime || formData.value.endDateTime <= formData.value.startDateTime) {
-    formData.value.endDateTime = addHoursToDateTimeLocal(formData.value.startDateTime, 1)
+// Ajuster automatiquement la date de fin quand la date de début change
+watch(
+  () => formData.value.startDateTime,
+  (newVal) => {
+    if (newVal && (!formData.value.endDateTime || formData.value.endDateTime <= newVal)) {
+      formData.value.endDateTime = addHoursToDateTimeLocal(newVal, 1)
+    }
   }
-}
+)
 
 // Définir la durée en ajoutant des heures à la date de début
 const setDuration = (hours: number) => {

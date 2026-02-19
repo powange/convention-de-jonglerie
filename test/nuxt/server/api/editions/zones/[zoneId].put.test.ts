@@ -35,7 +35,7 @@ describe('API Zones - Mise à jour (PUT)', () => {
       [48.8576, 2.3532],
       [48.8586, 2.3512],
     ],
-    zoneType: 'CAMPING',
+    zoneTypes: ['CAMPING'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -192,13 +192,13 @@ describe('API Zones - Mise à jour (PUT)', () => {
     prismaMock.editionZone.findFirst.mockResolvedValue(mockZone)
     prismaMock.editionZone.update.mockResolvedValue({
       ...mockZone,
-      zoneType: 'PARKING',
+      zoneTypes: ['PARKING'],
     })
-    global.readBody.mockResolvedValue({ zoneType: 'PARKING' })
+    global.readBody.mockResolvedValue({ zoneTypes: ['PARKING'] })
 
     const result = await zonesPutHandler(mockEvent as any)
 
-    expect(result.zone.zoneType).toBe('PARKING')
+    expect(result.zone.zoneTypes).toEqual(['PARKING'])
   })
 
   it("devrait retourner 400 si l'ID de zone est invalide", async () => {

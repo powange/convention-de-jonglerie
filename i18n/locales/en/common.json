@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Add a comment...",
     "add_lost_item": "Add lost item",
     "artist_space": "My artist space",
+    "artists": {
+      "title": "Artists"
+    },
     "cancelled_edition": "Cancelled edition",
     "cancelled_edition_message": "This edition has been cancelled",
     "cannot_add_comment": "Cannot add comment",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Lost & found opens when the edition starts.",
     "lost_item_added": "Lost item added",
     "management": "Management",
+    "map": "Map",
     "mark_as_lost": "Mark as lost",
     "mark_as_returned": "Mark as returned",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Invalid duration",
       "last_name": "Last name",
       "last_name_placeholder": "Your last name",
+      "loading_error": "Error loading volunteers",
       "login_prompt": "Log in to apply as a volunteer.",
       "manage_assignments": "Assigned volunteers",
       "manage_assignments_description": "Manage volunteers assigned to this slot",

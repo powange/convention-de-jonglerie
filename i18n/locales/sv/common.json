@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Lägg till en kommentar...",
     "add_lost_item": "Lägg till ett upphittat objekt",
     "artist_space": "Mitt artistutrymme",
+    "artists": {
+      "title": "Artister"
+    },
     "cancelled_edition": "Inställd utgåva",
     "cancelled_edition_message": "Denna utgåva har ställts in",
     "cannot_add_comment": "Det går inte att lägga till en kommentar",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Artiklar som hittas kommer att finnas tillgängliga i början av upplagan.",
     "lost_item_added": "Hittat objekt läggs till",
     "management": "Förvaltning",
+    "map": "Karta",
     "mark_as_lost": "Markera som förlorad",
     "mark_as_returned": "Markera som returnerad",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Ogiltig varaktighet",
       "last_name": "Namn",
       "last_name_placeholder": "Ditt namn",
+      "loading_error": "Fel vid laddning av volontärer",
       "login_prompt": "Logga in för att ansöka om att bli volontär.",
       "manage_assignments": "Tilldelade volontärer",
       "manage_assignments_description": "Hantera volontärer tilldelade denna tidsperiod",

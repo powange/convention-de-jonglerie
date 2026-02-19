@@ -118,17 +118,65 @@
         </template>
 
         <div class="space-y-4">
+          <!-- Régime alimentaire et allergies -->
+          <div
+            v-if="artist.dietaryPreference !== 'NONE' || artist.allergies"
+            class="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 space-y-2"
+          >
+            <div v-if="artist.dietaryPreference !== 'NONE'" class="flex items-center gap-2 text-sm">
+              <UIcon name="i-heroicons-heart" class="text-orange-500 shrink-0" />
+              <span class="text-gray-700 dark:text-gray-300">
+                {{ $t('artists.dietary_preference') }} :
+                <strong>{{ $t(`diet.${artist.dietaryPreference.toLowerCase()}`) }}</strong>
+              </span>
+            </div>
+            <div v-if="artist.allergies" class="flex items-start gap-2 text-sm">
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="text-orange-500 shrink-0 mt-0.5"
+              />
+              <span class="text-gray-700 dark:text-gray-300">
+                {{ $t('artists.allergies') }} :
+                <strong>{{ artist.allergies }}</strong>
+                <UBadge
+                  v-if="artist.allergySeverity"
+                  :color="
+                    getAllergySeverityBadgeColor(artist.allergySeverity as AllergySeverityLevel)
+                  "
+                  variant="soft"
+                  size="xs"
+                  class="ml-2"
+                >
+                  {{
+                    $t(getAllergySeverityInfo(artist.allergySeverity as AllergySeverityLevel).label)
+                  }}
+                </UBadge>
+              </span>
+            </div>
+          </div>
+
           <div v-for="(meals, date) in groupedMeals" :key="date">
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {{ formatDate(date) }}
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+              {{ formatDateFull(date) }}
             </p>
-            <div class="flex flex-wrap gap-2">
-              <UBadge v-for="meal in meals" :key="meal.id" color="primary" variant="soft" size="md">
-                {{ getMealTypeLabel(meal.meal.mealType) }}
-                <span v-if="meal.afterShow" class="ml-1 text-xs opacity-70">
-                  ({{ $t('artists.meal_after_show') }})
+            <div class="flex flex-wrap gap-3">
+              <div
+                v-for="meal in meals"
+                :key="meal.id"
+                class="flex flex-col items-center gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+              >
+                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                  {{ getMealTypeLabel(meal.meal.mealType) }}
                 </span>
-              </UBadge>
+                <USwitch
+                  :model-value="editableMeals[meal.id] ?? meal.afterShow"
+                  :loading="savingMealId === meal.id"
+                  :disabled="savingMealId !== null"
+                  size="xs"
+                  :label="$t('artists.meal_after_show')"
+                  @update:model-value="toggleAfterShow(meal, $event)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -361,6 +409,7 @@
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
+import type { AllergySeverityLevel } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
 
 interface ArtistShow {
@@ -421,7 +470,8 @@ interface ArtistInfo {
 const route = useRoute()
 const editionStore = useEditionStore()
 const { t } = useI18n()
-const { formatDateTime, formatDate } = useDateFormat()
+const toast = useToast()
+const { formatDateTime, formatDateFull } = useDateFormat()
 const { getMealTypeLabel } = useMealTypeLabel()
 
 const editionId = parseInt(route.params.id as string)
@@ -464,6 +514,43 @@ watch(
 
 // QR Code modal
 const qrModalOpen = ref(false)
+
+// État local pour les modifications de repas
+const editableMeals = ref<Record<number, boolean>>({})
+const savingMealId = ref<number | null>(null)
+
+const toggleAfterShow = async (meal: MealSelection, newValue: boolean) => {
+  editableMeals.value[meal.id] = newValue
+  savingMealId.value = meal.id
+
+  try {
+    const response = await $fetch<{ success: boolean; mealSelections: MealSelection[] }>(
+      `/api/editions/${editionId}/my-meals`,
+      {
+        method: 'PUT',
+        body: {
+          selections: [{ selectionId: meal.id, afterShow: newValue }],
+        },
+      }
+    )
+
+    if (response.success && artistResponse.value) {
+      artistResponse.value.artist!.mealSelections = response.mealSelections
+      editableMeals.value = {}
+    }
+  } catch {
+    // Annuler le changement local en cas d'erreur
+    const { [meal.id]: _, ...rest } = editableMeals.value
+    editableMeals.value = rest
+    toast.add({
+      title: t('common.error'),
+      description: t('artists.meals.error_saving'),
+      color: 'error',
+    })
+  } finally {
+    savingMealId.value = null
+  }
+}
 
 // Grouper les repas par date
 const groupedMeals = computed(() => {

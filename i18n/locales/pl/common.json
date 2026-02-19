@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Dodaj komentarz...",
     "add_lost_item": "Dodaj znalezioną rzecz",
     "artist_space": "Moja strefa artysty",
+    "artists": {
+      "title": "Artyści"
+    },
     "cancelled_edition": "Odwołana edycja",
     "cancelled_edition_message": "Ta edycja została odwołana",
     "cannot_add_comment": "Nie można dodać komentarza",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Rzeczy znalezione dostępne po rozpoczęciu edycji.",
     "lost_item_added": "Znaleziona rzecz dodana",
     "management": "Zarządzanie",
+    "map": "Mapa",
     "mark_as_lost": "Oznacz jako zgubione",
     "mark_as_returned": "Oznacz jako zwrócone",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Nieprawidłowy czas trwania",
       "last_name": "Nazwisko",
       "last_name_placeholder": "Pana/Pani nazwisko",
+      "loading_error": "Błąd ładowania wolontariuszy",
       "login_prompt": "Zaloguj się, aby zgłosić się jako wolontariusz.",
       "manage_assignments": "Przydzieleni wolontariusze",
       "manage_assignments_description": "Zarządzaj wolontariuszami przydzielonymi do tego slotu",

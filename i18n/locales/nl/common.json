@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Voeg een opmerking toe...",
     "add_lost_item": "Verloren voorwerp toevoegen",
     "artist_space": "Mijn artiestenruimte",
+    "artists": {
+      "title": "Artiesten"
+    },
     "cancelled_edition": "Geannuleerde editie",
     "cancelled_edition_message": "Deze editie is geannuleerd",
     "cannot_add_comment": "Kan opmerking niet toevoegen",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Gevonden voorwerpen openen zodra de editie begint.",
     "lost_item_added": "Verloren voorwerp toegevoegd",
     "management": "Beheer",
+    "map": "Kaart",
     "mark_as_lost": "Markeren als verloren",
     "mark_as_returned": "Markeren als teruggegeven",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Ongeldige duur",
       "last_name": "Achternaam",
       "last_name_placeholder": "Uw achternaam",
+      "loading_error": "Fout bij het laden van vrijwilligers",
       "login_prompt": "Log in om je als vrijwilliger aan te melden.",
       "manage_assignments": "Toegewezen vrijwilligers",
       "manage_assignments_description": "Beheer vrijwilligers toegewezen aan deze periode",

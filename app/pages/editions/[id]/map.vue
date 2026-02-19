@@ -143,7 +143,7 @@ watch(
           description: z.description,
           color: z.color,
           coordinates: z.coordinates,
-          zoneType: z.zoneType,
+          zoneTypes: z.zoneTypes,
           order: z.order,
         }))
       )
@@ -165,7 +165,7 @@ watch(
           description: m.description,
           latitude: m.latitude,
           longitude: m.longitude,
-          markerType: m.markerType,
+          markerTypes: m.markerTypes,
           color: m.color,
           order: m.order,
         }))
@@ -226,51 +226,3 @@ const handleToggleVisibility = (item: {
   }
 }
 </script>
-
-<style scoped>
-/* Styles pour les icônes de marqueurs personnalisés */
-:deep(.custom-marker-icon) {
-  background: transparent !important;
-  border: none !important;
-}
-
-:deep(.marker-icon) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: white;
-  border-radius: 50%;
-  border: 2px solid;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-:deep(.marker-icon svg) {
-  width: 16px;
-  height: 16px;
-}
-
-/* Styles pour les icônes de zones (polygones) */
-:deep(.zone-icon) {
-  background: transparent !important;
-  border: none !important;
-}
-
-:deep(.zone-icon-inner) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
-  border: 2px solid;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-:deep(.zone-icon-inner svg) {
-  width: 14px;
-  height: 14px;
-}
-</style>

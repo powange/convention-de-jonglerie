@@ -5,7 +5,7 @@
       :items="conventionOptions"
       value-key="value"
       icon="i-heroicons-building-library"
-      :placeholder="t('components.placeholders.select_convention')"
+      :placeholder="t('forms.placeholders.select_convention')"
       class="w-full max-w-md"
       @update:model-value="$emit('update:modelValue', $event)"
     />

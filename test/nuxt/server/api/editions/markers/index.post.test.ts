@@ -31,7 +31,7 @@ describe('API Markers - Création (POST)', () => {
     description: 'Entrée du site',
     latitude: 48.8566,
     longitude: 2.3522,
-    markerType: 'ENTRANCE',
+    markerTypes: ['ENTRANCE'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -57,7 +57,7 @@ describe('API Markers - Création (POST)', () => {
       description: 'Entrée du site',
       latitude: 48.8566,
       longitude: 2.3522,
-      markerType: 'ENTRANCE',
+      markerTypes: ['ENTRANCE'],
     }
 
     prismaMock.editionMarker.count.mockResolvedValue(0)
@@ -79,7 +79,7 @@ describe('API Markers - Création (POST)', () => {
         description: markerData.description,
         latitude: markerData.latitude,
         longitude: markerData.longitude,
-        markerType: markerData.markerType,
+        markerTypes: markerData.markerTypes,
         order: 0,
       }),
       select: expect.any(Object),
@@ -179,20 +179,20 @@ describe('API Markers - Création (POST)', () => {
   it('devrait utiliser le type OTHER par défaut', async () => {
     prismaMock.editionMarker.count.mockResolvedValue(0)
     prismaMock.editionMarker.aggregate.mockResolvedValue({ _max: { order: null } })
-    prismaMock.editionMarker.create.mockResolvedValue({ ...mockMarker, markerType: 'OTHER' })
+    prismaMock.editionMarker.create.mockResolvedValue({ ...mockMarker, markerTypes: ['OTHER'] })
 
     global.readBody.mockResolvedValue({
       name: 'Marker Test',
       latitude: 48.8566,
       longitude: 2.3522,
-      // Pas de markerType spécifié
+      // Pas de markerTypes spécifié
     })
 
     await markersPostHandler(mockEvent as any)
 
     expect(prismaMock.editionMarker.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        markerType: 'OTHER',
+        markerTypes: ['OTHER'],
       }),
       select: expect.any(Object),
     })
@@ -216,6 +216,57 @@ describe('API Markers - Création (POST)', () => {
       name: '', // Nom vide
       latitude: 48.8566,
       longitude: 2.3522,
+    })
+
+    await expect(markersPostHandler(mockEvent as any)).rejects.toThrow()
+  })
+
+  it('devrait accepter plusieurs types de marqueur', async () => {
+    prismaMock.editionMarker.count.mockResolvedValue(0)
+    prismaMock.editionMarker.aggregate.mockResolvedValue({ _max: { order: null } })
+    prismaMock.editionMarker.create.mockResolvedValue({
+      ...mockMarker,
+      markerTypes: ['ENTRANCE', 'INFO', 'PARKING'],
+    })
+
+    global.readBody.mockResolvedValue({
+      name: 'Point Multi-Services',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      markerTypes: ['ENTRANCE', 'INFO', 'PARKING'],
+    })
+
+    await markersPostHandler(mockEvent as any)
+
+    expect(prismaMock.editionMarker.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        markerTypes: ['ENTRANCE', 'INFO', 'PARKING'],
+      }),
+      select: expect.any(Object),
+    })
+  })
+
+  it('devrait rejeter un type de marqueur invalide', async () => {
+    prismaMock.editionMarker.count.mockResolvedValue(0)
+
+    global.readBody.mockResolvedValue({
+      name: 'Marker Test',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      markerTypes: ['INVALID_TYPE'],
+    })
+
+    await expect(markersPostHandler(mockEvent as any)).rejects.toThrow()
+  })
+
+  it('devrait rejeter un tableau de types vide', async () => {
+    prismaMock.editionMarker.count.mockResolvedValue(0)
+
+    global.readBody.mockResolvedValue({
+      name: 'Marker Test',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      markerTypes: [],
     })
 
     await expect(markersPostHandler(mockEvent as any)).rejects.toThrow()

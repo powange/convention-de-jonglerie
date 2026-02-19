@@ -98,21 +98,19 @@
         </div>
 
         <!-- Informations artiste -->
-        <UFormField :label="$t('artists.arrival')">
-          <UInput
-            v-model="formData.arrivalDateTime"
-            type="datetime-local"
-            :placeholder="$t('artists.arrival')"
-          />
-        </UFormField>
+        <UiDateTimePicker
+          v-model="formData.arrivalDateTime"
+          :date-label="$t('artists.arrival_date')"
+          :time-label="$t('artists.arrival_time')"
+          :placeholder="$t('artists.arrival')"
+        />
 
-        <UFormField :label="$t('artists.departure')">
-          <UInput
-            v-model="formData.departureDateTime"
-            type="datetime-local"
-            :placeholder="$t('artists.departure')"
-          />
-        </UFormField>
+        <UiDateTimePicker
+          v-model="formData.departureDateTime"
+          :date-label="$t('artists.departure_date')"
+          :time-label="$t('artists.departure_time')"
+          :placeholder="$t('artists.departure')"
+        />
 
         <UFormField :label="$t('artists.dietary_preference')">
           <USelect v-model="formData.dietaryPreference" :items="dietaryOptions" value-key="value" />

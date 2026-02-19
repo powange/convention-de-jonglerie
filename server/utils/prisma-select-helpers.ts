@@ -551,7 +551,7 @@ export const editionZoneSelect = {
   description: true,
   color: true,
   coordinates: true,
-  zoneType: true,
+  zoneTypes: true,
   order: true,
   createdAt: true,
   updatedAt: true,
@@ -575,7 +575,7 @@ export const editionMarkerSelect = {
   description: true,
   latitude: true,
   longitude: true,
-  markerType: true,
+  markerTypes: true,
   color: true,
   order: true,
   createdAt: true,
@@ -585,3 +585,46 @@ export const editionMarkerSelect = {
 export type EditionMarker = Prisma.EditionMarkerGetPayload<{
   select: typeof editionMarkerSelect
 }>
+
+// ============================================================================
+// SÉLECTIONS ZONES/MARQUEURS POUR LES SPECTACLES
+// ============================================================================
+
+/**
+ * Sélection minimale d'une zone pour l'affichage dans un spectacle
+ * Utilisée dans les endpoints shows (GET, POST, PUT)
+ *
+ * Occurrences: 3 fichiers (shows/index.get, shows/index.post, shows/[showId].put)
+ */
+export const showZoneSelect = {
+  id: true,
+  name: true,
+  color: true,
+  zoneTypes: true,
+} satisfies Prisma.EditionZoneSelect
+
+/**
+ * Sélection minimale d'un marqueur pour l'affichage dans un spectacle
+ * Utilisée dans les endpoints shows (GET, POST, PUT)
+ *
+ * Occurrences: 3 fichiers (shows/index.get, shows/index.post, shows/[showId].put)
+ */
+export const showMarkerSelect = {
+  id: true,
+  name: true,
+  color: true,
+  markerTypes: true,
+} satisfies Prisma.EditionMarkerSelect
+
+/**
+ * Include pour spectacle avec zone et marqueur
+ * Utilisé dans les endpoints shows pour inclure les relations zone/marker
+ */
+export const showZoneMarkerInclude = {
+  zone: {
+    select: showZoneSelect,
+  },
+  marker: {
+    select: showMarkerSelect,
+  },
+} satisfies Prisma.ShowInclude

@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Přidat komentář...",
     "add_lost_item": "Přidání nalezeného objektu",
     "artist_space": "Můj prostor umělce",
+    "artists": {
+      "title": "Umělci"
+    },
     "cancelled_edition": "Zrušená edice",
     "cancelled_edition_message": "Tato edice byla zrušena",
     "cannot_add_comment": "Nelze přidat komentář",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Nalezené položky budou k dispozici na začátku vydání.",
     "lost_item_added": "Přidán nalezený objekt",
     "management": "Management",
+    "map": "Mapa",
     "mark_as_lost": "Označit jako ztracený",
     "mark_as_returned": "Označit jako vrácené",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Neplatná doba trvání",
       "last_name": "Název",
       "last_name_placeholder": "Vaše jméno",
+      "loading_error": "Chyba při načítání dobrovolníků",
       "login_prompt": "Přihlaste se a přihlaste se jako dobrovolník.",
       "manage_assignments": "Přiřazení dobrovolníci",
       "manage_assignments_description": "Spravovat dobrovolníky přiřazené k tomuto slotu",

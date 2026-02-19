@@ -187,6 +187,9 @@
     "add_comment_placeholder": "Tilføj en kommentar...",
     "add_lost_item": "Tilføj hittegods",
     "artist_space": "Mit kunstnerområde",
+    "artists": {
+      "title": "Kunstnere"
+    },
     "cancelled_edition": "Aflyst udgave",
     "cancelled_edition_message": "Denne udgave er blevet aflyst",
     "cannot_add_comment": "Kan ikke tilføje kommentar",
@@ -215,6 +218,7 @@
     "lost_found_before_start": "Hittegods åbner når udgaven starter.",
     "lost_item_added": "Hittegods tilføjet",
     "management": "Administration",
+    "map": "Kort",
     "mark_as_lost": "Marker som tabt",
     "mark_as_returned": "Marker som returneret",
     "meals": {
@@ -581,6 +585,7 @@
       "invalid_duration": "Ugyldig varighed",
       "last_name": "Efternavn",
       "last_name_placeholder": "Dit efternavn",
+      "loading_error": "Fejl ved indlæsning af frivillige",
       "login_prompt": "Log ind for at ansøge som frivillig.",
       "manage_assignments": "Tildelte frivillige",
       "manage_assignments_description": "Administrer frivillige tildelt denne tidsperiode",
