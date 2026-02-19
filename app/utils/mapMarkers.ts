@@ -12,6 +12,12 @@ export function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (char) => map[char])
 }
 
+// Échappe le HTML et convertit les retours à la ligne en <br/>
+// L'échappement se fait AVANT le remplacement pour garantir la sécurité
+export function escapeHtmlWithNewlines(text: string): string {
+  return escapeHtml(text).replace(/\n/g, '<br/>')
+}
+
 export interface MarkerOptions {
   isUpcoming: boolean
   isOngoing: boolean

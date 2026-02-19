@@ -250,4 +250,27 @@ const handleToggleVisibility = (item: {
   width: 16px;
   height: 16px;
 }
+
+/* Styles pour les icônes de zones (polygones) */
+:deep(.zone-icon) {
+  background: transparent !important;
+  border: none !important;
+}
+
+:deep(.zone-icon-inner) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  border: 2px solid;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.zone-icon-inner svg) {
+  width: 14px;
+  height: 14px;
+}
 </style>

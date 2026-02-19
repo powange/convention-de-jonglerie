@@ -25,19 +25,13 @@ const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
 
-const zoneTypes = computed(() => [
-  { label: t('gestion.map.types.camping'), value: 'CAMPING' },
-  { label: t('gestion.map.types.parking'), value: 'PARKING' },
-  { label: t('gestion.map.types.shows'), value: 'SHOWS' },
-  { label: t('gestion.map.types.workshops'), value: 'WORKSHOPS' },
-  { label: t('gestion.map.types.food'), value: 'FOOD' },
-  { label: t('gestion.map.types.market'), value: 'MARKET' },
-  { label: t('gestion.map.types.entrance'), value: 'ENTRANCE' },
-  { label: t('gestion.map.types.toilets'), value: 'TOILETS' },
-  { label: t('gestion.map.types.info'), value: 'INFO' },
-  { label: t('gestion.map.types.gym'), value: 'GYM' },
-  { label: t('gestion.map.types.other'), value: 'OTHER' },
-])
+const zoneTypes = computed(() =>
+  EDITION_ZONE_TYPES.map((type) => ({
+    label: t(`gestion.map.types.${type.toLowerCase()}`),
+    value: type,
+    icon: getZoneTypeIcon(type),
+  }))
+)
 
 const defaultColors = [
   '#3b82f6', // blue
@@ -127,7 +121,12 @@ const modalTitle = computed(() =>
         </UFormField>
 
         <UFormField :label="t('gestion.map.zone_type')">
-          <USelect v-model="form.zoneType" :items="zoneTypes" class="w-full" />
+          <USelect
+            v-model="form.zoneType"
+            :items="zoneTypes"
+            :icon="getZoneTypeIcon(form.zoneType)"
+            class="w-full"
+          />
         </UFormField>
 
         <UFormField :label="t('gestion.map.zone_color')">

@@ -1,5 +1,5 @@
 import type { EditableMap, EditablePolygon, EditTools } from '~/types/leaflet-global'
-import { escapeHtml } from '~/utils/mapMarkers'
+import { escapeHtml, escapeHtmlWithNewlines } from '~/utils/mapMarkers'
 
 import type { Marker, LatLngExpression, TileLayer, LeafletMouseEvent } from 'leaflet'
 import type { Ref } from 'vue'
@@ -60,6 +60,7 @@ export const useLeafletEditable = (
   const map = shallowRef<EditableMap | null>(null)
   const tileLayerRef = shallowRef<TileLayer | null>(null)
   const polygons = shallowRef<Map<number, EditablePolygon>>(new Map())
+  const zoneIconMarkers = shallowRef<Map<number, Marker>>(new Map())
   const leafletMarkers = shallowRef<Map<number, Marker>>(new Map())
   const isLoading = ref(true)
   const error = ref<string | null>(null)
@@ -218,12 +219,24 @@ export const useLeafletEditable = (
     })
 
     // Ajouter un popup avec le nom (échappement HTML pour prévenir XSS)
-    const popupContent = `<strong>${escapeHtml(zone.name)}</strong>${zone.description ? `<br/>${escapeHtml(zone.description)}` : ''}`
+    const popupContent = `<strong>${escapeHtml(zone.name)}</strong>${zone.description ? `<br/>${escapeHtmlWithNewlines(zone.description)}` : ''}`
     polygon.bindPopup(popupContent)
 
     // D'abord ajouter le polygone à la carte
     polygon.addTo(map.value)
     polygons.value.set(zone.id, polygon)
+
+    // Ajouter une icône de type au centre de la zone
+    const zoneIcon = getZoneIcon(zone.zoneType, zone.color)
+    if (zoneIcon) {
+      const center = polygon.getBounds().getCenter()
+      const iconMarker = window.L.marker(center, {
+        icon: zoneIcon,
+        interactive: false,
+      })
+      iconMarker.addTo(map.value)
+      zoneIconMarkers.value.set(zone.id, iconMarker)
+    }
 
     // Si mode édition, activer l'édition du polygone (après l'avoir ajouté à la carte)
     const editTools: EditTools | undefined = map.value?.editTools
@@ -239,6 +252,12 @@ export const useLeafletEditable = (
               (latLng: any) => [latLng.lat, latLng.lng] as [number, number]
             )
             onPolygonEdited(zone.id, newCoords)
+
+            // Repositionner l'icône de zone au nouveau centroïde
+            const iconMarker = zoneIconMarkers.value.get(zone.id)
+            if (iconMarker) {
+              iconMarker.setLatLng(polygon.getBounds().getCenter())
+            }
           }
         })
       } catch (err) {
@@ -264,8 +283,28 @@ export const useLeafletEditable = (
   const updatePolygonPopup = (zoneId: number, name: string, description?: string | null) => {
     const polygon = polygons.value.get(zoneId)
     if (polygon) {
-      const popupContent = `<strong>${escapeHtml(name)}</strong>${description ? `<br/>${escapeHtml(description)}` : ''}`
+      const popupContent = `<strong>${escapeHtml(name)}</strong>${description ? `<br/>${escapeHtmlWithNewlines(description)}` : ''}`
       polygon.setPopupContent(popupContent)
+    }
+  }
+
+  const updateZoneIcon = (zoneId: number, zoneType: string, color: string) => {
+    const iconMarker = zoneIconMarkers.value.get(zoneId)
+    const polygon = polygons.value.get(zoneId)
+    if (iconMarker && polygon && map.value) {
+      map.value.removeLayer(iconMarker)
+      zoneIconMarkers.value.delete(zoneId)
+
+      const newIcon = getZoneIcon(zoneType, color)
+      if (newIcon) {
+        const center = polygon.getBounds().getCenter()
+        const newIconMarker = window.L.marker(center, {
+          icon: newIcon,
+          interactive: false,
+        })
+        newIconMarker.addTo(map.value)
+        zoneIconMarkers.value.set(zoneId, newIconMarker)
+      }
     }
   }
 
@@ -274,6 +313,11 @@ export const useLeafletEditable = (
     if (polygon && map.value) {
       map.value.removeLayer(polygon)
       polygons.value.delete(zoneId)
+    }
+    const iconMarker = zoneIconMarkers.value.get(zoneId)
+    if (iconMarker && map.value) {
+      map.value.removeLayer(iconMarker)
+      zoneIconMarkers.value.delete(zoneId)
     }
   }
 
@@ -284,6 +328,12 @@ export const useLeafletEditable = (
       }
     })
     polygons.value.clear()
+    zoneIconMarkers.value.forEach((marker) => {
+      if (map.value) {
+        map.value.removeLayer(marker)
+      }
+    })
+    zoneIconMarkers.value.clear()
   }
 
   const startDrawing = (color: string = '#3b82f6') => {
@@ -389,6 +439,20 @@ export const useLeafletEditable = (
   // FONCTIONS POUR LES MARQUEURS
   // ============================================================================
 
+  const getZoneIcon = (zoneType: string, color: string) => {
+    const L = window.L
+    if (!L) return null
+
+    const svgIcon = getZoneTypeSvgIcon(zoneType)
+
+    return L.divIcon({
+      className: 'zone-icon',
+      html: `<div class="zone-icon-inner" style="border-color: ${color}; color: ${color};">${svgIcon}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+    })
+  }
+
   const getMarkerIcon = (markerType: string, customColor?: string | null) => {
     const L = window.L
     if (!L) return null
@@ -422,7 +486,7 @@ export const useLeafletEditable = (
     })
 
     // Ajouter un popup avec le nom (échappement HTML pour prévenir XSS)
-    const popupContent = `<strong>${escapeHtml(marker.name)}</strong>${marker.description ? `<br/>${escapeHtml(marker.description)}` : ''}`
+    const popupContent = `<strong>${escapeHtml(marker.name)}</strong>${marker.description ? `<br/>${escapeHtmlWithNewlines(marker.description)}` : ''}`
     leafletMarker.bindPopup(popupContent)
 
     leafletMarker.addTo(map.value)
@@ -453,7 +517,7 @@ export const useLeafletEditable = (
   const updateMarkerPopup = (markerId: number, name: string, description?: string | null) => {
     const marker = leafletMarkers.value.get(markerId)
     if (marker) {
-      const popupContent = `<strong>${escapeHtml(name)}</strong>${description ? `<br/>${escapeHtml(description)}` : ''}`
+      const popupContent = `<strong>${escapeHtml(name)}</strong>${description ? `<br/>${escapeHtmlWithNewlines(description)}` : ''}`
       marker.setPopupContent(popupContent)
     }
   }
@@ -542,12 +606,20 @@ export const useLeafletEditable = (
     if (polygon && map.value) {
       polygon.addTo(map.value)
     }
+    const iconMarker = zoneIconMarkers.value.get(zoneId)
+    if (iconMarker && map.value) {
+      iconMarker.addTo(map.value)
+    }
   }
 
   const hideZone = (zoneId: number) => {
     const polygon = polygons.value.get(zoneId)
     if (polygon && map.value) {
       map.value.removeLayer(polygon)
+    }
+    const iconMarker = zoneIconMarkers.value.get(zoneId)
+    if (iconMarker && map.value) {
+      map.value.removeLayer(iconMarker)
     }
   }
 
@@ -591,6 +663,7 @@ export const useLeafletEditable = (
     }
     map.value = null
     polygons.value.clear()
+    zoneIconMarkers.value.clear()
     leafletMarkers.value.clear()
     currentDrawingPolygon.value = null
     isDrawing.value = false
@@ -625,6 +698,7 @@ export const useLeafletEditable = (
     addZones,
     updatePolygonStyle,
     updatePolygonPopup,
+    updateZoneIcon,
     removePolygon,
     clearPolygons,
     startDrawing,

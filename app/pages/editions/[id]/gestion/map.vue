@@ -292,6 +292,7 @@ const {
   addZones,
   updatePolygonStyle,
   updatePolygonPopup,
+  updateZoneIcon,
   removePolygon,
   startDrawing,
   stopDrawing,
@@ -555,6 +556,7 @@ const handleSaveZone = async (data: {
     if (success) {
       updatePolygonStyle(editingZone.value.id, data.color)
       updatePolygonPopup(editingZone.value.id, data.name, data.description)
+      updateZoneIcon(editingZone.value.id, data.zoneType, data.color)
     }
   } else if (pendingCoordinates.value) {
     // Création - la zone sera ajoutée automatiquement via le watch sur zones
@@ -625,5 +627,28 @@ const handleSaveZone = async (data: {
 :deep(.marker-icon svg) {
   width: 16px;
   height: 16px;
+}
+
+/* Styles pour les icônes de zones (polygones) */
+:deep(.zone-icon) {
+  background: transparent !important;
+  border: none !important;
+}
+
+:deep(.zone-icon-inner) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  border: 2px solid;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.zone-icon-inner svg) {
+  width: 14px;
+  height: 14px;
 }
 </style>
