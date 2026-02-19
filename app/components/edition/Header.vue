@@ -253,6 +253,21 @@
           />
           <span class="hidden md:inline">{{ t('shows_call.title') }}</span>
         </NuxtLink>
+
+        <NuxtLink
+          v-if="artistSpaceTabVisible"
+          :to="`/editions/${edition.id}/artist-space`"
+          :class="[
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'artist-space'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          :title="t('edition.artist_space')"
+        >
+          <UIcon name="i-heroicons-star" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
+          <span class="hidden md:inline">{{ t('edition.artist_space') }}</span>
+        </NuxtLink>
       </nav>
 
       <!-- Titre de la page courante sur mobile -->
@@ -330,6 +345,7 @@ interface Props {
     | 'workshops'
     | 'shows-call'
     | 'map'
+    | 'artist-space'
 }
 
 const props = defineProps<Props>()
@@ -353,6 +369,9 @@ const canAccessMealValidation = ref(false)
 
 // État pour vérifier si l'utilisateur a un créneau actif de contrôle d'accès
 const canAccessAccessControlPage = ref(false)
+
+// État pour vérifier si l'utilisateur est un artiste enregistré pour cette édition
+const isEditionArtist = ref(false)
 
 // Vérifier s'il y a des appels à spectacles (utilise _count de la réponse API)
 const hasShowCalls = computed(() => {
@@ -412,6 +431,12 @@ const showsCallTabVisible = computed<boolean>(() => {
   return authStore.isArtist
 })
 
+// Visibilité onglet espace artiste: visible pour les artistes enregistrés de cette édition
+const artistSpaceTabVisible = computed<boolean>(() => {
+  if (!authStore.isAuthenticated) return false
+  return isEditionArtist.value
+})
+
 // Visibilité onglet carte: visible si mapPublic est activé et l'édition a des coordonnées définies
 const mapTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
@@ -459,11 +484,22 @@ watch(
       } catch {
         canAccessAccessControlPage.value = false
       }
+
+      // Vérifier si l'utilisateur est un artiste enregistré pour cette édition
+      try {
+        const response = await $fetch<{ isArtist: boolean }>(
+          `/api/editions/${props.edition.id}/my-artist-status`
+        )
+        isEditionArtist.value = response.isArtist
+      } catch {
+        isEditionArtist.value = false
+      }
     } else {
       isTeamLeaderValue.value = false
       isAcceptedVolunteer.value = false
       canAccessMealValidation.value = false
       canAccessAccessControlPage.value = false
+      isEditionArtist.value = false
     }
   },
   { immediate: true }
@@ -549,6 +585,7 @@ const getPageTitle = (page: string) => {
     volunteers: t('edition.volunteers.title'),
     workshops: 'Workshops',
     'shows-call': t('shows_call.title'),
+    'artist-space': t('edition.artist_space'),
   }
   return titles[page] || t('edition.about_this_edition')
 }
