@@ -54,15 +54,18 @@ export const useLeafletEditable = (
     onMarkerMoved,
   } = options
 
-  const map = ref<EditableMap | null>(null)
-  const tileLayerRef = ref<TileLayer | null>(null)
-  const polygons = ref<Map<number, EditablePolygon>>(new Map())
-  const leafletMarkers = ref<Map<number, Marker>>(new Map())
+  // shallowRef pour les objets Leaflet : empêche Vue de créer des Proxy réactifs
+  // sur les instances Leaflet, ce qui interfère avec le positionnement des marqueurs
+  // pendant le zoom/pan (les propriétés internes de Leaflet changent constamment)
+  const map = shallowRef<EditableMap | null>(null)
+  const tileLayerRef = shallowRef<TileLayer | null>(null)
+  const polygons = shallowRef<Map<number, EditablePolygon>>(new Map())
+  const leafletMarkers = shallowRef<Map<number, Marker>>(new Map())
   const isLoading = ref(true)
   const error = ref<string | null>(null)
   const isDrawing = ref(false)
   const isPlacingMarker = ref(false)
-  const currentDrawingPolygon = ref<EditablePolygon | null>(null)
+  const currentDrawingPolygon = shallowRef<EditablePolygon | null>(null)
   // Référence locale pour le nettoyage (au cas où whenReady n'a pas encore été appelé)
   let leafletMapInstance: EditableMap | null = null
   // Référence pour le handler de clic lors du placement de marqueur
