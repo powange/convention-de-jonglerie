@@ -6,8 +6,6 @@
     "active_types": "Aktivní typy",
     "activity": "Aktivita",
     "administration_tools": "Nástroje pro správu",
-    "advanced_statistics": "Pokročilé statistiky",
-    "advanced_statistics_description": "Podrobné a analytické zprávy",
     "all_emails": "Všechny e-maily",
     "all_users": "Všichni uživatelé",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Stažení nebo úprava profilové fotografie tohoto uživatele",
     "cleanup_expired_tokens": "Čištění žetonů s prošlou platností",
     "cleanup_resolved_error_logs": "Čištění protokolů chyb",
-    "coming_soon": "Brzy k dispozici",
     "config": {
       "ai": "Umělá inteligence",
       "email": "E-mail",

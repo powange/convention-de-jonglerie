@@ -6,8 +6,6 @@
     "active_types": "Actieve types",
     "activity": "Activiteit",
     "administration_tools": "Beheertools",
-    "advanced_statistics": "Geavanceerde statistieken",
-    "advanced_statistics_description": "Gedetailleerde rapporten en analyses",
     "all_emails": "Alle e-mails",
     "all_users": "Alle gebruikers",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Upload of wijzig de profielfoto van deze gebruiker",
     "cleanup_expired_tokens": "Opruimen verlopen tokens",
     "cleanup_resolved_error_logs": "Opruimen foutenlogboeken",
-    "coming_soon": "Binnenkort beschikbaar",
     "config": {
       "ai": "Kunstmatige intelligentie",
       "email": "E-mail",

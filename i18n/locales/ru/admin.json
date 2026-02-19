@@ -6,8 +6,6 @@
     "active_types": "Активные типы",
     "activity": "Активность",
     "administration_tools": "Инструменты Администрирования",
-    "advanced_statistics": "Расширенная Статистика",
-    "advanced_statistics_description": "Подробные отчеты и аналитика",
     "all_emails": "Все email",
     "all_users": "Все пользователи",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Загрузить или изменить фото профиля этого пользователя",
     "cleanup_expired_tokens": "Очистка истекших токенов",
     "cleanup_resolved_error_logs": "Очистка журналов ошибок",
-    "coming_soon": "Скоро",
     "config": {
       "ai": "Искусственный интеллект",
       "email": "Электронная почта",

@@ -6,8 +6,6 @@
     "active_types": "Aktive Typen",
     "activity": "Aktivität",
     "administration_tools": "Verwaltungstools",
-    "advanced_statistics": "Erweiterte Statistiken",
-    "advanced_statistics_description": "Detaillierte Berichte und Analysen",
     "all_emails": "Alle E-Mails",
     "all_users": "Alle Benutzer",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Profilbild dieses Benutzers hochladen oder ändern",
     "cleanup_expired_tokens": "Bereinigung abgelaufener Token",
     "cleanup_resolved_error_logs": "Bereinigung von Fehlerprotokollen",
-    "coming_soon": "Demnächst verfügbar",
     "config": {
       "ai": "Künstliche Intelligenz",
       "email": "E-Mail",

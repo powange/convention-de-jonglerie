@@ -6,8 +6,6 @@
     "active_types": "Активні типи",
     "activity": "Активність",
     "administration_tools": "Інструменти адміністрування",
-    "advanced_statistics": "Розширена статистика",
-    "advanced_statistics_description": "Детальні звіти та аналітика",
     "all_emails": "Всі електронні пошти",
     "all_users": "Всі користувачі",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Завантажити або змінити фото профілю цього користувача",
     "cleanup_expired_tokens": "Очищення прострочених токенів",
     "cleanup_resolved_error_logs": "Очищення журналів помилок",
-    "coming_soon": "Скоро",
     "config": {
       "ai": "Штучний інтелект",
       "email": "Електронна пошта",

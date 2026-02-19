@@ -6,8 +6,6 @@
     "active_types": "Aktiva typer",
     "activity": "Aktivitet",
     "administration_tools": "Verktyg för administration",
-    "advanced_statistics": "Avancerad statistik",
-    "advanced_statistics_description": "Detaljerade och analytiska rapporter",
     "all_emails": "Alla e-postmeddelanden",
     "all_users": "Alla användare",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Ladda ner eller ändra den här användarens profilfoto",
     "cleanup_expired_tokens": "Rengöring av utgångna tokens",
     "cleanup_resolved_error_logs": "Rengöring av felloggar",
-    "coming_soon": "Tillgänglig inom kort",
     "config": {
       "ai": "Artificiell intelligens",
       "email": "E-post",

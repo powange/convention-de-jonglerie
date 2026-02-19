@@ -6,8 +6,6 @@
     "active_types": "Aktive typer",
     "activity": "Aktivitet",
     "administration_tools": "Administrationsværktøjer",
-    "advanced_statistics": "Avancerede statistikker",
-    "advanced_statistics_description": "Detaljerede rapporter og analyser",
     "all_emails": "Alle emails",
     "all_users": "Alle brugere",
     "anonymize": {
@@ -78,7 +76,6 @@
     "change_profile_picture_description": "Upload eller ændr denne brugers profilbillede",
     "cleanup_expired_tokens": "Oprydning af udløbne tokens",
     "cleanup_resolved_error_logs": "Oprydning af fejllogge",
-    "coming_soon": "Kommer snart",
     "config": {
       "ai": "Kunstig intelligens",
       "email": "E-mail",
