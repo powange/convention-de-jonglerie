@@ -120,39 +120,105 @@
         <div class="space-y-4">
           <!-- Régime alimentaire et allergies -->
           <div
-            v-if="artist.dietaryPreference !== 'NONE' || artist.allergies"
             class="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 space-y-2"
           >
-            <div v-if="artist.dietaryPreference !== 'NONE'" class="flex items-center gap-2 text-sm">
-              <UIcon name="i-heroicons-heart" class="text-orange-500 shrink-0" />
-              <span class="text-gray-700 dark:text-gray-300">
-                {{ $t('artists.dietary_preference') }} :
-                <strong>{{ $t(`diet.${artist.dietaryPreference.toLowerCase()}`) }}</strong>
-              </span>
-            </div>
-            <div v-if="artist.allergies" class="flex items-start gap-2 text-sm">
-              <UIcon
-                name="i-heroicons-exclamation-triangle"
-                class="text-orange-500 shrink-0 mt-0.5"
-              />
-              <span class="text-gray-700 dark:text-gray-300">
-                {{ $t('artists.allergies') }} :
-                <strong>{{ artist.allergies }}</strong>
-                <UBadge
-                  v-if="artist.allergySeverity"
-                  :color="
-                    getAllergySeverityBadgeColor(artist.allergySeverity as AllergySeverityLevel)
-                  "
-                  variant="soft"
+            <!-- Mode lecture -->
+            <template v-if="!editingDiet">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ $t('artists.dietary_preference') }}
+                </span>
+                <UButton
+                  icon="i-heroicons-pencil-square"
+                  variant="ghost"
                   size="xs"
-                  class="ml-2"
-                >
-                  {{
-                    $t(getAllergySeverityInfo(artist.allergySeverity as AllergySeverityLevel).label)
-                  }}
-                </UBadge>
-              </span>
-            </div>
+                  color="neutral"
+                  @click="editingDiet = true"
+                />
+              </div>
+              <div
+                v-if="artist.dietaryPreference !== 'NONE'"
+                class="flex items-center gap-2 text-sm"
+              >
+                <UIcon name="i-heroicons-heart" class="text-orange-500 shrink-0" />
+                <span class="text-gray-700 dark:text-gray-300">
+                  <strong>{{ $t(`diet.${artist.dietaryPreference.toLowerCase()}`) }}</strong>
+                </span>
+              </div>
+              <div v-else class="text-sm text-gray-400">
+                {{ $t('diet.none') }}
+              </div>
+              <div v-if="artist.allergies" class="flex items-start gap-2 text-sm">
+                <UIcon
+                  name="i-heroicons-exclamation-triangle"
+                  class="text-orange-500 shrink-0 mt-0.5"
+                />
+                <span class="text-gray-700 dark:text-gray-300">
+                  {{ $t('artists.allergies') }} :
+                  <strong>{{ artist.allergies }}</strong>
+                  <UBadge
+                    v-if="artist.allergySeverity"
+                    :color="
+                      getAllergySeverityBadgeColor(artist.allergySeverity as AllergySeverityLevel)
+                    "
+                    variant="soft"
+                    size="md"
+                    class="ml-2"
+                  >
+                    {{
+                      $t(
+                        getAllergySeverityInfo(artist.allergySeverity as AllergySeverityLevel).label
+                      )
+                    }}
+                  </UBadge>
+                </span>
+              </div>
+            </template>
+
+            <!-- Mode édition -->
+            <template v-else>
+              <div class="space-y-3">
+                <UFormField :label="$t('artists.dietary_preference')">
+                  <USelect
+                    v-model="dietForm.dietaryPreference"
+                    :items="dietaryOptions"
+                    value-key="value"
+                  />
+                </UFormField>
+
+                <UFormField :label="$t('artists.allergies')">
+                  <UTextarea
+                    v-model="dietForm.allergies"
+                    :placeholder="$t('artists.allergies')"
+                    :rows="2"
+                    autoresize
+                  />
+                </UFormField>
+
+                <UFormField v-if="dietForm.allergies" :label="$t('artists.allergy_severity')">
+                  <USelect
+                    v-model="dietForm.allergySeverity"
+                    :items="allergySeverityOptions"
+                    value-key="value"
+                  />
+                </UFormField>
+
+                <div class="flex justify-end gap-2">
+                  <UButton variant="ghost" color="neutral" size="sm" @click="cancelDietEdit">
+                    {{ $t('common.cancel') }}
+                  </UButton>
+                  <UButton
+                    :loading="savingDiet"
+                    :disabled="!dietFormDirty"
+                    icon="i-heroicons-check"
+                    size="sm"
+                    @click="saveDiet"
+                  >
+                    {{ $t('common.save') }}
+                  </UButton>
+                </div>
+              </div>
+            </template>
           </div>
 
           <div v-for="(meals, date) in groupedMeals" :key="date">
@@ -514,6 +580,101 @@ watch(
 
 // QR Code modal
 const qrModalOpen = ref(false)
+
+// Formulaire régime alimentaire / allergies
+const editingDiet = ref(false)
+
+const dietForm = reactive({
+  dietaryPreference: artist.value?.dietaryPreference ?? 'NONE',
+  allergies: artist.value?.allergies ?? '',
+  allergySeverity: artist.value?.allergySeverity ?? (null as string | null),
+})
+
+// Synchroniser le formulaire quand les données artiste changent (chargement initial)
+watch(artist, (newArtist) => {
+  if (newArtist && !editingDiet.value) {
+    dietForm.dietaryPreference = newArtist.dietaryPreference
+    dietForm.allergies = newArtist.allergies ?? ''
+    dietForm.allergySeverity = newArtist.allergySeverity
+  }
+})
+
+const dietFormDirty = computed(() => {
+  if (!artist.value) return false
+  return (
+    dietForm.dietaryPreference !== artist.value.dietaryPreference ||
+    (dietForm.allergies || '') !== (artist.value.allergies || '') ||
+    dietForm.allergySeverity !== artist.value.allergySeverity
+  )
+})
+
+const dietaryOptions = computed(() => [
+  { label: t('diet.none'), value: 'NONE' },
+  { label: t('diet.vegetarian'), value: 'VEGETARIAN' },
+  { label: t('diet.vegan'), value: 'VEGAN' },
+])
+
+const allergySeverityOptions = computed(() =>
+  getAllergySeveritySelectOptions().map((option) => ({
+    value: option.value,
+    label: t(option.label),
+  }))
+)
+
+const savingDiet = ref(false)
+
+const saveDiet = async () => {
+  savingDiet.value = true
+  try {
+    const response = await $fetch<{
+      success: boolean
+      dietaryPreference: string
+      allergies: string | null
+      allergySeverity: string | null
+    }>(`/api/editions/${editionId}/my-diet`, {
+      method: 'PUT',
+      body: {
+        dietaryPreference: dietForm.dietaryPreference,
+        allergies: dietForm.allergies || null,
+        allergySeverity: dietForm.allergies ? dietForm.allergySeverity : null,
+      },
+    })
+
+    if (response.success && artistResponse.value?.artist) {
+      artistResponse.value = {
+        ...artistResponse.value,
+        artist: {
+          ...artistResponse.value.artist,
+          dietaryPreference: response.dietaryPreference,
+          allergies: response.allergies,
+          allergySeverity: response.allergySeverity,
+        },
+      }
+      toast.add({
+        title: t('artists.diet_saved'),
+        color: 'success',
+      })
+      editingDiet.value = false
+    }
+  } catch {
+    toast.add({
+      title: t('common.error'),
+      description: t('artists.diet_save_error'),
+      color: 'error',
+    })
+  } finally {
+    savingDiet.value = false
+  }
+}
+
+const cancelDietEdit = () => {
+  if (artist.value) {
+    dietForm.dietaryPreference = artist.value.dietaryPreference
+    dietForm.allergies = artist.value.allergies ?? ''
+    dietForm.allergySeverity = artist.value.allergySeverity
+  }
+  editingDiet.value = false
+}
 
 // État local pour les modifications de repas
 const editableMeals = ref<Record<number, boolean>>({})

@@ -29,6 +29,8 @@
     "departure_date": "Date de départ",
     "departure_time": "Heure de départ",
     "details": "Détails",
+    "diet_save_error": "Erreur lors de l'enregistrement des préférences alimentaires",
+    "diet_saved": "Préférences alimentaires enregistrées",
     "dietary_preference": "Préférence alimentaire",
     "dropoff_at": "Retour : {location}",
     "dropoff_location": "Lieu de retour",
