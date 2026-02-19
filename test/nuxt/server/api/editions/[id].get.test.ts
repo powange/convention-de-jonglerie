@@ -244,7 +244,14 @@ describe('/api/editions/[id] GET', () => {
         },
         // Champs bénévolat nécessaires pour la page de gestion
         _count: {
-          select: { volunteerApplications: true, showCalls: true },
+          select: {
+            volunteerApplications: true,
+            showCalls: {
+              where: {
+                visibility: { in: ['PUBLIC', 'CLOSED'] },
+              },
+            },
+          },
         },
         // Champs bénévolat (valeurs)
         volunteerApplications: false,

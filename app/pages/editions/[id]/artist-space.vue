@@ -534,8 +534,14 @@ const toggleAfterShow = async (meal: MealSelection, newValue: boolean) => {
       }
     )
 
-    if (response.success && artistResponse.value) {
-      artistResponse.value.artist!.mealSelections = response.mealSelections
+    if (response.success && artistResponse.value?.artist) {
+      artistResponse.value = {
+        ...artistResponse.value,
+        artist: {
+          ...artistResponse.value.artist,
+          mealSelections: response.mealSelections,
+        },
+      }
       editableMeals.value = {}
     }
   } catch {

@@ -32,7 +32,11 @@ export default wrapApiHandler(
         _count: {
           select: {
             volunteerApplications: true,
-            showCalls: true,
+            showCalls: {
+              where: {
+                visibility: { in: ['PUBLIC', 'CLOSED'] },
+              },
+            },
           },
         },
         // Champs bénévolat simples sur le modèle Edition (inclus automatiquement, rien à faire)
