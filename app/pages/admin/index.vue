@@ -491,27 +491,6 @@
             <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
           </div>
         </UCard>
-
-        <UCard class="opacity-75 border-dashed border-2 border-gray-300 dark:border-gray-600">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <UIcon name="i-heroicons-chart-bar" class="h-6 w-6 text-gray-400" />
-                </div>
-                <h3 class="font-semibold text-lg text-gray-500">
-                  {{ $t('admin.advanced_statistics') }}
-                </h3>
-              </div>
-              <p class="text-gray-400 text-sm mb-4">
-                {{ $t('admin.advanced_statistics_description') }}
-              </p>
-              <UBadge color="neutral" variant="soft" size="xs">{{
-                $t('admin.coming_soon')
-              }}</UBadge>
-            </div>
-          </div>
-        </UCard>
       </div>
     </div>
 
