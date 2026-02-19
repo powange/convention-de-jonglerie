@@ -408,6 +408,7 @@ enum EditionZoneType {
   ENTRANCE
   TOILETS
   INFO
+  GYM
   OTHER
 }
 

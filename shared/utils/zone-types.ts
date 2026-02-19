@@ -14,6 +14,7 @@ export const EDITION_ZONE_TYPES = [
   'ENTRANCE',
   'TOILETS',
   'INFO',
+  'GYM',
   'OTHER',
 ] as const
 
@@ -30,6 +31,7 @@ export const ZONE_TYPE_COLORS: Record<EditionZoneType, string> = {
   ENTRANCE: '#06b6d4',
   TOILETS: '#64748b',
   INFO: '#0ea5e9',
+  GYM: '#d97706',
   OTHER: '#6b7280',
 }
 
@@ -44,6 +46,7 @@ export const ZONE_TYPE_ICONS: Record<EditionZoneType, string> = {
   ENTRANCE: 'i-lucide-door-open',
   TOILETS: 'i-lucide-bath',
   INFO: 'i-lucide-info',
+  GYM: 'i-lucide-warehouse',
   OTHER: 'i-lucide-map-pin',
 }
 
@@ -58,6 +61,7 @@ export const ZONE_TYPE_SVG_ICONS: Record<EditionZoneType, string> = {
   ENTRANCE: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"/></svg>`,
   TOILETS: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" x2="8" y1="5" y2="7"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="7" x2="7" y1="19" y2="21"/><line x1="17" x2="17" y1="19" y2="21"/></svg>`,
   INFO: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+  GYM: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 20V9a2 2 0 0 1 .874-1.657l7-4.667a2 2 0 0 1 2.252 0l7 4.667A2 2 0 0 1 22 9v11"/><path d="M8 20v-6h8v6"/></svg>`,
   OTHER: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
 }
 

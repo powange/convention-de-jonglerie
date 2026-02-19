@@ -35,6 +35,7 @@ const markerTypes = computed(() => [
   { label: t('gestion.map.types.entrance'), value: 'ENTRANCE' },
   { label: t('gestion.map.types.toilets'), value: 'TOILETS' },
   { label: t('gestion.map.types.info'), value: 'INFO' },
+  { label: t('gestion.map.types.gym'), value: 'GYM' },
   { label: t('gestion.map.types.other'), value: 'OTHER' },
 ])
 
