@@ -262,38 +262,37 @@
         </NuxtLink>
 
         <!-- Configuration Système -->
-        <UCard
-          class="hover:shadow-lg transition-shadow cursor-pointer"
-          @click="showConfigModal = true"
-        >
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <UIcon
-                    name="i-heroicons-cog-6-tooth"
-                    class="h-6 w-6 text-gray-600 dark:text-gray-400"
-                  />
+        <NuxtLink to="/admin/system-config" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-cog-6-tooth"
+                      class="h-6 w-6 text-gray-600 dark:text-gray-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.config.title') }}</h3>
                 </div>
-                <h3 class="font-semibold text-lg">{{ $t('admin.config.title') }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  {{ $t('admin.config.view_config') }}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-server" class="h-4 w-4" />
+                    {{ $t('admin.config.server') }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-globe-alt" class="h-4 w-4" />
+                    {{ $t('admin.config.public') }}
+                  </span>
+                </div>
               </div>
-              <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                {{ $t('admin.config.view_config') }}
-              </p>
-              <div class="flex items-center gap-4 text-sm text-gray-500">
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-server" class="h-4 w-4" />
-                  {{ $t('admin.config.server') }}
-                </span>
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-globe-alt" class="h-4 w-4" />
-                  {{ $t('admin.config.public') }}
-                </span>
-              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
             </div>
-            <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
-          </div>
-        </UCard>
+          </UCard>
+        </NuxtLink>
 
         <!-- Gestion des notifications -->
         <NuxtLink to="/admin/notifications" class="block">
@@ -529,9 +528,6 @@
       </UCard>
     </div>
 
-    <!-- Modal de configuration -->
-    <AdminConfigModal v-model:open="showConfigModal" />
-
     <!-- Modal de confirmation d'anonymisation -->
     <UModal v-model:open="showAnonymizeModal" :title="$t('admin.anonymize.confirm_title')">
       <template #body>
@@ -624,7 +620,6 @@ useSeoMeta({
 
 // État réactif
 const loading = ref(false)
-const showConfigModal = ref(false)
 
 // Anonymisation
 interface AnonymizeResult {

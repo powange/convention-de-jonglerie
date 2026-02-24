@@ -174,26 +174,7 @@
           <span class="hidden md:inline">{{ t('edition.carpool') }}</span>
         </NuxtLink>
 
-        <NuxtLink
-          v-if="volunteersTabVisible"
-          :to="`/editions/${edition.id}/volunteers`"
-          :class="[
-            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'volunteers'
-              ? 'border-primary-500 text-primary-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-          ]"
-          :title="t('edition.volunteers.title')"
-        >
-          <UIcon
-            name="i-heroicons-hand-raised"
-            :class="['md:mr-1']"
-            size="24"
-            class="md:w-4! md:h-4!"
-          />
-          <span class="hidden md:inline">{{ t('edition.volunteers.title') }}</span>
-        </NuxtLink>
-
+        <!-- Onglets sans dépendance auth (rendus en SSR) -->
         <NuxtLink
           v-if="workshopsTabVisible"
           :to="`/editions/${edition.id}/workshops`"
@@ -214,60 +195,83 @@
           <span class="hidden md:inline">Workshops</span>
         </NuxtLink>
 
-        <NuxtLink
-          v-if="hasEditionStarted"
-          :to="`/editions/${edition.id}/lost-found`"
-          :class="[
-            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'lost-found'
-              ? 'border-primary-500 text-primary-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-          ]"
-          :title="t('edition.lost_found')"
-        >
-          <UIcon
-            name="i-heroicons-magnifying-glass"
-            :class="['md:mr-1']"
-            size="24"
-            class="md:w-4! md:h-4!"
-          />
-          <span class="hidden md:inline">{{ t('edition.lost_found') }}</span>
-        </NuxtLink>
+        <!-- Onglets conditionnels dépendant de l'auth ou de Date.now() (rendu côté client pour éviter le mismatch d'hydration) -->
+        <ClientOnly>
+          <NuxtLink
+            v-if="volunteersTabVisible"
+            :to="`/editions/${edition.id}/volunteers`"
+            :class="[
+              'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+              currentPage === 'volunteers'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            ]"
+            :title="t('edition.volunteers.title')"
+          >
+            <UIcon
+              name="i-heroicons-hand-raised"
+              :class="['md:mr-1']"
+              size="24"
+              class="md:w-4! md:h-4!"
+            />
+            <span class="hidden md:inline">{{ t('edition.volunteers.title') }}</span>
+          </NuxtLink>
 
-        <NuxtLink
-          v-if="showsCallTabVisible"
-          :to="`/editions/${edition.id}/shows-call`"
-          :class="[
-            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'shows-call'
-              ? 'border-primary-500 text-primary-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-          ]"
-          :title="t('shows_call.title')"
-        >
-          <UIcon
-            name="i-heroicons-megaphone"
-            :class="['md:mr-1']"
-            size="24"
-            class="md:w-4! md:h-4!"
-          />
-          <span class="hidden md:inline">{{ t('shows_call.title') }}</span>
-        </NuxtLink>
+          <NuxtLink
+            v-if="hasEditionStarted"
+            :to="`/editions/${edition.id}/lost-found`"
+            :class="[
+              'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+              currentPage === 'lost-found'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            ]"
+            :title="t('edition.lost_found')"
+          >
+            <UIcon
+              name="i-heroicons-magnifying-glass"
+              :class="['md:mr-1']"
+              size="24"
+              class="md:w-4! md:h-4!"
+            />
+            <span class="hidden md:inline">{{ t('edition.lost_found') }}</span>
+          </NuxtLink>
 
-        <NuxtLink
-          v-if="artistSpaceTabVisible"
-          :to="`/editions/${edition.id}/artist-space`"
-          :class="[
-            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'artist-space'
-              ? 'border-primary-500 text-primary-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-          ]"
-          :title="t('edition.artist_space')"
-        >
-          <UIcon name="i-heroicons-star" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
-          <span class="hidden md:inline">{{ t('edition.artist_space') }}</span>
-        </NuxtLink>
+          <NuxtLink
+            v-if="showsCallTabVisible"
+            :to="`/editions/${edition.id}/shows-call`"
+            :class="[
+              'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+              currentPage === 'shows-call'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            ]"
+            :title="t('shows_call.title')"
+          >
+            <UIcon
+              name="i-heroicons-megaphone"
+              :class="['md:mr-1']"
+              size="24"
+              class="md:w-4! md:h-4!"
+            />
+            <span class="hidden md:inline">{{ t('shows_call.title') }}</span>
+          </NuxtLink>
+
+          <NuxtLink
+            v-if="artistSpaceTabVisible"
+            :to="`/editions/${edition.id}/artist-space`"
+            :class="[
+              'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+              currentPage === 'artist-space'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            ]"
+            :title="t('edition.artist_space')"
+          >
+            <UIcon name="i-heroicons-star" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
+            <span class="hidden md:inline">{{ t('edition.artist_space') }}</span>
+          </NuxtLink>
+        </ClientOnly>
       </nav>
 
       <!-- Titre de la page courante sur mobile -->

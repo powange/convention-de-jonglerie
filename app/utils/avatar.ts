@@ -175,8 +175,9 @@ export const useAvatar = () => {
 
       // Convertir l'URL relative en URL absolue pour éviter l'optimisation _ipx de Nuxt Image
       let finalUrl = imageUrl
-      if (imageUrl.startsWith('/') && typeof window !== 'undefined') {
-        finalUrl = `${window.location.origin}${imageUrl}`
+      if (imageUrl.startsWith('/')) {
+        const requestUrl = useRequestURL()
+        finalUrl = `${requestUrl.origin}${imageUrl}`
       }
 
       return `${finalUrl}?v=${version}`

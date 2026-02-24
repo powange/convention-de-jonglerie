@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue'
+import { version as nuxtVersion } from 'nuxt/package.json'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -83,6 +84,18 @@ export default defineNuxtConfig({
     },
     rollupConfig: {
       plugins: [vue()],
+      onwarn(warning, defaultHandler) {
+        // Ignorer les warnings d'imports auto-importés non utilisés dans #imports
+        // (h3, @intlify/h3 enregistrent des presets d'auto-import qui ne sont pas tous utilisés)
+        if (
+          warning.code === 'UNUSED_EXTERNAL_IMPORT' &&
+          warning.exporter &&
+          (warning.exporter.includes('/h3/') || warning.exporter.includes('/@intlify/h3/'))
+        ) {
+          return
+        }
+        defaultHandler(warning)
+      },
     },
     esbuild: {
       options: {
@@ -311,6 +324,8 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Version Nuxt (injectée au build)
+    nuxtVersion,
     // Private keys that are only available on the server
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || '',
@@ -397,6 +412,7 @@ export default defineNuxtConfig({
     // Permettre l'indexation uniquement sur le domaine principal en production
     disallow: process.env.NUXT_ENV === 'staging' || process.env.NUXT_ENV === 'release' ? ['/'] : [],
     sitemap: '/sitemap.xml',
+    debug: false,
   },
 
   sitemap: {

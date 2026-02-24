@@ -16,6 +16,9 @@ global.useImageUrl = vi.fn(() => ({
   getImageUrl: mockGetImageUrl,
 }))
 
+// Mock useRequestURL (Nuxt composable)
+global.useRequestURL = vi.fn(() => new URL('http://localhost:3000'))
+
 // Mock Date.now pour des tests prévisibles
 const originalDateNow = Date.now
 const mockDateNow = vi.fn(() => 1640995200000) // 1er janvier 2022
