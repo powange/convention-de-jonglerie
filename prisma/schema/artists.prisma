@@ -9,9 +9,9 @@ enum ShowCallMode {
 
 enum ShowCallVisibility {
   OFFLINE // Hors ligne, invisible partout (pages publiques, listes)
-  CLOSED  // Fermé, pas de candidature possible mais visible
+  CLOSED // Fermé, pas de candidature possible mais visible
   PRIVATE // Ouvert aux candidatures via lien direct uniquement
-  PUBLIC  // Ouvert et listé partout
+  PUBLIC // Ouvert et listé partout
 }
 
 enum ShowApplicationStatus {
@@ -20,39 +20,48 @@ enum ShowApplicationStatus {
   REJECTED
 }
 
+enum AccommodationType {
+  TENT // Tente
+  VEHICLE // Véhicule aménagé (van, camion, camping-car)
+  HOSTED // Hébergé (en dur, chez quelqu'un)
+  OTHER // Autre
+}
+
 model EditionArtist {
-  id                      Int               @id @default(autoincrement())
+  id                      Int                @id @default(autoincrement())
   editionId               Int
   userId                  Int
   arrivalDateTime         String?
   departureDateTime       String?
-  dietaryPreference       DietaryPreference @default(NONE)
-  allergies               String?           @db.Text
+  dietaryPreference       DietaryPreference  @default(NONE)
+  allergies               String?            @db.Text
   allergySeverity         AllergySeverity?
-  qrCodeToken             String?           @unique
-  entryValidated          Boolean           @default(false)
+  qrCodeToken             String?            @unique
+  entryValidated          Boolean            @default(false)
   entryValidatedAt        DateTime?
   entryValidatedBy        Int?
-  payment                 Decimal?          @db.Decimal(10, 2)
-  paymentPaid             Boolean           @default(false)
-  reimbursementMax        Decimal?          @db.Decimal(10, 2)
-  reimbursementActual     Decimal?          @db.Decimal(10, 2)
-  reimbursementActualPaid Boolean           @default(false)
-  organizerNotes          String?           @db.Text
-  accommodationAutonomous Boolean           @default(false)
-  accommodationProposal   String?           @db.Text
-  invoiceRequested        Boolean           @default(false)
-  invoiceProvided         Boolean           @default(false)
-  feeRequested            Boolean           @default(false)
-  feeProvided             Boolean           @default(false)
-  pickupRequired          Boolean           @default(false)
+  payment                 Decimal?           @db.Decimal(10, 2)
+  paymentPaid             Boolean            @default(false)
+  reimbursementMax        Decimal?           @db.Decimal(10, 2)
+  reimbursementActual     Decimal?           @db.Decimal(10, 2)
+  reimbursementActualPaid Boolean            @default(false)
+  organizerNotes          String?            @db.Text
+  accommodationAutonomous Boolean            @default(false)
+  accommodationType       AccommodationType?
+  accommodationTypeOther  String?            @db.Text
+  accommodationProposal   String?            @db.Text
+  invoiceRequested        Boolean            @default(false)
+  invoiceProvided         Boolean            @default(false)
+  feeRequested            Boolean            @default(false)
+  feeProvided             Boolean            @default(false)
+  pickupRequired          Boolean            @default(false)
   pickupLocation          String?
   pickupResponsibleId     Int?
-  dropoffRequired         Boolean           @default(false)
+  dropoffRequired         Boolean            @default(false)
   dropoffLocation         String?
   dropoffResponsibleId    Int?
-  createdAt               DateTime          @default(now())
-  updatedAt               DateTime          @updatedAt
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
 
   edition              Edition               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -132,23 +141,23 @@ model ShowReturnableItem {
 // Configuration de l'appel à spectacles sur une édition
 // Une édition peut avoir plusieurs appels (scène ouverte, gala, spectacles longs, etc.)
 model EditionShowCall {
-  id          Int           @id @default(autoincrement())
-  editionId   Int
-  name        String        // Nom de l'appel (ex: "Scène ouverte", "Gala", "Spectacles longs")
-  visibility  ShowCallVisibility @default(OFFLINE)
-  mode        ShowCallMode  @default(INTERNAL)
-  externalUrl String?
-  description String?       @db.Text
-  deadline    DateTime?
+  id                Int                @id @default(autoincrement())
+  editionId         Int
+  name              String // Nom de l'appel (ex: "Scène ouverte", "Gala", "Spectacles longs")
+  visibility        ShowCallVisibility @default(OFFLINE)
+  mode              ShowCallMode       @default(INTERNAL)
+  externalUrl       String?
+  description       String?            @db.Text
+  deadline          DateTime?
   // Champs demandés (configurables par l'organisateur)
-  askPortfolioUrl   Boolean @default(true)
-  askVideoUrl       Boolean @default(true)
-  askTechnicalNeeds Boolean @default(true)
-  askAccommodation  Boolean @default(false)
-  askDepartureCity  Boolean @default(false) // Demander la ville de départ pour le défraiement
-  askSocialLinks    Boolean @default(false) // Demander les réseaux sociaux
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  askPortfolioUrl   Boolean            @default(true)
+  askVideoUrl       Boolean            @default(true)
+  askTechnicalNeeds Boolean            @default(true)
+  askAccommodation  Boolean            @default(false)
+  askDepartureCity  Boolean            @default(false) // Demander la ville de départ pour le défraiement
+  askSocialLinks    Boolean            @default(false) // Demander les réseaux sociaux
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   edition      Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   applications ShowApplication[]
@@ -165,25 +174,25 @@ model ShowApplication {
   status     ShowApplicationStatus @default(PENDING)
 
   // Infos artiste
-  artistName   String        // Nom de scène
-  artistBio    String?       @db.Text // Présentation de l'artiste
-  portfolioUrl String?       // Site web / portfolio
-  videoUrl     String?       // Lien vidéo de démonstration
-  socialLinks  String?       @db.Text // Liens réseaux sociaux (un par ligne)
+  artistName   String // Nom de scène
+  artistBio    String? @db.Text // Présentation de l'artiste
+  portfolioUrl String? // Site web / portfolio
+  videoUrl     String? // Lien vidéo de démonstration
+  socialLinks  String? @db.Text // Liens réseaux sociaux (un par ligne)
 
   // Infos spectacle proposé
-  showTitle                 String  // Titre du spectacle
+  showTitle                 String // Titre du spectacle
   showDescription           String  @db.Text // Description détaillée
-  showDuration              Int     // Durée en minutes
+  showDuration              Int // Durée en minutes
   showCategory              String? // Type (jonglage, acrobatie, magie, etc.)
   technicalNeeds            String? @db.Text // Besoins techniques (espace, son, lumière)
   additionalPerformersCount Int     @default(0) // Nombre de personnes supplémentaires dans le spectacle
-  additionalPerformers      Json?   // Infos de contact des personnes supplémentaires [{lastName, firstName, email, phone}]
+  additionalPerformers      Json? // Infos de contact des personnes supplémentaires [{lastName, firstName, email, phone}]
 
   // Logistique
-  accommodationNeeded Boolean  @default(false)
-  accommodationNotes  String?  @db.Text
-  departureCity       String?  // Ville de départ pour le défraiement
+  accommodationNeeded Boolean @default(false)
+  accommodationNotes  String? @db.Text
+  departureCity       String? // Ville de départ pour le défraiement
 
   // Gestion par les organisateurs
   organizerNotes String?   @db.Text // Notes internes organisateurs

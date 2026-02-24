@@ -81,7 +81,6 @@
       "email": "E-post",
       "env_variables": "Miljövariabler (process.env)",
       "environment": "Miljö",
-      "load_error": "Fel vid laddning av konfiguration",
       "public": "Offentlig konfiguration",
       "server": "Serverkonfiguration",
       "title": "Systemkonfiguration",

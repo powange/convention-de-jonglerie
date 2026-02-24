@@ -206,6 +206,26 @@
             />
           </UFormField>
 
+          <UFormField :label="$t('artists.accommodation_type')">
+            <USelect
+              v-model="formData.accommodationType"
+              :items="accommodationTypeOptions"
+              value-key="value"
+              :placeholder="$t('artists.accommodation_not_specified')"
+              :ui="{ content: 'min-w-fit' }"
+            />
+          </UFormField>
+
+          <UFormField
+            v-if="formData.accommodationType === 'OTHER'"
+            :label="$t('artists.accommodation_type_other')"
+          >
+            <UInput
+              v-model="formData.accommodationTypeOther"
+              :placeholder="$t('artists.accommodation_type_other_placeholder')"
+            />
+          </UFormField>
+
           <div v-if="!formData.accommodationAutonomous">
             <UFormField :label="$t('artists.accommodation_proposal')">
               <UTextarea
@@ -335,6 +355,7 @@
 </template>
 
 <script setup lang="ts">
+import { getAccommodationTypeSelectOptions } from '~/utils/accommodation-type'
 import { getAllergySeveritySelectOptions } from '~/utils/allergy-severity'
 import { formatDateTimeLocal } from '~/utils/date'
 
@@ -387,6 +408,8 @@ const formData = ref({
   reimbursementActual: '',
   reimbursementActualPaid: false,
   accommodationAutonomous: false,
+  accommodationType: null as string | null,
+  accommodationTypeOther: '',
   accommodationProposal: '',
   invoiceRequested: false,
   invoiceProvided: false,
@@ -410,6 +433,8 @@ const dietaryOptions = computed(() => [
   { label: t('diet.vegetarian'), value: 'VEGETARIAN' },
   { label: t('diet.vegan'), value: 'VEGAN' },
 ])
+
+const accommodationTypeOptions = computed(() => getAccommodationTypeSelectOptions(t))
 
 const allergySeverityOptions = computed(() =>
   getAllergySeveritySelectOptions().map((option) => ({
@@ -510,6 +535,11 @@ const buildBasePayload = () => ({
     : null,
   reimbursementActualPaid: formData.value.reimbursementActualPaid,
   accommodationAutonomous: formData.value.accommodationAutonomous,
+  accommodationType: formData.value.accommodationType || null,
+  accommodationTypeOther:
+    formData.value.accommodationType === 'OTHER'
+      ? formData.value.accommodationTypeOther || null
+      : null,
   accommodationProposal: formData.value.accommodationProposal || null,
   invoiceRequested: formData.value.invoiceRequested,
   invoiceProvided: formData.value.invoiceProvided,
@@ -618,6 +648,8 @@ const resetForm = () => {
     reimbursementActual: '',
     reimbursementActualPaid: false,
     accommodationAutonomous: false,
+    accommodationType: null as string | null,
+    accommodationTypeOther: '',
     accommodationProposal: '',
     invoiceRequested: false,
     invoiceProvided: false,
@@ -674,6 +706,8 @@ watch(
           : '',
         reimbursementActualPaid: newArtist.reimbursementActualPaid || false,
         accommodationAutonomous: newArtist.accommodationAutonomous || false,
+        accommodationType: newArtist.accommodationType || null,
+        accommodationTypeOther: newArtist.accommodationTypeOther || '',
         accommodationProposal: newArtist.accommodationProposal || '',
         invoiceRequested: newArtist.invoiceRequested || false,
         invoiceProvided: newArtist.invoiceProvided || false,

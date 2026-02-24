@@ -69,12 +69,12 @@
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Nom
+                  {{ $t('common.name') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Email
+                  {{ $t('common.email') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -94,7 +94,7 @@
                 <th
                   class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Repas
+                  {{ $t('common.meals_short') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -136,7 +136,7 @@
                   v-if="canEdit"
                   class="px-4 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Actions
+                  {{ $t('common.actions') }}
                 </th>
               </tr>
             </thead>
@@ -264,28 +264,55 @@
                   <span v-else class="text-gray-400">-</span>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                  <div v-if="artist.accommodationAutonomous" class="flex items-center gap-2">
-                    <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
-                    <span class="text-sm text-gray-700 dark:text-gray-300">
-                      {{ $t('artists.accommodation_autonomous_yes') }}
-                    </span>
-                  </div>
-                  <button
-                    v-else-if="artist.accommodationProposal"
-                    class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
-                    @click="openAccommodationModal(artist)"
-                  >
-                    <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500 flex-shrink-0" />
-                    <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
-                      {{ artist.accommodationProposal }}
-                    </span>
-                    <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
-                  </button>
-                  <div v-else class="flex items-center gap-2">
-                    <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
-                    <span class="text-sm text-gray-400">
-                      {{ $t('artists.accommodation_not_specified') }}
-                    </span>
+                  <div class="space-y-1">
+                    <div v-if="artist.accommodationAutonomous" class="flex items-center gap-2">
+                      <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
+                      <span class="text-sm text-gray-700 dark:text-gray-300">
+                        {{ $t('artists.accommodation_autonomous_yes') }}
+                      </span>
+                    </div>
+                    <div v-if="artist.accommodationType" class="flex items-center gap-1 text-xs">
+                      <UBadge color="info" variant="subtle" size="sm">
+                        {{ accommodationTypeLabel(artist.accommodationType) }}
+                      </UBadge>
+                      <span
+                        v-if="artist.accommodationType === 'OTHER' && artist.accommodationTypeOther"
+                        class="text-gray-500 truncate max-w-[120px]"
+                        :title="artist.accommodationTypeOther"
+                      >
+                        {{ artist.accommodationTypeOther }}
+                      </span>
+                    </div>
+                    <button
+                      v-if="!artist.accommodationAutonomous && artist.accommodationProposal"
+                      class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
+                      @click="openAccommodationModal(artist)"
+                    >
+                      <UIcon
+                        name="i-heroicons-home"
+                        class="h-5 w-5 text-primary-500 flex-shrink-0"
+                      />
+                      <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
+                        {{ artist.accommodationProposal }}
+                      </span>
+                      <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
+                    </button>
+                    <div
+                      v-if="
+                        !artist.accommodationAutonomous &&
+                        !artist.accommodationProposal &&
+                        !artist.accommodationType
+                      "
+                      class="flex items-center gap-2"
+                    >
+                      <UIcon
+                        name="i-heroicons-question-mark-circle"
+                        class="h-5 w-5 text-gray-400"
+                      />
+                      <span class="text-sm text-gray-400">
+                        {{ $t('artists.accommodation_not_specified') }}
+                      </span>
+                    </div>
                   </div>
                 </td>
                 <td class="px-4 py-3 text-sm text-center">
@@ -421,6 +448,8 @@
 </template>
 
 <script setup lang="ts">
+import { getAccommodationTypeLabel } from '~/utils/accommodation-type'
+
 definePageMeta({
   middleware: ['authenticated'],
 })
@@ -571,6 +600,9 @@ const getMealsDisplayText = (artist: any) => {
   const totalCount = artist.mealSelections.length
   return `${acceptedCount}/${totalCount}`
 }
+
+// Label du type d'hébergement
+const accommodationTypeLabel = (type: string) => getAccommodationTypeLabel(type, t)
 
 // Fonctions pour l'état de la facture
 const getInvoiceStatusIcon = (artist: any) => {

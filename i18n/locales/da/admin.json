@@ -81,7 +81,6 @@
       "email": "E-mail",
       "env_variables": "Miljøvariabler (process.env)",
       "environment": "Miljø",
-      "load_error": "Fejl ved indlæsning af konfiguration",
       "public": "Offentlig konfiguration",
       "server": "Serverkonfiguration",
       "title": "Systemkonfiguration",

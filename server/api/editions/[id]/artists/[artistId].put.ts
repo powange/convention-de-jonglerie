@@ -19,6 +19,8 @@ const updateArtistSchema = z
     reimbursementActual: z.number().nonnegative().max(100000).optional().nullable(),
     reimbursementActualPaid: z.boolean().optional(),
     accommodationAutonomous: z.boolean().optional(),
+    accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
+    accommodationTypeOther: z.string().max(500).optional().nullable(),
     accommodationProposal: z.string().optional().nullable(),
     invoiceRequested: z.boolean().optional(),
     invoiceProvided: z.boolean().optional(),

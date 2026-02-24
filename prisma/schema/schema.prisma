@@ -73,7 +73,7 @@ model User {
   volunteerComments                  VolunteerComment[]
   conversationParticipants           ConversationParticipant[]
   showApplications                   ShowApplication[]
-  decidedShowApplications            ShowApplication[]           @relation("ShowApplicationDecider")
+  decidedShowApplications            ShowApplication[]                   @relation("ShowApplicationDecider")
 }
 
 // =============================================================================
@@ -81,9 +81,9 @@ model User {
 // =============================================================================
 
 enum EditionStatus {
-  PLANNED   // Planifié - dates confirmées mais détails incomplets
+  PLANNED // Planifié - dates confirmées mais détails incomplets
   PUBLISHED // Publié - en ligne et visible
-  OFFLINE   // Hors ligne - complet mais désactivé/caché
+  OFFLINE // Hors ligne - complet mais désactivé/caché
   CANCELLED // Annulé - convention annulée
 }
 
@@ -420,7 +420,7 @@ model EditionZone {
   name        String   @db.VarChar(100)
   description String?  @db.Text
   color       String   @db.VarChar(7) // Format #RRGGBB
-  coordinates Json     // GeoJSON polygon coordinates
+  coordinates Json // GeoJSON polygon coordinates
   zoneTypes   Json     @default("[\"OTHER\"]") // JSON array of EditionZoneType values
   order       Int      @default(0)
   createdAt   DateTime @default(now())
@@ -437,8 +437,8 @@ model EditionMarker {
   editionId   Int
   name        String   @db.VarChar(100)
   description String?  @db.Text
-  latitude    Float    // Coordonnée latitude
-  longitude   Float    // Coordonnée longitude
+  latitude    Float // Coordonnée latitude
+  longitude   Float // Coordonnée longitude
   markerTypes Json     @default("[\"OTHER\"]") // JSON array of EditionZoneType values
   color       String?  @db.VarChar(7) // Couleur personnalisée (format #RRGGBB), null = couleur du type
   order       Int      @default(0)

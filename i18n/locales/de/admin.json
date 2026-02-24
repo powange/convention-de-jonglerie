@@ -81,7 +81,6 @@
       "email": "E-Mail",
       "env_variables": "Umgebungsvariablen (process.env)",
       "environment": "Umgebung",
-      "load_error": "Fehler beim Laden der Konfiguration",
       "public": "Öffentliche Konfiguration",
       "server": "Serverkonfiguration",
       "title": "Systemkonfiguration",

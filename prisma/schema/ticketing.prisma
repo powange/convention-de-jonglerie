@@ -262,8 +262,8 @@ model TicketingOrder {
   payerEmail     String
 
   // Montant et statut
-  amount        Int     // Montant total en centimes
-  status        String  // Processed, Refunded, etc.
+  amount        Int // Montant total en centimes
+  status        String // Processed, Refunded, etc.
   paymentMethod String? // Type de paiement : cash, card, check, null si non payé
   checkNumber   String? // Numéro du chèque si paymentMethod = 'check'
 

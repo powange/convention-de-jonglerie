@@ -28,6 +28,8 @@ export default wrapApiHandler(
         reimbursementActual: true,
         reimbursementActualPaid: true,
         accommodationAutonomous: true,
+        accommodationType: true,
+        accommodationTypeOther: true,
         accommodationProposal: true,
         pickupRequired: true,
         pickupLocation: true,
@@ -54,16 +56,6 @@ export default wrapApiHandler(
                 startDateTime: true,
                 duration: true,
                 location: true,
-                returnableItems: {
-                  select: {
-                    returnableItem: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
-                    },
-                  },
-                },
               },
             },
           },
@@ -94,17 +86,6 @@ export default wrapApiHandler(
       }
     }
 
-    // Récupérer et dédupliquer les articles à restituer depuis tous les spectacles
-    const uniqueItems = new Map()
-    artist.shows.forEach((showArtist) => {
-      showArtist.show.returnableItems.forEach((item) => {
-        if (!uniqueItems.has(item.returnableItem.id)) {
-          uniqueItems.set(item.returnableItem.id, item.returnableItem)
-        }
-      })
-    })
-    const deduplicatedItems = Array.from(uniqueItems.values())
-
     return {
       artist: {
         id: artist.id,
@@ -123,6 +104,8 @@ export default wrapApiHandler(
         reimbursementActual: artist.reimbursementActual ? Number(artist.reimbursementActual) : null,
         reimbursementActualPaid: artist.reimbursementActualPaid,
         accommodationAutonomous: artist.accommodationAutonomous,
+        accommodationType: artist.accommodationType,
+        accommodationTypeOther: artist.accommodationTypeOther,
         accommodationProposal: artist.accommodationProposal,
         pickupRequired: artist.pickupRequired,
         pickupLocation: artist.pickupLocation,
@@ -148,10 +131,6 @@ export default wrapApiHandler(
             date: ms.meal.date,
             mealType: ms.meal.mealType,
           },
-        })),
-        returnableItems: deduplicatedItems.map((item) => ({
-          id: item.id,
-          name: item.name,
         })),
       },
     }

@@ -249,31 +249,120 @@
       </UCard>
 
       <!-- Hébergement -->
-      <UCard v-if="artist.accommodationAutonomous || artist.accommodationProposal">
+      <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-home-modern" class="text-blue-500" />
-            {{ $t('artists.my_accommodation') }}
-          </h2>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-home-modern" class="text-blue-500" />
+              {{ $t('artists.my_accommodation') }}
+            </h2>
+            <UButton
+              v-if="!editingAccommodation"
+              icon="i-heroicons-pencil-square"
+              variant="ghost"
+              size="xs"
+              color="neutral"
+              @click="editingAccommodation = true"
+            />
+          </div>
         </template>
 
         <div class="space-y-3">
-          <div v-if="artist.accommodationAutonomous" class="flex items-center gap-2">
-            <UIcon name="i-heroicons-check-circle" class="text-green-500" />
-            <span class="text-gray-700 dark:text-gray-300">
-              {{ $t('artists.accommodation_autonomous_info') }}
-            </span>
-          </div>
-          <div v-if="artist.accommodationProposal" class="space-y-1">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('artists.accommodation_proposal_info') }}
-            </p>
-            <p
-              class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3"
+          <!-- Mode lecture -->
+          <template v-if="!editingAccommodation">
+            <div class="flex items-center gap-2">
+              <UIcon
+                :name="
+                  artist.accommodationAutonomous
+                    ? 'i-heroicons-check-circle'
+                    : 'i-heroicons-x-circle'
+                "
+                :class="artist.accommodationAutonomous ? 'text-green-500' : 'text-gray-400'"
+              />
+              <span class="text-gray-700 dark:text-gray-300">
+                {{
+                  artist.accommodationAutonomous
+                    ? $t('artists.accommodation_autonomous_info')
+                    : $t('artists.accommodation_not_autonomous_info')
+                }}
+              </span>
+            </div>
+
+            <div
+              v-if="artist.accommodationType"
+              class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
             >
-              {{ artist.accommodationProposal }}
-            </p>
-          </div>
+              <div class="flex items-center gap-2 text-sm">
+                <UIcon name="i-heroicons-home" class="text-blue-500 shrink-0" />
+                <span class="text-gray-700 dark:text-gray-300">
+                  <strong>{{ accommodationTypeLabel(artist.accommodationType) }}</strong>
+                  <span
+                    v-if="artist.accommodationType === 'OTHER' && artist.accommodationTypeOther"
+                  >
+                    — {{ artist.accommodationTypeOther }}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div v-if="artist.accommodationProposal" class="space-y-1">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('artists.accommodation_proposal_info') }}
+              </p>
+              <p
+                class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3"
+              >
+                {{ artist.accommodationProposal }}
+              </p>
+            </div>
+          </template>
+
+          <!-- Mode édition -->
+          <template v-else>
+            <div class="space-y-3">
+              <USwitch
+                v-model="accommodationForm.accommodationAutonomous"
+                :label="$t('artists.accommodation_autonomous_info')"
+              />
+
+              <template v-if="accommodationForm.accommodationAutonomous">
+                <UFormField :label="$t('artists.accommodation_type')">
+                  <USelect
+                    v-model="accommodationForm.accommodationType"
+                    :items="accommodationTypeOptions"
+                    value-key="value"
+                    :placeholder="$t('artists.accommodation_not_specified')"
+                    :ui="{ content: 'min-w-fit' }"
+                  />
+                </UFormField>
+
+                <UFormField
+                  v-if="accommodationForm.accommodationType === 'OTHER'"
+                  :label="$t('artists.accommodation_type_other')"
+                >
+                  <UInput
+                    v-model="accommodationForm.accommodationTypeOther"
+                    :placeholder="$t('artists.accommodation_type_other_placeholder')"
+                  />
+                </UFormField>
+              </template>
+
+              <div class="flex justify-end gap-2">
+                <UButton variant="ghost" color="neutral" size="sm" @click="cancelAccommodationEdit">
+                  {{ $t('common.cancel') }}
+                </UButton>
+                <UButton
+                  :loading="savingAccommodation"
+                  :disabled="!accommodationFormDirty"
+                  icon="i-heroicons-check"
+                  size="sm"
+                  @click="saveAccommodation"
+                >
+                  {{ $t('common.save') }}
+                </UButton>
+              </div>
+            </div>
+          </template>
         </div>
       </UCard>
 
@@ -395,28 +484,6 @@
           </div>
         </div>
       </UCard>
-
-      <!-- Articles à récupérer -->
-      <UCard v-if="artist.returnableItems.length > 0">
-        <template #header>
-          <h2 class="text-lg font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-gift" class="text-pink-500" />
-            {{ $t('artists.my_returnable_items') }}
-          </h2>
-        </template>
-
-        <div class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="item in artist.returnableItems"
-            :key="item.id"
-            color="info"
-            variant="soft"
-            size="md"
-          >
-            {{ item.name }}
-          </UBadge>
-        </div>
-      </UCard>
     </div>
 
     <!-- Modal QR Code -->
@@ -475,6 +542,10 @@
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
+import {
+  getAccommodationTypeLabel,
+  getAccommodationTypeSelectOptions,
+} from '~/utils/accommodation-type'
 import type { AllergySeverityLevel } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
 
@@ -497,11 +568,6 @@ interface MealSelection {
   }
 }
 
-interface ReturnableItem {
-  id: number
-  name: string
-}
-
 interface ArtistInfo {
   id: number
   firstName: string
@@ -519,6 +585,8 @@ interface ArtistInfo {
   reimbursementActual: number | null
   reimbursementActualPaid: boolean
   accommodationAutonomous: boolean
+  accommodationType: string | null
+  accommodationTypeOther: string | null
   accommodationProposal: string | null
   pickupRequired: boolean
   pickupLocation: string | null
@@ -530,7 +598,6 @@ interface ArtistInfo {
   feeProvided: boolean
   shows: ArtistShow[]
   mealSelections: MealSelection[]
-  returnableItems: ReturnableItem[]
 }
 
 const route = useRoute()
@@ -580,6 +647,86 @@ watch(
 
 // QR Code modal
 const qrModalOpen = ref(false)
+
+// Helper pour le label du type d'hébergement
+const accommodationTypeLabel = (type: string) => getAccommodationTypeLabel(type, t)
+
+// Formulaire hébergement
+const editingAccommodation = ref(false)
+
+const accommodationForm = reactive({
+  accommodationAutonomous: artist.value?.accommodationAutonomous ?? false,
+  accommodationType: artist.value?.accommodationType ?? (null as string | null),
+  accommodationTypeOther: artist.value?.accommodationTypeOther ?? '',
+})
+
+const accommodationTypeOptions = computed(() => getAccommodationTypeSelectOptions(t))
+
+watch(artist, (newArtist) => {
+  if (newArtist && !editingAccommodation.value) {
+    accommodationForm.accommodationAutonomous = newArtist.accommodationAutonomous
+    accommodationForm.accommodationType = newArtist.accommodationType ?? null
+    accommodationForm.accommodationTypeOther = newArtist.accommodationTypeOther ?? ''
+  }
+})
+
+const accommodationFormDirty = computed(() => {
+  if (!artist.value) return false
+  return (
+    accommodationForm.accommodationAutonomous !== artist.value.accommodationAutonomous ||
+    accommodationForm.accommodationType !== (artist.value.accommodationType ?? null) ||
+    (accommodationForm.accommodationType === 'OTHER' &&
+      (accommodationForm.accommodationTypeOther || '') !==
+        (artist.value.accommodationTypeOther || ''))
+  )
+})
+
+const { execute: saveAccommodation, loading: savingAccommodation } = useApiAction<
+  unknown,
+  {
+    success: boolean
+    accommodationAutonomous: boolean
+    accommodationType: string | null
+    accommodationTypeOther: string | null
+  }
+>(() => `/api/editions/${editionId}/my-accommodation`, {
+  method: 'PUT',
+  body: () => ({
+    accommodationAutonomous: accommodationForm.accommodationAutonomous,
+    accommodationType: accommodationForm.accommodationAutonomous
+      ? accommodationForm.accommodationType || null
+      : null,
+    accommodationTypeOther:
+      accommodationForm.accommodationAutonomous && accommodationForm.accommodationType === 'OTHER'
+        ? accommodationForm.accommodationTypeOther || null
+        : null,
+  }),
+  successMessage: { title: t('artists.accommodation_saved') },
+  errorMessages: { default: t('artists.accommodation_save_error') },
+  onSuccess: (response) => {
+    if (response && artistResponse.value?.artist) {
+      artistResponse.value = {
+        ...artistResponse.value,
+        artist: {
+          ...artistResponse.value.artist,
+          accommodationAutonomous: response.accommodationAutonomous,
+          accommodationType: response.accommodationType,
+          accommodationTypeOther: response.accommodationTypeOther,
+        },
+      }
+    }
+    editingAccommodation.value = false
+  },
+})
+
+const cancelAccommodationEdit = () => {
+  if (artist.value) {
+    accommodationForm.accommodationAutonomous = artist.value.accommodationAutonomous
+    accommodationForm.accommodationType = artist.value.accommodationType ?? null
+    accommodationForm.accommodationTypeOther = artist.value.accommodationTypeOther ?? ''
+  }
+  editingAccommodation.value = false
+}
 
 // Formulaire régime alimentaire / allergies
 const editingDiet = ref(false)

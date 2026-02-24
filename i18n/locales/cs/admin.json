@@ -81,7 +81,6 @@
       "email": "E-mail",
       "env_variables": "Proměnné prostředí (process.env)",
       "environment": "Prostředí",
-      "load_error": "Chyba při načítání konfigurace",
       "public": "Veřejná konfigurace",
       "server": "Konfigurace serveru",
       "title": "Konfigurace systému",

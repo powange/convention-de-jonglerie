@@ -81,7 +81,6 @@
       "email": "E-mail",
       "env_variables": "Omgevingsvariabelen (process.env)",
       "environment": "Omgeving",
-      "load_error": "Fout bij laden van configuratie",
       "public": "Openbare configuratie",
       "server": "Serverconfiguratie",
       "title": "Systeemconfiguratie",

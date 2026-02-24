@@ -1053,7 +1053,7 @@ async function main() {
             editionId: edition.id,
             userId: randomUser.id,
             description: itemDescription,
-            status: isLost ? 'LOST' : 'FOUND',
+            status: 'LOST',
           },
         })
         lostFoundCount++
