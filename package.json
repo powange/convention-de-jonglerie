@@ -90,7 +90,7 @@
     "@nuxtjs/seo": "^3.2.2",
     "@pinia/nuxt": "^0.11.2",
     "@prisma/adapter-mariadb": "^7.0.0",
-    "@prisma/client": "^7.4.0",
+    "@prisma/client": "^7.4.1",
     "@types/nodemailer": "^6.4.17",
     "@unhead/vue": "^2.0.12",
     "@vue-email/components": "^0.0.21",
@@ -158,7 +158,7 @@
     "happy-dom": "^18.0.1",
     "nuxt-file-storage": "^0.3.0",
     "prettier": "^3.3.3",
-    "prisma": "^7.4.0",
+    "prisma": "^7.4.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "wait-on": "^8.0.4"
