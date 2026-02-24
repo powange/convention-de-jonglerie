@@ -121,6 +121,14 @@ export default defineConfig({
       }),
       // Projet 3 : Tests E2E (serveur Nuxt démarré)
       await defineVitestProject({
+        resolve: {
+          // Workaround: @nuxt/test-utils importe bun:test dynamiquement,
+          // ce qui casse Vite. On redirige vers un fichier existant.
+          // Ref: https://github.com/nuxt/test-utils/issues/1490
+          alias: {
+            'bun:test': resolve(__dirname, 'vitest.config.ts'),
+          },
+        },
         test: {
           name: 'e2e',
           include: ['test/e2e/**/*.{test,spec}.ts'],
@@ -139,8 +147,8 @@ export default defineConfig({
           globals: true,
           testTimeout: 30000,
           hookTimeout: 30000,
-          pool: 'threads',
-          poolOptions: { threads: { singleThread: true } },
+          pool: 'forks',
+          poolOptions: { forks: { singleFork: true } },
           sequence: { concurrent: false },
         },
       },
