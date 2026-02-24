@@ -451,7 +451,7 @@ export const NotificationHelpers = {
       category: 'edition',
       entityType: 'Convention',
       entityId: conventionId.toString(),
-      actionUrl: `/conventions/${conventionId}`,
+      actionUrl: `/my-conventions?convention=${conventionId}`,
       notificationType: 'new_convention',
     })
   },
@@ -827,7 +827,7 @@ export const NotificationHelpers = {
       category: 'convention',
       entityType: 'Convention',
       entityId: conventionId.toString(),
-      actionUrl: `/conventions/${conventionId}`,
+      actionUrl: `/my-conventions?convention=${conventionId}`,
       notificationType: 'organizer_added',
     })
   },
