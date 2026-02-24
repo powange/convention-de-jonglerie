@@ -25,6 +25,7 @@ vi.mock('fs/promises', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs/promises')>()
   return {
     ...actual,
+    default: actual,
     readFile: vi.fn().mockResolvedValue(Buffer.from('fake-image-data')),
   }
 })

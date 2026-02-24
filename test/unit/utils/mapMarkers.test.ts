@@ -187,21 +187,14 @@ describe('mapMarkers utils', () => {
   })
 
   describe('getEditionStatus', () => {
-    const originalDate = Date
-
     beforeEach(() => {
       // Mock de la date courante au 15 juin 2024 à 12:00:00 UTC
-      const mockDate = new Date('2024-06-15T12:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(((...args: any[]) => {
-        if (args.length === 0) {
-          return mockDate
-        }
-        return new originalDate(...(args as any))
-      }) as any)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2024-06-15T12:00:00Z'))
     })
 
     afterEach(() => {
-      vi.restoreAllMocks()
+      vi.useRealTimers()
     })
 
     it('devrait détecter un événement en cours', () => {

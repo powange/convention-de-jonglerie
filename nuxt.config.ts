@@ -77,25 +77,13 @@ export default defineNuxtConfig({
       },
     },
     externals: {
-      external: ['node-cron', '@prisma/client'],
+      external: ['@prisma/client'],
     },
     experimental: {
       tasks: true,
     },
     rollupConfig: {
       plugins: [vue()],
-      onwarn(warning, defaultHandler) {
-        // Ignorer les warnings d'imports auto-importés non utilisés dans #imports
-        // (h3, @intlify/h3 enregistrent des presets d'auto-import qui ne sont pas tous utilisés)
-        if (
-          warning.code === 'UNUSED_EXTERNAL_IMPORT' &&
-          warning.exporter &&
-          (warning.exporter.includes('/h3/') || warning.exporter.includes('/@intlify/h3/'))
-        ) {
-          return
-        }
-        defaultHandler(warning)
-      },
     },
     esbuild: {
       options: {

@@ -4,7 +4,7 @@ Ce document décrit le système de tâches automatisées (cron) implémenté dan
 
 ## 📋 Vue d'ensemble
 
-Le système utilise **Nitro Tasks** (natif Nuxt 4) + **node-cron** pour exécuter des tâches périodiques automatiques :
+Le système utilise **Nitro Tasks** (natif Nuxt 4) + **[cron](https://github.com/kelektiv/node-cron)** (kelektiv) pour exécuter des tâches périodiques automatiques :
 
 - 🔔 **Notifications** : Rappels bénévoles et conventions favorites
 - 🧹 **Maintenance** : Nettoyage des données expirées
@@ -109,13 +109,18 @@ export default defineTask({
 
 ```typescript
 // server/plugins/scheduler.ts
-cron.schedule('0 */6 * * *', async () => {
-  // Toutes les 6h
-  try {
-    await runTask('ma-nouvelle-tache')
-  } catch (error) {
-    console.error('Erreur:', error)
-  }
+import { CronJob } from 'cron'
+
+CronJob.from({
+  cronTime: '0 */6 * * *', // Toutes les 6h
+  onTick: async () => {
+    try {
+      await runTask('ma-nouvelle-tache')
+    } catch (error) {
+      console.error('Erreur:', error)
+    }
+  },
+  start: true,
 })
 ```
 

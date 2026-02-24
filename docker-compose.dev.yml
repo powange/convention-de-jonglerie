@@ -46,7 +46,7 @@ services:
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'development'
-      NODE_OPTIONS: '--max-old-space-size=8192'
+      NODE_OPTIONS: '--max-old-space-size=4096'
       # Force le polling pour Windows (hot reload)
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'
