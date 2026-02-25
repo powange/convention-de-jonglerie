@@ -816,26 +816,25 @@ const allergySeverityOptions = computed(() =>
   }))
 )
 
-const savingDiet = ref(false)
-
-const saveDiet = async () => {
-  savingDiet.value = true
-  try {
-    const response = await $fetch<{
-      success: boolean
-      dietaryPreference: string
-      allergies: string | null
-      allergySeverity: string | null
-    }>(`/api/editions/${editionId}/my-diet`, {
-      method: 'PUT',
-      body: {
-        dietaryPreference: dietForm.dietaryPreference,
-        allergies: dietForm.allergies || null,
-        allergySeverity: dietForm.allergies ? dietForm.allergySeverity : null,
-      },
-    })
-
-    if (response.success && artistResponse.value?.artist) {
+const { execute: saveDiet, loading: savingDiet } = useApiAction<
+  unknown,
+  {
+    success: boolean
+    dietaryPreference: string
+    allergies: string | null
+    allergySeverity: string | null
+  }
+>(() => `/api/editions/${editionId}/my-diet`, {
+  method: 'PUT',
+  body: () => ({
+    dietaryPreference: dietForm.dietaryPreference,
+    allergies: dietForm.allergies || null,
+    allergySeverity: dietForm.allergies ? dietForm.allergySeverity : null,
+  }),
+  successMessage: { title: t('artists.diet_saved') },
+  errorMessages: { default: t('artists.diet_save_error') },
+  onSuccess: (response) => {
+    if (response && artistResponse.value?.artist) {
       artistResponse.value = {
         ...artistResponse.value,
         artist: {
@@ -845,22 +844,10 @@ const saveDiet = async () => {
           allergySeverity: response.allergySeverity,
         },
       }
-      toast.add({
-        title: t('artists.diet_saved'),
-        color: 'success',
-      })
-      editingDiet.value = false
     }
-  } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('artists.diet_save_error'),
-      color: 'error',
-    })
-  } finally {
-    savingDiet.value = false
-  }
-}
+    editingDiet.value = false
+  },
+})
 
 const cancelDietEdit = () => {
   if (artist.value) {

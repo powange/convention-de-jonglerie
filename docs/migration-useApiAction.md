@@ -247,6 +247,63 @@ Pour chaque fichier à migrer :
 
 ---
 
+## Fichiers restants à migrer
+
+### Pages
+
+| Fichier                                                                    | Appels manuels | Détail                                                                                            |
+| -------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| `app/pages/my-conventions.vue`                                             | 6              | DELETE organizer, POST organizer, DELETE edition, DELETE convention, POST duplicate, PATCH status |
+| `app/pages/editions/[id]/gestion/organizers.vue`                           | 5              | POST/PATCH/DELETE convention organizer, POST/DELETE edition organizer                             |
+| `app/pages/editions/[id]/gestion/volunteers/applications.vue`              | 4              | PATCH teams (x3), PATCH team leader                                                               |
+| `app/pages/editions/[id]/artist-space.vue`                                 | 1              | PUT my-meals (repas artiste)                                                                      |
+| `app/pages/editions/[id]/gestion/volunteers/notifications.vue`             | 1              | POST notify-schedules                                                                             |
+| `app/pages/editions/[id]/gestion/shows-call/index.vue`                     | 1              | DELETE shows-call                                                                                 |
+| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/index.vue`        | 1              | PUT shows-call settings                                                                           |
+| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/applications.vue` | 3              | PATCH application status (x3)                                                                     |
+| `app/pages/editions/[id]/gestion/map.vue`                                  | 1              | PATCH zones                                                                                       |
+| `app/pages/editions/[id]/gestion/meals/index.vue`                          | 1              | PUT meals                                                                                         |
+| `app/pages/editions/[id]/gestion/index.vue`                                | 1              | PATCH edition                                                                                     |
+| `app/pages/admin/users/index.vue`                                          | 3              | PUT promote, PUT demote, PUT update                                                               |
+| `app/pages/admin/users/[id].vue`                                           | 3              | PUT update (x2), PUT promote                                                                      |
+| `app/pages/admin/backup.vue`                                               | 1              | DELETE backup                                                                                     |
+| `app/pages/admin/error-logs.vue`                                           | 2              | PATCH resolve, PATCH assign                                                                       |
+| `app/pages/admin/notifications.vue`                                        | 1              | PATCH notification                                                                                |
+| `app/pages/admin/conventions.vue`                                          | 2              | PATCH convention, DELETE convention                                                               |
+
+### Composants
+
+| Fichier                                                          | Appels manuels | Détail                                         |
+| ---------------------------------------------------------------- | -------------- | ---------------------------------------------- |
+| `app/components/edition/carpool/OfferCard.vue`                   | 3              | DELETE offer, POST booking, PUT cancel booking |
+| `app/components/edition/carpool/BookingsList.vue`                | 1              | PUT booking status                             |
+| `app/components/edition/carpool/RequestCard.vue`                 | 1              | DELETE request                                 |
+| `app/components/edition/volunteer/MealsCard.vue`                 | 1              | PUT my-meals                                   |
+| `app/components/edition/volunteer/MyTeamsCard.vue`               | 1              | POST team-conversation                         |
+| `app/components/edition/volunteer/AutoAssignmentPanel.vue`       | 2              | POST auto-assign (x2)                          |
+| `app/components/edition/volunteer/planning/AssignmentsModal.vue` | 2              | POST assignment, DELETE assignment             |
+| `app/components/edition/volunteer/notifications/Modal.vue`       | 1              | POST notifications                             |
+| `app/components/notifications/PushNotificationToggle.vue`        | 1              | POST push-test                                 |
+
+### Utilitaires et composables
+
+| Fichier                                  | Appels manuels | Détail                                                                               | Note                                                        |
+| ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `app/utils/volunteer-application-api.ts` | 5              | PATCH personal data, PATCH status, PATCH teams, POST application, DELETE application | Fichier utilitaire appelé par plusieurs pages               |
+| `app/utils/ticketing/tiers.ts`           | 1              | DELETE tier                                                                          |                                                             |
+| `app/composables/useTypingIndicator.ts`  | 2              | POST typing start/stop                                                               | Fire-and-forget, pas de toast nécessaire                    |
+| `app/composables/useTicketingCounter.ts` | 3              | PATCH increment/decrement/reset                                                      | Appels rapides en boucle, useApiAction peut ne pas convenir |
+
+### Stores (migration optionnelle)
+
+| Fichier                       | Appels manuels | Détail                                         | Note                            |
+| ----------------------------- | -------------- | ---------------------------------------------- | ------------------------------- |
+| `app/stores/auth.ts`          | 3              | POST register, POST login, POST logout         | Store global, pattern différent |
+| `app/stores/editions.ts`      | 5              | POST/PUT/DELETE edition, POST/DELETE organizer | Utilisé par plusieurs pages     |
+| `app/stores/notifications.ts` | 4              | PATCH read/unread, PATCH mark-all-read, DELETE | Actions silencieuses souvent    |
+
+---
+
 ## Fichiers déjà migrés
 
 | Fichier                                                    | Date       | Patterns migrés                                                            |
@@ -279,6 +336,9 @@ Pour chaque fichier à migrer :
 | `app/pages/admin/feedback.vue`                             | 2026-02-03 | resolveFeedback                                                            |
 | `app/pages/editions/[id]/gestion/artists/index.vue`        | 2026-02-04 | deleteArtist                                                               |
 | `app/pages/editions/[id]/gestion/artists/shows.vue`        | 2026-02-04 | deleteShow                                                                 |
+| `app/pages/editions/[id]/gestion/artists/index.vue`        | 2026-02-25 | saveArtistInfo                                                             |
+| `app/components/artists/OrganizerNotesModal.vue`           | 2026-02-25 | saveNotes                                                                  |
+| `app/pages/editions/[id]/artist-space.vue`                 | 2026-02-25 | saveDiet (saveAccommodation déjà migré)                                    |
 
 ---
 

@@ -39,11 +39,9 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = defineModel<boolean>({ required: true })
-const toast = useToast()
 const { t } = useI18n()
 
 const localNotes = ref('')
-const saving = ref(false)
 
 const artistName = computed(() => {
   if (!props.artist?.user) return ''
@@ -61,34 +59,17 @@ watch(
   { immediate: true }
 )
 
-const saveNotes = async () => {
-  if (!props.artist?.id) return
-
-  saving.value = true
-  try {
-    const trimmedNotes = localNotes.value.trim()
-    await $fetch(`/api/editions/${props.editionId}/artists/${props.artist.id}/notes`, {
-      method: 'PATCH',
-      body: {
-        organizerNotes: trimmedNotes || null,
-      },
-    })
-
-    toast.add({
-      title: t('artists.notes_saved'),
-      color: 'success',
-    })
-
-    emit('notesSaved')
-    isOpen.value = false
-  } catch (error) {
-    console.error('Error saving notes:', error)
-    toast.add({
-      title: t('artists.error_save_notes'),
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+const { execute: saveNotes, loading: saving } = useApiAction(
+  () => `/api/editions/${props.editionId}/artists/${props.artist?.id}/notes`,
+  {
+    method: 'PATCH',
+    body: () => ({ organizerNotes: localNotes.value.trim() || null }),
+    successMessage: { title: t('artists.notes_saved') },
+    errorMessages: { default: t('artists.error_save_notes') },
+    onSuccess: () => {
+      emit('notesSaved')
+      isOpen.value = false
+    },
   }
-}
+)
 </script>
