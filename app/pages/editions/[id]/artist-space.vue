@@ -67,6 +67,42 @@
         </div>
       </UCard>
 
+      <!-- Informations artistes -->
+      <UCard v-if="edition.artistInfo">
+        <template #header>
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <UIcon name="i-heroicons-information-circle" class="text-blue-500" />
+            {{ $t('artists.artist_info_title') }}
+          </h2>
+        </template>
+
+        <div class="prose prose-sm dark:prose-invert max-w-none">
+          <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div :class="{ 'line-clamp-4': !artistInfoExpanded }" v-html="artistInfoHtml" />
+          <UButton
+            v-if="!artistInfoExpanded"
+            variant="ghost"
+            color="primary"
+            size="xs"
+            class="mt-2"
+            @click="artistInfoExpanded = true"
+          >
+            {{ $t('common.see_more') }}...
+          </UButton>
+          <UButton
+            v-else
+            variant="ghost"
+            color="primary"
+            size="xs"
+            class="mt-2"
+            @click="artistInfoExpanded = false"
+          >
+            {{ $t('common.see_less') }}
+          </UButton>
+        </div>
+      </UCard>
+
       <!-- Spectacles -->
       <UCard>
         <template #header>
@@ -548,6 +584,7 @@ import {
 } from '~/utils/accommodation-type'
 import type { AllergySeverityLevel } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { markdownToHtml } from '~/utils/markdown'
 
 interface ArtistShow {
   id: number
@@ -616,6 +653,14 @@ const {
   error: _editionError,
 } = await useFetch<Edition>(`/api/editions/${editionId}`)
 
+// Informations artistes en HTML (rendu Markdown)
+const { data: artistInfoHtml } = await useAsyncData(`artist-info-${editionId}`, async () => {
+  if (!edition.value?.artistInfo) {
+    return ''
+  }
+  return await markdownToHtml(edition.value.artistInfo)
+})
+
 // Synchroniser avec le store
 watch(
   edition,
@@ -647,6 +692,9 @@ watch(
 
 // QR Code modal
 const qrModalOpen = ref(false)
+
+// Informations artistes : affichage tronqué
+const artistInfoExpanded = ref(false)
 
 // Helper pour le label du type d'hébergement
 const accommodationTypeLabel = (type: string) => getAccommodationTypeLabel(type, t)

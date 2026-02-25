@@ -262,16 +262,13 @@ const getShowImageUrl = (show: any) => {
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
-// Permissions
+// Permissions — page réservée aux organisateurs qui gèrent les artistes
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
+  return editionStore.canManageArtists(edition.value, authStore.user.id)
 })
 
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
+const canEdit = computed(() => canAccess.value)
 
 // Données
 const shows = ref<any[]>([])

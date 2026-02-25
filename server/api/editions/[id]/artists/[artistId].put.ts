@@ -2,7 +2,10 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import {
+  getEditionWithPermissions,
+  canManageArtists,
+} from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
@@ -55,21 +58,7 @@ export default wrapApiHandler(
     const artistId = validateResourceId(event, 'artistId', 'artiste')
 
     // Vérifier les permissions
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        convention: {
-          include: {
-            organizers: true,
-          },
-        },
-        organizerPermissions: {
-          include: {
-            organizer: true,
-          },
-        },
-      },
-    })
+    const edition = await getEditionWithPermissions(editionId)
 
     if (!edition) {
       throw createError({
@@ -78,8 +67,7 @@ export default wrapApiHandler(
       })
     }
 
-    const hasPermission = canEditEdition(edition, user)
-    if (!hasPermission) {
+    if (!canManageArtists(edition, user)) {
       throw createError({
         status: 403,
         message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",

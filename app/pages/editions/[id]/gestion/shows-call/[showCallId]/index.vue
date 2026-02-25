@@ -15,6 +15,9 @@
         :description="$t('pages.access_denied.description')"
       />
     </div>
+    <div v-else-if="!initialized">
+      <p>{{ $t('common.loading') }}</p>
+    </div>
     <div v-else-if="!showCall">
       <UAlert
         icon="i-heroicons-exclamation-triangle"

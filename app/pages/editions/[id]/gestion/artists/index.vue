@@ -29,6 +29,86 @@
         </p>
       </div>
 
+      <!-- Informations artistes -->
+      <UCard class="mb-6">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-information-circle" class="text-blue-500" />
+              {{ $t('artists.artist_info_title') }}
+            </h2>
+            <div v-if="canEdit" class="flex items-center gap-2">
+              <UButton
+                v-if="artistInfoDirty"
+                color="primary"
+                icon="i-heroicons-check"
+                :loading="savingArtistInfo"
+                @click="saveArtistInfo()"
+              >
+                {{ $t('common.save') }}
+              </UButton>
+              <UButton
+                v-if="editingArtistInfo"
+                color="neutral"
+                variant="soft"
+                icon="i-heroicons-x-mark"
+                @click="cancelArtistInfoEdit"
+              >
+                {{ $t('common.cancel') }}
+              </UButton>
+              <UButton
+                v-else
+                color="primary"
+                icon="i-heroicons-pencil-square"
+                @click="editingArtistInfo = true"
+              >
+                {{ $t('common.edit') }}
+              </UButton>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="editingArtistInfo">
+          <MinimalMarkdownEditor
+            v-model="artistInfoLocal"
+            :empty-placeholder="$t('artists.artist_info_placeholder')"
+          />
+        </template>
+
+        <template v-else-if="artistInfoLocal">
+          <div class="prose prose-sm dark:prose-invert max-w-none">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div :class="{ 'line-clamp-3': !artistInfoExpanded }" v-html="artistInfoPreviewHtml" />
+            <UButton
+              v-if="!artistInfoExpanded"
+              variant="ghost"
+              color="primary"
+              size="xs"
+              class="mt-2"
+              @click="artistInfoExpanded = true"
+            >
+              {{ $t('common.see_more') }}...
+            </UButton>
+            <UButton
+              v-else
+              variant="ghost"
+              color="primary"
+              size="xs"
+              class="mt-2"
+              @click="artistInfoExpanded = false"
+            >
+              {{ $t('common.see_less') }}
+            </UButton>
+          </div>
+        </template>
+
+        <template v-else>
+          <p class="text-sm text-gray-400 italic">
+            {{ $t('artists.artist_info_empty') }}
+          </p>
+        </template>
+      </UCard>
+
       <!-- Contenu -->
       <UCard>
         <template #header>
@@ -449,6 +529,7 @@
 
 <script setup lang="ts">
 import { getAccommodationTypeLabel } from '~/utils/accommodation-type'
+import { markdownToHtml } from '~/utils/markdown'
 
 definePageMeta({
   middleware: ['authenticated'],
@@ -463,16 +544,62 @@ const { formatDateTime } = useDateFormat()
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
-// Permissions
+// Permissions — toute la page est réservée aux organisateurs qui gèrent les artistes
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
+  return editionStore.canManageArtists(edition.value, authStore.user.id)
 })
 
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
+const canEdit = computed(() => canAccess.value)
+
+// Informations artistes (champ sur l'édition)
+const artistInfoLocal = ref(edition.value?.artistInfo ?? '')
+const artistInfoDirty = computed(() => artistInfoLocal.value !== (edition.value?.artistInfo ?? ''))
+const editingArtistInfo = ref(false)
+const artistInfoExpanded = ref(false)
+const artistInfoPreviewHtml = ref('')
+
+const renderArtistInfoPreview = async () => {
+  if (!edition.value?.artistInfo) {
+    artistInfoPreviewHtml.value = ''
+    return
+  }
+  try {
+    artistInfoPreviewHtml.value = await markdownToHtml(edition.value.artistInfo)
+  } catch {
+    artistInfoPreviewHtml.value = ''
+  }
+}
+
+const { execute: saveArtistInfo, loading: savingArtistInfo } = useApiAction(
+  () => `/api/editions/${editionId.value}/artist-info`,
+  {
+    method: 'PUT',
+    body: () => ({ artistInfo: artistInfoLocal.value || null }),
+    successMessage: { title: t('artists.artist_info_saved') },
+    errorMessages: { default: t('artists.artist_info_save_error') },
+    onSuccess: () => {
+      editionStore.fetchEditionById(editionId.value, { force: true })
+      editingArtistInfo.value = false
+    },
+  }
+)
+
+const cancelArtistInfoEdit = () => {
+  artistInfoLocal.value = edition.value?.artistInfo ?? ''
+  editingArtistInfo.value = false
+}
+
+// Sync artistInfoLocal quand l'édition change
+watch(
+  () => edition.value?.artistInfo,
+  (val) => {
+    if (!artistInfoDirty.value) {
+      artistInfoLocal.value = val ?? ''
+    }
+    renderArtistInfoPreview()
+  }
+)
 
 // Données
 const artists = ref<any[]>([])
@@ -493,7 +620,7 @@ onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {
     await editionStore.fetchEditionById(editionId.value)
   }
-  await fetchArtists()
+  await Promise.all([fetchArtists(), renderArtistInfoPreview()])
 })
 
 // Récupérer les artistes
