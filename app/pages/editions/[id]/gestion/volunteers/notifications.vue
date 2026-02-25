@@ -146,9 +146,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -156,7 +153,6 @@ import { useEditionStore } from '~/stores/editions'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -177,34 +173,21 @@ const volunteersMode = computed(() => volunteersInfo.value?.mode || 'INTERNAL')
 
 // Variables pour l'envoi des notifications de créneaux
 const showNotifyModal = ref(false)
-const sendingNotifications = ref(false)
 
-// Fonction pour envoyer les notifications de créneaux aux bénévoles acceptés
-const sendScheduleNotifications = async () => {
-  sendingNotifications.value = true
-  try {
-    const result = await $fetch(`/api/editions/${editionId}/volunteers/notify-schedules`, {
-      method: 'POST',
-    })
-
-    toast.add({
+const { execute: sendScheduleNotifications, loading: sendingNotifications } = useApiAction(
+  () => `/api/editions/${editionId}/volunteers/notify-schedules`,
+  {
+    method: 'POST',
+    successMessage: {
       title: t('common.success'),
-      description: result.message || 'Notifications envoyées avec succès',
-      color: 'success',
-    })
-
-    showNotifyModal.value = false
-  } catch (error: any) {
-    toast.add({
-      title: t('common.error'),
-      description:
-        error?.data?.message || error?.message || "Erreur lors de l'envoi des notifications",
-      color: 'error',
-    })
-  } finally {
-    sendingNotifications.value = false
+      description: t('edition.volunteers.notifications_sent_success'),
+    },
+    errorMessages: { default: t('edition.volunteers.notifications_sent_error') },
+    onSuccess: () => {
+      showNotifyModal.value = false
+    },
   }
-}
+)
 
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {

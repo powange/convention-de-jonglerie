@@ -104,7 +104,6 @@ const isLoading = ref(false)
 const isSubscribed = ref(false)
 const error = ref<string | null>(null)
 const permission = ref<NotificationPermission | null>(null)
-const isTesting = ref(false)
 const isSupported = ref(false)
 
 // Vérifier l'état de la subscription au montage
@@ -194,32 +193,16 @@ const handleToggleChange = async (newValue: boolean) => {
 }
 
 // Tester une notification (admin uniquement)
-const testNotification = async () => {
-  isTesting.value = true
-
-  try {
-    await $fetch('/api/admin/notifications/push-test', {
-      method: 'POST',
-      body: {
-        title: '🎯 Test de notification',
-        message: 'Cette notification a été envoyée depuis le serveur !',
-      },
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Test envoyé',
-      description: 'Notification de test envoyée',
-    })
-  } catch (err) {
-    console.error('Erreur lors du test:', err)
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: "Impossible d'envoyer la notification de test",
-    })
-  } finally {
-    isTesting.value = false
+const { execute: testNotification, loading: isTesting } = useApiAction(
+  '/api/admin/notifications/push-test',
+  {
+    method: 'POST',
+    body: {
+      title: '🎯 Test de notification',
+      message: 'Cette notification a été envoyée depuis le serveur !',
+    },
+    successMessage: { title: 'Test envoyé', description: 'Notification de test envoyée' },
+    errorMessages: { default: "Impossible d'envoyer la notification de test" },
   }
-}
+)
 </script>

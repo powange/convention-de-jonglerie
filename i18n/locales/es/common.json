@@ -664,6 +664,8 @@
       "notification_title_prefix": "Voluntarios",
       "notifications": "Notificaciones a voluntarios",
       "notifications_history": "Historial de notificaciones",
+      "notifications_sent_error": "Error al enviar las notificaciones",
+      "notifications_sent_success": "Notificaciones enviadas con éxito",
       "notify_volunteers_slots": "Notificar a los voluntarios de sus franjas horarias",
       "open": "Abrir",
       "organizer_addition_title": "Adición del organizador",

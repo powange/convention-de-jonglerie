@@ -78,8 +78,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 
-const toast = useToast()
-
 // Utiliser les utilitaires meals
 const { getMealTypeLabel } = useMealTypeLabel()
 const { getPhasesLabel } = useMealPhaseLabel()
@@ -92,7 +90,6 @@ const props = defineProps<{
 const meals = ref<any[]>([])
 const initialMeals = ref<any[]>([])
 const loadingMeals = ref(false)
-const savingMeals = ref(false)
 
 // Grouper les repas par date
 const groupedMeals = computed(() => groupMealsByDate(meals.value))
@@ -133,42 +130,29 @@ const fetchMeals = async () => {
 }
 
 // Sauvegarder les sélections
-const saveMealSelections = async () => {
-  savingMeals.value = true
-  try {
-    const selections = meals.value.map((meal) => ({
+const { execute: saveMealSelections, loading: savingMeals } = useApiAction<
+  unknown,
+  { success: boolean; meals: any[] }
+>(() => `/api/editions/${props.editionId}/volunteers/my-meals`, {
+  method: 'PUT',
+  body: () => ({
+    selections: meals.value.map((meal) => ({
       selectionId: meal.selectionId,
       accepted: meal.accepted,
-    }))
-
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteers/my-meals`, {
-      method: 'PUT',
-      body: { selections },
-    })
-
+    })),
+  }),
+  successMessage: {
+    title: 'Sauvegardé',
+    description: 'Vos préférences de repas ont été enregistrées',
+  },
+  errorMessages: { default: 'Impossible de sauvegarder vos repas' },
+  onSuccess: (response) => {
     if (response.success && response.meals) {
       meals.value = response.meals
-      // Mettre à jour l'état initial après sauvegarde
       initialMeals.value = JSON.parse(JSON.stringify(response.meals))
-
-      toast.add({
-        title: 'Sauvegardé',
-        description: 'Vos préférences de repas ont été enregistrées',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
     }
-  } catch (error: any) {
-    console.error('Failed to save meal selections:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error?.data?.message || 'Impossible de sauvegarder vos repas',
-      color: 'error',
-    })
-  } finally {
-    savingMeals.value = false
-  }
-}
+  },
+})
 
 onMounted(() => {
   fetchMeals()

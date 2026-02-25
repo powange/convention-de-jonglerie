@@ -419,7 +419,6 @@ interface Constraints {
 
 const props = defineProps<Props>()
 const { t } = useI18n()
-const toast = useToast()
 
 // État réactif
 const constraints = ref<Constraints>({
@@ -437,8 +436,6 @@ const constraints = ref<Constraints>({
   keepExistingAssignments: false,
 })
 
-const previewLoading = ref(false)
-const applyLoading = ref(false)
 const previewResult = ref<any>(null)
 
 // Fonctions utilitaires
@@ -524,88 +521,53 @@ const getConfidenceColor = (
 }
 
 // Actions
-const generatePreview = async () => {
-  previewLoading.value = true
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteers/auto-assign`, {
-      method: 'POST',
-      body: {
-        constraints: constraints.value,
-        applyAssignments: false,
-      },
-    })
-
-    previewResult.value = response
-
-    toast.add({
-      title: t('edition.volunteers.auto_assignment.preview_generated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error("Erreur lors de la génération de l'aperçu:", error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description:
-        error.data?.message || error.message || "Erreur lors de la génération de l'aperçu",
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    previewLoading.value = false
+const { execute: generatePreview, loading: previewLoading } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/auto-assign`,
+  {
+    method: 'POST',
+    body: () => ({
+      constraints: constraints.value,
+      applyAssignments: false,
+    }),
+    successMessage: { title: t('edition.volunteers.auto_assignment.preview_generated') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess: (response) => {
+      previewResult.value = response
+    },
   }
-}
+)
 
-const applyAssignments = async () => {
-  if (!previewResult.value) return
-
-  // Confirmation avec modal plus détaillée
-  const confirmed = await new Promise<boolean>((resolve) => {
-    const assignmentsCount = previewResult.value?.result.assignments.length || 0
-    const confirmKey = constraints.value.keepExistingAssignments
-      ? 'edition.volunteers.auto_assignment.confirm_apply_keep_existing'
-      : 'edition.volunteers.auto_assignment.confirm_apply'
-    const message = `${t(confirmKey)}\n\n${t('edition.volunteers.auto_assignment.confirm_details', { count: assignmentsCount })}`
-
-    resolve(confirm(message))
-  })
-
-  if (!confirmed) return
-
-  applyLoading.value = true
-  try {
-    await $fetch(`/api/editions/${props.editionId}/volunteers/auto-assign`, {
-      method: 'POST',
-      body: {
-        constraints: constraints.value,
-        applyAssignments: true,
-      },
-    })
-
-    toast.add({
+const { execute: executeApplyAssignments, loading: applyLoading } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/auto-assign`,
+  {
+    method: 'POST',
+    body: () => ({
+      constraints: constraints.value,
+      applyAssignments: true,
+    }),
+    successMessage: {
       title: t('edition.volunteers.auto_assignment.assignments_applied'),
       description: t('edition.volunteers.auto_assignment.assignments_applied_description'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Nettoyer l'aperçu et recharger les données
-    previewResult.value = null
-
-    // Émettre un événement pour recharger les données de la page parente
-    emit('assignments-applied')
-  } catch (error: any) {
-    console.error("Erreur lors de l'application des assignations:", error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description:
-        error.data?.message || error.message || "Erreur lors de l'application des assignations",
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    applyLoading.value = false
+    },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess: () => {
+      previewResult.value = null
+      emit('assignments-applied')
+    },
   }
+)
+
+const applyAssignments = () => {
+  if (!previewResult.value) return
+
+  const assignmentsCount = previewResult.value?.result.assignments.length || 0
+  const confirmKey = constraints.value.keepExistingAssignments
+    ? 'edition.volunteers.auto_assignment.confirm_apply_keep_existing'
+    : 'edition.volunteers.auto_assignment.confirm_apply'
+  const message = `${t(confirmKey)}\n\n${t('edition.volunteers.auto_assignment.confirm_details', { count: assignmentsCount })}`
+
+  if (!confirm(message)) return
+  executeApplyAssignments()
 }
 
 const clearPreview = () => {

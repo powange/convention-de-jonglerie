@@ -69,6 +69,7 @@
                 variant="ghost"
                 size="xs"
                 icon="i-heroicons-x-mark"
+                :loading="isUnassigning(assignment.id)"
                 @click="unassignVolunteer(assignment.id)"
               >
                 {{ t('common.remove') }}
@@ -197,7 +198,6 @@ const emit = defineEmits<{
 
 // i18n
 const { t } = useI18n()
-const toast = useToast()
 const { formatForDisplay } = useDatetime()
 
 // État
@@ -242,7 +242,6 @@ interface AvailableVolunteer {
 
 const assignments = ref<Assignment[]>([])
 const availableVolunteers = ref<AvailableVolunteer[]>([])
-const assignmentLoading = ref(false)
 
 // Computed
 const isOpen = computed({
@@ -335,83 +334,43 @@ const fetchAvailableVolunteers = async () => {
   }
 }
 
-const assignVolunteer = async (userId: number) => {
-  if (!props.timeSlot?.id || !effectiveEditionId.value) return
+const currentUserId = ref<number>()
 
-  try {
-    assignmentLoading.value = true
-    await $fetch<any>(
-      `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot.id}/assignments`,
-      {
-        method: 'POST',
-        body: { userId },
-      }
-    )
-
-    // Recharger les assignations
-    await fetchAssignments()
-
-    // Fermer le sélecteur
-    showVolunteerSelector.value = false
-
-    // Émettre l'événement de rafraîchissement
-    emit('refresh')
-
-    // Toast de succès
-    toast.add({
-      title: t('edition.volunteers.volunteer_assigned'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error("Erreur lors de l'assignation:", error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: error.data?.message || error.message || "Erreur lors de l'assignation",
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    assignmentLoading.value = false
+const { execute: executeAssign, loading: assignmentLoading } = useApiAction(
+  () =>
+    `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot?.id}/assignments`,
+  {
+    method: 'POST',
+    body: () => ({ userId: currentUserId.value }),
+    successMessage: { title: t('edition.volunteers.volunteer_assigned') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess: async () => {
+      await fetchAssignments()
+      showVolunteerSelector.value = false
+      emit('refresh')
+    },
   }
+)
+
+const assignVolunteer = (userId: number) => {
+  if (!props.timeSlot?.id || !effectiveEditionId.value) return
+  currentUserId.value = userId
+  executeAssign()
 }
 
-const unassignVolunteer = async (assignmentId: string) => {
-  if (!props.timeSlot?.id || !effectiveEditionId.value) return
-
-  try {
-    assignmentLoading.value = true
-    await $fetch(
-      `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot.id}/assignments/${assignmentId}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    // Recharger les assignations
-    await fetchAssignments()
-
-    // Émettre l'événement de rafraîchissement
-    emit('refresh')
-
-    // Toast de succès
-    toast.add({
-      title: t('edition.volunteers.volunteer_unassigned'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Erreur lors de la désassignation:', error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: error.data?.message || error.message || 'Erreur lors de la désassignation',
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    assignmentLoading.value = false
+const { execute: unassignVolunteer, isLoading: isUnassigning } = useApiActionById(
+  (assignmentId) =>
+    `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot?.id}/assignments/${assignmentId}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('edition.volunteers.volunteer_unassigned') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess: async () => {
+      await fetchAssignments()
+      emit('refresh')
+    },
   }
-}
+)
 
 // Charger les assignations à l'ouverture
 watch(

@@ -182,22 +182,25 @@ watch(
 )
 
 // Fonction pour envoyer un message à l'équipe
-const sendMessageToTeam = async (teamId: string) => {
-  try {
-    // Créer ou récupérer la conversation de l'équipe
-    const response = await $fetch<{ conversationId: string }>('/api/messenger/team-conversation', {
-      method: 'POST',
-      body: {
-        editionId: props.editionId,
-        teamId,
-      },
-    })
+const currentTeamId = ref<string>('')
 
-    // Rediriger vers la page messenger avec la conversation
-    navigateTo(`/messenger?conversation=${response.conversationId}`)
-  } catch (error: any) {
-    console.error("Erreur lors de la création de la conversation de l'équipe:", error)
-    // On pourrait ajouter un toast ici pour informer l'utilisateur de l'erreur
+const { execute: executeSendMessage } = useApiAction<unknown, { conversationId: string }>(
+  '/api/messenger/team-conversation',
+  {
+    method: 'POST',
+    body: () => ({
+      editionId: props.editionId,
+      teamId: currentTeamId.value,
+    }),
+    silentSuccess: true,
+    onSuccess: (response) => {
+      navigateTo(`/messenger?conversation=${response.conversationId}`)
+    },
   }
+)
+
+const sendMessageToTeam = (teamId: string) => {
+  currentTeamId.value = teamId
+  executeSendMessage()
 }
 </script>

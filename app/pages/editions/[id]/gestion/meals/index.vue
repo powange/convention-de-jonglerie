@@ -181,7 +181,7 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 // Gestion des repas
 const volunteerMeals = ref<any[]>([])
 const loadingMeals = ref(false)
-const savingMeals = ref(false)
+const pendingMeal = ref<any>(null)
 
 // Gestion des articles à restituer
 const returnableItems = ref<any[]>([])
@@ -274,47 +274,43 @@ const fetchReturnableItems = async () => {
 }
 
 // Gérer le changement d'un repas (enabled, phase ou articles)
-const handleMealChange = async (meal: any) => {
-  savingMeals.value = true
-  try {
-    // Extraire les IDs des articles sélectionnés
-    const returnableItemIds = meal.returnableItems?.map((item: any) => item.returnableItemId) || []
-
-    const response = await $fetch(`/api/editions/${editionId}/volunteers/meals`, {
-      method: 'PUT',
-      body: {
-        meals: [
-          {
-            id: meal.id,
-            enabled: meal.enabled,
-            phases: meal.phases,
-            returnableItemIds,
-          },
-        ],
-      },
-    })
-
-    if (response.success && response.meals) {
-      volunteerMeals.value = response.meals
-      toast.add({
-        title: 'Sauvegardé',
-        description: 'Le repas a été synchronisé avec les bénévoles et artistes',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
+const { execute: executeSaveMeal, loading: savingMeals } = useApiAction<
+  unknown,
+  { success: boolean; meals: any[] }
+>(() => `/api/editions/${editionId}/volunteers/meals`, {
+  method: 'PUT',
+  body: () => {
+    const meal = pendingMeal.value
+    const returnableItemIds = meal?.returnableItems?.map((item: any) => item.returnableItemId) || []
+    return {
+      meals: [
+        {
+          id: meal?.id,
+          enabled: meal?.enabled,
+          phases: meal?.phases,
+          returnableItemIds,
+        },
+      ],
     }
-  } catch (error) {
-    console.error('Failed to update volunteer meal:', error)
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de sauvegarder le repas',
-      color: 'error',
-    })
-    // Recharger les repas pour revenir à l'état précédent
-    await fetchVolunteerMeals()
-  } finally {
-    savingMeals.value = false
-  }
+  },
+  successMessage: {
+    title: 'Sauvegardé',
+    description: 'Le repas a été synchronisé avec les bénévoles et artistes',
+  },
+  errorMessages: { default: 'Impossible de sauvegarder le repas' },
+  onSuccess: (result) => {
+    if (result?.success && result.meals) {
+      volunteerMeals.value = result.meals
+    }
+  },
+  onError: () => {
+    fetchVolunteerMeals()
+  },
+})
+
+const handleMealChange = async (meal: any) => {
+  pendingMeal.value = meal
+  await executeSaveMeal()
 }
 
 // Obtenir les IDs des articles sélectionnés pour un repas

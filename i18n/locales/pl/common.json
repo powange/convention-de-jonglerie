@@ -664,6 +664,8 @@
       "notification_title_prefix": "Wolontariusze",
       "notifications": "Powiadomienia dla wolontariuszy",
       "notifications_history": "Historia powiadomień",
+      "notifications_sent_error": "Błąd podczas wysyłania powiadomień",
+      "notifications_sent_success": "Powiadomienia wysłane pomyślnie",
       "notify_volunteers_slots": "Powiadom wolontariuszy o ich przedziałach czasowych",
       "open": "Otwórz",
       "organizer_addition_title": "Dodatek organizatora",

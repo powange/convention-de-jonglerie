@@ -31,12 +31,22 @@
             >{{ b.status }}</UBadge
           >
           <template v-else>
-            <UButton size="xs" color="success" variant="soft" @click="update(b.id, 'ACCEPT')">{{
-              $t('components.carpool.accept')
-            }}</UButton>
-            <UButton size="xs" color="error" variant="soft" @click="update(b.id, 'REJECT')">{{
-              $t('components.carpool.reject')
-            }}</UButton>
+            <UButton
+              size="xs"
+              color="success"
+              variant="soft"
+              :loading="isUpdating(b.id)"
+              @click="update(b.id, 'ACCEPT')"
+              >{{ $t('components.carpool.accept') }}</UButton
+            >
+            <UButton
+              size="xs"
+              color="error"
+              variant="soft"
+              :loading="isUpdating(b.id)"
+              @click="update(b.id, 'REJECT')"
+              >{{ $t('components.carpool.reject') }}</UButton
+            >
           </template>
         </div>
       </div>
@@ -61,12 +71,23 @@ const load = async () => {
 onMounted(load)
 watch(() => props.offerId, load)
 
-const update = async (bookingId: number, action: 'ACCEPT' | 'REJECT' | 'CANCEL') => {
-  await $fetch(`/api/carpool-offers/${props.offerId}/bookings/${bookingId}`, {
+const pendingAction = ref<'ACCEPT' | 'REJECT' | 'CANCEL'>('ACCEPT')
+
+const { execute: executeUpdate, isLoading: isUpdating } = useApiActionById(
+  (bookingId) => `/api/carpool-offers/${props.offerId}/bookings/${bookingId}`,
+  {
     method: 'PUT',
-    body: { action },
-  } as any)
-  await load()
-  emit('updated')
+    body: () => ({ action: pendingAction.value }),
+    silentSuccess: true,
+    onSuccess: async () => {
+      await load()
+      emit('updated')
+    },
+  }
+)
+
+const update = (bookingId: number, action: 'ACCEPT' | 'REJECT' | 'CANCEL') => {
+  pendingAction.value = action
+  executeUpdate(bookingId)
 }
 </script>

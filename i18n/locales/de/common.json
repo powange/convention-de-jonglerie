@@ -664,6 +664,8 @@
       "notification_title_prefix": "Freiwillige",
       "notifications": "Freiwilligen-Benachrichtigungen",
       "notifications_history": "Benachrichtigungsverlauf",
+      "notifications_sent_error": "Fehler beim Senden der Benachrichtigungen",
+      "notifications_sent_success": "Benachrichtigungen erfolgreich gesendet",
       "notify_volunteers_slots": "Freiwillige über ihre Zeitfenster benachrichtigen",
       "open": "Öffnen",
       "organizer_addition_title": "Ergänzung des Organisators",

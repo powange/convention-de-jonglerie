@@ -664,6 +664,8 @@
       "notification_title_prefix": "Frivillige",
       "notifications": "Frivillige notifikationer",
       "notifications_history": "Notifikationshistorik",
+      "notifications_sent_error": "Fejl ved afsendelse af notifikationer",
+      "notifications_sent_success": "Notifikationer sendt med succes",
       "notify_volunteers_slots": "Giv frivillige besked om deres tidsrum",
       "open": "Åben",
       "organizer_addition_title": "Organisatorens tilføjelse",

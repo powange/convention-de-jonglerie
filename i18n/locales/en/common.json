@@ -664,6 +664,8 @@
       "notification_title_prefix": "Volunteers",
       "notifications": "Volunteer notifications",
       "notifications_history": "Notification history",
+      "notifications_sent_error": "Error sending notifications",
+      "notifications_sent_success": "Notifications sent successfully",
       "notify_volunteers_slots": "Notify volunteers of their slots",
       "open": "Open",
       "organizer_addition_title": "Organizer addition",

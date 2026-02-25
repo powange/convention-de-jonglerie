@@ -664,6 +664,8 @@
       "notification_title_prefix": "Vrijwilligers",
       "notifications": "Vrijwilligersmeldingen",
       "notifications_history": "Meldingsgeschiedenis",
+      "notifications_sent_error": "Fout bij het verzenden van meldingen",
+      "notifications_sent_success": "Meldingen succesvol verzonden",
       "notify_volunteers_slots": "Vrijwilligers op de hoogte stellen van hun tijdsloten",
       "open": "Open",
       "organizer_addition_title": "Toevoeging van organisator",

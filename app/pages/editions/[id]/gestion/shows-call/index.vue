@@ -259,8 +259,6 @@ const showCallsLoading = ref(true)
 const createModalOpen = ref(false)
 const deleteModalOpen = ref(false)
 const showCallToDelete = ref<EditionShowCallWithStats | null>(null)
-const creating = ref(false)
-const deleting = ref(false)
 const createForm = ref({
   name: '',
   description: '',
@@ -374,7 +372,24 @@ const openCreateModal = () => {
 }
 
 // Créer un appel
-const createShowCall = async () => {
+const { execute: executeCreateShowCall, loading: creating } = useApiAction(
+  () => `/api/editions/${editionId}/shows-call`,
+  {
+    method: 'POST',
+    body: () => ({
+      name: createForm.value.name.trim(),
+      description: createForm.value.description.trim() || null,
+    }),
+    successMessage: { title: t('common.created') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      createModalOpen.value = false
+      fetchShowCalls()
+    },
+  }
+)
+
+const createShowCall = () => {
   createErrors.value = {}
 
   if (!createForm.value.name.trim()) {
@@ -382,38 +397,7 @@ const createShowCall = async () => {
     return
   }
 
-  creating.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/shows-call`, {
-      method: 'POST',
-      body: {
-        name: createForm.value.name.trim(),
-        description: createForm.value.description.trim() || null,
-      },
-    })
-
-    toast.add({
-      title: t('common.created'),
-      color: 'success',
-    })
-
-    createModalOpen.value = false
-    await fetchShowCalls()
-  } catch (error: any) {
-    if (error?.data?.message) {
-      toast.add({
-        title: error.data.message,
-        color: 'error',
-      })
-    } else {
-      toast.add({
-        title: t('common.error'),
-        color: 'error',
-      })
-    }
-  } finally {
-    creating.value = false
-  }
+  executeCreateShowCall()
 }
 
 // Ouvrir la modal de suppression
@@ -423,31 +407,23 @@ const openDeleteModal = (showCall: EditionShowCallWithStats) => {
 }
 
 // Confirmer la suppression
-const confirmDelete = async () => {
-  if (!showCallToDelete.value) return
-
-  deleting.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/shows-call/${showCallToDelete.value.id}`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
-      title: t('common.deleted'),
-      color: 'success',
-    })
-
-    deleteModalOpen.value = false
-    showCallToDelete.value = null
-    await fetchShowCalls()
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('common.error'),
-      color: 'error',
-    })
-  } finally {
-    deleting.value = false
+const { execute: executeDeleteShowCall, loading: deleting } = useApiAction(
+  () => `/api/editions/${editionId}/shows-call/${showCallToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('common.deleted') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      deleteModalOpen.value = false
+      showCallToDelete.value = null
+      fetchShowCalls()
+    },
   }
+)
+
+const confirmDelete = () => {
+  if (!showCallToDelete.value) return
+  executeDeleteShowCall()
 }
 
 // Charger les données au montage

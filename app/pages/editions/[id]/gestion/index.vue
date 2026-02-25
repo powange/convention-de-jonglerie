@@ -444,9 +444,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -455,7 +452,6 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const router = useRouter()
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -556,7 +552,6 @@ const isTeamLeaderValue = ref(false)
 const localStatus = ref<'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'>(
   edition.value?.status || 'OFFLINE'
 )
-const savingStatus = ref(false)
 
 // Mettre à jour localStatus quand l'édition change
 watch(
@@ -584,64 +579,49 @@ const { statusOptions } = useEditionStatus()
 
 // Suppression d'édition avec modal de confirmation
 const showDeleteConfirm = ref(false)
-const deletingEdition = ref(false)
 
-const confirmDeleteEdition = async () => {
-  if (!edition.value) return
-
-  deletingEdition.value = true
-  try {
-    await editionStore.deleteEdition(edition.value.id)
-    showDeleteConfirm.value = false
-    toast.add({
-      title: t('messages.edition_deleted'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-    router.push('/')
-  } catch (e: any) {
-    toast.add({
-      title: e?.message || t('errors.edition_deletion_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    deletingEdition.value = false
+const { execute: executeDeleteEdition, loading: deletingEdition } = useApiAction(
+  () => `/api/editions/${edition.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('messages.edition_deleted') },
+    errorMessages: { default: t('errors.edition_deletion_failed') },
+    onSuccess: () => {
+      editionStore.editions = editionStore.editions.filter((e) => e.id !== editionId)
+      showDeleteConfirm.value = false
+      router.push('/')
+    },
   }
+)
+
+const confirmDeleteEdition = () => {
+  if (!edition.value) return
+  executeDeleteEdition()
 }
 
-const saveStatus = async () => {
-  if (!edition.value || !hasStatusChanged.value) return
-
-  savingStatus.value = true
-  try {
-    await $fetch(`/api/editions/${edition.value.id}/status`, {
-      method: 'PATCH',
-      body: { status: localStatus.value },
-    })
-
-    // Update local state immediately
-    edition.value.status = localStatus.value
-
-    // Also update in store
-    await editionStore.fetchEditionById(editionId, { force: true })
-
-    toast.add({
-      title: t('edition.status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error) {
-    console.error('Failed to update edition status:', error)
-    // Remettre le statut local à la valeur précédente en cas d'erreur
-    localStatus.value = edition.value.status
-    toast.add({
-      title: t('errors.status_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    savingStatus.value = false
+const { execute: executeSaveStatus, loading: savingStatus } = useApiAction(
+  () => `/api/editions/${edition.value?.id}/status`,
+  {
+    method: 'PATCH',
+    body: () => ({ status: localStatus.value }),
+    successMessage: { title: t('edition.status_updated') },
+    errorMessages: { default: t('errors.status_update_failed') },
+    onSuccess: async () => {
+      if (edition.value) {
+        edition.value.status = localStatus.value
+      }
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      if (edition.value) {
+        localStatus.value = edition.value.status
+      }
+    },
   }
+)
+
+const saveStatus = () => {
+  if (!edition.value || !hasStatusChanged.value) return
+  executeSaveStatus()
 }
 </script>

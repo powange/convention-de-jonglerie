@@ -664,6 +664,8 @@
       "notification_title_prefix": "Волонтери",
       "notifications": "Сповіщення волонтерам",
       "notifications_history": "Історія сповіщень",
+      "notifications_sent_error": "Помилка при надсиланні сповіщень",
+      "notifications_sent_success": "Сповіщення успішно надіслано",
       "notify_volunteers_slots": "Повідомити волонтерів про їхні часові проміжки",
       "open": "Відкрити",
       "organizer_addition_title": "Доповнення організатора",

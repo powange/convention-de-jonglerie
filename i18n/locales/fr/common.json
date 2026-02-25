@@ -664,6 +664,8 @@
       "notification_title_prefix": "Bénévoles",
       "notifications": "Notifications aux bénévoles",
       "notifications_history": "Historique des notifications",
+      "notifications_sent_success": "Notifications envoyées avec succès",
+      "notifications_sent_error": "Erreur lors de l'envoi des notifications",
       "notify_volunteers_slots": "Notifier les bénévoles de leurs créneaux",
       "open": "Ouvrir",
       "organizer_addition_title": "Ajout de l'organisateur",

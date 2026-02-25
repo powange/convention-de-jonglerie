@@ -321,7 +321,6 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
 // Vérifier si l'utilisateur peut éditer cette offre
@@ -364,33 +363,22 @@ const formatDate = (date: string) => {
   })
 }
 
-const handleDelete = async () => {
-  if (!confirm(t('components.carpool.confirm_delete_offer'))) {
-    return
-  }
-
-  try {
-    await $fetch(`/api/carpool-offers/${props.offer.id}`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
+const { execute: executeDeleteOffer } = useApiAction(
+  () => `/api/carpool-offers/${props.offer.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: t('messages.offer_deleted'),
       description: t('messages.offer_deleted_successfully'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    emit('deleted')
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string }
-    toast.add({
-      title: t('errors.deletion_error'),
-      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+    },
+    errorMessages: { default: t('errors.deletion_error') },
+    onSuccess: () => emit('deleted'),
   }
+)
+
+const handleDelete = () => {
+  if (!confirm(t('components.carpool.confirm_delete_offer'))) return
+  executeDeleteOffer()
 }
 
 const acceptedBookings = computed(() =>
@@ -435,64 +423,41 @@ watch(
 const showBookingModal = ref(false)
 const bookingSeats = ref(1)
 const bookingMessage = ref('')
-const isBooking = ref(false)
 
-const submitBooking = async () => {
-  if (bookingSeats.value < 1) return
-  try {
-    isBooking.value = true
-    await $fetch(`/api/carpool-offers/${props.offer.id}/bookings`, {
-      method: 'POST',
-      body: {
-        seats: bookingSeats.value,
-        message: bookingMessage.value.trim() || undefined,
-      },
-    } as any)
-    toast.add({
+const { execute: submitBooking, loading: isBooking } = useApiAction(
+  () => `/api/carpool-offers/${props.offer.id}/bookings`,
+  {
+    method: 'POST',
+    body: () => ({
+      seats: bookingSeats.value,
+      message: bookingMessage.value.trim() || undefined,
+    }),
+    successMessage: {
       title: t('messages.booking_requested'),
       description: t('messages.booking_requested_successfully'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-    showBookingModal.value = false
-    bookingMessage.value = ''
-    await loadMyBookings()
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string }
-    toast.add({
-      title: t('common.error'),
-      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    isBooking.value = false
+    },
+    errorMessages: { default: t('errors.generic_error') },
+    onSuccess: () => {
+      showBookingModal.value = false
+      bookingMessage.value = ''
+      loadMyBookings()
+    },
   }
-}
+)
 
-const isCancelling = ref(false)
-const cancelMyBooking = async () => {
-  if (!myBooking.value) return
-  try {
-    isCancelling.value = true
-    await $fetch(`/api/carpool-offers/${props.offer.id}/bookings/${myBooking.value.id}`, {
-      method: 'PUT',
-      body: { action: 'CANCEL' },
-    } as any)
-    await loadMyBookings()
-    toast.add({
-      title: t('messages.booking_cancelled') || t('common.cancelled') || 'Réservation annulée',
-      color: 'success',
-    })
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string }
-    toast.add({
-      title: t('common.error'),
-      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-      color: 'error',
-    })
-  } finally {
-    isCancelling.value = false
+const { execute: executeCancelBooking, loading: isCancelling } = useApiAction(
+  () => `/api/carpool-offers/${props.offer.id}/bookings/${myBooking.value?.id}`,
+  {
+    method: 'PUT',
+    body: () => ({ action: 'CANCEL' }),
+    successMessage: { title: t('messages.booking_cancelled') },
+    errorMessages: { default: t('errors.generic_error') },
+    onSuccess: () => loadMyBookings(),
   }
+)
+
+const cancelMyBooking = () => {
+  if (!myBooking.value) return
+  executeCancelBooking()
 }
 </script>

@@ -664,6 +664,8 @@
       "notification_title_prefix": "Volontärer",
       "notifications": "Meddelanden till volontärer",
       "notifications_history": "Notifieringshistorik",
+      "notifications_sent_error": "Fel vid sändning av aviseringar",
+      "notifications_sent_success": "Aviseringar skickade",
       "notify_volunteers_slots": "Meddela volontärerna om deras platser",
       "open": "Öppna",
       "organizer_addition_title": "Lägg till organisatör",

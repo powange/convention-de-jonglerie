@@ -392,7 +392,6 @@ const askAccommodationLocal = ref(false)
 const askDepartureCityLocal = ref(false)
 const askSocialLinksLocal = ref(false)
 
-const saving = ref(false)
 const fieldErrors = ref<Record<string, string>>({})
 const initialized = ref(false)
 const linkCopied = ref(false)
@@ -589,52 +588,43 @@ const updateInitialState = () => {
 }
 
 // Sauvegarder les paramètres
-const persistSettings = async () => {
-  if (!initialized.value) return
+const buildSettingsBody = () => {
+  const body: Record<string, unknown> = {
+    name: nameLocal.value.trim(),
+    visibility: visibilityLocal.value,
+    mode: modeLocal.value,
+    description: descriptionLocal.value || null,
+    deadline: deadlineLocal.value ? new Date(deadlineLocal.value).toISOString() : null,
+    askPortfolioUrl: askPortfolioUrlLocal.value,
+    askVideoUrl: askVideoUrlLocal.value,
+    askTechnicalNeeds: askTechnicalNeedsLocal.value,
+    askAccommodation: askAccommodationLocal.value,
+    askDepartureCity: askDepartureCityLocal.value,
+    askSocialLinks: askSocialLinksLocal.value,
+  }
 
-  saving.value = true
-  fieldErrors.value = {}
+  if (modeLocal.value === 'EXTERNAL') {
+    body.externalUrl = externalUrlLocal.value.trim() || null
+  }
 
-  try {
-    const body: any = {
-      name: nameLocal.value.trim(),
-      visibility: visibilityLocal.value,
-      mode: modeLocal.value,
-      description: descriptionLocal.value || null,
-      deadline: deadlineLocal.value ? new Date(deadlineLocal.value).toISOString() : null,
-      askPortfolioUrl: askPortfolioUrlLocal.value,
-      askVideoUrl: askVideoUrlLocal.value,
-      askTechnicalNeeds: askTechnicalNeedsLocal.value,
-      askAccommodation: askAccommodationLocal.value,
-      askDepartureCity: askDepartureCityLocal.value,
-      askSocialLinks: askSocialLinksLocal.value,
+  return body
+}
+
+const { execute: executePersistSettings, loading: saving } = useApiAction<
+  unknown,
+  { success: boolean; showCall: EditionShowCall }
+>(() => `/api/editions/${editionId}/shows-call/${showCallId}`, {
+  method: 'PUT',
+  body: buildSettingsBody,
+  successMessage: { title: t('common.saved') },
+  errorMessages: { default: t('common.error') },
+  onSuccess: (result) => {
+    if (result?.showCall) {
+      showCall.value = result.showCall
     }
-
-    if (modeLocal.value === 'EXTERNAL') {
-      body.externalUrl = externalUrlLocal.value.trim() || null
-    }
-
-    const updated = await $fetch<{ success: boolean; showCall: EditionShowCall }>(
-      `/api/editions/${editionId}/shows-call/${showCallId}`,
-      {
-        method: 'PUT',
-        body,
-      }
-    )
-
-    if (updated.showCall) {
-      showCall.value = updated.showCall
-    }
-
-    // Mettre à jour l'état initial après une sauvegarde réussie
     updateInitialState()
-
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-  } catch (error: any) {
+  },
+  onError: (error: any) => {
     // Gérer les erreurs de validation Zod
     if (error?.data?.data?.issues) {
       for (const issue of error.data.data.issues) {
@@ -642,15 +632,13 @@ const persistSettings = async () => {
         fieldErrors.value[path] = issue.message
       }
     }
+  },
+})
 
-    toast.add({
-      title: error?.data?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    saving.value = false
-  }
+const persistSettings = () => {
+  if (!initialized.value) return
+  fieldErrors.value = {}
+  executePersistSettings()
 }
 
 // Charger les paramètres au montage

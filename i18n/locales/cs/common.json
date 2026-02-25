@@ -664,6 +664,8 @@
       "notification_title_prefix": "Dobrovolníci",
       "notifications": "Oznámení dobrovolníkům",
       "notifications_history": "Historie oznámení",
+      "notifications_sent_error": "Chyba při odesílání oznámení",
+      "notifications_sent_success": "Oznámení úspěšně odeslána",
       "notify_volunteers_slots": "Upozornit dobrovolníky na jejich volná místa",
       "open": "Otevřít",
       "organizer_addition_title": "Přidat organizátora",

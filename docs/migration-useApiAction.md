@@ -217,13 +217,15 @@ Ces fichiers ont été analysés mais ne sont pas de bons candidats pour la migr
 
 ### Patterns trop complexes
 
-| Fichier                                     | Raison                                                                         |
-| ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `app/pages/editions/[id]/workshops.vue`     | Logique créer/modifier conditionnelle, `confirm()` natif, updates optimistes   |
-| `app/pages/editions/[id]/commentaires.vue`  | Mises à jour locales des données après succès, plusieurs paramètres dynamiques |
-| `app/pages/editions/[id]/lost-found.vue`    | Mises à jour locales des données après succès, plusieurs paramètres dynamiques |
-| `app/pages/admin/index.vue`                 | Logique de redirection 401 personnalisée, valeurs par défaut en cas d'erreur   |
-| `app/components/feedback/FeedbackModal.vue` | Loading doit commencer avant l'appel API (validation reCAPTCHA)                |
+| Fichier                                     | Raison                                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------------- |
+| `app/pages/editions/[id]/workshops.vue`     | Logique créer/modifier conditionnelle, `confirm()` natif, updates optimistes    |
+| `app/pages/editions/[id]/commentaires.vue`  | Mises à jour locales des données après succès, plusieurs paramètres dynamiques  |
+| `app/pages/editions/[id]/lost-found.vue`    | Mises à jour locales des données après succès, plusieurs paramètres dynamiques  |
+| `app/pages/admin/index.vue`                 | Logique de redirection 401 personnalisée, valeurs par défaut en cas d'erreur    |
+| `app/components/feedback/FeedbackModal.vue` | Loading doit commencer avant l'appel API (validation reCAPTCHA)                 |
+| `app/pages/editions/[id]/artist-space.vue`  | Loading non-booléen (`savingMealId`), mutation locale pré-appel, rollback       |
+| `app/pages/admin/backup.vue`                | Loading par tableau (`string[]`), `confirm()` natif, message avec interpolation |
 
 ### Composables dédiés
 
@@ -251,39 +253,17 @@ Pour chaque fichier à migrer :
 
 ### Pages
 
-| Fichier                                                                    | Appels manuels | Détail                                                                                            |
-| -------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
-| `app/pages/my-conventions.vue`                                             | 6              | DELETE organizer, POST organizer, DELETE edition, DELETE convention, POST duplicate, PATCH status |
-| `app/pages/editions/[id]/gestion/organizers.vue`                           | 5              | POST/PATCH/DELETE convention organizer, POST/DELETE edition organizer                             |
-| `app/pages/editions/[id]/gestion/volunteers/applications.vue`              | 4              | PATCH teams (x3), PATCH team leader                                                               |
-| `app/pages/editions/[id]/artist-space.vue`                                 | 1              | PUT my-meals (repas artiste)                                                                      |
-| `app/pages/editions/[id]/gestion/volunteers/notifications.vue`             | 1              | POST notify-schedules                                                                             |
-| `app/pages/editions/[id]/gestion/shows-call/index.vue`                     | 1              | DELETE shows-call                                                                                 |
-| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/index.vue`        | 1              | PUT shows-call settings                                                                           |
-| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/applications.vue` | 3              | PATCH application status (x3)                                                                     |
-| `app/pages/editions/[id]/gestion/map.vue`                                  | 1              | PATCH zones                                                                                       |
-| `app/pages/editions/[id]/gestion/meals/index.vue`                          | 1              | PUT meals                                                                                         |
-| `app/pages/editions/[id]/gestion/index.vue`                                | 1              | PATCH edition                                                                                     |
-| `app/pages/admin/users/index.vue`                                          | 3              | PUT promote, PUT demote, PUT update                                                               |
-| `app/pages/admin/users/[id].vue`                                           | 3              | PUT update (x2), PUT promote                                                                      |
-| `app/pages/admin/backup.vue`                                               | 1              | DELETE backup                                                                                     |
-| `app/pages/admin/error-logs.vue`                                           | 2              | PATCH resolve, PATCH assign                                                                       |
-| `app/pages/admin/notifications.vue`                                        | 1              | PATCH notification                                                                                |
-| `app/pages/admin/conventions.vue`                                          | 2              | PATCH convention, DELETE convention                                                               |
-
-### Composants
-
-| Fichier                                                          | Appels manuels | Détail                                         |
-| ---------------------------------------------------------------- | -------------- | ---------------------------------------------- |
-| `app/components/edition/carpool/OfferCard.vue`                   | 3              | DELETE offer, POST booking, PUT cancel booking |
-| `app/components/edition/carpool/BookingsList.vue`                | 1              | PUT booking status                             |
-| `app/components/edition/carpool/RequestCard.vue`                 | 1              | DELETE request                                 |
-| `app/components/edition/volunteer/MealsCard.vue`                 | 1              | PUT my-meals                                   |
-| `app/components/edition/volunteer/MyTeamsCard.vue`               | 1              | POST team-conversation                         |
-| `app/components/edition/volunteer/AutoAssignmentPanel.vue`       | 2              | POST auto-assign (x2)                          |
-| `app/components/edition/volunteer/planning/AssignmentsModal.vue` | 2              | POST assignment, DELETE assignment             |
-| `app/components/edition/volunteer/notifications/Modal.vue`       | 1              | POST notifications                             |
-| `app/components/notifications/PushNotificationToggle.vue`        | 1              | POST push-test                                 |
+| Fichier                                                       | Appels manuels | Détail                                                                                            |
+| ------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| `app/pages/my-conventions.vue`                                | 6              | DELETE organizer, POST organizer, DELETE edition, DELETE convention, POST duplicate, PATCH status |
+| `app/pages/editions/[id]/gestion/organizers.vue`              | 5              | POST/PATCH/DELETE convention organizer, POST/DELETE edition organizer                             |
+| `app/pages/editions/[id]/gestion/volunteers/applications.vue` | 4              | PATCH teams (x3), PATCH team leader                                                               |
+| `app/pages/editions/[id]/gestion/map.vue`                     | 1              | PATCH zones (utilise composables dédiés)                                                          |
+| `app/pages/admin/users/index.vue`                             | 3              | PUT promote, PUT demote, PUT update                                                               |
+| `app/pages/admin/users/[id].vue`                              | 3              | PUT update (x2), PUT promote                                                                      |
+| `app/pages/admin/error-logs.vue`                              | 2              | PATCH resolve, PATCH assign                                                                       |
+| `app/pages/admin/notifications.vue`                           | 1              | PATCH notification                                                                                |
+| `app/pages/admin/conventions.vue`                             | 2              | PATCH convention, DELETE convention                                                               |
 
 ### Utilitaires et composables
 
@@ -306,39 +286,54 @@ Pour chaque fichier à migrer :
 
 ## Fichiers déjà migrés
 
-| Fichier                                                    | Date       | Patterns migrés                                                            |
-| ---------------------------------------------------------- | ---------- | -------------------------------------------------------------------------- |
-| `app/components/ticketing/OptionModal.vue`                 | -          | create, update                                                             |
-| `app/components/ticketing/QuotasList.vue`                  | -          | delete, create, reorder                                                    |
-| `app/components/ticketing/TierModal.vue`                   | -          | create, update                                                             |
-| `app/components/ticketing/CustomFieldModal.vue`            | -          | create, update                                                             |
-| `app/components/ticketing/AddParticipantModal.vue`         | -          | submitOrder                                                                |
-| `app/components/volunteers/CommentModal.vue`               | -          | save                                                                       |
-| `app/components/profile/PushDevicesModal.vue`              | -          | delete by ID                                                               |
-| `app/pages/login.vue`                                      | -          | login avec redirect 403                                                    |
-| `app/components/artists/ArtistModal.vue`                   | 2026-02-03 | create, update                                                             |
-| `app/pages/editions/[id]/gestion/ticketing/orders.vue`     | 2026-02-03 | cancelOrder, updatePaymentMethod, validateEntry                            |
-| `app/pages/editions/[id]/gestion/ticketing/external.vue`   | 2026-02-03 | loadTiers, saveConfig, testConnection, disconnect, loadOrders, loadRawJson |
-| `app/components/edition/volunteer/planning/DelayModal.vue` | 2026-02-03 | saveDelay, removeDelay                                                     |
-| `app/components/shows/ShowModal.vue`                       | 2026-02-03 | create, update                                                             |
-| `app/components/organizers/ManageReturnableItemsModal.vue` | 2026-02-03 | addItem, removeItem                                                        |
-| `app/components/admin/UserDeletionModal.vue`               | 2026-02-03 | confirmDeletion                                                            |
-| `app/components/edition/carpool/FormBase.vue`              | 2026-02-03 | create, update                                                             |
-| `app/components/profile/UserCategoriesCard.vue`            | 2026-02-03 | saveCategories                                                             |
-| `app/pages/register.vue`                                   | 2026-02-03 | handleRegister                                                             |
-| `app/pages/verify-email.vue`                               | 2026-02-03 | handleResendCode (partiel - autres gardent erreur inline)                  |
-| `app/pages/auth/complete-profile.vue`                      | 2026-02-03 | saveCategories                                                             |
-| `app/pages/auth/forgot-password.vue`                       | 2026-02-03 | handleSubmit                                                               |
-| `app/pages/auth/reset-password.vue`                        | 2026-02-03 | handleSubmit                                                               |
-| `app/pages/profile.vue`                                    | 2026-02-03 | updateProfile, changePassword, saveNotificationPreferences                 |
-| `app/pages/conventions/add.vue`                            | 2026-02-03 | handleAddConvention                                                        |
-| `app/pages/editions/[id]/volunteers/.../confirm.vue`       | 2026-02-03 | confirmReading                                                             |
-| `app/pages/admin/feedback.vue`                             | 2026-02-03 | resolveFeedback                                                            |
-| `app/pages/editions/[id]/gestion/artists/index.vue`        | 2026-02-04 | deleteArtist                                                               |
-| `app/pages/editions/[id]/gestion/artists/shows.vue`        | 2026-02-04 | deleteShow                                                                 |
-| `app/pages/editions/[id]/gestion/artists/index.vue`        | 2026-02-25 | saveArtistInfo                                                             |
-| `app/components/artists/OrganizerNotesModal.vue`           | 2026-02-25 | saveNotes                                                                  |
-| `app/pages/editions/[id]/artist-space.vue`                 | 2026-02-25 | saveDiet (saveAccommodation déjà migré)                                    |
+| Fichier                                                                    | Date       | Patterns migrés                                                            |
+| -------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------- |
+| `app/components/ticketing/OptionModal.vue`                                 | -          | create, update                                                             |
+| `app/components/ticketing/QuotasList.vue`                                  | -          | delete, create, reorder                                                    |
+| `app/components/ticketing/TierModal.vue`                                   | -          | create, update                                                             |
+| `app/components/ticketing/CustomFieldModal.vue`                            | -          | create, update                                                             |
+| `app/components/ticketing/AddParticipantModal.vue`                         | -          | submitOrder                                                                |
+| `app/components/volunteers/CommentModal.vue`                               | -          | save                                                                       |
+| `app/components/profile/PushDevicesModal.vue`                              | -          | delete by ID                                                               |
+| `app/pages/login.vue`                                                      | -          | login avec redirect 403                                                    |
+| `app/components/artists/ArtistModal.vue`                                   | 2026-02-03 | create, update                                                             |
+| `app/pages/editions/[id]/gestion/ticketing/orders.vue`                     | 2026-02-03 | cancelOrder, updatePaymentMethod, validateEntry                            |
+| `app/pages/editions/[id]/gestion/ticketing/external.vue`                   | 2026-02-03 | loadTiers, saveConfig, testConnection, disconnect, loadOrders, loadRawJson |
+| `app/components/edition/volunteer/planning/DelayModal.vue`                 | 2026-02-03 | saveDelay, removeDelay                                                     |
+| `app/components/shows/ShowModal.vue`                                       | 2026-02-03 | create, update                                                             |
+| `app/components/organizers/ManageReturnableItemsModal.vue`                 | 2026-02-03 | addItem, removeItem                                                        |
+| `app/components/admin/UserDeletionModal.vue`                               | 2026-02-03 | confirmDeletion                                                            |
+| `app/components/edition/carpool/FormBase.vue`                              | 2026-02-03 | create, update                                                             |
+| `app/components/profile/UserCategoriesCard.vue`                            | 2026-02-03 | saveCategories                                                             |
+| `app/pages/register.vue`                                                   | 2026-02-03 | handleRegister                                                             |
+| `app/pages/verify-email.vue`                                               | 2026-02-03 | handleResendCode (partiel - autres gardent erreur inline)                  |
+| `app/pages/auth/complete-profile.vue`                                      | 2026-02-03 | saveCategories                                                             |
+| `app/pages/auth/forgot-password.vue`                                       | 2026-02-03 | handleSubmit                                                               |
+| `app/pages/auth/reset-password.vue`                                        | 2026-02-03 | handleSubmit                                                               |
+| `app/pages/profile.vue`                                                    | 2026-02-03 | updateProfile, changePassword, saveNotificationPreferences                 |
+| `app/pages/conventions/add.vue`                                            | 2026-02-03 | handleAddConvention                                                        |
+| `app/pages/editions/[id]/volunteers/.../confirm.vue`                       | 2026-02-03 | confirmReading                                                             |
+| `app/pages/admin/feedback.vue`                                             | 2026-02-03 | resolveFeedback                                                            |
+| `app/pages/editions/[id]/gestion/artists/index.vue`                        | 2026-02-04 | deleteArtist                                                               |
+| `app/pages/editions/[id]/gestion/artists/shows.vue`                        | 2026-02-04 | deleteShow                                                                 |
+| `app/pages/editions/[id]/gestion/artists/index.vue`                        | 2026-02-25 | saveArtistInfo                                                             |
+| `app/components/artists/OrganizerNotesModal.vue`                           | 2026-02-25 | saveNotes                                                                  |
+| `app/pages/editions/[id]/artist-space.vue`                                 | 2026-02-25 | saveDiet (saveAccommodation déjà migré)                                    |
+| `app/components/edition/carpool/OfferCard.vue`                             | 2026-02-25 | deleteOffer, submitBooking, cancelBooking                                  |
+| `app/components/edition/carpool/BookingsList.vue`                          | 2026-02-25 | updateBookingStatus (useApiActionById)                                     |
+| `app/components/edition/carpool/RequestCard.vue`                           | 2026-02-25 | deleteRequest                                                              |
+| `app/components/edition/volunteer/MealsCard.vue`                           | 2026-02-25 | saveMealSelections                                                         |
+| `app/components/edition/volunteer/MyTeamsCard.vue`                         | 2026-02-25 | sendMessageToTeam                                                          |
+| `app/components/edition/volunteer/AutoAssignmentPanel.vue`                 | 2026-02-25 | generatePreview, applyAssignments                                          |
+| `app/components/edition/volunteer/planning/AssignmentsModal.vue`           | 2026-02-25 | assignVolunteer, unassignVolunteer (useApiActionById)                      |
+| `app/components/edition/volunteer/notifications/Modal.vue`                 | 2026-02-25 | confirmSend (silentSuccess + toast dynamique)                              |
+| `app/pages/editions/[id]/gestion/volunteers/notifications.vue`             | 2026-02-25 | sendScheduleNotifications                                                  |
+| `app/pages/editions/[id]/gestion/shows-call/index.vue`                     | 2026-02-25 | createShowCall, confirmDelete                                              |
+| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/index.vue`        | 2026-02-25 | persistSettings (Zod errors via onError)                                   |
+| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/applications.vue` | 2026-02-25 | quickUpdateStatus, saveApplicationDetails, updateApplicationStatus         |
+| `app/pages/editions/[id]/gestion/index.vue`                                | 2026-02-25 | saveStatus, confirmDeleteEdition                                           |
+| `app/components/notifications/PushNotificationToggle.vue`                  | 2026-02-25 | testNotification                                                           |
+| `app/pages/editions/[id]/gestion/meals/index.vue`                          | 2026-02-25 | handleMealChange                                                           |
 
 ---
 

@@ -201,7 +201,6 @@ const formData = ref({
   message: '',
 })
 
-const sending = ref(false)
 const touchedFields = ref(new Set<string>())
 
 // Computed properties
@@ -326,7 +325,6 @@ const resetForm = () => {
     message: '',
   }
   touchedFields.value.clear()
-  sending.value = false
 }
 
 const showConfirmation = ref(false)
@@ -343,49 +341,45 @@ const handleSubmit = async () => {
   showConfirmation.value = true
 }
 
-const confirmSend = async () => {
-  showConfirmation.value = false
-
-  sending.value = true
-
-  try {
-    await $fetch(`/api/editions/${props.edition.id}/volunteers/notifications`, {
-      method: 'POST',
-      body: {
-        targetType: formData.value.targetType,
-        selectedTeams:
-          formData.value.targetType === 'teams' ? formData.value.selectedTeams : undefined,
-        message: formData.value.message.trim(),
-      },
-    })
-
-    emit('sent', {
+const { execute: executeSend, loading: sending } = useApiAction(
+  () => `/api/editions/${props.edition.id}/volunteers/notifications`,
+  {
+    method: 'POST',
+    body: () => ({
       targetType: formData.value.targetType,
       selectedTeams:
         formData.value.targetType === 'teams' ? formData.value.selectedTeams : undefined,
       message: formData.value.message.trim(),
-      recipientCount: recipientCount.value,
-    })
+    }),
+    silentSuccess: true,
+    errorMessages: { default: t('edition.volunteers.notification_send_error') },
+    onSuccess: () => {
+      emit('sent', {
+        targetType: formData.value.targetType,
+        selectedTeams:
+          formData.value.targetType === 'teams' ? formData.value.selectedTeams : undefined,
+        message: formData.value.message.trim(),
+        recipientCount: recipientCount.value,
+      })
 
-    toast.add({
-      title: t('edition.volunteers.notification_sent_success'),
-      description: t('edition.volunteers.notification_sent_count', {
-        count: recipientCount.value,
-      }),
-      color: 'success',
-    })
+      toast.add({
+        title: t('edition.volunteers.notification_sent_success'),
+        description: t('edition.volunteers.notification_sent_count', {
+          count: recipientCount.value,
+        }),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
 
-    resetForm()
-    isOpen.value = false
-  } catch (error: any) {
-    toast.add({
-      title: t('edition.volunteers.notification_send_error'),
-      description: error?.data?.message || t('common.error'),
-      color: 'error',
-    })
-  } finally {
-    sending.value = false
+      resetForm()
+      isOpen.value = false
+    },
   }
+)
+
+const confirmSend = () => {
+  showConfirmation.value = false
+  executeSend()
 }
 
 // Watch for modal changes to reset form and reload teams

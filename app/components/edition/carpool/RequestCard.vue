@@ -146,7 +146,6 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
 // Vérifier si l'utilisateur peut éditer cette demande
@@ -160,32 +159,21 @@ const formatTripDate = (date: string) => {
   return formatDate(date, { locale: locale.value, includeTime: true, format: 'long' })
 }
 
-const handleDelete = async () => {
-  if (!confirm(t('components.carpool.confirm_delete_request'))) {
-    return
-  }
-
-  try {
-    await $fetch(`/api/carpool-requests/${props.request.id}`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
+const { execute: executeDeleteRequest } = useApiAction(
+  () => `/api/carpool-requests/${props.request.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: t('messages.request_deleted'),
       description: t('messages.request_deleted_successfully'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    emit('deleted')
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string }
-    toast.add({
-      title: t('errors.deletion_error'),
-      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+    },
+    errorMessages: { default: t('errors.deletion_error') },
+    onSuccess: () => emit('deleted'),
   }
+)
+
+const handleDelete = () => {
+  if (!confirm(t('components.carpool.confirm_delete_request'))) return
+  executeDeleteRequest()
 }
 </script>

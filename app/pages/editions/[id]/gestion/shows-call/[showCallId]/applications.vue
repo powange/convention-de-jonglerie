@@ -501,12 +501,15 @@ const searchQuery = ref('')
 const showDetailsModal = ref(false)
 const selectedApplication = ref<ShowApplication | null>(null)
 const organizerNotes = ref('')
-const updatingStatus = ref(false)
 
 // Spectacle associé
 const linkedShowId = ref<number | null>(null)
 const loadingShows = ref(false)
 const editionShows = ref<{ id: number; title: string }[]>([])
+
+// Refs pour les actions useApiAction avec paramètres dynamiques
+const quickUpdateTarget = ref<{ appId: number; status: ShowApplicationStatus } | null>(null)
+const pendingStatus = ref<ShowApplicationStatus>('PENDING')
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize))
 
@@ -700,100 +703,72 @@ const openApplicationDetails = async (application: ShowApplication) => {
 }
 
 // Mise à jour rapide du statut
-const quickUpdateStatus = async (application: ShowApplication, status: ShowApplicationStatus) => {
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/shows-call/${showCallId}/applications/${application.id}`,
-      {
-        method: 'PATCH',
-        body: { status },
-      }
-    )
-
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-
-    await fetchApplications()
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('common.error'),
-      color: 'error',
-    })
+const { execute: executeQuickUpdate } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${quickUpdateTarget.value?.appId}`,
+  {
+    method: 'PATCH',
+    body: () => ({ status: quickUpdateTarget.value?.status }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => fetchApplications(),
   }
+)
+
+const quickUpdateStatus = (application: ShowApplication, status: ShowApplicationStatus) => {
+  quickUpdateTarget.value = { appId: application.id, status }
+  executeQuickUpdate()
 }
 
 // Enregistrer les notes et le spectacle associé sans changer le statut
-const saveApplicationDetails = async () => {
-  if (!selectedApplication.value) return
-
-  updatingStatus.value = true
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value.id}`,
-      {
-        method: 'PATCH',
-        body: {
-          organizerNotes: organizerNotes.value || null,
-          showId: linkedShowId.value,
-        },
-      }
-    )
-
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-
-    await fetchApplications()
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('common.error'),
-      color: 'error',
-    })
-  } finally {
-    updatingStatus.value = false
+const { execute: executeSaveDetails, loading: savingDetails } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value?.id}`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      organizerNotes: organizerNotes.value || null,
+      showId: linkedShowId.value,
+    }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => fetchApplications(),
   }
+)
+
+const saveApplicationDetails = () => {
+  if (!selectedApplication.value) return
+  executeSaveDetails()
 }
 
 // Mise à jour du statut depuis la modal
-const updateApplicationStatus = async (status: ShowApplicationStatus) => {
-  if (!selectedApplication.value) return
-
-  updatingStatus.value = true
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value.id}`,
-      {
-        method: 'PATCH',
-        body: {
-          status,
-          organizerNotes: organizerNotes.value || null,
-          showId: linkedShowId.value,
-        },
-      }
-    )
-
-    toast.add({
-      title: t('common.saved'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-
-    showDetailsModal.value = false
-    await fetchApplications()
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('common.error'),
-      color: 'error',
-    })
-  } finally {
-    updatingStatus.value = false
+const { execute: executeUpdateStatus, loading: updatingStatusFromModal } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value?.id}`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      status: pendingStatus.value,
+      organizerNotes: organizerNotes.value || null,
+      showId: linkedShowId.value,
+    }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      showDetailsModal.value = false
+      fetchApplications()
+    },
   }
+)
+
+const updateApplicationStatus = (status: ShowApplicationStatus) => {
+  if (!selectedApplication.value) return
+  pendingStatus.value = status
+  executeUpdateStatus()
 }
+
+// Computed combiné pour le loading des actions dans le drawer
+const updatingStatus = computed(() => savingDetails.value || updatingStatusFromModal.value)
 
 // Charger les données au montage
 onMounted(async () => {
