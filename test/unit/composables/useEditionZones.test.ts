@@ -85,7 +85,7 @@ describe('useEditionZones', () => {
     })
 
     it('devrait charger les zones automatiquement si editionId est défini', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
 
       const editionId = ref<number | undefined>(1)
       const { zones } = useEditionZones(editionId)
@@ -110,7 +110,7 @@ describe('useEditionZones', () => {
 
   describe('fetchZones', () => {
     it('devrait récupérer les zones avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
 
       const editionId = ref<number | undefined>(1)
       const { zones, loading, error, fetchZones } = useEditionZones(editionId)
@@ -120,7 +120,7 @@ describe('useEditionZones', () => {
       mockFetch.mockClear()
 
       // Déclencher un nouveau fetch
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
       await fetchZones()
 
       expect(zones.value).toEqual(mockZones)
@@ -155,7 +155,7 @@ describe('useEditionZones', () => {
   describe('createZone', () => {
     it('devrait créer une zone avec succès', async () => {
       // Premier fetch automatique
-      mockFetch.mockResolvedValueOnce({ success: true, zones: [] })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: [] } })
 
       const editionId = ref<number | undefined>(1)
       const { zones, createZone, creating } = useEditionZones(editionId)
@@ -197,7 +197,7 @@ describe('useEditionZones', () => {
 
   describe('updateZone', () => {
     it('devrait mettre à jour une zone avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
 
       const editionId = ref<number | undefined>(1)
       const { zones, updateZone } = useEditionZones(editionId)
@@ -225,7 +225,7 @@ describe('useEditionZones', () => {
 
   describe('deleteZone', () => {
     it('devrait supprimer une zone avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
 
       const editionId = ref<number | undefined>(1)
       const { zones, deleteZone } = useEditionZones(editionId)
@@ -251,7 +251,7 @@ describe('useEditionZones', () => {
 
   describe('updateZoneCoordinates', () => {
     it('devrait mettre à jour les coordonnées via updateZone', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
 
       const editionId = ref<number | undefined>(1)
       const { updateZoneCoordinates } = useEditionZones(editionId)
@@ -279,7 +279,7 @@ describe('useEditionZones', () => {
 
   describe('reorderZones', () => {
     it('devrait réorganiser les zones', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
 
       const editionId = ref<number | undefined>(1)
       const { zones, reorderZones } = useEditionZones(editionId)
@@ -309,7 +309,7 @@ describe('useEditionZones', () => {
       await nextTick()
       expect(mockFetch).not.toHaveBeenCalled()
 
-      mockFetch.mockResolvedValueOnce({ success: true, zones: mockZones })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { zones: mockZones } })
       editionId.value = 1
 
       await nextTick()

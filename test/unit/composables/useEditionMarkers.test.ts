@@ -77,7 +77,7 @@ describe('useEditionMarkers', () => {
     })
 
     it('devrait charger les markers automatiquement si editionId est défini', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
 
       const editionId = ref<number | undefined>(1)
       const { markers } = useEditionMarkers(editionId)
@@ -101,7 +101,7 @@ describe('useEditionMarkers', () => {
 
   describe('fetchMarkers', () => {
     it('devrait récupérer les markers avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
 
       const editionId = ref<number | undefined>(1)
       const { markers, loading, error, fetchMarkers } = useEditionMarkers(editionId)
@@ -109,7 +109,7 @@ describe('useEditionMarkers', () => {
       await new Promise((resolve) => setTimeout(resolve, 0))
       mockFetch.mockClear()
 
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
       await fetchMarkers()
 
       expect(markers.value).toEqual(mockMarkers)
@@ -142,7 +142,7 @@ describe('useEditionMarkers', () => {
 
   describe('createMarker', () => {
     it('devrait créer un marker avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: [] })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: [] } })
 
       const editionId = ref<number | undefined>(1)
       const { markers, createMarker } = useEditionMarkers(editionId)
@@ -180,7 +180,7 @@ describe('useEditionMarkers', () => {
 
   describe('updateMarker', () => {
     it('devrait mettre à jour un marker avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
 
       const editionId = ref<number | undefined>(1)
       const { markers, updateMarker } = useEditionMarkers(editionId)
@@ -207,7 +207,7 @@ describe('useEditionMarkers', () => {
 
   describe('deleteMarker', () => {
     it('devrait supprimer un marker avec succès', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
 
       const editionId = ref<number | undefined>(1)
       const { markers, deleteMarker } = useEditionMarkers(editionId)
@@ -232,7 +232,7 @@ describe('useEditionMarkers', () => {
 
   describe('updateMarkerPosition', () => {
     it('devrait mettre à jour la position via updateMarker', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
 
       const editionId = ref<number | undefined>(1)
       const { updateMarkerPosition } = useEditionMarkers(editionId)
@@ -257,7 +257,7 @@ describe('useEditionMarkers', () => {
 
   describe('reorderMarkers', () => {
     it('devrait réorganiser les markers', async () => {
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
 
       const editionId = ref<number | undefined>(1)
       const { markers, reorderMarkers } = useEditionMarkers(editionId)
@@ -287,7 +287,7 @@ describe('useEditionMarkers', () => {
       await nextTick()
       expect(mockFetch).not.toHaveBeenCalled()
 
-      mockFetch.mockResolvedValueOnce({ success: true, markers: mockMarkers })
+      mockFetch.mockResolvedValueOnce({ success: true, data: { markers: mockMarkers } })
       editionId.value = 1
 
       await nextTick()
