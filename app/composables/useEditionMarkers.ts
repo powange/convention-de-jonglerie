@@ -43,10 +43,10 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
     error.value = null
 
     try {
-      const response = await $fetch<{ success: boolean; markers: EditionMarker[] }>(
+      const response = await $fetch<{ success: boolean; data: { markers: EditionMarker[] } }>(
         `/api/editions/${editionId.value}/markers`
       )
-      markers.value = response.markers
+      markers.value = response.data.markers
     } catch (err: any) {
       error.value = err.data?.message || t('common.error')
       console.error('Error fetching markers:', err)

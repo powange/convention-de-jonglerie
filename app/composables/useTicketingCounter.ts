@@ -421,10 +421,10 @@ export function useTicketingCountersList(editionId: number) {
     error.value = null
 
     try {
-      const response = await $fetch<{ success: boolean; counters: Counter[] }>(
+      const response = await $fetch<{ success: boolean; data: { counters: Counter[] } }>(
         `/api/editions/${editionId}/ticketing/counters`
       )
-      counters.value = response.counters
+      counters.value = response.data.counters
     } catch (err: any) {
       error.value =
         err?.data?.message || err?.message || 'Erreur lors de la récupération des compteurs'

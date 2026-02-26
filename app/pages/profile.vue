@@ -1227,9 +1227,9 @@ const loadNotificationPreferences = async () => {
   try {
     const response = await $fetch<{
       success: boolean
-      preferences: typeof notificationPreferences
+      data: { preferences: typeof notificationPreferences }
     }>('/api/profile/notification-preferences')
-    Object.assign(notificationPreferences, response.preferences)
+    Object.assign(notificationPreferences, response.data.preferences)
   } catch (error) {
     console.error('Erreur lors du chargement des préférences:', error)
     // En cas d'erreur, garder les valeurs par défaut (tout activé)

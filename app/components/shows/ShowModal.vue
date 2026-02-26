@@ -309,7 +309,7 @@ const selectedReturnableItems = computed(() => {
 const fetchArtists = async () => {
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/artists`)
-    artists.value = response.artists || []
+    artists.value = response.data?.artists || []
   } catch (error) {
     console.error('Error fetching artists:', error)
   }
@@ -329,7 +329,7 @@ const fetchReturnableItems = async () => {
 const fetchZones = async () => {
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/zones`)
-    zones.value = response.data?.zones || response.zones || []
+    zones.value = response.data?.zones || []
   } catch (error) {
     console.error('Error fetching zones:', error)
   }
@@ -339,7 +339,7 @@ const fetchZones = async () => {
 const fetchMarkers = async () => {
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/markers`)
-    markers.value = response.data?.markers || response.markers || []
+    markers.value = response.data?.markers || []
   } catch (error) {
     console.error('Error fetching markers:', error)
   }

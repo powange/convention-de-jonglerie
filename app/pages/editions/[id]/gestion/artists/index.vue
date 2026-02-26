@@ -628,7 +628,7 @@ const fetchArtists = async () => {
   loading.value = true
   try {
     const response = await $fetch(`/api/editions/${editionId.value}/artists`)
-    artists.value = response.artists || []
+    artists.value = response.data?.artists || []
   } catch (error) {
     console.error('Error fetching artists:', error)
     toast.add({

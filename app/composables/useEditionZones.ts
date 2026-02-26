@@ -40,10 +40,10 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
     error.value = null
 
     try {
-      const response = await $fetch<{ success: boolean; zones: EditionZone[] }>(
+      const response = await $fetch<{ success: boolean; data: { zones: EditionZone[] } }>(
         `/api/editions/${editionId.value}/zones`
       )
-      zones.value = response.zones
+      zones.value = response.data.zones
     } catch (err: any) {
       error.value = err.data?.message || t('common.error')
       console.error('Error fetching zones:', err)

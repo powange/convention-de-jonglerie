@@ -1,6 +1,11 @@
 # Analyse du typage des retours de l'API
 
-## 📊 Statistiques globales
+> **Note** : Les statistiques de ce document datent d'avant la Phase 2 de migration `createSuccessResponse`.
+> Pour les chiffres à jour et la roadmap d'uniformisation, voir `docs/api-uniformisation-roadmap.md`.
+>
+> **État au 26/02/2026** : 175 endpoints utilisent `createSuccessResponse` (48%), 10 utilisent `createPaginatedResponse` (3%).
+
+## Statistiques globales (avant Phase 2 — obsolètes)
 
 - **Total d'endpoints analysés** : 303 fichiers
 - **Endpoints avec typage explicite** : 0 (0%)
