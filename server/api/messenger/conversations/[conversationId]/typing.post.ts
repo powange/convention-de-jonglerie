@@ -86,7 +86,7 @@ export default wrapApiHandler(
         })
     }
 
-    return { success: true, isTyping }
+    return createSuccessResponse({ isTyping })
   },
   { operationName: 'BroadcastTypingStatus' }
 )

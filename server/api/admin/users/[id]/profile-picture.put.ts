@@ -120,11 +120,10 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      profilePicture: updatedUser.profilePicture,
-      message: 'Photo de profil mise à jour avec succès',
-    }
+    return createSuccessResponse(
+      { profilePicture: updatedUser.profilePicture },
+      'Photo de profil mise à jour avec succès'
+    )
   },
   { operationName: 'UpdateUserProfilePicture' }
 )

@@ -133,7 +133,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.application.status).toBe('ACCEPTED')
+      expect(result.data.application.status).toBe('ACCEPTED')
       expect(prismaMock.showApplication.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: expect.objectContaining({
@@ -157,7 +157,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.application.status).toBe('REJECTED')
+      expect(result.data.application.status).toBe('REJECTED')
       expect(prismaMock.showApplication.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: expect.objectContaining({

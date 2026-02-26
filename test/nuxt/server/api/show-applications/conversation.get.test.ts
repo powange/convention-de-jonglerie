@@ -132,8 +132,10 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
 
       expect(result).toEqual({
         success: true,
-        exists: false,
-        conversationId: null,
+        data: {
+          exists: false,
+          conversationId: null,
+        },
       })
 
       expect(prismaMock.conversation.findUnique).toHaveBeenCalledWith({
@@ -158,8 +160,10 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
 
       expect(result).toEqual({
         success: true,
-        exists: true,
-        conversationId: 'conv-uuid-123',
+        data: {
+          exists: true,
+          conversationId: 'conv-uuid-123',
+        },
       })
     })
   })
@@ -180,7 +184,7 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.exists).toBe(true)
+      expect(result.data.exists).toBe(true)
     })
 
     it("devrait permettre à l'organisateur de vérifier la conversation", async () => {
@@ -198,7 +202,7 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.exists).toBe(true)
+      expect(result.data.exists).toBe(true)
     })
   })
 })

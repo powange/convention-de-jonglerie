@@ -34,10 +34,7 @@ export default wrapApiHandler(
     const body = bodySchema.parse(await readBody(event))
     const option = await createOption(editionId, body)
 
-    return {
-      success: true,
-      option,
-    }
+    return createSuccessResponse({ option })
   },
   { operationName: 'POST ticketing option' }
 )

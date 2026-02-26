@@ -63,18 +63,19 @@ export default wrapApiHandler(
       // Mettre à jour le statut de leader
       const updatedAssignment = await setTeamLeader(applicationId, teamId, parsed.isLeader)
 
-      return {
-        success: true,
-        assignment: {
-          ...updatedAssignment,
-          application: {
-            user: application.user,
+      return createSuccessResponse(
+        {
+          assignment: {
+            ...updatedAssignment,
+            application: {
+              user: application.user,
+            },
           },
         },
-        message: parsed.isLeader
+        parsed.isLeader
           ? `${application.user.pseudo} est maintenant responsable de l'équipe ${team.name}`
-          : `${application.user.pseudo} n'est plus responsable de l'équipe ${team.name}`,
-      }
+          : `${application.user.pseudo} n'est plus responsable de l'équipe ${team.name}`
+      )
     } catch (error: unknown) {
       // Si l'assignation n'existe pas, Prisma lancera une erreur
       if (error.code === 'P2025') {

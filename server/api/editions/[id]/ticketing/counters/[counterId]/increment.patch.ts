@@ -56,10 +56,7 @@ export default wrapApiHandler(
     // Diffuser la mise à jour via SSE
     broadcastCounterUpdate(editionId, counterId, updatedCounter)
 
-    return {
-      success: true,
-      counter: updatedCounter,
-    }
+    return createSuccessResponse({ counter: updatedCounter })
   },
   { operationName: 'PATCH increment counter' }
 )

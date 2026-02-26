@@ -73,11 +73,13 @@ describe('API Zones - Mise à jour (PUT)', () => {
 
     expect(result).toEqual({
       success: true,
-      zone: expect.objectContaining({
-        name: updateData.name,
-        description: updateData.description,
-        color: updateData.color,
-      }),
+      data: {
+        zone: expect.objectContaining({
+          name: updateData.name,
+          description: updateData.description,
+          color: updateData.color,
+        }),
+      },
     })
 
     expect(prismaMock.editionZone.update).toHaveBeenCalledWith({
@@ -105,7 +107,7 @@ describe('API Zones - Mise à jour (PUT)', () => {
 
     const result = await zonesPutHandler(mockEvent as any)
 
-    expect(result.zone.name).toBe(updateData.name)
+    expect(result.data.zone.name).toBe(updateData.name)
     expect(prismaMock.editionZone.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: expect.objectContaining({
@@ -185,7 +187,7 @@ describe('API Zones - Mise à jour (PUT)', () => {
 
     const result = await zonesPutHandler(mockEvent as any)
 
-    expect(result.zone.coordinates).toEqual(newCoordinates)
+    expect(result.data.zone.coordinates).toEqual(newCoordinates)
   })
 
   it('devrait permettre la mise à jour du type de zone', async () => {
@@ -198,7 +200,7 @@ describe('API Zones - Mise à jour (PUT)', () => {
 
     const result = await zonesPutHandler(mockEvent as any)
 
-    expect(result.zone.zoneTypes).toEqual(['PARKING'])
+    expect(result.data.zone.zoneTypes).toEqual(['PARKING'])
   })
 
   it("devrait retourner 400 si l'ID de zone est invalide", async () => {

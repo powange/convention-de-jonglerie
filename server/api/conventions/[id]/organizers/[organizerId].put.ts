@@ -130,8 +130,7 @@ export default wrapApiHandler(
       })
     }
 
-    return {
-      success: true,
+    return createSuccessResponse({
       organizer: {
         id: updatedOrganizer.id,
         title: updatedOrganizer.title,
@@ -152,7 +151,7 @@ export default wrapApiHandler(
         })),
         user: updatedOrganizer.user,
       },
-    }
+    })
   },
   { operationName: 'UpdateOrganizerRights' }
 )

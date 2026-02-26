@@ -162,12 +162,12 @@ const fetchMeals = async () => {
     const response = await $fetch(
       `/api/editions/${props.editionId}/volunteers/${props.volunteer.id}/meals`
     )
-    if (response.success && response.meals) {
+    if (response.data?.meals) {
       // Sauvegarder l'état initial AVANT de décocher (pour détecter les changements)
-      initialMeals.value = JSON.parse(JSON.stringify(response.meals))
+      initialMeals.value = JSON.parse(JSON.stringify(response.data.meals))
 
       // Décocher automatiquement les repas non éligibles
-      meals.value = response.meals.map((meal: Meal) => ({
+      meals.value = response.data.meals.map((meal: Meal) => ({
         ...meal,
         accepted: meal.eligible ? meal.accepted : false,
       }))

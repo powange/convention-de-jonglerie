@@ -42,12 +42,11 @@ export default wrapApiHandler(
       ? `/uploads/generic/${entityId}/${filename}`
       : `/uploads/temp/${filename}`
 
-    return {
-      success: true,
+    return createSuccessResponse({
       imageUrl,
       filename,
       temporary: !entityId,
-    }
+    })
   },
   { operationName: 'UploadGenericFile' }
 )

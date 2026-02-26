@@ -74,13 +74,12 @@ export default wrapApiHandler(
     // Construire l'URL publique
     const imageUrl = `/uploads/conventions/${edition.conventionId}/editions/${targetEditionId}/lost-found/${filename}`
 
-    return {
-      success: true,
+    return createSuccessResponse({
       imageUrl,
       filename,
       editionId: targetEditionId,
       conventionId: edition.conventionId,
-    }
+    })
   },
   { operationName: 'UploadLostFoundFile' }
 )

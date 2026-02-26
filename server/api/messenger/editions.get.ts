@@ -55,10 +55,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      data: editionsWithConversations,
-    }
+    return createSuccessResponse(editionsWithConversations)
   },
   { operationName: 'GetMessengerEditions' }
 )

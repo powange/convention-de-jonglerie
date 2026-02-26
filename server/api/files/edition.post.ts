@@ -119,11 +119,10 @@ export default wrapApiHandler(
       console.log('=== UPLOAD EDITION SUCCESS ===')
       console.log('Temporary URL:', firstUpload.temporaryUrl)
 
-      return {
-        success: true,
+      return createSuccessResponse({
         imageUrl: firstUpload.temporaryUrl,
         results,
-      }
+      })
     } else {
       throw createError({
         status: 500,

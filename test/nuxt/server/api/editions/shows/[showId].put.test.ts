@@ -114,7 +114,7 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.show.title).toBe('Nouveau Titre')
+      expect(result.data.show.title).toBe('Nouveau Titre')
     })
 
     it('devrait mettre à jour partiellement (duration seulement)', async () => {

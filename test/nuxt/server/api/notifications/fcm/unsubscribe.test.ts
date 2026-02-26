@@ -34,7 +34,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.count).toBe(3)
+    expect(result.data.count).toBe(3)
     expect(prismaMock.fcmToken.updateMany).toHaveBeenCalledWith({
       where: {
         userId: 1,
@@ -55,7 +55,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.count).toBe(1)
+    expect(result.data.count).toBe(1)
     expect(prismaMock.fcmToken.updateMany).toHaveBeenCalledWith({
       where: {
         userId: 1,
@@ -95,7 +95,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.count).toBe(0)
+    expect(result.data.count).toBe(0)
   })
 
   it('devrait gérer le cas où readBody échoue', async () => {

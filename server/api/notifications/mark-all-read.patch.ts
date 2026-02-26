@@ -15,11 +15,10 @@ export default wrapApiHandler(
     const parsed = bodySchema.parse(body)
     const result = await NotificationService.markAllAsRead(user.id, parsed.category)
 
-    return {
-      success: true,
-      message: `${result.count} notification${result.count > 1 ? 's' : ''} marquée${result.count > 1 ? 's' : ''} comme lue${result.count > 1 ? 's' : ''}`,
-      updatedCount: result.count,
-    }
+    return createSuccessResponse(
+      { updatedCount: result.count },
+      `${result.count} notification${result.count > 1 ? 's' : ''} marquée${result.count > 1 ? 's' : ''} comme lue${result.count > 1 ? 's' : ''}`
+    )
   },
   { operationName: 'MarkAllNotificationsAsRead' }
 )

@@ -50,10 +50,7 @@ export default wrapApiHandler(
       select: editionMarkerSelect,
     })
 
-    return {
-      success: true,
-      marker,
-    }
+    return createSuccessResponse({ marker })
   },
   { operationName: 'UpdateEditionMarker' }
 )

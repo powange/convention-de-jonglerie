@@ -190,11 +190,10 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return {
-          success: true,
-          validated: result.count,
-          message: `${result.count} bénévole${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
-        }
+        return createSuccessResponse(
+          { validated: result.count },
+          `${result.count} bénévole${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
+        )
       } else if (body.type === 'artist') {
         // Valider les artistes
         const result = await prisma.editionArtist.updateMany({
@@ -325,11 +324,10 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return {
-          success: true,
-          validated: result.count,
-          message: `${result.count} artiste${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
-        }
+        return createSuccessResponse(
+          { validated: result.count },
+          `${result.count} artiste${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
+        )
       } else if (body.type === 'organizer') {
         // Valider les organisateurs
         // Les participantIds sont les IDs des EditionOrganizer
@@ -395,11 +393,10 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return {
-          success: true,
-          validated: result.count,
-          message: `${result.count} organisateur${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
-        }
+        return createSuccessResponse(
+          { validated: result.count },
+          `${result.count} organisateur${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
+        )
       } else {
         // Vérifier si des billets appartiennent à des commandes remboursées
         const refundedItems = await prisma.ticketingOrderItem.findMany({
@@ -508,11 +505,10 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return {
-          success: true,
-          validated: result.count,
-          message: `${result.count} participant${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
-        }
+        return createSuccessResponse(
+          { validated: result.count },
+          `${result.count} participant${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
+        )
       }
     } catch (error: unknown) {
       console.error('Database validate entry error:', error)

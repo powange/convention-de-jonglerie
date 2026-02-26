@@ -153,8 +153,5 @@ export default wrapApiHandler(async (event) => {
     console.error("Erreur lors de l'envoi de la notification:", notificationError)
   }
 
-  return {
-    success: true,
-    application,
-  }
+  return createSuccessResponse({ application })
 }, 'AddVolunteerManually')

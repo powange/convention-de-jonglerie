@@ -45,11 +45,7 @@ export default wrapApiHandler(
     // Diffuser la mise à jour via SSE
     broadcastCounterUpdate(editionId, counterId, updatedCounter)
 
-    return {
-      success: true,
-      counter: updatedCounter,
-      message: 'Compteur réinitialisé à 0',
-    }
+    return createSuccessResponse({ counter: updatedCounter }, 'Compteur réinitialisé à 0')
   },
   { operationName: 'PATCH reset counter' }
 )

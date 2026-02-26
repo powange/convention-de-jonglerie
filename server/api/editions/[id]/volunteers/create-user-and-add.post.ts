@@ -339,9 +339,5 @@ export default wrapApiHandler(async (event) => {
     console.error("Erreur lors de l'envoi de l'email d'invitation:", emailError)
   }
 
-  return {
-    success: true,
-    user: newUser,
-    application,
-  }
+  return createSuccessResponse({ user: newUser, application })
 }, 'CreateUserAndAddVolunteer')

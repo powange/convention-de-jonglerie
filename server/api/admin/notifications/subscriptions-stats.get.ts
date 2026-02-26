@@ -45,17 +45,14 @@ export default wrapApiHandler(
       }))
     }
 
-    return {
-      success: true,
-      data: {
-        fcm: {
-          total: totalFcm,
-          active: activeFcm,
-          inactive: inactiveFcm,
-        },
-        ...(userTokens && { userTokens }),
+    return createSuccessResponse({
+      fcm: {
+        total: totalFcm,
+        active: activeFcm,
+        inactive: inactiveFcm,
       },
-    }
+      ...(userTokens && { userTokens }),
+    })
   },
   { operationName: 'GetSubscriptionsStats' }
 )

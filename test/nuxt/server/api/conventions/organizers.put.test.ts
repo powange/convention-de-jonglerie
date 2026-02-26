@@ -55,7 +55,7 @@ describe('/api/conventions/[id]/organizers/[organizerId] PUT', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.organizer.rights).toMatchObject({
+    expect(result.data.organizer.rights).toMatchObject({
       manageOrganizers: true,
       editConvention: true,
     })

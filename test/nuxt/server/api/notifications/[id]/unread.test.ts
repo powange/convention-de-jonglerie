@@ -48,7 +48,7 @@ describe('/api/notifications/[id]/unread PATCH', () => {
 
     expect(result.success).toBe(true)
     expect(result.message).toBe('Notification marquée comme non lue')
-    expect(result.notification).toEqual(mockNotification)
+    expect(result.data.notification).toEqual(mockNotification)
     expect(mockNotificationService.markAsUnread).toHaveBeenCalledWith('notif-123', 1)
   })
 

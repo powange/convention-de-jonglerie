@@ -32,8 +32,7 @@ export default wrapApiHandler(
 
     console.log(`✅ Tâche ${taskName} terminée en ${executionTime}ms`)
 
-    return {
-      success: true,
+    return createSuccessResponse({
       taskName,
       executedBy: {
         id: user.id,
@@ -43,7 +42,7 @@ export default wrapApiHandler(
       executionTime: `${executionTime}ms`,
       result,
       timestamp: new Date().toISOString(),
-    }
+    })
   },
   { operationName: 'ExecuteAdminTask' }
 )

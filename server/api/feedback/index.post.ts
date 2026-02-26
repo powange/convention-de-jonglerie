@@ -161,11 +161,10 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      message: 'Votre feedback a été envoyé avec succès. Merci pour votre contribution !',
-      feedbackId: feedback.id,
-    }
+    return createSuccessResponse(
+      { feedbackId: feedback.id },
+      'Votre feedback a été envoyé avec succès. Merci pour votre contribution !'
+    )
   },
   { operationName: 'SubmitFeedback' }
 )

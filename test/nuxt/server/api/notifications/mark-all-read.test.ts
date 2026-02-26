@@ -37,7 +37,7 @@ describe('/api/notifications/mark-all-read PATCH', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.updatedCount).toBe(5)
+    expect(result.data.updatedCount).toBe(5)
     expect(mockNotificationService.markAllAsRead).toHaveBeenCalledWith(1, undefined)
   })
 

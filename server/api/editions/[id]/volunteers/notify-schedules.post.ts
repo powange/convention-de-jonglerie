@@ -62,11 +62,7 @@ export default wrapApiHandler(async (event) => {
   })
 
   if (acceptedVolunteers.length === 0) {
-    return {
-      success: true,
-      message: 'Aucun bénévole accepté trouvé',
-      count: 0,
-    }
+    return createSuccessResponse({ count: 0 }, 'Aucun bénévole accepté trouvé')
   }
 
   const siteUrl = getSiteUrl()
@@ -200,11 +196,12 @@ export default wrapApiHandler(async (event) => {
     }
   }
 
-  return {
-    success: true,
-    message: `Notifications envoyées à ${successCount} bénévole(s)`,
-    count: successCount,
-    errors: errorCount,
-    total: acceptedVolunteers.length,
-  }
+  return createSuccessResponse(
+    {
+      count: successCount,
+      errors: errorCount,
+      total: acceptedVolunteers.length,
+    },
+    `Notifications envoyées à ${successCount} bénévole(s)`
+  )
 }, 'NotifyVolunteerSchedules')

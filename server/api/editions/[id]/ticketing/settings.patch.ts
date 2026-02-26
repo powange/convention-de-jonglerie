@@ -80,7 +80,7 @@ export default wrapApiHandler(
     // Construire les données de mise à jour avec buildUpdateData
     const data = buildUpdateData(mappedData) as EditionUpdateInput
 
-    if (Object.keys(data).length === 0) return { success: true, unchanged: true }
+    if (Object.keys(data).length === 0) return createSuccessResponse({ unchanged: true })
 
     const updated = await prisma.edition.update({
       where: { id: editionId },
@@ -91,13 +91,12 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
+    return createSuccessResponse({
       settings: {
         allowOnsiteRegistration: updated.ticketingAllowOnsiteRegistration ?? true,
         allowAnonymousOrders: updated.ticketingAllowAnonymousOrders ?? false,
       },
-    }
+    })
   },
   { operationName: 'UpdateTicketingSettings' }
 )

@@ -153,10 +153,10 @@ const fetchMeals = async () => {
     const response = await $fetch(
       `/api/editions/${props.editionId}/artists/${props.artist.id}/meals`
     )
-    if (response.success && response.meals) {
-      meals.value = response.meals
+    if (response.data?.meals) {
+      meals.value = response.data.meals
       // Sauvegarder l'état initial pour la détection de changements
-      initialMeals.value = JSON.parse(JSON.stringify(response.meals))
+      initialMeals.value = JSON.parse(JSON.stringify(response.data.meals))
     }
   } catch {
     toast.add({

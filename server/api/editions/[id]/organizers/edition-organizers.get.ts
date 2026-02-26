@@ -88,8 +88,7 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         organizers: editionOrganizers.map((eo) => ({
           id: eo.id,
           organizerId: eo.organizerId,
@@ -108,7 +107,7 @@ export default wrapApiHandler(
           },
         })),
         total: editionOrganizers.length,
-      }
+      })
     } catch (error: unknown) {
       console.error('Database error fetching edition organizers:', error)
       throw createError({

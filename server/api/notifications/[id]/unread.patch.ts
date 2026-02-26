@@ -17,11 +17,7 @@ export default wrapApiHandler(
     try {
       const notification = await NotificationService.markAsUnread(notificationId, user.id)
 
-      return {
-        success: true,
-        message: 'Notification marquée comme non lue',
-        notification,
-      }
+      return createSuccessResponse({ notification }, 'Notification marquée comme non lue')
     } catch (error: unknown) {
       // Vérifier si c'est une erreur de permission (notification non trouvée)
       if (error.code === 'P2025') {

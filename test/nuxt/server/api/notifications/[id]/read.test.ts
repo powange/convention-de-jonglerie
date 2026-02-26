@@ -48,7 +48,7 @@ describe('/api/notifications/[id]/read PATCH', () => {
 
     expect(result.success).toBe(true)
     expect(result.message).toBe('Notification marquée comme lue')
-    expect(result.notification).toEqual(mockNotification)
+    expect(result.data.notification).toEqual(mockNotification)
     expect(mockNotificationService.markAsRead).toHaveBeenCalledWith('notif-123', 1)
   })
 

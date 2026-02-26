@@ -21,10 +21,7 @@ export default wrapApiHandler(
         orderBy: { name: 'asc' },
       })
 
-      return {
-        success: true,
-        returnableItems,
-      }
+      return createSuccessResponse({ returnableItems })
     } catch (error: unknown) {
       console.error('Failed to fetch returnable items:', error)
       throw createError({

@@ -367,7 +367,7 @@ const loadReturnableItems = async () => {
   loadingReturnableItems.value = true
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    availableReturnableItems.value = response?.returnableItems || []
+    availableReturnableItems.value = response?.data?.returnableItems || []
   } catch (error) {
     console.error('Erreur lors du chargement des articles:', error)
   } finally {

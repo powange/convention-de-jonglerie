@@ -86,17 +86,19 @@ describe('/api/files/lost-found POST', () => {
     it('smoke test: structure de réponse attendue', () => {
       const mockResponse = {
         success: true,
-        imageUrl: '/uploads/conventions/10/editions/1/lost-found/abc123-objet.jpg',
-        filename: 'abc123-objet.jpg',
-        editionId: 1,
-        conventionId: 10,
+        data: {
+          imageUrl: '/uploads/conventions/10/editions/1/lost-found/abc123-objet.jpg',
+          filename: 'abc123-objet.jpg',
+          editionId: 1,
+          conventionId: 10,
+        },
       }
 
       expect(mockResponse).toHaveProperty('success')
-      expect(mockResponse).toHaveProperty('imageUrl')
-      expect(mockResponse).toHaveProperty('filename')
-      expect(mockResponse).toHaveProperty('editionId')
-      expect(mockResponse).toHaveProperty('conventionId')
+      expect(mockResponse).toHaveProperty('data.imageUrl')
+      expect(mockResponse).toHaveProperty('data.filename')
+      expect(mockResponse).toHaveProperty('data.editionId')
+      expect(mockResponse).toHaveProperty('data.conventionId')
       expect(mockResponse.success).toBe(true)
     })
 
@@ -154,7 +156,7 @@ describe('/api/files/lost-found POST', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.editionId).toBe(1)
+      expect(result.data.editionId).toBe(1)
     })
 
     it('devrait accepter editionId dans metadata.editionId', async () => {
@@ -169,7 +171,7 @@ describe('/api/files/lost-found POST', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.editionId).toBe(1)
+      expect(result.data.editionId).toBe(1)
     })
   })
 
@@ -263,9 +265,9 @@ describe('/api/files/lost-found POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.filename).toBe('abc123-objet.jpg')
-      expect(result.editionId).toBe(1)
-      expect(result.conventionId).toBe(10)
+      expect(result.data.filename).toBe('abc123-objet.jpg')
+      expect(result.data.editionId).toBe(1)
+      expect(result.data.conventionId).toBe(10)
     })
 
     it('devrait construire le chemin URL correct', async () => {
@@ -280,7 +282,9 @@ describe('/api/files/lost-found POST', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.imageUrl).toBe('/uploads/conventions/10/editions/1/lost-found/abc123-objet.jpg')
+      expect(result.data.imageUrl).toBe(
+        '/uploads/conventions/10/editions/1/lost-found/abc123-objet.jpg'
+      )
     })
 
     it('devrait appeler storeFileLocally avec les bons paramètres', async () => {

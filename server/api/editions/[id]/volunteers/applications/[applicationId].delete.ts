@@ -63,10 +63,7 @@ export default wrapApiHandler(
       where: { id: applicationId },
     })
 
-    return {
-      success: true,
-      message: 'Candidature supprimée avec succès',
-    }
+    return createSuccessResponse({}, 'Candidature supprimée avec succès')
   },
   { operationName: 'DeleteManualVolunteerApplication' }
 )

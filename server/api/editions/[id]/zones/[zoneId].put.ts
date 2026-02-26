@@ -49,10 +49,7 @@ export default wrapApiHandler(
       select: editionZoneSelect,
     })
 
-    return {
-      success: true,
-      zone,
-    }
+    return createSuccessResponse({ zone })
   },
   { operationName: 'UpdateEditionZone' }
 )

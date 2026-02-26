@@ -35,18 +35,12 @@ export default wrapApiHandler(
       )
 
       if (result.found) {
-        return {
-          success: true,
-          found: true,
-          ticket: result.ticket,
-          message: `Billet trouvé pour ${result.ticket?.user.firstName} ${result.ticket?.user.lastName}`,
-        }
+        return createSuccessResponse(
+          { found: true, ticket: result.ticket },
+          `Billet trouvé pour ${result.ticket?.user.firstName} ${result.ticket?.user.lastName}`
+        )
       } else {
-        return {
-          success: true,
-          found: false,
-          message: 'Aucun billet trouvé avec ce QR code',
-        }
+        return createSuccessResponse({ found: false }, 'Aucun billet trouvé avec ce QR code')
       }
     } catch (error: unknown) {
       console.error('HelloAsso verify QR code error:', error)

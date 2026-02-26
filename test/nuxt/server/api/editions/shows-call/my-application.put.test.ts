@@ -127,10 +127,10 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.application).toBeDefined()
-      expect(result.application.artistName).toBe('Artiste Modifié')
-      expect(result.application.showTitle).toBe('Mon Nouveau Spectacle')
-      expect(result.application.showDuration).toBe(45)
+      expect(result.data.application).toBeDefined()
+      expect(result.data.application.artistName).toBe('Artiste Modifié')
+      expect(result.data.application.showTitle).toBe('Mon Nouveau Spectacle')
+      expect(result.data.application.showDuration).toBe(45)
 
       // Vérifier que le profil utilisateur a été mis à jour
       expect(prismaMock.user.update).toHaveBeenCalledWith({
@@ -183,8 +183,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.application.additionalPerformersCount).toBe(2)
-      expect(result.application.additionalPerformers).toHaveLength(2)
+      expect(result.data.application.additionalPerformersCount).toBe(2)
+      expect(result.data.application.additionalPerformers).toHaveLength(2)
     })
   })
 

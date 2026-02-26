@@ -165,10 +165,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      show: updatedShow,
-    }
+    return createSuccessResponse({ show: updatedShow })
   },
   { operationName: 'UpdateShow' }
 )

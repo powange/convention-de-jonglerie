@@ -63,7 +63,9 @@ describe('API Zones - Liste (GET)', () => {
 
     expect(result).toEqual({
       success: true,
-      zones: mockZones,
+      data: {
+        zones: mockZones,
+      },
     })
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
@@ -86,7 +88,9 @@ describe('API Zones - Liste (GET)', () => {
 
     expect(result).toEqual({
       success: true,
-      zones: [],
+      data: {
+        zones: [],
+      },
     })
   })
 

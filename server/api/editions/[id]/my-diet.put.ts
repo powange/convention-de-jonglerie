@@ -58,10 +58,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      ...updated,
-    }
+    return createSuccessResponse(updated)
   },
   { operationName: 'UpdateMyDiet' }
 )

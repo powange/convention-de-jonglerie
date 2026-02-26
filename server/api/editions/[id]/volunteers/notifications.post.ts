@@ -171,10 +171,9 @@ export default wrapApiHandler(async (event) => {
     })
   )
 
-  return {
-    success: true,
+  return createSuccessResponse({
     recipientCount: volunteers.length,
     notificationGroupId: notificationGroup.id,
     confirmationUrl,
-  }
+  })
 }, 'CreateVolunteerNotification')

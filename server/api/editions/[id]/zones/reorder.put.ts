@@ -59,10 +59,7 @@ export default wrapApiHandler(
       orderBy: { order: 'asc' },
     })
 
-    return {
-      success: true,
-      zones,
-    }
+    return createSuccessResponse({ zones })
   },
   { operationName: 'ReorderEditionZones' }
 )

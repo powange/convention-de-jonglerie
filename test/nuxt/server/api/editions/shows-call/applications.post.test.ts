@@ -159,9 +159,9 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.application).toBeDefined()
-      expect(result.application.artistName).toBe('Artiste Test')
-      expect(result.application.showTitle).toBe('Mon Spectacle')
+      expect(result.data.application).toBeDefined()
+      expect(result.data.application.artistName).toBe('Artiste Test')
+      expect(result.data.application.showTitle).toBe('Mon Spectacle')
 
       expect(prismaMock.showApplication.create).toHaveBeenCalledWith({
         data: expect.objectContaining({

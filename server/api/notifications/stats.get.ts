@@ -7,10 +7,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const stats = await NotificationService.getStats(user.id)
 
-    return {
-      success: true,
-      stats,
-    }
+    return createSuccessResponse({ stats })
   },
   { operationName: 'GetNotificationStats' }
 )

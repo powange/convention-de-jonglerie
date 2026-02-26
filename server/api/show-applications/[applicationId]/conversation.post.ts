@@ -20,7 +20,7 @@ export default wrapApiHandler(
 
     const conversationId = await ensureShowApplicationConversation(application.id, user.id)
 
-    return { success: true, conversationId }
+    return createSuccessResponse({ conversationId })
   },
   { operationName: 'CreateShowApplicationConversation' }
 )

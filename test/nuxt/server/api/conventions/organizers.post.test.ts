@@ -87,7 +87,7 @@ describe('/api/conventions/[id]/organizers POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.organizer).toMatchObject({
+    expect(result.data.organizer).toMatchObject({
       id: mockOrganizer.id,
       rights: { editConvention: true },
       perEdition: [],
@@ -132,7 +132,7 @@ describe('/api/conventions/[id]/organizers POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.organizer.rights.manageOrganizers).toBe(true)
+    expect(result.data.organizer.rights.manageOrganizers).toBe(true)
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 2 },
       select: { id: true, pseudo: true },

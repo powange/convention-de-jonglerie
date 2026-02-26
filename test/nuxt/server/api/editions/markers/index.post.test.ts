@@ -69,7 +69,9 @@ describe('API Markers - Création (POST)', () => {
 
     expect(result).toEqual({
       success: true,
-      marker: mockMarker,
+      data: {
+        marker: mockMarker,
+      },
     })
 
     expect(prismaMock.editionMarker.create).toHaveBeenCalledWith({

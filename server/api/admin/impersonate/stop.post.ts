@@ -46,24 +46,25 @@ export default wrapApiHandler(
 
     console.log("[IMPERSONATE] Session restaurée pour l'utilisateur:", originalUser.pseudo)
 
-    return {
-      success: true,
-      message: "Session d'impersonation terminée",
-      user: {
-        id: originalUser.id,
-        email: originalUser.email,
-        pseudo: originalUser.pseudo,
-        nom: originalUser.nom,
-        prenom: originalUser.prenom,
-        phone: originalUser.phone,
-        profilePicture: originalUser.profilePicture,
-        isGlobalAdmin: originalUser.isGlobalAdmin,
-        createdAt: originalUser.createdAt,
-        updatedAt: originalUser.updatedAt,
-        isEmailVerified: originalUser.isEmailVerified,
+    return createSuccessResponse(
+      {
+        user: {
+          id: originalUser.id,
+          email: originalUser.email,
+          pseudo: originalUser.pseudo,
+          nom: originalUser.nom,
+          prenom: originalUser.prenom,
+          phone: originalUser.phone,
+          profilePicture: originalUser.profilePicture,
+          isGlobalAdmin: originalUser.isGlobalAdmin,
+          createdAt: originalUser.createdAt,
+          updatedAt: originalUser.updatedAt,
+          isEmailVerified: originalUser.isEmailVerified,
+        },
+        impersonationStopped: true,
       },
-      impersonationStopped: true,
-    }
+      "Session d'impersonation terminée"
+    )
   },
   { operationName: 'StopImpersonation' }
 )

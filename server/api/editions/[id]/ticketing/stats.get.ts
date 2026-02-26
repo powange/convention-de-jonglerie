@@ -165,8 +165,7 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         stats: {
           validatedToday:
             ticketsValidatedToday +
@@ -191,7 +190,7 @@ export default wrapApiHandler(
           totalArtists: totalArtists,
           totalOrganizers: totalOrganizers,
         },
-      }
+      })
     } catch (error: unknown) {
       console.error('Database stats error:', error)
       throw createError({

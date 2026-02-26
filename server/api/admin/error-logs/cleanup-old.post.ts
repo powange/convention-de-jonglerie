@@ -32,15 +32,16 @@ export default wrapApiHandler(
     const totalToDelete = resolvedCount + unresolvedCount
 
     if (totalToDelete === 0) {
-      return {
-        success: true,
-        message: "Aucun log de plus d'un mois à supprimer",
-        deleted: {
-          resolved: 0,
-          unresolved: 0,
-          total: 0,
+      return createSuccessResponse(
+        {
+          deleted: {
+            resolved: 0,
+            unresolved: 0,
+            total: 0,
+          },
         },
-      }
+        "Aucun log de plus d'un mois à supprimer"
+      )
     }
 
     // Supprimer les logs d'erreur résolus depuis plus d'un mois
@@ -69,19 +70,20 @@ export default wrapApiHandler(
       prisma.apiErrorLog.count({ where: { resolved: false } }),
     ])
 
-    return {
-      success: true,
-      message: `${deletedResolved.count + deletedUnresolved.count} logs d'erreur supprimés`,
-      deleted: {
-        resolved: deletedResolved.count,
-        unresolved: deletedUnresolved.count,
-        total: deletedResolved.count + deletedUnresolved.count,
+    return createSuccessResponse(
+      {
+        deleted: {
+          resolved: deletedResolved.count,
+          unresolved: deletedUnresolved.count,
+          total: deletedResolved.count + deletedUnresolved.count,
+        },
+        remaining: {
+          total: remainingTotal,
+          unresolved: remainingUnresolved,
+        },
       },
-      remaining: {
-        total: remainingTotal,
-        unresolved: remainingUnresolved,
-      },
-    }
+      `${deletedResolved.count + deletedUnresolved.count} logs d'erreur supprimés`
+    )
   },
   { operationName: 'CleanupOldErrorLogs' }
 )

@@ -70,13 +70,12 @@ export default wrapApiHandler(
       console.log('URL retournée:', imageUrl)
       console.log('Convention ID:', targetId)
 
-      return {
-        success: true,
+      return createSuccessResponse({
         imageUrl,
         filename, // Le nom de fichier sera stocké en DB lors du PUT
         temporary: true,
         conventionId: targetId,
-      }
+      })
     } else {
       // Nouvelle convention - stocker temporairement
       const filename = await storeFileLocally(
@@ -87,12 +86,11 @@ export default wrapApiHandler(
 
       const imageUrl = `/uploads/temp/${filename}`
 
-      return {
-        success: true,
+      return createSuccessResponse({
         imageUrl,
         filename,
         temporary: true,
-      }
+      })
     }
   },
   { operationName: 'UploadConventionFile' }

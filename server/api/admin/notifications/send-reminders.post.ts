@@ -103,12 +103,13 @@ export default wrapApiHandler(
       }
     }
 
-    return {
-      success: true,
-      message: `${remindersSent} rappel${remindersSent > 1 ? 's' : ''} envoyé${remindersSent > 1 ? 's' : ''}`,
-      editionsProcessed: upcomingEditions.length,
-      remindersSent,
-    }
+    return createSuccessResponse(
+      {
+        editionsProcessed: upcomingEditions.length,
+        remindersSent,
+      },
+      `${remindersSent} rappel${remindersSent > 1 ? 's' : ''} envoyé${remindersSent > 1 ? 's' : ''}`
+    )
   },
   { operationName: 'SendEditionReminders' }
 )

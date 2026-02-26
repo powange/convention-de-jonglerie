@@ -248,14 +248,15 @@ export default wrapApiHandler(
       `[ADMIN IMPORT] Convention "${convention.name}" (ID: ${convention.id}) et édition "${edition.name}" (ID: ${edition.id}) importées avec succès`
     )
 
-    return {
-      success: true,
-      conventionId: convention.id,
-      editionId: edition.id,
-      message: 'Import réussi',
-      imageDownloaded: imageDownloadResult?.success ?? false,
-      imageError: imageDownloadResult?.error,
-    }
+    return createSuccessResponse(
+      {
+        conventionId: convention.id,
+        editionId: edition.id,
+        imageDownloaded: imageDownloadResult?.success ?? false,
+        imageError: imageDownloadResult?.error,
+      },
+      'Import réussi'
+    )
   },
   { operationName: 'ImportEdition' }
 )

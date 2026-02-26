@@ -90,8 +90,7 @@ export default wrapApiHandler(
         (organizer) => organizer.editionOrganizers.length === 0
       )
 
-      return {
-        success: true,
+      return createSuccessResponse({
         organizers: availableOrganizers.map((organizer) => ({
           id: organizer.id,
           title: organizer.title,
@@ -106,7 +105,7 @@ export default wrapApiHandler(
           },
         })),
         total: availableOrganizers.length,
-      }
+      })
     } catch (error: unknown) {
       console.error('Database error fetching available organizers:', error)
       throw createError({

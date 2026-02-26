@@ -80,10 +80,7 @@ export default wrapApiHandler(
     // Transformer le message pour supprimer participantId
     const { participantId: _participantId, ...messageWithoutParticipantId } = updatedMessage
 
-    return {
-      success: true,
-      data: messageWithoutParticipantId,
-    }
+    return createSuccessResponse(messageWithoutParticipantId)
   },
   { operationName: 'UpdateMessage' }
 )

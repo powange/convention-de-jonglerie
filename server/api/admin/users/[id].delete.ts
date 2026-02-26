@@ -129,15 +129,16 @@ export default wrapApiHandler(
       `[ADMIN] Utilisateur supprimé par ${adminUser.pseudo} (${adminUser.email}): ${deletedUser.pseudo} (${deletedUser.email}) - Raison: ${deletionReason.title}`
     )
 
-    return {
-      success: true,
-      message: `Compte ${deletedUser.pseudo} supprimé avec succès`,
-      reason: deletionReason.title,
-      deletedUser: {
-        id: deletedUser.id,
-        pseudo: deletedUser.pseudo,
+    return createSuccessResponse(
+      {
+        reason: deletionReason.title,
+        deletedUser: {
+          id: deletedUser.id,
+          pseudo: deletedUser.pseudo,
+        },
       },
-    }
+      `Compte ${deletedUser.pseudo} supprimé avec succès`
+    )
   },
   { operationName: 'DeleteUser' }
 )

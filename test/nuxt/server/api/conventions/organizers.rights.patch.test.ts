@@ -64,7 +64,7 @@ describe('/api/conventions/[id]/organizers/[organizerId]/rights PATCH', () => {
     const args = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(args.data.actorId).toBe(42)
     expect(args.data.targetUserId).toBe(existingOrganizer.userId)
-    expect(res.organizer.rights.editConvention).toBe(true)
+    expect(res.data.organizer.rights.editConvention).toBe(true)
   })
 
   it('met à jour perEdition et log PER_EDITIONS_UPDATED', async () => {
@@ -92,7 +92,7 @@ describe('/api/conventions/[id]/organizers/[organizerId]/rights PATCH', () => {
     const args = prismaMock.organizerPermissionHistory.create.mock.calls[0][0]
     expect(args.data.actorId).toBe(42)
     expect(args.data.targetUserId).toBe(existingOrganizer.userId)
-    expect(res.organizer.perEdition[0].editionId).toBe(101)
+    expect(res.data.organizer.perEdition[0].editionId).toBe(101)
   })
 
   it('refuse sans permission', async () => {
@@ -149,7 +149,7 @@ describe('/api/conventions/[id]/organizers/[organizerId]/rights PATCH', () => {
     expect(historyArgs.data.after.rights.canDeleteConvention).toBe(true)
     expect(historyArgs.data.actorId).toBe(42)
     expect(historyArgs.data.targetUserId).toBe(existingOrganizer.userId)
-    expect(res.organizer.rights.deleteConvention).toBe(true)
-    expect(res.organizer.perEdition[0].editionId).toBe(150)
+    expect(res.data.organizer.rights.deleteConvention).toBe(true)
+    expect(res.data.organizer.perEdition[0].editionId).toBe(150)
   })
 })

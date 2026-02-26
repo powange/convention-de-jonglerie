@@ -111,13 +111,12 @@ export default wrapApiHandler(
 
     console.log(`Archive de sauvegarde créée: ${archiveFilename}`)
 
-    return {
-      success: true,
+    return createSuccessResponse({
       filename: archiveFilename,
       path: archivePath,
       size: archiveStats.size,
       includesUploads: hasUploads,
-    }
+    })
   },
   { operationName: 'CreateBackup' }
 )

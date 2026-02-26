@@ -110,7 +110,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] DELETE', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.deletedApplicationsCount).toBe(5)
+      expect(result.data.deletedApplicationsCount).toBe(5)
     })
 
     it('devrait supprimer un appel sans candidatures', async () => {
@@ -125,7 +125,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] DELETE', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.deletedApplicationsCount).toBe(0)
+      expect(result.data.deletedApplicationsCount).toBe(0)
     })
 
     it('devrait supprimer un appel avec beaucoup de candidatures', async () => {
@@ -140,7 +140,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] DELETE', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.deletedApplicationsCount).toBe(100)
+      expect(result.data.deletedApplicationsCount).toBe(100)
     })
   })
 

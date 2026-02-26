@@ -77,7 +77,9 @@ describe('API Zones - Création (POST)', () => {
 
     expect(result).toEqual({
       success: true,
-      zone: mockZone,
+      data: {
+        zone: mockZone,
+      },
     })
 
     expect(prismaMock.editionZone.create).toHaveBeenCalledWith({

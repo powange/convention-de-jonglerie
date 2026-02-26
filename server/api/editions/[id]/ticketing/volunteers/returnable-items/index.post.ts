@@ -96,8 +96,7 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         item: {
           id: item.id,
           returnableItemId: item.returnableItemId,
@@ -107,7 +106,7 @@ export default wrapApiHandler(
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         },
-      }
+      })
     } catch (error: unknown) {
       console.error("Erreur lors de l'ajout de l'article pour bénévoles:", error)
       if (isHttpError(error)) throw error

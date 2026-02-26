@@ -121,7 +121,7 @@ describe('/api/editions/[id]/shows POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.show).toBeDefined()
+      expect(result.data.show).toBeDefined()
       expect(prismaMock.show.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({

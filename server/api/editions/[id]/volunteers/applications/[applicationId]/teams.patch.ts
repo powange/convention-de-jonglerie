@@ -53,21 +53,22 @@ export default wrapApiHandler(
       // Assigner le bénévole aux équipes
       const assignments = await assignVolunteerToTeams(applicationId, teamIds)
 
-      return {
-        success: true,
-        application: {
-          id: applicationId,
-          assignedTeams: teamIds,
-          teamAssignments: assignments.map((a) => ({
-            teamId: a.teamId,
-            isLeader: a.isLeader,
-            assignedAt: a.assignedAt,
-            team: a.team,
-          })),
+      return createSuccessResponse(
+        {
+          application: {
+            id: applicationId,
+            assignedTeams: teamIds,
+            teamAssignments: assignments.map((a) => ({
+              teamId: a.teamId,
+              isLeader: a.isLeader,
+              assignedAt: a.assignedAt,
+              team: a.team,
+            })),
+          },
+          teams: parsed.teams,
         },
-        teams: parsed.teams,
-        message: `Assigné à ${parsed.teams.length} équipe(s)`,
-      }
+        `Assigné à ${parsed.teams.length} équipe(s)`
+      )
     } catch (error: unknown) {
       // Si c'est une erreur de notre util, la propager avec le bon format
       if (error.message?.includes('introuvable')) {

@@ -36,11 +36,7 @@ export default wrapApiHandler(
         const applicationId = parseInt(parts[0])
 
         if (isNaN(applicationId)) {
-          return {
-            success: true,
-            found: false,
-            message: 'QR code bénévole invalide',
-          }
+          return createSuccessResponse({ found: false }, 'QR code bénévole invalide')
         }
 
         // Si un token est présent, on le vérifie
@@ -203,60 +199,60 @@ export default wrapApiHandler(
           })
           const allDeduplicatedItems = Array.from(uniqueItems.values())
 
-          return {
-            success: true,
-            found: true,
-            type: 'volunteer',
-            participant: {
+          return createSuccessResponse(
+            {
               found: true,
-              volunteer: {
-                id: application.id,
-                user: {
-                  firstName: application.user.prenom,
-                  lastName: application.user.nom,
-                  email: application.user.email,
-                  phone: application.userSnapshotPhone || application.user.phone,
+              type: 'volunteer',
+              participant: {
+                found: true,
+                volunteer: {
+                  id: application.id,
+                  user: {
+                    firstName: application.user.prenom,
+                    lastName: application.user.nom,
+                    email: application.user.email,
+                    phone: application.userSnapshotPhone || application.user.phone,
+                  },
+                  teams: application.teamAssignments.map((assignment) => ({
+                    id: assignment.team.id,
+                    name: assignment.team.name,
+                    isLeader: assignment.isLeader,
+                  })),
+                  timeSlots: volunteerAssignments.map((assignment) => ({
+                    id: assignment.timeSlot.id,
+                    title: assignment.timeSlot.title,
+                    team: assignment.timeSlot.team?.name,
+                    startDateTime: assignment.timeSlot.startDateTime,
+                    endDateTime: assignment.timeSlot.endDateTime,
+                  })),
+                  returnableItems: allDeduplicatedItems.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                  })),
+                  meals: volunteerMeals.map((selection) => ({
+                    id: selection.meal.id,
+                    date: selection.meal.date,
+                    mealType: selection.meal.mealType,
+                    phases: selection.meal.phases,
+                  })),
+                  entryValidated: application.entryValidated,
+                  entryValidatedAt: application.entryValidatedAt,
+                  entryValidatedBy: validatedByUser
+                    ? {
+                        firstName: validatedByUser.prenom,
+                        lastName: validatedByUser.nom,
+                      }
+                    : null,
                 },
-                teams: application.teamAssignments.map((assignment) => ({
-                  id: assignment.team.id,
-                  name: assignment.team.name,
-                  isLeader: assignment.isLeader,
-                })),
-                timeSlots: volunteerAssignments.map((assignment) => ({
-                  id: assignment.timeSlot.id,
-                  title: assignment.timeSlot.title,
-                  team: assignment.timeSlot.team?.name,
-                  startDateTime: assignment.timeSlot.startDateTime,
-                  endDateTime: assignment.timeSlot.endDateTime,
-                })),
-                returnableItems: allDeduplicatedItems.map((item) => ({
-                  id: item.id,
-                  name: item.name,
-                })),
-                meals: volunteerMeals.map((selection) => ({
-                  id: selection.meal.id,
-                  date: selection.meal.date,
-                  mealType: selection.meal.mealType,
-                  phases: selection.meal.phases,
-                })),
-                entryValidated: application.entryValidated,
-                entryValidatedAt: application.entryValidatedAt,
-                entryValidatedBy: validatedByUser
-                  ? {
-                      firstName: validatedByUser.prenom,
-                      lastName: validatedByUser.nom,
-                    }
-                  : null,
               },
             },
-            message: `Bénévole trouvé : ${application.user.prenom} ${application.user.nom}`,
-          }
+            `Bénévole trouvé : ${application.user.prenom} ${application.user.nom}`
+          )
         } else {
-          return {
-            success: true,
-            found: false,
-            message: 'Aucun bénévole accepté trouvé avec ce QR code',
-          }
+          return createSuccessResponse(
+            { found: false },
+            'Aucun bénévole accepté trouvé avec ce QR code'
+          )
         }
       } else if (body.qrCode.startsWith('artist-')) {
         // Recherche d'un artiste
@@ -265,11 +261,7 @@ export default wrapApiHandler(
         const artistId = parseInt(parts[0])
 
         if (isNaN(artistId)) {
-          return {
-            success: true,
-            found: false,
-            message: 'QR code artiste invalide',
-          }
+          return createSuccessResponse({ found: false }, 'QR code artiste invalide')
         }
 
         // Si un token est présent, on le vérifie
@@ -369,54 +361,51 @@ export default wrapApiHandler(
           })
           const allDeduplicatedItems = Array.from(uniqueItems.values())
 
-          return {
-            success: true,
-            found: true,
-            type: 'artist',
-            participant: {
+          return createSuccessResponse(
+            {
               found: true,
-              artist: {
-                id: artist.id,
-                user: {
-                  firstName: artist.user.prenom,
-                  lastName: artist.user.nom,
-                  email: artist.user.email,
-                  phone: artist.user.phone,
+              type: 'artist',
+              participant: {
+                found: true,
+                artist: {
+                  id: artist.id,
+                  user: {
+                    firstName: artist.user.prenom,
+                    lastName: artist.user.nom,
+                    email: artist.user.email,
+                    phone: artist.user.phone,
+                  },
+                  shows: artist.shows.map((showArtist) => ({
+                    id: showArtist.show.id,
+                    title: showArtist.show.title,
+                    startDateTime: showArtist.show.startDateTime,
+                    location: showArtist.show.location,
+                  })),
+                  returnableItems: allDeduplicatedItems.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                  })),
+                  meals: artistMeals.map((selection) => ({
+                    id: selection.meal.id,
+                    date: selection.meal.date,
+                    mealType: selection.meal.mealType,
+                    phases: selection.meal.phases,
+                  })),
+                  entryValidated: artist.entryValidated,
+                  entryValidatedAt: artist.entryValidatedAt,
+                  entryValidatedBy: validatedByUser
+                    ? {
+                        firstName: validatedByUser.prenom,
+                        lastName: validatedByUser.nom,
+                      }
+                    : null,
                 },
-                shows: artist.shows.map((showArtist) => ({
-                  id: showArtist.show.id,
-                  title: showArtist.show.title,
-                  startDateTime: showArtist.show.startDateTime,
-                  location: showArtist.show.location,
-                })),
-                returnableItems: allDeduplicatedItems.map((item) => ({
-                  id: item.id,
-                  name: item.name,
-                })),
-                meals: artistMeals.map((selection) => ({
-                  id: selection.meal.id,
-                  date: selection.meal.date,
-                  mealType: selection.meal.mealType,
-                  phases: selection.meal.phases,
-                })),
-                entryValidated: artist.entryValidated,
-                entryValidatedAt: artist.entryValidatedAt,
-                entryValidatedBy: validatedByUser
-                  ? {
-                      firstName: validatedByUser.prenom,
-                      lastName: validatedByUser.nom,
-                    }
-                  : null,
               },
             },
-            message: `Artiste trouvé : ${artist.user.prenom} ${artist.user.nom}`,
-          }
+            `Artiste trouvé : ${artist.user.prenom} ${artist.user.nom}`
+          )
         } else {
-          return {
-            success: true,
-            found: false,
-            message: 'Aucun artiste trouvé avec ce QR code',
-          }
+          return createSuccessResponse({ found: false }, 'Aucun artiste trouvé avec ce QR code')
         }
       } else if (body.qrCode.startsWith('organizer-')) {
         // Recherche d'un organisateur
@@ -426,11 +415,7 @@ export default wrapApiHandler(
         const token = parts[1] || null
 
         if (isNaN(editionOrganizerId)) {
-          return {
-            success: true,
-            found: false,
-            message: 'QR code organisateur invalide',
-          }
+          return createSuccessResponse({ found: false }, 'QR code organisateur invalide')
         }
 
         const editionOrganizer = await prisma.editionOrganizer.findFirst({
@@ -509,47 +494,47 @@ export default wrapApiHandler(
             },
           })
 
-          return {
-            success: true,
-            found: true,
-            type: 'organizer',
-            participant: {
+          return createSuccessResponse(
+            {
               found: true,
-              organizer: {
-                id: editionOrganizer.id,
-                user: {
-                  firstName: editionOrganizer.organizer.user.prenom,
-                  lastName: editionOrganizer.organizer.user.nom,
-                  email: editionOrganizer.organizer.user.email,
-                  phone: editionOrganizer.organizer.user.phone,
+              type: 'organizer',
+              participant: {
+                found: true,
+                organizer: {
+                  id: editionOrganizer.id,
+                  user: {
+                    firstName: editionOrganizer.organizer.user.prenom,
+                    lastName: editionOrganizer.organizer.user.nom,
+                    email: editionOrganizer.organizer.user.email,
+                    phone: editionOrganizer.organizer.user.phone,
+                  },
+                  title: editionOrganizer.organizer.title,
+                  returnableItems: organizerSpecificItems.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                  })),
+                  globalReturnableItems: globalItems.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                  })),
+                  entryValidated: editionOrganizer.entryValidated,
+                  entryValidatedAt: editionOrganizer.entryValidatedAt,
+                  entryValidatedBy: validatedByUser
+                    ? {
+                        firstName: validatedByUser.prenom,
+                        lastName: validatedByUser.nom,
+                      }
+                    : null,
                 },
-                title: editionOrganizer.organizer.title,
-                returnableItems: organizerSpecificItems.map((item) => ({
-                  id: item.id,
-                  name: item.name,
-                })),
-                globalReturnableItems: globalItems.map((item) => ({
-                  id: item.id,
-                  name: item.name,
-                })),
-                entryValidated: editionOrganizer.entryValidated,
-                entryValidatedAt: editionOrganizer.entryValidatedAt,
-                entryValidatedBy: validatedByUser
-                  ? {
-                      firstName: validatedByUser.prenom,
-                      lastName: validatedByUser.nom,
-                    }
-                  : null,
               },
             },
-            message: `Organisateur trouvé : ${editionOrganizer.organizer.user.prenom} ${editionOrganizer.organizer.user.nom}`,
-          }
+            `Organisateur trouvé : ${editionOrganizer.organizer.user.prenom} ${editionOrganizer.organizer.user.nom}`
+          )
         } else {
-          return {
-            success: true,
-            found: false,
-            message: 'Aucun organisateur trouvé avec ce QR code',
-          }
+          return createSuccessResponse(
+            { found: false },
+            'Aucun organisateur trouvé avec ce QR code'
+          )
         }
       } else {
         // Recherche d'un billet HelloAsso
@@ -591,67 +576,64 @@ export default wrapApiHandler(
         })
 
         if (orderItem) {
-          return {
-            success: true,
-            found: true,
-            type: 'ticket',
-            isRefunded: orderItem.order.status === 'Refunded', // Nouveau flag pour indiquer si la commande est annulée
-            participant: {
+          return createSuccessResponse(
+            {
               found: true,
-              ticket: {
-                id: orderItem.id, // ID de OrderItem
-                helloAssoItemId: orderItem.helloAssoItemId,
-                name: orderItem.name,
-                amount: orderItem.amount,
-                state: orderItem.state,
-                qrCode: orderItem.qrCode,
-                user: {
-                  firstName: orderItem.firstName,
-                  lastName: orderItem.lastName,
-                  email: orderItem.email,
-                },
-                order: {
-                  id: orderItem.order.helloAssoOrderId,
-                  status: orderItem.order.status,
-                  payer: {
-                    firstName: orderItem.order.payerFirstName,
-                    lastName: orderItem.order.payerLastName,
-                    email: orderItem.order.payerEmail,
+              type: 'ticket',
+              isRefunded: orderItem.order.status === 'Refunded', // Nouveau flag pour indiquer si la commande est annulée
+              participant: {
+                found: true,
+                ticket: {
+                  id: orderItem.id, // ID de OrderItem
+                  helloAssoItemId: orderItem.helloAssoItemId,
+                  name: orderItem.name,
+                  amount: orderItem.amount,
+                  state: orderItem.state,
+                  qrCode: orderItem.qrCode,
+                  user: {
+                    firstName: orderItem.firstName,
+                    lastName: orderItem.lastName,
+                    email: orderItem.email,
                   },
-                  items: orderItem.order.items.map((item) => ({
-                    id: item.id, // ID de OrderItem (au lieu de helloAssoItemId qui peut être null)
-                    helloAssoItemId: item.helloAssoItemId,
-                    name: item.name,
-                    type: item.type,
-                    amount: item.amount,
-                    state: item.state,
-                    qrCode: item.qrCode,
-                    firstName: item.firstName,
-                    lastName: item.lastName,
-                    email: item.email,
-                    customFields: item.customFields as any,
-                    entryValidated: item.entryValidated,
-                    entryValidatedAt: item.entryValidatedAt,
-                    tier: item.tier
-                      ? {
-                          id: item.tier.id,
-                          name: item.tier.name,
-                          returnableItems: calculateReturnableItemsForTicket(item),
-                        }
-                      : null,
-                  })),
+                  order: {
+                    id: orderItem.order.helloAssoOrderId,
+                    status: orderItem.order.status,
+                    payer: {
+                      firstName: orderItem.order.payerFirstName,
+                      lastName: orderItem.order.payerLastName,
+                      email: orderItem.order.payerEmail,
+                    },
+                    items: orderItem.order.items.map((item) => ({
+                      id: item.id, // ID de OrderItem (au lieu de helloAssoItemId qui peut être null)
+                      helloAssoItemId: item.helloAssoItemId,
+                      name: item.name,
+                      type: item.type,
+                      amount: item.amount,
+                      state: item.state,
+                      qrCode: item.qrCode,
+                      firstName: item.firstName,
+                      lastName: item.lastName,
+                      email: item.email,
+                      customFields: item.customFields as any,
+                      entryValidated: item.entryValidated,
+                      entryValidatedAt: item.entryValidatedAt,
+                      tier: item.tier
+                        ? {
+                            id: item.tier.id,
+                            name: item.tier.name,
+                            returnableItems: calculateReturnableItemsForTicket(item),
+                          }
+                        : null,
+                    })),
+                  },
+                  customFields: orderItem.customFields as any,
                 },
-                customFields: orderItem.customFields as any,
               },
             },
-            message: `Billet trouvé pour ${orderItem.firstName} ${orderItem.lastName}`,
-          }
+            `Billet trouvé pour ${orderItem.firstName} ${orderItem.lastName}`
+          )
         } else {
-          return {
-            success: true,
-            found: false,
-            message: 'Aucun billet trouvé avec ce QR code',
-          }
+          return createSuccessResponse({ found: false }, 'Aucun billet trouvé avec ce QR code')
         }
       }
     } catch (error: unknown) {

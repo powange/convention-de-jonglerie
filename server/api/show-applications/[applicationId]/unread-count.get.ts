@@ -25,12 +25,12 @@ export default wrapApiHandler(
     })
 
     if (!conversation) {
-      return { success: true, unreadCount: 0, hasConversation: false }
+      return createSuccessResponse({ unreadCount: 0, hasConversation: false })
     }
 
     const participant = conversation.participants[0]
     if (!participant) {
-      return { success: true, unreadCount: 0, hasConversation: true }
+      return createSuccessResponse({ unreadCount: 0, hasConversation: true })
     }
 
     // Compter les messages après le dernier lu
@@ -55,7 +55,7 @@ export default wrapApiHandler(
       unreadCount = conversation._count.messages
     }
 
-    return { success: true, unreadCount, hasConversation: true }
+    return createSuccessResponse({ unreadCount, hasConversation: true })
   },
   { operationName: 'GetShowApplicationUnreadCount' }
 )

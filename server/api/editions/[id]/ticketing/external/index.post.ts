@@ -101,11 +101,7 @@ export default wrapApiHandler(
           },
         })
 
-        return {
-          success: true,
-          message: 'Configuration HelloAsso mise à jour',
-          config: updated,
-        }
+        return createSuccessResponse({ config: updated }, 'Configuration HelloAsso mise à jour')
       } else {
         // Créer une nouvelle configuration
         const created = await prisma.externalTicketing.create({
@@ -137,11 +133,7 @@ export default wrapApiHandler(
           },
         })
 
-        return {
-          success: true,
-          message: 'Configuration HelloAsso créée',
-          config: created,
-        }
+        return createSuccessResponse({ config: created }, 'Configuration HelloAsso créée')
       }
     }
 

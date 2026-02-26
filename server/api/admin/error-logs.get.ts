@@ -279,8 +279,7 @@ export default wrapApiHandler(
 
     if (cursor) {
       // Pagination par curseur - structure différente
-      return {
-        success: true,
+      return createSuccessResponse({
         logs: errorLogs,
         pagination: {
           cursor: nextCursor,
@@ -289,7 +288,7 @@ export default wrapApiHandler(
           total, // Le total peut être approximatif avec le curseur
         },
         stats: statsResponse,
-      }
+      })
     } else {
       // Pagination classique - utiliser createPaginatedResponse
       return {

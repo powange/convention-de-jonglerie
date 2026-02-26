@@ -222,10 +222,7 @@ export default wrapApiHandler(
         }
       })
 
-      return {
-        success: true,
-        validations: validationsWithValidators,
-      }
+      return createSuccessResponse({ validations: validationsWithValidators })
     } catch (error: unknown) {
       console.error('Database recent validations error:', error)
       throw createError({

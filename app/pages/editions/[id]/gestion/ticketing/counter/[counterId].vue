@@ -441,7 +441,7 @@ const shareUrl = async () => {
 
 const { execute: handleRegenerateToken, loading: isRegenerating } = useApiAction<
   undefined,
-  { success: boolean; token?: string }
+  { token: string; counter: unknown }
 >(`/api/editions/${editionId}/ticketing/counters/${token}/regenerate-token`, {
   method: 'PATCH',
   silentSuccess: true,
@@ -449,7 +449,7 @@ const { execute: handleRegenerateToken, loading: isRegenerating } = useApiAction
     default: t('ticketing.counters.regenerate_token_error'),
   },
   onSuccess: async (response) => {
-    if (response.success && response.token) {
+    if (response.token) {
       // Déconnecter la connexion SSE actuelle avant de changer d'URL
       disconnect()
 

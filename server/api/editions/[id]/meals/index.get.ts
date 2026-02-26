@@ -21,10 +21,7 @@ export default wrapApiHandler(
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    return {
-      success: true,
-      meals,
-    }
+    return createSuccessResponse({ meals })
   },
   { operationName: 'GetEditionMeals' }
 )

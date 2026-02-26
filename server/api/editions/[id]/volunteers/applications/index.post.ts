@@ -234,10 +234,7 @@ export default wrapApiHandler(
       console.error("Erreur lors de l'envoi de la notification:", notificationError)
     }
 
-    return {
-      success: true,
-      application,
-    }
+    return createSuccessResponse({ application })
   },
   { operationName: 'CreateVolunteerApplication' }
 )

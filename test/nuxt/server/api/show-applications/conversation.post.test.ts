@@ -137,7 +137,9 @@ describe('/api/show-applications/[applicationId]/conversation POST', () => {
 
       expect(result).toEqual({
         success: true,
-        conversationId: 'new-conv-uuid-123',
+        data: {
+          conversationId: 'new-conv-uuid-123',
+        },
       })
 
       expect(mockEnsureConversation).toHaveBeenCalledWith(1, mockArtist.id)
@@ -157,7 +159,9 @@ describe('/api/show-applications/[applicationId]/conversation POST', () => {
 
       expect(result).toEqual({
         success: true,
-        conversationId: 'existing-conv-uuid-456',
+        data: {
+          conversationId: 'existing-conv-uuid-456',
+        },
       })
     })
   })

@@ -55,12 +55,7 @@ export default wrapApiHandler(
       actionText: parsed.actionText,
     })
 
-    return {
-      success: true,
-      message: 'Notification créée avec succès',
-      notification,
-      targetUser,
-    }
+    return createSuccessResponse({ notification, targetUser }, 'Notification créée avec succès')
   },
   { operationName: 'CreateAdminNotification' }
 )

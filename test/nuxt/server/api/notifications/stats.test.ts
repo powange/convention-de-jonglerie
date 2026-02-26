@@ -46,7 +46,7 @@ describe('/api/notifications/stats GET', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.success).toBe(true)
-    expect(result.stats).toEqual(mockStats)
+    expect(result.data.stats).toEqual(mockStats)
     expect(mockNotificationService.getStats).toHaveBeenCalledWith(1)
   })
 

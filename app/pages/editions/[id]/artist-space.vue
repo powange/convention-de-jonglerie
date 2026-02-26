@@ -732,7 +732,6 @@ const accommodationFormDirty = computed(() => {
 const { execute: saveAccommodation, loading: savingAccommodation } = useApiAction<
   unknown,
   {
-    success: boolean
     accommodationAutonomous: boolean
     accommodationType: string | null
     accommodationTypeOther: string | null
@@ -819,7 +818,6 @@ const allergySeverityOptions = computed(() =>
 const { execute: saveDiet, loading: savingDiet } = useApiAction<
   unknown,
   {
-    success: boolean
     dietaryPreference: string
     allergies: string | null
     allergySeverity: string | null
@@ -867,7 +865,7 @@ const toggleAfterShow = async (meal: MealSelection, newValue: boolean) => {
   savingMealId.value = meal.id
 
   try {
-    const response = await $fetch<{ success: boolean; mealSelections: MealSelection[] }>(
+    const response = await $fetch<{ success: boolean; data: { mealSelections: MealSelection[] } }>(
       `/api/editions/${editionId}/my-meals`,
       {
         method: 'PUT',
@@ -877,12 +875,12 @@ const toggleAfterShow = async (meal: MealSelection, newValue: boolean) => {
       }
     )
 
-    if (response.success && artistResponse.value?.artist) {
+    if (response.data?.mealSelections && artistResponse.value?.artist) {
       artistResponse.value = {
         ...artistResponse.value,
         artist: {
           ...artistResponse.value.artist,
-          mealSelections: response.mealSelections,
+          mealSelections: response.data.mealSelections,
         },
       }
       editableMeals.value = {}

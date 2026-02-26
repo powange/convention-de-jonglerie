@@ -87,8 +87,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
+    return createSuccessResponse({
       mealSelections: updatedSelections.map((ms) => ({
         id: ms.id,
         afterShow: ms.afterShow,
@@ -98,7 +97,7 @@ export default wrapApiHandler(
           mealType: ms.meal.mealType,
         },
       })),
-    }
+    })
   },
   { operationName: 'UpdateMyMeals' }
 )

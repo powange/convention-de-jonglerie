@@ -382,7 +382,7 @@ const loadReturnableItems = async () => {
   loadingReturnableItems.value = true
   try {
     const response = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
-    returnableItems.value = response.returnableItems || []
+    returnableItems.value = response.data?.returnableItems || []
   } catch {
     // Erreur silencieuse
   } finally {

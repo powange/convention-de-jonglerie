@@ -36,12 +36,11 @@ const checkConversation = async () => {
   try {
     const response = await $fetch<{
       success: boolean
-      exists: boolean
-      conversationId: string | null
+      data: { exists: boolean; conversationId: string | null }
     }>(`/api/show-applications/${props.applicationId}/conversation`, { method: 'GET' })
 
-    if (response.success && response.exists && response.conversationId) {
-      conversationId.value = response.conversationId
+    if (response.data.exists && response.data.conversationId) {
+      conversationId.value = response.data.conversationId
       hasConversation.value = true
       await loadMessages()
     } else {
@@ -97,15 +96,15 @@ const loadMoreMessages = async () => {
 // S'assurer que l'utilisateur est participant (et créer la conversation si nécessaire)
 const ensureParticipant = async (): Promise<string | null> => {
   try {
-    const response = await $fetch<{ success: boolean; conversationId: string }>(
+    const response = await $fetch<{ success: boolean; data: { conversationId: string } }>(
       `/api/show-applications/${props.applicationId}/conversation`,
       { method: 'POST' }
     )
 
-    if (response.success) {
-      conversationId.value = response.conversationId
+    if (response.data.conversationId) {
+      conversationId.value = response.data.conversationId
       hasConversation.value = true
-      return response.conversationId
+      return response.data.conversationId
     }
   } catch (error) {
     console.error('Erreur lors de la création/mise à jour de la conversation:', error)

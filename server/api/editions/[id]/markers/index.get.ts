@@ -25,10 +25,7 @@ export default wrapApiHandler(
       orderBy: { order: 'asc' },
     })
 
-    return {
-      success: true,
-      markers,
-    }
+    return createSuccessResponse({ markers })
   },
   { operationName: 'GetEditionMarkers' }
 )

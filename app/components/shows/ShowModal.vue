@@ -319,7 +319,7 @@ const fetchArtists = async () => {
 const fetchReturnableItems = async () => {
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    returnableItems.value = response?.returnableItems || []
+    returnableItems.value = response?.data?.returnableItems || []
   } catch (error) {
     console.error('Error fetching returnable items:', error)
   }

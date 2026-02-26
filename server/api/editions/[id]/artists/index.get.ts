@@ -91,10 +91,7 @@ export default wrapApiHandler(
       },
     }))
 
-    return {
-      success: true,
-      artists: artistsWithEmailHash,
-    }
+    return createSuccessResponse({ artists: artistsWithEmailHash })
   },
   { operationName: 'GetArtists' }
 )

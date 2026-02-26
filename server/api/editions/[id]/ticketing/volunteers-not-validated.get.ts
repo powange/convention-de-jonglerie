@@ -72,8 +72,7 @@ export default wrapApiHandler(
         return prenomA.localeCompare(prenomB)
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         volunteers: sortedVolunteers.map((volunteer) => ({
           id: volunteer.id,
           user: {
@@ -88,7 +87,7 @@ export default wrapApiHandler(
           teams: volunteer.teamAssignments.map((assignment) => assignment.team),
         })),
         total: sortedVolunteers.length,
-      }
+      })
     } catch (error: unknown) {
       console.error('Failed to fetch volunteers not validated:', error)
       throw createError({

@@ -90,10 +90,10 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.application).toBeDefined()
-      expect(result.application.setupAvailability).toBe(true)
-      expect(result.application.teardownAvailability).toBe(false)
-      expect(result.application.eventAvailability).toBe(true)
+      expect(result.data.application).toBeDefined()
+      expect(result.data.application.setupAvailability).toBe(true)
+      expect(result.data.application.teardownAvailability).toBe(false)
+      expect(result.data.application.eventAvailability).toBe(true)
 
       expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -443,7 +443,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
         // Les préférences horaires valides doivent être acceptées
         const result = await handler(mockEvent as any)
-        expect(result.application.timePreferences).toEqual(validTimes)
+        expect(result.data.application.timePreferences).toEqual(validTimes)
       }
     })
 
@@ -511,7 +511,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         const mockEvent = { context: { user: mockUser } }
 
         const result = await handler(mockEvent as any)
-        expect(result.application.teamPreferences).toEqual(validTeams)
+        expect(result.data.application.teamPreferences).toEqual(validTeams)
       }
     })
 
@@ -736,7 +736,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result).toBeDefined()
-      expect(result.application.userId).toBe(mockUser.id)
+      expect(result.data.application.userId).toBe(mockUser.id)
     })
   })
 

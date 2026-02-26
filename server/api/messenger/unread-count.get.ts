@@ -24,10 +24,7 @@ export default wrapApiHandler(
     const conversationCount = participations.length
 
     if (conversationCount === 0) {
-      return {
-        success: true,
-        data: { unreadCount: 0, conversationCount: 0 },
-      }
+      return createSuccessResponse({ unreadCount: 0, conversationCount: 0 })
     }
 
     // Compter les messages non lus pour chaque conversation
@@ -51,10 +48,7 @@ export default wrapApiHandler(
       totalUnread += unreadCount
     }
 
-    return {
-      success: true,
-      data: { unreadCount: totalUnread, conversationCount },
-    }
+    return createSuccessResponse({ unreadCount: totalUnread, conversationCount })
   },
   { operationName: 'GetMessengerUnreadCount' }
 )

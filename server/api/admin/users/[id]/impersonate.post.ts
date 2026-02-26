@@ -67,31 +67,32 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      message: `Connecté en tant que ${targetUser.pseudo}`,
-      user: {
-        id: targetUser.id,
-        email: targetUser.email,
-        pseudo: targetUser.pseudo,
-        nom: targetUser.nom,
-        prenom: targetUser.prenom,
-        phone: targetUser.phone,
-        profilePicture: targetUser.profilePicture,
-        isGlobalAdmin: targetUser.isGlobalAdmin,
-        createdAt: targetUser.createdAt,
-        updatedAt: targetUser.updatedAt,
-        isEmailVerified: targetUser.isEmailVerified,
-      },
-      impersonation: {
-        active: true,
-        originalUser: {
-          id: session.user.id,
-          pseudo: session.user.pseudo,
-          email: session.user.email,
+    return createSuccessResponse(
+      {
+        user: {
+          id: targetUser.id,
+          email: targetUser.email,
+          pseudo: targetUser.pseudo,
+          nom: targetUser.nom,
+          prenom: targetUser.prenom,
+          phone: targetUser.phone,
+          profilePicture: targetUser.profilePicture,
+          isGlobalAdmin: targetUser.isGlobalAdmin,
+          createdAt: targetUser.createdAt,
+          updatedAt: targetUser.updatedAt,
+          isEmailVerified: targetUser.isEmailVerified,
+        },
+        impersonation: {
+          active: true,
+          originalUser: {
+            id: session.user.id,
+            pseudo: session.user.pseudo,
+            email: session.user.email,
+          },
         },
       },
-    }
+      `Connecté en tant que ${targetUser.pseudo}`
+    )
   },
   { operationName: 'ImpersonateUser' }
 )

@@ -195,10 +195,7 @@ export default wrapApiHandler(
       }
     }
 
-    return {
-      success: true,
-      consumedAt: now,
-    }
+    return createSuccessResponse({ consumedAt: now })
   },
   { operationName: 'ValidateMeal' }
 )

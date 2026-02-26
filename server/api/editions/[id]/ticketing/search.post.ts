@@ -791,10 +791,7 @@ export default wrapApiHandler(
         total: orderItems.length + volunteers.length + artists.length + organizers.length,
       }
 
-      return {
-        success: true,
-        results,
-      }
+      return createSuccessResponse({ results })
     } catch (error: unknown) {
       console.error('Database search error:', error)
       throw createError({

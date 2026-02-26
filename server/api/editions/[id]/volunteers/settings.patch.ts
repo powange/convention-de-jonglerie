@@ -189,7 +189,7 @@ export default wrapApiHandler(
       },
     }) as EditionUpdateInput
 
-    if (Object.keys(data).length === 0) return { success: true, unchanged: true }
+    if (Object.keys(data).length === 0) return createSuccessResponse({ unchanged: true })
     data.volunteersUpdatedAt = new Date()
 
     const updated = await prisma.edition.update({
@@ -219,7 +219,7 @@ export default wrapApiHandler(
         volunteersUpdatedAt: true,
       },
     })
-    return { success: true, settings: updated }
+    return createSuccessResponse({ settings: updated })
   },
   { operationName: 'UpdateVolunteerSettings' }
 )

@@ -52,10 +52,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      artist: updatedArtist,
-    }
+    return createSuccessResponse({ artist: updatedArtist })
   },
   { operationName: 'UpdateArtistNotes' }
 )

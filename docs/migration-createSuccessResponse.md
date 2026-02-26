@@ -4,7 +4,7 @@
 
 Uniformiser les retours API côté backend en utilisant le helper `createSuccessResponse()` au lieu de construire manuellement `{ success: true, ... }` dans chaque endpoint.
 
-**Statut : Phase 1 terminée (26 février 2026)**
+**Statut : Phase 2 terminée (26 février 2026)**
 
 ---
 
@@ -15,10 +15,10 @@ Uniformiser les retours API côté backend en utilisant le helper `createSuccess
 | Catégorie                                      | Fichiers | %    |
 | ---------------------------------------------- | -------- | ---- |
 | Total endpoints API                            | 366      | 100% |
-| Retournent `{ success: true }` manuellement    | ~104     | 28%  |
-| Utilisent `createSuccessResponse()`            | 56       | 15%  |
+| Utilisent `createSuccessResponse()`            | ~160     | 44%  |
 | Utilisent `createPaginatedResponse()`          | 10       | 3%   |
-| Retournent des données brutes (pas de wrapper) | ~196     | 54%  |
+| Retournent `{ success: true }` manuellement    | 3        | <1%  |
+| Retournent des données brutes (pas de wrapper) | ~193     | 53%  |
 
 ### Helper existant
 
@@ -87,31 +87,23 @@ Retournait déjà `{ success: true, data: result }` manuellement.
 
 ---
 
-### Groupe A — Champs à la racine (~85 fichiers) ⚠️ MIGRATION COMPLEXE
+### Groupe A — Champs à la racine (~94 fichiers) ✅ MIGRÉ (Phase 2 — 26/02/2026)
 
-Retournent `{ success: true, field1: ..., field2: ... }` avec des champs **à la racine** (pas wrappés dans `data`).
+Retournaient `{ success: true, field1: ..., field2: ... }` avec des champs **à la racine** (pas wrappés dans `data`).
 
-**Exemples** :
+**Approche utilisée** : Smart unwrap dans `useApiAction` — la fonction `unwrapApiResponse()` détecte automatiquement le format `createSuccessResponse` et extrait `data` avant de le passer aux callbacks. Cela rend la migration backend transparente pour le frontend.
 
-```typescript
-return { success: true, artist } // → response.artist
-return { success: true, meals, message } // → response.meals
-return { success: true, stats } // → response.stats
-return { success: true, validated, message } // → response.validated
-return { success: true, imageUrl } // → response.imageUrl
-```
+**Changements clés** :
 
-**Le problème** : Convertir en `createSuccessResponse({ artist })` changerait `response.artist` en `response.data.artist` côté frontend → **breaking change**.
+1. **`app/composables/useApiAction.ts`** : Ajout de `unwrapApiResponse()` appliquée dans `useApiAction` (3 endroits) et `useApiActionById` (2 endroits)
+2. **`app/components/edition/volunteer/MealsCard.vue`** : Seul callback frontend modifié (retrait de `response.success &&` redondant)
+3. **~94 fichiers `server/api/**/\*.ts`** : `{ success: true, ... }`→`createSuccessResponse(...)`
+4. **25 fichiers de tests** : Assertions mises à jour pour le nouveau format `result.data.field`
 
-**Sous-catégories** :
+**3 fichiers légitimement exclus** :
 
-| Sous-groupe   | ~Fichiers | Pattern                              | Champs typiques                                                          |
-| ------------- | --------- | ------------------------------------ | ------------------------------------------------------------------------ |
-| Entité unique | ~45       | `{ success: true, [entity]: obj }`   | `artist`, `show`, `marker`, `zone`, `application`, `feedback`, `counter` |
-| Tableau       | ~15       | `{ success: true, [plural]: [...] }` | `meals`, `markers`, `zones`, `shows`, `artists`                          |
-| Status/Count  | ~12       | `{ success: true, field1, field2 }`  | `validated`, `consumed`, `archived`, `unchanged`                         |
-| Complexe      | ~8        | `{ success: true, obj1, obj2, ... }` | `user` + `impersonation`, `content` + `facebookEvent`                    |
-| Upload        | ~5        | `{ success: true, imageUrl }`        | `imageUrl`, `results`                                                    |
+- `generate-import-json.post.ts` / `generate-import-json-agent.post.ts` — retours internes (pas des réponses API)
+- `push-test.post.ts` — champ `success` dynamique (booléen variable)
 
 ---
 
@@ -163,29 +155,15 @@ Utilisent déjà `createSuccessResponse()` ou `createPaginatedResponse()`.
 
 **Résultat** : 19 fichiers migrés (18 Group C + 1 Group B). Tests globaux de test setup mis à jour pour exposer `createSuccessResponse` comme global Nitro (`test/setup.ts`, `test/setup-mocks.ts`). 2 assertions de tests mises à jour pour inclure `data: null`.
 
-### Phase 2 : Groupe A (~85 fichiers) — Avec mise à jour frontend
+### Phase 2 : Groupe A (~94 fichiers) — Smart unwrap ✅ TERMINÉ (26/02/2026)
 
-**Effort** : Moyen à élevé. Nécessite des changements coordonnés backend + frontend.
+**Effort** : Moyen. Migration backend mécanique, 1 seule modification frontend.
 
-**Approche recommandée** : Convertir les endpoints + mettre à jour les consommateurs frontend.
+**Approche retenue** : Smart unwrap dans `useApiAction` via `unwrapApiResponse()`.
 
-**Pour chaque fichier** :
+La fonction détecte le format `createSuccessResponse` (objet avec uniquement les clés `success`, `data`, `message` et `success === true`) et extrait automatiquement `data` avant de le passer aux callbacks. Cela rend la migration backend transparente pour le frontend existant.
 
-1. **Backend** : `return { success: true, artist }` → `return createSuccessResponse({ artist })`
-2. **Frontend** : `response.artist` → `response.data.artist`
-
-**Avantage** : Le frontend a été migré vers `useApiAction`, donc les consommateurs sont principalement dans les callbacks `onSuccess` — faciles à trouver et modifier.
-
-**Regrouper par domaine** pour limiter le risque :
-
-1. Artists & Shows (8 fichiers backend + quelques pages frontend)
-2. Markers & Zones (8 fichiers)
-3. Meals & Volunteers (20 fichiers)
-4. Ticketing (18 fichiers)
-5. Messaging & Notifications (6 fichiers)
-6. Admin (8 fichiers)
-7. Files/Upload (5 fichiers)
-8. Autres (12 fichiers)
+**Résultat** : ~94 fichiers backend migrés, 25 fichiers de tests mis à jour, 1 fichier frontend corrigé (`MealsCard.vue`). Tous les tests passent (367 unit + 1614 nuxt).
 
 ### Phase 3 (optionnelle) : Endpoints sans wrapper (~196 fichiers)
 
@@ -211,11 +189,11 @@ Après chaque phase :
 
 ## Fichiers clés
 
-| Fichier                           | Rôle                                                        |
-| --------------------------------- | ----------------------------------------------------------- |
-| `server/utils/api-helpers.ts`     | Helper `createSuccessResponse` et `createPaginatedResponse` |
-| `server/types/api.ts`             | Types `ApiSuccessResponse`, `ApiPaginatedResponse`          |
-| `app/composables/useApiAction.ts` | Consommateur principal côté frontend                        |
+| Fichier                           | Rôle                                                         |
+| --------------------------------- | ------------------------------------------------------------ |
+| `server/utils/api-helpers.ts`     | Helper `createSuccessResponse` et `createPaginatedResponse`  |
+| `server/types/api.ts`             | Types `ApiSuccessResponse`, `ApiPaginatedResponse`           |
+| `app/composables/useApiAction.ts` | Consommateur principal côté frontend + `unwrapApiResponse()` |
 
 ---
 

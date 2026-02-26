@@ -239,11 +239,7 @@ export default wrapApiHandler(
       }
     }
 
-    return {
-      success: true,
-      pending,
-      count: pending.length,
-    }
+    return createSuccessResponse({ pending, count: pending.length })
   },
   { operationName: 'GetPendingMealValidations' }
 )

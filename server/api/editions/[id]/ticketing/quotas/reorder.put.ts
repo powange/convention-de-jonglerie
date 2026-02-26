@@ -44,10 +44,7 @@ export default wrapApiHandler(
         )
       )
 
-      return {
-        success: true,
-        message: 'Positions mises à jour avec succès',
-      }
+      return createSuccessResponse({}, 'Positions mises à jour avec succès')
     } catch (error: unknown) {
       console.error('Failed to update quotas positions:', error)
       throw createError({

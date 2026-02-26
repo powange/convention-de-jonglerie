@@ -158,8 +158,5 @@ export default wrapApiHandler(async (event) => {
     }
   })
 
-  return {
-    success: true,
-    meals: mealsWithSelections,
-  }
+  return createSuccessResponse({ meals: mealsWithSelections })
 }, 'GetMyVolunteerMeals')

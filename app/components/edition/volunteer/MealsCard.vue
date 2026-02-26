@@ -112,10 +112,10 @@ const fetchMeals = async () => {
   loadingMeals.value = true
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/volunteers/my-meals`)
-    if (response.success && response.meals) {
-      meals.value = response.meals
+    if (response.data?.meals) {
+      meals.value = response.data.meals
       // Sauvegarder l'état initial pour la détection de changements
-      initialMeals.value = JSON.parse(JSON.stringify(response.meals))
+      initialMeals.value = JSON.parse(JSON.stringify(response.data.meals))
     }
   } catch (error: any) {
     console.error('Failed to fetch meals:', error)
@@ -147,7 +147,7 @@ const { execute: saveMealSelections, loading: savingMeals } = useApiAction<
   },
   errorMessages: { default: 'Impossible de sauvegarder vos repas' },
   onSuccess: (response) => {
-    if (response.success && response.meals) {
+    if (response.meals) {
       meals.value = response.meals
       initialMeals.value = JSON.parse(JSON.stringify(response.meals))
     }

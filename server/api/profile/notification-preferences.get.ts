@@ -35,10 +35,7 @@ export default wrapApiHandler(
       ...userPrefs,
     }
 
-    return {
-      success: true,
-      preferences,
-    }
+    return createSuccessResponse({ preferences })
   },
   { operationName: 'GetNotificationPreferences' }
 )

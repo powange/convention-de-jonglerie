@@ -34,10 +34,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      counter,
-    }
+    return createSuccessResponse({ counter })
   },
   { operationName: 'POST create ticketing counter' }
 )

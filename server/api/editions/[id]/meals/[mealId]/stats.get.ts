@@ -164,8 +164,7 @@ export default wrapApiHandler(
     const total = volunteerCount + artistCount + participantCount
     const validated = volunteerValidatedCount + artistValidatedCount + participantValidatedCount
 
-    return {
-      success: true,
+    return createSuccessResponse({
       stats: {
         total,
         validated,
@@ -185,7 +184,7 @@ export default wrapApiHandler(
           },
         },
       },
-    }
+    })
   },
   { operationName: 'GetMealStats' }
 )

@@ -63,8 +63,7 @@ export default wrapApiHandler(
         return prenomA.localeCompare(prenomB)
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         artists: sortedArtists.map((artist) => ({
           id: artist.id,
           user: {
@@ -79,7 +78,7 @@ export default wrapApiHandler(
           shows: artist.shows.map((showArtist) => showArtist.show),
         })),
         total: sortedArtists.length,
-      }
+      })
     } catch (error: unknown) {
       console.error('Failed to fetch artists not validated:', error)
       throw createError({

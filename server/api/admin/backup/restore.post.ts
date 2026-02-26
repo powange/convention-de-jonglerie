@@ -209,10 +209,7 @@ export default wrapApiHandler(
       }
     }
 
-    return {
-      success: true,
-      message: 'Base de données et fichiers restaurés avec succès',
-    }
+    return createSuccessResponse(null, 'Base de données et fichiers restaurés avec succès')
   },
   { operationName: 'RestoreBackup' }
 )

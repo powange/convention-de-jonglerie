@@ -69,11 +69,10 @@ export default wrapApiHandler(
       // On continue même si l'email échoue, l'utilisateur peut utiliser le code manuellement
     }
 
-    return {
-      success: true,
-      user: updatedUser,
-      message: 'Email invalidé avec succès. Un nouveau code de vérification a été envoyé.',
-    }
+    return createSuccessResponse(
+      { user: updatedUser },
+      'Email invalidé avec succès. Un nouveau code de vérification a été envoyé.'
+    )
   },
   { operationName: 'InvalidateUserEmail' }
 )

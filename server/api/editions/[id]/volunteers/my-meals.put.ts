@@ -86,8 +86,5 @@ export default wrapApiHandler(async (event) => {
     accepted: selection.accepted,
   }))
 
-  return {
-    success: true,
-    meals: mealsWithSelections,
-  }
+  return createSuccessResponse({ meals: mealsWithSelections })
 }, 'UpdateMyVolunteerMeals')

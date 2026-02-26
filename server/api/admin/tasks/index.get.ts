@@ -53,13 +53,12 @@ export default wrapApiHandler(
       },
     ]
 
-    return {
-      success: true,
+    return createSuccessResponse({
       tasks,
       totalTasks: tasks.length,
       cronEnabled: process.env.NODE_ENV === 'production' || process.env.ENABLE_CRON === 'true',
       timestamp: new Date().toISOString(),
-    }
+    })
   },
   { operationName: 'GetAdminTasks' }
 )

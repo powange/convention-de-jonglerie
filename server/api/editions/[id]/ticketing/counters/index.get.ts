@@ -26,10 +26,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      counters,
-    }
+    return createSuccessResponse({ counters })
   },
   { operationName: 'GET ticketing counters' }
 )

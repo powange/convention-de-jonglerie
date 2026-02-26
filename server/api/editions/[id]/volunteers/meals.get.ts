@@ -116,7 +116,7 @@ export default wrapApiHandler(
 
     // Si rien n'a changé, retourner les repas existants directement
     if (mealsToDeleteIds.length === 0 && mealsToCreate.length === 0) {
-      return { success: true, meals: existingMeals }
+      return createSuccessResponse({ meals: existingMeals })
     }
 
     // Sinon, récupérer la liste à jour
@@ -132,10 +132,7 @@ export default wrapApiHandler(
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    return {
-      success: true,
-      meals: updatedMeals,
-    }
+    return createSuccessResponse({ meals: updatedMeals })
   },
   { operationName: 'GetVolunteerMeals' }
 )

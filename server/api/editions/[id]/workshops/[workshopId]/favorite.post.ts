@@ -38,10 +38,7 @@ export default wrapApiHandler(
       update: {},
     })
 
-    return {
-      success: true,
-      favorite,
-    }
+    return createSuccessResponse({ favorite })
   },
   { operationName: 'AddWorkshopFavorite' }
 )

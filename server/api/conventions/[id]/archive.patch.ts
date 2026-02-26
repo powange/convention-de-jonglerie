@@ -21,7 +21,7 @@ export default wrapApiHandler(
     const convention = await getConventionForArchive(conventionId, user)
 
     if (convention.isArchived === archived) {
-      return { success: true, archived, unchanged: true }
+      return createSuccessResponse({ archived, unchanged: true })
     }
 
     const before: ConventionArchiveSnapshot = {
@@ -50,7 +50,7 @@ export default wrapApiHandler(
       },
     })
 
-    return { success: true, archived: updated.isArchived, archivedAt: updated.archivedAt }
+    return createSuccessResponse({ archived: updated.isArchived, archivedAt: updated.archivedAt })
   },
   { operationName: 'ArchiveConvention' }
 )

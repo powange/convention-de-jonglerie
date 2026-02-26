@@ -91,8 +91,5 @@ export default wrapApiHandler(async (event) => {
     }
   })
 
-  return {
-    success: true,
-    meals: formattedMeals,
-  }
+  return createSuccessResponse({ meals: formattedMeals })
 }, 'GetVolunteerMealsByVolunteerId')

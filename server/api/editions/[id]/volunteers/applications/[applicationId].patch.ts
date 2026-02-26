@@ -218,7 +218,7 @@ export default wrapApiHandler(
         )
       }
 
-      return { success: true, application: updated }
+      return createSuccessResponse({ application: updated })
     }
 
     // Sinon, gestion classique du changement de statut
@@ -327,7 +327,7 @@ export default wrapApiHandler(
       )
     }
 
-    return { success: true, application: updated }
+    return createSuccessResponse({ application: updated })
   },
   { operationName: 'UpdateVolunteerApplication' }
 )

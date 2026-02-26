@@ -55,7 +55,9 @@ describe('API Markers - Liste (GET)', () => {
 
     expect(result).toEqual({
       success: true,
-      markers: mockMarkers,
+      data: {
+        markers: mockMarkers,
+      },
     })
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
@@ -78,7 +80,9 @@ describe('API Markers - Liste (GET)', () => {
 
     expect(result).toEqual({
       success: true,
-      markers: [],
+      data: {
+        markers: [],
+      },
     })
   })
 

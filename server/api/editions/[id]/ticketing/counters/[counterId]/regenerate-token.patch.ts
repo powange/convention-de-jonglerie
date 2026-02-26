@@ -53,11 +53,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      token: newToken,
-      counter: updatedCounter,
-    }
+    return createSuccessResponse({ token: newToken, counter: updatedCounter })
   },
   { operationName: 'PATCH regenerate ticketing counter token' }
 )

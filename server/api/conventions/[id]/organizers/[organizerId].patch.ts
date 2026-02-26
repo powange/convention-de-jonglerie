@@ -46,7 +46,7 @@ export default wrapApiHandler(
 
     // Pas de payload => rien à faire
     if (!parsed.rights && parsed.title === undefined && !parsed.perEdition)
-      return { success: true, unchanged: true }
+      return createSuccessResponse({ unchanged: true })
 
     const canManage = await canManageOrganizers(conventionId, user.id, event)
     if (!canManage) throw createError({ status: 403, message: 'Permission insuffisante' })
@@ -159,8 +159,7 @@ export default wrapApiHandler(
       return { updated, perEdition: afterSnapshot.perEdition }
     })
 
-    return {
-      success: true,
+    return createSuccessResponse({
       organizer: {
         id: organizerId,
         title: result.updated.title,
@@ -175,7 +174,7 @@ export default wrapApiHandler(
         },
         perEdition: result.perEdition,
       },
-    }
+    })
   },
   { operationName: 'UpdateOrganizerPermissions' }
 )

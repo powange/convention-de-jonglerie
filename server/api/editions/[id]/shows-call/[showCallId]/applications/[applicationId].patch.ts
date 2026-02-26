@@ -208,10 +208,7 @@ export default wrapApiHandler(
       }
     }
 
-    return {
-      success: true,
-      application: updatedApplication,
-    }
+    return createSuccessResponse({ application: updatedApplication })
   },
   { operationName: 'UpdateShowCallApplicationStatus' }
 )

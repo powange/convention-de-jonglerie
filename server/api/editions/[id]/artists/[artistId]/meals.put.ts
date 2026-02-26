@@ -107,10 +107,7 @@ export default wrapApiHandler(
       afterShow: selection.afterShow,
     }))
 
-    return {
-      success: true,
-      meals: mealsWithSelections,
-    }
+    return createSuccessResponse({ meals: mealsWithSelections })
   },
   { operationName: 'UpdateArtistMeals' }
 )

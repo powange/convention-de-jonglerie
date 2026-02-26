@@ -50,11 +50,10 @@ export default wrapApiHandler(async (event) => {
 
   // Si déjà confirmé (confirmedAt n'est pas null)
   if (existingConfirmation.confirmedAt) {
-    return {
-      success: true,
+    return createSuccessResponse({
       alreadyConfirmed: true,
       confirmedAt: existingConfirmation.confirmedAt,
-    }
+    })
   }
 
   // Mettre à jour la confirmation avec la date actuelle
@@ -92,9 +91,8 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  return {
-    success: true,
+  return createSuccessResponse({
     alreadyConfirmed: false,
     confirmedAt: confirmation.confirmedAt,
-  }
+  })
 }, 'ConfirmVolunteerNotification')

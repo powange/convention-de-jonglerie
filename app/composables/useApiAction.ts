@@ -117,6 +117,26 @@ export interface ApiActionByIdReturn<TResult = unknown> {
 }
 
 /**
+ * Détecte le format createSuccessResponse et extrait data.
+ * Format détecté : { success: true, data: T, message?: string }
+ * où TOUTES les clés sont dans ['success', 'data', 'message'].
+ */
+function unwrapApiResponse<T>(result: T): T {
+  if (
+    result &&
+    typeof result === 'object' &&
+    !Array.isArray(result) &&
+    'success' in result &&
+    'data' in result &&
+    (result as Record<string, unknown>).success === true &&
+    Object.keys(result).every((k) => ['success', 'data', 'message'].includes(k))
+  ) {
+    return (result as Record<string, unknown>).data as T
+  }
+  return result
+}
+
+/**
  * Normalise une erreur capturée en ApiError
  */
 function normalizeError(e: unknown): ApiError {
@@ -258,7 +278,8 @@ export function useApiAction<TData = unknown, TResult = unknown>(
         query: requestQuery,
       })
 
-      data.value = result
+      const unwrapped = unwrapApiResponse(result)
+      data.value = unwrapped
 
       // Toast de succès
       if (!silent && !silentSuccess && successMessage) {
@@ -273,16 +294,16 @@ export function useApiAction<TData = unknown, TResult = unknown>(
       // Actions post-succès
       if (emitOnSuccess) emitOnSuccess()
       if (refreshOnSuccess) await refreshOnSuccess()
-      if (onSuccess) await onSuccess(result)
+      if (onSuccess) await onSuccess(unwrapped)
 
       // Redirection
       if (redirectOnSuccess) {
         const destination =
-          typeof redirectOnSuccess === 'function' ? redirectOnSuccess(result) : redirectOnSuccess
+          typeof redirectOnSuccess === 'function' ? redirectOnSuccess(unwrapped) : redirectOnSuccess
         await navigateTo(destination)
       }
 
-      return result
+      return unwrapped
     } catch (e: unknown) {
       const apiError = normalizeError(e)
       error.value = apiError
@@ -420,6 +441,9 @@ export function useApiActionById<TResult = unknown>(
         query: requestQuery,
       })
 
+      // Unwrap createSuccessResponse avant tout traitement
+      const unwrapped = unwrapApiResponse(result)
+
       // Toast de succès
       if (!silent && !silentSuccess && successMessage) {
         toast.add({
@@ -433,16 +457,16 @@ export function useApiActionById<TResult = unknown>(
       // Actions post-succès (on passe l'ID à la callback)
       if (emitOnSuccess) emitOnSuccess()
       if (refreshOnSuccess) await refreshOnSuccess()
-      if (onSuccess) await onSuccess(result, id)
+      if (onSuccess) await onSuccess(unwrapped, id)
 
       // Redirection
       if (redirectOnSuccess) {
         const destination =
-          typeof redirectOnSuccess === 'function' ? redirectOnSuccess(result) : redirectOnSuccess
+          typeof redirectOnSuccess === 'function' ? redirectOnSuccess(unwrapped) : redirectOnSuccess
         await navigateTo(destination)
       }
 
-      return result
+      return unwrapped
     } catch (e: unknown) {
       const apiError = normalizeError(e)
       error.value = apiError

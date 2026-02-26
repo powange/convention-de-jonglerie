@@ -39,11 +39,10 @@ export default wrapApiHandler(
         }
       )
 
-      return {
-        success: true,
+      return createSuccessResponse({
         orders: result.data,
         pagination: result.pagination,
-      }
+      })
     } catch (error: unknown) {
       console.error('HelloAsso orders error:', error)
       throw error

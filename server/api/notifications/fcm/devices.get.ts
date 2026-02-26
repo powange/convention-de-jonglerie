@@ -30,10 +30,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return {
-      success: true,
-      data: devices,
-    }
+    return createSuccessResponse(devices)
   } catch (error: any) {
     console.error('[FCM Devices] Erreur:', error)
     throw createError({

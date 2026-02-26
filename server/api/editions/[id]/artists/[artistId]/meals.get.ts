@@ -184,10 +184,7 @@ export default wrapApiHandler(
       }
     })
 
-    return {
-      success: true,
-      meals: mealsWithSelections,
-    }
+    return createSuccessResponse({ meals: mealsWithSelections })
   },
   { operationName: 'GetArtistMeals' }
 )

@@ -30,14 +30,11 @@ export default wrapApiHandler(
     // Récupérer les IDs des utilisateurs présents
     const presentUserIds = conversationPresenceService.getPresentUsers(conversationId)
 
-    return {
-      success: true,
-      data: {
-        conversationId,
-        presentUserIds,
-        count: presentUserIds.length,
-      },
-    }
+    return createSuccessResponse({
+      conversationId,
+      presentUserIds,
+      count: presentUserIds.length,
+    })
   },
   { operationName: 'GetConversationPresence' }
 )

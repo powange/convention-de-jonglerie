@@ -236,8 +236,8 @@ const fetchVolunteerMeals = async () => {
   loadingMeals.value = true
   try {
     const response = await $fetch(`/api/editions/${editionId}/volunteers/meals`)
-    if (response.success && response.meals) {
-      volunteerMeals.value = response.meals
+    if (response.data?.meals) {
+      volunteerMeals.value = response.data.meals
     }
   } catch (error) {
     console.error('Failed to fetch volunteer meals:', error)
@@ -258,8 +258,8 @@ const fetchReturnableItems = async () => {
   loadingReturnableItems.value = true
   try {
     const response = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
-    if (response.success && response.returnableItems) {
-      returnableItems.value = response.returnableItems
+    if (response.data?.returnableItems) {
+      returnableItems.value = response.data.returnableItems
     }
   } catch (error) {
     console.error('Failed to fetch returnable items:', error)

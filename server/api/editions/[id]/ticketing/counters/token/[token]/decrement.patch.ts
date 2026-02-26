@@ -47,10 +47,7 @@ export default wrapApiHandler(
     // Notifier les clients connectés
     notifyCounterUpdate(editionId, counter.id, counter.value, counter.updatedAt.toISOString())
 
-    return {
-      success: true,
-      counter,
-    }
+    return createSuccessResponse({ counter })
   },
   { operationName: 'PATCH decrement ticketing counter by token' }
 )

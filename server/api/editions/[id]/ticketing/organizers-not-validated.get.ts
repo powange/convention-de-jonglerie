@@ -58,8 +58,7 @@ export default wrapApiHandler(
         return prenomA.localeCompare(prenomB)
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         organizers: sortedOrganizers.map((editionOrganizer) => ({
           id: editionOrganizer.organizer.id, // ID du ConventionOrganizer pour la validation
           editionOrganizerId: editionOrganizer.id, // ID de l'EditionOrganizer pour le QR code
@@ -75,7 +74,7 @@ export default wrapApiHandler(
           title: editionOrganizer.organizer.title,
         })),
         total: sortedOrganizers.length,
-      }
+      })
     } catch (error: unknown) {
       console.error('Failed to fetch organizers not validated:', error)
       throw createError({

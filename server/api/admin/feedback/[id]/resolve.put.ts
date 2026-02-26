@@ -47,11 +47,10 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      message: resolved ? 'Feedback marqué comme résolu' : 'Feedback marqué comme non résolu',
-      feedback: updatedFeedback,
-    }
+    return createSuccessResponse(
+      { feedback: updatedFeedback },
+      resolved ? 'Feedback marqué comme résolu' : 'Feedback marqué comme non résolu'
+    )
   },
   { operationName: 'ResolveFeedback' }
 )

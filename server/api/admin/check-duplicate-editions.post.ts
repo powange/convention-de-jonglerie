@@ -95,12 +95,11 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
+    return createSuccessResponse({
       hasDuplicates: overlappingEditions.length > 0,
       duplicates: overlappingEditions as DuplicateEdition[],
       count: overlappingEditions.length,
-    }
+    })
   },
   { operationName: 'CheckDuplicateEditions' }
 )

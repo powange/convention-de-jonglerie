@@ -31,11 +31,10 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      message: `${result.count} log(s) identique(s) marqué(s) comme résolu(s)`,
-      count: result.count,
-    }
+    return createSuccessResponse(
+      { count: result.count },
+      `${result.count} log(s) identique(s) marqué(s) comme résolu(s)`
+    )
   },
   { operationName: 'ResolveSimilarErrorLogs' }
 )

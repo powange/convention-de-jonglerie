@@ -107,7 +107,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.showCall.name).toBe('Nouveau nom')
+      expect(result.data.showCall.name).toBe('Nouveau nom')
       expect(prismaMock.editionShowCall.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: expect.objectContaining({ name: 'Nouveau nom' }),
@@ -124,7 +124,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.showCall.visibility).toBe('PUBLIC')
+      expect(result.data.showCall.visibility).toBe('PUBLIC')
     })
 
     it('devrait mettre à jour la description', async () => {
@@ -137,7 +137,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.showCall.description).toBe('Nouvelle description')
+      expect(result.data.showCall.description).toBe('Nouvelle description')
     })
 
     it("devrait mettre à jour le mode et l'URL externe", async () => {
@@ -159,8 +159,8 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.showCall.mode).toBe('EXTERNAL')
-      expect(result.showCall.externalUrl).toBe('https://external-form.com')
+      expect(result.data.showCall.mode).toBe('EXTERNAL')
+      expect(result.data.showCall.externalUrl).toBe('https://external-form.com')
     })
 
     it('devrait mettre à jour les champs du formulaire', async () => {
@@ -184,7 +184,7 @@ describe('/api/editions/[id]/shows-call/[showCallId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(result.showCall.askAccommodation).toBe(true)
+      expect(result.data.showCall.askAccommodation).toBe(true)
     })
 
     it('devrait mettre à jour la date limite', async () => {

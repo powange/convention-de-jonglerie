@@ -89,11 +89,10 @@ export default wrapApiHandler(
     if (successfulUploads.length > 0) {
       const firstUpload = successfulUploads[0]
 
-      return {
-        success: true,
+      return createSuccessResponse({
         imageUrl: firstUpload.temporaryUrl,
         results,
-      }
+      })
     } else {
       throw createError({
         status: 500,

@@ -40,11 +40,10 @@ export default wrapApiHandler(
       console.log(`[Counter SSE] Tentative de déconnexion d'une session inexistante: ${sessionId}`)
     }
 
-    return {
-      success: true,
-      disconnected,
-      message: disconnected ? 'Session déconnectée' : 'Session déjà fermée',
-    }
+    return createSuccessResponse(
+      { disconnected },
+      disconnected ? 'Session déconnectée' : 'Session déjà fermée'
+    )
   },
   { operationName: 'POST disconnect ticketing counter by token' }
 )

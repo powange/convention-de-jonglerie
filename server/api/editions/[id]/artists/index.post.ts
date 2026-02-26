@@ -191,10 +191,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      artist,
-    }
+    return createSuccessResponse({ artist })
   },
   { operationName: 'CreateArtist' }
 )

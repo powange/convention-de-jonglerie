@@ -65,11 +65,10 @@ export default wrapApiHandler(
         ordersData = await ordersResponse.json()
       }
 
-      return {
-        success: true,
+      return createSuccessResponse({
         form: formData,
         orders: ordersData,
-      }
+      })
     } catch (error: unknown) {
       console.error('Failed to fetch raw HelloAsso data:', error)
       throw createError({

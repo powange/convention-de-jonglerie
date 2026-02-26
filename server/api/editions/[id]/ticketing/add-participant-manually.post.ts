@@ -229,8 +229,7 @@ export default wrapApiHandler(
       }
 
       // Retourner le QR code pour redirection
-      return {
-        success: true,
+      return createSuccessResponse({
         qrCode,
         order: {
           id: order.id,
@@ -240,7 +239,7 @@ export default wrapApiHandler(
           amount: order.amount,
           itemCount: orderItems.length,
         },
-      }
+      })
     } catch (error: unknown) {
       console.error("Erreur lors de l'ajout manuel du participant:", error)
       throw error

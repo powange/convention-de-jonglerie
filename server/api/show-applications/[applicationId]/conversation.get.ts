@@ -22,11 +22,10 @@ export default wrapApiHandler(
       select: { id: true },
     })
 
-    return {
-      success: true,
+    return createSuccessResponse({
       exists: !!conversation,
       conversationId: conversation?.id || null,
-    }
+    })
   },
   { operationName: 'CheckShowApplicationConversation' }
 )

@@ -194,11 +194,10 @@ export default wrapApiHandler(async (event) => {
     )
   }
 
-  return {
-    success: true,
+  return createSuccessResponse({
     result,
     preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
-  }
+  })
 }, 'AutoAssignVolunteers')
 
 /**

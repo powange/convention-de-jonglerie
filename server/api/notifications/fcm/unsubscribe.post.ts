@@ -45,11 +45,7 @@ export default defineEventHandler(async (event) => {
       )
     }
 
-    return {
-      success: true,
-      message: 'Token(s) FCM désactivé(s)',
-      count: result.count,
-    }
+    return createSuccessResponse({ count: result.count }, 'Token(s) FCM désactivé(s)')
   } catch (error: any) {
     console.error('[FCM Unsubscribe] Erreur:', error)
     throw createError({

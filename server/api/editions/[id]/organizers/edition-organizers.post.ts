@@ -154,26 +154,27 @@ export default wrapApiHandler(
       // Synchroniser les participants de la conversation organisateurs (si elle existe)
       await syncOrganizersGroupParticipants(editionId)
 
-      return {
-        success: true,
-        organizer: {
-          id: editionOrganizer.id,
-          organizerId: editionOrganizer.organizerId,
-          entryValidated: editionOrganizer.entryValidated,
-          entryValidatedAt: editionOrganizer.entryValidatedAt,
-          createdAt: editionOrganizer.createdAt,
-          title: editionOrganizer.organizer.title,
-          user: {
-            id: editionOrganizer.organizer.user.id,
-            pseudo: editionOrganizer.organizer.user.pseudo,
-            prenom: editionOrganizer.organizer.user.prenom,
-            nom: editionOrganizer.organizer.user.nom,
-            email: editionOrganizer.organizer.user.email,
-            profilePicture: editionOrganizer.organizer.user.profilePicture,
+      return createSuccessResponse(
+        {
+          organizer: {
+            id: editionOrganizer.id,
+            organizerId: editionOrganizer.organizerId,
+            entryValidated: editionOrganizer.entryValidated,
+            entryValidatedAt: editionOrganizer.entryValidatedAt,
+            createdAt: editionOrganizer.createdAt,
+            title: editionOrganizer.organizer.title,
+            user: {
+              id: editionOrganizer.organizer.user.id,
+              pseudo: editionOrganizer.organizer.user.pseudo,
+              prenom: editionOrganizer.organizer.user.prenom,
+              nom: editionOrganizer.organizer.user.nom,
+              email: editionOrganizer.organizer.user.email,
+              profilePicture: editionOrganizer.organizer.user.profilePicture,
+            },
           },
         },
-        message: "Organisateur ajouté à l'édition avec succès",
-      }
+        "Organisateur ajouté à l'édition avec succès"
+      )
     } catch (error: unknown) {
       // Si c'est déjà une erreur HTTP, la relancer
       if (isHttpError(error)) {

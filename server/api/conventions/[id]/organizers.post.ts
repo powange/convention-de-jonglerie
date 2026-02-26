@@ -109,8 +109,7 @@ export default wrapApiHandler(
       }>
     }
 
-    return {
-      success: true,
+    return createSuccessResponse({
       organizer: {
         id: organizer.id,
         title: organizer.title,
@@ -131,7 +130,7 @@ export default wrapApiHandler(
         })),
         user: organizer.user,
       },
-    }
+    })
   },
   { operationName: 'AddConventionOrganizer' }
 )

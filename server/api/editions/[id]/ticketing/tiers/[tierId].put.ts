@@ -38,10 +38,7 @@ export default wrapApiHandler(
     const body = bodySchema.parse(await readBody(event))
     const tier = await updateTier(tierId, editionId, body)
 
-    return {
-      success: true,
-      tier,
-    }
+    return createSuccessResponse({ tier })
   },
   { operationName: 'PUT ticketing tier' }
 )

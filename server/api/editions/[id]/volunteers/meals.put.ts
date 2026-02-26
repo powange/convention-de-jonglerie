@@ -271,8 +271,5 @@ export default wrapApiHandler(async (event) => {
     orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
   })
 
-  return {
-    success: true,
-    meals: updatedMeals,
-  }
+  return createSuccessResponse({ meals: updatedMeals })
 }, 'UpdateVolunteerMeals')

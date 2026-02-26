@@ -68,10 +68,12 @@ describe('API Markers - Mise à jour (PUT)', () => {
 
     expect(result).toEqual({
       success: true,
-      marker: expect.objectContaining({
-        name: updateData.name,
-        description: updateData.description,
-      }),
+      data: {
+        marker: expect.objectContaining({
+          name: updateData.name,
+          description: updateData.description,
+        }),
+      },
     })
 
     expect(prismaMock.editionMarker.update).toHaveBeenCalledWith({
@@ -98,7 +100,7 @@ describe('API Markers - Mise à jour (PUT)', () => {
 
     const result = await markersPutHandler(mockEvent as any)
 
-    expect(result.marker.name).toBe(updateData.name)
+    expect(result.data.marker.name).toBe(updateData.name)
   })
 
   it('devrait permettre la mise à jour de la position', async () => {
@@ -116,8 +118,8 @@ describe('API Markers - Mise à jour (PUT)', () => {
 
     const result = await markersPutHandler(mockEvent as any)
 
-    expect(result.marker.latitude).toBe(updateData.latitude)
-    expect(result.marker.longitude).toBe(updateData.longitude)
+    expect(result.data.marker.latitude).toBe(updateData.latitude)
+    expect(result.data.marker.longitude).toBe(updateData.longitude)
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -183,7 +185,7 @@ describe('API Markers - Mise à jour (PUT)', () => {
 
     const result = await markersPutHandler(mockEvent as any)
 
-    expect(result.marker.markerTypes).toEqual(['INFO'])
+    expect(result.data.marker.markerTypes).toEqual(['INFO'])
   })
 
   it("devrait retourner 400 si l'ID de marker est invalide", async () => {

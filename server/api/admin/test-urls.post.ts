@@ -107,10 +107,7 @@ export default wrapApiHandler(
     // Tester chaque URL en parallèle
     const results = await Promise.all(urls.map(testUrl))
 
-    return {
-      success: true,
-      results,
-    }
+    return createSuccessResponse({ results })
   },
   { operationName: 'TestUrls' }
 )

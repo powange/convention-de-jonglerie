@@ -108,21 +108,22 @@ export default wrapApiHandler(
     // Obtenir les statistiques des connexions SSE
     const streamStats = notificationStreamManager.getStats()
 
-    return {
-      success: true,
-      message: 'Notification de test envoyée avec succès',
-      notification,
-      streamStats: {
-        totalConnections: streamStats.totalConnections,
-        activeUsers: streamStats.activeUsers,
-        connectionsByUser: streamStats.connectionsByUser,
+    return createSuccessResponse(
+      {
+        notification,
+        streamStats: {
+          totalConnections: streamStats.totalConnections,
+          activeUsers: streamStats.activeUsers,
+          connectionsByUser: streamStats.connectionsByUser,
+        },
+        testInfo: {
+          type: parsed.type,
+          targetUserId,
+          timestamp: new Date().toISOString(),
+        },
       },
-      testInfo: {
-        type: parsed.type,
-        targetUserId,
-        timestamp: new Date().toISOString(),
-      },
-    }
+      'Notification de test envoyée avec succès'
+    )
   },
   { operationName: 'TestNotification' }
 )

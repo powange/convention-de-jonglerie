@@ -105,10 +105,7 @@ export default wrapApiHandler(
       })
     )
 
-    return {
-      success: true,
-      data: conversationsWithUnreadCount,
-    }
+    return createSuccessResponse(conversationsWithUnreadCount)
   },
   { operationName: 'GetPrivateConversations' }
 )

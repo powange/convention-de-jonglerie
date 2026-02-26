@@ -70,10 +70,7 @@ export default wrapApiHandler(
       where: { id: showCallId },
     })
 
-    return {
-      success: true,
-      deletedApplicationsCount: showCall._count.applications,
-    }
+    return createSuccessResponse({ deletedApplicationsCount: showCall._count.applications })
   },
   { operationName: 'DeleteShowCall' }
 )

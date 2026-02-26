@@ -48,11 +48,10 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      log: updatedLog,
-      message: parsed.resolved ? 'Log marqué comme résolu' : 'Log marqué comme non résolu',
-    }
+    return createSuccessResponse(
+      { log: updatedLog },
+      parsed.resolved ? 'Log marqué comme résolu' : 'Log marqué comme non résolu'
+    )
   },
   { operationName: 'ResolveErrorLog' }
 )

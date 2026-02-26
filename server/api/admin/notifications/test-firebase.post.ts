@@ -62,13 +62,14 @@ export default wrapApiHandler(
       })
     }
 
-    return {
-      success: true,
-      message: 'Notification Firebase envoyée avec succès',
-      result: {
-        successCount: result.success,
-        failureCount: result.failure,
+    return createSuccessResponse(
+      {
+        result: {
+          successCount: result.success,
+          failureCount: result.failure,
+        },
       },
-    }
+      'Notification Firebase envoyée avec succès'
+    )
   })
 )

@@ -300,15 +300,14 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        success: true,
+      return createSuccessResponse({
         orders: result.data,
         pagination: result.pagination,
         stats: {
           totalOrders,
           totalItems,
         },
-      }
+      })
     } catch (error: unknown) {
       console.error('HelloAsso orders fetch error:', error)
       throw error
