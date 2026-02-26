@@ -371,7 +371,6 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 const workshopsEnabled = computed(() => edition.value?.workshopsEnabled ?? false)
 
 const workshops = ref<any[]>([])
-const loading = ref(true)
 const showAddModal = ref(false)
 const editingWorkshop = ref<any>(null)
 const canCreateWorkshop = ref(false)
@@ -623,21 +622,16 @@ const formatTime = (dateTimeStr: string) => {
   })
 }
 
-const fetchWorkshops = async () => {
-  loading.value = true
-  try {
-    const data = await $fetch(`/api/editions/${editionId}/workshops`)
-    workshops.value = data as any[]
-  } catch {
-    toast.add({
-      title: 'Erreur lors du chargement des workshops',
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    loading.value = false
+const { execute: fetchWorkshops, loading } = useApiAction(
+  () => `/api/editions/${editionId}/workshops`,
+  {
+    method: 'GET',
+    errorMessages: { default: 'Erreur lors du chargement des workshops' },
+    onSuccess: (response: any) => {
+      workshops.value = response as any[]
+    },
   }
-}
+)
 
 const checkCanCreate = async () => {
   if (!authStore.isAuthenticated) {
@@ -830,8 +824,6 @@ onMounted(async () => {
   }
   if (workshopsEnabled.value) {
     await Promise.all([fetchWorkshops(), checkCanCreate()])
-  } else {
-    loading.value = false
   }
 })
 </script>

@@ -603,7 +603,6 @@ watch(
 
 // Données
 const artists = ref<any[]>([])
-const loading = ref(false)
 const showArtistModal = ref(false)
 const selectedArtist = ref<any>(null)
 const showMealsModal = ref(false)
@@ -624,21 +623,16 @@ onMounted(async () => {
 })
 
 // Récupérer les artistes
-const fetchArtists = async () => {
-  loading.value = true
-  try {
-    const response = await $fetch(`/api/editions/${editionId.value}/artists`)
-    artists.value = response.data?.artists || []
-  } catch (error) {
-    console.error('Error fetching artists:', error)
-    toast.add({
-      title: 'Erreur lors du chargement des artistes',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+const { execute: fetchArtists, loading } = useApiAction(
+  () => `/api/editions/${editionId.value}/artists`,
+  {
+    method: 'GET',
+    errorMessages: { default: 'Erreur lors du chargement des artistes' },
+    onSuccess: (response: any) => {
+      artists.value = response?.artists || []
+    },
   }
-}
+)
 
 // Ouvrir le modal d'ajout
 const openAddArtistModal = () => {

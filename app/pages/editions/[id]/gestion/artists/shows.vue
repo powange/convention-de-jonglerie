@@ -272,7 +272,6 @@ const canEdit = computed(() => canAccess.value)
 
 // Données
 const shows = ref<any[]>([])
-const loading = ref(false)
 const showShowModal = ref(false)
 const selectedShow = ref<any>(null)
 const showDeleteConfirm = ref(false)
@@ -294,21 +293,16 @@ onMounted(async () => {
 })
 
 // Récupérer les spectacles
-const fetchShows = async () => {
-  loading.value = true
-  try {
-    const response = await $fetch(`/api/editions/${editionId.value}/shows`)
-    shows.value = response.data?.shows || []
-  } catch (error) {
-    console.error('Error fetching shows:', error)
-    toast.add({
-      title: 'Erreur lors du chargement des spectacles',
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+const { execute: fetchShows, loading } = useApiAction(
+  () => `/api/editions/${editionId.value}/shows`,
+  {
+    method: 'GET',
+    errorMessages: { default: 'Erreur lors du chargement des spectacles' },
+    onSuccess: (response: any) => {
+      shows.value = response?.shows || []
+    },
   }
-}
+)
 
 // Ouvrir le modal d'ajout
 const openAddShowModal = () => {
