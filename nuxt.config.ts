@@ -323,6 +323,7 @@ export default defineNuxtConfig({
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
     smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
+    smtpFrom: process.env.SMTP_FROM || '', // Adresse d'expéditeur (alias Gmail, ex: notifications@juggling-convention.com)
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || '', // Anthropic Claude API key for AI features
     // Configuration du provider IA (anthropic, ollama ou lmstudio)
     aiProvider: process.env.AI_PROVIDER || 'anthropic', // Provider IA à utiliser (anthropic par défaut)

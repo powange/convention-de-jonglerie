@@ -27,6 +27,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const isEmailEnabled = (sendEmailsEnv ?? (config.emailEnabled as string)) === 'true'
   const smtpUser = process.env.SMTP_USER || (config.smtpUser as string) || ''
   const smtpPass = process.env.SMTP_PASS || (config.smtpPass as string) || ''
+  const smtpFrom = process.env.SMTP_FROM || (config.smtpFrom as string) || smtpUser
 
   try {
     if (!isEmailEnabled) {
@@ -66,7 +67,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     })
 
     const mailOptions = {
-      from: `"Juggling Convention" <${smtpUser}>`,
+      from: `"Juggling Convention" <${smtpFrom}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
