@@ -1,56 +1,42 @@
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+
 /**
- * API pour désactiver un ou tous les tokens FCM de l'utilisateur
+ * POST /api/notifications/fcm/unsubscribe
+ * Désactive un ou tous les tokens FCM de l'utilisateur
  */
-export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  if (!session.user?.id) {
-    throw createError({
-      status: 401,
-      message: 'Non authentifié',
-    })
-  }
+    const body = await readBody(event).catch(() => ({}))
+    const { token } = body || {}
 
-  const body = await readBody(event).catch(() => ({}))
-  const { token } = body || {}
-
-  try {
     let result
 
     if (token && typeof token === 'string') {
-      // Désactiver un token spécifique
       result = await prisma.fcmToken.updateMany({
         where: {
-          userId: session.user.id,
+          userId: user.id,
           token,
         },
         data: {
           isActive: false,
         },
       })
-      console.log(`🔕 [FCM] Token spécifique désactivé pour l'utilisateur ${session.user.id}`)
     } else {
-      // Désactiver tous les tokens de l'utilisateur
       result = await prisma.fcmToken.updateMany({
         where: {
-          userId: session.user.id,
+          userId: user.id,
           isActive: true,
         },
         data: {
           isActive: false,
         },
       })
-      console.log(
-        `🔕 [FCM] Tous les tokens désactivés pour l'utilisateur ${session.user.id} (${result.count} tokens)`
-      )
     }
 
     return createSuccessResponse({ count: result.count }, 'Token(s) FCM désactivé(s)')
-  } catch (error: any) {
-    console.error('[FCM Unsubscribe] Erreur:', error)
-    throw createError({
-      status: 500,
-      message: 'Erreur lors de la désactivation du token FCM',
-    })
-  }
-})
+  },
+  { operationName: 'UnsubscribeFcm' }
+)

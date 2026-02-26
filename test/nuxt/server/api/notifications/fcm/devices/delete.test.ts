@@ -1,18 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock de requireAuth pour simuler un utilisateur authentifié
+vi.mock('#server/utils/auth-utils', () => ({
+  requireAuth: vi.fn((event) => {
+    if (!event.context.user) {
+      throw createError({ status: 401, message: 'Unauthorized' })
+    }
+    return event.context.user
+  }),
+}))
+
 import handler from '../../../../../../../server/api/notifications/fcm/devices/[id].delete'
 
 // Utiliser le mock global de Prisma
 const prismaMock = (globalThis as any).prisma
-
-// Mock de getUserSession
-vi.mock('nuxt-auth-utils', () => ({
-  getUserSession: vi.fn(),
-}))
-
-import { getUserSession } from 'nuxt-auth-utils'
-
-const mockGetUserSession = getUserSession as ReturnType<typeof vi.fn>
 
 describe('/api/notifications/fcm/devices/[id] DELETE', () => {
   const mockUser = {
@@ -34,14 +35,13 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetUserSession.mockResolvedValue({ user: mockUser })
     global.getRouterParam = vi.fn().mockReturnValue('device-uuid-123')
     prismaMock.fcmToken.findFirst.mockResolvedValue(mockDevice)
     prismaMock.fcmToken.delete.mockResolvedValue(mockDevice)
   })
 
   it('devrait supprimer un appareil avec succès', async () => {
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
@@ -53,7 +53,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
   })
 
   it("devrait vérifier que l'appareil appartient à l'utilisateur", async () => {
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await handler(mockEvent as any)
 
@@ -68,7 +68,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
   it('devrait rejeter si ID manquant', async () => {
     global.getRouterParam = vi.fn().mockReturnValue(undefined)
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 400,
@@ -76,9 +76,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
-    mockGetUserSession.mockResolvedValue({ user: null })
-
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: {}, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 401,
@@ -88,7 +86,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
   it('devrait rejeter si appareil non trouvé', async () => {
     prismaMock.fcmToken.findFirst.mockResolvedValue(null)
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 404,
@@ -99,7 +97,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
     // L'appareil existe mais avec un userId différent -> findFirst retourne null
     prismaMock.fcmToken.findFirst.mockResolvedValue(null)
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 404,
@@ -109,7 +107,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     prismaMock.fcmToken.findFirst.mockRejectedValue(new Error('DB Error'))
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 500,
@@ -120,7 +118,7 @@ describe('/api/notifications/fcm/devices/[id] DELETE', () => {
     const httpError = { statusCode: 403, message: 'Forbidden' }
     prismaMock.fcmToken.findFirst.mockRejectedValue(httpError)
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })

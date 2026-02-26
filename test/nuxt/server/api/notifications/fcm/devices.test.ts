@@ -1,18 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock de requireAuth pour simuler un utilisateur authentifié
+vi.mock('#server/utils/auth-utils', () => ({
+  requireAuth: vi.fn((event) => {
+    if (!event.context.user) {
+      throw createError({ status: 401, message: 'Unauthorized' })
+    }
+    return event.context.user
+  }),
+}))
+
 import handler from '../../../../../../server/api/notifications/fcm/devices.get'
 
 // Utiliser le mock global de Prisma
 const prismaMock = (globalThis as any).prisma
-
-// Mock de getUserSession
-vi.mock('nuxt-auth-utils', () => ({
-  getUserSession: vi.fn(),
-}))
-
-import { getUserSession } from 'nuxt-auth-utils'
-
-const mockGetUserSession = getUserSession as ReturnType<typeof vi.fn>
 
 describe('/api/notifications/fcm/devices GET', () => {
   const mockUser = {
@@ -40,12 +41,11 @@ describe('/api/notifications/fcm/devices GET', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetUserSession.mockResolvedValue({ user: mockUser })
     prismaMock.fcmToken.findMany.mockResolvedValue(mockDevices)
   })
 
   it('devrait retourner la liste des appareils enregistrés', async () => {
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
@@ -55,7 +55,7 @@ describe('/api/notifications/fcm/devices GET', () => {
   })
 
   it('devrait filtrer uniquement les tokens actifs', async () => {
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await handler(mockEvent as any)
 
@@ -78,9 +78,7 @@ describe('/api/notifications/fcm/devices GET', () => {
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
-    mockGetUserSession.mockResolvedValue({ user: null })
-
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: {}, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 401,
@@ -90,7 +88,7 @@ describe('/api/notifications/fcm/devices GET', () => {
   it('devrait retourner une liste vide si aucun appareil', async () => {
     prismaMock.fcmToken.findMany.mockResolvedValue([])
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
@@ -101,7 +99,7 @@ describe('/api/notifications/fcm/devices GET', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     prismaMock.fcmToken.findMany.mockRejectedValue(new Error('DB Error'))
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 500,

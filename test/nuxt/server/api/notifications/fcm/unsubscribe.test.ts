@@ -1,18 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock de requireAuth pour simuler un utilisateur authentifié
+vi.mock('#server/utils/auth-utils', () => ({
+  requireAuth: vi.fn((event) => {
+    if (!event.context.user) {
+      throw createError({ status: 401, message: 'Unauthorized' })
+    }
+    return event.context.user
+  }),
+}))
+
 import handler from '../../../../../../server/api/notifications/fcm/unsubscribe.post'
 
 // Utiliser le mock global de Prisma
 const prismaMock = (globalThis as any).prisma
-
-// Mock de getUserSession
-vi.mock('nuxt-auth-utils', () => ({
-  getUserSession: vi.fn(),
-}))
-
-import { getUserSession } from 'nuxt-auth-utils'
-
-const mockGetUserSession = getUserSession as ReturnType<typeof vi.fn>
 
 describe('/api/notifications/fcm/unsubscribe POST', () => {
   const mockUser = {
@@ -23,13 +24,12 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetUserSession.mockResolvedValue({ user: mockUser })
     global.readBody = vi.fn().mockResolvedValue({})
     prismaMock.fcmToken.updateMany.mockResolvedValue({ count: 3 })
   })
 
   it("devrait désactiver tous les tokens de l'utilisateur", async () => {
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
@@ -50,7 +50,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
     global.readBody = vi.fn().mockResolvedValue({ token: 'specific-token-123' })
     prismaMock.fcmToken.updateMany.mockResolvedValue({ count: 1 })
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
@@ -68,9 +68,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
-    mockGetUserSession.mockResolvedValue({ user: null })
-
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: {}, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 401,
@@ -80,7 +78,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     prismaMock.fcmToken.updateMany.mockRejectedValue(new Error('DB Error'))
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     await expect(handler(mockEvent as any)).rejects.toMatchObject({
       statusCode: 500,
@@ -90,7 +88,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
   it('devrait retourner count: 0 si aucun token à désactiver', async () => {
     prismaMock.fcmToken.updateMany.mockResolvedValue({ count: 0 })
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     const result = await handler(mockEvent as any)
 
@@ -102,7 +100,7 @@ describe('/api/notifications/fcm/unsubscribe POST', () => {
     global.readBody = vi.fn().mockRejectedValue(new Error('Parse error'))
     prismaMock.fcmToken.updateMany.mockResolvedValue({ count: 2 })
 
-    const mockEvent = { node: { req: {} } }
+    const mockEvent = { context: { user: mockUser }, node: { req: {} } }
 
     // Le handler attrape l'erreur et utilise un objet vide
     const result = await handler(mockEvent as any)

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -12,90 +13,86 @@ const bodySchema = z.object({
   content: z.string().min(1, 'Le commentaire ne peut pas être vide').max(5000),
 })
 
-export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  const user = await requireAuth(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  // Valider les paramètres
-  const parseParamsResult = paramsSchema.safeParse(event.context.params)
-  if (!parseParamsResult.success) {
-    handleValidationError(parseParamsResult.error)
-  }
+    const parseParamsResult = paramsSchema.safeParse(event.context.params)
+    if (!parseParamsResult.success) {
+      handleValidationError(parseParamsResult.error)
+    }
 
-  const { id: editionId, userId } = parseParamsResult.data
+    const { id: editionId, userId } = parseParamsResult.data
 
-  // Valider le body
-  const body = await readBody(event)
-  const parseBodyResult = bodySchema.safeParse(body)
-  if (!parseBodyResult.success) {
-    handleValidationError(parseBodyResult.error)
-  }
+    const body = await readBody(event)
+    const parseBodyResult = bodySchema.safeParse(body)
+    if (!parseBodyResult.success) {
+      handleValidationError(parseBodyResult.error)
+    }
 
-  const { content } = parseBodyResult.data
+    const { content } = parseBodyResult.data
 
-  // Récupérer l'édition avec la convention
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    include: {
-      convention: {
-        include: {
-          organizers: {
-            where: { userId: user.id },
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      include: {
+        convention: {
+          include: {
+            organizers: {
+              where: { userId: user.id },
+            },
           },
         },
       },
-    },
-  })
-
-  if (!edition) {
-    throw createError({
-      status: 404,
-      statusText: 'Édition non trouvée',
     })
-  }
 
-  // Vérifier que l'utilisateur est organisateur ou auteur de la convention
-  const isAuthor = edition.convention.authorId === user.id
-  const isOrganizer = edition.convention.organizers.length > 0
+    if (!edition) {
+      throw createError({
+        status: 404,
+        statusText: 'Édition non trouvée',
+      })
+    }
 
-  if (!isAuthor && !isOrganizer && !user.isGlobalAdmin) {
-    throw createError({
-      status: 403,
-      statusText: "Vous n'avez pas les permissions nécessaires",
+    const isAuthor = edition.convention.authorId === user.id
+    const isOrganizer = edition.convention.organizers.length > 0
+
+    if (!isAuthor && !isOrganizer && !user.isGlobalAdmin) {
+      throw createError({
+        status: 403,
+        statusText: "Vous n'avez pas les permissions nécessaires",
+      })
+    }
+
+    const volunteer = await prisma.user.findUnique({
+      where: { id: userId },
     })
-  }
 
-  // Vérifier que le bénévole existe
-  const volunteer = await prisma.user.findUnique({
-    where: { id: userId },
-  })
+    if (!volunteer) {
+      throw createError({
+        status: 404,
+        statusText: 'Bénévole non trouvé',
+      })
+    }
 
-  if (!volunteer) {
-    throw createError({
-      status: 404,
-      statusText: 'Bénévole non trouvé',
-    })
-  }
-
-  // Créer ou mettre à jour le commentaire
-  const comment = await prisma.volunteerComment.upsert({
-    where: {
-      userId_editionId: {
+    const comment = await prisma.volunteerComment.upsert({
+      where: {
+        userId_editionId: {
+          userId,
+          editionId,
+        },
+      },
+      create: {
         userId,
         editionId,
+        content,
       },
-    },
-    create: {
-      userId,
-      editionId,
-      content,
-    },
-    update: {
-      content,
-    },
-  })
+      update: {
+        content,
+      },
+    })
 
-  return {
-    comment,
-  }
-})
+    return {
+      comment,
+    }
+  },
+  { operationName: 'UpdateVolunteerComment' }
+)

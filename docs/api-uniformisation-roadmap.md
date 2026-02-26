@@ -11,10 +11,10 @@
 | Retournent `{ success: true }` manuellement (exclus volontairement) | 3        | <1% |
 | Retournent des données brutes (pas de wrapper)                      | ~178     | 49% |
 
-| Infrastructure                             | Fichiers | %   |
-| ------------------------------------------ | -------- | --- |
-| Utilisent `wrapApiHandler`                 | 355      | 97% |
-| Utilisent `defineEventHandler` directement | 11       | 3%  |
+| Infrastructure                             | Fichiers | %    |
+| ------------------------------------------ | -------- | ---- |
+| Utilisent `wrapApiHandler`                 | 366      | 100% |
+| Utilisent `defineEventHandler` directement | 0        | 0%   |
 
 ### Chiffres frontend (`app/` — fichiers .vue et .ts)
 
@@ -29,36 +29,13 @@
 
 ## Axes d'uniformisation restants
 
-### Axe 1 — Endpoints sans `defineEventHandler` → `wrapApiHandler` (11 fichiers)
+### Axe 1 — Endpoints sans `defineEventHandler` → `wrapApiHandler` (11 fichiers) ✅ TERMINÉ
 
 **Effort** : Faible | **Impact** : Moyen (gestion d'erreurs centralisée)
 
-11 endpoints utilisent encore `defineEventHandler` directement au lieu de `wrapApiHandler` :
+~~11 endpoints utilisaient `defineEventHandler` directement au lieu de `wrapApiHandler`.~~
 
-**Commentaires bénévoles (3 fichiers)** :
-
-- `server/api/conventions/[id]/volunteers/[userId]/comment.delete.ts`
-- `server/api/conventions/[id]/volunteers/[userId]/comment.get.ts`
-- `server/api/conventions/[id]/volunteers/[userId]/comment.put.ts`
-
-**Messenger (3 fichiers)** :
-
-- `server/api/messenger/organizers-group.post.ts`
-- `server/api/messenger/team-conversation.post.ts`
-- `server/api/messenger/volunteer-to-organizers.post.ts`
-
-**Notifications FCM (4 fichiers)** :
-
-- `server/api/notifications/fcm/devices.get.ts`
-- `server/api/notifications/fcm/devices/[id].delete.ts`
-- `server/api/notifications/fcm/subscribe.post.ts`
-- `server/api/notifications/fcm/unsubscribe.post.ts`
-
-**Ticketing stats (1 fichier)** :
-
-- `server/api/editions/[id]/ticketing/stats/order-sources.get.ts`
-
-**Bénéfice** : Ces endpoints n'ont pas de gestion d'erreurs centralisée (pas de logging, pas de formatage d'erreur uniforme). Migrer vers `wrapApiHandler` apporte automatiquement le logging structuré et la gestion d'erreurs Prisma.
+**Migré le 26/02/2026** : Les 11 endpoints ont été migrés vers `wrapApiHandler` avec `requireAuth`. Les `try/catch` manuels avec `console.error` ont été supprimés (gérés par `wrapApiHandler`). 4 fichiers de tests FCM mis à jour pour utiliser le mock `requireAuth` au lieu de `getUserSession`.
 
 ---
 
@@ -138,12 +115,12 @@ return { conventions, total }
 
 ## Priorités recommandées
 
-| Priorité | Axe                                                         | Effort | Valeur                |
-| -------- | ----------------------------------------------------------- | ------ | --------------------- |
-| 1        | Axe 1 — 11 fichiers `defineEventHandler` → `wrapApiHandler` | Faible | Sécurité/logging      |
-| 2        | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate |
-| 3        | Axe 2 — Mutations brutes → `createSuccessResponse`          | Moyen  | Uniformité            |
-| -        | Axe 4 — 3 fichiers exclus                                   | -      | Pas nécessaire        |
+| Priorité | Axe                                                         | Effort | Valeur                | Statut     |
+| -------- | ----------------------------------------------------------- | ------ | --------------------- | ---------- |
+| ~~1~~    | Axe 1 — 11 fichiers `defineEventHandler` → `wrapApiHandler` | Faible | Sécurité/logging      | ✅ Terminé |
+| 1        | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate | À faire    |
+| 2        | Axe 2 — Mutations brutes → `createSuccessResponse`          | Moyen  | Uniformité            | À faire    |
+| -        | Axe 4 — 3 fichiers exclus                                   | -      | Pas nécessaire        | -          |
 
 ---
 
@@ -153,6 +130,7 @@ return { conventions, total }
 | ------- | ---------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | Phase 1 | 26/02/2026 | 19 fichiers (Groupes C+B) — message-only et data-already | Remplacement mécanique, sans impact frontend                                        |
 | Phase 2 | 26/02/2026 | ~94 fichiers (Groupe A) — champs à la racine             | Smart unwrap + migration backend + 13 $fetch directs corrigés + 25 tests mis à jour |
+| Axe 1   | 26/02/2026 | 11 fichiers `defineEventHandler` → `wrapApiHandler`      | Migration + suppression try/catch manuels + 4 tests FCM mis à jour                  |
 
 Détails dans `docs/migration-createSuccessResponse.md`.
 
@@ -170,4 +148,4 @@ Détails dans `docs/migration-createSuccessResponse.md`.
 
 ---
 
-**Dernière mise à jour** : 26 février 2026
+**Dernière mise à jour** : 26 février 2026 (Axe 1 terminé)

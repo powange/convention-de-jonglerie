@@ -1,47 +1,48 @@
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
 import { ensureVolunteerConversations } from '#server/utils/messenger-helpers'
 
 /**
  * POST /api/messenger/team-conversation
  * Crée ou récupère la conversation de groupe d'une équipe
  */
-export default defineEventHandler(async (event) => {
-  const { user } = await requireUserSession(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  const body = await readBody(event)
-  const { editionId, teamId } = body
+    const body = await readBody(event)
+    const { editionId, teamId } = body
 
-  if (!editionId || !teamId) {
-    throw createError({
-      status: 400,
-      message: "L'ID de l'édition et l'ID de l'équipe sont requis",
-    })
-  }
+    if (!editionId || !teamId) {
+      throw createError({
+        status: 400,
+        message: "L'ID de l'édition et l'ID de l'équipe sont requis",
+      })
+    }
 
-  // Vérifier que l'utilisateur est bien membre de l'équipe
-  const teamAssignment = await prisma.applicationTeamAssignment.findFirst({
-    where: {
-      teamId,
-      application: {
-        editionId,
-        userId: user.id,
-        status: 'ACCEPTED',
+    // Vérifier que l'utilisateur est bien membre de l'équipe
+    const teamAssignment = await prisma.applicationTeamAssignment.findFirst({
+      where: {
+        teamId,
+        application: {
+          editionId,
+          userId: user.id,
+          status: 'ACCEPTED',
+        },
       },
-    },
-  })
-
-  if (!teamAssignment) {
-    throw createError({
-      status: 403,
-      message: "Vous n'êtes pas membre de cette équipe",
     })
-  }
 
-  try {
+    if (!teamAssignment) {
+      throw createError({
+        status: 403,
+        message: "Vous n'êtes pas membre de cette équipe",
+      })
+    }
+
     // Créer ou récupérer les conversations de l'équipe pour l'utilisateur actuel
     await ensureVolunteerConversations(editionId, teamId, user.id)
 
     // Synchroniser tous les membres de l'équipe dans la conversation
-    // Récupérer tous les bénévoles acceptés de cette équipe
     const allTeamMembers = await prisma.applicationTeamAssignment.findMany({
       where: {
         teamId,
@@ -84,11 +85,6 @@ export default defineEventHandler(async (event) => {
     return {
       conversationId: teamGroupConversation.id,
     }
-  } catch (error: any) {
-    console.error('Erreur lors de la création de la conversation:', error)
-    throw createError({
-      status: 500,
-      message: error.message || "Erreur lors de la création de la conversation de l'équipe",
-    })
-  }
-})
+  },
+  { operationName: 'CreateTeamConversation' }
+)

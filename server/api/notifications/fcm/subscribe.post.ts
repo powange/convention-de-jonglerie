@@ -1,34 +1,29 @@
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+
 /**
- * API pour enregistrer un token FCM
+ * POST /api/notifications/fcm/subscribe
+ * Enregistre un token FCM pour les notifications push
  */
-export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
 
-  if (!session.user?.id) {
-    throw createError({
-      status: 401,
-      message: 'Non authentifié',
-    })
-  }
+    const { token, deviceId } = await readBody(event)
 
-  const { token, deviceId } = await readBody(event)
+    if (!token || typeof token !== 'string') {
+      throw createError({
+        status: 400,
+        message: 'Token FCM requis',
+      })
+    }
 
-  if (!token || typeof token !== 'string') {
-    throw createError({
-      status: 400,
-      message: 'Token FCM requis',
-    })
-  }
+    const userAgent = getHeader(event, 'user-agent') || null
 
-  // Récupérer le User-Agent pour identifier l'appareil (informatif)
-  const userAgent = getHeader(event, 'user-agent') || null
-
-  try {
-    // Upsert atomique pour éviter les race conditions
     await prisma.fcmToken.upsert({
       where: {
         userId_token: {
-          userId: session.user.id,
+          userId: user.id,
           token,
         },
       },
@@ -38,7 +33,7 @@ export default defineEventHandler(async (event) => {
         userAgent,
       },
       create: {
-        userId: session.user.id,
+        userId: user.id,
         token,
         isActive: true,
         deviceId: deviceId || null,
@@ -47,11 +42,6 @@ export default defineEventHandler(async (event) => {
     })
 
     return createSuccessResponse(null, 'Token FCM enregistré')
-  } catch (error: any) {
-    console.error('[FCM Subscribe] Erreur:', error)
-    throw createError({
-      status: 500,
-      message: "Erreur lors de l'enregistrement du token FCM",
-    })
-  }
-})
+  },
+  { operationName: 'SubscribeFcm' }
+)
