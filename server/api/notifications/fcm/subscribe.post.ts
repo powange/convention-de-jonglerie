@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return { success: true, message: 'Token FCM enregistré' }
+    return createSuccessResponse(null, 'Token FCM enregistré')
   } catch (error: any) {
     console.error('[FCM Subscribe] Erreur:', error)
     throw createError({

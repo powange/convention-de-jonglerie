@@ -46,10 +46,7 @@ export default defineEventHandler(async (event) => {
 
     console.log(`🗑️ [FCM] Token supprimé pour l'utilisateur ${session.user.id}`)
 
-    return {
-      success: true,
-      message: 'Appareil supprimé',
-    }
+    return createSuccessResponse(null, 'Appareil supprimé')
   } catch (error: unknown) {
     if (isHttpError(error)) throw error
 

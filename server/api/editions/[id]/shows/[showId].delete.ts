@@ -61,10 +61,7 @@ export default wrapApiHandler(
       where: { id: showId },
     })
 
-    return {
-      success: true,
-      message: 'Spectacle supprimé avec succès',
-    }
+    return createSuccessResponse(null, 'Spectacle supprimé avec succès')
   },
   { operationName: 'DeleteShow' }
 )

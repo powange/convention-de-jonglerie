@@ -66,7 +66,5 @@ export default defineEventHandler(async (event) => {
     // Si le commentaire n'existe pas, on ignore l'erreur
   }
 
-  return {
-    success: true,
-  }
+  return createSuccessResponse(null)
 })

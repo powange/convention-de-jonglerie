@@ -37,10 +37,7 @@ export default wrapApiHandler(
       where: { id: existingConfig.id },
     })
 
-    return {
-      success: true,
-      message: 'Configuration de billeterie supprimée',
-    }
+    return createSuccessResponse(null, 'Configuration de billeterie supprimée')
   },
   { operationName: 'DELETE ticketing external index' }
 )

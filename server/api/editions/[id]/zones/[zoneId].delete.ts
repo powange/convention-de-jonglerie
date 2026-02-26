@@ -36,10 +36,7 @@ export default wrapApiHandler(
       where: { id: zoneId },
     })
 
-    return {
-      success: true,
-      message: 'Zone supprimée avec succès',
-    }
+    return createSuccessResponse(null, 'Zone supprimée avec succès')
   },
   { operationName: 'DeleteEditionZone' }
 )

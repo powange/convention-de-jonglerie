@@ -17,10 +17,7 @@ export default wrapApiHandler(
     try {
       await NotificationService.delete(notificationId, user.id)
 
-      return {
-        success: true,
-        message: 'Notification supprimée',
-      }
+      return createSuccessResponse(null, 'Notification supprimée')
     } catch (error) {
       // Vérifier si c'est une erreur de permission (notification non trouvée)
       if (error.code === 'P2025') {

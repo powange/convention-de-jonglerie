@@ -72,6 +72,10 @@ declare global {
   var deleteCookie: ((event: unknown, name: string) => void) | undefined
 
   var getRequestURL: ((event: unknown) => URL) | undefined
+
+  var createSuccessResponse:
+    | ((data: unknown, message?: string) => { success: true; data: unknown; message?: string })
+    | undefined
 }
 // Rendre mockable par les tests (mockImplementation, etc.)
 // Par défaut, passe-plat
@@ -82,6 +86,15 @@ globalThis.defineEventHandler = vi.fn((fn) => fn) as unknown as typeof globalThi
 
 if (!(globalThis as any).createError) {
   ;(globalThis as any).createError = vi.fn((input: any) => h3CreateError(input))
+}
+
+// Exposer createSuccessResponse global (auto-importé par Nitro depuis server/utils/)
+if (!(globalThis as any).createSuccessResponse) {
+  ;(globalThis as any).createSuccessResponse = vi.fn((data: unknown, message?: string) => ({
+    success: true,
+    ...(message && { message }),
+    data,
+  }))
 }
 
 // Permettre aux tests d'écrire global.readBody.mockResolvedValue(...)

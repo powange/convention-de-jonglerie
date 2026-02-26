@@ -104,10 +104,7 @@ export default wrapApiHandler(
       }
     })
 
-    return {
-      success: true,
-      data: result,
-    }
+    return createSuccessResponse(result)
   },
   { operationName: 'CreatePrivateConversation' }
 )

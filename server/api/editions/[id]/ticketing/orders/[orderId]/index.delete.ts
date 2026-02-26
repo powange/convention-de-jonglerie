@@ -58,10 +58,7 @@ export default wrapApiHandler(
           where: { id: orderId },
         })
 
-        return {
-          success: true,
-          message: 'Commande supprimée avec succès',
-        }
+        return createSuccessResponse(null, 'Commande supprimée avec succès')
       }
 
       // Sinon, changer le statut de la commande à "Refunded" (annuler)
@@ -72,10 +69,7 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        success: true,
-        message: 'Commande annulée avec succès',
-      }
+      return createSuccessResponse(null, 'Commande annulée avec succès')
     } catch (error: unknown) {
       console.error('Delete order error:', error)
       if (isHttpError(error)) throw error

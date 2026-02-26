@@ -114,9 +114,7 @@ export default wrapApiHandler(
       })
     }
 
-    return {
-      success: true,
-    }
+    return createSuccessResponse(null)
   },
   { operationName: 'CancelMeal' }
 )

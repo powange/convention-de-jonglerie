@@ -66,10 +66,7 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        success: true,
-        message: 'Méthode de paiement mise à jour avec succès',
-      }
+      return createSuccessResponse(null, 'Méthode de paiement mise à jour avec succès')
     } catch (error: unknown) {
       console.error('Update payment method error:', error)
       if (isHttpError(error)) throw error

@@ -36,10 +36,7 @@ export default wrapApiHandler(
       where: { id: markerId },
     })
 
-    return {
-      success: true,
-      message: 'Point de repère supprimé avec succès',
-    }
+    return createSuccessResponse(null, 'Point de repère supprimé avec succès')
   },
   { operationName: 'DeleteEditionMarker' }
 )

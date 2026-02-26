@@ -61,10 +61,7 @@ export default wrapApiHandler(
       where: { id: artistId },
     })
 
-    return {
-      success: true,
-      message: 'Artiste supprimé avec succès',
-    }
+    return createSuccessResponse(null, 'Artiste supprimé avec succès')
   },
   { operationName: 'DeleteArtist' }
 )

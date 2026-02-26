@@ -105,8 +105,11 @@ describe('/api/editions/[id]/shows/[showId] DELETE', () => {
       const mockEvent = { context: { user: mockUser } }
       const result = await handler(mockEvent as any)
 
-      expect(result.success).toBe(true)
-      expect(result.message).toMatch(/supprimé/i)
+      expect(result).toEqual({
+        success: true,
+        data: null,
+        message: 'Spectacle supprimé avec succès',
+      })
       expect(prismaMock.show.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       })
@@ -184,7 +187,11 @@ describe('/api/editions/[id]/shows/[showId] DELETE', () => {
       const mockEvent = { context: { user: adminUser } }
       const result = await handler(mockEvent as any)
 
-      expect(result.success).toBe(true)
+      expect(result).toEqual({
+        success: true,
+        data: null,
+        message: 'Spectacle supprimé avec succès',
+      })
     })
   })
 })

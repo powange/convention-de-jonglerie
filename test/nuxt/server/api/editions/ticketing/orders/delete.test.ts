@@ -57,8 +57,11 @@ describe('DELETE /api/editions/[id]/ticketing/orders/[orderId]', () => {
 
     const result = await handler(mockEvent(1, 1) as any)
 
-    expect(result.success).toBe(true)
-    expect(result.message).toContain('annulée')
+    expect(result).toEqual({
+      success: true,
+      data: null,
+      message: 'Commande annulée avec succès',
+    })
     expect(prismaMock.ticketingOrder.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: { status: 'Refunded' },
@@ -88,8 +91,11 @@ describe('DELETE /api/editions/[id]/ticketing/orders/[orderId]', () => {
 
     const result = await handler(mockEvent(1, 1) as any)
 
-    expect(result.success).toBe(true)
-    expect(result.message).toContain('supprimée')
+    expect(result).toEqual({
+      success: true,
+      data: null,
+      message: 'Commande supprimée avec succès',
+    })
     expect(prismaMock.ticketingOrder.delete).toHaveBeenCalledWith({
       where: { id: 1 },
     })

@@ -7,10 +7,7 @@ export default wrapApiHandler(
     // Vider la session corrompue
     await clearUserSession(event)
 
-    return {
-      success: true,
-      message: 'Session cleared. Please log in again.',
-    }
+    return createSuccessResponse(null, 'Session cleared. Please log in again.')
   },
   { operationName: 'FixSession' }
 )

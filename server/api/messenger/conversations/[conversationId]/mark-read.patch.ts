@@ -68,9 +68,7 @@ export default wrapApiHandler(
       console.error('[Messenger] Erreur lors de la mise à jour du compteur SSE:', error)
     })
 
-    return {
-      success: true,
-    }
+    return createSuccessResponse(null)
   },
   { operationName: 'MarkConversationAsRead' }
 )

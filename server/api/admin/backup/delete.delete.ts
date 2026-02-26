@@ -26,10 +26,7 @@ export default wrapApiHandler(
 
       console.log(`Sauvegarde supprimée: ${filename}`)
 
-      return {
-        success: true,
-        message: 'Sauvegarde supprimée avec succès',
-      }
+      return createSuccessResponse(null, 'Sauvegarde supprimée avec succès')
     } catch (fileError: any) {
       if (fileError.code === 'ENOENT') {
         throw createError({

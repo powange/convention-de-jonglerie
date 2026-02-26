@@ -58,6 +58,7 @@ describe('API Markers - Suppression (DELETE)', () => {
 
     expect(result).toEqual({
       success: true,
+      data: null,
       message: 'Point de repère supprimé avec succès',
     })
 

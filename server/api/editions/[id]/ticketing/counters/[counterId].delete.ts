@@ -38,10 +38,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      success: true,
-      message: 'Compteur supprimé avec succès',
-    }
+    return createSuccessResponse(null, 'Compteur supprimé avec succès')
   },
   { operationName: 'DELETE ticketing counter' }
 )

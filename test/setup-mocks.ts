@@ -126,6 +126,15 @@ global.sendStream = vi.fn()
 // Mock de sendError
 global.sendError = vi.fn()
 
+// Mock de createSuccessResponse (auto-importé par Nitro depuis server/utils/)
+if (!global.createSuccessResponse) {
+  global.createSuccessResponse = vi.fn((data: unknown, message?: string) => ({
+    success: true,
+    ...(message && { message }),
+    data,
+  }))
+}
+
 // Mock de readMultipartFormData
 global.readMultipartFormData = vi.fn()
 

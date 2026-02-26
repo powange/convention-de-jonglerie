@@ -87,10 +87,7 @@ export default wrapApiHandler(
       // Synchroniser les participants de la conversation organisateurs (si elle existe)
       await syncOrganizersGroupParticipants(editionId)
 
-      return {
-        success: true,
-        message: "Organisateur retiré de l'édition avec succès",
-      }
+      return createSuccessResponse(null, "Organisateur retiré de l'édition avec succès")
     } catch (error: unknown) {
       // Si c'est déjà une erreur HTTP, la relancer
       if (isHttpError(error)) {

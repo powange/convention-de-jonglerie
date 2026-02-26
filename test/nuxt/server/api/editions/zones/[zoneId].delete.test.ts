@@ -62,6 +62,7 @@ describe('API Zones - Suppression (DELETE)', () => {
 
     expect(result).toEqual({
       success: true,
+      data: null,
       message: 'Zone supprimée avec succès',
     })
 

@@ -195,10 +195,7 @@ export default wrapApiHandler(
         }
       }
 
-      return {
-        success: true,
-        message: 'Entrée dévalidée avec succès',
-      }
+      return createSuccessResponse(null, 'Entrée dévalidée avec succès')
     } catch (error: unknown) {
       console.error('Invalidate entry error:', error)
       if (isHttpError(error)) throw error
