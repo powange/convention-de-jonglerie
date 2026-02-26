@@ -233,7 +233,6 @@ import { ref, onMounted, watch, computed } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
 import type {
-  HttpError,
   ConventionListItem,
   DashboardEdition,
   DashboardOrganizer,
@@ -331,8 +330,6 @@ watch(selectedConventionId, async (id) => {
 // Modal d'édition de organisateur
 const editOrganizerModalOpen = ref(false)
 const selectedOrganizerForEdit = ref<DashboardOrganizer | null>(null)
-const savingOrganizer = ref(false)
-
 // Modal d'ajout de organisateur
 const addOrganizerModalOpen = ref(false)
 
@@ -430,8 +427,6 @@ const showFeaturesModal = ref(false)
 // Modal de suppression d'édition
 const deleteEditionModalOpen = ref(false)
 const editionToDelete = ref<DashboardEdition | null>(null)
-const deletingEdition = ref(false)
-
 // Historique des organisateurs
 const historyModalOpen = ref(false)
 
@@ -464,82 +459,51 @@ const closeEditOrganizerModal = () => {
   selectedOrganizerForEdit.value = null
 }
 
-const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
-  if (!selectedOrganizerForEdit.value || !selectedListItem.value) {
-    return
+const saveOrgRights = ref<OrganizerRightsFormData | null>(null)
+
+const { execute: executeSaveOrganizer, loading: savingOrganizer } = useApiAction(
+  () =>
+    `/api/conventions/${selectedListItem.value?.id}/organizers/${selectedOrganizerForEdit.value?.id}`,
+  {
+    method: 'PUT',
+    body: () => ({
+      rights: saveOrgRights.value?.rights,
+      title: saveOrgRights.value?.title,
+      perEdition: saveOrgRights.value?.perEdition || [],
+    }),
+    successMessage: { title: t('gestion.organizers.organizer_updated') },
+    errorMessages: { default: t('errors.update_organizer_error') },
+    onSuccess: async () => {
+      closeEditOrganizerModal()
+      if (selectedListItem.value) await fetchConventionDetail(selectedListItem.value.id)
+    },
   }
+)
 
-  const { handleError } = useErrorHandler()
-
-  try {
-    savingOrganizer.value = true
-
-    await $fetch(
-      `/api/conventions/${selectedListItem.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
-      {
-        method: 'PUT',
-        body: {
-          rights: rights.rights,
-          title: rights.title,
-          perEdition: rights.perEdition || [],
-        },
-      }
-    )
-
-    toast.add({
-      title: t('gestion.organizers.organizer_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    closeEditOrganizerModal()
-    await fetchConventionDetail(selectedListItem.value.id)
-  } catch (error: unknown) {
-    handleError(error, {
-      defaultTitleKey: 'errors.update_organizer_error',
-      logPrefix: 'Error updating organizer rights',
-    })
-  } finally {
-    savingOrganizer.value = false
-  }
+const saveOrganizerChanges = (rights: OrganizerRightsFormData) => {
+  if (!selectedOrganizerForEdit.value || !selectedListItem.value) return
+  saveOrgRights.value = rights
+  executeSaveOrganizer()
 }
 
-const removeOrganizer = async () => {
-  if (!selectedOrganizerForEdit.value || !selectedListItem.value) {
-    return
+const { execute: executeRemoveOrganizer } = useApiAction(
+  () =>
+    `/api/conventions/${selectedListItem.value?.id}/organizers/${selectedOrganizerForEdit.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('gestion.organizers.organizer_removed') },
+    errorMessages: { default: t('errors.remove_organizer_error') },
+    onSuccess: async () => {
+      closeEditOrganizerModal()
+      if (selectedListItem.value) await fetchConventionDetail(selectedListItem.value.id)
+    },
   }
+)
 
-  if (!confirm(t('gestion.organizers.confirm_remove'))) {
-    return
-  }
-
-  const { handleError } = useErrorHandler()
-
-  try {
-    savingOrganizer.value = true
-
-    await $fetch(
-      `/api/conventions/${selectedListItem.value.id}/organizers/${selectedOrganizerForEdit.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
-      title: t('gestion.organizers.organizer_removed'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    closeEditOrganizerModal()
-    await fetchConventionDetail(selectedListItem.value.id)
-  } catch (error: unknown) {
-    handleError(error, {
-      defaultTitleKey: 'errors.remove_organizer_error',
-      logPrefix: 'Error removing organizer',
-    })
-  } finally {
-    savingOrganizer.value = false
+const removeOrganizer = () => {
+  if (!selectedOrganizerForEdit.value || !selectedListItem.value) return
+  if (confirm(t('gestion.organizers.confirm_remove'))) {
+    executeRemoveOrganizer()
   }
 }
 
@@ -571,40 +535,28 @@ const closeAddOrganizerModal = () => {
   searchedUsers.value = []
 }
 
-const addOrganizer = async () => {
-  if (!newOrganizerUser.value || !selectedListItem.value) {
-    return
+const { execute: executeAddOrganizer } = useApiAction(
+  () => `/api/conventions/${selectedListItem.value?.id}/organizers`,
+  {
+    method: 'POST',
+    body: () => ({
+      userId: newOrganizerUser.value?.id,
+      rights: newOrganizerRights.value.rights,
+      title: newOrganizerRights.value.title,
+      perEdition: newOrganizerRights.value.perEdition || [],
+    }),
+    successMessage: { title: 'Organisateur ajouté' },
+    errorMessages: { default: "Erreur lors de l'ajout" },
+    onSuccess: async () => {
+      closeAddOrganizerModal()
+      if (selectedListItem.value) await fetchConventionDetail(selectedListItem.value.id)
+    },
   }
+)
 
-  try {
-    await $fetch(`/api/conventions/${selectedListItem.value.id}/organizers`, {
-      method: 'POST',
-      body: {
-        userId: newOrganizerUser.value.id,
-        rights: newOrganizerRights.value.rights,
-        title: newOrganizerRights.value.title,
-        perEdition: newOrganizerRights.value.perEdition || [],
-      },
-    })
-
-    toast.add({
-      title: 'Organisateur ajouté',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    closeAddOrganizerModal()
-    await fetchConventionDetail(selectedListItem.value.id)
-  } catch (error: unknown) {
-    const httpError = error as HttpError
-    console.error('Error adding organizer:', error)
-    toast.add({
-      title: "Erreur lors de l'ajout",
-      description: httpError.data?.message || httpError.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
+const addOrganizer = () => {
+  if (!newOrganizerUser.value || !selectedListItem.value) return
+  executeAddOrganizer()
 }
 
 const deleteEdition = (id: number) => {
@@ -620,38 +572,29 @@ const deleteEdition = (id: number) => {
 const cancelDeleteEdition = () => {
   deleteEditionModalOpen.value = false
   editionToDelete.value = null
-  deletingEdition.value = false
 }
 
-const confirmDeleteEdition = async () => {
-  if (!editionToDelete.value || !selectedListItem.value) return
-
-  try {
-    deletingEdition.value = true
-
-    await $fetch(`/api/editions/${editionToDelete.value.id}`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
-      title: t('messages.edition_deleted'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    cancelDeleteEdition()
-    // Recharger le détail ET la liste (pour mettre à jour le compteur d'éditions)
-    await Promise.all([fetchConventionDetail(selectedListItem.value.id), fetchConventionsList()])
-  } catch (e: unknown) {
-    const error = e as HttpError
-    toast.add({
-      title: t('errors.deletion_error'),
-      description: error.message || error.data?.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-    deletingEdition.value = false
+const { execute: executeDeleteEdition, loading: deletingEdition } = useApiAction(
+  () => `/api/editions/${editionToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('messages.edition_deleted') },
+    errorMessages: { default: t('errors.deletion_error') },
+    onSuccess: async () => {
+      cancelDeleteEdition()
+      if (selectedListItem.value) {
+        await Promise.all([
+          fetchConventionDetail(selectedListItem.value.id),
+          fetchConventionsList(),
+        ])
+      }
+    },
   }
+)
+
+const confirmDeleteEdition = () => {
+  if (!editionToDelete.value || !selectedListItem.value) return
+  executeDeleteEdition()
 }
 
 // Fonctions de fetch
@@ -702,34 +645,29 @@ const fetchConventionDetail = async (id: number) => {
 }
 
 // Fonction pour supprimer une convention
-const deleteConvention = async (id: number) => {
-  if (confirm(t('conventions.confirm_delete_convention'))) {
-    try {
-      await $fetch(`/api/conventions/${id}`, {
-        method: 'DELETE',
-      })
+const deleteConventionId = ref<number | null>(null)
 
-      toast.add({
-        title: t('conventions.convention_deleted'),
-        description: t('conventions.convention_deleted_success'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-
-      // Recharger la liste (l'auto-sélection gèrera le reste)
+const { execute: executeDeleteConvention } = useApiAction(
+  () => `/api/conventions/${deleteConventionId.value}`,
+  {
+    method: 'DELETE',
+    successMessage: {
+      title: t('conventions.convention_deleted'),
+      description: t('conventions.convention_deleted_success'),
+    },
+    errorMessages: { default: t('errors.deletion_error') },
+    onSuccess: async () => {
       selectedConventionId.value = null
       conventionDetail.value = null
       await fetchConventionsList()
-    } catch (error: unknown) {
-      const httpError = error as HttpError
-      console.error('Error deleting convention:', error)
-      toast.add({
-        title: t('errors.deletion_error'),
-        description: httpError.data?.message || httpError.message || t('errors.server_error'),
-        icon: 'i-heroicons-x-circle',
-        color: 'error',
-      })
-    }
+    },
+  }
+)
+
+const deleteConvention = (id: number) => {
+  if (confirm(t('conventions.confirm_delete_convention'))) {
+    deleteConventionId.value = id
+    executeDeleteConvention()
   }
 }
 
@@ -758,64 +696,54 @@ const getEditionDisplayName = (edition: DashboardEdition) => {
 }
 
 // Duplication d'édition
-const duplicatingEdition = ref(false)
-const duplicateEdition = async (editionId: number) => {
-  if (!selectedListItem.value || duplicatingEdition.value) return
+const duplicateEditionId = ref<number | null>(null)
 
-  duplicatingEdition.value = true
-  try {
-    const newEdition = await $fetch<{ id: number }>(`/api/editions/${editionId}/duplicate`, {
-      method: 'POST',
-    })
-
-    toast.add({
+const { execute: executeDuplicateEdition, loading: duplicatingEdition } = useApiAction(
+  () => `/api/editions/${duplicateEditionId.value}/duplicate`,
+  {
+    method: 'POST',
+    successMessage: {
       title: t('conventions.edition_duplicated'),
       description: t('conventions.edition_duplicated_desc'),
-      icon: 'i-heroicons-document-duplicate',
-      color: 'success',
-    })
-
-    await navigateTo(`/editions/${newEdition.id}/edit`)
-  } catch (error) {
-    console.error('Failed to duplicate edition:', error)
-    toast.add({
-      title: t('conventions.duplication_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    duplicatingEdition.value = false
+    },
+    errorMessages: { default: t('conventions.duplication_error') },
+    onSuccess: async (result: any) => {
+      await navigateTo(`/editions/${result.id}/edit`)
+    },
   }
+)
+
+const duplicateEdition = (editionId: number) => {
+  if (!selectedListItem.value || duplicatingEdition.value) return
+  duplicateEditionId.value = editionId
+  executeDuplicateEdition()
 }
 
 // Update edition status
-const updateEditionStatus = async (
+const statusEditionId = ref<number | null>(null)
+const statusValue = ref<string | null>(null)
+
+const { execute: executeUpdateStatus, loading: updatingStatus } = useApiAction(
+  () => `/api/editions/${statusEditionId.value}/status`,
+  {
+    method: 'PATCH',
+    body: () => ({ status: statusValue.value }),
+    successMessage: { title: t('edition.status_updated') },
+    errorMessages: { default: t('errors.status_update_failed') },
+    refreshOnSuccess: async () => {
+      if (selectedListItem.value) await fetchConventionDetail(selectedListItem.value.id)
+    },
+  }
+)
+
+const updateEditionStatus = (
   editionId: number,
   status: 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
 ) => {
-  if (!selectedListItem.value) return
-
-  try {
-    await $fetch(`/api/editions/${editionId}/status`, {
-      method: 'PATCH',
-      body: { status },
-    })
-
-    toast.add({
-      title: t('edition.status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    await fetchConventionDetail(selectedListItem.value.id)
-  } catch (error) {
-    console.error('Failed to update edition status:', error)
-    toast.add({
-      title: t('errors.status_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
+  if (!selectedListItem.value || updatingStatus.value) return
+  statusEditionId.value = editionId
+  statusValue.value = status
+  executeUpdateStatus()
 }
 
 onMounted(async () => {

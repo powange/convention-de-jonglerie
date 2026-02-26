@@ -417,7 +417,6 @@ const newOrganizerUser = ref<any>(null)
 const newOrganizersearchTerm = ref('')
 const searchedUsers = ref<any[]>([])
 const searchingUsers = ref(false)
-const savingOrganizer = ref(false)
 
 // État pour la gestion des organisateurs sur l'édition
 const editionOrganizers = ref<any[]>([])
@@ -537,118 +536,78 @@ const closeEditOrganizerModal = () => {
   selectedOrganizer.value = null
 }
 
-const addOrganizer = async () => {
-  if (!newOrganizerUser.value || !edition.value) {
-    return
+const { execute: executeAddOrganizer } = useApiAction(
+  () => `/api/conventions/${edition.value?.convention?.id}/organizers`,
+  {
+    method: 'POST',
+    body: () => ({
+      userId: newOrganizerUser.value?.id,
+      rights: newOrganizerRights.value.rights,
+      title: newOrganizerRights.value.title,
+      perEdition: newOrganizerRights.value.perEdition || [],
+    }),
+    successMessage: { title: t('gestion.organizers.organizer_added') },
+    errorMessages: { default: t('errors.add_organizer_error') },
+    onSuccess: async () => {
+      cancelEditing()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      await loadEditionOrganizers()
+    },
   }
+)
 
-  try {
-    await $fetch(`/api/conventions/${edition.value.convention?.id}/organizers`, {
-      method: 'POST',
-      body: {
-        userId: newOrganizerUser.value.id,
-        rights: newOrganizerRights.value.rights,
-        title: newOrganizerRights.value.title,
-        perEdition: newOrganizerRights.value.perEdition || [],
-      },
-    })
-
-    toast.add({
-      title: t('gestion.organizers.organizer_added'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    cancelEditing()
-    // Recharger l'édition pour mettre à jour la liste des organisateurs
-    await editionStore.fetchEditionById(editionId, { force: true })
-    // Recharger les organisateurs disponibles pour le select de la seconde card
-    await loadEditionOrganizers()
-  } catch (error: any) {
-    console.error('Error adding organizer:', error)
-    toast.add({
-      title: t('errors.add_organizer_error'),
-      description: error.data?.message || error.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
+const addOrganizer = () => {
+  if (!newOrganizerUser.value || !edition.value) return
+  executeAddOrganizer()
 }
 
-const saveOrganizerChanges = async (rights: OrganizerRightsFormData) => {
-  if (!selectedOrganizer.value || !edition.value) {
-    return
+const saveOrganizerRights = ref<OrganizerRightsFormData | null>(null)
+
+const { execute: executeSaveOrganizer, loading: savingOrganizer } = useApiAction(
+  () =>
+    `/api/conventions/${edition.value?.convention?.id}/organizers/${selectedOrganizer.value?.id}`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      rights: saveOrganizerRights.value?.rights,
+      title: saveOrganizerRights.value?.title,
+      perEdition: saveOrganizerRights.value?.perEdition,
+    }),
+    successMessage: { title: t('gestion.organizers.organizer_updated') },
+    errorMessages: { default: t('errors.update_organizer_error') },
+    onSuccess: async () => {
+      closeEditOrganizerModal()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      await loadEditionOrganizers()
+    },
   }
+)
 
-  const { handleError } = useErrorHandler()
-  savingOrganizer.value = true
-
-  try {
-    await $fetch(
-      `/api/conventions/${edition.value.convention?.id}/organizers/${selectedOrganizer.value.id}`,
-      {
-        method: 'PATCH',
-        body: {
-          rights: rights.rights,
-          title: rights.title,
-          perEdition: rights.perEdition,
-        },
-      }
-    )
-
-    toast.add({
-      title: t('gestion.organizers.organizer_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    closeEditOrganizerModal()
-    await editionStore.fetchEditionById(editionId, { force: true })
-    await loadEditionOrganizers()
-  } catch (error: unknown) {
-    handleError(error, {
-      defaultTitleKey: 'errors.update_organizer_error',
-      logPrefix: 'Error updating organizer',
-    })
-  } finally {
-    savingOrganizer.value = false
-  }
+const saveOrganizerChanges = (rights: OrganizerRightsFormData) => {
+  if (!selectedOrganizer.value || !edition.value) return
+  saveOrganizerRights.value = rights
+  executeSaveOrganizer()
 }
 
-const removeOrganizer = async () => {
-  if (!selectedOrganizer.value || !edition.value) {
-    return
+const { execute: executeRemoveOrganizer } = useApiAction(
+  () =>
+    `/api/conventions/${edition.value?.convention?.id}/organizers/${selectedOrganizer.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('gestion.organizers.organizer_removed') },
+    errorMessages: { default: t('errors.remove_organizer_error') },
+    onSuccess: async () => {
+      closeEditOrganizerModal()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      await loadEditionOrganizers()
+    },
   }
+)
 
-  if (!confirm(t('gestion.organizers.confirm_remove'))) {
-    return
-  }
-
-  try {
-    await $fetch(
-      `/api/conventions/${edition.value.convention?.id}/organizers/${selectedOrganizer.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
-      title: t('gestion.organizers.organizer_removed'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    closeEditOrganizerModal()
-    await editionStore.fetchEditionById(editionId, { force: true })
-    await loadEditionOrganizers()
-  } catch (error: any) {
-    console.error('Error removing organizer:', error)
-    toast.add({
-      title: t('errors.remove_organizer_error'),
-      description: error.data?.message || error.message || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+const removeOrganizer = () => {
+  if (!selectedOrganizer.value || !edition.value) return
+  if (confirm(t('gestion.organizers.confirm_remove'))) {
+    executeRemoveOrganizer()
   }
 }
 
@@ -732,34 +691,23 @@ const loadEditionOrganizers = async () => {
   }
 }
 
-const addToEdition = async () => {
-  if (!selectedAvailableOrganizer.value) return
-
-  try {
-    await $fetch(`/api/editions/${editionId}/organizers/edition-organizers`, {
-      method: 'POST',
-      body: {
-        organizerId: selectedAvailableOrganizer.value,
-      },
-    })
-
-    toast.add({
-      title: t('gestion.organizers.added_to_edition'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    selectedAvailableOrganizer.value = null
-    await loadEditionOrganizers()
-  } catch (error: any) {
-    console.error('Failed to add organizer to edition:', error)
-    toast.add({
-      title: t('errors.add_error'),
-      description: error.data?.message || t('gestion.organizers.add_to_edition_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+const { execute: executeAddToEdition } = useApiAction(
+  () => `/api/editions/${editionId}/organizers/edition-organizers`,
+  {
+    method: 'POST',
+    body: () => ({ organizerId: selectedAvailableOrganizer.value }),
+    successMessage: { title: t('gestion.organizers.added_to_edition') },
+    errorMessages: { default: t('gestion.organizers.add_to_edition_error') },
+    onSuccess: async () => {
+      selectedAvailableOrganizer.value = null
+      await loadEditionOrganizers()
+    },
   }
+)
+
+const addToEdition = () => {
+  if (!selectedAvailableOrganizer.value) return
+  executeAddToEdition()
 }
 
 const confirmRemoveFromEdition = (organizer: any) => {
@@ -772,35 +720,24 @@ const confirmRemoveFromEdition = (organizer: any) => {
   removeFromEditionConfirmOpen.value = true
 }
 
-const removeFromEdition = async () => {
-  if (!organizerToRemoveFromEdition.value) return
-
-  try {
-    await $fetch(
-      `/api/editions/${editionId}/organizers/edition-organizers/${organizerToRemoveFromEdition.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
-      title: t('gestion.organizers.removed_from_edition'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    removeFromEditionConfirmOpen.value = false
-    organizerToRemoveFromEdition.value = null
-    await loadEditionOrganizers()
-  } catch (error: any) {
-    console.error('Failed to remove organizer from edition:', error)
-    toast.add({
-      title: t('errors.remove_error'),
-      description: error.data?.message || t('gestion.organizers.remove_from_edition_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+const { execute: executeRemoveFromEdition } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/organizers/edition-organizers/${organizerToRemoveFromEdition.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('gestion.organizers.removed_from_edition') },
+    errorMessages: { default: t('gestion.organizers.remove_from_edition_error') },
+    onSuccess: async () => {
+      removeFromEditionConfirmOpen.value = false
+      organizerToRemoveFromEdition.value = null
+      await loadEditionOrganizers()
+    },
   }
+)
+
+const removeFromEdition = () => {
+  if (!organizerToRemoveFromEdition.value) return
+  executeRemoveFromEdition()
 }
 
 // Fonction pour ouvrir la modal d'historique

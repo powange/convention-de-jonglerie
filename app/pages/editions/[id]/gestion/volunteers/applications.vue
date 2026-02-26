@@ -677,7 +677,6 @@ const sourceTeamId = ref<string | null>(null)
 const targetTeamId = ref<string | null>(null)
 const showMoveModal = ref(false)
 const showTeamSelectionModal = ref(false)
-const isProcessingMove = ref(false)
 const showAddVolunteerModal = ref(false)
 const showVolunteerMealsModal = ref(false)
 const selectedVolunteerForMeals = ref<any>(null)
@@ -1030,57 +1029,47 @@ const handleTeamSelection = async (teamId: string) => {
 }
 
 // Fonction pour désassigner un bénévole d'une équipe spécifique
-const unassignFromTeam = async (volunteer: any, teamId: string) => {
-  try {
-    const volunteerName = `${volunteer.user.prenom} ${volunteer.user.nom}`
-    const volunteerId = volunteer.id
+const unassignVolunteerId = ref<number | null>(null)
+const unassignTeams = ref<string[]>([])
+const unassignMeta = ref<{ volunteerName: string; teamName: string }>({
+  volunteerName: '',
+  teamName: '',
+})
 
-    // Récupérer les équipes actuelles du bénévole
-    const currentTeams = volunteer.teamAssignments?.map((t: any) => t.teamId) || []
-
-    // Retirer l'équipe spécifiée
-    const newTeams = currentTeams.filter((id: string) => id !== teamId)
-
-    // Appeler l'API pour mettre à jour les assignations
-    await $fetch(`/api/editions/${editionId}/volunteers/applications/${volunteerId}/teams`, {
-      method: 'PATCH',
-      body: {
-        teams: newTeams,
-      },
-    })
-
-    // Rafraîchir les données
-    await fetchTeamAssignments()
-    await fetchVolunteersInfo()
-
-    // Rafraîchir le tableau des bénévoles
-    if (volunteerTableRef.value && volunteerTableRef.value.refreshApplications) {
-      await volunteerTableRef.value.refreshApplications()
-    }
-
-    // Trouver le nom de l'équipe
-    const team = volunteerTeams.value.find((t) => t.id === teamId)
-    const teamName = team?.name || "l'équipe"
-
-    toast.add({
-      title: 'Bénévole désassigné',
-      description: `${volunteerName} a été retiré de ${teamName}`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Failed to unassign volunteer from team:', error)
-
-    const errorMessage =
-      error?.data?.message || error?.message || 'Impossible de désassigner le bénévole'
-
-    toast.add({
-      title: 'Erreur',
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+const { execute: executeUnassign } = useApiAction(
+  () => `/api/editions/${editionId}/volunteers/applications/${unassignVolunteerId.value}/teams`,
+  {
+    method: 'PATCH',
+    body: () => ({ teams: unassignTeams.value }),
+    silentSuccess: true,
+    errorMessages: { default: 'Impossible de désassigner le bénévole' },
+    onSuccess: async () => {
+      await fetchTeamAssignments()
+      await fetchVolunteersInfo()
+      if (volunteerTableRef.value?.refreshApplications) {
+        await volunteerTableRef.value.refreshApplications()
+      }
+      toast.add({
+        title: 'Bénévole désassigné',
+        description: `${unassignMeta.value.volunteerName} a été retiré de ${unassignMeta.value.teamName}`,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    },
   }
+)
+
+const unassignFromTeam = (volunteer: any, teamId: string) => {
+  const currentTeams = volunteer.teamAssignments?.map((t: any) => t.teamId) || []
+  const team = volunteerTeams.value.find((t) => t.id === teamId)
+
+  unassignVolunteerId.value = volunteer.id
+  unassignTeams.value = currentTeams.filter((id: string) => id !== teamId)
+  unassignMeta.value = {
+    volunteerName: `${volunteer.user.prenom} ${volunteer.user.nom}`,
+    teamName: team?.name || "l'équipe",
+  }
+  executeUnassign()
 }
 
 // Vérifier si un bénévole est leader d'une équipe
@@ -1091,109 +1080,111 @@ const isTeamLeader = (volunteer: any, teamId: string): boolean => {
 }
 
 // Toggle le statut de leader d'un bénévole pour une équipe
-const toggleTeamLeader = async (volunteer: any, teamId: string) => {
-  try {
-    const volunteerName = `${volunteer.user.prenom} ${volunteer.user.nom}`
-    const isCurrentlyLeader = isTeamLeader(volunteer, teamId)
+const leaderVolunteerId = ref<number | null>(null)
+const leaderTeamId = ref<string | null>(null)
+const leaderNewValue = ref(false)
+const leaderMeta = ref<{ volunteerName: string; teamName: string; wasLeader: boolean }>({
+  volunteerName: '',
+  teamName: '',
+  wasLeader: false,
+})
 
-    await $fetch(
-      `/api/editions/${editionId}/volunteers/applications/${volunteer.id}/teams/${teamId}/leader`,
-      {
-        method: 'PATCH',
-        body: {
-          isLeader: !isCurrentlyLeader,
-        },
-      }
-    )
-
-    // Rafraîchir les données
-    await fetchTeamAssignments()
-    await fetchVolunteersInfo()
-
-    // Trouver le nom de l'équipe
-    const team = volunteerTeams.value.find((t) => t.id === teamId)
-    const teamName = team?.name || "l'équipe"
-
-    toast.add({
-      title: isCurrentlyLeader
-        ? $t('pages.volunteers.team_distribution.leader_removed')
-        : $t('pages.volunteers.team_distribution.leader_added'),
-      description: isCurrentlyLeader
-        ? `${volunteerName} n'est plus responsable de ${teamName}`
-        : `${volunteerName} est maintenant responsable de ${teamName}`,
-      icon: 'i-heroicons-star',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Failed to toggle team leader:', error)
-
-    const errorMessage =
-      error?.data?.message || error?.message || 'Impossible de modifier le statut de responsable'
-
-    toast.add({
-      title: 'Erreur',
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+const { execute: executeToggleLeader } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/volunteers/applications/${leaderVolunteerId.value}/teams/${leaderTeamId.value}/leader`,
+  {
+    method: 'PATCH',
+    body: () => ({ isLeader: leaderNewValue.value }),
+    silentSuccess: true,
+    errorMessages: { default: 'Impossible de modifier le statut de responsable' },
+    onSuccess: async () => {
+      await fetchTeamAssignments()
+      await fetchVolunteersInfo()
+      const { volunteerName, teamName, wasLeader } = leaderMeta.value
+      toast.add({
+        title: wasLeader
+          ? t('pages.volunteers.team_distribution.leader_removed')
+          : t('pages.volunteers.team_distribution.leader_added'),
+        description: wasLeader
+          ? `${volunteerName} n'est plus responsable de ${teamName}`
+          : `${volunteerName} est maintenant responsable de ${teamName}`,
+        icon: 'i-heroicons-star',
+        color: 'success',
+      })
+    },
   }
+)
+
+const toggleTeamLeader = (volunteer: any, teamId: string) => {
+  const isCurrentlyLeader = isTeamLeader(volunteer, teamId)
+  const team = volunteerTeams.value.find((t) => t.id === teamId)
+
+  leaderVolunteerId.value = volunteer.id
+  leaderTeamId.value = teamId
+  leaderNewValue.value = !isCurrentlyLeader
+  leaderMeta.value = {
+    volunteerName: `${volunteer.user.prenom} ${volunteer.user.nom}`,
+    teamName: team?.name || "l'équipe",
+    wasLeader: isCurrentlyLeader,
+  }
+  executeToggleLeader()
 }
 
 // Fonction d'assignation directe (pour les bénévoles non assignés)
-const directAssign = async (teamId: string) => {
+const directAssignVolunteerId = ref<number | null>(null)
+const directAssignTeams = ref<string[]>([])
+const directAssignMeta = ref<{ volunteerName: string; teamName: string }>({
+  volunteerName: '',
+  teamName: '',
+})
+
+const { execute: executeDirectAssign } = useApiAction(
+  () => `/api/editions/${editionId}/volunteers/applications/${directAssignVolunteerId.value}/teams`,
+  {
+    method: 'PATCH',
+    body: () => ({ teams: directAssignTeams.value }),
+    silentSuccess: true,
+    errorMessages: { default: "Impossible d'assigner le bénévole à l'équipe" },
+    onSuccess: async () => {
+      await fetchTeamAssignments()
+      await fetchVolunteersInfo()
+      if (volunteerTableRef.value?.refreshApplications) {
+        await volunteerTableRef.value.refreshApplications()
+      }
+      toast.add({
+        title: 'Bénévole assigné',
+        description: `${directAssignMeta.value.volunteerName} a été assigné à ${directAssignMeta.value.teamName}`,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    },
+    onError: () => {
+      draggedVolunteer.value = null
+      dragOverTeam.value = null
+      sourceTeamId.value = null
+      targetTeamId.value = null
+    },
+  }
+)
+
+const directAssign = (teamId: string) => {
   if (!draggedVolunteer.value) return
 
-  try {
-    // Sauvegarder les infos du bénévole avant de l'assigner
-    const volunteerName = `${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
-    const volunteerId = draggedVolunteer.value.id
-
-    // Assigner le bénévole à l'équipe
-    await $fetch(`/api/editions/${editionId}/volunteers/applications/${volunteerId}/teams`, {
-      method: 'PATCH',
-      body: {
-        teams: [teamId],
-      },
-    })
-
-    // Rafraîchir les données
-    await fetchTeamAssignments()
-    await fetchVolunteersInfo()
-
-    // Rafraîchir le tableau des bénévoles
-    if (volunteerTableRef.value && volunteerTableRef.value.refreshApplications) {
-      await volunteerTableRef.value.refreshApplications()
-    }
-
-    // Trouver le nom de l'équipe
-    const team = volunteerTeams.value.find((t) => t.id === teamId)
-    const teamName = team?.name || "l'équipe"
-
-    toast.add({
-      title: 'Bénévole assigné',
-      description: `${volunteerName} a été assigné à ${teamName}`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Failed to assign volunteer to team:', error)
-
-    // Si l'erreur contient un message spécifique, l'afficher
-    const errorMessage =
-      error?.data?.message || error?.message || "Impossible d'assigner le bénévole à l'équipe"
-
-    toast.add({
-      title: 'Erreur',
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    draggedVolunteer.value = null
-    dragOverTeam.value = null
-    sourceTeamId.value = null
-    targetTeamId.value = null
+  const team = volunteerTeams.value.find((t) => t.id === teamId)
+  directAssignVolunteerId.value = draggedVolunteer.value.id
+  directAssignTeams.value = [teamId]
+  directAssignMeta.value = {
+    volunteerName: `${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`,
+    teamName: team?.name || "l'équipe",
   }
+
+  // Cleanup drag state
+  draggedVolunteer.value = null
+  dragOverTeam.value = null
+  sourceTeamId.value = null
+  targetTeamId.value = null
+
+  executeDirectAssign()
 }
 
 // Fonction pour traiter les actions de déplacer/ajouter depuis la modal
@@ -1225,81 +1216,71 @@ const handleMealsUpdated = async () => {
   }
 }
 
-const processMove = async (action: 'move' | 'add') => {
+const moveVolunteerId = ref<number | null>(null)
+const moveNewTeams = ref<string[]>([])
+const moveMeta = ref<{ volunteerName: string; actionText: string; targetName: string }>({
+  volunteerName: '',
+  actionText: '',
+  targetName: '',
+})
+
+const { execute: executeProcessMove, loading: isProcessingMove } = useApiAction(
+  () => `/api/editions/${editionId}/volunteers/applications/${moveVolunteerId.value}/teams`,
+  {
+    method: 'PATCH',
+    body: () => ({ teams: moveNewTeams.value }),
+    silentSuccess: true,
+    errorMessages: { default: "Impossible de traiter l'opération" },
+    onSuccess: async () => {
+      await fetchTeamAssignments()
+      await fetchVolunteersInfo()
+      if (volunteerTableRef.value?.refreshApplications) {
+        await volunteerTableRef.value.refreshApplications()
+      }
+      toast.add({
+        title: 'Opération réussie',
+        description: `${moveMeta.value.volunteerName} a été ${moveMeta.value.actionText} ${moveMeta.value.targetName}`,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      showMoveModal.value = false
+      draggedVolunteer.value = null
+      dragOverTeam.value = null
+      sourceTeamId.value = null
+      targetTeamId.value = null
+    },
+    onError: () => {
+      showMoveModal.value = false
+      draggedVolunteer.value = null
+      dragOverTeam.value = null
+      sourceTeamId.value = null
+      targetTeamId.value = null
+    },
+  }
+)
+
+const processMove = (action: 'move' | 'add') => {
   if (!draggedVolunteer.value || !targetTeamId.value) return
 
-  isProcessingMove.value = true
+  const volunteerName = `${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
 
-  try {
-    const volunteerName = `${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
-    const volunteerId = draggedVolunteer.value.id
-
-    let newTeams: string[] = []
-
-    if (action === 'move') {
-      // Déplacer : assigner uniquement à la nouvelle équipe
-      newTeams = [targetTeamId.value]
-    } else {
-      // Ajouter : garder les équipes existantes et ajouter la nouvelle
-      const currentTeams = draggedVolunteer.value.teamAssignments?.map((t: any) => t.teamId) || []
-      newTeams = [...currentTeams, targetTeamId.value]
-      // Enlever les doublons au cas où
-      newTeams = [...new Set(newTeams)]
-    }
-
-    // Appeler l'API pour mettre à jour les assignations
-    await $fetch(`/api/editions/${editionId}/volunteers/applications/${volunteerId}/teams`, {
-      method: 'PATCH',
-      body: {
-        teams: newTeams,
-      },
-    })
-
-    // Rafraîchir les données
-    await fetchTeamAssignments()
-    await fetchVolunteersInfo()
-
-    // Rafraîchir le tableau des bénévoles
-    if (volunteerTableRef.value && volunteerTableRef.value.refreshApplications) {
-      await volunteerTableRef.value.refreshApplications()
-    }
-
-    // Message de succès
-    const actionText = action === 'move' ? 'déplacé vers' : 'ajouté à'
-    toast.add({
-      title: 'Opération réussie',
-      description: `${volunteerName} a été ${actionText} ${targetTeamName.value}`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Fermer la modal et nettoyer les variables
-    showMoveModal.value = false
-    draggedVolunteer.value = null
-    dragOverTeam.value = null
-    sourceTeamId.value = null
-    targetTeamId.value = null
-  } catch (error: any) {
-    console.error('Failed to process move/add:', error)
-
-    const errorMessage =
-      error?.data?.message || error?.message || "Impossible de traiter l'opération"
-
-    toast.add({
-      title: 'Erreur',
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-    // En cas d'erreur, fermer quand même la modal et nettoyer
-    showMoveModal.value = false
-    draggedVolunteer.value = null
-    dragOverTeam.value = null
-    sourceTeamId.value = null
-    targetTeamId.value = null
-  } finally {
-    isProcessingMove.value = false
+  let newTeams: string[] = []
+  if (action === 'move') {
+    newTeams = [targetTeamId.value]
+  } else {
+    const currentTeams = draggedVolunteer.value.teamAssignments?.map((t: any) => t.teamId) || []
+    newTeams = [...new Set([...currentTeams, targetTeamId.value])]
   }
+
+  moveVolunteerId.value = draggedVolunteer.value.id
+  moveNewTeams.value = newTeams
+  moveMeta.value = {
+    volunteerName,
+    actionText: action === 'move' ? 'déplacé vers' : 'ajouté à',
+    targetName: targetTeamName.value,
+  }
+
+  executeProcessMove()
 }
 
 // Watcher pour nettoyer les variables quand la modal se ferme
@@ -1310,7 +1291,6 @@ watch(showMoveModal, (newValue) => {
     dragOverTeam.value = null
     sourceTeamId.value = null
     targetTeamId.value = null
-    isProcessingMove.value = false
   }
 })
 

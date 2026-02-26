@@ -674,38 +674,33 @@ const toggleArchiveConvention = (conventionId: number, isArchived: boolean) => {
   showArchiveModal.value = true
 }
 
-const executeToggleArchive = async () => {
-  if (!conventionToArchive.value) return
+const { execute: executeToggleArchiveAction } = useApiAction(
+  () => `/api/conventions/${conventionToArchive.value?.id}/archive`,
+  {
+    method: 'PATCH',
+    body: () => ({ archived: !conventionToArchive.value?.isArchived }),
+    silentSuccess: true,
+    errorMessages: { default: t('admin.archive_error') },
+    onSuccess: () => {
+      const successMessage = !conventionToArchive.value?.isArchived
+        ? t('admin.convention_archived')
+        : t('admin.convention_unarchived')
 
-  try {
-    await ($fetch as any)(`/api/conventions/${conventionToArchive.value.id}/archive`, {
-      method: 'PATCH',
-      body: { archived: !conventionToArchive.value.isArchived },
-    })
-
-    // Rafraîchir les données
-    refresh()
-
-    // Message de succès
-    const successMessage = !conventionToArchive.value.isArchived
-      ? t('admin.convention_archived')
-      : t('admin.convention_unarchived')
-
-    useToast().add({
-      title: successMessage,
-      color: 'success',
-    })
-  } catch (error) {
-    console.error("Erreur lors de l'archivage:", error)
-    useToast().add({
-      title: t('common.error'),
-      description: t('admin.archive_error'),
-      color: 'error',
-    })
-  } finally {
-    showArchiveModal.value = false
-    conventionToArchive.value = null
+      useToast().add({ title: successMessage, color: 'success' })
+      refresh()
+      showArchiveModal.value = false
+      conventionToArchive.value = null
+    },
+    onError: () => {
+      showArchiveModal.value = false
+      conventionToArchive.value = null
+    },
   }
+)
+
+const executeToggleArchive = () => {
+  if (!conventionToArchive.value) return
+  executeToggleArchiveAction()
 }
 
 // Fonction pour supprimer définitivement une convention
@@ -714,36 +709,27 @@ const deleteConventionPermanently = (convention: Convention) => {
   showDeleteModal.value = true
 }
 
-const executeDeleteConvention = async () => {
-  if (!conventionToDelete.value) return
-
-  try {
-    await ($fetch as any)(`/api/admin/conventions/${conventionToDelete.value.id}`, {
-      method: 'DELETE',
-    })
-
-    // Rafraîchir les données
-    refresh()
-
-    // Message de succès
-    useToast().add({
-      title: t('admin.pages.conventions.convention_deleted_permanently'),
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Erreur lors de la suppression définitive:', error)
-    const errorMessage =
-      error?.data?.message || t('admin.pages.conventions.error_deleting_convention')
-
-    useToast().add({
-      title: t('common.error'),
-      description: errorMessage,
-      color: 'error',
-    })
-  } finally {
-    showDeleteModal.value = false
-    conventionToDelete.value = null
+const { execute: executeDeleteConventionAction } = useApiAction(
+  () => `/api/admin/conventions/${conventionToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('admin.pages.conventions.convention_deleted_permanently') },
+    errorMessages: { default: t('admin.pages.conventions.error_deleting_convention') },
+    onSuccess: () => {
+      refresh()
+      showDeleteModal.value = false
+      conventionToDelete.value = null
+    },
+    onError: () => {
+      showDeleteModal.value = false
+      conventionToDelete.value = null
+    },
   }
+)
+
+const executeDeleteConvention = () => {
+  if (!conventionToDelete.value) return
+  executeDeleteConventionAction()
 }
 
 // Fonction pour exporter une édition en JSON

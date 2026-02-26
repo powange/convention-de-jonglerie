@@ -958,13 +958,9 @@ useSeoMeta({
 const toast = useToast()
 
 // État réactif
-const sendingReminders = ref(false)
 const showCreateModal = ref(false)
 const showTestModal = ref(false)
 const showFirebaseTestModal = ref(false)
-const creatingNotification = ref(false)
-const testingAdvanced = ref(false)
-const testingFirebase = ref(false)
 const loadingRecent = ref(false)
 
 interface NotificationStats {
@@ -1325,68 +1321,48 @@ const handlePageChange = (newPage: number) => {
 }
 
 // Actions
-const sendReminders = async () => {
-  sendingReminders.value = true
-  try {
-    const response = await $fetch('/api/admin/notifications/send-reminders', {
-      method: 'POST',
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Rappels envoyés',
-      description: response.message,
-    })
-
-    await loadStats()
-    await loadRecentNotifications()
-  } catch {
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: "Impossible d'envoyer les rappels",
-    })
-  } finally {
-    sendingReminders.value = false
+const { execute: executeSendReminders, loading: sendingReminders } = useApiAction(
+  '/api/admin/notifications/send-reminders',
+  {
+    method: 'POST',
+    silentSuccess: true,
+    errorMessages: { default: "Impossible d'envoyer les rappels" },
+    onSuccess: async (result: any) => {
+      toast.add({ color: 'success', title: 'Rappels envoyés', description: result.message })
+      await loadStats()
+      await loadRecentNotifications()
+    },
   }
-}
+)
 
-const createNotification = async () => {
-  creatingNotification.value = true
-  try {
-    const response = await $fetch('/api/admin/notifications/create', {
-      method: 'POST',
-      body: {
-        userId: createForm.targetUser?.id,
-        type: createForm.type,
-        title: createForm.title,
-        message: createForm.message,
-        category: createForm.category === 'none' ? undefined : createForm.category || undefined,
-        actionUrl: createForm.actionUrl || undefined,
-        actionText: createForm.actionText || undefined,
-      },
-    })
+const sendReminders = () => executeSendReminders()
 
-    toast.add({
-      color: 'success',
-      title: 'Notification envoyée',
-      description: response.message,
-    })
-
-    showCreateModal.value = false
-    resetCreateForm()
-    await loadStats()
-    await loadRecentNotifications()
-  } catch (error) {
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: (error as any).data?.message || "Impossible d'envoyer la notification",
-    })
-  } finally {
-    creatingNotification.value = false
+const { execute: executeCreateNotification, loading: creatingNotification } = useApiAction(
+  '/api/admin/notifications/create',
+  {
+    method: 'POST',
+    body: () => ({
+      userId: createForm.targetUser?.id,
+      type: createForm.type,
+      title: createForm.title,
+      message: createForm.message,
+      category: createForm.category === 'none' ? undefined : createForm.category || undefined,
+      actionUrl: createForm.actionUrl || undefined,
+      actionText: createForm.actionText || undefined,
+    }),
+    silentSuccess: true,
+    errorMessages: { default: "Impossible d'envoyer la notification" },
+    onSuccess: async (result: any) => {
+      toast.add({ color: 'success', title: 'Notification envoyée', description: result.message })
+      showCreateModal.value = false
+      resetCreateForm()
+      await loadStats()
+      await loadRecentNotifications()
+    },
   }
-}
+)
+
+const createNotification = () => executeCreateNotification()
 
 // Fonction pour rechercher des utilisateurs
 const searchUsers = async (query: string) => {
@@ -1467,7 +1443,39 @@ watch(createSearchQuery, (query) => {
 })
 
 // Test avancé avec utilisateur sélectionné et message personnalisé
-const testNotificationAdvanced = async () => {
+const { execute: executeTestAdvanced, loading: testingAdvanced } = useApiAction(
+  '/api/admin/notifications/test',
+  {
+    method: 'POST',
+    body: () => {
+      const requestBody: any = {
+        type: testForm.type,
+        message: testForm.message || undefined,
+      }
+      if (testForm.targetUser?.isRealUser) {
+        requestBody.targetUserId = testForm.targetUser.id
+      } else if (testForm.targetUser) {
+        requestBody.targetUserEmail = testForm.targetUser.email
+      }
+      return requestBody
+    },
+    silentSuccess: true,
+    errorMessages: { default: "Impossible d'envoyer le test" },
+    onSuccess: async () => {
+      toast.add({
+        color: 'success',
+        title: 'Test personnalisé envoyé',
+        description: `Notification ${testForm.type} envoyée à ${testForm.targetUser?.label}`,
+      })
+      showTestModal.value = false
+      resetTestForm()
+      await loadStats()
+      await loadRecentNotifications()
+    },
+  }
+)
+
+const testNotificationAdvanced = () => {
   if (!testForm.targetUser) {
     toast.add({
       color: 'error',
@@ -1476,47 +1484,7 @@ const testNotificationAdvanced = async () => {
     })
     return
   }
-
-  testingAdvanced.value = true
-  try {
-    // Déterminer si on utilise targetUserId ou targetUserEmail
-    const requestBody: any = {
-      type: testForm.type,
-      message: testForm.message || undefined,
-    }
-
-    if (testForm.targetUser.isRealUser) {
-      // Pour les vrais utilisateurs, utiliser l'ID
-      requestBody.targetUserId = testForm.targetUser.id
-    } else {
-      // Pour les utilisateurs de test, utiliser l'email
-      requestBody.targetUserEmail = testForm.targetUser.email
-    }
-
-    await $fetch('/api/admin/notifications/test', {
-      method: 'POST',
-      body: requestBody,
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Test personnalisé envoyé',
-      description: `Notification ${testForm.type} envoyée à ${testForm.targetUser.label}`,
-    })
-
-    showTestModal.value = false
-    resetTestForm()
-    await loadStats()
-    await loadRecentNotifications()
-  } catch (error) {
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: (error as any).data?.message || "Impossible d'envoyer le test",
-    })
-  } finally {
-    testingAdvanced.value = false
-  }
+  executeTestAdvanced()
 }
 
 const resetCreateForm = () => {
@@ -1573,7 +1541,28 @@ const getFirebaseToken = async () => {
   }
 }
 
-const testFirebaseNotification = async () => {
+const { execute: executeTestFirebase, loading: testingFirebase } = useApiAction(
+  '/api/admin/notifications/test-firebase',
+  {
+    method: 'POST',
+    body: () => ({
+      token: firebaseToken.value,
+      title: firebaseTestForm.title,
+      body: firebaseTestForm.body,
+      actionUrl: firebaseTestForm.actionUrl,
+    }),
+    successMessage: {
+      title: 'Notification Firebase envoyée',
+      description: 'La notification de test a été envoyée via Firebase Cloud Messaging',
+    },
+    errorMessages: { default: "Impossible d'envoyer la notification Firebase" },
+    onSuccess: () => {
+      showFirebaseTestModal.value = false
+    },
+  }
+)
+
+const testFirebaseNotification = () => {
   if (!firebaseToken.value) {
     toast.add({
       color: 'error',
@@ -1582,68 +1571,40 @@ const testFirebaseNotification = async () => {
     })
     return
   }
-
-  testingFirebase.value = true
-  try {
-    await $fetch('/api/admin/notifications/test-firebase', {
-      method: 'POST',
-      body: {
-        token: firebaseToken.value,
-        title: firebaseTestForm.title,
-        body: firebaseTestForm.body,
-        actionUrl: firebaseTestForm.actionUrl,
-      },
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Notification Firebase envoyée',
-      description: 'La notification de test a été envoyée via Firebase Cloud Messaging',
-    })
-
-    showFirebaseTestModal.value = false
-  } catch (error) {
-    console.error("Erreur lors de l'envoi de la notification Firebase:", error)
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: (error as any).data?.message || "Impossible d'envoyer la notification Firebase",
-    })
-  } finally {
-    testingFirebase.value = false
-  }
+  executeTestFirebase()
 }
 
 // Fonction pour basculer le statut de lecture d'une notification
-const toggleNotificationReadStatus = async (notification: RecentNotification) => {
-  try {
-    const endpoint = notification.isRead
-      ? `/api/notifications/${notification.id}/unread`
-      : `/api/notifications/${notification.id}/read`
+const notificationToToggle = ref<RecentNotification | null>(null)
 
-    await $fetch(endpoint, {
-      method: 'PATCH',
-    })
-
-    // Mettre à jour localement
-    notification.isRead = !notification.isRead
-    notification.readAt = notification.isRead ? new Date().toISOString() : null
-
-    toast.add({
-      color: 'success',
-      title: notification.isRead ? 'Marquée comme lue' : 'Marquée comme non lue',
-    })
-
-    // Rafraîchir les statistiques
-    await loadStats()
-  } catch (error) {
-    console.error('Erreur lors de la modification du statut:', error)
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de modifier le statut de lecture',
-    })
+const { execute: executeToggleRead, loading: togglingRead } = useApiAction(
+  () =>
+    notificationToToggle.value?.isRead
+      ? `/api/notifications/${notificationToToggle.value.id}/unread`
+      : `/api/notifications/${notificationToToggle.value?.id}/read`,
+  {
+    method: 'PATCH',
+    silentSuccess: true,
+    errorMessages: { default: 'Impossible de modifier le statut de lecture' },
+    onSuccess: async () => {
+      if (notificationToToggle.value) {
+        const wasRead = notificationToToggle.value.isRead
+        notificationToToggle.value.isRead = !wasRead
+        notificationToToggle.value.readAt = !wasRead ? new Date().toISOString() : null
+        toast.add({
+          color: 'success',
+          title: !wasRead ? 'Marquée comme lue' : 'Marquée comme non lue',
+        })
+      }
+      await loadStats()
+    },
   }
+)
+
+const toggleNotificationReadStatus = (notification: RecentNotification) => {
+  if (togglingRead.value) return
+  notificationToToggle.value = notification
+  executeToggleRead()
 }
 
 const loadStats = async () => {

@@ -251,26 +251,12 @@ Pour chaque fichier à migrer :
 
 ## Fichiers restants à migrer
 
-### Pages
-
-| Fichier                                                       | Appels manuels | Détail                                                                                            |
-| ------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
-| `app/pages/my-conventions.vue`                                | 6              | DELETE organizer, POST organizer, DELETE edition, DELETE convention, POST duplicate, PATCH status |
-| `app/pages/editions/[id]/gestion/organizers.vue`              | 5              | POST/PATCH/DELETE convention organizer, POST/DELETE edition organizer                             |
-| `app/pages/editions/[id]/gestion/volunteers/applications.vue` | 4              | PATCH teams (x3), PATCH team leader                                                               |
-| `app/pages/editions/[id]/gestion/map.vue`                     | 1              | PATCH zones (utilise composables dédiés)                                                          |
-| `app/pages/admin/users/index.vue`                             | 3              | PUT promote, PUT demote, PUT update                                                               |
-| `app/pages/admin/users/[id].vue`                              | 3              | PUT update (x2), PUT promote                                                                      |
-| `app/pages/admin/error-logs.vue`                              | 2              | PATCH resolve, PATCH assign                                                                       |
-| `app/pages/admin/notifications.vue`                           | 1              | PATCH notification                                                                                |
-| `app/pages/admin/conventions.vue`                             | 2              | PATCH convention, DELETE convention                                                               |
-
-### Utilitaires et composables
+### Utilitaires et composables (non candidats ou cas spéciaux)
 
 | Fichier                                  | Appels manuels | Détail                                                                               | Note                                                        |
 | ---------------------------------------- | -------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `app/utils/volunteer-application-api.ts` | 5              | PATCH personal data, PATCH status, PATCH teams, POST application, DELETE application | Fichier utilitaire appelé par plusieurs pages               |
-| `app/utils/ticketing/tiers.ts`           | 1              | DELETE tier                                                                          |                                                             |
+| `app/utils/volunteer-application-api.ts` | 5              | PATCH personal data, PATCH status, PATCH teams, POST application, DELETE application | Wrappers $fetch purs sans toast/loading — non candidat      |
+| `app/utils/ticketing/tiers.ts`           | 1              | DELETE tier                                                                          | Wrapper $fetch pur sans toast/loading — non candidat        |
 | `app/composables/useTypingIndicator.ts`  | 2              | POST typing start/stop                                                               | Fire-and-forget, pas de toast nécessaire                    |
 | `app/composables/useTicketingCounter.ts` | 3              | PATCH increment/decrement/reset                                                      | Appels rapides en boucle, useApiAction peut ne pas convenir |
 
@@ -286,54 +272,63 @@ Pour chaque fichier à migrer :
 
 ## Fichiers déjà migrés
 
-| Fichier                                                                    | Date       | Patterns migrés                                                            |
-| -------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------- |
-| `app/components/ticketing/OptionModal.vue`                                 | -          | create, update                                                             |
-| `app/components/ticketing/QuotasList.vue`                                  | -          | delete, create, reorder                                                    |
-| `app/components/ticketing/TierModal.vue`                                   | -          | create, update                                                             |
-| `app/components/ticketing/CustomFieldModal.vue`                            | -          | create, update                                                             |
-| `app/components/ticketing/AddParticipantModal.vue`                         | -          | submitOrder                                                                |
-| `app/components/volunteers/CommentModal.vue`                               | -          | save                                                                       |
-| `app/components/profile/PushDevicesModal.vue`                              | -          | delete by ID                                                               |
-| `app/pages/login.vue`                                                      | -          | login avec redirect 403                                                    |
-| `app/components/artists/ArtistModal.vue`                                   | 2026-02-03 | create, update                                                             |
-| `app/pages/editions/[id]/gestion/ticketing/orders.vue`                     | 2026-02-03 | cancelOrder, updatePaymentMethod, validateEntry                            |
-| `app/pages/editions/[id]/gestion/ticketing/external.vue`                   | 2026-02-03 | loadTiers, saveConfig, testConnection, disconnect, loadOrders, loadRawJson |
-| `app/components/edition/volunteer/planning/DelayModal.vue`                 | 2026-02-03 | saveDelay, removeDelay                                                     |
-| `app/components/shows/ShowModal.vue`                                       | 2026-02-03 | create, update                                                             |
-| `app/components/organizers/ManageReturnableItemsModal.vue`                 | 2026-02-03 | addItem, removeItem                                                        |
-| `app/components/admin/UserDeletionModal.vue`                               | 2026-02-03 | confirmDeletion                                                            |
-| `app/components/edition/carpool/FormBase.vue`                              | 2026-02-03 | create, update                                                             |
-| `app/components/profile/UserCategoriesCard.vue`                            | 2026-02-03 | saveCategories                                                             |
-| `app/pages/register.vue`                                                   | 2026-02-03 | handleRegister                                                             |
-| `app/pages/verify-email.vue`                                               | 2026-02-03 | handleResendCode (partiel - autres gardent erreur inline)                  |
-| `app/pages/auth/complete-profile.vue`                                      | 2026-02-03 | saveCategories                                                             |
-| `app/pages/auth/forgot-password.vue`                                       | 2026-02-03 | handleSubmit                                                               |
-| `app/pages/auth/reset-password.vue`                                        | 2026-02-03 | handleSubmit                                                               |
-| `app/pages/profile.vue`                                                    | 2026-02-03 | updateProfile, changePassword, saveNotificationPreferences                 |
-| `app/pages/conventions/add.vue`                                            | 2026-02-03 | handleAddConvention                                                        |
-| `app/pages/editions/[id]/volunteers/.../confirm.vue`                       | 2026-02-03 | confirmReading                                                             |
-| `app/pages/admin/feedback.vue`                                             | 2026-02-03 | resolveFeedback                                                            |
-| `app/pages/editions/[id]/gestion/artists/index.vue`                        | 2026-02-04 | deleteArtist                                                               |
-| `app/pages/editions/[id]/gestion/artists/shows.vue`                        | 2026-02-04 | deleteShow                                                                 |
-| `app/pages/editions/[id]/gestion/artists/index.vue`                        | 2026-02-25 | saveArtistInfo                                                             |
-| `app/components/artists/OrganizerNotesModal.vue`                           | 2026-02-25 | saveNotes                                                                  |
-| `app/pages/editions/[id]/artist-space.vue`                                 | 2026-02-25 | saveDiet (saveAccommodation déjà migré)                                    |
-| `app/components/edition/carpool/OfferCard.vue`                             | 2026-02-25 | deleteOffer, submitBooking, cancelBooking                                  |
-| `app/components/edition/carpool/BookingsList.vue`                          | 2026-02-25 | updateBookingStatus (useApiActionById)                                     |
-| `app/components/edition/carpool/RequestCard.vue`                           | 2026-02-25 | deleteRequest                                                              |
-| `app/components/edition/volunteer/MealsCard.vue`                           | 2026-02-25 | saveMealSelections                                                         |
-| `app/components/edition/volunteer/MyTeamsCard.vue`                         | 2026-02-25 | sendMessageToTeam                                                          |
-| `app/components/edition/volunteer/AutoAssignmentPanel.vue`                 | 2026-02-25 | generatePreview, applyAssignments                                          |
-| `app/components/edition/volunteer/planning/AssignmentsModal.vue`           | 2026-02-25 | assignVolunteer, unassignVolunteer (useApiActionById)                      |
-| `app/components/edition/volunteer/notifications/Modal.vue`                 | 2026-02-25 | confirmSend (silentSuccess + toast dynamique)                              |
-| `app/pages/editions/[id]/gestion/volunteers/notifications.vue`             | 2026-02-25 | sendScheduleNotifications                                                  |
-| `app/pages/editions/[id]/gestion/shows-call/index.vue`                     | 2026-02-25 | createShowCall, confirmDelete                                              |
-| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/index.vue`        | 2026-02-25 | persistSettings (Zod errors via onError)                                   |
-| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/applications.vue` | 2026-02-25 | quickUpdateStatus, saveApplicationDetails, updateApplicationStatus         |
-| `app/pages/editions/[id]/gestion/index.vue`                                | 2026-02-25 | saveStatus, confirmDeleteEdition                                           |
-| `app/components/notifications/PushNotificationToggle.vue`                  | 2026-02-25 | testNotification                                                           |
-| `app/pages/editions/[id]/gestion/meals/index.vue`                          | 2026-02-25 | handleMealChange                                                           |
+| Fichier                                                                    | Date       | Patterns migrés                                                                                                             |
+| -------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `app/components/ticketing/OptionModal.vue`                                 | -          | create, update                                                                                                              |
+| `app/components/ticketing/QuotasList.vue`                                  | -          | delete, create, reorder                                                                                                     |
+| `app/components/ticketing/TierModal.vue`                                   | -          | create, update                                                                                                              |
+| `app/components/ticketing/CustomFieldModal.vue`                            | -          | create, update                                                                                                              |
+| `app/components/ticketing/AddParticipantModal.vue`                         | -          | submitOrder                                                                                                                 |
+| `app/components/volunteers/CommentModal.vue`                               | -          | save                                                                                                                        |
+| `app/components/profile/PushDevicesModal.vue`                              | -          | delete by ID                                                                                                                |
+| `app/pages/login.vue`                                                      | -          | login avec redirect 403                                                                                                     |
+| `app/components/artists/ArtistModal.vue`                                   | 2026-02-03 | create, update                                                                                                              |
+| `app/pages/editions/[id]/gestion/ticketing/orders.vue`                     | 2026-02-03 | cancelOrder, updatePaymentMethod, validateEntry                                                                             |
+| `app/pages/editions/[id]/gestion/ticketing/external.vue`                   | 2026-02-03 | loadTiers, saveConfig, testConnection, disconnect, loadOrders, loadRawJson                                                  |
+| `app/components/edition/volunteer/planning/DelayModal.vue`                 | 2026-02-03 | saveDelay, removeDelay                                                                                                      |
+| `app/components/shows/ShowModal.vue`                                       | 2026-02-03 | create, update                                                                                                              |
+| `app/components/organizers/ManageReturnableItemsModal.vue`                 | 2026-02-03 | addItem, removeItem                                                                                                         |
+| `app/components/admin/UserDeletionModal.vue`                               | 2026-02-03 | confirmDeletion                                                                                                             |
+| `app/components/edition/carpool/FormBase.vue`                              | 2026-02-03 | create, update                                                                                                              |
+| `app/components/profile/UserCategoriesCard.vue`                            | 2026-02-03 | saveCategories                                                                                                              |
+| `app/pages/register.vue`                                                   | 2026-02-03 | handleRegister                                                                                                              |
+| `app/pages/verify-email.vue`                                               | 2026-02-03 | handleResendCode (partiel - autres gardent erreur inline)                                                                   |
+| `app/pages/auth/complete-profile.vue`                                      | 2026-02-03 | saveCategories                                                                                                              |
+| `app/pages/auth/forgot-password.vue`                                       | 2026-02-03 | handleSubmit                                                                                                                |
+| `app/pages/auth/reset-password.vue`                                        | 2026-02-03 | handleSubmit                                                                                                                |
+| `app/pages/profile.vue`                                                    | 2026-02-03 | updateProfile, changePassword, saveNotificationPreferences                                                                  |
+| `app/pages/conventions/add.vue`                                            | 2026-02-03 | handleAddConvention                                                                                                         |
+| `app/pages/editions/[id]/volunteers/.../confirm.vue`                       | 2026-02-03 | confirmReading                                                                                                              |
+| `app/pages/admin/feedback.vue`                                             | 2026-02-03 | resolveFeedback                                                                                                             |
+| `app/pages/editions/[id]/gestion/artists/index.vue`                        | 2026-02-04 | deleteArtist                                                                                                                |
+| `app/pages/editions/[id]/gestion/artists/shows.vue`                        | 2026-02-04 | deleteShow                                                                                                                  |
+| `app/pages/editions/[id]/gestion/artists/index.vue`                        | 2026-02-25 | saveArtistInfo                                                                                                              |
+| `app/components/artists/OrganizerNotesModal.vue`                           | 2026-02-25 | saveNotes                                                                                                                   |
+| `app/pages/editions/[id]/artist-space.vue`                                 | 2026-02-25 | saveDiet (saveAccommodation déjà migré)                                                                                     |
+| `app/components/edition/carpool/OfferCard.vue`                             | 2026-02-25 | deleteOffer, submitBooking, cancelBooking                                                                                   |
+| `app/components/edition/carpool/BookingsList.vue`                          | 2026-02-25 | updateBookingStatus (useApiActionById)                                                                                      |
+| `app/components/edition/carpool/RequestCard.vue`                           | 2026-02-25 | deleteRequest                                                                                                               |
+| `app/components/edition/volunteer/MealsCard.vue`                           | 2026-02-25 | saveMealSelections                                                                                                          |
+| `app/components/edition/volunteer/MyTeamsCard.vue`                         | 2026-02-25 | sendMessageToTeam                                                                                                           |
+| `app/components/edition/volunteer/AutoAssignmentPanel.vue`                 | 2026-02-25 | generatePreview, applyAssignments                                                                                           |
+| `app/components/edition/volunteer/planning/AssignmentsModal.vue`           | 2026-02-25 | assignVolunteer, unassignVolunteer (useApiActionById)                                                                       |
+| `app/components/edition/volunteer/notifications/Modal.vue`                 | 2026-02-25 | confirmSend (silentSuccess + toast dynamique)                                                                               |
+| `app/pages/editions/[id]/gestion/volunteers/notifications.vue`             | 2026-02-25 | sendScheduleNotifications                                                                                                   |
+| `app/pages/editions/[id]/gestion/shows-call/index.vue`                     | 2026-02-25 | createShowCall, confirmDelete                                                                                               |
+| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/index.vue`        | 2026-02-25 | persistSettings (Zod errors via onError)                                                                                    |
+| `app/pages/editions/[id]/gestion/shows-call/[showCallId]/applications.vue` | 2026-02-25 | quickUpdateStatus, saveApplicationDetails, updateApplicationStatus                                                          |
+| `app/pages/editions/[id]/gestion/index.vue`                                | 2026-02-25 | saveStatus, confirmDeleteEdition                                                                                            |
+| `app/components/notifications/PushNotificationToggle.vue`                  | 2026-02-25 | testNotification                                                                                                            |
+| `app/pages/editions/[id]/gestion/meals/index.vue`                          | 2026-02-25 | handleMealChange                                                                                                            |
+| `app/pages/admin/conventions.vue`                                          | 2026-02-26 | toggleArchive (silentSuccess), deleteConvention                                                                             |
+| `app/pages/admin/users/[id].vue`                                           | 2026-02-26 | promoteToAdmin, demoteFromAdmin, saveChanges                                                                                |
+| `app/pages/admin/users/index.vue`                                          | 2026-02-26 | startPrivateConversation, promoteToAdmin, demoteFromAdmin, invalidateEmail                                                  |
+| `app/pages/admin/error-logs.vue`                                           | 2026-02-26 | cleanupOldLogs, resolveLog, resolveSimilarLogs, updateAdminNotes                                                            |
+| `app/pages/admin/notifications.vue`                                        | 2026-02-26 | sendReminders, createNotification, testNotification, testFirebase, toggleRead                                               |
+| `app/pages/editions/[id]/gestion/organizers.vue`                           | 2026-02-26 | addOrganizer, saveOrganizerChanges, removeOrganizer, addToEdition, removeFromEdition                                        |
+| `app/pages/my-conventions.vue`                                             | 2026-02-26 | saveOrganizerChanges, removeOrganizer, addOrganizer, deleteEdition, deleteConvention, duplicateEdition, updateEditionStatus |
+| `app/pages/editions/[id]/gestion/volunteers/applications.vue`              | 2026-02-26 | unassignFromTeam, toggleTeamLeader, directAssign, processMove                                                               |
+| `app/pages/editions/[id]/gestion/map.vue`                                  | 2026-02-26 | (déjà migré auparavant — confirmé)                                                                                          |
 
 ---
 

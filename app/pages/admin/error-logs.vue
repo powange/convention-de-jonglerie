@@ -510,7 +510,7 @@
                   color="warning"
                   variant="outline"
                   icon="i-heroicons-squares-plus"
-                  :loading="resolvingSimilar"
+                  :loading="resolvingSimilarLoading"
                   @click="resolveSimilarLogs"
                 >
                   Résoudre tous les logs identiques
@@ -566,14 +566,10 @@ const filters = ref({
   timeRange: '7d', // Par défaut, 7 jours
 })
 
-const cleaningOldLogs = ref(false)
-
 // Modal de détails
 const showLogDetails = ref(false)
 const selectedLog = ref<any>(null)
-const resolving = ref(false)
-const resolvingSimilar = ref(false)
-const updatingNotes = ref(false)
+const resolveResolved = ref(true)
 
 // Options pour les filtres (statiques)
 const statusOptions = [
@@ -720,42 +716,29 @@ const refreshLogs = () => {
   loadLogs()
 }
 
-const cleanupOldLogs = async () => {
+const { execute: executeCleanup, loading: cleaningOldLogs } = useApiAction(
+  '/api/admin/error-logs/cleanup-old',
+  {
+    method: 'POST',
+    silentSuccess: true,
+    errorMessages: { default: 'Impossible de nettoyer les logs' },
+    onSuccess: (result: any) => {
+      toast.add({
+        color: 'success',
+        title: 'Nettoyage effectué',
+        description: result.message,
+      })
+      loadLogs()
+    },
+  }
+)
+
+const cleanupOldLogs = () => {
   const confirmed = confirm(
     "Êtes-vous sûr de vouloir supprimer TOUS les logs de plus d'un mois (résolus et non résolus) ?\n\nCette action ne peut pas être annulée."
   )
-
-  if (!confirmed) return
-
-  cleaningOldLogs.value = true
-  try {
-    const response: any = await $fetch('/api/admin/error-logs/cleanup-old', {
-      method: 'POST',
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Nettoyage effectué',
-      description: response.message,
-    })
-
-    // Afficher les détails de la suppression
-    if (response.deleted.total > 0) {
-      console.log('Logs supprimés:', response.deleted)
-      console.log('Logs restants:', response.remaining)
-    }
-
-    // Recharger les logs pour mettre à jour l'interface
-    loadLogs()
-  } catch (error: any) {
-    console.error('Erreur lors du nettoyage:', error)
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de nettoyer les logs',
-    })
-  } finally {
-    cleaningOldLogs.value = false
+  if (confirmed) {
+    executeCleanup()
   }
 }
 
@@ -802,111 +785,78 @@ const openLogDetails = async (log: any) => {
   }
 }
 
-const resolveLog = async (resolved: boolean) => {
-  if (!selectedLog.value) return
-
-  resolving.value = true
-  try {
-    const response = await $fetch(`/api/admin/error-logs/${selectedLog.value.id}/resolve`, {
-      method: 'PATCH',
-      body: {
-        resolved,
-        adminNotes: selectedLog.value.adminNotes,
-      },
-    })
-
-    selectedLog.value.resolved = resolved
-    selectedLog.value.resolvedAt = resolved ? new Date().toISOString() : null
-
-    toast.add({
-      color: 'success',
-      title: 'Succès',
-      description: response.message,
-    })
-
-    // Recharger les logs pour mettre à jour les stats
-    loadLogs()
-  } catch {
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de mettre à jour le statut',
-    })
-  } finally {
-    resolving.value = false
+const { execute: executeResolveLog, loading: resolving } = useApiAction(
+  () => `/api/admin/error-logs/${selectedLog.value?.id}/resolve`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      resolved: resolveResolved.value,
+      adminNotes: selectedLog.value?.adminNotes,
+    }),
+    silentSuccess: true,
+    errorMessages: { default: 'Impossible de mettre à jour le statut' },
+    onSuccess: (result: any) => {
+      if (selectedLog.value) {
+        selectedLog.value.resolved = result.resolved ?? resolveResolved.value
+        selectedLog.value.resolvedAt = result.resolvedAt ?? null
+      }
+      toast.add({ color: 'success', title: 'Succès', description: result.message })
+      loadLogs()
+    },
   }
+)
+
+const resolveLog = (resolved: boolean) => {
+  if (!selectedLog.value) return
+  resolveResolved.value = resolved
+  executeResolveLog()
 }
 
-const resolveSimilarLogs = async () => {
-  if (!selectedLog.value) return
+const { execute: executeResolveSimilar, loading: resolvingSimilarLoading } = useApiAction(
+  '/api/admin/error-logs/resolve-similar',
+  {
+    method: 'POST',
+    body: () => ({
+      message: selectedLog.value?.message,
+      adminNotes: selectedLog.value?.adminNotes || 'Résolu en masse - logs identiques',
+    }),
+    silentSuccess: true,
+    errorMessages: { default: 'Impossible de résoudre les logs identiques' },
+    onSuccess: (result: any) => {
+      toast.add({ color: 'success', title: 'Succès', description: result.message })
+      if (selectedLog.value) {
+        selectedLog.value.resolved = true
+        selectedLog.value.resolvedAt = new Date().toISOString()
+      }
+      loadLogs()
+    },
+  }
+)
 
-  // Demander confirmation à l'utilisateur
+const resolveSimilarLogs = () => {
+  if (!selectedLog.value) return
   const confirmed = confirm(
     `Êtes-vous sûr de vouloir marquer comme résolus TOUS les logs avec le message d'erreur suivant ?\n\n"${selectedLog.value.message}"\n\nCette action ne peut pas être annulée.`
   )
-
-  if (!confirmed) return
-
-  resolvingSimilar.value = true
-  try {
-    const response = await $fetch('/api/admin/error-logs/resolve-similar', {
-      method: 'POST',
-      body: {
-        message: selectedLog.value.message,
-        adminNotes: selectedLog.value.adminNotes || 'Résolu en masse - logs identiques',
-      },
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Succès',
-      description: response.message,
-    })
-
-    // Marquer le log actuel comme résolu dans l'interface
-    selectedLog.value.resolved = true
-    selectedLog.value.resolvedAt = new Date().toISOString()
-
-    // Recharger les logs pour mettre à jour les stats et la liste
-    loadLogs()
-  } catch (error: any) {
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de résoudre les logs identiques',
-    })
-  } finally {
-    resolvingSimilar.value = false
-  }
+  if (confirmed) executeResolveSimilar()
 }
 
-const updateAdminNotes = async () => {
-  if (!selectedLog.value) return
-
-  updatingNotes.value = true
-  try {
-    await $fetch(`/api/admin/error-logs/${selectedLog.value.id}/resolve`, {
-      method: 'PATCH',
-      body: {
-        resolved: selectedLog.value.resolved,
-        adminNotes: selectedLog.value.adminNotes,
-      },
-    })
-
-    toast.add({
-      color: 'success',
-      title: 'Succès',
-      description: 'Notes sauvegardées avec succès',
-    })
-  } catch {
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de sauvegarder les notes',
-    })
-  } finally {
-    updatingNotes.value = false
+const { execute: executeUpdateNotes, loading: updatingNotes } = useApiAction(
+  () => `/api/admin/error-logs/${selectedLog.value?.id}/resolve`,
+  {
+    method: 'PATCH',
+    body: () => ({
+      resolved: selectedLog.value?.resolved,
+      adminNotes: selectedLog.value?.adminNotes,
+    }),
+    successMessage: { title: 'Succès', description: 'Notes sauvegardées avec succès' },
+    errorMessages: { default: 'Impossible de sauvegarder les notes' },
   }
+)
+
+const updateAdminNotes = () => {
+  if (!selectedLog.value) return
+  executeUpdateNotes()
 }
 
 // Charger les données au montage

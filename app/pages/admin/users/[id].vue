@@ -329,7 +329,6 @@ const showDeletionModal = ref(false)
 
 // État pour l'édition
 const isEditing = ref(false)
-const saving = ref(false)
 const editForm = ref({
   email: '',
   pseudo: '',
@@ -357,67 +356,40 @@ const onProfilePictureChanged = async (newProfilePicture: string | null) => {
 }
 
 // Actions administrateur
-const promoteToAdmin = async (user: UserProfile) => {
-  try {
-    const confirmMessage = t('admin.confirm_promote_to_admin', {
-      name: `${user.prenom} ${user.nom}`,
-    })
+const { execute: executePromote } = useApiAction(() => `/api/admin/users/${userId}/promote`, {
+  method: 'PUT',
+  body: () => ({ isGlobalAdmin: true }),
+  successMessage: {
+    title: t('common.success'),
+    description: t('admin.user_promoted_successfully'),
+  },
+  errorMessages: { default: t('admin.promotion_error') },
+  refreshOnSuccess: () => refresh(),
+})
 
-    if (confirm(confirmMessage)) {
-      await $fetch<UserProfile>(`/api/admin/users/${user.id}/promote`, {
-        method: 'PUT',
-        body: { isGlobalAdmin: true },
-      })
-
-      // Rafraîchir les données depuis le serveur
-      await refresh()
-
-      toast.add({
-        title: t('common.success'),
-        description: t('admin.user_promoted_successfully'),
-        color: 'success',
-      })
-    }
-  } catch (error: any) {
-    console.error('Erreur lors de la promotion:', error)
-
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.promotion_error'),
-      color: 'error',
-    })
+const promoteToAdmin = (targetUser: UserProfile) => {
+  const confirmMessage = t('admin.confirm_promote_to_admin', {
+    name: `${targetUser.prenom} ${targetUser.nom}`,
+  })
+  if (confirm(confirmMessage)) {
+    executePromote()
   }
 }
 
-const demoteFromAdmin = async (user: UserProfile) => {
-  try {
-    const confirmMessage = t('admin.confirm_demote_from_admin', {
-      name: `${user.prenom} ${user.nom}`,
-    })
+const { execute: executeDemote } = useApiAction(() => `/api/admin/users/${userId}/promote`, {
+  method: 'PUT',
+  body: () => ({ isGlobalAdmin: false }),
+  successMessage: { title: t('common.success'), description: t('admin.user_demoted_successfully') },
+  errorMessages: { default: t('admin.demotion_error') },
+  refreshOnSuccess: () => refresh(),
+})
 
-    if (confirm(confirmMessage)) {
-      await $fetch<UserProfile>(`/api/admin/users/${user.id}/promote`, {
-        method: 'PUT',
-        body: { isGlobalAdmin: false },
-      })
-
-      // Rafraîchir les données depuis le serveur
-      await refresh()
-
-      toast.add({
-        title: t('common.success'),
-        description: t('admin.user_demoted_successfully'),
-        color: 'success',
-      })
-    }
-  } catch (error: any) {
-    console.error('Erreur lors de la rétrogradation:', error)
-
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.demotion_error'),
-      color: 'error',
-    })
+const demoteFromAdmin = (targetUser: UserProfile) => {
+  const confirmMessage = t('admin.confirm_demote_from_admin', {
+    name: `${targetUser.prenom} ${targetUser.nom}`,
+  })
+  if (confirm(confirmMessage)) {
+    executeDemote()
   }
 }
 
@@ -466,37 +438,27 @@ const cancelEditing = () => {
   }
 }
 
-const saveChanges = async () => {
-  if (!user.value) return
-
-  saving.value = true
-
-  try {
-    const updatedUser = await $fetch<UserProfile>(`/api/admin/users/${userId}`, {
-      method: 'PUT',
-      body: editForm.value,
-    })
-
-    // Mettre à jour les données locales
-    Object.assign(user.value, updatedUser)
-
-    isEditing.value = false
-
-    toast.add({
+const { execute: executeSaveChanges, loading: saving } = useApiAction(
+  () => `/api/admin/users/${userId}`,
+  {
+    method: 'PUT',
+    body: () => editForm.value,
+    successMessage: {
       title: t('common.success'),
       description: 'Informations utilisateur mises à jour',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Erreur lors de la mise à jour:', error)
-
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || 'Erreur lors de la mise à jour',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+    },
+    errorMessages: { default: 'Erreur lors de la mise à jour' },
+    onSuccess: (result) => {
+      if (user.value) {
+        Object.assign(user.value, result)
+      }
+      isEditing.value = false
+    },
   }
+)
+
+const saveChanges = () => {
+  if (!user.value) return
+  executeSaveChanges()
 }
 </script>

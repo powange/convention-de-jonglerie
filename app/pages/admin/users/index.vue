@@ -708,29 +708,23 @@ const getUserActions = (user: AdminUserWithConnection) => {
 }
 
 // Fonction pour démarrer une conversation privée
-const startPrivateConversation = async (user: AdminUserWithConnection) => {
-  try {
-    const result = await $fetch<{
-      success: boolean
-      data: { conversationId: string; created: boolean }
-    }>('/api/messenger/private', {
-      method: 'POST',
-      body: { userId: user.id },
-    })
+const contactUserId = ref<number | null>(null)
 
+const { execute: executeStartConversation } = useApiAction('/api/messenger/private', {
+  method: 'POST',
+  body: () => ({ userId: contactUserId.value }),
+  silentSuccess: true,
+  errorMessages: { default: t('admin.contact_user_error') },
+  onSuccess: (result: any) => {
     if (result.success) {
-      // Naviguer vers la messagerie avec la conversation
-      await navigateTo(`/messenger?conversationId=${result.data.conversationId}`)
+      navigateTo(`/messenger?conversationId=${result.data.conversationId}`)
     }
-  } catch (error: any) {
-    console.error('Erreur lors de la création de la conversation:', error)
+  },
+})
 
-    useToast().add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.contact_user_error'),
-      color: 'error',
-    })
-  }
+const startPrivateConversation = (user: AdminUserWithConnection) => {
+  contactUserId.value = user.id
+  executeStartConversation()
 }
 
 // Fonction d'impersonation
@@ -781,118 +775,96 @@ const impersonateUser = async (user: AdminUserWithConnection) => {
   }
 }
 
-// Fonctions d'action
-const promoteToAdmin = async (user: AdminUserWithConnection) => {
-  try {
-    const confirmMessage = t('admin.confirm_promote_to_admin', {
-      name: `${user.prenom} ${user.nom}`,
-    })
+// Fonctions d'action - userId cible pour les actions admin
+const actionTargetUserId = ref<number | null>(null)
 
-    if (confirm(confirmMessage)) {
-      const updatedUser = await $fetch<AdminUserWithConnection>(
-        `/api/admin/users/${user.id}/promote`,
-        {
-          method: 'PUT',
-          body: { isGlobalAdmin: true },
-        }
-      )
-
-      // Mettre à jour l'utilisateur dans la liste locale
-      const userIndex = users.value.findIndex((u) => u.id === user.id)
+const { execute: executePromote } = useApiAction(
+  () => `/api/admin/users/${actionTargetUserId.value}/promote`,
+  {
+    method: 'PUT',
+    body: () => ({ isGlobalAdmin: true }),
+    successMessage: {
+      title: t('common.success'),
+      description: t('admin.user_promoted_successfully'),
+    },
+    errorMessages: { default: t('admin.promotion_error') },
+    onSuccess: (result: any) => {
+      const userIndex = users.value.findIndex((u) => u.id === result.id)
       if (userIndex !== -1) {
-        users.value[userIndex] = updatedUser
+        users.value[userIndex] = result
       }
+    },
+  }
+)
 
-      useToast().add({
-        title: t('common.success'),
-        description: t('admin.user_promoted_successfully'),
-        color: 'success',
-      })
-    }
-  } catch (error: any) {
-    console.error('Erreur lors de la promotion:', error)
-
-    useToast().add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.promotion_error'),
-      color: 'error',
-    })
+const promoteToAdmin = (user: AdminUserWithConnection) => {
+  const confirmMessage = t('admin.confirm_promote_to_admin', {
+    name: `${user.prenom} ${user.nom}`,
+  })
+  if (confirm(confirmMessage)) {
+    actionTargetUserId.value = user.id
+    executePromote()
   }
 }
 
-const demoteFromAdmin = async (user: AdminUserWithConnection) => {
-  try {
-    const confirmMessage = t('admin.confirm_demote_from_admin', {
-      name: `${user.prenom} ${user.nom}`,
-    })
-
-    if (confirm(confirmMessage)) {
-      const updatedUser = await $fetch<AdminUserWithConnection>(
-        `/api/admin/users/${user.id}/promote`,
-        {
-          method: 'PUT',
-          body: { isGlobalAdmin: false },
-        }
-      )
-
-      // Mettre à jour l'utilisateur dans la liste locale
-      const userIndex = users.value.findIndex((u) => u.id === user.id)
+const { execute: executeDemote } = useApiAction(
+  () => `/api/admin/users/${actionTargetUserId.value}/promote`,
+  {
+    method: 'PUT',
+    body: () => ({ isGlobalAdmin: false }),
+    successMessage: {
+      title: t('common.success'),
+      description: t('admin.user_demoted_successfully'),
+    },
+    errorMessages: { default: t('admin.demotion_error') },
+    onSuccess: (result: any) => {
+      const userIndex = users.value.findIndex((u) => u.id === result.id)
       if (userIndex !== -1) {
-        users.value[userIndex] = updatedUser
+        users.value[userIndex] = result
       }
+    },
+  }
+)
 
-      useToast().add({
-        title: t('common.success'),
-        description: t('admin.user_demoted_successfully'),
-        color: 'success',
-      })
-    }
-  } catch (error: any) {
-    console.error('Erreur lors de la rétrogradation:', error)
-
-    useToast().add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.demotion_error'),
-      color: 'error',
-    })
+const demoteFromAdmin = (user: AdminUserWithConnection) => {
+  const confirmMessage = t('admin.confirm_demote_from_admin', {
+    name: `${user.prenom} ${user.nom}`,
+  })
+  if (confirm(confirmMessage)) {
+    actionTargetUserId.value = user.id
+    executeDemote()
   }
 }
 
 // Fonction pour invalider l'email d'un utilisateur
-const invalidateUserEmail = async (user: AdminUserWithConnection) => {
-  try {
-    const confirmMessage = t('admin.confirm_invalidate_email', {
-      name: `${user.prenom} ${user.nom}`,
-    })
-
-    if (confirm(confirmMessage)) {
-      await $fetch(`/api/admin/users/${user.id}/invalidate-email`, {
-        method: 'PUT',
-      })
-
-      // Mettre à jour l'utilisateur dans la liste locale
-      const userIndex = users.value.findIndex((u) => u.id === user.id)
+const { execute: executeInvalidateEmail } = useApiAction(
+  () => `/api/admin/users/${actionTargetUserId.value}/invalidate-email`,
+  {
+    method: 'PUT',
+    successMessage: {
+      title: t('common.success'),
+      description: t('admin.email_invalidated_successfully'),
+    },
+    errorMessages: { default: t('admin.invalidate_email_error') },
+    onSuccess: () => {
+      const userIndex = users.value.findIndex((u) => u.id === actionTargetUserId.value)
       if (userIndex !== -1) {
         users.value[userIndex] = {
           ...users.value[userIndex],
           isEmailVerified: false,
         }
       }
+    },
+  }
+)
 
-      useToast().add({
-        title: t('common.success'),
-        description: t('admin.email_invalidated_successfully'),
-        color: 'success',
-      })
-    }
-  } catch (error: any) {
-    console.error("Erreur lors de l'invalidation de l'email:", error)
-
-    useToast().add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.invalidate_email_error'),
-      color: 'error',
-    })
+const invalidateUserEmail = (user: AdminUserWithConnection) => {
+  const confirmMessage = t('admin.confirm_invalidate_email', {
+    name: `${user.prenom} ${user.nom}`,
+  })
+  if (confirm(confirmMessage)) {
+    actionTargetUserId.value = user.id
+    executeInvalidateEmail()
   }
 }
 
