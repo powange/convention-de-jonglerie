@@ -82,10 +82,9 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-const saving = ref(false)
+const toast = useToast()
 const deleteConfirmOpen = ref(false)
 const itemToDelete = ref<TicketingReturnableItem | null>(null)
-const deleting = ref(false)
 
 const form = ref<ReturnableItemForm>({
   name: '',
@@ -96,45 +95,44 @@ const confirmDeleteItem = (item: TicketingReturnableItem) => {
   deleteConfirmOpen.value = true
 }
 
-const deleteItem = async () => {
-  if (!itemToDelete.value) return
-
-  const toast = useToast()
-  deleting.value = true
-  try {
-    await $fetch(
-      `/api/editions/${props.editionId}/ticketing/returnable-items/${itemToDelete.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
+const { execute: executeDeleteItem, loading: deleting } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/returnable-items/${itemToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: 'Item supprimé',
       description: "L'item à restituer a été supprimé avec succès",
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    deleteConfirmOpen.value = false
-    itemToDelete.value = null
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to delete returnable item:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible de supprimer l'item",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    deleting.value = false
+    },
+    errorMessages: { default: "Impossible de supprimer l'item" },
+    onSuccess: () => {
+      deleteConfirmOpen.value = false
+      itemToDelete.value = null
+      emit('refresh')
+    },
   }
+)
+
+const deleteItem = () => {
+  if (!itemToDelete.value) return
+  executeDeleteItem()
 }
 
-const updateItem = async (itemId: number, name: string) => {
-  const toast = useToast()
+const pendingUpdateName = ref('')
 
+const { execute: executeUpdateItem } = useApiActionById(
+  (itemId) => `/api/editions/${props.editionId}/ticketing/returnable-items/${itemId}`,
+  {
+    method: 'PUT',
+    body: () => ({ name: pendingUpdateName.value }),
+    silentSuccess: true,
+    errorMessages: { default: "Impossible de mettre à jour l'item" },
+    onSuccess: () => {
+      emit('refresh')
+    },
+  }
+)
+
+const updateItem = (itemId: number, name: string) => {
   if (!name.trim()) {
     toast.add({
       title: 'Erreur',
@@ -144,28 +142,28 @@ const updateItem = async (itemId: number, name: string) => {
     })
     return
   }
-
-  try {
-    await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items/${itemId}`, {
-      method: 'PUT',
-      body: { name: name.trim() },
-    })
-
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to update returnable item:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible de mettre à jour l'item",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  }
+  pendingUpdateName.value = name.trim()
+  executeUpdateItem(itemId)
 }
 
-const handleSave = async () => {
-  const toast = useToast()
+const { execute: executeHandleSave, loading: saving } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/returnable-items`,
+  {
+    method: 'POST',
+    body: () => ({ name: form.value.name.trim() }),
+    successMessage: {
+      title: 'Item créé',
+      description: "L'item à restituer a été créé avec succès",
+    },
+    errorMessages: { default: "Impossible d'enregistrer l'item" },
+    onSuccess: () => {
+      form.value.name = ''
+      emit('refresh')
+    },
+  }
+)
 
+const handleSave = () => {
   if (!form.value.name.trim()) {
     toast.add({
       title: 'Erreur',
@@ -175,33 +173,6 @@ const handleSave = async () => {
     })
     return
   }
-
-  saving.value = true
-  try {
-    await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`, {
-      method: 'POST',
-      body: { name: form.value.name.trim() },
-    })
-
-    toast.add({
-      title: 'Item créé',
-      description: "L'item à restituer a été créé avec succès",
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    form.value.name = ''
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to save returnable item:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible d'enregistrer l'item",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
-  }
+  executeHandleSave()
 }
 </script>

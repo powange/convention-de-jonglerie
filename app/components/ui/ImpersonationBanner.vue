@@ -62,7 +62,6 @@
 import { useAuthStore } from '~/stores/auth'
 import { useImpersonationStore } from '~/stores/impersonation'
 
-const toast = useToast()
 const { t } = useI18n()
 const authStore = useAuthStore()
 const impersonationStore = useImpersonationStore()
@@ -70,47 +69,31 @@ const impersonationStore = useImpersonationStore()
 // Utiliser directement le store pour vérifier l'état
 const impersonationActive = computed(() => impersonationStore.isActive)
 
-// Charger le fichier de langue admin si l'impersonation est active
-useLazyI18n('admin', impersonationActive)
-
-const stopping = ref(false)
+// Charger le fichier de langue admin avant le rendu (nécessaire pour les traductions admin.*)
+await useLazyI18n('admin')
 
 // Fonction pour arrêter l'impersonation
-const stopImpersonation = async () => {
-  stopping.value = true
-
-  try {
-    const result = await $fetch<any>('/api/admin/impersonate/stop', {
-      method: 'POST',
-    })
-
-    // Arrêter l'impersonation dans le store AVANT de mettre à jour l'auth
-    impersonationStore.stopImpersonation()
-
-    // Mettre à jour le store d'authentification avec l'utilisateur original
-    if (result.user) {
-      authStore.user = result.user
-    }
-
-    toast.add({
+const { execute: stopImpersonation, loading: stopping } = useApiAction(
+  '/api/admin/impersonate/stop',
+  {
+    method: 'POST',
+    successMessage: {
       title: t('common.success'),
       description: t('admin.impersonation_stopped'),
-      color: 'success',
-    })
+    },
+    errorMessages: { default: t('admin.stop_impersonation_error') },
+    onSuccess: (result: { user?: Record<string, unknown> }) => {
+      // Arrêter l'impersonation dans le store AVANT de mettre à jour l'auth
+      impersonationStore.stopImpersonation()
 
-    // Recharger complètement la page pour que le nouveau cookie soit pris en compte
-    // On utilise navigateTo avec external: true pour forcer un rechargement complet
-    window.location.href = '/admin/users'
-  } catch (error: any) {
-    console.error("Erreur lors de l'arrêt de l'impersonation:", error)
+      // Mettre à jour le store d'authentification avec l'utilisateur original
+      if (result.user) {
+        authStore.user = result.user
+      }
 
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.stop_impersonation_error'),
-      color: 'error',
-    })
-  } finally {
-    stopping.value = false
+      // Recharger complètement la page pour que le nouveau cookie soit pris en compte
+      window.location.href = '/admin/users'
+    },
   }
-}
+)
 </script>

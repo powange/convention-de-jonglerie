@@ -132,8 +132,8 @@
           </div>
           <div class="flex flex-col items-end gap-3">
             <UButton
-              :loading="executingTasks.includes(task.name)"
-              :disabled="executingTasks.includes(task.name)"
+              :loading="isExecutingTask(task.name)"
+              :disabled="isExecutingTask(task.name)"
               color="primary"
               size="sm"
               @click="executeTask(task.name)"
@@ -141,9 +141,7 @@
               <template #leading>
                 <UIcon name="i-heroicons-play" />
               </template>
-              {{
-                executingTasks.includes(task.name) ? $t('admin.executing') : $t('admin.execute_now')
-              }}
+              {{ isExecutingTask(task.name) ? $t('admin.executing') : $t('admin.execute_now') }}
             </UButton>
             <div v-if="taskResults[task.name]" class="text-right">
               <UBadge
@@ -203,46 +201,53 @@ const systemStatus = computed(() => ({
 }))
 
 // État pour les exécutions
-const executingTasks = ref<string[]>([])
-const taskResults = ref<Record<string, any>>({})
+const taskResults = ref<
+  Record<
+    string,
+    {
+      success: boolean
+      result?: Record<string, unknown>
+      error?: string
+      timestamp: string
+      executionTime?: string
+    }
+  >
+>({})
 
 // Exécution d'une tâche
+const { execute: doExecuteTask, isLoading: isExecutingTask } = useApiActionById(
+  (taskName) => `/api/admin/tasks/${taskName}`,
+  {
+    method: 'POST',
+    silentSuccess: true,
+    errorMessages: { default: t('admin.task_execution_error') },
+    onSuccess: (
+      result: { executionTime: string; success: boolean; timestamp: string },
+      taskName: string | number
+    ) => {
+      taskResults.value[taskName as string] = result
+
+      toast.add({
+        title: t('admin.task_executed_successfully'),
+        description: t('admin.task_executed_details', {
+          taskName: getTaskDisplayName(taskName as string),
+          time: result.executionTime,
+        }),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    },
+  }
+)
+
 const executeTask = async (taskName: string) => {
-  executingTasks.value.push(taskName)
-
-  try {
-    const result = await $fetch(`/api/admin/tasks/${taskName}`, {
-      method: 'POST',
-    })
-
-    taskResults.value[taskName] = result
-
-    toast.add({
-      title: t('admin.task_executed_successfully'),
-      description: t('admin.task_executed_details', {
-        taskName: getTaskDisplayName(taskName),
-        time: result.executionTime,
-      }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (err: any) {
-    console.error("Erreur lors de l'exécution de la tâche:", err)
-
+  const result = await doExecuteTask(taskName)
+  if (!result) {
+    // Stocker le résultat d'erreur pour affichage dans l'UI
     taskResults.value[taskName] = {
       success: false,
-      error: err.data?.message || err.message,
       timestamp: new Date().toISOString(),
     }
-
-    toast.add({
-      title: t('admin.task_execution_failed'),
-      description: err.data?.message || t('admin.task_execution_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    executingTasks.value = executingTasks.value.filter((name) => name !== taskName)
   }
 }
 
@@ -301,10 +306,10 @@ const formatExecutionTime = (timestamp: string) => {
   })
 }
 
-const getExecutionStats = (result: any) => {
+const getExecutionStats = (result: Record<string, unknown>) => {
   if (!result) return {}
 
-  const stats = {}
+  const stats: Record<string, number> = {}
   Object.entries(result).forEach(([key, value]) => {
     if (key !== 'success' && key !== 'timestamp' && typeof value === 'number') {
       stats[key] = value

@@ -45,9 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Convention, EditionFormData, HttpError } from '~/types'
@@ -81,8 +78,6 @@ onMounted(async () => {
       }
     }
   } catch (error: unknown) {
-    console.error('Erreur lors du chargement de la convention:', error)
-
     const httpError = error as HttpError
     if (httpError.status === 404) {
       toast.add({
@@ -127,8 +122,6 @@ const handleAddEdition = async (data: EditionFormData) => {
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions')
   } catch (error: unknown) {
-    console.error('Error creating edition:', error)
-
     const httpError = error as HttpError
     const errorMessage =
       httpError.data?.message || httpError.message || t('errors.edition_creation_error')

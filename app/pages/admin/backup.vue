@@ -175,7 +175,7 @@
               color="error"
               variant="outline"
               size="xs"
-              :disabled="deleting.includes(backup.filename)"
+              :disabled="isDeletingBackup(backup.filename)"
               @click="deleteBackup(backup.filename)"
             >
               <UIcon name="i-heroicons-trash" class="h-3 w-3" />
@@ -235,10 +235,7 @@ useSeoMeta({
 })
 
 // État réactif
-const creating = ref(false)
-const restoring = ref(false)
 const loadingBackups = ref(false)
-const deleting = ref<string[]>([])
 const showConfirmModal = ref(false)
 const pendingRestore = ref<string | File | null>(null)
 
@@ -270,8 +267,7 @@ const loadBackups = async () => {
     loadingBackups.value = true
     const data = await $fetch<Backup[]>('/api/admin/backup/list')
     backups.value = data
-  } catch (error) {
-    console.error('Error loading backups:', error)
+  } catch {
     toast.add({
       color: 'error',
       title: t('common.error'),
@@ -283,32 +279,24 @@ const loadBackups = async () => {
 }
 
 // Créer une sauvegarde
-const createBackup = async () => {
-  try {
-    creating.value = true
-    const response = await $fetch<{ filename: string }>('/api/admin/backup/create', {
-      method: 'POST',
-    })
-
+const { execute: executeCreateBackup, loading: creating } = useApiAction<
+  undefined,
+  { filename: string }
+>('/api/admin/backup/create', {
+  method: 'POST',
+  silentSuccess: true,
+  errorMessages: { default: t('admin.backup_create_error') },
+  onSuccess: async (response: { filename: string }) => {
     toast.add({
       color: 'success',
       title: t('admin.backup_create_success'),
       description: t('admin.backup_create_success_description', { filename: response.filename }),
     })
-
-    // Recharger la liste
     await loadBackups()
-  } catch (error) {
-    console.error('Error creating backup:', error)
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('admin.backup_create_error'),
-    })
-  } finally {
-    creating.value = false
-  }
-}
+  },
+})
+
+const createBackup = () => executeCreateBackup()
 
 // Ouvrir le dialogue de fichier
 const openFileDialog = () => {
@@ -345,47 +333,32 @@ const restoreBackup = (filename: string) => {
 }
 
 // Confirmer la restauration
-const confirmRestore = async () => {
-  if (!pendingRestore.value) return
+const buildRestoreBody = () => {
+  if (typeof pendingRestore.value === 'string') {
+    return { filename: pendingRestore.value }
+  }
+  const formData = new FormData()
+  formData.append('file', pendingRestore.value as File)
+  return formData
+}
 
-  try {
-    restoring.value = true
-
-    if (typeof pendingRestore.value === 'string') {
-      // Restaurer depuis un fichier existant
-      await $fetch('/api/admin/backup/restore', {
-        method: 'POST',
-        body: { filename: pendingRestore.value },
-      })
-    } else {
-      // Restaurer depuis un fichier uploadé
-      const formData = new FormData()
-      formData.append('file', pendingRestore.value)
-
-      await $fetch('/api/admin/backup/restore', {
-        method: 'POST',
-        body: formData,
-      })
-    }
-
-    toast.add({
-      color: 'success',
-      title: t('admin.backup_restore_success'),
-      description: t('admin.backup_restore_success_description'),
-    })
-
+const { execute: executeRestore, loading: restoring } = useApiAction('/api/admin/backup/restore', {
+  method: 'POST',
+  body: buildRestoreBody,
+  successMessage: {
+    title: t('admin.backup_restore_success'),
+    description: t('admin.backup_restore_success_description'),
+  },
+  errorMessages: { default: t('admin.backup_restore_error') },
+  onSuccess: () => {
     showConfirmModal.value = false
     pendingRestore.value = null
-  } catch (error) {
-    console.error('Error restoring backup:', error)
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('admin.backup_restore_error'),
-    })
-  } finally {
-    restoring.value = false
-  }
+  },
+})
+
+const confirmRestore = () => {
+  if (!pendingRestore.value) return
+  executeRestore()
 }
 
 // Télécharger une sauvegarde
@@ -400,36 +373,29 @@ const downloadBackup = (filename: string) => {
 }
 
 // Supprimer une sauvegarde
-const deleteBackup = async (filename: string) => {
+const { execute: executeDeleteBackup, isLoading: isDeletingBackup } = useApiActionById(
+  () => '/api/admin/backup/delete',
+  {
+    method: 'DELETE',
+    body: (filename) => ({ filename }),
+    silentSuccess: true,
+    errorMessages: { default: t('admin.backup_delete_error') },
+    onSuccess: async (_result: unknown, filename: string | number) => {
+      toast.add({
+        color: 'success',
+        title: t('admin.backup_delete_success'),
+        description: t('admin.backup_delete_success_description', { filename }),
+      })
+      await loadBackups()
+    },
+  }
+)
+
+const deleteBackup = (filename: string) => {
   if (!confirm(t('admin.backup_delete_confirm', { filename }))) {
     return
   }
-
-  try {
-    deleting.value.push(filename)
-    await $fetch('/api/admin/backup/delete', {
-      method: 'DELETE',
-      body: { filename },
-    })
-
-    toast.add({
-      color: 'success',
-      title: t('admin.backup_delete_success'),
-      description: t('admin.backup_delete_success_description', { filename }),
-    })
-
-    // Recharger la liste
-    await loadBackups()
-  } catch (error) {
-    console.error('Error deleting backup:', error)
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('admin.backup_delete_error'),
-    })
-  } finally {
-    deleting.value = deleting.value.filter((f) => f !== filename)
-  }
+  executeDeleteBackup(filename)
 }
 
 // Charger les données au montage

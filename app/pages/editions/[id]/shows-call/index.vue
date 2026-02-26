@@ -347,8 +347,8 @@ async function loadMyApplications() {
       `/api/editions/${editionId}/shows-call/my-applications`
     )
     myApplications.value = response.applications
-  } catch (error) {
-    console.error('Error loading my applications:', error)
+  } catch {
+    // Silencieux - les candidatures ne sont pas critiques
   }
 }
 

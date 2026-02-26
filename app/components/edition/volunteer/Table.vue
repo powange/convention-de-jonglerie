@@ -944,31 +944,31 @@ const confirmDeleteApplication = (app: any) => {
 }
 
 // Fonction pour exécuter la suppression
-const executeDeleteApplication = async () => {
-  if (!applicationToDelete.value) return
-
-  try {
-    await $fetch(
-      `/api/editions/${props.editionId}/volunteers/applications/${applicationToDelete.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
+const { execute: executeDeleteApplicationAction } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/applications/${applicationToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: t('edition.volunteers.application_deleted'),
       description: t('edition.volunteers.volunteer_removed_successfully'),
-      color: 'success',
-    })
-
-    emit('refreshVolunteersInfo')
-    refreshApplications()
-  } catch (e: any) {
-    toast.add({ title: e?.message || t('common.error'), color: 'error' })
-  } finally {
-    showDeleteModal.value = false
-    applicationToDelete.value = null
+    },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      emit('refreshVolunteersInfo')
+      refreshApplications()
+      showDeleteModal.value = false
+      applicationToDelete.value = null
+    },
+    onError: () => {
+      showDeleteModal.value = false
+      applicationToDelete.value = null
+    },
   }
+)
+
+const executeDeleteApplication = () => {
+  if (!applicationToDelete.value) return
+  executeDeleteApplicationAction()
 }
 
 // Fonctions pour la modal d'acceptation

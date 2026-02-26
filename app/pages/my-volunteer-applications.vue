@@ -478,6 +478,10 @@ interface ApplicationWithSettings {
   volunteersSettings?: any
 }
 
+interface ContactOrganizerResponse {
+  conversationId: number
+}
+
 definePageMeta({
   middleware: 'auth-protected',
 })
@@ -507,8 +511,7 @@ const getVolunteerSettings = async (editionId: number) => {
     const settings = (response as any)?.settings || response
     volunteersSettingsCache.value.set(editionId, settings)
     return settings
-  } catch (error) {
-    console.error(`Failed to fetch volunteer settings for edition ${editionId}:`, error)
+  } catch {
     return null
   }
 }
@@ -730,8 +733,8 @@ const withdrawApplication = async (applicationId: number) => {
 
     // Rafraîchir la liste
     await refresh()
-  } catch (error: any) {
-    console.error('Erreur lors du retrait:', error)
+  } catch (_error: unknown) {
+    const error = _error as { data?: { message?: string } }
     toast.add({
       title: t('common.error'),
       description: error.data?.message || t('pages.volunteers.withdrawal_error'),
@@ -747,28 +750,30 @@ const showApplicationDetails = (application: any) => {
 }
 
 // Fonction pour contacter les responsables bénévoles
-const contactOrganizer = async (application: any) => {
-  try {
-    // Créer ou récupérer la conversation avec les organisateurs
-    const response = await $fetch('/api/messenger/volunteer-to-organizers', {
-      method: 'POST',
-      body: {
-        editionId: application.edition.id,
-      },
-    })
+const contactOrganizerEditionId = ref<number | null>(null)
 
-    // Rediriger vers la page messenger avec la conversation
-    navigateTo(`/messenger?conversation=${response.conversationId}`)
-  } catch (error: any) {
-    console.error('Erreur lors de la création de la conversation:', error)
+const { execute: executeContactOrganizer } = useApiAction<
+  { editionId: number },
+  ContactOrganizerResponse
+>('/api/messenger/volunteer-to-organizers', {
+  method: 'POST',
+  body: () => ({ editionId: contactOrganizerEditionId.value! }),
+  silent: true,
+  onSuccess: (result: ContactOrganizerResponse) => {
+    navigateTo(`/messenger?conversation=${result.conversationId}`)
+  },
+  onError: () => {
     toast.add({
       title: t('common.error'),
-      description:
-        error.data?.message ||
-        'Erreur lors de la création de la conversation avec les organisateurs',
+      description: t('pages.volunteers.contact_organizer_error'),
       color: 'error',
     })
-  }
+  },
+})
+
+const contactOrganizer = (application: any) => {
+  contactOrganizerEditionId.value = application.edition.id
+  executeContactOrganizer()
 }
 
 // Fonction pour afficher le QR code

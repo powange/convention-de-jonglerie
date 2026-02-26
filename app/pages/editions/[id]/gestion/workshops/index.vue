@@ -138,7 +138,7 @@
                       color="error"
                       variant="ghost"
                       icon="i-heroicons-trash"
-                      :loading="deletingLocationId === location.id"
+                      :loading="isDeletingLocation(location.id)"
                       @click="deleteLocation(location.id)"
                     />
                   </div>
@@ -184,16 +184,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -201,7 +197,6 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Gestion de l'activation des workshops
 const workshopsEnabledLocal = ref(false)
-const savingWorkshops = ref(false)
 
 // Initialiser workshopsEnabled depuis l'édition
 watch(
@@ -214,48 +209,33 @@ watch(
   { immediate: true }
 )
 
-const handleToggleWorkshops = async (val: boolean) => {
-  const previous = !val
-  savingWorkshops.value = true
-
-  try {
-    await $fetch(`/api/editions/${editionId}`, {
-      method: 'PUT',
-      body: { workshopsEnabled: val },
-    })
-
-    // Recharger l'édition
-    await editionStore.fetchEditionById(editionId, { force: true })
-
-    toast.add({
-      title: t('common.saved') || 'Sauvegardé',
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-
-    // Charger les lieux si workshops activés
-    if (val) {
-      await fetchWorkshopLocations()
-    }
-  } catch (e: any) {
-    workshopsEnabledLocal.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    savingWorkshops.value = false
+const { execute: executeToggleWorkshops, loading: savingWorkshops } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ workshopsEnabled: workshopsEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+      if (workshopsEnabledLocal.value) {
+        await fetchWorkshopLocations()
+      }
+    },
+    onError: () => {
+      workshopsEnabledLocal.value = !workshopsEnabledLocal.value
+    },
   }
+)
+
+const handleToggleWorkshops = () => {
+  executeToggleWorkshops()
 }
 
 // Gestion des lieux de workshops
 const workshopLocations = ref<any[]>([])
 const newLocationName = ref('')
-const addingLocation = ref(false)
-const deletingLocationId = ref<number | null>(null)
 const workshopLocationsFreeInputLocal = ref(false)
-const savingLocationMode = ref(false)
 
 // Initialiser workshopLocationsFreeInput depuis l'édition
 watch(
@@ -278,92 +258,60 @@ const fetchWorkshopLocations = async () => {
   }
 }
 
-const addLocation = async () => {
+const { execute: executeAddLocation, loading: addingLocation } = useApiAction(
+  `/api/editions/${editionId}/workshops/locations`,
+  {
+    method: 'POST',
+    body: () => ({ name: newLocationName.value.trim() }),
+    successMessage: { title: t('workshops.location_added') },
+    errorMessages: { default: t('workshops.location_error') },
+    onSuccess: async () => {
+      newLocationName.value = ''
+      await fetchWorkshopLocations()
+    },
+  }
+)
+
+const addLocation = () => {
   if (!newLocationName.value.trim()) return
-
-  addingLocation.value = true
-  try {
-    await $fetch(`/api/editions/${editionId}/workshops/locations`, {
-      method: 'POST',
-      body: { name: newLocationName.value.trim() },
-    })
-
-    toast.add({
-      title: t('workshops.location_added'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-
-    newLocationName.value = ''
-    await fetchWorkshopLocations()
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('workshops.location_error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    addingLocation.value = false
-  }
+  executeAddLocation()
 }
 
-const deleteLocation = async (locationId: number) => {
-  if (!confirm(t('workshops.confirm_delete_location'))) {
-    return
+const { execute: executeDeleteLocation, isLoading: isDeletingLocation } = useApiActionById(
+  (locationId) => `/api/editions/${editionId}/workshops/locations/${locationId}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('workshops.location_deleted') },
+    errorMessages: { default: t('workshops.location_error') },
+    onSuccess: async () => {
+      await fetchWorkshopLocations()
+    },
   }
+)
 
-  deletingLocationId.value = locationId
-  try {
-    await $fetch(`/api/editions/${editionId}/workshops/locations/${locationId}`, {
-      method: 'DELETE',
-    })
-
-    toast.add({
-      title: t('workshops.location_deleted'),
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-
-    await fetchWorkshopLocations()
-  } catch (error: any) {
-    toast.add({
-      title: error?.data?.message || t('workshops.location_error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    deletingLocationId.value = null
-  }
+const deleteLocation = (locationId: number) => {
+  if (!confirm(t('workshops.confirm_delete_location'))) return
+  executeDeleteLocation(locationId)
 }
 
-const handleToggleLocationMode = async (val: boolean) => {
-  const previous = !val
-  savingLocationMode.value = true
-
-  try {
-    await $fetch(`/api/editions/${editionId}`, {
-      method: 'PUT',
-      body: { workshopLocationsFreeInput: val },
-    })
-
-    // Recharger l'édition
-    await editionStore.fetchEditionById(editionId, { force: true })
-
-    toast.add({
-      title: t('common.saved') || 'Sauvegardé',
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-  } catch (e: any) {
-    workshopLocationsFreeInputLocal.value = previous
-    toast.add({
-      title: e?.data?.message || e?.message || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    savingLocationMode.value = false
+const { execute: executeToggleLocationMode, loading: savingLocationMode } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ workshopLocationsFreeInput: workshopLocationsFreeInputLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      workshopLocationsFreeInputLocal.value = !workshopLocationsFreeInputLocal.value
+    },
   }
+)
+
+const handleToggleLocationMode = () => {
+  executeToggleLocationMode()
 }
 
 // État pour la modal d'import de workshops

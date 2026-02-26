@@ -46,9 +46,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import type { Convention } from '~/types'
 
@@ -66,7 +63,7 @@ const { t } = useI18n()
 const conventionId = parseInt(route.params.id as string)
 const convention = ref<Convention | null>(null)
 const loading = ref(true)
-const updating = ref(false)
+const pendingFormData = ref<Record<string, unknown> | null>(null)
 
 onMounted(async () => {
   // La protection est gérée côté serveur par session et par middleware 'auth-protected'.
@@ -120,55 +117,31 @@ onMounted(async () => {
   }
 })
 
-const handleUpdateConvention = async (
+const { execute: executeUpdate, loading: updating } = useApiAction(
+  `/api/conventions/${conventionId}`,
+  {
+    method: 'PUT',
+    body: () => pendingFormData.value,
+    silentSuccess: true,
+    errorMessages: { default: t('errors.convention_update_error') },
+    onSuccess: (result: Convention & { name: string }) => {
+      convention.value = result
+      toast.add({
+        title: t('messages.convention_updated'),
+        description: t('messages.convention_updated_desc', { name: result.name }),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      navigateTo('/my-conventions')
+    },
+  }
+)
+
+const handleUpdateConvention = (
   formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>
 ) => {
-  updating.value = true
-
-  try {
-    // Mettre à jour la convention (l'upload d'image se fait automatiquement via ImageUpload)
-    const updatedConvention = await $fetch(`/api/conventions/${conventionId}`, {
-      method: 'PUT',
-      body: formData,
-    })
-
-    convention.value = updatedConvention as unknown as Convention
-
-    toast.add({
-      title: t('messages.convention_updated'),
-      description: t('messages.convention_updated_desc', { name: updatedConvention.name }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Rediriger vers la page des conventions de l'utilisateur
-    router.push('/my-conventions')
-  } catch (error: unknown) {
-    console.error('Error updating convention:', error)
-
-    let errorMessage = t('errors.convention_update_error')
-    if (error && typeof error === 'object') {
-      if (
-        'data' in error &&
-        error.data &&
-        typeof error.data === 'object' &&
-        'message' in error.data
-      ) {
-        errorMessage = String(error.data.message)
-      } else if ('message' in error && typeof error.message === 'string') {
-        errorMessage = error.message
-      }
-    }
-
-    toast.add({
-      title: t('errors.update_error'),
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    updating.value = false
-  }
+  pendingFormData.value = formData
+  executeUpdate()
 }
 
 const handleCancel = () => {

@@ -217,15 +217,24 @@ Ces fichiers ont été analysés mais ne sont pas de bons candidats pour la migr
 
 ### Patterns trop complexes
 
-| Fichier                                     | Raison                                                                          |
-| ------------------------------------------- | ------------------------------------------------------------------------------- |
-| `app/pages/editions/[id]/workshops.vue`     | Logique créer/modifier conditionnelle, `confirm()` natif, updates optimistes    |
-| `app/pages/editions/[id]/commentaires.vue`  | Mises à jour locales des données après succès, plusieurs paramètres dynamiques  |
-| `app/pages/editions/[id]/lost-found.vue`    | Mises à jour locales des données après succès, plusieurs paramètres dynamiques  |
-| `app/pages/admin/index.vue`                 | Logique de redirection 401 personnalisée, valeurs par défaut en cas d'erreur    |
-| `app/components/feedback/FeedbackModal.vue` | Loading doit commencer avant l'appel API (validation reCAPTCHA)                 |
-| `app/pages/editions/[id]/artist-space.vue`  | Loading non-booléen (`savingMealId`), mutation locale pré-appel, rollback       |
-| `app/pages/admin/backup.vue`                | Loading par tableau (`string[]`), `confirm()` natif, message avec interpolation |
+| Fichier                                                        | Raison                                                                                                     |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `app/pages/editions/[id]/commentaires.vue`                     | Partiellement migré — addComment/deleteComment/togglePin restent manuels (plusieurs paramètres dynamiques) |
+| `app/pages/editions/[id]/lost-found.vue`                       | Partiellement migré — deleteItem/submitEdit/addComment restent manuels (mises à jour locales complexes)    |
+| `app/components/feedback/FeedbackModal.vue`                    | Loading doit commencer avant l'appel API (validation reCAPTCHA)                                            |
+| `app/pages/editions/[id]/artist-space.vue`                     | Loading non-booléen (`savingMealId`), mutation locale pré-appel, rollback                                  |
+| `app/pages/conventions/[id]/editions/add.vue`                  | Appelle `editionStore.addEdition()` (pas `$fetch` direct)                                                  |
+| `app/pages/editions/[id]/gestion/meals/list.vue`               | Chargement données GET complexe + génération PDF                                                           |
+| `app/pages/editions/[id]/gestion/meals/validate.vue`           | Loading par tableau (`validatingIds`), non-booléen                                                         |
+| `app/pages/editions/[id]/gestion/ticketing/access-control.vue` | Majorité de chargements de données                                                                         |
+| `app/pages/editions/[id]/gestion/ticketing/tiers.vue`          | Majorité de chargements de données (wraps store)                                                           |
+| `app/pages/editions/[id]/gestion/volunteers/planning.vue`      | Utilise composables dédiés (`useTimeSlots`)                                                                |
+| `app/components/edition/Form.vue`                              | Formulaire complexe, pas d'actions API directes                                                            |
+| `app/components/edition/volunteer/Table.vue`                   | Chargement de données avec filtrage/pagination                                                             |
+| `app/components/ticketing/TicketingTiersList.vue`              | Appelle l'utilitaire `deleteTier()` (pas `$fetch` direct)                                                  |
+| `app/components/volunteers/AddVolunteerModal.vue`              | Erreurs inline (pas de toast), gestion spécifique 409                                                      |
+| `app/components/ui/ImageUpload.vue`                            | Upload fichier, erreurs via emit                                                                           |
+| `app/components/workshops/ImportFromImageModal.vue`            | FileReader + Promise.allSettled                                                                            |
 
 ### Composables dédiés
 
@@ -329,6 +338,32 @@ Pour chaque fichier à migrer :
 | `app/pages/my-conventions.vue`                                             | 2026-02-26 | saveOrganizerChanges, removeOrganizer, addOrganizer, deleteEdition, deleteConvention, duplicateEdition, updateEditionStatus |
 | `app/pages/editions/[id]/gestion/volunteers/applications.vue`              | 2026-02-26 | unassignFromTeam, toggleTeamLeader, directAssign, processMove                                                               |
 | `app/pages/editions/[id]/gestion/map.vue`                                  | 2026-02-26 | (déjà migré auparavant — confirmé)                                                                                          |
+| `app/components/admin/ProfilePictureUpload.vue`                            | 2026-02-26 | saveChanges                                                                                                                 |
+| `app/components/ticketing/CustomFieldsList.vue`                            | 2026-02-26 | deleteCustomField                                                                                                           |
+| `app/components/ui/ImpersonationBanner.vue`                                | 2026-02-26 | stopImpersonation                                                                                                           |
+| `app/components/artists/MealsModal.vue`                                    | 2026-02-26 | saveMealSelections                                                                                                          |
+| `app/components/volunteers/MealsModal.vue`                                 | 2026-02-26 | saveMealSelections                                                                                                          |
+| `app/components/ticketing/CustomFieldAssociationsModal.vue`                | 2026-02-26 | save (associations tarifs/quotas/articles)                                                                                  |
+| `app/components/ticketing/ReturnableItemsList.vue`                         | 2026-02-26 | deleteItem, handleSave                                                                                                      |
+| `app/components/ticketing/TicketingVolunteerReturnableItemsList.vue`       | 2026-02-26 | deleteItem                                                                                                                  |
+| `app/pages/conventions/[id]/edit.vue`                                      | 2026-02-26 | handleUpdateConvention (silentSuccess + toast dynamique)                                                                    |
+| `app/pages/editions/[id]/index.vue`                                        | 2026-02-26 | publishEdition, toggleAttendance (silentSuccess + toast dynamique)                                                          |
+| `app/pages/editions/[id]/gestion/workshops/index.vue`                      | 2026-02-26 | handleToggleWorkshops, addLocation, deleteLocation (useApiActionById), handleToggleLocationMode (rollback onError)          |
+| `app/pages/admin/backup.vue`                                               | 2026-02-26 | createBackup (silentSuccess + toast dynamique), confirmRestore, deleteBackup (useApiActionById + confirm)                   |
+| `app/pages/admin/crons.vue`                                                | 2026-02-26 | executeTask (useApiActionById + silentSuccess + toast dynamique + résultat stocké)                                          |
+| `app/pages/admin/import-edition.vue`                                       | 2026-02-26 | performImport (silent + onSuccess/onError manuels), testUrls (silent + validation pré-appel)                                |
+| `app/pages/admin/index.vue`                                                | 2026-02-26 | executeAnonymization (silentSuccess + toast dynamique + résultat stocké)                                                    |
+| `app/pages/editions/[id]/gestion/ticketing/access-control.vue`             | 2026-02-26 | syncHelloAsso (silentSuccess + toast dynamique) + nettoyage console.error/imports                                           |
+| `app/pages/editions/[id]/gestion/ticketing/counter/[counterId].vue`        | 2026-02-26 | handleRegenerateToken (silentSuccess + redirect window.location) + nettoyage                                                |
+| `app/pages/editions/[id]/gestion/ticketing/tiers.vue`                      | 2026-02-26 | refreshData (sync HelloAsso) + nettoyage console.error/imports                                                              |
+| `app/pages/editions/[id]/gestion/meals/validate.vue`                       | 2026-02-26 | nettoyage uniquement (validatingIds = loading non-booléen, non migrable)                                                    |
+| `app/pages/editions/[id]/gestion/volunteers/planning.vue`                  | 2026-02-26 | nettoyage uniquement (utilise composables dédiés, pas de $fetch direct)                                                     |
+| `app/pages/editions/[id]/gestion/ticketing/stats.vue`                      | 2026-02-26 | nettoyage uniquement (que des GET de lecture)                                                                               |
+| `app/pages/editions/[id]/commentaires.vue`                                 | 2026-02-26 | submitNewPost, deletePost (useApiActionById) — partiel, addComment/deleteComment/togglePin restent manuels (multi-params)   |
+| `app/pages/editions/[id]/lost-found.vue`                                   | 2026-02-26 | toggleStatus (useApiActionById), submitNewItem — partiel, deleteItem/submitEdit/addComment restent manuels                  |
+| `app/pages/editions/[id]/workshops.vue`                                    | 2026-02-26 | createWorkshop, updateWorkshop, deleteWorkshop (useApiActionById)                                                           |
+| `app/pages/editions/[id]/shows-call/[showCallId]/apply.vue`                | 2026-02-26 | createApplication, updateApplication (2 instances useApiAction pour POST/PUT conditionnel)                                  |
+| `app/pages/my-volunteer-applications.vue`                                  | 2026-02-26 | contactOrganizer                                                                                                            |
 
 ---
 
@@ -344,10 +379,106 @@ Pour chaque fichier à migrer :
    - Le loading doit commencer avant l'appel API (ex: validation reCAPTCHA)
    - Plusieurs paramètres dynamiques sont passés à la fonction
    - La logique post-succès modifie localement les données (sans refresh)
-   - Une logique de rollback est nécessaire (updates optimistes)
+   - Le loading est non-booléen (tableau d'IDs, string, etc.)
+   - Le fichier utilise des wrappers (stores, utilitaires) au lieu de `$fetch` direct
 
 3. **Toujours utiliser `() => formData`** pour le body si les données sont dynamiques au moment de l'appel
 
 4. **Combiner les loading** avec `computed()` quand plusieurs actions partagent le même bouton
 
 5. **Ajouter les clés i18n** manquantes dans le bon fichier de traduction français
+
+---
+
+## Pièges et bonnes pratiques (leçons de la code review)
+
+### 1. `useToast()` doit être déclaré au setup level
+
+Si un composant utilise `useApiAction` (qui gère ses propres toasts) ET un `$fetch` manuel dans un `try/catch` (ex: `fetchMeals`), le `toast` doit quand même être déclaré au niveau setup :
+
+```typescript
+// CORRECT
+const toast = useToast() // Déclaré au setup, disponible partout
+
+const fetchMeals = async () => {
+  try {
+    /* ... */
+  } catch {
+    toast.add({
+      /* ... */
+    }) // ✅ toast est défini
+  }
+}
+
+const { execute } = useApiAction(/* ... */) // useApiAction gère ses propres toasts
+```
+
+### 2. `isLoading()` au lieu de `loadingId ===` pour `useApiActionById`
+
+Toujours utiliser la fonction `isLoading()` retournée par `useApiActionById`, jamais comparer `loadingId` directement :
+
+```typescript
+// INCORRECT
+const { execute, loadingId } = useApiActionById(/* ... */)
+// ❌ :loading="loadingId === item.id"
+
+// CORRECT
+const { execute, isLoading } = useApiActionById(/* ... */)
+// ✅ :loading="isLoading(item.id)"
+```
+
+### 3. Null guard sur les lambdas `body`
+
+Quand le body dépend d'une valeur potentiellement nulle, ajouter un guard dans la fonction appelante :
+
+```typescript
+const { execute } = useApiAction(url, {
+  body: () => validationResult.value.data, // ⚠️ peut être null
+})
+
+// Ajouter un guard avant d'appeler execute
+const performAction = () => {
+  if (!validationResult.value?.data) return // ✅ null guard
+  execute()
+}
+```
+
+### 4. `navigateTo` au lieu de `router.push` dans `onSuccess`
+
+Dans les callbacks `onSuccess` de `useApiAction`, utiliser `navigateTo` (idiomatique Nuxt) plutôt que `router.push` :
+
+```typescript
+// INCORRECT
+onSuccess: () => {
+  router.push('/my-conventions')
+}
+
+// CORRECT
+onSuccess: () => {
+  navigateTo('/my-conventions')
+}
+```
+
+### 5. Typer le paramètre `onSuccess`
+
+Toujours typer le paramètre `result` de `onSuccess` pour avoir l'autocomplétion et éviter les `any` :
+
+```typescript
+const { execute } = useApiAction(url, {
+  onSuccess: (result: { meals?: Meal[] }) => {
+    if (result.meals) {
+      meals.value = result.meals
+    }
+  },
+})
+```
+
+### 6. Spécifier le générique sur `useApiActionById`
+
+Préciser le type générique pour bénéficier du typage dans les callbacks :
+
+```typescript
+const { execute, isLoading } = useApiActionById<LostFoundItem>((id) => `/api/items/${id}`, {
+  /* ... */
+})
+```

@@ -91,9 +91,14 @@
 </template>
 
 <script setup lang="ts">
+interface ArtistProp {
+  id: number
+  user: { prenom: string; nom: string }
+}
+
 const props = defineProps<{
   modelValue: boolean
-  artist: any
+  artist: ArtistProp | null
   editionId: number
 }>()
 
@@ -122,10 +127,9 @@ const title = computed(() => {
 })
 
 // État pour les repas
-const meals = ref<any[]>([])
-const initialMeals = ref<any[]>([])
+const meals = ref<Meal[]>([])
+const initialMeals = ref<Meal[]>([])
 const loadingMeals = ref(false)
-const savingMeals = ref(false)
 
 // Grouper les repas par date
 const groupedMeals = computed(() => groupMealsByDate(meals.value))
@@ -154,11 +158,10 @@ const fetchMeals = async () => {
       // Sauvegarder l'état initial pour la détection de changements
       initialMeals.value = JSON.parse(JSON.stringify(response.meals))
     }
-  } catch (error: any) {
-    console.error('Failed to fetch meals:', error)
+  } catch {
     toast.add({
       title: t('common.error'),
-      description: error?.data?.message || t('artists.meals.error_loading'),
+      description: t('artists.meals.error_loading'),
       color: 'error',
     })
   } finally {
@@ -167,49 +170,32 @@ const fetchMeals = async () => {
 }
 
 // Sauvegarder les sélections de repas
-const saveMealSelections = async () => {
-  if (!props.artist) return
-
-  savingMeals.value = true
-  try {
-    const selections = meals.value.map((meal) => ({
-      selectionId: meal.selectionId,
-      accepted: meal.accepted,
-      afterShow: meal.afterShow || false,
-    }))
-
-    const response = await $fetch(
-      `/api/editions/${props.editionId}/artists/${props.artist.id}/meals`,
-      {
-        method: 'PUT',
-        body: { selections },
+const { execute: executeSaveMeals, loading: savingMeals } = useApiAction(
+  () => `/api/editions/${props.editionId}/artists/${props.artist?.id}/meals`,
+  {
+    method: 'PUT',
+    body: () => ({
+      selections: meals.value.map((meal) => ({
+        selectionId: meal.selectionId,
+        accepted: meal.accepted,
+        afterShow: meal.afterShow || false,
+      })),
+    }),
+    successMessage: { title: t('common.saved'), description: t('artists.meals.saved_success') },
+    errorMessages: { default: t('artists.meals.error_saving') },
+    onSuccess: (result: { meals?: Meal[] }) => {
+      if (result.meals) {
+        meals.value = result.meals
+        initialMeals.value = JSON.parse(JSON.stringify(result.meals))
       }
-    )
-
-    if (response.success && response.meals) {
-      meals.value = response.meals
-      // Mettre à jour l'état initial après sauvegarde
-      initialMeals.value = JSON.parse(JSON.stringify(response.meals))
-
-      toast.add({
-        title: t('common.saved'),
-        description: t('artists.meals.saved_success'),
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
-
       emit('meals-saved')
-    }
-  } catch (error: any) {
-    console.error('Failed to save meal selections:', error)
-    toast.add({
-      title: t('common.error'),
-      description: error?.data?.message || t('artists.meals.error_saving'),
-      color: 'error',
-    })
-  } finally {
-    savingMeals.value = false
+    },
   }
+)
+
+const saveMealSelections = () => {
+  if (!props.artist) return
+  executeSaveMeals()
 }
 
 const closeModal = () => {

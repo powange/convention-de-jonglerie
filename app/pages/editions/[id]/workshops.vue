@@ -356,9 +356,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { formatDateTimeLocal, addHoursToDateTimeLocal } from '~/utils/date'
@@ -376,7 +373,6 @@ const workshopsEnabled = computed(() => edition.value?.workshopsEnabled ?? false
 const workshops = ref<any[]>([])
 const loading = ref(true)
 const showAddModal = ref(false)
-const saving = ref(false)
 const editingWorkshop = ref<any>(null)
 const canCreateWorkshop = ref(false)
 const filterMode = ref<'all' | 'favorites'>('all')
@@ -446,8 +442,8 @@ const fetchWorkshopLocations = async () => {
   try {
     const data = await $fetch(`/api/editions/${editionId}/workshops/locations`)
     workshopLocations.value = data as Array<{ id: number; name: string }>
-  } catch (error) {
-    console.error('Failed to fetch workshop locations:', error)
+  } catch {
+    // Silencieux - les lieux ne sont pas critiques
   } finally {
     loadingLocations.value = false
   }
@@ -632,8 +628,7 @@ const fetchWorkshops = async () => {
   try {
     const data = await $fetch(`/api/editions/${editionId}/workshops`)
     workshops.value = data as any[]
-  } catch (error) {
-    console.error('Failed to fetch workshops:', error)
+  } catch {
     toast.add({
       title: 'Erreur lors du chargement des workshops',
       color: 'error',
@@ -687,91 +682,88 @@ const closeModal = () => {
   }
 }
 
-const saveWorkshop = async () => {
-  saving.value = true
-  try {
-    const body: any = {
-      title: formData.value.title.trim(),
-      description: formData.value.description.trim() || null,
-      startDateTime: new Date(formData.value.startDateTime).toISOString(),
-      endDateTime: new Date(formData.value.endDateTime).toISOString(),
-      maxParticipants: formData.value.maxParticipants || null,
-    }
+// Construire le body du workshop
+const buildWorkshopBody = () => {
+  const body: Record<string, unknown> = {
+    title: formData.value.title.trim(),
+    description: formData.value.description.trim() || null,
+    startDateTime: new Date(formData.value.startDateTime).toISOString(),
+    endDateTime: new Date(formData.value.endDateTime).toISOString(),
+    maxParticipants: formData.value.maxParticipants || null,
+  }
 
-    // Gérer le lieu selon le mode
-    if (workshopLocationsFreeInput.value && formData.value.locationId === 'other') {
-      // Mode libre avec "Autre" sélectionné : envoyer le nom du nouveau lieu
-      if (formData.value.locationName.trim()) {
-        body.locationName = formData.value.locationName.trim()
-      }
-    } else {
-      // Mode exclusif ou lieu existant : envoyer l'ID du lieu (même si null pour supprimer)
-      body.locationId = formData.value.locationId === 'other' ? null : formData.value.locationId
+  // Gérer le lieu selon le mode
+  if (workshopLocationsFreeInput.value && formData.value.locationId === 'other') {
+    // Mode libre avec "Autre" sélectionné : envoyer le nom du nouveau lieu
+    if (formData.value.locationName.trim()) {
+      body.locationName = formData.value.locationName.trim()
     }
+  } else {
+    // Mode exclusif ou lieu existant : envoyer l'ID du lieu (même si null pour supprimer)
+    body.locationId = formData.value.locationId === 'other' ? null : formData.value.locationId
+  }
 
-    if (editingWorkshop.value) {
-      // Modifier
-      await $fetch(`/api/editions/${editionId}/workshops/${editingWorkshop.value.id}`, {
-        method: 'PUT',
-        body,
-      })
-      toast.add({
-        title: 'Workshop modifié avec succès',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
-    } else {
-      // Créer
-      await $fetch(`/api/editions/${editionId}/workshops`, {
-        method: 'POST',
-        body,
-      })
-      toast.add({
-        title: 'Workshop ajouté avec succès',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
-    }
+  return body
+}
 
-    closeModal()
-    await fetchWorkshops()
-  } catch (error: any) {
-    console.error('Failed to save workshop:', error)
-    toast.add({
-      title: error?.data?.message || 'Erreur lors de la sauvegarde',
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    saving.value = false
+const onWorkshopSaved = async () => {
+  closeModal()
+  await fetchWorkshops()
+}
+
+// Action pour créer un workshop
+const { execute: executeCreateWorkshop, loading: isCreating } = useApiAction(
+  () => `/api/editions/${editionId}/workshops`,
+  {
+    method: 'POST',
+    body: buildWorkshopBody,
+    successMessage: { title: 'Workshop ajouté avec succès' },
+    errorMessages: { default: 'Erreur lors de la sauvegarde' },
+    onSuccess: onWorkshopSaved,
+  }
+)
+
+// Action pour modifier un workshop
+const { execute: executeUpdateWorkshop, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${editionId}/workshops/${editingWorkshop.value?.id}`,
+  {
+    method: 'PUT',
+    body: buildWorkshopBody,
+    successMessage: { title: 'Workshop modifié avec succès' },
+    errorMessages: { default: 'Erreur lors de la sauvegarde' },
+    onSuccess: onWorkshopSaved,
+  }
+)
+
+const saving = computed(() => isCreating.value || isUpdating.value)
+
+const saveWorkshop = () => {
+  if (editingWorkshop.value) {
+    executeUpdateWorkshop()
+  } else {
+    executeCreateWorkshop()
   }
 }
 
-const deleteWorkshop = async (workshopId: number) => {
+// Supprimer un workshop
+const { execute: executeDeleteWorkshop } = useApiActionById(
+  (id) => `/api/editions/${editionId}/workshops/${id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: 'Workshop supprimé avec succès' },
+    errorMessages: { default: 'Erreur lors de la suppression' },
+    refreshOnSuccess: () => fetchWorkshops(),
+  }
+)
+
+const deleteWorkshop = (workshopId: number) => {
   if (!confirm('Êtes-vous sûr de vouloir supprimer ce workshop ?')) {
     return
   }
-
-  try {
-    await $fetch(`/api/editions/${editionId}/workshops/${workshopId}`, {
-      method: 'DELETE',
-    })
-    toast.add({
-      title: 'Workshop supprimé avec succès',
-      color: 'success',
-      icon: 'i-heroicons-check-circle',
-    })
-    await fetchWorkshops()
-  } catch (error: any) {
-    console.error('Failed to delete workshop:', error)
-    toast.add({
-      title: error?.data?.message || 'Erreur lors de la suppression',
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  }
+  executeDeleteWorkshop(workshopId)
 }
 
+// Toggle favori - update optimiste avec rollback en cas d'erreur
 const toggleFavorite = async (workshop: any) => {
   const wasFavorite = workshop.isFavorite
 
@@ -780,7 +772,6 @@ const toggleFavorite = async (workshop: any) => {
 
   try {
     if (wasFavorite) {
-      // Retirer des favoris
       await $fetch(`/api/editions/${editionId}/workshops/${workshop.id}/favorite`, {
         method: 'DELETE',
       })
@@ -790,7 +781,6 @@ const toggleFavorite = async (workshop: any) => {
         icon: 'i-heroicons-star',
       })
     } else {
-      // Ajouter aux favoris
       await $fetch(`/api/editions/${editionId}/workshops/${workshop.id}/favorite`, {
         method: 'POST',
       })
@@ -800,12 +790,11 @@ const toggleFavorite = async (workshop: any) => {
         icon: 'i-heroicons-star-solid',
       })
     }
-  } catch (error: any) {
+  } catch {
     // Annuler le changement optimiste en cas d'erreur
     workshop.isFavorite = wasFavorite
-    console.error('Failed to toggle favorite:', error)
     toast.add({
-      title: error?.data?.message || $t('workshops.favorite_error'),
+      title: $t('workshops.favorite_error'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })
@@ -835,8 +824,8 @@ onMounted(async () => {
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
+    } catch {
+      // Silencieux - géré par le store
     }
   }
   if (workshopsEnabled.value) {

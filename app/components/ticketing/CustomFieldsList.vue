@@ -229,8 +229,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
 interface CustomField {
   id: number
   label: string
@@ -276,7 +274,6 @@ const isAssociationsModalOpen = ref(false)
 const selectedCustomFieldForAssociations = ref<CustomField | null>(null)
 const showDeleteModal = ref(false)
 const customFieldToDelete = ref<CustomField | null>(null)
-const deleting = ref(false)
 
 const getTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
@@ -308,42 +305,25 @@ const confirmDelete = (field: CustomField) => {
   showDeleteModal.value = true
 }
 
-const deleteCustomField = async () => {
-  if (!customFieldToDelete.value) return
-
-  deleting.value = true
-  const toast = useToast()
-
-  try {
-    await $fetch(
-      `/api/editions/${props.editionId}/ticketing/custom-fields/${customFieldToDelete.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
+const { execute: executeDeleteCustomField, loading: deleting } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/custom-fields/${customFieldToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: 'Champ supprimé',
       description: 'Le champ personnalisé a été supprimé avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    showDeleteModal.value = false
-    customFieldToDelete.value = null
-
-    // Recharger la liste via l'événement refresh
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Erreur lors de la suppression du champ:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de supprimer le champ personnalisé',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    deleting.value = false
+    },
+    errorMessages: { default: 'Impossible de supprimer le champ personnalisé' },
+    onSuccess: () => {
+      showDeleteModal.value = false
+      customFieldToDelete.value = null
+      emit('refresh')
+    },
   }
+)
+
+const deleteCustomField = () => {
+  if (!customFieldToDelete.value) return
+  executeDeleteCustomField()
 }
 </script>

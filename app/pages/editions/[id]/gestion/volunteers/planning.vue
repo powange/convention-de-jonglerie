@@ -121,11 +121,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue & libs
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-
-// App components & stores
 import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'
 import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
 import { useDatetime } from '~/composables/useDatetime'
@@ -273,15 +268,12 @@ const handleSlotUpdate = async (data: {
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error: any) {
-    console.error('Erreur lors de la mise à jour du créneau:', error)
-
-    const errorMessage =
-      error.data?.message || error.message || error.statusText || 'Erreur lors de la mise à jour'
-
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string }; message?: string; statusText?: string }
     toast.add({
       title: t('errors.error_occurred'),
-      description: errorMessage,
+      description:
+        err.data?.message || err.message || err.statusText || 'Erreur lors de la mise à jour',
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -297,15 +289,12 @@ const handleSlotDelete = async (slotId: string) => {
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
-    } catch (error: any) {
-      console.error('Erreur lors de la suppression du créneau:', error)
-
-      const errorMessage =
-        error.data?.message || error.message || error.statusText || 'Erreur lors de la suppression'
-
+    } catch (error: unknown) {
+      const err = error as { data?: { message?: string }; message?: string; statusText?: string }
       toast.add({
         title: t('errors.error_occurred'),
-        description: errorMessage,
+        description:
+          err.data?.message || err.message || err.statusText || 'Erreur lors de la suppression',
         icon: 'i-heroicons-x-circle',
         color: 'error',
       })
@@ -347,19 +336,12 @@ const handleSlotSave = async (slotData: any) => {
         color: 'success',
       })
     }
-  } catch (error: any) {
-    console.error('Erreur lors de la sauvegarde du créneau:', error)
-
-    // Extraire le message d'erreur approprié
-    const errorMessage =
-      error.data?.message || // Message de l'API
-      error.message || // Message de l'erreur standard
-      error.statusText || // Texte du statut HTTP
-      'Erreur lors de la sauvegarde'
-
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string }; message?: string; statusText?: string }
     toast.add({
       title: t('errors.error_occurred'),
-      description: errorMessage,
+      description:
+        err.data?.message || err.message || err.statusText || 'Erreur lors de la sauvegarde',
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -700,8 +682,7 @@ const fetchAcceptedVolunteers = async () => {
     // L'API retourne { success: true, data: [...], pagination: {...} }
     const applications = response.data || response.applications || response
     volunteers.value = Array.isArray(applications) ? applications : []
-  } catch (error) {
-    console.error('Failed to fetch accepted volunteers:', error)
+  } catch {
     volunteers.value = []
   }
 }
@@ -737,8 +718,7 @@ onMounted(async () => {
       fetchTeams(),
       fetchTimeSlots(),
     ])
-  } catch (error) {
-    console.error('Failed to load planning data:', error)
+  } catch {
     toast.add({
       title: t('errors.error_occurred'),
       description: t('edition.volunteers.loading_error'),

@@ -406,9 +406,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useDebounce } from '~/composables/useDebounce'
 import { useMealTypeLabel } from '~/composables/useMeals'
 import { useAuthStore } from '~/stores/auth'
@@ -578,8 +575,7 @@ const fetchMeals = async () => {
         }
       }
     }
-  } catch (error) {
-    console.error('Error fetching meals:', error)
+  } catch {
     toast.add({
       title: t('gestion.meals.error_loading_meals'),
       color: 'error',
@@ -606,8 +602,7 @@ const searchPeople = async () => {
       }
     )
     searchResults.value = data.results || []
-  } catch (error) {
-    console.error('Error searching people:', error)
+  } catch {
     toast.add({
       title: t('gestion.meals.error_searching'),
       color: 'error',
@@ -632,8 +627,7 @@ const fetchMealStats = async () => {
       `/api/editions/${editionId}/meals/${selectedMeal.value.id}/stats`
     )
     mealStats.value = data.stats || null
-  } catch (error) {
-    console.error('Error fetching meal stats:', error)
+  } catch {
     mealStats.value = null
   } finally {
     loadingStats.value = false
@@ -660,10 +654,10 @@ const validateMeal = async (person: any) => {
 
     // Rafraîchir la recherche et les stats pour mettre à jour le statut
     await Promise.all([searchPeople(), fetchMealStats()])
-  } catch (error: any) {
-    console.error('Error validating meal:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
-      title: error?.data?.message || t('gestion.meals.error_validating'),
+      title: err?.data?.message || t('gestion.meals.error_validating'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })
@@ -698,8 +692,7 @@ const fetchPendingList = async (type: 'volunteer' | 'artist' | 'participant') =>
       if (lastNameCompare !== 0) return lastNameCompare
       return (a.firstName || '').localeCompare(b.firstName || '', 'fr')
     })
-  } catch (error) {
-    console.error('Error fetching pending list:', error)
+  } catch {
     toast.add({
       title: t('gestion.meals.error_loading_pending'),
       color: 'error',
@@ -738,10 +731,10 @@ const cancelMeal = async (person: any) => {
 
     // Rafraîchir la recherche et les stats pour mettre à jour le statut
     await Promise.all([searchPeople(), fetchMealStats()])
-  } catch (error: any) {
-    console.error('Error cancelling meal:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
-      title: error?.data?.message || t('gestion.meals.error_cancelling'),
+      title: err?.data?.message || t('gestion.meals.error_cancelling'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })
@@ -775,8 +768,8 @@ onMounted(async () => {
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
+    } catch {
+      // Erreur silencieuse
     }
   }
 

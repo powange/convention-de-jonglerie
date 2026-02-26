@@ -670,9 +670,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -732,7 +729,6 @@ const stats = ref({
   totalArtists: 0,
 })
 const hasHelloAssoConfig = ref(false)
-const syncingHelloAsso = ref(false)
 const volunteersNotValidatedModalOpen = ref(false)
 const volunteersNotValidated = ref<any[]>([])
 const loadingVolunteersNotValidated = ref(false)
@@ -747,8 +743,8 @@ onMounted(async () => {
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
+    } catch {
+      // Erreur silencieuse
     }
   }
 
@@ -830,11 +826,11 @@ const handleScan = async (code: string) => {
         color: 'warning',
       })
     }
-  } catch (error: any) {
-    console.error('Failed to validate ticket:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de vérifier le billet',
+      description: err.data?.message || 'Impossible de vérifier le billet',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -887,11 +883,11 @@ const handleValidateParticipants = async (
     } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }
-  } catch (error: any) {
-    console.error('Failed to validate participants:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de valider les participants',
+      description: err.data?.message || 'Impossible de valider les participants',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -924,8 +920,8 @@ const reloadParticipant = async (
     if (result.success && result.found) {
       selectedParticipant.value = result.participant
     }
-  } catch (error) {
-    console.error('Failed to reload participant:', error)
+  } catch {
+    // Erreur silencieuse lors du rechargement du participant
   }
 }
 
@@ -959,11 +955,11 @@ const handleInvalidateEntry = async (participantId: number) => {
     } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }
-  } catch (error: any) {
-    console.error('Failed to invalidate entry:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || "Impossible de dévalider l'entrée",
+      description: err.data?.message || "Impossible de dévalider l'entrée",
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -996,11 +992,11 @@ const handleOrderCreated = async (qrCode: string) => {
       // Recharger les statistiques et les dernières validations
       await Promise.all([loadStats(), loadRecentValidations()])
     }
-  } catch (error: any) {
-    console.error('Failed to load created order:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger la commande créée',
+      description: err.data?.message || 'Impossible de charger la commande créée',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -1024,11 +1020,11 @@ const searchTickets = async () => {
     if (result.success) {
       searchResults.value = result.results
     }
-  } catch (error: any) {
-    console.error('Failed to search tickets:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de rechercher les billets',
+      description: err.data?.message || 'Impossible de rechercher les billets',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -1055,8 +1051,8 @@ const loadStats = async () => {
     if (result.success) {
       stats.value = result.stats
     }
-  } catch (error: any) {
-    console.error('Failed to load stats:', error)
+  } catch {
+    // Erreur silencieuse lors du chargement des stats
   }
 }
 
@@ -1069,8 +1065,8 @@ const loadRecentValidations = async () => {
     if (result.success) {
       recentValidations.value = result.validations
     }
-  } catch (error: any) {
-    console.error('Failed to load recent validations:', error)
+  } catch {
+    // Erreur silencieuse lors du chargement des validations récentes
   } finally {
     loadingValidations.value = false
   }
@@ -1105,39 +1101,28 @@ const checkHelloAssoConfig = async () => {
 }
 
 // Synchroniser les participants depuis HelloAsso
-const syncHelloAsso = async () => {
-  if (syncingHelloAsso.value) return
-
-  syncingHelloAsso.value = true
-
-  try {
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/orders`)
-
+const { execute: syncHelloAsso, loading: syncingHelloAsso } = useApiAction<
+  undefined,
+  { success: boolean; stats?: { totalItems?: number } }
+>(`/api/editions/${editionId}/ticketing/helloasso/orders`, {
+  method: 'GET',
+  silentSuccess: true,
+  errorMessages: {
+    default: 'Impossible de synchroniser les participants HelloAsso',
+  },
+  onSuccess: async (result) => {
     if (result.success) {
       const totalParticipants = result.stats?.totalItems || 0
-
       toast.add({
         title: 'Synchronisation réussie',
         description: `${totalParticipants} participant${totalParticipants > 1 ? 's' : ''} synchronisé${totalParticipants > 1 ? 's' : ''} depuis HelloAsso`,
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
-
-      // Recharger les statistiques et les dernières validations
       await Promise.all([loadStats(), loadRecentValidations()])
     }
-  } catch (error: any) {
-    console.error('Failed to sync HelloAsso:', error)
-    toast.add({
-      title: 'Erreur de synchronisation',
-      description: error.data?.message || 'Impossible de synchroniser les participants HelloAsso',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    syncingHelloAsso.value = false
-  }
-}
+  },
+})
 
 // Charger les bénévoles non validés
 const loadVolunteersNotValidated = async () => {
@@ -1151,11 +1136,11 @@ const loadVolunteersNotValidated = async () => {
     if (result.success) {
       volunteersNotValidated.value = result.volunteers
     }
-  } catch (error: any) {
-    console.error('Failed to load volunteers not validated:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger les bénévoles non validés',
+      description: err.data?.message || 'Impossible de charger les bénévoles non validés',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -1181,11 +1166,11 @@ const loadArtistsNotValidated = async () => {
     if (result.success) {
       artistsNotValidated.value = result.artists
     }
-  } catch (error: any) {
-    console.error('Failed to load artists not validated:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger les artistes non validés',
+      description: err.data?.message || 'Impossible de charger les artistes non validés',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -1213,11 +1198,11 @@ const loadOrganizersNotValidated = async () => {
     if (result.success) {
       organizersNotValidated.value = result.organizers
     }
-  } catch (error: any) {
-    console.error('Failed to load organizers not validated:', error)
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Erreur',
-      description: error.data?.message || 'Impossible de charger les organisateurs non validés',
+      description: err.data?.message || 'Impossible de charger les organisateurs non validés',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

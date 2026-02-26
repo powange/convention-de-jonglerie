@@ -345,7 +345,6 @@ const {
 const step = ref(1)
 const showResetModal = ref(false)
 const showRegenerateModal = ref(false)
-const isRegenerating = ref(false)
 
 // URL du compteur pour le QR code (utilise le token pour la sécurité)
 const counterUrl = computed(() => {
@@ -435,60 +434,47 @@ const shareUrl = async () => {
     } else {
       await copyUrl()
     }
-  } catch (err) {
-    console.error('Error sharing:', err)
+  } catch {
+    // Partage annulé ou non supporté
   }
 }
 
-const handleRegenerateToken = async () => {
-  try {
-    isRegenerating.value = true
-
-    const response = await $fetch(
-      `/api/editions/${editionId}/ticketing/counters/${token}/regenerate-token`,
-      {
-        method: 'PATCH',
-      }
-    )
-
+const { execute: handleRegenerateToken, loading: isRegenerating } = useApiAction<
+  undefined,
+  { success: boolean; token?: string }
+>(`/api/editions/${editionId}/ticketing/counters/${token}/regenerate-token`, {
+  method: 'PATCH',
+  silentSuccess: true,
+  errorMessages: {
+    default: t('ticketing.counters.regenerate_token_error'),
+  },
+  onSuccess: async (response) => {
     if (response.success && response.token) {
       // Déconnecter la connexion SSE actuelle avant de changer d'URL
       disconnect()
 
-      // Afficher le toast de succès
       toast.add({
         title: t('common.success'),
         description: t('ticketing.counters.token_regenerated'),
         color: 'success',
       })
 
-      // Fermer la modal
       showRegenerateModal.value = false
 
-      // Utiliser replace au lieu de push pour remplacer l'URL sans déclencher onBeforeRouteLeave
-      // On utilise nextTick pour s'assurer que la déconnexion SSE est complète
+      // Utiliser nextTick pour s'assurer que la déconnexion SSE est complète
       await nextTick()
       window.location.href = `/editions/${editionId}/gestion/ticketing/counter/${response.token}`
     }
-  } catch (error) {
-    console.error('Error regenerating token:', error)
-    toast.add({
-      title: t('common.error'),
-      description: t('ticketing.counters.regenerate_token_error'),
-      color: 'error',
-    })
-  } finally {
-    isRegenerating.value = false
-  }
-}
+  },
+})
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
+    } catch {
+      // Erreur silencieuse
     }
   }
 
@@ -498,7 +484,6 @@ onMounted(async () => {
 
 // Déconnecter explicitement avant de quitter la page
 onBeforeRouteLeave(() => {
-  console.log('[Counter Page] Navigation détectée - Déconnexion SSE')
   disconnect()
 })
 

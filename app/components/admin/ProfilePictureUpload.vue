@@ -126,7 +126,6 @@ const { t } = useI18n()
 // État local
 const showModal = ref(false)
 const tempProfilePictureUrl = ref(props.user.profilePicture || '')
-const saving = ref(false)
 
 // Computed pour l'utilisateur avec la photo temporaire
 const previewUser = computed(() => ({
@@ -158,51 +157,30 @@ const cancelChanges = () => {
 }
 
 // Sauvegarder les changements
-const saveChanges = async () => {
-  if (!hasUnsavedChanges.value) return
-
-  saving.value = true
-
-  try {
-    // Appel API pour mettre à jour la photo de profil
-    const response = await $fetch<{ success: boolean; profilePicture: string | null }>(
-      `/api/admin/users/${props.user.id}/profile-picture`,
-      {
-        method: 'PUT',
-        body: {
-          profilePicture: tempProfilePictureUrl.value || null,
-        },
-      }
-    )
-
-    // Émettre les événements avec le nom de fichier final (pas l'URL temporaire)
-    const finalProfilePicture = response.profilePicture
-    emit('update:modelValue', finalProfilePicture)
-    emit('changed', finalProfilePicture)
-
-    showModal.value = false
-
-    toast.add({
-      title: t('common.success'),
-      description: t('admin.profile_picture_updated'),
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Erreur lors de la mise à jour de la photo:', error)
-
-    toast.add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.profile_picture_update_error'),
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+const { execute: executeSaveChanges, loading: saving } = useApiAction(
+  () => `/api/admin/users/${props.user.id}/profile-picture`,
+  {
+    method: 'PUT',
+    body: () => ({
+      profilePicture: tempProfilePictureUrl.value || null,
+    }),
+    successMessage: { title: t('common.success'), description: t('admin.profile_picture_updated') },
+    errorMessages: { default: t('admin.profile_picture_update_error') },
+    onSuccess: (result: { profilePicture: string | null }) => {
+      emit('update:modelValue', result.profilePicture)
+      emit('changed', result.profilePicture)
+      showModal.value = false
+    },
   }
+)
+
+const saveChanges = () => {
+  if (!hasUnsavedChanges.value) return
+  executeSaveChanges()
 }
 
 // Gestionnaires d'événements ImageUpload
 const onProfilePictureUploaded = (result: { success: boolean; imageUrl?: string }) => {
-  console.log('Upload result:', result)
   if (result.success && result.imageUrl) {
     tempProfilePictureUrl.value = result.imageUrl
   }
@@ -212,11 +190,12 @@ const onProfilePictureDeleted = () => {
   tempProfilePictureUrl.value = ''
 }
 
-const onProfilePictureError = (error: any) => {
+const onProfilePictureError = (error: unknown) => {
   console.error('Erreur upload:', error)
+  const message = error instanceof Error ? error.message : undefined
   toast.add({
     title: t('common.error'),
-    description: error.message || t('upload.error'),
+    description: message || t('upload.error'),
     color: 'error',
   })
 }

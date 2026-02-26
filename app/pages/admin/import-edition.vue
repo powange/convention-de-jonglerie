@@ -387,7 +387,6 @@ const { parseAndValidateUrls } = useUrlValidation()
 const showDocumentation = ref(false)
 const jsonInput = ref('')
 const jsonCopied = ref(false)
-const importing = ref(false)
 const validationResult = ref<any>(null)
 const importResult = ref<any>(null)
 
@@ -400,7 +399,6 @@ const showDuplicateModal = ref(false)
 const urlsInput = ref('')
 
 // État pour le test des URLs
-const testingUrls = ref(false)
 const testResults = ref<any[]>([])
 const selectedTestUrl = ref<string>('')
 
@@ -533,8 +531,8 @@ const copyJsonToClipboard = async () => {
     setTimeout(() => {
       jsonCopied.value = false
     }, 2000)
-  } catch (err) {
-    console.error('Failed to copy:', err)
+  } catch {
+    // Clipboard API not available
   }
 }
 
@@ -608,7 +606,9 @@ const isValidDate = (dateString: string): boolean => {
 /**
  * Vérifie s'il existe des éditions similaires (même période, même pays)
  */
-const checkForDuplicates = async (data: any): Promise<boolean> => {
+const checkForDuplicates = async (data: {
+  edition: { startDate: string; endDate: string; country: string }
+}): Promise<boolean> => {
   try {
     checkingDuplicates.value = true
     const response = await $fetch<{
@@ -631,8 +631,7 @@ const checkForDuplicates = async (data: any): Promise<boolean> => {
 
     duplicateEditions.value = []
     return false
-  } catch (error) {
-    console.error('Erreur lors de la vérification des doublons:', error)
+  } catch {
     // En cas d'erreur, on continue l'import (fail-safe)
     return false
   } finally {
@@ -643,20 +642,14 @@ const checkForDuplicates = async (data: any): Promise<boolean> => {
 /**
  * Effectue l'import après validation et confirmation des doublons
  */
-const performImport = async () => {
-  try {
-    importing.value = true
-    importResult.value = null
-    showDuplicateModal.value = false
-
-    const response = await $fetch<{ editionId: string; conventionId: string }>(
-      '/api/admin/import-edition',
-      {
-        method: 'POST',
-        body: validationResult.value.data,
-      }
-    )
-
+const { execute: executeImport, loading: importing } = useApiAction<
+  unknown,
+  { editionId: string; conventionId: string }
+>('/api/admin/import-edition', {
+  method: 'POST',
+  body: () => validationResult.value.data,
+  silent: true,
+  onSuccess: (response: { editionId: string; conventionId: string }) => {
     importResult.value = {
       success: true,
       editionId: response.editionId,
@@ -668,10 +661,10 @@ const performImport = async () => {
       description: t('admin.import.import_success_toast'),
       color: 'success',
     })
-  } catch (error: any) {
-    // Récupérer les erreurs de validation détaillées si disponibles
-    const validationErrors = error?.data?.data?.errors
-    const errorMessage = error?.data?.message || t('admin.import.import_failed')
+  },
+  onError: (err) => {
+    const validationErrors = err.data?.errors as Record<string, string> | undefined
+    const errorMessage = err.data?.message || t('admin.import.import_failed')
 
     importResult.value = {
       success: false,
@@ -679,7 +672,6 @@ const performImport = async () => {
       validationErrors: validationErrors || null,
     }
 
-    // Toast avec message principal
     toast.add({
       title: t('common.error'),
       description: validationErrors
@@ -687,9 +679,14 @@ const performImport = async () => {
         : errorMessage,
       color: 'error',
     })
-  } finally {
-    importing.value = false
-  }
+  },
+})
+
+const performImport = async () => {
+  if (!validationResult.value?.data) return
+  importResult.value = null
+  showDuplicateModal.value = false
+  await executeImport()
 }
 
 const validateAndImport = async () => {
@@ -727,6 +724,32 @@ const getPreviewedImageUrl = (): string | undefined => {
 /**
  * Teste les URLs fournies sans passer par l'IA
  */
+const parsedUrls = ref<string[]>([])
+
+const { execute: executeTestUrls, loading: testingUrls } = useApiAction<
+  { urls: string[] },
+  { results: any[] }
+>('/api/admin/test-urls', {
+  method: 'POST',
+  body: () => ({ urls: parsedUrls.value }),
+  silent: true,
+  onSuccess: (response: { results: any[] }) => {
+    testResults.value = response.results
+    if (response.results.length > 0) {
+      selectedTestUrl.value = response.results[0].url
+    }
+
+    toast.add({
+      title: t('admin.import.test_success'),
+      description: t('admin.import.test_success_description', { count: response.results.length }),
+      color: 'success',
+    })
+  },
+  onError: (err) => {
+    generateError.value = err.data?.message || err.message || t('admin.import.test_failed')
+  },
+})
+
 const testUrls = async () => {
   generateError.value = ''
   testResults.value = []
@@ -738,32 +761,9 @@ const testUrls = async () => {
     generateError.value = urlsResult.error!
     return
   }
-  const urls = urlsResult.urls!
+  parsedUrls.value = urlsResult.urls!
 
-  try {
-    testingUrls.value = true
-
-    const response = await $fetch<{ results: any[] }>('/api/admin/test-urls', {
-      method: 'POST',
-      body: { urls },
-    })
-
-    testResults.value = response.results
-    // Sélectionner automatiquement la première URL
-    if (response.results.length > 0) {
-      selectedTestUrl.value = response.results[0].url
-    }
-
-    toast.add({
-      title: t('admin.import.test_success'),
-      description: t('admin.import.test_success_description', { count: response.results.length }),
-      color: 'success',
-    })
-  } catch (error: any) {
-    generateError.value = error?.data?.message || error?.message || t('admin.import.test_failed')
-  } finally {
-    testingUrls.value = false
-  }
+  await executeTestUrls()
 }
 
 const generateFromUrls = async () => {

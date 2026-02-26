@@ -198,8 +198,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-
 interface CustomField {
   id: number
   label: string
@@ -268,7 +266,6 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 })
 
-const saving = ref(false)
 const loadingTiers = ref(false)
 const loadingQuotas = ref(false)
 const loadingReturnableItems = ref(false)
@@ -378,59 +375,45 @@ const loadReturnableItems = async () => {
   }
 }
 
-const save = async () => {
-  saving.value = true
-  const toast = useToast()
+const buildAssociationsBody = () => {
+  const validQuotas = quotaAssociations.value
+    .filter((a) => a.quotaId !== null)
+    .map((a) => ({
+      quotaId: a.quotaId!,
+      choiceValue: a.choiceValue || undefined,
+    }))
 
-  try {
-    // Filtrer les associations valides (avec un quota/article sélectionné)
-    const validQuotas = quotaAssociations.value
-      .filter((a) => a.quotaId !== null)
-      .map((a) => ({
-        quotaId: a.quotaId!,
-        choiceValue: a.choiceValue || undefined,
-      }))
+  const validReturnableItems = returnableItemAssociations.value
+    .filter((a) => a.returnableItemId !== null)
+    .map((a) => ({
+      returnableItemId: a.returnableItemId!,
+      choiceValue: a.choiceValue || undefined,
+    }))
 
-    const validReturnableItems = returnableItemAssociations.value
-      .filter((a) => a.returnableItemId !== null)
-      .map((a) => ({
-        returnableItemId: a.returnableItemId!,
-        choiceValue: a.choiceValue || undefined,
-      }))
-
-    await $fetch(
-      `/api/editions/${props.editionId}/ticketing/custom-fields/${props.customField!.id}/associations`,
-      {
-        method: 'PUT',
-        body: {
-          tierIds: selectedTierIds.value,
-          quotas: validQuotas,
-          returnableItems: validReturnableItems,
-        },
-      }
-    )
-
-    toast.add({
-      title: 'Associations mises à jour',
-      description: 'Les tarifs, quotas et articles ont été enregistrés avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    isOpen.value = false
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Erreur lors de la sauvegarde des associations:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de sauvegarder les associations',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
+  return {
+    tierIds: selectedTierIds.value,
+    quotas: validQuotas,
+    returnableItems: validReturnableItems,
   }
 }
+
+const { execute: save, loading: saving } = useApiAction(
+  () =>
+    `/api/editions/${props.editionId}/ticketing/custom-fields/${props.customField?.id}/associations`,
+  {
+    method: 'PUT',
+    body: buildAssociationsBody,
+    successMessage: {
+      title: 'Associations mises à jour',
+      description: 'Les tarifs, quotas et articles ont été enregistrés avec succès',
+    },
+    errorMessages: { default: 'Impossible de sauvegarder les associations' },
+    onSuccess: () => {
+      isOpen.value = false
+      emit('refresh')
+    },
+  }
+)
 
 // Initialiser les associations quand on ouvre la modal
 watch(

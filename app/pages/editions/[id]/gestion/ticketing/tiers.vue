@@ -159,9 +159,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { fetchOptions } from '~/utils/ticketing/options'
@@ -171,7 +168,6 @@ const route = useRoute()
 const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
@@ -187,7 +183,6 @@ const activeTab = computed({
 })
 
 const loading = ref(true)
-const refreshing = ref(false)
 const hasExternalTicketing = ref(false)
 const lastSync = ref<Date | null>(null)
 const tiers = ref<any[]>([])
@@ -266,8 +261,7 @@ onMounted(async () => {
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
+    } catch {
       return
     }
   }
@@ -296,8 +290,8 @@ const loadData = async () => {
 
     // Charger les tarifs et options depuis la BDD (indépendamment de la config)
     await Promise.all([loadTiers(), loadOptions()])
-  } catch (error) {
-    console.error('Failed to load data:', error)
+  } catch {
+    // Erreur silencieuse lors du chargement des données
   } finally {
     loading.value = false
   }
@@ -306,16 +300,16 @@ const loadData = async () => {
 const loadTiers = async () => {
   try {
     tiers.value = await fetchTiers(editionId)
-  } catch (error) {
-    console.error('Failed to load tiers:', error)
+  } catch {
+    // Erreur silencieuse
   }
 }
 
 const loadOptions = async () => {
   try {
     options.value = await fetchOptions(editionId)
-  } catch (error) {
-    console.error('Failed to load options:', error)
+  } catch {
+    // Erreur silencieuse
   }
 }
 
@@ -323,45 +317,30 @@ const loadCustomFields = async () => {
   loadingCustomFields.value = true
   try {
     customFields.value = await $fetch(`/api/editions/${editionId}/ticketing/custom-fields`)
-  } catch (error) {
-    console.error('Failed to load custom fields:', error)
+  } catch {
+    // Erreur silencieuse
   } finally {
     loadingCustomFields.value = false
   }
 }
 
-const refreshData = async () => {
-  if (refreshing.value) return
-
-  refreshing.value = true
-  const toast = useToast()
-
-  try {
-    // Appeler l'API pour synchroniser avec HelloAsso
-    await $fetch(`/api/editions/${editionId}/ticketing/helloasso/tiers`)
-
-    // Recharger les données
-    await loadData()
-    await loadCustomFields()
-
-    toast.add({
+const { execute: refreshData, loading: refreshing } = useApiAction(
+  `/api/editions/${editionId}/ticketing/helloasso/tiers`,
+  {
+    method: 'GET',
+    successMessage: {
       title: 'Données actualisées',
       description: 'Les tarifs, options et champs personnalisés ont été synchronisés avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Failed to refresh data:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de synchroniser les données',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    refreshing.value = false
+    },
+    errorMessages: {
+      default: 'Impossible de synchroniser les données',
+    },
+    onSuccess: async () => {
+      await loadData()
+      await loadCustomFields()
+    },
   }
-}
+)
 
 // Permissions
 const canEdit = computed(() => {
@@ -391,8 +370,8 @@ const loadQuotas = async () => {
   loadingQuotas.value = true
   try {
     quotas.value = await $fetch(`/api/editions/${editionId}/ticketing/quotas`)
-  } catch (error) {
-    console.error('Failed to load quotas:', error)
+  } catch {
+    // Erreur silencieuse
   } finally {
     loadingQuotas.value = false
   }
@@ -404,8 +383,8 @@ const loadReturnableItems = async () => {
   try {
     const response = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
     returnableItems.value = response.returnableItems || []
-  } catch (error) {
-    console.error('Failed to load returnable items:', error)
+  } catch {
+    // Erreur silencieuse
   } finally {
     loadingReturnableItems.value = false
   }
@@ -427,8 +406,8 @@ const loadVolunteerReturnableItems = async () => {
       `/api/editions/${editionId}/ticketing/volunteers/returnable-items`
     )
     volunteerReturnableItems.value = response.items
-  } catch (error) {
-    console.error('Failed to load volunteer returnable items:', error)
+  } catch {
+    // Erreur silencieuse
   } finally {
     loadingVolunteerReturnableItems.value = false
   }

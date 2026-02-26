@@ -240,10 +240,9 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-const saving = ref(false)
+const toast = useToast()
 const deleteConfirmOpen = ref(false)
 const itemToDelete = ref<VolunteerReturnableItem | null>(null)
-const deleting = ref(false)
 const selectedItemId = ref<number | null>(null)
 const selectedTeamId = ref<string | null>(null) // null = global par défaut, string = équipe spécifique
 const allReturnableItems = ref<TicketingReturnableItem[]>([])
@@ -345,91 +344,62 @@ const confirmDeleteItem = (item: VolunteerReturnableItem) => {
   deleteConfirmOpen.value = true
 }
 
-const deleteItem = async () => {
-  if (!itemToDelete.value) return
-
-  const toast = useToast()
-  deleting.value = true
-  try {
-    await $fetch(
-      `/api/editions/${props.editionId}/ticketing/volunteers/returnable-items/${itemToDelete.value.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
-
-    toast.add({
+const { execute: executeDeleteItem, loading: deleting } = useApiAction(
+  () =>
+    `/api/editions/${props.editionId}/ticketing/volunteers/returnable-items/${itemToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: 'Article retiré',
       description: "L'article a été retiré des articles à restituer pour les bénévoles",
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    deleteConfirmOpen.value = false
-    itemToDelete.value = null
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to delete volunteer returnable item:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible de retirer l'article",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    deleting.value = false
+    },
+    errorMessages: { default: "Impossible de retirer l'article" },
+    onSuccess: () => {
+      deleteConfirmOpen.value = false
+      itemToDelete.value = null
+      emit('refresh')
+    },
   }
+)
+
+const deleteItem = () => {
+  if (!itemToDelete.value) return
+  executeDeleteItem()
 }
+
+const { execute: executeHandleAdd, loading: saving } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/volunteers/returnable-items`,
+  {
+    method: 'POST',
+    body: () => ({
+      returnableItemId: selectedItemId.value,
+      teamId: selectedTeamId.value,
+    }),
+    silentSuccess: true,
+    errorMessages: { default: "Impossible d'ajouter l'article" },
+    onSuccess: async () => {
+      const scope = selectedTeamId.value
+        ? teams.value.find((t) => t.id === selectedTeamId.value)?.name || 'cette équipe'
+        : 'tous les bénévoles'
+
+      toast.add({
+        title: 'Article ajouté',
+        description: `L'article a été ajouté pour ${scope}`,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+
+      selectedItemId.value = null
+      emit('refresh')
+      await nextTick()
+    },
+  }
+)
 
 const handleAdd = async () => {
   if (!selectedItemId.value) return
-
-  const toast = useToast()
-  saving.value = true
-  try {
-    // Recharger d'abord la liste complète au cas où de nouveaux articles auraient été créés
-    await loadAllReturnableItems()
-
-    await $fetch(`/api/editions/${props.editionId}/ticketing/volunteers/returnable-items`, {
-      method: 'POST',
-      body: {
-        returnableItemId: selectedItemId.value,
-        teamId: selectedTeamId.value,
-      },
-    })
-
-    const scope = selectedTeamId.value
-      ? teams.value.find((t) => t.id === selectedTeamId.value)?.name || 'cette équipe'
-      : 'tous les bénévoles'
-
-    toast.add({
-      title: 'Article ajouté',
-      description: `L'article a été ajouté pour ${scope}`,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    selectedItemId.value = null
-    // Ne pas réinitialiser selectedTeamId pour faciliter l'ajout multiple
-
-    // Émettre l'événement de refresh pour que le parent recharge les données
-    emit('refresh')
-
-    // Attendre le prochain cycle pour que les props soient mises à jour
-    await nextTick()
-
-    // Le computed availableReturnableItems a maintenant les nouvelles props.items
-    // et peut recalculer la liste des articles disponibles
-  } catch (error: any) {
-    console.error('Failed to add volunteer returnable item:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible d'ajouter l'article",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    saving.value = false
-  }
+  // Recharger d'abord la liste complète au cas où de nouveaux articles auraient été créés
+  await loadAllReturnableItems()
+  executeHandleAdd()
 }
 </script>

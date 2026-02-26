@@ -146,12 +146,10 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
-const { $fetch } = useNuxtApp()
 
 const isOpen = ref(false)
 
 const step = ref<'confirm' | 'verify' | 'success'>('confirm')
-const loading = ref(false)
 const verificationCode = ref('')
 const codeExpiry = ref<Date | null>(null)
 const hasExistingRequest = ref(false)
@@ -163,67 +161,51 @@ const formatTime = (date: Date) => {
   }).format(date)
 }
 
-const sendClaimCode = async () => {
-  try {
-    loading.value = true
-    const response = await $fetch(`/api/conventions/${props.convention.id}/claim`, {
-      method: 'POST',
-    })
-
+const { execute: sendClaimCode, loading: sendingCode } = useApiAction<
+  undefined,
+  { expiresAt: string }
+>(() => `/api/conventions/${props.convention.id}/claim`, {
+  method: 'POST',
+  successMessage: {
+    title: t('conventions.claim.code_sent_toast'),
+    description: t('conventions.claim.code_sent_toast_description'),
+  },
+  errorMessages: { default: t('conventions.claim.error_sending_code') },
+  onSuccess: (response) => {
     codeExpiry.value = new Date(response.expiresAt)
     step.value = 'verify'
     hasExistingRequest.value = false
-
-    useToast().add({
-      title: t('conventions.claim.code_sent_toast'),
-      description: t('conventions.claim.code_sent_toast_description'),
-      color: 'success',
-    })
-  } catch (error: any) {
-    // Si c'est une erreur de demande existante, on active le flag
-    if (error?.data?.message?.includes('déjà en cours')) {
+  },
+  onError: (error) => {
+    if (error.data?.message?.includes('déjà en cours')) {
       hasExistingRequest.value = true
     }
+  },
+})
 
-    useToast().add({
-      title: t('common.error'),
-      description: error?.data?.message || t('conventions.claim.error_sending_code'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
-}
+const buildVerifyBody = () => ({
+  code: Array.isArray(verificationCode.value)
+    ? verificationCode.value.join('')
+    : verificationCode.value,
+})
 
-const verifyCode = async () => {
-  try {
-    loading.value = true
-    await $fetch(`/api/conventions/${props.convention.id}/claim/verify`, {
-      method: 'POST',
-      body: {
-        code: Array.isArray(verificationCode.value)
-          ? verificationCode.value.join('')
-          : verificationCode.value,
-      },
-    })
-
-    step.value = 'success'
-
-    useToast().add({
+const { execute: verifyCode, loading: verifyingCode } = useApiAction(
+  () => `/api/conventions/${props.convention.id}/claim/verify`,
+  {
+    method: 'POST',
+    body: buildVerifyBody,
+    successMessage: {
       title: t('conventions.claim.verification_success'),
       description: t('conventions.claim.verification_success_description'),
-      color: 'success',
-    })
-  } catch (error: any) {
-    useToast().add({
-      title: t('common.error'),
-      description: error?.data?.message || t('conventions.claim.error_verifying_code'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
+    },
+    errorMessages: { default: t('conventions.claim.error_verifying_code') },
+    onSuccess: () => {
+      step.value = 'success'
+    },
   }
-}
+)
+
+const loading = computed(() => sendingCode.value || verifyingCode.value)
 
 const handleSuccess = () => {
   emit('claimed')
@@ -236,7 +218,6 @@ watch(isOpen, (newValue) => {
     step.value = 'confirm'
     verificationCode.value = ''
     codeExpiry.value = null
-    loading.value = false
     hasExistingRequest.value = false
   }
 })

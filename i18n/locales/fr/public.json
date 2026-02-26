@@ -116,6 +116,7 @@
       "companion_name": "Nom de l'accompagnant",
       "confirm_withdraw": "Êtes-vous sûr de vouloir retirer votre candidature ?",
       "contact_organizer": "Contacter responsables bénévoles",
+      "contact_organizer_error": "Erreur lors de la création de la conversation avec les organisateurs",
       "dates": "Dates",
       "diet": "Régime",
       "dietary": {

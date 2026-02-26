@@ -602,9 +602,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -915,59 +912,41 @@ const canManageEdition = computed(() => {
 })
 
 // Publish edition (make it online)
-const publishEdition = async () => {
-  if (!edition.value) return
-
-  try {
-    await $fetch(`/api/editions/${edition.value.id}/status`, {
-      method: 'PATCH',
-      body: { status: 'PUBLISHED' },
-    })
-
-    // Update local state
-    await refreshEdition()
-
-    toast.add({
-      title: t('edition.edition_published'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error) {
-    console.error('Failed to publish edition:', error)
-    toast.add({
-      title: t('errors.publish_edition_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
+const { execute: publishEdition } = useApiAction(
+  () => `/api/editions/${edition.value?.id}/status`,
+  {
+    method: 'PATCH',
+    body: () => ({ status: 'PUBLISHED' }),
+    successMessage: { title: t('edition.edition_published') },
+    errorMessages: { default: t('errors.publish_edition_failed') },
+    onSuccess: async () => {
+      await refreshEdition()
+    },
   }
-}
+)
 
-const toggleAttendance = async (id: number) => {
-  try {
-    const response = await $fetch(`/api/editions/${id}/attendance`, {
-      method: 'POST',
-    })
-
-    // Recharger l'édition pour mettre à jour les données (forcer le rafraîchissement)
-    await refreshEdition()
-
-    // Afficher le message traduit selon l'état
-    const message = response.isAttending
-      ? t('messages.attendance_added')
-      : t('messages.attendance_removed')
-
-    toast.add({
-      title: message,
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: unknown) {
-    const errorMessage =
-      e && typeof e === 'object' && 'message' in e && typeof e.message === 'string'
-        ? e.message
-        : t('errors.attendance_update_failed')
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
+const { execute: executeToggleAttendance } = useApiAction(
+  () => `/api/editions/${editionId}/attendance`,
+  {
+    method: 'POST',
+    silentSuccess: true,
+    errorMessages: { default: t('errors.attendance_update_failed') },
+    onSuccess: async (result: { isAttending: boolean }) => {
+      await refreshEdition()
+      const message = result.isAttending
+        ? t('messages.attendance_added')
+        : t('messages.attendance_removed')
+      toast.add({
+        title: message,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    },
   }
+)
+
+const toggleAttendance = (_id: number) => {
+  executeToggleAttendance()
 }
 
 const getGoogleMapsUrl = (edition: Edition) => {

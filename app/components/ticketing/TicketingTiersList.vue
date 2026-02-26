@@ -280,7 +280,7 @@
 
 <script setup lang="ts">
 import { formatMealDisplay } from '~/utils/meals'
-import { deleteTier, isFixedPrice, type TicketingTier } from '~/utils/ticketing/tiers'
+import { isFixedPrice, type TicketingTier } from '~/utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
 
@@ -298,7 +298,6 @@ const tierModalOpen = ref(false)
 const selectedTier = ref<TicketingTier | null>(null)
 const deleteConfirmOpen = ref(false)
 const tierToDelete = ref<TicketingTier | null>(null)
-const deleting = ref(false)
 
 // Drag and drop
 const draggedTierId = ref<number | null>(null)
@@ -416,39 +415,28 @@ const handleDrop = async (targetTier: TicketingTier, event: DragEvent) => {
   dragOverTierId.value = null
 }
 
-const updateTiersPositions = async (tiers: TicketingTier[]) => {
-  const toast = useToast()
+const reorderPositions = ref<{ id: number; position: number }[]>([])
 
-  try {
-    // Créer la liste des positions à envoyer à l'API
-    const positions = tiers.map((tier, index) => ({
-      id: tier.id,
-      position: index,
-    }))
-
-    await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/reorder`, {
-      method: 'PUT',
-      body: { positions },
-    })
-
-    toast.add({
+const { execute: executeReorder } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/tiers/reorder`,
+  {
+    method: 'PUT',
+    body: () => ({ positions: reorderPositions.value }),
+    successMessage: {
       title: 'Ordre mis à jour',
       description: "L'ordre des tarifs a été enregistré",
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    // Rafraîchir les données
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to update tiers positions:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || "Impossible de mettre à jour l'ordre des tarifs",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
+    },
+    errorMessages: { default: "Impossible de mettre à jour l'ordre des tarifs" },
+    emitOnSuccess: () => emit('refresh'),
   }
+)
+
+const updateTiersPositions = (tiers: TicketingTier[]) => {
+  reorderPositions.value = tiers.map((tier, index) => ({
+    id: tier.id,
+    position: index,
+  }))
+  executeReorder()
 }
 
 const openTierModal = (tier?: TicketingTier) => {
@@ -465,35 +453,26 @@ const confirmDeleteTier = (tier: TicketingTier) => {
   deleteConfirmOpen.value = true
 }
 
-const deleteTierAction = async () => {
-  if (!tierToDelete.value) return
-
-  const toast = useToast()
-  deleting.value = true
-  try {
-    await deleteTier(props.editionId, tierToDelete.value.id)
-
-    toast.add({
+const { execute: executeDeleteTier, loading: deleting } = useApiAction(
+  () => `/api/editions/${props.editionId}/ticketing/tiers/${tierToDelete.value?.id}`,
+  {
+    method: 'DELETE',
+    successMessage: {
       title: 'Tarif supprimé',
       description: 'Le tarif a été supprimé avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-
-    deleteConfirmOpen.value = false
-    tierToDelete.value = null
-    emit('refresh')
-  } catch (error: any) {
-    console.error('Failed to delete tier:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de supprimer le tarif',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    deleting.value = false
+    },
+    errorMessages: { default: 'Impossible de supprimer le tarif' },
+    onSuccess: () => {
+      deleteConfirmOpen.value = false
+      tierToDelete.value = null
+      emit('refresh')
+    },
   }
+)
+
+const deleteTierAction = () => {
+  if (!tierToDelete.value) return
+  executeDeleteTier()
 }
 
 const { formatDateTimeWithWeekday } = useDateFormat()

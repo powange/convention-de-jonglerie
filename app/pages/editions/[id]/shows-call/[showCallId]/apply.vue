@@ -604,7 +604,6 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 const route = useRoute()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
-const toast = useToast()
 const { t } = useI18n()
 const { formatDate } = useDateFormat()
 
@@ -644,7 +643,6 @@ const formState = reactive({
   additionalPerformers: [] as AdditionalPerformer[],
 })
 
-const submitting = ref(false)
 const existingApplication = ref<ShowApplication | null>(null)
 
 // Mode édition si une candidature existe et est en attente
@@ -883,87 +881,86 @@ function validate(state: typeof formState) {
   return errors
 }
 
-// Soumettre ou modifier la candidature
-async function submitApplication(_event: FormSubmitEvent<typeof formState>) {
-  submitting.value = true
+// Construire le body de candidature
+const buildApplicationBody = () => ({
+  // Informations personnelles (seront mises à jour dans le profil)
+  lastName: formState.lastName.trim(),
+  firstName: formState.firstName.trim(),
+  phone: formState.phone.trim(),
+  // Informations artiste
+  artistName: formState.artistName,
+  artistBio: formState.artistBio || null,
+  portfolioUrl: formState.portfolioUrl || null,
+  videoUrl: formState.videoUrl || null,
+  socialLinks: formState.socialLinks || null,
+  showTitle: formState.showTitle,
+  showDescription: formState.showDescription,
+  showDuration: formState.showDuration,
+  showCategory: formState.showCategory || null,
+  technicalNeeds: formState.technicalNeeds || null,
+  accommodationNeeded: formState.accommodationNeeded,
+  accommodationNotes: formState.accommodationNotes || null,
+  departureCity: formState.departureCity || null,
+  // Personnes supplémentaires
+  additionalPerformersCount: formState.additionalPerformersCount,
+  additionalPerformers: formState.additionalPerformers.map((p) => ({
+    lastName: p.lastName.trim(),
+    firstName: p.firstName.trim(),
+    email: p.email.trim().toLowerCase(),
+    phone: p.phone.trim(),
+  })),
+})
 
-  const body = {
-    // Informations personnelles (seront mises à jour dans le profil)
-    lastName: formState.lastName.trim(),
-    firstName: formState.firstName.trim(),
-    phone: formState.phone.trim(),
-    // Informations artiste
-    artistName: formState.artistName,
-    artistBio: formState.artistBio || null,
-    portfolioUrl: formState.portfolioUrl || null,
-    videoUrl: formState.videoUrl || null,
-    socialLinks: formState.socialLinks || null,
-    showTitle: formState.showTitle,
-    showDescription: formState.showDescription,
-    showDuration: formState.showDuration,
-    showCategory: formState.showCategory || null,
-    technicalNeeds: formState.technicalNeeds || null,
-    accommodationNeeded: formState.accommodationNeeded,
-    accommodationNotes: formState.accommodationNotes || null,
-    departureCity: formState.departureCity || null,
-    // Personnes supplémentaires
-    additionalPerformersCount: formState.additionalPerformersCount,
-    additionalPerformers: formState.additionalPerformers.map((p) => ({
-      lastName: p.lastName.trim(),
-      firstName: p.firstName.trim(),
-      email: p.email.trim().toLowerCase(),
-      phone: p.phone.trim(),
-    })),
+const onApplicationSuccess = async () => {
+  // Mettre à jour les données utilisateur dans le store (ne pas bloquer si erreur)
+  try {
+    await authStore.fetchUser()
+  } catch {
+    // Ignorer les erreurs de mise à jour du profil
   }
 
-  try {
-    if (isEditMode.value) {
-      // Mode édition : PUT
-      await $fetch(`/api/editions/${editionId}/shows-call/${showCallId}/my-application`, {
-        method: 'PUT',
-        body,
-      })
+  // Rediriger vers la liste des appels
+  await navigateTo(`/editions/${editionId}/shows-call`)
+}
 
-      toast.add({
-        title: t('shows_call.application_updated'),
-        description: t('shows_call.application_updated_desc'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } else {
-      // Mode création : POST
-      await $fetch(`/api/editions/${editionId}/shows-call/${showCallId}/applications`, {
-        method: 'POST',
-        body,
-      })
+// Action pour créer une candidature
+const { execute: executeCreateApplication, loading: isCreating } = useApiAction(
+  () => `/api/editions/${editionId}/shows-call/${showCallId}/applications`,
+  {
+    method: 'POST',
+    body: buildApplicationBody,
+    successMessage: {
+      title: t('shows_call.application_submitted'),
+      description: t('shows_call.application_submitted_desc'),
+    },
+    errorMessages: { default: t('shows_call.submit_error') },
+    onSuccess: onApplicationSuccess,
+  }
+)
 
-      toast.add({
-        title: t('shows_call.application_submitted'),
-        description: t('shows_call.application_submitted_desc'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    }
+// Action pour modifier une candidature
+const { execute: executeUpdateApplication, loading: isUpdating } = useApiAction(
+  () => `/api/editions/${editionId}/shows-call/${showCallId}/my-application`,
+  {
+    method: 'PUT',
+    body: buildApplicationBody,
+    successMessage: {
+      title: t('shows_call.application_updated'),
+      description: t('shows_call.application_updated_desc'),
+    },
+    errorMessages: { default: t('shows_call.submit_error') },
+    onSuccess: onApplicationSuccess,
+  }
+)
 
-    // Mettre à jour les données utilisateur dans le store (ne pas bloquer si erreur)
-    try {
-      await authStore.fetchUser()
-    } catch {
-      // Ignorer les erreurs de mise à jour du profil
-    }
+const submitting = computed(() => isCreating.value || isUpdating.value)
 
-    // Rediriger vers la liste des appels
-    await navigateTo(`/editions/${editionId}/shows-call`)
-  } catch (err: any) {
-    console.error('Error submitting application:', err)
-    toast.add({
-      title: t('common.error'),
-      description: err.data?.message || t('shows_call.submit_error'),
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error',
-    })
-  } finally {
-    submitting.value = false
+// Soumettre ou modifier la candidature
+function submitApplication(_event: FormSubmitEvent<typeof formState>) {
+  if (isEditMode.value) {
+    executeUpdateApplication()
+  } else {
+    executeCreateApplication()
   }
 }
 

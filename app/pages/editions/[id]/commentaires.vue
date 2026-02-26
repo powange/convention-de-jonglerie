@@ -102,9 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
@@ -128,7 +125,6 @@ const {
 
 // Gestion des erreurs
 if (error.value) {
-  console.error('Failed to fetch edition:', error.value)
   throw createError({
     status: error.value.status || error.value.statusCode || 404,
     statusText: error.value.statusText || error.value.statusMessage || 'Edition not found',
@@ -147,8 +143,7 @@ watch(
 )
 
 const loading = ref(false)
-const posts = ref([])
-const isSubmittingPost = ref(false)
+const posts = ref<Record<string, unknown>[]>([])
 
 const newPostForm = reactive({
   content: '',
@@ -178,8 +173,7 @@ const loadPosts = async () => {
   try {
     const response = await $fetch(`/api/editions/${editionId}/posts`)
     posts.value = response
-  } catch (error: unknown) {
-    console.error('Erreur lors du chargement des posts:', error)
+  } catch {
     toast.add({
       title: t('errors.loading_error'),
       description: t('errors.cannot_load_comments'),
@@ -191,63 +185,47 @@ const loadPosts = async () => {
 }
 
 // Soumettre un nouveau post
-const submitNewPost = async () => {
-  if (!authStore.isAuthenticated) return
-
-  isSubmittingPost.value = true
-  try {
-    const newPost = await $fetch(`/api/editions/${editionId}/posts`, {
-      method: 'POST',
-      body: { content: newPostForm.content.trim() },
-    })
-
-    posts.value.unshift(newPost)
-    newPostForm.content = ''
-
-    toast.add({
+const { execute: executeSubmitNewPost, loading: isSubmittingPost } = useApiAction(
+  () => `/api/editions/${editionId}/posts`,
+  {
+    method: 'POST',
+    body: () => ({ content: newPostForm.content.trim() }),
+    successMessage: {
       title: t('messages.comment_published'),
       description: t('messages.comment_published_successfully'),
-      color: 'success',
-    })
-  } catch (error: unknown) {
-    console.error('Error creating post:', error)
-    const httpError = error as { data?: { message?: string } } | undefined
-    toast.add({
-      title: t('common.error'),
-      description: httpError?.data?.message || t('errors.cannot_publish_comment'),
-      color: 'error',
-    })
-  } finally {
-    isSubmittingPost.value = false
+    },
+    errorMessages: { default: t('errors.cannot_publish_comment') },
+    onSuccess: (newPost: Record<string, unknown>) => {
+      posts.value.unshift(newPost)
+      newPostForm.content = ''
+    },
   }
+)
+
+const submitNewPost = () => {
+  if (!authStore.isAuthenticated) return
+  executeSubmitNewPost()
 }
 
 // Supprimer un post
-const deletePost = async (postId: number) => {
-  try {
-    await $fetch(`/api/editions/${editionId}/posts/${postId}`, { method: 'DELETE' })
-
-    // Filtrer les posts pour déclencher la réactivité
-    posts.value = posts.value.filter((p) => p.id !== postId)
-
-    toast.add({
-      title: t('messages.comment_deleted'),
-      description: t('messages.comment_deleted_successfully'),
-      color: 'success',
-    })
-  } catch (error: unknown) {
-    console.error('Erreur lors de la suppression du post:', error)
-    toast.add({
-      title: t('common.error'),
-      description: t('errors.cannot_delete_comment'),
-      color: 'error',
-    })
-    // Recharger les posts en cas d'erreur pour resynchroniser
+const { execute: deletePost } = useApiActionById((id) => `/api/editions/${editionId}/posts/${id}`, {
+  method: 'DELETE',
+  successMessage: {
+    title: t('messages.comment_deleted'),
+    description: t('messages.comment_deleted_successfully'),
+  },
+  errorMessages: { default: t('errors.cannot_delete_comment') },
+  onSuccess: (_result: unknown, id: string | number) => {
+    posts.value = posts.value.filter((p: Record<string, unknown>) => p.id !== id)
+  },
+  onError: async () => {
     await loadPosts()
-  }
-}
+  },
+})
 
 // Ajouter un commentaire à un post
+// Note: addComment reçoit (postId, content) depuis le composant enfant,
+// on doit wrapper car useApiActionById ne supporte qu'un seul paramètre (id)
 const addComment = async (postId: number, content: string) => {
   try {
     const newComment = await $fetch(`/api/editions/${editionId}/posts/${postId}/comments`, {
@@ -256,34 +234,33 @@ const addComment = async (postId: number, content: string) => {
     })
 
     // Trouver le post et ajouter le commentaire
-    const postIndex = posts.value.findIndex((p) => p.id === postId)
+    const postIndex = posts.value.findIndex((p: Record<string, unknown>) => p.id === postId)
     if (postIndex !== -1) {
-      // Créer une nouvelle référence pour déclencher la réactivité
       posts.value[postIndex] = {
         ...posts.value[postIndex],
-        comments: [...posts.value[postIndex].comments, newComment],
+        comments: [...(posts.value[postIndex] as any).comments, newComment],
       }
     }
 
     toast.add({
       title: t('messages.reply_published'),
       description: t('messages.reply_published_successfully'),
+      icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error: unknown) {
-    console.error('Error creating comment:', error)
-    const httpError = error as { data?: { message?: string } } | undefined
+  } catch {
     toast.add({
-      title: t('common.error'),
-      description: httpError?.data?.message || t('errors.cannot_publish_reply'),
+      title: t('errors.cannot_publish_reply'),
+      icon: 'i-heroicons-x-circle',
       color: 'error',
     })
-    // Recharger les posts en cas d'erreur pour resynchroniser
     await loadPosts()
   }
 }
 
 // Supprimer un commentaire
+// Note: deleteComment reçoit (postId, commentId) depuis le composant enfant,
+// on doit wrapper car useApiActionById ne supporte qu'un seul paramètre (id)
 const deleteComment = async (postId: number, commentId: number) => {
   try {
     await $fetch(`/api/editions/${editionId}/posts/${postId}/comments/${commentId}`, {
@@ -291,50 +268,42 @@ const deleteComment = async (postId: number, commentId: number) => {
     })
 
     // Trouver le post et supprimer le commentaire
-    const postIndex = posts.value.findIndex((p) => p.id === postId)
+    const postIndex = posts.value.findIndex((p: Record<string, unknown>) => p.id === postId)
     if (postIndex !== -1) {
-      // Créer une nouvelle référence pour déclencher la réactivité
       posts.value[postIndex] = {
         ...posts.value[postIndex],
-        comments: posts.value[postIndex].comments.filter((c) => c.id !== commentId),
+        comments: (posts.value[postIndex] as any).comments.filter(
+          (c: Record<string, unknown>) => c.id !== commentId
+        ),
       }
     }
 
     toast.add({
       title: t('messages.reply_deleted'),
       description: t('messages.reply_deleted_successfully'),
+      icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error: unknown) {
-    console.error('Erreur lors de la suppression du commentaire:', error)
+  } catch {
     toast.add({
-      title: t('common.error'),
-      description: t('errors.cannot_delete_reply'),
+      title: t('errors.cannot_delete_reply'),
+      icon: 'i-heroicons-x-circle',
       color: 'error',
     })
-    // Recharger les posts en cas d'erreur pour resynchroniser
     await loadPosts()
   }
 }
 
 // Épingler/désépingler un post
+// Note: togglePin reçoit (postId, currentPinned) depuis le composant enfant,
+// on doit wrapper car le body dépend de currentPinned
 const togglePin = async (postId: number, currentPinned: boolean) => {
+  const newPinned = !currentPinned
   try {
-    const newPinned = !currentPinned
-
     await $fetch(`/api/editions/${editionId}/posts/${postId}/pin`, {
       method: 'PATCH',
       body: { pinned: newPinned },
     })
-
-    // Mettre à jour le post localement
-    const postIndex = posts.value.findIndex((p) => p.id === postId)
-    if (postIndex !== -1) {
-      posts.value[postIndex] = {
-        ...posts.value[postIndex],
-        pinned: newPinned,
-      }
-    }
 
     // Recharger les posts pour avoir le bon tri (épinglés en premier)
     await loadPosts()
@@ -344,17 +313,15 @@ const togglePin = async (postId: number, currentPinned: boolean) => {
       description: newPinned
         ? t('messages.post_pinned_successfully')
         : t('messages.post_unpinned_successfully'),
+      icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'épinglage du post:", error)
-    const httpError = error as { data?: { message?: string } } | undefined
+  } catch {
     toast.add({
-      title: t('common.error'),
-      description: httpError?.data?.message || t('errors.cannot_pin_post'),
+      title: t('errors.cannot_pin_post'),
+      icon: 'i-heroicons-x-circle',
       color: 'error',
     })
-    // Recharger les posts en cas d'erreur pour resynchroniser
     await loadPosts()
   }
 }

@@ -629,7 +629,6 @@ interface AnonymizeResult {
 }
 const showAnonymizeModal = ref(false)
 const showAnonymizeResult = ref(false)
-const anonymizing = ref(false)
 const anonymizeResult = ref<AnonymizeResult | null>(null)
 
 const stats = ref({
@@ -693,11 +692,15 @@ const getActivityIconClass = (type: string) => {
 }
 
 // Anonymisation des données utilisateurs
-const executeAnonymization = async () => {
-  anonymizing.value = true
-  try {
-    const response = await $fetch('/api/admin/anonymize-users', { method: 'POST' })
-    anonymizeResult.value = (response as any).data
+const { execute: doAnonymize, loading: anonymizing } = useApiAction<
+  undefined,
+  { data: AnonymizeResult }
+>('/api/admin/anonymize-users', {
+  method: 'POST',
+  silentSuccess: true,
+  errorMessages: { default: t('admin.anonymize.error') },
+  onSuccess: async (response: { data: AnonymizeResult }) => {
+    anonymizeResult.value = response.data
     showAnonymizeModal.value = false
     showAnonymizeResult.value = true
     toast.add({
@@ -706,16 +709,10 @@ const executeAnonymization = async () => {
       description: t('admin.anonymize.success_description'),
     })
     await refreshData()
-  } catch (error: any) {
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: error?.data?.message || t('admin.anonymize.error'),
-    })
-  } finally {
-    anonymizing.value = false
-  }
-}
+  },
+})
+
+const executeAnonymization = () => doAnonymize()
 
 // Fonction pour charger les statistiques
 const loadStats = async () => {
@@ -723,8 +720,6 @@ const loadStats = async () => {
     const data = await $fetch('/api/admin/stats')
     stats.value = data
   } catch (error) {
-    console.error('Error loading statistics:', error)
-
     // Si erreur d'authentification, rediriger vers login
     if ((error as any)?.statusCode === 401 || (error as any)?.status === 401) {
       navigateTo('/login')
@@ -758,8 +753,6 @@ const loadRecentActivity = async () => {
     const data = await $fetch('/api/admin/activity', { query: { limit: 10 } })
     recentActivity.value = data
   } catch (error) {
-    console.error('Error loading activity:', error)
-
     // Si erreur d'authentification, rediriger vers login
     if ((error as any)?.statusCode === 401 || (error as any)?.status === 401) {
       navigateTo('/login')

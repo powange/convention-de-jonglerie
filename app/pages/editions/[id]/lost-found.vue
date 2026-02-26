@@ -79,6 +79,7 @@
                       ? t('edition.mark_as_lost')
                       : t('edition.mark_as_returned')
                   "
+                  :loading="isTogglingStatus(item.id)"
                   class="flex items-center gap-1"
                   @click="toggleStatus(item.id)"
                 >
@@ -238,8 +239,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -278,7 +277,6 @@ const commentContents = ref<Record<number, string>>({})
 const showAddModal = ref(false)
 const showImageModalState = ref(false)
 const currentImageUrl = ref('')
-const submittingItem = ref(false)
 
 const newItem = ref({
   description: '',
@@ -329,8 +327,7 @@ const fetchLostFoundItems = async () => {
     const data = await $fetch(`/api/editions/${editionId.value}/lost-found`)
     // Sécurise: toujours un tableau
     lostFoundItems.value = Array.isArray(data) ? data : []
-  } catch (error: unknown) {
-    console.error('Error loading lost items:', error)
+  } catch {
     toast.add({
       color: 'error',
       title: t('common.error'),
@@ -351,6 +348,9 @@ const toggleShowReturned = () => {
   showReturned.value = !showReturned.value
 }
 
+// Ajouter un commentaire à un item
+// Note: postComment utilise le contenu du champ commentContents par itemId,
+// on doit wrapper car useApiActionById ne supporte qu'un seul paramètre (id)
 const postComment = async (itemId: number) => {
   const content = commentContents.value[itemId]?.trim()
   if (!content) return
@@ -373,46 +373,41 @@ const postComment = async (itemId: number) => {
     toast.add({
       color: 'success',
       title: t('edition.comment_added'),
+      icon: 'i-heroicons-check-circle',
     })
   } catch {
     toast.add({
       color: 'error',
-      title: t('common.error'),
-      description: t('edition.cannot_add_comment'),
+      title: t('edition.cannot_add_comment'),
+      icon: 'i-heroicons-x-circle',
     })
   }
 }
 
-const toggleStatus = async (itemId: number) => {
-  try {
-    const updatedItem = await $fetch(
-      `/api/editions/${editionId.value}/lost-found/${itemId}/return`,
-      {
-        method: 'PATCH',
+// Changer le statut d'un item (perdu/restitué) - toast dynamique => silentSuccess
+const { execute: toggleStatus, isLoading: isTogglingStatus } = useApiActionById<LostFoundItem>(
+  (id) => `/api/editions/${editionId.value}/lost-found/${id}/return`,
+  {
+    method: 'PATCH',
+    silentSuccess: true,
+    errorMessages: { default: t('edition.cannot_change_status') },
+    onSuccess: (updatedItem, id) => {
+      const index = lostFoundItems.value.findIndex((i) => i.id === id)
+      if (index !== -1) {
+        lostFoundItems.value[index] = updatedItem
       }
-    )
 
-    // Mettre à jour l'item dans la liste
-    const index = lostFoundItems.value.findIndex((i) => i.id === itemId)
-    if (index !== -1) {
-      lostFoundItems.value[index] = updatedItem
-    }
-
-    toast.add({
-      color: 'success',
-      title:
-        updatedItem.status === 'RETURNED'
-          ? t('edition.item_marked_returned')
-          : t('edition.item_marked_lost'),
-    })
-  } catch {
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('edition.cannot_change_status'),
-    })
+      toast.add({
+        color: 'success',
+        title:
+          updatedItem.status === 'RETURNED'
+            ? t('edition.item_marked_returned')
+            : t('edition.item_marked_lost'),
+        icon: 'i-heroicons-check-circle',
+      })
+    },
   }
-}
+)
 
 // Gestionnaires d'événements pour ImageUpload
 const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
@@ -425,48 +420,36 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
   }
 }
 
-const onImageError = (error: string) => {
+const onImageError = (errorMsg: string) => {
   toast.add({
     color: 'error',
     title: t('common.error'),
-    description: error || t('edition.cannot_upload_photo'),
+    description: errorMsg || t('edition.cannot_upload_photo'),
   })
 }
 
-const submitNewItem = async () => {
-  if (!newItem.value.description?.trim()) return
-
-  submittingItem.value = true
-  try {
-    const item = await $fetch(`/api/editions/${editionId.value}/lost-found`, {
-      method: 'POST',
-      body: {
-        description: newItem.value.description.trim(),
-        imageUrl: newItem.value.imageUrl || undefined,
-      },
-    })
-
-    // Ajouter à la liste
-    lostFoundItems.value.unshift(item)
-
-    // Réinitialiser et fermer
-    newItem.value = { description: '', imageUrl: '' }
-    showAddModal.value = false
-
-    toast.add({
-      color: 'success',
-      title: t('edition.lost_item_added'),
-    })
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } } | undefined
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: err?.data?.message || t('edition.cannot_add_item'),
-    })
-  } finally {
-    submittingItem.value = false
+// Soumettre un nouvel objet trouvé
+const { execute: executeSubmitNewItem, loading: submittingItem } = useApiAction(
+  () => `/api/editions/${editionId.value}/lost-found`,
+  {
+    method: 'POST',
+    body: () => ({
+      description: newItem.value.description.trim(),
+      imageUrl: newItem.value.imageUrl || undefined,
+    }),
+    successMessage: { title: t('edition.lost_item_added') },
+    errorMessages: { default: t('edition.cannot_add_item') },
+    onSuccess: (item: LostFoundItem) => {
+      lostFoundItems.value.unshift(item)
+      newItem.value = { description: '', imageUrl: '' }
+      showAddModal.value = false
+    },
   }
+)
+
+const submitNewItem = () => {
+  if (!newItem.value.description?.trim()) return
+  executeSubmitNewItem()
 }
 
 const showImageModal = (imageUrl: string) => {

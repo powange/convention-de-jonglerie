@@ -770,8 +770,7 @@ async function fetchValidations() {
       `/api/editions/${editionId}/ticketing/stats/validations?${params.toString()}`
     )
     validationsData.value = data
-  } catch (error) {
-    console.error('Failed to fetch validations:', error)
+  } catch {
     validationsError.value = true
   } finally {
     loadingValidations.value = false
@@ -791,8 +790,7 @@ async function fetchPurchases() {
       `/api/editions/${editionId}/ticketing/stats/purchases?${params.toString()}`
     )
     purchasesData.value = data
-  } catch (error) {
-    console.error('Failed to fetch purchases:', error)
+  } catch {
     purchasesError.value = true
   } finally {
     loadingPurchases.value = false
@@ -816,8 +814,7 @@ async function fetchOrderSources() {
 
     const data = await $fetch<OrderSourcesData>(url)
     orderSourcesData.value = data
-  } catch (error) {
-    console.error('Failed to fetch order sources:', error)
+  } catch {
     orderSourcesError.value = true
   } finally {
     loadingOrderSources.value = false
@@ -831,8 +828,8 @@ async function fetchTiers() {
   try {
     const data = await $fetch<Tier[]>(`/api/editions/${editionId}/ticketing/tiers`)
     tiers.value = data.filter((tier) => tier.isActive)
-  } catch (error) {
-    console.error('Failed to fetch tiers:', error)
+  } catch {
+    // Erreur silencieuse
   } finally {
     loadingTiers.value = false
   }
@@ -856,8 +853,8 @@ onMounted(async () => {
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
+    } catch {
+      // Erreur silencieuse
     }
   }
 

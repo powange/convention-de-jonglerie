@@ -298,10 +298,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue & libs
-import { ref, computed, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
-
 // App components & stores
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
