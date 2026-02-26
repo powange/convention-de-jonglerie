@@ -89,7 +89,6 @@ const props = defineProps<{
 // État
 const meals = ref<any[]>([])
 const initialMeals = ref<any[]>([])
-const loadingMeals = ref(false)
 
 // Grouper les repas par date
 const groupedMeals = computed(() => groupMealsByDate(meals.value))
@@ -108,26 +107,19 @@ const hasUnsavedChanges = computed(() => {
 })
 
 // Charger les repas
-const fetchMeals = async () => {
-  loadingMeals.value = true
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteers/my-meals`)
-    if (response.data?.meals) {
-      meals.value = response.data.meals
-      // Sauvegarder l'état initial pour la détection de changements
-      initialMeals.value = JSON.parse(JSON.stringify(response.data.meals))
-    }
-  } catch (error: any) {
-    console.error('Failed to fetch meals:', error)
-    toast.add({
-      title: 'Erreur',
-      description: error?.data?.message || 'Impossible de charger vos repas',
-      color: 'error',
-    })
-  } finally {
-    loadingMeals.value = false
+const { execute: fetchMeals, loading: loadingMeals } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/my-meals`,
+  {
+    method: 'GET',
+    errorMessages: { default: 'Impossible de charger vos repas' },
+    onSuccess: (response: any) => {
+      if (response.meals) {
+        meals.value = response.meals
+        initialMeals.value = JSON.parse(JSON.stringify(response.meals))
+      }
+    },
   }
-}
+)
 
 // Sauvegarder les sélections
 const { execute: saveMealSelections, loading: savingMeals } = useApiAction<

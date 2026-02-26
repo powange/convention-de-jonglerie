@@ -253,7 +253,6 @@ const { t } = useI18n()
 const editionId = computed(() => parseInt(route.params.id as string))
 
 // État local
-const loading = ref(true)
 type LostFoundUser = {
   id: number
   pseudo: string
@@ -321,22 +320,16 @@ const canEditLostFound = computed(() => canAddLostFound.value)
 
 // Fonctions
 
-const fetchLostFoundItems = async () => {
-  loading.value = true
-  try {
-    const data = await $fetch(`/api/editions/${editionId.value}/lost-found`)
-    // Sécurise: toujours un tableau
-    lostFoundItems.value = Array.isArray(data) ? data : []
-  } catch {
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('edition.cannot_load_lost_items'),
-    })
-  } finally {
-    loading.value = false
+const { execute: fetchLostFoundItems, loading } = useApiAction(
+  () => `/api/editions/${editionId.value}/lost-found`,
+  {
+    method: 'GET',
+    errorMessages: { default: t('edition.cannot_load_lost_items') },
+    onSuccess: (response: any) => {
+      lostFoundItems.value = Array.isArray(response) ? response : []
+    },
   }
-}
+)
 
 // Filtrage des items (masquer les RETURNED par défaut)
 const hasReturnedItems = computed(() => lostFoundItems.value.some((i) => i.status === 'RETURNED'))
@@ -349,39 +342,30 @@ const toggleShowReturned = () => {
 }
 
 // Ajouter un commentaire à un item
-// Note: postComment utilise le contenu du champ commentContents par itemId,
-// on doit wrapper car useApiActionById ne supporte qu'un seul paramètre (id)
-const postComment = async (itemId: number) => {
+const postCommentItemId = ref<number>(0)
+
+const { execute: executePostComment } = useApiAction(
+  () => `/api/editions/${editionId.value}/lost-found/${postCommentItemId.value}/comments`,
+  {
+    method: 'POST',
+    body: () => ({ content: commentContents.value[postCommentItemId.value]?.trim() }),
+    successMessage: { title: t('edition.comment_added') },
+    errorMessages: { default: t('edition.cannot_add_comment') },
+    onSuccess: (comment: any) => {
+      const item = lostFoundItems.value.find((i) => i.id === postCommentItemId.value)
+      if (item) {
+        item.comments.push(comment)
+      }
+      commentContents.value[postCommentItemId.value] = ''
+    },
+  }
+)
+
+const postComment = (itemId: number) => {
   const content = commentContents.value[itemId]?.trim()
   if (!content) return
-
-  try {
-    const comment = await $fetch(`/api/editions/${editionId.value}/lost-found/${itemId}/comments`, {
-      method: 'POST',
-      body: { content },
-    })
-
-    // Ajouter le commentaire à l'item
-    const item = lostFoundItems.value.find((i) => i.id === itemId)
-    if (item) {
-      item.comments.push(comment)
-    }
-
-    // Réinitialiser le champ
-    commentContents.value[itemId] = ''
-
-    toast.add({
-      color: 'success',
-      title: t('edition.comment_added'),
-      icon: 'i-heroicons-check-circle',
-    })
-  } catch {
-    toast.add({
-      color: 'error',
-      title: t('edition.cannot_add_comment'),
-      icon: 'i-heroicons-x-circle',
-    })
-  }
+  postCommentItemId.value = itemId
+  executePostComment()
 }
 
 // Changer le statut d'un item (perdu/restitué) - toast dynamique => silentSuccess
@@ -463,8 +447,6 @@ onMounted(async () => {
   if (hasEditionStarted.value) {
     await fetchLostFoundItems()
   } else {
-    // Edition pas encore démarrée: on arrête le loading mais on ne fetch pas encore
-    loading.value = false
     // Planification d'un fetch au démarrage si la date de début est connue
     if (edition.value?.startDate) {
       const startTime = new Date(edition.value.startDate).getTime()
@@ -472,7 +454,6 @@ onMounted(async () => {
       if (delay > 0 && delay < 1000 * 60 * 60 * 24) {
         setTimeout(async () => {
           if (!lostFoundItems.value.length) {
-            loading.value = true
             await fetchLostFoundItems()
           }
         }, delay + 500) // léger buffer

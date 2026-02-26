@@ -103,12 +103,25 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
-const loading = ref(false)
 const comments = ref<Comment[]>([])
 const newComment = ref('')
+
+// Charger les commentaires
+const { execute: loadComments, loading } = useApiAction(
+  () =>
+    props.type === 'offer'
+      ? `/api/carpool-offers/${props.id}/comments`
+      : `/api/carpool-requests/${props.id}/comments`,
+  {
+    method: 'GET',
+    errorMessages: { default: t('errors.cannot_load_comments') },
+    onSuccess: (response: any) => {
+      comments.value = response
+    },
+  }
+)
 
 // Action pour ajouter un commentaire
 const { execute: executeAddComment, loading: isAddingComment } = useApiAction(
@@ -140,28 +153,6 @@ watch(showCommentsModal, async (open) => {
     await loadComments()
   }
 })
-
-const loadComments = async () => {
-  loading.value = true
-  try {
-    const endpoint =
-      props.type === 'offer'
-        ? `/api/carpool-offers/${props.id}/comments`
-        : `/api/carpool-requests/${props.id}/comments`
-
-    const response = await $fetch(endpoint)
-    comments.value = response
-  } catch (error) {
-    console.error('Erreur lors du chargement des commentaires:', error)
-    toast.add({
-      title: t('common.error'),
-      description: t('errors.cannot_load_comments'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
-}
 
 const addComment = () => {
   // Nettoyer le commentaire et vérifier qu'il n'est pas vide

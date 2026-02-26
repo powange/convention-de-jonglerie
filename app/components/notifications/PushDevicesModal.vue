@@ -89,11 +89,9 @@ interface Device {
 }
 
 const { t } = useI18n()
-const toast = useToast()
 const { getDeviceId } = useDeviceId()
 
 const isOpen = ref(false)
-const loading = ref(false)
 const devices = ref<Device[]>([])
 
 // Utilisation de useApiActionById pour la suppression
@@ -120,33 +118,21 @@ onMounted(() => {
   }
 })
 
+// Charger les appareils
+const { execute: fetchDevices, loading } = useApiAction('/api/notifications/fcm/devices', {
+  method: 'GET',
+  errorMessages: { default: t('notifications.devices.error_loading') },
+  onSuccess: (response: any) => {
+    devices.value = response
+  },
+})
+
 /**
  * Ouvre la modal et charge les appareils
  */
-async function openModal() {
+function openModal() {
   isOpen.value = true
-  await fetchDevices()
-}
-
-/**
- * Récupère la liste des appareils
- */
-async function fetchDevices() {
-  loading.value = true
-  try {
-    const response = await $fetch<{ success: boolean; data: Device[] }>(
-      '/api/notifications/fcm/devices'
-    )
-    devices.value = response.data
-  } catch (error) {
-    console.error('[PushDevices] Erreur:', error)
-    toast.add({
-      color: 'error',
-      title: t('notifications.devices.error_loading'),
-    })
-  } finally {
-    loading.value = false
-  }
+  fetchDevices()
 }
 
 /**

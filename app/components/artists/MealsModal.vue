@@ -108,7 +108,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const toast = useToast()
 
 // Utiliser les utilitaires meals
 const { getMealTypeLabel } = useMealTypeLabel()
@@ -129,7 +128,6 @@ const title = computed(() => {
 // État pour les repas
 const meals = ref<Meal[]>([])
 const initialMeals = ref<Meal[]>([])
-const loadingMeals = ref(false)
 
 // Grouper les repas par date
 const groupedMeals = computed(() => groupMealsByDate(meals.value))
@@ -145,28 +143,23 @@ const hasUnsavedMealChanges = computed(() => {
 })
 
 // Charger les repas
-const fetchMeals = async () => {
-  if (!props.artist) return
-
-  loadingMeals.value = true
-  try {
-    const response = await $fetch(
-      `/api/editions/${props.editionId}/artists/${props.artist.id}/meals`
-    )
-    if (response.data?.meals) {
-      meals.value = response.data.meals
-      // Sauvegarder l'état initial pour la détection de changements
-      initialMeals.value = JSON.parse(JSON.stringify(response.data.meals))
-    }
-  } catch {
-    toast.add({
-      title: t('common.error'),
-      description: t('artists.meals.error_loading'),
-      color: 'error',
-    })
-  } finally {
-    loadingMeals.value = false
+const { execute: executeFetchMeals, loading: loadingMeals } = useApiAction(
+  () => `/api/editions/${props.editionId}/artists/${props.artist?.id}/meals`,
+  {
+    method: 'GET',
+    errorMessages: { default: t('artists.meals.error_loading') },
+    onSuccess: (response: any) => {
+      if (response.meals) {
+        meals.value = response.meals
+        initialMeals.value = JSON.parse(JSON.stringify(response.meals))
+      }
+    },
   }
+)
+
+const fetchMeals = () => {
+  if (!props.artist) return
+  executeFetchMeals()
 }
 
 // Sauvegarder les sélections de repas

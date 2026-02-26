@@ -640,7 +640,6 @@ interface ArtistInfo {
 const route = useRoute()
 const editionStore = useEditionStore()
 const { t } = useI18n()
-const toast = useToast()
 const { formatDateTime, formatDateFull } = useDateFormat()
 const { getMealTypeLabel } = useMealTypeLabel()
 
@@ -859,44 +858,46 @@ const cancelDietEdit = () => {
 // État local pour les modifications de repas
 const editableMeals = ref<Record<number, boolean>>({})
 const savingMealId = ref<number | null>(null)
+const toggleMealData = ref<{ mealId: number; newValue: boolean } | null>(null)
 
-const toggleAfterShow = async (meal: MealSelection, newValue: boolean) => {
+const { execute: executeToggleAfterShow } = useApiAction(
+  () => `/api/editions/${editionId}/my-meals`,
+  {
+    method: 'PUT',
+    body: () => ({
+      selections: [
+        { selectionId: toggleMealData.value!.mealId, afterShow: toggleMealData.value!.newValue },
+      ],
+    }),
+    errorMessages: { default: t('artists.meals.error_saving') },
+    onSuccess: (response: any) => {
+      if (response?.mealSelections && artistResponse.value?.artist) {
+        artistResponse.value = {
+          ...artistResponse.value,
+          artist: {
+            ...artistResponse.value.artist,
+            mealSelections: response.mealSelections,
+          },
+        }
+        editableMeals.value = {}
+      }
+      savingMealId.value = null
+    },
+    onError: () => {
+      if (toggleMealData.value) {
+        const { [toggleMealData.value.mealId]: _, ...rest } = editableMeals.value
+        editableMeals.value = rest
+      }
+      savingMealId.value = null
+    },
+  }
+)
+
+const toggleAfterShow = (meal: MealSelection, newValue: boolean) => {
   editableMeals.value[meal.id] = newValue
   savingMealId.value = meal.id
-
-  try {
-    const response = await $fetch<{ success: boolean; data: { mealSelections: MealSelection[] } }>(
-      `/api/editions/${editionId}/my-meals`,
-      {
-        method: 'PUT',
-        body: {
-          selections: [{ selectionId: meal.id, afterShow: newValue }],
-        },
-      }
-    )
-
-    if (response.data?.mealSelections && artistResponse.value?.artist) {
-      artistResponse.value = {
-        ...artistResponse.value,
-        artist: {
-          ...artistResponse.value.artist,
-          mealSelections: response.data.mealSelections,
-        },
-      }
-      editableMeals.value = {}
-    }
-  } catch {
-    // Annuler le changement local en cas d'erreur
-    const { [meal.id]: _, ...rest } = editableMeals.value
-    editableMeals.value = rest
-    toast.add({
-      title: t('common.error'),
-      description: t('artists.meals.error_saving'),
-      color: 'error',
-    })
-  } finally {
-    savingMealId.value = null
-  }
+  toggleMealData.value = { mealId: meal.id, newValue }
+  executeToggleAfterShow()
 }
 
 // Grouper les repas par date

@@ -728,16 +728,16 @@ const startPrivateConversation = (user: AdminUserWithConnection) => {
 }
 
 // Fonction d'impersonation
-const impersonateUser = async (user: AdminUserWithConnection) => {
-  try {
-    const confirmMessage = t('admin.confirm_impersonate', {
-      name: `${user.prenom} ${user.nom}`,
-    })
+const impersonateTargetUser = ref<AdminUserWithConnection | null>(null)
 
-    if (confirm(confirmMessage)) {
-      const result = await $fetch(`/api/admin/users/${user.id}/impersonate`, {
-        method: 'POST',
-      })
+const { execute: executeImpersonate } = useApiAction(
+  () => `/api/admin/users/${impersonateTargetUser.value!.id}/impersonate`,
+  {
+    method: 'POST',
+    silentSuccess: true,
+    errorMessages: { default: t('admin.impersonation_error') },
+    onSuccess: async (result: any) => {
+      const target = impersonateTargetUser.value!
 
       // Mettre à jour le store d'authentification avec le nouvel utilisateur
       const authStore = useAuthStore()
@@ -754,7 +754,7 @@ const impersonateUser = async (user: AdminUserWithConnection) => {
       // Afficher le toast de succès
       useToast().add({
         title: t('common.success'),
-        description: t('admin.impersonation_started', { pseudo: user.pseudo }),
+        description: t('admin.impersonation_started', { pseudo: target.pseudo }),
         color: 'success',
       })
 
@@ -763,15 +763,18 @@ const impersonateUser = async (user: AdminUserWithConnection) => {
 
       // Naviguer vers la page d'accueil
       await navigateTo('/')
-    }
-  } catch (error: any) {
-    console.error("Erreur lors de l'impersonation:", error)
+    },
+  }
+)
 
-    useToast().add({
-      title: t('common.error'),
-      description: error.data?.message || t('admin.impersonation_error'),
-      color: 'error',
-    })
+const impersonateUser = (user: AdminUserWithConnection) => {
+  const confirmMessage = t('admin.confirm_impersonate', {
+    name: `${user.prenom} ${user.nom}`,
+  })
+
+  if (confirm(confirmMessage)) {
+    impersonateTargetUser.value = user
+    executeImpersonate()
   }
 }
 
