@@ -58,7 +58,7 @@ export default wrapApiHandler(
     const artistId = validateResourceId(event, 'artistId', 'artiste')
 
     // Vérifier les permissions
-    const edition = await getEditionWithPermissions(editionId)
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
 
     if (!edition) {
       throw createError({

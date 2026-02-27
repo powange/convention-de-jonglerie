@@ -47,10 +47,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      message: 'Assignation supprimée avec succès',
-      unassignedUser: assignment.user,
-    }
+    return createSuccessResponse(assignment.user, 'Assignation supprimée avec succès')
   },
   { operationName: 'DeleteVolunteerTimeSlotAssignment' }
 )

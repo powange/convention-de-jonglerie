@@ -1,15 +1,15 @@
 # Roadmap d'uniformisation des retours API
 
-## État des lieux (26 février 2026)
+## État des lieux (27 février 2026)
 
 ### Chiffres backend (`server/api/` — 366 endpoints)
 
 | Pattern                                                             | Fichiers | %   |
 | ------------------------------------------------------------------- | -------- | --- |
-| Utilisent `createSuccessResponse()`                                 | 175      | 48% |
+| Utilisent `createSuccessResponse()`                                 | ~246     | 67% |
 | Utilisent `createPaginatedResponse()`                               | 10       | 3%  |
 | Retournent `{ success: true }` manuellement (exclus volontairement) | 3        | <1% |
-| Retournent des données brutes (pas de wrapper)                      | ~178     | 49% |
+| Retournent des données brutes (GETs uniquement)                     | ~107     | 29% |
 
 | Infrastructure                             | Fichiers | %    |
 | ------------------------------------------ | -------- | ---- |
@@ -39,40 +39,36 @@
 
 ---
 
-### Axe 2 — Endpoints bruts → `createSuccessResponse` (~178 fichiers)
+### Axe 2 — Endpoints mutations bruts → `createSuccessResponse` (~71 fichiers) ✅ TERMINÉ
 
 **Effort** : Élevé | **Impact** : Moyen (uniformité, typage)
 
-~178 endpoints retournent des données brutes sans wrapper `{ success, data }`. Principalement des GET qui retournent directement les données Prisma.
+```71 endpoints mutations (POST/PUT/PATCH/DELETE) retournaient des données brutes sans wrapper `{ success, data }`.~~
 
-**Exemples typiques** :
+**Migré le 27/02/2026** en 6 batches progressifs par niveau de risque :
 
-```typescript
-// Retour direct d'objet
-return updatedOffer
+| Batch | Scope | Endpoints | Frontend | Tests |
+|-------|-------|-----------|----------|-------|
+| 1 | Sans impact frontend (delete, duplicate, posts, lost-found) | 15 | 0 | 6 |
+| 2 | Carpool + Messenger + Admin | 15 | 0 | 7 |
+| 3 | Ticketing + Workshops | 14 | 2 fichiers | 0 |
+| 4 | Volunteer Management | 8 | 2 composables | 0 |
+| 5 | Editions/Conventions CRUD + Profile | 11 | 3 fichiers | 10 |
+| 6 | Auth (risque le plus élevé) | 8 | 4 fichiers | 7 |
+| **Total** | | **~71** | **~11 fichiers** | **~30** |
 
-// Retour direct de tableau
-return markers
+**Patterns de transformation appliqués** :
+- Pattern A : `return entity` → `return createSuccessResponse(entity)`
+- Pattern B : `return { message }` → `return createSuccessResponse(null, message)`
+- Pattern C : `return { field1, field2 }` → `return createSuccessResponse({ field1, field2 })`
+- Pattern D : `return { success, message, entity }` → `return createSuccessResponse({ entity }, message)`
 
-// Retour d'objet composé
-return { conventions, total }
-```
+**Impact frontend** :
+- Appelants `useApiAction` : Aucun changement (auto-unwrap via `unwrapApiResponse()`)
+- Appelants `$fetch` directs : `response.field` → `response.data.field` (~11 fichiers mis à jour)
+- Tests : `result.field` → `result.data.field` (~30 fichiers mis à jour)
 
-**Sous-catégories estimées** :
-
-| Type                              | ~Fichiers | Exemple                   |
-| --------------------------------- | --------- | ------------------------- |
-| GET retournant un objet Prisma    | ~60       | `return edition`          |
-| GET retournant un tableau         | ~40       | `return markers`          |
-| GET retournant un objet composé   | ~30       | `return { stats, dates }` |
-| Mutations (POST/PUT/PATCH/DELETE) | ~48       | `return updatedOffer`     |
-
-**Points à considérer avant de migrer** :
-
-- Le frontend accède déjà à `response.field` directement — changer vers `response.data.field` impacte tous les consommateurs
-- Le smart unwrap dans `useApiAction` gère la transition pour les appels via `useApiAction`, mais les `$fetch` directs doivent être mis à jour manuellement
-- Les endpoints GET simples (retour direct) n'apportent pas de valeur ajoutée avec `createSuccessResponse` — le code HTTP 200 suffit
-- **Recommandation** : Ne migrer que les mutations (POST/PUT/PATCH/DELETE) pour uniformité avec les endpoints déjà migrés. Laisser les GET bruts.
+**Les ~107 endpoints GET restants** retournent des données brutes intentionnellement (pas de valeur ajoutée à wrapper un GET avec `createSuccessResponse`).
 
 ---
 
@@ -166,7 +162,7 @@ return { conventions, total }
 | -------- | ----------------------------------------------------------- | ------ | --------------------- | ---------- |
 | ~~1~~    | Axe 1 — 11 fichiers `defineEventHandler` → `wrapApiHandler` | Faible | Sécurité/logging      | ✅ Terminé |
 | ~~1~~    | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate | ✅ Terminé |
-| 2        | Axe 2 — Mutations brutes → `createSuccessResponse`          | Moyen  | Uniformité            | À faire    |
+| ~~2~~    | Axe 2 — Mutations brutes → `createSuccessResponse`          | Élevé  | Uniformité            | ✅ Terminé |
 | -        | Axe 4 — 3 fichiers exclus                                   | -      | Pas nécessaire        | -          |
 
 ---
@@ -182,6 +178,7 @@ return { conventions, total }
 | Axe 3 B3   | 26/02/2026 | 3 fichiers `$fetch` GET → `useApiAction` (pages gestion)              | 3 appels migrés, −20 lignes boilerplate, 2 fichiers skipés                          |
 | Axe 3 B4   | 26/02/2026 | 2 fichiers `$fetch` → `useApiAction` (validate + access-control)      | 7 appels migrés, −60 lignes boilerplate, 3 fichiers skipés                          |
 | Axe 3 B5   | 27/02/2026 | 3 fichiers admin `$fetch` → `useApiAction` (index + notif + feedback) | 5 appels migrés, −50 lignes boilerplate, 3 fichiers skipés                          |
+| Axe 2      | 27/02/2026 | ~71 mutations → `createSuccessResponse` (6 batches)                   | ~71 endpoints + ~11 fichiers frontend + ~30 fichiers tests                          |
 
 Détails dans `docs/migration-createSuccessResponse.md`.
 
@@ -199,4 +196,5 @@ Détails dans `docs/migration-createSuccessResponse.md`.
 
 ---
 
-**Dernière mise à jour** : 27 février 2026 (Axe 3 terminé — Batch 1-5)
+**Dernière mise à jour** : 27 février 2026 (Axe 2 terminé — ~71 mutations migrées en 6 batches)
+```

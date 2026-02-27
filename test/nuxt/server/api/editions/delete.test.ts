@@ -40,7 +40,9 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Edition deleted successfully',
+      data: null,
     })
     expect(prismaMock.edition.delete).toHaveBeenCalledWith({
       where: { id: 1 },
@@ -65,7 +67,9 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Edition deleted successfully',
+      data: null,
     })
   })
 
@@ -92,7 +96,9 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Edition deleted successfully',
+      data: null,
     })
   })
 
@@ -125,7 +131,9 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Edition deleted successfully',
+      data: null,
     })
   })
 
@@ -158,7 +166,9 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(eventWithGlobalAdmin as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Edition deleted successfully',
+      data: null,
     })
   })
 
@@ -361,7 +371,7 @@ describe('/api/editions/[id] DELETE', () => {
       if (testCase.shouldPass) {
         prismaMock.edition.delete.mockResolvedValue({})
         const result = await handler(event as any)
-        expect(result.message).toContain('deleted successfully')
+        expect(result.message).toBe('Edition deleted successfully')
       } else {
         await expect(handler(event as any)).rejects.toThrow(
           "Vous n'avez pas les droits pour supprimer cette édition"

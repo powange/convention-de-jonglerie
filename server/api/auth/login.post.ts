@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { setUserSession } from '#imports'
 
+import type { ApiSuccessResponse } from '#server/types/api'
 import type { LoginResponse } from '#server/types/api-responses'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -16,7 +17,7 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional().default(false),
 })
 
-export default wrapApiHandler<LoginResponse>(
+export default wrapApiHandler<ApiSuccessResponse<LoginResponse>>(
   async (event) => {
     // Appliquer le rate limiting
     await authRateLimiter(event)
@@ -122,7 +123,7 @@ export default wrapApiHandler<LoginResponse>(
       sessionConfig
     )
 
-    return {
+    return createSuccessResponse({
       user: {
         id: user.id,
         email: user.email,
@@ -139,7 +140,7 @@ export default wrapApiHandler<LoginResponse>(
         updatedAt: user.updatedAt,
         isEmailVerified: user.isEmailVerified,
       },
-    }
+    })
   },
   { operationName: 'Login' }
 )

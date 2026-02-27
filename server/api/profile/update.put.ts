@@ -183,7 +183,7 @@ export default wrapApiHandler(
     })
 
     // emailHash est déjà présent dans updatedUser
-    return updatedUser
+    return createSuccessResponse(updatedUser)
   },
   { operationName: 'UpdateProfile' }
 )

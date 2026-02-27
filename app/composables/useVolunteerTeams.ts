@@ -68,10 +68,11 @@ export function useVolunteerTeams(
     try {
       loading.value = true
       error.value = null
-      const newTeam = await $fetch(`/api/editions/${id}/volunteer-teams`, {
+      const response = await $fetch(`/api/editions/${id}/volunteer-teams`, {
         method: 'POST',
         body: teamData,
       })
+      const newTeam = response.data
       teams.value.push(newTeam)
       return newTeam
     } catch (err: any) {
@@ -90,10 +91,11 @@ export function useVolunteerTeams(
     try {
       loading.value = true
       error.value = null
-      const updatedTeam = await $fetch(`/api/editions/${id}/volunteer-teams/${teamId}`, {
+      const response = await $fetch(`/api/editions/${id}/volunteer-teams/${teamId}`, {
         method: 'PUT',
         body: teamData,
       })
+      const updatedTeam = response.data
       const index = teams.value.findIndex((t) => t.id === teamId)
       if (index !== -1) {
         teams.value[index] = updatedTeam

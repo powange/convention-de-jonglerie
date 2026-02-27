@@ -10,11 +10,7 @@ export default wrapApiHandler(
 
     const result = await deleteConventionImage(conventionId, user)
 
-    return {
-      success: result.success,
-      message: result.message,
-      convention: result.entity,
-    }
+    return createSuccessResponse({ convention: result.entity }, result.message)
   },
   { operationName: 'DeleteConventionImage' }
 )

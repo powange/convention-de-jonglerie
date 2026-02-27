@@ -39,7 +39,7 @@ export default wrapApiHandler(
           },
         },
       })
-      return { isAttending: false }
+      return createSuccessResponse({ isAttending: false })
     } else {
       // Add to attendance
       await prisma.user.update({
@@ -50,7 +50,7 @@ export default wrapApiHandler(
           },
         },
       })
-      return { isAttending: true }
+      return createSuccessResponse({ isAttending: true })
     }
   },
   { operationName: 'ToggleEditionAttendance' }

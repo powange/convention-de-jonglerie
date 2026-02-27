@@ -81,7 +81,7 @@ export default wrapApiHandler(
     })
 
     setResponseStatus(event, 201)
-    return team
+    return createSuccessResponse(team)
   },
   { operationName: 'CreateVolunteerTeam' }
 )

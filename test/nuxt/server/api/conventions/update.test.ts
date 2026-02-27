@@ -70,7 +70,7 @@ describe('API Convention - Mise à jour', () => {
 
     const result = await updateConventionHandler(mockEvent)
 
-    expect(result).toEqual(mockUpdatedConvention)
+    expect(result).toEqual({ success: true, data: mockUpdatedConvention })
     expect(prismaMock.convention.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: {
@@ -115,7 +115,7 @@ describe('API Convention - Mise à jour', () => {
 
     const result = await updateConventionHandler(mockEvent)
 
-    expect(result).toEqual(mockUpdatedConvention)
+    expect(result).toEqual({ success: true, data: mockUpdatedConvention })
   })
 
   it('devrait rejeter les utilisateurs non authentifiés', async () => {

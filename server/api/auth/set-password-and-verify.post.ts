@@ -108,25 +108,27 @@ export default wrapApiHandler(
       console.error("Erreur lors de l'envoi de la notification de bienvenue:", notificationError)
     }
 
-    return {
-      message: 'Mot de passe créé avec succès ! Votre compte est maintenant actif.',
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        pseudo: updatedUser.pseudo,
-        nom: updatedUser.nom,
-        prenom: updatedUser.prenom,
-        phone: updatedUser.phone,
-        profilePicture: updatedUser.profilePicture,
-        isGlobalAdmin: updatedUser.isGlobalAdmin,
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt,
-        isEmailVerified: updatedUser.isEmailVerified,
-        isVolunteer: updatedUser.isVolunteer,
-        isArtist: updatedUser.isArtist,
-        isOrganizer: updatedUser.isOrganizer,
+    return createSuccessResponse(
+      {
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          pseudo: updatedUser.pseudo,
+          nom: updatedUser.nom,
+          prenom: updatedUser.prenom,
+          phone: updatedUser.phone,
+          profilePicture: updatedUser.profilePicture,
+          isGlobalAdmin: updatedUser.isGlobalAdmin,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
+          isEmailVerified: updatedUser.isEmailVerified,
+          isVolunteer: updatedUser.isVolunteer,
+          isArtist: updatedUser.isArtist,
+          isOrganizer: updatedUser.isOrganizer,
+        },
       },
-    }
+      'Mot de passe créé avec succès ! Votre compte est maintenant actif.'
+    )
   },
   { operationName: 'SetPasswordAndVerify' }
 )

@@ -33,7 +33,7 @@ export default wrapApiHandler(
     }
 
     try {
-      return await createReturnableItem(editionId, validation.data)
+      return createSuccessResponse(await createReturnableItem(editionId, validation.data))
     } catch (error: unknown) {
       console.error('Failed to create returnable item:', error)
       throw createError({

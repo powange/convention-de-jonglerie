@@ -61,7 +61,7 @@ export default wrapApiHandler(
       },
     })
 
-    return rawComment
+    return createSuccessResponse(rawComment)
   },
   { operationName: 'CreateLostFoundComment' }
 )

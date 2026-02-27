@@ -38,6 +38,8 @@ describe('/api/conventions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
+      data: null,
       message: 'Convention supprimée avec succès',
     })
     expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(
@@ -64,6 +66,8 @@ describe('/api/conventions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
+      data: null,
       message: 'Convention supprimée avec succès',
     })
     expect(prismaMock.convention.delete).toHaveBeenCalledWith({

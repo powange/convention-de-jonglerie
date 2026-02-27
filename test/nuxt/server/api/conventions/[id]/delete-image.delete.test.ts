@@ -53,12 +53,14 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       expect(result).toEqual({
         success: true,
+        data: {
+          convention: expect.objectContaining({
+            id: 1,
+            nom: 'Convention Test',
+            logo: null,
+          }),
+        },
         message: 'Image supprimée avec succès',
-        convention: expect.objectContaining({
-          id: 1,
-          nom: 'Convention Test',
-          logo: null,
-        }),
       })
     })
   })
@@ -231,17 +233,19 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       expect(result).toEqual({
         success: true,
+        data: {
+          convention: expect.objectContaining({
+            id: 1,
+            nom: 'Convention Test',
+            logo: null,
+          }),
+        },
         message: 'Image supprimée avec succès',
-        convention: expect.objectContaining({
-          id: 1,
-          nom: 'Convention Test',
-          logo: null,
-        }),
       })
 
       expect(result).toHaveProperty('success')
       expect(result).toHaveProperty('message')
-      expect(result).toHaveProperty('convention')
+      expect(result).toHaveProperty('data.convention')
       expect(result.success).toBe(true)
       expect(typeof result.message).toBe('string')
     })
@@ -251,8 +255,8 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.convention).toHaveProperty('author')
-      expect(result.convention.author).toEqual({
+      expect(result.data.convention).toHaveProperty('author')
+      expect(result.data.convention.author).toEqual({
         id: 1,
         pseudo: 'testuser',
         email: 'test@example.com',
@@ -264,7 +268,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.convention.logo).toBeNull()
+      expect(result.data.convention.logo).toBeNull()
     })
   })
 
@@ -361,8 +365,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       expect(result).toEqual({
         success: true,
+        data: {
+          convention: customResponse.entity,
+        },
         message: 'Logo de convention supprimé avec succès',
-        convention: customResponse.entity,
       })
     })
   })

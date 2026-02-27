@@ -45,18 +45,18 @@ export const useAuthStore = defineStore('auth', {
       return response
     },
     async login(identifier: string, password: string, rememberMe: boolean = false) {
-      const response = await $fetch<{ user: User }>('/api/auth/login', {
+      const response = await $fetch('/api/auth/login', {
         method: 'POST',
         body: { identifier, password, rememberMe },
       })
 
-      this.user = response.user
+      this.user = (response as any).data.user
       this.rememberMe = rememberMe
 
-      // Mémoriser l’utilisateur si nécessaire (pure UX; l’auth reste en session serveur)
+      // Mémoriser l'utilisateur si nécessaire (pure UX; l'auth reste en session serveur)
       if (import.meta.client) {
         const storage = rememberMe ? localStorage : sessionStorage
-        storage.setItem('authUser', JSON.stringify(response.user))
+        storage.setItem('authUser', JSON.stringify((response as any).data.user))
         storage.setItem('rememberMe', String(rememberMe))
       }
 

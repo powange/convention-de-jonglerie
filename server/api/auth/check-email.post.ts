@@ -25,7 +25,7 @@ export default wrapApiHandler(
         },
       },
     })
-    return { exists: !!user }
+    return createSuccessResponse({ exists: !!user })
   },
   { operationName: 'CheckEmail' }
 )

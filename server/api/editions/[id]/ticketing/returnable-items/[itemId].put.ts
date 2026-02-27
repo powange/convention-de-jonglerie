@@ -32,7 +32,7 @@ export default wrapApiHandler(
       })
     }
 
-    return await updateReturnableItem(itemId, editionId, validation.data)
+    return createSuccessResponse(await updateReturnableItem(itemId, editionId, validation.data))
   },
   { operationName: 'PUT ticketing returnable item' }
 )

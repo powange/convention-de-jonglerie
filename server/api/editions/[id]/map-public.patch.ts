@@ -26,7 +26,7 @@ export default wrapApiHandler(
       select: { id: true, mapPublic: true },
     })
 
-    return updatedEdition
+    return createSuccessResponse(updatedEdition)
   },
   { operationName: 'UpdateEditionMapPublic' }
 )

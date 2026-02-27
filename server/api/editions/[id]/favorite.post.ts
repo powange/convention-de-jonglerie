@@ -39,7 +39,7 @@ export default wrapApiHandler(
           },
         },
       })
-      return { message: 'Edition removed from favorites', isFavorited: false }
+      return createSuccessResponse({ isFavorited: false }, 'Edition removed from favorites')
     } else {
       // Add to favorites
       await prisma.user.update({
@@ -50,7 +50,7 @@ export default wrapApiHandler(
           },
         },
       })
-      return { message: 'Edition added to favorites', isFavorited: true }
+      return createSuccessResponse({ isFavorited: true }, 'Edition added to favorites')
     }
   },
   { operationName: 'ToggleEditionFavorite' }

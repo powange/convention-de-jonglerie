@@ -26,9 +26,7 @@ export default wrapApiHandler(
 
     if (!user) {
       // Retourner le même message pour ne pas révéler l'existence du compte
-      return {
-        message: genericMessage,
-      }
+      return createSuccessResponse(null, genericMessage)
     }
 
     // Générer un token unique
@@ -55,9 +53,7 @@ export default wrapApiHandler(
       text: `Bonjour ${user.prenom},\n\nVous avez demandé la réinitialisation de votre mot de passe.\n\nCliquez sur ce lien pour réinitialiser votre mot de passe : ${resetLink}\n\nCe lien est valide pendant 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\nL'équipe des Conventions de Jonglerie`,
     })
 
-    return {
-      message: genericMessage,
-    }
+    return createSuccessResponse(null, genericMessage)
   },
   { operationName: 'RequestPasswordReset' }
 )

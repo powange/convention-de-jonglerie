@@ -9,10 +9,7 @@ export default wrapApiHandler(
     // Utiliser l'utilitaire de suppression
     const result = await deleteProfilePicture(user.id)
 
-    return {
-      success: result.success,
-      user: result.entity,
-    }
+    return createSuccessResponse({ user: result.entity })
   },
   { operationName: 'DeleteProfilePicture' }
 )

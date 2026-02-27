@@ -40,7 +40,9 @@ describe('API Reset Password', () => {
     const result = await resetPasswordHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message: 'Votre mot de passe a été réinitialisé avec succès',
+      data: null,
     })
 
     expect(prismaMock.user.update).toHaveBeenCalledWith({
@@ -161,7 +163,9 @@ describe('API Reset Password', () => {
     const result = await resetPasswordHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message: 'Votre mot de passe a été réinitialisé avec succès',
+      data: null,
     })
   })
 

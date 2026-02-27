@@ -106,40 +106,44 @@ export default wrapApiHandler(
         },
       })
 
-      return {
-        message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',
-        needsPassword: false,
-        user: {
-          id: updatedUser.id,
-          email: updatedUser.email,
-          pseudo: updatedUser.pseudo,
-          nom: updatedUser.nom,
-          prenom: updatedUser.prenom,
-          phone: updatedUser.phone,
-          profilePicture: updatedUser.profilePicture,
-          isGlobalAdmin: updatedUser.isGlobalAdmin,
-          isVolunteer: updatedUser.isVolunteer,
-          isArtist: updatedUser.isArtist,
-          isOrganizer: updatedUser.isOrganizer,
-          createdAt: updatedUser.createdAt,
-          updatedAt: updatedUser.updatedAt,
-          isEmailVerified: updatedUser.isEmailVerified,
+      return createSuccessResponse(
+        {
+          needsPassword: false,
+          user: {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            pseudo: updatedUser.pseudo,
+            nom: updatedUser.nom,
+            prenom: updatedUser.prenom,
+            phone: updatedUser.phone,
+            profilePicture: updatedUser.profilePicture,
+            isGlobalAdmin: updatedUser.isGlobalAdmin,
+            isVolunteer: updatedUser.isVolunteer,
+            isArtist: updatedUser.isArtist,
+            isOrganizer: updatedUser.isOrganizer,
+            createdAt: updatedUser.createdAt,
+            updatedAt: updatedUser.updatedAt,
+            isEmailVerified: updatedUser.isEmailVerified,
+          },
         },
-      }
+        'Email vérifié avec succès ! Votre compte est maintenant actif.'
+      )
     }
 
     // Si l'utilisateur n'a pas de mot de passe, retourner un flag pour la création de mot de passe
-    return {
-      message: 'Code vérifié avec succès. Veuillez créer votre mot de passe.',
-      needsPassword: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        pseudo: user.pseudo,
-        nom: user.nom,
-        prenom: user.prenom,
+    return createSuccessResponse(
+      {
+        needsPassword: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          pseudo: user.pseudo,
+          nom: user.nom,
+          prenom: user.prenom,
+        },
       },
-    }
+      'Code vérifié avec succès. Veuillez créer votre mot de passe.'
+    )
   },
   { operationName: 'VerifyEmail' }
 )

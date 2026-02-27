@@ -54,7 +54,7 @@ export default wrapApiHandler(
       },
     })
 
-    return location
+    return createSuccessResponse(location)
   },
   { operationName: 'CreateWorkshopLocation' }
 )

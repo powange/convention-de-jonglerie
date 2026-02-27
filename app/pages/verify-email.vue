@@ -340,9 +340,12 @@ const handleVerification = async () => {
 
   try {
     const response = await $fetch<{
-      needsPassword: boolean
-      message: string
-      user: { id: number; email: string }
+      success: true
+      message?: string
+      data: {
+        needsPassword: boolean
+        user: { id: number; email: string }
+      }
     }>('/api/auth/verify-email', {
       method: 'POST',
       body: {
@@ -352,18 +355,18 @@ const handleVerification = async () => {
     })
 
     // Si l'utilisateur a besoin de créer un mot de passe, afficher le formulaire
-    if (response.needsPassword) {
+    if (response.data.needsPassword) {
       needsPassword.value = true
       return
     }
 
     // Sinon, l'utilisateur est maintenant connecté automatiquement
     // Mettre à jour le store auth avec les données utilisateur
-    authStore.user = response.user
+    authStore.user = response.data.user
 
     // Sauvegarder dans sessionStorage (pas de rememberMe pour la vérification email)
     if (import.meta.client) {
-      sessionStorage.setItem('authUser', JSON.stringify(response.user))
+      sessionStorage.setItem('authUser', JSON.stringify(response.data.user))
       sessionStorage.setItem('rememberMe', 'false')
     }
 
@@ -407,7 +410,11 @@ const handleSetPassword = async () => {
   hasError.value = false
 
   try {
-    const response = await $fetch('/api/auth/set-password-and-verify', {
+    const response = await $fetch<{
+      success: true
+      message?: string
+      data: { user: { id: number; email: string } }
+    }>('/api/auth/set-password-and-verify', {
       method: 'POST',
       body: {
         email: email.value,
@@ -417,11 +424,11 @@ const handleSetPassword = async () => {
     })
 
     // Mettre à jour le store auth avec les données utilisateur
-    authStore.user = response.user
+    authStore.user = response.data.user
 
     // Sauvegarder dans sessionStorage (pas de rememberMe pour la vérification email)
     if (import.meta.client) {
-      sessionStorage.setItem('authUser', JSON.stringify(response.user))
+      sessionStorage.setItem('authUser', JSON.stringify(response.data.user))
       sessionStorage.setItem('rememberMe', 'false')
     }
 

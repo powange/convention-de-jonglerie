@@ -23,7 +23,7 @@ export default wrapApiHandler(
       where: { id: requestId },
     })
 
-    return { message: 'Demande de covoiturage supprimée avec succès' }
+    return createSuccessResponse(null, 'Demande de covoiturage supprimée avec succès')
   },
   { operationName: 'DeleteCarpoolRequest' }
 )

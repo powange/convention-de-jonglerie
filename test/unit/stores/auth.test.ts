@@ -222,7 +222,10 @@ describe('useAuthStore', () => {
 
   describe('Action login', () => {
     const mockLoginResponse = {
-      user: mockUser,
+      success: true,
+      data: {
+        user: mockUser,
+      },
     }
 
     beforeEach(() => {

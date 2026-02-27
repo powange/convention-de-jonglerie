@@ -164,7 +164,7 @@ export default wrapApiHandler(
 
     await invalidateEditionCache(newEdition.id)
 
-    return newEdition
+    return createSuccessResponse(newEdition)
   },
   { operationName: 'DuplicateEdition' }
 )

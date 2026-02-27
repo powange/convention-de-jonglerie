@@ -50,7 +50,7 @@ export default wrapApiHandler(
       },
     })
 
-    return updatedConvention
+    return createSuccessResponse(updatedConvention)
   },
   { operationName: 'UpdateConvention' }
 )

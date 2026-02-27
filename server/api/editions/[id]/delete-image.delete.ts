@@ -11,10 +11,7 @@ export default wrapApiHandler(
     // Utiliser l'utilitaire de suppression
     const result = await deleteEditionImage(editionId, user.id)
 
-    return {
-      success: result.success,
-      edition: result.entity,
-    }
+    return createSuccessResponse({ edition: result.entity })
   },
   { operationName: 'DeleteEditionImage' }
 )

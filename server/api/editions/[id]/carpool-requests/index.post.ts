@@ -39,7 +39,7 @@ export default wrapApiHandler(
       },
     })
 
-    return carpoolRequest
+    return createSuccessResponse(carpoolRequest)
   },
   { operationName: 'CreateCarpoolRequest' }
 )

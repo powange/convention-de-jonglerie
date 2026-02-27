@@ -51,7 +51,7 @@ export default wrapApiHandler(
     })
 
     setResponseStatus(event, 204)
-    return null
+    return createSuccessResponse(null)
   },
   { operationName: 'DeleteVolunteerTeam' }
 )

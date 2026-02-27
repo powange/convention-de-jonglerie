@@ -91,7 +91,7 @@ export default wrapApiHandler(
       'covoiturage réservation reçue'
     )
 
-    return booking
+    return createSuccessResponse(booking)
   },
   { operationName: 'CreateCarpoolOfferBooking' }
 )

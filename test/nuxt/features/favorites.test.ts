@@ -74,8 +74,9 @@ describe('Système de favoris', () => {
       const result = await favoriteHandler(mockEvent as any)
 
       expect(result).toEqual({
+        success: true,
         message: 'Edition added to favorites',
-        isFavorited: true,
+        data: { isFavorited: true },
       })
 
       expect(prismaMock.user.update).toHaveBeenCalledWith({
@@ -111,8 +112,9 @@ describe('Système de favoris', () => {
       const result = await favoriteHandler(mockEvent as any)
 
       expect(result).toEqual({
+        success: true,
         message: 'Edition removed from favorites',
-        isFavorited: false,
+        data: { isFavorited: false },
       })
 
       expect(prismaMock.user.update).toHaveBeenCalledWith({

@@ -197,7 +197,7 @@ export default wrapApiHandler(
     // Invalider le cache après mise à jour
     await invalidateEditionCache(editionId)
 
-    return updatedEdition
+    return createSuccessResponse(updatedEdition)
   },
   { operationName: 'UpdateEdition' }
 )

@@ -1052,7 +1052,7 @@ const handleConfigTest = async (config: any) => {
 
     toast.add({
       title: 'Connexion réussie !',
-      description: `Formulaire trouvé : ${(result as any).form.name} (${(result as any).form.organizationName})`,
+      description: `Formulaire trouvé : ${(result as any).data.form.name} (${(result as any).data.form.organizationName})`,
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })

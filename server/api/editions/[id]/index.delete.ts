@@ -21,7 +21,7 @@ export default wrapApiHandler(
     // Invalider le cache après suppression
     await invalidateEditionCache(editionId)
 
-    return { message: 'Edition deleted successfully' }
+    return createSuccessResponse(null, 'Edition deleted successfully')
   },
   { operationName: 'DeleteEdition' }
 )

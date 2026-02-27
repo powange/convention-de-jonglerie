@@ -97,7 +97,7 @@ export default wrapApiHandler(
         },
       },
     })
-    return rawItem
+    return createSuccessResponse(rawItem)
   },
   { operationName: 'CreateLostFoundItem' }
 )

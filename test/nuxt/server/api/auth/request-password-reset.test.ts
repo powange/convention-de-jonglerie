@@ -53,8 +53,10 @@ describe('API Request Password Reset', () => {
     const result = await requestPasswordResetHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message:
         'Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes.',
+      data: null,
     })
 
     expect(prismaMock.passwordResetToken.create).toHaveBeenCalledWith({
@@ -86,8 +88,10 @@ describe('API Request Password Reset', () => {
     const result = await requestPasswordResetHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message:
         'Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes.',
+      data: null,
     })
 
     expect(prismaMock.passwordResetToken.create).not.toHaveBeenCalled()

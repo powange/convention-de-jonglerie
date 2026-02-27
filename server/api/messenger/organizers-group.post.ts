@@ -33,9 +33,7 @@ export default wrapApiHandler(
 
     const conversationId = await ensureOrganizersGroupConversation(editionId)
 
-    return {
-      conversationId,
-    }
+    return createSuccessResponse({ conversationId })
   },
   { operationName: 'CreateOrganizersGroupConversation' }
 )

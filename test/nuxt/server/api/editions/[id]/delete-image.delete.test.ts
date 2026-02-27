@@ -54,11 +54,13 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       expect(result).toEqual({
         success: true,
-        edition: expect.objectContaining({
-          id: 1,
-          nom: 'Édition Test 2024',
-          imageUrl: null,
-        }),
+        data: {
+          edition: expect.objectContaining({
+            id: 1,
+            nom: 'Édition Test 2024',
+            imageUrl: null,
+          }),
+        },
       })
     })
   })
@@ -231,15 +233,17 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       expect(result).toEqual({
         success: true,
-        edition: expect.objectContaining({
-          id: 1,
-          nom: 'Édition Test 2024',
-          imageUrl: null,
-        }),
+        data: {
+          edition: expect.objectContaining({
+            id: 1,
+            nom: 'Édition Test 2024',
+            imageUrl: null,
+          }),
+        },
       })
 
       expect(result).toHaveProperty('success')
-      expect(result).toHaveProperty('edition')
+      expect(result).toHaveProperty('data.edition')
       expect(result.success).toBe(true)
     })
 
@@ -248,14 +252,14 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.edition).toHaveProperty('creator')
-      expect(result.edition).toHaveProperty('favoritedBy')
-      expect(result.edition.creator).toEqual({
+      expect(result.data.edition).toHaveProperty('creator')
+      expect(result.data.edition).toHaveProperty('favoritedBy')
+      expect(result.data.edition.creator).toEqual({
         id: 1,
         pseudo: 'testuser',
         email: 'test@example.com',
       })
-      expect(Array.isArray(result.edition.favoritedBy)).toBe(true)
+      expect(Array.isArray(result.data.edition.favoritedBy)).toBe(true)
     })
 
     it("devrait confirmer que l'imageUrl est null après suppression", async () => {
@@ -263,7 +267,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.edition.imageUrl).toBeNull()
+      expect(result.data.edition.imageUrl).toBeNull()
     })
   })
 
@@ -349,7 +353,9 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       expect(result).toEqual({
         success: true,
-        edition: customResponse.entity,
+        data: {
+          edition: customResponse.entity,
+        },
       })
     })
 
@@ -373,8 +379,8 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.edition.creatorId).toBe(2)
-      expect(result.edition.creator.id).toBe(2)
+      expect(result.data.edition.creatorId).toBe(2)
+      expect(result.data.edition.creator.id).toBe(2)
     })
   })
 

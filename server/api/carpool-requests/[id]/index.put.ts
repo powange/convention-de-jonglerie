@@ -56,7 +56,7 @@ export default wrapApiHandler(
       include: carpoolRequestInclude,
     })
 
-    return updatedRequest
+    return createSuccessResponse(updatedRequest)
   },
   { operationName: 'UpdateCarpoolRequest' }
 )

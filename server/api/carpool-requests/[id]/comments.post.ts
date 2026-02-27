@@ -3,11 +3,12 @@ import { createCommentForEntity } from '#server/utils/commentsHandler'
 
 export default wrapApiHandler(
   async (event) => {
-    return createCommentForEntity(event, {
+    const comment = await createCommentForEntity(event, {
       entityType: 'carpoolRequest',
       entityIdField: 'carpoolRequestId',
       requireAuth: true,
     })
+    return createSuccessResponse(comment)
   },
   { operationName: 'CreateCarpoolRequestComment' }
 )

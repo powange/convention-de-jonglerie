@@ -88,10 +88,11 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
             : slotData.endDateTime,
       }
 
-      const newSlot = await $fetch(`/api/editions/${id}/volunteer-time-slots`, {
+      const response = await $fetch(`/api/editions/${id}/volunteer-time-slots`, {
         method: 'POST',
         body: processedData,
       })
+      const newSlot = response.data
       timeSlots.value.push(newSlot)
       return newSlot
     } catch (err: any) {
@@ -133,10 +134,11 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
             : slotData.endDateTime
       }
 
-      const updatedSlot = await $fetch(`/api/editions/${id}/volunteer-time-slots/${slotId}`, {
+      const response = await $fetch(`/api/editions/${id}/volunteer-time-slots/${slotId}`, {
         method: 'PUT',
         body: processedData,
       })
+      const updatedSlot = response.data
       const index = timeSlots.value.findIndex((s) => s.id === slotId)
       if (index !== -1) {
         timeSlots.value[index] = updatedSlot

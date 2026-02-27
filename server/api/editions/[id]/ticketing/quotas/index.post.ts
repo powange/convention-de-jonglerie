@@ -43,7 +43,7 @@ export default wrapApiHandler(
         },
       })
 
-      return quota
+      return createSuccessResponse(quota)
     } catch (error: unknown) {
       console.error('Failed to create quota:', error)
       throw createError({

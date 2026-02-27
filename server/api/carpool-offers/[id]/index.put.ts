@@ -45,7 +45,7 @@ export default wrapApiHandler(
       include: carpoolOfferInclude,
     })
 
-    return updatedOffer
+    return createSuccessResponse(updatedOffer)
   },
   { operationName: 'UpdateCarpoolOffer' }
 )

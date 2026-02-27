@@ -106,9 +106,10 @@ describe('/api/editions/[id] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.name).toBe(updateData.name)
-    expect(result.description).toBe(updateData.description)
-    expect(result.city).toBe(updateData.city)
+    expect(result.success).toBe(true)
+    expect(result.data.name).toBe(updateData.name)
+    expect(result.data.description).toBe(updateData.description)
+    expect(result.data.city).toBe(updateData.city)
 
     expect(prismaMock.edition.update).toHaveBeenCalledWith({
       where: { id: 1 },
@@ -383,7 +384,7 @@ describe('/api/editions/[id] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.imageUrl).toBe('simple-filename.jpg')
+    expect(result.data.imageUrl).toBe('simple-filename.jpg')
     expect(prismaMock.edition.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 1 },

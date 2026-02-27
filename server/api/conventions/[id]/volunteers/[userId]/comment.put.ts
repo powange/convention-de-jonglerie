@@ -90,9 +90,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      comment,
-    }
+    return createSuccessResponse({ comment })
   },
   { operationName: 'UpdateVolunteerComment' }
 )

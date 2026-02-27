@@ -82,9 +82,7 @@ export default wrapApiHandler(
       })
     }
 
-    return {
-      conversationId: teamGroupConversation.id,
-    }
+    return createSuccessResponse({ conversationId: teamGroupConversation.id })
   },
   { operationName: 'CreateTeamConversation' }
 )

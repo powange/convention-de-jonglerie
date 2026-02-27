@@ -173,7 +173,7 @@ export default wrapApiHandler(
       resourceId: timeSlot.teamId || 'unassigned',
     }
 
-    return formattedTimeSlot
+    return createSuccessResponse(formattedTimeSlot)
   },
   { operationName: 'UpdateVolunteerTimeSlot' }
 )

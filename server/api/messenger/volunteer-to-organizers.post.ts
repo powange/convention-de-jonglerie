@@ -34,9 +34,7 @@ export default wrapApiHandler(
 
     const conversationId = await ensureVolunteerToOrganizersConversation(editionId, user.id)
 
-    return {
-      conversationId,
-    }
+    return createSuccessResponse({ conversationId })
   },
   { operationName: 'CreateVolunteerToOrganizersConversation' }
 )

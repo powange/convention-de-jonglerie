@@ -79,7 +79,9 @@ describe('/api/auth/resend-verification POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Nouveau code de vérification envoyé avec succès',
+      data: null,
     })
 
     expect(mockEmailRateLimiter).toHaveBeenCalledWith(mockEvent)
@@ -257,7 +259,9 @@ describe('/api/auth/resend-verification POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Nouveau code de vérification envoyé avec succès',
+      data: null,
     })
 
     // Le code devrait quand même être mis à jour en base

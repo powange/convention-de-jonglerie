@@ -32,10 +32,7 @@ export default wrapApiHandler(
         }
       )
 
-      return {
-        ...result,
-        message: 'Connexion réussie',
-      }
+      return createSuccessResponse(result, 'Connexion réussie')
     } catch (error: unknown) {
       console.error('HelloAsso test error:', error)
 

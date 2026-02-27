@@ -78,10 +78,10 @@ export default wrapApiHandler(
       text: `Bonjour,\\n\\nUn utilisateur souhaite revendiquer la propriété de la convention "${convention.name}".\\n\\nCode de vérification : ${code}\\n\\nCe code est valide pendant 1 heure.\\n\\nSi vous n'êtes pas à l'origine de cette demande, ignorez cet email.\\n\\nL'équipe des Conventions de Jonglerie`,
     })
 
-    return {
-      message: "Code de vérification envoyé à l'email de la convention",
-      expiresAt: createFutureDate(TOKEN_DURATIONS.CLAIM_CODE),
-    }
+    return createSuccessResponse(
+      { expiresAt: createFutureDate(TOKEN_DURATIONS.CLAIM_CODE) },
+      "Code de vérification envoyé à l'email de la convention"
+    )
   },
   { operationName: 'ClaimConvention' }
 )

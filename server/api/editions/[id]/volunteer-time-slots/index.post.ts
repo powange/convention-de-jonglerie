@@ -137,7 +137,7 @@ export default wrapApiHandler(
     }
 
     setResponseStatus(event, 201)
-    return formattedTimeSlot
+    return createSuccessResponse(formattedTimeSlot)
   },
   { operationName: 'CreateVolunteerTimeSlot' }
 )

@@ -23,7 +23,7 @@ export default wrapApiHandler(
       where: { id: offerId },
     })
 
-    return { message: 'Offre de covoiturage supprimée avec succès' }
+    return createSuccessResponse(null, 'Offre de covoiturage supprimée avec succès')
   },
   { operationName: 'DeleteCarpoolOffer' }
 )

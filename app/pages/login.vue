@@ -564,8 +564,8 @@ watch(debouncedEmail, async (email) => {
     const res = (await $fetch('/api/auth/check-email', {
       method: 'POST',
       body: { email },
-    })) as { exists: boolean }
-    emailExists.value = res.exists
+    })) as { data: { exists: boolean } }
+    emailExists.value = res.data.exists
     emailValidationStatus.value = 'valid'
   } catch {
     emailValidationStatus.value = 'invalid'
@@ -579,8 +579,8 @@ const handleEmailSubmit = async () => {
     const res = (await $fetch('/api/auth/check-email', {
       method: 'POST',
       body: { email: emailState.email },
-    })) as { exists: boolean }
-    step.value = res.exists ? 'password' : 'register'
+    })) as { data: { exists: boolean } }
+    step.value = res.data.exists ? 'password' : 'register'
   } catch {
     toast.add({ title: t('errors.network_error'), icon: 'i-heroicons-x-circle', color: 'error' })
   } finally {
@@ -677,9 +677,9 @@ const handleRegisterSubmit = async () => {
         prenom: registerState.prenom,
       },
     })) as any
-    if (response?.requiresVerification) {
+    if (response?.data?.requiresVerification) {
       await navigateTo(
-        `/verify-email?email=${encodeURIComponent(response.email || emailState.email)}`
+        `/verify-email?email=${encodeURIComponent(response.data.email || emailState.email)}`
       )
       toast.add({
         title: t('messages.account_created'),

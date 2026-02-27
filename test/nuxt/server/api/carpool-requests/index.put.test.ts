@@ -55,8 +55,8 @@ describe('/api/carpool-requests/[id] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.locationCity).toBe('Lyon')
-    expect(result.seatsNeeded).toBe(3)
+    expect(result.data.locationCity).toBe('Lyon')
+    expect(result.data.seatsNeeded).toBe(3)
     expect(prismaMock.carpoolRequest.update).toHaveBeenCalled()
   })
 
@@ -129,7 +129,7 @@ describe('/api/carpool-requests/[id] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.phoneNumber).toBe('0612345678')
+    expect(result.data.phoneNumber).toBe('0612345678')
   })
 
   it('devrait permettre de supprimer le numéro de téléphone (null)', async () => {
@@ -145,7 +145,7 @@ describe('/api/carpool-requests/[id] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.phoneNumber).toBeNull()
+    expect(result.data.phoneNumber).toBeNull()
   })
 
   it('devrait convertir tripDate en objet Date', async () => {

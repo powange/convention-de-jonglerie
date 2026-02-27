@@ -108,10 +108,7 @@ export default wrapApiHandler(
       },
     })
 
-    return {
-      message: 'Bénévole assigné avec succès',
-      assignment,
-    }
+    return createSuccessResponse(assignment, 'Bénévole assigné avec succès')
   },
   { operationName: 'CreateVolunteerTimeSlotAssignment' }
 )

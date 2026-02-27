@@ -16,7 +16,7 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
-    return await deleteTier(tierId, editionId)
+    return createSuccessResponse(await deleteTier(tierId, editionId))
   },
   { operationName: 'DELETE ticketing tier' }
 )

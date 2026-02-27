@@ -48,17 +48,20 @@ describe('API Login', () => {
     const result = await loginHandler(mockEvent)
 
     expect(result).toEqual({
-      user: {
-        id: mockUser.id,
-        email: mockUser.email,
-        pseudo: mockUser.pseudo,
-        nom: mockUser.nom,
-        prenom: mockUser.prenom,
-        profilePicture: mockUser.profilePicture,
-        isGlobalAdmin: mockUser.isGlobalAdmin,
-        isEmailVerified: mockUser.isEmailVerified,
-        createdAt: mockUser.createdAt,
-        updatedAt: mockUser.updatedAt,
+      success: true,
+      data: {
+        user: {
+          id: mockUser.id,
+          email: mockUser.email,
+          pseudo: mockUser.pseudo,
+          nom: mockUser.nom,
+          prenom: mockUser.prenom,
+          profilePicture: mockUser.profilePicture,
+          isGlobalAdmin: mockUser.isGlobalAdmin,
+          isEmailVerified: mockUser.isEmailVerified,
+          createdAt: mockUser.createdAt,
+          updatedAt: mockUser.updatedAt,
+        },
       },
     })
 
@@ -82,7 +85,7 @@ describe('API Login', () => {
 
     const result = await loginHandler(mockEvent)
 
-    expect(result.user.id).toBe(mockUser.id)
+    expect(result.data.user.id).toBe(mockUser.id)
     expect(prismaMock.user.findUnique).toHaveBeenNthCalledWith(2, {
       where: { pseudo: 'testuser' },
     })

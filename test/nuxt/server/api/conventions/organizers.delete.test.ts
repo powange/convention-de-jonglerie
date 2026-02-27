@@ -38,6 +38,7 @@ describe('/api/conventions/[id]/organizers/[organizerId] DELETE', () => {
 
     expect(result).toEqual({
       success: true,
+      data: null,
       message: 'Organisateur supprimé avec succès',
     })
     expect(mockDeleteOrganizer).toHaveBeenCalledWith(1, 2, 1, expect.anything())
@@ -110,7 +111,7 @@ describe('/api/conventions/[id]/organizers/[organizerId] DELETE', () => {
     expect(mockDeleteOrganizer).toHaveBeenCalledWith(123, 456, 1, expect.anything())
   })
 
-  it("devrait retourner le message d'erreur spécifique", async () => {
+  it("devrait rejeter avec le message d'erreur spécifique", async () => {
     const mockResult = {
       success: false,
       message: 'Impossible de supprimer le dernier administrateur',
@@ -118,12 +119,9 @@ describe('/api/conventions/[id]/organizers/[organizerId] DELETE', () => {
 
     mockDeleteOrganizer.mockResolvedValue(mockResult)
 
-    const result = await handler(mockEvent as any)
-
-    expect(result).toEqual({
-      success: false,
-      message: 'Impossible de supprimer le dernier administrateur',
-    })
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      'Impossible de supprimer le dernier administrateur'
+    )
   })
 
   it('devrait gérer les erreurs de organisateur introuvable', async () => {
@@ -154,7 +152,7 @@ describe('/api/conventions/[id]/organizers/[organizerId] DELETE', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur')
   })
 
-  it("devrait gérer le cas où l'utilisateur tente de se supprimer lui-même", async () => {
+  it("devrait rejeter si l'utilisateur tente de se supprimer lui-même", async () => {
     const mockResult = {
       success: false,
       message: 'Vous ne pouvez pas vous supprimer vous-même',
@@ -162,10 +160,9 @@ describe('/api/conventions/[id]/organizers/[organizerId] DELETE', () => {
 
     mockDeleteOrganizer.mockResolvedValue(mockResult)
 
-    const result = await handler(mockEvent as any)
-
-    expect(result.success).toBe(false)
-    expect(result.message).toContain('vous supprimer vous-même')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      'Vous ne pouvez pas vous supprimer vous-même'
+    )
   })
 
   it("déclenche une entrée d'historique REMOVED (appel utilitaire simulé)", async () => {

@@ -72,9 +72,12 @@ describe('API Register', () => {
     const result = await registerHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
-      requiresVerification: true,
-      email: 'test@example.com',
+      data: {
+        requiresVerification: true,
+        email: 'test@example.com',
+      },
     })
 
     expect(prismaMock.user.create).toHaveBeenCalledWith({
@@ -120,9 +123,12 @@ describe('API Register', () => {
     const result = await registerHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
-      requiresVerification: true,
-      email: 'test@example.com',
+      data: {
+        requiresVerification: true,
+        email: 'test@example.com',
+      },
     })
 
     expect(prismaMock.user.create).toHaveBeenCalledWith({
@@ -311,9 +317,12 @@ describe('API Register', () => {
     const result = await registerHandler(mockEvent)
 
     expect(result).toEqual({
+      success: true,
       message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
-      requiresVerification: true,
-      email: 'test@example.com',
+      data: {
+        requiresVerification: true,
+        email: 'test@example.com',
+      },
     })
   })
 

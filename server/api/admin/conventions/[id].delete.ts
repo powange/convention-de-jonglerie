@@ -47,15 +47,17 @@ export default wrapApiHandler(
       where: { id: conventionId },
     })
 
-    return {
-      message: 'Convention supprimée définitivement avec succès',
-      deletedConvention: {
-        id: conventionId,
-        name: convention.name,
-        editionsCount: convention.editions.length,
-        organizersCount: convention.organizers.length,
+    return createSuccessResponse(
+      {
+        deletedConvention: {
+          id: conventionId,
+          name: convention.name,
+          editionsCount: convention.editions.length,
+          organizersCount: convention.organizers.length,
+        },
       },
-    }
+      'Convention supprimée définitivement avec succès'
+    )
   },
   { operationName: 'AdminDeleteConvention' }
 )

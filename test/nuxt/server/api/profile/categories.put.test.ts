@@ -45,20 +45,23 @@ describe('/api/profile/categories.put', () => {
     const result = await categoriesHandler(event)
 
     expect(result).toEqual({
-      id: mockUpdatedUser.id,
-      email: mockUpdatedUser.email,
-      emailHash: mockUpdatedUser.emailHash,
-      pseudo: mockUpdatedUser.pseudo,
-      nom: mockUpdatedUser.nom,
-      prenom: mockUpdatedUser.prenom,
-      phone: mockUpdatedUser.phone,
-      profilePicture: mockUpdatedUser.profilePicture,
-      preferredLanguage: mockUpdatedUser.preferredLanguage,
-      isVolunteer: mockUpdatedUser.isVolunteer,
-      isArtist: mockUpdatedUser.isArtist,
-      isOrganizer: mockUpdatedUser.isOrganizer,
-      createdAt: mockUpdatedUser.createdAt,
-      updatedAt: mockUpdatedUser.updatedAt,
+      success: true,
+      data: {
+        id: mockUpdatedUser.id,
+        email: mockUpdatedUser.email,
+        emailHash: mockUpdatedUser.emailHash,
+        pseudo: mockUpdatedUser.pseudo,
+        nom: mockUpdatedUser.nom,
+        prenom: mockUpdatedUser.prenom,
+        phone: mockUpdatedUser.phone,
+        profilePicture: mockUpdatedUser.profilePicture,
+        preferredLanguage: mockUpdatedUser.preferredLanguage,
+        isVolunteer: mockUpdatedUser.isVolunteer,
+        isArtist: mockUpdatedUser.isArtist,
+        isOrganizer: mockUpdatedUser.isOrganizer,
+        createdAt: mockUpdatedUser.createdAt,
+        updatedAt: mockUpdatedUser.updatedAt,
+      },
     })
 
     // Vérifier que update a été appelé avec les bons paramètres

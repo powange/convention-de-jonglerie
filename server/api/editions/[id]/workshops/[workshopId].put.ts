@@ -105,7 +105,7 @@ export default wrapApiHandler(
       },
     })
 
-    return updatedWorkshop
+    return createSuccessResponse(updatedWorkshop)
   },
   { operationName: 'UpdateWorkshop' }
 )

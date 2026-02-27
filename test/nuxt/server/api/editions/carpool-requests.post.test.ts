@@ -67,7 +67,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockCarpoolRequest)
+    expect(result).toEqual({ success: true, data: mockCarpoolRequest })
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
     })
@@ -188,7 +188,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockCarpoolRequest)
+    expect(result).toEqual({ success: true, data: mockCarpoolRequest })
     expect(prismaMock.carpoolRequest.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -225,7 +225,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockCarpoolRequest)
+    expect(result).toEqual({ success: true, data: mockCarpoolRequest })
     expect(prismaMock.carpoolRequest.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({

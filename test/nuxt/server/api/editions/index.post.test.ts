@@ -106,12 +106,13 @@ describe('/api/editions POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.name).toBe(editionData.name)
-    expect(result.description).toBe(editionData.description)
-    expect(result.city).toBe(editionData.city)
-    expect(result.hasFoodTrucks).toBe(true)
-    expect(result.hasToilets).toBe(true)
-    expect(result.hasShowers).toBe(false)
+    expect(result.success).toBe(true)
+    expect(result.data.name).toBe(editionData.name)
+    expect(result.data.description).toBe(editionData.description)
+    expect(result.data.city).toBe(editionData.city)
+    expect(result.data.hasFoodTrucks).toBe(true)
+    expect(result.data.hasToilets).toBe(true)
+    expect(result.data.hasShowers).toBe(false)
 
     expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: editionData.conventionId } })
@@ -248,7 +249,7 @@ describe('/api/editions POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(mockMoveTempImage).toHaveBeenCalledWith('/temp/123456.jpg', 1)
-    expect(result.imageUrl).toBe('/uploads/editions/1/image.jpg')
+    expect(result.data.imageUrl).toBe('/uploads/editions/1/image.jpg')
   })
 
   it('devrait valider les champs requis', async () => {

@@ -16,7 +16,7 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
-    return await deleteOption(optionId, editionId)
+    return createSuccessResponse(await deleteOption(optionId, editionId))
   },
   { operationName: 'DELETE ticketing option' }
 )

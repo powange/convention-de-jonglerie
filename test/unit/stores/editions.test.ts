@@ -324,7 +324,7 @@ describe('useEditionStore', () => {
     it('devrait ajouter une nouvelle édition', async () => {
       const newEdition = { ...mockEdition, ...newEditionData, id: 2 }
       const newEditionCopy = { ...newEdition }
-      vi.mocked($fetch).mockResolvedValue(newEditionCopy)
+      vi.mocked($fetch).mockResolvedValue({ success: true, data: newEditionCopy })
 
       const result = await editionStore.addEdition(newEditionData)
 
@@ -356,7 +356,7 @@ describe('useEditionStore', () => {
 
     it('devrait mettre à jour une édition existante', async () => {
       const updatedEdition = { ...mockEdition, name: 'Updated Edition' }
-      vi.mocked($fetch).mockResolvedValue(updatedEdition)
+      vi.mocked($fetch).mockResolvedValue({ success: true, data: updatedEdition })
 
       const result = await editionStore.updateEdition(1, updatedEdition)
 
@@ -370,7 +370,7 @@ describe('useEditionStore', () => {
 
     it("devrait gérer l'édition non trouvée localement", async () => {
       const updatedEdition = { ...mockEdition, name: 'Updated Edition' }
-      vi.mocked($fetch).mockResolvedValue(updatedEdition)
+      vi.mocked($fetch).mockResolvedValue({ success: true, data: updatedEdition })
 
       await editionStore.updateEdition(999, updatedEdition)
 

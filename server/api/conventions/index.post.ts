@@ -108,7 +108,7 @@ export default wrapApiHandler(
       })),
     }
 
-    return transformed
+    return createSuccessResponse(transformed)
   },
   { operationName: 'CreateConvention' }
 )

@@ -83,7 +83,7 @@ describe('/api/editions/[id]/lost-found POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockLostFoundItem)
+    expect(result).toEqual({ success: true, data: mockLostFoundItem })
     expect(prismaMock.lostFoundItem.create).toHaveBeenCalledWith({
       data: {
         editionId: 1,

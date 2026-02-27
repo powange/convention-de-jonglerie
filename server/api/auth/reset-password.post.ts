@@ -61,9 +61,7 @@ export default wrapApiHandler(
       data: { used: true },
     })
 
-    return {
-      message: 'Votre mot de passe a été réinitialisé avec succès',
-    }
+    return createSuccessResponse(null, 'Votre mot de passe a été réinitialisé avec succès')
   },
   { operationName: 'ResetPassword' }
 )

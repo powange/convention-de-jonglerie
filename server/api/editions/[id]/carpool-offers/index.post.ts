@@ -40,7 +40,7 @@ export default wrapApiHandler(
       },
     })
 
-    return carpoolOffer
+    return createSuccessResponse(carpoolOffer)
   },
   { operationName: 'CreateCarpoolOffer' }
 )

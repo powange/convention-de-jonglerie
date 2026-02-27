@@ -80,23 +80,26 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',
-      needsPassword: false,
-      user: {
-        id: mockVerifiedUser.id,
-        email: mockVerifiedUser.email,
-        pseudo: mockVerifiedUser.pseudo,
-        nom: mockVerifiedUser.nom,
-        prenom: mockVerifiedUser.prenom,
-        phone: mockVerifiedUser.phone,
-        profilePicture: mockVerifiedUser.profilePicture,
-        isGlobalAdmin: mockVerifiedUser.isGlobalAdmin,
-        isVolunteer: mockVerifiedUser.isVolunteer,
-        isArtist: mockVerifiedUser.isArtist,
-        isOrganizer: mockVerifiedUser.isOrganizer,
-        createdAt: mockVerifiedUser.createdAt,
-        updatedAt: mockVerifiedUser.updatedAt,
-        isEmailVerified: mockVerifiedUser.isEmailVerified,
+      data: {
+        needsPassword: false,
+        user: {
+          id: mockVerifiedUser.id,
+          email: mockVerifiedUser.email,
+          pseudo: mockVerifiedUser.pseudo,
+          nom: mockVerifiedUser.nom,
+          prenom: mockVerifiedUser.prenom,
+          phone: mockVerifiedUser.phone,
+          profilePicture: mockVerifiedUser.profilePicture,
+          isGlobalAdmin: mockVerifiedUser.isGlobalAdmin,
+          isVolunteer: mockVerifiedUser.isVolunteer,
+          isArtist: mockVerifiedUser.isArtist,
+          isOrganizer: mockVerifiedUser.isOrganizer,
+          createdAt: mockVerifiedUser.createdAt,
+          updatedAt: mockVerifiedUser.updatedAt,
+          isEmailVerified: mockVerifiedUser.isEmailVerified,
+        },
       },
     })
 
@@ -129,14 +132,17 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
+      success: true,
       message: 'Code vérifié avec succès. Veuillez créer votre mot de passe.',
-      needsPassword: true,
-      user: {
-        id: mockUserWithoutPassword.id,
-        email: mockUserWithoutPassword.email,
-        pseudo: mockUserWithoutPassword.pseudo,
-        nom: mockUserWithoutPassword.nom,
-        prenom: mockUserWithoutPassword.prenom,
+      data: {
+        needsPassword: true,
+        user: {
+          id: mockUserWithoutPassword.id,
+          email: mockUserWithoutPassword.email,
+          pseudo: mockUserWithoutPassword.pseudo,
+          nom: mockUserWithoutPassword.nom,
+          prenom: mockUserWithoutPassword.prenom,
+        },
       },
     })
 
@@ -172,14 +178,14 @@ describe('/api/auth/verify-email POST', () => {
     })
 
     // Vérifier que la réponse contient tous les champs attendus
-    expect(result.user).toHaveProperty('id')
-    expect(result.user).toHaveProperty('email')
-    expect(result.user).toHaveProperty('phone')
-    expect(result.user).toHaveProperty('profilePicture')
-    expect(result.user).toHaveProperty('isGlobalAdmin')
-    expect(result.user).toHaveProperty('isVolunteer')
-    expect(result.user).toHaveProperty('isArtist')
-    expect(result.user).toHaveProperty('isOrganizer')
+    expect(result.data.user).toHaveProperty('id')
+    expect(result.data.user).toHaveProperty('email')
+    expect(result.data.user).toHaveProperty('phone')
+    expect(result.data.user).toHaveProperty('profilePicture')
+    expect(result.data.user).toHaveProperty('isGlobalAdmin')
+    expect(result.data.user).toHaveProperty('isVolunteer')
+    expect(result.data.user).toHaveProperty('isArtist')
+    expect(result.data.user).toHaveProperty('isOrganizer')
   })
 
   it("devrait rejeter si l'email est invalide", async () => {
@@ -380,11 +386,11 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.message).toBe('Email vérifié avec succès ! Votre compte est maintenant actif.')
-    expect(result).toHaveProperty('needsPassword', false)
-    expect(result.user).toHaveProperty('id')
-    expect(result.user).toHaveProperty('email')
-    expect(result.user).toHaveProperty('phone')
-    expect(result.user).toHaveProperty('profilePicture')
+    expect(result.data).toHaveProperty('needsPassword', false)
+    expect(result.data.user).toHaveProperty('id')
+    expect(result.data.user).toHaveProperty('email')
+    expect(result.data.user).toHaveProperty('phone')
+    expect(result.data.user).toHaveProperty('profilePicture')
   })
 
   it('devrait gérer correctement la comparaison temporelle UTC', async () => {
@@ -406,9 +412,9 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.message).toBe('Email vérifié avec succès ! Votre compte est maintenant actif.')
-    expect(result).toHaveProperty('needsPassword', false)
-    expect(result.user).toHaveProperty('id')
-    expect(result.user).toHaveProperty('email')
+    expect(result.data).toHaveProperty('needsPassword', false)
+    expect(result.data.user).toHaveProperty('id')
+    expect(result.data.user).toHaveProperty('email')
   })
 
   it("ne devrait pas exposer d'informations sensibles dans la réponse", async () => {
@@ -424,24 +430,24 @@ describe('/api/auth/verify-email POST', () => {
     const result = await handler(mockEvent as any)
 
     // Vérifier que les champs sensibles ne sont pas exposés
-    expect(result.user).not.toHaveProperty('emailVerificationCode')
-    expect(result.user).not.toHaveProperty('verificationCodeExpiry')
-    expect(result.user).not.toHaveProperty('password')
-    expect(result.user).not.toHaveProperty('passwordResetToken')
-    expect(result.user).not.toHaveProperty('lastLoginAt')
+    expect(result.data.user).not.toHaveProperty('emailVerificationCode')
+    expect(result.data.user).not.toHaveProperty('verificationCodeExpiry')
+    expect(result.data.user).not.toHaveProperty('password')
+    expect(result.data.user).not.toHaveProperty('passwordResetToken')
+    expect(result.data.user).not.toHaveProperty('lastLoginAt')
 
     // Vérifier que les champs attendus sont présents
-    expect(result.user).toHaveProperty('id')
-    expect(result.user).toHaveProperty('email')
-    expect(result.user).toHaveProperty('pseudo')
-    expect(result.user).toHaveProperty('nom')
-    expect(result.user).toHaveProperty('prenom')
-    expect(result.user).toHaveProperty('phone')
-    expect(result.user).toHaveProperty('profilePicture')
-    expect(result.user).toHaveProperty('isGlobalAdmin')
-    expect(result.user).toHaveProperty('isVolunteer')
-    expect(result.user).toHaveProperty('isArtist')
-    expect(result.user).toHaveProperty('isOrganizer')
-    expect(result.user).toHaveProperty('isEmailVerified')
+    expect(result.data.user).toHaveProperty('id')
+    expect(result.data.user).toHaveProperty('email')
+    expect(result.data.user).toHaveProperty('pseudo')
+    expect(result.data.user).toHaveProperty('nom')
+    expect(result.data.user).toHaveProperty('prenom')
+    expect(result.data.user).toHaveProperty('phone')
+    expect(result.data.user).toHaveProperty('profilePicture')
+    expect(result.data.user).toHaveProperty('isGlobalAdmin')
+    expect(result.data.user).toHaveProperty('isVolunteer')
+    expect(result.data.user).toHaveProperty('isArtist')
+    expect(result.data.user).toHaveProperty('isOrganizer')
+    expect(result.data.user).toHaveProperty('isEmailVerified')
   })
 })

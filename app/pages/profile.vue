@@ -1142,7 +1142,7 @@ const validateProfilePictureChanges = async () => {
     const profilePictureValue = profilePictureUrl.value || null
 
     // Sauvegarder les changements (nouvelle photo ou suppression)
-    const updatedUser = await $fetch('/api/profile/update', {
+    const response = await $fetch<{ success: boolean; data: any }>('/api/profile/update', {
       method: 'PUT',
       body: {
         email: authStore.user?.email,
@@ -1155,9 +1155,9 @@ const validateProfilePictureChanges = async () => {
     })
 
     // Mettre à jour les données utilisateur avec le résultat de l'API
-    if (updatedUser) {
-      authStore.updateUser(updatedUser)
-      profilePictureUrl.value = updatedUser.profilePicture || ''
+    if (response.data) {
+      authStore.updateUser(response.data)
+      profilePictureUrl.value = response.data.profilePicture || ''
     }
 
     const isDelete = !profilePictureValue

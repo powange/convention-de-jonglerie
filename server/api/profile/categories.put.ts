@@ -53,7 +53,7 @@ export default wrapApiHandler(
       },
     })
 
-    return updatedUser
+    return createSuccessResponse(updatedUser)
   },
   { operationName: 'UpdateUserCategories' }
 )

@@ -93,7 +93,7 @@ export default wrapApiHandler(
       },
     })
 
-    return team
+    return createSuccessResponse(team)
   },
   { operationName: 'UpdateVolunteerTeam' }
 )

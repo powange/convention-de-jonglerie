@@ -211,10 +211,11 @@ export const useEditionStore = defineStore('editions', {
       this.loading = true
       this.error = null
       try {
-        const newEdition = await $fetch<Edition>('/api/editions', {
+        const response = await $fetch<{ success: boolean; data: Edition }>('/api/editions', {
           method: 'POST',
           body: editionData,
         })
+        const newEdition = response.data
         // Utiliser setEdition pour éviter la duplication de logique
         this.setEdition(newEdition)
         this.processEditions()
@@ -232,10 +233,11 @@ export const useEditionStore = defineStore('editions', {
       this.loading = true
       this.error = null
       try {
-        const updatedEdition = await $fetch<Edition>(`/api/editions/${id}`, {
+        const response = await $fetch<{ success: boolean; data: Edition }>(`/api/editions/${id}`, {
           method: 'PUT',
           body: editionData,
         })
+        const updatedEdition = response.data
         const index = this.editions.findIndex((c) => c.id === id)
         if (index !== -1) {
           this.editions[index] = updatedEdition

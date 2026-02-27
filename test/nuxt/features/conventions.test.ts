@@ -81,9 +81,10 @@ describe('Système de conventions', () => {
 
       const result = await createConventionHandler(mockEvent as any)
 
-      expect(result.name).toBe(conventionData.name)
-      expect(result.description).toBe(conventionData.description)
-      expect(result.author.id).toBe(mockUser.id)
+      expect(result.success).toBe(true)
+      expect(result.data.name).toBe(conventionData.name)
+      expect(result.data.description).toBe(conventionData.description)
+      expect(result.data.author.id).toBe(mockUser.id)
 
       expect(prismaMock.convention.create).toHaveBeenCalledWith({
         data: {
@@ -287,8 +288,9 @@ describe('Système de conventions', () => {
 
       const result = await updateConventionHandler(mockEvent as any)
 
-      expect(result.name).toBe(updateData.name)
-      expect(result.description).toBe(updateData.description)
+      expect(result.success).toBe(true)
+      expect(result.data.name).toBe(updateData.name)
+      expect(result.data.description).toBe(updateData.description)
 
       expect(prismaMock.convention.update).toHaveBeenCalledWith({
         where: { id: 1 },
@@ -346,7 +348,8 @@ describe('Système de conventions', () => {
 
       const result = await updateConventionHandler(mockEvent as any)
 
-      expect(result.name).toBe(updateData.name)
+      expect(result.success).toBe(true)
+      expect(result.data.name).toBe(updateData.name)
     })
 
     it("devrait rejeter si l'utilisateur n'a pas les droits", async () => {

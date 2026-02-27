@@ -74,9 +74,7 @@ export default wrapApiHandler(
       console.warn(`Échec de l'envoi d'email pour ${cleanEmail}`)
     }
 
-    return {
-      message: 'Nouveau code de vérification envoyé avec succès',
-    }
+    return createSuccessResponse(null, 'Nouveau code de vérification envoyé avec succès')
   },
   { operationName: 'ResendVerification' }
 )

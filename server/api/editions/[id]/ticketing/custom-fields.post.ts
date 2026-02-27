@@ -125,7 +125,7 @@ export default wrapApiHandler(
       })
     })
 
-    return customField
+    return createSuccessResponse(customField)
   },
   { operationName: 'POST ticketing custom field' }
 )

@@ -95,14 +95,16 @@ export default wrapApiHandler(
       where: { id: claimRequest.id },
     })
 
-    return {
-      message: 'Revendication réussie ! Vous êtes maintenant propriétaire de cette convention.',
-      convention: {
-        id: convention.id,
-        name: convention.name,
-        editionsCount: convention.editions.length,
+    return createSuccessResponse(
+      {
+        convention: {
+          id: convention.id,
+          name: convention.name,
+          editionsCount: convention.editions.length,
+        },
       },
-    }
+      'Revendication réussie ! Vous êtes maintenant propriétaire de cette convention.'
+    )
   },
   { operationName: 'VerifyClaimConvention' }
 )

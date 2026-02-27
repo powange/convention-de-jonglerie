@@ -94,11 +94,10 @@ export default wrapApiHandler(
       console.warn(`Échec de l'envoi d'email pour ${cleanEmail}`)
     }
 
-    return {
-      message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
-      requiresVerification: true,
-      email: cleanEmail,
-    }
+    return createSuccessResponse(
+      { requiresVerification: true, email: cleanEmail },
+      'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.'
+    )
   },
   { operationName: 'Register' }
 )

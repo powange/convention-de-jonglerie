@@ -64,7 +64,7 @@ export default wrapApiHandler(
       },
     })
 
-    return newComment
+    return createSuccessResponse(newComment)
   },
   { operationName: 'CreatePostComment' }
 )

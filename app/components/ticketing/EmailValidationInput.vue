@@ -92,7 +92,7 @@ watch(
 
     emailCheckTimeout = setTimeout(async () => {
       try {
-        const response = await $fetch('/api/auth/check-email', {
+        const response = await $fetch<{ data: { exists: boolean } }>('/api/auth/check-email', {
           method: 'POST',
           body: {
             email: newEmail,
@@ -100,7 +100,7 @@ watch(
           },
         })
 
-        if (response.exists) {
+        if (response.data.exists) {
           emailValidation.value = {
             checking: false,
             isValid: false,

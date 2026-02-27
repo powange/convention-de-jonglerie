@@ -74,7 +74,7 @@ export default wrapApiHandler(
     }
 
     // Les données retournées directement de Prisma ne contiennent plus d'email
-    return updatedEdition
+    return createSuccessResponse(updatedEdition)
   },
   { operationName: 'UpdateEditionStatus' }
 )

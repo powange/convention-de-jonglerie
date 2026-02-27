@@ -204,28 +204,29 @@ describe('/api/editions POST - Tests complets', () => {
       const result = await handler(mockEvent as any)
 
       // Vérifier que tous les services sont correctement définis
-      expect(result.hasTentCamping).toBe(true)
-      expect(result.hasTruckCamping).toBe(true)
-      expect(result.hasFamilyCamping).toBe(false)
-      expect(result.hasSleepingRoom).toBe(true)
-      expect(result.hasFoodTrucks).toBe(true)
-      expect(result.hasCantine).toBe(false)
-      expect(result.hasKidsZone).toBe(true)
-      expect(result.hasGala).toBe(true)
-      expect(result.hasOpenStage).toBe(false)
-      expect(result.hasConcert).toBe(true)
-      expect(result.hasWorkshops).toBe(true)
-      expect(result.hasGym).toBe(true)
-      expect(result.hasFireSpace).toBe(false)
-      expect(result.hasAerialSpace).toBe(true)
-      expect(result.hasSlacklineSpace).toBe(true)
-      expect(result.hasToilets).toBe(true)
-      expect(result.hasShowers).toBe(false)
-      expect(result.hasAccessibility).toBe(true)
-      expect(result.acceptsPets).toBe(false)
-      expect(result.hasCashPayment).toBe(true)
-      expect(result.hasCreditCardPayment).toBe(true)
-      expect(result.hasAfjTokenPayment).toBe(false)
+      expect(result.success).toBe(true)
+      expect(result.data.hasTentCamping).toBe(true)
+      expect(result.data.hasTruckCamping).toBe(true)
+      expect(result.data.hasFamilyCamping).toBe(false)
+      expect(result.data.hasSleepingRoom).toBe(true)
+      expect(result.data.hasFoodTrucks).toBe(true)
+      expect(result.data.hasCantine).toBe(false)
+      expect(result.data.hasKidsZone).toBe(true)
+      expect(result.data.hasGala).toBe(true)
+      expect(result.data.hasOpenStage).toBe(false)
+      expect(result.data.hasConcert).toBe(true)
+      expect(result.data.hasWorkshops).toBe(true)
+      expect(result.data.hasGym).toBe(true)
+      expect(result.data.hasFireSpace).toBe(false)
+      expect(result.data.hasAerialSpace).toBe(true)
+      expect(result.data.hasSlacklineSpace).toBe(true)
+      expect(result.data.hasToilets).toBe(true)
+      expect(result.data.hasShowers).toBe(false)
+      expect(result.data.hasAccessibility).toBe(true)
+      expect(result.data.acceptsPets).toBe(false)
+      expect(result.data.hasCashPayment).toBe(true)
+      expect(result.data.hasCreditCardPayment).toBe(true)
+      expect(result.data.hasAfjTokenPayment).toBe(false)
       // hasAtm n'existe pas dans le schéma
     })
 
@@ -304,10 +305,10 @@ describe('/api/editions POST - Tests complets', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.officialWebsiteUrl).toBe(dataWithLinks.officialWebsiteUrl)
-      expect(result.ticketingUrl).toBe(dataWithLinks.ticketingUrl)
-      expect(result.facebookUrl).toBe(dataWithLinks.facebookUrl)
-      expect(result.instagramUrl).toBe(dataWithLinks.instagramUrl)
+      expect(result.data.officialWebsiteUrl).toBe(dataWithLinks.officialWebsiteUrl)
+      expect(result.data.ticketingUrl).toBe(dataWithLinks.ticketingUrl)
+      expect(result.data.facebookUrl).toBe(dataWithLinks.facebookUrl)
+      expect(result.data.instagramUrl).toBe(dataWithLinks.instagramUrl)
     })
 
     it("devrait valider les formats d'URL", async () => {
@@ -363,7 +364,7 @@ describe('/api/editions POST - Tests complets', () => {
       const mockEvent = { context: { user: mockUser } }
 
       const result = await handler(mockEvent as any)
-      expect(result.name).toBe(editionData.name)
+      expect(result.data.name).toBe(editionData.name)
     })
 
     it('devrait permettre aux organisateurs autorisés', async () => {
@@ -398,7 +399,7 @@ describe('/api/editions POST - Tests complets', () => {
       const mockEvent = { context: { user: organizerUser } }
 
       const result = await handler(mockEvent as any)
-      expect(result.name).toBe(editionData.name)
+      expect(result.data.name).toBe(editionData.name)
     })
 
     it('devrait rejeter les organisateurs sans autorisation', async () => {

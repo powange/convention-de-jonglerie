@@ -107,7 +107,7 @@ describe('API Convention - Création', () => {
 
     const result = await createConventionHandler(mockEvent)
 
-    expect(result).toEqual(transformedExpectation())
+    expect(result).toEqual({ success: true, data: transformedExpectation() })
     expect(prismaMock.convention.create).toHaveBeenCalledWith({
       data: {
         name: 'Convention de Test',

@@ -145,7 +145,7 @@ export default wrapApiHandler(
       )
     }
 
-    return updated
+    return createSuccessResponse(updated)
   },
   { operationName: 'UpdateCarpoolBooking' }
 )

@@ -48,7 +48,7 @@ export default wrapApiHandler(
       },
     })
 
-    return newPost
+    return createSuccessResponse(newPost)
   },
   { operationName: 'CreateEditionPost' }
 )

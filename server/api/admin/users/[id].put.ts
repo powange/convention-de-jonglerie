@@ -59,7 +59,7 @@ export default wrapApiHandler(
       select: userAdminSelect,
     })
 
-    return updatedUser
+    return createSuccessResponse(updatedUser)
   },
   { operationName: 'UpdateUser' }
 )

@@ -39,10 +39,13 @@ export default wrapApiHandler(
           },
         })
       }
-      return { message: 'Convention archivée (non supprimée car elle possède des éditions)' }
+      return createSuccessResponse(
+        null,
+        'Convention archivée (non supprimée car elle possède des éditions)'
+      )
     } else {
       await prisma.convention.delete({ where: { id: conventionId } })
-      return { message: 'Convention supprimée avec succès' }
+      return createSuccessResponse(null, 'Convention supprimée avec succès')
     }
   },
   { operationName: 'DeleteConvention' }

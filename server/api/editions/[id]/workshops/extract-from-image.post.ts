@@ -159,9 +159,7 @@ Exemple de réponse attendue :
       })
     }
 
-    return {
-      workshops: validatedWorkshops,
-    }
+    return createSuccessResponse({ workshops: validatedWorkshops })
   },
   { operationName: 'ExtractWorkshopsFromImage' }
 )

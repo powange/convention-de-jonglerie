@@ -12,10 +12,11 @@ export default wrapApiHandler(
     // Utiliser l'utilitaire de suppression en passant l'event pour vérifier le mode admin
     const result = await deleteConventionOrganizer(conventionId, organizerId, user.id, event)
 
-    return {
-      success: result.success,
-      message: result.message,
+    if (!result.success) {
+      throw createError({ statusCode: 400, statusMessage: result.message })
     }
+
+    return createSuccessResponse(null, result.message)
   },
   { operationName: 'DeleteConventionOrganizer' }
 )

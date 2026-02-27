@@ -98,9 +98,10 @@ describe("Système d'éditions", () => {
 
       const result = await createEditionHandler(mockEvent as any)
 
-      expect(result.name).toBe(editionData.name)
-      expect(result.description).toBe(editionData.description)
-      expect(result.city).toBe(editionData.city)
+      expect(result.success).toBe(true)
+      expect(result.data.name).toBe(editionData.name)
+      expect(result.data.description).toBe(editionData.description)
+      expect(result.data.city).toBe(editionData.city)
 
       expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -230,7 +231,8 @@ describe("Système d'éditions", () => {
       const result = await createEditionHandler(mockEvent as any)
 
       expect(moveTempImageToEdition).toHaveBeenCalledWith('/temp/123456.jpg', 1)
-      expect(result.imageUrl).toBe('/uploads/editions/1/image.jpg')
+      expect(result.success).toBe(true)
+      expect(result.data.imageUrl).toBe('/uploads/editions/1/image.jpg')
     })
   })
 
@@ -370,8 +372,9 @@ describe("Système d'éditions", () => {
 
       const result = await updateEditionHandler(mockEvent as any)
 
-      expect(result.name).toBe(updateData.name)
-      expect(result.description).toBe(updateData.description)
+      expect(result.success).toBe(true)
+      expect(result.data.name).toBe(updateData.name)
+      expect(result.data.description).toBe(updateData.description)
 
       expect(prismaMock.edition.update).toHaveBeenCalled()
       const callArgs = prismaMock.edition.update.mock.calls[0][0]

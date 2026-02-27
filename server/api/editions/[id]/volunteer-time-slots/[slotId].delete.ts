@@ -69,7 +69,7 @@ export default wrapApiHandler(
     console.log(`[DELETE SLOT] Transaction terminée avec succès:`, result)
 
     setResponseStatus(event, 204)
-    return null
+    return createSuccessResponse(null)
   },
   { operationName: 'DeleteVolunteerTimeSlot' }
 )

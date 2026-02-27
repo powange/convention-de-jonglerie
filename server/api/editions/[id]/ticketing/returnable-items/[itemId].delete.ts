@@ -16,7 +16,7 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour modifier ces données',
       })
 
-    return await deleteReturnableItem(itemId, editionId)
+    return createSuccessResponse(await deleteReturnableItem(itemId, editionId))
   },
   { operationName: 'DELETE ticketing returnable item' }
 )

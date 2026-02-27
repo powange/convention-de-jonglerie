@@ -104,7 +104,7 @@ export default wrapApiHandler(
       },
     })
 
-    return newWorkshop
+    return createSuccessResponse(newWorkshop)
   },
   { operationName: 'CreateWorkshop' }
 )

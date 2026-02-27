@@ -145,14 +145,14 @@ export default wrapApiHandler(
         // Invalider le cache après création
         await invalidateEditionCache(updatedEdition.id)
 
-        return updatedEdition
+        return createSuccessResponse(updatedEdition)
       }
     }
 
     // Invalider le cache après création
     await invalidateEditionCache(edition.id)
 
-    return edition
+    return createSuccessResponse(edition)
   },
   { operationName: 'CreateEdition' }
 )

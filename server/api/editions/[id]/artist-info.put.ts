@@ -22,7 +22,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
 
     // Vérifier les permissions de gestion des artistes
-    const edition = await getEditionWithPermissions(editionId)
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
 
     if (!edition) {
       throw createError({
@@ -49,7 +49,7 @@ export default wrapApiHandler(
 
     await invalidateEditionCache(editionId)
 
-    return updated
+    return createSuccessResponse(updated)
   },
   { operationName: 'UpdateArtistInfo' }
 )

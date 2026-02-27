@@ -66,7 +66,7 @@ describe('/api/editions/[id]/lost-found/[itemId]/comments POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockComment)
+    expect(result).toEqual({ success: true, data: mockComment })
     expect(prismaMock.lostFoundComment.create).toHaveBeenCalledWith({
       data: {
         lostFoundItemId: 1,
@@ -191,12 +191,12 @@ describe('/api/editions/[id]/lost-found/[itemId]/comments POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.user).toHaveProperty('id')
-    expect(result.user).toHaveProperty('pseudo')
-    expect(result.user).toHaveProperty('prenom')
-    expect(result.user).toHaveProperty('nom')
-    expect(result.user).toHaveProperty('profilePicture')
-    expect(result.user).toHaveProperty('emailHash')
+    expect(result.data.user).toHaveProperty('id')
+    expect(result.data.user).toHaveProperty('pseudo')
+    expect(result.data.user).toHaveProperty('prenom')
+    expect(result.data.user).toHaveProperty('nom')
+    expect(result.data.user).toHaveProperty('profilePicture')
+    expect(result.data.user).toHaveProperty('emailHash')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {

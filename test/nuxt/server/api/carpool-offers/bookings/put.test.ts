@@ -86,7 +86,7 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.status).toBe('ACCEPTED')
+      expect(result.data.status).toBe('ACCEPTED')
       expect(prismaMock.$transaction).toHaveBeenCalled()
       expect(prismaMock.carpoolBooking.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -107,7 +107,7 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
 
       const result = await handler(mockEvent as any)
 
-      expect(result.status).toBe('REJECTED')
+      expect(result.data.status).toBe('REJECTED')
       expect(prismaMock.carpoolBooking.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: { status: 'REJECTED' },
@@ -173,7 +173,7 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
 
       const result = await handler(eventRequester as any)
 
-      expect(result.status).toBe('CANCELLED')
+      expect(result.data.status).toBe('CANCELLED')
     })
 
     it("devrait rejeter CANCEL si l'utilisateur n'est pas le demandeur", async () => {
