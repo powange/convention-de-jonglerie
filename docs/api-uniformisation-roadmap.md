@@ -104,23 +104,25 @@ return { conventions, total }
 
 **Batch 3 — GETs avec loading+toast** (5 fichiers) ✅ TERMINÉ le 26/02/2026 :
 
-| Fichier | Fonction | Statut |
-|---------|----------|--------|
-| `pages/editions/[id]/workshops.vue` | `fetchWorkshops()` | ✅ Migré |
-| `pages/editions/[id]/gestion/artists/index.vue` | `fetchArtists()` | ✅ Migré |
-| `pages/editions/[id]/gestion/artists/shows.vue` | `fetchShows()` | ✅ Migré |
-| `pages/editions/[id]/gestion/meals/list.vue` | `generateCateringPdf()` | ❌ Skip — $fetch = 1 étape dans génération PDF |
-| `pages/admin/error-logs.vue` | `loadLogs()` | ❌ Skip — réponse paginée complexe (data+stats+pagination) |
+| Fichier                                         | Fonction                | Statut                                                     |
+| ----------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| `pages/editions/[id]/workshops.vue`             | `fetchWorkshops()`      | ✅ Migré                                                   |
+| `pages/editions/[id]/gestion/artists/index.vue` | `fetchArtists()`        | ✅ Migré                                                   |
+| `pages/editions/[id]/gestion/artists/shows.vue` | `fetchShows()`          | ✅ Migré                                                   |
+| `pages/editions/[id]/gestion/meals/list.vue`    | `generateCateringPdf()` | ❌ Skip — $fetch = 1 étape dans génération PDF             |
+| `pages/admin/error-logs.vue`                    | `loadLogs()`            | ❌ Skip — réponse paginée complexe (data+stats+pagination) |
 
-**Batch 4 — Pages non migrées** (5 fichiers, effort moyen/élevé) :
+**Batch 4 — Pages complexes** (5 fichiers) ✅ TERMINÉ le 26/02/2026 :
 
-| Fichier                                                    | Fonctions                                       | Complexité                   |
-| ---------------------------------------------------------- | ----------------------------------------------- | ---------------------------- |
-| `pages/editions/[id]/gestion/meals/validate.vue`           | `validateMeal()`, `cancelMeal()`                | Moyenne                      |
-| `pages/editions/[id]/gestion/ticketing/access-control.vue` | `validateEntry()`, `invalidateEntry()` + GETs   | **Élevée** (~10 $fetch)      |
-| `pages/conventions/[id]/editions/add.vue`                  | soumission formulaire                           | Moyenne                      |
-| `pages/verify-email.vue`                                   | `verifyCode()`, `setPasswordAndVerify()`        | Moyenne                      |
-| `pages/login.vue`                                          | `handleEmailSubmit()`, `handleRegisterSubmit()` | **Élevée** (erreurs 409/403) |
+| Fichier                                                    | Fonctions migrées                                                                                              | Statut                                                                                 |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `pages/editions/[id]/gestion/meals/validate.vue`           | `fetchMeals()`, `searchPeople()`, `fetchPendingList()`                                                         | ✅ 3 GETs migrés                                                                       |
+| `pages/editions/[id]/gestion/ticketing/access-control.vue` | `loadVolunteersNotValidated()`, `loadArtistsNotValidated()`, `loadOrganizersNotValidated()`, `searchTickets()` | ✅ 4 fonctions migrées                                                                 |
+| `pages/conventions/[id]/editions/add.vue`                  | —                                                                                                              | ❌ Skip — `editionStore.addEdition()` (store, pas $fetch) + onMounted throw 403 manuel |
+| `pages/verify-email.vue`                                   | —                                                                                                              | ❌ Skip — loading partagé, erreurs inline (pas toast), auth state + sessionStorage     |
+| `pages/login.vue`                                          | —                                                                                                              | ❌ Skip — loading partagé entre 3 fonctions, `authStore.login()`, erreurs 401/403/409  |
+
+**Note** : Pour `validate.vue`, les fonctions `validateMeal()`/`cancelMeal()` (prévues initialement) utilisent un loading per-item (`validatingIds` array), incompatible avec `useApiAction`. Les 3 GETs ont été migrés à la place.
 
 **Batch 5 — Cas optionnels, bas impact** (6 fichiers) :
 
@@ -163,7 +165,7 @@ return { conventions, total }
 | Priorité | Axe                                                         | Effort | Valeur                | Statut       |
 | -------- | ----------------------------------------------------------- | ------ | --------------------- | ------------ |
 | ~~1~~    | Axe 1 — 11 fichiers `defineEventHandler` → `wrapApiHandler` | Faible | Sécurité/logging      | ✅ Terminé   |
-| 1        | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate | Batch 1-3 ✅ |
+| 1        | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate | Batch 1-4 ✅ |
 | 2        | Axe 2 — Mutations brutes → `createSuccessResponse`          | Moyen  | Uniformité            | À faire      |
 | -        | Axe 4 — 3 fichiers exclus                                   | -      | Pas nécessaire        | -            |
 
@@ -178,6 +180,7 @@ return { conventions, total }
 | Axe 1      | 26/02/2026 | 11 fichiers `defineEventHandler` → `wrapApiHandler`                 | Migration + suppression try/catch manuels + 4 tests FCM mis à jour                  |
 | Axe 3 B1+2 | 26/02/2026 | 9 fichiers `$fetch` → `useApiAction` (composants + pages mutations) | ~15 appels migrés, −57 lignes boilerplate, 3 fichiers skipés                        |
 | Axe 3 B3   | 26/02/2026 | 3 fichiers `$fetch` GET → `useApiAction` (pages gestion)            | 3 appels migrés, −20 lignes boilerplate, 2 fichiers skipés                          |
+| Axe 3 B4   | 26/02/2026 | 2 fichiers `$fetch` → `useApiAction` (validate + access-control)    | 7 appels migrés, −60 lignes boilerplate, 3 fichiers skipés                          |
 
 Détails dans `docs/migration-createSuccessResponse.md`.
 
@@ -195,4 +198,4 @@ Détails dans `docs/migration-createSuccessResponse.md`.
 
 ---
 
-**Dernière mise à jour** : 26 février 2026 (Axe 3 Batch 1-3 terminé)
+**Dernière mise à jour** : 26 février 2026 (Axe 3 Batch 1-4 terminé)

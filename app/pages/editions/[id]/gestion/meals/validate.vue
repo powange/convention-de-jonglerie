@@ -423,11 +423,9 @@ const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État
-const loadingMeals = ref(false)
 const meals = ref<any[]>([])
 const selectedMealId = ref<number | null>(null) // Stocker l'ID au lieu de l'objet
 const searchQuery = ref('')
-const searching = ref(false)
 const searchResults = ref<any[]>([])
 const validatingIds = ref<string[]>([])
 const mealStats = ref<any>(null)
@@ -435,7 +433,6 @@ const loadingStats = ref(false)
 const pendingModalOpen = ref(false)
 const pendingType = ref<'volunteer' | 'artist' | 'participant'>('volunteer')
 const pendingList = ref<any[]>([])
-const loadingPending = ref(false)
 
 // Debounce pour la recherche
 const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -535,83 +532,72 @@ const getPersonTypeBadgeColor = (type: string) => {
 }
 
 // Charger les repas
-const fetchMeals = async () => {
-  loadingMeals.value = true
-  try {
-    const data = await $fetch<{ success: boolean; meals: any[] }>(
-      `/api/editions/${editionId}/meals`
-    )
-    meals.value = data.meals || []
+const { execute: fetchMeals, loading: loadingMeals } = useApiAction(
+  `/api/editions/${editionId}/meals`,
+  {
+    method: 'GET',
+    errorMessages: { default: t('gestion.meals.error_loading_meals') },
+    onSuccess: (response: any) => {
+      meals.value = response?.meals || []
 
-    // Sélectionner automatiquement le repas en cours ou à venir
-    if (meals.value.length > 0 && !selectedMealId.value) {
-      const now = new Date()
+      // Sélectionner automatiquement le repas en cours ou à venir
+      if (meals.value.length > 0 && !selectedMealId.value) {
+        const now = new Date()
 
-      // Chercher le repas en cours ou le prochain repas à venir
-      const currentOrUpcomingMeal = meals.value.find((meal) => {
-        const mealDate = new Date(meal.date)
-        // Considérer un repas comme "en cours" s'il est dans les 3 heures avant ou après l'heure actuelle
-        const threeHoursBefore = new Date(mealDate.getTime() - 3 * 60 * 60 * 1000)
-        const threeHoursAfter = new Date(mealDate.getTime() + 3 * 60 * 60 * 1000)
-        return now >= threeHoursBefore && now <= threeHoursAfter
-      })
+        // Chercher le repas en cours ou le prochain repas à venir
+        const currentOrUpcomingMeal = meals.value.find((meal) => {
+          const mealDate = new Date(meal.date)
+          // Considérer un repas comme "en cours" s'il est dans les 3 heures avant ou après l'heure actuelle
+          const threeHoursBefore = new Date(mealDate.getTime() - 3 * 60 * 60 * 1000)
+          const threeHoursAfter = new Date(mealDate.getTime() + 3 * 60 * 60 * 1000)
+          return now >= threeHoursBefore && now <= threeHoursAfter
+        })
 
-      if (currentOrUpcomingMeal) {
-        // Repas en cours trouvé
-        selectedMealId.value = currentOrUpcomingMeal.id
-      } else {
-        // Sinon, chercher le prochain repas à venir
-        const upcomingMeals = meals.value.filter((meal) => new Date(meal.date) > now)
-        if (upcomingMeals.length > 0) {
-          // Trier par date croissante et prendre le premier
-          upcomingMeals.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          selectedMealId.value = upcomingMeals[0].id
+        if (currentOrUpcomingMeal) {
+          // Repas en cours trouvé
+          selectedMealId.value = currentOrUpcomingMeal.id
         } else {
-          // Sinon, prendre le dernier repas (le plus récent)
-          const sortedMeals = [...meals.value].sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          )
-          selectedMealId.value = sortedMeals[0].id
+          // Sinon, chercher le prochain repas à venir
+          const upcomingMeals = meals.value.filter((meal) => new Date(meal.date) > now)
+          if (upcomingMeals.length > 0) {
+            // Trier par date croissante et prendre le premier
+            upcomingMeals.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            selectedMealId.value = upcomingMeals[0].id
+          } else {
+            // Sinon, prendre le dernier repas (le plus récent)
+            const sortedMeals = [...meals.value].sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )
+            selectedMealId.value = sortedMeals[0].id
+          }
         }
       }
-    }
-  } catch {
-    toast.add({
-      title: t('gestion.meals.error_loading_meals'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-  } finally {
-    loadingMeals.value = false
+    },
   }
-}
+)
 
 // Rechercher des personnes ayant accès au repas sélectionné
-const searchPeople = async () => {
+const { execute: executeSearchPeople, loading: searching } = useApiAction(
+  () => `/api/editions/${editionId}/meals/${selectedMeal.value?.id}/search`,
+  {
+    method: 'GET',
+    query: () => ({ q: searchQuery.value }),
+    errorMessages: { default: t('gestion.meals.error_searching') },
+    onSuccess: (response: any) => {
+      searchResults.value = response?.results || []
+    },
+    onError: () => {
+      searchResults.value = []
+    },
+  }
+)
+
+const searchPeople = () => {
   if (!selectedMeal.value || !searchQuery.value || searchQuery.value.length < 2) {
     searchResults.value = []
     return
   }
-
-  searching.value = true
-  try {
-    const data = await $fetch<{ results: any[] }>(
-      `/api/editions/${editionId}/meals/${selectedMeal.value.id}/search`,
-      {
-        params: { q: searchQuery.value },
-      }
-    )
-    searchResults.value = data.results || []
-  } catch {
-    toast.add({
-      title: t('gestion.meals.error_searching'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-    searchResults.value = []
-  } finally {
-    searching.value = false
-  }
+  executeSearchPeople()
 }
 
 // Charger les statistiques du repas sélectionné
@@ -670,45 +656,41 @@ const validateMeal = async (person: any) => {
 const openPendingModal = async (type: 'volunteer' | 'artist' | 'participant') => {
   pendingType.value = type
   pendingModalOpen.value = true
-  await fetchPendingList(type)
+  await fetchPendingList()
 }
 
 // Récupérer la liste des personnes non validées
-const fetchPendingList = async (type: 'volunteer' | 'artist' | 'participant') => {
-  if (!selectedMeal.value) return
-
-  loadingPending.value = true
-  try {
-    const data = await $fetch<{ success: boolean; pending: any[] }>(
-      `/api/editions/${editionId}/meals/${selectedMeal.value.id}/pending`,
-      {
-        params: { type },
-      }
-    )
-    // Trier par nom de famille, puis prénom
-    const pending = data.pending || []
-    pendingList.value = pending.sort((a, b) => {
-      const lastNameCompare = (a.lastName || '').localeCompare(b.lastName || '', 'fr')
-      if (lastNameCompare !== 0) return lastNameCompare
-      return (a.firstName || '').localeCompare(b.firstName || '', 'fr')
-    })
-  } catch {
-    toast.add({
-      title: t('gestion.meals.error_loading_pending'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
-    pendingList.value = []
-  } finally {
-    loadingPending.value = false
+const { execute: executeFetchPending, loading: loadingPending } = useApiAction(
+  () => `/api/editions/${editionId}/meals/${selectedMeal.value?.id}/pending`,
+  {
+    method: 'GET',
+    query: () => ({ type: pendingType.value }),
+    errorMessages: { default: t('gestion.meals.error_loading_pending') },
+    onSuccess: (response: any) => {
+      // Trier par nom de famille, puis prénom
+      const pending = response?.pending || []
+      pendingList.value = pending.sort((a: any, b: any) => {
+        const lastNameCompare = (a.lastName || '').localeCompare(b.lastName || '', 'fr')
+        if (lastNameCompare !== 0) return lastNameCompare
+        return (a.firstName || '').localeCompare(b.firstName || '', 'fr')
+      })
+    },
+    onError: () => {
+      pendingList.value = []
+    },
   }
+)
+
+const fetchPendingList = () => {
+  if (!selectedMeal.value) return
+  executeFetchPending()
 }
 
 // Valider un repas depuis la modal
 const validateMealFromModal = async (person: any) => {
   await validateMeal(person)
   // Rafraîchir la liste des personnes non validées
-  await fetchPendingList(pendingType.value)
+  await fetchPendingList()
 }
 
 // Annuler un repas
@@ -759,7 +741,7 @@ watch(selectedMeal, () => {
 // Recharger la liste des personnes non validées à chaque ouverture de la modal
 watch(pendingModalOpen, (isOpen) => {
   if (isOpen && selectedMeal.value) {
-    fetchPendingList(pendingType.value)
+    fetchPendingList()
   }
 })
 

@@ -711,7 +711,6 @@ const selectedParticipant = ref<any>(null)
 const participantType = ref<'ticket' | 'volunteer'>('ticket')
 const isRefundedOrder = ref(false)
 const searchTerm = ref('')
-const searching = ref(false)
 const searchResults = ref<any>(null)
 const recentValidations = ref<any[]>([])
 const loadingValidations = ref(false)
@@ -731,13 +730,10 @@ const stats = ref({
 const hasHelloAssoConfig = ref(false)
 const volunteersNotValidatedModalOpen = ref(false)
 const volunteersNotValidated = ref<any[]>([])
-const loadingVolunteersNotValidated = ref(false)
 const artistsNotValidatedModalOpen = ref(false)
 const artistsNotValidated = ref<any[]>([])
-const loadingArtistsNotValidated = ref(false)
 const organizersNotValidatedModalOpen = ref(false)
 const organizersNotValidated = ref<any[]>([])
-const loadingOrganizersNotValidated = ref(false)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -1003,34 +999,22 @@ const handleOrderCreated = async (qrCode: string) => {
   }
 }
 
-const searchTickets = async () => {
-  if (!searchTerm.value || searchTerm.value.length < 2 || searching.value) return
-
-  searching.value = true
-  searchResults.value = null
-
-  try {
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/search`, {
-      method: 'POST',
-      body: {
-        searchTerm: searchTerm.value,
-      },
-    })
-
-    if (result.success) {
-      searchResults.value = result.results
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de rechercher les billets',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    searching.value = false
+const { execute: executeSearchTickets, loading: searching } = useApiAction(
+  `/api/editions/${editionId}/ticketing/search`,
+  {
+    method: 'POST',
+    body: () => ({ searchTerm: searchTerm.value }),
+    errorMessages: { default: 'Impossible de rechercher les billets' },
+    onSuccess: (response: any) => {
+      searchResults.value = response?.results || null
+    },
   }
+)
+
+const searchTickets = () => {
+  if (!searchTerm.value || searchTerm.value.length < 2 || searching.value) return
+  searchResults.value = null
+  executeSearchTickets()
 }
 
 const selectSearchResult = (result: any) => {
@@ -1125,29 +1109,14 @@ const { execute: syncHelloAsso, loading: syncingHelloAsso } = useApiAction<
 })
 
 // Charger les bénévoles non validés
-const loadVolunteersNotValidated = async () => {
-  loadingVolunteersNotValidated.value = true
-
-  try {
-    const result: any = await $fetch(
-      `/api/editions/${editionId}/ticketing/volunteers-not-validated`
-    )
-
-    if (result.success) {
-      volunteersNotValidated.value = result.volunteers
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de charger les bénévoles non validés',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loadingVolunteersNotValidated.value = false
-  }
-}
+const { execute: loadVolunteersNotValidated, loading: loadingVolunteersNotValidated } =
+  useApiAction(`/api/editions/${editionId}/ticketing/volunteers-not-validated`, {
+    method: 'GET',
+    errorMessages: { default: 'Impossible de charger les bénévoles non validés' },
+    onSuccess: (response: any) => {
+      volunteersNotValidated.value = response?.volunteers || []
+    },
+  })
 
 // Afficher la modal des bénévoles non validés
 const showVolunteersNotValidatedModal = async () => {
@@ -1157,27 +1126,16 @@ const showVolunteersNotValidatedModal = async () => {
 }
 
 // Charger les artistes non validés
-const loadArtistsNotValidated = async () => {
-  loadingArtistsNotValidated.value = true
-
-  try {
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/artists-not-validated`)
-
-    if (result.success) {
-      artistsNotValidated.value = result.artists
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de charger les artistes non validés',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loadingArtistsNotValidated.value = false
+const { execute: loadArtistsNotValidated, loading: loadingArtistsNotValidated } = useApiAction(
+  `/api/editions/${editionId}/ticketing/artists-not-validated`,
+  {
+    method: 'GET',
+    errorMessages: { default: 'Impossible de charger les artistes non validés' },
+    onSuccess: (response: any) => {
+      artistsNotValidated.value = response?.artists || []
+    },
   }
-}
+)
 
 // Afficher la modal des artistes non validés
 const showArtistsNotValidatedModal = async () => {
@@ -1187,29 +1145,14 @@ const showArtistsNotValidatedModal = async () => {
 }
 
 // Charger les organisateurs non validés
-const loadOrganizersNotValidated = async () => {
-  loadingOrganizersNotValidated.value = true
-
-  try {
-    const result: any = await $fetch(
-      `/api/editions/${editionId}/ticketing/organizers-not-validated`
-    )
-
-    if (result.success) {
-      organizersNotValidated.value = result.organizers
-    }
-  } catch (error: unknown) {
-    const err = error as { data?: { message?: string } }
-    toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de charger les organisateurs non validés',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  } finally {
-    loadingOrganizersNotValidated.value = false
-  }
-}
+const { execute: loadOrganizersNotValidated, loading: loadingOrganizersNotValidated } =
+  useApiAction(`/api/editions/${editionId}/ticketing/organizers-not-validated`, {
+    method: 'GET',
+    errorMessages: { default: 'Impossible de charger les organisateurs non validés' },
+    onSuccess: (response: any) => {
+      organizersNotValidated.value = response?.organizers || []
+    },
+  })
 
 // Afficher la modal des organisateurs non validés
 const showOrganizersNotValidatedModal = async () => {
