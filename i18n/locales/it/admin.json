@@ -407,7 +407,6 @@
     "task_executed_details": "L'attività {taskName} è stata eseguita in {time}",
     "task_executed_successfully": "Attività eseguita con successo",
     "task_execution_error": "Si è verificato un errore durante l'esecuzione",
-    "task_execution_failed": "Esecuzione dell'attività fallita",
     "test": "Prova",
     "test_debug": "Test e debug",
     "total_cleaned": "Totale pulito",

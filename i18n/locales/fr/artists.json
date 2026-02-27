@@ -1,11 +1,6 @@
 {
   "artists": {
     "accommodation": "Hébergement",
-    "artist_info_title": "Informations artistes",
-    "artist_info_empty": "Aucune information renseignée par l'organisateur",
-    "artist_info_placeholder": "Informations pratiques pour les artistes (consignes, plan, règles...)",
-    "artist_info_saved": "Informations artistes enregistrées",
-    "artist_info_save_error": "Erreur lors de l'enregistrement des informations artistes",
     "accommodation_autonomous": "Autonomie hébergement",
     "accommodation_autonomous_info": "Vous êtes autonome pour l'hébergement",
     "accommodation_autonomous_label": "L'artiste est autonome pour l'hébergement",
@@ -33,6 +28,11 @@
     "artist_access": "Accès artiste",
     "artist_added": "Artiste ajouté avec succès",
     "artist_deleted": "Artiste supprimé avec succès",
+    "artist_info_empty": "Aucune information renseignée par l'organisateur",
+    "artist_info_placeholder": "Informations pratiques pour les artistes (consignes, plan, règles...)",
+    "artist_info_save_error": "Erreur lors de l'enregistrement des informations artistes",
+    "artist_info_saved": "Informations artistes enregistrées",
+    "artist_info_title": "Informations artistes",
     "artist_qr_code": "QR Code artiste",
     "artist_space_subtitle": "Votre récapitulatif pour cette édition",
     "artist_space_title": "Mon espace artiste",

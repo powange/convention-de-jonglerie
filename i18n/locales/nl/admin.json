@@ -407,7 +407,6 @@
     "task_executed_details": "Taak {taskName} is uitgevoerd in {time}",
     "task_executed_successfully": "Taak succesvol uitgevoerd",
     "task_execution_error": "Er is een fout opgetreden tijdens de uitvoering",
-    "task_execution_failed": "Taakuitvoering mislukt",
     "test": "Testen",
     "test_debug": "Tests en debug",
     "total_cleaned": "Totaal opgeruimd",

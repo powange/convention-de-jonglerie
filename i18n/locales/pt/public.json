@@ -116,6 +116,7 @@
       "companion_name": "Nome do companheiro",
       "confirm_withdraw": "Tem certeza de que quer retirar a sua candidatura?",
       "contact_organizer": "Entrar em contato com organizador",
+      "contact_organizer_error": "Erro ao criar a conversa com os organizadores",
       "dates": "Datas",
       "diet": "Dieta",
       "dietary": {

@@ -116,6 +116,7 @@
       "companion_name": "Name der Begleitung",
       "confirm_withdraw": "Sind Sie sicher, dass Sie Ihre Bewerbung zurückziehen möchten?",
       "contact_organizer": "Organisator kontaktieren",
+      "contact_organizer_error": "Fehler beim Erstellen der Unterhaltung mit den Organisatoren",
       "dates": "Termine",
       "diet": "Diät",
       "dietary": {

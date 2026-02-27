@@ -116,6 +116,7 @@
       "companion_name": "Namn på den medföljande personen",
       "confirm_withdraw": "Är du säker på att du vill dra tillbaka din kandidatur?",
       "contact_organizer": "Kontakta arrangören",
+      "contact_organizer_error": "Fel vid skapande av konversationen med arrangörerna",
       "dates": "Datum",
       "diet": "Diet",
       "dietary": {

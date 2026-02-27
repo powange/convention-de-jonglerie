@@ -407,7 +407,6 @@
     "task_executed_details": "Задача {taskName} выполнена за {time}",
     "task_executed_successfully": "Задача выполнена успешно",
     "task_execution_error": "Произошла ошибка при выполнении",
-    "task_execution_failed": "Сбой выполнения задачи",
     "test": "Тест",
     "test_debug": "Тесты и отладка",
     "total_cleaned": "Всего очищено",

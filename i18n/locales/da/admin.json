@@ -407,7 +407,6 @@
     "task_executed_details": "Opgaven {taskName} blev udført på {time}",
     "task_executed_successfully": "Opgave udført succesfuldt",
     "task_execution_error": "Der opstod en fejl under udførelsen",
-    "task_execution_failed": "Udførelse af opgave mislykkedes",
     "test": "Test",
     "test_debug": "Tests og fejlfinding",
     "total_cleaned": "Total ryddet",

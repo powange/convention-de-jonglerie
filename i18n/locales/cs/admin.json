@@ -407,7 +407,6 @@
     "task_executed_details": "Úloha {taskName} byla provedena v {time}.",
     "task_executed_successfully": "Úspěšně splněný úkol",
     "task_execution_error": "Během provádění došlo k chybě",
-    "task_execution_failed": "Provedení úlohy se nezdařilo",
     "test": "Test",
     "test_debug": "Testy a ladění",
     "total_cleaned": "Celkem vyčištěno",

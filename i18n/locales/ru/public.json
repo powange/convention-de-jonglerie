@@ -116,6 +116,7 @@
       "companion_name": "Имя компаньона",
       "confirm_withdraw": "Вы уверены, что хотите отозвать свою заявку?",
       "contact_organizer": "Связаться с организатором",
+      "contact_organizer_error": "Ошибка при создании разговора с организаторами",
       "dates": "Даты",
       "diet": "Диета",
       "dietary": {

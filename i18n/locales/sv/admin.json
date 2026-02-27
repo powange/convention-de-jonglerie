@@ -407,7 +407,6 @@
     "task_executed_details": "Uppgiften {taskName} utfördes i {time}.",
     "task_executed_successfully": "Uppgiften har slutförts framgångsrikt",
     "task_execution_error": "Ett fel har inträffat under exekveringen",
-    "task_execution_failed": "Utförandet av uppgiften misslyckades",
     "test": "Test",
     "test_debug": "Tester och felsökning",
     "total_cleaned": "Totalt rengjorda",

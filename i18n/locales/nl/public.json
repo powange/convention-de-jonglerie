@@ -116,6 +116,7 @@
       "companion_name": "Naam begeleider",
       "confirm_withdraw": "Weet je zeker dat je je aanmelding wilt intrekken?",
       "contact_organizer": "Contact organisator",
+      "contact_organizer_error": "Fout bij het aanmaken van het gesprek met de organisatoren",
       "dates": "Data",
       "diet": "Dieet",
       "dietary": {

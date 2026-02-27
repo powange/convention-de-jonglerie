@@ -116,6 +116,7 @@
       "companion_name": "Nombre del acompañante",
       "confirm_withdraw": "¿Estás seguro de que quieres retirar tu solicitud?",
       "contact_organizer": "Contactar organizador",
+      "contact_organizer_error": "Error al crear la conversación con los organizadores",
       "dates": "Fechas",
       "diet": "Dieta",
       "dietary": {

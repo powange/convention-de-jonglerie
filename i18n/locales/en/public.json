@@ -116,6 +116,7 @@
       "companion_name": "Companion name",
       "confirm_withdraw": "Are you sure you want to withdraw your application?",
       "contact_organizer": "Contact organizer",
+      "contact_organizer_error": "Error creating the conversation with the organizers",
       "dates": "Dates",
       "diet": "Diet",
       "dietary": {

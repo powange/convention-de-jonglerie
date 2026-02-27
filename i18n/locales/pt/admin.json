@@ -407,7 +407,6 @@
     "task_executed_details": "A tarefa {taskName} foi executada em {time}",
     "task_executed_successfully": "Tarefa executada com sucesso",
     "task_execution_error": "Ocorreu um erro durante a execução",
-    "task_execution_failed": "Falha na execução da tarefa",
     "test": "Testar",
     "test_debug": "Testes e depuração",
     "total_cleaned": "Total limpo",

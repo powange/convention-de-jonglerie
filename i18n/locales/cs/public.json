@@ -116,6 +116,7 @@
       "companion_name": "Jméno doprovázející osoby",
       "confirm_withdraw": "Jste si jistý, že chcete svou kandidaturu stáhnout?",
       "contact_organizer": "Kontakt na organizátora",
+      "contact_organizer_error": "Chyba při vytváření konverzace s organizátory",
       "dates": "Data",
       "diet": "Dieta",
       "dietary": {

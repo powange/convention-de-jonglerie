@@ -116,6 +116,7 @@
       "companion_name": "Ledsagernavn",
       "confirm_withdraw": "Er du sikker på, at du vil trække din ansøgning tilbage?",
       "contact_organizer": "Kontakt arrangør",
+      "contact_organizer_error": "Fejl ved oprettelse af samtalen med arrangørerne",
       "dates": "Datoer",
       "diet": "Diæt",
       "dietary": {
