@@ -47,28 +47,3 @@ export async function requireGlobalAdminWithDbCheck(event: H3Event<EventHandlerR
     isGlobalAdmin: true,
   }
 }
-
-/**
- * Version légère qui utilise directement les données de session
- * (plus rapide mais moins sûre, à utiliser uniquement si les données de session sont fiables)
- */
-export async function requireGlobalAdminFromSession(event: H3Event<EventHandlerRequest>) {
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      status: 401,
-      message: 'Non authentifié',
-    })
-  }
-
-  // Vérification directe depuis la session (plus rapide)
-  if (!user.isGlobalAdmin) {
-    throw createError({
-      status: 403,
-      message: 'Accès refusé - Droits super administrateur requis',
-    })
-  }
-
-  return user
-}

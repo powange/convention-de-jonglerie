@@ -1,7 +1,7 @@
 import type { ServerFile } from 'nuxt-file-storage'
 
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { requireGlobalAdmin } from '#server/utils/auth-utils'
 
 interface RequestBody {
   files: ServerFile[]
@@ -14,7 +14,7 @@ interface RequestBody {
 export default wrapApiHandler(
   async (event) => {
     // Vérifier l'authentification et que l'utilisateur est admin global
-    requireGlobalAdmin(event)
+    await requireGlobalAdminWithDbCheck(event)
 
     const { files, metadata } = await readBody<RequestBody>(event)
 

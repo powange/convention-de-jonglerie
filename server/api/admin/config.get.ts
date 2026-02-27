@@ -1,9 +1,9 @@
+import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { requireGlobalAdmin } from '#server/utils/auth-utils'
 
 export default wrapApiHandler(
   async (event) => {
-    requireGlobalAdmin(event)
+    await requireGlobalAdminWithDbCheck(event)
 
     const config = useRuntimeConfig()
 

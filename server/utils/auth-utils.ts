@@ -25,47 +25,12 @@ export function requireAuth(event: any): AuthenticatedUser {
 }
 
 /**
- * Vérifie que l'utilisateur est authentifié et est un admin global
- * @param event L'événement Nuxt/Nitro
- * @returns L'utilisateur admin authentifié
- * @throws createError 401 si non authentifié ou 403 si pas admin
- */
-export function requireGlobalAdmin(event: any): AuthenticatedUser {
-  const user = requireAuth(event)
-
-  if (!user.isGlobalAdmin) {
-    throw createError({
-      status: 403,
-      message: 'Accès réservé aux administrateurs',
-    })
-  }
-
-  return user
-}
-
-/**
  * Vérifie optionnellement l'authentification (retourne null si pas authentifié)
  * @param event L'événement Nuxt/Nitro
  * @returns L'utilisateur authentifié ou null
  */
 export function optionalAuth(event: any): AuthenticatedUser | null {
   return (event.context.user as AuthenticatedUser) || null
-}
-
-/**
- * Vérifie que l'utilisateur est authentifié ou est un admin global
- * Utile pour les endpoints qui ont des permissions différentes selon le rôle
- * @param event L'événement Nuxt/Nitro
- * @returns L'utilisateur avec information isGlobalAdmin garantie
- */
-export function requireAuthWithAdminCheck(
-  event: any
-): AuthenticatedUser & { isGlobalAdmin: boolean } {
-  const user = requireAuth(event)
-  return {
-    ...user,
-    isGlobalAdmin: user.isGlobalAdmin || false,
-  }
 }
 
 /**
@@ -140,30 +105,5 @@ export function requireResourceOwner<T extends OwnedResource>(
   throw createError({
     status: 403,
     message: errorMessage,
-  })
-}
-
-/**
- * Messages d'erreur d'authentification standardisés
- */
-export const AUTH_ERRORS = {
-  NOT_AUTHENTICATED: 'Unauthorized',
-  UNAUTHORIZED: 'Unauthorized', // Pour l'API anglaise
-  FORBIDDEN: 'Accès non autorisé',
-  ADMIN_ONLY: 'Accès réservé aux administrateurs',
-  INSUFFICIENT_RIGHTS: 'Droits insuffisants',
-} as const
-
-/**
- * Crée une erreur d'authentification standardisée
- * @param type Le type d'erreur
- * @param customMessage Message personnalisé optionnel
- */
-export function createAuthError(type: keyof typeof AUTH_ERRORS, customMessage?: string) {
-  const statusCode = type === 'NOT_AUTHENTICATED' || type === 'UNAUTHORIZED' ? 401 : 403
-
-  throw createError({
-    statusCode,
-    message: customMessage || AUTH_ERRORS[type],
   })
 }
