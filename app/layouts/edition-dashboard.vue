@@ -15,11 +15,13 @@
           <!-- Navigation -->
           <template #default="{ collapsed }">
             <UNavigationMenu
+              v-model="openSections"
               :collapsed="collapsed"
               :items="filteredNavigationItems"
               orientation="vertical"
               color="primary"
               variant="pill"
+              highlight
               :collapsible="true"
             />
           </template>
@@ -105,9 +107,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -124,10 +123,30 @@ const { formatDateRange } = useDateFormat()
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
-// Fonction pour déterminer si un accordéon doit être ouvert basé sur la route actuelle
-const isAccordionOpen = (section: string): boolean => {
-  return route.path.includes(`/gestion/${section}`)
+// Sections ouvertes dans le menu de navigation (contrôlées par v-model)
+const openSections = ref<string[]>([])
+
+// Déterminer la section active basée sur la route actuelle
+const getCurrentSection = (path: string): string | null => {
+  if (path.includes('/gestion/volunteers')) return 'volunteers'
+  if (path.includes('/gestion/artists') || path.includes('/gestion/shows-call')) return 'artists'
+  if (path.includes('/gestion/meals')) return 'meals'
+  if (path.includes('/gestion/ticketing')) return 'ticketing'
+  if (path.includes('/gestion/map') || path.includes('/edit')) return 'infos'
+  return null
 }
+
+// Auto-expand la section correspondant à la route actuelle
+const expandCurrentSection = () => {
+  const section = getCurrentSection(route.path)
+  if (section && !openSections.value.includes(section)) {
+    openSections.value = [...openSections.value, section]
+  }
+}
+
+// Expand au montage et à chaque changement de route
+watch(() => route.path, expandCurrentSection)
+onMounted(expandCurrentSection)
 
 // Permissions calculées
 const canEdit = computed(() => {
@@ -224,7 +243,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         },
       ],
       value: 'infos',
-      defaultOpen: isAccordionOpen('map'),
     })
   }
 
@@ -287,7 +305,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         icon: 'i-heroicons-user-group',
         children: volunteersChildren,
         value: 'volunteers',
-        defaultOpen: isAccordionOpen('volunteers'),
       })
     }
   }
@@ -314,7 +331,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-star',
       children: artistsChildren,
       value: 'artists',
-      defaultOpen: isAccordionOpen('artists') || isAccordionOpen('shows-call'),
     })
   }
 
@@ -345,7 +361,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'cbi:mealie',
       children: mealsChildren,
       value: 'meals',
-      defaultOpen: isAccordionOpen('meals'),
     })
   }
 
@@ -385,7 +400,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         },
       ],
       value: 'ticketing',
-      defaultOpen: isAccordionOpen('ticketing'),
     })
   }
 
