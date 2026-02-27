@@ -390,20 +390,24 @@
 
           <!-- Body POST/PUT si disponible -->
           <div v-if="selectedLog.body && Object.keys(selectedLog.body).length > 0">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Corps de la requête (body)
-            </label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Corps de la requête (body)
+              </label>
+              <UButton
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                icon="i-lucide-copy"
+                @click="copyJson(selectedLog.body)"
+              >
+                Copier
+              </UButton>
+            </div>
             <div
               class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
             >
-              <JsonViewer
-                :value="selectedLog.body"
-                :expand-depth="2"
-                copyable
-                boxed
-                sort
-                theme="dark"
-              />
+              <JsonViewer :value="selectedLog.body" :expand-depth="2" boxed sort theme="dark" />
             </div>
           </div>
 
@@ -423,16 +427,26 @@
 
           <!-- Paramètres de requête -->
           <div v-if="selectedLog.queryParams && Object.keys(selectedLog.queryParams).length > 0">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Paramètres de requête
-            </label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Paramètres de requête
+              </label>
+              <UButton
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                icon="i-lucide-copy"
+                @click="copyJson(selectedLog.queryParams)"
+              >
+                Copier
+              </UButton>
+            </div>
             <div
               class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
             >
               <JsonViewer
                 :value="selectedLog.queryParams"
                 :expand-depth="3"
-                copyable
                 boxed
                 sort
                 theme="dark"
@@ -442,20 +456,24 @@
 
           <!-- Headers HTTP -->
           <div v-if="selectedLog.headers && Object.keys(selectedLog.headers).length > 0">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              En-têtes HTTP
-            </label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                En-têtes HTTP
+              </label>
+              <UButton
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                icon="i-lucide-copy"
+                @click="copyJson(selectedLog.headers)"
+              >
+                Copier
+              </UButton>
+            </div>
             <div
               class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
             >
-              <JsonViewer
-                :value="selectedLog.headers"
-                :expand-depth="1"
-                copyable
-                boxed
-                sort
-                theme="dark"
-              />
+              <JsonViewer :value="selectedLog.headers" :expand-depth="1" boxed sort theme="dark" />
             </div>
           </div>
 
@@ -539,6 +557,16 @@ definePageMeta({
 })
 
 const toast = useToast()
+
+// Copier un JSON dans le presse-papier
+const copyJson = async (data: unknown) => {
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(data, null, 2))
+    toast.add({ title: 'Copié dans le presse-papier', color: 'success' })
+  } catch {
+    toast.add({ title: 'Impossible de copier', color: 'error' })
+  }
+}
 
 // État réactif
 const loading = ref(false)
