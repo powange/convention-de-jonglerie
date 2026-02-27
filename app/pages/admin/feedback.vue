@@ -435,7 +435,6 @@ const { t } = useI18n()
 const toast = useToast()
 
 // État
-const loading = ref(false)
 const feedbacks = shallowRef([])
 const stats = shallowRef(null)
 const pagination = ref({
@@ -480,33 +479,25 @@ const detailsModal = reactive({
 })
 
 // Fonctions
-async function fetchFeedbacks() {
-  loading.value = true
-  try {
-    const query = new URLSearchParams({
-      page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString(),
-    })
-
-    if (filters.search) query.append('search', filters.search)
-    if (filters.type) query.append('type', filters.type)
-    if (filters.resolved) query.append('resolved', filters.resolved)
-
-    const response = await $fetch(`/api/admin/feedback?${query.toString()}`)
-
+const { execute: fetchFeedbacks, loading } = useApiAction('/api/admin/feedback', {
+  method: 'GET',
+  query: () => {
+    const q: Record<string, unknown> = {
+      page: pagination.value.page,
+      limit: pagination.value.limit,
+    }
+    if (filters.search) q.search = filters.search
+    if (filters.type) q.type = filters.type
+    if (filters.resolved) q.resolved = filters.resolved
+    return q
+  },
+  errorMessages: { default: t('admin.feedback.error.load') },
+  onSuccess: (response: any) => {
     feedbacks.value = response.data
     pagination.value = response.pagination
     stats.value = response.stats
-  } catch (error) {
-    console.error('Erreur lors du chargement des feedbacks:', error)
-    toast.add({
-      title: t('admin.feedback.error.load'),
-      color: 'error',
-    })
-  } finally {
-    loading.value = false
-  }
-}
+  },
+})
 
 // Fonction de debounce simple
 let searchTimeout: NodeJS.Timeout

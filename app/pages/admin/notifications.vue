@@ -961,7 +961,6 @@ const toast = useToast()
 const showCreateModal = ref(false)
 const showTestModal = ref(false)
 const showFirebaseTestModal = ref(false)
-const loadingRecent = ref(false)
 
 interface NotificationStats {
   totalSent: number
@@ -1329,7 +1328,7 @@ const { execute: executeSendReminders, loading: sendingReminders } = useApiActio
     errorMessages: { default: "Impossible d'envoyer les rappels" },
     onSuccess: async (result: any) => {
       toast.add({ color: 'success', title: 'Rappels envoyés', description: result.message })
-      await loadStats()
+      await executeLoadStats()
       await loadRecentNotifications()
     },
   }
@@ -1356,7 +1355,7 @@ const { execute: executeCreateNotification, loading: creatingNotification } = us
       toast.add({ color: 'success', title: 'Notification envoyée', description: result.message })
       showCreateModal.value = false
       resetCreateForm()
-      await loadStats()
+      await executeLoadStats()
       await loadRecentNotifications()
     },
   }
@@ -1469,7 +1468,7 @@ const { execute: executeTestAdvanced, loading: testingAdvanced } = useApiAction(
       })
       showTestModal.value = false
       resetTestForm()
-      await loadStats()
+      await executeLoadStats()
       await loadRecentNotifications()
     },
   }
@@ -1596,7 +1595,7 @@ const { execute: executeToggleRead, loading: togglingRead } = useApiAction(
           title: !wasRead ? 'Marquée comme lue' : 'Marquée comme non lue',
         })
       }
-      await loadStats()
+      await executeLoadStats()
     },
   }
 )
@@ -1607,77 +1606,51 @@ const toggleNotificationReadStatus = (notification: RecentNotification) => {
   executeToggleRead()
 }
 
-const loadStats = async () => {
-  try {
-    const response = await $fetch('/api/admin/notifications/stats')
+const { execute: executeLoadStats } = useApiAction('/api/admin/notifications/stats', {
+  method: 'GET',
+  errorMessages: { default: 'Impossible de charger les statistiques' },
+  onSuccess: (response: any) => {
     stats.value = {
       totalSent: response.totalSent || 0,
       totalUnread: response.unreadCount || 0,
       sentToday: response.thisWeekCount || 0,
       activeTypes: response.pushSubscriptionsActive || 0,
     }
-  } catch (error) {
-    console.error('Erreur lors du chargement des statistiques:', error)
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de charger les statistiques',
-    })
-  }
-}
+  },
+})
 
-const loadRecentNotifications = async () => {
-  console.log(
-    'loadRecentNotifications called with page:',
-    pagination.value.page,
-    'limit:',
-    pagination.value.limit
-  )
-  loadingRecent.value = true
-  try {
-    const query: any = {
-      page: pagination.value.page,
-      limit: pagination.value.limit,
-      days: filters.value.days,
-    }
-
-    // Ajouter les filtres seulement s'ils ne sont pas 'all'
-    if (filters.value.type !== 'all') {
-      query.type = filters.value.type
-    }
-
-    if (filters.value.category !== 'all') {
-      query.category = filters.value.category
-    }
-
-    const response = await $fetch('/api/admin/notifications/recent', {
-      query,
-    })
-
-    recentNotifications.value = response.data || []
-
-    // Mettre à jour la pagination depuis la réponse serveur
-    if (response.pagination) {
-      pagination.value = {
-        ...pagination.value,
-        total: response.pagination.total,
-        totalPages: response.pagination.totalPages,
+const { execute: loadRecentNotifications, loading: loadingRecent } = useApiAction(
+  '/api/admin/notifications/recent',
+  {
+    method: 'GET',
+    query: () => {
+      const q: Record<string, unknown> = {
+        page: pagination.value.page,
+        limit: pagination.value.limit,
+        days: filters.value.days,
       }
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement des notifications récentes:', error)
-    toast.add({
-      color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de charger les notifications récentes',
-    })
-    recentNotifications.value = []
-    pagination.value.total = 0
-    pagination.value.totalPages = 0
-  } finally {
-    loadingRecent.value = false
+      if (filters.value.type !== 'all') q.type = filters.value.type
+      if (filters.value.category !== 'all') q.category = filters.value.category
+      return q
+    },
+    errorMessages: { default: 'Impossible de charger les notifications récentes' },
+    onSuccess: (response: any) => {
+      recentNotifications.value = response.data || []
+      if (response.pagination) {
+        pagination.value = {
+          ...pagination.value,
+          total: response.pagination.total,
+          totalPages: response.pagination.totalPages,
+        }
+      }
+    },
+    onError: () => {
+      recentNotifications.value = []
+      pagination.value.total = 0
+      pagination.value.totalPages = 0
+    },
   }
-}
+)
 
 // Computed pour les filtres
 const hasActiveFilters = computed(() => {
@@ -1739,6 +1712,6 @@ watch(
 
 // Initialisation
 onMounted(async () => {
-  await Promise.all([loadStats(), loadRecentNotifications()])
+  await Promise.all([executeLoadStats(), loadRecentNotifications()])
 })
 </script>

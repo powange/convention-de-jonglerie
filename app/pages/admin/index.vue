@@ -618,9 +618,6 @@ useSeoMeta({
   description: t('admin.dashboard_subtitle'),
 })
 
-// État réactif
-const loading = ref(false)
-
 // Anonymisation
 interface AnonymizeResult {
   usersAnonymized: number
@@ -715,18 +712,14 @@ const { execute: doAnonymize, loading: anonymizing } = useApiAction<
 const executeAnonymization = () => doAnonymize()
 
 // Fonction pour charger les statistiques
-const loadStats = async () => {
-  try {
-    const data = await $fetch('/api/admin/stats')
-    stats.value = data
-  } catch (error) {
-    // Si erreur d'authentification, rediriger vers login
-    if ((error as any)?.statusCode === 401 || (error as any)?.status === 401) {
-      navigateTo('/login')
-      return
-    }
-
-    // Valeurs par défaut en cas d'erreur
+const { execute: executeLoadStats, loading: loadingStats } = useApiAction('/api/admin/stats', {
+  method: 'GET',
+  errorMessages: { default: t('admin.cannot_load_stats') },
+  redirectOnError: { 401: '/login' },
+  onSuccess: (response: any) => {
+    stats.value = response
+  },
+  onError: () => {
     stats.value = {
       totalUsers: 0,
       newUsersThisMonth: 0,
@@ -738,43 +731,31 @@ const loadStats = async () => {
       unresolvedFeedbacks: 0,
       unresolvedErrorLogs: 0,
     }
-
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('admin.cannot_load_stats'),
-    })
-  }
-}
+  },
+})
 
 // Fonction pour charger l'activité récente
-const loadRecentActivity = async () => {
-  try {
-    const data = await $fetch('/api/admin/activity', { query: { limit: 10 } })
-    recentActivity.value = data
-  } catch (error) {
-    // Si erreur d'authentification, rediriger vers login
-    if ((error as any)?.statusCode === 401 || (error as any)?.status === 401) {
-      navigateTo('/login')
-      return
-    }
-
-    // Laisser la liste vide en cas d'erreur
-    recentActivity.value = []
-
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('admin.cannot_load_activity'),
-    })
+const { execute: executeLoadActivity, loading: loadingActivity } = useApiAction(
+  '/api/admin/activity',
+  {
+    method: 'GET',
+    query: { limit: 10 },
+    errorMessages: { default: t('admin.cannot_load_activity') },
+    redirectOnError: { 401: '/login' },
+    onSuccess: (response: any) => {
+      recentActivity.value = response
+    },
+    onError: () => {
+      recentActivity.value = []
+    },
   }
-}
+)
+
+const loading = computed(() => loadingStats.value || loadingActivity.value)
 
 // Fonction pour actualiser toutes les données
 const refreshData = async () => {
-  loading.value = true
-  await Promise.all([loadStats(), loadRecentActivity()])
-  loading.value = false
+  await Promise.all([executeLoadStats(), executeLoadActivity()])
 }
 
 // Fonction pour basculer le mode administrateur

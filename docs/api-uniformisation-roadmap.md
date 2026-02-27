@@ -126,14 +126,14 @@ return { conventions, total }
 
 **Batch 5 — Cas optionnels, bas impact** (6 fichiers) :
 
-| Fichier                                               | Fonctions                                         | Notes                         |
-| ----------------------------------------------------- | ------------------------------------------------- | ----------------------------- |
-| `pages/admin/index.vue`                               | `loadStats()`, `loadActivity()`                   | GETs admin                    |
-| `pages/admin/notifications.vue`                       | `loadRecentNotifications()`                       | GET admin                     |
-| `pages/admin/feedback.vue`                            | `loadFeedback()`                                  | GET paginé                    |
-| `pages/admin/conventions.vue`                         | `exportEdition()`                                 | Mutation admin                |
-| `components/workshops/ImportFromImageModal.vue`       | `extractWorkshops()`, `importSelectedWorkshops()` | `Promise.allSettled` complexe |
-| `components/notifications/PushNotificationToggle.vue` | `toggleNotifications()`                           | Logique browser avant $fetch  |
+| Fichier                                               | Fonctions                                         | Statut                                                                                   |
+| ----------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `pages/admin/index.vue`                               | `loadStats()`, `loadRecentActivity()`             | ✅ 2 fonctions migrées                                                                   |
+| `pages/admin/notifications.vue`                       | `loadStats()`, `loadRecentNotifications()`        | ✅ 2 fonctions migrées                                                                   |
+| `pages/admin/feedback.vue`                            | `fetchFeedbacks()`                                | ✅ 1 fonction migrée                                                                     |
+| `pages/admin/conventions.vue`                         | `exportEdition()`                                 | ❌ Skip — pas de toast, pas de loading ref, erreur affichée dans modal                   |
+| `components/workshops/ImportFromImageModal.vue`       | `extractWorkshops()`, `importSelectedWorkshops()` | ❌ Skip — FileReader async avant $fetch + Promise.allSettled avec succès/échecs partiels |
+| `components/notifications/PushNotificationToggle.vue` | `handleToggleChange()`                            | ❌ Skip — appels browser API (Firebase), pas de $fetch direct                            |
 
 **Non-candidats** — `$fetch` à garder tel quel :
 
@@ -162,25 +162,26 @@ return { conventions, total }
 
 ## Priorités recommandées
 
-| Priorité | Axe                                                         | Effort | Valeur                | Statut       |
-| -------- | ----------------------------------------------------------- | ------ | --------------------- | ------------ |
-| ~~1~~    | Axe 1 — 11 fichiers `defineEventHandler` → `wrapApiHandler` | Faible | Sécurité/logging      | ✅ Terminé   |
-| 1        | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate | Batch 1-4 ✅ |
-| 2        | Axe 2 — Mutations brutes → `createSuccessResponse`          | Moyen  | Uniformité            | À faire      |
-| -        | Axe 4 — 3 fichiers exclus                                   | -      | Pas nécessaire        | -            |
+| Priorité | Axe                                                         | Effort | Valeur                | Statut     |
+| -------- | ----------------------------------------------------------- | ------ | --------------------- | ---------- |
+| ~~1~~    | Axe 1 — 11 fichiers `defineEventHandler` → `wrapApiHandler` | Faible | Sécurité/logging      | ✅ Terminé |
+| ~~1~~    | Axe 3 — `$fetch` → `useApiAction` (pages CRUD)              | Moyen  | Réduction boilerplate | ✅ Terminé |
+| 2        | Axe 2 — Mutations brutes → `createSuccessResponse`          | Moyen  | Uniformité            | À faire    |
+| -        | Axe 4 — 3 fichiers exclus                                   | -      | Pas nécessaire        | -          |
 
 ---
 
 ## Historique des migrations terminées
 
-| Phase      | Date       | Scope                                                               | Résultat                                                                            |
-| ---------- | ---------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Phase 1    | 26/02/2026 | 19 fichiers (Groupes C+B) — message-only et data-already            | Remplacement mécanique, sans impact frontend                                        |
-| Phase 2    | 26/02/2026 | ~94 fichiers (Groupe A) — champs à la racine                        | Smart unwrap + migration backend + 13 $fetch directs corrigés + 25 tests mis à jour |
-| Axe 1      | 26/02/2026 | 11 fichiers `defineEventHandler` → `wrapApiHandler`                 | Migration + suppression try/catch manuels + 4 tests FCM mis à jour                  |
-| Axe 3 B1+2 | 26/02/2026 | 9 fichiers `$fetch` → `useApiAction` (composants + pages mutations) | ~15 appels migrés, −57 lignes boilerplate, 3 fichiers skipés                        |
-| Axe 3 B3   | 26/02/2026 | 3 fichiers `$fetch` GET → `useApiAction` (pages gestion)            | 3 appels migrés, −20 lignes boilerplate, 2 fichiers skipés                          |
-| Axe 3 B4   | 26/02/2026 | 2 fichiers `$fetch` → `useApiAction` (validate + access-control)    | 7 appels migrés, −60 lignes boilerplate, 3 fichiers skipés                          |
+| Phase      | Date       | Scope                                                                 | Résultat                                                                            |
+| ---------- | ---------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Phase 1    | 26/02/2026 | 19 fichiers (Groupes C+B) — message-only et data-already              | Remplacement mécanique, sans impact frontend                                        |
+| Phase 2    | 26/02/2026 | ~94 fichiers (Groupe A) — champs à la racine                          | Smart unwrap + migration backend + 13 $fetch directs corrigés + 25 tests mis à jour |
+| Axe 1      | 26/02/2026 | 11 fichiers `defineEventHandler` → `wrapApiHandler`                   | Migration + suppression try/catch manuels + 4 tests FCM mis à jour                  |
+| Axe 3 B1+2 | 26/02/2026 | 9 fichiers `$fetch` → `useApiAction` (composants + pages mutations)   | ~15 appels migrés, −57 lignes boilerplate, 3 fichiers skipés                        |
+| Axe 3 B3   | 26/02/2026 | 3 fichiers `$fetch` GET → `useApiAction` (pages gestion)              | 3 appels migrés, −20 lignes boilerplate, 2 fichiers skipés                          |
+| Axe 3 B4   | 26/02/2026 | 2 fichiers `$fetch` → `useApiAction` (validate + access-control)      | 7 appels migrés, −60 lignes boilerplate, 3 fichiers skipés                          |
+| Axe 3 B5   | 27/02/2026 | 3 fichiers admin `$fetch` → `useApiAction` (index + notif + feedback) | 5 appels migrés, −50 lignes boilerplate, 3 fichiers skipés                          |
 
 Détails dans `docs/migration-createSuccessResponse.md`.
 
@@ -198,4 +199,4 @@ Détails dans `docs/migration-createSuccessResponse.md`.
 
 ---
 
-**Dernière mise à jour** : 26 février 2026 (Axe 3 Batch 1-4 terminé)
+**Dernière mise à jour** : 27 février 2026 (Axe 3 terminé — Batch 1-5)
