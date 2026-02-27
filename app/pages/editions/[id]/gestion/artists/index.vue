@@ -590,11 +590,11 @@ const cancelArtistInfoEdit = () => {
   editingArtistInfo.value = false
 }
 
-// Sync artistInfoLocal quand l'édition change
+// Sync artistInfoLocal quand l'édition change (sauf si l'utilisateur est en train d'éditer)
 watch(
   () => edition.value?.artistInfo,
   (val) => {
-    if (!artistInfoDirty.value) {
+    if (!editingArtistInfo.value) {
       artistInfoLocal.value = val ?? ''
     }
     renderArtistInfoPreview()
