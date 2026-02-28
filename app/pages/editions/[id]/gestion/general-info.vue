@@ -42,7 +42,7 @@
         <UFormField
           :label="$t('forms.labels.edition_name_optional')"
           name="name"
-          description="Si aucun nom n'est spécifié, le nom de la convention sera utilisé"
+          :description="$t('gestion.general_info.name_fallback_hint')"
         >
           <UInput
             v-model="name"
@@ -558,9 +558,8 @@ const { execute: save, loading: saving } = useApiAction(() => `/api/editions/${e
   successMessage: { title: t('gestion.general_info.save_success') },
   errorMessages: { default: t('gestion.general_info.save_error') },
   onSuccess: (response: any) => {
-    const data = response?.data || response
-    if (data) {
-      editionStore.setEdition(data)
+    if (response && edition.value) {
+      editionStore.setEdition({ ...edition.value, ...response })
     }
   },
 })

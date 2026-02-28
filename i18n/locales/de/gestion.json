@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Sind Sie sicher, dass Sie diese Ausgabe löschen möchten?",
     "delete_edition": "Ausgabe löschen",
-    "edit_edition": "Bearbeiten der Ausgabe",
     "external_links": {
       "description": "Verwalten Sie Links zu Ihrer Website, Ticketing und sozialen Medien.",
       "save": "Speichern",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Bearbeiten Sie Name, Daten, Zeitzone und Adresse Ihrer Veranstaltung.",
+      "name_fallback_hint": "Wenn kein Name angegeben wird, wird der Name der Convention verwendet",
       "save": "Speichern",
       "save_error": "Fehler beim Aktualisieren der Informationen",
       "save_success": "Informationen erfolgreich aktualisiert",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Plakat, Beschreibung und Programm bearbeiten",
-      "delete_description": "Diese Ausgabe und alle zugehörigen Daten endgültig löschen",
-      "edit_description": "Daten, Ort und Informationen der Ausgabe bearbeiten",
       "external_links_description": "Website, Ticketing und soziale Medien verwalten",
       "general_info_description": "Name, Daten und Adresse bearbeiten",
       "map_description": "Zonen auf der Geländekarte definieren",

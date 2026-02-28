@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "¿Estás seguro de que quieres desechar esta edición?",
     "delete_edition": "Borrar edición",
-    "edit_edition": "Modificar la edición",
     "external_links": {
       "description": "Gestione los enlaces a su sitio web, venta de entradas y redes sociales.",
       "save": "Guardar",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Edite el nombre, las fechas, la zona horaria y la dirección de su evento.",
+      "name_fallback_hint": "Si no se especifica un nombre, se utilizará el nombre de la convención",
       "save": "Guardar",
       "save_error": "Error al actualizar la información",
       "save_success": "Información actualizada con éxito",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Editar el cartel, la descripción y el programa",
-      "delete_description": "Eliminar permanentemente esta edición y todos sus datos",
-      "edit_description": "Modificar las fechas, lugar e información de la edición",
       "external_links_description": "Gestionar el sitio web, la venta de entradas y las redes sociales",
       "general_info_description": "Editar el nombre, las fechas y la dirección",
       "map_description": "Definir las zonas en el mapa del sitio",

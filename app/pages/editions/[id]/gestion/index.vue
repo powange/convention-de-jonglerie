@@ -61,15 +61,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Modifier l'édition -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/edit`"
-                icon="i-heroicons-pencil"
-                :title="$t('gestion.edit_edition')"
-                :description="$t('gestion.infos.edit_description')"
-                color="warning"
-              />
-
               <!-- Informations générales -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/general-info`"
@@ -113,16 +104,6 @@
                 :title="$t('gestion.map.title')"
                 :description="$t('gestion.infos.map_description')"
                 color="blue"
-              />
-
-              <!-- Supprimer l'édition -->
-              <ManagementNavigationCard
-                v-if="canDelete"
-                icon="i-heroicons-trash"
-                :title="$t('gestion.delete_edition')"
-                :description="$t('gestion.infos.delete_description')"
-                color="error"
-                @click="showDeleteConfirm = true"
               />
             </div>
           </div>
@@ -474,6 +455,18 @@
             </div>
           </div>
         </UCard>
+
+        <!-- Supprimer l'édition -->
+        <div v-if="canDelete" class="flex justify-end">
+          <UButton
+            color="error"
+            variant="soft"
+            icon="i-heroicons-trash"
+            @click="showDeleteConfirm = true"
+          >
+            {{ $t('gestion.delete_edition') }}
+          </UButton>
+        </div>
       </div>
     </div>
   </div>
@@ -643,9 +636,6 @@ const { execute: executeSaveStatus, loading: savingStatus } = useApiAction(
     successMessage: { title: t('edition.status_updated') },
     errorMessages: { default: t('errors.status_update_failed') },
     onSuccess: async () => {
-      if (edition.value) {
-        edition.value.status = localStatus.value
-      }
       await editionStore.fetchEditionById(editionId, { force: true })
     },
     onError: () => {

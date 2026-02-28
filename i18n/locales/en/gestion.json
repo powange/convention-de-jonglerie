@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Are you sure you want to scrap this edition?",
     "delete_edition": "Delete edit",
-    "edit_edition": "Modify editing",
     "external_links": {
       "description": "Manage links to your website, ticketing and social media.",
       "save": "Save",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Edit the name, dates, timezone and address of your event.",
+      "name_fallback_hint": "If no name is specified, the convention name will be used",
       "save": "Save",
       "save_error": "Error updating information",
       "save_success": "Information updated successfully",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Edit the poster, description and program",
-      "delete_description": "Permanently delete this edition and all its data",
-      "edit_description": "Edit the dates, location and information of the edition",
       "external_links_description": "Manage website, ticketing and social media",
       "general_info_description": "Edit the name, dates and address",
       "map_description": "Define zones on the site map",

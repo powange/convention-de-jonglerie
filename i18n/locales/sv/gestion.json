@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
     "delete_edition": "Radera redigera",
-    "edit_edition": "Ändra redigering",
     "external_links": {
       "description": "Hantera länkar till din webbplats, biljettförsäljning och sociala medier.",
       "save": "Spara",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Redigera namn, datum, tidszon och adress för ditt evenemang.",
+      "name_fallback_hint": "Om inget namn anges kommer konventionens namn att användas",
       "save": "Spara",
       "save_error": "Fel vid uppdatering av information",
       "save_success": "Information uppdaterad",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Redigera affisch, beskrivning och program",
-      "delete_description": "Ta bort denna upplaga och all dess data permanent",
-      "edit_description": "Redigera datum, plats och information om upplagan",
       "external_links_description": "Hantera webbplats, biljettförsäljning och sociala medier",
       "general_info_description": "Redigera namn, datum och adress",
       "map_description": "Definiera zonerna på områdeskartan",

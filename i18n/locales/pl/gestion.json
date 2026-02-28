@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Jesteś pewien, że chcesz wyrzucić tę edycję?",
     "delete_edition": "Usuń edycję",
-    "edit_edition": "Modyfikacja edycji",
     "external_links": {
       "description": "Zarządzaj linkami do swojej strony internetowej, sprzedaży biletów i mediów społecznościowych.",
       "save": "Zapisz",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Edytuj nazwę, daty, strefę czasową i adres swojego wydarzenia.",
+      "name_fallback_hint": "Jeśli nie podano nazwy, zostanie użyta nazwa konwencji",
       "save": "Zapisz",
       "save_error": "Błąd podczas aktualizacji informacji",
       "save_success": "Informacje zaktualizowane pomyślnie",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Edytuj plakat, opis i program",
-      "delete_description": "Trwale usuń tę edycję i wszystkie jej dane",
-      "edit_description": "Zmień daty, miejsce i informacje o edycji",
       "external_links_description": "Zarządzaj stroną internetową, sprzedażą biletów i mediami społecznościowymi",
       "general_info_description": "Edytuj nazwę, daty i adres",
       "map_description": "Zdefiniuj strefy na mapie terenu",

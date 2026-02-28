@@ -137,8 +137,7 @@ const getCurrentSection = (path: string): string | null => {
     path.includes('/gestion/services') ||
     path.includes('/gestion/about') ||
     path.includes('/gestion/external-links') ||
-    path.includes('/gestion/general-info') ||
-    path.includes('/edit')
+    path.includes('/gestion/general-info')
   )
     return 'infos'
   return null
@@ -239,11 +238,6 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.infos.title'),
       icon: 'i-lucide-info',
       children: [
-        {
-          label: t('gestion.edit_edition'),
-          icon: 'i-heroicons-pencil',
-          to: `/editions/${editionId.value}/edit`,
-        },
         {
           label: t('gestion.general_info.title'),
           icon: 'i-lucide-settings',

@@ -101,10 +101,10 @@
     "edition_form": {
       "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
       "address_title": "Adresse du lieu",
-      "end_date_time": "Date et heure de fin",
       "convention_description_placeholder": "Description de la convention",
       "convention_poster_optional": "Affiche de la convention (Optionnel)",
       "country_placeholder": "Nom du pays",
+      "end_date_time": "Date et heure de fin",
       "facebook_page": "Page Facebook",
       "instagram_account": "Compte Instagram",
       "next": "Suivant",

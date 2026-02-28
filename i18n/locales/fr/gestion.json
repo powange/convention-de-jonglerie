@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
     "delete_edition": "Supprimer l'édition",
-    "edit_edition": "Modifier l'édition",
     "external_links": {
       "description": "Gérez les liens vers votre site web, billetterie et réseaux sociaux.",
       "save": "Enregistrer",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Modifiez le nom, les dates, le fuseau horaire et l'adresse de votre événement.",
+      "name_fallback_hint": "Si aucun nom n'est spécifié, le nom de la convention sera utilisé",
       "save": "Enregistrer",
       "save_error": "Erreur lors de la mise à jour des informations",
       "save_success": "Informations mises à jour avec succès",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Modifier l'affiche, la description et le programme",
-      "delete_description": "Supprimer définitivement cette édition et toutes ses données",
-      "edit_description": "Modifier les dates, lieu et informations de l'édition",
       "external_links_description": "Gérer le site web, la billetterie et les réseaux sociaux",
       "general_info_description": "Modifier le nom, les dates et l'adresse",
       "map_description": "Définir les zones sur la carte du site",
@@ -129,13 +127,6 @@
       "validation_title": "Validation des repas",
       "volunteers": "Bénévoles"
     },
-    "services": {
-      "description": "Gérez les services et équipements disponibles lors de votre événement.",
-      "save": "Enregistrer les services",
-      "save_error": "Erreur lors de la mise à jour des services",
-      "save_success": "Services mis à jour avec succès",
-      "title": "Services"
-    },
     "organizers": {
       "access_rights": "Droits d'accès",
       "add_returnable_item": "Ajouter un article",
@@ -189,6 +180,13 @@
       "title_required": "Le titre de l'organisateur est requis"
     },
     "overview": "Vue d'ensemble",
+    "services": {
+      "description": "Gérez les services et équipements disponibles lors de votre événement.",
+      "save": "Enregistrer les services",
+      "save_error": "Erreur lors de la mise à jour des services",
+      "save_success": "Services mis à jour avec succès",
+      "title": "Services"
+    },
     "shows": {
       "add_show": "Ajouter un spectacle",
       "artists": "Artistes",

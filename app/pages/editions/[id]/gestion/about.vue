@@ -188,9 +188,8 @@ const { execute: save, loading: saving } = useApiAction(() => `/api/editions/${e
   successMessage: { title: t('gestion.about.save_success') },
   errorMessages: { default: t('gestion.about.save_error') },
   onSuccess: (response: any) => {
-    const data = response?.data || response
-    if (data) {
-      editionStore.setEdition(data)
+    if (response && edition.value) {
+      editionStore.setEdition({ ...edition.value, ...response })
     }
   },
 })

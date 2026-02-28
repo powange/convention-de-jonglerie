@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Er du sikker på, at du vil skrotte denne udgave?",
     "delete_edition": "Slet redigering",
-    "edit_edition": "Modificer redigering",
     "external_links": {
       "description": "Administrer links til din hjemmeside, billetsalg og sociale medier.",
       "save": "Gem",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Rediger navn, datoer, tidszone og adresse for dit arrangement.",
+      "name_fallback_hint": "Hvis der ikke angives et navn, vil konventionens navn blive brugt",
       "save": "Gem",
       "save_error": "Fejl ved opdatering af oplysninger",
       "save_success": "Oplysninger opdateret",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Rediger plakat, beskrivelse og program",
-      "delete_description": "Slet denne udgave og alle dens data permanent",
-      "edit_description": "Rediger datoer, sted og oplysninger om udgaven",
       "external_links_description": "Administrer hjemmeside, billetsalg og sociale medier",
       "general_info_description": "Rediger navn, datoer og adresse",
       "map_description": "Definer zonerne på områdekortet",

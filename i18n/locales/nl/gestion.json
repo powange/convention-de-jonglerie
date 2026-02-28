@@ -14,7 +14,6 @@
     },
     "confirm_delete_edition": "Weet je zeker dat je deze editie wilt schrappen?",
     "delete_edition": "Bewerken verwijderen",
-    "edit_edition": "Bewerken aanpassen",
     "external_links": {
       "description": "Beheer links naar uw website, ticketverkoop en sociale media.",
       "save": "Opslaan",
@@ -24,6 +23,7 @@
     },
     "general_info": {
       "description": "Bewerk de naam, data, tijdzone en het adres van uw evenement.",
+      "name_fallback_hint": "Als er geen naam is opgegeven, wordt de naam van de conventie gebruikt",
       "save": "Opslaan",
       "save_error": "Fout bij het bijwerken van de informatie",
       "save_success": "Informatie succesvol bijgewerkt",
@@ -31,8 +31,6 @@
     },
     "infos": {
       "about_description": "Poster, beschrijving en programma bewerken",
-      "delete_description": "Deze editie en alle bijbehorende gegevens definitief verwijderen",
-      "edit_description": "De datums, locatie en informatie van de editie bewerken",
       "external_links_description": "Website, ticketverkoop en sociale media beheren",
       "general_info_description": "Naam, data en adres bewerken",
       "map_description": "Zones op de plattegrond definiëren",
