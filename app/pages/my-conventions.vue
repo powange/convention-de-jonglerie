@@ -708,7 +708,7 @@ const { execute: executeDuplicateEdition, loading: duplicatingEdition } = useApi
     },
     errorMessages: { default: t('conventions.duplication_error') },
     onSuccess: async (result: any) => {
-      await navigateTo(`/editions/${result.id}/edit`)
+      await navigateTo(`/editions/${result.id}/gestion`)
     },
   }
 )

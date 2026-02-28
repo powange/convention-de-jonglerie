@@ -215,11 +215,6 @@ const getEditionActions = (edition: DashboardEdition) => {
 
   if (canEditEdition(edition.id)) {
     actions.push({
-      label: t('common.edit'),
-      icon: 'i-heroicons-pencil',
-      to: `/editions/${edition.id}/edit`,
-    })
-    actions.push({
       label: t('common.manage'),
       icon: 'i-heroicons-cog-6-tooth',
       to: `/editions/${edition.id}/gestion`,

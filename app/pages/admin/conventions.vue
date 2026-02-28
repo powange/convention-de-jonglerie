@@ -773,11 +773,6 @@ const getDropdownItems = (editionId: number) => {
         to: `/editions/${editionId}`,
       },
       {
-        label: t('common.edit'),
-        icon: 'i-heroicons-pencil-square',
-        to: `/editions/${editionId}/edit`,
-      },
-      {
         label: t('common.manage'),
         icon: 'i-heroicons-cog-6-tooth',
         to: `/editions/${editionId}/gestion`,
