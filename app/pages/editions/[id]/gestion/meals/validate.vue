@@ -609,10 +609,10 @@ const fetchMealStats = async () => {
 
   loadingStats.value = true
   try {
-    const data = await $fetch<{ success: boolean; stats: any }>(
+    const data = await $fetch<{ data: { stats: any } }>(
       `/api/editions/${editionId}/meals/${selectedMeal.value.id}/stats`
     )
-    mealStats.value = data.stats || null
+    mealStats.value = data.data?.stats || null
   } catch {
     mealStats.value = null
   } finally {

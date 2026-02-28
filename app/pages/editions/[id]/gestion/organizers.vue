@@ -672,12 +672,14 @@ const loadEditionOrganizers = async () => {
   loadingEditionOrganizers.value = true
   try {
     const [editionOrgsResult, availableOrgsResult] = await Promise.all([
-      $fetch<{ organizers: any[] }>(`/api/editions/${editionId}/organizers/edition-organizers`),
-      $fetch<{ organizers: any[] }>(`/api/editions/${editionId}/organizers/available`),
+      $fetch<{ data: { organizers: any[] } }>(
+        `/api/editions/${editionId}/organizers/edition-organizers`
+      ),
+      $fetch<{ data: { organizers: any[] } }>(`/api/editions/${editionId}/organizers/available`),
     ])
 
-    editionOrganizers.value = editionOrgsResult.organizers || []
-    availableOrganizers.value = availableOrgsResult.organizers || []
+    editionOrganizers.value = editionOrgsResult.data?.organizers || []
+    availableOrganizers.value = availableOrgsResult.data?.organizers || []
   } catch (error) {
     console.error('Failed to load edition organizers:', error)
     toast.add({
