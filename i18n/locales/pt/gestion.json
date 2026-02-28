@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Edite o cartaz, a descrição e o programa do seu evento.",
+      "save": "Guardar",
+      "save_error": "Erro ao atualizar as informações",
+      "save_success": "Informações atualizadas com sucesso",
+      "title": "Sobre"
+    },
     "artists": {
       "list_title": "Gestão de artistas",
       "manage_artists_description": "Gerir os artistas convidados para esta edição",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Tens a certeza de que queres eliminar esta edição?",
     "delete_edition": "Eliminar edição",
     "edit_edition": "Modificar a edição",
+    "external_links": {
+      "description": "Gerir os links para o seu site, bilheteira e redes sociais.",
+      "save": "Guardar",
+      "save_error": "Erro ao atualizar os links",
+      "save_success": "Links atualizados com sucesso",
+      "title": "Links externos"
+    },
+    "general_info": {
+      "description": "Edite o nome, as datas, o fuso horário e o endereço do seu evento.",
+      "save": "Guardar",
+      "save_error": "Erro ao atualizar as informações",
+      "save_success": "Informações atualizadas com sucesso",
+      "title": "Informações gerais"
+    },
     "infos": {
+      "about_description": "Editar o cartaz, a descrição e o programa",
       "delete_description": "Eliminar permanentemente esta edição e todos os seus dados",
       "edit_description": "Modificar as datas, local e informações da edição",
+      "external_links_description": "Gerir o site, a bilheteira e as redes sociais",
+      "general_info_description": "Editar o nome, as datas e o endereço",
       "map_description": "Definir as zonas no mapa do local",
+      "services_description": "Gerir os serviços e equipamentos disponíveis",
       "title": "Informações"
     },
     "lost_found_active_description": "Os participantes podem comunicar objectos perdidos e achados",
@@ -157,6 +182,13 @@
       "title_required": "O título do organizador é obrigatório"
     },
     "overview": "Visão geral",
+    "services": {
+      "description": "Gerir os serviços e equipamentos disponíveis no seu evento.",
+      "save": "Guardar serviços",
+      "save_error": "Erro ao atualizar os serviços",
+      "save_success": "Serviços atualizados com sucesso",
+      "title": "Serviços"
+    },
     "shows": {
       "add_show": "Adicionar um espetáculo",
       "artists": "Artistas",

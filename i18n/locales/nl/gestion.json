@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Bewerk de poster, beschrijving en het programma van uw evenement.",
+      "save": "Opslaan",
+      "save_error": "Fout bij het bijwerken van de informatie",
+      "save_success": "Informatie succesvol bijgewerkt",
+      "title": "Over"
+    },
     "artists": {
       "list_title": "Artiestenmanagement",
       "manage_artists_description": "Beheer de kunstenaars die zijn uitgenodigd voor deze editie",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Weet je zeker dat je deze editie wilt schrappen?",
     "delete_edition": "Bewerken verwijderen",
     "edit_edition": "Bewerken aanpassen",
+    "external_links": {
+      "description": "Beheer links naar uw website, ticketverkoop en sociale media.",
+      "save": "Opslaan",
+      "save_error": "Fout bij het bijwerken van de links",
+      "save_success": "Links succesvol bijgewerkt",
+      "title": "Externe links"
+    },
+    "general_info": {
+      "description": "Bewerk de naam, data, tijdzone en het adres van uw evenement.",
+      "save": "Opslaan",
+      "save_error": "Fout bij het bijwerken van de informatie",
+      "save_success": "Informatie succesvol bijgewerkt",
+      "title": "Algemene informatie"
+    },
     "infos": {
+      "about_description": "Poster, beschrijving en programma bewerken",
       "delete_description": "Deze editie en alle bijbehorende gegevens definitief verwijderen",
       "edit_description": "De datums, locatie en informatie van de editie bewerken",
+      "external_links_description": "Website, ticketverkoop en sociale media beheren",
+      "general_info_description": "Naam, data en adres bewerken",
       "map_description": "Zones op de plattegrond definiëren",
+      "services_description": "Beschikbare diensten en faciliteiten beheren",
       "title": "Informatie"
     },
     "lost_found_active_description": "Deelnemers kunnen verloren en gevonden voorwerpen melden",
@@ -157,6 +182,13 @@
       "title_required": "Titel van organisator is verplicht"
     },
     "overview": "Overzicht",
+    "services": {
+      "description": "Beheer de diensten en faciliteiten beschikbaar op uw evenement.",
+      "save": "Diensten opslaan",
+      "save_error": "Fout bij het bijwerken van de diensten",
+      "save_success": "Diensten succesvol bijgewerkt",
+      "title": "Diensten"
+    },
     "shows": {
       "add_show": "Voeg een voorstelling toe",
       "artists": "Artiesten",

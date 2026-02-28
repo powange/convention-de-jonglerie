@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Edytuj plakat, opis i program swojego wydarzenia.",
+      "save": "Zapisz",
+      "save_error": "Błąd podczas aktualizacji informacji",
+      "save_success": "Informacje zaktualizowane pomyślnie",
+      "title": "O nas"
+    },
     "artists": {
       "list_title": "Zarządzanie artystami",
       "manage_artists_description": "Zarządzaj artystami zaproszonymi do tej edycji",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Jesteś pewien, że chcesz wyrzucić tę edycję?",
     "delete_edition": "Usuń edycję",
     "edit_edition": "Modyfikacja edycji",
+    "external_links": {
+      "description": "Zarządzaj linkami do swojej strony internetowej, sprzedaży biletów i mediów społecznościowych.",
+      "save": "Zapisz",
+      "save_error": "Błąd podczas aktualizacji linków",
+      "save_success": "Linki zaktualizowane pomyślnie",
+      "title": "Linki zewnętrzne"
+    },
+    "general_info": {
+      "description": "Edytuj nazwę, daty, strefę czasową i adres swojego wydarzenia.",
+      "save": "Zapisz",
+      "save_error": "Błąd podczas aktualizacji informacji",
+      "save_success": "Informacje zaktualizowane pomyślnie",
+      "title": "Informacje ogólne"
+    },
     "infos": {
+      "about_description": "Edytuj plakat, opis i program",
       "delete_description": "Trwale usuń tę edycję i wszystkie jej dane",
       "edit_description": "Zmień daty, miejsce i informacje o edycji",
+      "external_links_description": "Zarządzaj stroną internetową, sprzedażą biletów i mediami społecznościowymi",
+      "general_info_description": "Edytuj nazwę, daty i adres",
       "map_description": "Zdefiniuj strefy na mapie terenu",
+      "services_description": "Zarządzaj dostępnymi usługami i udogodnieniami",
       "title": "Informacje"
     },
     "lost_found_active_description": "Uczestnicy mogą zgłaszać zgubione i znalezione przedmioty",
@@ -157,6 +182,13 @@
       "title_required": "Tytuł organizatora jest wymagany"
     },
     "overview": "Przegląd",
+    "services": {
+      "description": "Zarządzaj usługami i udogodnieniami dostępnymi na swoim wydarzeniu.",
+      "save": "Zapisz usługi",
+      "save_error": "Błąd podczas aktualizacji usług",
+      "save_success": "Usługi zaktualizowane pomyślnie",
+      "title": "Usługi"
+    },
     "shows": {
       "add_show": "Dodaj przedstawienie",
       "artists": "Artyści",

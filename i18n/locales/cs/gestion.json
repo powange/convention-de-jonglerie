@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Upravte plakát, popis a program vaší akce.",
+      "save": "Uložit",
+      "save_error": "Chyba při aktualizaci informací",
+      "save_success": "Informace úspěšně aktualizovány",
+      "title": "O akci"
+    },
     "artists": {
       "list_title": "Správa umělců",
       "manage_artists_description": "Správa umělců pozvaných do tohoto vydání",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Jste si jistí, že chcete toto vydání vyřadit?",
     "delete_edition": "Smazat upravit",
     "edit_edition": "Úprava úprav",
+    "external_links": {
+      "description": "Spravujte odkazy na váš web, prodej vstupenek a sociální sítě.",
+      "save": "Uložit",
+      "save_error": "Chyba při aktualizaci odkazů",
+      "save_success": "Odkazy úspěšně aktualizovány",
+      "title": "Externí odkazy"
+    },
+    "general_info": {
+      "description": "Upravte název, data, časové pásmo a adresu vaší akce.",
+      "save": "Uložit",
+      "save_error": "Chyba při aktualizaci informací",
+      "save_success": "Informace úspěšně aktualizovány",
+      "title": "Obecné informace"
+    },
     "infos": {
+      "about_description": "Upravit plakát, popis a program",
       "delete_description": "Trvale smazat tuto edici a všechna její data",
       "edit_description": "Upravit data, místo a informace o edici",
+      "external_links_description": "Spravovat web, prodej vstupenek a sociální sítě",
+      "general_info_description": "Upravit název, data a adresu",
       "map_description": "Definovat zóny na mapě areálu",
+      "services_description": "Spravovat dostupné služby a vybavení",
       "title": "Informace"
     },
     "lost_found_active_description": "Účastníci mohou nahlásit ztracené a nalezené předměty",
@@ -157,6 +182,13 @@
       "title_required": "Titul organizátora je povinný"
     },
     "overview": "Přehled",
+    "services": {
+      "description": "Spravujte služby a vybavení dostupné na vaší akci.",
+      "save": "Uložit služby",
+      "save_error": "Chyba při aktualizaci služeb",
+      "save_success": "Služby úspěšně aktualizovány",
+      "title": "Služby"
+    },
     "shows": {
       "add_show": "Přidat představení",
       "artists": "Umělci",

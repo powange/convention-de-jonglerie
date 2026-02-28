@@ -100,6 +100,8 @@
     },
     "edition_form": {
       "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
+      "address_title": "Adresse du lieu",
+      "end_date_time": "Date et heure de fin",
       "convention_description_placeholder": "Description de la convention",
       "convention_poster_optional": "Affiche de la convention (Optionnel)",
       "country_placeholder": "Nom du pays",
@@ -113,6 +115,7 @@
       "program_placeholder": "Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Partagez vos pages pour augmenter la visibilité",
       "social_networks_title": "Réseaux sociaux",
+      "start_date_time": "Date et heure de début",
       "step_about_description": "Description de l'édition",
       "step_about_title": "À propos",
       "step_external_links_description": "Billetterie et réseaux sociaux",

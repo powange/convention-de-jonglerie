@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Bearbeiten Sie das Plakat, die Beschreibung und das Programm Ihrer Veranstaltung.",
+      "save": "Speichern",
+      "save_error": "Fehler beim Aktualisieren der Informationen",
+      "save_success": "Informationen erfolgreich aktualisiert",
+      "title": "Über uns"
+    },
     "artists": {
       "list_title": "Verwaltung von Künstlern",
       "manage_artists_description": "Verwalten Sie die zu dieser Ausgabe eingeladenen Künstler",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Sind Sie sicher, dass Sie diese Ausgabe löschen möchten?",
     "delete_edition": "Ausgabe löschen",
     "edit_edition": "Bearbeiten der Ausgabe",
+    "external_links": {
+      "description": "Verwalten Sie Links zu Ihrer Website, Ticketing und sozialen Medien.",
+      "save": "Speichern",
+      "save_error": "Fehler beim Aktualisieren der Links",
+      "save_success": "Links erfolgreich aktualisiert",
+      "title": "Externe Links"
+    },
+    "general_info": {
+      "description": "Bearbeiten Sie Name, Daten, Zeitzone und Adresse Ihrer Veranstaltung.",
+      "save": "Speichern",
+      "save_error": "Fehler beim Aktualisieren der Informationen",
+      "save_success": "Informationen erfolgreich aktualisiert",
+      "title": "Allgemeine Informationen"
+    },
     "infos": {
+      "about_description": "Plakat, Beschreibung und Programm bearbeiten",
       "delete_description": "Diese Ausgabe und alle zugehörigen Daten endgültig löschen",
       "edit_description": "Daten, Ort und Informationen der Ausgabe bearbeiten",
+      "external_links_description": "Website, Ticketing und soziale Medien verwalten",
+      "general_info_description": "Name, Daten und Adresse bearbeiten",
       "map_description": "Zonen auf der Geländekarte definieren",
+      "services_description": "Verfügbare Dienste und Einrichtungen verwalten",
       "title": "Informationen"
     },
     "lost_found_active_description": "Teilnehmer können gefundene oder verlorene Gegenstände melden",
@@ -157,6 +182,13 @@
       "title_required": "Der Titel des Organisators ist erforderlich"
     },
     "overview": "Übersicht",
+    "services": {
+      "description": "Verwalten Sie die bei Ihrer Veranstaltung verfügbaren Dienste und Einrichtungen.",
+      "save": "Dienste speichern",
+      "save_error": "Fehler beim Aktualisieren der Dienste",
+      "save_success": "Dienste erfolgreich aktualisiert",
+      "title": "Dienste"
+    },
     "shows": {
       "add_show": "Vorstellung hinzufügen",
       "artists": "Künstler",

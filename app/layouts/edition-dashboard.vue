@@ -132,7 +132,15 @@ const getCurrentSection = (path: string): string | null => {
   if (path.includes('/gestion/artists') || path.includes('/gestion/shows-call')) return 'artists'
   if (path.includes('/gestion/meals')) return 'meals'
   if (path.includes('/gestion/ticketing')) return 'ticketing'
-  if (path.includes('/gestion/map') || path.includes('/edit')) return 'infos'
+  if (
+    path.includes('/gestion/map') ||
+    path.includes('/gestion/services') ||
+    path.includes('/gestion/about') ||
+    path.includes('/gestion/external-links') ||
+    path.includes('/gestion/general-info') ||
+    path.includes('/edit')
+  )
+    return 'infos'
   return null
 }
 
@@ -235,6 +243,26 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('gestion.edit_edition'),
           icon: 'i-heroicons-pencil',
           to: `/editions/${editionId.value}/edit`,
+        },
+        {
+          label: t('gestion.general_info.title'),
+          icon: 'i-lucide-settings',
+          to: `/editions/${editionId.value}/gestion/general-info`,
+        },
+        {
+          label: t('gestion.about.title'),
+          icon: 'i-lucide-file-text',
+          to: `/editions/${editionId.value}/gestion/about`,
+        },
+        {
+          label: t('gestion.services.title'),
+          icon: 'i-lucide-wrench',
+          to: `/editions/${editionId.value}/gestion/services`,
+        },
+        {
+          label: t('gestion.external_links.title'),
+          icon: 'i-lucide-link',
+          to: `/editions/${editionId.value}/gestion/external-links`,
         },
         {
           label: t('gestion.map.title'),

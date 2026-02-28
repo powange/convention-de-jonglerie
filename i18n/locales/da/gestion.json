@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Rediger plakaten, beskrivelsen og programmet for dit arrangement.",
+      "save": "Gem",
+      "save_error": "Fejl ved opdatering af oplysninger",
+      "save_success": "Oplysninger opdateret",
+      "title": "Om"
+    },
     "artists": {
       "list_title": "Management af kunstnere",
       "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Er du sikker på, at du vil skrotte denne udgave?",
     "delete_edition": "Slet redigering",
     "edit_edition": "Modificer redigering",
+    "external_links": {
+      "description": "Administrer links til din hjemmeside, billetsalg og sociale medier.",
+      "save": "Gem",
+      "save_error": "Fejl ved opdatering af links",
+      "save_success": "Links opdateret",
+      "title": "Eksterne links"
+    },
+    "general_info": {
+      "description": "Rediger navn, datoer, tidszone og adresse for dit arrangement.",
+      "save": "Gem",
+      "save_error": "Fejl ved opdatering af oplysninger",
+      "save_success": "Oplysninger opdateret",
+      "title": "Generelle oplysninger"
+    },
     "infos": {
+      "about_description": "Rediger plakat, beskrivelse og program",
       "delete_description": "Slet denne udgave og alle dens data permanent",
       "edit_description": "Rediger datoer, sted og oplysninger om udgaven",
+      "external_links_description": "Administrer hjemmeside, billetsalg og sociale medier",
+      "general_info_description": "Rediger navn, datoer og adresse",
       "map_description": "Definer zonerne på områdekortet",
+      "services_description": "Administrer tilgængelige tjenester og faciliteter",
       "title": "Information"
     },
     "lost_found_active_description": "Deltagere kan rapportere tabte og fundne genstande",
@@ -157,6 +182,13 @@
       "title_required": "Arrangørens titel er påkrævet"
     },
     "overview": "Oversigt",
+    "services": {
+      "description": "Administrer tjenester og faciliteter tilgængelige ved dit arrangement.",
+      "save": "Gem tjenester",
+      "save_error": "Fejl ved opdatering af tjenester",
+      "save_success": "Tjenester opdateret",
+      "title": "Tjenester"
+    },
     "shows": {
       "add_show": "Tilføj en forestilling",
       "artists": "Kunstnere",

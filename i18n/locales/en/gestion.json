@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Edit the poster, description and program of your event.",
+      "save": "Save",
+      "save_error": "Error updating information",
+      "save_success": "Information updated successfully",
+      "title": "About"
+    },
     "artists": {
       "list_title": "Artist management",
       "manage_artists_description": "Manage the artists invited to this edition",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Are you sure you want to scrap this edition?",
     "delete_edition": "Delete edit",
     "edit_edition": "Modify editing",
+    "external_links": {
+      "description": "Manage links to your website, ticketing and social media.",
+      "save": "Save",
+      "save_error": "Error updating links",
+      "save_success": "Links updated successfully",
+      "title": "External links"
+    },
+    "general_info": {
+      "description": "Edit the name, dates, timezone and address of your event.",
+      "save": "Save",
+      "save_error": "Error updating information",
+      "save_success": "Information updated successfully",
+      "title": "General information"
+    },
     "infos": {
+      "about_description": "Edit the poster, description and program",
       "delete_description": "Permanently delete this edition and all its data",
       "edit_description": "Edit the dates, location and information of the edition",
+      "external_links_description": "Manage website, ticketing and social media",
+      "general_info_description": "Edit the name, dates and address",
       "map_description": "Define zones on the site map",
+      "services_description": "Manage available services and facilities",
       "title": "Information"
     },
     "lost_found_active_description": "Participants can report lost and found items",
@@ -157,6 +182,13 @@
       "title_required": "Organizer title is required"
     },
     "overview": "Overview",
+    "services": {
+      "description": "Manage services and facilities available at your event.",
+      "save": "Save services",
+      "save_error": "Error updating services",
+      "save_success": "Services updated successfully",
+      "title": "Services"
+    },
     "shows": {
       "add_show": "Add a show",
       "artists": "Artists",

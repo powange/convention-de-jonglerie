@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Redigera affischen, beskrivningen och programmet för ditt evenemang.",
+      "save": "Spara",
+      "save_error": "Fel vid uppdatering av information",
+      "save_success": "Information uppdaterad",
+      "title": "Om"
+    },
     "artists": {
       "list_title": "Artisthantering",
       "manage_artists_description": "Hantera de inbjudna konstnärerna till denna utgåva",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
     "delete_edition": "Radera redigera",
     "edit_edition": "Ändra redigering",
+    "external_links": {
+      "description": "Hantera länkar till din webbplats, biljettförsäljning och sociala medier.",
+      "save": "Spara",
+      "save_error": "Fel vid uppdatering av länkar",
+      "save_success": "Länkar uppdaterade",
+      "title": "Externa länkar"
+    },
+    "general_info": {
+      "description": "Redigera namn, datum, tidszon och adress för ditt evenemang.",
+      "save": "Spara",
+      "save_error": "Fel vid uppdatering av information",
+      "save_success": "Information uppdaterad",
+      "title": "Allmän information"
+    },
     "infos": {
+      "about_description": "Redigera affisch, beskrivning och program",
       "delete_description": "Ta bort denna upplaga och all dess data permanent",
       "edit_description": "Redigera datum, plats och information om upplagan",
+      "external_links_description": "Hantera webbplats, biljettförsäljning och sociala medier",
+      "general_info_description": "Redigera namn, datum och adress",
       "map_description": "Definiera zonerna på områdeskartan",
+      "services_description": "Hantera tillgängliga tjänster och faciliteter",
       "title": "Information"
     },
     "lost_found_active_description": "Deltagarna kan rapportera borttappade och upphittade föremål",
@@ -157,6 +182,13 @@
       "title_required": "Arrangörens titel är obligatorisk"
     },
     "overview": "Översikt",
+    "services": {
+      "description": "Hantera tjänster och faciliteter tillgängliga vid ditt evenemang.",
+      "save": "Spara tjänster",
+      "save_error": "Fel vid uppdatering av tjänster",
+      "save_success": "Tjänster uppdaterade",
+      "title": "Tjänster"
+    },
     "shows": {
       "add_show": "Lägg till en föreställning",
       "artists": "Artister",

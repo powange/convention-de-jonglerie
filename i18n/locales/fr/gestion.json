@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Modifiez l'affiche, la description et le programme de votre événement.",
+      "save": "Enregistrer",
+      "save_error": "Erreur lors de la mise à jour des informations",
+      "save_success": "Informations mises à jour avec succès",
+      "title": "À propos"
+    },
     "artists": {
       "list_title": "Gestion des artistes",
       "manage_artists_description": "Gérez les artistes invités à cette édition",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
     "delete_edition": "Supprimer l'édition",
     "edit_edition": "Modifier l'édition",
+    "external_links": {
+      "description": "Gérez les liens vers votre site web, billetterie et réseaux sociaux.",
+      "save": "Enregistrer",
+      "save_error": "Erreur lors de la mise à jour des liens",
+      "save_success": "Liens mis à jour avec succès",
+      "title": "Liens externes"
+    },
+    "general_info": {
+      "description": "Modifiez le nom, les dates, le fuseau horaire et l'adresse de votre événement.",
+      "save": "Enregistrer",
+      "save_error": "Erreur lors de la mise à jour des informations",
+      "save_success": "Informations mises à jour avec succès",
+      "title": "Informations générales"
+    },
     "infos": {
+      "about_description": "Modifier l'affiche, la description et le programme",
       "delete_description": "Supprimer définitivement cette édition et toutes ses données",
       "edit_description": "Modifier les dates, lieu et informations de l'édition",
+      "external_links_description": "Gérer le site web, la billetterie et les réseaux sociaux",
+      "general_info_description": "Modifier le nom, les dates et l'adresse",
       "map_description": "Définir les zones sur la carte du site",
+      "services_description": "Gérer les services et équipements disponibles",
       "title": "Informations"
     },
     "lost_found_active_description": "Les participants peuvent déclarer des objets trouvés ou perdus",
@@ -103,6 +128,13 @@
       "validation_description": "Valider la prise des repas par les participants",
       "validation_title": "Validation des repas",
       "volunteers": "Bénévoles"
+    },
+    "services": {
+      "description": "Gérez les services et équipements disponibles lors de votre événement.",
+      "save": "Enregistrer les services",
+      "save_error": "Erreur lors de la mise à jour des services",
+      "save_success": "Services mis à jour avec succès",
+      "title": "Services"
     },
     "organizers": {
       "access_rights": "Droits d'accès",

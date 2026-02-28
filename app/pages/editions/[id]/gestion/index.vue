@@ -70,6 +70,42 @@
                 color="warning"
               />
 
+              <!-- Informations générales -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/general-info`"
+                icon="i-lucide-settings"
+                :title="$t('gestion.general_info.title')"
+                :description="$t('gestion.infos.general_info_description')"
+                color="cyan"
+              />
+
+              <!-- À propos -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/about`"
+                icon="i-lucide-file-text"
+                :title="$t('gestion.about.title')"
+                :description="$t('gestion.infos.about_description')"
+                color="indigo"
+              />
+
+              <!-- Services -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/services`"
+                icon="i-lucide-wrench"
+                :title="$t('gestion.services.title')"
+                :description="$t('gestion.infos.services_description')"
+                color="teal"
+              />
+
+              <!-- Liens externes -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/external-links`"
+                icon="i-lucide-link"
+                :title="$t('gestion.external_links.title')"
+                :description="$t('gestion.infos.external_links_description')"
+                color="violet"
+              />
+
               <!-- Carte du site -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/map`"

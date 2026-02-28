@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Modifica la locandina, la descrizione e il programma del tuo evento.",
+      "save": "Salva",
+      "save_error": "Errore durante l'aggiornamento delle informazioni",
+      "save_success": "Informazioni aggiornate con successo",
+      "title": "Informazioni"
+    },
     "artists": {
       "list_title": "Gestione degli artisti",
       "manage_artists_description": "Gestisci gli artisti invitati a questa edizione",
@@ -8,10 +15,28 @@
     "confirm_delete_edition": "Sei sicuro di voler rottamare questa edizione?",
     "delete_edition": "Cancella modifica",
     "edit_edition": "Modificare l'editing",
+    "external_links": {
+      "description": "Gestisci i link al tuo sito web, biglietteria e social media.",
+      "save": "Salva",
+      "save_error": "Errore durante l'aggiornamento dei link",
+      "save_success": "Link aggiornati con successo",
+      "title": "Link esterni"
+    },
+    "general_info": {
+      "description": "Modifica il nome, le date, il fuso orario e l'indirizzo del tuo evento.",
+      "save": "Salva",
+      "save_error": "Errore durante l'aggiornamento delle informazioni",
+      "save_success": "Informazioni aggiornate con successo",
+      "title": "Informazioni generali"
+    },
     "infos": {
+      "about_description": "Modifica la locandina, la descrizione e il programma",
       "delete_description": "Eliminare definitivamente questa edizione e tutti i suoi dati",
       "edit_description": "Modificare le date, il luogo e le informazioni dell'edizione",
+      "external_links_description": "Gestisci il sito web, la biglietteria e i social media",
+      "general_info_description": "Modifica il nome, le date e l'indirizzo",
       "map_description": "Definisci le zone sulla mappa del sito",
+      "services_description": "Gestisci i servizi e le strutture disponibili",
       "title": "Informazioni"
     },
     "lost_found_active_description": "I partecipanti possono segnalare gli oggetti smarriti",
@@ -157,6 +182,13 @@
       "title_required": "Il titolo dell'organizzatore è obbligatorio"
     },
     "overview": "Panoramica",
+    "services": {
+      "description": "Gestisci i servizi e le strutture disponibili al tuo evento.",
+      "save": "Salva servizi",
+      "save_error": "Errore durante l'aggiornamento dei servizi",
+      "save_success": "Servizi aggiornati con successo",
+      "title": "Servizi"
+    },
     "shows": {
       "add_show": "Aggiungi uno spettacolo",
       "artists": "Artisti",
