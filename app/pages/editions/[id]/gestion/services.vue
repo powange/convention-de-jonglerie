@@ -44,7 +44,7 @@
               {{ category.label }}
             </h3>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             <UCheckbox
               v-for="service in category.services"
               :key="service.key"

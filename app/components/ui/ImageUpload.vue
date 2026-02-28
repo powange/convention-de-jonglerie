@@ -7,7 +7,7 @@
         <img
           :src="displayImageUrl"
           :alt="alt"
-          class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
+          class="w-full max-h-64 object-contain rounded-lg border-2 border-gray-200 dark:border-gray-700"
         />
         <div class="absolute top-2 right-2 flex space-x-2">
           <!-- Bouton de suppression -->
