@@ -71,6 +71,10 @@
                 <span class="text-gray-600 dark:text-gray-400">Nuxt:</span>
                 <span class="ml-2 font-mono">{{ config.server.nuxtVersion }}</span>
               </div>
+              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
+                <span class="text-gray-600 dark:text-gray-400">Prisma:</span>
+                <span class="ml-2 font-mono">{{ config.server.prismaVersion }}</span>
+              </div>
             </div>
           </div>
 

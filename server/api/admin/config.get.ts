@@ -1,3 +1,5 @@
+import { version } from '@prisma/client/package.json'
+
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 
@@ -18,6 +20,7 @@ export default wrapApiHandler(
       server: {
         nodeEnv: process.env.NODE_ENV,
         nuxtVersion: config.nuxtVersion || 'inconnu',
+        prismaVersion: version,
         // Configuration IA
         ai: {
           provider: process.env.AI_PROVIDER || config.aiProvider || 'non défini',
