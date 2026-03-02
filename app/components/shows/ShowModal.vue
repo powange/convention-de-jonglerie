@@ -62,23 +62,32 @@
             />
           </UFormField>
 
-          <!-- Zone ou point de repère -->
-          <UFormField :label="$t('gestion.shows.zone_or_marker')">
-            <USelect
-              v-model="selectedLocationRef"
-              :items="locationOptions"
-              :placeholder="$t('gestion.shows.select_zone_or_marker')"
-              class="w-full"
-            />
-          </UFormField>
-
-          <!-- Lieu (texte libre) -->
+          <!-- Lieu -->
           <UFormField :label="$t('gestion.shows.location')">
-            <UInput
-              v-model="formData.location"
-              :placeholder="$t('gestion.shows.location')"
-              class="w-full"
-            />
+            <div class="space-y-2">
+              <URadioGroup
+                v-model="locationType"
+                orientation="horizontal"
+                :items="locationTypeOptions"
+              />
+
+              <!-- Mode zone/marqueur -->
+              <USelect
+                v-if="locationType === 'zone'"
+                v-model="selectedLocationRef"
+                :items="locationOptions"
+                :placeholder="$t('gestion.shows.select_zone_or_marker')"
+                class="w-full"
+              />
+
+              <!-- Mode texte libre -->
+              <UInput
+                v-else
+                v-model="formData.location"
+                :placeholder="$t('gestion.shows.free_text_placeholder')"
+                class="w-full"
+              />
+            </div>
           </UFormField>
 
           <!-- Sélection des artistes -->
@@ -214,6 +223,14 @@ const formData = ref({
   returnableItemIds: [] as number[],
 })
 
+// Type de localisation : zone/marqueur ou texte libre
+const locationType = ref<'zone' | 'text'>('zone')
+
+const locationTypeOptions = computed(() => [
+  { label: t('gestion.shows.zone_or_marker'), value: 'zone' },
+  { label: t('gestion.shows.free_text'), value: 'text' },
+])
+
 // Configuration pour l'upload d'image
 const uploadEndpoint = computed(() => ({
   type: 'show' as const,
@@ -229,6 +246,16 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
 const onImageDeleted = () => {
   formData.value.imageUrl = null
 }
+
+// Nettoyer les données de l'autre mode au changement
+watch(locationType, (newType) => {
+  if (newType === 'zone') {
+    formData.value.location = ''
+  } else {
+    formData.value.zoneId = null
+    formData.value.markerId = null
+  }
+})
 
 // Sélection combinée zone/marqueur
 // Format de la valeur : "zone:{id}" ou "marker:{id}" ou "" (aucun)
@@ -409,6 +436,7 @@ const closeModal = () => {
 }
 
 const resetForm = () => {
+  locationType.value = 'zone'
   formData.value = {
     title: '',
     description: '',
@@ -447,6 +475,15 @@ watch(
         markerId: newShow.markerId || null,
         artistIds: newShow.artists?.map((showArtist: any) => showArtist.artistId) || [],
         returnableItemIds: newShow.returnableItems?.map((item: any) => item.returnableItemId) || [],
+      }
+
+      // Auto-détecter le mode selon les données existantes
+      if (newShow.zoneId || newShow.markerId) {
+        locationType.value = 'zone'
+      } else if (newShow.location) {
+        locationType.value = 'text'
+      } else {
+        locationType.value = 'zone'
       }
     } else {
       resetForm()

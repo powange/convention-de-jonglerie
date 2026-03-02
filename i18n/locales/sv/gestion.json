@@ -199,6 +199,8 @@
       "error_create": "Fel vid skapande av föreställning",
       "error_delete": "Fel vid borttagning av föreställning",
       "error_update": "Fel vid uppdatering av föreställning",
+      "free_text": "Fritext",
+      "free_text_placeholder": "Ange en plats...",
       "image": "Bild / Affisch",
       "image_placeholder": "Klicka för att lägga till en bild",
       "items_to_receive": "Föremål att hämta",

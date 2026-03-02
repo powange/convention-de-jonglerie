@@ -199,6 +199,8 @@
       "error_create": "Błąd podczas tworzenia przedstawienia",
       "error_delete": "Błąd podczas usuwania przedstawienia",
       "error_update": "Błąd podczas aktualizacji przedstawienia",
+      "free_text": "Dowolny tekst",
+      "free_text_placeholder": "Wpisz miejsce...",
       "image": "Obraz / Plakat",
       "image_placeholder": "Kliknij, aby dodać obraz",
       "items_to_receive": "Przedmioty do odebrania",

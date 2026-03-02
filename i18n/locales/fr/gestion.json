@@ -199,6 +199,8 @@
       "error_create": "Erreur lors de la création du spectacle",
       "error_delete": "Erreur lors de la suppression du spectacle",
       "error_update": "Erreur lors de la mise à jour du spectacle",
+      "free_text": "Texte libre",
+      "free_text_placeholder": "Saisir un lieu...",
       "image": "Image / Affiche",
       "image_placeholder": "Cliquez pour ajouter une image",
       "items_to_receive": "Articles à récupérer",

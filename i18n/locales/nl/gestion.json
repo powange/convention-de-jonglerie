@@ -199,6 +199,8 @@
       "error_create": "Fout bij maken van voorstelling",
       "error_delete": "Fout bij verwijderen van voorstelling",
       "error_update": "Fout bij bijwerken van voorstelling",
+      "free_text": "Vrije tekst",
+      "free_text_placeholder": "Voer een locatie in...",
       "image": "Afbeelding / Poster",
       "image_placeholder": "Klik om een afbeelding toe te voegen",
       "items_to_receive": "Artikelen om op te halen",

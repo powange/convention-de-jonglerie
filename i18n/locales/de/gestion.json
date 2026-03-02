@@ -199,6 +199,8 @@
       "error_create": "Fehler beim Erstellen der Vorstellung",
       "error_delete": "Fehler beim Löschen der Vorstellung",
       "error_update": "Fehler beim Aktualisieren der Vorstellung",
+      "free_text": "Freitext",
+      "free_text_placeholder": "Ort eingeben...",
       "image": "Bild / Plakat",
       "image_placeholder": "Klicken Sie, um ein Bild hinzuzufügen",
       "items_to_receive": "Gegenstände abzuholen",

@@ -199,6 +199,8 @@
       "error_create": "Error creating show",
       "error_delete": "Error deleting show",
       "error_update": "Error updating show",
+      "free_text": "Free text",
+      "free_text_placeholder": "Enter a location...",
       "image": "Image / Poster",
       "image_placeholder": "Click to add an image",
       "items_to_receive": "Items to receive",

@@ -199,6 +199,8 @@
       "error_create": "Fejl ved oprettelse af forestilling",
       "error_delete": "Fejl ved sletning af forestilling",
       "error_update": "Fejl ved opdatering af forestilling",
+      "free_text": "Fritekst",
+      "free_text_placeholder": "Indtast et sted...",
       "image": "Billede / Plakat",
       "image_placeholder": "Klik for at tilføje et billede",
       "items_to_receive": "Genstande at hente",

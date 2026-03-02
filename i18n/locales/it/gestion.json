@@ -199,6 +199,8 @@
       "error_create": "Errore durante la creazione dello spettacolo",
       "error_delete": "Errore durante l'eliminazione dello spettacolo",
       "error_update": "Errore durante l'aggiornamento dello spettacolo",
+      "free_text": "Testo libero",
+      "free_text_placeholder": "Inserisci un luogo...",
       "image": "Immagine / Locandina",
       "image_placeholder": "Clicca per aggiungere un'immagine",
       "items_to_receive": "Articoli da ritirare",

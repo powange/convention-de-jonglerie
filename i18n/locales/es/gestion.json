@@ -199,6 +199,8 @@
       "error_create": "Error al crear el espectáculo",
       "error_delete": "Error al eliminar el espectáculo",
       "error_update": "Error al actualizar el espectáculo",
+      "free_text": "Texto libre",
+      "free_text_placeholder": "Introducir un lugar...",
       "image": "Imagen / Cartel",
       "image_placeholder": "Haz clic para añadir una imagen",
       "items_to_receive": "Artículos para recuperar",
