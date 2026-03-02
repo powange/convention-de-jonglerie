@@ -389,7 +389,6 @@ export default defineNuxtConfig({
   },
 
   experimental: {
-    appManifest: false,
     // Améliorer les performances avec la lazy hydration
     lazyHydration: true,
     // Optimiser la gestion d'erreur des chunks

@@ -28,15 +28,13 @@ future: {
 
 **Attention** : nécessite de vérifier que le code existant n'utilise pas `data.value === null` ou des accès indexés non vérifiés. Passage progressif avec tests recommandé.
 
-### 2. `experimental.appManifest: false` — à reconsidérer (priorité haute)
+### ~~2. `experimental.appManifest: false` — à reconsidérer (priorité haute)~~ CORRIGÉ
 
-Ligne 392 — désactivé alors qu'activé par défaut et recommandé. Permet au client de respecter les route rules côté navigation. Sans elle, les `routeRules` (comme le layout `edition-dashboard`) ne sont appliquées que côté serveur.
+Ligne supprimée — `appManifest` reprend sa valeur par défaut (`true`). Le client respecte maintenant les route rules côté navigation.
 
-Sauf raison spécifique connue, supprimer cette ligne ou remettre à `true`.
+### ~~3. `compatibilityDate` potentiellement dans le futur (mineur)~~ CORRIGÉ
 
-### 3. `compatibilityDate` potentiellement dans le futur (mineur)
-
-Ligne 7 — `compatibilityDate: '2025-07-15'` est une date future par rapport à la version de Nuxt utilisée au moment de sa configuration. Normalement cette date correspond au jour de la mise à jour, pour verrouiller les comportements de Nitro. Peut être mis à jour à la date courante.
+Mis à jour à `'2026-03-02'` (date courante).
 
 ### 4. Options expérimentales à considérer (priorité moyenne)
 
