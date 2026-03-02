@@ -376,9 +376,6 @@ export default defineNuxtConfig({
         interval: 1000,
       },
     },
-    resolve: {
-      alias: {},
-    },
     optimizeDeps: {
       exclude: ['node-cron', '@prisma/client'],
     },

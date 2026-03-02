@@ -53,9 +53,9 @@ Ligne 1 — utilisé dans `nitro.rollupConfig.plugins`. Inhabituel car Nuxt gèr
 
 Ligne 3 — utilisé dans `vite.plugins`. Nuxt gère nativement les alias de paths. Avec `future.typescriptBundlerResolution: true`, ce plugin pourrait devenir redondant. À vérifier si sa suppression casse quelque chose.
 
-### 7. `vite.resolve.alias: {}` vide (cosmétique)
+### ~~7. `vite.resolve.alias: {}` vide (cosmétique)~~ CORRIGÉ
 
-Ligne 379-381 — objet alias vide qui ne fait rien. Peut être supprimé.
+Bloc `resolve.alias` vide supprimé.
 
 ### 8. i18n : `bundle.runtimeOnly: false` (à vérifier)
 
