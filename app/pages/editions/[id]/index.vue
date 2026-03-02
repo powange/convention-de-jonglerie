@@ -234,21 +234,6 @@
                               {{ show.zone?.name || show.marker?.name || show.location }}
                             </span>
                           </div>
-                          <div
-                            v-if="show.artists && show.artists.length > 0"
-                            class="flex flex-wrap gap-1 mt-2"
-                          >
-                            <UBadge
-                              v-for="showArtist in show.artists"
-                              :key="showArtist.artist.id"
-                              color="yellow"
-                              variant="subtle"
-                              size="sm"
-                            >
-                              {{ showArtist.artist.user.prenom }}
-                              {{ showArtist.artist.user.nom }}
-                            </UBadge>
-                          </div>
                           <p
                             v-if="show.description"
                             class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2"
@@ -311,20 +296,6 @@
                           <UIcon name="i-heroicons-map-pin" class="shrink-0" />
                           {{ show.zone?.name || show.marker?.name || show.location }}
                         </span>
-                      </div>
-                      <div
-                        v-if="show.artists && show.artists.length > 0"
-                        class="flex flex-wrap gap-1 mt-2"
-                      >
-                        <UBadge
-                          v-for="showArtist in show.artists"
-                          :key="showArtist.artist.id"
-                          color="yellow"
-                          variant="subtle"
-                          size="sm"
-                        >
-                          {{ showArtist.artist.user.prenom }} {{ showArtist.artist.user.nom }}
-                        </UBadge>
                       </div>
                       <p
                         v-if="show.description"

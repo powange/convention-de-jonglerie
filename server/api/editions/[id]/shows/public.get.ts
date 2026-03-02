@@ -12,20 +12,6 @@ export default wrapApiHandler(
         isPublic: true,
       },
       include: {
-        artists: {
-          include: {
-            artist: {
-              include: {
-                user: {
-                  select: {
-                    prenom: true,
-                    nom: true,
-                  },
-                },
-              },
-            },
-          },
-        },
         ...showZoneMarkerInclude,
       },
       orderBy: {

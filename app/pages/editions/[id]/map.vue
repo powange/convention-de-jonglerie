@@ -279,15 +279,6 @@ const buildShowsPopupHtml = (shows: any[]) => {
     html += `<div style="margin-top: 4px;">• ${escapeHtml(show.title)} — ${formatPopupTime(show.startDateTime)}`
     if (show.duration) html += ` (${show.duration} min)`
     html += '</div>'
-    if (show.artists?.length > 0) {
-      const names = show.artists
-        .map((a: any) => `${a.artist.user.prenom || ''} ${a.artist.user.nom || ''}`.trim())
-        .filter(Boolean)
-        .join(', ')
-      if (names) {
-        html += `<div style="font-size: 11px; color: #6b7280; margin-left: 12px;">${escapeHtml(names)}</div>`
-      }
-    }
   }
   html += '</div></div>'
   return html
