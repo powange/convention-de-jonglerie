@@ -66,6 +66,9 @@ export const useLeafletEditable = (
   const error = ref<string | null>(null)
   const isDrawing = ref(false)
   const isPlacingMarker = ref(false)
+  // Stockage des données de popup pour pouvoir les reconstruire avec du contenu supplémentaire
+  const popupBaseData = new Map<string, { name: string; description?: string | null }>()
+  const popupExtraContent = new Map<string, string>()
   const currentDrawingPolygon = shallowRef<EditablePolygon | null>(null)
   // Référence locale pour le nettoyage (au cas où whenReady n'a pas encore été appelé)
   let leafletMapInstance: EditableMap | null = null
@@ -202,6 +205,13 @@ export const useLeafletEditable = (
     }
   }
 
+  const buildPopupContent = (name: string, description?: string | null, extraHtml?: string) => {
+    let html = `<strong>${escapeHtml(name)}</strong>`
+    if (description) html += `<br/>${escapeHtmlWithNewlines(description)}`
+    if (extraHtml) html += extraHtml
+    return html
+  }
+
   const addPolygon = (zone: EditionZoneData) => {
     if (!map.value || !window.L || !zone.id) return
 
@@ -221,8 +231,9 @@ export const useLeafletEditable = (
     })
 
     // Ajouter un popup avec le nom (échappement HTML pour prévenir XSS)
-    const popupContent = `<strong>${escapeHtml(zone.name)}</strong>${zone.description ? `<br/>${escapeHtmlWithNewlines(zone.description)}` : ''}`
-    polygon.bindPopup(popupContent)
+    const key = `zone:${zone.id}`
+    popupBaseData.set(key, { name: zone.name, description: zone.description })
+    polygon.bindPopup(buildPopupContent(zone.name, zone.description, popupExtraContent.get(key)))
 
     // D'abord ajouter le polygone à la carte
     polygon.addTo(map.value)
@@ -283,10 +294,11 @@ export const useLeafletEditable = (
   }
 
   const updatePolygonPopup = (zoneId: number, name: string, description?: string | null) => {
+    const key = `zone:${zoneId}`
+    popupBaseData.set(key, { name, description })
     const polygon = polygons.value.get(zoneId)
     if (polygon) {
-      const popupContent = `<strong>${escapeHtml(name)}</strong>${description ? `<br/>${escapeHtmlWithNewlines(description)}` : ''}`
-      polygon.setPopupContent(popupContent)
+      polygon.setPopupContent(buildPopupContent(name, description, popupExtraContent.get(key)))
     }
   }
 
@@ -492,8 +504,11 @@ export const useLeafletEditable = (
     })
 
     // Ajouter un popup avec le nom (échappement HTML pour prévenir XSS)
-    const popupContent = `<strong>${escapeHtml(marker.name)}</strong>${marker.description ? `<br/>${escapeHtmlWithNewlines(marker.description)}` : ''}`
-    leafletMarker.bindPopup(popupContent)
+    const key = `marker:${marker.id}`
+    popupBaseData.set(key, { name: marker.name, description: marker.description })
+    leafletMarker.bindPopup(
+      buildPopupContent(marker.name, marker.description, popupExtraContent.get(key))
+    )
 
     leafletMarker.addTo(map.value)
     leafletMarkers.value.set(marker.id, leafletMarker)
@@ -521,10 +536,28 @@ export const useLeafletEditable = (
   }
 
   const updateMarkerPopup = (markerId: number, name: string, description?: string | null) => {
+    const key = `marker:${markerId}`
+    popupBaseData.set(key, { name, description })
     const marker = leafletMarkers.value.get(markerId)
     if (marker) {
-      const popupContent = `<strong>${escapeHtml(name)}</strong>${description ? `<br/>${escapeHtmlWithNewlines(description)}` : ''}`
-      marker.setPopupContent(popupContent)
+      marker.setPopupContent(buildPopupContent(name, description, popupExtraContent.get(key)))
+    }
+  }
+
+  const setPopupExtra = (type: 'zone' | 'marker', id: number, extraHtml: string) => {
+    const key = `${type}:${id}`
+    popupExtraContent.set(key, extraHtml)
+
+    const base = popupBaseData.get(key)
+    if (!base) return
+
+    const newContent = buildPopupContent(base.name, base.description, extraHtml)
+    if (type === 'zone') {
+      const polygon = polygons.value.get(id)
+      if (polygon) polygon.setPopupContent(newContent)
+    } else {
+      const marker = leafletMarkers.value.get(id)
+      if (marker) marker.setPopupContent(newContent)
     }
   }
 
@@ -729,6 +762,8 @@ export const useLeafletEditable = (
     stopPlacingMarker,
     focusOnMarker,
     fitBoundsToItems,
+    // Contenu supplémentaire dans les popups
+    setPopupExtra,
     // Fonctions de visibilité
     showZone,
     hideZone,

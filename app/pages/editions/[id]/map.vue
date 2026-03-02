@@ -69,9 +69,10 @@ import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { escapeHtml } from '~/utils/mapMarkers'
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 
 const editionId = computed(() => parseInt(route.params.id as string))
@@ -125,6 +126,7 @@ const {
   setView,
   focusOnZone,
   focusOnMarker,
+  setPopupExtra,
   showZone,
   hideZone,
   showMarker,
@@ -224,6 +226,91 @@ watch(
     } else if (focusMarkerId.value && newMarkers.some((m) => m.id === focusMarkerId.value)) {
       focusOnMarker(focusMarkerId.value)
       focusApplied.value = true
+    }
+  },
+  { immediate: true }
+)
+
+// Spectacles publics — affichés dans les popups des zones/marqueurs
+const { data: publicShows } = useFetch<any[]>(`/api/editions/${editionId.value}/shows/public`, {
+  lazy: true,
+  transform: (response: any) => response?.data?.shows || response?.shows || [],
+})
+
+const showsByZone = computed(() => {
+  const map = new Map<number, any[]>()
+  if (!publicShows.value) return map
+  for (const show of publicShows.value) {
+    if (show.zoneId) {
+      if (!map.has(show.zoneId)) map.set(show.zoneId, [])
+      map.get(show.zoneId)!.push(show)
+    }
+  }
+  return map
+})
+
+const showsByMarker = computed(() => {
+  const map = new Map<number, any[]>()
+  if (!publicShows.value) return map
+  for (const show of publicShows.value) {
+    if (show.markerId) {
+      if (!map.has(show.markerId)) map.set(show.markerId, [])
+      map.get(show.markerId)!.push(show)
+    }
+  }
+  return map
+})
+
+const formatPopupTime = (dateTimeStr: string) => {
+  return new Date(dateTimeStr).toLocaleTimeString(locale.value, {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+const buildShowsPopupHtml = (shows: any[]) => {
+  const sorted = [...shows].sort(
+    (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
+  )
+  let html = '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
+  html += '<div style="margin-top: 4px;"><strong>🎭 Spectacles</strong>'
+  html += '<div style="margin-top: 4px; font-size: 13px;">'
+  for (const show of sorted) {
+    html += `<div style="margin-top: 4px;">• ${escapeHtml(show.title)} — ${formatPopupTime(show.startDateTime)}`
+    if (show.duration) html += ` (${show.duration} min)`
+    html += '</div>'
+    if (show.artists?.length > 0) {
+      const names = show.artists
+        .map((a: any) => `${a.artist.user.prenom || ''} ${a.artist.user.nom || ''}`.trim())
+        .filter(Boolean)
+        .join(', ')
+      if (names) {
+        html += `<div style="font-size: 11px; color: #6b7280; margin-left: 12px;">${escapeHtml(names)}</div>`
+      }
+    }
+  }
+  html += '</div></div>'
+  return html
+}
+
+// Mettre à jour les popups quand les spectacles sont chargés
+watch(
+  [publicShows, zones, markers, map],
+  () => {
+    if (!map.value || !publicShows.value) return
+
+    for (const zone of zones.value) {
+      const zoneShows = showsByZone.value.get(zone.id)
+      if (zoneShows && zoneShows.length > 0) {
+        setPopupExtra('zone', zone.id, buildShowsPopupHtml(zoneShows))
+      }
+    }
+
+    for (const marker of markers.value) {
+      const markerShows = showsByMarker.value.get(marker.id)
+      if (markerShows && markerShows.length > 0) {
+        setPopupExtra('marker', marker.id, buildShowsPopupHtml(markerShows))
+      }
     }
   },
   { immediate: true }
