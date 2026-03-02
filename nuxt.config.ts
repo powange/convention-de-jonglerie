@@ -1,6 +1,5 @@
 import vue from '@vitejs/plugin-vue'
 import { version as nuxtVersion } from 'nuxt/package.json'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -368,7 +367,6 @@ export default defineNuxtConfig({
         exclude: [/node_modules/],
       },
     },
-    plugins: [tsconfigPaths()],
     // Configuration Vite pour le hot reload dans Docker sur Windows
     server: {
       watch: {

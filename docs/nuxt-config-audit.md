@@ -49,9 +49,9 @@ Mis à jour à `'2026-03-02'` (date courante).
 
 Ligne 1 — utilisé dans `nitro.rollupConfig.plugins`. Inhabituel car Nuxt gère déjà la compilation Vue via Vite. Ce plugin est normalement nécessaire uniquement pour compiler des SFC dans des fichiers serveur Nitro. Si ce n'est pas le cas, cette ligne et la config `rollupConfig` peuvent être supprimées.
 
-### 6. Import de `vite-tsconfig-paths` (priorité basse)
+### ~~6. Import de `vite-tsconfig-paths` (priorité basse)~~ CORRIGÉ
 
-Ligne 3 — utilisé dans `vite.plugins`. Nuxt gère nativement les alias de paths. Avec `future.typescriptBundlerResolution: true`, ce plugin pourrait devenir redondant. À vérifier si sa suppression casse quelque chose.
+Import et `vite.plugins: [tsconfigPaths()]` supprimés de `nuxt.config.ts`. Nuxt résout nativement les alias `~/` et `@/`. La dépendance reste dans le projet car utilisée par `vitest.config.ts`.
 
 ### ~~7. `vite.resolve.alias: {}` vide (cosmétique)~~ CORRIGÉ
 
