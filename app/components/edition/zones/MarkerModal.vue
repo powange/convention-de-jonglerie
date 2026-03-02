@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { EditionMarker } from '~/composables/useEditionMarkers'
 
+import { EDITION_ZONE_TYPES, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+
 interface Props {
   marker?: EditionMarker | null
   open: boolean

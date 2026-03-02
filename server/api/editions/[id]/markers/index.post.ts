@@ -4,6 +4,7 @@ import { canAccessEditionData } from '#server/utils/permissions/edition-permissi
 import { editionMarkerSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { createMarkerSchema } from '#server/utils/zone-validation'
+import { ZONE_LIMITS } from '~~/shared/utils/zone-types'
 
 export default wrapApiHandler(
   async (event) => {

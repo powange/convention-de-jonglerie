@@ -5,6 +5,12 @@ import { version as nuxtVersion } from 'nuxt/package.json'
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-02',
 
+  // Préparer la migration vers Nuxt 5
+  future: {
+    compatibilityVersion: 5,
+    typescriptBundlerResolution: true,
+  },
+
   // Configuration SEO du site
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://juggling-convention.com',

@@ -8,25 +8,11 @@ La config est globalement saine : aucune option dépréciée, structure `app/` e
 
 ## Points d'amélioration identifiés
 
-### 1. Ajouter `future.compatibilityVersion: 5` (priorité haute)
+### ~~1. Ajouter `future.compatibilityVersion: 5`~~ CORRIGÉ
 
-Recommandation principale de Nuxt 4 pour préparer la migration vers Nuxt 5. Actuellement absent.
+Activé avec `typescriptBundlerResolution: true`. L'analyse d'impact initiale avait identifié des incompatibilités potentielles (mutations profondes, checks `=== null`), mais la vérification manuelle a révélé que tous les cas étaient des **faux positifs** : les mutations profondes concernent des `ref()` locaux (pas des données `useFetch`), et les checks `=== null` portent sur des champs nullable de la BDD (pas sur les valeurs par défaut de `useFetch`). Aucune modification de code nécessaire. Tous les tests passent (367 unit + 1605 nuxt).
 
-```ts
-future: {
-  compatibilityVersion: 5,
-  typescriptBundlerResolution: true,
-}
-```
-
-**Ce que ça active :**
-
-- `useAsyncData`/`useFetch` utilisent `shallowRef` au lieu de `ref` (plus performant)
-- Les valeurs par défaut de `data`/`error` deviennent `undefined` au lieu de `null`
-- `noUncheckedIndexedAccess: true` en TypeScript
-- Normalisation des noms de composants et scanning des index dans les middleware
-
-**Attention** : nécessite de vérifier que le code existant n'utilise pas `data.value === null` ou des accès indexés non vérifiés. Passage progressif avec tests recommandé.
+Voir [docs/migration-compatibility-v5.md](migration-compatibility-v5.md) pour le détail de l'analyse.
 
 ### ~~2. `experimental.appManifest: false` — à reconsidérer (priorité haute)~~ CORRIGÉ
 
@@ -38,16 +24,16 @@ Mis à jour à `'2026-03-02'` (date courante).
 
 ### 4. Options expérimentales à considérer (priorité moyenne)
 
-| Option                         | Intérêt pour le projet                                          |
-| ------------------------------ | --------------------------------------------------------------- |
-| `buildCache: true`             | Cache les artefacts de build — accélère les rebuilds en dev Docker |
-| `viewTransition: true`         | Transitions de navigation fluides via View Transition API       |
-| `typedPages: true`             | Router typé — meilleure DX avec TypeScript                      |
-| `crossOriginPrefetch: true`    | Prefetch via Speculation Rules API — améliore la navigation     |
+| Option                      | Intérêt pour le projet                                             |
+| --------------------------- | ------------------------------------------------------------------ |
+| `buildCache: true`          | Cache les artefacts de build — accélère les rebuilds en dev Docker |
+| `viewTransition: true`      | Transitions de navigation fluides via View Transition API          |
+| `typedPages: true`          | Router typé — meilleure DX avec TypeScript                         |
+| `crossOriginPrefetch: true` | Prefetch via Speculation Rules API — améliore la navigation        |
 
-### 5. Import inutile de `@vitejs/plugin-vue` (priorité basse)
+### ~~5. Import de `@vitejs/plugin-vue` (priorité basse)~~ VÉRIFIÉ — correct
 
-Ligne 1 — utilisé dans `nitro.rollupConfig.plugins`. Inhabituel car Nuxt gère déjà la compilation Vue via Vite. Ce plugin est normalement nécessaire uniquement pour compiler des SFC dans des fichiers serveur Nitro. Si ce n'est pas le cas, cette ligne et la config `rollupConfig` peuvent être supprimées.
+Utilisé dans `nitro.rollupConfig.plugins` pour compiler 6 templates Vue d'emails côté serveur (`server/emails/*.vue`). Nécessaire car Nitro doit compiler ces SFC pour le rendu des emails.
 
 ### ~~6. Import de `vite-tsconfig-paths` (priorité basse)~~ CORRIGÉ
 
@@ -57,9 +43,9 @@ Import et `vite.plugins: [tsconfigPaths()]` supprimés de `nuxt.config.ts`. Nuxt
 
 Bloc `resolve.alias` vide supprimé.
 
-### 8. i18n : `bundle.runtimeOnly: false` (à vérifier)
+### ~~8. i18n : `bundle.runtimeOnly: false` (à vérifier)~~ VÉRIFIÉ — correct
 
-Ligne 301 — désactivé, ce qui inclut le compilateur de messages dans le bundle. Cohérent avec `dropMessageCompiler: false` (ligne 304), mais augmente la taille du JS client. Si les messages ne contiennent pas de syntaxe complexe ICU nécessitant une compilation runtime, `runtimeOnly: true` réduirait la taille du bundle.
+Configuration nécessaire : le projet utilise la pluralisation avec `|` (20+ occurrences) et le lazy loading JSON. Le compilateur de messages est requis au runtime pour parser ces syntaxes. `runtimeOnly: false` et `dropMessageCompiler: false` sont corrects.
 
 ## Ce qui est déjà bien fait
 

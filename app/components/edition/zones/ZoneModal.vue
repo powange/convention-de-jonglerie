@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { EditionZone } from '~/composables/useEditionZones'
 
+import { EDITION_ZONE_TYPES, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+
 interface Props {
   zone?: EditionZone | null
   open: boolean

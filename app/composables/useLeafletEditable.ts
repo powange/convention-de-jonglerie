@@ -4,7 +4,7 @@ import { escapeHtml, escapeHtmlWithNewlines } from '~/utils/mapMarkers'
 import type { Marker, LatLngExpression, TileLayer, LeafletMouseEvent } from 'leaflet'
 import type { Ref } from 'vue'
 
-// getZoneTypeColor et getZoneTypeSvgIcon sont auto-importés depuis shared/utils/zone-types.ts
+import { getZoneTypeColor, getZoneTypeSvgIcon } from '~~/shared/utils/zone-types'
 
 export interface EditionZoneData {
   id?: number

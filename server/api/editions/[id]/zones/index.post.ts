@@ -4,8 +4,7 @@ import { canAccessEditionData } from '#server/utils/permissions/edition-permissi
 import { editionZoneSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { createZoneSchema } from '#server/utils/zone-validation'
-
-// ZONE_LIMITS est auto-importé depuis shared/utils/zone-types.ts
+import { ZONE_LIMITS } from '~~/shared/utils/zone-types'
 
 export default wrapApiHandler(
   async (event) => {

@@ -2,7 +2,7 @@
 import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
 
-// getZoneTypeColor et getZoneTypeIcon sont auto-importés depuis shared/utils/zone-types.ts
+import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 // Type unifié pour la légende
 interface LegendItem {

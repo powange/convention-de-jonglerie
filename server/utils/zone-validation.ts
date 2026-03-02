@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-// EDITION_ZONE_TYPES et ZONE_LIMITS sont auto-importés depuis shared/utils/zone-types.ts
+import { EDITION_ZONE_TYPES, ZONE_LIMITS } from '~~/shared/utils/zone-types'
 
 /**
  * Schéma Zod pour le type de zone (enum)
