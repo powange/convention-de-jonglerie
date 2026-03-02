@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker volume ls --filter name=node_modules -q)",
+      "Bash(docker compose -f docker-compose.dev.yml config --volumes)",
+      "Bash(# Test: get the project name used by docker compose docker compose -f docker-compose.dev.yml config --format json)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(docker run --rm node:24-slim sh -c \"node --version && npm --version\")",
+      "Bash(nvm --version)",
+      "Bash(fnm --version)",
+      "Bash(volta --version)",
+      "Bash(node --no-experimental-strip-types -e ':*)",
+      "Bash(node /tmp/compare-locks.cjs)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}

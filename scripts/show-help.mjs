@@ -202,6 +202,10 @@ const sections = [
         name: 'docker:dev:get-package',
         desc: 'Récupère package.json depuis le conteneur',
       },
+      {
+        name: 'docker:dev:clean-modules',
+        desc: 'Supprime le volume node_modules Docker',
+      },
     ],
   },
   {
