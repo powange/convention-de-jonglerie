@@ -19,6 +19,7 @@ const updateShowSchema = z.object({
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
   returnableItemIds: z.array(z.number().int().positive()).optional(),
+  isPublic: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -81,6 +82,7 @@ export default wrapApiHandler(
     if (validatedData.location !== undefined) updateData.location = validatedData.location
     if (validatedData.zoneId !== undefined) updateData.zoneId = validatedData.zoneId || null
     if (validatedData.markerId !== undefined) updateData.markerId = validatedData.markerId || null
+    if (validatedData.isPublic !== undefined) updateData.isPublic = validatedData.isPublic
 
     // Gérer l'image avec le helper centralisé
     if (validatedData.imageUrl !== undefined) {

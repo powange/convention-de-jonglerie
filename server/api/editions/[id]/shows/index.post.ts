@@ -19,6 +19,7 @@ const showSchema = z.object({
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),
   returnableItemIds: z.array(z.number().int().positive()).optional().default([]),
+  isPublic: z.boolean().optional().default(false),
 })
 
 export default wrapApiHandler(
@@ -65,6 +66,7 @@ export default wrapApiHandler(
         location: validatedData.location,
         zoneId: validatedData.zoneId || null,
         markerId: validatedData.markerId || null,
+        isPublic: validatedData.isPublic,
         artists: {
           create: validatedData.artistIds.map((artistId) => ({
             artistId,

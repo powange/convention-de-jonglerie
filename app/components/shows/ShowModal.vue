@@ -156,6 +156,13 @@
               {{ item.name }}
             </UBadge>
           </div>
+
+          <!-- Visibilité publique -->
+          <USwitch
+            v-model="formData.isPublic"
+            :label="$t('gestion.shows.is_public')"
+            :description="$t('gestion.shows.is_public_hint')"
+          />
         </div>
       </form>
     </template>
@@ -221,6 +228,7 @@ const formData = ref({
   markerId: null as number | null,
   artistIds: [] as number[],
   returnableItemIds: [] as number[],
+  isPublic: false,
 })
 
 // Type de localisation : zone/marqueur ou texte libre
@@ -386,6 +394,7 @@ const buildPayload = () => {
     markerId: formData.value.markerId,
     artistIds: formData.value.artistIds,
     returnableItemIds: formData.value.returnableItemIds,
+    isPublic: formData.value.isPublic,
   }
 }
 
@@ -448,6 +457,7 @@ const resetForm = () => {
     markerId: null,
     artistIds: [],
     returnableItemIds: [],
+    isPublic: false,
   }
 }
 
@@ -475,6 +485,7 @@ watch(
         markerId: newShow.markerId || null,
         artistIds: newShow.artists?.map((showArtist: any) => showArtist.artistId) || [],
         returnableItemIds: newShow.returnableItems?.map((item: any) => item.returnableItemId) || [],
+        isPublic: newShow.isPublic || false,
       }
 
       // Auto-détecter le mode selon les données existantes

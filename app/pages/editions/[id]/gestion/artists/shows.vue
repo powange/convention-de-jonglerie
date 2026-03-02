@@ -50,6 +50,10 @@
           <UBadge color="neutral" variant="soft">
             {{ $t('common.total') }}: {{ shows.length }}
           </UBadge>
+          <UBadge v-if="publicShowsCount > 0" color="success" variant="soft">
+            <UIcon name="i-heroicons-eye" class="mr-1" />
+            {{ $t('gestion.shows.public_count', { count: publicShowsCount }) }}
+          </UBadge>
         </div>
 
         <!-- Liste des spectacles -->
@@ -95,6 +99,11 @@
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   {{ $t('gestion.shows.artists_to_return') }}
+                </th>
+                <th
+                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('gestion.shows.is_public') }}
                 </th>
                 <th
                   v-if="canEdit"
@@ -199,6 +208,16 @@
                     {{ $t('gestion.shows.no_returnable_items') }}
                   </span>
                 </td>
+                <td class="px-4 py-3 text-sm text-center">
+                  <UIcon
+                    :name="show.isPublic ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
+                    :class="
+                      show.isPublic
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-gray-400 dark:text-gray-500'
+                    "
+                  />
+                </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">
                     <UButton
@@ -277,6 +296,9 @@ const selectedShow = ref<any>(null)
 const showDeleteConfirm = ref(false)
 const showToDelete = ref<any>(null)
 
+// Nombre de spectacles publics
+const publicShowsCount = computed(() => shows.value.filter((s) => s.isPublic).length)
+
 // Spectacles triés par date
 const sortedShows = computed(() => {
   return [...shows.value].sort((a, b) => {
@@ -313,7 +335,6 @@ const openAddShowModal = () => {
 // Ouvrir le modal d'édition
 const openEditShowModal = (show: any) => {
   selectedShow.value = show
-  console.log('Editing show:', show)
   showShowModal.value = true
 }
 

@@ -77,6 +77,16 @@ const editionStore = useEditionStore()
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
+// Query params pour focus automatique sur une zone ou un marqueur
+const focusZoneId = computed(() => {
+  const val = route.query.focusZone
+  return val ? parseInt(val as string) : null
+})
+const focusMarkerId = computed(() => {
+  const val = route.query.focusMarker
+  return val ? parseInt(val as string) : null
+})
+
 // Métadonnées SEO
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 
@@ -187,12 +197,33 @@ onMounted(async () => {
 })
 
 // Centrer sur l'édition quand elle est chargée ET que la carte est prête (une seule fois)
+// Si un focus spécifique est demandé via query param, ne pas centrer (le focus prend le relais)
 watch(
   [edition, map],
   ([newEdition, newMap]) => {
     if (!initialViewSet.value && newMap && newEdition?.latitude && newEdition?.longitude) {
-      setView([newEdition.latitude, newEdition.longitude], 15)
+      if (!focusZoneId.value && !focusMarkerId.value) {
+        setView([newEdition.latitude, newEdition.longitude], 15)
+      }
       initialViewSet.value = true
+    }
+  },
+  { immediate: true }
+)
+
+// Focus automatique sur une zone/marqueur via query params
+const focusApplied = ref(false)
+watch(
+  [zones, markers, map],
+  ([newZones, newMarkers, newMap]) => {
+    if (focusApplied.value || !newMap) return
+
+    if (focusZoneId.value && newZones.some((z) => z.id === focusZoneId.value)) {
+      focusOnZone(focusZoneId.value)
+      focusApplied.value = true
+    } else if (focusMarkerId.value && newMarkers.some((m) => m.id === focusMarkerId.value)) {
+      focusOnMarker(focusMarkerId.value)
+      focusApplied.value = true
     }
   },
   { immediate: true }
