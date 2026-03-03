@@ -88,8 +88,11 @@
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Carte -->
         <div class="lg:col-span-2">
-          <UCard>
-            <div ref="mapContainerRef" class="h-[500px] w-full rounded-lg cursor-crosshair" />
+          <UCard
+            class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-10rem)]"
+            :ui="{ body: 'h-full p-0' }"
+          >
+            <div ref="mapContainerRef" class="h-full w-full rounded-lg cursor-crosshair" />
           </UCard>
         </div>
 
@@ -297,7 +300,6 @@ const {
   removePolygon,
   startDrawing,
   stopDrawing,
-  setView,
   focusOnZone,
   addMarkers,
   updateMarkerPopup,
@@ -310,6 +312,7 @@ const {
   hideZone,
   showMarker,
   hideMarker,
+  fitBoundsToItems,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
@@ -424,16 +427,18 @@ onMounted(async () => {
   initialLoading.value = false
 })
 
-// Centrer sur l'édition quand elle est chargée ET que la carte est prête (une seule fois)
+// Adapter le zoom pour afficher tous les éléments (une seule fois)
+// nextTick garantit que les watches addZones/addMarkers ont peuplé les structures Leaflet
 watch(
-  [edition, map],
-  ([newEdition, newMap]) => {
-    if (!initialViewSet.value && newMap && newEdition?.latitude && newEdition?.longitude) {
-      setView([newEdition.latitude, newEdition.longitude], 15)
+  [zones, markers, map],
+  async ([newZones, newMarkers, newMap]) => {
+    if (!initialViewSet.value && newMap && (newZones.length > 0 || newMarkers.length > 0)) {
+      await nextTick()
+      fitBoundsToItems()
       initialViewSet.value = true
     }
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 // Modal Zone

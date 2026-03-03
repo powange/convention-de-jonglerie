@@ -33,8 +33,11 @@
       >
         <!-- Carte -->
         <div class="lg:col-span-2 relative z-0">
-          <UCard>
-            <div ref="mapContainerRef" class="h-[500px] w-full rounded-lg" />
+          <UCard
+            class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-16rem)]"
+            :ui="{ body: 'h-full p-0' }"
+          >
+            <div ref="mapContainerRef" class="h-full w-full rounded-lg" />
           </UCard>
         </div>
 
@@ -123,7 +126,6 @@ const {
   map,
   addZones,
   addMarkers,
-  setView,
   focusOnZone,
   focusOnMarker,
   setPopupExtra,
@@ -131,6 +133,7 @@ const {
   hideZone,
   showMarker,
   hideMarker,
+  fitBoundsToItems,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
@@ -200,14 +203,16 @@ onMounted(async () => {
   }
 })
 
-// Centrer sur l'édition quand elle est chargée ET que la carte est prête (une seule fois)
+// Adapter le zoom pour afficher tous les éléments (une seule fois)
 // Si un focus spécifique est demandé via query param, ne pas centrer (le focus prend le relais)
+// nextTick garantit que les watches addZones/addMarkers ont peuplé les structures Leaflet
 watch(
-  [edition, map],
-  ([newEdition, newMap]) => {
-    if (!initialViewSet.value && newMap && newEdition?.latitude && newEdition?.longitude) {
+  [zones, markers, map],
+  async ([newZones, newMarkers, newMap]) => {
+    if (!initialViewSet.value && newMap && (newZones.length > 0 || newMarkers.length > 0)) {
       if (!focusZoneId.value && !focusMarkerId.value) {
-        setView([newEdition.latitude, newEdition.longitude], 15)
+        await nextTick()
+        fitBoundsToItems()
       }
       initialViewSet.value = true
     }
