@@ -106,14 +106,9 @@ sourcemap: {
   server: false,
   client: process.env.NODE_ENV !== 'production',
 }
-
-// Niveau Vite (déjà en place)
-vite: {
-  build: {
-    sourcemap: process.env.NODE_ENV !== 'production',
-  }
-}
 ```
+
+Note : l'ancienne config `vite.build.sourcemap` a été supprimée (redondante avec la config Nuxt-level).
 
 **Impact** : Réduction de 200-500 Mo pendant le build.
 
@@ -168,29 +163,36 @@ if (this.notifications.length > MAX_NOTIFICATIONS) {
 
 ### 3.2 Lazy-loading des bibliothèques lourdes côté client
 
-**Problème** : Leaflet, FullCalendar, Chart.js, html2canvas et jsPDF sont compilés côté serveur alors qu'ils ne servent que côté client. Cela augmente la mémoire du build et le bundle serveur.
+> **Statut : IMPLÉMENTÉ** (03/03/2026)
 
-**Solutions** :
+**Problème** : Les bibliothèques client-only lourdes peuvent être bundlées côté serveur et augmenter la consommation mémoire.
 
-1. Envelopper les composants lourds avec `process.client` :
+**Audit des bibliothèques lourdes** :
+
+| Bibliothèque | Taille      | Stratégie                                                     | Statut     |
+| ------------ | ----------- | ------------------------------------------------------------- | ---------- |
+| Leaflet      | ~145 KB     | CDN dynamique via composable                                  | ✅ Déjà OK |
+| FullCalendar | ~300-400 KB | `LazyFullCalendar.vue` + `defineAsyncComponent`               | ✅ Déjà OK |
+| Chart.js     | ~60 KB      | `defineAsyncComponent` dans page stats                        | ✅ Déjà OK |
+| html2canvas  | ~100 KB     | Import dynamique dans `useChartExport.ts`                     | ✅ Corrigé |
+| jsPDF        | ~50 KB      | Import dynamique dans `useChartExport.ts` et `meals/list.vue` | ✅ Corrigé |
+| Firebase     | ~100 KB     | Plugin `.client.ts` (exclu du serveur)                        | ✅ Déjà OK |
+
+**Correction appliquée** : Conversion des imports statiques de `html2canvas` et `jsPDF` en imports dynamiques dans `useChartExport.ts` :
 
 ```typescript
-const HeavyChart = process.client
-  ? defineAsyncComponent(() => import('~/components/HeavyChart.vue'))
-  : null
+// Avant (imports statiques en top-level)
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+
+// Après (imports dynamiques à la demande)
+const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+  import('html2canvas'),
+  import('jspdf'),
+])
 ```
 
-2. Utiliser `<ClientOnly>` dans les templates :
-
-```vue
-<ClientOnly>
-  <LazyFullCalendar :options="calendarOptions" />
-</ClientOnly>
-```
-
-3. Voir le document existant : `docs/optimization/lazy-loading-libraries.md`
-
-**Impact** : -5-15 Mo par page utilisant ces bibliothèques.
+**Impact** : ~150 KB retirés du chunk initial du composable, chargés uniquement à la demande lors d'un export PDF.
 
 ### 3.3 i18n — Fuites mémoire connues en SSR
 

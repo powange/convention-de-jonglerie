@@ -1,6 +1,3 @@
-import html2canvas from 'html2canvas'
-import { jsPDF } from 'jspdf'
-
 export const useChartExport = () => {
   /**
    * Exporte un graphique Chart.js en PDF
@@ -14,6 +11,12 @@ export const useChartExport = () => {
     title: string
   ): Promise<void> => {
     try {
+      // Import dynamique pour éviter de bundler ces bibliothèques lourdes (~150 KB)
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+
       // Capturer le graphique en tant qu'image avec html2canvas
       const canvas = await html2canvas(chartElement, {
         backgroundColor: null,
