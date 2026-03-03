@@ -244,14 +244,8 @@ export const useNotificationsStore = defineStore('notifications', {
           }
         })
 
-        if (category) {
-          const categoryNotifications = this.notifications.filter(
-            (n) => n.category === category && !n.isRead
-          )
-          this.unreadCount = Math.max(0, this.unreadCount - categoryNotifications.length)
-        } else {
-          this.unreadCount = 0
-        }
+        // Utiliser updatedCount du serveur (source fiable) pour décrémenter le compteur
+        this.unreadCount = Math.max(0, this.unreadCount - (response.updatedCount || 0))
 
         return response
       } catch (error) {
