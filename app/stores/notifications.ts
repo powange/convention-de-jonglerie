@@ -62,6 +62,9 @@ export interface NotificationFilters {
   offset?: number
 }
 
+// Limite mémoire pour éviter l'accumulation non bornée (voir docs/optimization/memory-optimization.md)
+const MAX_NOTIFICATIONS = 500
+
 export const useNotificationsStore = defineStore('notifications', {
   state: () => ({
     notifications: [] as Notification[],
@@ -137,6 +140,10 @@ export const useNotificationsStore = defineStore('notifications', {
 
         if (append) {
           this.notifications.push(...normalizedNotifications)
+          // Éviter l'accumulation non bornée : garder les plus récentes (début du tableau)
+          if (this.notifications.length > MAX_NOTIFICATIONS) {
+            this.notifications = this.notifications.slice(0, MAX_NOTIFICATIONS)
+          }
         } else {
           this.notifications = normalizedNotifications
         }
@@ -334,6 +341,11 @@ export const useNotificationsStore = defineStore('notifications', {
       // Ajouter la notification en tête de liste
       this.notifications.unshift(normalizedNotification)
 
+      // Éviter l'accumulation non bornée : supprimer les plus anciennes
+      if (this.notifications.length > MAX_NOTIFICATIONS) {
+        this.notifications = this.notifications.slice(0, MAX_NOTIFICATIONS)
+      }
+
       // Mettre à jour le compteur de non lues
       if (!normalizedNotification.isRead) {
         this.unreadCount++
@@ -341,13 +353,6 @@ export const useNotificationsStore = defineStore('notifications', {
 
       // Marquer le timestamp de la dernière mise à jour
       this.lastRealTimeUpdate = new Date()
-
-      console.log(
-        '[Store] Notification temps réel ajoutée:',
-        normalizedNotification.titleKey ||
-          normalizedNotification.titleText ||
-          normalizedNotification.id
-      )
     },
 
     /**
@@ -355,7 +360,6 @@ export const useNotificationsStore = defineStore('notifications', {
      */
     setRealTimeEnabled(enabled: boolean) {
       this.realTimeEnabled = enabled
-      console.log('[Store] Mode temps réel:', enabled ? 'activé' : 'désactivé')
     },
 
     /**
@@ -368,7 +372,6 @@ export const useNotificationsStore = defineStore('notifications', {
         this.lastRealTimeUpdate && Date.now() - this.lastRealTimeUpdate.getTime() < 30000 // 30 secondes
 
       if (this.realTimeEnabled && hasRecentRealTimeUpdate && !force) {
-        console.log('[Store] Skip refresh - données temps réel récentes')
         return
       }
 

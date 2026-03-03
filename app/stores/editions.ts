@@ -55,6 +55,10 @@ interface PaginatedResponse {
   }
 }
 
+// Limites mémoire pour éviter l'accumulation non bornée (voir docs/optimization/memory-optimization.md)
+const MAX_CACHED_EDITIONS = 200
+const MAX_ALL_EDITIONS = 1000
+
 export const useEditionStore = defineStore('editions', {
   state: () => ({
     editions: [] as Edition[],
@@ -177,8 +181,15 @@ export const useEditionStore = defineStore('editions', {
       const p = $fetch<Edition>(`/api/editions/${id}`)
         .then((edition) => {
           const existingIndex = this.editions.findIndex((e) => e.id === id)
-          if (existingIndex !== -1) this.editions[existingIndex] = edition
-          else this.editions.push(edition)
+          if (existingIndex !== -1) {
+            this.editions[existingIndex] = edition
+          } else {
+            // Éviter l'accumulation non bornée : supprimer les plus anciennes entrées du cache
+            if (this.editions.length >= MAX_CACHED_EDITIONS) {
+              this.editions.splice(0, this.editions.length - MAX_CACHED_EDITIONS + 1)
+            }
+            this.editions.push(edition)
+          }
           return edition
         })
         .catch((e: unknown) => {
@@ -202,7 +213,10 @@ export const useEditionStore = defineStore('editions', {
         // Mettre à jour l'édition existante
         this.editions[existingIndex] = edition
       } else {
-        // Ajouter la nouvelle édition
+        // Éviter l'accumulation non bornée
+        if (this.editions.length >= MAX_CACHED_EDITIONS) {
+          this.editions.splice(0, this.editions.length - MAX_CACHED_EDITIONS + 1)
+        }
         this.editions.push(edition)
       }
     },
@@ -567,8 +581,8 @@ export const useEditionStore = defineStore('editions', {
       try {
         const queryParams: { [key: string]: string } = {}
 
-        // Récupérer un grand nombre d'éditions (pas de pagination réelle)
-        queryParams.limit = '10000' // Limite très élevée pour récupérer toutes les éditions
+        // Récupérer toutes les éditions pour l'agenda/carte (sans pagination réelle)
+        queryParams.limit = MAX_ALL_EDITIONS.toString()
 
         // Filtres de base
         if (filters?.name) {
