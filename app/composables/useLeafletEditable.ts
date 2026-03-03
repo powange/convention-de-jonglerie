@@ -468,6 +468,10 @@ export const useLeafletEditable = (
       map.value.removeLayer(iconMarker)
       zoneIconMarkers.value.delete(zoneId)
     }
+    // Nettoyer les données de popup orphelines
+    const key = `zone:${zoneId}`
+    popupBaseData.delete(key)
+    popupExtraContent.delete(key)
   }
 
   const clearPolygons = () => {
@@ -483,6 +487,13 @@ export const useLeafletEditable = (
       }
     })
     zoneIconMarkers.value.clear()
+    // Nettoyer les données de popup des zones
+    for (const key of [...popupBaseData.keys()]) {
+      if (key.startsWith('zone:')) popupBaseData.delete(key)
+    }
+    for (const key of [...popupExtraContent.keys()]) {
+      if (key.startsWith('zone:')) popupExtraContent.delete(key)
+    }
   }
 
   const startDrawing = (color: string = '#3b82f6') => {
@@ -754,6 +765,10 @@ export const useLeafletEditable = (
       map.value.removeLayer(marker)
       leafletMarkers.value.delete(markerId)
     }
+    // Nettoyer les données de popup orphelines
+    const key = `marker:${markerId}`
+    popupBaseData.delete(key)
+    popupExtraContent.delete(key)
   }
 
   const clearMarkers = () => {
@@ -763,6 +778,13 @@ export const useLeafletEditable = (
       }
     })
     leafletMarkers.value.clear()
+    // Nettoyer les données de popup des marqueurs
+    for (const key of [...popupBaseData.keys()]) {
+      if (key.startsWith('marker:')) popupBaseData.delete(key)
+    }
+    for (const key of [...popupExtraContent.keys()]) {
+      if (key.startsWith('marker:')) popupExtraContent.delete(key)
+    }
   }
 
   const startPlacingMarker = () => {
@@ -886,6 +908,8 @@ export const useLeafletEditable = (
     polygons.value.clear()
     zoneIconMarkers.value.clear()
     leafletMarkers.value.clear()
+    popupBaseData.clear()
+    popupExtraContent.clear()
     currentDrawingPolygon.value = null
     isDrawing.value = false
     isPlacingMarker.value = false

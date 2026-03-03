@@ -275,13 +275,23 @@ watchDebounced(
 
 ### 4.3 Optimiser Leaflet (cartes)
 
-**Problème** : Le composable `useLeafletEditable` maintient 5 Maps en mémoire (polygons, zoneIconMarkers, leafletMarkers, popupBaseData, popupExtraContent). Avec 1000 zones/marqueurs : 20-50 Mo de références DOM.
+> **Statut : IMPLÉMENTÉ** (03/03/2026)
 
-**Solutions** :
+**Problème** : Le composable `useLeafletEditable` maintient 5 Maps en mémoire (`polygons`, `zoneIconMarkers`, `leafletMarkers`, `popupBaseData`, `popupExtraContent`). Les Maps `popupBaseData` et `popupExtraContent` n'étaient jamais nettoyées lors de la suppression de zones/marqueurs, créant des entrées orphelines.
 
-1. **Clustering** : Utiliser `leaflet.markercluster` pour regrouper les marqueurs à faible zoom.
-2. **Limiter les éléments visibles** : Ne charger que les éléments dans le viewport actuel.
-3. **Nettoyage des références DOM** : Supprimer les polygones/marqueurs hors viewport.
+**Corrections appliquées** dans `app/composables/useLeafletEditable.ts` :
+
+- `removePolygon()` : nettoyage de `popupBaseData` et `popupExtraContent` pour la zone supprimée
+- `removeMarker()` : idem pour le marqueur supprimé
+- `clearPolygons()` : nettoyage des entrées `zone:*` dans les Maps de popup
+- `clearMarkers()` : nettoyage des entrées `marker:*` dans les Maps de popup
+- `destroy()` : `.clear()` sur `popupBaseData` et `popupExtraContent`
+
+**Non retenu** (non pertinent pour ce projet) :
+
+- **Clustering** (`leaflet.markercluster`) : les cartes d'édition ont 5-20 éléments, le clustering n'apporte rien
+- **Virtualisation viewport** : même raison, le volume d'éléments est trop faible
+- La carte d'accueil utilise `useMapMarkers` (composable séparé) qui recrée les marqueurs à chaque mise à jour via `updateMarkers()` → pas de fuite possible
 
 ### 4.4 File d'attente pour les exports PDF/Chart
 
