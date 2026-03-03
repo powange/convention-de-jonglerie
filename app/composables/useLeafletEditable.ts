@@ -4,7 +4,11 @@ import { escapeHtml, escapeHtmlWithNewlines } from '~/utils/mapMarkers'
 import type { Marker, LatLngExpression, TileLayer, LeafletMouseEvent } from 'leaflet'
 import type { Ref } from 'vue'
 
-import { getZoneTypeColor, getZoneTypeSvgIcon } from '~~/shared/utils/zone-types'
+import {
+  getZoneTypeColor,
+  getZoneTypeSvgIcon,
+  type EditionZoneType,
+} from '~~/shared/utils/zone-types'
 
 export interface EditionZoneData {
   id?: number
@@ -27,14 +31,24 @@ export interface EditionMarkerData {
   order?: number
 }
 
+export interface PopupLabels {
+  navigate?: string
+  edit?: string
+  delete?: string
+}
+
 export interface UseLeafletEditableOptions {
   center?: LatLngExpression
   zoom?: number
   editable?: boolean
+  typeLabel?: (type: string) => string
+  popupLabels?: PopupLabels
   onPolygonCreated?: (coordinates: [number, number][]) => void
   onPolygonEdited?: (zoneId: number, coordinates: [number, number][]) => void
   onMarkerCreated?: (latitude: number, longitude: number) => void
   onMarkerMoved?: (markerId: number, latitude: number, longitude: number) => void
+  onEditRequest?: (type: 'zone' | 'marker', id: number) => void
+  onDeleteRequest?: (type: 'zone' | 'marker', id: number) => void
 }
 
 // Note: Les icônes SVG et couleurs sont centralisées dans shared/utils/zone-types.ts (auto-importé)
@@ -48,6 +62,10 @@ export const useLeafletEditable = (
     center = [46.603354, 1.888334],
     zoom = 6,
     editable = false,
+    typeLabel,
+    popupLabels = {},
+    onEditRequest,
+    onDeleteRequest,
     onPolygonCreated,
     onPolygonEdited,
     onMarkerCreated,
@@ -67,13 +85,23 @@ export const useLeafletEditable = (
   const isDrawing = ref(false)
   const isPlacingMarker = ref(false)
   // Stockage des données de popup pour pouvoir les reconstruire avec du contenu supplémentaire
-  const popupBaseData = new Map<string, { name: string; description?: string | null }>()
+  const popupBaseData = new Map<
+    string,
+    { name: string; description?: string | null; types?: string[]; coords?: [number, number] }
+  >()
   const popupExtraContent = new Map<string, string>()
   const currentDrawingPolygon = shallowRef<EditablePolygon | null>(null)
   // Référence locale pour le nettoyage (au cas où whenReady n'a pas encore été appelé)
   let leafletMapInstance: EditableMap | null = null
   // Référence pour le handler de clic lors du placement de marqueur
   let markerPlacementHandler: ((e: LeafletMouseEvent) => void) | null = null
+  // Référence pour le handler de délégation d'événements (popups)
+  let popupActionHandler: ((e: MouseEvent) => void) | null = null
+
+  // Sanitise une couleur pour éviter l'injection CSS (n'accepte que les couleurs hex)
+  const sanitizeColor = (color: string): string => {
+    return /^#[0-9a-fA-F]{3,6}$/.test(color) ? color : '#6b7280'
+  }
 
   const loadLeaflet = async () => {
     try {
@@ -187,6 +215,29 @@ export const useLeafletEditable = (
         tilePane.style.zIndex = '1'
       }
 
+      // Délégation d'événements pour les boutons d'action dans les popups
+      // (plus fiable que popupopen + querySelector, car insensible aux animations fitBounds/setView)
+      if (onEditRequest || onDeleteRequest) {
+        popupActionHandler = (e: MouseEvent) => {
+          const target = (e.target as HTMLElement).closest(
+            '.leaflet-popup-edit-btn, .leaflet-popup-delete-btn'
+          ) as HTMLElement | null
+          if (!target) return
+          e.preventDefault()
+          const key = target.dataset.key
+          if (!key) return
+          const [type, idStr] = key.split(':')
+          const id = parseInt(idStr)
+          if ((type !== 'zone' && type !== 'marker') || isNaN(id)) return
+          if (target.classList.contains('leaflet-popup-edit-btn') && onEditRequest) {
+            onEditRequest(type as 'zone' | 'marker', id)
+          } else if (target.classList.contains('leaflet-popup-delete-btn') && onDeleteRequest) {
+            onDeleteRequest(type as 'zone' | 'marker', id)
+          }
+        }
+        leafletMapInstance.getContainer().addEventListener('click', popupActionHandler)
+      }
+
       // Attendre que la carte soit prête (pour que editTools soit disponible)
       // avant d'exposer la ref map
       if (editable) {
@@ -205,10 +256,58 @@ export const useLeafletEditable = (
     }
   }
 
-  const buildPopupContent = (name: string, description?: string | null, extraHtml?: string) => {
+  const buildTypesHtml = (types: string[]) => {
+    if (types.length === 0) return ''
+    const items = types
+      .map((type) => {
+        const svg = getZoneTypeSvgIcon(type as EditionZoneType)
+        const color = getZoneTypeColor(type as EditionZoneType)
+        const label = typeLabel ? escapeHtml(typeLabel(type)) : type
+        return `<span style="display:inline-flex;align-items:center;gap:3px;color:${color}">${svg} <span style="font-size:12px">${label}</span></span>`
+      })
+      .join('')
+    return `<div style="margin-top:2px;display:flex;flex-wrap:wrap;align-items:center;gap:4px">${items}</div>`
+  }
+
+  const editSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>`
+  const deleteSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`
+  const navSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>`
+
+  const buildPopupContent = (
+    name: string,
+    description?: string | null,
+    types?: string[],
+    extraHtml?: string,
+    coords?: [number, number],
+    itemKey?: string
+  ) => {
     let html = `<strong>${escapeHtml(name)}</strong>`
+    if (types && types.length > 0) html += buildTypesHtml(types)
     if (description) html += `<br/>${escapeHtmlWithNewlines(description)}`
     if (extraHtml) html += extraHtml
+    // Lien navigation
+    if (coords) {
+      const navLabel = escapeHtml(popupLabels.navigate || 'Itinéraire')
+      const navUrl = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`
+      html += `<div style="margin-top:6px"><a href="${navUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#3b82f6;text-decoration:none">${navSvg}${navLabel}</a></div>`
+    }
+    // Boutons d'action (modifier / supprimer)
+    if (itemKey && (onEditRequest || onDeleteRequest)) {
+      const actions: string[] = []
+      if (onEditRequest) {
+        const editLabel = escapeHtml(popupLabels.edit || 'Modifier')
+        actions.push(
+          `<a href="#" class="leaflet-popup-edit-btn" data-key="${itemKey}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#3b82f6;text-decoration:none">${editSvg}${editLabel}</a>`
+        )
+      }
+      if (onDeleteRequest) {
+        const deleteLabel = escapeHtml(popupLabels.delete || 'Supprimer')
+        actions.push(
+          `<a href="#" class="leaflet-popup-delete-btn" data-key="${itemKey}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#ef4444;text-decoration:none">${deleteSvg}${deleteLabel}</a>`
+        )
+      }
+      html += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;display:flex;gap:12px;align-items:center">${actions.join('')}</div>`
+    }
     return html
   }
 
@@ -230,10 +329,29 @@ export const useLeafletEditable = (
       weight: 2,
     })
 
+    // Calculer le centroïde de la zone pour le lien de navigation
+    const centroidLat = zone.coordinates.reduce((sum, c) => sum + c[0], 0) / zone.coordinates.length
+    const centroidLng = zone.coordinates.reduce((sum, c) => sum + c[1], 0) / zone.coordinates.length
+    const zoneCoords: [number, number] = [centroidLat, centroidLng]
+
     // Ajouter un popup avec le nom (échappement HTML pour prévenir XSS)
     const key = `zone:${zone.id}`
-    popupBaseData.set(key, { name: zone.name, description: zone.description })
-    polygon.bindPopup(buildPopupContent(zone.name, zone.description, popupExtraContent.get(key)))
+    popupBaseData.set(key, {
+      name: zone.name,
+      description: zone.description,
+      types: zone.zoneTypes,
+      coords: zoneCoords,
+    })
+    polygon.bindPopup(
+      buildPopupContent(
+        zone.name,
+        zone.description,
+        zone.zoneTypes,
+        popupExtraContent.get(key),
+        zoneCoords,
+        key
+      )
+    )
 
     // D'abord ajouter le polygone à la carte
     polygon.addTo(map.value)
@@ -293,12 +411,29 @@ export const useLeafletEditable = (
     }
   }
 
-  const updatePolygonPopup = (zoneId: number, name: string, description?: string | null) => {
+  const updatePolygonPopup = (
+    zoneId: number,
+    name: string,
+    description?: string | null,
+    types?: string[]
+  ) => {
     const key = `zone:${zoneId}`
-    popupBaseData.set(key, { name, description })
+    const existing = popupBaseData.get(key)
+    const existingTypes = types ?? existing?.types
+    const existingCoords = existing?.coords
+    popupBaseData.set(key, { name, description, types: existingTypes, coords: existingCoords })
     const polygon = polygons.value.get(zoneId)
     if (polygon) {
-      polygon.setPopupContent(buildPopupContent(name, description, popupExtraContent.get(key)))
+      polygon.setPopupContent(
+        buildPopupContent(
+          name,
+          description,
+          existingTypes,
+          popupExtraContent.get(key),
+          existingCoords,
+          key
+        )
+      )
     }
   }
 
@@ -461,9 +596,10 @@ export const useLeafletEditable = (
     const iconCount = zoneTypes.length
     const width = iconCount === 1 ? 28 : 20 * iconCount + 8
 
+    const safeColor = sanitizeColor(color)
     return L.divIcon({
       className: 'zone-icon',
-      html: `<div class="zone-icon-inner" style="border-color: ${color}; color: ${color};">${iconsHtml}</div>`,
+      html: `<div class="zone-icon-inner" style="border-color: ${safeColor}; color: ${safeColor};">${iconsHtml}</div>`,
       iconSize: [width, 28],
       iconAnchor: [width / 2, 14],
     })
@@ -474,7 +610,7 @@ export const useLeafletEditable = (
     if (!L || markerTypes.length === 0) return null
 
     // Utiliser la couleur personnalisée si définie, sinon la couleur du premier type
-    const color = customColor || getZoneTypeColor(markerTypes[0])
+    const color = sanitizeColor(customColor || getZoneTypeColor(markerTypes[0]))
     const iconsHtml = markerTypes.map((type) => getZoneTypeSvgIcon(type)).join('')
     const iconCount = markerTypes.length
     const width = iconCount === 1 ? 32 : 22 * iconCount + 10
@@ -504,10 +640,23 @@ export const useLeafletEditable = (
     })
 
     // Ajouter un popup avec le nom (échappement HTML pour prévenir XSS)
+    const markerCoords: [number, number] = [marker.latitude, marker.longitude]
     const key = `marker:${marker.id}`
-    popupBaseData.set(key, { name: marker.name, description: marker.description })
+    popupBaseData.set(key, {
+      name: marker.name,
+      description: marker.description,
+      types: marker.markerTypes,
+      coords: markerCoords,
+    })
     leafletMarker.bindPopup(
-      buildPopupContent(marker.name, marker.description, popupExtraContent.get(key))
+      buildPopupContent(
+        marker.name,
+        marker.description,
+        marker.markerTypes,
+        popupExtraContent.get(key),
+        markerCoords,
+        key
+      )
     )
 
     leafletMarker.addTo(map.value)
@@ -535,12 +684,29 @@ export const useLeafletEditable = (
     }
   }
 
-  const updateMarkerPopup = (markerId: number, name: string, description?: string | null) => {
+  const updateMarkerPopup = (
+    markerId: number,
+    name: string,
+    description?: string | null,
+    types?: string[]
+  ) => {
     const key = `marker:${markerId}`
-    popupBaseData.set(key, { name, description })
+    const existing = popupBaseData.get(key)
+    const existingTypes = types ?? existing?.types
+    const existingCoords = existing?.coords
+    popupBaseData.set(key, { name, description, types: existingTypes, coords: existingCoords })
     const marker = leafletMarkers.value.get(markerId)
     if (marker) {
-      marker.setPopupContent(buildPopupContent(name, description, popupExtraContent.get(key)))
+      marker.setPopupContent(
+        buildPopupContent(
+          name,
+          description,
+          existingTypes,
+          popupExtraContent.get(key),
+          existingCoords,
+          key
+        )
+      )
     }
   }
 
@@ -551,7 +717,14 @@ export const useLeafletEditable = (
     const base = popupBaseData.get(key)
     if (!base) return
 
-    const newContent = buildPopupContent(base.name, base.description, extraHtml)
+    const newContent = buildPopupContent(
+      base.name,
+      base.description,
+      base.types,
+      extraHtml,
+      base.coords,
+      key
+    )
     if (type === 'zone') {
       const polygon = polygons.value.get(id)
       if (polygon) polygon.setPopupContent(newContent)
@@ -699,6 +872,11 @@ export const useLeafletEditable = (
   }
 
   const destroy = () => {
+    // Retirer le handler de délégation d'événements avant de supprimer la carte
+    if (popupActionHandler && leafletMapInstance) {
+      leafletMapInstance.getContainer().removeEventListener('click', popupActionHandler)
+      popupActionHandler = null
+    }
     // Utiliser leafletMapInstance pour le nettoyage (peut exister même si map.value est null)
     if (leafletMapInstance) {
       leafletMapInstance.remove()

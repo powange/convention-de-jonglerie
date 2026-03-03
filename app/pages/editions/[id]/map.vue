@@ -44,7 +44,7 @@
             <template #header>
               <div class="flex items-center gap-2">
                 <UIcon name="i-lucide-layers" class="h-5 w-5" />
-                <h2 class="font-semibold">{{ $t('gestion.map.zones_list') || 'Zones' }}</h2>
+                <h2 class="font-semibold">{{ $t('gestion.map.zones_list') }}</h2>
               </div>
             </template>
 
@@ -140,6 +140,8 @@ const {
   }).value,
   zoom: edition.value?.latitude ? 15 : 6,
   editable: false,
+  typeLabel: (type: string) => t(`gestion.map.types.${type.toLowerCase()}`),
+  popupLabels: { navigate: t('gestion.map.popup_navigate') },
 })
 
 // Ajouter les zones à la carte quand elles sont chargées ET que la carte est prête

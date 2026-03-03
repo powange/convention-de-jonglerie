@@ -99,7 +99,7 @@
             <template #header>
               <div class="flex items-center gap-2">
                 <UIcon name="i-lucide-layers" class="h-5 w-5" />
-                <h2 class="font-semibold">{{ $t('gestion.map.zones_list') || 'Zones' }}</h2>
+                <h2 class="font-semibold">{{ $t('gestion.map.zones_list') }}</h2>
               </div>
             </template>
 
@@ -114,6 +114,7 @@
               @edit-marker="handleEditMarker"
               @delete-marker="handleDeleteMarker"
               @focus-marker="handleFocusMarker"
+              @toggle-visibility="handleToggleVisibility"
             />
           </UCard>
         </div>
@@ -305,6 +306,10 @@ const {
   startPlacingMarker,
   stopPlacingMarker,
   focusOnMarker,
+  showZone,
+  hideZone,
+  showMarker,
+  hideMarker,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
@@ -314,6 +319,12 @@ const {
   }).value,
   zoom: edition.value?.latitude ? 15 : 6,
   editable: true,
+  typeLabel: (type: string) => t(`gestion.map.types.${type.toLowerCase()}`),
+  popupLabels: {
+    navigate: t('gestion.map.popup_navigate'),
+    edit: t('gestion.map.popup_edit'),
+    delete: t('gestion.map.popup_delete'),
+  },
   onPolygonCreated: (coordinates) => {
     pendingCoordinates.value = coordinates
     openModal()
@@ -330,6 +341,24 @@ const {
   },
   onMarkerMoved: async (markerId, latitude, longitude) => {
     await updateMarkerPosition(markerId, latitude, longitude)
+  },
+  onEditRequest: (type, id) => {
+    if (type === 'zone') {
+      const zone = zones.value.find((z) => z.id === id)
+      if (zone) handleEditZone(zone)
+    } else {
+      const marker = markers.value.find((m) => m.id === id)
+      if (marker) handleEditMarker(marker)
+    }
+  },
+  onDeleteRequest: (type, id) => {
+    if (type === 'zone') {
+      const zone = zones.value.find((z) => z.id === id)
+      if (zone) handleDeleteZone(zone)
+    } else {
+      const marker = markers.value.find((m) => m.id === id)
+      if (marker) handleDeleteMarker(marker)
+    }
   },
 })
 
@@ -517,6 +546,26 @@ const confirmDeleteMarker = async () => {
 
 const handleFocusMarker = (marker: EditionMarker) => {
   focusOnMarker(marker.id)
+}
+
+const handleToggleVisibility = (item: {
+  id: number
+  type: 'zone' | 'marker'
+  visible: boolean
+}) => {
+  if (item.type === 'zone') {
+    if (item.visible) {
+      showZone(item.id)
+    } else {
+      hideZone(item.id)
+    }
+  } else {
+    if (item.visible) {
+      showMarker(item.id)
+    } else {
+      hideMarker(item.id)
+    }
+  }
 }
 
 const handleSaveMarker = async (data: {
