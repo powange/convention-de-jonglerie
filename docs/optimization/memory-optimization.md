@@ -77,13 +77,15 @@ deploy:
 
 ### 2.2 Désactiver le SSR pour les pages admin/gestion
 
+> **Statut : IMPLÉMENTÉ** (03/03/2026)
+
 **Problème** : Chaque requête SSR consomme de la mémoire serveur. Les pages d'administration et de gestion n'ont pas besoin de rendu côté serveur (pas de SEO, utilisateurs authentifiés).
 
-**Solution** : Ajouter des `routeRules` dans `nuxt.config.ts` :
+**Correction appliquée** dans `nuxt.config.ts` :
 
 ```typescript
 routeRules: {
-  '/editions/*/gestion/**': { ssr: false },
+  '/editions/*/gestion/**': { appLayout: 'edition-dashboard', ssr: false },
   '/admin/**': { ssr: false },
 }
 ```
@@ -92,14 +94,24 @@ routeRules: {
 
 ### 2.3 Désactiver les sourcemaps en production
 
+> **Statut : IMPLÉMENTÉ** (03/03/2026)
+
 **Problème** : Les sourcemaps doublent la consommation mémoire pendant le build et augmentent la taille des bundles.
 
-**Solution** : Dans `nuxt.config.ts` :
+**Correction appliquée** dans `nuxt.config.ts` :
 
 ```typescript
+// Niveau Nuxt — désactivé côté serveur, client uniquement en dev
 sourcemap: {
   server: false,
-  client: false, // ou 'hidden' si besoin pour le debug en production
+  client: process.env.NODE_ENV !== 'production',
+}
+
+// Niveau Vite (déjà en place)
+vite: {
+  build: {
+    sourcemap: process.env.NODE_ENV !== 'production',
+  }
 }
 ```
 

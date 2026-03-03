@@ -365,7 +365,6 @@ export default defineNuxtConfig({
       devSourcemap: true,
     },
     build: {
-      sourcemap: process.env.NODE_ENV !== 'production', // Sourcemaps en dev et preview
       chunkSizeWarningLimit: 800, // Seuil optimal pour les performances
       // Optimisation des imports
       dynamicImportVarsOptions: {
@@ -384,9 +383,18 @@ export default defineNuxtConfig({
       exclude: ['node-cron', '@prisma/client'],
     },
   },
-  // Layouts centralisés par route
+  // Désactiver les sourcemaps en production (économie mémoire au build)
+  sourcemap: {
+    server: false,
+    client: process.env.NODE_ENV !== 'production',
+  },
+
+  // Layouts et optimisations par route
   routeRules: {
-    '/editions/*/gestion/**': { appLayout: 'edition-dashboard' },
+    // Pages de gestion : pas de SSR (utilisateurs authentifiés, pas de SEO)
+    '/editions/*/gestion/**': { appLayout: 'edition-dashboard', ssr: false },
+    // Pages admin : pas de SSR
+    '/admin/**': { ssr: false },
   },
 
   experimental: {
