@@ -487,6 +487,8 @@
       "change_mode_hint": "Changez le mode de gestion dans la page de gestion principale.",
       "changes_saved_successfully": "Vos modifications ont été sauvegardées avec succès",
       "closed_message": "Les candidatures bénévoles ne sont pas ouvertes actuellement.",
+      "closed_visible_as_editor": "Cette page n'est pas visible publiquement. Vous y avez accès en tant qu'organisateur de cette édition.",
+      "closed_visible_as_volunteer_manager": "Cette page n'est pas visible publiquement. Vous y avez accès en tant que gestionnaire des bénévoles.",
       "columns": "Colonnes",
       "companion_hint": "Optionnel - Cette information aide les organisateurs à former des équipes avec d'autres bénévoles que vous connaissez",
       "companion_label": "Bénévoles avec qui j'aimerais faire mes créneaux (optionnel)",

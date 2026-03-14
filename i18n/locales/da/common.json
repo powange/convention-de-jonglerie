@@ -487,6 +487,8 @@
       "change_mode_hint": "Skift administrationsmode på hovedadministrationssiden.",
       "changes_saved_successfully": "Dine ændringer er blevet gemt",
       "closed_message": "Ansøgninger for frivillige er ikke åbne i øjeblikket.",
+      "closed_visible_as_editor": "Denne side er ikke offentligt synlig. Du har adgang som arrangør af denne udgave.",
+      "closed_visible_as_volunteer_manager": "Denne side er ikke offentligt synlig. Du har adgang som frivilligkoordinator.",
       "columns": "Kolonner",
       "companion_hint": "Valgfrit - Denne information hjælper arrangørerne med at danne hold med andre frivillige, du kender",
       "companion_label": "Frivillige jeg gerne vil arbejde vagter med (valgfrit)",

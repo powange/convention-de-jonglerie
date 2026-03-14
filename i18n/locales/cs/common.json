@@ -487,6 +487,8 @@
       "change_mode_hint": "Změna režimu správy na hlavní stránce správy.",
       "changes_saved_successfully": "Vaše změny byly úspěšně uloženy",
       "closed_message": "Přihlášky dobrovolníků nejsou v současné době otevřeny.",
+      "closed_visible_as_editor": "Tato stránka není veřejně viditelná. Máte přístup jako organizátor této edice.",
+      "closed_visible_as_volunteer_manager": "Tato stránka není veřejně viditelná. Máte přístup jako koordinátor dobrovolníků.",
       "columns": "Sloupce",
       "companion_hint": "Nepovinné - tyto informace pomohou organizátorům sestavit týmy s dalšími dobrovolníky, které znáte.",
       "companion_label": "Dobrovolníci, se kterými bych chtěl/a dělat své sloty (nepovinné)",

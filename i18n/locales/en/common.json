@@ -487,6 +487,8 @@
       "change_mode_hint": "Change the management mode on the main management page.",
       "changes_saved_successfully": "Your changes have been saved successfully",
       "closed_message": "Volunteer applications are not open currently.",
+      "closed_visible_as_editor": "This page is not publicly visible. You have access as an organizer of this edition.",
+      "closed_visible_as_volunteer_manager": "This page is not publicly visible. You have access as a volunteer manager.",
       "columns": "Columns",
       "companion_hint": "Optional - This information helps organizers form teams with other volunteers you know",
       "companion_label": "Volunteers I would like to work shifts with (optional)",

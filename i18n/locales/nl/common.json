@@ -487,6 +487,8 @@
       "change_mode_hint": "Wijzig de beheermodus op de hoofdbeheerpagina.",
       "changes_saved_successfully": "Uw wijzigingen zijn succesvol opgeslagen",
       "closed_message": "Vrijwilligersaanmeldingen zijn momenteel niet open.",
+      "closed_visible_as_editor": "Deze pagina is niet publiek zichtbaar. Je hebt toegang als organisator van deze editie.",
+      "closed_visible_as_volunteer_manager": "Deze pagina is niet publiek zichtbaar. Je hebt toegang als vrijwilligerscoördinator.",
       "columns": "Kolommen",
       "companion_hint": "Optioneel - Deze informatie helpt organisatoren teams te vormen met andere vrijwilligers die je kent",
       "companion_label": "Vrijwilligers waarmee ik graag diensten zou willen draaien (optioneel)",

@@ -487,6 +487,8 @@
       "change_mode_hint": "Cambie el modo de gestión en la página de gestión principal.",
       "changes_saved_successfully": "Sus modificaciones han sido guardadas con éxito",
       "closed_message": "Las solicitudes de voluntarios no están abiertas actualmente.",
+      "closed_visible_as_editor": "Esta página no es visible públicamente. Tienes acceso como organizador de esta edición.",
+      "closed_visible_as_volunteer_manager": "Esta página no es visible públicamente. Tienes acceso como gestor de voluntarios.",
       "columns": "Columnas",
       "companion_hint": "Opcional - Esta información ayuda a los organizadores a formar equipos con otros voluntarios que conoces",
       "companion_label": "Voluntarios con los que me gustaría trabajar turnos (opcional)",

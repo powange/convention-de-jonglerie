@@ -487,6 +487,8 @@
       "change_mode_hint": "Cambia la modalità di gestione nella pagina di gestione principale.",
       "changes_saved_successfully": "Le tue modifiche sono state salvate con successo",
       "closed_message": "Le candidature per volontari non sono aperte al momento.",
+      "closed_visible_as_editor": "Questa pagina non è visibile pubblicamente. Hai accesso in quanto organizzatore di questa edizione.",
+      "closed_visible_as_volunteer_manager": "Questa pagina non è visibile pubblicamente. Hai accesso in quanto responsabile dei volontari.",
       "columns": "Colonne",
       "companion_hint": "Opzionale - Queste informazioni aiutano gli organizzatori a formare squadre con altri volontari che conosci",
       "companion_label": "Volontari con cui vorrei fare i turni (opzionale)",

@@ -487,6 +487,8 @@
       "change_mode_hint": "Ändra hanteringsläget på den huvudsakliga hanteringssidan.",
       "changes_saved_successfully": "Dina ändringar har sparats framgångsrikt",
       "closed_message": "Volontäransökningar är inte öppna för närvarande.",
+      "closed_visible_as_editor": "Denna sida är inte offentligt synlig. Du har åtkomst som arrangör av denna upplaga.",
+      "closed_visible_as_volunteer_manager": "Denna sida är inte offentligt synlig. Du har åtkomst som volontärsamordnare.",
       "columns": "Kolumner",
       "companion_hint": "Frivillig - Denna information hjälper organisatörerna att bilda team med andra volontärer som du känner.",
       "companion_label": "Volontärer som jag skulle vilja göra mina slots med (valfritt)",

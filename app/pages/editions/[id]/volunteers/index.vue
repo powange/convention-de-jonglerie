@@ -3,6 +3,17 @@
     <EditionHeader :edition="edition" current-page="volunteers" />
 
     <div class="space-y-6">
+      <!-- Message d'information pour les éditeurs/gestionnaires quand la page n'est pas publique -->
+      <ClientOnly>
+        <UAlert
+          v-if="closedVisibilityReason"
+          color="info"
+          variant="subtle"
+          icon="i-heroicons-eye"
+          :title="closedVisibilityReason"
+        />
+      </ClientOnly>
+
       <ClientOnly>
         <!-- Planning Card - Visible seulement pour les bénévoles acceptés -->
         <EditionVolunteerPlanningCard
@@ -389,6 +400,21 @@ const canManageEdition = computed(() => {
     rights.manageOrganizers ||
     rights.editConvention
   )
+})
+
+// Message d'info quand la page est visible grâce aux droits d'éditeur/gestionnaire (mais pas ouverte au public)
+const closedVisibilityReason = computed<string | null>(() => {
+  if (!edition.value || !authStore.user?.id) return null
+  // Si la page est ouverte au public, pas besoin de message
+  if ((edition.value as any).volunteersOpen === true) return null
+
+  const canEdit = editionStore.canEditEdition(edition.value, authStore.user.id)
+  if (canEdit) return t('edition.volunteers.closed_visible_as_editor')
+
+  const canManage = editionStore.canManageVolunteers(edition.value, authStore.user.id)
+  if (canManage) return t('edition.volunteers.closed_visible_as_volunteer_manager')
+
+  return null
 })
 
 // Volunteer logic reused

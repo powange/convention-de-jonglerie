@@ -487,6 +487,8 @@
       "change_mode_hint": "Ändern Sie den Verwaltungsmodus auf der Hauptverwaltungsseite.",
       "changes_saved_successfully": "Ihre Änderungen wurden erfolgreich gespeichert",
       "closed_message": "Bewerbungen für Freiwillige sind derzeit nicht geöffnet.",
+      "closed_visible_as_editor": "Diese Seite ist nicht öffentlich sichtbar. Sie haben Zugang als Organisator dieser Ausgabe.",
+      "closed_visible_as_volunteer_manager": "Diese Seite ist nicht öffentlich sichtbar. Sie haben Zugang als Freiwilligenkoordinator.",
       "columns": "Spalten",
       "companion_hint": "Optional - Diese Information hilft Organisatoren, Teams mit anderen Freiwilligen zu bilden, die Sie kennen",
       "companion_label": "Freiwillige, mit denen ich Schichten arbeiten möchte (optional)",

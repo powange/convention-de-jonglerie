@@ -6,7 +6,7 @@
     <div class="max-w-6xl mx-auto px-4 py-8">
       <!-- Actions et titre -->
       <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h1 class="text-3xl font-bold">{{ $t('workshops.page_title') }}</h1>
           <div class="flex items-center gap-3">
             <!-- Filtre favoris -->
@@ -25,9 +25,10 @@
               v-if="canAddWorkshop"
               icon="i-heroicons-plus"
               color="primary"
+              size="sm"
               @click="showAddModal = true"
             >
-              {{ $t('workshops.add_workshop') }}
+              <span class="hidden sm:inline">{{ $t('workshops.add_workshop') }}</span>
             </UButton>
           </div>
         </div>
