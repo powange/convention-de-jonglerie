@@ -621,7 +621,7 @@
 
     <!-- Modal de gestion des repas -->
     <VolunteersMealsModal
-      v-if="selectedVolunteerForMeals"
+      v-if="edition?.mealsEnabled && selectedVolunteerForMeals"
       v-model="showVolunteerMealsModal"
       :edition-id="editionId"
       :volunteer="selectedVolunteerForMeals"

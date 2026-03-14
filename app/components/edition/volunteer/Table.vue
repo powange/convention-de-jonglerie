@@ -1448,33 +1448,37 @@ const columns = computed((): TableColumn<any>[] => [
     },
     size: 130,
   } as TableColumn<any>,
-  // Colonne Repas
-  {
-    accessorKey: 'meals',
-    header: t('edition.volunteers.table_meals'),
-    cell: ({ row }: any) => {
-      const mealSelections = row.original.mealSelections || []
-      const acceptedMealsCount = mealSelections.filter((s: any) => s.accepted).length
-
-      return h(
-        resolveComponent('UButton'),
+  // Colonne Repas (conditionnelle)
+  ...(props.edition?.mealsEnabled
+    ? [
         {
-          color: acceptedMealsCount > 0 ? 'primary' : 'neutral',
-          variant: 'soft',
-          size: 'sm',
-          onClick: () => emit('open-meals-modal', row.original),
-        },
-        () => [
-          h('span', { class: 'font-medium' }, acceptedMealsCount.toString()),
-          h(resolveComponent('UIcon'), {
-            name: 'i-heroicons-chevron-right',
-            class: 'ml-1 h-4 w-4',
-          }),
-        ]
-      )
-    },
-    size: 100,
-  } as TableColumn<any>,
+          accessorKey: 'meals',
+          header: t('edition.volunteers.table_meals'),
+          cell: ({ row }: any) => {
+            const mealSelections = row.original.mealSelections || []
+            const acceptedMealsCount = mealSelections.filter((s: any) => s.accepted).length
+
+            return h(
+              resolveComponent('UButton'),
+              {
+                color: acceptedMealsCount > 0 ? 'primary' : 'neutral',
+                variant: 'soft',
+                size: 'sm',
+                onClick: () => emit('open-meals-modal', row.original),
+              },
+              () => [
+                h('span', { class: 'font-medium' }, acceptedMealsCount.toString()),
+                h(resolveComponent('UIcon'), {
+                  name: 'i-heroicons-chevron-right',
+                  class: 'ml-1 h-4 w-4',
+                }),
+              ]
+            )
+          },
+          size: 100,
+        } as TableColumn<any>,
+      ]
+    : []),
   // Colonne préférences horaires si activée (déplacée après Présence)
   ...(props.volunteersInfo?.askTimePreferences
     ? [

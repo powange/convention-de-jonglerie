@@ -50,85 +50,85 @@
 
             <!-- Gestion des lieux -->
             <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <h3 class="font-medium text-gray-900 dark:text-white">
-                      {{ $t('workshops.locations') }}
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ $t('workshops.locations_description') }}
-                    </p>
-                  </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('workshops.locations') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('workshops.locations_description') }}
+                  </p>
                 </div>
+              </div>
 
-                <!-- Mode de saisie -->
+              <!-- Mode de saisie -->
+              <div
+                v-if="canEdit"
+                class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+              >
+                <div>
+                  <h4 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('workshops.location_mode') }}
+                  </h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{
+                      workshopLocationsFreeInputLocal
+                        ? $t('workshops.location_mode_free_description')
+                        : $t('workshops.location_mode_exclusive_description')
+                    }}
+                  </p>
+                </div>
+                <USwitch
+                  v-model="workshopLocationsFreeInputLocal"
+                  :disabled="savingLocationMode"
+                  color="primary"
+                  @update:model-value="handleToggleLocationMode"
+                />
+              </div>
+
+              <!-- Liste des lieux -->
+              <div v-if="workshopLocations.length > 0" class="space-y-2">
                 <div
-                  v-if="canEdit"
-                  class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                  v-for="location in workshopLocations"
+                  :key="location.id"
+                  class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
                 >
-                  <div>
-                    <h4 class="font-medium text-gray-900 dark:text-white">
-                      {{ $t('workshops.location_mode') }}
-                    </h4>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{
-                        workshopLocationsFreeInputLocal
-                          ? $t('workshops.location_mode_free_description')
-                          : $t('workshops.location_mode_exclusive_description')
-                      }}
-                    </p>
-                  </div>
-                  <USwitch
-                    v-model="workshopLocationsFreeInputLocal"
-                    :disabled="savingLocationMode"
-                    color="primary"
-                    @update:model-value="handleToggleLocationMode"
-                  />
-                </div>
-
-                <!-- Liste des lieux -->
-                <div v-if="workshopLocations.length > 0" class="space-y-2">
-                  <div
-                    v-for="location in workshopLocations"
-                    :key="location.id"
-                    class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
-                  >
-                    <span class="text-sm text-gray-900 dark:text-white">{{ location.name }}</span>
-                    <UButton
-                      v-if="canEdit"
-                      size="xs"
-                      color="error"
-                      variant="ghost"
-                      icon="i-heroicons-trash"
-                      :loading="isDeletingLocation(location.id)"
-                      @click="deleteLocation(location.id)"
-                    />
-                  </div>
-                </div>
-
-                <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
-                  {{ $t('workshops.no_locations') }}
-                </p>
-
-                <!-- Formulaire d'ajout -->
-                <div v-if="canEdit" class="flex gap-2">
-                  <UInput
-                    v-model="newLocationName"
-                    :placeholder="$t('workshops.location_name_placeholder')"
-                    class="flex-1"
-                    size="sm"
-                    @keyup.enter="addLocation"
-                  />
+                  <span class="text-sm text-gray-900 dark:text-white">{{ location.name }}</span>
                   <UButton
-                    size="sm"
-                    icon="i-heroicons-plus"
-                    :loading="addingLocation"
-                    :disabled="!newLocationName.trim()"
-                    @click="addLocation"
-                  >
-                    {{ $t('workshops.add_location') }}
-                  </UButton>
+                    v-if="canEdit"
+                    size="xs"
+                    color="error"
+                    variant="ghost"
+                    icon="i-heroicons-trash"
+                    :loading="isDeletingLocation(location.id)"
+                    @click="deleteLocation(location.id)"
+                  />
                 </div>
+              </div>
+
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
+                {{ $t('workshops.no_locations') }}
+              </p>
+
+              <!-- Formulaire d'ajout -->
+              <div v-if="canEdit" class="flex gap-2">
+                <UInput
+                  v-model="newLocationName"
+                  :placeholder="$t('workshops.location_name_placeholder')"
+                  class="flex-1"
+                  size="sm"
+                  @keyup.enter="addLocation"
+                />
+                <UButton
+                  size="sm"
+                  icon="i-heroicons-plus"
+                  :loading="addingLocation"
+                  :disabled="!newLocationName.trim()"
+                  @click="addLocation"
+                >
+                  {{ $t('workshops.add_location') }}
+                </UButton>
+              </div>
             </div>
           </div>
         </UCard>

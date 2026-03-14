@@ -45,6 +45,7 @@
         <!-- Carte "Mes repas" - Visible pour les bénévoles acceptés -->
         <EditionVolunteerMealsCard
           v-if="
+            edition?.mealsEnabled &&
             authStore.isAuthenticated &&
             myApplication?.status === 'ACCEPTED' &&
             volunteersMode === 'INTERNAL'

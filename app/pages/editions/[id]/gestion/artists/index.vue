@@ -172,6 +172,7 @@
                   {{ $t('artists.departure') }}
                 </th>
                 <th
+                  v-if="edition.mealsEnabled"
                   class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   {{ $t('common.meals_short') }}
@@ -282,7 +283,7 @@
                   </div>
                   <span v-else class="text-gray-400">-</span>
                 </td>
-                <td class="px-4 py-3 text-sm text-center">
+                <td v-if="edition.mealsEnabled" class="px-4 py-3 text-sm text-center">
                   <UButton
                     :color="getAcceptedMealsCount(artist) > 0 ? 'primary' : 'neutral'"
                     variant="soft"
@@ -492,7 +493,7 @@
 
     <!-- Modal repas -->
     <ArtistsMealsModal
-      v-if="showMealsModal"
+      v-if="edition?.mealsEnabled && showMealsModal"
       v-model="showMealsModal"
       :artist="selectedArtistForMeals"
       :edition-id="editionId"

@@ -145,7 +145,7 @@
       </UCard>
 
       <!-- Repas -->
-      <UCard v-if="artist.mealSelections.length > 0">
+      <UCard v-if="edition?.mealsEnabled && artist.mealSelections.length > 0">
         <template #header>
           <h2 class="text-lg font-semibold flex items-center gap-2">
             <UIcon name="i-heroicons-cake" class="text-orange-500" />
