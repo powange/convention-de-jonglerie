@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="editionStore.loading">
+    <div v-if="initialLoading">
       <p>{{ $t('edition.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
@@ -497,14 +497,14 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 const editionDisplayName = computed(() =>
   edition.value ? getEditionDisplayName(edition.value) : ''
 )
+const initialLoading = ref(true)
 
 onMounted(async () => {
-  if (!edition.value) {
-    try {
-      await editionStore.fetchEditionById(editionId, { force: true })
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
-    }
+  try {
+    // Toujours forcer le fetch pour avoir les données complètes (organizers, etc.)
+    await editionStore.fetchEditionById(editionId, { force: true })
+  } catch (error) {
+    console.error('Failed to fetch edition:', error)
   }
 
   // Vérifier si l'utilisateur est team leader
@@ -524,6 +524,8 @@ onMounted(async () => {
       canAccessMealValidation.value = false
     }
   }
+
+  initialLoading.value = false
 })
 
 // Vérifier l'accès à cette page
