@@ -11,10 +11,12 @@
       "Bash(fnm --version)",
       "Bash(volta --version)",
       "Bash(node --no-experimental-strip-types -e ':*)",
-      "Bash(node /tmp/compare-locks.cjs)"
+      "Bash(node /tmp/compare-locks.cjs)",
+      "Read(//root/projets/convention-de-jonglerie/**)",
+      "Bash(docker compose:*)",
+      "Bash(mkdir -p /root/projets/convention-de-jonglerie/server/lib)",
+      "Bash(mv /root/projets/convention-de-jonglerie/server/utils/import-json-schema.ts /root/projets/convention-de-jonglerie/server/lib/import-json-schema.ts)"
     ],
-    "additionalDirectories": [
-      "/tmp"
-    ]
+    "additionalDirectories": ["/tmp"]
   }
 }
