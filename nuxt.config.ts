@@ -380,6 +380,17 @@ export default defineNuxtConfig({
       },
     },
     optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        'i18n-iso-countries',
+        'firebase/app',
+        'firebase/messaging',
+        'vue3-json-viewer',
+        '@internationalized/date',
+        '@unhead/schema-org/vue',
+        'zod',
+      ],
       exclude: ['node-cron', '@prisma/client'],
     },
   },
