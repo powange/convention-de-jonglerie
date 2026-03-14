@@ -98,6 +98,15 @@
         </UButton>
 
         <EditionManageButton :edition="edition" variant="soft" size="sm" color="primary" />
+
+        <ClientOnly>
+          <ConventionClaimModal
+            v-if="canClaimConvention"
+            :convention="edition.convention"
+            class="md:hidden"
+            @claimed="handleConventionClaimed"
+          />
+        </ClientOnly>
       </div>
     </div>
 

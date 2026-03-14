@@ -701,6 +701,19 @@
             :is-authenticated="authStore.isAuthenticated"
             @toggle-attendance="toggleAttendance(edition.id)"
           />
+
+          <!-- Bouton de partage -->
+          <ClientOnly>
+            <UButton
+              icon="i-heroicons-share"
+              color="neutral"
+              variant="soft"
+              block
+              @click="shareEdition"
+            >
+              {{ $t('common.share') }}
+            </UButton>
+          </ClientOnly>
         </div>
       </main>
 
@@ -1157,6 +1170,31 @@ const { execute: executeToggleAttendance } = useApiAction(
 
 const toggleAttendance = (_id: number) => {
   executeToggleAttendance()
+}
+
+const shareEdition = async () => {
+  if (!edition.value) return
+  const url = `${window.location.origin}/editions/${edition.value.id}`
+  const title = getEditionDisplayName(edition.value)
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url })
+    } catch {
+      // L'utilisateur a annulé le partage
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.add({
+        title: t('common.link_copied'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    } catch {
+      // Fallback silencieux
+    }
+  }
 }
 
 const getGoogleMapsUrl = (edition: Edition) => {
