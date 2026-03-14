@@ -1,5 +1,13 @@
 import { z } from 'zod'
 
+import {
+  COMMON_RULES_FULL,
+  generateCompactDirectPrompt,
+  generateFeaturesDescription,
+  generateJsonExample,
+  PROMPT_COMPLETE_PREFILLED_JSON,
+} from '../../lib/import-json-schema'
+
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
   AI_TIMEOUTS,
@@ -29,13 +37,6 @@ import {
   sendUrlFetchedEvent,
   type GenerationStep as SSEGenerationStep,
 } from '#server/utils/import-generation-sse'
-import {
-  COMMON_RULES_FULL,
-  generateCompactDirectPrompt,
-  generateFeaturesDescription,
-  generateJsonExample,
-  PROMPT_COMPLETE_PREFILLED_JSON,
-} from '#server/utils/import-json-schema'
 import {
   isJugglingEdgeEventUrl,
   jugglingEdgeEventToImportJson,

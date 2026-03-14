@@ -3,7 +3,7 @@
  * Utilisé par l'agent d'exploration (EI) et la génération directe (ED)
  */
 
-import { EDITION_FEATURES_DESCRIPTIONS } from './edition-features-extractor'
+import { EDITION_FEATURES_DESCRIPTIONS } from '#server/utils/edition-features-extractor'
 
 // ============================================
 // COMPOSANTS PARTAGÉS POUR LES PROMPTS ED/EI
