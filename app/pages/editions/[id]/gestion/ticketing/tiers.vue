@@ -29,38 +29,10 @@
         </p>
       </div>
 
-      <!-- Message si pas de configuration -->
-      <UAlert
-        v-if="!hasExternalTicketing"
-        icon="i-heroicons-information-circle"
-        color="info"
-        variant="soft"
-        class="mb-6"
-      >
-        <template #title>Aucune billeterie externe configurée</template>
-        <template #description>
-          <div class="space-y-2">
-            <p>
-              Vous devez d'abord connecter une billeterie externe (HelloAsso, etc.) pour gérer les
-              tarifs et options.
-            </p>
-            <UButton
-              :to="`/editions/${edition.id}/gestion/ticketing/external`"
-              color="primary"
-              variant="soft"
-              size="sm"
-              icon="i-heroicons-arrow-right"
-            >
-              Configurer une billeterie
-            </UButton>
-          </div>
-        </template>
-      </UAlert>
-
       <!-- Contenu principal -->
-      <div v-else class="space-y-6">
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="space-y-6">
+        <!-- Stats de synchronisation (uniquement si billeterie externe configurée) -->
+        <div v-if="hasExternalTicketing" class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <UCard>
             <div class="flex items-center gap-3">
               <UIcon name="i-heroicons-clock" class="h-5 w-5 text-success-600" />

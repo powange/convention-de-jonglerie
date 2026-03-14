@@ -228,7 +228,11 @@
           </div>
         </div>
 
-        <UFormField :label="$t('ticketing.tiers.modal.quotas_label')" name="quotas">
+        <UFormField
+          v-if="quotas.length > 0"
+          :label="$t('ticketing.tiers.modal.quotas_label')"
+          name="quotas"
+        >
           <USelectMenu
             v-model="form.quotaIds"
             :items="(quotas || []).map((q) => ({ label: q.title, value: q.id }))"
@@ -248,6 +252,7 @@
         </UFormField>
 
         <UFormField
+          v-if="returnableItems.length > 0"
           :label="$t('ticketing.tiers.modal.returnable_items_label')"
           name="returnableItems"
         >
