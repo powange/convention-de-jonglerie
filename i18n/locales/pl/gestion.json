@@ -450,12 +450,9 @@
       "teams_description": "Organizowanie zespołów wolontariuszy"
     },
     "workshops": {
-      "enable_workshops": "Warsztaty aktywizujące",
       "manage_description": "Przeglądaj i moderuj warsztaty proponowane przez uczestników",
       "manage_title": "Zarządzaj warsztatami",
-      "title": "Warsztaty",
-      "workshops_enabled_description": "Uczestnicy i wolontariusze mogą teraz tworzyć warsztaty dla tej edycji.",
-      "workshops_enabled_notice": "Warsztaty są aktywowane"
+      "title": "Warsztaty"
     }
   }
 }

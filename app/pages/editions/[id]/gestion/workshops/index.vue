@@ -23,7 +23,7 @@
           {{ $t('gestion.workshops.title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Gérer l'activation des workshops et les lieux disponibles
+          {{ $t('workshops.locations_description') }}
         </p>
       </div>
 
@@ -36,58 +36,20 @@
                 <UIcon name="i-heroicons-academic-cap" class="text-green-500" />
                 <h2 class="text-lg font-semibold">{{ $t('gestion.workshops.title') }}</h2>
               </div>
-              <div class="flex items-center gap-2">
-                <UButton
-                  v-if="canEdit && workshopsEnabledLocal"
-                  size="sm"
-                  color="primary"
-                  variant="soft"
-                  icon="i-heroicons-photo"
-                  @click="openImportWorkshopsModal"
-                >
-                  {{ $t('workshops.import_from_image') }}
-                </UButton>
-                <UBadge :color="workshopsEnabledLocal ? 'success' : 'neutral'" variant="soft">
-                  {{
-                    workshopsEnabledLocal
-                      ? $t('common.active') || 'Actif'
-                      : $t('common.inactive') || 'Inactif'
-                  }}
-                </UBadge>
-              </div>
-            </div>
-
-            <div
-              v-if="canEdit"
-              class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
-            >
-              <div>
-                <h3 class="font-medium text-gray-900 dark:text-white">
-                  {{ $t('gestion.workshops.enable_workshops') }}
-                </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Permettre aux participants et bénévoles de créer des workshops
-                </p>
-              </div>
-              <USwitch
-                v-model="workshopsEnabledLocal"
-                :disabled="savingWorkshops"
+              <UButton
+                v-if="canEdit"
+                size="sm"
                 color="primary"
-                @update:model-value="handleToggleWorkshops"
-              />
+                variant="soft"
+                icon="i-heroicons-photo"
+                @click="openImportWorkshopsModal"
+              >
+                {{ $t('workshops.import_from_image') }}
+              </UButton>
             </div>
 
-            <div v-if="workshopsEnabledLocal">
-              <UAlert
-                :title="$t('gestion.workshops.workshops_enabled_notice')"
-                :description="$t('gestion.workshops.workshops_enabled_description')"
-                icon="i-heroicons-academic-cap"
-                color="success"
-                variant="subtle"
-              />
-
-              <!-- Gestion des lieux -->
-              <div class="mt-6 space-y-3">
+            <!-- Gestion des lieux -->
+            <div class="space-y-3">
                 <div class="flex items-center justify-between">
                   <div>
                     <h3 class="font-medium text-gray-900 dark:text-white">
@@ -167,7 +129,6 @@
                     {{ $t('workshops.add_location') }}
                   </UButton>
                 </div>
-              </div>
             </div>
           </div>
         </UCard>
@@ -194,43 +155,6 @@ const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
-
-// Gestion de l'activation des workshops
-const workshopsEnabledLocal = ref(false)
-
-// Initialiser workshopsEnabled depuis l'édition
-watch(
-  edition,
-  (newEdition) => {
-    if (newEdition) {
-      workshopsEnabledLocal.value = newEdition.workshopsEnabled || false
-    }
-  },
-  { immediate: true }
-)
-
-const { execute: executeToggleWorkshops, loading: savingWorkshops } = useApiAction(
-  `/api/editions/${editionId}`,
-  {
-    method: 'PUT',
-    body: () => ({ workshopsEnabled: workshopsEnabledLocal.value }),
-    successMessage: { title: t('common.saved') },
-    errorMessages: { default: t('common.error') },
-    onSuccess: async () => {
-      await editionStore.fetchEditionById(editionId, { force: true })
-      if (workshopsEnabledLocal.value) {
-        await fetchWorkshopLocations()
-      }
-    },
-    onError: () => {
-      workshopsEnabledLocal.value = !workshopsEnabledLocal.value
-    },
-  }
-)
-
-const handleToggleWorkshops = () => {
-  executeToggleWorkshops()
-}
 
 // Gestion des lieux de workshops
 const workshopLocations = ref<any[]>([])

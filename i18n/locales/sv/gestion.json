@@ -450,12 +450,9 @@
       "teams_description": "Organisera team av volontärer"
     },
     "workshops": {
-      "enable_workshops": "Aktivera workshops",
       "manage_description": "Visa och moderera workshops föreslagna av deltagare",
       "manage_title": "Hantera workshops",
-      "title": "Verkstäder",
-      "workshops_enabled_description": "Deltagare och volontärer kan nu skapa workshops för denna utgåva.",
-      "workshops_enabled_notice": "Verkstäderna är aktiverade"
+      "title": "Verkstäder"
     }
   }
 }

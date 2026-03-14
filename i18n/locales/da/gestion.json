@@ -450,12 +450,9 @@
       "teams_description": "Organisering af hold af frivillige"
     },
     "workshops": {
-      "enable_workshops": "Aktiver workshops",
       "manage_description": "Se og moderer workshops foreslået af deltagere",
       "manage_title": "Administrer workshops",
-      "title": "Værksteder",
-      "workshops_enabled_description": "Deltagere og frivillige kan nu oprette workshops til denne udgave.",
-      "workshops_enabled_notice": "Workshops er aktiveret"
+      "title": "Værksteder"
     }
   }
 }

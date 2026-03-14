@@ -450,12 +450,9 @@
       "teams_description": "Organizar equipos de voluntarios"
     },
     "workshops": {
-      "enable_workshops": "Activar talleres",
       "manage_description": "Consultar y moderar los talleres propuestos por los participantes",
       "manage_title": "Gestionar talleres",
-      "title": "Talleres",
-      "workshops_enabled_description": "Los participantes y voluntarios ya pueden crear talleres para esta edición.",
-      "workshops_enabled_notice": "Se activan los talleres"
+      "title": "Talleres"
     }
   }
 }

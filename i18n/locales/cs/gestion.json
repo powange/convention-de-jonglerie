@@ -450,12 +450,9 @@
       "teams_description": "Organizování týmů dobrovolníků"
     },
     "workshops": {
-      "enable_workshops": "Aktivační workshopy",
       "manage_description": "Zobrazit a moderovat workshopy navržené účastníky",
       "manage_title": "Spravovat workshopy",
-      "title": "Workshopy",
-      "workshops_enabled_description": "Účastníci a dobrovolníci mohou nyní vytvářet workshopy pro toto vydání.",
-      "workshops_enabled_notice": "Workshopy jsou aktivovány"
+      "title": "Workshopy"
     }
   }
 }

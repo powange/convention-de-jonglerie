@@ -450,12 +450,9 @@
       "teams_description": "Organizar equipas de voluntários"
     },
     "workshops": {
-      "enable_workshops": "Ativar workshops",
       "manage_description": "Consultar e moderar os workshops propostos pelos participantes",
       "manage_title": "Gerir workshops",
-      "title": "Workshops",
-      "workshops_enabled_description": "Os participantes e os voluntários podem agora criar workshops para esta edição.",
-      "workshops_enabled_notice": "As oficinas são activadas"
+      "title": "Workshops"
     }
   }
 }

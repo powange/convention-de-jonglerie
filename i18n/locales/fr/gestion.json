@@ -21,6 +21,15 @@
       "save_success": "Liens mis à jour avec succès",
       "title": "Liens externes"
     },
+    "features": {
+      "artists_description": "Permettre la gestion des artistes et spectacles pour cette édition",
+      "description": "Activer ou désactiver les modules optionnels de cette édition",
+      "meals_description": "Permettre la gestion des repas pour bénévoles et artistes",
+      "ticketing_description": "Permettre la gestion de la billetterie pour cette édition",
+      "title": "Fonctionnalités",
+      "volunteers_description": "Permettre la gestion des bénévoles pour cette édition",
+      "workshops_description": "Permettre aux participants et bénévoles de créer des workshops"
+    },
     "general_info": {
       "description": "Modifiez le nom, les dates, le fuseau horaire et l'adresse de votre événement.",
       "name_fallback_hint": "Si aucun nom n'est spécifié, le nom de la convention sera utilisé",
@@ -32,10 +41,10 @@
     "infos": {
       "about_description": "Modifier l'affiche, la description et le programme",
       "external_links_description": "Gérer le site web, la billetterie et les réseaux sociaux",
+      "features_description": "Activer ou désactiver les modules optionnels",
       "general_info_description": "Modifier le nom, les dates et l'adresse",
       "map_description": "Définir les zones sur la carte du site",
       "services_description": "Gérer les services et équipements disponibles",
-      "features_description": "Activer ou désactiver les modules optionnels",
       "title": "Informations"
     },
     "lost_found_active_description": "Les participants peuvent déclarer des objets trouvés ou perdus",
@@ -204,12 +213,11 @@
       "error_delete": "Erreur lors de la suppression du spectacle",
       "error_update": "Erreur lors de la mise à jour du spectacle",
       "free_text": "Texte libre",
-      "is_public": "Public",
-      "is_public_hint": "Rendre ce spectacle visible sur la page publique de l'édition",
-      "public_count": "{count} public(s)",
       "free_text_placeholder": "Saisir un lieu...",
       "image": "Image / Affiche",
       "image_placeholder": "Cliquez pour ajouter une image",
+      "is_public": "Public",
+      "is_public_hint": "Rendre ce spectacle visible sur la page publique de l'édition",
       "items_to_receive": "Articles à récupérer",
       "list_title": "Spectacles",
       "location": "Lieu",
@@ -219,6 +227,7 @@
       "no_items_selected": "Aucun article sélectionné",
       "no_returnable_items": "Aucun article à restituer",
       "no_shows": "Aucun spectacle",
+      "public_count": "{count} public(s)",
       "returnable_items": "Articles à restituer",
       "select_artists": "Sélectionner des artistes",
       "select_returnable_items": "Sélectionner des articles à restituer",
@@ -441,21 +450,9 @@
       "teams_description": "Organiser les équipes de bénévoles"
     },
     "workshops": {
-      "enable_workshops": "Activer les workshops",
       "manage_description": "Consulter et modérer les workshops proposés par les participants",
       "manage_title": "Gérer les workshops",
-      "title": "Workshops",
-      "workshops_enabled_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition",
-      "workshops_enabled_notice": "Les workshops sont activés"
-    },
-    "features": {
-      "title": "Fonctionnalités",
-      "description": "Activer ou désactiver les modules optionnels de cette édition",
-      "artists_description": "Permettre la gestion des artistes et spectacles pour cette édition",
-      "meals_description": "Permettre la gestion des repas pour bénévoles et artistes",
-      "ticketing_description": "Permettre la gestion de la billetterie pour cette édition",
-      "volunteers_description": "Permettre la gestion des bénévoles pour cette édition",
-      "workshops_description": "Permettre aux participants et bénévoles de créer des workshops"
+      "title": "Workshops"
     }
   }
 }

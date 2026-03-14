@@ -450,12 +450,9 @@
       "teams_description": "Vrijwilligersteams organiseren"
     },
     "workshops": {
-      "enable_workshops": "Workshops activeren",
       "manage_description": "Bekijk en modereer workshops voorgesteld door deelnemers",
       "manage_title": "Beheer workshops",
-      "title": "Workshops",
-      "workshops_enabled_description": "Deelnemers en vrijwilligers kunnen nu workshops maken voor deze editie.",
-      "workshops_enabled_notice": "Workshops worden geactiveerd"
+      "title": "Workshops"
     }
   }
 }

@@ -450,12 +450,9 @@
       "teams_description": "Organising teams of volunteers"
     },
     "workshops": {
-      "enable_workshops": "Activate workshops",
       "manage_description": "View and moderate workshops proposed by participants",
       "manage_title": "Manage workshops",
-      "title": "Workshops",
-      "workshops_enabled_description": "Participants and volunteers can now create workshops for this edition.",
-      "workshops_enabled_notice": "Workshops are activated"
+      "title": "Workshops"
     }
   }
 }

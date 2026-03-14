@@ -450,12 +450,9 @@
       "teams_description": "Organisation von Freiwilligenteams"
     },
     "workshops": {
-      "enable_workshops": "Workshops aktivieren",
       "manage_description": "Workshops von Teilnehmern ansehen und moderieren",
       "manage_title": "Workshops verwalten",
-      "title": "Workshops",
-      "workshops_enabled_description": "Teilnehmer und Freiwillige können nun Workshops für diese Ausgabe erstellen.",
-      "workshops_enabled_notice": "Workshops werden aktiviert"
+      "title": "Workshops"
     }
   }
 }

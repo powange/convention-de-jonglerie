@@ -450,12 +450,9 @@
       "teams_description": "Organizzare squadre di volontari"
     },
     "workshops": {
-      "enable_workshops": "Attivazione di laboratori",
       "manage_description": "Visualizza e modera i workshop proposti dai partecipanti",
       "manage_title": "Gestisci workshop",
-      "title": "Laboratori",
-      "workshops_enabled_description": "I partecipanti e i volontari possono ora creare laboratori per questa edizione.",
-      "workshops_enabled_notice": "I laboratori sono attivati"
+      "title": "Laboratori"
     }
   }
 }
