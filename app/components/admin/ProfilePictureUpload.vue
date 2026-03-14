@@ -180,8 +180,8 @@ const saveChanges = () => {
 }
 
 // Gestionnaires d'événements ImageUpload
-const onProfilePictureUploaded = (result: { success: boolean; imageUrl?: string }) => {
-  if (result.success && result.imageUrl) {
+const onProfilePictureUploaded = (result: { imageUrl?: string }) => {
+  if (result.imageUrl) {
     tempProfilePictureUrl.value = result.imageUrl
   }
 }

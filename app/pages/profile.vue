@@ -1115,12 +1115,8 @@ const changePassword = () => {
 }
 
 // Gestionnaires d'événements pour ImageUpload
-const onProfilePictureTemporarilyUploaded = async (result: {
-  success: boolean
-  imageUrl?: string
-  user?: User
-}) => {
-  if (result.success && result.imageUrl) {
+const onProfilePictureTemporarilyUploaded = async (result: { imageUrl?: string; user?: User }) => {
+  if (result.imageUrl) {
     profilePictureUrl.value = result.imageUrl
   }
 }

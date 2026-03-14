@@ -245,8 +245,8 @@ const uploadEndpoint = computed(() => ({
   id: props.editionId,
 }))
 
-const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
-  if (result.success && result.imageUrl) {
+const onImageUploaded = (result: { imageUrl?: string }) => {
+  if (result.imageUrl) {
     formData.value.imageUrl = result.imageUrl
   }
 }

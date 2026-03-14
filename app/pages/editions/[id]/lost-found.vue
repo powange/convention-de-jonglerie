@@ -394,8 +394,8 @@ const { execute: toggleStatus, isLoading: isTogglingStatus } = useApiActionById<
 )
 
 // Gestionnaires d'événements pour ImageUpload
-const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
-  if (result.success && result.imageUrl) {
+const onImageUploaded = (result: { imageUrl?: string }) => {
+  if (result.imageUrl) {
     newItem.value.imageUrl = result.imageUrl
     toast.add({
       color: 'success',

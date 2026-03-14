@@ -880,23 +880,17 @@ const getProgramError = () => {
 }
 
 // Gestionnaires d'événements pour l'upload d'image
-const onImageUploaded = (result: {
-  success: boolean
-  imageUrl?: string
-  edition?: { imageUrl?: string }
-}) => {
-  if (result.success) {
-    // L'API d'upload d'édition peut retourner soit imageUrl directement, soit dans l'objet edition
-    const newImageUrl = result.imageUrl || result.edition?.imageUrl
-    if (newImageUrl) {
-      state.imageUrl = newImageUrl
-    }
-    toast.add({
-      title: t('upload.success_message'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+const onImageUploaded = (result: { imageUrl?: string; edition?: { imageUrl?: string } }) => {
+  // L'API d'upload d'édition peut retourner soit imageUrl directement, soit dans l'objet edition
+  const newImageUrl = result.imageUrl || result.edition?.imageUrl
+  if (newImageUrl) {
+    state.imageUrl = newImageUrl
   }
+  toast.add({
+    title: t('upload.success_message'),
+    icon: 'i-heroicons-check-circle',
+    color: 'success',
+  })
 }
 
 const onImageDeleted = () => {

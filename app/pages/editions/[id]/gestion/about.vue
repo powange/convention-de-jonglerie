@@ -141,22 +141,16 @@ watch(
 )
 
 // Gestionnaires d'événements pour l'upload d'image
-const onImageUploaded = (result: {
-  success: boolean
-  imageUrl?: string
-  edition?: { imageUrl?: string }
-}) => {
-  if (result.success) {
-    const newImageUrl = result.imageUrl || result.edition?.imageUrl
-    if (newImageUrl) {
-      imageUrl.value = newImageUrl
-    }
-    toast.add({
-      title: t('upload.success_message'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+const onImageUploaded = (result: { imageUrl?: string; edition?: { imageUrl?: string } }) => {
+  const newImageUrl = result.imageUrl || result.edition?.imageUrl
+  if (newImageUrl) {
+    imageUrl.value = newImageUrl
   }
+  toast.add({
+    title: t('upload.success_message'),
+    icon: 'i-heroicons-check-circle',
+    color: 'success',
+  })
 }
 
 const onImageDeleted = () => {

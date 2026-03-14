@@ -130,7 +130,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:modelValue', value: string | null): void
-  (e: 'uploaded', result: { success: boolean; imageUrl?: string }): void
+  (e: 'uploaded', result: { imageUrl?: string }): void
   (e: 'deleted'): void
   (e: 'error', error: string): void
 }
@@ -378,8 +378,10 @@ const upload = async () => {
       },
     })
 
-    emit('update:modelValue', response.imageUrl || null)
-    emit('uploaded', response)
+    // Unwrap createSuccessResponse format: { success, data: { imageUrl, ... } }
+    const responseData = response.data ?? response
+    emit('update:modelValue', responseData.imageUrl || null)
+    emit('uploaded', responseData)
   } catch (uploadError: unknown) {
     console.error('Upload error:', uploadError)
     const message = uploadError instanceof Error ? uploadError.message : 'Upload failed'

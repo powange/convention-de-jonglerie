@@ -211,8 +211,8 @@ const isValidUrl = (url: string): boolean => {
 }
 
 // Gestionnaires d'événements pour ImageUpload
-const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
-  if (result.success && result.imageUrl) {
+const onImageUploaded = (result: { imageUrl?: string }) => {
+  if (result.imageUrl) {
     form.logo = result.imageUrl
     toast.add({
       title: t('components.convention_form.image_uploaded'),
