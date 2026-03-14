@@ -406,7 +406,7 @@ const canManageEdition = computed(() => {
 const closedVisibilityReason = computed<string | null>(() => {
   if (!edition.value || !authStore.user?.id) return null
   // Si la page est ouverte au public, pas besoin de message
-  if ((edition.value as any).volunteersOpen === true) return null
+  if (edition.value.volunteersOpen === true) return null
 
   const canEdit = editionStore.canEditEdition(edition.value, authStore.user.id)
   if (canEdit) return t('edition.volunteers.closed_visible_as_editor')

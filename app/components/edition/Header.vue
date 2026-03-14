@@ -421,8 +421,7 @@ const volunteersTabVisible = computed<boolean>(() => {
     if (isAcceptedVolunteer.value) return true
   }
   // Visible publiquement uniquement si ouvert
-  // edition.volunteersOpen peut ne pas encore être dans le type Edition (ajout récent), cast temporaire
-  return (props.edition as any).volunteersOpen === true
+  return props.edition.volunteersOpen === true
 })
 
 // Vérifier si l'édition a commencé (affichage onglet objets trouvés dès le début)

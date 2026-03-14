@@ -71,6 +71,9 @@ export interface Edition {
   hasCantine: boolean
   hasAerialSpace: boolean
   hasSlacklineSpace: boolean
+  hasUnicycleSpace: boolean
+  hasLongShow: boolean
+  hasATM: boolean
   hasToilets: boolean
   hasShowers: boolean
   hasAccessibility: boolean
@@ -84,6 +87,8 @@ export interface Edition {
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean
+  volunteersOpen?: boolean
+  volunteersMode?: 'INTERNAL' | 'EXTERNAL'
   volunteersSetupStartDate?: string | null
   volunteersTeardownEndDate?: string | null
 }

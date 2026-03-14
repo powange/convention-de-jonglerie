@@ -38,6 +38,7 @@ const serviceTranslationKeys: Record<string, string> = {
   hasCantine: 'services.canteen',
   hasAerialSpace: 'services.aerial_space',
   hasSlacklineSpace: 'services.slackline_space',
+  hasUnicycleSpace: 'services.unicycle_space',
   hasToilets: 'services.toilets',
   hasShowers: 'services.showers',
   hasAccessibility: 'services.accessibility',
@@ -90,6 +91,7 @@ export const useTranslatedConventionServices = () => {
           'hasWorkshops',
           'hasAerialSpace',
           'hasSlacklineSpace',
+          'hasUnicycleSpace',
         ],
       },
       amenities: {

@@ -26,6 +26,7 @@
               icon="i-heroicons-plus"
               color="primary"
               size="sm"
+              :title="$t('workshops.add_workshop')"
               @click="showAddModal = true"
             >
               <span class="hidden sm:inline">{{ $t('workshops.add_workshop') }}</span>

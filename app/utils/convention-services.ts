@@ -21,6 +21,7 @@ export interface ConventionServiceKeys {
   hasCantine: boolean
   hasAerialSpace: boolean
   hasSlacklineSpace: boolean
+  hasUnicycleSpace: boolean
   hasToilets: boolean
   hasShowers: boolean
   hasAccessibility: boolean
@@ -114,6 +115,12 @@ export const conventionServices: ConventionService[] = [
     icon: 'i-heroicons-minus',
     color: 'text-teal-500',
   },
+  {
+    key: 'hasUnicycleSpace',
+    label: 'Espace monocycle',
+    icon: 'i-mdi:unicycle',
+    color: 'text-lime-600',
+  },
   { key: 'hasToilets', label: 'WC', icon: 'i-guidance:wc', color: 'text-gray-600' },
   {
     key: 'hasShowers',
@@ -193,6 +200,7 @@ export const getServicesGrouped = () => {
         'hasWorkshops',
         'hasAerialSpace',
         'hasSlacklineSpace',
+        'hasUnicycleSpace',
       ],
     },
     amenities: {

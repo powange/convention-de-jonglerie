@@ -13,7 +13,7 @@ import {
 describe('convention-services utils', () => {
   describe('conventionServices array', () => {
     it('devrait contenir tous les services définis', () => {
-      expect(conventionServices).toHaveLength(24)
+      expect(conventionServices).toHaveLength(25)
     })
 
     it('chaque service devrait avoir la structure correcte', () => {
@@ -231,6 +231,7 @@ describe('convention-services utils', () => {
         'hasWorkshops',
         'hasAerialSpace',
         'hasSlacklineSpace',
+        'hasUnicycleSpace',
       ])
     })
 

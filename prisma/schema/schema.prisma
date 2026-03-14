@@ -128,6 +128,7 @@ model Edition {
   hasOpenStage                      Boolean                          @default(false)
   hasShowers                        Boolean                          @default(false)
   hasSlacklineSpace                 Boolean                          @default(false)
+  hasUnicycleSpace                  Boolean                          @default(false)
   hasToilets                        Boolean                          @default(false)
   hasWorkshops                      Boolean                          @default(false)
   hasCashPayment                    Boolean                          @default(false)

@@ -51,10 +51,12 @@ export default wrapApiHandler(
       hasFireSpace,
       hasGala,
       hasOpenStage,
+      hasLongShow,
       hasConcert,
       hasCantine,
       hasAerialSpace,
       hasSlacklineSpace,
+      hasUnicycleSpace,
       hasToilets,
       hasShowers,
       hasAccessibility,
@@ -65,6 +67,7 @@ export default wrapApiHandler(
       ticketingEnabled,
       workshopsEnabled,
       workshopLocationsFreeInput,
+      hasATM,
       hasCashPayment,
       hasCreditCardPayment,
       hasAfjTokenPayment,
@@ -147,10 +150,12 @@ export default wrapApiHandler(
     if (hasFireSpace !== undefined) updatedData.hasFireSpace = hasFireSpace
     if (hasGala !== undefined) updatedData.hasGala = hasGala
     if (hasOpenStage !== undefined) updatedData.hasOpenStage = hasOpenStage
+    if (hasLongShow !== undefined) updatedData.hasLongShow = hasLongShow
     if (hasConcert !== undefined) updatedData.hasConcert = hasConcert
     if (hasCantine !== undefined) updatedData.hasCantine = hasCantine
     if (hasAerialSpace !== undefined) updatedData.hasAerialSpace = hasAerialSpace
     if (hasSlacklineSpace !== undefined) updatedData.hasSlacklineSpace = hasSlacklineSpace
+    if (hasUnicycleSpace !== undefined) updatedData.hasUnicycleSpace = hasUnicycleSpace
     if (hasToilets !== undefined) updatedData.hasToilets = hasToilets
     if (hasShowers !== undefined) updatedData.hasShowers = hasShowers
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility
@@ -162,6 +167,7 @@ export default wrapApiHandler(
     if (workshopsEnabled !== undefined) updatedData.workshopsEnabled = workshopsEnabled
     if (workshopLocationsFreeInput !== undefined)
       updatedData.workshopLocationsFreeInput = workshopLocationsFreeInput
+    if (hasATM !== undefined) updatedData.hasATM = hasATM
     if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment
     if (hasAfjTokenPayment !== undefined) updatedData.hasAfjTokenPayment = hasAfjTokenPayment
