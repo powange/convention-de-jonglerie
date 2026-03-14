@@ -137,6 +137,7 @@ model Edition {
   hasATM                            Boolean                          @default(false)
   hasLongShow                       Boolean                          @default(false)
   status                            EditionStatus                    @default(OFFLINE)
+  volunteersEnabled                 Boolean                          @default(false)
   volunteersDescription             String?                          @db.Text
   volunteersOpen                    Boolean                          @default(false)
   volunteersUpdatedAt               DateTime?
@@ -159,6 +160,9 @@ model Edition {
   volunteersSetupStartDate          DateTime?
   volunteersAskSetup                Boolean                          @default(false)
   volunteersAskTeardown             Boolean                          @default(false)
+  mealsEnabled                      Boolean                          @default(false)
+  artistsEnabled                    Boolean                          @default(false)
+  ticketingEnabled                  Boolean                          @default(false)
   ticketingAllowOnsiteRegistration  Boolean                          @default(true)
   ticketingAllowAnonymousOrders     Boolean                          @default(false)
   workshopsEnabled                  Boolean                          @default(false)

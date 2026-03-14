@@ -83,6 +83,14 @@ export default wrapApiHandler(
         // Config billetterie
         ticketingAllowOnsiteRegistration: true,
         ticketingAllowAnonymousOrders: true,
+        // Config repas
+        mealsEnabled: true,
+        // Config bénévoles
+        volunteersEnabled: true,
+        // Config artistes
+        artistsEnabled: true,
+        // Config billetterie
+        ticketingEnabled: true,
         // Config workshops
         workshopsEnabled: true,
         workshopLocationsFreeInput: true,

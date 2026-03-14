@@ -21,6 +21,15 @@
       "save_success": "Links opdateret",
       "title": "Eksterne links"
     },
+    "features": {
+      "artists_description": "Aktivér administration af kunstnere og shows for denne udgave",
+      "description": "Aktivér eller deaktivér valgfrie moduler for denne udgave",
+      "meals_description": "Aktivér administration af måltider for frivillige og kunstnere",
+      "ticketing_description": "Aktivér administration af billetsalg for denne udgave",
+      "title": "Funktioner",
+      "volunteers_description": "Aktivér administration af frivillige for denne udgave",
+      "workshops_description": "Giv deltagere og frivillige mulighed for at oprette workshops"
+    },
     "general_info": {
       "description": "Rediger navn, datoer, tidszone og adresse for dit arrangement.",
       "name_fallback_hint": "Hvis der ikke angives et navn, vil konventionens navn blive brugt",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Rediger plakat, beskrivelse og program",
       "external_links_description": "Administrer hjemmeside, billetsalg og sociale medier",
+      "features_description": "Aktivér eller deaktivér valgfrie moduler",
       "general_info_description": "Rediger navn, datoer og adresse",
       "map_description": "Definer zonerne på områdekortet",
       "services_description": "Administrer tilgængelige tjenester og faciliteter",

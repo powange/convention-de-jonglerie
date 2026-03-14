@@ -21,6 +21,15 @@
       "save_success": "Links atualizados com sucesso",
       "title": "Links externos"
     },
+    "features": {
+      "artists_description": "Permitir a gestão de artistas e espetáculos para esta edição",
+      "description": "Ativar ou desativar os módulos opcionais desta edição",
+      "meals_description": "Permitir a gestão de refeições para voluntários e artistas",
+      "ticketing_description": "Permitir a gestão de bilhética para esta edição",
+      "title": "Funcionalidades",
+      "volunteers_description": "Permitir a gestão de voluntários para esta edição",
+      "workshops_description": "Permitir aos participantes e voluntários criar workshops"
+    },
     "general_info": {
       "description": "Edite o nome, as datas, o fuso horário e o endereço do seu evento.",
       "name_fallback_hint": "Se nenhum nome for especificado, o nome da convenção será utilizado",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Editar o cartaz, a descrição e o programa",
       "external_links_description": "Gerir o site, a bilheteira e as redes sociais",
+      "features_description": "Ativar ou desativar os módulos opcionais",
       "general_info_description": "Editar o nome, as datas e o endereço",
       "map_description": "Definir as zonas no mapa do local",
       "services_description": "Gerir os serviços e equipamentos disponíveis",

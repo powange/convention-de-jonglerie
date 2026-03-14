@@ -105,6 +105,15 @@
                 :description="$t('gestion.infos.map_description')"
                 color="blue"
               />
+
+              <!-- Fonctionnalités -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/features`"
+                icon="i-lucide-toggle-right"
+                :title="$t('gestion.features.title')"
+                :description="$t('gestion.infos.features_description')"
+                color="emerald"
+              />
             </div>
           </div>
         </UCard>
@@ -147,7 +156,7 @@
         </UCard>
 
         <!-- Gestion bénévole -->
-        <UCard v-if="isOrganizer || isTeamLeaderValue">
+        <UCard v-if="edition.volunteersEnabled && (isOrganizer || isTeamLeaderValue)">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
@@ -234,7 +243,7 @@
         </UCard>
 
         <!-- Gestion des artistes -->
-        <UCard v-if="isOrganizer">
+        <UCard v-if="edition.artistsEnabled && isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-star" class="text-yellow-500" />
@@ -280,7 +289,7 @@
         </UCard>
 
         <!-- Repas (accès complet pour organisateurs) -->
-        <UCard v-if="isOrganizer">
+        <UCard v-if="edition.mealsEnabled && isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="cbi:mealie" class="text-orange-500" />
@@ -319,7 +328,7 @@
         </UCard>
 
         <!-- Validation des repas (accès pour bénévoles d'équipes de validation) -->
-        <UCard v-else-if="canAccessMealValidation">
+        <UCard v-else-if="edition.mealsEnabled && canAccessMealValidation">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="cbi:mealie" class="text-orange-500" />
@@ -340,7 +349,7 @@
         </UCard>
 
         <!-- Billeterie -->
-        <UCard v-if="isOrganizer">
+        <UCard v-if="edition.ticketingEnabled && isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-ticket" class="text-blue-500" />
@@ -415,7 +424,7 @@
         </UCard>
 
         <!-- Workshops -->
-        <UCard v-if="isOrganizer">
+        <UCard v-if="isOrganizer && edition.workshopsEnabled">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-academic-cap" class="text-indigo-500" />

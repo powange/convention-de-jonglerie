@@ -75,6 +75,10 @@ export interface Edition {
   hasShowers: boolean
   hasAccessibility: boolean
   hasWorkshops: boolean
+  mealsEnabled?: boolean
+  volunteersEnabled?: boolean
+  artistsEnabled?: boolean
+  ticketingEnabled?: boolean
   workshopsEnabled?: boolean
   mapPublic?: boolean
   hasCashPayment: boolean
@@ -274,6 +278,10 @@ export interface EditionFormData {
   hasShowers?: boolean
   hasAccessibility?: boolean
   hasWorkshops?: boolean
+  mealsEnabled?: boolean
+  volunteersEnabled?: boolean
+  artistsEnabled?: boolean
+  ticketingEnabled?: boolean
   workshopsEnabled?: boolean
   hasCashPayment?: boolean
   hasCreditCardPayment?: boolean

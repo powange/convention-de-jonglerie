@@ -35,6 +35,7 @@
       "general_info_description": "Modifier le nom, les dates et l'adresse",
       "map_description": "Définir les zones sur la carte du site",
       "services_description": "Gérer les services et équipements disponibles",
+      "features_description": "Activer ou désactiver les modules optionnels",
       "title": "Informations"
     },
     "lost_found_active_description": "Les participants peuvent déclarer des objets trouvés ou perdus",
@@ -446,6 +447,15 @@
       "title": "Workshops",
       "workshops_enabled_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition",
       "workshops_enabled_notice": "Les workshops sont activés"
+    },
+    "features": {
+      "title": "Fonctionnalités",
+      "description": "Activer ou désactiver les modules optionnels de cette édition",
+      "artists_description": "Permettre la gestion des artistes et spectacles pour cette édition",
+      "meals_description": "Permettre la gestion des repas pour bénévoles et artistes",
+      "ticketing_description": "Permettre la gestion de la billetterie pour cette édition",
+      "volunteers_description": "Permettre la gestion des bénévoles pour cette édition",
+      "workshops_description": "Permettre aux participants et bénévoles de créer des workshops"
     }
   }
 }

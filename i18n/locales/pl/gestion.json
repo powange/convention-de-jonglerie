@@ -21,6 +21,15 @@
       "save_success": "Linki zaktualizowane pomyślnie",
       "title": "Linki zewnętrzne"
     },
+    "features": {
+      "artists_description": "Włącz zarządzanie artystami i spektaklami dla tej edycji",
+      "description": "Aktywuj lub dezaktywuj opcjonalne moduły tej edycji",
+      "meals_description": "Włącz zarządzanie posiłkami dla wolontariuszy i artystów",
+      "ticketing_description": "Włącz zarządzanie biletami dla tej edycji",
+      "title": "Funkcje",
+      "volunteers_description": "Włącz zarządzanie wolontariuszami dla tej edycji",
+      "workshops_description": "Pozwól uczestnikom i wolontariuszom tworzyć warsztaty"
+    },
     "general_info": {
       "description": "Edytuj nazwę, daty, strefę czasową i adres swojego wydarzenia.",
       "name_fallback_hint": "Jeśli nie podano nazwy, zostanie użyta nazwa konwencji",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Edytuj plakat, opis i program",
       "external_links_description": "Zarządzaj stroną internetową, sprzedażą biletów i mediami społecznościowymi",
+      "features_description": "Aktywuj lub dezaktywuj opcjonalne moduły",
       "general_info_description": "Edytuj nazwę, daty i adres",
       "map_description": "Zdefiniuj strefy na mapie terenu",
       "services_description": "Zarządzaj dostępnymi usługami i udogodnieniami",

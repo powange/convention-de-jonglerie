@@ -21,6 +21,15 @@
       "save_success": "Links updated successfully",
       "title": "External links"
     },
+    "features": {
+      "artists_description": "Enable artist and show management for this edition",
+      "description": "Enable or disable optional modules for this edition",
+      "meals_description": "Enable meal management for volunteers and artists",
+      "ticketing_description": "Enable ticketing management for this edition",
+      "title": "Features",
+      "volunteers_description": "Enable volunteer management for this edition",
+      "workshops_description": "Allow participants and volunteers to create workshops"
+    },
     "general_info": {
       "description": "Edit the name, dates, timezone and address of your event.",
       "name_fallback_hint": "If no name is specified, the convention name will be used",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Edit the poster, description and program",
       "external_links_description": "Manage website, ticketing and social media",
+      "features_description": "Enable or disable optional modules",
       "general_info_description": "Edit the name, dates and address",
       "map_description": "Define zones on the site map",
       "services_description": "Manage available services and facilities",

@@ -21,6 +21,15 @@
       "save_success": "Links succesvol bijgewerkt",
       "title": "Externe links"
     },
+    "features": {
+      "artists_description": "Beheer van artiesten en shows voor deze editie inschakelen",
+      "description": "Optionele modules voor deze editie in- of uitschakelen",
+      "meals_description": "Beheer van maaltijden voor vrijwilligers en artiesten inschakelen",
+      "ticketing_description": "Beheer van ticketverkoop voor deze editie inschakelen",
+      "title": "Functies",
+      "volunteers_description": "Beheer van vrijwilligers voor deze editie inschakelen",
+      "workshops_description": "Deelnemers en vrijwilligers toestaan om workshops te maken"
+    },
     "general_info": {
       "description": "Bewerk de naam, data, tijdzone en het adres van uw evenement.",
       "name_fallback_hint": "Als er geen naam is opgegeven, wordt de naam van de conventie gebruikt",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Poster, beschrijving en programma bewerken",
       "external_links_description": "Website, ticketverkoop en sociale media beheren",
+      "features_description": "Optionele modules in- of uitschakelen",
       "general_info_description": "Naam, data en adres bewerken",
       "map_description": "Zones op de plattegrond definiëren",
       "services_description": "Beschikbare diensten en faciliteiten beheren",

@@ -59,6 +59,10 @@ export default wrapApiHandler(
       hasShowers,
       hasAccessibility,
       hasWorkshops,
+      mealsEnabled,
+      volunteersEnabled,
+      artistsEnabled,
+      ticketingEnabled,
       workshopsEnabled,
       workshopLocationsFreeInput,
       hasCashPayment,
@@ -151,6 +155,10 @@ export default wrapApiHandler(
     if (hasShowers !== undefined) updatedData.hasShowers = hasShowers
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops
+    if (mealsEnabled !== undefined) updatedData.mealsEnabled = mealsEnabled
+    if (volunteersEnabled !== undefined) updatedData.volunteersEnabled = volunteersEnabled
+    if (artistsEnabled !== undefined) updatedData.artistsEnabled = artistsEnabled
+    if (ticketingEnabled !== undefined) updatedData.ticketingEnabled = ticketingEnabled
     if (workshopsEnabled !== undefined) updatedData.workshopsEnabled = workshopsEnabled
     if (workshopLocationsFreeInput !== undefined)
       updatedData.workshopLocationsFreeInput = workshopLocationsFreeInput

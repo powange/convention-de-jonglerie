@@ -21,6 +21,15 @@
       "save_success": "Odkazy úspěšně aktualizovány",
       "title": "Externí odkazy"
     },
+    "features": {
+      "artists_description": "Povolit správu umělců a představení pro tuto edici",
+      "description": "Aktivovat nebo deaktivovat volitelné moduly této edice",
+      "meals_description": "Povolit správu stravování pro dobrovolníky a umělce",
+      "ticketing_description": "Povolit správu vstupenek pro tuto edici",
+      "title": "Funkce",
+      "volunteers_description": "Povolit správu dobrovolníků pro tuto edici",
+      "workshops_description": "Umožnit účastníkům a dobrovolníkům vytvářet workshopy"
+    },
     "general_info": {
       "description": "Upravte název, data, časové pásmo a adresu vaší akce.",
       "name_fallback_hint": "Pokud není zadán žádný název, bude použit název konvence",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Upravit plakát, popis a program",
       "external_links_description": "Spravovat web, prodej vstupenek a sociální sítě",
+      "features_description": "Aktivovat nebo deaktivovat volitelné moduly",
       "general_info_description": "Upravit název, data a adresu",
       "map_description": "Definovat zóny na mapě areálu",
       "services_description": "Spravovat dostupné služby a vybavení",

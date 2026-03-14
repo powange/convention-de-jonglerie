@@ -137,7 +137,8 @@ const getCurrentSection = (path: string): string | null => {
     path.includes('/gestion/services') ||
     path.includes('/gestion/about') ||
     path.includes('/gestion/external-links') ||
-    path.includes('/gestion/general-info')
+    path.includes('/gestion/general-info') ||
+    path.includes('/gestion/features')
   )
     return 'infos'
   return null
@@ -263,6 +264,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-lucide-map',
           to: `/editions/${editionId.value}/gestion/map`,
         },
+        {
+          label: t('gestion.features.title'),
+          icon: 'i-lucide-toggle-right',
+          to: `/editions/${editionId.value}/gestion/features`,
+        },
       ],
       value: 'infos',
     })
@@ -278,7 +284,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Bénévoles
-  if (canManageVolunteers.value || isTeamLeader.value) {
+  if (edition.value?.volunteersEnabled && (canManageVolunteers.value || isTeamLeader.value)) {
     const volunteersChildren: NavigationMenuItem[] = []
 
     if (canManageVolunteers.value) {
@@ -332,7 +338,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Artistes
-  if (isOrganizer.value) {
+  if (edition.value?.artistsEnabled && isOrganizer.value) {
     const artistsChildren: NavigationMenuItem[] = [
       {
         label: t('gestion.artists.list_title'),
@@ -357,7 +363,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Repas
-  if (isOrganizer.value || canAccessMealValidation.value) {
+  if (edition.value?.mealsEnabled && (isOrganizer.value || canAccessMealValidation.value)) {
     const mealsChildren: NavigationMenuItem[] = []
 
     if (isOrganizer.value) {
@@ -387,7 +393,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Billeterie
-  if (isOrganizer.value) {
+  if (edition.value?.ticketingEnabled && isOrganizer.value) {
     managementSection.push({
       label: t('gestion.ticketing.title'),
       icon: 'i-heroicons-ticket',
@@ -426,7 +432,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Workshops
-  if (isOrganizer.value) {
+  if (isOrganizer.value && edition.value?.workshopsEnabled) {
     managementSection.push({
       label: t('gestion.workshops.title'),
       icon: 'i-heroicons-academic-cap',

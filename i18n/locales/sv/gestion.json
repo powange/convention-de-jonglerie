@@ -21,6 +21,15 @@
       "save_success": "Länkar uppdaterade",
       "title": "Externa länkar"
     },
+    "features": {
+      "artists_description": "Aktivera hantering av artister och föreställningar för denna upplaga",
+      "description": "Aktivera eller inaktivera valfria moduler för denna upplaga",
+      "meals_description": "Aktivera hantering av måltider för volontärer och artister",
+      "ticketing_description": "Aktivera hantering av biljettförsäljning för denna upplaga",
+      "title": "Funktioner",
+      "volunteers_description": "Aktivera hantering av volontärer för denna upplaga",
+      "workshops_description": "Låt deltagare och volontärer skapa workshops"
+    },
     "general_info": {
       "description": "Redigera namn, datum, tidszon och adress för ditt evenemang.",
       "name_fallback_hint": "Om inget namn anges kommer konventionens namn att användas",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Redigera affisch, beskrivning och program",
       "external_links_description": "Hantera webbplats, biljettförsäljning och sociala medier",
+      "features_description": "Aktivera eller inaktivera valfria moduler",
       "general_info_description": "Redigera namn, datum och adress",
       "map_description": "Definiera zonerna på områdeskartan",
       "services_description": "Hantera tillgängliga tjänster och faciliteter",

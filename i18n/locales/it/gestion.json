@@ -21,6 +21,15 @@
       "save_success": "Link aggiornati con successo",
       "title": "Link esterni"
     },
+    "features": {
+      "artists_description": "Abilitare la gestione degli artisti e degli spettacoli per questa edizione",
+      "description": "Attivare o disattivare i moduli opzionali di questa edizione",
+      "meals_description": "Abilitare la gestione dei pasti per volontari e artisti",
+      "ticketing_description": "Abilitare la gestione della biglietteria per questa edizione",
+      "title": "Funzionalità",
+      "volunteers_description": "Abilitare la gestione dei volontari per questa edizione",
+      "workshops_description": "Permettere ai partecipanti e ai volontari di creare workshop"
+    },
     "general_info": {
       "description": "Modifica il nome, le date, il fuso orario e l'indirizzo del tuo evento.",
       "name_fallback_hint": "Se non viene specificato un nome, verrà utilizzato il nome della convention",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Modifica la locandina, la descrizione e il programma",
       "external_links_description": "Gestisci il sito web, la biglietteria e i social media",
+      "features_description": "Attivare o disattivare i moduli opzionali",
       "general_info_description": "Modifica il nome, le date e l'indirizzo",
       "map_description": "Definisci le zone sulla mappa del sito",
       "services_description": "Gestisci i servizi e le strutture disponibili",

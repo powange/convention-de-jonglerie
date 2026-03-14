@@ -21,6 +21,15 @@
       "save_success": "Links erfolgreich aktualisiert",
       "title": "Externe Links"
     },
+    "features": {
+      "artists_description": "Verwaltung von Künstlern und Shows für diese Ausgabe aktivieren",
+      "description": "Optionale Module dieser Ausgabe aktivieren oder deaktivieren",
+      "meals_description": "Verwaltung der Mahlzeiten für Freiwillige und Künstler aktivieren",
+      "ticketing_description": "Verwaltung des Ticketverkaufs für diese Ausgabe aktivieren",
+      "title": "Funktionen",
+      "volunteers_description": "Verwaltung der Freiwilligen für diese Ausgabe aktivieren",
+      "workshops_description": "Teilnehmern und Freiwilligen ermöglichen, Workshops zu erstellen"
+    },
     "general_info": {
       "description": "Bearbeiten Sie Name, Daten, Zeitzone und Adresse Ihrer Veranstaltung.",
       "name_fallback_hint": "Wenn kein Name angegeben wird, wird der Name der Convention verwendet",
@@ -32,6 +41,7 @@
     "infos": {
       "about_description": "Plakat, Beschreibung und Programm bearbeiten",
       "external_links_description": "Website, Ticketing und soziale Medien verwalten",
+      "features_description": "Optionale Module aktivieren oder deaktivieren",
       "general_info_description": "Name, Daten und Adresse bearbeiten",
       "map_description": "Zonen auf der Geländekarte definieren",
       "services_description": "Verfügbare Dienste und Einrichtungen verwalten",
