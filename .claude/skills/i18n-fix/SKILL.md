@@ -1,3 +1,7 @@
+---
+description: 'Correction automatique des traductions i18n : suppression des clés inutilisées, ajout des manquantes et synchronisation'
+---
+
 # Correction automatique des traductions i18n
 
 Cette commande automatise le processus de nettoyage et de correction des traductions i18n.

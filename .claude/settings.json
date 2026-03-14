@@ -17,6 +17,6 @@
       "Bash(mkdir -p /root/projets/convention-de-jonglerie/server/lib)",
       "Bash(mv /root/projets/convention-de-jonglerie/server/utils/import-json-schema.ts /root/projets/convention-de-jonglerie/server/lib/import-json-schema.ts)"
     ],
-    "additionalDirectories": ["/tmp"]
+    "additionalDirectories": ["/tmp", "/root/projets/convention-de-jonglerie/.claude/commands"]
   }
 }
