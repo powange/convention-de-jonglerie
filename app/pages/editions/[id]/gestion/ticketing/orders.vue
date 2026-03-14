@@ -1937,7 +1937,7 @@ const loadData = async () => {
     const [configResponse, tiersData, optionsData, customFieldsData] = await Promise.all([
       $fetch(`/api/editions/${editionId}/ticketing/external`),
       fetchTiers(editionId),
-      $fetch<TicketingOption[]>(`/api/editions/${editionId}/ticketing/options`),
+      $fetch<any>(`/api/editions/${editionId}/ticketing/options`),
       $fetch<{ name: string; values: string[] }[]>(
         `/api/editions/${editionId}/ticketing/custom-fields/distinct`
       ),
@@ -1945,7 +1945,7 @@ const loadData = async () => {
 
     hasExternalTicketing.value = configResponse.hasConfig
     tiers.value = tiersData
-    options.value = optionsData || []
+    options.value = Array.isArray(optionsData?.data?.options) ? optionsData.data.options : []
     distinctCustomFields.value = customFieldsData || []
 
     if (configResponse.hasConfig) {

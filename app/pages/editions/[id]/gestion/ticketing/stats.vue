@@ -828,8 +828,9 @@ async function fetchTiers() {
   loadingTiers.value = true
 
   try {
-    const data = await $fetch<Tier[]>(`/api/editions/${editionId}/ticketing/tiers`)
-    tiers.value = data.filter((tier) => tier.isActive)
+    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/tiers`)
+    const data = Array.isArray(response?.data?.tiers) ? response.data.tiers : []
+    tiers.value = data.filter((tier: Tier) => tier.isActive)
   } catch {
     // Erreur silencieuse
   } finally {

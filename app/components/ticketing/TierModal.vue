@@ -465,7 +465,7 @@ const loadQuotasAndItems = async () => {
       promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
     }
     const [quotasData, itemsResponse, mealsResponse] = await Promise.all(promises)
-    quotas.value = Array.isArray(quotasData) ? quotasData : []
+    quotas.value = Array.isArray(quotasData?.data?.quotas) ? quotasData.data.quotas : []
     returnableItems.value = Array.isArray(itemsResponse?.data?.returnableItems)
       ? itemsResponse.data.returnableItems
       : []

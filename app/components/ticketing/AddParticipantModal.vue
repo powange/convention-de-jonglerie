@@ -1163,11 +1163,8 @@ const handleFileUpload = (event: Event, item: SelectedItem, option: TicketingOpt
 
 const fetchOptions = async () => {
   try {
-    const response = await $fetch<TicketingOption[]>(
-      `/api/editions/${props.editionId}/ticketing/options`
-    )
-    // L'API retourne directement un tableau
-    editionOptions.value = response
+    const response = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/options`)
+    editionOptions.value = Array.isArray(response?.data?.options) ? response.data.options : []
   } catch (err: any) {
     console.error('Error fetching options:', err)
     // Ne pas afficher d'erreur si pas d'options

@@ -55,7 +55,8 @@ export interface OptionFormData {
 }
 
 export async function fetchOptions(editionId: number): Promise<TicketingOption[]> {
-  return await $fetch(`/api/editions/${editionId}/ticketing/options`)
+  const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/options`)
+  return Array.isArray(response?.data?.options) ? response.data.options : []
 }
 
 export async function createOption(editionId: number, data: OptionFormData): Promise<void> {

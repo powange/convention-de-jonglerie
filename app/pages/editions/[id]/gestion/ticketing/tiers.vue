@@ -288,7 +288,10 @@ const loadOptions = async () => {
 const loadCustomFields = async () => {
   loadingCustomFields.value = true
   try {
-    customFields.value = await $fetch(`/api/editions/${editionId}/ticketing/custom-fields`)
+    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/custom-fields`)
+    customFields.value = Array.isArray(response?.data?.customFields)
+      ? response.data.customFields
+      : []
   } catch {
     // Erreur silencieuse
   } finally {
@@ -341,7 +344,8 @@ const canAccess = computed(() => {
 const loadQuotas = async () => {
   loadingQuotas.value = true
   try {
-    quotas.value = await $fetch(`/api/editions/${editionId}/ticketing/quotas`)
+    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/quotas`)
+    quotas.value = Array.isArray(response?.data?.quotas) ? response.data.quotas : []
   } catch {
     // Erreur silencieuse
   } finally {

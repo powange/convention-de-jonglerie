@@ -354,8 +354,8 @@ const loadTiers = async () => {
 const loadQuotas = async () => {
   loadingQuotas.value = true
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/quotas`)
-    availableQuotas.value = response || []
+    const response = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/quotas`)
+    availableQuotas.value = Array.isArray(response?.data?.quotas) ? response.data.quotas : []
   } catch (error) {
     console.error('Erreur lors du chargement des quotas:', error)
   } finally {

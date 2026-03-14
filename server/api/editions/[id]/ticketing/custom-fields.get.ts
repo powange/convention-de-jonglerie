@@ -53,7 +53,7 @@ export default wrapApiHandler(
       },
     })
 
-    return customFields
+    return createSuccessResponse({ customFields })
   },
   { operationName: 'GET ticketing custom fields' }
 )

@@ -21,7 +21,7 @@ export default wrapApiHandler(
         orderBy: { position: 'asc' },
       })
 
-      return quotas
+      return createSuccessResponse({ quotas })
     } catch (error: unknown) {
       console.error('Failed to fetch quotas:', error)
       throw createError({

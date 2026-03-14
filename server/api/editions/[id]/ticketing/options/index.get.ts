@@ -15,7 +15,8 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour accéder à ces données',
       })
 
-    return await getEditionOptions(editionId)
+    const options = await getEditionOptions(editionId)
+    return createSuccessResponse({ options })
   },
   { operationName: 'GET ticketing options' }
 )

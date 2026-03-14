@@ -329,11 +329,11 @@ const loadQuotasAndItems = async () => {
       promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
     }
     const [quotasData, itemsData, tiersData, mealsData] = await Promise.all(promises)
-    quotas.value = quotasData
+    quotas.value = Array.isArray(quotasData?.data?.quotas) ? quotasData.data.quotas : []
     returnableItems.value = Array.isArray(itemsData?.data?.returnableItems)
       ? itemsData.data.returnableItems
       : []
-    tiers.value = tiersData
+    tiers.value = Array.isArray(tiersData?.data?.tiers) ? tiersData.data.tiers : []
     meals.value =
       mealsData?.data?.meals && Array.isArray(mealsData.data.meals) ? mealsData.data.meals : []
   } catch (error) {

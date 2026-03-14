@@ -16,7 +16,8 @@ export default wrapApiHandler(
       })
 
     // Pour l'administration des tiers, on retourne les deux noms
-    return await getEditionTiers(editionId, { includeOriginalName: true })
+    const tiers = await getEditionTiers(editionId, { includeOriginalName: true })
+    return createSuccessResponse({ tiers })
   },
   { operationName: 'GET ticketing tiers' }
 )
