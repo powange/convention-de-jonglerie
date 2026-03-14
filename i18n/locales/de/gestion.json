@@ -413,7 +413,9 @@
       "stats_volunteers": "Freiwillige",
       "tiers_description": "Verwalten von Tarifen, Optionen, Quoten und zurückzugebenden Artikeln",
       "tiers_title": "Tarife, Optionen & Quoten",
-      "title": "Eintrittskarten"
+      "title": "Eintrittskarten",
+      "volunteer_returnable_items_description": "Diese Artikel werden allen Freiwilligen bei der Zugangsvalidierung ausgehändigt",
+      "volunteer_returnable_items_title": "Rückgabeartikel für Freiwillige"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

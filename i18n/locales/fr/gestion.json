@@ -413,7 +413,9 @@
       "stats_volunteers": "Bénévoles",
       "tiers_description": "Gérer les tarifs, options, quotas et articles à restituer",
       "tiers_title": "Tarifs, options & quotas",
-      "title": "Billetterie"
+      "title": "Billetterie",
+      "volunteer_returnable_items_title": "Articles à restituer pour les bénévoles",
+      "volunteer_returnable_items_description": "Ces articles seront remis à tous les bénévoles lors de leur validation d'accès"
     },
     "title": "Gestion",
     "view_edition": "Voir l'édition",

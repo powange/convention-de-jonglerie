@@ -269,7 +269,11 @@
           </USelectMenu>
         </UFormField>
 
-        <UFormField :label="$t('ticketing.tiers.modal.meals_label')" name="meals">
+        <UFormField
+          v-if="edition?.mealsEnabled"
+          :label="$t('ticketing.tiers.modal.meals_label')"
+          name="meals"
+        >
           <USelectMenu
             v-model="form.mealIds"
             :items="mealsOptions"
@@ -304,6 +308,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
+import { useEditionStore } from '~/stores/editions'
 import { isFreePrice } from '~/utils/ticketing/tiers'
 
 interface TicketingTier {
@@ -337,6 +342,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const editionStore = useEditionStore()
+const edition = computed(() => editionStore.getEditionById(props.editionId))
 
 const isOpen = computed({
   get: () => props.open,
@@ -445,16 +452,22 @@ const mealsOptions = computed(() => {
 
 const loadQuotasAndItems = async () => {
   try {
-    const [quotasData, itemsResponse, mealsResponse] = await Promise.all([
+    const promises: Promise<any>[] = [
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
       $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`),
-      $fetch(`/api/editions/${props.editionId}/volunteers/meals`),
-    ])
+    ]
+    if (edition.value?.mealsEnabled) {
+      promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
+    }
+    const [quotasData, itemsResponse, mealsResponse] = await Promise.all(promises)
     quotas.value = Array.isArray(quotasData) ? quotasData : []
-    returnableItems.value = Array.isArray(itemsResponse?.returnableItems)
-      ? itemsResponse.returnableItems
+    returnableItems.value = Array.isArray(itemsResponse?.data?.returnableItems)
+      ? itemsResponse.data.returnableItems
       : []
-    meals.value = Array.isArray(mealsResponse?.meals) ? mealsResponse.meals : []
+    meals.value =
+      mealsResponse?.data?.meals && Array.isArray(mealsResponse.data.meals)
+        ? mealsResponse.data.meals
+        : []
   } catch (error) {
     console.error('Failed to load quotas, items and meals:', error)
   }

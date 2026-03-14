@@ -119,7 +119,10 @@
         </div>
 
         <!-- Repas associés -->
-        <div v-if="option.meals && option.meals.length > 0" class="flex flex-wrap gap-1">
+        <div
+          v-if="edition?.mealsEnabled && option.meals && option.meals.length > 0"
+          class="flex flex-wrap gap-1"
+        >
           <p class="font-medium text-gray-700 dark:text-gray-300">Repas :</p>
           <UBadge
             v-for="mealRelation in option.meals"
@@ -183,6 +186,7 @@
 
 <script setup lang="ts">
 import { useMealTypeLabel } from '~/composables/useMeals'
+import { useEditionStore } from '~/stores/editions'
 import { formatMealDate } from '~/utils/meals'
 import { deleteOption, type TicketingOption } from '~/utils/ticketing/options'
 
@@ -191,6 +195,9 @@ const props = defineProps<{
   loading: boolean
   editionId: number
 }>()
+
+const editionStore = useEditionStore()
+const edition = computed(() => editionStore.getEditionById(props.editionId))
 
 const emit = defineEmits<{
   refresh: []

@@ -279,6 +279,7 @@
 </template>
 
 <script setup lang="ts">
+import { useEditionStore } from '~/stores/editions'
 import { formatMealDisplay } from '~/utils/meals'
 import { isFixedPrice, type TicketingTier } from '~/utils/ticketing/tiers'
 
@@ -289,6 +290,9 @@ const props = defineProps<{
   loading: boolean
   editionId: number
 }>()
+
+const editionStore = useEditionStore()
+const edition = computed(() => editionStore.getEditionById(props.editionId))
 
 const emit = defineEmits<{
   refresh: []
@@ -346,11 +350,15 @@ const columns = computed((): TableColumn<TicketingTier>[] => [
     header: 'Articles à restituer',
     size: 150,
   },
-  {
-    id: 'meals',
-    header: 'Repas',
-    size: 150,
-  },
+  ...(edition.value?.mealsEnabled
+    ? [
+        {
+          id: 'meals',
+          header: 'Repas',
+          size: 150,
+        },
+      ]
+    : []),
   {
     id: 'actions',
     header: 'Actions',

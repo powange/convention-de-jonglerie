@@ -413,7 +413,9 @@
       "stats_volunteers": "Volunteers",
       "tiers_description": "Manage tariffs, options, quotas and items to be returned",
       "tiers_title": "Rates, options & quotas",
-      "title": "Tickets"
+      "title": "Tickets",
+      "volunteer_returnable_items_description": "These items will be given to all volunteers upon access validation",
+      "volunteer_returnable_items_title": "Returnable items for volunteers"
     },
     "title": "Management",
     "view_edition": "View edition",

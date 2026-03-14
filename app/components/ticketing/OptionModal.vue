@@ -178,6 +178,7 @@
         </UFormField>
 
         <UFormField
+          v-if="edition?.mealsEnabled"
           label="Repas associés"
           name="meals"
           help="Cette option donnera accès aux repas sélectionnés"
@@ -214,6 +215,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
+import { useEditionStore } from '~/stores/editions'
+
 interface TicketingOption {
   id: number
   name: string
@@ -242,6 +245,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const editionStore = useEditionStore()
+const edition = computed(() => editionStore.getEditionById(props.editionId))
 
 const isOpen = computed({
   get: () => props.open,
@@ -310,18 +315,22 @@ const mealsOptions = computed(() => {
 
 const loadQuotasAndItems = async () => {
   try {
-    const [quotasData, itemsData, tiersData, mealsData] = await Promise.all([
+    const promises: Promise<any>[] = [
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
-      $fetch<{ success: boolean; returnableItems: any[] }>(
-        `/api/editions/${props.editionId}/ticketing/returnable-items`
-      ),
+      $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/returnable-items`),
       $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/tiers`),
-      $fetch(`/api/editions/${props.editionId}/volunteers/meals`),
-    ])
+    ]
+    if (edition.value?.mealsEnabled) {
+      promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
+    }
+    const [quotasData, itemsData, tiersData, mealsData] = await Promise.all(promises)
     quotas.value = quotasData
-    returnableItems.value = itemsData.returnableItems
+    returnableItems.value = Array.isArray(itemsData?.data?.returnableItems)
+      ? itemsData.data.returnableItems
+      : []
     tiers.value = tiersData
-    meals.value = Array.isArray(mealsData?.meals) ? mealsData.meals : []
+    meals.value =
+      mealsData?.data?.meals && Array.isArray(mealsData.data.meals) ? mealsData.data.meals : []
   } catch (error) {
     console.error('Failed to load quotas, items, tiers and meals:', error)
   }

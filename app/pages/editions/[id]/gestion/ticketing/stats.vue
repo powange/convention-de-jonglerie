@@ -512,11 +512,15 @@ const typeItems = computed(() => [
     value: 'volunteers',
     icon: 'i-heroicons-hand-raised',
   },
-  {
-    label: t('gestion.ticketing.stats_artists'),
-    value: 'artists',
-    icon: 'i-heroicons-star',
-  },
+  ...(edition.value?.artistsEnabled
+    ? [
+        {
+          label: t('gestion.ticketing.stats_artists'),
+          value: 'artists',
+          icon: 'i-heroicons-star',
+        },
+      ]
+    : []),
   {
     label: t('gestion.ticketing.stats_organizers'),
     value: 'organizers',
@@ -604,13 +608,11 @@ const tierItems = computed(() =>
 )
 
 // Filtres sélectionnés pour les validations d'entrée
-const selectedTypes = ref<string[]>([
-  'participants',
-  'volunteers',
-  'artists',
-  'organizers',
-  'others',
-])
+const selectedTypes = ref<string[]>(
+  ['participants', 'volunteers', 'artists', 'organizers', 'others'].filter(
+    (type) => type !== 'artists' || edition.value?.artistsEnabled
+  )
+)
 const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
 const selectedGranularity = ref<number>(60) // Par défaut 1h
 
@@ -623,7 +625,7 @@ const filters = computed(() => ({
   showParticipants: selectedPurchaseTypes.value.includes('participants'),
   showOthers: selectedPurchaseTypes.value.includes('others'),
   showVolunteers: selectedTypes.value.includes('volunteers'),
-  showArtists: selectedTypes.value.includes('artists'),
+  showArtists: selectedTypes.value.includes('artists') && !!edition.value?.artistsEnabled,
   showOrganizers: selectedTypes.value.includes('organizers'),
   showSetup: selectedPeriods.value.includes('setup'),
   showEvent: selectedPeriods.value.includes('event'),

@@ -413,7 +413,9 @@
       "stats_volunteers": "Volontärer",
       "tiers_description": "Hantera tariffer, optioner, kvoter och artiklar som ska returneras",
       "tiers_title": "Priser, optioner och kvoter",
-      "title": "Biljetter"
+      "title": "Biljetter",
+      "volunteer_returnable_items_description": "Dessa artiklar delas ut till alla volontärer vid åtkomstvalidering",
+      "volunteer_returnable_items_title": "Återlämningsartiklar för volontärer"
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

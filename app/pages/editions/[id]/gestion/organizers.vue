@@ -236,7 +236,7 @@
         </UCard>
 
         <!-- Articles globaux pour tous les organisateurs -->
-        <UCard>
+        <UCard v-if="edition.ticketingEnabled">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
@@ -650,16 +650,20 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
     header: t('gestion.organizers.organizer'),
     size: 300,
   },
-  {
-    id: 'status',
-    header: t('gestion.organizers.status'),
-    size: 150,
-  },
-  {
-    id: 'articles',
-    header: t('gestion.organizers.returnable_items'),
-    size: 200,
-  },
+  ...(edition.value?.ticketingEnabled
+    ? [
+        {
+          id: 'status',
+          header: t('gestion.organizers.status'),
+          size: 150,
+        },
+        {
+          id: 'articles',
+          header: t('gestion.organizers.returnable_items'),
+          size: 200,
+        },
+      ]
+    : []),
   {
     id: 'actions',
     header: t('common.actions'),
@@ -806,8 +810,10 @@ onMounted(async () => {
   // Charger les organisateurs de l'édition
   await loadEditionOrganizers()
 
-  // Charger les articles à restituer globaux
-  await loadGlobalReturnableItems()
+  // Charger les articles à restituer globaux (uniquement si billetterie activée)
+  if (edition.value?.ticketingEnabled) {
+    await loadGlobalReturnableItems()
+  }
 })
 
 // Métadonnées de la page

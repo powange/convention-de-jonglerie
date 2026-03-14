@@ -413,7 +413,9 @@
       "stats_volunteers": "Frivillige",
       "tiers_description": "Administrer tariffer, optioner, kvoter og varer, der skal returneres",
       "tiers_title": "Priser, optioner og kvoter",
-      "title": "Billetter"
+      "title": "Billetter",
+      "volunteer_returnable_items_description": "Disse genstande vil blive udleveret til alle frivillige ved adgangsvalidering",
+      "volunteer_returnable_items_title": "Returnerbare genstande for frivillige"
     },
     "title": "Administration",
     "view_edition": "Se udgaven",

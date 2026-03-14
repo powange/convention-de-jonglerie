@@ -413,7 +413,9 @@
       "stats_volunteers": "Voluntários",
       "tiers_description": "Gerir tarifas, opções, contingentes e artigos a devolver",
       "tiers_title": "Tarifas, opções e quotas",
-      "title": "Bilhetes"
+      "title": "Bilhetes",
+      "volunteer_returnable_items_description": "Estes artigos serão entregues a todos os voluntários durante a validação de acesso",
+      "volunteer_returnable_items_title": "Artigos a devolver para os voluntários"
     },
     "title": "Gestão",
     "view_edition": "Ver a edição",

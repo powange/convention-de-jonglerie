@@ -413,7 +413,9 @@
       "stats_volunteers": "Voluntarios",
       "tiers_description": "Gestionar tarifas, opciones, cuotas y artículos a devolver",
       "tiers_title": "Tarifas, opciones y cuotas",
-      "title": "Entradas"
+      "title": "Entradas",
+      "volunteer_returnable_items_description": "Estos artículos se entregarán a todos los voluntarios durante la validación de acceso",
+      "volunteer_returnable_items_title": "Artículos a devolver para los voluntarios"
     },
     "title": "Gestión",
     "view_edition": "Ver la edición",

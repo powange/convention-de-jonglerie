@@ -413,7 +413,9 @@
       "stats_volunteers": "Vrijwilligers",
       "tiers_description": "Tarieven, opties, quota en te retourneren items beheren",
       "tiers_title": "Tarieven, opties & quota",
-      "title": "Tickets"
+      "title": "Tickets",
+      "volunteer_returnable_items_description": "Deze artikelen worden aan alle vrijwilligers overhandigd bij de toegangsvalidatie",
+      "volunteer_returnable_items_title": "In te leveren artikelen voor vrijwilligers"
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

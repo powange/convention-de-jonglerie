@@ -53,8 +53,8 @@ async function loadData() {
     const itemsResponse = await $fetch(
       `/api/editions/${props.editionId}/ticketing/returnable-items`
     )
-    // L'API retourne { success: true, returnableItems: [...] }
-    availableItems.value = itemsResponse.returnableItems || []
+    // L'API retourne { success: true, data: { returnableItems: [...] } }
+    availableItems.value = itemsResponse.data?.returnableItems || []
 
     // Charger les articles déjà assignés
     const assignedResponse = await $fetch(

@@ -413,7 +413,9 @@
       "stats_volunteers": "Wolontariusze",
       "tiers_description": "Zarządzanie taryfami, opcjami, kwotami i pozycjami do zwrotu.",
       "tiers_title": "Stawki, opcje i kwoty",
-      "title": "Bilety"
+      "title": "Bilety",
+      "volunteer_returnable_items_description": "Te artykuły zostaną przekazane wszystkim wolontariuszom podczas walidacji dostępu",
+      "volunteer_returnable_items_title": "Artykuły do zwrotu dla wolontariuszy"
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

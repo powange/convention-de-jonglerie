@@ -413,7 +413,9 @@
       "stats_volunteers": "Волонтёры",
       "tiers_description": "Управление тарифами, опциями, квотами и товарами, подлежащими возврату",
       "tiers_title": "Тарифы, опционы и квоты",
-      "title": "Билеты"
+      "title": "Билеты",
+      "volunteer_returnable_items_description": "Эти предметы будут выданы всем волонтёрам при подтверждении доступа",
+      "volunteer_returnable_items_title": "Предметы для возврата волонтёрами"
     },
     "title": "Управление",
     "view_edition": "Просмотр выпуска",

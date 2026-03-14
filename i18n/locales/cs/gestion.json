@@ -413,7 +413,9 @@
       "stats_volunteers": "Dobrovolníci",
       "tiers_description": "Správa tarifů, možností, kvót a položek k vrácení",
       "tiers_title": "Sazby, opce a kvóty",
-      "title": "Vstupenky"
+      "title": "Vstupenky",
+      "volunteer_returnable_items_description": "Tyto předměty budou předány všem dobrovolníkům při validaci přístupu",
+      "volunteer_returnable_items_title": "Předměty k vrácení pro dobrovolníky"
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

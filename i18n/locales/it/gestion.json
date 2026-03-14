@@ -413,7 +413,9 @@
       "stats_volunteers": "Volontari",
       "tiers_description": "Gestione di tariffe, opzioni, quote e articoli da restituire",
       "tiers_title": "Tariffe, opzioni e quote",
-      "title": "Biglietti"
+      "title": "Biglietti",
+      "volunteer_returnable_items_description": "Questi articoli saranno consegnati a tutti i volontari durante la convalida dell'accesso",
+      "volunteer_returnable_items_title": "Articoli da restituire per i volontari"
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",

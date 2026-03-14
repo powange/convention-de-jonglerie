@@ -131,14 +131,14 @@
             />
 
             <!-- Articles à restituer pour les bénévoles -->
-            <div class="mt-8">
+            <div v-if="edition?.volunteersEnabled" class="mt-8">
               <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
                 <div class="mb-4">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Articles à restituer pour les bénévoles
+                    {{ $t('gestion.ticketing.volunteer_returnable_items_title') }}
                   </h2>
                   <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Ces articles seront remis à tous les bénévoles lors de leur validation d'accès
+                    {{ $t('gestion.ticketing.volunteer_returnable_items_description') }}
                   </p>
                 </div>
 
