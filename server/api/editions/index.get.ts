@@ -31,6 +31,7 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasCantine,
       hasAerialSpace,
       hasSlacklineSpace,
+      hasUnicycleSpace,
       hasToilets,
       hasShowers,
       hasAccessibility,
@@ -68,6 +69,7 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasCantine?: boolean
       hasAerialSpace?: boolean
       hasSlacklineSpace?: boolean
+      hasUnicycleSpace?: boolean
       hasToilets?: boolean
       hasShowers?: boolean
       hasAccessibility?: boolean
@@ -196,6 +198,9 @@ export default wrapApiHandler<GetEditionsResponse>(
     }
     if (hasSlacklineSpace === 'true') {
       where.hasSlacklineSpace = true
+    }
+    if (hasUnicycleSpace === 'true') {
+      where.hasUnicycleSpace = true
     }
     if (hasToilets === 'true') {
       where.hasToilets = true
