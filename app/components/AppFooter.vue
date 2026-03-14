@@ -66,8 +66,3 @@ function openFeedbackModal() {
   showFeedbackModal.value = true
 }
 </script>
-
-<style scoped>
-/* Import des drapeaux si pas déjà fait */
-@import 'flag-icons/css/flag-icons.min.css';
-</style>

@@ -109,8 +109,6 @@ watch(selectedCountries, (newValue) => {
 </script>
 
 <style>
-@import 'flag-icons/css/flag-icons.min.css';
-
 .fi {
   background-size: contain;
   background-position: 50%;
