@@ -168,6 +168,7 @@ model Edition {
   ticketingAllowAnonymousOrders     Boolean                          @default(false)
   workshopsEnabled                  Boolean                          @default(false)
   workshopLocationsFreeInput        Boolean                          @default(false)
+  siteMapEnabled                    Boolean                          @default(false)
   mapPublic                         Boolean                          @default(false)
   carpoolOffers                     CarpoolOffer[]
   carpoolRequests                   CarpoolRequest[]
@@ -432,7 +433,8 @@ model EditionZone {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  shows Show[]
+  shows              Show[]
+  workshopLocations  WorkshopLocation[]
 
   @@index([editionId])
 }
@@ -451,7 +453,8 @@ model EditionMarker {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  shows Show[]
+  shows              Show[]
+  workshopLocations  WorkshopLocation[]
 
   @@index([editionId])
 }

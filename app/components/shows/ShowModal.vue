@@ -66,6 +66,7 @@
           <UFormField :label="$t('gestion.shows.location')">
             <div class="space-y-2">
               <URadioGroup
+                v-if="edition?.siteMapEnabled"
                 v-model="locationType"
                 orientation="horizontal"
                 :items="locationTypeOptions"
@@ -73,7 +74,7 @@
 
               <!-- Mode zone/marqueur -->
               <USelect
-                v-if="locationType === 'zone'"
+                v-if="edition?.siteMapEnabled && locationType === 'zone'"
                 v-model="selectedLocationRef"
                 :items="locationOptions"
                 :placeholder="$t('gestion.shows.select_zone_or_marker')"

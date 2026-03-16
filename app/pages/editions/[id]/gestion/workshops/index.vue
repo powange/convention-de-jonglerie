@@ -129,6 +129,38 @@
                   {{ $t('workshops.add_location') }}
                 </UButton>
               </div>
+
+              <!-- Import depuis la carte du site -->
+              <div
+                v-if="canEdit && edition.siteMapEnabled && mapItems.length > 0"
+                class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-3"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-lucide-map" class="size-4 text-blue-600 dark:text-blue-400" />
+                  <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    {{ $t('workshops.import_from_map') }}
+                  </h4>
+                </div>
+                <p class="text-xs text-blue-700 dark:text-blue-300">
+                  {{ $t('workshops.import_from_map_description') }}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <UButton
+                    v-for="item in mapItems"
+                    :key="item.key"
+                    size="xs"
+                    color="primary"
+                    variant="soft"
+                    :icon="item.type === 'zone' ? 'i-lucide-square' : 'i-lucide-map-pin'"
+                    :disabled="isMapItemAlreadyAdded(item)"
+                    :loading="addingFromMap"
+                    @click="addLocationFromMap(item)"
+                  >
+                    {{ item.name }}
+                    <UIcon v-if="isMapItemAlreadyAdded(item)" name="i-lucide-check" class="ml-1" />
+                  </UButton>
+                </div>
+              </div>
             </div>
           </div>
         </UCard>
@@ -173,10 +205,63 @@ watch(
   { immediate: true }
 )
 
+// Zones et markers de la carte du site
+const mapZones = ref<Array<{ id: number; name: string }>>([])
+const mapMarkers = ref<Array<{ id: number; name: string }>>([])
+
+const mapItems = computed(() => {
+  const items: Array<{ key: string; type: 'zone' | 'marker'; id: number; name: string }> = []
+  mapZones.value.forEach((z) =>
+    items.push({ key: `zone:${z.id}`, type: 'zone', id: z.id, name: z.name })
+  )
+  mapMarkers.value.forEach((m) =>
+    items.push({ key: `marker:${m.id}`, type: 'marker', id: m.id, name: m.name })
+  )
+  return items
+})
+
+const isMapItemAlreadyAdded = (item: { type: 'zone' | 'marker'; id: number }) => {
+  return workshopLocations.value.some(
+    (loc) =>
+      (item.type === 'zone' && loc.zoneId === item.id) ||
+      (item.type === 'marker' && loc.markerId === item.id)
+  )
+}
+
+const addingFromMap = ref(false)
+const addLocationFromMap = async (item: { type: 'zone' | 'marker'; id: number; name: string }) => {
+  addingFromMap.value = true
+  try {
+    const body: Record<string, unknown> = { name: item.name }
+    if (item.type === 'zone') body.zoneId = item.id
+    else body.markerId = item.id
+    await $fetch(`/api/editions/${editionId}/workshops/locations`, {
+      method: 'POST',
+      body,
+    })
+    await fetchWorkshopLocations()
+  } catch {
+    // Erreur silencieuse
+  } finally {
+    addingFromMap.value = false
+  }
+}
+
 const fetchWorkshopLocations = async () => {
   try {
-    const data = await $fetch(`/api/editions/${editionId}/workshops/locations`)
-    workshopLocations.value = data as any[]
+    const promises: Promise<any>[] = [$fetch(`/api/editions/${editionId}/workshops/locations`)]
+    if (edition.value?.siteMapEnabled) {
+      promises.push($fetch(`/api/editions/${editionId}/zones`))
+      promises.push($fetch(`/api/editions/${editionId}/markers`))
+    }
+    const [locData, zonesResponse, markersResponse] = await Promise.all(promises)
+    workshopLocations.value = locData as any[]
+    if (edition.value?.siteMapEnabled) {
+      mapZones.value = Array.isArray(zonesResponse?.data?.zones) ? zonesResponse.data.zones : []
+      mapMarkers.value = Array.isArray(markersResponse?.data?.markers)
+        ? markersResponse.data.markers
+        : []
+    }
   } catch (error) {
     console.error('Failed to fetch workshop locations:', error)
   }

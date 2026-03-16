@@ -39,6 +39,14 @@ export default wrapApiHandler(
           select: {
             id: true,
             name: true,
+            zoneId: true,
+            markerId: true,
+            zone: {
+              select: { id: true, name: true, color: true },
+            },
+            marker: {
+              select: { id: true, name: true, color: true },
+            },
           },
         },
         favorites: userId

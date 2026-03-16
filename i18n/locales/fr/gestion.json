@@ -28,6 +28,7 @@
       "ticketing_description": "Permettre la gestion de la billetterie pour cette édition",
       "title": "Fonctionnalités",
       "volunteers_description": "Permettre la gestion des bénévoles pour cette édition",
+      "site_map_description": "Permettre de définir et publier une carte du site de l'événement",
       "workshops_description": "Permettre aux participants et bénévoles de créer des workshops"
     },
     "general_info": {

@@ -883,16 +883,7 @@ const formatShowTime = (dateTimeStr: string) => {
 }
 
 // Lien vers la carte pour les zones/marqueurs
-const isMapAvailable = computed(
-  () => !!(edition.value?.mapPublic && edition.value?.latitude && edition.value?.longitude)
-)
-
-const getShowLocationUrl = (show: any): string | null => {
-  if (!isMapAvailable.value) return null
-  if (show.zone) return `/editions/${editionId}/map?focusZone=${show.zone.id}`
-  if (show.marker) return `/editions/${editionId}/map?focusMarker=${show.marker.id}`
-  return null
-}
+const { getMapLocationUrl: getShowLocationUrl } = useMapLink(editionId)
 
 // Gestion des erreurs
 if (error.value) {

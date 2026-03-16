@@ -449,10 +449,15 @@ const artistSpaceTabVisible = computed<boolean>(() => {
   return isEditionArtist.value
 })
 
-// Visibilité onglet carte: visible si mapPublic est activé et l'édition a des coordonnées définies
+// Visibilité onglet carte: visible si siteMapEnabled + mapPublic sont activés et l'édition a des coordonnées définies
 const mapTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
-  return !!(props.edition.mapPublic && props.edition.latitude && props.edition.longitude)
+  return !!(
+    props.edition.siteMapEnabled &&
+    props.edition.mapPublic &&
+    props.edition.latitude &&
+    props.edition.longitude
+  )
 })
 
 // Gestion des favoris - Initialisation automatique si utilisateur connecté

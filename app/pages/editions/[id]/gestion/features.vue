@@ -148,6 +148,29 @@
             />
           </div>
         </UCard>
+        <!-- Carte du site -->
+        <UCard>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-lucide-map" class="text-blue-500 size-5" />
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.map.title') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.features.site_map_description') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="siteMapEnabledLocal"
+              :loading="savingSiteMap"
+              :disabled="savingSiteMap"
+              color="primary"
+              @update:model-value="handleToggleSiteMap"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
@@ -180,6 +203,9 @@ const ticketingEnabledLocal = ref(false)
 // Gestion de l'activation des workshops
 const workshopsEnabledLocal = ref(false)
 
+// Gestion de l'activation de la carte du site
+const siteMapEnabledLocal = ref(false)
+
 watch(
   edition,
   (newEdition) => {
@@ -189,6 +215,7 @@ watch(
       artistsEnabledLocal.value = newEdition.artistsEnabled || false
       ticketingEnabledLocal.value = newEdition.ticketingEnabled || false
       workshopsEnabledLocal.value = newEdition.workshopsEnabled || false
+      siteMapEnabledLocal.value = newEdition.siteMapEnabled || false
     }
   },
   { immediate: true }
@@ -292,6 +319,26 @@ const { execute: executeToggleWorkshops, loading: savingWorkshops } = useApiActi
 
 const handleToggleWorkshops = () => {
   executeToggleWorkshops()
+}
+
+const { execute: executeToggleSiteMap, loading: savingSiteMap } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ siteMapEnabled: siteMapEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      siteMapEnabledLocal.value = !siteMapEnabledLocal.value
+    },
+  }
+)
+
+const handleToggleSiteMap = () => {
+  executeToggleSiteMap()
 }
 
 // Vérifier l'accès à cette page

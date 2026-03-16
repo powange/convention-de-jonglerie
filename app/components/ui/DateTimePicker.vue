@@ -16,6 +16,7 @@
           <UCalendar
             v-model="calendarDateValue"
             class="p-2"
+            :placeholder="calendarPlaceholder"
             :is-date-disabled="isCalendarDateDisabled"
             @update:model-value="handleDateUpdate"
           />
@@ -55,6 +56,8 @@ interface Props {
   required?: boolean
   /** Date minimum autorisée */
   minDate?: Date
+  /** Date maximum autorisée */
+  maxDate?: Date
 }
 
 const { t } = useI18n()
@@ -127,13 +130,30 @@ watch(
   { immediate: true }
 )
 
+// Placeholder pour le calendrier (mois affiché par défaut quand aucune date n'est sélectionnée)
+const calendarPlaceholder = computed(() => {
+  if (calendarDateValue.value) return undefined
+  if (props.minDate) {
+    return new CalendarDate(
+      props.minDate.getFullYear(),
+      props.minDate.getMonth() + 1,
+      props.minDate.getDate()
+    )
+  }
+  return undefined
+})
+
+// Comparer uniquement les dates (sans l'heure)
+const toDateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+
 // Fonction pour vérifier si une date CalendarDate est désactivée
 const isCalendarDateDisabled = (calendarDate: CalendarDate) => {
-  if (!props.minDate) return false
-
   try {
     const jsDate = calendarDate.toDate(getLocalTimeZone())
-    return jsDate < props.minDate
+    const dateOnly = toDateOnly(jsDate)
+    if (props.minDate && dateOnly < toDateOnly(props.minDate)) return true
+    if (props.maxDate && dateOnly > toDateOnly(props.maxDate)) return true
+    return false
   } catch {
     return false
   }

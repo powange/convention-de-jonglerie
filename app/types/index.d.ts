@@ -83,6 +83,7 @@ export interface Edition {
   artistsEnabled?: boolean
   ticketingEnabled?: boolean
   workshopsEnabled?: boolean
+  siteMapEnabled?: boolean
   mapPublic?: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean

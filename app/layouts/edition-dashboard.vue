@@ -259,11 +259,15 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-lucide-link',
           to: `/editions/${editionId.value}/gestion/external-links`,
         },
-        {
-          label: t('gestion.map.title'),
-          icon: 'i-lucide-map',
-          to: `/editions/${editionId.value}/gestion/map`,
-        },
+        ...(edition.value?.siteMapEnabled
+          ? [
+              {
+                label: t('gestion.map.title'),
+                icon: 'i-lucide-map',
+                to: `/editions/${editionId.value}/gestion/map`,
+              },
+            ]
+          : []),
         {
           label: t('gestion.features.title'),
           icon: 'i-lucide-toggle-right',

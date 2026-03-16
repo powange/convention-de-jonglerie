@@ -68,8 +68,22 @@
                         >
                       </div>
                       <div v-if="workshop.location" class="flex items-center gap-1">
-                        <UIcon name="mdi:map-marker-radius" />
-                        <span>{{ workshop.location.name }}</span>
+                        <NuxtLink
+                          v-if="getWorkshopLocationUrl(workshop)"
+                          :to="getWorkshopLocationUrl(workshop)!"
+                          class="flex items-center gap-1 text-primary hover:underline"
+                        >
+                          <UIcon name="i-heroicons-map-pin" class="shrink-0" />
+                          {{ workshop.location.zone?.name || workshop.location.marker?.name }}
+                        </NuxtLink>
+                        <span v-else class="flex items-center gap-1">
+                          <UIcon name="mdi:map-marker-radius" class="shrink-0" />
+                          {{
+                            workshop.location.zone?.name ||
+                            workshop.location.marker?.name ||
+                            workshop.location.name
+                          }}
+                        </span>
                       </div>
                       <div v-if="workshop.maxParticipants" class="flex items-center gap-1">
                         <UIcon name="i-heroicons-users" />
@@ -257,6 +271,7 @@
                 :time-label="$t('workshops.start_time')"
                 :placeholder="$t('workshops.start_datetime')"
                 :min-date="editionStartDate"
+                :max-date="editionEndDate"
                 required
               />
               <UiDateTimePicker
@@ -265,6 +280,7 @@
                 :time-label="$t('workshops.end_time')"
                 :placeholder="$t('workshops.end_datetime')"
                 :min-date="editionStartDate"
+                :max-date="editionEndDate"
                 required
               />
             </div>
@@ -511,6 +527,20 @@ const editionStartDate = computed(() => {
   if (!edition.value?.startDate) return undefined
   return new Date(edition.value.startDate)
 })
+
+// Date maximum pour le DateTimePicker (fin de l'édition)
+const editionEndDate = computed(() => {
+  if (!edition.value?.endDate) return undefined
+  return new Date(edition.value.endDate)
+})
+
+// Lien vers la carte du site pour les locations liées à une zone/marker
+const { getMapLocationUrl } = useMapLink(editionId)
+
+const getWorkshopLocationUrl = (workshop: any): string | null => {
+  if (!workshop.location) return null
+  return getMapLocationUrl(workshop.location)
+}
 
 // Durée rapide
 const quickDurations = [

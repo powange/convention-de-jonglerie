@@ -268,46 +268,109 @@ const showsByMarker = computed(() => {
   return map
 })
 
-const formatPopupTime = (dateTimeStr: string) => {
-  return new Date(dateTimeStr).toLocaleTimeString(locale.value, {
-    hour: '2-digit',
-    minute: '2-digit',
+const formatPopupDateTime = (dateTimeStr: string) => {
+  const date = new Date(dateTimeStr)
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : locale.value
+  const day = date.toLocaleDateString(localeCode, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
   })
+  const time = date.toLocaleTimeString(localeCode, { hour: '2-digit', minute: '2-digit' })
+  return `${day} ${time}`
 }
 
-const buildShowsPopupHtml = (shows: any[]) => {
-  const sorted = [...shows].sort(
-    (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
-  )
-  let html = '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
-  html += '<div style="margin-top: 4px;"><strong>🎭 Spectacles</strong>'
-  html += '<div style="margin-top: 4px; font-size: 13px;">'
-  for (const show of sorted) {
-    html += `<div style="margin-top: 4px;">• ${escapeHtml(show.title)} — ${formatPopupTime(show.startDateTime)}`
-    if (show.duration) html += ` (${show.duration} min)`
-    html += '</div>'
+// Workshops — affichés dans les popups des zones/marqueurs
+const { data: workshops } = useFetch<any[]>(`/api/editions/${editionId.value}/workshops`, {
+  lazy: true,
+  transform: (response: any) => response?.data?.workshops || response?.workshops || response || [],
+})
+
+// Filtrer les workshops non terminés
+const upcomingWorkshops = computed(() => {
+  if (!workshops.value) return []
+  const now = new Date()
+  return workshops.value.filter((ws) => new Date(ws.endDateTime) > now)
+})
+
+const workshopsByZone = computed(() => {
+  const m = new Map<number, any[]>()
+  for (const ws of upcomingWorkshops.value) {
+    const zId = ws.location?.zoneId
+    if (zId) {
+      if (!m.has(zId)) m.set(zId, [])
+      m.get(zId)!.push(ws)
+    }
   }
-  html += '</div></div>'
+  return m
+})
+
+const workshopsByMarker = computed(() => {
+  const m = new Map<number, any[]>()
+  for (const ws of upcomingWorkshops.value) {
+    const mId = ws.location?.markerId
+    if (mId) {
+      if (!m.has(mId)) m.set(mId, [])
+      m.get(mId)!.push(ws)
+    }
+  }
+  return m
+})
+
+const buildItemsPopupHtml = (shows: any[], wsItems: any[]) => {
+  let html = ''
+
+  if (shows.length > 0) {
+    const sorted = [...shows].sort(
+      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
+    )
+    html += '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
+    html += `<div style="margin-top: 4px;"><strong>🎭 ${escapeHtml(t('edition.public_shows'))}</strong>`
+    html += '<div style="margin-top: 4px; font-size: 13px;">'
+    for (const show of sorted) {
+      html += `<div style="margin-top: 4px;">• ${escapeHtml(show.title)} — ${formatPopupDateTime(show.startDateTime)}`
+      if (show.duration) html += ` (${show.duration} min)`
+      html += '</div>'
+    }
+    html += '</div></div>'
+  }
+
+  if (wsItems.length > 0) {
+    const sorted = [...wsItems].sort(
+      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
+    )
+    html += '<hr style="margin: 8px 0; border-color: #e5e7eb;"/>'
+    html += `<div style="margin-top: 4px;"><strong>🎓 ${escapeHtml(t('workshops.page_title'))}</strong>`
+    html += '<div style="margin-top: 4px; font-size: 13px;">'
+    for (const ws of sorted) {
+      html += `<div style="margin-top: 4px;">• ${escapeHtml(ws.title)} — ${formatPopupDateTime(ws.startDateTime)}`
+      html += '</div>'
+    }
+    html += '</div></div>'
+  }
+
   return html
 }
 
-// Mettre à jour les popups quand les spectacles sont chargés
+// Mettre à jour les popups quand les spectacles ou workshops sont chargés
 watch(
-  [publicShows, zones, markers, map],
+  [publicShows, workshops, zones, markers, map],
   () => {
-    if (!map.value || !publicShows.value) return
+    if (!map.value) return
 
     for (const zone of zones.value) {
-      const zoneShows = showsByZone.value.get(zone.id)
-      if (zoneShows && zoneShows.length > 0) {
-        setPopupExtra('zone', zone.id, buildShowsPopupHtml(zoneShows))
+      const zoneShows = showsByZone.value.get(zone.id) || []
+      const zoneWorkshops = workshopsByZone.value.get(zone.id) || []
+      if (zoneShows.length > 0 || zoneWorkshops.length > 0) {
+        setPopupExtra('zone', zone.id, buildItemsPopupHtml(zoneShows, zoneWorkshops))
       }
     }
 
     for (const marker of markers.value) {
-      const markerShows = showsByMarker.value.get(marker.id)
-      if (markerShows && markerShows.length > 0) {
-        setPopupExtra('marker', marker.id, buildShowsPopupHtml(markerShows))
+      const markerShows = showsByMarker.value.get(marker.id) || []
+      const markerWorkshops = workshopsByMarker.value.get(marker.id) || []
+      if (markerShows.length > 0 || markerWorkshops.length > 0) {
+        setPopupExtra('marker', marker.id, buildItemsPopupHtml(markerShows, markerWorkshops))
       }
     }
   },

@@ -99,6 +99,7 @@
 
               <!-- Carte du site -->
               <ManagementNavigationCard
+                v-if="edition.siteMapEnabled"
                 :to="`/editions/${edition.id}/gestion/map`"
                 icon="i-lucide-map"
                 :title="$t('gestion.map.title')"

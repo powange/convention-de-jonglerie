@@ -44,11 +44,17 @@ model WorkshopLocation {
   id        Int      @id @default(autoincrement())
   editionId Int
   name      String
+  zoneId    Int?
+  markerId  Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition   Edition    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition   Edition        @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  zone      EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker    EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
   workshops Workshop[]
 
   @@index([editionId])
+  @@index([zoneId])
+  @@index([markerId])
 }

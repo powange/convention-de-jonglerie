@@ -9,6 +9,8 @@ import { validateAndSanitize } from '#server/utils/validation-schemas'
 
 const locationSchema = z.object({
   name: z.string().min(1).max(100),
+  zoneId: z.number().int().positive().optional(),
+  markerId: z.number().int().positive().optional(),
 })
 
 export default wrapApiHandler(
@@ -51,6 +53,8 @@ export default wrapApiHandler(
       data: {
         editionId,
         name: validatedData.name,
+        zoneId: validatedData.zoneId || null,
+        markerId: validatedData.markerId || null,
       },
     })
 
