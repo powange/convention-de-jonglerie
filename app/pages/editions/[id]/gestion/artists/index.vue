@@ -16,8 +16,6 @@
       />
     </div>
     <div v-else>
-      <!-- En-tête avec navigation -->
-
       <!-- Titre de la page -->
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -112,25 +110,62 @@
       <!-- Contenu -->
       <UCard>
         <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold">{{ $t('artists.title') }}</h2>
-            <UButton
-              v-if="canEdit"
-              color="primary"
-              icon="i-heroicons-plus"
-              @click="openAddArtistModal"
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold">{{ $t('artists.title') }}</h2>
+              <UButton
+                v-if="canEdit"
+                color="primary"
+                icon="i-heroicons-plus"
+                @click="openAddArtistModal"
+              >
+                {{ $t('artists.add_artist') }}
+              </UButton>
+            </div>
+
+            <!-- Barre de filtres et contrôles -->
+            <div
+              v-if="artists.length > 0"
+              class="flex flex-col sm:flex-row items-start sm:items-center gap-3"
             >
-              {{ $t('artists.add_artist') }}
-            </UButton>
+              <UInput
+                v-model="globalFilter"
+                :placeholder="$t('artists.search_placeholder')"
+                icon="i-heroicons-magnifying-glass"
+                class="w-full sm:w-64"
+              />
+
+              <USelect
+                v-model="showFilter"
+                :items="showFilterItems"
+                :placeholder="$t('artists.filter_by_show')"
+                class="w-full sm:w-56"
+              />
+
+              <div class="flex items-center gap-2 ml-auto">
+                <UBadge color="neutral" variant="soft">
+                  {{ $t('common.total') }}: {{ filteredArtists.length }}
+                </UBadge>
+
+                <UButton
+                  v-if="globalFilter || (showFilter && showFilter !== 'ALL')"
+                  icon="i-heroicons-x-mark"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  :title="$t('artists.reset_filters')"
+                  @click="resetFilters"
+                />
+
+                <UDropdownMenu :items="columnVisibilityItems">
+                  <UButton icon="i-heroicons-view-columns" color="neutral" size="sm" variant="soft">
+                    <span class="hidden sm:inline">{{ $t('common.columns') }}</span>
+                  </UButton>
+                </UDropdownMenu>
+              </div>
+            </div>
           </div>
         </template>
-
-        <!-- Statistiques -->
-        <div v-if="artists.length > 0" class="mb-4 flex gap-2">
-          <UBadge color="neutral" variant="soft">
-            {{ $t('common.total') }}: {{ artists.length }}
-          </UBadge>
-        </div>
 
         <!-- Liste des artistes -->
         <div v-if="loading" class="text-center py-8">
@@ -143,342 +178,286 @@
         </div>
 
         <div v-else class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('common.name') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('common.email') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('edition.ticketing.phone') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.arrival') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.departure') }}
-                </th>
-                <th
-                  v-if="edition.mealsEnabled"
-                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('common.meals_short') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.shows') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.payment_amount') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.reimbursement_max_actual') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.accommodation') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.invoice_short') }}
-                </th>
-                <th
-                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('artists.fee_short') }}
-                </th>
-                <th
-                  v-if="canEdit"
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[300px]"
-                >
-                  {{ $t('artists.organizer_notes') }}
-                </th>
-                <th
-                  v-if="canEdit"
-                  class="px-4 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('common.actions') }}
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr
-                v-for="artist in artists"
-                :key="artist.id"
-                class="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+          <UTable
+            ref="tableRef"
+            v-model:sorting="sorting"
+            v-model:column-visibility="columnVisibility"
+            v-model:global-filter="globalFilter"
+            :data="filteredArtists"
+            :columns="columns"
+            class="w-full"
+          >
+            <!-- Nom -->
+            <template #name-cell="{ row }">
+              <div class="flex items-center gap-2">
+                <UiUserAvatar :user="row.original.user" size="sm" />
+                <span class="font-medium">
+                  {{ row.original.user.prenom }} {{ row.original.user.nom }}
+                </span>
+              </div>
+            </template>
+
+            <!-- Email -->
+            <template #email-cell="{ row }">
+              <span class="text-gray-600 dark:text-gray-400">{{ row.original.user.email }}</span>
+            </template>
+
+            <!-- Téléphone -->
+            <template #phone-cell="{ row }">
+              <span class="text-gray-600 dark:text-gray-400">{{
+                row.original.user.phone || '-'
+              }}</span>
+            </template>
+
+            <!-- Arrivée -->
+            <template #arrival-cell="{ row }">
+              <div v-if="row.original.arrivalDateTime" class="space-y-1">
+                <div class="text-gray-900 dark:text-white font-medium">
+                  {{ formatDateTime(row.original.arrivalDateTime) }}
+                </div>
+                <div v-if="row.original.pickupRequired" class="text-xs space-y-0.5">
+                  <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
+                    <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
+                    <span>{{ row.original.pickupLocation || $t('artists.pickup_location') }}</span>
+                  </div>
+                  <div
+                    v-if="row.original.pickupResponsible"
+                    class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
+                  >
+                    <UIcon name="i-heroicons-user" class="h-3 w-3" />
+                    <span>{{ row.original.pickupResponsible.pseudo }}</span>
+                  </div>
+                </div>
+              </div>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+
+            <!-- Départ -->
+            <template #departure-cell="{ row }">
+              <div v-if="row.original.departureDateTime" class="space-y-1">
+                <div class="text-gray-900 dark:text-white font-medium">
+                  {{ formatDateTime(row.original.departureDateTime) }}
+                </div>
+                <div v-if="row.original.dropoffRequired" class="text-xs space-y-0.5">
+                  <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
+                    <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
+                    <span>{{
+                      row.original.dropoffLocation || $t('artists.dropoff_location')
+                    }}</span>
+                  </div>
+                  <div
+                    v-if="row.original.dropoffResponsible"
+                    class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
+                  >
+                    <UIcon name="i-heroicons-user" class="h-3 w-3" />
+                    <span>{{ row.original.dropoffResponsible.pseudo }}</span>
+                  </div>
+                </div>
+              </div>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+
+            <!-- Repas -->
+            <template #meals-cell="{ row }">
+              <UButton
+                :color="getAcceptedMealsCount(row.original) > 0 ? 'primary' : 'neutral'"
+                variant="soft"
+                size="sm"
+                @click="openMealsModal(row.original)"
               >
-                <td class="px-4 py-3 text-sm">
-                  <div class="flex items-center gap-2">
-                    <UiUserAvatar :user="artist.user" size="sm" />
-                    <span class="font-medium">
-                      {{ artist.user.prenom }} {{ artist.user.nom }}
-                    </span>
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ artist.user.email }}
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ artist.user.phone || '-' }}
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div v-if="artist.arrivalDateTime" class="space-y-1">
-                    <div class="text-gray-900 dark:text-white font-medium">
-                      {{ formatDateTime(artist.arrivalDateTime) }}
-                    </div>
-                    <div v-if="artist.pickupRequired" class="text-xs space-y-0.5">
-                      <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
-                        <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
-                        <span>{{ artist.pickupLocation || $t('artists.pickup_location') }}</span>
-                      </div>
-                      <div
-                        v-if="artist.pickupResponsible"
-                        class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
-                      >
-                        <UIcon name="i-heroicons-user" class="h-3 w-3" />
-                        <span>{{ artist.pickupResponsible.pseudo }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div v-if="artist.departureDateTime" class="space-y-1">
-                    <div class="text-gray-900 dark:text-white font-medium">
-                      {{ formatDateTime(artist.departureDateTime) }}
-                    </div>
-                    <div v-if="artist.dropoffRequired" class="text-xs space-y-0.5">
-                      <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
-                        <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
-                        <span>{{ artist.dropoffLocation || $t('artists.dropoff_location') }}</span>
-                      </div>
-                      <div
-                        v-if="artist.dropoffResponsible"
-                        class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
-                      >
-                        <UIcon name="i-heroicons-user" class="h-3 w-3" />
-                        <span>{{ artist.dropoffResponsible.pseudo }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td v-if="edition.mealsEnabled" class="px-4 py-3 text-sm text-center">
-                  <UButton
-                    :color="getAcceptedMealsCount(artist) > 0 ? 'primary' : 'neutral'"
+                <span class="font-medium">{{ getMealsDisplayText(row.original) }}</span>
+                <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
+              </UButton>
+            </template>
+
+            <!-- Spectacles -->
+            <template #shows-cell="{ row }">
+              <div
+                v-if="row.original.shows && row.original.shows.length > 0"
+                class="flex flex-wrap gap-1"
+              >
+                <UBadge
+                  v-for="showArtist in row.original.shows"
+                  :key="showArtist.show.id"
+                  color="purple"
+                  variant="subtle"
+                  size="sm"
+                >
+                  {{ showArtist.show.title }}
+                </UBadge>
+              </div>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+
+            <!-- Paiement -->
+            <template #payment-cell="{ row }">
+              <div v-if="row.original.payment" class="flex items-center gap-2">
+                <span class="font-medium">{{ row.original.payment }}€</span>
+                <UBadge
+                  :color="row.original.paymentPaid ? 'success' : 'warning'"
+                  variant="soft"
+                  size="sm"
+                >
+                  {{ row.original.paymentPaid ? '✓' : '○' }}
+                </UBadge>
+              </div>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+
+            <!-- Remboursement -->
+            <template #reimbursement-cell="{ row }">
+              <div
+                v-if="row.original.reimbursementMax || row.original.reimbursementActual"
+                class="space-y-1"
+              >
+                <div v-if="row.original.reimbursementMax" class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Max:</span>
+                  <span class="font-medium">{{ row.original.reimbursementMax }}€</span>
+                </div>
+                <div v-if="row.original.reimbursementActual" class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Réel:</span>
+                  <span class="font-medium">{{ row.original.reimbursementActual }}€</span>
+                  <UBadge
+                    :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
                     variant="soft"
                     size="sm"
-                    @click="openMealsModal(artist)"
                   >
-                    <span class="font-medium">{{ getMealsDisplayText(artist) }}</span>
-                    <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
-                  </UButton>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div v-if="artist.shows && artist.shows.length > 0" class="flex flex-wrap gap-1">
-                    <UBadge
-                      v-for="showArtist in artist.shows"
-                      :key="showArtist.show.id"
-                      color="purple"
-                      variant="subtle"
-                      size="sm"
-                    >
-                      {{ showArtist.show.title }}
-                    </UBadge>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div v-if="artist.payment" class="flex items-center gap-2">
-                    <span class="font-medium">{{ artist.payment }}€</span>
-                    <UBadge
-                      :color="artist.paymentPaid ? 'success' : 'warning'"
-                      variant="soft"
-                      size="sm"
-                    >
-                      {{ artist.paymentPaid ? '✓' : '○' }}
-                    </UBadge>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div
-                    v-if="artist.reimbursementMax || artist.reimbursementActual"
-                    class="space-y-1"
+                    {{ row.original.reimbursementActualPaid ? '✓' : '○' }}
+                  </UBadge>
+                </div>
+              </div>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+
+            <!-- Hébergement -->
+            <template #accommodation-cell="{ row }">
+              <div class="space-y-1">
+                <div v-if="row.original.accommodationAutonomous" class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">
+                    {{ $t('artists.accommodation_autonomous_yes') }}
+                  </span>
+                </div>
+                <div v-if="row.original.accommodationType" class="flex items-center gap-1 text-xs">
+                  <UBadge color="info" variant="subtle" size="sm">
+                    {{ accommodationTypeLabel(row.original.accommodationType) }}
+                  </UBadge>
+                  <span
+                    v-if="
+                      row.original.accommodationType === 'OTHER' &&
+                      row.original.accommodationTypeOther
+                    "
+                    class="text-gray-500 truncate max-w-30"
+                    :title="row.original.accommodationTypeOther"
                   >
-                    <div v-if="artist.reimbursementMax" class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">Max:</span>
-                      <span class="font-medium">{{ artist.reimbursementMax }}€</span>
-                    </div>
-                    <div v-if="artist.reimbursementActual" class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">Réel:</span>
-                      <span class="font-medium">{{ artist.reimbursementActual }}€</span>
-                      <UBadge
-                        :color="artist.reimbursementActualPaid ? 'success' : 'warning'"
-                        variant="soft"
-                        size="sm"
-                      >
-                        {{ artist.reimbursementActualPaid ? '✓' : '○' }}
-                      </UBadge>
-                    </div>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div class="space-y-1">
-                    <div v-if="artist.accommodationAutonomous" class="flex items-center gap-2">
-                      <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
-                      <span class="text-sm text-gray-700 dark:text-gray-300">
-                        {{ $t('artists.accommodation_autonomous_yes') }}
-                      </span>
-                    </div>
-                    <div v-if="artist.accommodationType" class="flex items-center gap-1 text-xs">
-                      <UBadge color="info" variant="subtle" size="sm">
-                        {{ accommodationTypeLabel(artist.accommodationType) }}
-                      </UBadge>
-                      <span
-                        v-if="artist.accommodationType === 'OTHER' && artist.accommodationTypeOther"
-                        class="text-gray-500 truncate max-w-[120px]"
-                        :title="artist.accommodationTypeOther"
-                      >
-                        {{ artist.accommodationTypeOther }}
-                      </span>
-                    </div>
-                    <button
-                      v-if="!artist.accommodationAutonomous && artist.accommodationProposal"
-                      class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
-                      @click="openAccommodationModal(artist)"
-                    >
-                      <UIcon
-                        name="i-heroicons-home"
-                        class="h-5 w-5 text-primary-500 flex-shrink-0"
-                      />
-                      <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
-                        {{ artist.accommodationProposal }}
-                      </span>
-                      <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
-                    </button>
-                    <div
-                      v-if="
-                        !artist.accommodationAutonomous &&
-                        !artist.accommodationProposal &&
-                        !artist.accommodationType
-                      "
-                      class="flex items-center gap-2"
-                    >
-                      <UIcon
-                        name="i-heroicons-question-mark-circle"
-                        class="h-5 w-5 text-gray-400"
-                      />
-                      <span class="text-sm text-gray-400">
-                        {{ $t('artists.accommodation_not_specified') }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-sm text-center">
-                  <UPopover :popper="{ placement: 'top' }">
-                    <UBadge
-                      :color="getInvoiceStatusColor(artist)"
-                      variant="soft"
-                      size="sm"
-                      class="cursor-help"
-                    >
-                      {{ getInvoiceStatusIcon(artist) }}
-                    </UBadge>
-                    <template #content>
-                      <div class="p-2 text-sm">
-                        {{ getInvoiceStatusText(artist) }}
-                      </div>
-                    </template>
-                  </UPopover>
-                </td>
-                <td class="px-4 py-3 text-sm text-center">
-                  <UPopover :popper="{ placement: 'top' }">
-                    <UBadge
-                      :color="getFeeStatusColor(artist)"
-                      variant="soft"
-                      size="sm"
-                      class="cursor-help"
-                    >
-                      {{ getFeeStatusIcon(artist) }}
-                    </UBadge>
-                    <template #content>
-                      <div class="p-2 text-sm">
-                        {{ getFeeStatusText(artist) }}
-                      </div>
-                    </template>
-                  </UPopover>
-                </td>
-                <td v-if="canEdit" class="px-4 py-3 text-sm min-w-[300px]">
-                  <button
-                    v-if="artist.organizerNotes"
-                    class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                    @click="openNotesModal(artist)"
-                  >
-                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3">
-                      {{ artist.organizerNotes }}
-                    </p>
-                    <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
-                      <span>{{ $t('common.view_more') }}</span>
-                      <UIcon name="i-heroicons-chevron-right" class="h-3 w-3" />
-                    </div>
-                  </button>
-                  <button
-                    v-else
-                    class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                    @click="openNotesModal(artist)"
-                  >
-                    <p class="text-gray-400 italic text-xs">
-                      {{ $t('artists.no_notes') }}
-                    </p>
-                    <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
-                      <span>{{ $t('common.add') }}</span>
-                      <UIcon name="i-heroicons-plus" class="h-3 w-3" />
-                    </div>
-                  </button>
-                </td>
-                <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <UButton
-                      icon="i-heroicons-pencil"
-                      color="primary"
-                      variant="ghost"
-                      size="sm"
-                      @click="openEditArtistModal(artist)"
-                    />
-                    <UButton
-                      icon="i-heroicons-trash"
-                      color="error"
-                      variant="ghost"
-                      size="sm"
-                      @click="confirmDeleteArtist(artist)"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    {{ row.original.accommodationTypeOther }}
+                  </span>
+                </div>
+                <button
+                  v-if="!row.original.accommodationAutonomous && row.original.accommodationProposal"
+                  class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
+                  @click="openAccommodationModal(row.original)"
+                >
+                  <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500 shrink-0" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
+                    {{ row.original.accommodationProposal }}
+                  </span>
+                  <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
+                </button>
+                <div
+                  v-if="
+                    !row.original.accommodationAutonomous &&
+                    !row.original.accommodationProposal &&
+                    !row.original.accommodationType
+                  "
+                  class="flex items-center gap-2"
+                >
+                  <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
+                  <span class="text-sm text-gray-400">
+                    {{ $t('artists.accommodation_not_specified') }}
+                  </span>
+                </div>
+              </div>
+            </template>
+
+            <!-- Facture -->
+            <template #invoice-cell="{ row }">
+              <UTooltip :text="getInvoiceStatusText(row.original)">
+                <UBadge
+                  :color="getInvoiceStatusColor(row.original)"
+                  variant="soft"
+                  size="sm"
+                  class="cursor-help"
+                >
+                  {{ getInvoiceStatusIcon(row.original) }}
+                </UBadge>
+              </UTooltip>
+            </template>
+
+            <!-- Cachet -->
+            <template #fee-cell="{ row }">
+              <UTooltip :text="getFeeStatusText(row.original)">
+                <UBadge
+                  :color="getFeeStatusColor(row.original)"
+                  variant="soft"
+                  size="sm"
+                  class="cursor-help"
+                >
+                  {{ getFeeStatusIcon(row.original) }}
+                </UBadge>
+              </UTooltip>
+            </template>
+
+            <!-- Notes organisateur -->
+            <template #notes-cell="{ row }">
+              <button
+                v-if="row.original.organizerNotes"
+                class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                @click="openNotesModal(row.original)"
+              >
+                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3">
+                  {{ row.original.organizerNotes }}
+                </p>
+                <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
+                  <span>{{ $t('common.view_more') }}</span>
+                  <UIcon name="i-heroicons-chevron-right" class="h-3 w-3" />
+                </div>
+              </button>
+              <button
+                v-else
+                class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                @click="openNotesModal(row.original)"
+              >
+                <p class="text-gray-400 italic text-xs">
+                  {{ $t('artists.no_notes') }}
+                </p>
+                <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
+                  <span>{{ $t('common.add') }}</span>
+                  <UIcon name="i-heroicons-plus" class="h-3 w-3" />
+                </div>
+              </button>
+            </template>
+
+            <!-- Actions -->
+            <template #actions-cell="{ row }">
+              <div class="flex items-center justify-end gap-2">
+                <UButton
+                  icon="i-heroicons-pencil"
+                  color="primary"
+                  variant="ghost"
+                  size="sm"
+                  @click="openEditArtistModal(row.original)"
+                />
+                <UButton
+                  icon="i-heroicons-trash"
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  @click="confirmDeleteArtist(row.original)"
+                />
+              </div>
+            </template>
+          </UTable>
         </div>
       </UCard>
     </div>
@@ -531,6 +510,9 @@
 <script setup lang="ts">
 import { getAccommodationTypeLabel } from '~/utils/accommodation-type'
 import { markdownToHtml } from '~/utils/markdown'
+
+import type { TableColumn } from '@nuxt/ui'
+import type { Column } from '@tanstack/vue-table'
 
 definePageMeta({
   middleware: ['authenticated'],
@@ -614,6 +596,203 @@ const showAccommodationModal = ref(false)
 const selectedArtistForAccommodation = ref<any>(null)
 const showDeleteConfirm = ref(false)
 const artistToDelete = ref<any>(null)
+
+// Table ref pour accès API TanStack
+const tableRef = ref<InstanceType<typeof import('@nuxt/ui').UTable> | null>(null)
+
+// État du tri
+const sorting = ref<{ id: string; desc: boolean }[]>([])
+
+// Visibilité des colonnes
+const columnVisibility = ref<Record<string, boolean>>({})
+
+// Filtres
+const globalFilter = ref('')
+const showFilter = ref('ALL')
+
+// Liste des spectacles pour le filtre
+const allShows = computed(() => {
+  const showsMap = new Map<number, string>()
+  artists.value.forEach((artist) => {
+    artist.shows?.forEach((sa: any) => {
+      if (!showsMap.has(sa.show.id)) {
+        showsMap.set(sa.show.id, sa.show.title)
+      }
+    })
+  })
+  return Array.from(showsMap.entries()).map(([id, title]) => ({
+    label: title,
+    value: String(id),
+  }))
+})
+
+const showFilterItems = computed(() => [
+  { label: t('artists.all_shows'), value: 'ALL' },
+  ...allShows.value,
+])
+
+// Artistes filtrés par spectacle
+const filteredArtists = computed(() => {
+  if (!showFilter.value || showFilter.value === 'ALL') return artists.value
+  return artists.value.filter((artist) =>
+    artist.shows?.some((sa: any) => String(sa.show.id) === showFilter.value)
+  )
+})
+
+const resetFilters = () => {
+  globalFilter.value = ''
+  showFilter.value = 'ALL'
+  sorting.value = []
+}
+
+// Helper pour les en-têtes triables
+function getSortableHeader(column: Column<any>, label: string) {
+  const isSorted = column.getIsSorted()
+  return h(resolveComponent('UButton'), {
+    color: 'neutral',
+    variant: 'ghost',
+    label,
+    icon: isSorted
+      ? isSorted === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(isSorted === 'asc'),
+  })
+}
+
+// Labels des colonnes pour le sélecteur de visibilité
+const getColumnLabel = (columnId: string): string => {
+  const labels: Record<string, string> = {
+    name: t('common.name'),
+    email: t('common.email'),
+    phone: t('edition.ticketing.phone'),
+    arrival: t('artists.arrival'),
+    departure: t('artists.departure'),
+    meals: t('common.meals_short'),
+    shows: t('artists.shows'),
+    payment: t('artists.payment_amount'),
+    reimbursement: t('artists.reimbursement_max_actual'),
+    accommodation: t('artists.accommodation'),
+    invoice: t('artists.invoice_short'),
+    fee: t('artists.fee_short'),
+    notes: t('artists.organizer_notes'),
+    actions: t('common.actions'),
+  }
+  return labels[columnId] || columnId
+}
+
+// Items du dropdown de visibilité des colonnes
+const columnVisibilityItems = computed(() => {
+  const allColumns = tableRef.value?.tableApi
+    ?.getAllColumns()
+    .filter((column: any) => column.getCanHide())
+
+  if (!allColumns) return []
+
+  return allColumns.map((column: any) => ({
+    label: getColumnLabel(column.id),
+    type: 'checkbox' as const,
+    checked: column.getIsVisible(),
+    onUpdateChecked(checked: boolean) {
+      tableRef.value?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+    },
+    onSelect(e?: Event) {
+      e?.preventDefault()
+    },
+  }))
+})
+
+// Définition des colonnes
+const columns = computed((): TableColumn<any>[] => [
+  {
+    id: 'name',
+    accessorFn: (row: any) => `${row.user?.prenom} ${row.user?.nom}`,
+    header: ({ column }) => getSortableHeader(column, t('common.name')),
+    enableHiding: false,
+  },
+  {
+    id: 'email',
+    accessorFn: (row: any) => row.user?.email,
+    header: ({ column }) => getSortableHeader(column, t('common.email')),
+  },
+  {
+    id: 'phone',
+    accessorFn: (row: any) => row.user?.phone,
+    header: t('edition.ticketing.phone'),
+    enableSorting: false,
+  },
+  {
+    id: 'arrival',
+    accessorKey: 'arrivalDateTime',
+    header: ({ column }) => getSortableHeader(column, t('artists.arrival')),
+  },
+  {
+    id: 'departure',
+    accessorKey: 'departureDateTime',
+    header: ({ column }) => getSortableHeader(column, t('artists.departure')),
+  },
+  ...(edition.value?.mealsEnabled
+    ? [
+        {
+          id: 'meals',
+          header: t('common.meals_short'),
+          enableSorting: false,
+          meta: { class: { th: 'text-center', td: 'text-center' } },
+        } as TableColumn<any>,
+      ]
+    : []),
+  {
+    id: 'shows',
+    accessorFn: (row: any) => row.shows?.map((sa: any) => sa.show.title).join(', ') || '',
+    header: ({ column }) => getSortableHeader(column, t('artists.shows')),
+  },
+  {
+    id: 'payment',
+    accessorKey: 'payment',
+    header: ({ column }) => getSortableHeader(column, t('artists.payment_amount')),
+  },
+  {
+    id: 'reimbursement',
+    accessorFn: (row: any) => row.reimbursementMax || row.reimbursementActual || 0,
+    header: ({ column }) => getSortableHeader(column, t('artists.reimbursement_max_actual')),
+  },
+  {
+    id: 'accommodation',
+    header: t('artists.accommodation'),
+    enableSorting: false,
+  },
+  {
+    id: 'invoice',
+    header: t('artists.invoice_short'),
+    enableSorting: false,
+    meta: { class: { th: 'text-center', td: 'text-center' } },
+  },
+  {
+    id: 'fee',
+    header: t('artists.fee_short'),
+    enableSorting: false,
+    meta: { class: { th: 'text-center', td: 'text-center' } },
+  },
+  ...(canEdit.value
+    ? [
+        {
+          id: 'notes',
+          header: t('artists.organizer_notes'),
+          enableSorting: false,
+          size: 300,
+        } as TableColumn<any>,
+        {
+          id: 'actions',
+          header: t('common.actions'),
+          enableSorting: false,
+          enableHiding: false,
+          meta: { class: { th: 'text-right', td: 'text-right' } },
+        } as TableColumn<any>,
+      ]
+    : []),
+])
 
 // Charger l'édition
 onMounted(async () => {
@@ -699,7 +878,6 @@ const openNotesModal = (artist: any) => {
 
 // Gérer la sauvegarde des notes
 const handleNotesSaved = () => {
-  // Rafraîchir les artistes pour obtenir les notes mises à jour
   fetchArtists()
 }
 
@@ -728,15 +906,15 @@ const accommodationTypeLabel = (type: string) => getAccommodationTypeLabel(type,
 
 // Fonctions pour l'état de la facture
 const getInvoiceStatusIcon = (artist: any) => {
-  if (!artist.invoiceRequested) return '○' // Non demandé
-  if (artist.invoiceRequested && !artist.invoiceProvided) return '⏳' // Demandé
-  return '✓' // Fourni
+  if (!artist.invoiceRequested) return '○'
+  if (artist.invoiceRequested && !artist.invoiceProvided) return '⏳'
+  return '✓'
 }
 
 const getInvoiceStatusColor = (artist: any) => {
-  if (!artist.invoiceRequested) return 'neutral' // Non demandé
-  if (artist.invoiceRequested && !artist.invoiceProvided) return 'warning' // Demandé
-  return 'success' // Fourni
+  if (!artist.invoiceRequested) return 'neutral'
+  if (artist.invoiceRequested && !artist.invoiceProvided) return 'warning'
+  return 'success'
 }
 
 const getInvoiceStatusText = (artist: any) => {
@@ -747,15 +925,15 @@ const getInvoiceStatusText = (artist: any) => {
 
 // Fonctions pour l'état du cachet
 const getFeeStatusIcon = (artist: any) => {
-  if (!artist.feeRequested) return '○' // Non demandé
-  if (artist.feeRequested && !artist.feeProvided) return '⏳' // Demandé
-  return '✓' // Fourni
+  if (!artist.feeRequested) return '○'
+  if (artist.feeRequested && !artist.feeProvided) return '⏳'
+  return '✓'
 }
 
 const getFeeStatusColor = (artist: any) => {
-  if (!artist.feeRequested) return 'neutral' // Non demandé
-  if (artist.feeRequested && !artist.feeProvided) return 'warning' // Demandé
-  return 'success' // Fourni
+  if (!artist.feeRequested) return 'neutral'
+  if (artist.feeRequested && !artist.feeProvided) return 'warning'
+  return 'success'
 }
 
 const getFeeStatusText = (artist: any) => {

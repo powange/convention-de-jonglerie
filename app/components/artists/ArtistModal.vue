@@ -1,7 +1,7 @@
 <template>
   <UModal v-model:open="isOpen" :title="title">
     <template #body>
-      <form class="space-y-4" @submit.prevent="handleSubmit">
+      <form class="space-y-5" @submit.prevent="handleSubmit">
         <!-- Sélection utilisateur existant OU création nouveau (mode ajout) -->
         <div v-if="!artist" class="space-y-4">
           <UFormField :label="$t('artists.search_user')">
@@ -32,31 +32,40 @@
               type="email"
               :placeholder="$t('artists.user_email')"
               :disabled="!!selectedUser"
+              class="w-full"
             />
           </UFormField>
 
-          <UFormField :label="$t('artists.user_firstname')">
-            <UInput
-              v-model="formData.prenom"
-              :placeholder="$t('artists.user_firstname')"
-              :disabled="!!selectedUser"
-            />
-          </UFormField>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <UFormField :label="$t('artists.user_firstname')">
+              <UInput
+                v-model="formData.prenom"
+                :placeholder="$t('artists.user_firstname')"
+                :disabled="!!selectedUser"
+              />
+            </UFormField>
 
-          <UFormField :label="$t('artists.user_lastname')">
-            <UInput
-              v-model="formData.nom"
-              :placeholder="$t('artists.user_lastname')"
-              :disabled="!!selectedUser"
-            />
-          </UFormField>
+            <UFormField :label="$t('artists.user_lastname')">
+              <UInput
+                v-model="formData.nom"
+                :placeholder="$t('artists.user_lastname')"
+                :disabled="!!selectedUser"
+              />
+            </UFormField>
+          </div>
         </div>
 
         <!-- Informations utilisateur (mode édition) -->
-        <div v-else class="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-            {{ $t('artists.user_info') }}
-          </h3>
+        <div
+          v-else
+          class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-4 border border-gray-200 dark:border-gray-800"
+        >
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-user" class="size-4 text-gray-600 dark:text-gray-400" />
+            <h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">
+              {{ $t('artists.user_info') }}
+            </h3>
+          </div>
 
           <UFormField :label="$t('artists.user_email')">
             <UInput
@@ -64,24 +73,27 @@
               type="email"
               :placeholder="$t('artists.user_email')"
               :disabled="!isManualUser"
+              class="w-full"
             />
           </UFormField>
 
-          <UFormField :label="$t('artists.user_firstname')">
-            <UInput
-              v-model="formData.prenom"
-              :placeholder="$t('artists.user_firstname')"
-              :disabled="!isManualUser"
-            />
-          </UFormField>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <UFormField :label="$t('artists.user_firstname')">
+              <UInput
+                v-model="formData.prenom"
+                :placeholder="$t('artists.user_firstname')"
+                :disabled="!isManualUser"
+              />
+            </UFormField>
 
-          <UFormField :label="$t('artists.user_lastname')">
-            <UInput
-              v-model="formData.nom"
-              :placeholder="$t('artists.user_lastname')"
-              :disabled="!isManualUser"
-            />
-          </UFormField>
+            <UFormField :label="$t('artists.user_lastname')">
+              <UInput
+                v-model="formData.nom"
+                :placeholder="$t('artists.user_lastname')"
+                :disabled="!isManualUser"
+              />
+            </UFormField>
+          </div>
 
           <UFormField :label="$t('edition.ticketing.phone')">
             <UInput
@@ -89,52 +101,86 @@
               type="tel"
               :placeholder="$t('edition.ticketing.phone')"
               :disabled="!isManualUser"
+              class="w-full"
             />
           </UFormField>
 
-          <div v-if="!isManualUser" class="text-xs text-gray-500 dark:text-gray-400">
+          <p v-if="!isManualUser" class="text-xs text-gray-500 dark:text-gray-400">
             {{ $t('artists.user_info_readonly') }}
-          </div>
+          </p>
         </div>
 
-        <!-- Informations artiste -->
-        <UiDateTimePicker
-          v-model="formData.arrivalDateTime"
-          :date-label="$t('artists.arrival_date')"
-          :time-label="$t('artists.arrival_time')"
-          :placeholder="$t('artists.arrival')"
-        />
+        <!-- Présence -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-calendar" class="size-4 text-blue-600 dark:text-blue-400" />
+            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+              {{ $t('artists.presence_section') }}
+            </h3>
+          </div>
 
-        <UiDateTimePicker
-          v-model="formData.departureDateTime"
-          :date-label="$t('artists.departure_date')"
-          :time-label="$t('artists.departure_time')"
-          :placeholder="$t('artists.departure')"
-        />
-
-        <UFormField :label="$t('artists.dietary_preference')">
-          <USelect v-model="formData.dietaryPreference" :items="dietaryOptions" value-key="value" />
-        </UFormField>
-
-        <UFormField :label="$t('artists.allergies')">
-          <UTextarea v-model="formData.allergies" :placeholder="$t('artists.allergies')" rows="3" />
-        </UFormField>
-
-        <UFormField v-if="formData.allergies" :label="$t('artists.allergy_severity')">
-          <USelect
-            v-model="formData.allergySeverity"
-            :items="allergySeverityOptions"
-            value-key="value"
+          <UiDateTimePicker
+            v-model="formData.arrivalDateTime"
+            :date-label="$t('artists.arrival_date')"
+            :time-label="$t('artists.arrival_time')"
+            :placeholder="$t('artists.arrival')"
           />
-        </UFormField>
+
+          <UiDateTimePicker
+            v-model="formData.departureDateTime"
+            :date-label="$t('artists.departure_date')"
+            :time-label="$t('artists.departure_time')"
+            :placeholder="$t('artists.departure')"
+          />
+        </div>
+
+        <!-- Alimentation -->
+        <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 space-y-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-utensils" class="size-4 text-orange-600 dark:text-orange-400" />
+            <h3 class="text-sm font-medium text-orange-800 dark:text-orange-200">
+              {{ $t('artists.dietary_section') }}
+            </h3>
+          </div>
+
+          <UFormField :label="$t('artists.dietary_preference')">
+            <USelect
+              v-model="formData.dietaryPreference"
+              :items="dietaryOptions"
+              value-key="value"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField :label="$t('artists.allergies')">
+            <UTextarea
+              v-model="formData.allergies"
+              :placeholder="$t('artists.allergies')"
+              rows="3"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField v-if="formData.allergies" :label="$t('artists.allergy_severity')">
+            <USelect
+              v-model="formData.allergySeverity"
+              :items="allergySeverityOptions"
+              value-key="value"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
 
         <!-- Paiement et défraiement -->
-        <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-            {{ $t('artists.payment_section') }}
-          </h3>
+        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 space-y-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-banknote" class="size-4 text-green-600 dark:text-green-400" />
+            <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
+              {{ $t('artists.payment_section') }}
+            </h3>
+          </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField :label="$t('artists.payment_amount')">
               <UInput
                 v-model="formData.payment"
@@ -154,7 +200,7 @@
             </UFormField>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField :label="$t('artists.reimbursement_max')">
               <UInput
                 v-model="formData.reimbursementMax"
@@ -184,20 +230,25 @@
             </UFormField>
           </div>
 
-          <div v-if="formData.reimbursementActual" class="grid grid-cols-2 gap-4">
-            <div></div>
-            <UFormField :label="$t('artists.reimbursement_status')">
-              <UCheckbox
-                v-model="formData.reimbursementActualPaid"
-                :label="$t('artists.reimbursement_paid')"
-              />
-            </UFormField>
-          </div>
+          <UFormField
+            v-if="formData.reimbursementActual"
+            :label="$t('artists.reimbursement_status')"
+          >
+            <UCheckbox
+              v-model="formData.reimbursementActualPaid"
+              :label="$t('artists.reimbursement_paid')"
+            />
+          </UFormField>
+        </div>
 
-          <!-- Hébergement -->
-          <h3 class="text-lg font-semibold mb-3">
-            {{ $t('artists.accommodation_section') }}
-          </h3>
+        <!-- Hébergement -->
+        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 space-y-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-bed-double" class="size-4 text-purple-600 dark:text-purple-400" />
+            <h3 class="text-sm font-medium text-purple-800 dark:text-purple-200">
+              {{ $t('artists.accommodation_section') }}
+            </h3>
+          </div>
 
           <UFormField :label="$t('artists.accommodation_autonomous')">
             <UCheckbox
@@ -213,6 +264,7 @@
               value-key="value"
               :placeholder="$t('artists.accommodation_not_specified')"
               :ui="{ content: 'min-w-fit' }"
+              class="w-full"
             />
           </UFormField>
 
@@ -223,25 +275,33 @@
             <UInput
               v-model="formData.accommodationTypeOther"
               :placeholder="$t('artists.accommodation_type_other_placeholder')"
+              class="w-full"
             />
           </UFormField>
 
-          <div v-if="!formData.accommodationAutonomous">
-            <UFormField :label="$t('artists.accommodation_proposal')">
-              <UTextarea
-                v-model="formData.accommodationProposal"
-                :placeholder="$t('artists.accommodation_proposal_placeholder')"
-                :rows="3"
-              />
-            </UFormField>
+          <UFormField
+            v-if="!formData.accommodationAutonomous"
+            :label="$t('artists.accommodation_proposal')"
+          >
+            <UTextarea
+              v-model="formData.accommodationProposal"
+              :placeholder="$t('artists.accommodation_proposal_placeholder')"
+              :rows="3"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Facture et cachet -->
+        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 space-y-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-file-text" class="size-4 text-amber-600 dark:text-amber-400" />
+            <h3 class="text-sm font-medium text-amber-800 dark:text-amber-200">
+              {{ $t('artists.invoice_fee_section') }}
+            </h3>
           </div>
 
-          <!-- Facture et cachet -->
-          <h3 class="text-lg font-semibold mb-3 mt-4">
-            {{ $t('artists.invoice_fee_section') }}
-          </h3>
-
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField :label="$t('artists.invoice_requested')">
               <UCheckbox
                 v-model="formData.invoiceRequested"
@@ -257,7 +317,7 @@
             </UFormField>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField :label="$t('artists.fee_requested')">
               <UCheckbox
                 v-model="formData.feeRequested"
@@ -269,11 +329,16 @@
               <UCheckbox v-model="formData.feeProvided" :label="$t('artists.fee_provided_label')" />
             </UFormField>
           </div>
+        </div>
 
-          <!-- Récupération et retour -->
-          <h3 class="text-lg font-semibold mb-3 mt-4">
-            {{ $t('artists.pickup_dropoff_section') }}
-          </h3>
+        <!-- Récupération et retour -->
+        <div class="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 space-y-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-car" class="size-4 text-teal-600 dark:text-teal-400" />
+            <h3 class="text-sm font-medium text-teal-800 dark:text-teal-200">
+              {{ $t('artists.pickup_dropoff_section') }}
+            </h3>
+          </div>
 
           <!-- Récupération -->
           <div class="space-y-3">
@@ -286,12 +351,13 @@
 
             <div
               v-if="formData.pickupRequired"
-              class="space-y-3 pl-6 border-l-2 border-primary-200"
+              class="space-y-3 pl-6 border-l-2 border-teal-300 dark:border-teal-700"
             >
               <UFormField :label="$t('artists.pickup_location')">
                 <UInput
                   v-model="formData.pickupLocation"
                   :placeholder="$t('artists.pickup_location_placeholder')"
+                  class="w-full"
                 />
               </UFormField>
 
@@ -308,7 +374,7 @@
           </div>
 
           <!-- Retour -->
-          <div class="space-y-3 mt-4">
+          <div class="space-y-3">
             <UFormField :label="$t('artists.dropoff_required')">
               <UCheckbox
                 v-model="formData.dropoffRequired"
@@ -318,12 +384,13 @@
 
             <div
               v-if="formData.dropoffRequired"
-              class="space-y-3 pl-6 border-l-2 border-primary-200"
+              class="space-y-3 pl-6 border-l-2 border-teal-300 dark:border-teal-700"
             >
               <UFormField :label="$t('artists.dropoff_location')">
                 <UInput
                   v-model="formData.dropoffLocation"
                   :placeholder="$t('artists.dropoff_location_placeholder')"
+                  class="w-full"
                 />
               </UFormField>
 
