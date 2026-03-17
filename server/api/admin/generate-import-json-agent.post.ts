@@ -4,7 +4,7 @@ import {
   generateAgentSystemPrompt,
   generateCompactAgentSystemPrompt,
   generateForceGenerationPrompt,
-  PROMPT_COMPLETE_PREFILLED_JSON,
+  getPrefilledJsonPrompt,
 } from '../../lib/import-json-schema'
 
 import { generateImportJson } from './generate-import-json.post'
@@ -241,7 +241,7 @@ function extractAndApplyTimeFromContent(parsedJson: any, collectedContent: strin
 // Choix du prompt selon le provider IA
 // - Modèles locaux (LM Studio, Ollama) : prompt compact pour contexte limité (4k tokens)
 // - Anthropic : prompt complet avec tous les détails
-function getSystemPrompt(aiProvider: string): string {
+async function getSystemPrompt(aiProvider: string): Promise<string> {
   if (aiProvider === 'anthropic') {
     return generateAgentSystemPrompt()
   }
@@ -953,7 +953,7 @@ INSTRUCTIONS:
     console.log(`[AGENT] Phase 3 - Iteration ${iteration}/${maxAdditionalIterations}`)
 
     // Appeler le LLM
-    const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+    const systemPrompt = await getSystemPrompt(configToUse.aiProvider || 'lmstudio')
     const agentResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
 
     if (agentResponse.action === 'fetch' && agentResponse.url) {
@@ -1091,11 +1091,11 @@ ${contentSummary}
 
 Complète les champs vides avec les informations des sources. Réponds UNIQUEMENT avec le JSON complet.`
 
-      systemPromptToUse = PROMPT_COMPLETE_PREFILLED_JSON
+      systemPromptToUse = await getPrefilledJsonPrompt()
     } else {
       const contentSummary = collectedContent.slice(0, 3).join('\n\n---\n\n')
-      forcePrompt = generateForceGenerationPrompt(visitedUrls, contentSummary)
-      systemPromptToUse = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+      forcePrompt = await generateForceGenerationPrompt(visitedUrls, contentSummary)
+      systemPromptToUse = await getSystemPrompt(configToUse.aiProvider || 'lmstudio')
     }
 
     conversationHistory.push({

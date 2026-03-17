@@ -74,9 +74,11 @@ export const JSON_FORMAT_FOR_COMPLETION = `{
  * Prompt pour compléter un JSON pré-rempli (Facebook + autres sources)
  * Utilisé par ED et EI quand des données Facebook sont disponibles
  */
-export const PROMPT_COMPLETE_PREFILLED_JSON = loadPrompt('complete-prefilled', {
-  JSON_FORMAT_FOR_COMPLETION,
-})
+export async function getPrefilledJsonPrompt(): Promise<string> {
+  return loadPrompt('complete-prefilled', {
+    JSON_FORMAT_FOR_COMPLETION,
+  })
+}
 
 /**
  * Définition des champs du schéma d'import avec leurs descriptions
@@ -294,11 +296,11 @@ export function generateCompactJsonFormat(): string {
  * Génère le prompt système complet pour l'agent d'exploration
  * Version complète avec tous les champs
  */
-export function generateAgentSystemPrompt(): string {
+export async function generateAgentSystemPrompt(): Promise<string> {
   return loadPrompt('agent-full', {
     FEATURES_DESCRIPTION: generateFeaturesDescription(),
     JSON_EXAMPLE: generateJsonExample(),
-    RULES_FULL: loadPrompt('rules-full'),
+    RULES_FULL: await loadPrompt('rules-full'),
   })
 }
 
@@ -306,10 +308,10 @@ export function generateAgentSystemPrompt(): string {
  * Génère un prompt système compact pour ED (Extraction Directe)
  * Pour les modèles avec contexte limité (4k tokens)
  */
-export function generateCompactDirectPrompt(): string {
+export async function generateCompactDirectPrompt(): Promise<string> {
   return loadPrompt('direct-compact', {
     FIELDS_SECTION: generateFieldsSection(),
-    RULES_COMPACT: loadPrompt('rules-compact'),
+    RULES_COMPACT: await loadPrompt('rules-compact'),
     COMPACT_FEATURES: generateCompactFeaturesDescription(),
     COMPACT_JSON_FORMAT: generateCompactJsonFormat(),
   })
@@ -319,10 +321,10 @@ export function generateCompactDirectPrompt(): string {
  * Génère un prompt système compact pour EI (Exploration Intelligente)
  * Pour les modèles avec contexte limité (4k tokens)
  */
-export function generateCompactAgentSystemPrompt(): string {
+export async function generateCompactAgentSystemPrompt(): Promise<string> {
   return loadPrompt('agent-compact', {
     FIELDS_SECTION: generateFieldsSection(),
-    RULES_COMPACT: loadPrompt('rules-compact'),
+    RULES_COMPACT: await loadPrompt('rules-compact'),
     COMPACT_FEATURES: generateCompactFeaturesDescription(),
     COMPACT_JSON_FORMAT: generateCompactJsonFormat(),
   })
@@ -331,14 +333,14 @@ export function generateCompactAgentSystemPrompt(): string {
 /**
  * Génère le prompt de forçage de génération JSON
  */
-export function generateForceGenerationPrompt(
+export async function generateForceGenerationPrompt(
   visitedUrls: string[],
   contentSummary: string
-): string {
+): Promise<string> {
   return loadPrompt('force-generation', {
     VISITED_COUNT: String(visitedUrls.length),
     CONTENT_SUMMARY: contentSummary,
-    RULES_COMPACT: loadPrompt('rules-compact'),
+    RULES_COMPACT: await loadPrompt('rules-compact'),
     COMPACT_JSON_FORMAT: generateCompactJsonFormat(),
   })
 }
