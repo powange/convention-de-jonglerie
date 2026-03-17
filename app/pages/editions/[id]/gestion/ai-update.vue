@@ -481,8 +481,8 @@ const compareResults = (aiData: any) => {
     const editionFields: Array<{ key: string; edValue: any }> = [
       { key: 'name', edValue: ed.name },
       { key: 'description', edValue: ed.description },
-      { key: 'startDate', edValue: ed.startDate?.split('T')[0] },
-      { key: 'endDate', edValue: ed.endDate?.split('T')[0] },
+      { key: 'startDate', edValue: ed.startDate },
+      { key: 'endDate', edValue: ed.endDate },
       { key: 'addressLine1', edValue: ed.addressLine1 },
       { key: 'city', edValue: ed.city },
       { key: 'country', edValue: ed.country },
@@ -498,8 +498,24 @@ const compareResults = (aiData: any) => {
       const aiValue = aiData.edition[key]
       if (!aiValue) continue
 
+      // Pour les dates, comparer les timestamps pour éviter les faux positifs de format
+      if (key === 'startDate' || key === 'endDate') {
+        const currentDate = edValue ? new Date(edValue).getTime() : 0
+        const aiDate = new Date(aiValue).getTime()
+        if (!isNaN(aiDate) && currentDate !== aiDate) {
+          diffs.push({
+            field: `edition.${key}`,
+            label: fieldLabels[`edition.${key}`] || key,
+            currentValue: String(edValue || ''),
+            newValue: String(aiValue),
+            apply: !edValue,
+          })
+        }
+        continue
+      }
+
       const currentStr = String(edValue || '')
-      const aiStr = String(aiValue).split('T')[0] === aiValue ? aiValue : String(aiValue)
+      const aiStr = String(aiValue)
 
       if (aiStr && aiStr !== currentStr) {
         diffs.push({
