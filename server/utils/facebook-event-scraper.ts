@@ -132,13 +132,14 @@ export function facebookEventToImportJson(fbEvent: FacebookScraperResult): Faceb
   }
 
   // Dates depuis les timestamps (le scraper retourne des timestamps en secondes)
+  // On garde le format ISO complet avec Z pour indiquer UTC
   if (fbEvent.startTimestamp) {
     const startDate = new Date(fbEvent.startTimestamp * 1000)
-    json.edition.startDate = startDate.toISOString().replace('.000Z', '')
+    json.edition.startDate = startDate.toISOString()
   }
   if (fbEvent.endTimestamp) {
     const endDate = new Date(fbEvent.endTimestamp * 1000)
-    json.edition.endDate = endDate.toISOString().replace('.000Z', '')
+    json.edition.endDate = endDate.toISOString()
   }
 
   // Timezone (le scraper le fournit directement, ex: "UTC-06" ou "Australia/Melbourne")
