@@ -90,7 +90,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const agentResult = ref<GenerationResult | null>(null)
 
   // Timeout par défaut: 5 minutes
-  const defaultTimeout = options.timeout ?? 5 * 60 * 1000
+  const defaultTimeout = options.timeout ?? 8 * 60 * 1000
 
   /**
    * Vérifie si l'index correspond à l'étape en cours

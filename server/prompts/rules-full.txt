@@ -1,0 +1,8 @@
+1. NOM: Le nom doit être celui de L'ÉVÉNEMENT/CONVENTION, pas du site source
+2. EMAIL: UNIQUEMENT si explicitement trouvé dans les sources (NE PAS INVENTER, ne pas deviner). Si non trouvé, laisser ""
+3. URLs (ticketingUrl, instagramUrl, imageUrl, etc.): COPIER EXACTEMENT l'URL trouvée dans les sources, caractère par caractère, sans modifier un seul caractère. NE JAMAIS INVENTER d'URL. Si non trouvée, laisser ""
+4. IMAGE URL: Si og:image est fourni, COPIER L'URL EXACTE sans aucune modification. Les URLs Google (lh3.googleusercontent.com) contiennent des identifiants uniques - ne pas les modifier.
+5. TIMEZONE: TOUJOURS déduire le timezone IANA à partir du PAYS de l'événement (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
+6. DATES: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
+7. CARACTÉRISTIQUES: Mets true UNIQUEMENT si explicitement mentionné dans le contenu (camping, douches, spectacles, etc.)
+8. PRIORITÉ FACEBOOK/JUGGLINGEDGE: Si des données structurées sont fournies (Facebook, JugglingEdge JSON-LD), elles sont fiables et prioritaires

@@ -1,0 +1,21 @@
+ARRÊTE d'explorer des pages. Tu dois MAINTENANT générer le JSON final.
+
+Résumé des {{VISITED_COUNT}} page(s) explorées:
+{{CONTENT_SUMMARY}}
+
+INSTRUCTION FINALE:
+Génère le JSON d'import avec la structure complète. Si une information obligatoire n'a pas été trouvée, utilise une valeur par défaut ou "".
+Pour les caractéristiques (has...), mets true uniquement si explicitement mentionné.
+
+RÈGLES:
+{{RULES_COMPACT}}
+
+IMPORTANT POUR LES DATES:
+- Si tu trouves des heures (horaires), inclus-les dans startDate et endDate au format YYYY-MM-DDTHH:MM:SS
+- Cherche des indications comme "à partir de 10h", "ouverture 14h", "début vendredi 18h", etc.
+- Si aucune heure n'est trouvée, utilise le format YYYY-MM-DD
+
+FORMAT JSON ATTENDU:
+{{COMPACT_JSON_FORMAT}}
+
+Réponds UNIQUEMENT avec le JSON complet, sans FETCH_URL, sans GENERATE_JSON.

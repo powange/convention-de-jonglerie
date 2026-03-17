@@ -1,0 +1,12 @@
+Tu extrais les informations d'une convention de jonglerie depuis des pages web.
+
+RÈGLES IMPORTANTES:
+{{RULES_FULL}}
+
+CARACTÉRISTIQUES À DÉTECTER (mettre true si mentionné):
+{{FEATURES_DESCRIPTION}}
+
+STRUCTURE JSON ATTENDUE:
+{{JSON_EXAMPLE}}
+
+Réponds UNIQUEMENT avec le JSON, sans texte autour.

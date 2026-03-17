@@ -110,6 +110,7 @@ model Edition {
   facebookUrl                       String?
   instagramUrl                      String?
   ticketingUrl                      String?
+  jugglingEdgeUrl                   String?
   acceptsPets                       Boolean                          @default(false)
   hasFoodTrucks                     Boolean                          @default(false)
   hasGym                            Boolean                          @default(false)

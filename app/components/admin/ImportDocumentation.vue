@@ -45,6 +45,7 @@
             <li><code>edition.facebookUrl</code> - Page Facebook</li>
             <li><code>edition.instagramUrl</code> - Page Instagram</li>
             <li><code>edition.officialWebsiteUrl</code> - Site officiel</li>
+            <li><code>edition.jugglingEdgeUrl</code> - URL JugglingEdge</li>
             <li>
               <code>edition.status</code> - Statut de l'édition (PLANNED | PUBLISHED | OFFLINE |
               CANCELLED)

@@ -161,6 +161,7 @@ export const editionSchema = z
     officialWebsiteUrl: urlSchema,
     facebookUrl: urlSchema,
     instagramUrl: urlSchema,
+    jugglingEdgeUrl: urlSchema,
     // Services booléens
     hasFoodTrucks: z.boolean().optional(),
     hasKidsZone: z.boolean().optional(),
@@ -256,6 +257,7 @@ export const updateEditionSchema = z
     officialWebsiteUrl: urlSchema,
     facebookUrl: urlSchema,
     instagramUrl: urlSchema,
+    jugglingEdgeUrl: urlSchema,
     // Services booléens
     hasFoodTrucks: z.boolean().optional(),
     hasKidsZone: z.boolean().optional(),

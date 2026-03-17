@@ -512,6 +512,7 @@ async function fetchAndExtractContent(
   externalLinks?: {
     officialWebsite: string | null
     facebookEvent: string | null
+    facebookPage: string | null
   }
 }> {
   try {
@@ -781,17 +782,25 @@ export async function runAgentExploration(
       }
 
       // Collecter les liens externes trouvés (pour exploration automatique)
+      // Collecter les liens externes avec priorité : Facebook event (données structurées compactes)
+      // puis Facebook page, puis site officiel (souvent le plus verbeux)
       if (result.externalLinks) {
+        if (result.externalLinks.facebookEvent) {
+          externalLinksToExplore.push(result.externalLinks.facebookEvent)
+          console.log(
+            `[AGENT] Lien externe trouvé (Facebook event): ${result.externalLinks.facebookEvent}`
+          )
+        }
+        if (result.externalLinks.facebookPage) {
+          externalLinksToExplore.push(result.externalLinks.facebookPage)
+          console.log(
+            `[AGENT] Lien externe trouvé (Facebook page): ${result.externalLinks.facebookPage}`
+          )
+        }
         if (result.externalLinks.officialWebsite) {
           externalLinksToExplore.push(result.externalLinks.officialWebsite)
           console.log(
             `[AGENT] Lien externe trouvé (site officiel): ${result.externalLinks.officialWebsite}`
-          )
-        }
-        if (result.externalLinks.facebookEvent) {
-          externalLinksToExplore.push(result.externalLinks.facebookEvent)
-          console.log(
-            `[AGENT] Lien externe trouvé (Facebook): ${result.externalLinks.facebookEvent}`
           )
         }
       }

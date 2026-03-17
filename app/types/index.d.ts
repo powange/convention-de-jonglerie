@@ -56,6 +56,7 @@ export interface Edition {
   facebookUrl?: string | null
   instagramUrl?: string | null
   officialWebsiteUrl?: string | null
+  jugglingEdgeUrl?: string | null
   hasFoodTrucks: boolean
   hasKidsZone: boolean
   acceptsPets: boolean

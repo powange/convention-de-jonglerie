@@ -56,6 +56,7 @@ export interface JugglingEdgeScraperResult {
   externalLinks: {
     officialWebsite: string | null
     facebookEvent: string | null
+    facebookPage: string | null
   }
 }
 
@@ -287,10 +288,12 @@ function extractAddressFromNominatim(
 function extractExternalLinks(html: string): {
   officialWebsite: string | null
   facebookEvent: string | null
+  facebookPage: string | null
 } {
   const result = {
     officialWebsite: null as string | null,
     facebookEvent: null as string | null,
+    facebookPage: null as string | null,
   }
 
   // Extraire tous les liens href
@@ -312,8 +315,11 @@ function extractExternalLinks(html: string): {
 
     // Détecter les événements Facebook
     if (href.includes('facebook.com/events/') && !result.facebookEvent) {
-      // Nettoyer l'URL (supprimer les entités HTML)
       result.facebookEvent = href.replace(/&amp;/g, '&')
+    }
+    // Détecter les pages Facebook (pas un événement)
+    else if (href.includes('facebook.com/') && !href.includes('/events/') && !result.facebookPage) {
+      result.facebookPage = href.replace(/&amp;/g, '&')
     }
 
     // Détecter les sites officiels (URLs externes qui ne sont pas des réseaux sociaux)
@@ -404,6 +410,9 @@ export async function scrapeJugglingEdgeEvent(
     }
     if (externalLinks.facebookEvent) {
       console.log(`[JUGGLINGEDGE] Facebook Event trouvé: ${externalLinks.facebookEvent}`)
+    }
+    if (externalLinks.facebookPage) {
+      console.log(`[JUGGLINGEDGE] Page Facebook trouvée: ${externalLinks.facebookPage}`)
     }
 
     // Extraire les données de base
@@ -609,13 +618,20 @@ export function formatJugglingEdgeDataAsContent(
   }
 
   // Ajouter les liens externes pour l'exploration
-  if (jeEvent.externalLinks.officialWebsite || jeEvent.externalLinks.facebookEvent) {
+  const hasLinks =
+    jeEvent.externalLinks.officialWebsite ||
+    jeEvent.externalLinks.facebookEvent ||
+    jeEvent.externalLinks.facebookPage
+  if (hasLinks) {
     content += `\n--- LIENS À EXPLORER (FETCH_URL recommandé) ---\n`
     if (jeEvent.externalLinks.officialWebsite) {
       content += `Site officiel: ${jeEvent.externalLinks.officialWebsite}\n`
     }
     if (jeEvent.externalLinks.facebookEvent) {
       content += `Événement Facebook: ${jeEvent.externalLinks.facebookEvent}\n`
+    }
+    if (jeEvent.externalLinks.facebookPage) {
+      content += `Page Facebook: ${jeEvent.externalLinks.facebookPage}\n`
     }
     content += `(Ces liens peuvent contenir des infos supplémentaires: email, tarifs, camping, restauration, etc.)\n`
   }

@@ -48,6 +48,7 @@ export default wrapApiHandler(
         facebookUrl: edition.facebookUrl || undefined,
         instagramUrl: edition.instagramUrl || undefined,
         officialWebsiteUrl: edition.officialWebsiteUrl || undefined,
+        jugglingEdgeUrl: edition.jugglingEdgeUrl || undefined,
         // Services et caractéristiques
         hasFoodTrucks: edition.hasFoodTrucks,
         hasKidsZone: edition.hasKidsZone,

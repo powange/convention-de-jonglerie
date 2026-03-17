@@ -21,6 +21,7 @@ export const EDITION_FEATURES_DESCRIPTIONS: Record<string, string> = {
   hasFireSpace: 'Espace dédié au feu/poi enflammés',
   hasAerialSpace: 'Espace pour les arts aériens (trapèze, cerceau, tissu)',
   hasSlacklineSpace: 'Espace slackline/funambule',
+  hasUnicycleSpace: 'Espace monocycle',
   hasWorkshops: 'Ateliers ou workshops programmés',
 
   // Spectacles

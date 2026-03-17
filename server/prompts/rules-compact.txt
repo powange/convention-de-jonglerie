@@ -1,0 +1,8 @@
+- nom=événement (pas site source)
+- email=seulement si explicitement trouvé (NE PAS INVENTER), sinon ""
+- URLs=COPIER EXACTEMENT caractère par caractère (imageUrl, ticketingUrl...), JAMAIS INVENTER
+- imageUrl=COPIER l'URL og:image EXACTE (ne pas modifier les URLs Google)
+- timezone=DÉDUIS du PAYS (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)
+- dates avec heures si trouvées (YYYY-MM-DDTHH:MM:SS)
+- caractéristiques=true seulement si explicitement mentionné
+- PRIORITÉ données structurées (Facebook, JugglingEdge JSON-LD)

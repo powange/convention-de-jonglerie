@@ -62,6 +62,7 @@ const importSchema = z.object({
     facebookUrl: z.string().url().or(z.literal('')).nullable().optional(),
     instagramUrl: z.string().url().or(z.literal('')).nullable().optional(),
     officialWebsiteUrl: z.string().url().or(z.literal('')).nullable().optional(),
+    jugglingEdgeUrl: z.string().url().or(z.literal('')).nullable().optional(),
     imageUrl: z.string().nullable().optional(),
     // Caractéristiques booléennes
     hasFoodTrucks: z.boolean().optional(),
@@ -176,6 +177,7 @@ export default wrapApiHandler(
         facebookUrl: validatedData.edition.facebookUrl || null,
         instagramUrl: validatedData.edition.instagramUrl || null,
         officialWebsiteUrl: validatedData.edition.officialWebsiteUrl || null,
+        jugglingEdgeUrl: validatedData.edition.jugglingEdgeUrl || null,
         // imageUrl sera mis à jour après téléchargement
         imageUrl: null,
         // Caractéristiques

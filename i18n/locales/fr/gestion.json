@@ -1,5 +1,26 @@
 {
   "gestion": {
+    "ai_update": {
+      "apply_selected": "Appliquer {count} modification(s)",
+      "current_value": "Valeur actuelle",
+      "description": "Rechercher des mises à jour via l'IA depuis les liens externes",
+      "differences_found": "{count} différence(s) détectée(s)",
+      "external_links": "Liens externes à analyser",
+      "launch_search": "Lancer la recherche",
+      "link_ticketing": "Billetterie",
+      "link_website": "Site officiel",
+      "new_value": "Nouvelle valeur",
+      "no_differences": "Aucune mise à jour détectée. Les informations sont à jour.",
+      "no_external_links": "Aucun lien externe configuré",
+      "no_external_links_description": "Ajoutez des liens externes (site officiel, Facebook, etc.) sur la page Liens externes pour utiliser cette fonctionnalité.",
+      "page_description": "Analysez les liens externes de cette édition pour détecter des mises à jour d'informations via l'intelligence artificielle.",
+      "results_title": "Résultats de l'analyse",
+      "search_error": "Erreur lors de la recherche",
+      "search_updates": "Recherche de mises à jour",
+      "search_updates_description": "L'IA va analyser les liens sélectionnés et comparer les informations trouvées avec les données actuelles de l'édition.",
+      "title": "Mise à jour IA",
+      "updates_applied": "Mises à jour appliquées avec succès"
+    },
     "about": {
       "description": "Modifiez l'affiche, la description et le programme de votre événement.",
       "save": "Enregistrer",

@@ -165,9 +165,16 @@
                 {{ (convention as any)._count?.editions || 0 }}
                 {{ $t('admin.editions').toLowerCase() }}
               </UBadge>
-              <UBadge color="neutral" variant="soft" size="md">
-                {{ (convention as any)._count?.organizers || 0 }}
-                {{ $t('admin.organizers').toLowerCase() }}
+              <UBadge
+                :color="(convention as any)._count?.organizers > 0 ? 'neutral' : 'warning'"
+                variant="soft"
+                size="md"
+              >
+                {{
+                  (convention as any)._count?.organizers > 0
+                    ? `${(convention as any)._count.organizers} ${$t('admin.organizers').toLowerCase()}`
+                    : $t('admin.unclaimed')
+                }}
               </UBadge>
               <UDropdownMenu
                 :items="[
@@ -507,6 +514,7 @@ const archivedFilterOptions = computed(() => [
   { label: t('admin.filter_all_conventions'), value: 'all' },
   { label: t('admin.filter_active_conventions'), value: 'active' },
   { label: t('admin.filter_archived_conventions'), value: 'archived' },
+  { label: t('admin.filter_unclaimed_conventions'), value: 'unclaimed' },
 ])
 
 // Options de tri
@@ -545,11 +553,13 @@ const filteredConventions = computed(() => {
 
   let filtered = data.value.conventions
 
-  // Filtre par statut archivé
+  // Filtre par statut
   if (archivedFilter.value === 'active') {
     filtered = filtered.filter((conv) => !(conv as any).isArchived)
   } else if (archivedFilter.value === 'archived') {
     filtered = filtered.filter((conv) => (conv as any).isArchived)
+  } else if (archivedFilter.value === 'unclaimed') {
+    filtered = filtered.filter((conv) => (conv as any)._count?.organizers === 0)
   }
 
   // Filtre par recherche (avec debounce)

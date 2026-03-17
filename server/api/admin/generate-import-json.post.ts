@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
 import {
-  COMMON_RULES_FULL,
   generateCompactDirectPrompt,
   generateFeaturesDescription,
   generateJsonExample,
   PROMPT_COMPLETE_PREFILLED_JSON,
 } from '../../lib/import-json-schema'
+import { loadPrompt } from '../../lib/prompt-loader'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
@@ -62,18 +62,11 @@ export interface GenerateImportResult {
 
 // Génère le prompt système complet pour Anthropic (modèles avec grand contexte)
 function getFullSystemPrompt(): string {
-  return `Tu extrais les informations d'une convention de jonglerie depuis des pages web.
-
-RÈGLES IMPORTANTES:
-${COMMON_RULES_FULL}
-
-CARACTÉRISTIQUES À DÉTECTER (mettre true si mentionné):
-${generateFeaturesDescription()}
-
-STRUCTURE JSON ATTENDUE:
-${generateJsonExample()}
-
-Réponds UNIQUEMENT avec le JSON, sans texte autour.`
+  return loadPrompt('direct-full', {
+    RULES_FULL: loadPrompt('rules-full'),
+    FEATURES_DESCRIPTION: generateFeaturesDescription(),
+    JSON_EXAMPLE: generateJsonExample(),
+  })
 }
 
 /**

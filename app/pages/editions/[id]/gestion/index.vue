@@ -107,6 +107,16 @@
                 color="blue"
               />
 
+              <!-- Mise à jour IA (conventions non revendiquées) -->
+              <ManagementNavigationCard
+                v-if="isUnclaimedConvention"
+                :to="`/editions/${edition.id}/gestion/ai-update`"
+                icon="i-lucide-sparkles"
+                :title="$t('gestion.ai_update.title')"
+                :description="$t('gestion.ai_update.description')"
+                color="yellow"
+              />
+
               <!-- Fonctionnalités -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/features`"
@@ -559,6 +569,11 @@ const canAccess = computed(() => {
 const canEdit = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canEditEdition(edition.value, authStore.user.id)
+})
+
+const isUnclaimedConvention = computed(() => {
+  if (!edition.value?.convention) return false
+  return !edition.value.convention.organizers || edition.value.convention.organizers.length === 0
 })
 
 const canDelete = computed(() => {

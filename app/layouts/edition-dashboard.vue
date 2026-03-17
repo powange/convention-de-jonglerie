@@ -138,7 +138,8 @@ const getCurrentSection = (path: string): string | null => {
     path.includes('/gestion/about') ||
     path.includes('/gestion/external-links') ||
     path.includes('/gestion/general-info') ||
-    path.includes('/gestion/features')
+    path.includes('/gestion/features') ||
+    path.includes('/gestion/ai-update')
   )
     return 'infos'
   return null
@@ -175,6 +176,11 @@ const canManageOrganizers = computed(() => {
 const isOrganizer = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.isOrganizer(edition.value, authStore.user.id)
+})
+
+const isUnclaimedConvention = computed(() => {
+  if (!edition.value?.convention) return false
+  return !edition.value.convention.organizers || edition.value.convention.organizers.length === 0
 })
 
 const _canManageArtists = computed(() => {
@@ -273,6 +279,15 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-lucide-toggle-right',
           to: `/editions/${editionId.value}/gestion/features`,
         },
+        ...(isUnclaimedConvention.value
+          ? [
+              {
+                label: t('gestion.ai_update.title'),
+                icon: 'i-lucide-sparkles',
+                to: `/editions/${editionId.value}/gestion/ai-update`,
+              },
+            ]
+          : []),
       ],
       value: 'infos',
     })

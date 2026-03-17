@@ -469,6 +469,7 @@ const exampleJson = `{
     "facebookUrl": "https://facebook.com/cij2025",
     "instagramUrl": "https://instagram.com/cij2025",
     "officialWebsiteUrl": "https://www.cij2025.fr",
+    "jugglingEdgeUrl": "https://www.jugglingedge.com/event.php?EventID=1234",
     "status": "PUBLISHED",
     "hasFoodTrucks": true,
     "hasKidsZone": true,

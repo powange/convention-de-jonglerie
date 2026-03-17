@@ -40,6 +40,7 @@ export default wrapApiHandler(
       officialWebsiteUrl,
       facebookUrl,
       instagramUrl,
+      jugglingEdgeUrl,
       hasFoodTrucks,
       hasKidsZone,
       acceptsPets,
@@ -140,6 +141,7 @@ export default wrapApiHandler(
     if (officialWebsiteUrl !== undefined) updatedData.officialWebsiteUrl = officialWebsiteUrl
     if (facebookUrl !== undefined) updatedData.facebookUrl = facebookUrl
     if (instagramUrl !== undefined) updatedData.instagramUrl = instagramUrl
+    if (jugglingEdgeUrl !== undefined) updatedData.jugglingEdgeUrl = jugglingEdgeUrl
     if (hasFoodTrucks !== undefined) updatedData.hasFoodTrucks = hasFoodTrucks
     if (hasKidsZone !== undefined) updatedData.hasKidsZone = hasKidsZone
     if (acceptsPets !== undefined) updatedData.acceptsPets = acceptsPets

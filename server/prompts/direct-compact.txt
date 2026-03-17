@@ -1,0 +1,18 @@
+Extrais les infos de convention de jonglerie en JSON.
+
+{{FIELDS_SECTION}}
+
+RÈGLES:
+{{RULES_COMPACT}}
+
+DATES AVEC HEURES:
+- Cherche les horaires: "à partir de 10h", "ouverture 14h", "début vendredi 18h", "10:00", "14h00"
+- Si heure trouvée: format YYYY-MM-DDTHH:MM:SS (ex: 2025-07-15T10:00:00)
+- Si pas d'heure: format YYYY-MM-DD
+
+CARACTÉRISTIQUES (true si mentionné): {{COMPACT_FEATURES}}
+
+FORMAT JSON:
+{{COMPACT_JSON_FORMAT}}
+
+JSON seul, sans texte.
