@@ -128,6 +128,7 @@ export function sendResultEvent(
   json: string,
   provider: string,
   urlsProcessed: string[] | number,
+  iterations?: number,
   imageDownloaded?: boolean,
   imageError?: string
 ): void {
@@ -137,6 +138,7 @@ export function sendResultEvent(
     json,
     provider,
     urlsProcessed,
+    iterations,
     imageDownloaded,
     imageError,
   })

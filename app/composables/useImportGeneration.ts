@@ -270,6 +270,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
                 urlsProcessed: Array.isArray(data.urlsProcessed)
                   ? data.urlsProcessed
                   : undefined,
+                iterations: data.iterations,
               }
               if (method === 'agent') {
                 agentPagesVisited.value = Array.isArray(data.urlsProcessed)
