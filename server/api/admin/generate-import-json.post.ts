@@ -359,6 +359,28 @@ export async function generateImportJson(
       }
     }
 
+    // Post-traitement: Réinjecter les données Facebook fiables (description, dates, timezone)
+    // L'IA peut tronquer ou modifier ces champs — les données Facebook sont la source de vérité
+    if (prefilledJson) {
+      if (!parsedJson.edition) parsedJson.edition = {}
+      const fb = prefilledJson.edition
+
+      // Description complète (l'IA la tronque souvent)
+      if (fb.description) {
+        parsedJson.edition.description = fb.description
+      }
+
+      // Dates et heures (Facebook fournit des dates précises avec heures)
+      if (fb.startDate) parsedJson.edition.startDate = fb.startDate
+      if (fb.endDate) parsedJson.edition.endDate = fb.endDate
+
+      // Timezone
+      if (fb.timezone) parsedJson.edition.timezone = fb.timezone
+
+      generatedJson = JSON.stringify(parsedJson, null, 2)
+      console.log('[GENERATE-IMPORT] Données Facebook réinjectées (description, dates, timezone)')
+    }
+
     const description = parsedJson.edition?.description || ''
 
     if (description && description.length >= 50) {

@@ -128,7 +128,7 @@ export function facebookEventToImportJson(fbEvent: FacebookScraperResult): Faceb
 
   // Description
   if (fbEvent.description) {
-    json.edition.description = fbEvent.description.substring(0, 2000)
+    json.edition.description = fbEvent.description
   }
 
   // Dates depuis les timestamps (le scraper retourne des timestamps en secondes)
