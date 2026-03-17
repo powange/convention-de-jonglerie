@@ -4,7 +4,7 @@ describe('Page /editions/[id]/carpool', () => {
   it('smoke: devrait pouvoir importer le composant sans erreur', async () => {
     // Test simple : vérifier que le composant peut être importé
     // Le rendu complet est lent (~2s) et sera couvert par les tests e2e
-    const modulePath = '../../../app/pages/editions/[id]/carpool.vue'
+    const modulePath = '../../../app/pages/editions/[id]/carpool/index.vue'
     const module = await import(modulePath)
 
     expect(module.default).toBeDefined()

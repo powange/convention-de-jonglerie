@@ -69,9 +69,12 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       tripDate: new Date('2024-07-15T08:00:00Z'),
       locationCity: 'Lyon',
       seatsNeeded: 2,
+      direction: undefined,
       description: 'Cherche covoiturage',
-      phoneNumber: '0123456789',
+      hasPhoneNumber: true,
+      phoneNumber: null, // Non authentifié -> masqué
       createdAt: new Date('2024-01-01'),
+      updatedAt: undefined,
       user: {
         id: 1,
         pseudo: 'passenger1',
@@ -82,10 +85,9 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       comments: [
         {
           id: 1,
-          carpoolRequestId: 1,
-          userId: 2,
           content: 'Je peux te prendre !',
           createdAt: new Date('2024-01-02'),
+          updatedAt: undefined,
           user: {
             id: 2,
             pseudo: 'driver1',

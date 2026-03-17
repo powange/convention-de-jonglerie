@@ -1,321 +1,156 @@
 <template>
-  <UCard
-    :ref="highlighted ? 'highlightedCard' : undefined"
-    :class="highlighted ? 'ring-2 ring-primary-500 shadow-lg' : ''"
-  >
-    <div class="space-y-4">
-      <!-- En-tête avec les infos utilisateur -->
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <UiUserDisplay :user="offer.user" :datetime="offer.createdAt" size="lg" />
-        </div>
-
-        <!-- Boutons d'action pour le créateur -->
-        <div v-if="canEdit" class="flex gap-1">
-          <UButton
-            icon="i-heroicons-pencil"
-            size="xs"
-            color="warning"
-            variant="ghost"
-            :title="$t('components.carpool.edit_offer')"
-            @click="emit('edit')"
-          />
-          <UButton
-            icon="i-heroicons-trash"
-            size="xs"
-            color="error"
-            variant="ghost"
-            :title="$t('components.carpool.delete_offer')"
-            @click="handleDelete"
-          />
-        </div>
-        <div class="text-right">
-          <UBadge :color="remainingSeats > 0 ? 'primary' : 'neutral'" variant="soft" class="mb-2">
-            {{ $t('components.carpool.seats_available', { count: remainingSeats }) }}
-          </UBadge>
-          <div class="text-sm">
-            <div class="flex items-center gap-1 justify-end mb-1">
-              <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ formatDate(offer.tripDate) }}</span>
-            </div>
-            <div class="flex items-center gap-1 justify-end mb-1">
-              <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ offer.locationCity }}</span>
-            </div>
-            <div class="flex items-center gap-1 justify-end">
-              <UIcon
-                :name="
-                  offer.direction === 'TO_EVENT'
-                    ? 'i-heroicons-arrow-right'
-                    : 'i-heroicons-arrow-left'
-                "
-                class="text-gray-400 w-4 h-4"
-              />
-              <span class="text-sm font-medium">{{
-                offer.direction === 'TO_EVENT'
-                  ? $t('carpool.direction.to_event')
-                  : $t('carpool.direction.from_event')
-              }}</span>
-            </div>
+  <NuxtLink :to="`/editions/${editionId}/carpool/offers/${offer.id}`" class="block">
+    <UCard
+      :ref="highlighted ? 'highlightedCard' : undefined"
+      :class="[
+        highlighted ? 'ring-2 ring-primary-500 shadow-lg' : '',
+        'hover:shadow-md transition-shadow cursor-pointer',
+      ]"
+    >
+      <div class="space-y-4">
+        <!-- En-tête avec les infos utilisateur -->
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <UiUserDisplay :user="offer.user" :datetime="offer.createdAt" size="lg" />
           </div>
-        </div>
-      </div>
 
-      <!-- Détails du trajet -->
-      <div class="space-y-2">
-        <div class="flex items-center gap-2">
-          <UIcon name="i-heroicons-map" class="text-gray-400" />
-          <span class="font-medium">{{ $t('components.carpool.address') }} :</span>
-          <span>{{ offer.locationAddress }}</span>
-        </div>
-
-        <div v-if="authStore.isAuthenticated && offer.phoneNumber" class="flex items-center gap-2">
-          <UIcon name="i-heroicons-phone" class="text-gray-400" />
-          <span class="font-medium">{{ $t('components.carpool.contact') }} :</span>
-          <span>{{ offer.phoneNumber }}</span>
-        </div>
-      </div>
-
-      <!-- Description -->
-      <p v-if="offer.description" class="text-sm text-gray-600 dark:text-gray-400">
-        {{ offer.description }}
-      </p>
-
-      <!-- Préférences -->
-      <div class="flex flex-wrap gap-2">
-        <UBadge
-          v-if="offer.smokingAllowed"
-          color="neutral"
-          variant="soft"
-          class="flex items-center gap-1"
-        >
-          <UIcon name="i-heroicons-no-symbol" class="w-4 h-4" />
-          {{ $t('carpool.smoking_allowed') }}
-        </UBadge>
-        <UBadge
-          v-if="offer.petsAllowed"
-          color="neutral"
-          variant="soft"
-          class="flex items-center gap-1"
-        >
-          <UIcon name="i-heroicons-heart" class="w-4 h-4" />
-          {{ $t('carpool.pets_allowed') }}
-        </UBadge>
-        <UBadge
-          v-if="offer.musicAllowed"
-          color="neutral"
-          variant="soft"
-          class="flex items-center gap-1"
-        >
-          <UIcon name="i-heroicons-musical-note" class="w-4 h-4" />
-          {{ $t('carpool.music_allowed') }}
-        </UBadge>
-      </div>
-
-      <!-- Ma réservation (pour l'utilisateur connecté non propriétaire) -->
-      <div
-        v-if="authStore.isAuthenticated && !canEdit && myBooking"
-        class="border rounded p-3 bg-gray-50 dark:bg-gray-900/30"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-ticket" class="text-primary-500" />
-            <span class="font-medium">{{ $t('components.carpool.my_booking') }}</span>
-          </div>
-          <UBadge
-            :color="
-              myBooking.status === 'ACCEPTED'
-                ? 'success'
-                : myBooking.status === 'REJECTED'
-                  ? 'error'
-                  : myBooking.status === 'CANCELLED'
-                    ? 'neutral'
-                    : 'warning'
-            "
-            variant="soft"
-            >{{ bookingStatusLabel }}</UBadge
-          >
-        </div>
-        <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
-          {{ $t('components.carpool.requested_seats', { count: myBooking.seats }) }}
-        </div>
-        <div v-if="myBooking.message" class="mt-2 text-sm text-gray-600 dark:text-gray-400 italic">
-          "{{ myBooking.message }}"
-        </div>
-        <div
-          v-if="myBooking.status === 'PENDING' || myBooking.status === 'ACCEPTED'"
-          class="mt-2 text-right"
-        >
-          <UButton
-            size="xs"
-            color="error"
-            variant="soft"
-            :loading="isCancelling"
-            @click="cancelMyBooking"
-            >{{ $t('common.cancel') }}</UButton
-          >
-        </div>
-      </div>
-
-      <!-- Réservations acceptées -->
-      <div v-if="acceptedBookings.length > 0" class="space-y-2">
-        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {{ $t('components.carpool.confirmed_passengers') }} :
-        </h4>
-        <div class="flex flex-wrap gap-2">
-          <div
-            v-for="b in acceptedBookings"
-            :key="b.id"
-            class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full text-sm"
-          >
-            <UiUserDisplay :user="b.requester" :datetime="b.createdAt" size="xs" />
-            <UBadge color="success" variant="soft">+{{ b.seats }}</UBadge>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section commentaires -->
-      <div class="pt-4">
-        <div
-          class="flex items-center"
-          :class="authStore.isAuthenticated && !canEdit ? 'justify-between' : 'justify-end'"
-        >
-          <div v-if="authStore.isAuthenticated && !canEdit" class="flex gap-2">
+          <!-- Boutons d'action pour le créateur -->
+          <div v-if="canEdit" class="flex gap-1">
             <UButton
-              :disabled="remainingSeats <= 0"
-              color="primary"
-              icon="i-heroicons-ticket"
-              size="sm"
-              @click="showBookingModal = true"
-            >
-              {{ $t('components.carpool.book_seats') }}
-            </UButton>
+              icon="i-heroicons-pencil"
+              size="xs"
+              color="warning"
+              variant="ghost"
+              :title="$t('components.carpool.edit_offer')"
+              @click.stop="emit('edit')"
+            />
+            <UButton
+              icon="i-heroicons-trash"
+              size="xs"
+              color="error"
+              variant="ghost"
+              :title="$t('components.carpool.delete_offer')"
+              @click.stop="handleDelete"
+            />
           </div>
-          <!-- Modal des commentaires -->
-          <EditionCarpoolCommentsModal
-            :id="offer.id"
-            type="offer"
-            @comment-added="emit('comment-added')"
-          />
-        </div>
-      </div>
-
-      <!-- Réservations en attente (visible au propriétaire) -->
-      <div v-if="canEdit" class="pt-2">
-        <EditionCarpoolBookingsList :offer-id="offer.id" @updated="emit('passenger-added')" />
-      </div>
-
-      <!-- Modal de réservation -->
-      <UModal v-model:open="showBookingModal" :title="$t('components.carpool.book_seats')">
-        <template #body>
-          <div class="space-y-4">
-            <UFormField :label="$t('components.carpool.how_many_seats_needed')">
-              <div class="flex gap-2">
-                <UButton
-                  v-for="n in Math.min(8, Math.max(1, remainingSeats))"
-                  :key="n"
-                  :color="bookingSeats === n ? 'primary' : 'neutral'"
-                  :variant="bookingSeats === n ? 'solid' : 'outline'"
-                  size="sm"
-                  @click="bookingSeats = n"
-                >
-                  <UIcon name="i-heroicons-user" />
-                  {{ n }}
-                </UButton>
+          <div class="text-right">
+            <UBadge :color="remainingSeats > 0 ? 'primary' : 'neutral'" variant="soft" class="mb-2">
+              {{ $t('components.carpool.seats_available', { count: remainingSeats }) }}
+            </UBadge>
+            <div class="text-sm">
+              <div class="flex items-center gap-1 justify-end mb-1">
+                <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
+                <span class="font-medium">{{ formatDate(offer.tripDate) }}</span>
               </div>
-            </UFormField>
-            <UFormField :label="$t('components.carpool.booking_message')">
-              <UTextarea
-                v-model="bookingMessage"
-                :placeholder="$t('components.carpool.booking_message_placeholder')"
-                :rows="3"
-                class="w-full"
-              />
-            </UFormField>
-            <div class="flex justify-end gap-2">
-              <UButton variant="ghost" @click="showBookingModal = false">{{
-                $t('common.cancel')
-              }}</UButton>
-              <UButton
-                color="primary"
-                :disabled="isBooking || bookingSeats < 1"
-                @click="submitBooking"
-                >{{
-                  isBooking
-                    ? $t('forms.buttons.submitting')
-                    : $t('components.carpool.confirm_booking')
-                }}</UButton
-              >
+              <div class="flex items-center gap-1 justify-end mb-1">
+                <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
+                <span class="font-medium">{{ offer.locationCity }}</span>
+              </div>
+              <div class="flex items-center gap-1 justify-end">
+                <UIcon
+                  :name="
+                    offer.direction === 'TO_EVENT'
+                      ? 'i-heroicons-arrow-right'
+                      : 'i-heroicons-arrow-left'
+                  "
+                  class="text-gray-400 w-4 h-4"
+                />
+                <span class="text-sm font-medium">{{
+                  offer.direction === 'TO_EVENT'
+                    ? $t('carpool.direction.to_event')
+                    : $t('carpool.direction.from_event')
+                }}</span>
+              </div>
             </div>
           </div>
-        </template>
-      </UModal>
-    </div>
-  </UCard>
+        </div>
+
+        <!-- Détails du trajet -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-map" class="text-gray-400" />
+            <span class="font-medium">{{ $t('components.carpool.address') }} :</span>
+            <span>{{ offer.locationAddress }}</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p v-if="offer.description" class="text-sm text-gray-600 dark:text-gray-400">
+          {{ offer.description }}
+        </p>
+
+        <!-- Préférences -->
+        <div class="flex flex-wrap gap-2">
+          <UBadge
+            v-if="offer.smokingAllowed"
+            color="neutral"
+            variant="soft"
+            class="flex items-center gap-1"
+          >
+            <UIcon name="i-heroicons-no-symbol" class="w-4 h-4" />
+            {{ $t('carpool.smoking_allowed') }}
+          </UBadge>
+          <UBadge
+            v-if="offer.petsAllowed"
+            color="neutral"
+            variant="soft"
+            class="flex items-center gap-1"
+          >
+            <UIcon name="i-heroicons-heart" class="w-4 h-4" />
+            {{ $t('carpool.pets_allowed') }}
+          </UBadge>
+          <UBadge
+            v-if="offer.musicAllowed"
+            color="neutral"
+            variant="soft"
+            class="flex items-center gap-1"
+          >
+            <UIcon name="i-heroicons-musical-note" class="w-4 h-4" />
+            {{ $t('carpool.music_allowed') }}
+          </UBadge>
+        </div>
+
+        <!-- Réservations acceptées (résumé) -->
+        <div v-if="acceptedBookings.length > 0" class="space-y-2">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $t('components.carpool.confirmed_passengers') }} :
+          </h4>
+          <div class="flex flex-wrap gap-2">
+            <div
+              v-for="b in acceptedBookings"
+              :key="b.id"
+              class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full text-sm"
+            >
+              <UiUserDisplay :user="b.requester" :datetime="b.createdAt" size="xs" />
+              <UBadge color="success" variant="soft">+{{ b.seats }}</UBadge>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nombre de commentaires -->
+        <div v-if="offer.comments && offer.comments.length > 0" class="pt-2">
+          <div class="flex items-center gap-1 text-sm text-gray-500">
+            <UIcon name="i-heroicons-chat-bubble-left" class="w-4 h-4" />
+            {{ $t('components.carpool.view_comments', { count: offer.comments.length }) }}
+          </div>
+        </div>
+      </div>
+    </UCard>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
-
-// Auto-imported: EditionCarpoolBookingsList, EditionCarpoolCommentsModal
-
-interface CarpoolOffer {
-  id: number
-  tripDate: string
-  locationCity: string
-  locationAddress: string
-  availableSeats: number
-  direction: 'TO_EVENT' | 'FROM_EVENT'
-  remainingSeats?: number
-  description?: string
-  phoneNumber?: string
-  smokingAllowed?: boolean
-  petsAllowed?: boolean
-  musicAllowed?: boolean
-  createdAt: string
-  user: {
-    id: number
-    pseudo: string
-    emailHash: string
-    profilePicture?: string | null
-    updatedAt?: string
-  }
-  bookings?: Array<{
-    id: number
-    seats: number
-    status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED'
-    createdAt: string
-    requester: {
-      id: number
-      pseudo: string
-      emailHash: string
-      profilePicture?: string | null
-      updatedAt?: string
-    }
-  }>
-  comments?: Array<{
-    id: number
-    content: string
-    createdAt: string
-    user: {
-      id: number
-      pseudo: string
-      emailHash: string
-      profilePicture?: string | null
-      updatedAt?: string
-    }
-  }>
-}
+import type { CarpoolOffer } from '~/types/carpool'
 
 interface Props {
   offer: CarpoolOffer
+  editionId: number
   highlighted?: boolean
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  'comment-added': []
-  'passenger-added': []
   edit: []
   deleted: []
 }>()
@@ -384,80 +219,4 @@ const handleDelete = () => {
 const acceptedBookings = computed(() =>
   (props.offer.bookings || []).filter((b) => b.status === 'ACCEPTED')
 )
-
-// Ma réservation sur cette offre (dernier en date si plusieurs)
-const myBookings = ref<
-  Array<{ id: number; seats: number; status: string; message?: string; createdAt: string }>
->([])
-const myBooking = computed(() => {
-  if (!myBookings.value.length) return null as any
-  return [...myBookings.value].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )[0]
-})
-
-const bookingStatusLabel = computed(() => {
-  if (!myBooking.value) return ''
-  const statusKey = myBooking.value.status.toLowerCase()
-  return t(`components.carpool.status.${statusKey}`)
-})
-
-const loadMyBookings = async () => {
-  if (!authStore.isAuthenticated || canEdit.value) return // pas pour le propriétaire
-  try {
-    const data = await $fetch(`/api/carpool-offers/${props.offer.id}/bookings`)
-    // L'API renvoie déjà seulement mes réservations si je ne suis pas propriétaire
-    myBookings.value = Array.isArray(data) ? data : []
-  } catch {
-    // silencieux
-  }
-}
-
-onMounted(loadMyBookings)
-watch(
-  () => authStore.isAuthenticated,
-  () => loadMyBookings()
-)
-
-// Réservation
-const showBookingModal = ref(false)
-const bookingSeats = ref(1)
-const bookingMessage = ref('')
-
-const { execute: submitBooking, loading: isBooking } = useApiAction(
-  () => `/api/carpool-offers/${props.offer.id}/bookings`,
-  {
-    method: 'POST',
-    body: () => ({
-      seats: bookingSeats.value,
-      message: bookingMessage.value.trim() || undefined,
-    }),
-    successMessage: {
-      title: t('messages.booking_requested'),
-      description: t('messages.booking_requested_successfully'),
-    },
-    errorMessages: { default: t('errors.generic_error') },
-    onSuccess: () => {
-      showBookingModal.value = false
-      bookingMessage.value = ''
-      loadMyBookings()
-    },
-  }
-)
-
-const { execute: executeCancelBooking, loading: isCancelling } = useApiAction(
-  () => `/api/carpool-offers/${props.offer.id}/bookings/${myBooking.value?.id}`,
-  {
-    method: 'PUT',
-    body: () => ({ action: 'CANCEL' }),
-    successMessage: { title: t('messages.booking_cancelled') },
-    errorMessages: { default: t('errors.generic_error') },
-    onSuccess: () => loadMyBookings(),
-  }
-)
-
-const cancelMyBooking = () => {
-  if (!myBooking.value) return
-  executeCancelBooking()
-}
 </script>

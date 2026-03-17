@@ -15,8 +15,16 @@
       "Read(//root/projets/convention-de-jonglerie/**)",
       "Bash(docker compose:*)",
       "Bash(mkdir -p /root/projets/convention-de-jonglerie/server/lib)",
-      "Bash(mv /root/projets/convention-de-jonglerie/server/utils/import-json-schema.ts /root/projets/convention-de-jonglerie/server/lib/import-json-schema.ts)"
+      "Bash(mv /root/projets/convention-de-jonglerie/server/utils/import-json-schema.ts /root/projets/convention-de-jonglerie/server/lib/import-json-schema.ts)",
+      "Bash(mkdir -p \"app/pages/editions/[id]/carpool/offers\" \"app/pages/editions/[id]/carpool/requests\")",
+      "Bash(mv \"app/pages/editions/[id]/carpool.vue\" \"app/pages/editions/[id]/carpool/index.vue\")",
+      "Bash(export PATH=\"/root/.nvm/versions/node/v24.14.0/bin:$PATH\")",
+      "Bash(export PATH=\"/root/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH\")",
+      "Bash(git -C /root/projets/convention-de-jonglerie log --oneline -1)"
     ],
-    "additionalDirectories": ["/tmp", "/root/projets/convention-de-jonglerie/.claude/commands"]
+    "additionalDirectories": [
+      "/tmp",
+      "/root/projets/convention-de-jonglerie/.claude/commands"
+    ]
   }
 }

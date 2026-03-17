@@ -1,141 +1,91 @@
 <template>
-  <UCard>
-    <div class="space-y-4">
-      <!-- En-tête avec les infos utilisateur -->
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <UiUserDisplay :user="request.user" :datetime="request.createdAt" size="lg" />
-        </div>
+  <NuxtLink :to="`/editions/${editionId}/carpool/requests/${request.id}`" class="block">
+    <UCard class="hover:shadow-md transition-shadow cursor-pointer">
+      <div class="space-y-4">
+        <!-- En-tête avec les infos utilisateur -->
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <UiUserDisplay :user="request.user" :datetime="request.createdAt" size="lg" />
+          </div>
 
-        <!-- Boutons d'action pour le créateur -->
-        <div v-if="canEdit" class="flex gap-1">
-          <UButton
-            icon="i-heroicons-pencil"
-            size="xs"
-            color="warning"
-            variant="ghost"
-            :title="$t('components.carpool.edit_request')"
-            @click="emit('edit')"
-          />
-          <UButton
-            icon="i-heroicons-trash"
-            size="xs"
-            color="error"
-            variant="ghost"
-            :title="$t('components.carpool.delete_request')"
-            @click="handleDelete"
-          />
-        </div>
-        <div class="text-right">
-          <UBadge color="warning" variant="soft" class="mb-2">
-            {{ $t('components.carpool.seats_needed', { count: request.seatsNeeded }) }}
-          </UBadge>
-          <div class="text-sm">
-            <div class="flex items-center gap-1 justify-end mb-1">
-              <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ formatTripDate(request.tripDate) }}</span>
-            </div>
-            <div class="flex items-center gap-1 justify-end mb-1">
-              <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ request.locationCity }}</span>
-            </div>
-            <div class="flex items-center gap-1 justify-end">
-              <UIcon
-                :name="
+          <!-- Boutons d'action pour le créateur -->
+          <div v-if="canEdit" class="flex gap-1">
+            <UButton
+              icon="i-heroicons-pencil"
+              size="xs"
+              color="warning"
+              variant="ghost"
+              :title="$t('components.carpool.edit_request')"
+              @click.stop="emit('edit')"
+            />
+            <UButton
+              icon="i-heroicons-trash"
+              size="xs"
+              color="error"
+              variant="ghost"
+              :title="$t('components.carpool.delete_request')"
+              @click.stop="handleDelete"
+            />
+          </div>
+          <div class="text-right">
+            <UBadge color="warning" variant="soft" class="mb-2">
+              {{ $t('components.carpool.seats_needed', { count: request.seatsNeeded }) }}
+            </UBadge>
+            <div class="text-sm">
+              <div class="flex items-center gap-1 justify-end mb-1">
+                <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
+                <span class="font-medium">{{ formatTripDate(request.tripDate) }}</span>
+              </div>
+              <div class="flex items-center gap-1 justify-end mb-1">
+                <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
+                <span class="font-medium">{{ request.locationCity }}</span>
+              </div>
+              <div class="flex items-center gap-1 justify-end">
+                <UIcon
+                  :name="
+                    request.direction === 'TO_EVENT'
+                      ? 'i-heroicons-arrow-right'
+                      : 'i-heroicons-arrow-left'
+                  "
+                  class="text-gray-400 w-4 h-4"
+                />
+                <span class="text-sm font-medium">{{
                   request.direction === 'TO_EVENT'
-                    ? 'i-heroicons-arrow-right'
-                    : 'i-heroicons-arrow-left'
-                "
-                class="text-gray-400 w-4 h-4"
-              />
-              <span class="text-sm font-medium">{{
-                request.direction === 'TO_EVENT'
-                  ? $t('carpool.direction.to_event')
-                  : $t('carpool.direction.from_event')
-              }}</span>
+                    ? $t('carpool.direction.to_event')
+                    : $t('carpool.direction.from_event')
+                }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Détails de la demande -->
-      <div class="space-y-2">
-        <div
-          v-if="authStore.isAuthenticated && request.phoneNumber"
-          class="flex items-center gap-2"
-        >
-          <UIcon name="i-heroicons-phone" class="text-gray-400" />
-          <span class="font-medium">{{ $t('components.carpool.contact') }} :</span>
-          <span>{{ request.phoneNumber }}</span>
+        <!-- Description -->
+        <p v-if="request.description" class="text-sm text-gray-600">{{ request.description }}</p>
+
+        <!-- Section commentaires -->
+        <div class="pt-4">
+          <div class="flex items-center justify-between">
+            <!-- Modal des commentaires -->
+            <EditionCarpoolCommentsModal
+              :id="request.id"
+              type="request"
+              @comment-added="emit('comment-added')"
+            />
+          </div>
         </div>
       </div>
-
-      <!-- Description -->
-      <p v-if="request.description" class="text-sm text-gray-600">{{ request.description }}</p>
-
-      <!-- Bouton de contact -->
-      <div v-if="authStore.isAuthenticated && request.phoneNumber" class="pt-2">
-        <UButton
-          size="sm"
-          variant="soft"
-          icon="i-heroicons-chat-bubble-left-right"
-          :href="`tel:${request.phoneNumber}`"
-        >
-          {{ $t('components.carpool.contact_user', { name: request.user.pseudo }) }}
-        </UButton>
-      </div>
-
-      <!-- Section commentaires -->
-      <div class="pt-4">
-        <div class="flex items-center justify-between">
-          <!-- Modal des commentaires -->
-          <EditionCarpoolCommentsModal
-            :id="request.id"
-            type="request"
-            @comment-added="emit('comment-added')"
-          />
-        </div>
-      </div>
-    </div>
-  </UCard>
+    </UCard>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import type { CarpoolRequest } from '~/types/carpool'
 import { formatDate } from '~/utils/date'
-
-// Auto-imported: EditionCarpoolCommentsModal
-
-interface CarpoolRequest {
-  id: number
-  tripDate: string
-  locationCity: string
-  seatsNeeded: number
-  direction: 'TO_EVENT' | 'FROM_EVENT'
-  description?: string
-  phoneNumber?: string
-  createdAt: string
-  user: {
-    id: number
-    pseudo: string
-    email: string
-  }
-  comments?: Array<{
-    id: number
-    content: string
-    createdAt: string
-    user: {
-      id: number
-      pseudo: string
-      emailHash: string
-      profilePicture?: string | null
-      updatedAt?: string
-    }
-  }>
-}
 
 interface Props {
   request: CarpoolRequest
+  editionId: number
 }
 
 const props = defineProps<Props>()

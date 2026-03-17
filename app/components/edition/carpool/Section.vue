@@ -119,9 +119,8 @@
               v-for="offer in offers"
               :key="offer.id"
               :offer="offer"
+              :edition-id="props.editionId"
               :highlighted="props.highlightOfferId === offer.id"
-              @comment-added="refreshOffers"
-              @passenger-added="refreshOffers"
               @edit="editOffer(offer)"
               @deleted="refreshOffers"
             />
@@ -142,6 +141,7 @@
               v-for="request in requests"
               :key="request.id"
               :request="request"
+              :edition-id="props.editionId"
               @comment-added="refreshRequests"
               @edit="editRequest(request)"
               @deleted="refreshRequests"
@@ -249,19 +249,13 @@ onUnmounted(() => {
 })
 
 const onOfferCreated = () => {
-  console.log('onOfferCreated appelé')
   refreshOffers()
-  // Fermer la modal après succès
   showOfferModal.value = false
-  console.log('Modal fermée:', showOfferModal.value)
 }
 
 const onRequestCreated = () => {
-  console.log('onRequestCreated appelé')
   refreshRequests()
-  // Fermer la modal après succès
   showRequestModal.value = false
-  console.log('Modal fermée:', showRequestModal.value)
 }
 
 // Fonctions pour l'édition

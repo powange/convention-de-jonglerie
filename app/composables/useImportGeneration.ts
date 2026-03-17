@@ -267,9 +267,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
                 success: data.success,
                 json: data.json,
                 provider: data.provider,
-                urlsProcessed: Array.isArray(data.urlsProcessed)
-                  ? data.urlsProcessed
-                  : undefined,
+                urlsProcessed: Array.isArray(data.urlsProcessed) ? data.urlsProcessed : undefined,
                 iterations: data.iterations,
               }
               if (method === 'agent') {

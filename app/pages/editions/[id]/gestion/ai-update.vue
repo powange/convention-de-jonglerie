@@ -511,9 +511,9 @@ const compareResults = (aiData: any) => {
             const localDate = new Date(
               new Date(aiDateStr).toLocaleString('en-US', { timeZone: 'UTC' })
             )
-            const tzOffset = new Date(
-              new Date(aiDateStr).toLocaleString('en-US', { timeZone: tz })
-            ).getTime() - localDate.getTime()
+            const tzOffset =
+              new Date(new Date(aiDateStr).toLocaleString('en-US', { timeZone: tz })).getTime() -
+              localDate.getTime()
             const utcDate = new Date(new Date(aiDateStr).getTime() - tzOffset)
             aiDateStr = utcDate.toISOString()
           } catch {

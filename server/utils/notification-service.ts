@@ -609,7 +609,7 @@ export const NotificationHelpers = {
     })
 
     const actionUrl = offer
-      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      ? `/editions/${offer.editionId}/carpool/offers/${offerId}`
       : `/carpool-offers/${offerId}`
 
     // Choisir la bonne clé selon si il y a un message ou non
@@ -655,7 +655,7 @@ export const NotificationHelpers = {
     })
 
     const actionUrl = offer
-      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      ? `/editions/${offer.editionId}/carpool/offers/${offerId}`
       : `/carpool-offers/${offerId}`
 
     // Note: La date sera formatée côté client selon la locale
@@ -693,7 +693,7 @@ export const NotificationHelpers = {
     })
 
     const actionUrl = offer
-      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      ? `/editions/${offer.editionId}/carpool/offers/${offerId}`
       : `/carpool-offers/${offerId}`
 
     return await NotificationService.create({
@@ -729,7 +729,7 @@ export const NotificationHelpers = {
     })
 
     const actionUrl = offer
-      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      ? `/editions/${offer.editionId}/carpool/offers/${offerId}`
       : `/carpool-offers/${offerId}`
 
     // Note: La date sera formatée côté client selon la locale

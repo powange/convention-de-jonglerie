@@ -30,6 +30,11 @@ const { formatDateTimeRange } = useDateFormat()
 
 const editionId = parseInt(route.params.id as string)
 
+// Rétrocompatibilité : rediriger ?offerId=X vers la page de détail
+if (route.query.offerId) {
+  navigateTo(`/editions/${editionId}/carpool/offers/${route.query.offerId}`, { replace: true })
+}
+
 // Charger l'édition côté serveur ET client pour SSR/SEO
 const {
   data: edition,
