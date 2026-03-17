@@ -432,12 +432,35 @@ async function callAIToCompleteJson(
   additionalContent: string,
   maxContent: number
 ): Promise<string> {
-  // Construire le prompt avec le JSON pré-rempli et les données supplémentaires
-  const prefilledJsonStr = JSON.stringify(prefilledJson, null, 2)
+  // Retirer les champs Facebook fiables du JSON envoyé à l'IA pour économiser des tokens
+  // Ces champs seront réinjectés dans le post-traitement (description, dates, timezone)
+  const lightJson = JSON.parse(JSON.stringify(prefilledJson))
+  const removedFields: string[] = []
+  if (lightJson.edition?.description) {
+    lightJson.edition.description = '(fourni par Facebook, ne pas remplir)'
+    removedFields.push('description')
+  }
+  if (lightJson.edition?.startDate) {
+    removedFields.push('startDate')
+  }
+  if (lightJson.edition?.endDate) {
+    removedFields.push('endDate')
+  }
+  if (lightJson.edition?.timezone) {
+    removedFields.push('timezone')
+  }
+
+  if (removedFields.length > 0) {
+    console.log(
+      `[GENERATE-IMPORT] Champs Facebook retirés du prompt IA: ${removedFields.join(', ')}`
+    )
+  }
+
+  const prefilledJsonStr = JSON.stringify(lightJson, null, 2)
 
   const userPrompt = additionalContent
-    ? `JSON PRÉ-REMPLI (ne modifie pas les champs déjà remplis):\n${prefilledJsonStr}\n\nDONNÉES SUPPLÉMENTAIRES:\n${additionalContent}\n\nComplète le JSON:`
-    : `JSON PRÉ-REMPLI (complète les champs vides):\n${prefilledJsonStr}\n\nComplète le JSON:`
+    ? `JSON PRÉ-REMPLI (ne modifie pas les champs déjà remplis):\n${prefilledJsonStr}\n\nDONNÉES SUPPLÉMENTAIRES:\n${additionalContent}\n\nComplète les champs vides du JSON:`
+    : `JSON PRÉ-REMPLI (complète les champs vides):\n${prefilledJsonStr}\n\nComplète les champs vides du JSON:`
 
   if (aiProvider === 'lmstudio') {
     return await callLMStudioComplete(
