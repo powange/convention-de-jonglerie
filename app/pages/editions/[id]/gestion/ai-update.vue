@@ -201,7 +201,7 @@
                   <p v-else class="text-gray-400 mt-1">-</p>
                 </template>
                 <p v-else class="text-gray-700 dark:text-gray-300 mt-1 break-words">
-                  {{ diff.currentValue || '-' }}
+                  {{ formatDiffValue(diff.field, diff.currentValue) }}
                 </p>
               </div>
               <div class="bg-green-50 dark:bg-green-900/20 rounded p-2">
@@ -218,7 +218,7 @@
                   <p v-else class="text-gray-400 mt-1">-</p>
                 </template>
                 <p v-else class="text-gray-700 dark:text-gray-300 mt-1 break-words">
-                  {{ diff.newValue || '-' }}
+                  {{ formatDiffValue(diff.field, diff.newValue) }}
                 </p>
               </div>
             </div>
@@ -396,8 +396,34 @@ const selectedDifferences = computed(() => differences.value.filter((d) => d.app
 // Labels lisibles pour les champs
 // Champs qui contiennent des URLs d'images
 const IMAGE_FIELDS = ['edition.imageUrl', 'convention.logo']
+const DATE_FIELDS = ['edition.startDate', 'edition.endDate']
 
 const isImageField = (field: string) => IMAGE_FIELDS.includes(field)
+const isDateField = (field: string) => DATE_FIELDS.includes(field)
+
+const formatDiffValue = (field: string, value: string): string => {
+  if (!value) return '-'
+  if (isDateField(field)) {
+    try {
+      const date = new Date(value)
+      if (isNaN(date.getTime())) return value
+      const hasTime = value.includes('T')
+      return date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        ...(hasTime ? { hour: '2-digit', minute: '2-digit' } : {}),
+      })
+    } catch {
+      return value
+    }
+  }
+  if (field === 'edition.description' && value.length > 200) {
+    return value.substring(0, 200) + '...'
+  }
+  return value
+}
 
 const fieldLabels: Record<string, string> = {
   'convention.name': 'Nom de la convention',
