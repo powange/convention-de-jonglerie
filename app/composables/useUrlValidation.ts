@@ -59,7 +59,15 @@ export const useUrlValidation = () => {
    */
   const getHostname = (url: string): string => {
     try {
-      return new URL(url).hostname.replace('www.', '')
+      const parsed = new URL(url)
+      const hostname = parsed.hostname.replace('www.', '')
+
+      if (hostname === 'facebook.com') {
+        if (parsed.pathname.includes('/events/')) return 'facebook.com (event)'
+        return 'facebook.com (page)'
+      }
+
+      return hostname
     } catch {
       return url
     }
