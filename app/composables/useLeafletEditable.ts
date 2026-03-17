@@ -200,14 +200,32 @@ export const useLeafletEditable = (
         editable: editable,
       }).setView(center, zoom)
 
-      // Ajouter le layer de tuiles avec un z-index élevé pour éviter qu'il soit caché
-      tileLayerRef.value = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Couches de tuiles
+      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         zIndex: 1,
         maxZoom: 22,
         maxNativeZoom: 19,
-      }).addTo(leafletMapInstance)
+      })
+
+      const satelliteLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: '© Esri, Maxar, Earthstar Geographics',
+          zIndex: 1,
+          maxZoom: 22,
+          maxNativeZoom: 19,
+        }
+      )
+
+      // Ajouter la couche par défaut et le contrôle de couches
+      osmLayer.addTo(leafletMapInstance)
+      tileLayerRef.value = osmLayer
+
+      L.control
+        .layers({ Plan: osmLayer, Satellite: satelliteLayer }, {}, { position: 'topright' })
+        .addTo(leafletMapInstance)
 
       // S'assurer que le tile pane a le bon z-index
       const tilePane = mapContainer.value.querySelector('.leaflet-tile-pane') as HTMLElement
