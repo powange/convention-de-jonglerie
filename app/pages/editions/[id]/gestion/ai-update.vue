@@ -498,16 +498,38 @@ const compareResults = (aiData: any) => {
       const aiValue = aiData.edition[key]
       if (!aiValue) continue
 
-      // Pour les dates, comparer les timestamps pour éviter les faux positifs de format
+      // Pour les dates, convertir la valeur IA en UTC si elle est en heure locale (sans Z)
+      // puis comparer les timestamps pour éviter les faux positifs
       if (key === 'startDate' || key === 'endDate') {
+        let aiDateStr = String(aiValue)
+
+        // Si la date IA n'a pas de Z (heure locale), la convertir en UTC via le timezone de l'édition
+        if (aiDateStr.includes('T') && !aiDateStr.endsWith('Z')) {
+          const tz = aiData.edition.timezone || ed.timezone || 'UTC'
+          try {
+            // Interpréter la date dans le timezone de l'édition et convertir en ISO UTC
+            const localDate = new Date(
+              new Date(aiDateStr).toLocaleString('en-US', { timeZone: 'UTC' })
+            )
+            const tzOffset = new Date(
+              new Date(aiDateStr).toLocaleString('en-US', { timeZone: tz })
+            ).getTime() - localDate.getTime()
+            const utcDate = new Date(new Date(aiDateStr).getTime() - tzOffset)
+            aiDateStr = utcDate.toISOString()
+          } catch {
+            // Fallback : ajouter Z pour forcer UTC
+            aiDateStr = aiDateStr + 'Z'
+          }
+        }
+
         const currentDate = edValue ? new Date(edValue).getTime() : 0
-        const aiDate = new Date(aiValue).getTime()
+        const aiDate = new Date(aiDateStr).getTime()
         if (!isNaN(aiDate) && currentDate !== aiDate) {
           diffs.push({
             field: `edition.${key}`,
             label: fieldLabels[`edition.${key}`] || key,
             currentValue: String(edValue || ''),
-            newValue: String(aiValue),
+            newValue: aiDateStr,
             apply: !edValue,
           })
         }
