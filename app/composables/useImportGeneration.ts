@@ -267,10 +267,14 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
                 success: data.success,
                 json: data.json,
                 provider: data.provider,
-                urlsProcessed: data.urlsProcessed,
+                urlsProcessed: Array.isArray(data.urlsProcessed)
+                  ? data.urlsProcessed
+                  : undefined,
               }
               if (method === 'agent') {
-                agentPagesVisited.value = data.urlsProcessed?.length || 0
+                agentPagesVisited.value = Array.isArray(data.urlsProcessed)
+                  ? data.urlsProcessed.length
+                  : data.urlsProcessed || 0
               }
               options.onComplete?.(result)
               // Ne pas fermer ici, attendre que le serveur ferme

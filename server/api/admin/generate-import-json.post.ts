@@ -418,7 +418,7 @@ export async function generateImportJson(
     success: true,
     json: finalJson,
     provider: prefilledJson && otherContents.length === 0 ? 'facebook-direct' : aiProvider,
-    urlsProcessed: urls.length,
+    urlsProcessed: urls,
   }
 }
 

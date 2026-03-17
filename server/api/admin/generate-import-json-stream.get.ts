@@ -178,9 +178,7 @@ export default wrapApiHandler(
               result.success,
               result.json,
               result.provider,
-              Array.isArray(result.urlsProcessed)
-                ? result.urlsProcessed.length
-                : result.urlsProcessed
+              result.urlsProcessed
             )
 
             console.log(`[GENERATE-STREAM] Génération terminée: success=${result.success}`)

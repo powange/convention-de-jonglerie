@@ -127,7 +127,7 @@ export function sendResultEvent(
   success: boolean,
   json: string,
   provider: string,
-  urlsProcessed: number,
+  urlsProcessed: string[] | number,
   imageDownloaded?: boolean,
   imageError?: string
 ): void {
