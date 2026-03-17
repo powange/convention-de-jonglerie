@@ -61,9 +61,9 @@ export interface GenerateImportResult {
 // Note: getPrefilledJsonPrompt est importé depuis import-json-schema.ts (partagé ED/EI)
 
 // Génère le prompt système complet pour Anthropic (modèles avec grand contexte)
-async function getFullSystemPrompt(): Promise<string> {
+function getFullSystemPrompt(): string {
   return loadPrompt('direct-full', {
-    RULES_FULL: await loadPrompt('rules-full'),
+    RULES_FULL: loadPrompt('rules-full'),
     FEATURES_DESCRIPTION: generateFeaturesDescription(),
     JSON_EXAMPLE: generateJsonExample(),
   })
@@ -464,7 +464,7 @@ async function callLMStudioComplete(
       body: JSON.stringify({
         model,
         messages: [
-          { role: 'system', content: await getPrefilledJsonPrompt() },
+          { role: 'system', content: getPrefilledJsonPrompt() },
           { role: 'user', content: truncatedPrompt },
         ],
         temperature: 0.3,
@@ -509,7 +509,7 @@ async function callAnthropicComplete(apiKey: string, userPrompt: string): Promis
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 4096,
-    system: await getPrefilledJsonPrompt(),
+    system: getPrefilledJsonPrompt(),
     messages: [{ role: 'user', content: userPrompt }],
   })
 
@@ -541,7 +541,7 @@ async function callOllamaComplete(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model,
-      prompt: `${await getPrefilledJsonPrompt()}\n\n${userPrompt}`,
+      prompt: `${getPrefilledJsonPrompt()}\n\n${userPrompt}`,
       stream: false,
     }),
   })
@@ -622,7 +622,7 @@ async function callLMStudio(
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: await generateCompactDirectPrompt() },
+            { role: 'system', content: generateCompactDirectPrompt() },
             {
               role: 'user',
               content: `Données:\n${truncatedContent}\n\nGénère le JSON:`,
@@ -696,7 +696,7 @@ async function callAnthropic(apiKey: string, content: string): Promise<string> {
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 4096,
-    system: await getFullSystemPrompt(),
+    system: getFullSystemPrompt(),
     messages: [
       {
         role: 'user',
@@ -734,7 +734,7 @@ async function callOllama(baseUrl: string, model: string, content: string): Prom
     },
     body: JSON.stringify({
       model,
-      prompt: `${await getFullSystemPrompt()}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
+      prompt: `${getFullSystemPrompt()}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
       stream: false,
     }),
   })

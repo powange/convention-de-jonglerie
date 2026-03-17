@@ -74,12 +74,6 @@ export default defineNuxtConfig({
   },
   nitro: {
     ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
-    serverAssets: [
-      {
-        baseName: 'prompts',
-        dir: './server/prompts',
-      },
-    ],
     // Routes avec timeout étendu pour les appels IA longs
     routeRules: {
       '/api/admin/generate-import-json': {
