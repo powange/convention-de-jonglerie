@@ -25,11 +25,13 @@ export default wrapApiHandler(
           select: {
             id: true,
             email: true,
+            pseudo: true,
             prenom: true,
             nom: true,
             phone: true,
             authProvider: true,
             profilePicture: true,
+            updatedAt: true,
           },
         },
         pickupResponsible: {
