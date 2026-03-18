@@ -168,6 +168,37 @@ model EditionShowCall {
   @@index([editionId])
 }
 
+// Preset de spectacle réutilisable pour les candidatures
+model ShowPreset {
+  id                        Int      @id @default(autoincrement())
+  userId                    Int
+  name                      String
+
+  // Infos artiste
+  artistName   String // Nom de scène
+  artistBio    String? @db.Text
+  portfolioUrl String?
+  videoUrl     String?
+  socialLinks  String? @db.Text
+
+  // Infos spectacle
+  showTitle                 String
+  showDescription           String  @db.Text
+  showDuration              Int
+  showCategory              String?
+  technicalNeeds            String? @db.Text
+  additionalPerformersCount Int     @default(0)
+  additionalPerformers      Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
 // Candidature d'un artiste avec sa proposition de spectacle
 model ShowApplication {
   id         Int                   @id @default(autoincrement())

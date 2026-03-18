@@ -353,6 +353,27 @@ export interface AdditionalPerformer {
   phone: string
 }
 
+// Preset de spectacle réutilisable
+export interface ShowPreset {
+  id: number
+  userId: number
+  name: string
+  artistName: string
+  artistBio?: string | null
+  portfolioUrl?: string | null
+  videoUrl?: string | null
+  socialLinks?: string | null
+  showTitle: string
+  showDescription: string
+  showDuration: number
+  showCategory?: string | null
+  technicalNeeds?: string | null
+  additionalPerformersCount: number
+  additionalPerformers?: AdditionalPerformer[] | null
+  createdAt: string
+  updatedAt: string
+}
+
 // Candidature de spectacle
 export interface ShowApplication {
   id: number

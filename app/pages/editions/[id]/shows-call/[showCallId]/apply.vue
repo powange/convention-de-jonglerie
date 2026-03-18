@@ -204,6 +204,92 @@
           </div>
         </UCard>
 
+        <!-- Section: Presets de spectacle -->
+        <UCard v-if="authStore.isArtist && presets.length > 0" variant="soft">
+          <div class="flex items-end gap-3">
+            <UFormField :label="t('shows_call.presets.load_preset')" class="flex-1">
+              <USelect
+                v-model="selectedPresetId"
+                :items="presetItems"
+                :placeholder="t('shows_call.presets.select_placeholder')"
+                value-key="value"
+                size="lg"
+                class="w-full"
+                @update:model-value="loadPreset"
+              />
+            </UFormField>
+            <UButton
+              variant="soft"
+              color="neutral"
+              icon="i-heroicons-bookmark"
+              size="lg"
+              @click="showSavePresetModal = true"
+            >
+              {{ t('shows_call.presets.save_as_preset') }}
+            </UButton>
+            <UButton
+              v-if="selectedPresetId"
+              variant="soft"
+              color="error"
+              icon="i-heroicons-trash"
+              size="lg"
+              :loading="deletingPreset"
+              @click="confirmDeletePreset"
+            />
+          </div>
+        </UCard>
+
+        <!-- Modal de sauvegarde de preset -->
+        <UModal v-model:open="showSavePresetModal" :title="t('shows_call.presets.save_preset')">
+          <template #body>
+            <div class="space-y-4">
+              <UFormField :label="t('shows_call.presets.preset_name')" required>
+                <UInput
+                  v-model="presetName"
+                  :placeholder="t('shows_call.presets.preset_name_placeholder')"
+                  size="lg"
+                  class="w-full"
+                />
+              </UFormField>
+
+              <!-- Option de mise à jour si des presets existent -->
+              <div v-if="presets.length > 0" class="space-y-2">
+                <UFormField :label="t('shows_call.presets.update_existing')">
+                  <USelect
+                    v-model="updatePresetId"
+                    :items="updatePresetItems"
+                    :placeholder="t('shows_call.presets.new_preset')"
+                    value-key="value"
+                    size="lg"
+                    class="w-full"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </template>
+
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton color="neutral" variant="ghost" @click="showSavePresetModal = false">
+                {{ t('common.cancel') }}
+              </UButton>
+              <UButton
+                color="primary"
+                :loading="savingPreset"
+                :disabled="!presetName.trim() && !updatePresetId"
+                icon="i-heroicons-bookmark"
+                @click="savePreset"
+              >
+                {{
+                  updatePresetId
+                    ? t('shows_call.presets.update_preset')
+                    : t('shows_call.presets.save_preset')
+                }}
+              </UButton>
+            </div>
+          </template>
+        </UModal>
+
         <!-- Formulaire -->
         <UCard variant="soft">
           <template #header>
@@ -565,6 +651,17 @@
             <!-- Bouton de soumission -->
             <div class="flex justify-end gap-3 pt-4 border-t">
               <UButton
+                v-if="authStore.isArtist"
+                type="button"
+                variant="soft"
+                color="neutral"
+                icon="i-heroicons-bookmark"
+                @click="showSavePresetModal = true"
+              >
+                {{ t('shows_call.presets.save_as_preset') }}
+              </UButton>
+              <div class="flex-1" />
+              <UButton
                 type="button"
                 color="neutral"
                 variant="ghost"
@@ -595,7 +692,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import type { Edition, EditionShowCallPublic, ShowApplication } from '~/types'
+import type { Edition, EditionShowCallPublic, ShowApplication, ShowPreset } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
@@ -644,6 +741,148 @@ const formState = reactive({
 })
 
 const existingApplication = ref<ShowApplication | null>(null)
+
+// Presets de spectacle
+const presets = ref<ShowPreset[]>([])
+const selectedPresetId = ref<number | null>(null)
+const showSavePresetModal = ref(false)
+const presetName = ref('')
+const updatePresetId = ref<number | null>(null)
+const savingPreset = ref(false)
+const deletingPreset = ref(false)
+
+const presetItems = computed(() => presets.value.map((p) => ({ label: p.name, value: p.id })))
+
+const updatePresetItems = computed(() => [
+  { label: t('shows_call.presets.new_preset'), value: null },
+  ...presets.value.map((p) => ({ label: p.name, value: p.id })),
+])
+
+function loadPreset(presetId: number | null) {
+  const preset = presets.value.find((p) => p.id === presetId)
+  if (!preset) return
+
+  formState.artistName = preset.artistName
+  formState.artistBio = preset.artistBio || ''
+  formState.portfolioUrl = preset.portfolioUrl || ''
+  formState.videoUrl = preset.videoUrl || ''
+  formState.socialLinks = preset.socialLinks || ''
+  formState.showTitle = preset.showTitle
+  formState.showDescription = preset.showDescription
+  formState.showDuration = preset.showDuration
+  formState.showCategory = preset.showCategory || ''
+  formState.technicalNeeds = preset.technicalNeeds || ''
+  formState.additionalPerformersCount = preset.additionalPerformersCount
+  if (preset.additionalPerformers && Array.isArray(preset.additionalPerformers)) {
+    formState.additionalPerformers = preset.additionalPerformers.map((p) => ({ ...p }))
+  }
+
+  useToast().add({
+    title: t('shows_call.presets.preset_loaded'),
+    description: t('shows_call.presets.preset_loaded_desc'),
+    color: 'success',
+  })
+}
+
+function buildPresetBody() {
+  return {
+    name: updatePresetId.value
+      ? presets.value.find((p) => p.id === updatePresetId.value)?.name || presetName.value.trim()
+      : presetName.value.trim(),
+    artistName: formState.artistName,
+    artistBio: formState.artistBio || null,
+    portfolioUrl: formState.portfolioUrl || null,
+    videoUrl: formState.videoUrl || null,
+    socialLinks: formState.socialLinks || null,
+    showTitle: formState.showTitle,
+    showDescription: formState.showDescription,
+    showDuration: formState.showDuration,
+    showCategory: formState.showCategory || null,
+    technicalNeeds: formState.technicalNeeds || null,
+    additionalPerformersCount: formState.additionalPerformersCount,
+    additionalPerformers: formState.additionalPerformers.map((p) => ({
+      lastName: p.lastName.trim(),
+      firstName: p.firstName.trim(),
+      email: p.email.trim().toLowerCase(),
+      phone: p.phone.trim(),
+    })),
+  }
+}
+
+async function savePreset() {
+  const isUpdate = !!updatePresetId.value
+  const name = isUpdate
+    ? presets.value.find((p) => p.id === updatePresetId.value)?.name
+    : presetName.value.trim()
+
+  if (!name) return
+
+  savingPreset.value = true
+  try {
+    const body = buildPresetBody()
+    if (isUpdate) {
+      const response = await $fetch<{ data: { preset: ShowPreset } }>(
+        `/api/profile/show-presets/${updatePresetId.value}`,
+        { method: 'PUT', body }
+      )
+      const idx = presets.value.findIndex((p) => p.id === updatePresetId.value)
+      if (idx !== -1) presets.value[idx] = response.data.preset
+      useToast().add({
+        title: t('shows_call.presets.preset_updated'),
+        description: t('shows_call.presets.preset_updated_desc'),
+        color: 'success',
+      })
+    } else {
+      const response = await $fetch<{ data: { preset: ShowPreset } }>('/api/profile/show-presets', {
+        method: 'POST',
+        body,
+      })
+      presets.value.unshift(response.data.preset)
+      selectedPresetId.value = response.data.preset.id
+      useToast().add({
+        title: t('shows_call.presets.preset_saved'),
+        description: t('shows_call.presets.preset_saved_desc'),
+        color: 'success',
+      })
+    }
+    showSavePresetModal.value = false
+    presetName.value = ''
+    updatePresetId.value = null
+  } catch {
+    useToast().add({
+      title: t('shows_call.presets.preset_save_error'),
+      color: 'error',
+    })
+  } finally {
+    savingPreset.value = false
+  }
+}
+
+async function confirmDeletePreset() {
+  if (!selectedPresetId.value) return
+  if (!window.confirm(t('shows_call.presets.delete_preset_confirm'))) return
+
+  deletingPreset.value = true
+  try {
+    await $fetch(`/api/profile/show-presets/${selectedPresetId.value}`, {
+      method: 'DELETE',
+    })
+    presets.value = presets.value.filter((p) => p.id !== selectedPresetId.value)
+    selectedPresetId.value = null
+    useToast().add({
+      title: t('shows_call.presets.preset_deleted'),
+      description: t('shows_call.presets.preset_deleted_desc'),
+      color: 'success',
+    })
+  } catch {
+    useToast().add({
+      title: t('shows_call.presets.preset_delete_error'),
+      color: 'error',
+    })
+  } finally {
+    deletingPreset.value = false
+  }
+}
 
 // Mode édition si une candidature existe et est en attente
 const isEditMode = computed(() => existingApplication.value?.status === 'PENDING')
@@ -734,6 +973,18 @@ onMounted(async () => {
       }
     } catch {
       existingApplication.value = null
+    }
+
+    // Charger les presets de spectacle
+    if (authStore.isArtist) {
+      try {
+        const presetsResponse = await $fetch<{ data: { presets: ShowPreset[] } }>(
+          '/api/profile/show-presets'
+        )
+        presets.value = presetsResponse.data.presets
+      } catch {
+        // Ignorer les erreurs de chargement des presets
+      }
     }
   }
 })
