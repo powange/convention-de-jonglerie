@@ -400,11 +400,11 @@ const searchUsers = async (email: string) => {
 
   try {
     searchingUsers.value = true
-    const response = await $fetch<{ users: UserSearchResult[] }>('/api/users/search', {
+    const response = await $fetch<{ data: { users: UserSearchResult[] } }>('/api/users/search', {
       query: { emailExact: email },
     })
 
-    searchedUsers.value = response.users.map((user) => ({
+    searchedUsers.value = response.data.users.map((user) => ({
       id: user.id,
       label: user.pseudo || `${user.prenom ?? ''} ${user.nom ?? ''}`.trim() || user.email,
       pseudo: user.pseudo || `${user.prenom ?? ''} ${user.nom ?? ''}`.trim() || user.email,

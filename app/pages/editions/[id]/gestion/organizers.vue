@@ -470,10 +470,10 @@ watch(debouncedSearchTerm, async (searchTerm) => {
 
   searchingUsers.value = true
   try {
-    const response = await $fetch<{ users: any[] }>('/api/users/search', {
+    const response = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
       params: { emailExact: searchTerm },
     })
-    searchedUsers.value = response.users.map((user) => ({
+    searchedUsers.value = response.data.users.map((user) => ({
       id: user.id,
       label: user.pseudo || `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email,
       pseudo: user.pseudo || `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email,

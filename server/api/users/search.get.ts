@@ -30,7 +30,7 @@ export default wrapApiHandler(
       take: 1,
     })
 
-    return {
+    return createSuccessResponse({
       users: users.map((u) => ({
         id: u.id,
         pseudo: u.pseudo,
@@ -40,7 +40,7 @@ export default wrapApiHandler(
         email: u.email,
         emailHash: u.emailHash,
       })),
-    }
+    })
   },
   { operationName: 'SearchUsers' }
 )

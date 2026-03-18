@@ -1366,17 +1366,16 @@ const searchUserByEmail = async () => {
   searchingUser.value = true
 
   try {
-    const response = await $fetch<{ users: Array<{ prenom: string; nom: string; email: string }> }>(
-      '/api/users/search',
-      {
-        query: {
-          emailExact: email,
-        },
-      }
-    )
+    const response = await $fetch<{
+      data: { users: Array<{ prenom: string; nom: string; email: string }> }
+    }>('/api/users/search', {
+      query: {
+        emailExact: email,
+      },
+    })
 
     // Avec emailExact, on récupère directement l'utilisateur correspondant
-    const matchingUser = response.users[0]
+    const matchingUser = response.data.users[0]
 
     if (matchingUser) {
       // Utilisateur trouvé : préremplir les champs

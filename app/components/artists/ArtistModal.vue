@@ -603,10 +603,10 @@ const searchUsers = async (email: string) => {
   // Validation basique d'email
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return []
   try {
-    const response = await $fetch<{ users: any[] }>('/api/users/search', {
+    const response = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
       params: { emailExact: email },
     })
-    return (response.users || []).map((user) => ({
+    return (response.data.users || []).map((user) => ({
       id: user.id,
       label: `${user.pseudo} (${user.email})`,
       pseudo: user.pseudo,

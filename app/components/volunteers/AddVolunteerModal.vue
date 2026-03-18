@@ -227,7 +227,6 @@ const newUser = ref({
   nom: '',
 })
 
-const loading = ref(false)
 const error = ref('')
 
 // Validation du nouveau utilisateur
@@ -262,10 +261,10 @@ const performSearch = async (email: string) => {
   error.value = ''
 
   try {
-    const response = await $fetch<{ users: User[] }>('/api/users/search', {
+    const response = await $fetch<{ data: { users: User[] } }>('/api/users/search', {
       params: { emailExact: trimmedEmail },
     })
-    searchResults.value = response.users || []
+    searchResults.value = response.data.users || []
   } catch (err: any) {
     console.error('User search error:', err)
     error.value = t('edition.volunteers.search_error')
@@ -307,61 +306,59 @@ const switchToSearchMode = () => {
   newUser.value = { email: '', prenom: '', nom: '' }
 }
 
-const addVolunteer = async () => {
+const { execute: executeAddVolunteer, loading: addLoading } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/add-manually`,
+  {
+    method: 'POST',
+    body: () => ({ userId: selectedUser.value?.id }),
+    silent: true,
+    onSuccess: () => {
+      emit('volunteer-added')
+      closeModal()
+    },
+    onError: (err) => {
+      error.value = err.message || t('edition.volunteers.add_error')
+    },
+  }
+)
+
+const addVolunteer = () => {
   if (!selectedUser.value) return
-
-  loading.value = true
   error.value = ''
-
-  try {
-    await $fetch(`/api/editions/${props.editionId}/volunteers/add-manually`, {
-      method: 'POST',
-      body: {
-        userId: selectedUser.value.id,
-      },
-    })
-
-    emit('volunteer-added')
-    closeModal()
-  } catch (err: any) {
-    console.error('Add volunteer error:', err)
-    error.value = err.data?.message || t('edition.volunteers.add_error')
-  } finally {
-    loading.value = false
-  }
+  executeAddVolunteer()
 }
 
-const createUserAndAdd = async () => {
+const { execute: executeCreateUserAndAdd, loading: createLoading } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/create-user-and-add`,
+  {
+    method: 'POST',
+    body: () => ({
+      email: newUser.value.email.toLowerCase().trim(),
+      prenom: newUser.value.prenom.trim(),
+      nom: newUser.value.nom.trim(),
+    }),
+    silent: true,
+    onSuccess: () => {
+      emit('volunteer-added')
+      closeModal()
+    },
+    onError: (err) => {
+      if (err.statusCode === 409) {
+        error.value = t('edition.volunteers.email_already_exists_suggest_search')
+      } else {
+        error.value = err.message || t('edition.volunteers.create_error')
+      }
+    },
+  }
+)
+
+const createUserAndAdd = () => {
   if (!isNewUserValid.value) return
-
-  loading.value = true
   error.value = ''
-
-  try {
-    await $fetch(`/api/editions/${props.editionId}/volunteers/create-user-and-add`, {
-      method: 'POST',
-      body: {
-        email: newUser.value.email.toLowerCase().trim(),
-        prenom: newUser.value.prenom.trim(),
-        nom: newUser.value.nom.trim(),
-      },
-    })
-
-    emit('volunteer-added')
-    closeModal()
-  } catch (err: any) {
-    console.error('Create user and add volunteer error:', err)
-
-    // Gestion des erreurs spécifiques
-    if (err.statusCode === 409 || err.status === 409) {
-      error.value = t('edition.volunteers.email_already_exists_suggest_search')
-    } else {
-      error.value = err.data?.message || t('edition.volunteers.create_error')
-    }
-  } finally {
-    loading.value = false
-  }
+  executeCreateUserAndAdd()
 }
+
+const loading = computed(() => addLoading.value || createLoading.value)
 
 const closeModal = () => {
   isOpen.value = false
