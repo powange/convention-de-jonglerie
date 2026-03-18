@@ -88,11 +88,11 @@ export function useTicketingCounter(editionId: number, token: string) {
     error.value = null
 
     try {
-      const response = await $fetch<{ success: boolean; counter: Counter }>(
+      const response = await $fetch<{ success: boolean; data: { counter: Counter } }>(
         `/api/editions/${editionId}/ticketing/counters/token/${token}`
       )
-      counter.value = response.counter
-      localValue.value = response.counter.value
+      counter.value = response.data.counter
+      localValue.value = response.data.counter.value
     } catch (err: any) {
       error.value =
         err?.data?.message || err?.message || 'Erreur lors de la récupération du compteur'
