@@ -14,7 +14,6 @@ const messenger = useMessenger()
 
 // État de la conversation
 const conversationId = ref<string | null>(null)
-const isLoading = ref(true)
 const isLoadingMore = ref(false)
 const isSending = ref(false)
 const hasConversation = ref(false)
@@ -30,28 +29,22 @@ const { realtimeMessages, isConnected, messageUpdates, clearMessages, clearMessa
   useMessengerStream(conversationId)
 
 // Vérifier si une conversation existe (sans la créer)
-const checkConversation = async () => {
-  isLoading.value = true
-
-  try {
-    const response = await $fetch<{
-      success: boolean
-      data: { exists: boolean; conversationId: string | null }
-    }>(`/api/show-applications/${props.applicationId}/conversation`, { method: 'GET' })
-
-    if (response.data.exists && response.data.conversationId) {
-      conversationId.value = response.data.conversationId
-      hasConversation.value = true
-      await loadMessages()
-    } else {
-      hasConversation.value = false
-    }
-  } catch (error) {
-    console.error('Erreur lors de la vérification de la conversation:', error)
-  } finally {
-    isLoading.value = false
+const { execute: checkConversation, loading: checkLoading } = useApiAction(
+  () => `/api/show-applications/${props.applicationId}/conversation`,
+  {
+    method: 'GET',
+    silent: true,
+    onSuccess: async (response: any) => {
+      if (response.exists && response.conversationId) {
+        conversationId.value = response.conversationId
+        hasConversation.value = true
+        await loadMessages()
+      } else {
+        hasConversation.value = false
+      }
+    },
   }
-}
+)
 
 // Charger les messages
 const loadMessages = async () => {
@@ -252,7 +245,7 @@ defineExpose({
     </div>
 
     <!-- Contenu -->
-    <div v-if="isLoading" class="flex flex-1 items-center justify-center">
+    <div v-if="checkLoading" class="flex flex-1 items-center justify-center">
       <UIcon name="i-lucide-loader-2" class="h-8 w-8 animate-spin text-muted" />
     </div>
 

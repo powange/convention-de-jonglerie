@@ -41,7 +41,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: true,
     })
 
@@ -81,7 +81,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: false,
       reason: 'invalid',
     })
@@ -96,7 +96,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: false,
       reason: 'expired',
     })
@@ -111,7 +111,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: false,
       reason: 'used',
     })
@@ -132,7 +132,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: true,
     })
   })
@@ -153,9 +153,9 @@ describe('/api/auth/verify-reset-token GET', () => {
     const result = await handler(mockEvent as any)
 
     // Le résultat peut être valid: true ou valid: false selon le timing exact
-    expect(result.valid).toBeTypeOf('boolean')
-    if (!result.valid) {
-      expect(result.reason).toBe('expired')
+    expect(result.data.valid).toBeTypeOf('boolean')
+    if (!result.data.valid) {
+      expect(result.data.reason).toBe('expired')
     }
   })
 
@@ -175,7 +175,7 @@ describe('/api/auth/verify-reset-token GET', () => {
     const result = await handler(mockEvent as any)
 
     // L'API vérifie d'abord l'expiration, puis l'utilisation
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: false,
       reason: 'expired',
     })
@@ -196,7 +196,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: false,
       reason: 'expired',
     })
@@ -262,7 +262,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: true,
     })
 
@@ -287,7 +287,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: true,
     })
   })
@@ -310,7 +310,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: true,
     })
   })
@@ -324,7 +324,7 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       valid: false,
       reason: 'invalid',
     })
@@ -344,11 +344,11 @@ describe('/api/auth/verify-reset-token GET', () => {
 
     // Première vérification
     const result1 = await handler(mockEvent as any)
-    expect(result1).toEqual({ valid: true })
+    expect(result1.data).toEqual({ valid: true })
 
     // Deuxième vérification (la fonction ne modifie pas l'état)
     const result2 = await handler(mockEvent as any)
-    expect(result2).toEqual({ valid: true })
+    expect(result2.data).toEqual({ valid: true })
 
     expect(prismaMock.passwordResetToken.findUnique).toHaveBeenCalledTimes(2)
   })

@@ -15,14 +15,14 @@ export default wrapApiHandler(
     try {
       const hasAccess = await canAccessMealValidation(user.id, editionId)
 
-      return {
+      return createSuccessResponse({
         canAccess: hasAccess,
-      }
+      })
     } catch (error: unknown) {
       console.error('Erreur lors de la vérification des permissions:', error)
-      return {
+      return createSuccessResponse({
         canAccess: false,
-      }
+      })
     }
   },
   { operationName: 'CheckMealValidationAccess' }

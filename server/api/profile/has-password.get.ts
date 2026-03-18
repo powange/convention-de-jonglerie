@@ -15,9 +15,9 @@ export default wrapApiHandler(
       }
     )
 
-    return {
+    return createSuccessResponse({
       hasPassword: !!userWithPassword.password,
-    }
+    })
   },
   { operationName: 'CheckHasPassword' }
 )

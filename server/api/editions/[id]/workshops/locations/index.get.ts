@@ -15,7 +15,7 @@ export default wrapApiHandler(
       orderBy: { name: 'asc' },
     })
 
-    return locations
+    return createSuccessResponse({ locations })
   },
   { operationName: 'GetWorkshopLocations' }
 )

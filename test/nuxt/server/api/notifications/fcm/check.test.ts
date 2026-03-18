@@ -37,8 +37,8 @@ describe('/api/notifications/fcm/check GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.hasActiveToken).toBe(false)
-    expect(result.tokenCount).toBe(2)
+    expect(result.data.hasActiveToken).toBe(false)
+    expect(result.data.tokenCount).toBe(2)
     expect(prismaMock.fcmToken.findFirst).not.toHaveBeenCalled()
   })
 
@@ -52,8 +52,8 @@ describe('/api/notifications/fcm/check GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.hasActiveToken).toBe(true)
-    expect(result.tokenCount).toBe(1)
+    expect(result.data.hasActiveToken).toBe(true)
+    expect(result.data.tokenCount).toBe(1)
   })
 
   it("devrait retourner hasActiveToken=false si deviceId n'a pas de token actif", async () => {
@@ -66,8 +66,8 @@ describe('/api/notifications/fcm/check GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.hasActiveToken).toBe(false)
-    expect(result.tokenCount).toBe(3)
+    expect(result.data.hasActiveToken).toBe(false)
+    expect(result.data.tokenCount).toBe(3)
   })
 
   it("devrait chercher uniquement les tokens actifs de l'utilisateur", async () => {

@@ -27,48 +27,34 @@ Appels simples avec pattern try/catch/loading/toast, facilement remplaçables.
   - POST ajout bénévole manuel — migré
   - POST création user + ajout bénévole — migré
 
-- [ ] **`components/show-application/Chat.vue`** (2 appels)
-  - GET fetch messages
-  - POST créer conversation
+- [x] **`components/show-application/Chat.vue`** (1/2 appels migré)
+  - GET checkConversation — migré vers `useApiAction`
+  - POST ensureParticipant — non migré (retourne une valeur dans un flow séquentiel)
 
-- [ ] **`components/feedback/FeedbackModal.vue`** (1 appel)
-  - POST soumission feedback
+- [x] **`components/feedback/FeedbackModal.vue`** — non migré (logique reCAPTCHA complexe avec early returns, `$fetch` imbriqué, endpoint déjà `createSuccessResponse`)
 
-- [ ] **`components/artists/ArtistModal.vue`** (1 appel)
-  - GET recherche user par email
+- [x] **`components/artists/ArtistModal.vue`** — non migré (debounce search, endpoint `response.data.users` déjà corrigé)
 
-- [ ] **`components/ticketing/EmailValidationInput.vue`** (1 appel)
-  - POST vérification existence email
+- [x] **`components/ticketing/EmailValidationInput.vue`** — non migré (debounce avec état interne, endpoint déjà `createSuccessResponse`)
 
-- [ ] **`components/notifications/PushNotificationToggle.vue`** (1 appel)
-  - GET vérification statut FCM
+- [x] **`components/notifications/PushNotificationToggle.vue`** + **`composables/usePushNotificationPromo.ts`** — serveur migré vers `createSuccessResponse`, front corrigé `response.data.hasActiveToken` (2 consommateurs). Non migré vers `useApiAction` (init dans onMounted)
 
 ### Pages
 
-- [ ] **`pages/profile.vue`** (3 appels)
-  - PUT mise à jour photo de profil
-  - GET chargement préférences notifications
-  - GET vérification si l'utilisateur a un mot de passe
+- [x] **`pages/profile.vue`** (1/3 corrigé)
+  - PUT mise à jour photo de profil — non migré (early return + toast conditionnel + state complexe, endpoint déjà `createSuccessResponse`, `response.data` déjà correct)
+  - GET chargement préférences notifications — non migré (init onMounted, endpoint déjà `createSuccessResponse`, `response.data.preferences` déjà correct)
+  - GET has-password — serveur migré vers `createSuccessResponse`, front corrigé `response.data.hasPassword`
 
-- [ ] **`pages/login.vue`** (3 appels)
-  - POST vérification existence email
-  - POST validation email
-  - POST inscription
+- [x] **`pages/login.vue`** — aucune migration nécessaire (endpoints déjà `createSuccessResponse`, front lit déjà `response.data.xxx` correctement, logique auth critique pas adaptée à `useApiAction`)
 
-- [ ] **`pages/verify-email.vue`** (2 appels)
-  - POST vérification token email
-  - POST renvoi code de vérification
+- [x] **`pages/verify-email.vue`** — aucune migration nécessaire (endpoints déjà `createSuccessResponse`, front lit déjà `response.data.xxx`, flow auth critique)
 
-- [ ] **`pages/auth/reset-password.vue`** (1 appel)
-  - POST vérification token de reset
+- [x] **`pages/auth/reset-password.vue`** — serveur migré vers `createSuccessResponse`, front corrigé `response.data.valid/reason`
 
-- [ ] **`pages/editions/[id]/workshops.vue`** (2 appels)
-  - POST toggle favori atelier
-  - POST suppression favori atelier
+- [x] **`pages/editions/[id]/workshops.vue`** + **`gestion/workshops/index.vue`** — serveurs migrés vers `createSuccessResponse` (`can-create`, `locations GET`), fronts corrigés. Favoris toggle non migré (update optimiste avec rollback)
 
-- [ ] **`pages/editions/[id]/gestion/meals/validate.vue`** (2 appels)
-  - POST validation repas
-  - POST annulation repas
+- [x] **`pages/editions/[id]/gestion/meals/validate.vue`** + 4 autres fichiers — serveur `can-access-meal-validation` migré vers `createSuccessResponse`, 5 consommateurs corrigés (`validate.vue`, `ManageButton.vue`, `Header.vue`, `gestion/index.vue`, `edition-dashboard.vue`). Validate/cancel repas non migrés (endpoints déjà `createSuccessResponse`, pas de lecture de réponse)
 
 - [ ] **`pages/editions/[id]/gestion/ticketing/access-control.vue`** (2 appels)
   - POST validation entrée

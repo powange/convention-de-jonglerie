@@ -30,10 +30,10 @@ export default wrapApiHandler(
       },
     })
 
-    return {
+    return createSuccessResponse({
       hasActiveToken: !!deviceToken,
       tokenCount: activeTokenCount,
-    }
+    })
   },
   { operationName: 'CheckFcmToken' }
 )

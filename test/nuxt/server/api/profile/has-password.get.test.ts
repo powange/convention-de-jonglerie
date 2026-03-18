@@ -47,7 +47,7 @@ describe('/api/profile/has-password', () => {
         password: true,
       },
     })
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       hasPassword: true,
     })
   })
@@ -71,7 +71,7 @@ describe('/api/profile/has-password', () => {
         password: true,
       },
     })
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       hasPassword: false,
     })
   })
@@ -131,7 +131,7 @@ describe('/api/profile/has-password', () => {
 
     const result = await hasPasswordHandler(mockEvent)
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       hasPassword: false,
     })
   })

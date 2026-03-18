@@ -9,9 +9,9 @@ export default wrapApiHandler(
 
     const hasPermission = await canCreateWorkshop(user.user.id, editionId)
 
-    return {
+    return createSuccessResponse({
       canCreate: hasPermission,
-    }
+    })
   },
   { operationName: 'CheckCanCreateWorkshop' }
 )

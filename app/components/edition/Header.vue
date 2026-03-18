@@ -484,10 +484,10 @@ watch(
 
       // Vérifier si l'utilisateur peut accéder à la validation des repas
       try {
-        const response = await $fetch<{ canAccess: boolean }>(
+        const response = await $fetch<{ data: { canAccess: boolean } }>(
           `/api/editions/${props.edition.id}/permissions/can-access-meal-validation`
         )
-        canAccessMealValidation.value = response.canAccess
+        canAccessMealValidation.value = response.data.canAccess
       } catch {
         canAccessMealValidation.value = false
       }

@@ -485,10 +485,10 @@ watch(
   async (isAuthenticated) => {
     if (isAuthenticated && authStore.user?.id && edition.value?.id) {
       try {
-        const response = await $fetch<{ canAccess: boolean }>(
+        const response = await $fetch<{ data: { canAccess: boolean } }>(
           `/api/editions/${edition.value.id}/permissions/can-access-meal-validation`
         )
-        canAccessMealValidation.value = response.canAccess
+        canAccessMealValidation.value = response.data.canAccess
       } catch {
         canAccessMealValidation.value = false
       }

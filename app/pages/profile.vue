@@ -1260,8 +1260,8 @@ onMounted(async () => {
 
   // Vérifier si l'utilisateur a un mot de passe
   try {
-    const { hasPassword } = await $fetch('/api/profile/has-password')
-    userHasPassword.value = hasPassword
+    const response = await $fetch<{ data: { hasPassword: boolean } }>('/api/profile/has-password')
+    userHasPassword.value = response.data.hasPassword
   } catch (error) {
     console.error('Erreur lors de la vérification du mot de passe:', error)
     // En cas d'erreur, on suppose qu'il a un mot de passe pour la sécurité

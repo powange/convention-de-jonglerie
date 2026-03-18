@@ -273,18 +273,19 @@ onMounted(async () => {
   }
 
   try {
-    const response = await $fetch('/api/auth/verify-reset-token', {
-      params: { token: token.value },
-    })
+    const response = await $fetch<{ data: { valid: boolean; reason?: string } }>(
+      '/api/auth/verify-reset-token',
+      { params: { token: token.value } }
+    )
 
-    if (!response.valid) {
+    if (!response.data.valid) {
       invalidToken.value = true
 
       // Message spécifique selon la raison
       let message = t('auth.invalid_link')
-      if (response.reason === 'expired') {
+      if (response.data.reason === 'expired') {
         message = t('auth.reset_link_expired')
-      } else if (response.reason === 'used') {
+      } else if (response.data.reason === 'used') {
         message = t('auth.reset_link_used')
       }
 

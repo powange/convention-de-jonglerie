@@ -457,8 +457,10 @@ const canAddWorkshop = computed(() => {
 const fetchWorkshopLocations = async () => {
   loadingLocations.value = true
   try {
-    const data = await $fetch(`/api/editions/${editionId}/workshops/locations`)
-    workshopLocations.value = data as Array<{ id: number; name: string }>
+    const response = await $fetch<{ data: { locations: Array<{ id: number; name: string }> } }>(
+      `/api/editions/${editionId}/workshops/locations`
+    )
+    workshopLocations.value = response.data.locations
   } catch {
     // Silencieux - les lieux ne sont pas critiques
   } finally {
@@ -672,8 +674,10 @@ const checkCanCreate = async () => {
   }
 
   try {
-    const result = await $fetch(`/api/editions/${editionId}/workshops/can-create`)
-    canCreateWorkshop.value = result.canCreate
+    const result = await $fetch<{ data: { canCreate: boolean } }>(
+      `/api/editions/${editionId}/workshops/can-create`
+    )
+    canCreateWorkshop.value = result.data.canCreate
   } catch {
     // Si l'utilisateur n'est pas connecté ou n'a pas les permissions, on masque le bouton
     canCreateWorkshop.value = false

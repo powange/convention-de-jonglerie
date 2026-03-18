@@ -254,8 +254,8 @@ const fetchWorkshopLocations = async () => {
       promises.push($fetch(`/api/editions/${editionId}/zones`))
       promises.push($fetch(`/api/editions/${editionId}/markers`))
     }
-    const [locData, zonesResponse, markersResponse] = await Promise.all(promises)
-    workshopLocations.value = locData as any[]
+    const [locResponse, zonesResponse, markersResponse] = await Promise.all(promises)
+    workshopLocations.value = locResponse?.data?.locations || []
     if (edition.value?.siteMapEnabled) {
       mapZones.value = Array.isArray(zonesResponse?.data?.zones) ? zonesResponse.data.zones : []
       mapMarkers.value = Array.isArray(markersResponse?.data?.markers)

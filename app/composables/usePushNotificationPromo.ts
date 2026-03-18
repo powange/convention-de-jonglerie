@@ -64,8 +64,10 @@ export const usePushNotificationPromo = () => {
     if (!import.meta.client || !authStore.isAuthenticated) return
 
     try {
-      const response = await $fetch('/api/notifications/fcm/check')
-      state.isSubscribed = response.hasActiveToken
+      const response = await $fetch<{ data: { hasActiveToken: boolean } }>(
+        '/api/notifications/fcm/check'
+      )
+      state.isSubscribed = response.data.hasActiveToken
     } catch (error) {
       console.warn('[PushPromo] Erreur vérification FCM:', error)
       state.isSubscribed = false

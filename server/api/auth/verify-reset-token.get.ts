@@ -18,10 +18,10 @@ export default wrapApiHandler(
     })
 
     if (!resetToken) {
-      return {
+      return createSuccessResponse({
         valid: false,
         reason: 'invalid',
-      }
+      })
     }
 
     // Vérifier si le token a expiré
@@ -30,23 +30,23 @@ export default wrapApiHandler(
     const expiresAtUTC = new Date(resetToken.expiresAt)
 
     if (nowUTC.getTime() > expiresAtUTC.getTime()) {
-      return {
+      return createSuccessResponse({
         valid: false,
         reason: 'expired',
-      }
+      })
     }
 
     // Vérifier si le token a déjà été utilisé
     if (resetToken.used) {
-      return {
+      return createSuccessResponse({
         valid: false,
         reason: 'used',
-      }
+      })
     }
 
-    return {
+    return createSuccessResponse({
       valid: true,
-    }
+    })
   },
   { operationName: 'VerifyResetToken' }
 )

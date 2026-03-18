@@ -119,10 +119,11 @@ onMounted(async () => {
   // Vérifier si cet appareil a un token FCM actif (basé sur le deviceId)
   try {
     const deviceId = getDeviceId()
-    const response = await $fetch('/api/notifications/fcm/check', {
-      query: { deviceId },
-    })
-    isSubscribed.value = response.hasActiveToken
+    const response = await $fetch<{ data: { hasActiveToken: boolean } }>(
+      '/api/notifications/fcm/check',
+      { query: { deviceId } }
+    )
+    isSubscribed.value = response.data.hasActiveToken
     if (isSubscribed.value) {
       notificationStore.setRealTimeEnabled(true)
     }
