@@ -560,7 +560,7 @@ export const useEditionStore = defineStore('editions', {
     },
 
     // Vérifier si l'utilisateur est responsable d'au moins une équipe de bénévoles
-    async isTeamLeader(editionId: number, _userId: number): Promise<boolean> {
+    async isTeamLeader(editionId: number): Promise<boolean> {
       const authStore = useAuthStore()
 
       // Les admins globaux ne sont pas considérés comme team leaders

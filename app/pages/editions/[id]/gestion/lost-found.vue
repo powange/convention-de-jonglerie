@@ -94,7 +94,7 @@ onMounted(async () => {
 
   // Vérifier si l'utilisateur est team leader
   if (authStore.user?.id) {
-    isTeamLeaderValue.value = await editionStore.isTeamLeader(editionId, authStore.user.id)
+    isTeamLeaderValue.value = await editionStore.isTeamLeader(editionId)
   }
 })
 

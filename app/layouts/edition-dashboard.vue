@@ -212,7 +212,7 @@ onMounted(async () => {
 
   // Vérifier si l'utilisateur est team leader
   if (authStore.user?.id) {
-    isTeamLeader.value = await editionStore.isTeamLeader(editionId.value, authStore.user.id)
+    isTeamLeader.value = await editionStore.isTeamLeader(editionId.value)
   }
 
   // Vérifier si l'utilisateur peut accéder à la validation des repas

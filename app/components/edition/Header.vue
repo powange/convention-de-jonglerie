@@ -470,7 +470,7 @@ watch(
 
     // Vérifier si l'utilisateur est team leader quand il se connecte
     if (isAuthenticated && authStore.user?.id && props.edition?.id) {
-      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id, authStore.user.id)
+      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id)
 
       // Vérifier si l'utilisateur est un bénévole accepté
       try {

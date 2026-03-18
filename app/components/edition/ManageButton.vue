@@ -107,7 +107,7 @@ watch(
   async (isAuthenticated) => {
     if (isAuthenticated && authStore.user?.id && props.edition?.id) {
       // Vérifier si l'utilisateur est team leader
-      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id, authStore.user.id)
+      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id)
 
       // Vérifier si l'utilisateur peut accéder à la validation des repas
       canAccessMealValidation.value = await editionStore.canAccessMealValidation(props.edition.id)
