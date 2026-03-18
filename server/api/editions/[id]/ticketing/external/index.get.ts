@@ -35,16 +35,16 @@ export default wrapApiHandler(
     })
 
     if (!config) {
-      return {
+      return createSuccessResponse({
         hasConfig: false,
         config: null,
-      }
+      })
     }
 
-    return {
+    return createSuccessResponse({
       hasConfig: true,
       config,
-    }
+    })
   },
   { operationName: 'GET ticketing external index' }
 )

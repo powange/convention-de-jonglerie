@@ -798,16 +798,16 @@ const handleScan = async (code: string) => {
       },
     })
 
-    if (result.found && result.participant) {
+    if (result.data.found && result.data.participant) {
       // Afficher la modal avec les détails du participant
-      selectedParticipant.value = result.participant
-      participantType.value = result.type || 'ticket'
-      isRefundedOrder.value = result.isRefunded || false
+      selectedParticipant.value = result.data.participant
+      participantType.value = result.data.type || 'ticket'
+      isRefundedOrder.value = result.data.isRefunded || false
       participantModalOpen.value = true
 
       toast.add({
         title:
-          result.type === 'volunteer'
+          result.data.type === 'volunteer'
             ? t('ticketing.access_control.volunteer_found')
             : t('ticketing.access_control.ticket_found'),
         description: result.message,
@@ -913,8 +913,8 @@ const reloadParticipant = async (
       },
     })
 
-    if (result.success && result.found) {
-      selectedParticipant.value = result.participant
+    if (result.data.found) {
+      selectedParticipant.value = result.data.participant
     }
   } catch {
     // Erreur silencieuse lors du rechargement du participant
@@ -972,9 +972,9 @@ const handleOrderCreated = async (qrCode: string) => {
       },
     })
 
-    if (result.found && result.participant) {
+    if (result.data.found && result.data.participant) {
       // Afficher la modal avec les détails du participant
-      selectedParticipant.value = result.participant
+      selectedParticipant.value = result.data.participant
       participantType.value = 'ticket'
       participantModalOpen.value = true
 
@@ -1031,10 +1031,7 @@ const selectSearchResult = (result: any) => {
 const loadStats = async () => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/stats`)
-
-    if (result.success) {
-      stats.value = result.stats
-    }
+    stats.value = result.data.stats
   } catch {
     // Erreur silencieuse lors du chargement des stats
   }
@@ -1045,10 +1042,7 @@ const loadRecentValidations = async () => {
 
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/recent-validations`)
-
-    if (result.success) {
-      recentValidations.value = result.validations
-    }
+    recentValidations.value = result.data.validations
   } catch {
     // Erreur silencieuse lors du chargement des validations récentes
   } finally {
@@ -1077,7 +1071,7 @@ const checkHelloAssoConfig = async () => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/external`)
     hasHelloAssoConfig.value =
-      result?.hasConfig && result?.config?.provider?.toUpperCase() === 'HELLOASSO'
+      result?.data?.hasConfig && result?.data?.config?.provider?.toUpperCase() === 'HELLOASSO'
   } catch {
     // Pas de configuration HelloAsso
     hasHelloAssoConfig.value = false

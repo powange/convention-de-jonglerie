@@ -251,12 +251,12 @@ const loadData = async () => {
   loading.value = true
   try {
     // Charger la configuration pour vérifier si une billeterie est configurée
-    const configResponse = await $fetch(`/api/editions/${editionId}/ticketing/external`)
-    hasExternalTicketing.value = configResponse.hasConfig
+    const configResponse: any = await $fetch(`/api/editions/${editionId}/ticketing/external`)
+    hasExternalTicketing.value = configResponse.data.hasConfig
 
-    if (configResponse.hasConfig) {
-      lastSync.value = configResponse.config?.lastSyncAt
-        ? new Date(configResponse.config.lastSyncAt)
+    if (configResponse.data.hasConfig) {
+      lastSync.value = configResponse.data.config?.lastSyncAt
+        ? new Date(configResponse.data.config.lastSyncAt)
         : null
     }
 

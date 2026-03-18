@@ -856,9 +856,9 @@ onMounted(async () => {
 
 const loadExistingConfig = async () => {
   try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/external`)
-    if (response.hasConfig && response.config?.helloAssoConfig) {
-      const haConfig = response.config.helloAssoConfig
+    const response: any = await $fetch(`/api/editions/${editionId}/ticketing/external`)
+    if (response.data.hasConfig && response.data.config?.helloAssoConfig) {
+      const haConfig = response.data.config.helloAssoConfig
       helloAssoClientId.value = haConfig.clientId
       helloAssoOrganizationSlug.value = haConfig.organizationSlug
       helloAssoFormType.value = haConfig.formType

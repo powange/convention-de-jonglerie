@@ -27,8 +27,10 @@ export const useFavoritesEditionsStore = defineStore('favoritesEditions', {
 
       this.isLoading = true
       try {
-        const favoriteIds = await $fetch<number[]>('/api/editions/favorites')
-        this.favoriteEditionIds = favoriteIds || []
+        const response = await $fetch<{ data: { favoriteIds: number[] } }>(
+          '/api/editions/favorites'
+        )
+        this.favoriteEditionIds = response.data.favoriteIds || []
         this.isInitialized = true
       } catch (error) {
         console.error('Erreur lors du chargement des favoris:', error)

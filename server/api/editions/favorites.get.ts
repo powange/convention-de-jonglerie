@@ -26,7 +26,9 @@ export default wrapApiHandler(
     }
 
     // Retourner uniquement les IDs des éditions favorites
-    return favoriteEditions.favoriteEditions.map((edition) => edition.id)
+    return createSuccessResponse({
+      favoriteIds: favoriteEditions.favoriteEditions.map((edition) => edition.id),
+    })
   },
   { operationName: 'GetFavoriteEditions' }
 )

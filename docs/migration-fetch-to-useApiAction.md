@@ -56,34 +56,21 @@ Appels simples avec pattern try/catch/loading/toast, facilement remplaçables.
 
 - [x] **`pages/editions/[id]/gestion/meals/validate.vue`** + 4 autres fichiers — serveur `can-access-meal-validation` migré vers `createSuccessResponse`, 5 consommateurs corrigés (`validate.vue`, `ManageButton.vue`, `Header.vue`, `gestion/index.vue`, `edition-dashboard.vue`). Validate/cancel repas non migrés (endpoints déjà `createSuccessResponse`, pas de lecture de réponse)
 
-- [ ] **`pages/editions/[id]/gestion/ticketing/access-control.vue`** (2 appels)
-  - POST validation entrée
-  - POST invalidation entrée
+- [x] **`pages/editions/[id]/gestion/ticketing/access-control.vue`** + `tiers.vue` + `external.vue` — corrigé les accès `result.data.xxx` pour verify, stats, recent-validations, et helloasso config. Serveur `ticketing/external GET` migré vers `createSuccessResponse` (3 consommateurs corrigés). validate-entry/invalidate-entry non migrés (pas de lecture de réponse)
 
 ### Composables
 
-- [ ] **`composables/useFirebaseMessaging.ts`** (2 appels)
-  - POST subscribe FCM
-  - POST unsubscribe FCM
+- [x] **`composables/useFirebaseMessaging.ts`** — aucune migration nécessaire (endpoints déjà `createSuccessResponse`, pas de lecture de réponse, logique Firebase complexe)
 
-- [ ] **`composables/useMessenger.ts`** (2 appels)
-  - PATCH suppression message
-  - PATCH marquer message comme lu
+- [x] **`composables/useMessenger.ts`** — aucune migration nécessaire (8 appels, endpoints déjà `createSuccessResponse`, front lit déjà `response.data` correctement, service avec retour de valeurs pas adapté à `useApiAction`)
 
-- [ ] **`composables/useTypingIndicator.ts`** (2 appels)
-  - POST envoi indicateur de frappe
-  - DELETE arrêt indicateur de frappe
+- [x] **`composables/useTypingIndicator.ts`** — aucune migration nécessaire (endpoints déjà `createSuccessResponse`, pas de lecture de réponse, logique temps réel throttled)
 
 ### Stores
 
-- [ ] **`stores/notifications.ts`** (4 appels)
-  - POST marquer notification lue
-  - POST marquer notification non lue
-  - PUT marquer tout comme lu
-  - POST supprimer notification
+- [x] **`stores/notifications.ts`** — corrigé `response.data.stats` et `response.data.updatedCount` (bugs). GET notifications OK (`createPaginatedResponse` met `data` au 1er niveau). markAsRead/Unread/delete non migrés (pas de lecture de réponse, endpoints déjà `createSuccessResponse`)
 
-- [ ] **`stores/favoritesEditions.ts`** (1 appel)
-  - POST toggle favori édition
+- [x] **`stores/favoritesEditions.ts`** — serveur `favorites.get` migré vers `createSuccessResponse`, front corrigé. Toggle POST non migré (optimiste, pas de lecture de réponse, endpoint déjà `createSuccessResponse`)
 
 ---
 

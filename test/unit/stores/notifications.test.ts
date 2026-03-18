@@ -215,7 +215,7 @@ describe('notifications store', () => {
       store.notifications = [...mockNotifications]
       store.unreadCount = 1
 
-      vi.mocked($fetch).mockResolvedValue({ updatedCount: 1 })
+      vi.mocked($fetch).mockResolvedValue({ success: true, data: { updatedCount: 1 } })
 
       await store.markAllAsRead()
 
@@ -231,7 +231,7 @@ describe('notifications store', () => {
       store.notifications = [...mockNotifications]
       store.unreadCount = 1
 
-      vi.mocked($fetch).mockResolvedValue({ updatedCount: 1 })
+      vi.mocked($fetch).mockResolvedValue({ success: true, data: { updatedCount: 1 } })
 
       await store.markAllAsRead('convention')
 

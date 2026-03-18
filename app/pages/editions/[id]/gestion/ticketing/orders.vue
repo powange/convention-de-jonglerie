@@ -1943,14 +1943,14 @@ const loadData = async () => {
       ),
     ])
 
-    hasExternalTicketing.value = configResponse.hasConfig
+    hasExternalTicketing.value = configResponse?.data?.hasConfig
     tiers.value = tiersData
     options.value = Array.isArray(optionsData?.data?.options) ? optionsData.data.options : []
     distinctCustomFields.value = customFieldsData || []
 
-    if (configResponse.hasConfig) {
-      lastSync.value = configResponse.config?.lastSyncAt
-        ? new Date(configResponse.config.lastSyncAt)
+    if (configResponse?.data?.hasConfig) {
+      lastSync.value = configResponse.data.config?.lastSyncAt
+        ? new Date(configResponse.data.config.lastSyncAt)
         : null
     }
 

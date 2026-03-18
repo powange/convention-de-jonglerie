@@ -228,7 +228,7 @@ export const useNotificationsStore = defineStore('notifications', {
      */
     async markAllAsRead(category?: string) {
       try {
-        const response = await $fetch<{ updatedCount: number }>(
+        const response = await $fetch<{ data: { updatedCount: number } }>(
           '/api/notifications/mark-all-read',
           {
             method: 'PATCH',
@@ -245,7 +245,7 @@ export const useNotificationsStore = defineStore('notifications', {
         })
 
         // Utiliser updatedCount du serveur (source fiable) pour décrémenter le compteur
-        this.unreadCount = Math.max(0, this.unreadCount - (response.updatedCount || 0))
+        this.unreadCount = Math.max(0, this.unreadCount - (response.data.updatedCount || 0))
 
         return response
       } catch (error) {
@@ -304,15 +304,16 @@ export const useNotificationsStore = defineStore('notifications', {
     async getStats() {
       try {
         const response = await $fetch<{
-          success: boolean
-          stats: {
-            total: number
-            unread: number
-            byType: Array<{ type: string; count: number }>
+          data: {
+            stats: {
+              total: number
+              unread: number
+              byType: Array<{ type: string; count: number }>
+            }
           }
         }>('/api/notifications/stats')
 
-        return response.stats
+        return response.data.stats
       } catch (error) {
         console.error('Erreur lors de la récupération des statistiques:', error)
         throw error
