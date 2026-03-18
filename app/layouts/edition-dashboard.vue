@@ -217,15 +217,7 @@ onMounted(async () => {
 
   // Vérifier si l'utilisateur peut accéder à la validation des repas
   if (authStore.user?.id) {
-    try {
-      const response = await $fetch<{ data: { canAccess: boolean } }>(
-        `/api/editions/${editionId.value}/permissions/can-access-meal-validation`
-      )
-      canAccessMealValidation.value = response.data.canAccess
-    } catch (error) {
-      console.error('Error checking meal validation access:', error)
-      canAccessMealValidation.value = false
-    }
+    canAccessMealValidation.value = await editionStore.canAccessMealValidation(editionId.value)
   }
 })
 

@@ -22,7 +22,7 @@ export default wrapApiHandler(async (event) => {
     },
   })
 
-  return {
+  return createSuccessResponse({
     isTeamLeader: !!leaderAssignment,
-  }
+  })
 }, 'IsVolunteerTeamLeader')

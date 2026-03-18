@@ -17,8 +17,8 @@ export default wrapApiHandler(async (event) => {
   // Récupérer les détails du créneau actif si applicable
   const activeSlot = isActive ? await getActiveAccessControlSlot(user.id, editionId) : null
 
-  return {
+  return createSuccessResponse({
     isActive,
     activeSlot,
-  }
+  })
 }, 'GetVolunteerAccessControlStatus')

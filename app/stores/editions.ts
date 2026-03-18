@@ -74,6 +74,12 @@ export const useEditionStore = defineStore('editions', {
     _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,
     // Toutes les éditions pour l'agenda (sans pagination)
     allEditions: [] as Edition[],
+    // Cache pour isTeamLeader par édition (évite les appels doublons)
+    _teamLeaderCache: {} as Record<number, Promise<boolean> | undefined>,
+    // Cache pour canAccessMealValidation par édition
+    _mealValidationCache: {} as Record<number, Promise<boolean> | undefined>,
+    // Cache pour accessControlStatus par édition
+    _accessControlStatusCache: {} as Record<number, Promise<boolean> | undefined>,
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -563,15 +569,74 @@ export const useEditionStore = defineStore('editions', {
         return false
       }
 
-      try {
-        const response = await $fetch<{ isTeamLeader: boolean }>(
-          `/api/editions/${editionId}/volunteers/is-team-leader`
-        )
-        return response.isTeamLeader
-      } catch (error) {
-        console.error('Error checking team leader status:', error)
-        return false
+      // Réutiliser la promesse en cours pour éviter les appels doublons
+      if (this._teamLeaderCache[editionId]) {
+        return this._teamLeaderCache[editionId]!
       }
+
+      const promise = (async () => {
+        try {
+          const response = await $fetch<{ data: { isTeamLeader: boolean } }>(
+            `/api/editions/${editionId}/volunteers/is-team-leader`
+          )
+          return response.data.isTeamLeader
+        } catch (error) {
+          console.error('Error checking team leader status:', error)
+          return false
+        } finally {
+          this._teamLeaderCache[editionId] = undefined
+        }
+      })()
+
+      this._teamLeaderCache[editionId] = promise
+      return promise
+    },
+
+    // Vérifier si l'utilisateur peut accéder à la validation des repas
+    async canAccessMealValidation(editionId: number): Promise<boolean> {
+      // Réutiliser la promesse en cours pour éviter les appels doublons
+      if (this._mealValidationCache[editionId]) {
+        return this._mealValidationCache[editionId]!
+      }
+
+      const promise = (async () => {
+        try {
+          const response = await $fetch<{ data: { canAccess: boolean } }>(
+            `/api/editions/${editionId}/permissions/can-access-meal-validation`
+          )
+          return response.data.canAccess
+        } catch {
+          return false
+        } finally {
+          this._mealValidationCache[editionId] = undefined
+        }
+      })()
+
+      this._mealValidationCache[editionId] = promise
+      return promise
+    },
+
+    // Vérifier si l'utilisateur a un créneau actif de contrôle d'accès
+    async isAccessControlActive(editionId: number): Promise<boolean> {
+      if (this._accessControlStatusCache[editionId]) {
+        return this._accessControlStatusCache[editionId]!
+      }
+
+      const promise = (async () => {
+        try {
+          const response = await $fetch<{ data: { isActive: boolean } }>(
+            `/api/editions/${editionId}/volunteers/access-control/status`
+          )
+          return response.data.isActive
+        } catch {
+          return false
+        } finally {
+          this._accessControlStatusCache[editionId] = undefined
+        }
+      })()
+
+      this._accessControlStatusCache[editionId] = promise
+      return promise
     },
 
     // Récupérer toutes les éditions sans pagination (pour l'agenda)

@@ -110,24 +110,10 @@ watch(
       isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id, authStore.user.id)
 
       // Vérifier si l'utilisateur peut accéder à la validation des repas
-      try {
-        const response = await $fetch<{ data: { canAccess: boolean } }>(
-          `/api/editions/${props.edition.id}/permissions/can-access-meal-validation`
-        )
-        canAccessMealValidation.value = response.data.canAccess
-      } catch {
-        canAccessMealValidation.value = false
-      }
+      canAccessMealValidation.value = await editionStore.canAccessMealValidation(props.edition.id)
 
       // Vérifier si l'utilisateur a un créneau actif de contrôle d'accès
-      try {
-        const response = await $fetch<{ isActive: boolean; activeSlot: any }>(
-          `/api/editions/${props.edition.id}/volunteers/access-control/status`
-        )
-        canAccessAccessControlPage.value = response.isActive
-      } catch {
-        canAccessAccessControlPage.value = false
-      }
+      canAccessAccessControlPage.value = await editionStore.isAccessControlActive(props.edition.id)
     } else {
       isTeamLeaderValue.value = false
       canAccessMealValidation.value = false

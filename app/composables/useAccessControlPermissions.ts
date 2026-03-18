@@ -40,14 +40,13 @@ export function useAccessControlPermissions(editionId: MaybeRefOrGetter<number |
       error.value = null
 
       const response = await $fetch<{
-        isActive: boolean
-        activeSlot: ActiveAccessControlSlot | null
+        data: { isActive: boolean; activeSlot: ActiveAccessControlSlot | null }
       }>(`/api/editions/${id}/volunteers/access-control/status`)
 
-      isActiveAccessControlVolunteer.value = response.isActive
-      activeSlot.value = response.activeSlot
+      isActiveAccessControlVolunteer.value = response.data.isActive
+      activeSlot.value = response.data.activeSlot
 
-      return response.isActive
+      return response.data.isActive
     } catch (err: any) {
       error.value = err.data?.message || 'Erreur lors de la vérification du statut'
       isActiveAccessControlVolunteer.value = false
