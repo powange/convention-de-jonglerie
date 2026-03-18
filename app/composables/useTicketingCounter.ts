@@ -410,82 +410,57 @@ export function useTicketingCounter(editionId: number, token: string) {
  */
 export function useTicketingCountersList(editionId: number) {
   const counters = ref<Counter[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
 
-  /**
-   * Récupère la liste des compteurs
-   */
-  const fetchCounters = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await $fetch<{ success: boolean; data: { counters: Counter[] } }>(
-        `/api/editions/${editionId}/ticketing/counters`
-      )
-      counters.value = response.data.counters
-    } catch (err: any) {
-      error.value =
-        err?.data?.message || err?.message || 'Erreur lors de la récupération des compteurs'
-      console.error('Error fetching counters:', err)
-    } finally {
-      loading.value = false
+  const { execute: fetchCounters, loading: fetchLoading } = useApiAction(
+    `/api/editions/${editionId}/ticketing/counters`,
+    {
+      method: 'GET',
+      silent: true,
+      onSuccess: (response: any) => {
+        counters.value = response.counters
+      },
     }
+  )
+
+  const createCounterBody = ref({ name: '' })
+  const { execute: executeCreate, loading: createLoading } = useApiAction(
+    `/api/editions/${editionId}/ticketing/counters`,
+    {
+      method: 'POST',
+      body: () => createCounterBody.value,
+      silent: true,
+      onSuccess: (response: any) => {
+        counters.value.unshift(response.counter)
+      },
+    }
+  )
+
+  const createCounter = async (name: string): Promise<Counter> => {
+    createCounterBody.value = { name }
+    const result = await executeCreate()
+    return (result as any).counter
   }
 
-  /**
-   * Crée un nouveau compteur
-   */
-  const createCounter = async (name: string) => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await $fetch<{ success: boolean; counter: Counter }>(
-        `/api/editions/${editionId}/ticketing/counters`,
-        {
-          method: 'POST',
-          body: { name },
-        }
-      )
-      counters.value.unshift(response.counter)
-      return response.counter
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Erreur lors de la création du compteur'
-      console.error('Error creating counter:', err)
-      throw err
-    } finally {
-      loading.value = false
+  const { execute: executeDelete, loading: deleteLoading } = useApiActionById(
+    (id) => `/api/editions/${editionId}/ticketing/counters/${id}`,
+    {
+      method: 'DELETE',
+      silent: true,
+      onSuccess: (_response: any, id?: string | number) => {
+        counters.value = counters.value.filter((c) => c.id !== Number(id))
+      },
     }
-  }
+  )
 
-  /**
-   * Supprime un compteur
-   */
   const deleteCounter = async (counterId: number) => {
-    loading.value = true
-    error.value = null
-
-    try {
-      await $fetch(`/api/editions/${editionId}/ticketing/counters/${counterId}`, {
-        method: 'DELETE',
-      })
-      counters.value = counters.value.filter((c) => c.id !== counterId)
-    } catch (err: any) {
-      error.value =
-        err?.data?.message || err?.message || 'Erreur lors de la suppression du compteur'
-      console.error('Error deleting counter:', err)
-      throw err
-    } finally {
-      loading.value = false
-    }
+    await executeDelete(counterId)
   }
+
+  const loading = computed(() => fetchLoading.value || createLoading.value || deleteLoading.value)
 
   return {
     counters: computed(() => counters.value),
-    loading: computed(() => loading.value),
-    error: computed(() => error.value),
+    loading,
     fetchCounters,
     createCounter,
     deleteCounter,

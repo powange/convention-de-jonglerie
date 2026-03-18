@@ -42,13 +42,13 @@
         </p>
       </div>
 
-      <div v-else-if="error" class="mb-6">
+      <div v-else-if="fetchError" class="mb-6">
         <UAlert
           icon="i-heroicons-exclamation-triangle"
           color="error"
           variant="soft"
           :title="$t('common.error')"
-          :description="error"
+          :description="$t('ticketing.counters.loading_error')"
         />
       </div>
 
@@ -179,11 +179,12 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 const {
   counters,
   loading,
-  error,
   fetchCounters,
   createCounter: createCounterApi,
   deleteCounter: deleteCounterApi,
 } = useTicketingCountersList(editionId)
+
+const fetchError = ref(false)
 
 const showCreateModal = ref(false)
 const newCounterName = ref('')
@@ -225,7 +226,7 @@ const createCounter = async () => {
   } catch {
     toast.add({
       title: t('common.error'),
-      description: error.value || t('ticketing.counters.create_error'),
+      description: t('ticketing.counters.create_error'),
       color: 'error',
     })
   }
@@ -248,7 +249,7 @@ const deleteCounter = async () => {
   } catch {
     toast.add({
       title: t('common.error'),
-      description: error.value || t('ticketing.counters.delete_error'),
+      description: t('ticketing.counters.delete_error'),
       color: 'error',
     })
   }
@@ -265,7 +266,8 @@ onMounted(async () => {
   }
 
   // Charger les compteurs
-  await fetchCounters()
+  const result = await fetchCounters()
+  if (!result) fetchError.value = true
 })
 
 // Métadonnées de la page
