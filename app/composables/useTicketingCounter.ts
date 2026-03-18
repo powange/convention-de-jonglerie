@@ -441,7 +441,7 @@ export function useTicketingCountersList(editionId: number) {
     return (result as any).counter
   }
 
-  const { execute: executeDelete, loading: deleteLoading } = useApiActionById(
+  const { execute: executeDelete, loadingId: deleteLoadingId } = useApiActionById(
     (id) => `/api/editions/${editionId}/ticketing/counters/${id}`,
     {
       method: 'DELETE',
@@ -456,7 +456,9 @@ export function useTicketingCountersList(editionId: number) {
     await executeDelete(counterId)
   }
 
-  const loading = computed(() => fetchLoading.value || createLoading.value || deleteLoading.value)
+  const loading = computed(
+    () => fetchLoading.value || createLoading.value || deleteLoadingId.value !== null
+  )
 
   return {
     counters: computed(() => counters.value),
