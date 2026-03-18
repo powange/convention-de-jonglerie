@@ -238,6 +238,70 @@
         </div>
       </UCard>
 
+      <!-- Données liées -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-link" class="text-blue-500" />
+            <h3 class="font-medium text-gray-900 dark:text-white">
+              {{ $t('admin.linked_data') }}
+            </h3>
+          </div>
+        </template>
+
+        <!-- Légende -->
+        <div class="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
+          <div class="flex items-center gap-1">
+            <UIcon name="i-heroicons-trash" class="w-3 h-3 text-error-500" />
+            {{ $t('admin.on_delete_cascade') }}
+          </div>
+          <div class="flex items-center gap-1">
+            <UIcon name="i-heroicons-link-slash" class="w-3 h-3 text-warning-500" />
+            {{ $t('admin.on_delete_unlink') }}
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div v-for="section in linkedDataSections" :key="section.titleKey" class="space-y-2">
+            <h4
+              class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1"
+            >
+              <UIcon :name="section.icon" class="w-4 h-4" />
+              {{ $t(section.titleKey) }}
+            </h4>
+            <div class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+              <template v-for="item in section.items" :key="item.label">
+                <div v-if="item.count > 0" class="flex items-center justify-between">
+                  <span class="flex items-center gap-1">
+                    <UIcon :name="item.icon" :class="item.iconClass" class="w-3 h-3" />
+                    {{ $t(item.label) }}
+                  </span>
+                  <UBadge :color="item.color" variant="soft" size="xs">{{ item.count }}</UBadge>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <p
+          v-if="totalLinkedData === 0"
+          class="text-sm text-gray-500 dark:text-gray-400 text-center py-2"
+        >
+          {{ $t('admin.no_linked_data') }}
+        </p>
+
+        <!-- Alerte de suppression si données liées -->
+        <UAlert
+          v-if="totalLinkedData > 0"
+          class="mt-4"
+          icon="i-heroicons-exclamation-triangle"
+          color="warning"
+          variant="soft"
+          :title="$t('admin.deletion_warning')"
+          :description="$t('admin.deletion_warning_description', { count: totalLinkedData })"
+        />
+      </UCard>
+
       <!-- Actions administrateur -->
       <UCard>
         <template #header>
@@ -308,6 +372,29 @@ interface UserProfile {
     createdConventions: number
     createdEditions: number
     favoriteEditions: number
+    attendingEditions: number
+    organizations: number
+    volunteerApplications: number
+    artistProfiles: number
+    showApplications: number
+    workshops: number
+    workshopFavorites: number
+    carpoolOffers: number
+    carpoolRequests: number
+    carpoolBookings: number
+    carpoolComments: number
+    carpoolRequestComments: number
+    editionPosts: number
+    editionPostComments: number
+    lostFoundItems: number
+    lostFoundComments: number
+    conversationParticipants: number
+    notifications: number
+    feedbacks: number
+    claimRequests: number
+    manuallyAddedVolunteers: number
+    validatedArtistEntries: number
+    decidedShowApplications: number
   }
 }
 
@@ -322,6 +409,178 @@ const toast = useToast()
 const { t } = useI18n()
 
 const userId = parseInt(route.params.id as string)
+
+// Helper pour construire un item de données liées
+const cascadeIcon = 'i-heroicons-trash'
+const cascadeClass = 'text-error-500'
+const unlinkIcon = 'i-heroicons-link-slash'
+const unlinkClass = 'text-warning-500'
+
+// Items par catégorie avec indicateur cascade/unlink
+const conventionItems = computed(() => {
+  const c = user.value?._count
+  if (!c) return []
+  return [
+    {
+      label: 'admin.conventions_created',
+      count: c.createdConventions || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.editions_created',
+      count: c.createdEditions || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.organizer_roles',
+      count: c.organizations || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.claim_requests',
+      count: c.claimRequests || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+  ]
+})
+
+const participationItems = computed(() => {
+  const c = user.value?._count
+  if (!c) return []
+  return [
+    {
+      label: 'admin.volunteer_applications',
+      count: c.volunteerApplications || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.artist_profiles',
+      count: c.artistProfiles || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.show_applications',
+      count: c.showApplications || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.workshops_created',
+      count: c.workshops || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.manually_added_volunteers',
+      count: c.manuallyAddedVolunteers || 0,
+      color: 'warning' as const,
+      icon: unlinkIcon,
+      iconClass: unlinkClass,
+    },
+    {
+      label: 'admin.decided_applications',
+      count: c.decidedShowApplications || 0,
+      color: 'warning' as const,
+      icon: unlinkIcon,
+      iconClass: unlinkClass,
+    },
+    {
+      label: 'admin.validated_artist_entries',
+      count: c.validatedArtistEntries || 0,
+      color: 'warning' as const,
+      icon: unlinkIcon,
+      iconClass: unlinkClass,
+    },
+  ]
+})
+
+const interactionItems = computed(() => {
+  const c = user.value?._count
+  if (!c) return []
+  return [
+    {
+      label: 'admin.favorites',
+      count: (c.favoriteEditions || 0) + (c.workshopFavorites || 0),
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.carpool_items',
+      count: (c.carpoolOffers || 0) + (c.carpoolRequests || 0),
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.posts_and_comments',
+      count: (c.editionPosts || 0) + (c.editionPostComments || 0),
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.lost_found_items',
+      count: (c.lostFoundItems || 0) + (c.lostFoundComments || 0),
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.conversations',
+      count: c.conversationParticipants || 0,
+      color: 'error' as const,
+      icon: cascadeIcon,
+      iconClass: cascadeClass,
+    },
+    {
+      label: 'admin.feedbacks_count',
+      count: c.feedbacks || 0,
+      color: 'warning' as const,
+      icon: unlinkIcon,
+      iconClass: unlinkClass,
+    },
+  ]
+})
+
+const linkedDataSections = computed(() => [
+  {
+    titleKey: 'admin.linked_conventions',
+    icon: 'i-heroicons-building-library',
+    items: conventionItems.value,
+  },
+  {
+    titleKey: 'admin.linked_participation',
+    icon: 'i-heroicons-user-group',
+    items: participationItems.value,
+  },
+  {
+    titleKey: 'admin.linked_interactions',
+    icon: 'i-heroicons-chat-bubble-left-right',
+    items: interactionItems.value,
+  },
+])
+
+const totalLinkedData = computed(() => {
+  return linkedDataSections.value.reduce(
+    (sum, section) => sum + section.items.reduce((s, item) => s + item.count, 0),
+    0
+  )
+})
 
 // État pour le modal de suppression
 const userToDelete = ref<UserProfile | null>(null)

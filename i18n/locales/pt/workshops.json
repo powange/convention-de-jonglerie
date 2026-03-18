@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop removido dos favoritos",
     "import_error": "Erro durante a importação",
     "import_from_image": "Importar de uma fotografia",
+    "import_from_map": "Importar do mapa do recinto",
+    "import_from_map_description": "Adicione rapidamente zonas ou pontos de referência do mapa como locais de workshops.",
     "import_partial_error": "Importação parcialmente bem sucedida",
     "import_partial_error_description": "{success} seminário(s) importado(s), {fail} fracasso(s)",
     "import_selected": "Seleção de importação",

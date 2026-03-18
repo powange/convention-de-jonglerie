@@ -23,9 +23,9 @@
       "be_first_to_comment": "Soyez le premier à commenter cette {type} !",
       "be_first_to_offer": "Soyez le premier à proposer un covoiturage pour cette édition !",
       "book_seats": "Réserver",
-      "call": "Appeler",
       "booking_message": "Message pour le conducteur (optionnel)",
       "booking_message_placeholder": "Ex: J'ai beaucoup de bagages, puis-je prendre 2 places ?",
+      "call": "Appeler",
       "comments": "Commentaires",
       "confirm_booking": "Confirmer la réservation",
       "confirm_delete_offer": "Êtes-vous sûr de vouloir supprimer cette offre de covoiturage ?",
@@ -36,18 +36,20 @@
       "delete_offer": "Supprimer l'offre",
       "delete_request": "Supprimer la demande",
       "departure_date_time": "Date et heure de départ",
+      "direction": "Direction",
       "edit_offer": "Modifier l'offre de covoiturage",
       "edit_request": "Modifier la demande de covoiturage",
       "how_many_seats_needed": "Combien de places recherchez-vous ?",
       "loading_comments": "Chargement des commentaires...",
+      "location": "Lieu",
       "my_booking": "Ma réservation",
       "no_comments": "Aucun commentaire",
       "no_offers": "Aucune offre de covoiturage",
-      "offer_not_found": "Offre de covoiturage introuvable",
       "no_pending_bookings": "Aucune réservation en attente",
       "no_requests": "Aucune demande de covoiturage",
       "no_requests_published": "Aucune demande n'a été publiée pour le moment.",
       "offer": "offre",
+      "offer_not_found": "Offre de covoiturage introuvable",
       "offered_on": "Proposé le {date}",
       "offers_long": "Offres de covoiturage",
       "offers_short": "Offres",
@@ -59,10 +61,10 @@
       "request_carpool": "Demander un covoiturage",
       "request_not_found": "Demande de covoiturage introuvable",
       "requested_on": "Demandé le {date}",
-      "reveal_contact": "Afficher le numéro de téléphone",
       "requested_seats": "{count} place demandée | {count} places demandées",
       "requests_long": "Demandes de covoiturage",
       "requests_short": "Demandes",
+      "reveal_contact": "Afficher le numéro de téléphone",
       "seats_available": "{count} place disponible | {count} places disponibles",
       "seats_needed": "{count} place recherchée | {count} places recherchées",
       "show_active_only": "Actifs seulement",
@@ -76,8 +78,6 @@
       "suggestions": "Suggestions",
       "to_add_comment": "pour ajouter un commentaire",
       "trip_date": "Date du trajet",
-      "location": "Lieu",
-      "direction": "Direction",
       "view_comments": "Voir les commentaires ({count})"
     },
     "convention_form": {
@@ -175,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Publication...",
-      "submitting": "Envoi..."
+      "publishing": "Publication..."
     },
     "labels": {
       "address_complement": "Complément d'adresse",

@@ -19,11 +19,13 @@
       "added_on": "Dodano {date}",
       "address": "Adres",
       "available_seats": "Liczba dostępnych miejsc",
+      "back_to_list": "Powrót do listy",
       "be_first_to_comment": "Bądź pierwszy, który skomentuje tę {type}!",
       "be_first_to_offer": "Bądź pierwszy, który zaoferuje wspólny przejazd na tę edycję!",
       "book_seats": "Zarezerwuj",
       "booking_message": "Wiadomość do kierowcy (opcjonalnie)",
       "booking_message_placeholder": "Np.: Mam dużo bagażu, czy mogę zająć 2 miejsca?",
+      "call": "Zadzwoń",
       "comments": "Komentarze",
       "confirm_booking": "Potwierdź rezerwację",
       "confirm_delete_offer": "Czy na pewno chcesz usunąć tę ofertę wspólnego przejazdu?",
@@ -34,10 +36,12 @@
       "delete_offer": "Usuń ofertę",
       "delete_request": "Usuń prośbę",
       "departure_date_time": "Data i godzina wyjazdu",
+      "direction": "Kierunek",
       "edit_offer": "Edytuj ofertę wspólnego przejazdu",
       "edit_request": "Edytuj prośbę o wspólny przejazd",
       "how_many_seats_needed": "Ile miejsc szukasz?",
       "loading_comments": "Ładowanie komentarzy...",
+      "location": "Miejsce",
       "my_booking": "Moja rezerwacja",
       "no_comments": "Brak komentarzy",
       "no_offers": "Brak ofert wspólnych przejazdów",
@@ -45,6 +49,7 @@
       "no_requests": "Brak próśb o wspólne przejazdy",
       "no_requests_published": "Nie opublikowano jeszcze żadnych próśb.",
       "offer": "ofertę",
+      "offer_not_found": "Nie znaleziono oferty wspólnego przejazdu",
       "offered_on": "Zaoferowane {date}",
       "offers_long": "Oferty wspólnych przejazdów",
       "offers_short": "Oferty",
@@ -54,10 +59,12 @@
       "reject": "Odrzuć",
       "request": "prośbę",
       "request_carpool": "Poproś o wspólny przejazd",
+      "request_not_found": "Nie znaleziono prośby o wspólny przejazd",
       "requested_on": "Poproszono {date}",
       "requested_seats": "{count} miejsce wymagane | {count} miejsca wymagane | {count} miejsc wymaganych",
       "requests_long": "Prośby o wspólne przejazdy",
       "requests_short": "Prośby",
+      "reveal_contact": "Pokaż numer telefonu",
       "seats_available": "{count} dostępne miejsce | {count} dostępnych miejsc",
       "seats_needed": "{count} szukane miejsce | {count} szukanych miejsc",
       "show_active_only": "Tylko aktywne",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Sugestie",
       "to_add_comment": "aby dodać komentarz",
+      "trip_date": "Data podróży",
       "view_comments": "Zobacz komentarze ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Publikowanie...",
-      "submitting": "Wysyłanie..."
+      "publishing": "Publikowanie..."
     },
     "labels": {
       "address_complement": "Uzupełnienie adresu",

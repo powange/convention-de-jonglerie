@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop aus Favoriten entfernt",
     "import_error": "Fehler beim Import",
     "import_from_image": "Aus einem Foto importieren",
+    "import_from_map": "Vom Lageplan importieren",
+    "import_from_map_description": "Fügen Sie schnell Zonen oder Orientierungspunkte der Karte als Workshop-Standorte hinzu.",
     "import_partial_error": "Import teilweise erfolgreich",
     "import_partial_error_description": "{success} importierte(r) Workshop(s), {fail} Fehlschlag(e)",
     "import_selected": "Auswahl importieren",

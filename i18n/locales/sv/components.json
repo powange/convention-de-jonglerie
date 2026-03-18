@@ -19,11 +19,13 @@
       "added_on": "Lagt till den {date}",
       "address": "Adress",
       "available_seats": "Antal tillgängliga platser",
+      "back_to_list": "Tillbaka till listan",
       "be_first_to_comment": "Bli först med att kommentera detta {type}!",
       "be_first_to_offer": "Bli först med att föreslå en samåkning för denna utgåva!",
       "book_seats": "Bok",
       "booking_message": "Meddelande till föraren (valfritt)",
       "booking_message_placeholder": "T.ex.: Jag har mycket bagage, kan jag ta 2 platser?",
+      "call": "Ring",
       "comments": "Kommentarer",
       "confirm_booking": "Bekräfta bokningen",
       "confirm_delete_offer": "Är du säker på att du vill säga upp den här bildelningstjänsten?",
@@ -34,10 +36,12 @@
       "delete_offer": "Ta bort erbjudande",
       "delete_request": "Ta bort begäran",
       "departure_date_time": "Datum och tid för avresa",
+      "direction": "Riktning",
       "edit_offer": "Modifiera erbjudandet om samåkning",
       "edit_request": "Ändra begäran om bilpool",
       "how_many_seats_needed": "Hur många platser söker du?",
       "loading_comments": "Laddar kommentarer...",
+      "location": "Plats",
       "my_booking": "Min reservation",
       "no_comments": "Ingen kommentar",
       "no_offers": "Inget erbjudande om bildelning",
@@ -45,6 +49,7 @@
       "no_requests": "Inga önskemål om samåkning",
       "no_requests_published": "Hittills har inga ansökningar publicerats.",
       "offer": "erbjudande",
+      "offer_not_found": "Samåkningserbjudande hittades inte",
       "offered_on": "Förslag framlagt den {date}",
       "offers_long": "Erbjudanden om samåkning",
       "offers_short": "Erbjudanden",
@@ -54,10 +59,12 @@
       "reject": "Avvisa",
       "request": "begäran",
       "request_carpool": "Begär en bilpool",
+      "request_not_found": "Samåkningsförfrågan hittades inte",
       "requested_on": "Begärd den {date}",
       "requested_seats": "{count} platser begärda | {count} platser begärda",
       "requests_long": "Önskemål om samåkning",
       "requests_short": "Förfrågningar",
+      "reveal_contact": "Visa telefonnummer",
       "seats_available": "{count} platser tillgängliga | {count} platser tillgängliga",
       "seats_needed": "{count} platser sökta | {count} platser sökta",
       "show_active_only": "Endast aktiva",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Förslag",
       "to_add_comment": "för att lägga till en kommentar",
+      "trip_date": "Resedatum",
       "view_comments": "Visa kommentarer ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Publikation...",
-      "submitting": "Skickar..."
+      "publishing": "Publikation..."
     },
     "labels": {
       "address_complement": "Ytterligare adress",

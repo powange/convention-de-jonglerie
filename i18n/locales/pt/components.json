@@ -19,11 +19,13 @@
       "added_on": "Adicionado em {date}",
       "address": "Morada",
       "available_seats": "Número de lugares disponíveis",
+      "back_to_list": "Voltar à lista",
       "be_first_to_comment": "Seja o primeiro a comentar esta {type}!",
       "be_first_to_offer": "Seja o primeiro a propor uma boleia para esta edição!",
       "book_seats": "Reservar",
       "booking_message": "Mensagem para o motorista (opcional)",
       "booking_message_placeholder": "Ex.: Tenho muita bagagem, posso ocupar 2 lugares?",
+      "call": "Ligar",
       "comments": "Comentários",
       "confirm_booking": "Confirmar reserva",
       "confirm_delete_offer": "Tem a certeza de que quer eliminar esta oferta de boleia?",
@@ -34,10 +36,12 @@
       "delete_offer": "Eliminar a oferta",
       "delete_request": "Eliminar o pedido",
       "departure_date_time": "Data e hora de partida",
+      "direction": "Direção",
       "edit_offer": "Alterar a oferta de boleia",
       "edit_request": "Alterar o pedido de boleia",
       "how_many_seats_needed": "Quantos lugares procura?",
       "loading_comments": "A carregar comentários...",
+      "location": "Local",
       "my_booking": "A minha reserva",
       "no_comments": "Nenhum comentário",
       "no_offers": "Nenhuma oferta de boleia",
@@ -45,6 +49,7 @@
       "no_requests": "Nenhum pedido de boleia",
       "no_requests_published": "Nenhum pedido foi publicado por enquanto.",
       "offer": "oferta",
+      "offer_not_found": "Oferta de boleia não encontrada",
       "offered_on": "Oferecido em {date}",
       "offers_long": "Ofertas de boleia",
       "offers_short": "Ofertas",
@@ -54,10 +59,12 @@
       "reject": "Rejeitar",
       "request": "pedido",
       "request_carpool": "Pedir uma boleia",
+      "request_not_found": "Pedido de boleia não encontrado",
       "requested_on": "Pedido em {date}",
       "requested_seats": "{count} lugar solicitado | {count} lugares solicitados",
       "requests_long": "Pedidos de boleia",
       "requests_short": "Pedidos",
+      "reveal_contact": "Mostrar número de telefone",
       "seats_available": "{count} lugar disponível | {count} lugares disponíveis",
       "seats_needed": "{count} lugar procurado | {count} lugares procurados",
       "show_active_only": "Apenas ativos",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Sugestões",
       "to_add_comment": "para adicionar um comentário",
+      "trip_date": "Data da viagem",
       "view_comments": "Ver comentários ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "A publicar...",
-      "submitting": "A enviar..."
+      "publishing": "A publicar..."
     },
     "labels": {
       "address_complement": "Complemento de morada",

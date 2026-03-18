@@ -1,5 +1,12 @@
 {
   "gestion": {
+    "about": {
+      "description": "Modifiez l'affiche, la description et le programme de votre événement.",
+      "save": "Enregistrer",
+      "save_error": "Erreur lors de la mise à jour des informations",
+      "save_success": "Informations mises à jour avec succès",
+      "title": "À propos"
+    },
     "ai_update": {
       "apply_selected": "Appliquer {count} modification(s)",
       "current_value": "Valeur actuelle",
@@ -21,13 +28,6 @@
       "title": "Mise à jour IA",
       "updates_applied": "Mises à jour appliquées avec succès"
     },
-    "about": {
-      "description": "Modifiez l'affiche, la description et le programme de votre événement.",
-      "save": "Enregistrer",
-      "save_error": "Erreur lors de la mise à jour des informations",
-      "save_success": "Informations mises à jour avec succès",
-      "title": "À propos"
-    },
     "artists": {
       "list_title": "Gestion des artistes",
       "manage_artists_description": "Gérez les artistes invités à cette édition",
@@ -46,10 +46,10 @@
       "artists_description": "Permettre la gestion des artistes et spectacles pour cette édition",
       "description": "Activer ou désactiver les modules optionnels de cette édition",
       "meals_description": "Permettre la gestion des repas pour bénévoles et artistes",
+      "site_map_description": "Permettre de définir et publier une carte du site de l'événement",
       "ticketing_description": "Permettre la gestion de la billetterie pour cette édition",
       "title": "Fonctionnalités",
       "volunteers_description": "Permettre la gestion des bénévoles pour cette édition",
-      "site_map_description": "Permettre de définir et publier une carte du site de l'événement",
       "workshops_description": "Permettre aux participants et bénévoles de créer des workshops"
     },
     "general_info": {
@@ -436,8 +436,8 @@
       "tiers_description": "Gérer les tarifs, options, quotas et articles à restituer",
       "tiers_title": "Tarifs, options & quotas",
       "title": "Billetterie",
-      "volunteer_returnable_items_title": "Articles à restituer pour les bénévoles",
-      "volunteer_returnable_items_description": "Ces articles seront remis à tous les bénévoles lors de leur validation d'accès"
+      "volunteer_returnable_items_description": "Ces articles seront remis à tous les bénévoles lors de leur validation d'accès",
+      "volunteer_returnable_items_title": "Articles à restituer pour les bénévoles"
     },
     "title": "Gestion",
     "view_edition": "Voir l'édition",

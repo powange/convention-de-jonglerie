@@ -19,11 +19,13 @@
       "added_on": "Hinzugefügt am {date}",
       "address": "Adresse",
       "available_seats": "Anzahl verfügbarer Plätze",
+      "back_to_list": "Zurück zur Liste",
       "be_first_to_comment": "Sei der erste, der dieses {type} kommentiert!",
       "be_first_to_offer": "Sei der erste, der eine Fahrgemeinschaft für diese Auflage anbietet!",
       "book_seats": "Buchen",
       "booking_message": "Nachricht an den Fahrer (optional)",
       "booking_message_placeholder": "Z.B.: Ich habe viel Gepäck, kann ich 2 Plätze nehmen?",
+      "call": "Anrufen",
       "comments": "Kommentare",
       "confirm_booking": "Buchung bestätigen",
       "confirm_delete_offer": "Bist du sicher, dass du dieses Fahrgemeinschafts-Angebot löschen möchtest?",
@@ -34,10 +36,12 @@
       "delete_offer": "Angebot löschen",
       "delete_request": "Anfrage löschen",
       "departure_date_time": "Abfahrtsdatum und -zeit",
+      "direction": "Richtung",
       "edit_offer": "Fahrgemeinschafts-Angebot bearbeiten",
       "edit_request": "Fahrgemeinschafts-Anfrage bearbeiten",
       "how_many_seats_needed": "Wie viele Plätze suchst du?",
       "loading_comments": "Lade Kommentare...",
+      "location": "Ort",
       "my_booking": "Meine Buchung",
       "no_comments": "Keine Kommentare",
       "no_offers": "Keine Fahrgemeinschafts-Angebote",
@@ -45,6 +49,7 @@
       "no_requests": "Keine Fahrgemeinschafts-Anfragen",
       "no_requests_published": "Bisher wurden keine Anfragen veröffentlicht.",
       "offer": "Angebot",
+      "offer_not_found": "Mitfahrangebot nicht gefunden",
       "offered_on": "Angeboten am {date}",
       "offers_long": "Fahrgemeinschafts-Angebote",
       "offers_short": "Angebote",
@@ -54,10 +59,12 @@
       "reject": "Ablehnen",
       "request": "Anfrage",
       "request_carpool": "Fahrgemeinschaft anfragen",
+      "request_not_found": "Mitfahrgesuch nicht gefunden",
       "requested_on": "Angefragt am {date}",
       "requested_seats": "{count} angefragter Platz | {count} angefragte Plätze",
       "requests_long": "Fahrgemeinschafts-Anfragen",
       "requests_short": "Anfragen",
+      "reveal_contact": "Telefonnummer anzeigen",
       "seats_available": "{count} Platz verfügbar | {count} Plätze verfügbar",
       "seats_needed": "{count} Platz gesucht | {count} Plätze gesucht",
       "show_active_only": "Nur aktive",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Vorschläge",
       "to_add_comment": "um einen Kommentar hinzuzufügen",
+      "trip_date": "Reisedatum",
       "view_comments": "Kommentare anzeigen ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Veröffentlichung...",
-      "submitting": "Übermittlung..."
+      "publishing": "Veröffentlichung..."
     },
     "labels": {
       "address_complement": "Adresszusatz",

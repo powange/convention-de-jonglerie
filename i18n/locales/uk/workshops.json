@@ -26,6 +26,8 @@
     "favorite_removed": "Майстер-клас видалено з обраного",
     "import_error": "Помилка під час імпорту",
     "import_from_image": "Імпорт з фотографії",
+    "import_from_map": "Імпорт з карти місця",
+    "import_from_map_description": "Швидко додайте зони або орієнтири з карти як місця проведення воркшопів.",
     "import_partial_error": "Частково успішний імпорт",
     "import_partial_error_description": "{success} імпортовано майстерню(и), {fail} відмова(и)",
     "import_selected": "Вибір імпорту",

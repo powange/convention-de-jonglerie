@@ -19,11 +19,13 @@
       "added_on": "Toegevoegd op {date}",
       "address": "Adres",
       "available_seats": "Aantal beschikbare plaatsen",
+      "back_to_list": "Terug naar de lijst",
       "be_first_to_comment": "Wees de eerste om te reageren op deze {type}!",
       "be_first_to_offer": "Wees de eerste om een rit aan te bieden voor deze editie!",
       "book_seats": "Plaatsen reserveren",
       "booking_message": "Bericht voor de bestuurder (optioneel)",
       "booking_message_placeholder": "Bijv.: Ik heb veel bagage, mag ik 2 plaatsen innemen?",
+      "call": "Bellen",
       "comments": "Opmerkingen",
       "confirm_booking": "Reservering bevestigen",
       "confirm_delete_offer": "Weet je zeker dat je deze meerijdaanbieding wilt verwijderen?",
@@ -34,10 +36,12 @@
       "delete_offer": "Aanbieding verwijderen",
       "delete_request": "Verzoek verwijderen",
       "departure_date_time": "Vertrekdatum en -tijd",
+      "direction": "Richting",
       "edit_offer": "Meerijdaanbieding bewerken",
       "edit_request": "Meerijdverzoek bewerken",
       "how_many_seats_needed": "Hoeveel plaatsen heb je nodig?",
       "loading_comments": "Opmerkingen laden...",
+      "location": "Locatie",
       "my_booking": "Mijn reservering",
       "no_comments": "Geen opmerkingen",
       "no_offers": "Geen meerijdaanbiedingen",
@@ -45,6 +49,7 @@
       "no_requests": "Geen meerijdverzoeken",
       "no_requests_published": "Er zijn nog geen verzoeken gepubliceerd.",
       "offer": "aanbieding",
+      "offer_not_found": "Carpoolaanbod niet gevonden",
       "offered_on": "Aangeboden op {date}",
       "offers_long": "Meerijdaanbiedingen",
       "offers_short": "Aanbiedingen",
@@ -54,10 +59,12 @@
       "reject": "Weigeren",
       "request": "verzoek",
       "request_carpool": "Rit aanvragen",
+      "request_not_found": "Carpoolverzoek niet gevonden",
       "requested_on": "Aangevraagd op {date}",
       "requested_seats": "{count} aangevraagde plaats | {count} aangevraagde plaatsen",
       "requests_long": "Meerijdverzoeken",
       "requests_short": "Verzoeken",
+      "reveal_contact": "Telefoonnummer tonen",
       "seats_available": "{count} plaats beschikbaar | {count} plaatsen beschikbaar",
       "seats_needed": "{count} plaats nodig | {count} plaatsen nodig",
       "show_active_only": "Alleen actieve",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Suggesties",
       "to_add_comment": "om een opmerking toe te voegen",
+      "trip_date": "Reisdatum",
       "view_comments": "Bekijk opmerkingen ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Publiceren...",
-      "submitting": "Verzenden..."
+      "publishing": "Publiceren..."
     },
     "labels": {
       "address_complement": "Adresaanvulling",

@@ -19,11 +19,13 @@
       "added_on": "Tilføjet den {date}",
       "address": "Adresse",
       "available_seats": "Antal ledige pladser",
+      "back_to_list": "Tilbage til listen",
       "be_first_to_comment": "Vær den første til at kommentere dette {type}!",
       "be_first_to_offer": "Vær den første til at tilbyde samkørsel for denne udgave!",
       "book_seats": "Reserver",
       "booking_message": "Besked til chaufføren (valgfrit)",
       "booking_message_placeholder": "F.eks.: Jeg har meget bagage, kan jeg tage 2 pladser?",
+      "call": "Ring",
       "comments": "Kommentarer",
       "confirm_booking": "Bekræft reservation",
       "confirm_delete_offer": "Er du sikker på, at du vil slette dette samkørselstilbud?",
@@ -34,10 +36,12 @@
       "delete_offer": "Slet tilbud",
       "delete_request": "Slet anmodning",
       "departure_date_time": "Afrejsedato og -tid",
+      "direction": "Retning",
       "edit_offer": "Rediger samkørselstilbud",
       "edit_request": "Rediger samkørselsanmodning",
       "how_many_seats_needed": "Hvor mange pladser søger du?",
       "loading_comments": "Indlæser kommentarer...",
+      "location": "Sted",
       "my_booking": "Min reservation",
       "no_comments": "Ingen kommentarer",
       "no_offers": "Ingen samkørselstilbud",
@@ -45,6 +49,7 @@
       "no_requests": "Ingen samkørselsanmodninger",
       "no_requests_published": "Ingen anmodninger er offentliggjort endnu.",
       "offer": "tilbud",
+      "offer_not_found": "Samkørselstilbud ikke fundet",
       "offered_on": "Tilbudt den {date}",
       "offers_long": "Samkørselstilbud",
       "offers_short": "Tilbud",
@@ -54,10 +59,12 @@
       "reject": "Afvis",
       "request": "anmodning",
       "request_carpool": "Anmod om samkørsel",
+      "request_not_found": "Samkørselsanmodning ikke fundet",
       "requested_on": "Anmodet den {date}",
       "requested_seats": "{count} anmodet plads | {count} anmodede pladser",
       "requests_long": "Samkørselsanmodninger",
       "requests_short": "Anmodninger",
+      "reveal_contact": "Vis telefonnummer",
       "seats_available": "{count} ledig plads | {count} ledige pladser",
       "seats_needed": "{count} søgt plads | {count} søgte pladser",
       "show_active_only": "Kun aktive",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Forslag",
       "to_add_comment": "for at tilføje en kommentar",
+      "trip_date": "Rejsedato",
       "view_comments": "Se kommentarer ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Offentliggør...",
-      "submitting": "Indsender..."
+      "publishing": "Offentliggør..."
     },
     "labels": {
       "address_complement": "Adressetillæg",

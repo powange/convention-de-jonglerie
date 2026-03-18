@@ -19,11 +19,13 @@
       "added_on": "Добавлено {date}",
       "address": "Адрес",
       "available_seats": "Количество доступных мест",
+      "back_to_list": "Вернуться к списку",
       "be_first_to_comment": "Будьте первым, кто прокомментирует это {type}!",
       "be_first_to_offer": "Будьте первым, кто предложит поездку для этого издания!",
       "book_seats": "Забронировать",
       "booking_message": "Сообщение водителю (необязательно)",
       "booking_message_placeholder": "Напр.: У меня много багажа, могу ли я занять 2 места?",
+      "call": "Позвонить",
       "comments": "Комментарии",
       "confirm_booking": "Подтвердить бронирование",
       "confirm_delete_offer": "Вы уверены, что хотите удалить это предложение совместной поездки?",
@@ -34,10 +36,12 @@
       "delete_offer": "Удалить предложение",
       "delete_request": "Удалить запрос",
       "departure_date_time": "Дата и время отправления",
+      "direction": "Направление",
       "edit_offer": "Редактировать предложение совместной поездки",
       "edit_request": "Редактировать запрос совместной поездки",
       "how_many_seats_needed": "Сколько мест вам нужно?",
       "loading_comments": "Загрузка комментариев...",
+      "location": "Место",
       "my_booking": "Моё бронирование",
       "no_comments": "Нет комментариев",
       "no_offers": "Нет предложений совместных поездок",
@@ -45,6 +49,7 @@
       "no_requests": "Нет запросов совместных поездок",
       "no_requests_published": "Запросы еще не опубликованы.",
       "offer": "предложение",
+      "offer_not_found": "Предложение совместной поездки не найдено",
       "offered_on": "Предложено {date}",
       "offers_long": "Предложения совместных поездок",
       "offers_short": "Предложения",
@@ -54,10 +59,12 @@
       "reject": "Отклонить",
       "request": "запрос",
       "request_carpool": "Запросить поездку",
+      "request_not_found": "Запрос на совместную поездку не найден",
       "requested_on": "Запрошено {date}",
       "requested_seats": "{count} запрошенное место | {count} запрошенных места | {count} запрошенных мест",
       "requests_long": "Запросы совместных поездок",
       "requests_short": "Запросы",
+      "reveal_contact": "Показать номер телефона",
       "seats_available": "{count} место доступно | {count} мест доступно",
       "seats_needed": "{count} место нужно | {count} мест нужно",
       "show_active_only": "Только активные",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Предложения",
       "to_add_comment": "чтобы добавить комментарий",
+      "trip_date": "Дата поездки",
       "view_comments": "Просмотреть комментарии ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Публикация...",
-      "submitting": "Отправка..."
+      "publishing": "Публикация..."
     },
     "labels": {
       "address_complement": "Дополнение к адресу",

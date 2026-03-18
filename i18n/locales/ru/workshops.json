@@ -26,6 +26,8 @@
     "favorite_removed": "Мастер-класс удален из избранного",
     "import_error": "Ошибка при импорте",
     "import_from_image": "Импорт из фотографии",
+    "import_from_map": "Импорт с карты площадки",
+    "import_from_map_description": "Быстро добавьте зоны или ориентиры с карты в качестве мест проведения мастер-классов.",
     "import_partial_error": "Частично успешный импорт",
     "import_partial_error_description": "{success} мастерская (мастерские) импортирована, {fail} неудача (неудачи)",
     "import_selected": "Выбор импорта",

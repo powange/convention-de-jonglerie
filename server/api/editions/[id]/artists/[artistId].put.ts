@@ -40,6 +40,8 @@ const updateArtistSchema = z
     userPrenom: z.string().min(1).optional(),
     userNom: z.string().min(1).optional(),
     userPhone: z.string().optional().nullable(),
+    // Relier l'artiste à un utilisateur existant (remplace l'utilisateur MANUAL)
+    switchToUserId: z.number().int().positive().optional(),
   })
   .refine(
     (data) => {
@@ -124,6 +126,62 @@ export default wrapApiHandler(
       })
     }
 
+    // Relier l'artiste à un utilisateur existant (remplace l'utilisateur MANUAL)
+    if (validatedData.switchToUserId) {
+      if (existingArtist.user.authProvider !== 'MANUAL') {
+        throw createError({
+          status: 403,
+          message:
+            "Le changement d'utilisateur n'est possible que pour les artistes créés manuellement",
+        })
+      }
+
+      // Vérifier que l'utilisateur cible existe
+      const targetUser = await prisma.user.findUnique({
+        where: { id: validatedData.switchToUserId },
+        select: { id: true },
+      })
+      if (!targetUser) {
+        throw createError({
+          status: 404,
+          message: 'Utilisateur cible non trouvé',
+        })
+      }
+
+      // Vérifier que l'utilisateur cible n'est pas déjà artiste sur cette édition
+      const existingArtistForUser = await prisma.editionArtist.findFirst({
+        where: {
+          editionId,
+          userId: validatedData.switchToUserId,
+          id: { not: artistId },
+        },
+      })
+      if (existingArtistForUser) {
+        throw createError({
+          status: 409,
+          message: 'Cet utilisateur est déjà enregistré comme artiste sur cette édition',
+        })
+      }
+
+      const oldUserId = existingArtist.user.id
+
+      // Changer le userId de l'artiste
+      await prisma.editionArtist.update({
+        where: { id: artistId },
+        data: { userId: validatedData.switchToUserId },
+      })
+
+      // Supprimer l'ancien utilisateur MANUAL s'il n'est lié à rien d'autre
+      const oldUserUsages = await prisma.editionArtist.count({
+        where: { userId: oldUserId },
+      })
+      if (oldUserUsages === 0) {
+        await prisma.user.delete({ where: { id: oldUserId } }).catch(() => {
+          // Ignorer si la suppression échoue (contraintes FK)
+        })
+      }
+    }
+
     // Vérifier si des modifications d'utilisateur sont demandées
     const hasUserUpdates =
       validatedData.userEmail ||
@@ -141,7 +199,12 @@ export default wrapApiHandler(
     }
 
     // Mettre à jour l'utilisateur si authProvider = MANUAL et que des modifications sont demandées
-    if (hasUserUpdates && existingArtist.user.authProvider === 'MANUAL') {
+    // (ignoré si switchToUserId est utilisé car on a changé d'utilisateur)
+    if (
+      hasUserUpdates &&
+      !validatedData.switchToUserId &&
+      existingArtist.user.authProvider === 'MANUAL'
+    ) {
       const userUpdateData: {
         email?: string
         prenom?: string
@@ -164,7 +227,7 @@ export default wrapApiHandler(
     const updatedArtist = await prisma.editionArtist.update({
       where: { id: artistId },
       data: buildUpdateData(validatedData, {
-        exclude: ['userEmail', 'userPrenom', 'userNom', 'userPhone'],
+        exclude: ['userEmail', 'userPrenom', 'userNom', 'userPhone', 'switchToUserId'],
       }),
       include: {
         user: {

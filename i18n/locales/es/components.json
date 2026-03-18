@@ -19,11 +19,13 @@
       "added_on": "Agregado el {date}",
       "address": "Dirección",
       "available_seats": "Número de asientos disponibles",
+      "back_to_list": "Volver a la lista",
       "be_first_to_comment": "¡Sé el primero en comentar esta {type}!",
       "be_first_to_offer": "¡Sé el primero en proponer un viaje compartido para esta edición!",
       "book_seats": "Reservar",
       "booking_message": "Mensaje para el conductor (opcional)",
       "booking_message_placeholder": "Ej.: Tengo mucho equipaje, ¿puedo ocupar 2 asientos?",
+      "call": "Llamar",
       "comments": "Comentarios",
       "confirm_booking": "Confirmar reserva",
       "confirm_delete_offer": "¿Estás seguro de que quieres eliminar esta oferta de viaje compartido?",
@@ -34,10 +36,12 @@
       "delete_offer": "Eliminar oferta",
       "delete_request": "Eliminar solicitud",
       "departure_date_time": "Fecha y hora de salida",
+      "direction": "Dirección",
       "edit_offer": "Editar oferta de viaje compartido",
       "edit_request": "Editar solicitud de viaje compartido",
       "how_many_seats_needed": "¿Cuántos asientos necesitas?",
       "loading_comments": "Cargando comentarios...",
+      "location": "Ubicación",
       "my_booking": "Mi reserva",
       "no_comments": "Sin comentarios",
       "no_offers": "Sin ofertas de viaje compartido",
@@ -45,6 +49,7 @@
       "no_requests": "Sin solicitudes de viaje compartido",
       "no_requests_published": "No se han publicado solicitudes por el momento.",
       "offer": "oferta",
+      "offer_not_found": "Oferta de viaje compartido no encontrada",
       "offered_on": "Ofrecido el {date}",
       "offers_long": "Ofertas de viaje compartido",
       "offers_short": "Ofertas",
@@ -54,10 +59,12 @@
       "reject": "Rechazar",
       "request": "solicitud",
       "request_carpool": "Solicitar viaje compartido",
+      "request_not_found": "Solicitud de viaje compartido no encontrada",
       "requested_on": "Solicitado el {date}",
       "requested_seats": "{count} asiento solicitado | {count} asientos solicitados",
       "requests_long": "Solicitudes de viaje compartido",
       "requests_short": "Solicitudes",
+      "reveal_contact": "Mostrar número de teléfono",
       "seats_available": "{count} asiento disponible | {count} asientos disponibles",
       "seats_needed": "{count} asiento necesario | {count} asientos necesarios",
       "show_active_only": "Solo activos",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Sugerencias",
       "to_add_comment": "para agregar un comentario",
+      "trip_date": "Fecha del viaje",
       "view_comments": "Ver comentarios ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Publicando...",
-      "submitting": "Enviando..."
+      "publishing": "Publicando..."
     },
     "labels": {
       "address_complement": "Complemento de dirección",

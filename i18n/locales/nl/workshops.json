@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop verwijderd uit favorieten",
     "import_error": "Fout tijdens importeren",
     "import_from_image": "Importeren vanaf een foto",
+    "import_from_map": "Importeren vanuit plattegrond",
+    "import_from_map_description": "Voeg snel zones of oriëntatiepunten van de kaart toe als workshoplocaties.",
     "import_partial_error": "Deels geslaagde import",
     "import_partial_error_description": "{success} geïmporteerde workshop(s), {fail} mislukte(n)",
     "import_selected": "Selectie importeren",

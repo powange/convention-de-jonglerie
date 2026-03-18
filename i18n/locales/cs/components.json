@@ -19,11 +19,13 @@
       "added_on": "Přidáno dne {date}",
       "address": "Adresa",
       "available_seats": "Počet volných míst",
+      "back_to_list": "Zpět na seznam",
       "be_first_to_comment": "Buďte první, kdo okomentuje tento {type}!",
       "be_first_to_offer": "Buďte první, kdo navrhne spolujízdu pro toto vydání!",
       "book_seats": "Kniha",
       "booking_message": "Zpráva pro řidiče (nepovinné)",
       "booking_message_placeholder": "Např.: Mám hodně zavazadel, mohu si vzít 2 sedadla?",
+      "call": "Zavolat",
       "comments": "Komentáře",
       "confirm_booking": "Potvrzení rezervace",
       "confirm_delete_offer": "Určitě chcete tuto službu sdílení aut zrušit?",
@@ -34,10 +36,12 @@
       "delete_offer": "Smazat nabídku",
       "delete_request": "Odstranit požadavek",
       "departure_date_time": "Datum a čas odjezdu",
+      "direction": "Směr",
       "edit_offer": "Úprava nabídky spolujízdy",
       "edit_request": "Úprava žádosti o spolujízdu",
       "how_many_seats_needed": "Kolik míst hledáte?",
       "loading_comments": "Načítání komentářů...",
+      "location": "Místo",
       "my_booking": "Moje rezervace",
       "no_comments": "Bez komentáře",
       "no_offers": "Žádná nabídka sdílení aut",
@@ -45,6 +49,7 @@
       "no_requests": "Žádné žádosti o spolujízdu",
       "no_requests_published": "Dosud nebyla zveřejněna žádná žádost.",
       "offer": "nabídka",
+      "offer_not_found": "Nabídka spolujízdy nenalezena",
       "offered_on": "Navrženo dne {date}",
       "offers_long": "Nabídky spolujízdy",
       "offers_short": "Nabídky",
@@ -54,10 +59,12 @@
       "reject": "Odpady",
       "request": "žádost",
       "request_carpool": "Žádost o spolujízdu",
+      "request_not_found": "Žádost o spolujízdu nenalezena",
       "requested_on": "Vyžádáno dne {date}",
       "requested_seats": "{count} požadované místo | {count} požadované místo",
       "requests_long": "Žádosti o spolujízdu",
       "requests_short": "Žádosti",
+      "reveal_contact": "Zobrazit telefonní číslo",
       "seats_available": "{count} volných míst | {count} volných míst",
       "seats_needed": "{count} prohledané místo | {count} prohledaná místa",
       "show_active_only": "Pouze aktivní",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Návrhy",
       "to_add_comment": "přidat komentář",
+      "trip_date": "Datum cesty",
       "view_comments": "Zobrazit komentáře ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Publikace...",
-      "submitting": "Odeslání..."
+      "publishing": "Publikace..."
     },
     "labels": {
       "address_complement": "Další adresa",

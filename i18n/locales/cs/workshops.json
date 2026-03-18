@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop odebrán z oblíbených",
     "import_error": "Chyba při importu",
     "import_from_image": "Import z fotografie",
+    "import_from_map": "Importovat z mapy areálu",
+    "import_from_map_description": "Rychle přidejte zóny nebo orientační body z mapy jako místa workshopů.",
     "import_partial_error": "Částečně úspěšný import",
     "import_partial_error_description": "{success} dovezený(é) workshop(y), {fail} neúspěch(y)",
     "import_selected": "Výběr importu",

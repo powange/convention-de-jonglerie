@@ -26,6 +26,8 @@
     "favorite_removed": "Taller eliminado de favoritos",
     "import_error": "Error durante la importación",
     "import_from_image": "Importar desde una foto",
+    "import_from_map": "Importar desde el mapa del recinto",
+    "import_from_map_description": "Añade rápidamente zonas o puntos de referencia del mapa como ubicaciones de talleres.",
     "import_partial_error": "Importación parcialmente correcta",
     "import_partial_error_description": "{success} taller(es) importado(s), {fail} fracaso(s)",
     "import_selected": "Importar selección",

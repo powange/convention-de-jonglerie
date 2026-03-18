@@ -19,11 +19,13 @@
       "added_on": "Aggiunto il {date}",
       "address": "Indirizzo",
       "available_seats": "Numero di posti disponibili",
+      "back_to_list": "Torna alla lista",
       "be_first_to_comment": "Sii il primo a commentare questa {type}!",
       "be_first_to_offer": "Sii il primo a proporre una condivisione auto per questa edizione!",
       "book_seats": "Prenota",
       "booking_message": "Messaggio per il conducente (facoltativo)",
       "booking_message_placeholder": "Es.: Ho molti bagagli, posso occupare 2 posti?",
+      "call": "Chiama",
       "comments": "Commenti",
       "confirm_booking": "Conferma prenotazione",
       "confirm_delete_offer": "Sei sicuro di voler eliminare questa offerta di condivisione auto?",
@@ -34,10 +36,12 @@
       "delete_offer": "Elimina offerta",
       "delete_request": "Elimina richiesta",
       "departure_date_time": "Data e ora di partenza",
+      "direction": "Direzione",
       "edit_offer": "Modifica offerta condivisione auto",
       "edit_request": "Modifica richiesta condivisione auto",
       "how_many_seats_needed": "Quanti posti stai cercando?",
       "loading_comments": "Caricamento commenti...",
+      "location": "Luogo",
       "my_booking": "La mia prenotazione",
       "no_comments": "Nessun commento",
       "no_offers": "Nessuna offerta di condivisione auto",
@@ -45,6 +49,7 @@
       "no_requests": "Nessuna richiesta di condivisione auto",
       "no_requests_published": "Nessuna richiesta è stata pubblicata al momento.",
       "offer": "offerta",
+      "offer_not_found": "Offerta di carpooling non trovata",
       "offered_on": "Offerto il {date}",
       "offers_long": "Offerte condivisione auto",
       "offers_short": "Offerte",
@@ -54,10 +59,12 @@
       "reject": "Rifiuta",
       "request": "richiesta",
       "request_carpool": "Richiedi condivisione auto",
+      "request_not_found": "Richiesta di carpooling non trovata",
       "requested_on": "Richiesto il {date}",
       "requested_seats": "{count} posto richiesto | {count} posti richiesti",
       "requests_long": "Richieste condivisione auto",
       "requests_short": "Richieste",
+      "reveal_contact": "Mostra numero di telefono",
       "seats_available": "{count} posto disponibile | {count} posti disponibili",
       "seats_needed": "{count} posto cercato | {count} posti cercati",
       "show_active_only": "Solo attivi",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Suggerimenti",
       "to_add_comment": "per aggiungere un commento",
+      "trip_date": "Data del viaggio",
       "view_comments": "Visualizza commenti ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Pubblicazione...",
-      "submitting": "Invio..."
+      "publishing": "Pubblicazione..."
     },
     "labels": {
       "address_complement": "Complemento indirizzo",

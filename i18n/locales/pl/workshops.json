@@ -26,6 +26,8 @@
     "favorite_removed": "Warsztat usunięty z ulubionych",
     "import_error": "Błąd podczas importowania",
     "import_from_image": "Import ze zdjęcia",
+    "import_from_map": "Importuj z mapy terenu",
+    "import_from_map_description": "Szybko dodaj strefy lub punkty orientacyjne z mapy jako lokalizacje warsztatów.",
     "import_partial_error": "Częściowo udany import",
     "import_partial_error_description": "{success} zaimportowane warsztaty, {fail} niepowodzenie(a)",
     "import_selected": "Wybór importu",

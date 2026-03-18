@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop fjernet fra favoritter",
     "import_error": "Fejl under import",
     "import_from_image": "Importer fra et foto",
+    "import_from_map": "Importer fra stedkort",
+    "import_from_map_description": "Tilføj hurtigt zoner eller vartegn fra kortet som workshop-steder.",
     "import_partial_error": "Delvist vellykket import",
     "import_partial_error_description": "{success} workshop(s) importeret, {fail} fiasko(er)",
     "import_selected": "Valg af import",

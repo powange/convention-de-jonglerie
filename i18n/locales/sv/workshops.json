@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop borttagen från favoriter",
     "import_error": "Fel under import",
     "import_from_image": "Importera från ett foto",
+    "import_from_map": "Importera från platskarta",
+    "import_from_map_description": "Lägg snabbt till zoner eller landmärken från kartan som workshopplatser.",
     "import_partial_error": "Delvis framgångsrik import",
     "import_partial_error_description": "{success} verkstad(er) importerad(e), {fail} misslyckande(n)",
     "import_selected": "Val av import",

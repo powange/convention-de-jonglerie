@@ -19,11 +19,13 @@
       "added_on": "Додано {date}",
       "address": "Адреса",
       "available_seats": "Кількість доступних місць",
+      "back_to_list": "Повернутися до списку",
       "be_first_to_comment": "Будьте першим, хто прокоментує цю {type}!",
       "be_first_to_offer": "Будьте першим, хто запропонує підвезення для цього видання!",
       "book_seats": "Забронювати",
       "booking_message": "Повідомлення водієві (необов'язково)",
       "booking_message_placeholder": "Напр.: У мене багато багажу, чи можу я зайняти 2 місця?",
+      "call": "Зателефонувати",
       "comments": "Коментарі",
       "confirm_booking": "Підтвердити бронювання",
       "confirm_delete_offer": "Ви впевнені, що хочете видалити цю пропозицію сумісної поїздки?",
@@ -34,10 +36,12 @@
       "delete_offer": "Видалити пропозицію",
       "delete_request": "Видалити запит",
       "departure_date_time": "Дата та час відправлення",
+      "direction": "Напрямок",
       "edit_offer": "Редагувати пропозицію сумісної поїздки",
       "edit_request": "Редагувати запит сумісної поїздки",
       "how_many_seats_needed": "Скільки місць вам потрібно?",
       "loading_comments": "Завантаження коментарів...",
+      "location": "Місце",
       "my_booking": "Моє бронювання",
       "no_comments": "Немає коментарів",
       "no_offers": "Немає пропозицій сумісних поїздок",
@@ -45,6 +49,7 @@
       "no_requests": "Немає запитів на сумісні поїздки",
       "no_requests_published": "Поки що не було опубліковано жодних запитів.",
       "offer": "пропозицію",
+      "offer_not_found": "Пропозицію спільної поїздки не знайдено",
       "offered_on": "Запропоновано {date}",
       "offers_long": "Пропозиції сумісних поїздок",
       "offers_short": "Пропозиції",
@@ -54,10 +59,12 @@
       "reject": "Відхилити",
       "request": "запит",
       "request_carpool": "Запросити підвезення",
+      "request_not_found": "Запит на спільну поїздку не знайдено",
       "requested_on": "Запитано {date}",
       "requested_seats": "{count} запитане місце | {count} запитаних місця | {count} запитаних місць",
       "requests_long": "Запити сумісних поїздок",
       "requests_short": "Запити",
+      "reveal_contact": "Показати номер телефону",
       "seats_available": "{count} доступне місце | {count} доступних місць",
       "seats_needed": "{count} потрібне місце | {count} потрібних місць",
       "show_active_only": "Тільки активні",
@@ -70,6 +77,7 @@
       },
       "suggestions": "Пропозиції",
       "to_add_comment": "щоб додати коментар",
+      "trip_date": "Дата поїздки",
       "view_comments": "Переглянути коментарі ({count})"
     },
     "convention_form": {
@@ -167,8 +175,7 @@
   },
   "forms": {
     "buttons": {
-      "publishing": "Публікація...",
-      "submitting": "Надсилання..."
+      "publishing": "Публікація..."
     },
     "labels": {
       "address_complement": "Доповнення до адреси",

@@ -72,17 +72,43 @@
               v-model="formData.email"
               type="email"
               :placeholder="$t('artists.user_email')"
-              :disabled="!isManualUser"
+              :disabled="!isManualUser || !!existingUserMatch"
               class="w-full"
             />
           </UFormField>
+
+          <!-- Bandeau utilisateur existant détecté -->
+          <UAlert
+            v-if="existingUserMatch"
+            icon="i-heroicons-user-circle"
+            color="info"
+            variant="soft"
+            :title="$t('artists.existing_user_found')"
+            :description="
+              $t('artists.existing_user_found_description', {
+                pseudo: existingUserMatch.pseudo,
+                email: existingUserMatch.email,
+              })
+            "
+          >
+            <template #actions>
+              <div class="flex gap-2">
+                <UButton size="sm" color="primary" @click="useExistingUser">
+                  {{ $t('artists.use_existing_user') }}
+                </UButton>
+                <UButton size="sm" color="neutral" variant="outline" @click="cancelExistingUser">
+                  {{ $t('common.cancel') }}
+                </UButton>
+              </div>
+            </template>
+          </UAlert>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField :label="$t('artists.user_firstname')">
               <UInput
                 v-model="formData.prenom"
                 :placeholder="$t('artists.user_firstname')"
-                :disabled="!isManualUser"
+                :disabled="!isManualUser || !!existingUserMatch"
               />
             </UFormField>
 
@@ -90,7 +116,7 @@
               <UInput
                 v-model="formData.nom"
                 :placeholder="$t('artists.user_lastname')"
-                :disabled="!isManualUser"
+                :disabled="!isManualUser || !!existingUserMatch"
               />
             </UFormField>
           </div>
@@ -100,7 +126,7 @@
               v-model="formData.phone"
               type="tel"
               :placeholder="$t('edition.ticketing.phone')"
-              :disabled="!isManualUser"
+              :disabled="!isManualUser || !!existingUserMatch"
               class="w-full"
             />
           </UFormField>
@@ -495,6 +521,68 @@ const isManualUser = computed(() => {
   return props.artist && props.artist.user && props.artist.user.authProvider === 'MANUAL'
 })
 
+// Détection d'utilisateur existant lors du changement d'email en mode édition MANUAL
+const existingUserMatch = ref<{
+  id: number
+  pseudo: string
+  email: string
+  prenom?: string | null
+  nom?: string | null
+} | null>(null)
+let emailCheckTimeout: ReturnType<typeof setTimeout> | null = null
+let skipEmailWatch = false
+
+watch(
+  () => formData.value.email,
+  (newEmail) => {
+    // Ignorer si l'assignation vient de useExistingUser/cancelExistingUser
+    if (skipEmailWatch) {
+      skipEmailWatch = false
+      return
+    }
+
+    // Uniquement en mode édition MANUAL et si l'email a changé par rapport à l'original
+    if (!props.artist || !isManualUser.value) return
+    if (newEmail === props.artist.user?.email) {
+      existingUserMatch.value = null
+      return
+    }
+
+    // Debounce 500ms
+    if (emailCheckTimeout) clearTimeout(emailCheckTimeout)
+    existingUserMatch.value = null
+
+    if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) return
+
+    emailCheckTimeout = setTimeout(async () => {
+      const results = await searchUsers(newEmail)
+      // Exclure l'utilisateur actuel de l'artiste
+      const match = results.find((u: any) => u.id !== props.artist?.user?.id)
+      existingUserMatch.value = match || null
+    }, 500)
+  }
+)
+
+const useExistingUser = () => {
+  if (!existingUserMatch.value) return
+  // Pré-remplir les champs avec l'utilisateur existant (en lecture seule)
+  skipEmailWatch = true
+  formData.value.email = existingUserMatch.value.email
+  formData.value.prenom = existingUserMatch.value.prenom || ''
+  formData.value.nom = existingUserMatch.value.nom || ''
+}
+
+const cancelExistingUser = () => {
+  // Remettre l'email original
+  existingUserMatch.value = null
+  if (props.artist?.user) {
+    skipEmailWatch = true
+    formData.value.email = props.artist.user.email || ''
+    formData.value.prenom = props.artist.user.prenom || ''
+    formData.value.nom = props.artist.user.nom || ''
+  }
+}
+
 const dietaryOptions = computed(() => [
   { label: t('diet.none'), value: 'NONE' },
   { label: t('diet.vegetarian'), value: 'VEGETARIAN' },
@@ -624,10 +712,15 @@ const buildBasePayload = () => ({
 const buildUpdatePayload = () => {
   const payload: Record<string, unknown> = buildBasePayload()
   if (isManualUser.value) {
-    payload.userEmail = formData.value.email
-    payload.userPrenom = formData.value.prenom
-    payload.userNom = formData.value.nom
-    payload.userPhone = formData.value.phone || null
+    if (existingUserMatch.value) {
+      // Relier l'artiste à l'utilisateur existant
+      payload.switchToUserId = existingUserMatch.value.id
+    } else {
+      payload.userEmail = formData.value.email
+      payload.userPrenom = formData.value.prenom
+      payload.userNom = formData.value.nom
+      payload.userPhone = formData.value.phone || null
+    }
   }
   return payload
 }

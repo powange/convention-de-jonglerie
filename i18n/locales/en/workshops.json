@@ -26,6 +26,8 @@
     "favorite_removed": "Workshop removed from favorites",
     "import_error": "Error during import",
     "import_from_image": "Import from a photo",
+    "import_from_map": "Import from site map",
+    "import_from_map_description": "Quickly add zones or landmarks from the map as workshop locations.",
     "import_partial_error": "Partially successful import",
     "import_partial_error_description": "{success} workshop(s) imported, {fail} failure(s)",
     "import_selected": "Import selection",
