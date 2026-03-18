@@ -1230,7 +1230,7 @@ const getAllOrganizers = (edition: Edition) => {
           pseudo: edOrg.organizer.user.pseudo,
           isCreator: false,
           entryValidated: edOrg.entryValidated,
-          title: null, // Peut être étendu si on ajoute un champ titre custom sur EditionOrganizer
+          title: edOrg.organizer.title || null,
         } as any)
       }
     })
@@ -1239,13 +1239,10 @@ const getAllOrganizers = (edition: Edition) => {
   return organizers
 }
 
-// Tooltip: afficher statut de validation si applicable
+// Tooltip: afficher le titre de l'organisateur
 const organizerTitleTooltip = (organizer: any) => {
   const parts = [organizer.pseudo]
   if (organizer.title) parts.push(organizer.title)
-  if (organizer.entryValidated !== undefined) {
-    parts.push(organizer.entryValidated ? t('common.validated') : t('common.pending_validation'))
-  }
   return parts.join(' - ')
 }
 
