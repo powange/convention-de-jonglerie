@@ -1375,7 +1375,7 @@ const searchUserByEmail = async () => {
     })
 
     // Avec emailExact, on récupère directement l'utilisateur correspondant
-    const matchingUser = response.data.users[0]
+    const matchingUser = (response.data.users || [])[0]
 
     if (matchingUser) {
       // Utilisateur trouvé : préremplir les champs

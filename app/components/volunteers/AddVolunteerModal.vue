@@ -358,7 +358,7 @@ const createUserAndAdd = () => {
   executeCreateUserAndAdd()
 }
 
-const loading = computed(() => addLoading.value || createLoading.value)
+const loading = computed(() => addLoading.value || createLoading.value || searching.value)
 
 const closeModal = () => {
   isOpen.value = false
