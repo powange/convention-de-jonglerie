@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Du har inte rätt att komma åt den här sidan.",
-      "title": "Åtkomst nekad"
+      "title": "Åtkomst nekad",
+      "volunteers_description": "Du har inte de nödvändiga behörigheterna för att visa volontäransökningar."
     },
     "add_convention": {
       "description": "Ett konvent sammanför flera upplagor av samma jongleringsevenemang.",

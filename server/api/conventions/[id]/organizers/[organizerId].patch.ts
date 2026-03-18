@@ -17,6 +17,9 @@ const perEditionSchema = z.object({
   canEdit: z.boolean().optional(),
   canDelete: z.boolean().optional(),
   canManageVolunteers: z.boolean().optional(),
+  canManageArtists: z.boolean().optional(),
+  canManageMeals: z.boolean().optional(),
+  canManageTicketing: z.boolean().optional(),
 })
 
 const payloadSchema = z.object({
@@ -27,6 +30,9 @@ const payloadSchema = z.object({
       deleteConvention: z.boolean().optional(),
       manageOrganizers: z.boolean().optional(),
       manageVolunteers: z.boolean().optional(),
+      manageArtists: z.boolean().optional(),
+      manageMeals: z.boolean().optional(),
+      manageTicketing: z.boolean().optional(),
       addEdition: z.boolean().optional(),
       editAllEditions: z.boolean().optional(),
       deleteAllEditions: z.boolean().optional(),
@@ -65,6 +71,9 @@ export default wrapApiHandler(
         canDeleteConvention: organizer.canDeleteConvention,
         canManageOrganizers: organizer.canManageOrganizers,
         canManageVolunteers: organizer.canManageVolunteers,
+        canManageArtists: organizer.canManageArtists,
+        canManageMeals: organizer.canManageMeals,
+        canManageTicketing: organizer.canManageTicketing,
         canAddEdition: organizer.canAddEdition,
         canEditAllEditions: organizer.canEditAllEditions,
         canDeleteAllEditions: organizer.canDeleteAllEditions,
@@ -74,6 +83,9 @@ export default wrapApiHandler(
         canEdit: p.canEdit,
         canDelete: p.canDelete,
         canManageVolunteers: p.canManageVolunteers,
+        canManageArtists: p.canManageArtists,
+        canManageMeals: p.canManageMeals,
+        canManageTicketing: p.canManageTicketing,
       })),
     }
 
@@ -88,6 +100,12 @@ export default wrapApiHandler(
         updateData.canManageOrganizers = parsed.rights.manageOrganizers
       if (parsed.rights.manageVolunteers !== undefined)
         updateData.canManageVolunteers = parsed.rights.manageVolunteers
+      if (parsed.rights.manageArtists !== undefined)
+        updateData.canManageArtists = parsed.rights.manageArtists
+      if (parsed.rights.manageMeals !== undefined)
+        updateData.canManageMeals = parsed.rights.manageMeals
+      if (parsed.rights.manageTicketing !== undefined)
+        updateData.canManageTicketing = parsed.rights.manageTicketing
       if (parsed.rights.addEdition !== undefined)
         updateData.canAddEdition = parsed.rights.addEdition
       if (parsed.rights.editAllEditions !== undefined)
@@ -118,6 +136,9 @@ export default wrapApiHandler(
                   canEdit: !!p.canEdit,
                   canDelete: !!p.canDelete,
                   canManageVolunteers: !!p.canManageVolunteers,
+                  canManageArtists: !!p.canManageArtists,
+                  canManageMeals: !!p.canManageMeals,
+                  canManageTicketing: !!p.canManageTicketing,
                 },
               })
             )
@@ -132,6 +153,9 @@ export default wrapApiHandler(
           canDeleteConvention: updated.canDeleteConvention,
           canManageOrganizers: updated.canManageOrganizers,
           canManageVolunteers: updated.canManageVolunteers,
+          canManageArtists: updated.canManageArtists,
+          canManageMeals: updated.canManageMeals,
+          canManageTicketing: updated.canManageTicketing,
           canAddEdition: updated.canAddEdition,
           canEditAllEditions: updated.canEditAllEditions,
           canDeleteAllEditions: updated.canDeleteAllEditions,
@@ -141,6 +165,9 @@ export default wrapApiHandler(
           canEdit: p.canEdit,
           canDelete: p.canDelete,
           canManageVolunteers: p.canManageVolunteers,
+          canManageArtists: p.canManageArtists,
+          canManageMeals: p.canManageMeals,
+          canManageTicketing: p.canManageTicketing,
         })),
       }
 
@@ -168,6 +195,9 @@ export default wrapApiHandler(
           deleteConvention: result.updated.canDeleteConvention,
           manageOrganizers: result.updated.canManageOrganizers,
           manageVolunteers: result.updated.canManageVolunteers,
+          manageArtists: result.updated.canManageArtists,
+          manageMeals: result.updated.canManageMeals,
+          manageTicketing: result.updated.canManageTicketing,
           addEdition: result.updated.canAddEdition,
           editAllEditions: result.updated.canEditAllEditions,
           deleteAllEditions: result.updated.canDeleteAllEditions,

@@ -213,6 +213,8 @@ interface AddConventionOrganizerInput {
     deleteAllEditions: boolean
     manageVolunteers: boolean
     manageArtists: boolean
+    manageMeals: boolean
+    manageTicketing: boolean
   }>
   title?: string
   perEdition?: Array<{
@@ -221,6 +223,8 @@ interface AddConventionOrganizerInput {
     canDelete?: boolean
     canManageVolunteers?: boolean
     canManageArtists?: boolean
+    canManageMeals?: boolean
+    canManageTicketing?: boolean
   }>
 }
 
@@ -265,13 +269,22 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
         canDeleteAllEditions: rights?.deleteAllEditions ?? false,
         canManageVolunteers: rights?.manageVolunteers ?? false,
         canManageArtists: rights?.manageArtists ?? false,
+        canManageMeals: rights?.manageMeals ?? false,
+        canManageTicketing: rights?.manageTicketing ?? false,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
 
     if (perEdition && perEdition.length) {
       const filtered = perEdition.filter(
-        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists)
+        (p) =>
+          p &&
+          (p.canEdit ||
+            p.canDelete ||
+            p.canManageVolunteers ||
+            p.canManageArtists ||
+            p.canManageMeals ||
+            p.canManageTicketing)
       )
       if (filtered.length) {
         await tx.editionOrganizerPermission.createMany({
@@ -282,6 +295,8 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             canDelete: !!p.canDelete,
             canManageVolunteers: !!p.canManageVolunteers,
             canManageArtists: !!p.canManageArtists,
+            canManageMeals: !!p.canManageMeals,
+            canManageTicketing: !!p.canManageTicketing,
           })),
           skipDuplicates: true,
         })
@@ -489,6 +504,8 @@ export async function updateOrganizerRights(params: {
     deleteAllEditions: boolean
     manageVolunteers: boolean
     manageArtists: boolean
+    manageMeals: boolean
+    manageTicketing: boolean
   }>
   title?: string
   perEdition?: Array<{
@@ -497,6 +514,8 @@ export async function updateOrganizerRights(params: {
     canDelete?: boolean
     canManageVolunteers?: boolean
     canManageArtists?: boolean
+    canManageMeals?: boolean
+    canManageTicketing?: boolean
   }>
 }) {
   const { conventionId, organizerId, userId, rights, title, perEdition } = params
@@ -520,6 +539,8 @@ export async function updateOrganizerRights(params: {
         canDeleteAllEditions: rights?.deleteAllEditions ?? organizer.canDeleteAllEditions,
         canManageVolunteers: rights?.manageVolunteers ?? organizer.canManageVolunteers,
         canManageArtists: rights?.manageArtists ?? organizer.canManageArtists,
+        canManageMeals: rights?.manageMeals ?? organizer.canManageMeals,
+        canManageTicketing: rights?.manageTicketing ?? organizer.canManageTicketing,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
@@ -533,7 +554,14 @@ export async function updateOrganizerRights(params: {
 
       // Ajouter les nouvelles permissions (filtrer les vides)
       const filtered = perEdition.filter(
-        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists)
+        (p) =>
+          p &&
+          (p.canEdit ||
+            p.canDelete ||
+            p.canManageVolunteers ||
+            p.canManageArtists ||
+            p.canManageMeals ||
+            p.canManageTicketing)
       )
       if (filtered.length > 0) {
         await tx.editionOrganizerPermission.createMany({
@@ -544,6 +572,8 @@ export async function updateOrganizerRights(params: {
             canDelete: !!p.canDelete,
             canManageVolunteers: !!p.canManageVolunteers,
             canManageArtists: !!p.canManageArtists,
+            canManageMeals: !!p.canManageMeals,
+            canManageTicketing: !!p.canManageTicketing,
           })),
           skipDuplicates: true,
         })

@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Nie masz uprawnień do tej strony.",
-      "title": "Dostęp zabroniony"
+      "title": "Dostęp zabroniony",
+      "volunteers_description": "Nie masz wymaganych uprawnień, aby przeglądać kandydatury wolontariuszy."
     },
     "add_convention": {
       "description": "Konwencja grupuje kilka edycji tego samego wydarzenia żonglerskiego.",

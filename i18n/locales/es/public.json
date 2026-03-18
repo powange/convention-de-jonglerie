@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "No tienes permisos para acceder a esta página.",
-      "title": "Acceso denegado"
+      "title": "Acceso denegado",
+      "volunteers_description": "No tiene los permisos necesarios para ver las candidaturas de voluntarios."
     },
     "add_convention": {
       "description": "Una convención agrupa múltiples ediciones del mismo evento de malabares.",

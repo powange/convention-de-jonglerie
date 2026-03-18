@@ -402,12 +402,12 @@
         </UCard>
 
         <!-- Message si pas les permissions -->
-        <UCard v-else>
+        <UCard v-if="!canViewVolunteersTable && !editionStore.loading && authStore.isAuthenticated">
           <div class="text-center py-12">
             <UIcon name="i-heroicons-lock-closed" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 class="text-xl font-semibold mb-2">Accès restreint</h2>
+            <h2 class="text-xl font-semibold mb-2">{{ $t('pages.access_denied.title') }}</h2>
             <p class="text-gray-600 dark:text-gray-400">
-              Vous n'avez pas les permissions nécessaires pour voir les candidatures de bénévoles.
+              {{ $t('pages.access_denied.volunteers_description') }}
             </p>
           </div>
         </UCard>
@@ -668,7 +668,7 @@ const isVolunteersDataReady = computed(() => {
 })
 
 // Récupération des équipes et des assignations pour la nouvelle répartition
-const { teams: volunteerTeams } = useVolunteerTeams(editionId)
+const { teams: volunteerTeams, fetchTeams: fetchVolunteerTeams } = useVolunteerTeams(editionId)
 const teamAssignments = ref<any[]>([])
 const acceptedVolunteers = ref<any[]>([])
 const draggedVolunteer = ref<any>(null)
@@ -1307,9 +1307,9 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
-  // Charger les informations des bénévoles
-  await fetchVolunteersInfo()
-  // Charger les assignations d'équipes
+  // Charger les informations des bénévoles et les équipes en parallèle
+  await Promise.all([fetchVolunteersInfo(), fetchVolunteerTeams()])
+  // Charger les assignations d'équipes (nécessite les équipes)
   await fetchTeamAssignments()
 })
 

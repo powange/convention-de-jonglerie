@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "You don't have the rights to access this page.",
-      "title": "Access denied"
+      "title": "Access denied",
+      "volunteers_description": "You do not have the necessary permissions to view volunteer applications."
     },
     "add_convention": {
       "description": "A convention brings together several editions of the same juggling event.",

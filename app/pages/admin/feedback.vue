@@ -494,7 +494,13 @@ const { execute: fetchFeedbacks, loading } = useApiAction('/api/admin/feedback',
   errorMessages: { default: t('admin.feedback.error.load') },
   onSuccess: (response: any) => {
     feedbacks.value = response.data
-    pagination.value = response.pagination
+    pagination.value = {
+      ...pagination.value,
+      page: response.pagination.page,
+      limit: response.pagination.limit,
+      total: response.pagination.totalCount,
+      pages: response.pagination.totalPages,
+    }
     stats.value = response.stats
   },
 })

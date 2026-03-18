@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Du hast keine Berechtigung, auf diese Seite zuzugreifen.",
-      "title": "Zugang verweigert"
+      "title": "Zugang verweigert",
+      "volunteers_description": "Sie haben nicht die erforderlichen Berechtigungen, um die Freiwilligenbewerbungen einzusehen."
     },
     "add_convention": {
       "description": "Eine Convention gruppiert mehrere Auflagen derselben Jonglier-Veranstaltung.",

@@ -5,11 +5,19 @@
         <!-- Sidebar de navigation -->
         <UDashboardSidebar collapsible resizable>
           <template #header="{ collapsed }">
-            <div v-if="!collapsed" class="flex items-center gap-2">
-              <UIcon name="i-heroicons-cog-6-tooth" class="text-primary-500" />
-              <span class="font-semibold">{{ $t('gestion.title') }}</span>
+            <div class="flex items-center justify-between w-full">
+              <div v-if="!collapsed" class="flex items-center gap-2">
+                <UIcon name="i-heroicons-cog-6-tooth" class="text-primary-500" />
+                <span class="font-semibold">{{ $t('gestion.title') }}</span>
+              </div>
+              <UIcon v-else name="i-heroicons-cog-6-tooth" class="text-primary-500" />
+              <UDashboardSidebarCollapse
+                :icon="
+                  collapsed ? 'i-heroicons-chevron-double-right' : 'i-heroicons-chevron-double-left'
+                "
+                size="xs"
+              />
             </div>
-            <UIcon v-else name="i-heroicons-cog-6-tooth" class="text-primary-500 mx-auto" />
           </template>
 
           <!-- Navigation -->
@@ -231,6 +239,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.overview'),
       icon: 'i-heroicons-home',
       to: `/editions/${editionId.value}/gestion`,
+      tooltip: { content: t('gestion.overview') },
     },
   ]
 
@@ -290,6 +299,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           : []),
       ],
       value: 'infos',
+      popover: {},
     })
   }
 
@@ -297,8 +307,9 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   if (canManageOrganizers.value) {
     managementSection.push({
       label: t('organizers.title'),
-      icon: 'i-heroicons-users',
+      icon: 'i-heroicons-user-group',
       to: `/editions/${editionId.value}/gestion/organizers`,
+      tooltip: { content: t('organizers.title') },
     })
   }
 
@@ -309,11 +320,13 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     if (canManageVolunteers.value) {
       volunteersChildren.push({
         label: t('gestion.volunteers.config_title'),
+        icon: 'i-heroicons-cog-6-tooth',
         to: `/editions/${editionId.value}/gestion/volunteers/config`,
       })
 
       volunteersChildren.push({
         label: t('edition.volunteers.volunteer_page'),
+        icon: 'i-heroicons-clipboard-document-list',
         to: `/editions/${editionId.value}/gestion/volunteers/page`,
       })
     }
@@ -322,18 +335,22 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       volunteersChildren.push(
         {
           label: t('edition.volunteers.volunteer_form'),
+          icon: 'i-heroicons-megaphone',
           to: `/editions/${editionId.value}/gestion/volunteers/form`,
         },
         {
           label: t('edition.volunteers.application_management'),
+          icon: 'i-heroicons-document-text',
           to: `/editions/${editionId.value}/gestion/volunteers/applications`,
         },
         {
           label: t('edition.volunteers.teams'),
+          icon: 'i-heroicons-user-group',
           to: `/editions/${editionId.value}/gestion/volunteers/teams`,
         },
         {
           label: t('edition.volunteers.planning'),
+          icon: 'i-heroicons-calendar-days',
           to: `/editions/${editionId.value}/gestion/volunteers/planning`,
         }
       )
@@ -342,6 +359,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     if ((canManageVolunteers.value || isTeamLeader.value) && isVolunteersModeInternal.value) {
       volunteersChildren.push({
         label: t('edition.volunteers.volunteer_notifications'),
+        icon: 'i-heroicons-bell',
         to: `/editions/${editionId.value}/gestion/volunteers/notifications`,
       })
     }
@@ -352,6 +370,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         icon: 'i-heroicons-user-group',
         children: volunteersChildren,
         value: 'volunteers',
+        popover: {},
       })
     }
   }
@@ -361,14 +380,17 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     const artistsChildren: NavigationMenuItem[] = [
       {
         label: t('gestion.artists.list_title'),
+        icon: 'i-heroicons-users',
         to: `/editions/${editionId.value}/gestion/artists`,
       },
       {
         label: t('gestion.shows.list_title'),
+        icon: 'i-heroicons-sparkles',
         to: `/editions/${editionId.value}/gestion/artists/shows`,
       },
       {
         label: t('gestion.shows_call.title'),
+        icon: 'i-heroicons-megaphone',
         to: `/editions/${editionId.value}/gestion/shows-call`,
       },
     ]
@@ -378,6 +400,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-star',
       children: artistsChildren,
       value: 'artists',
+      popover: {},
     })
   }
 
@@ -389,10 +412,12 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       mealsChildren.push(
         {
           label: t('gestion.meals.configuration_title'),
+          icon: 'cbi:mealie',
           to: `/editions/${editionId.value}/gestion/meals`,
         },
         {
           label: t('gestion.meals.list_title'),
+          icon: 'i-heroicons-list-bullet',
           to: `/editions/${editionId.value}/gestion/meals/list`,
         }
       )
@@ -400,6 +425,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
 
     mealsChildren.push({
       label: t('gestion.meals.validation_title'),
+      icon: 'i-heroicons-check-badge',
       to: `/editions/${editionId.value}/gestion/meals/validate`,
     })
 
@@ -408,6 +434,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'cbi:mealie',
       children: mealsChildren,
       value: 'meals',
+      popover: {},
     })
   }
 
@@ -419,34 +446,42 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       children: [
         {
           label: t('gestion.ticketing.config_title'),
+          icon: 'i-heroicons-cog-6-tooth',
           to: `/editions/${editionId.value}/gestion/ticketing/config`,
         },
         {
           label: t('gestion.ticketing.external_link_title'),
+          icon: 'i-heroicons-link',
           to: `/editions/${editionId.value}/gestion/ticketing/external`,
         },
         {
           label: t('gestion.ticketing.tiers_title'),
+          icon: 'i-heroicons-currency-euro',
           to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
         },
         {
           label: t('gestion.ticketing.orders_title'),
+          icon: 'i-heroicons-shopping-cart',
           to: `/editions/${editionId.value}/gestion/ticketing/orders`,
         },
         {
           label: t('gestion.ticketing.access_control_title'),
+          icon: 'i-heroicons-shield-check',
           to: `/editions/${editionId.value}/gestion/ticketing/access-control`,
         },
         {
           label: t('gestion.ticketing.counters_title'),
+          icon: 'i-heroicons-calculator',
           to: `/editions/${editionId.value}/gestion/ticketing/counter`,
         },
         {
           label: t('gestion.ticketing.stats_title'),
+          icon: 'i-heroicons-chart-bar',
           to: `/editions/${editionId.value}/gestion/ticketing/stats`,
         },
       ],
       value: 'ticketing',
+      popover: {},
     })
   }
 
@@ -456,6 +491,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.workshops.title'),
       icon: 'i-heroicons-academic-cap',
       to: `/editions/${editionId.value}/gestion/workshops`,
+      tooltip: { content: t('gestion.workshops.title') },
     })
   }
 
@@ -465,6 +501,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('edition.lost_found'),
       icon: 'i-heroicons-magnifying-glass',
       to: `/editions/${editionId.value}/gestion/lost-found`,
+      tooltip: { content: t('edition.lost_found') },
     })
   }
 

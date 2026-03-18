@@ -8,11 +8,12 @@ export interface OrganizerRights {
   deleteConvention?: boolean
   manageOrganizers?: boolean
   manageVolunteers?: boolean
+  manageArtists?: boolean
+  manageMeals?: boolean
+  manageTicketing?: boolean
   addEdition?: boolean
   editAllEditions?: boolean
   deleteAllEditions?: boolean
-  manageMeals?: boolean
-  manageTicketing?: boolean
 }
 
 /**
@@ -24,6 +25,9 @@ export interface OrganizerPerEditionRights {
     canEdit?: boolean
     canDelete?: boolean
     canManageVolunteers?: boolean
+    canManageArtists?: boolean
+    canManageMeals?: boolean
+    canManageTicketing?: boolean
   }
 }
 

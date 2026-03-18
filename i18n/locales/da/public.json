@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Du har ikke rettigheder til at få adgang til denne side.",
-      "title": "Adgang nægtet"
+      "title": "Adgang nægtet",
+      "volunteers_description": "Du har ikke de nødvendige rettigheder til at se frivilligansøgninger."
     },
     "add_convention": {
       "description": "En konvention grupperer flere udgaver af samme jonglørbegivenhed.",

@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Non hai i diritti per accedere a questa pagina.",
-      "title": "Accesso negato"
+      "title": "Accesso negato",
+      "volunteers_description": "Non hai i permessi necessari per visualizzare le candidature dei volontari."
     },
     "add_convention": {
       "description": "Un convegno raggruppa più edizioni di uno stesso evento di giocoleria.",

@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Não tem permissões para aceder a esta página.",
-      "title": "Acesso negado"
+      "title": "Acesso negado",
+      "volunteers_description": "Não tem as permissões necessárias para ver as candidaturas de voluntários."
     },
     "add_convention": {
       "description": "Uma convenção agrupa várias edições do mesmo evento de malabarismo.",

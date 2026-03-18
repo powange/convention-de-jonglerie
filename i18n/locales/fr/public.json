@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Vous n'avez pas les droits pour accéder à cette page.",
-      "title": "Accès refusé"
+      "title": "Accès refusé",
+      "volunteers_description": "Vous n'avez pas les permissions nécessaires pour voir les candidatures de bénévoles."
     },
     "add_convention": {
       "description": "Une convention regroupe plusieurs éditions d'un même événement de jonglerie.",

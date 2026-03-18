@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "K přístupu na tuto stránku nemáte práva.",
-      "title": "Přístup odepřen"
+      "title": "Přístup odepřen",
+      "volunteers_description": "Nemáte potřebná oprávnění k zobrazení přihlášek dobrovolníků."
     },
     "add_convention": {
       "description": "Sjezd sdružuje několik ročníků jedné žonglérské akce.",

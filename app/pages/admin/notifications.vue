@@ -1639,7 +1639,7 @@ const { execute: loadRecentNotifications, loading: loadingRecent } = useApiActio
       if (response.pagination) {
         pagination.value = {
           ...pagination.value,
-          total: response.pagination.total,
+          total: response.pagination.totalCount,
           totalPages: response.pagination.totalPages,
         }
       }

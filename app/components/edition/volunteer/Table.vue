@@ -832,7 +832,7 @@ const refreshApplications = async () => {
     } as any)
     applications.value = res.data || []
     if (res.pagination) {
-      serverPagination.value.total = res.pagination.total
+      serverPagination.value.total = res.pagination.totalCount
       serverPagination.value.page = res.pagination.page
       serverPagination.value.totalPages = res.pagination.totalPages
     }

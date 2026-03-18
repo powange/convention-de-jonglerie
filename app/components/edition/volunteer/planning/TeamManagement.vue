@@ -349,7 +349,10 @@ const loading = ref(false)
 const expandedTeams = ref<Record<string, boolean>>({})
 
 // API
-const { teams, createTeam, updateTeam, deleteTeam } = useVolunteerTeams(props.editionId)
+const { teams, fetchTeams, createTeam, updateTeam, deleteTeam } = useVolunteerTeams(props.editionId)
+
+// Charger les équipes au montage
+onMounted(() => fetchTeams())
 
 // Schéma de validation
 const teamSchema = z.object({

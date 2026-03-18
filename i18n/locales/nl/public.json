@@ -15,7 +15,8 @@
   "pages": {
     "access_denied": {
       "description": "Je hebt niet de rechten om deze pagina te bekijken.",
-      "title": "Toegang geweigerd"
+      "title": "Toegang geweigerd",
+      "volunteers_description": "U heeft niet de benodigde rechten om de vrijwilligersaanvragen te bekijken."
     },
     "add_convention": {
       "description": "Een conventie brengt verschillende edities van hetzelfde jongleerevenement samen.",
