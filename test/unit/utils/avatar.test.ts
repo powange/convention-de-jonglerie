@@ -49,14 +49,14 @@ describe('avatar utils', () => {
       expect(url).toContain('data:image/svg+xml;base64,')
     })
 
-    it('devrait utiliser Gravatar avec emailHash', () => {
+    it('devrait utiliser Gravatar avec emailHash et d=404', () => {
       const { getUserAvatar } = useAvatar()
 
       const user = { profilePicture: null, emailHash: 'abc123' }
       const url = getUserAvatar(user as any)
 
-      // Should return Gravatar URL with emailHash
-      expect(url).toBe('https://www.gravatar.com/avatar/abc123?s=80&d=mp')
+      // Should return Gravatar URL with emailHash and d=404
+      expect(url).toBe('https://www.gravatar.com/avatar/abc123?s=80&d=404')
     })
 
     it("devrait utiliser profilePicture si c'est une URL absolue HTTP", () => {
@@ -124,7 +124,7 @@ describe('avatar utils', () => {
       expect(mockDateNow).toHaveBeenCalled()
     })
 
-    it('devrait retourner fallback si getImageUrl échoue', () => {
+    it('devrait retourner Gravatar d=404 si getImageUrl échoue', () => {
       const { getUserAvatar } = useAvatar()
 
       mockGetImageUrl.mockReturnValue(null)
@@ -138,7 +138,7 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user)
 
-      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=80&d=mp')
+      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=80&d=404')
     })
 
     it('devrait utiliser emailHash directement si fourni', () => {
@@ -151,11 +151,11 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user, 120)
 
-      expect(url).toBe('https://www.gravatar.com/avatar/abc123def456?s=120&d=mp')
+      expect(url).toBe('https://www.gravatar.com/avatar/abc123def456?s=120&d=404')
       expect(mockGetGravatarAvatar).not.toHaveBeenCalled()
     })
 
-    it('devrait utiliser Gravatar même avec un pseudo', () => {
+    it('devrait utiliser Gravatar d=404 même avec un pseudo', () => {
       const { getUserAvatar } = useAvatar()
 
       const user = {
@@ -166,8 +166,8 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user)
 
-      // Devrait retourner Gravatar car emailHash est obligatoire
-      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=80&d=mp')
+      // getUserAvatar retourne toujours Gravatar, le fallback initiales est dans getUserAvatarWithCache
+      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=80&d=404')
     })
 
     it('devrait utiliser la taille par défaut de 80px', () => {
@@ -179,7 +179,7 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user)
 
-      expect(url).toContain('s=80')
+      expect(url).toBe('https://www.gravatar.com/avatar/abc123def456?s=80&d=404')
     })
 
     it('devrait respecter la taille personnalisée', () => {
@@ -193,8 +193,8 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user, 200)
 
-      // Devrait retourner Gravatar avec taille personnalisée
-      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=200&d=mp')
+      // Devrait retourner Gravatar avec la taille personnalisée
+      expect(url).toBe('https://www.gravatar.com/avatar/hash123?s=200&d=404')
     })
 
     it('devrait prioriser profilePicture sur email et emailHash', () => {
@@ -222,7 +222,7 @@ describe('avatar utils', () => {
 
       const url = getUserAvatar(user)
 
-      expect(url).toBe('https://www.gravatar.com/avatar/abc123def456?s=80&d=mp')
+      expect(url).toBe('https://www.gravatar.com/avatar/abc123def456?s=80&d=404')
       expect(mockGetGravatarAvatar).not.toHaveBeenCalled()
     })
 
@@ -247,18 +247,26 @@ describe('avatar utils', () => {
           },
           expected: 'gravatar',
         },
-        // Utilisateur avec email et emailHash
+        // Utilisateur avec email et emailHash (sans pseudo → Gravatar)
         {
           user: {
             email: 'user@test.com',
             emailHash: 'hash789',
+          },
+          expected: 'gravatar',
+        },
+        // Utilisateur avec pseudo (sans profilePicture → Gravatar d=404, initiales gérées par cache)
+        {
+          user: {
+            email: 'user@test.com',
+            emailHash: 'hash000',
             pseudo: 'Test User',
           },
           expected: 'gravatar',
         },
       ]
 
-      testCases.forEach(({ user, expected }, index) => {
+      testCases.forEach(({ user, expected }) => {
         vi.clearAllMocks()
 
         const url = getUserAvatar(user as any)
@@ -266,7 +274,7 @@ describe('avatar utils', () => {
         if (expected === 'profile-picture') {
           expect(url).toBe('https://example.com/pic.jpg')
         } else if (expected === 'gravatar') {
-          expect(url).toBe(`https://www.gravatar.com/avatar/${user.emailHash}?s=80&d=mp`)
+          expect(url).toBe(`https://www.gravatar.com/avatar/${user.emailHash}?s=80&d=404`)
         }
       })
     })

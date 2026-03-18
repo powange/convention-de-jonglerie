@@ -170,7 +170,7 @@ export const useAvatar = () => {
       const imageUrl = getImageUrl(user.profilePicture, 'profile', user.id)
       if (!imageUrl) {
         // Si échec du chargement, utiliser Gravatar
-        return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
+        return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=404`
       }
 
       // Convertir l'URL relative en URL absolue pour éviter l'optimisation _ipx de Nuxt Image
@@ -183,8 +183,9 @@ export const useAvatar = () => {
       return `${finalUrl}?v=${version}`
     }
 
-    // Sinon, utiliser Gravatar
-    return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=mp`
+    // Sinon, utiliser Gravatar avec d=404 pour détecter l'absence d'avatar
+    // Le fallback vers les initiales est géré par getUserAvatarWithCache
+    return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=404`
   }
 
   /**
@@ -202,20 +203,16 @@ export const useAvatar = () => {
     size: number = 80
   ) => {
     const imageUrl = getUserAvatar(user, size)
-    const fallbackUrl = getUserAvatar(
-      {
-        ...user,
-        profilePicture: null, // Force l'utilisation du fallback (Gravatar ou initiales)
-      },
-      size
-    )
 
-    // Détecter si l'URL est une image externe (Google, etc.)
+    // Fallback : initiales du pseudo si disponible, sinon image Gravatar par défaut
+    const fallbackUrl = user?.pseudo
+      ? generateInitialsAvatar(user.pseudo, size)
+      : `https://www.gravatar.com/avatar/${user?.emailHash || 'default'}?s=${size}&d=mp`
+
+    // Détecter si l'URL nécessite un chargement avec vérification (images externes + Gravatar avec d=404)
     const isExternalImage =
       imageUrl.startsWith('http://') ||
-      (imageUrl.startsWith('https://') &&
-        !imageUrl.includes('gravatar.com') &&
-        !imageUrl.startsWith('data:'))
+      (imageUrl.startsWith('https://') && !imageUrl.startsWith('data:'))
 
     const currentUrl = ref<string>(imageUrl)
     const isLoading = ref(true)
