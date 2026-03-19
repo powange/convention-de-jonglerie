@@ -68,7 +68,7 @@ const altText = computed(() => {
 })
 
 const avatarClasses = computed(() => {
-  const classes = ['rounded-full']
+  const classes = ['rounded-full', 'object-cover']
 
   // Taille CSS seulement pour les tailles prédéfinies
   if (typeof props.size === 'string') {
