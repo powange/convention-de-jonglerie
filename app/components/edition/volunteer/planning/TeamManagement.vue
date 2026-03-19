@@ -226,7 +226,7 @@
               />
               <template #hint>
                 <span class="text-xs text-gray-500">{{
-                  t('edition.volunteers.max_volunteers_hint')
+                  t('edition.volunteers.max_volunteers_team_hint')
                 }}</span>
               </template>
             </UFormField>

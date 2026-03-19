@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Maksymalna liczba wolontariuszy dla tego przedziału czasowego",
       "max_volunteers_optional": "Maksymalna liczba wolontariuszy (opcjonalne)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Maksymalna liczba wolontariuszy w tym zespole",
       "meal_time_conflicts": "Konflikty z godzinami posiłków",
       "meal_validation_team": "Zespół walidacji posiłków",
       "meal_validation_team_hint": "Ten zespół zajmuje się walidacją posiłków uczestników",

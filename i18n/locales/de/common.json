@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Maximale Anzahl von Freiwilligen für diesen Zeitslot",
       "max_volunteers_optional": "Maximale Anzahl von Freiwilligen (optional)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Maximale Anzahl an Freiwilligen für dieses Team",
       "meal_time_conflicts": "Konflikte mit Essenszeiten",
       "meal_validation_team": "Team für Mahlzeitvalidierung",
       "meal_validation_team_hint": "Dieses Team kümmert sich um die Validierung der Teilnehmermahlzeiten",

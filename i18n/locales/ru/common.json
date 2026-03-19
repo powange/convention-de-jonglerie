@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Максимальное количество волонтеров для этого временного слота",
       "max_volunteers_optional": "Максимальное количество волонтеров (необязательно)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Максимальное количество волонтёров для этой команды",
       "meal_time_conflicts": "Конфликты с временем приема пищи",
       "meal_validation_team": "Команда валидации питания",
       "meal_validation_team_hint": "Эта команда занимается валидацией питания участников",

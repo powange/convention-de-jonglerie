@@ -597,6 +597,7 @@
       "management_title": "Gestion des candidatures",
       "max_volunteers": "Nombre de bénévoles requis",
       "max_volunteers_hint": "Nombre maximum de bénévoles pour ce créneau",
+      "max_volunteers_team_hint": "Nombre maximum de bénévoles pour cette équipe",
       "max_volunteers_optional": "Nombre maximum de bénévoles (optionnel)",
       "max_volunteers_placeholder": "3",
       "meal_time_conflicts": "Conflits avec les horaires de repas",

@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Número máximo de voluntarios para esta franja horaria",
       "max_volunteers_optional": "Número máximo de voluntarios (opcional)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Número máximo de voluntarios para este equipo",
       "meal_time_conflicts": "Conflictos con horarios de comidas",
       "meal_validation_team": "Equipo de validación de comidas",
       "meal_validation_team_hint": "Este equipo se encarga de la validación de las comidas de los participantes",

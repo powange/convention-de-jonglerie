@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Maximalt antal volontärer för denna slot",
       "max_volunteers_optional": "Högsta antal volontärer (valfritt)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Maximalt antal volontärer för detta lag",
       "meal_time_conflicts": "Konflikter i samband med måltider",
       "meal_validation_team": "Team för måltidsvalidering",
       "meal_validation_team_hint": "Detta team hanterar validering av deltagaremåltider",

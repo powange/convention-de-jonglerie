@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Maximum number of volunteers for this time slot",
       "max_volunteers_optional": "Maximum number of volunteers (optional)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Maximum number of volunteers for this team",
       "meal_time_conflicts": "Meal time conflicts",
       "meal_validation_team": "Meal validation team",
       "meal_validation_team_hint": "This team handles participant meal validation",

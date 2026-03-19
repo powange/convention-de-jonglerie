@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Максимальна кількість волонтерів для цього часового проміжку",
       "max_volunteers_optional": "Максимальна кількість волонтерів (необов'язково)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Максимальна кількість волонтерів для цієї команди",
       "meal_time_conflicts": "Конфлікти з часом прийому їжі",
       "meal_validation_team": "Команда валідації харчування",
       "meal_validation_team_hint": "Ця команда займається валідацією харчування учасників",

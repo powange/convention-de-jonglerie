@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Maksimalt antal frivillige for dette tidsrum",
       "max_volunteers_optional": "Maksimalt antal frivillige (valgfrit)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Maksimalt antal frivillige for dette hold",
       "meal_time_conflicts": "Konflikter med måltidstider",
       "meal_validation_team": "Team til validering af måltider",
       "meal_validation_team_hint": "Dette team håndterer valideringen af deltagernes måltider",

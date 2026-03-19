@@ -599,6 +599,7 @@
       "max_volunteers_hint": "Numero massimo di volontari per questa fascia oraria",
       "max_volunteers_optional": "Numero massimo di volontari (opzionale)",
       "max_volunteers_placeholder": "3",
+      "max_volunteers_team_hint": "Numero massimo di volontari per questa squadra",
       "meal_time_conflicts": "Conflitti con gli orari dei pasti",
       "meal_validation_team": "Team di convalida pasti",
       "meal_validation_team_hint": "Questo team gestisce la convalida dei pasti dei partecipanti",
