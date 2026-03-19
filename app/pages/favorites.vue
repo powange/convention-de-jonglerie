@@ -31,12 +31,16 @@
 
     <div v-else>
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
-        <p class="text-gray-600 mb-4 lg:mb-0">
-          {{ $t('pages.favorites.editions_in_favorites', { count: favoriteEditions.length }) }}
-          <span v-if="favoriteEditions.length > itemsPerPage" class="ml-2">
-            (Page {{ currentPage }} sur {{ Math.ceil(favoriteEditions.length / itemsPerPage) }})
-          </span>
-        </p>
+        <div class="flex items-center gap-4 mb-4 lg:mb-0">
+          <p class="text-gray-600">
+            {{
+              $t('pages.favorites.editions_in_favorites', {
+                count: filteredFavoriteEditions.length,
+              })
+            }}
+          </p>
+          <UCheckbox v-model="showPastEditions" :label="$t('pages.favorites.show_past_editions')" />
+        </div>
 
         <!-- Sélecteur de vue -->
         <div class="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
@@ -93,10 +97,10 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="favoriteEditions.length > itemsPerPage" class="mt-8 flex justify-center">
+        <div v-if="filteredFavoriteEditions.length > itemsPerPage" class="mt-8 flex justify-center">
           <UPagination
             v-model:page="currentPage"
-            :total="favoriteEditions.length"
+            :total="filteredFavoriteEditions.length"
             :items-per-page="itemsPerPage"
             :sibling-count="1"
             :show-edges="true"
@@ -108,13 +112,13 @@
       <!-- Vue Agenda -->
       <div v-else-if="viewMode === 'agenda'">
         <ClientOnly>
-          <HomeAgenda :editions="favoriteEditions" />
+          <HomeAgenda :editions="filteredFavoriteEditions" />
         </ClientOnly>
       </div>
 
       <!-- Vue en carte -->
       <div v-else-if="viewMode === 'map'">
-        <FavoritesMap :editions="favoriteEditions" />
+        <FavoritesMap :editions="filteredFavoriteEditions" />
       </div>
     </div>
   </div>
@@ -143,6 +147,12 @@ const route = useRoute()
 const router = useRouter()
 
 const loading = ref(true)
+const showPastEditions = ref(false)
+
+// Réinitialiser la page quand on change le filtre
+watch(showPastEditions, () => {
+  currentPage.value = 1
+})
 
 // Initialiser le mode de vue depuis l'URL ou par défaut 'grid'
 const getInitialViewMode = (): 'grid' | 'map' | 'agenda' => {
@@ -182,11 +192,18 @@ const favoriteEditions = computed(() => {
     })
 })
 
+// Filtrer les éditions terminées sauf si le toggle est activé
+const filteredFavoriteEditions = computed(() => {
+  if (showPastEditions.value) return favoriteEditions.value
+  const now = new Date()
+  return favoriteEditions.value.filter((edition) => new Date(edition.endDate) >= now)
+})
+
 // Éditions favorites paginées
 const paginatedFavoriteEditions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
-  return favoriteEditions.value.slice(start, end)
+  return filteredFavoriteEditions.value.slice(start, end)
 })
 
 const removeFavorite = async (id: number) => {

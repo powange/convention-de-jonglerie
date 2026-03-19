@@ -27,8 +27,15 @@
 
     <!-- Contenu principal à droite -->
     <div class="flex-1 min-w-0">
-      <!-- En-tête avec boutons -->
-      <div class="flex justify-end items-center gap-3 mb-6">
+      <!-- Sentinelle pour détecter l'état sticky -->
+      <div ref="stickyBarSentinel" class="h-0" />
+      <!-- En-tête avec boutons (sticky sous le header) -->
+      <div
+        :class="[
+          'flex justify-end items-center gap-3 mb-6 sticky top-(--ui-header-height) z-40 py-3 transition-colors duration-200',
+          isBarStuck ? 'bg-default/75 backdrop-blur' : '',
+        ]"
+      >
         <!-- Sélecteur de vue -->
         <div class="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
           <UButton
@@ -170,16 +177,16 @@
             </EditionCard>
           </div>
 
-          <!-- Pagination -->
-          <div v-if="editionStore.pagination.totalPages > 1" class="mt-8 flex justify-center">
-            <UPagination
-              v-model:page="currentPage"
-              :total="editionStore.pagination.totalCount"
-              :items-per-page="itemsPerPage"
-              :sibling-count="1"
-              :show-edges="true"
-              size="md"
-            />
+          <!-- Sentinelle pour le scroll infini -->
+          <div
+            v-if="editionStore.pagination.hasNextPage"
+            ref="infiniteScrollSentinel"
+            class="mt-8 flex justify-center py-4"
+          >
+            <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+              <UIcon name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
+              <span class="text-sm">{{ $t('common.loading') }}...</span>
+            </div>
           </div>
         </div>
 
@@ -201,7 +208,7 @@
 
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
-import { useDebounceFn } from '@vueuse/core'
+import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 import { onMounted, computed, reactive, watch, ref, defineAsyncComponent, toRaw } from 'vue'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
@@ -307,6 +314,12 @@ const route = useRoute()
 const router = useRouter()
 
 const showMobileFilters = ref(false)
+const stickyBarSentinel = ref<HTMLElement | null>(null)
+const isBarStuck = ref(false)
+
+useIntersectionObserver(stickyBarSentinel, ([entry]) => {
+  isBarStuck.value = !entry?.isIntersecting
+})
 const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const services = getTranslatedServices
 const servicesByCategory = getTranslatedServicesByCategory
@@ -354,6 +367,7 @@ const initFiltersFromUrl = () => {
 const changeViewMode = (newMode: 'grid' | 'map' | 'agenda') => {
   viewMode.value = newMode
   updateUrlFromFilters({ view: newMode === 'grid' ? undefined : newMode })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 // Fonction pour mettre à jour l'URL avec les filtres
@@ -388,9 +402,26 @@ const updateUrlFromFilters = (extraParams: Record<string, any> = {}) => {
   router.push({ query })
 }
 
-// Pagination
+// Scroll infini
 const currentPage = ref(1)
-const itemsPerPage = ref(12)
+const itemsPerPage = 12
+const loadingMore = ref(false)
+const infiniteScrollSentinel = ref<HTMLElement | null>(null)
+
+const loadNextPage = async () => {
+  if (loadingMore.value || !editionStore.pagination.hasNextPage) return
+  loadingMore.value = true
+  currentPage.value++
+  const filtersWithPage = { ...filters, page: currentPage.value, limit: itemsPerPage }
+  await editionStore.fetchEditions(filtersWithPage, { append: true })
+  loadingMore.value = false
+}
+
+useIntersectionObserver(infiniteScrollSentinel, ([entry]) => {
+  if (entry?.isIntersecting) {
+    loadNextPage()
+  }
+})
 
 // CalendarDate objects pour les sélecteurs de date
 const calendarStartDate = ref<CalendarDate | null>(null)
@@ -440,11 +471,14 @@ const debouncedNameFetch = useDebounceFn((newFilters: any) => {
 // Ref pour tracker le dernier nom pour éviter les appels inutiles
 const lastNameSearched = ref('')
 
-// Watcher principal optimisé - combine filters et currentPage
+// Watcher principal optimisé - surveille les filtres uniquement
+// Le scroll infini gère le chargement des pages suivantes
 watch(
-  [() => ({ ...filters }), currentPage],
-  ([newFilters, newPage]) => {
-    const filtersWithPage = { ...newFilters, page: newPage, limit: itemsPerPage.value }
+  () => ({ ...filters }),
+  (newFilters) => {
+    // Réinitialiser la page à 1 quand les filtres changent
+    currentPage.value = 1
+    const filtersWithPage = { ...newFilters, page: 1, limit: itemsPerPage }
 
     // Cas spécial pour le champ name avec debounce
     const nameChanged = newFilters.name !== lastNameSearched.value
@@ -574,7 +608,7 @@ const resetFilters = () => {
     query.view = viewMode.value
   }
   router.push({ query })
-  editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value }) // Fetch all conventions again
+  editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage }) // Fetch all conventions again
 }
 
 // Fonction pour gérer les mises à jour de filtres depuis le composant FiltersPanel
@@ -584,7 +618,7 @@ const handleFilterUpdate = ({ key, value }: { key: string; value: any }) => {
 
 onMounted(async () => {
   // Charger les éditions initiales
-  const initialFilters = { ...filters, page: currentPage.value, limit: itemsPerPage.value }
+  const initialFilters = { ...filters, page: currentPage.value, limit: itemsPerPage }
   const fetchPromises = [editionStore.fetchEditions(initialFilters)]
 
   // Si on démarre en mode agenda ou carte, charger toutes les éditions en parallèle
@@ -605,17 +639,6 @@ onMounted(async () => {
 const isFavorited = computed(() => (editionId: number) => {
   return favoritesStore.isFavorite(editionId)
 })
-
-// Réinitialiser la page courante quand les filtres changent (intégré au watcher principal)
-watch(
-  () => ({ ...filters }),
-  (newFilters, oldFilters) => {
-    // Réinitialiser seulement si un filtre autre que la page a changé
-    if (JSON.stringify(newFilters) !== JSON.stringify(oldFilters)) {
-      currentPage.value = 1
-    }
-  }
-)
 
 const toggleFavorite = async (id: number) => {
   try {

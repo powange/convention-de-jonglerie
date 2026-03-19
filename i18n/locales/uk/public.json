@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} видання | {count} видань в улюблених",
-      "no_favorites_added": "Ви ще не додали жодного видання до улюблених."
+      "no_favorites_added": "Ви ще не додали жодного видання до улюблених.",
+      "show_past_editions": "Показати завершені випуски"
     },
     "objets_trouves": {
       "photo_alt": "Фото знайденого предмета"

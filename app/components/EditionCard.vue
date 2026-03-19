@@ -7,6 +7,7 @@
             <img
               :src="displayImageUrl"
               :alt="displayImageAlt"
+              loading="lazy"
               class="w-16 h-auto object-contain rounded-lg"
             />
           </div>

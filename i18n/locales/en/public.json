@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} edition | {count} editions in favorites",
-      "no_favorites_added": "You haven't added any edition to your favorites yet."
+      "no_favorites_added": "You haven't added any edition to your favorites yet.",
+      "show_past_editions": "Show past editions"
     },
     "objets_trouves": {
       "photo_alt": "Photo of found item"

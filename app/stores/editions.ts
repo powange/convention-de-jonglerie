@@ -111,8 +111,10 @@ export const useEditionStore = defineStore('editions', {
       this.filterFutureEditions()
       this.sortEditions()
     },
-    async fetchEditions(filters?: EditionFilters) {
-      this.loading = true
+    async fetchEditions(filters?: EditionFilters, opts?: { append?: boolean }) {
+      if (!opts?.append) {
+        this.loading = true
+      }
       this.error = null
       try {
         const queryParams: { [key: string]: string } = {}
@@ -165,7 +167,11 @@ export const useEditionStore = defineStore('editions', {
         const response = await $fetch<PaginatedResponse>('/api/editions', {
           params: queryParams,
         })
-        this.editions = response.data
+        if (opts?.append) {
+          this.editions = [...this.editions, ...response.data]
+        } else {
+          this.editions = response.data
+        }
         this.pagination = response.pagination
         this.processEditions()
       } catch (e: unknown) {

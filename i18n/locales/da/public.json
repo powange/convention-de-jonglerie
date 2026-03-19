@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} udgave i favoritter | {count} udgaver i favoritter",
-      "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter."
+      "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter.",
+      "show_past_editions": "Vis afsluttede udgaver"
     },
     "objets_trouves": {
       "photo_alt": "Foto af den fundne genstand"

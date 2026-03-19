@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} Auflage in Favoriten | {count} Auflagen in Favoriten",
-      "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt."
+      "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt.",
+      "show_past_editions": "Vergangene Ausgaben anzeigen"
     },
     "objets_trouves": {
       "photo_alt": "Foto des gefundenen Gegenstands"

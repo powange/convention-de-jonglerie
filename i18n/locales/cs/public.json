@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} oblíbená vydání | {count} oblíbená vydání",
-      "no_favorites_added": "Zatím jste si nepřidali edici do oblíbených."
+      "no_favorites_added": "Zatím jste si nepřidali edici do oblíbených.",
+      "show_past_editions": "Zobrazit ukončené edice"
     },
     "objets_trouves": {
       "photo_alt": "Fotografie nalezeného předmětu"

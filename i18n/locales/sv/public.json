@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} favoritutgåvor | {count} favoritutgåvor",
-      "no_favorites_added": "Du har ännu inte lagt till en utgåva bland dina favoriter."
+      "no_favorites_added": "Du har ännu inte lagt till en utgåva bland dina favoriter.",
+      "show_past_editions": "Visa avslutade utgåvor"
     },
     "objets_trouves": {
       "photo_alt": "Foto av upphittat föremål"

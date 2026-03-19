@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} editie | {count} edities in favorieten",
-      "no_favorites_added": "Je hebt nog geen editie aan je favorieten toegevoegd."
+      "no_favorites_added": "Je hebt nog geen editie aan je favorieten toegevoegd.",
+      "show_past_editions": "Afgelopen edities tonen"
     },
     "objets_trouves": {
       "photo_alt": "Foto van het gevonden voorwerp"

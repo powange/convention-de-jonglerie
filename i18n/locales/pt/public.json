@@ -94,7 +94,8 @@
     },
     "favorites": {
       "editions_in_favorites": "{count} edição em favoritos | {count} edições em favoritos",
-      "no_favorites_added": "Ainda não adicionou nenhuma edição aos seus favoritos."
+      "no_favorites_added": "Ainda não adicionou nenhuma edição aos seus favoritos.",
+      "show_past_editions": "Mostrar edições encerradas"
     },
     "objets_trouves": {
       "photo_alt": "Foto do objeto encontrado"
