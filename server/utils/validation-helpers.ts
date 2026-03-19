@@ -91,6 +91,26 @@ export function validateResourceId(
 }
 
 /**
+ * Valide un ID de ressource de type string (CUID) depuis les paramètres de route
+ */
+export function validateStringResourceId(
+  event: H3Event<EventHandlerRequest>,
+  paramName: string = 'id',
+  resourceType: ResourceType
+): string {
+  const rawId = getRouterParam(event, paramName)
+
+  if (!rawId || rawId.trim().length === 0) {
+    throw createError({
+      status: 400,
+      message: RESOURCE_MESSAGES[resourceType],
+    })
+  }
+
+  return rawId
+}
+
+/**
  * Valide un ID de convention depuis les paramètres de route
  * Alias pour validateResourceId avec type 'convention'
  */

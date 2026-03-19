@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
-import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { validateEditionId, validateStringResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -10,7 +10,7 @@ export default wrapApiHandler(
 
     // Validation des paramètres
     const editionId = validateEditionId(event)
-    const teamId = validateResourceId(event, 'teamId', 'équipe')
+    const teamId = validateStringResourceId(event, 'teamId', 'équipe')
 
     // Vérifier les permissions de gestion des bénévoles
     await requireVolunteerManagementAccess(event, editionId)
