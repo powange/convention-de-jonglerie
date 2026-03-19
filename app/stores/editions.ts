@@ -48,10 +48,12 @@ interface EditionFilters {
 interface PaginatedResponse {
   data: Edition[]
   pagination: {
-    total: number
+    totalCount: number
     page: number
     limit: number
     totalPages: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
   }
 }
 
@@ -65,10 +67,12 @@ export const useEditionStore = defineStore('editions', {
     loading: false,
     error: null as string | null,
     pagination: {
-      total: 0,
+      totalCount: 0,
       page: 1,
       limit: 12,
       totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false,
     },
     // Promesses en cours pour éviter les requêtes doublons simultanées
     _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,

@@ -90,10 +90,12 @@ describe('useEditionStore', () => {
       expect(editionStore.loading).toBe(false)
       expect(editionStore.error).toBeNull()
       expect(editionStore.pagination).toEqual({
-        total: 0,
+        totalCount: 0,
         page: 1,
         limit: 12,
         totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
       })
     })
   })

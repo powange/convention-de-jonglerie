@@ -174,7 +174,7 @@
           <div v-if="editionStore.pagination.totalPages > 1" class="mt-8 flex justify-center">
             <UPagination
               v-model:page="currentPage"
-              :total="editionStore.pagination.total"
+              :total="editionStore.pagination.totalCount"
               :items-per-page="itemsPerPage"
               :sibling-count="1"
               :show-edges="true"
