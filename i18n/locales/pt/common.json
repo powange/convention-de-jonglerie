@@ -199,6 +199,7 @@
     "choose_photo": "Escolher uma foto",
     "click_to_enlarge_poster": "Clique para ampliar o cartaz de",
     "comment_added": "Comentário adicionado",
+    "convention_editions_title": "Edições de {name}",
     "describe_lost_item": "Descreva o objecto encontrado...",
     "edit": "Editar a edição",
     "edition_published": "Edição publicada com sucesso",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Bilheteria",
     "useful_links": "Ligações úteis",
+    "view_convention_editions": "Ver edições desta convenção",
     "view_on_map": "Ver no mapa",
     "volunteers": {
       "about_you_title": "Coisas a saber sobre você",

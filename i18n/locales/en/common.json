@@ -199,6 +199,7 @@
     "choose_photo": "Choose photo",
     "click_to_enlarge_poster": "Click to enlarge poster of",
     "comment_added": "Comment added",
+    "convention_editions_title": "Editions of {name}",
     "describe_lost_item": "Describe the lost item...",
     "edit": "Edit edition",
     "edition_published": "Edition published successfully",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Useful links",
+    "view_convention_editions": "View editions of this convention",
     "view_on_map": "View on map",
     "volunteers": {
       "about_you_title": "Things to know about you",

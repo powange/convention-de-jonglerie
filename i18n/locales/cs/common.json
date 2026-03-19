@@ -199,6 +199,7 @@
     "choose_photo": "Výběr fotografie",
     "click_to_enlarge_poster": "Kliknutím zvětšíte plakát",
     "comment_added": "Přidaný komentář",
+    "convention_editions_title": "Ročníky {name}",
     "describe_lost_item": "Popište nalezený předmět...",
     "edit": "Úprava úprav",
     "edition_published": "Edice byla úspěšně publikována",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Vstupenky",
     "useful_links": "Užitečné odkazy",
+    "view_convention_editions": "Zobrazit ročníky této konvence",
     "view_on_map": "Podívejte se na mapu",
     "volunteers": {
       "about_you_title": "Co byste o sobě měli vědět",

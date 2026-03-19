@@ -199,6 +199,7 @@
     "choose_photo": "Foto kiezen",
     "click_to_enlarge_poster": "Klik om de poster te vergroten van",
     "comment_added": "Opmerking toegevoegd",
+    "convention_editions_title": "Edities van {name}",
     "describe_lost_item": "Beschrijf het verloren voorwerp...",
     "edit": "Editie bewerken",
     "edition_published": "Editie succesvol gepubliceerd",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nuttige links",
+    "view_convention_editions": "Edities van deze conventie bekijken",
     "view_on_map": "Bekijk op kaart",
     "volunteers": {
       "about_you_title": "Dingen om te weten over u",

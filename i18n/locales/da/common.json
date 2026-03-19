@@ -199,6 +199,7 @@
     "choose_photo": "Vælg et foto",
     "click_to_enlarge_poster": "Klik for at forstørre plakaten for",
     "comment_added": "Kommentar tilføjet",
+    "convention_editions_title": "Udgaver af {name}",
     "describe_lost_item": "Beskriv den fundne genstand...",
     "edit": "Rediger udgaven",
     "edition_published": "Udgave publiceret med succes",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Billetsystem",
     "useful_links": "Nyttige links",
+    "view_convention_editions": "Se udgaver af denne konvention",
     "view_on_map": "Se på kortet",
     "volunteers": {
       "about_you_title": "Ting at vide om dig",

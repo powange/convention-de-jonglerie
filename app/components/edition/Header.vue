@@ -319,13 +319,26 @@
       </template>
 
       <template #footer="{ close }">
-        <div class="flex justify-end">
-          <UButton variant="outline" @click="close">
-            {{ $t('common.close') }}
+        <div class="flex justify-center w-full">
+          <UButton
+            variant="soft"
+            color="primary"
+            icon="i-heroicons-calendar-days"
+            @click="openEditionsList(close)"
+          >
+            {{ $t('edition.view_convention_editions') }}
           </UButton>
         </div>
       </template>
     </UModal>
+
+    <!-- Modale de la liste des éditions de la convention -->
+    <ConventionEditionsListModal
+      v-if="edition.convention"
+      v-model:open="showEditionsListModal"
+      :convention-id="edition.convention.id"
+      :title="$t('edition.convention_editions_title', { name: edition.convention.name })"
+    />
   </div>
 </template>
 
@@ -370,6 +383,12 @@ const toast = useToast()
 
 // État des modales
 const showConventionModal = ref(false)
+const showEditionsListModal = ref(false)
+
+const openEditionsList = (close: () => void) => {
+  close()
+  showEditionsListModal.value = true
+}
 
 // État pour vérifier si l'utilisateur est team leader
 const isTeamLeaderValue = ref(false)

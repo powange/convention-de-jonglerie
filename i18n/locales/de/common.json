@@ -199,6 +199,7 @@
     "choose_photo": "Foto auswählen",
     "click_to_enlarge_poster": "Klicken um das Poster zu vergrößern von",
     "comment_added": "Kommentar hinzugefügt",
+    "convention_editions_title": "Ausgaben von {name}",
     "describe_lost_item": "Beschreibe die gefundene Sache...",
     "edit": "Auflage bearbeiten",
     "edition_published": "Edition erfolgreich veröffentlicht",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nützliche Links",
+    "view_convention_editions": "Ausgaben dieser Convention anzeigen",
     "view_on_map": "Auf Karte anzeigen",
     "volunteers": {
       "about_you_title": "Was man über Sie wissen sollte",

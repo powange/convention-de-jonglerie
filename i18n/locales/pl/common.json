@@ -199,6 +199,7 @@
     "choose_photo": "Wybierz zdjęcie",
     "click_to_enlarge_poster": "Kliknij aby powiększyć plakat",
     "comment_added": "Komentarz dodany",
+    "convention_editions_title": "Edycje {name}",
     "describe_lost_item": "Opisz znalezioną rzecz...",
     "edit": "Edytuj edycję",
     "edition_published": "Edycja opublikowana pomyślnie",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "System biletowy",
     "useful_links": "Przydatne linki",
+    "view_convention_editions": "Zobacz edycje tej konwencji",
     "view_on_map": "Zobacz na mapie",
     "volunteers": {
       "about_you_title": "Rzeczy do wiedzenia o tobie",

@@ -199,6 +199,7 @@
     "choose_photo": "Välj ett foto",
     "click_to_enlarge_poster": "Klicka för att förstora affischen av",
     "comment_added": "Kommentar tillagd",
+    "convention_editions_title": "Utgåvor av {name}",
     "describe_lost_item": "Beskriv föremålet som du hittade...",
     "edit": "Ändra redigering",
     "edition_published": "Utgåvan publicerades framgångsrikt",
@@ -362,6 +363,7 @@
     },
     "ticketing_title": "Biljetter",
     "useful_links": "Användbara länkar",
+    "view_convention_editions": "Visa utgåvor av denna konvention",
     "view_on_map": "Se på kartan",
     "volunteers": {
       "about_you_title": "Saker du behöver veta om dig själv",
