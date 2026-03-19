@@ -107,6 +107,7 @@
 
           <template #body>
             <slot />
+            <AppFooter />
           </template>
         </UDashboardPanel>
       </UDashboardGroup>
