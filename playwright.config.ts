@@ -67,11 +67,12 @@ export default defineConfig<ConfigOptions>({
         storageState: authFile,
       },
     },
-    // Tests de gestion d'édition (dépend du data setup)
+    // Tests de gestion d'édition (dépend du data setup, séquentiel car état partagé)
     {
       name: 'edition-management',
       testMatch: /edition-management\//,
       dependencies: ['data-setup'],
+      fullyParallel: false,
       use: {
         ...devices['Desktop Chrome'],
         locale: 'fr-FR',
