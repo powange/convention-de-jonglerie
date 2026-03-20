@@ -84,6 +84,9 @@ RUN if [ -f package-lock.json ]; then \
       echo "No package-lock.json -> npm install (dev stage)" && npm install; \
     fi
 
+# Installer Chromium pour les tests E2E Playwright
+RUN npx playwright install --with-deps chromium
+
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
 EXPOSE 3000 24678
 CMD ["npm", "run", "dev"]

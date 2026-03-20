@@ -173,6 +173,8 @@ const sections = [
       { name: 'test:e2e:run', desc: 'E2E one-shot' },
       { name: 'test:db:run', desc: 'Intégration DB one-shot' },
       { name: 'test:all', desc: 'Unit + Nuxt + E2E enchaînés' },
+      { name: 'test:playwright', desc: 'Tests E2E Playwright (navigateur)' },
+      { name: 'test:playwright:ui', desc: 'Playwright avec interface graphique' },
     ],
   },
   {

@@ -44,4 +44,10 @@ scripts/translation/translations-config.json
 scripts/translation/translations-config.template.json
 scripts/translation/todo-*.json
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 !.gitkeep
