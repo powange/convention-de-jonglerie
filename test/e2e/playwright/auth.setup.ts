@@ -13,18 +13,29 @@ const TEST_PASSWORD = 'TestPass123!'
 const TEST_PSEUDO = `E2ETest${timestamp}`
 
 /**
- * Extrait le code de vérification depuis les logs Docker.
- * Le serveur log "[DEV_VERIFICATION_CODE] XXXXXX" en mode dev (process.dev).
+ * Extrait le code de vérification depuis les logs.
+ * - En CI : lit le fichier de log défini par NUXT_SERVER_LOG
+ * - En local : lit les logs Docker
+ * Le serveur log "[DEV_VERIFICATION_CODE] XXXXXX" en mode dev ou E2E_TEST=true.
  */
 function getVerificationCodeFromLogs(): string {
-  const logs = execSync('docker compose -f docker-compose.dev.yml logs app --tail=200 2>&1', {
-    encoding: 'utf-8',
-    timeout: 10000,
-  })
+  let logs: string
+
+  const serverLogFile = process.env.NUXT_SERVER_LOG
+  if (serverLogFile) {
+    // CI : lire le fichier de log du serveur
+    logs = fs.readFileSync(serverLogFile, 'utf-8')
+  } else {
+    // Local : lire les logs Docker
+    logs = execSync('docker compose -f docker-compose.dev.yml logs app --tail=200 2>&1', {
+      encoding: 'utf-8',
+      timeout: 10000,
+    })
+  }
 
   const matches = [...logs.matchAll(/\[DEV_VERIFICATION_CODE]\s*(\d{6})/g)]
   if (matches.length === 0) {
-    throw new Error('Code de vérification non trouvé dans les logs Docker')
+    throw new Error('Code de vérification non trouvé dans les logs')
   }
   return matches[matches.length - 1][1]
 }

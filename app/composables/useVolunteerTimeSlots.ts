@@ -172,6 +172,15 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
     }
   }
 
+  // Auto-fetch au montage et quand editionId change
+  watch(
+    () => toValue(editionId),
+    (id) => {
+      if (id) fetchTimeSlots()
+    },
+    { immediate: true }
+  )
+
   return {
     // État
     timeSlots: readonly(timeSlots),

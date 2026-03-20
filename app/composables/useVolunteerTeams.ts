@@ -41,7 +41,7 @@ export function useVolunteerTeams(
   const error = ref<string | null>(null)
 
   // Récupérer toutes les équipes
-  const fetchTeams = async () => {
+  const fetchTeams = async (): Promise<void> => {
     const id = toValue(editionId)
     if (!id) return
 
@@ -128,6 +128,15 @@ export function useVolunteerTeams(
       loading.value = false
     }
   }
+
+  // Auto-fetch au montage et quand editionId change
+  watch(
+    () => toValue(editionId),
+    (id) => {
+      if (id) fetchTeams()
+    },
+    { immediate: true }
+  )
 
   return {
     // État

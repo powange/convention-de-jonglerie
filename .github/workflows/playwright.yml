@@ -4,7 +4,6 @@ on:
   workflow_dispatch: # Lancement manuel uniquement
 
 env:
-  NODE_ENV: test
   E2E_TEST: true
   DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
   NUXT_SESSION_PASSWORD: test_session_password_32_chars_minimum_here
@@ -13,72 +12,9 @@ env:
   NUXT_RECAPTCHA_DEV_BYPASS: true
 
 jobs:
-  # Job 1 : Installer les dépendances et builder l'application
-  setup:
+  playwright:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    outputs:
-      deps-cache-key: ${{ steps.cache-keys.outputs.deps }}
-      prisma-cache-key: ${{ steps.cache-keys.outputs.prisma }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: Generate cache keys
-        id: cache-keys
-        run: |
-          echo "deps=${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema/**', 'prisma.config.ts') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-
-      - name: Cache Node dependencies
-        id: cache-deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-          key: ${{ steps.cache-keys.outputs.deps }}
-
-      - name: Cache Prisma client
-        id: cache-prisma
-        uses: actions/cache@v4
-        with:
-          path: server/generated/prisma
-          key: ${{ steps.cache-keys.outputs.prisma }}
-          restore-keys: |
-            ${{ runner.os }}-prisma-
-
-      - name: Install dependencies (if not cached)
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Generate Prisma client (if not cached)
-        if: steps.cache-prisma.outputs.cache-hit != 'true'
-        run: npx prisma generate
-
-      - name: Build application
-        run: NODE_ENV=production npm run build
-
-      - name: Upload build output
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-build-${{ github.run_id }}
-          path: .output/
-          retention-days: 1
-
-  # Job 2 : Exécuter les tests Playwright
-  test:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    needs: setup
+    timeout-minutes: 20
 
     services:
       mysql:
@@ -105,23 +41,35 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
-      - name: Restore Node dependencies
+      - name: Generate cache keys
+        id: cache-keys
+        run: |
+          echo "deps=${{ runner.os }}-deps-v2-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-v2-${{ hashFiles('prisma/schema/**', 'prisma.config.ts') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache Node dependencies
+        id: cache-deps
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             ~/.npm
-          key: ${{ needs.setup.outputs.deps-cache-key }}
-          fail-on-cache-miss: true
+          key: ${{ steps.cache-keys.outputs.deps }}
 
-      - name: Restore Prisma client
+      - name: Cache Prisma client
         id: cache-prisma
         uses: actions/cache@v4
         with:
           path: server/generated/prisma
-          key: ${{ needs.setup.outputs.prisma-cache-key }}
+          key: ${{ steps.cache-keys.outputs.prisma }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-v2-
 
-      - name: Generate Prisma Client (if cache miss)
+      - name: Install dependencies (if not cached)
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Generate Prisma client (if not cached)
         if: steps.cache-prisma.outputs.cache-hit != 'true'
         run: npx prisma generate
 
@@ -139,17 +87,21 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
-      - name: Download build output
-        uses: actions/download-artifact@v4
-        with:
-          name: app-build-${{ github.run_id }}
-          path: .output/
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Verify build output
+        run: |
+          ls -la .output/ || echo "ERROR: .output/ not found"
+          ls -la .output/server/ || echo "ERROR: .output/server/ not found"
 
       - name: Start application and run tests
         run: |
-          node .output/server/index.mjs &
+          node .output/server/index.mjs > /tmp/nuxt-server.log 2>&1 &
           npx wait-on http://localhost:3000 --timeout 60000
-          npx playwright test
+          NUXT_SERVER_LOG=/tmp/nuxt-server.log npx playwright test
 
       - name: Upload test report
         if: always()
