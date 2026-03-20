@@ -46,6 +46,8 @@ const sections = [
         desc: 'Reset complet (DROP + migrations) DEV UNIQUEMENT',
       },
       { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' },
+      { name: 'db:e2e:accounts', desc: 'Liste les comptes créés par les tests E2E' },
+      { name: 'db:e2e:clean', desc: 'Supprime les comptes créés par les tests E2E' },
     ],
   },
   {
