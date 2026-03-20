@@ -90,11 +90,11 @@ export const authRateLimiter = createRateLimiter({
 
 /**
  * Rate limiter pré-configuré pour l'inscription
- * 3 comptes par heure par IP (100 en dev pour les tests E2E)
+ * 3 comptes par heure par IP (100 en dev/E2E pour les tests)
  */
 export const registerRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: import.meta.dev ? 100 : 3,
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 3,
   message: 'Trop de créations de compte, veuillez réessayer plus tard',
 })
 

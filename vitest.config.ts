@@ -132,6 +132,7 @@ export default defineConfig({
         test: {
           name: 'e2e',
           include: ['test/e2e/**/*.{test,spec}.ts'],
+          exclude: ['test/e2e/playwright/**'],
           environment: 'nuxt',
           globals: true,
           testTimeout: 60000,

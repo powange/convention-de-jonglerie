@@ -86,7 +86,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 export function generateVerificationCode(): string {
   // Générer un code à 6 chiffres
   const code = Math.floor(100000 + Math.random() * 900000).toString()
-  if (import.meta.dev) {
+  if (import.meta.dev || process.env.E2E_TEST === 'true') {
     console.log(`[DEV_VERIFICATION_CODE] ${code}`)
   }
   return code

@@ -378,6 +378,16 @@ export default defineNuxtConfig({
         usePolling: true,
         interval: 1000,
       },
+      // Autoriser le hostname de NUXT_PUBLIC_SITE_URL (ex: dev.juggling-convention.com)
+      allowedHosts: (() => {
+        const siteUrl = process.env.NUXT_PUBLIC_SITE_URL
+        if (!siteUrl) return []
+        try {
+          return [new URL(siteUrl).hostname]
+        } catch {
+          return []
+        }
+      })(),
     },
     optimizeDeps: {
       include: [

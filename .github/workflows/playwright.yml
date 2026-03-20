@@ -1,0 +1,162 @@
+name: Playwright E2E Tests
+
+on:
+  workflow_dispatch: # Lancement manuel uniquement
+
+env:
+  NODE_ENV: test
+  E2E_TEST: true
+  DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
+  NUXT_SESSION_PASSWORD: test_session_password_32_chars_minimum_here
+  NUXT_PUBLIC_SITE_URL: http://localhost:3000
+  SEND_EMAILS: false
+  NUXT_RECAPTCHA_DEV_BYPASS: true
+
+jobs:
+  # Job 1 : Installer les dépendances et builder l'application
+  setup:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    outputs:
+      deps-cache-key: ${{ steps.cache-keys.outputs.deps }}
+      prisma-cache-key: ${{ steps.cache-keys.outputs.prisma }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Generate cache keys
+        id: cache-keys
+        run: |
+          echo "deps=${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema/**', 'prisma.config.ts') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache Node dependencies
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ steps.cache-keys.outputs.deps }}
+
+      - name: Cache Prisma client
+        id: cache-prisma
+        uses: actions/cache@v4
+        with:
+          path: server/generated/prisma
+          key: ${{ steps.cache-keys.outputs.prisma }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-
+
+      - name: Install dependencies (if not cached)
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Generate Prisma client (if not cached)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
+
+      - name: Build application
+        run: NODE_ENV=production npm run build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build-${{ github.run_id }}
+          path: .output/
+          retention-days: 1
+
+  # Job 2 : Exécuter les tests Playwright
+  test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    needs: setup
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: convention_db_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Restore Node dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Prisma client
+        id: cache-prisma
+        uses: actions/cache@v4
+        with:
+          path: server/generated/prisma
+          key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      - name: Generate Prisma Client (if cache miss)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
+
+      - name: Apply migrations and seed
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed:dev
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: app-build-${{ github.run_id }}
+          path: .output/
+
+      - name: Start application and run tests
+        run: |
+          node .output/server/index.mjs &
+          npx wait-on http://localhost:3000 --timeout 60000
+          npx playwright test
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
