@@ -71,7 +71,7 @@
             {{ t('shows_call.intro') }}
           </p>
 
-          <div class="grid gap-4 md:grid-cols-2">
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <UCard
               v-for="call in showCalls"
               :key="call.id"
@@ -103,14 +103,6 @@
                     </UBadge>
                   </div>
                 </div>
-
-                <!-- Description -->
-                <p
-                  v-if="call.description"
-                  class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3"
-                >
-                  {{ call.description }}
-                </p>
 
                 <!-- Date limite -->
                 <div v-if="call.deadline" class="flex items-center gap-2 text-sm">
