@@ -19,6 +19,10 @@ Lance les tests Playwright, analyse les erreurs et corrige les tests ou le code 
    - **Bug applicatif** : Corriger le code source
 4. **Re-exécution** — Relancer les tests jusqu'à ce que tous passent
 5. **Rapport** — Afficher le résultat final (nombre de tests passés/échoués)
+6. **Nettoyage** — Supprimer les données E2E créées en BDD et les fichiers d'état :
+   ```bash
+   npm run db:e2e:clean
+   ```
 
 ## Commandes :
 

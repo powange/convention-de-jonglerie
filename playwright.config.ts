@@ -13,6 +13,7 @@ const testResultsAuth = path.join(
 
 const authFile = path.join(testResultsAuth, 'user.json')
 const credentialsFile = path.join(testResultsAuth, 'credentials.json')
+const conventionStateFile = path.join(testResultsAuth, 'convention-state.json')
 
 export default defineConfig<ConfigOptions>({
   testDir: './test/e2e/playwright',
@@ -31,20 +32,31 @@ export default defineConfig<ConfigOptions>({
     },
   },
   projects: [
-    // Setup : se connecte et sauvegarde la session
+    // Setup : crée un compte E2E et sauvegarde la session
     {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
       timeout: 60000,
       use: { ...devices['Desktop Chrome'], locale: 'fr-FR' },
     },
+    // Data setup : crée convention + édition via API
+    {
+      name: 'data-setup',
+      testMatch: /data\.setup\.ts/,
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        locale: 'fr-FR',
+        storageState: authFile,
+      },
+    },
     // Tests publics (sans authentification)
     {
-      name: 'chromium',
-      testIgnore: /authenticated\/|auth\.setup\.ts/,
+      name: 'public',
+      testIgnore: /authenticated\/|edition-management\/|\.setup\.ts/,
       use: { ...devices['Desktop Chrome'], locale: 'fr-FR' },
     },
-    // Tests authentifiés (chargent la session du setup)
+    // Tests authentifiés (profil, login, convention UI)
     {
       name: 'authenticated',
       testMatch: /authenticated\//,
@@ -55,7 +67,18 @@ export default defineConfig<ConfigOptions>({
         storageState: authFile,
       },
     },
+    // Tests de gestion d'édition (dépend du data setup)
+    {
+      name: 'edition-management',
+      testMatch: /edition-management\//,
+      dependencies: ['data-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        locale: 'fr-FR',
+        storageState: authFile,
+      },
+    },
   ],
 })
 
-export { authFile, credentialsFile }
+export { authFile, credentialsFile, conventionStateFile }
