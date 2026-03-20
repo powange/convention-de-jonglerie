@@ -1,17 +1,31 @@
-import { PrismaClient } from '@prisma/client'
+import 'dotenv/config'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+
+import { PrismaClient } from '../server/generated/prisma/client'
 
 // Vérifier si DATABASE_URL est définie
-const hasDatabaseConnection = !!process.env.DATABASE_URL
+const databaseUrl = process.env.DATABASE_URL
 
-let prisma: PrismaClient | null = null
-if (hasDatabaseConnection) {
-  prisma = new PrismaClient()
+let prisma: InstanceType<typeof PrismaClient> | null = null
+if (databaseUrl) {
+  const url = new URL(databaseUrl)
+  const adapter = new PrismaMariaDb({
+    host: url.hostname,
+    port: parseInt(url.port) || 3306,
+    user: url.username,
+    password: url.password,
+    database: url.pathname.slice(1),
+    connectionLimit: 2,
+    bigIntAsNumber: true,
+    allowPublicKeyRetrieval: true,
+  })
+  prisma = new PrismaClient({ adapter })
 }
 
 async function listSeedAccounts() {
   console.log('🔑 Comptes créés par le seeder de développement:\n')
 
-  if (!hasDatabaseConnection) {
+  if (!prisma) {
     console.log('⚠️  DATABASE_URL non définie - Affichage des comptes par défaut\n')
   }
 
@@ -103,6 +117,9 @@ async function listSeedAccounts() {
       if (user) {
         console.log(`✅ ${user.prenom} ${user.nom} (${user.pseudo})`)
         console.log(`   📧 ${user.email}`)
+      } else {
+        console.log(`❌ ${userData.prenom} ${userData.nom} (non trouvé en BDD)`)
+        console.log(`   📧 ${userData.email}`)
       }
     } else {
       console.log(`📋 ${userData.prenom} ${userData.nom} (${userData.pseudo})`)
@@ -142,6 +159,9 @@ async function listSeedAccounts() {
       if (user) {
         console.log(`✅ ${user.prenom} ${user.nom} (${user.pseudo})`)
         console.log(`   📧 ${user.email}`)
+      } else {
+        console.log(`❌ ${userData.prenom} ${userData.nom} (non trouvé en BDD)`)
+        console.log(`   📧 ${userData.email}`)
       }
     } else {
       console.log(`📋 ${userData.prenom} ${userData.nom} (${userData.pseudo})`)

@@ -85,7 +85,11 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
 export function generateVerificationCode(): string {
   // Générer un code à 6 chiffres
-  return Math.floor(100000 + Math.random() * 900000).toString()
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
+  if (import.meta.dev) {
+    console.log(`[DEV_VERIFICATION_CODE] ${code}`)
+  }
+  return code
 }
 
 /**

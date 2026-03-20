@@ -1,6 +1,6 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-test.describe('Filtres de la page d\'accueil', () => {
+test.describe("Filtres de la page d'accueil", () => {
   test('le panneau de filtres est visible sur desktop', async ({ page, goto }) => {
     await goto('/', { waitUntil: 'hydration' })
 
@@ -17,18 +17,21 @@ test.describe('Filtres de la page d\'accueil', () => {
     const initialCount = await page.locator('a[href*="/editions/"]').count()
 
     // Taper un texte de recherche improbable
-    const searchInput = page.locator('input[placeholder*="recherch" i], input[placeholder*="search" i]').first()
+    const searchInput = page
+      .locator('input[placeholder*="recherch" i], input[placeholder*="search" i]')
+      .first()
+    await expect(searchInput).toBeVisible()
+    await searchInput.fill('xyzimpossible123')
 
-    if (await searchInput.isVisible()) {
-      await searchInput.fill('xyzimpossible123')
-
-      // Attendre que le contenu change (debounce + réponse API)
-      await expect(async () => {
-        const newCount = await page.locator('a[href*="/editions/"]').count()
-        const noResults = await page.getByText(/aucune convention/i).isVisible().catch(() => false)
-        expect(newCount < initialCount || noResults).toBe(true)
-      }).toPass({ timeout: 5000 })
-    }
+    // Attendre que le contenu change (debounce + réponse API)
+    await expect(async () => {
+      const newCount = await page.locator('a[href*="/editions/"]').count()
+      const noResults = await page
+        .getByText(/aucune convention/i)
+        .isVisible()
+        .catch(() => false)
+      expect(newCount < initialCount || noResults).toBe(true)
+    }).toPass({ timeout: 5000 })
   })
 
   test('les filtres temporels sont disponibles', async ({ page, goto }) => {

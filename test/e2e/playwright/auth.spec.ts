@@ -18,21 +18,28 @@ test.describe('Authentification', () => {
     await expect(page.getByText(/facebook/i)).toBeVisible()
   })
 
-  test('le bouton confirmer soumet l\'email', async ({ page, goto }) => {
+  test("le bouton confirmer soumet l'email", async ({ page, goto }) => {
     await goto('/login', { waitUntil: 'hydration' })
 
     // Remplir l'email
-    await page.locator('input[type="email"], input[placeholder*="email" i]').fill('test@example.com')
+    await page
+      .locator('input[type="email"], input[placeholder*="email" i]')
+      .fill('test@example.com')
 
-    // Cliquer sur confirmer
-    await page.getByText(/confirmer/i).first().click()
+    // Cliquer sur confirmer et attendre la réponse API
+    await Promise.all([
+      page.waitForResponse(
+        (res) => res.url().includes('/api/auth/check-email') && res.status() === 200
+      ),
+      page.getByRole('button', { name: /confirmer/i }).click(),
+    ])
 
-    // Attendre une réaction (champ mot de passe, message d'erreur, ou changement d'état)
-    await page.waitForSelector('input[type="password"], [role="alert"], [role="status"]', {
-      timeout: 10000,
-    }).catch(() => {})
+    // La page doit réagir : afficher le mot de passe ou le formulaire d'inscription
+    await expect(
+      page.locator('input[type="password"]').or(page.getByRole('switch').first())
+    ).toBeVisible({ timeout: 5000 })
 
-    // Vérifier qu'on est toujours sur la page de login
+    // On reste sur la page de login
     expect(page.url()).toContain('/login')
   })
 })

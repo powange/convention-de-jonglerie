@@ -247,12 +247,11 @@
                   <p class="text-xs text-blue-700 dark:text-blue-300 mb-3">
                     {{ $t('auth.verification_email_notice') }}
                   </p>
-                  <div class="flex items-center gap-2">
-                    <USwitch v-model="emailAccessConfirmed" />
-                    <span class="text-sm text-blue-800 dark:text-blue-200">
-                      {{ $t('auth.email_access_confirmation') }}
-                    </span>
-                  </div>
+                  <USwitch
+                    v-model="emailAccessConfirmed"
+                    :label="$t('auth.email_access_confirmation')"
+                    data-testid="confirm-email-access"
+                  />
                 </div>
               </div>
             </div>
@@ -273,12 +272,11 @@
                   <p class="text-xs text-amber-700 dark:text-amber-300 mb-3">
                     {{ $t('auth.personal_account_description') }}
                   </p>
-                  <div class="flex items-center gap-2">
-                    <USwitch v-model="personalAccountConfirmed" />
-                    <span class="text-sm text-amber-800 dark:text-amber-200">
-                      {{ $t('auth.personal_account_confirmation') }}
-                    </span>
-                  </div>
+                  <USwitch
+                    v-model="personalAccountConfirmed"
+                    :label="$t('auth.personal_account_confirmation')"
+                    data-testid="confirm-personal-account"
+                  />
                 </div>
               </div>
             </div>

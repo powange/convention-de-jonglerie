@@ -1,7 +1,10 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 import type { Page } from '@playwright/test'
 
-async function navigateToFirstEdition(page: Page, goto: Function) {
+async function navigateToFirstEdition(
+  page: Page,
+  goto: (url: string, options?: Record<string, unknown>) => Promise<unknown>
+) {
   await goto('/', { waitUntil: 'hydration' })
   await page.waitForSelector('a[href*="/editions/"]', { timeout: 10000 })
 

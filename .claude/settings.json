@@ -21,8 +21,16 @@
       "Bash(export PATH=\"/root/.nvm/versions/node/v24.14.0/bin:$PATH\")",
       "Bash(export PATH=\"/root/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH\")",
       "Bash(git -C /root/projets/convention-de-jonglerie log --oneline -1)",
-      "Read(//^model EditionArtist/**)"
+      "Read(//^model EditionArtist/**)",
+      "Bash(npm ls:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run:*)",
+      "Bash(npx tsx:*)"
     ],
-    "additionalDirectories": ["/tmp", "/root/projets/convention-de-jonglerie/.claude/commands"]
+    "additionalDirectories": [
+      "/tmp",
+      "/root/projets/convention-de-jonglerie/.claude/commands",
+      "/root/projets/convention-de-jonglerie/.claude/skills"
+    ]
   }
 }

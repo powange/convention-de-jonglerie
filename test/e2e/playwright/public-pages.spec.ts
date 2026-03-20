@@ -24,15 +24,13 @@ test.describe('Pages publiques', () => {
     await expect(footer.getByText(/confidentialité|privacy/i)).toBeVisible()
     await expect(footer.getByText(/guide/i)).toBeVisible()
   })
-
 })
 
 test.describe('Page 404', () => {
   test('affiche une page 404 pour une URL inexistante', async ({ page, goto }) => {
-    const response = await goto('/cette-page-nexiste-pas', { waitUntil: 'hydration' })
+    await goto('/cette-page-nexiste-pas', { waitUntil: 'hydration' })
 
-    // La page doit indiquer une erreur ou un contenu par défaut
-    const pageContent = await page.textContent('body')
-    expect(pageContent).toBeTruthy()
+    // La page doit afficher un message d'erreur 404
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible()
   })
 })
