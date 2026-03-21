@@ -182,8 +182,6 @@
           "move_description_single": "Fjern frivillig fra \"{sourceTeam}\" og placer dem i \"{targetTeam}\"",
           "question": "Hvad vil du gerne gøre?"
         },
-        "no_assignments": "Ingen holdtildeling fundet",
-        "no_assignments_description": "Accepterede frivillige vil blive vist her, når de er tildelt til hold",
         "preferences_label": "Præf:",
         "remove_as_leader": "Fjern lederrollen",
         "select_team_instruction": "Vælg destinationsteamet",

@@ -182,8 +182,6 @@
           "move_description_single": "Remove the volunteer from \"{sourceTeam}\" and place them in \"{targetTeam}\"",
           "question": "What would you like to do?"
         },
-        "no_assignments": "No team assignments found",
-        "no_assignments_description": "Accepted volunteers will appear here once assigned to teams",
         "preferences_label": "Pref:",
         "remove_as_leader": "Remove leader role",
         "select_team_instruction": "Select the destination team",

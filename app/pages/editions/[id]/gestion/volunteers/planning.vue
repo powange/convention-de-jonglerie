@@ -60,7 +60,7 @@
 
         <!-- Panneau d'auto-assignation -->
         <AutoAssignmentPanel
-          v-if="canManageVolunteers"
+          v-if="canManageVolunteers && acceptedVolunteers.length > 0"
           :edition-id="editionId"
           :volunteers="acceptedVolunteers"
           :time-slots="convertedTimeSlots"

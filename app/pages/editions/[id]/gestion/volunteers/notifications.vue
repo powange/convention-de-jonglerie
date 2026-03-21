@@ -25,71 +25,89 @@
           {{ t('edition.volunteers.notifications') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Envoi et gestion des notifications aux bénévoles
+          {{ t('edition.volunteers.notifications_description') }}
         </p>
       </div>
 
       <!-- Contenu des notifications bénévoles -->
       <div class="space-y-6">
-        <!-- Notifier les bénévoles de leurs créneaux -->
-        <UCard v-if="canManageVolunteers && volunteersMode === 'INTERNAL'">
-          <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-bell" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">
-                {{ $t('edition.volunteers.notify_volunteers_slots') }}
-              </h2>
+        <!-- Message si aucun bénévole accepté -->
+        <UCard v-if="acceptedCount === 0 && (canManageVolunteers || isTeamLeaderValue)">
+          <div class="text-center py-12">
+            <UIcon
+              name="i-heroicons-user-group"
+              class="h-16 w-16 text-gray-400 mx-auto mb-4"
+            />
+            <h2 class="text-xl font-semibold mb-2">
+              {{ $t('edition.volunteers.no_accepted_volunteers_title') }}
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              {{ $t('edition.volunteers.no_accepted_volunteers_description') }}
+            </p>
+          </div>
+        </UCard>
+
+        <template v-else-if="canManageVolunteers || isTeamLeaderValue">
+          <!-- Notifier les bénévoles de leurs créneaux -->
+          <UCard v-if="canManageVolunteers && volunteersMode === 'INTERNAL'">
+            <template #header>
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-bell" class="text-orange-500" />
+                <h2 class="text-lg font-semibold">
+                  {{ $t('edition.volunteers.notify_volunteers_slots') }}
+                </h2>
+              </div>
+            </template>
+
+            <div class="space-y-4">
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                :description="t('edition.volunteers.notify_slots_description')"
+              />
+
+              <UButton
+                color="primary"
+                icon="i-heroicons-bell"
+                :loading="sendingNotifications"
+                @click="showNotifyModal = true"
+              >
+                {{ t('edition.volunteers.notify_all_accepted') }}
+              </UButton>
             </div>
-          </template>
+          </UCard>
 
-          <div class="space-y-4">
-            <UAlert
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              description="Envoyez une notification et un email à tous les bénévoles acceptés pour les informer que leurs créneaux sont disponibles."
-            />
+          <!-- Section notification des bénévoles -->
+          <UCard>
+            <div class="space-y-4">
+              <UAlert
+                v-if="canManageVolunteers"
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                :description="t('edition.volunteers.notifications_info_admin')"
+              />
+              <UAlert
+                v-else-if="isTeamLeaderValue"
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                :description="t('edition.volunteers.notifications_info_leader')"
+              />
 
-            <UButton
-              color="primary"
-              icon="i-heroicons-bell"
-              :loading="sendingNotifications"
-              @click="showNotifyModal = true"
-            >
-              Notifier tous les bénévoles acceptés
-            </UButton>
-          </div>
-        </UCard>
-
-        <!-- Section notification des bénévoles -->
-        <UCard v-if="canManageVolunteers || isTeamLeaderValue">
-          <div class="space-y-4">
-            <UAlert
-              v-if="canManageVolunteers"
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              description="Envoyez des notifications et gérez les communications avec les bénévoles acceptés pour cette édition."
-            />
-            <UAlert
-              v-else-if="isTeamLeaderValue"
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              description="En tant que responsable d'équipe, vous pouvez envoyer des notifications aux bénévoles de vos équipes."
-            />
-
-            <EditionVolunteerNotifications
-              ref="notificationsListRef"
-              :edition-id="editionId"
-              :edition="edition"
-              :volunteers-info="volunteersInfo"
-              :can-manage-volunteers="canManageVolunteers"
-              :is-team-leader="isTeamLeaderValue"
-              :accepted-volunteers-count="volunteersInfo?.counts?.ACCEPTED ?? 0"
-            />
-          </div>
-        </UCard>
+              <EditionVolunteerNotifications
+                ref="notificationsListRef"
+                :edition-id="editionId"
+                :edition="edition"
+                :volunteers-info="volunteersInfo"
+                :can-manage-volunteers="canManageVolunteers"
+                :is-team-leader="isTeamLeaderValue"
+                :accepted-volunteers-count="acceptedCount"
+              />
+            </div>
+          </UCard>
+        </template>
 
         <!-- Message si pas les permissions -->
         <UCard v-else>
@@ -106,37 +124,41 @@
       </div>
 
       <!-- Modal de confirmation pour l'envoi des notifications -->
-      <UModal v-model:open="showNotifyModal" title="Confirmer l'envoi des notifications">
+      <UModal v-model:open="showNotifyModal" :title="t('edition.volunteers.notify_confirm_title')">
         <template #body>
           <div class="space-y-4">
             <UAlert
               icon="i-heroicons-exclamation-triangle"
               color="warning"
               variant="soft"
-              title="Attention"
-              description="Vous allez envoyer une notification et un email à tous les bénévoles acceptés pour les informer que leurs créneaux sont disponibles."
+              :title="t('common.warning')"
+              :description="t('edition.volunteers.notify_confirm_warning')"
             />
-            <p class="text-gray-600 dark:text-gray-400">Cette action enverra :</p>
+            <p class="text-gray-600 dark:text-gray-400">
+              {{ t('edition.volunteers.notify_confirm_action') }}
+            </p>
             <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
-              <li>Une notification dans l'application</li>
-              <li>Un email récapitulatif avec tous les créneaux assignés</li>
-              <li>Un lien vers la page "Mes candidatures"</li>
+              <li>{{ t('edition.volunteers.notify_confirm_item_notification') }}</li>
+              <li>{{ t('edition.volunteers.notify_confirm_item_email') }}</li>
+              <li>{{ t('edition.volunteers.notify_confirm_item_link') }}</li>
             </ul>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              Les bénévoles recevront uniquement les créneaux qui leur ont été assignés.
+              {{ t('edition.volunteers.notify_confirm_note') }}
             </p>
           </div>
         </template>
         <template #footer>
           <div class="flex justify-end gap-3">
-            <UButton variant="outline" @click="showNotifyModal = false"> Annuler </UButton>
+            <UButton variant="outline" @click="showNotifyModal = false">
+              {{ t('common.cancel') }}
+            </UButton>
             <UButton
               color="primary"
               icon="i-heroicons-bell"
               :loading="sendingNotifications"
               @click="sendScheduleNotifications"
             >
-              Confirmer l'envoi
+              {{ t('edition.volunteers.notify_confirm_send') }}
             </UButton>
           </div>
         </template>
@@ -170,6 +192,9 @@ const isTeamLeaderValue = ref(false)
 
 // Mode des bénévoles
 const volunteersMode = computed(() => volunteersInfo.value?.mode || 'INTERNAL')
+
+// Nombre de bénévoles acceptés
+const acceptedCount = computed(() => volunteersInfo.value?.counts?.ACCEPTED ?? 0)
 
 // Variables pour l'envoi des notifications de créneaux
 const showNotifyModal = ref(false)

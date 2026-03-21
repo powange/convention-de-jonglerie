@@ -81,6 +81,14 @@ export default wrapApiHandler(
     if (body.isVisibleToVolunteers !== undefined)
       updateData.isVisibleToVolunteers = body.isVisibleToVolunteers
 
+    // Une équipe non visible ne peut pas être obligatoire
+    const willBeInvisible =
+      body.isVisibleToVolunteers === false ||
+      (body.isVisibleToVolunteers === undefined && !existingTeam.isVisibleToVolunteers)
+    if (willBeInvisible) {
+      updateData.isRequired = false
+    }
+
     const team = await prisma.volunteerTeam.update({
       where: { id: teamId },
       data: updateData,

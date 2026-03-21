@@ -123,7 +123,10 @@
         <!-- Répartition par équipes (nouveau système) -->
         <UCard
           v-if="
-            canViewVolunteersTable && volunteersMode === 'INTERNAL' && volunteerTeams.length > 0
+            canViewVolunteersTable &&
+            volunteersMode === 'INTERNAL' &&
+            volunteerTeams.length > 0 &&
+            acceptedVolunteers.length > 0
           "
           variant="soft"
         >
@@ -150,17 +153,7 @@
             </div>
           </template>
 
-          <div v-if="acceptedVolunteers.length === 0" class="text-center py-8">
-            <UIcon name="i-heroicons-user-group" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p class="text-gray-600 dark:text-gray-400 text-sm">
-              {{ $t('pages.volunteers.team_distribution.no_assignments') }}
-            </p>
-            <p class="text-xs text-gray-500 mt-1">
-              {{ $t('pages.volunteers.team_distribution.no_assignments_description') }}
-            </p>
-          </div>
-
-          <div v-else class="space-y-4">
+          <div class="space-y-4">
             <!-- Statistiques générales -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div

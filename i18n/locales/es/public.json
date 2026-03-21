@@ -182,8 +182,6 @@
           "move_description_single": "Remover el voluntario de \"{sourceTeam}\" y colocarlo en \"{targetTeam}\"",
           "question": "¿Qué te gustaría hacer?"
         },
-        "no_assignments": "No se encontraron asignaciones de equipo",
-        "no_assignments_description": "Los voluntarios aceptados aparecerán aquí una vez asignados a equipos",
         "preferences_label": "Pref:",
         "remove_as_leader": "Retirar rol de responsable",
         "select_team_instruction": "Seleccione el equipo de destino",

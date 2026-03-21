@@ -182,8 +182,6 @@
           "move_description_single": "Retirer le bénévole de \"{sourceTeam}\" et le placer dans \"{targetTeam}\"",
           "question": "Que souhaitez-vous faire ?"
         },
-        "no_assignments": "Aucune assignation d'équipe trouvée",
-        "no_assignments_description": "Les bénévoles acceptés apparaîtront ici une fois assignés à des équipes",
         "preferences_label": "Préf:",
         "remove_as_leader": "Retirer le rôle de responsable",
         "select_team_instruction": "Sélectionnez l'équipe de destination",

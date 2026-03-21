@@ -182,8 +182,6 @@
           "move_description_single": "Freiwilligen aus \"{sourceTeam}\" entfernen und in \"{targetTeam}\" platzieren",
           "question": "Was möchten Sie tun?"
         },
-        "no_assignments": "Keine Teamzuweisungen gefunden",
-        "no_assignments_description": "Akzeptierte Freiwillige werden hier angezeigt, sobald sie Teams zugewiesen sind",
         "preferences_label": "Präf:",
         "remove_as_leader": "Leiterrolle entfernen",
         "select_team_instruction": "Wählen Sie das Zielteam aus",

@@ -59,6 +59,9 @@ export default wrapApiHandler(
       })
     }
 
+    // Une équipe non visible ne peut pas être obligatoire
+    const isRequired = body.isVisibleToVolunteers === false ? false : body.isRequired
+
     // Créer l'équipe
     const team = await prisma.volunteerTeam.create({
       data: {
@@ -67,7 +70,7 @@ export default wrapApiHandler(
         description: body.description,
         color: body.color,
         maxVolunteers: body.maxVolunteers,
-        isRequired: body.isRequired,
+        isRequired,
         isAccessControlTeam: body.isAccessControlTeam,
         isVisibleToVolunteers: body.isVisibleToVolunteers,
       },

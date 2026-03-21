@@ -182,8 +182,6 @@
           "move_description_single": "Видалити волонтера з \"{sourceTeam}\" і помістити в \"{targetTeam}\"",
           "question": "Що ви хочете зробити?"
         },
-        "no_assignments": "Призначень команд не знайдено",
-        "no_assignments_description": "Прийняті волонтери з'являться тут після призначення до команд",
         "preferences_label": "Пер:",
         "remove_as_leader": "Зняти роль керівника",
         "select_team_instruction": "Виберіть команду призначення",

@@ -182,8 +182,6 @@
           "move_description_single": "Ta bort volontären från \"{sourceTeam}\" och placera den i \"{targetTeam}\".",
           "question": "Vad skulle du vilja göra?"
         },
-        "no_assignments": "Inga teamuppdrag hittades",
-        "no_assignments_description": "Godkända volontärer kommer att visas här när de har tilldelats team.",
         "preferences_label": "Pref:",
         "remove_as_leader": "Ta bort rollen som chef",
         "select_team_instruction": "Välj destinationsteam",

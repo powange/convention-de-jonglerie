@@ -182,8 +182,6 @@
           "move_description_single": "Odeberte dobrovolníka z \"{sourceTeam}\" a umístěte ho do \"{targetTeam}\".",
           "question": "Co byste chtěli dělat?"
         },
-        "no_assignments": "Nebylo nalezeno žádné přiřazení k týmu",
-        "no_assignments_description": "Přijatí dobrovolníci se zde objeví, jakmile budou přiřazeni k týmům.",
         "preferences_label": "Pref:",
         "remove_as_leader": "Odstranění role manažera",
         "select_team_instruction": "Výběr cílového týmu",

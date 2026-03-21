@@ -182,8 +182,6 @@
           "move_description_single": "Usuń wolontariusza z \"{sourceTeam}\" i umieść go w \"{targetTeam}\"",
           "question": "Co chciałbyś zrobić?"
         },
-        "no_assignments": "Nie znaleziono przypisań zespołów",
-        "no_assignments_description": "Zaakceptowani wolontariusze pojawią się tutaj po przypisaniu do zespołów",
         "preferences_label": "Pref:",
         "remove_as_leader": "Usuń rolę lidera",
         "select_team_instruction": "Wybierz zespół docelowy",

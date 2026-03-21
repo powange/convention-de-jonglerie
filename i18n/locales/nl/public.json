@@ -182,8 +182,6 @@
           "move_description_single": "Verwijder de vrijwilliger uit \"{sourceTeam}\" en plaats ze in \"{targetTeam}\"",
           "question": "Wat wil je doen?"
         },
-        "no_assignments": "Geen teamtoewijzingen gevonden",
-        "no_assignments_description": "Geaccepteerde vrijwilligers verschijnen hier zodra ze zijn toegewezen aan teams",
         "preferences_label": "Voork:",
         "remove_as_leader": "Verwijder leiderrol",
         "select_team_instruction": "Selecteer het bestemmingsteam",

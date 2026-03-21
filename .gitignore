@@ -38,6 +38,7 @@ public/uploads/
 # Backup folder (local development)
 /backup
 /backups/*
+i18n/locales-backup/
 
 # Translation config files (generated)
 scripts/translation/translations-config.json

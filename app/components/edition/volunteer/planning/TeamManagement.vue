@@ -231,8 +231,23 @@
               </template>
             </UFormField>
 
-            <!-- Équipe obligatoire -->
-            <UFormField name="isRequired" :label="t('edition.volunteers.required_team')">
+            <!-- Visibilité pour les bénévoles -->
+            <UFormField name="isVisibleToVolunteers" label="Visibilité pour les bénévoles">
+              <USwitch v-model="teamFormState.isVisibleToVolunteers">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    Cette équipe est visible lors de la candidature des bénévoles
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
+
+            <!-- Équipe obligatoire (uniquement si visible pour les bénévoles) -->
+            <UFormField
+              v-if="teamFormState.isVisibleToVolunteers"
+              name="isRequired"
+              :label="t('edition.volunteers.required_team')"
+            >
               <USwitch v-model="teamFormState.isRequired">
                 <template #label>
                   <span class="text-sm text-gray-600 dark:text-gray-400">
@@ -265,17 +280,6 @@
                 <template #label>
                   <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ t('edition.volunteers.meal_validation_team_hint') }}
-                  </span>
-                </template>
-              </USwitch>
-            </UFormField>
-
-            <!-- Visibilité pour les bénévoles -->
-            <UFormField name="isVisibleToVolunteers" label="Visibilité pour les bénévoles">
-              <USwitch v-model="teamFormState.isVisibleToVolunteers">
-                <template #label>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">
-                    Cette équipe est visible lors de la candidature des bénévoles
                   </span>
                 </template>
               </USwitch>
@@ -374,6 +378,16 @@ const teamFormState = ref({
   isMealValidationTeam: false,
   isVisibleToVolunteers: true,
 })
+
+// Désélectionner "obligatoire" si l'équipe n'est plus visible pour les bénévoles
+watch(
+  () => teamFormState.value.isVisibleToVolunteers,
+  (visible) => {
+    if (!visible) {
+      teamFormState.value.isRequired = false
+    }
+  }
+)
 
 // Couleurs prédéfinies pour la palette
 const predefinedColors = [
