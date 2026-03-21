@@ -158,7 +158,10 @@
       "volunteer_validated": "Волонтёр подтвердил свой вход"
     },
     "payment": {
+      "cash_received": "Полученная сумма (€)",
+      "change_to_give": "Сдача",
       "checkNumber": "Номер чека",
+      "insufficient_amount": "Недостаточная сумма",
       "methods": {
         "card": "Банковская карта",
         "cash": "Наличные",

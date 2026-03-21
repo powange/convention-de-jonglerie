@@ -158,7 +158,10 @@
       "volunteer_validated": "Волонтер підтвердив свій вхід"
     },
     "payment": {
+      "cash_received": "Отримана сума (€)",
+      "change_to_give": "Решта",
       "checkNumber": "Номер чека",
+      "insufficient_amount": "Недостатня сума",
       "methods": {
         "card": "Банківська картка",
         "cash": "Готівка",

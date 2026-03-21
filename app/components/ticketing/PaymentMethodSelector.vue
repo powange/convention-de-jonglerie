@@ -7,6 +7,7 @@
     <div class="grid grid-cols-2 gap-3">
       <!-- Paiement liquide -->
       <div
+        v-if="props.enabledMethods.includes('cash')"
         class="p-4 rounded-lg border-2 cursor-pointer transition-all"
         :class="
           modelValue === 'cash'
@@ -17,7 +18,7 @@
       >
         <div class="flex items-center gap-3">
           <UIcon
-            :name="modelValue === 'cash' ? 'i-heroicons-check-circle' : 'i-lucide-circle'"
+            name="i-lucide-coins"
             :class="
               modelValue === 'cash'
                 ? 'text-green-600 dark:text-green-400'
@@ -38,6 +39,7 @@
 
       <!-- Paiement carte bancaire -->
       <div
+        v-if="props.enabledMethods.includes('card')"
         class="p-4 rounded-lg border-2 cursor-pointer transition-all"
         :class="
           modelValue === 'card'
@@ -48,7 +50,7 @@
       >
         <div class="flex items-center gap-3">
           <UIcon
-            :name="modelValue === 'card' ? 'i-heroicons-check-circle' : 'i-lucide-circle'"
+            name="i-heroicons-credit-card"
             :class="
               modelValue === 'card'
                 ? 'text-blue-600 dark:text-blue-400'
@@ -69,6 +71,7 @@
 
       <!-- Paiement chèque -->
       <div
+        v-if="props.enabledMethods.includes('check')"
         class="p-4 rounded-lg border-2 cursor-pointer transition-all"
         :class="
           modelValue === 'check'
@@ -79,7 +82,7 @@
       >
         <div class="flex items-center gap-3">
           <UIcon
-            :name="modelValue === 'check' ? 'i-heroicons-check-circle' : 'i-lucide-circle'"
+            name="i-picon-paycheck"
             :class="
               modelValue === 'check'
                 ? 'text-purple-600 dark:text-purple-400'
@@ -110,7 +113,7 @@
       >
         <div class="flex items-center gap-3">
           <UIcon
-            :name="modelValue === null ? 'i-heroicons-check-circle' : 'i-lucide-circle'"
+            name="i-heroicons-question-mark-circle"
             :class="
               modelValue === null
                 ? 'text-orange-600 dark:text-orange-400'
@@ -141,29 +144,93 @@
         />
       </UFormField>
     </div>
+
+    <!-- Calculateur de monnaie pour paiement en espèces -->
+    <div v-if="modelValue === 'cash' && amount !== undefined && amount > 0" class="mt-4">
+      <UFormField :label="$t('ticketing.payment.cash_received')">
+        <UInput
+          :model-value="cashReceivedInput"
+          inputmode="decimal"
+          :placeholder="formatPrice(amount)"
+          class="w-full"
+          icon="i-lucide-coins"
+          @update:model-value="handleCashReceivedInput"
+        />
+      </UFormField>
+      <div v-if="cashReceivedInput && cashReceivedCents > 0" class="mt-2">
+        <div
+          v-if="changeToGive >= 0"
+          class="flex items-center justify-between p-3 rounded-lg"
+          :class="
+            changeToGive > 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-800/50'
+          "
+        >
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $t('ticketing.payment.change_to_give') }}
+          </span>
+          <span class="text-lg font-bold text-green-600 dark:text-green-400">
+            {{ formatPrice(changeToGive) }}
+          </span>
+        </div>
+        <div
+          v-else
+          class="flex items-center justify-between p-3 rounded-lg bg-red-50 dark:bg-red-900/20"
+        >
+          <span class="text-sm font-medium text-red-700 dark:text-red-300">
+            {{ $t('ticketing.payment.insufficient_amount') }}
+          </span>
+          <span class="text-lg font-bold text-red-600 dark:text-red-400">
+            {{ formatPrice(Math.abs(changeToGive)) }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
 export type PaymentMethod = 'cash' | 'card' | 'check' | null
 
-defineProps<{
-  modelValue: PaymentMethod
-  checkNumber?: string
-  amount?: number
-  showTitle?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: PaymentMethod
+    checkNumber?: string
+    amount?: number
+    showTitle?: boolean
+    enabledMethods?: ('cash' | 'card' | 'check')[]
+  }>(),
+  {
+    enabledMethods: () => ['cash', 'card', 'check'],
+  }
+)
 
 const emit = defineEmits<{
   'update:modelValue': [value: PaymentMethod]
   'update:checkNumber': [value: string]
 }>()
 
+// Calculateur de monnaie pour paiement en espèces
+const cashReceivedInput = ref('')
+const handleCashReceivedInput = (value: string) => {
+  cashReceivedInput.value = value
+}
+const cashReceivedCents = computed(() => {
+  const normalized = cashReceivedInput.value.replace(',', '.')
+  const val = parseFloat(normalized)
+  return isNaN(val) ? 0 : Math.round(val * 100)
+})
+const changeToGive = computed(() => cashReceivedCents.value - (props.amount || 0))
+
 function selectMethod(method: PaymentMethod) {
   emit('update:modelValue', method)
-  // Réinitialiser le numéro de chèque si on change de méthode (sauf pour chèque)
+  // Réinitialiser les champs annexes
   if (method !== 'check') {
     emit('update:checkNumber', '')
+  }
+  if (method !== 'cash') {
+    cashReceivedInput.value = ''
   }
 }
 

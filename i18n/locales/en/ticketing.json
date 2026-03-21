@@ -158,7 +158,10 @@
       "volunteer_validated": "The volunteer has validated their entry"
     },
     "payment": {
+      "cash_received": "Amount received (€)",
+      "change_to_give": "Change to give",
       "checkNumber": "Check number",
+      "insufficient_amount": "Insufficient amount",
       "methods": {
         "card": "Bank card",
         "cash": "Cash",

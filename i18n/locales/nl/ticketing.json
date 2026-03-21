@@ -158,7 +158,10 @@
       "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd"
     },
     "payment": {
+      "cash_received": "Ontvangen bedrag (€)",
+      "change_to_give": "Wisselgeld",
       "checkNumber": "Chequenummer",
+      "insufficient_amount": "Ontoereikend bedrag",
       "methods": {
         "card": "Bankkaart",
         "cash": "Contant",

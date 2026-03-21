@@ -12,12 +12,18 @@ export default wrapApiHandler(
         id: true,
         ticketingAllowOnsiteRegistration: true,
         ticketingAllowAnonymousOrders: true,
+        ticketingPaymentCash: true,
+        ticketingPaymentCard: true,
+        ticketingPaymentCheck: true,
       },
     })
 
     return {
       allowOnsiteRegistration: edition.ticketingAllowOnsiteRegistration ?? true,
       allowAnonymousOrders: edition.ticketingAllowAnonymousOrders ?? false,
+      paymentCash: edition.ticketingPaymentCash ?? true,
+      paymentCard: edition.ticketingPaymentCard ?? true,
+      paymentCheck: edition.ticketingPaymentCheck ?? true,
     }
   },
   { operationName: 'GetTicketingSettings' }

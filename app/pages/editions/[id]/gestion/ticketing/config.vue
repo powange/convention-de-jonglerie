@@ -126,13 +126,102 @@
             </div>
           </div>
         </UCard>
+
+        <!-- Types de paiement acceptés -->
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-credit-card" class="text-green-500" />
+              <h2 class="text-lg font-semibold">
+                {{ $t('gestion.ticketing.payment_methods_title') }}
+              </h2>
+            </div>
+
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('gestion.ticketing.payment_methods_description') }}
+            </p>
+
+            <!-- Espèces -->
+            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <UIcon name="i-lucide-coins" class="h-5 w-5 text-green-600 dark:text-green-400" />
+                  <div>
+                    <h3 class="font-medium text-gray-900 dark:text-white">
+                      {{ $t('ticketing.payment.methods.cash') }}
+                    </h3>
+                  </div>
+                </div>
+                <USwitch
+                  v-model="paymentCash"
+                  :disabled="updating"
+                  color="primary"
+                  @update:model-value="handleTogglePaymentMethod('paymentCash', $event)"
+                />
+              </div>
+            </div>
+
+            <!-- Carte bancaire -->
+            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <UIcon
+                    name="i-heroicons-credit-card"
+                    class="h-5 w-5 text-blue-600 dark:text-blue-400"
+                  />
+                  <div>
+                    <h3 class="font-medium text-gray-900 dark:text-white">
+                      {{ $t('ticketing.payment.methods.card') }}
+                    </h3>
+                  </div>
+                </div>
+                <USwitch
+                  v-model="paymentCard"
+                  :disabled="updating"
+                  color="primary"
+                  @update:model-value="handleTogglePaymentMethod('paymentCard', $event)"
+                />
+              </div>
+            </div>
+
+            <!-- Chèque -->
+            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <UIcon
+                    name="i-picon-paycheck"
+                    class="h-5 w-5 text-purple-600 dark:text-purple-400"
+                  />
+                  <div>
+                    <h3 class="font-medium text-gray-900 dark:text-white">
+                      {{ $t('ticketing.payment.methods.check') }}
+                    </h3>
+                  </div>
+                </div>
+                <USwitch
+                  v-model="paymentCheck"
+                  :disabled="updating"
+                  color="primary"
+                  @update:model-value="handleTogglePaymentMethod('paymentCheck', $event)"
+                />
+              </div>
+            </div>
+
+            <UAlert
+              icon="i-heroicons-information-circle"
+              color="info"
+              variant="soft"
+              :description="$t('gestion.ticketing.payment_methods_note')"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { type Ref, computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
@@ -163,6 +252,9 @@ const { settings, loading, updating, fetchSettings, updateSettings } = useTicket
 // Variables locales pour les toggles
 const allowOnsiteRegistration = ref(true)
 const allowAnonymousOrders = ref(false)
+const paymentCash = ref(true)
+const paymentCard = ref(true)
+const paymentCheck = ref(true)
 
 // Charger les données au montage
 onMounted(async () => {
@@ -175,6 +267,9 @@ onMounted(async () => {
   if (settings.value) {
     allowOnsiteRegistration.value = settings.value.allowOnsiteRegistration
     allowAnonymousOrders.value = settings.value.allowAnonymousOrders
+    paymentCash.value = settings.value.paymentCash ?? true
+    paymentCard.value = settings.value.paymentCard ?? true
+    paymentCheck.value = settings.value.paymentCheck ?? true
   }
 })
 
@@ -213,6 +308,35 @@ const handleToggleAnonymousOrders = async (val: boolean) => {
     })
   } catch (e: any) {
     allowAnonymousOrders.value = previous
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
+const paymentMethodRefs: Record<string, Ref<boolean>> = {
+  paymentCash,
+  paymentCard,
+  paymentCheck,
+}
+
+const handleTogglePaymentMethod = async (field: string, val: boolean) => {
+  const ref = paymentMethodRefs[field]
+  if (!ref) return
+  const previous = !val
+
+  try {
+    await updateSettings({ [field]: val })
+
+    toast.add({
+      title: t('common.saved'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (e: any) {
+    ref.value = previous
     toast.add({
       title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',

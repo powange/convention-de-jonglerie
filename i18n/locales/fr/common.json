@@ -351,6 +351,8 @@
       "scanner_activating": "Activation de la caméra...",
       "select_tiers": "Sélection des tarifs",
       "select_tiers_description": "Choisissez les tarifs et les quantités souhaitées",
+      "show_all_tiers": "Afficher tous les tarifs",
+      "show_all_tiers_description": "Y compris les tarifs hors période de validité",
       "summary": "Récapitulatif",
       "summary_and_customize": "Récapitulatif et personnalisation",
       "teams": "Équipes",

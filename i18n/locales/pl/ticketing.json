@@ -158,7 +158,10 @@
       "volunteer_validated": "Wolontariusz zwalidował swoje wejście"
     },
     "payment": {
+      "cash_received": "Otrzymana kwota (€)",
+      "change_to_give": "Reszta do wydania",
       "checkNumber": "Numer czeku",
+      "insufficient_amount": "Niewystarczająca kwota",
       "methods": {
         "card": "Karta płatnicza",
         "cash": "Gotówka",

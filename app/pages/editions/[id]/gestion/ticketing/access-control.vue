@@ -486,6 +486,7 @@
         v-model:open="showAddParticipantModal"
         :edition-id="editionId"
         :allow-anonymous-orders="allowAnonymousOrders"
+        :enabled-payment-methods="enabledPaymentMethods"
         @order-created="handleOrderCreated"
       />
 
@@ -703,6 +704,13 @@ const allowOnsiteRegistration = computed(
   () => ticketingSettings.value?.allowOnsiteRegistration ?? true
 )
 const allowAnonymousOrders = computed(() => ticketingSettings.value?.allowAnonymousOrders ?? false)
+const enabledPaymentMethods = computed(() => {
+  const methods: ('cash' | 'card' | 'check')[] = []
+  if (ticketingSettings.value?.paymentCash ?? true) methods.push('cash')
+  if (ticketingSettings.value?.paymentCard ?? true) methods.push('card')
+  if (ticketingSettings.value?.paymentCheck ?? true) methods.push('check')
+  return methods
+})
 
 const scannerOpen = ref(false)
 const participantModalOpen = ref(false)
@@ -1083,7 +1091,7 @@ const checkHelloAssoConfig = async () => {
 const checkHasTiers = async () => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/tiers`)
-    const tiers = result?.data || result || []
+    const tiers = result?.data?.tiers || result?.data || result || []
     hasTiers.value = Array.isArray(tiers) && tiers.length > 0
   } catch {
     hasTiers.value = false

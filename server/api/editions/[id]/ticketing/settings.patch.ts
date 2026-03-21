@@ -12,6 +12,9 @@ import { handleValidationError } from '#server/utils/validation-schemas'
 const bodySchema = z.object({
   allowOnsiteRegistration: z.boolean().optional(),
   allowAnonymousOrders: z.boolean().optional(),
+  paymentCash: z.boolean().optional(),
+  paymentCard: z.boolean().optional(),
+  paymentCheck: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -75,6 +78,9 @@ export default wrapApiHandler(
     const mappedData = {
       ticketingAllowOnsiteRegistration: parsed.allowOnsiteRegistration,
       ticketingAllowAnonymousOrders: parsed.allowAnonymousOrders,
+      ticketingPaymentCash: parsed.paymentCash,
+      ticketingPaymentCard: parsed.paymentCard,
+      ticketingPaymentCheck: parsed.paymentCheck,
     }
 
     // Construire les données de mise à jour avec buildUpdateData
@@ -88,6 +94,9 @@ export default wrapApiHandler(
       select: {
         ticketingAllowOnsiteRegistration: true,
         ticketingAllowAnonymousOrders: true,
+        ticketingPaymentCash: true,
+        ticketingPaymentCard: true,
+        ticketingPaymentCheck: true,
       },
     })
 
@@ -95,6 +104,9 @@ export default wrapApiHandler(
       settings: {
         allowOnsiteRegistration: updated.ticketingAllowOnsiteRegistration ?? true,
         allowAnonymousOrders: updated.ticketingAllowAnonymousOrders ?? false,
+        paymentCash: updated.ticketingPaymentCash ?? true,
+        paymentCard: updated.ticketingPaymentCard ?? true,
+        paymentCheck: updated.ticketingPaymentCheck ?? true,
       },
     })
   },

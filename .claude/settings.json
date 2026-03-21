@@ -32,7 +32,8 @@
       "Bash(node scripts/show-help.mjs 99)",
       "Bash(timeout 5 node scripts/show-help.mjs)",
       "Bash(node scripts/show-help.mjs 5 2)",
-      "Bash(node scripts/show-help.mjs 2 3)"
+      "Bash(node scripts/show-help.mjs 2 3)",
+      "Bash(node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''scripts/translation/translations-all.json'',''utf8''\\)\\)\")"
     ],
     "additionalDirectories": [
       "/tmp",

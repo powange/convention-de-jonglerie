@@ -3,6 +3,9 @@ import { ref } from 'vue'
 export interface TicketingSettings {
   allowOnsiteRegistration: boolean
   allowAnonymousOrders: boolean
+  paymentCash: boolean
+  paymentCard: boolean
+  paymentCheck: boolean
 }
 
 export const useTicketingSettings = (editionId: number) => {

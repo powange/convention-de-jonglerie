@@ -158,7 +158,10 @@
       "volunteer_validated": "Il volontario ha convalidato il suo ingresso"
     },
     "payment": {
+      "cash_received": "Importo ricevuto (€)",
+      "change_to_give": "Resto da dare",
       "checkNumber": "Numero dell'assegno",
+      "insufficient_amount": "Importo insufficiente",
       "methods": {
         "card": "Carta di credito",
         "cash": "Contanti",

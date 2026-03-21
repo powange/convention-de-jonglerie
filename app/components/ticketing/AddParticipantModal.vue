@@ -138,11 +138,12 @@
           </div>
 
           <div v-else class="space-y-3">
-            <!-- Switch pour afficher tous les tarifs -->
+            <!-- Switch pour afficher tous les tarifs (uniquement s'il y a des tarifs masqués) -->
             <USwitch
+              v-if="hasHiddenTiers || showAllTiers"
               v-model="showAllTiers"
-              label="Afficher tous les tarifs"
-              description="Y compris les tarifs hors période de validité"
+              :label="$t('edition.ticketing.show_all_tiers')"
+              :description="$t('edition.ticketing.show_all_tiers_description')"
             />
             <div
               v-for="tier in availableTiers"
@@ -427,15 +428,13 @@
                 <div v-if="isFreePrice(item)">
                   <UFormField label="Montant (€)" :error="getItemAmountError(item)">
                     <UInput
-                      :model-value="item.price / 100"
-                      type="number"
-                      :min="item.minAmount != null ? item.minAmount / 100 : 0"
-                      :max="item.maxAmount != null ? item.maxAmount / 100 : undefined"
-                      step="0.01"
+                      :model-value="getFreePriceDisplay(item, index)"
+                      inputmode="decimal"
                       placeholder="Montant en euros"
                       @update:model-value="
-                        (value: number) => (item.price = Math.round(value * 100))
+                        (value: string) => handleFreePriceInput(item, index, value)
                       "
+                      @blur="handleFreePriceBlur(item, index)"
                     />
                   </UFormField>
                   <p
@@ -662,6 +661,7 @@
             v-model="paymentMethod"
             v-model:check-number="checkNumber"
             :amount="totalAmount"
+            :enabled-methods="props.enabledPaymentMethods"
             show-title
           />
         </div>
@@ -790,6 +790,7 @@ interface Props {
   open: boolean
   editionId: number
   allowAnonymousOrders?: boolean
+  enabledPaymentMethods?: ('cash' | 'card' | 'check')[]
 }
 
 const props = defineProps<Props>()
@@ -917,6 +918,7 @@ const availableTiers = ref<TicketingTier[]>([])
 const tierQuantities = ref<Record<number, number>>({})
 const selectedItems = ref<SelectedItem[]>([])
 const showAllTiers = ref(false)
+const hasHiddenTiers = ref(false)
 const editionOptions = ref<TicketingOption[]>([])
 
 // Fonctions pour gérer les quantités avec boutons +/-
@@ -1021,6 +1023,36 @@ const totalAmount = computed(() => {
 
 const formatPrice = (priceInCents: number) => {
   return (priceInCents / 100).toFixed(2) + ' €'
+}
+
+// Gestion du prix libre : on garde le texte brut pour ne pas reformater pendant la saisie
+// On utilise l'index de l'item (pas tierId) car plusieurs items peuvent avoir le même tarif
+const freePriceDisplays = ref<Map<number, string>>(new Map())
+
+const getFreePriceDisplay = (item: SelectedItem, index: number) => {
+  const display = freePriceDisplays.value.get(index)
+  if (display !== undefined) return display
+  // Valeur initiale depuis le prix stocké
+  if (item.price === 0) return ''
+  return (item.price / 100).toString()
+}
+
+const handleFreePriceInput = (item: SelectedItem, index: number, value: string) => {
+  // Stocker le texte brut tel quel
+  freePriceDisplays.value.set(index, value)
+  // Convertir en centimes (accepter point et virgule)
+  const normalized = value.replace(',', '.')
+  const parsed = parseFloat(normalized)
+  item.price = isNaN(parsed) ? 0 : Math.round(parsed * 100)
+}
+
+const handleFreePriceBlur = (item: SelectedItem, index: number) => {
+  // Au blur, reformater proprement
+  if (item.price > 0) {
+    freePriceDisplays.value.set(index, (item.price / 100).toFixed(2))
+  } else {
+    freePriceDisplays.value.delete(index)
+  }
 }
 
 // Récupérer le prix d'une option par son ID
@@ -1192,6 +1224,19 @@ const fetchTiers = async () => {
       },
       {} as Record<number, number>
     )
+
+    // Vérifier s'il y a des tarifs masqués (hors période de validité)
+    if (!showAllTiers.value) {
+      try {
+        const allResponse = await $fetch<{ tiers: TicketingTier[] }>(
+          `/api/editions/${props.editionId}/ticketing/tiers/available`,
+          { query: { showAll: 'true' } }
+        )
+        hasHiddenTiers.value = allResponse.tiers.length > response.tiers.length
+      } catch {
+        hasHiddenTiers.value = false
+      }
+    }
   } catch (err: any) {
     console.error('Error fetching tiers:', err)
     error.value = t('edition.ticketing.error_loading_tiers')

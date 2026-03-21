@@ -158,7 +158,10 @@
       "volunteer_validated": "O voluntário validou a sua entrada"
     },
     "payment": {
+      "cash_received": "Montante recebido (€)",
+      "change_to_give": "Troco a devolver",
       "checkNumber": "Número do cheque",
+      "insufficient_amount": "Montante insuficiente",
       "methods": {
         "card": "Cartão bancário",
         "cash": "Dinheiro",

@@ -158,7 +158,10 @@
       "volunteer_validated": "Frivillig har valideret sin adgang"
     },
     "payment": {
+      "cash_received": "Modtaget beløb (€)",
+      "change_to_give": "Byttepenge",
       "checkNumber": "Checknummer",
+      "insufficient_amount": "Utilstrækkeligt beløb",
       "methods": {
         "card": "Betalingskort",
         "cash": "Kontant",

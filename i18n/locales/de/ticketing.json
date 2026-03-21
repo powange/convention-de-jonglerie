@@ -158,7 +158,10 @@
       "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert"
     },
     "payment": {
+      "cash_received": "Erhaltener Betrag (€)",
+      "change_to_give": "Wechselgeld",
       "checkNumber": "Schecknummer",
+      "insufficient_amount": "Unzureichender Betrag",
       "methods": {
         "card": "Bankkarte",
         "cash": "Bargeld",

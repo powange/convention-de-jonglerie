@@ -158,7 +158,10 @@
       "volunteer_validated": "Volontären har validerat sin post"
     },
     "payment": {
+      "cash_received": "Mottaget belopp (€)",
+      "change_to_give": "Växel att ge",
       "checkNumber": "Checknummer",
+      "insufficient_amount": "Otillräckligt belopp",
       "methods": {
         "card": "Bankkort",
         "cash": "Kontant",

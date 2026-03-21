@@ -158,7 +158,10 @@
       "volunteer_validated": "Dobrovolník potvrdil svůj vstup"
     },
     "payment": {
+      "cash_received": "Přijatá částka (€)",
+      "change_to_give": "Vrátit drobné",
       "checkNumber": "Číslo šeku",
+      "insufficient_amount": "Nedostatečná částka",
       "methods": {
         "card": "Platební karta",
         "cash": "Hotovost",
