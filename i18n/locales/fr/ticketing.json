@@ -162,6 +162,8 @@
       "change_to_give": "Monnaie à rendre",
       "checkNumber": "Numéro du chèque",
       "insufficient_amount": "Montant insuffisant",
+      "open_sumup": "Ouvrir SumUp",
+      "sumup_hint": "Validez le paiement sur SumUp puis confirmez ici",
       "methods": {
         "card": "Carte bancaire",
         "cash": "Liquide",

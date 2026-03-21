@@ -133,6 +133,22 @@
       </div>
     </div>
 
+    <!-- Bouton SumUp pour paiement par carte -->
+    <div v-if="modelValue === 'card' && props.sumupEnabled && amount && amount > 0" class="mt-4">
+      <UButton
+        icon="i-heroicons-device-phone-mobile"
+        color="primary"
+        variant="soft"
+        class="w-full justify-center"
+        @click="openSumup"
+      >
+        {{ $t('ticketing.payment.open_sumup') }}
+      </UButton>
+      <p class="text-xs text-gray-500 mt-2 text-center">
+        {{ $t('ticketing.payment.sumup_hint') }}
+      </p>
+    </div>
+
     <!-- Champ pour le numéro de chèque -->
     <div v-if="modelValue === 'check'" class="mt-4">
       <UFormField :label="$t('ticketing.payment.checkNumber')" required>
@@ -200,6 +216,8 @@ const props = withDefaults(
     amount?: number
     showTitle?: boolean
     enabledMethods?: ('cash' | 'card' | 'check')[]
+    sumupEnabled?: boolean
+    sumupTitle?: string
   }>(),
   {
     enabledMethods: () => ['cash', 'card', 'check'],
@@ -231,6 +249,20 @@ function selectMethod(method: PaymentMethod) {
   }
   if (method !== 'cash') {
     cashReceivedInput.value = ''
+  }
+}
+
+// Lien SumUp App Link
+const sumupAppLink = computed(() => {
+  if (!props.amount) return ''
+  const amountInEuros = (props.amount / 100).toFixed(2)
+  const title = encodeURIComponent(props.sumupTitle || 'Billetterie')
+  return `sumupmerchant://pay/1.0?amount=${amountInEuros}&currency=EUR&title=${title}`
+})
+
+function openSumup() {
+  if (sumupAppLink.value) {
+    window.location.href = sumupAppLink.value
   }
 }
 

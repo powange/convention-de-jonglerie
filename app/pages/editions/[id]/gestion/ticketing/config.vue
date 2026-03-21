@@ -179,8 +179,31 @@
                   v-model="paymentCard"
                   :disabled="updating"
                   color="primary"
-                  @update:model-value="handleTogglePaymentMethod('paymentCard', $event)"
+                  @update:model-value="handleTogglePaymentCard"
                 />
+              </div>
+
+              <!-- Sous-option SumUp -->
+              <div
+                v-if="paymentCard"
+                class="ml-8 pl-4 border-l-2 border-blue-200 dark:border-blue-800 space-y-2"
+              >
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ $t('gestion.ticketing.sumup_integration') }}
+                    </h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">
+                      {{ $t('gestion.ticketing.sumup_integration_description') }}
+                    </p>
+                  </div>
+                  <USwitch
+                    v-model="sumupEnabled"
+                    :disabled="updating"
+                    color="primary"
+                    @update:model-value="handleTogglePaymentMethod('sumupEnabled', $event)"
+                  />
+                </div>
               </div>
             </div>
 
@@ -255,6 +278,7 @@ const allowAnonymousOrders = ref(false)
 const paymentCash = ref(true)
 const paymentCard = ref(true)
 const paymentCheck = ref(true)
+const sumupEnabled = ref(false)
 
 // Charger les données au montage
 onMounted(async () => {
@@ -270,6 +294,7 @@ onMounted(async () => {
     paymentCash.value = settings.value.paymentCash ?? true
     paymentCard.value = settings.value.paymentCard ?? true
     paymentCheck.value = settings.value.paymentCheck ?? true
+    sumupEnabled.value = settings.value.sumupEnabled ?? false
   }
 })
 
@@ -320,6 +345,7 @@ const paymentMethodRefs: Record<string, Ref<boolean>> = {
   paymentCash,
   paymentCard,
   paymentCheck,
+  sumupEnabled,
 }
 
 const handleTogglePaymentMethod = async (field: string, val: boolean) => {
@@ -337,6 +363,35 @@ const handleTogglePaymentMethod = async (field: string, val: boolean) => {
     })
   } catch (e: any) {
     ref.value = previous
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
+// Désactiver SumUp quand on désactive la carte bancaire
+const handleTogglePaymentCard = async (val: boolean) => {
+  const previous = !val
+
+  try {
+    const data: Record<string, boolean> = { paymentCard: val }
+    // Si on désactive la carte, désactiver aussi SumUp
+    if (!val && sumupEnabled.value) {
+      data.sumupEnabled = false
+      sumupEnabled.value = false
+    }
+
+    await updateSettings(data)
+
+    toast.add({
+      title: t('common.saved'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (e: any) {
+    paymentCard.value = previous
     toast.add({
       title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',

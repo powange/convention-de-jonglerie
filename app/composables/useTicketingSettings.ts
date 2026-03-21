@@ -6,6 +6,7 @@ export interface TicketingSettings {
   paymentCash: boolean
   paymentCard: boolean
   paymentCheck: boolean
+  sumupEnabled: boolean
 }
 
 export const useTicketingSettings = (editionId: number) => {

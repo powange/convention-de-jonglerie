@@ -391,6 +391,8 @@
       "payment_methods_note": "L'option « Non spécifié » reste toujours disponible pour les cas où le paiement n'est pas encore encaissé",
       "payment_methods_title": "Moyens de paiement acceptés",
       "settings_title": "Paramètres",
+      "sumup_integration": "Intégration SumUp",
+      "sumup_integration_description": "Ouvre automatiquement l'application SumUp avec le montant à encaisser lors d'un paiement par carte",
       "stats_artists": "Artistes",
       "stats_chart_title": "Graphique des validations d'entrée",
       "stats_description": "Consulter les statistiques de ventes et de participation",

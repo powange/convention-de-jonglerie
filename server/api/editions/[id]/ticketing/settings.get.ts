@@ -15,6 +15,7 @@ export default wrapApiHandler(
         ticketingPaymentCash: true,
         ticketingPaymentCard: true,
         ticketingPaymentCheck: true,
+        ticketingSumupEnabled: true,
       },
     })
 
@@ -24,6 +25,7 @@ export default wrapApiHandler(
       paymentCash: edition.ticketingPaymentCash ?? true,
       paymentCard: edition.ticketingPaymentCard ?? true,
       paymentCheck: edition.ticketingPaymentCheck ?? true,
+      sumupEnabled: edition.ticketingSumupEnabled ?? false,
     }
   },
   { operationName: 'GetTicketingSettings' }

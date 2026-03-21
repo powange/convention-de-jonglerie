@@ -15,6 +15,7 @@ const bodySchema = z.object({
   paymentCash: z.boolean().optional(),
   paymentCard: z.boolean().optional(),
   paymentCheck: z.boolean().optional(),
+  sumupEnabled: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -81,6 +82,7 @@ export default wrapApiHandler(
       ticketingPaymentCash: parsed.paymentCash,
       ticketingPaymentCard: parsed.paymentCard,
       ticketingPaymentCheck: parsed.paymentCheck,
+      ticketingSumupEnabled: parsed.sumupEnabled,
     }
 
     // Construire les données de mise à jour avec buildUpdateData
@@ -97,6 +99,7 @@ export default wrapApiHandler(
         ticketingPaymentCash: true,
         ticketingPaymentCard: true,
         ticketingPaymentCheck: true,
+        ticketingSumupEnabled: true,
       },
     })
 
@@ -107,6 +110,7 @@ export default wrapApiHandler(
         paymentCash: updated.ticketingPaymentCash ?? true,
         paymentCard: updated.ticketingPaymentCard ?? true,
         paymentCheck: updated.ticketingPaymentCheck ?? true,
+        sumupEnabled: updated.ticketingSumupEnabled ?? false,
       },
     })
   },

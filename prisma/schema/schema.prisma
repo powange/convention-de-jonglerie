@@ -171,6 +171,7 @@ model Edition {
   ticketingPaymentCash              Boolean                          @default(true)
   ticketingPaymentCard              Boolean                          @default(true)
   ticketingPaymentCheck             Boolean                          @default(true)
+  ticketingSumupEnabled             Boolean                          @default(false)
   workshopsEnabled                  Boolean                          @default(false)
   workshopLocationsFreeInput        Boolean                          @default(false)
   siteMapEnabled                    Boolean                          @default(false)

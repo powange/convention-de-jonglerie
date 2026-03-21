@@ -487,6 +487,8 @@
         :edition-id="editionId"
         :allow-anonymous-orders="allowAnonymousOrders"
         :enabled-payment-methods="enabledPaymentMethods"
+        :sumup-enabled="sumupEnabled"
+        :edition-name="edition?.name"
         @order-created="handleOrderCreated"
       />
 
@@ -711,6 +713,7 @@ const enabledPaymentMethods = computed(() => {
   if (ticketingSettings.value?.paymentCheck ?? true) methods.push('check')
   return methods
 })
+const sumupEnabled = computed(() => ticketingSettings.value?.sumupEnabled ?? false)
 
 const scannerOpen = ref(false)
 const participantModalOpen = ref(false)

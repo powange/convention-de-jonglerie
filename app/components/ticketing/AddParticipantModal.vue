@@ -662,6 +662,8 @@
             v-model:check-number="checkNumber"
             :amount="totalAmount"
             :enabled-methods="props.enabledPaymentMethods"
+            :sumup-enabled="props.sumupEnabled"
+            :sumup-title="props.editionName"
             show-title
           />
         </div>
@@ -791,6 +793,8 @@ interface Props {
   editionId: number
   allowAnonymousOrders?: boolean
   enabledPaymentMethods?: ('cash' | 'card' | 'check')[]
+  sumupEnabled?: boolean
+  editionName?: string
 }
 
 const props = defineProps<Props>()
