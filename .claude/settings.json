@@ -25,7 +25,8 @@
       "Bash(npm ls:*)",
       "Bash(npx playwright:*)",
       "Bash(npm run:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(git stash:*)"
     ],
     "additionalDirectories": [
       "/tmp",

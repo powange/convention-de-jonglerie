@@ -20,6 +20,13 @@ export function getSiteUrl(): string {
   return config.public.siteUrl || 'http://localhost:3000'
 }
 
+/**
+ * Domaines d'email pour lesquels aucun envoi ne doit être tenté,
+ * même si SEND_EMAILS=true. Protège contre l'envoi accidentel
+ * vers des adresses de test ou fictives.
+ */
+const BLOCKED_EMAIL_DOMAINS = ['example.com', 'example.fr', 'example.org', 'example.net']
+
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const config = useRuntimeConfig()
   // Priorité aux variables d'environnement runtime (conteneur) pour éviter les valeurs figées au build
@@ -28,6 +35,16 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const smtpUser = process.env.SMTP_USER || (config.smtpUser as string) || ''
   const smtpPass = process.env.SMTP_PASS || (config.smtpPass as string) || ''
   const smtpFrom = process.env.SMTP_FROM || (config.smtpFrom as string) || smtpUser
+
+  // Bloquer les envois vers les domaines de test
+  const recipientDomain = options.to.split('@')[1]?.toLowerCase()
+  if (recipientDomain && BLOCKED_EMAIL_DOMAINS.includes(recipientDomain)) {
+    console.log(`🚫 Email bloqué (domaine interdit ${recipientDomain}):`, {
+      to: options.to,
+      subject: options.subject,
+    })
+    return true
+  }
 
   try {
     if (!isEmailEnabled) {

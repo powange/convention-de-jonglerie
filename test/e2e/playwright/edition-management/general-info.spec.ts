@@ -41,8 +41,6 @@ test.describe.serial("Modification des informations générales d'une édition",
     await addressInput.fill(UPDATED_ADDRESS)
 
     // Modifier la ville
-    const cityInput = page.locator('input').filter({ hasText: '' }).nth(0)
-    // Chercher le champ ville par son label
     const cityField = page.getByLabel(/ville|city/i)
     await cityField.clear()
     await cityField.fill(UPDATED_CITY)
