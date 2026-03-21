@@ -3,7 +3,9 @@ import { expect, test } from '@nuxt/test-utils/playwright'
 import {
   disableVolunteers,
   enableVolunteers,
+  loadFromState,
   loadState,
+  saveToState,
   setEditionStatus,
   updateVolunteerSettings,
   getVolunteerSettings,
@@ -86,17 +88,20 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
     }
     const body = await response.json()
     // Réponse: { data: { application: { status, ... } } }
-    const status = body.data?.application?.status || body.data?.status || body.status
-    expect(status).toBe('PENDING')
+    const application = body.data?.application || body.data || body
+    expect(application.status).toBe('PENDING')
+    saveToState('volunteerApplicationId', String(application.id))
   })
 
   test("la page publique affiche le statut 'en attente'", async ({ page, goto }) => {
     const { editionId } = loadState()
 
-    await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-    await page.waitForSelector('h3', { timeout: 15000 })
+    await expect(async () => {
+      await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      await page.waitForSelector('h3', { timeout: 10000 })
+      await expect(page.getByText(/en attente|pending/i).first()).toBeVisible({ timeout: 3000 })
+    }).toPass({ timeout: 15000, intervals: [2000] })
 
-    await expect(page.getByText(/en attente|pending/i).first()).toBeVisible({ timeout: 5000 })
     await expect(page.getByRole('button', { name: /postuler/i })).not.toBeVisible({
       timeout: 2000,
     })
@@ -134,18 +139,9 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
 
   test('accepter la candidature', async ({ page }) => {
     const { editionId } = loadState()
-
-    // Récupérer la candidature PENDING
-    const listResponse = await page.request.get(
-      `http://localhost:3000/api/editions/${editionId}/volunteers/applications?status=PENDING`
-    )
-    const listBody = await listResponse.json()
-    const data = listBody.data || listBody
-    const applications = data.items || data
-    const applicationId = applications[0]?.id
+    const applicationId = loadFromState('volunteerApplicationId')
     expect(applicationId).toBeTruthy()
 
-    // Accepter
     const patchResponse = await page.request.patch(
       `http://localhost:3000/api/editions/${editionId}/volunteers/applications/${applicationId}`,
       { data: { status: 'ACCEPTED' } }
@@ -175,22 +171,18 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
   test("la page publique affiche le statut 'acceptée'", async ({ page, goto }) => {
     const { editionId } = loadState()
 
-    await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-    await page.waitForSelector('h3', { timeout: 15000 })
-
-    await expect(page.getByText(/acceptée|accepted/i).first()).toBeVisible({ timeout: 10000 })
+    // Recharger la page jusqu'à ce que le statut soit visible (cache SSR)
+    await expect(async () => {
+      await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      await page.waitForSelector('h3', { timeout: 10000 })
+      await expect(page.getByText(/acceptée|accepted/i).first()).toBeVisible({ timeout: 3000 })
+    }).toPass({ timeout: 15000, intervals: [2000] })
   })
 
   test('rejeter la candidature (ACCEPTED → PENDING → REJECTED)', async ({ page }) => {
     const { editionId } = loadState()
-
-    const listResponse = await page.request.get(
-      `http://localhost:3000/api/editions/${editionId}/volunteers/applications?status=ACCEPTED`
-    )
-    const listBody = await listResponse.json()
-    const data = listBody.data || listBody
-    const applications = data.items || data
-    const applicationId = applications[0]?.id
+    const applicationId = loadFromState('volunteerApplicationId')
+    expect(applicationId).toBeTruthy()
 
     // ACCEPTED → PENDING
     const pendingResponse = await page.request.patch(
@@ -210,10 +202,11 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
   test("la page publique affiche le statut 'refusée'", async ({ page, goto }) => {
     const { editionId } = loadState()
 
-    await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-    await page.waitForSelector('h3', { timeout: 15000 })
-
-    await expect(page.getByText(/refusée|rejected/i).first()).toBeVisible({ timeout: 5000 })
+    await expect(async () => {
+      await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      await page.waitForSelector('h3', { timeout: 10000 })
+      await expect(page.getByText(/refusée|rejected/i).first()).toBeVisible({ timeout: 3000 })
+    }).toPass({ timeout: 15000, intervals: [2000] })
   })
 
   // ──────────────────────────────────────────────

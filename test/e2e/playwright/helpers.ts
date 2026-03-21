@@ -23,6 +23,26 @@ export function loadState(): ConventionState {
   return JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
 }
 
+/**
+ * Sauvegarde une valeur dans le state file (ajoute/met à jour un champ).
+ */
+export function saveToState(key: string, value: unknown) {
+  const state = fs.existsSync(conventionStateFile)
+    ? JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
+    : {}
+  state[key] = value
+  fs.writeFileSync(conventionStateFile, JSON.stringify(state))
+}
+
+/**
+ * Charge une valeur depuis le state file.
+ */
+export function loadFromState<T = string>(key: string): T | undefined {
+  if (!fs.existsSync(conventionStateFile)) return undefined
+  const state = JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
+  return state[key] as T | undefined
+}
+
 // ──────────────────────────────────────────────
 // Edition helpers
 // ──────────────────────────────────────────────

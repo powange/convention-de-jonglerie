@@ -4,6 +4,29 @@ import { spawn } from 'child_process'
 
 import { select } from '@inquirer/prompts'
 
+/**
+ * Wrapper select avec support Echap.
+ * En raw mode, Echap arrive comme le byte 0x1b (27) sur stdin.
+ * Utilise promise.cancel() car AbortController ne fonctionne pas avec @inquirer/select.
+ */
+async function selectWithEscape(options) {
+  const promise = select(options)
+
+  const onData = (data) => {
+    if (data.length === 1 && data[0] === 27) {
+      promise.cancel()
+    }
+  }
+
+  process.stdin.prependListener('data', onData)
+
+  try {
+    return await promise
+  } finally {
+    process.stdin.removeListener('data', onData)
+  }
+}
+
 // Couleurs pour le terminal
 const colors = {
   blue: '\x1b[34m',
@@ -294,119 +317,170 @@ async function interactiveMenu() {
     `${colors.bold}${colors.blue}📦 Scripts NPM - Menu interactif${colors.reset}\n`
   )
 
-  // Génère un raccourci clavier pour un index donné (1-9, puis 0, a, b, c...)
-  const getShortcutKey = (index) => {
-    if (index < 9) return String(index + 1) // 1-9
-    if (index === 9) return '0' // 10ème = 0
-    return String.fromCharCode(97 + index - 10) // a, b, c... pour 11+
-  }
-
-  const getShortcutDisplay = (index) => {
-    if (index < 9) return String(index + 1)
-    if (index === 9) return '0'
-    return String.fromCharCode(97 + index - 10)
-  }
-
+  // Sélection de la catégorie
+  let category
   try {
-    // Sélection de la catégorie avec raccourcis numériques
     const categoryChoices = [
-      ...sections.map((s, index) => ({
-        name: `${colors.dim}[${getShortcutDisplay(index)}]${colors.reset} ${s.icon} ${s.title} ${colors.dim}(${s.scripts.length} scripts)${colors.reset}`,
+      ...sections.map((s, i) => ({
+        name: `${colors.dim}${String(i + 1).padStart(2)}.${colors.reset} ${s.icon} ${s.title} ${colors.dim}(${s.scripts.length} scripts)${colors.reset}`,
         value: s,
-        key: getShortcutKey(index),
       })),
-      { name: `${colors.dim}───────────────────────────${colors.reset}`, value: 'separator', disabled: true },
-      { name: `${colors.dim}[l]${colors.reset} 📋 Afficher la liste complète`, value: 'list', key: 'l' },
-      { name: `${colors.dim}[q]${colors.reset} ❌ Quitter`, value: 'exit', key: 'q' },
+      { name: `${colors.dim} 0.${colors.reset} 📋 Afficher la liste complète`, value: 'list' },
     ]
 
-    const category = await select({
-      message: 'Choisissez une catégorie (ou tapez un numéro):',
+    category = await selectWithEscape({
+      message: 'Choisissez une catégorie :',
       choices: categoryChoices,
-      pageSize: 15,
+      pageSize: categoryChoices.length,
+      loop: false,
     })
-
-    if (category === 'exit') {
-      console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
-      process.exit(0)
-    }
-
-    if (category === 'list') {
-      console.clear()
-      showStaticHelp()
-      console.log(`${colors.dim}Appuyez sur Entrée pour revenir au menu...${colors.reset}`)
-      await new Promise((resolve) => {
-        process.stdin.once('data', resolve)
-      })
-      return interactiveMenu()
-    }
-
-    // Sélection du script dans la catégorie
-    console.clear()
-    console.log(
-      `${colors.bold}${category.color}${category.icon} ${category.title}${colors.reset}\n`
-    )
-
-    const scriptChoices = [
-      ...category.scripts.map((s, index) => {
-        const arg = s.requiresArg ? ` ${colors.yellow}${s.requiresArg}${colors.reset}` : ''
-        return {
-          name: `${colors.dim}[${getShortcutDisplay(index)}]${colors.reset} ${colors.green}${s.name}${arg}${colors.reset} ${colors.dim}- ${s.desc}${colors.reset}`,
-          value: s,
-          key: getShortcutKey(index),
-        }
-      }),
-      { name: `${colors.dim}───────────────────────────${colors.reset}`, value: 'separator', disabled: true },
-      { name: `${colors.dim}[b]${colors.reset} ⬅️  Retour aux catégories`, value: 'back', key: 'b' },
-      { name: `${colors.dim}[q]${colors.reset} ❌ Quitter`, value: 'exit', key: 'q' },
-    ]
-
-    const script = await select({
-      message: 'Choisissez un script (ou tapez un numéro):',
-      choices: scriptChoices,
-      pageSize: 15,
-    })
-
-    if (script === 'exit') {
-      console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
-      process.exit(0)
-    }
-
-    if (script === 'back') {
-      return interactiveMenu()
-    }
-
-    // Gestion des scripts nécessitant des arguments
-    if (script.requiresArg) {
-      console.log(
-        `\n${colors.yellow}⚠️  Ce script nécessite un argument: ${script.requiresArg}${colors.reset}`
-      )
-      console.log(
-        `${colors.dim}Exécutez manuellement: ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}\n`
-      )
-      console.log(`${colors.dim}Appuyez sur Entrée pour revenir au menu...${colors.reset}`)
-      await new Promise((resolve) => {
-        process.stdin.once('data', resolve)
-      })
-      return interactiveMenu()
-    }
-
-    // Exécution du script
-    runScript(script.name)
-  } catch (error) {
-    // Gestion de Ctrl+C
-    if (error.name === 'ExitPromptError' || error.message?.includes('User force closed')) {
-      console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
-      process.exit(0)
-    }
-    throw error
+  } catch {
+    // Echap ou Ctrl+C au menu principal → quitter
+    console.log(`\n${colors.dim}À bientôt !${colors.reset}\n`)
+    process.exit(0)
   }
+
+  if (category === 'list') {
+    console.clear()
+    showStaticHelp()
+    console.log(`${colors.dim}Appuyez sur Entrée pour revenir au menu...${colors.reset}`)
+    await new Promise((resolve) => {
+      process.stdin.once('data', resolve)
+    })
+    return interactiveMenu()
+  }
+
+  // Sélection du script dans la catégorie
+  console.clear()
+  console.log(
+    `${colors.bold}${category.color}${category.icon} ${category.title}${colors.reset}\n`
+  )
+
+  let script
+  try {
+    const scriptChoices = category.scripts.map((s, i) => {
+      const arg = s.requiresArg ? ` ${colors.yellow}${s.requiresArg}${colors.reset}` : ''
+      return {
+        name: `${colors.dim}${String(i + 1).padStart(2)}.${colors.reset} ${colors.green}${s.name}${arg}${colors.reset} ${colors.dim}- ${s.desc}${colors.reset}`,
+        value: s,
+      }
+    })
+
+    script = await selectWithEscape({
+      message: `Choisissez un script ${colors.dim}(Echap = retour)${colors.reset} :`,
+      choices: scriptChoices,
+      pageSize: scriptChoices.length,
+      loop: false,
+    })
+  } catch {
+    // Echap ou Ctrl+C au menu script → retour aux catégories
+    return interactiveMenu()
+  }
+
+  // Gestion des scripts nécessitant des arguments
+  if (script.requiresArg) {
+    console.log(
+      `\n${colors.yellow}⚠️  Ce script nécessite un argument: ${script.requiresArg}${colors.reset}`
+    )
+    console.log(
+      `${colors.dim}Exécutez manuellement: ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}\n`
+    )
+    console.log(`${colors.dim}Appuyez sur Entrée pour revenir au menu...${colors.reset}`)
+    await new Promise((resolve) => {
+      process.stdin.once('data', resolve)
+    })
+    return interactiveMenu()
+  }
+
+  // Exécution du script
+  runScript(script.name)
+}
+
+/**
+ * Résout un raccourci clavier en index de section/script.
+ * "1" → 0, "9" → 8, "0" → 9, "a" → 10, "b" → 11, etc.
+ */
+function resolveShortcutIndex(shortcut) {
+  if (!shortcut || shortcut.length !== 1) return -1
+  const code = shortcut.charCodeAt(0)
+  if (code >= 49 && code <= 57) return code - 49 // '1'-'9' → 0-8
+  if (code === 48) return 9 // '0' → 9
+  if (code >= 97 && code <= 122) return code - 97 + 10 // 'a'-'z' → 10+
+  return -1
+}
+
+/**
+ * Mode direct : `npm run help 2 6` → catégorie 2, script 6
+ */
+async function directMode(categoryShortcut, scriptShortcut) {
+  const categoryIndex = resolveShortcutIndex(categoryShortcut)
+  if (categoryIndex < 0 || categoryIndex >= sections.length) {
+    console.log(`${colors.red}❌ Catégorie "${categoryShortcut}" invalide${colors.reset}`)
+    console.log(`${colors.dim}Catégories disponibles : 1-${Math.min(9, sections.length)}${sections.length > 9 ? ', 0' : ''}${sections.length > 10 ? ', a-' + String.fromCharCode(96 + sections.length - 10) : ''}${colors.reset}`)
+    process.exit(1)
+  }
+
+  const section = sections[categoryIndex]
+
+  if (!scriptShortcut) {
+    // Afficher les scripts de la catégorie puis passer en mode interactif
+    console.log(`${colors.bold}${section.color}${section.icon} ${section.title}${colors.reset}\n`)
+
+    const scriptChoices = section.scripts.map((s, i) => {
+      const arg = s.requiresArg ? ` ${colors.yellow}${s.requiresArg}${colors.reset}` : ''
+      return {
+        name: `${colors.dim}${String(i + 1).padStart(2)}.${colors.reset} ${colors.green}${s.name}${arg}${colors.reset} ${colors.dim}- ${s.desc}${colors.reset}`,
+        value: s,
+      }
+    })
+
+    let script
+    try {
+      script = await selectWithEscape({
+        message: `Choisissez un script ${colors.dim}(Echap = retour)${colors.reset} :`,
+        choices: scriptChoices,
+        pageSize: scriptChoices.length,
+        loop: false,
+      })
+    } catch {
+      // Echap ou Ctrl+C → retour au menu principal
+      return interactiveMenu()
+    }
+
+    if (script.requiresArg) {
+      console.log(`\n${colors.yellow}⚠️  Ce script nécessite un argument : ${script.requiresArg}${colors.reset}`)
+      console.log(`${colors.dim}Exécutez : ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}\n`)
+      process.exit(1)
+    }
+
+    runScript(script.name)
+    return
+  }
+
+  const scriptIndex = resolveShortcutIndex(scriptShortcut)
+  if (scriptIndex < 0 || scriptIndex >= section.scripts.length) {
+    console.log(`${colors.red}❌ Script "${scriptShortcut}" invalide dans ${section.title}${colors.reset}`)
+    console.log(`${colors.dim}Scripts disponibles : 1-${Math.min(9, section.scripts.length)}${colors.reset}`)
+    process.exit(1)
+  }
+
+  const script = section.scripts[scriptIndex]
+
+  if (script.requiresArg) {
+    console.log(`${colors.yellow}⚠️  Ce script nécessite un argument : ${script.requiresArg}${colors.reset}`)
+    console.log(`${colors.dim}Exécutez : ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}`)
+    process.exit(1)
+  }
+
+  runScript(script.name)
 }
 
 // Point d'entrée
 const args = process.argv.slice(2)
 if (args.includes('--list') || args.includes('-l')) {
   showStaticHelp()
+} else if (args.length > 0 && !args[0].startsWith('-')) {
+  directMode(args[0], args[1])
 } else {
   interactiveMenu()
 }
