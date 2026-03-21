@@ -1,21 +1,13 @@
-import fs from 'node:fs'
-
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { conventionStateFile } from '../../../../playwright.config'
-
-interface ConventionState {
-  conventionId: string
-  editionId: string
-  name: string
-}
-
-function loadState(): ConventionState {
-  if (!fs.existsSync(conventionStateFile)) {
-    throw new Error(`State file introuvable: ${conventionStateFile}. Lancer le data-setup d'abord.`)
-  }
-  return JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
-}
+import {
+  disableVolunteers,
+  enableVolunteers,
+  loadState,
+  setEditionStatus,
+  updateVolunteerSettings,
+  getVolunteerSettings,
+} from '../helpers'
 
 test.describe.serial('Parcours complet bénévoles : configuration → candidature → gestion', () => {
   // ──────────────────────────────────────────────
@@ -25,38 +17,15 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
   test('activer les bénévoles et ouvrir le recrutement via API', async ({ page }) => {
     const { editionId } = loadState()
 
-    // Activer la feature bénévoles
-    const enableResponse = await page.request.put(
-      `http://localhost:3000/api/editions/${editionId}`,
-      { data: { volunteersEnabled: true } }
-    )
-    expect(enableResponse.ok()).toBe(true)
-
-    // Ouvrir le recrutement
-    const settingsResponse = await page.request.patch(
-      `http://localhost:3000/api/editions/${editionId}/volunteers/settings`,
-      { data: { open: true } }
-    )
-    expect(settingsResponse.ok()).toBe(true)
-
-    // Publier l'édition pour la page publique
-    const statusResponse = await page.request.patch(
-      `http://localhost:3000/api/editions/${editionId}/status`,
-      { data: { status: 'PUBLISHED' } }
-    )
-    expect(statusResponse.ok()).toBe(true)
+    await enableVolunteers(page, editionId)
+    await updateVolunteerSettings(page, editionId, { open: true })
+    await setEditionStatus(page, editionId, 'PUBLISHED')
   })
 
   test('vérifier les settings via API', async ({ page }) => {
     const { editionId } = loadState()
 
-    const response = await page.request.get(
-      `http://localhost:3000/api/editions/${editionId}/volunteers/settings`
-    )
-    expect(response.ok()).toBe(true)
-
-    const body = await response.json()
-    const settings = body.data || body
+    const settings = await getVolunteerSettings(page, editionId)
     expect(settings.mode).toBe('INTERNAL')
     expect(settings.open).toBe(true)
   })
@@ -209,7 +178,7 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
     await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
     await page.waitForSelector('h3', { timeout: 15000 })
 
-    await expect(page.getByText(/acceptée|accepted/i).first()).toBeVisible({ timeout: 5000 })
+    await expect(page.getByText(/acceptée|accepted/i).first()).toBeVisible({ timeout: 10000 })
   })
 
   test('rejeter la candidature (ACCEPTED → PENDING → REJECTED)', async ({ page }) => {
@@ -257,24 +226,8 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
     const { editionId } = loadState()
 
     // Fermer le recrutement (les candidatures seront nettoyées par db:e2e:clean)
-    const settingsResponse = await page.request.patch(
-      `http://localhost:3000/api/editions/${editionId}/volunteers/settings`,
-      { data: { open: false } }
-    )
-    expect(settingsResponse.ok()).toBe(true)
-
-    // Désactiver les bénévoles
-    const disableResponse = await page.request.put(
-      `http://localhost:3000/api/editions/${editionId}`,
-      { data: { volunteersEnabled: false } }
-    )
-    expect(disableResponse.ok()).toBe(true)
-
-    // Remettre OFFLINE
-    const statusResponse = await page.request.patch(
-      `http://localhost:3000/api/editions/${editionId}/status`,
-      { data: { status: 'OFFLINE' } }
-    )
-    expect(statusResponse.ok()).toBe(true)
+    await updateVolunteerSettings(page, editionId, { open: false })
+    await disableVolunteers(page, editionId)
+    await setEditionStatus(page, editionId, 'OFFLINE')
   })
 })

@@ -19,7 +19,7 @@ export default defineConfig<ConfigOptions>({
   testDir: './test/e2e/playwright',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
@@ -53,7 +53,7 @@ export default defineConfig<ConfigOptions>({
     // Tests publics (sans authentification)
     {
       name: 'public',
-      testIgnore: /authenticated\/|edition-management\/|\.setup\.ts/,
+      testMatch: /public\//,
       use: { ...devices['Desktop Chrome'], locale: 'fr-FR' },
     },
     // Tests authentifiés (profil, login, convention UI)

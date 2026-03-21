@@ -1,21 +1,6 @@
-import fs from 'node:fs'
-
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { conventionStateFile } from '../../../../playwright.config'
-
-interface ConventionState {
-  conventionId: string
-  editionId: string
-  name: string
-}
-
-function loadState(): ConventionState {
-  if (!fs.existsSync(conventionStateFile)) {
-    throw new Error(`State file introuvable: ${conventionStateFile}. Lancer le data-setup d'abord.`)
-  }
-  return JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
-}
+import { loadState } from '../helpers'
 
 test.describe.serial("Activation et désactivation des fonctionnalités d'une édition", () => {
   const features = [

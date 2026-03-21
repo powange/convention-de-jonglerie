@@ -1,48 +1,11 @@
-import fs from 'node:fs'
-
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { conventionStateFile } from '../../../../playwright.config'
-
-interface ConventionState {
-  conventionId: string
-  editionId: string
-  name: string
-}
-
-function loadState(): ConventionState {
-  if (!fs.existsSync(conventionStateFile)) {
-    throw new Error(`State file introuvable: ${conventionStateFile}. Lancer le data-setup d'abord.`)
-  }
-  return JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
-}
-
-/**
- * Récupère le statut actuel de l'édition via l'API.
- */
-async function getEditionStatus(
-  page: import('@playwright/test').Page,
-  editionId: string
-): Promise<string | null> {
-  const response = await page.request.get(`http://localhost:3000/api/editions/${editionId}`)
-  if (!response.ok()) return null
-  const body = await response.json()
-  const edition = body.data || body
-  return edition.status
-}
+import { getEditionStatus, loadState, setEditionStatus } from '../helpers'
 
 test.describe.serial("Gestion du statut d'une édition", () => {
   test("s'assurer que l'édition est OFFLINE au départ", async ({ page }) => {
     const { editionId } = loadState()
-
-    // Forcer le statut OFFLINE via API pour être indépendant de l'ordre des fichiers
-    const response = await page.request.patch(
-      `http://localhost:3000/api/editions/${editionId}/status`,
-      {
-        data: { status: 'OFFLINE' },
-      }
-    )
-    expect(response.ok()).toBe(true)
+    await setEditionStatus(page, editionId, 'OFFLINE')
   })
 
   test("l'édition a bien le statut OFFLINE", async ({ page }) => {
