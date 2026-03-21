@@ -30,7 +30,7 @@
           </p>
         </div>
         <UButton
-          v-if="allowOnsiteRegistration"
+          v-if="allowOnsiteRegistration && hasTiers"
           icon="i-heroicons-user-plus"
           color="primary"
           class="sm:flex-shrink-0"
@@ -359,8 +359,8 @@
           @show-organizers-not-validated="showOrganizersNotValidatedModal"
         />
 
-        <!-- Statistiques des quotas -->
-        <TicketingStatsQuotaStatsCard :edition-id="editionId" />
+        <!-- Statistiques des quotas (uniquement si des tarifs sont configurés) -->
+        <TicketingStatsQuotaStatsCard v-if="hasTiers" :edition-id="editionId" />
 
         <!-- Dernières validations -->
         <UCard>
@@ -727,6 +727,7 @@ const stats = ref({
   totalVolunteers: 0,
   totalArtists: 0,
 })
+const hasTiers = ref(false)
 const hasHelloAssoConfig = ref(false)
 const volunteersNotValidatedModalOpen = ref(false)
 const volunteersNotValidated = ref<any[]>([])
@@ -748,7 +749,7 @@ onMounted(async () => {
   await fetchTicketingSettings()
 
   // Charger les statistiques et les dernières validations
-  await Promise.all([loadStats(), loadRecentValidations(), checkHelloAssoConfig()])
+  await Promise.all([loadStats(), loadRecentValidations(), checkHelloAssoConfig(), checkHasTiers()])
 })
 
 // Permissions calculées
@@ -1075,6 +1076,17 @@ const checkHelloAssoConfig = async () => {
   } catch {
     // Pas de configuration HelloAsso
     hasHelloAssoConfig.value = false
+  }
+}
+
+// Vérifier s'il y a des tarifs configurés
+const checkHasTiers = async () => {
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/tiers`)
+    const tiers = result?.data || result || []
+    hasTiers.value = Array.isArray(tiers) && tiers.length > 0
+  } catch {
+    hasTiers.value = false
   }
 }
 
