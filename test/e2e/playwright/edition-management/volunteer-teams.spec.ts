@@ -15,7 +15,7 @@ const TEAM_UPDATED_NAME = 'Équipe Technique E2E'
 
 let createdTeamId: string
 
-test.describe.serial("Gestion des équipes de bénévoles", () => {
+test.describe.serial('Gestion des équipes de bénévoles', () => {
   // ──────────────────────────────────────────────
   // Setup : activer les bénévoles
   // ──────────────────────────────────────────────
@@ -70,8 +70,7 @@ test.describe.serial("Gestion des équipes de bénévoles", () => {
     // Soumettre et attendre la réponse API
     const [response] = await Promise.all([
       page.waitForResponse(
-        (res) =>
-          res.url().includes('/volunteer-teams') && res.request().method() === 'POST'
+        (res) => res.url().includes('/volunteer-teams') && res.request().method() === 'POST'
       ),
       modal.getByRole('button', { name: /créer/i }).click(),
     ])
@@ -147,7 +146,7 @@ test.describe.serial("Gestion des équipes de bénévoles", () => {
     await expect(page.getByText(TEAM_NAME)).not.toBeVisible({ timeout: 2000 })
   })
 
-  test("vérifier les modifications via API", async ({ page }) => {
+  test('vérifier les modifications via API', async ({ page }) => {
     const { editionId } = loadState()
 
     const response = await page.request.get(
@@ -208,7 +207,10 @@ test.describe.serial("Gestion des équipes de bénévoles", () => {
     )
     if (existingApps.ok()) {
       const body = await existingApps.json()
-      const apps = (body.data?.items || body.data || body.items || body) as { id: string; status: string }[]
+      const apps = (body.data?.items || body.data || body.items || body) as {
+        id: string
+        status: string
+      }[]
       if (Array.isArray(apps)) {
         for (const app of apps) {
           // Repasser en PENDING si nécessaire avant suppression
@@ -359,7 +361,7 @@ test.describe.serial("Gestion des équipes de bénévoles", () => {
     await expect(page.getByText(/aucune équipe/i).first()).toBeVisible({ timeout: 5000 })
   })
 
-  test("vérifier la suppression via API", async ({ page }) => {
+  test('vérifier la suppression via API', async ({ page }) => {
     const { editionId } = loadState()
 
     const response = await page.request.get(

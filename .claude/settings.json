@@ -26,7 +26,13 @@
       "Bash(npx playwright:*)",
       "Bash(npm run:*)",
       "Bash(npx tsx:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(node scripts/show-help.mjs 2)",
+      "Bash(node scripts/show-help.mjs 2 6)",
+      "Bash(node scripts/show-help.mjs 99)",
+      "Bash(timeout 5 node scripts/show-help.mjs)",
+      "Bash(node scripts/show-help.mjs 5 2)",
+      "Bash(node scripts/show-help.mjs 2 3)"
     ],
     "additionalDirectories": [
       "/tmp",

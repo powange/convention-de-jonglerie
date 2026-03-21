@@ -34,10 +34,7 @@
         <!-- Message si aucun bénévole accepté -->
         <UCard v-if="acceptedCount === 0 && (canManageVolunteers || isTeamLeaderValue)">
           <div class="text-center py-12">
-            <UIcon
-              name="i-heroicons-user-group"
-              class="h-16 w-16 text-gray-400 mx-auto mb-4"
-            />
+            <UIcon name="i-heroicons-user-group" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 class="text-xl font-semibold mb-2">
               {{ $t('edition.volunteers.no_accepted_volunteers_title') }}
             </h2>
