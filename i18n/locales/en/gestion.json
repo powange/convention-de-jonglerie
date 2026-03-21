@@ -459,6 +459,8 @@
       "config_description": "Configure volunteering system",
       "config_page_description": "Configure volunteering system settings",
       "config_title": "Volunteering Configuration",
+      "dates_description": "Set the setup and teardown dates to allow volunteers to indicate their availability",
+      "dates_title": "Setup and teardown dates",
       "external_link": "External link",
       "external_url_description": "Link to your form or external volunteer management tool",
       "external_url_placeholder": "https://exemple.com/benevoles",

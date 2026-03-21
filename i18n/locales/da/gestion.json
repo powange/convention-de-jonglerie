@@ -459,6 +459,8 @@
       "config_description": "Konfigurer frivilligsystem",
       "config_page_description": "Konfigurer indstillinger for frivilligsystem",
       "config_title": "Frivilligkonfiguration",
+      "dates_description": "Angiv opsætnings- og nedtagningsdatoer, så frivillige kan angive deres tilgængelighed",
+      "dates_title": "Opsætnings- og nedtagningsdatoer",
       "external_link": "Eksternt link",
       "external_url_description": "Link til din formular eller et eksternt værktøj til styring af frivillige",
       "external_url_placeholder": "https://exemple.com/benevoles",

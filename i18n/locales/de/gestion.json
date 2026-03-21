@@ -459,6 +459,8 @@
       "config_description": "Freiwilligensystem konfigurieren",
       "config_page_description": "Einstellungen des Freiwilligensystems konfigurieren",
       "config_title": "Freiwilligenkonfiguration",
+      "dates_description": "Legen Sie die Auf- und Abbaudaten fest, damit Freiwillige ihre Verfügbarkeit angeben können",
+      "dates_title": "Auf- und Abbaudaten",
       "external_link": "Externer Link",
       "external_url_description": "Link zu Ihrem Formular oder externen Tool für das Freiwilligenmanagement",
       "external_url_placeholder": "https://exemple.com/benevoles",

@@ -459,6 +459,8 @@
       "config_description": "Nastavit systém dobrovolnictví",
       "config_page_description": "Nastavit parametry systému dobrovolnictví",
       "config_title": "Konfigurace dobrovolnictví",
+      "dates_description": "Nastavte data montáže a demontáže, aby dobrovolníci mohli uvést svou dostupnost",
+      "dates_title": "Data montáže a demontáže",
       "external_link": "Externí odkaz",
       "external_url_description": "Odkaz na váš formulář nebo externí nástroj pro správu dobrovolníků",
       "external_url_placeholder": "https://exemple.com/benevoles",

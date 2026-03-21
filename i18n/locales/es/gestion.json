@@ -459,6 +459,8 @@
       "config_description": "Configurar sistema de voluntariado",
       "config_page_description": "Configurar ajustes del sistema de voluntariado",
       "config_title": "Configuración de voluntariado",
+      "dates_description": "Defina las fechas de montaje y desmontaje para permitir a los voluntarios indicar su disponibilidad",
+      "dates_title": "Fechas de montaje y desmontaje",
       "external_link": "Enlace externo",
       "external_url_description": "Enlace a su formulario o herramienta externa de gestión de voluntarios",
       "external_url_placeholder": "https://exemple.com/benevoles",

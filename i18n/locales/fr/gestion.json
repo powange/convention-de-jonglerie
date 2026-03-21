@@ -459,6 +459,8 @@
       "config_description": "Paramétrer le système de bénévolat",
       "config_page_description": "Configurer les paramètres du système de bénévolat",
       "config_title": "Configuration bénévolat",
+      "dates_description": "Définissez les dates de montage et démontage pour permettre aux bénévoles d'indiquer leur disponibilité",
+      "dates_title": "Dates de montage et démontage",
       "external_link": "Lien externe",
       "external_url_description": "Lien vers votre formulaire ou outil externe de gestion des bénévoles",
       "external_url_placeholder": "https://exemple.com/benevoles",

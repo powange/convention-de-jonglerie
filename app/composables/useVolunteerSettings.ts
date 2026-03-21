@@ -1,4 +1,3 @@
-import { fromDate } from '@internationalized/date'
 import { ref } from 'vue'
 
 export interface VolunteerSettings {
@@ -90,12 +89,8 @@ export const useVolunteerSettings = (editionId: number) => {
     if (!settings.value) return {}
 
     return {
-      setupStartDate: settings.value.setupStartDate
-        ? fromDate(new Date(settings.value.setupStartDate), 'UTC')
-        : null,
-      teardownEndDate: settings.value.teardownEndDate
-        ? fromDate(new Date(settings.value.teardownEndDate), 'UTC')
-        : null,
+      hasSetupStartDate: !!settings.value.setupStartDate,
+      hasTeardownEndDate: !!settings.value.teardownEndDate,
       askSetup: settings.value.askSetup,
       askTeardown: settings.value.askTeardown,
       askDiet: settings.value.askDiet,

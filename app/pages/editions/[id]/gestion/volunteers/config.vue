@@ -97,6 +97,101 @@
               </div>
             </div>
 
+            <!-- Dates de montage/démontage (mode interne uniquement) -->
+            <div
+              v-if="volunteersModeLocal === 'INTERNAL'"
+              class="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+            >
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.volunteers.dates_title') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.volunteers.dates_description') }}
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Date de début du montage -->
+                <UFormField
+                  :label="$t('edition.volunteers.setup_start_date_label')"
+                  :error="fieldErrors.setupStartDate"
+                >
+                  <UPopover>
+                    <UFieldGroup>
+                      <UButton
+                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        variant="outline"
+                        color="neutral"
+                        icon="i-heroicons-calendar-days"
+                      >
+                        {{
+                          setupStartDateLocal
+                            ? toCalendarDate(setupStartDateLocal).toString()
+                            : $t('forms.labels.select_date')
+                        }}
+                      </UButton>
+                      <UButton
+                        v-if="setupStartDateLocal"
+                        icon="i-heroicons-x-mark"
+                        color="neutral"
+                        variant="outline"
+                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        @click="handleClearSetupStartDate"
+                      />
+                    </UFieldGroup>
+                    <template #content>
+                      <UCalendar
+                        v-model="setupStartDateLocal"
+                        :placeholder="setupStartDatePlaceholder"
+                        :max-value="setupStartDateMaxValue"
+                        @update:model-value="handleSetupStartDateChange"
+                      />
+                    </template>
+                  </UPopover>
+                </UFormField>
+
+                <!-- Date de fin du démontage -->
+                <UFormField
+                  :label="$t('edition.volunteers.setup_end_date_label')"
+                  :error="fieldErrors.setupEndDate"
+                >
+                  <UPopover>
+                    <UFieldGroup>
+                      <UButton
+                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        variant="outline"
+                        color="neutral"
+                        icon="i-heroicons-calendar-days"
+                      >
+                        {{
+                          teardownEndDateLocal
+                            ? toCalendarDate(teardownEndDateLocal).toString()
+                            : $t('forms.labels.select_date')
+                        }}
+                      </UButton>
+                      <UButton
+                        v-if="teardownEndDateLocal"
+                        icon="i-heroicons-x-mark"
+                        color="neutral"
+                        variant="outline"
+                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        @click="handleClearTeardownEndDate"
+                      />
+                    </UFieldGroup>
+                    <template #content>
+                      <UCalendar
+                        v-model="teardownEndDateLocal"
+                        :placeholder="teardownEndDatePlaceholder"
+                        :min-value="teardownEndDateMinValue"
+                        @update:model-value="handleTeardownEndDateChange"
+                      />
+                    </template>
+                  </UPopover>
+                </UFormField>
+              </div>
+            </div>
+
             <!-- Ouverture des candidatures -->
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div class="flex items-center justify-between">
@@ -149,6 +244,8 @@
 </template>
 
 <script setup lang="ts">
+import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
+
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -186,6 +283,10 @@ const volunteersExternalUrlLocal = ref('')
 const volunteersUpdatedAt = ref<Date | null>(null)
 const volunteersInitialized = ref(false)
 
+// Variables pour les dates de montage/démontage
+const setupStartDateLocal = ref<DateValue | null>(null)
+const teardownEndDateLocal = ref<DateValue | null>(null)
+
 const volunteerModeItems = computed(() => [
   { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') || 'Interne' },
   { value: 'EXTERNAL', label: t('gestion.volunteers.mode_external') || 'Externe' },
@@ -216,6 +317,94 @@ const applyVolunteerSettings = () => {
     volunteersExternalUrlLocal.value = volunteersSettings.value.externalUrl || ''
     volunteersUpdatedAt.value = new Date()
     volunteersInitialized.value = true
+
+    // Appliquer les dates de montage/démontage
+    setupStartDateLocal.value = volunteersSettings.value.setupStartDate
+      ? fromDate(new Date(volunteersSettings.value.setupStartDate), 'UTC')
+      : null
+    teardownEndDateLocal.value = volunteersSettings.value.teardownEndDate
+      ? fromDate(new Date(volunteersSettings.value.teardownEndDate), 'UTC')
+      : null
+  }
+}
+
+// Contraintes de dates
+const editionData = computed(() => edition.value?.data || edition.value)
+
+const setupStartDateMaxValue = computed(() => {
+  const ed = editionData.value
+  if (!ed?.startDate) return undefined
+  return fromDate(new Date(ed.startDate), 'UTC')
+})
+
+const teardownEndDateMinValue = computed(() => {
+  const ed = editionData.value
+  if (!ed?.endDate) return undefined
+  return fromDate(new Date(ed.endDate), 'UTC')
+})
+
+const setupStartDatePlaceholder = computed(() => {
+  const ed = editionData.value
+  if (!ed?.startDate) return undefined
+  return toCalendarDate(fromDate(new Date(ed.startDate), 'UTC'))
+})
+
+const teardownEndDatePlaceholder = computed(() => {
+  const ed = editionData.value
+  if (!ed?.endDate) return undefined
+  return toCalendarDate(fromDate(new Date(ed.endDate), 'UTC'))
+})
+
+// Handlers pour les dates
+const handleSetupStartDateChange = async () => {
+  await persistDateSettings({
+    setupStartDate: setupStartDateLocal.value
+      ? new Date(toCalendarDate(setupStartDateLocal.value).toString()).toISOString()
+      : null,
+  })
+}
+
+const handleClearSetupStartDate = async () => {
+  setupStartDateLocal.value = null
+  await persistDateSettings({
+    setupStartDate: null,
+    askSetup: false,
+  })
+}
+
+const handleTeardownEndDateChange = async () => {
+  await persistDateSettings({
+    setupEndDate: teardownEndDateLocal.value
+      ? new Date(toCalendarDate(teardownEndDateLocal.value).toString()).toISOString()
+      : null,
+  })
+}
+
+const handleClearTeardownEndDate = async () => {
+  teardownEndDateLocal.value = null
+  await persistDateSettings({
+    setupEndDate: null,
+    askTeardown: false,
+  })
+}
+
+const persistDateSettings = async (data: Record<string, unknown>) => {
+  try {
+    const updatedSettings = await updateSettings(data)
+    if (updatedSettings) {
+      volunteersUpdatedAt.value = new Date()
+      toast.add({
+        title: t('common.saved') || 'Sauvegardé',
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+  } catch (error: any) {
+    toast.add({
+      title: error?.data?.message || error?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
   }
 }
 

@@ -30,8 +30,12 @@
             <div class="flex items-center gap-2 cursor-pointer" @click="openEditTeamModal(team)">
               <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: team.color }" />
               <h4 class="font-medium">{{ team.name }}</h4>
-              <UBadge v-if="team.isRequired" color="primary" variant="soft" size="xs">
+              <UBadge v-if="team.isRequired" color="primary" variant="soft" size="sm">
                 {{ t('common.required') }}
+              </UBadge>
+              <UBadge v-if="!team.isVisibleToVolunteers" color="neutral" variant="soft" size="sm">
+                <UIcon name="i-heroicons-eye-slash" class="w-3.5 h-3.5 mr-1" />
+                {{ t('edition.volunteers.team_hidden') }}
               </UBadge>
             </div>
             <div @click.stop>

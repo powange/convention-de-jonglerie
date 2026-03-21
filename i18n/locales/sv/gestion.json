@@ -459,6 +459,8 @@
       "config_description": "Konfigurera volontärsystem",
       "config_page_description": "Konfigurera inställningar för volontärsystem",
       "config_title": "Volontärkonfiguration",
+      "dates_description": "Ange uppställnings- och nedmonteringsdatum så att volontärer kan ange sin tillgänglighet",
+      "dates_title": "Uppställnings- och nedmonteringsdatum",
       "external_link": "Extern länk",
       "external_url_description": "Länk till ditt formulär eller ett externt verktyg för hantering av volontärer",
       "external_url_placeholder": "https://exemple.com/benevoles",

@@ -44,19 +44,11 @@
               </h2>
             </div>
 
-            <UAlert
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              :description="$t('edition.volunteers.internal_mode_description')"
-            />
-
             <EditionVolunteerInternalModeOptions
               v-if="canEdit || canManageVolunteers"
               :edition-id="editionId"
               :initial-data="volunteersInternalData"
-              :edition-start-date="edition?.startDate ? new Date(edition.startDate) : undefined"
-              :edition-end-date="edition?.endDate ? new Date(edition.endDate) : undefined"
+              :show-title="false"
               @updated="handleVolunteerInternalOptionsUpdated"
             />
 

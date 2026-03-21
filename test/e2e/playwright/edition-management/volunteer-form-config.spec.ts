@@ -234,10 +234,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     expect(settings.askAvoidList).toBe(true)
   })
 
-  test('la modale affiche les champs "préférences de créneaux" activés', async ({
-    page,
-    goto,
-  }) => {
+  test('la modale affiche les champs "préférences de créneaux" activés', async ({ page, goto }) => {
     const { editionId } = loadState()
 
     await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })

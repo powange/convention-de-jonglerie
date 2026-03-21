@@ -459,6 +459,8 @@
       "config_description": "Настроить систему волонтёров",
       "config_page_description": "Настроить параметры системы волонтёров",
       "config_title": "Конфигурация волонтёрства",
+      "dates_description": "Укажите даты монтажа и демонтажа, чтобы волонтёры могли указать свою доступность",
+      "dates_title": "Даты монтажа и демонтажа",
       "external_link": "Внешняя ссылка",
       "external_url_description": "Ссылка на вашу форму или внешний инструмент управления волонтерами",
       "external_url_placeholder": "https://exemple.com/benevoles",

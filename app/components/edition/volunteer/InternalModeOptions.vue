@@ -6,82 +6,6 @@
       </h3>
     </div>
 
-    <!-- Dates de montage -->
-    <div class="space-y-4 mb-4">
-      <UFormField
-        :label="t('edition.volunteers.setup_start_date_label')"
-        :error="fieldErrors.setupStartDate"
-      >
-        <UPopover>
-          <UFieldGroup>
-            <UButton
-              :disabled="saving"
-              variant="outline"
-              color="neutral"
-              icon="i-heroicons-calendar-days"
-            >
-              {{
-                setupStartDate
-                  ? toCalendarDate(setupStartDate).toString()
-                  : t('forms.labels.select_date')
-              }}
-            </UButton>
-            <UButton
-              v-if="setupStartDate"
-              icon="i-heroicons-x-mark"
-              color="neutral"
-              variant="outline"
-              :disabled="saving"
-              @click="handleSetupStartDateClear"
-            />
-          </UFieldGroup>
-          <template #content>
-            <UCalendar
-              v-model="setupStartDate"
-              :placeholder="setupStartDatePlaceholder"
-              :max-value="setupStartDateMaxValue"
-              @update:model-value="handleSetupStartDateChange"
-            />
-          </template>
-        </UPopover>
-      </UFormField>
-
-      <UFormField :label="t('edition.volunteers.setup_end_date_label')">
-        <UPopover>
-          <UFieldGroup>
-            <UButton
-              :disabled="saving"
-              variant="outline"
-              color="neutral"
-              icon="i-heroicons-calendar-days"
-            >
-              {{
-                teardownEndDate
-                  ? toCalendarDate(teardownEndDate).toString()
-                  : t('forms.labels.select_date')
-              }}
-            </UButton>
-            <UButton
-              v-if="teardownEndDate"
-              icon="i-heroicons-x-mark"
-              color="neutral"
-              variant="outline"
-              :disabled="saving"
-              @click="handleTeardownEndDateClear"
-            />
-          </UFieldGroup>
-          <template #content>
-            <UCalendar
-              v-model="teardownEndDate"
-              :placeholder="teardownEndDatePlaceholder"
-              :min-value="setupEndDateMinValue"
-              @update:model-value="handleTeardownEndDateChange"
-            />
-          </template>
-        </UPopover>
-      </UFormField>
-    </div>
-
     <!-- Section: Présence et disponibilité -->
     <div class="space-y-4 mt-6">
       <h3
@@ -91,36 +15,46 @@
       </h3>
 
       <!-- Switch demander participation au montage -->
-      <USwitch
-        v-model="askSetup"
-        :disabled="saving || !setupStartDate"
-        color="primary"
-        class="mb-2"
-        :label="
-          !setupStartDate
-            ? t('edition.volunteers.ask_setup_label') +
-              ' (définissez d\'abord la date de début du montage)'
-            : t('edition.volunteers.ask_setup_label')
-        "
-        size="lg"
-        @update:model-value="handleChange('askSetup', $event)"
-      />
+      <div class="mb-2">
+        <USwitch
+          v-model="askSetup"
+          :disabled="saving || !hasSetupStartDate"
+          color="primary"
+          :label="t('edition.volunteers.ask_setup_label')"
+          size="lg"
+          @update:model-value="handleChange('askSetup', $event)"
+        />
+        <p v-if="!hasSetupStartDate" class="text-sm text-gray-500 mt-1 ml-10">
+          (définissez d'abord la date de début du montage dans
+          <NuxtLink
+            :to="`/editions/${editionId}/gestion/volunteers/config`"
+            class="text-primary-600 dark:text-primary-400 hover:underline"
+          >
+            Configuration bénévolat </NuxtLink
+          >)
+        </p>
+      </div>
 
       <!-- Switch demander participation au démontage -->
-      <USwitch
-        v-model="askTeardown"
-        :disabled="saving || !teardownEndDate"
-        color="primary"
-        class="mb-2"
-        :label="
-          !teardownEndDate
-            ? t('edition.volunteers.ask_teardown_label') +
-              ' (définissez d\'abord la date de fin du démontage)'
-            : t('edition.volunteers.ask_teardown_label')
-        "
-        size="lg"
-        @update:model-value="handleChange('askTeardown', $event)"
-      />
+      <div class="mb-2">
+        <USwitch
+          v-model="askTeardown"
+          :disabled="saving || !hasTeardownEndDate"
+          color="primary"
+          :label="t('edition.volunteers.ask_teardown_label')"
+          size="lg"
+          @update:model-value="handleChange('askTeardown', $event)"
+        />
+        <p v-if="!hasTeardownEndDate" class="text-sm text-gray-500 mt-1 ml-10">
+          (définissez d'abord la date de fin du démontage dans
+          <NuxtLink
+            :to="`/editions/${editionId}/gestion/volunteers/config`"
+            class="text-primary-600 dark:text-primary-400 hover:underline"
+          >
+            Configuration bénévolat </NuxtLink
+          >)
+        </p>
+      </div>
     </div>
 
     <!-- Section: Préférences de créneaux -->
@@ -352,8 +286,7 @@
 </template>
 
 <script setup lang="ts">
-import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
@@ -362,8 +295,8 @@ interface Props {
   editionId: number
   showTitle?: boolean
   initialData?: {
-    setupStartDate?: DateValue | null
-    teardownEndDate?: DateValue | null
+    hasSetupStartDate?: boolean
+    hasTeardownEndDate?: boolean
     askSetup?: boolean
     askTeardown?: boolean
     askDiet?: boolean
@@ -380,8 +313,6 @@ interface Props {
     askEmergencyContact?: boolean
     teams?: { name: string; slots?: number }[]
   }
-  editionStartDate?: Date
-  editionEndDate?: Date
 }
 
 interface Emits {
@@ -404,8 +335,8 @@ const { teams: volunteerTeams } = useVolunteerTeams(props.editionId)
 const { updating: saving, fieldErrors, updateSettings } = useVolunteerSettings(props.editionId)
 
 // Données du composant
-const setupStartDate = ref<DateValue | null>(props.initialData?.setupStartDate || null)
-const teardownEndDate = ref<DateValue | null>(props.initialData?.teardownEndDate || null)
+const hasSetupStartDate = ref(props.initialData?.hasSetupStartDate || false)
+const hasTeardownEndDate = ref(props.initialData?.hasTeardownEndDate || false)
 const askSetup = ref(props.initialData?.askSetup || false)
 const askTeardown = ref(props.initialData?.askTeardown || false)
 const askDiet = ref(props.initialData?.askDiet || false)
@@ -421,72 +352,10 @@ const askTimePreferences = ref(props.initialData?.askTimePreferences || false)
 const askTeamPreferences = ref(props.initialData?.askTeamPreferences || false)
 const askEmergencyContact = ref(props.initialData?.askEmergencyContact || false)
 
-// Contraintes de dates
-const setupStartDateMaxValue = computed(() => {
-  if (!props.editionStartDate) return null
-  return fromDate(new Date(props.editionStartDate), 'UTC')
-})
-
-const setupEndDateMinValue = computed(() => {
-  if (!props.editionEndDate) return null
-  return fromDate(new Date(props.editionEndDate), 'UTC')
-})
-
-// Placeholders pour afficher le bon mois quand aucune date n'est sélectionnée
-const setupStartDatePlaceholder = computed(() => {
-  if (!props.editionStartDate) return undefined
-  return toCalendarDate(fromDate(new Date(props.editionStartDate), 'UTC'))
-})
-
-const teardownEndDatePlaceholder = computed(() => {
-  if (!props.editionEndDate) return undefined
-  return toCalendarDate(fromDate(new Date(props.editionEndDate), 'UTC'))
-})
-
 // Fonctions de gestion des changements
 const handleChange = async (field: string, value: any) => {
   const data: any = {}
   data[field] = value
-  await persistSettings(data)
-}
-
-const handleSetupStartDateChange = async () => {
-  const data: any = {
-    setupStartDate: setupStartDate.value
-      ? new Date(toCalendarDate(setupStartDate.value).toString()).toISOString()
-      : null,
-  }
-  fieldErrors.value = { ...fieldErrors.value }
-  delete fieldErrors.value.setupStartDate
-  await persistSettings(data)
-}
-
-const handleSetupStartDateClear = async () => {
-  setupStartDate.value = null
-  askSetup.value = false
-  const data: any = {
-    setupStartDate: null,
-    askSetup: false,
-  }
-  await persistSettings(data)
-}
-
-const handleTeardownEndDateChange = async () => {
-  const data: any = {
-    setupEndDate: teardownEndDate.value
-      ? new Date(toCalendarDate(teardownEndDate.value).toString()).toISOString()
-      : null,
-  }
-  await persistSettings(data)
-}
-
-const handleTeardownEndDateClear = async () => {
-  teardownEndDate.value = null
-  askTeardown.value = false
-  const data: any = {
-    setupEndDate: null,
-    askTeardown: false,
-  }
   await persistSettings(data)
 }
 
@@ -532,8 +401,8 @@ watch(
   () => props.initialData,
   (newData) => {
     if (newData) {
-      setupStartDate.value = newData.setupStartDate || null
-      teardownEndDate.value = newData.teardownEndDate || null
+      hasSetupStartDate.value = newData.hasSetupStartDate || false
+      hasTeardownEndDate.value = newData.hasTeardownEndDate || false
       askSetup.value = newData.askSetup || false
       askTeardown.value = newData.askTeardown || false
       askDiet.value = newData.askDiet || false

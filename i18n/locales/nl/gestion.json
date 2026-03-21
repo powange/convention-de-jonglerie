@@ -459,6 +459,8 @@
       "config_description": "Vrijwilligerssysteem configureren",
       "config_page_description": "Vrijwilligerssysteem instellingen configureren",
       "config_title": "Vrijwilligersconfiguratie",
+      "dates_description": "Stel de opbouw- en afbreekdata in zodat vrijwilligers hun beschikbaarheid kunnen aangeven",
+      "dates_title": "Opbouw- en afbreekdata",
       "external_link": "Externe link",
       "external_url_description": "Link naar je formulier of externe vrijwilligersmanagementtool",
       "external_url_placeholder": "https://exemple.com/benevoles",
