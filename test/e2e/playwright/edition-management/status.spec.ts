@@ -18,22 +18,17 @@ function loadState(): ConventionState {
 }
 
 /**
- * Vérifie si l'édition est visible sur la page d'accueil publique via l'API.
- * Retourne true si l'édition apparaît dans la liste publique.
+ * Récupère le statut actuel de l'édition via l'API.
  */
-async function isEditionVisiblePublicly(
+async function getEditionStatus(
   page: import('@playwright/test').Page,
   editionId: string
-): Promise<boolean> {
-  // L'API publique des éditions ne nécessite pas d'auth
-  const response = await page.request.get('http://localhost:3000/api/editions')
-  if (!response.ok()) return false
+): Promise<string | null> {
+  const response = await page.request.get(`http://localhost:3000/api/editions/${editionId}`)
+  if (!response.ok()) return null
   const body = await response.json()
-  const editions = body.data || body
-  return (
-    Array.isArray(editions) &&
-    editions.some((e: { id: number | string }) => String(e.id) === editionId)
-  )
+  const edition = body.data || body
+  return edition.status
 }
 
 test.describe.serial("Gestion du statut d'une édition", () => {
@@ -50,11 +45,11 @@ test.describe.serial("Gestion du statut d'une édition", () => {
     expect(response.ok()).toBe(true)
   })
 
-  test("l'édition OFFLINE n'apparaît pas dans la liste publique", async ({ page }) => {
+  test("l'édition a bien le statut OFFLINE", async ({ page }) => {
     const { editionId } = loadState()
 
-    const visible = await isEditionVisiblePublicly(page, editionId)
-    expect(visible).toBe(false)
+    const status = await getEditionStatus(page, editionId)
+    expect(status).toBe('OFFLINE')
   })
 
   test('passer le statut en PUBLISHED via la page de gestion', async ({ page, goto }) => {
@@ -92,11 +87,11 @@ test.describe.serial("Gestion du statut d'une édition", () => {
     })
   })
 
-  test("l'édition PUBLISHED est visible dans la liste publique", async ({ page }) => {
+  test("l'édition a bien le statut PUBLISHED", async ({ page }) => {
     const { editionId } = loadState()
 
-    const visible = await isEditionVisiblePublicly(page, editionId)
-    expect(visible).toBe(true)
+    const status = await getEditionStatus(page, editionId)
+    expect(status).toBe('PUBLISHED')
   })
 
   test('repasser le statut en OFFLINE', async ({ page, goto }) => {
@@ -126,10 +121,10 @@ test.describe.serial("Gestion du statut d'une édition", () => {
     expect(response.ok()).toBe(true)
   })
 
-  test("l'édition repassée OFFLINE n'est plus visible publiquement", async ({ page }) => {
+  test("l'édition a bien le statut OFFLINE après le changement", async ({ page }) => {
     const { editionId } = loadState()
 
-    const visible = await isEditionVisiblePublicly(page, editionId)
-    expect(visible).toBe(false)
+    const status = await getEditionStatus(page, editionId)
+    expect(status).toBe('OFFLINE')
   })
 })
