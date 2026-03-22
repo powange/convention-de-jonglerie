@@ -38,7 +38,8 @@
       "Bash(gh run:*)",
       "WebFetch(domain:etickets.infomaniak.com)",
       "WebFetch(domain:www.infomaniak.com)",
-      "WebFetch(domain:developer.infomaniak.com)"
+      "WebFetch(domain:developer.infomaniak.com)",
+      "Bash(node scripts/check-i18n.js --help)"
     ],
     "additionalDirectories": [
       "/tmp",

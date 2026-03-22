@@ -30,9 +30,12 @@ const localeDir = path.join(projectRoot, 'i18n', 'locales', 'fr')
 
 // Fichiers à exclure de l'analyse (qui génèrent des faux positifs)
 // Ces fichiers contiennent leurs propres traductions intégrées
-const EXCLUDED_FILES = [
-  'app/pages/privacy-policy.vue',
-  // Ajouter d'autres fichiers ici si nécessaire
+const EXCLUDED_FILES = ['app/pages/privacy-policy.vue']
+
+// Fichiers exclus uniquement de l'étape 4 (textes hardcodés)
+// Ces fichiers contiennent des textes techniques intentionnellement non traduits
+const EXCLUDED_HARDCODED_FILES = [
+  'app/components/admin/ImportDocumentation.vue', // Documentation technique d'import
 ]
 
 /**
@@ -48,6 +51,52 @@ function usesLocalScope(content) {
 const EXCLUDED_DIRS = [
   'server/generated/', // Fichiers générés par Prisma
 ]
+
+/**
+ * Clés détectées comme manquantes mais qui sont des faux positifs.
+ * Supporte les patterns exacts et les préfixes avec wildcard (*).
+ * Exemples :
+ *   'facebook.com'        → ignore exactement 'facebook.com'
+ *   'edition.imageUrl'    → ignore exactement 'edition.imageUrl'
+ *   'example.*'           → ignore 'example.com', 'example.fr', etc.
+ */
+const IGNORED_MISSING_KEYS = [
+  // Noms de domaine détectés comme clés i18n (dans useUrlValidation.ts et emailService.ts)
+  'facebook.com',
+  'example.*',
+  // Noms de champs Prisma utilisés dans ai-update.vue (pas des clés i18n)
+  'edition.imageUrl',
+  'edition.startDate',
+  'edition.endDate',
+  'edition.description',
+  'edition.name',
+  'edition.addressLine1',
+  'edition.city',
+  'edition.country',
+  'edition.postalCode',
+  'edition.ticketingUrl',
+  'edition.facebookUrl',
+  'edition.instagramUrl',
+  'edition.officialWebsiteUrl',
+  'edition.latitude',
+  'edition.longitude',
+  'convention.logo',
+  'convention.name',
+  'convention.email',
+  'convention.description',
+]
+
+/**
+ * Vérifie si une clé correspond à un pattern ignoré.
+ */
+function isIgnoredMissingKey(key) {
+  return IGNORED_MISSING_KEYS.some((pattern) => {
+    if (pattern.endsWith('.*')) {
+      return key.startsWith(pattern.slice(0, -1))
+    }
+    return key === pattern
+  })
+}
 
 /**
  * Fusionne profondément deux objets (deep merge)
@@ -445,6 +494,12 @@ function extractHardcodedTexts(filePath) {
     return []
   }
 
+  // Exclure les fichiers de documentation technique
+  const relativePath = path.relative(projectRoot, filePath).replace(/\\/g, '/')
+  if (EXCLUDED_HARDCODED_FILES.some((f) => relativePath === f)) {
+    return []
+  }
+
   const content = fs.readFileSync(filePath, 'utf8')
   const hardcodedTexts = []
 
@@ -452,7 +507,8 @@ function extractHardcodedTexts(filePath) {
   const templateMatch = content.match(/<template>([\s\S]*?)<\/template>/)
   if (!templateMatch) return hardcodedTexts
 
-  const template = templateMatch[1]
+  // Retirer le contenu des balises <code>, <pre> et <script> pour éviter les faux positifs
+  const template = templateMatch[1].replace(/<(code|pre|script)[^>]*>[\s\S]*?<\/\1>/gi, '')
 
   // Textes entre balises (excluant les composants, les expressions {{ }}, et certains mots-clés)
   const textBetweenTagsRegex = />([^<>{}\n]+)</g
@@ -692,7 +748,9 @@ async function main() {
   // 1. Clés utilisées dans le code mais absentes de fr.json
   if (!stepToRun || stepToRun === 1) {
     console.log(`${BOLD}1. Clés manquantes dans fr.json${RESET}`)
-    const missingKeys = [...cleanUsedKeys].filter((key) => !localeKeys.has(key))
+    const allMissingKeys = [...cleanUsedKeys].filter((key) => !localeKeys.has(key))
+    const missingKeys = allMissingKeys.filter((key) => !isIgnoredMissingKey(key))
+    const ignoredCount = allMissingKeys.length - missingKeys.length
     if (missingKeys.length > 0) {
       console.log(`${RED}✗ ${missingKeys.length} clé(s) manquante(s):${RESET}`)
       missingKeys.forEach((key) => {
@@ -708,6 +766,11 @@ async function main() {
       hasErrors = true
     } else {
       console.log(`${GREEN}✓ Toutes les clés utilisées sont présentes${RESET}`)
+    }
+    if (ignoredCount > 0) {
+      console.log(
+        `${YELLOW}ℹ️  ${ignoredCount} faux positif(s) ignoré(s) (voir IGNORED_MISSING_KEYS)${RESET}`
+      )
     }
     if (stepToRun === 1) process.exit(hasErrors ? 1 : 0)
   }
@@ -842,7 +905,9 @@ async function main() {
 
   // Résumé (seulement si toutes les étapes sont exécutées)
   if (!stepToRun) {
-    const missingKeys = [...cleanUsedKeys].filter((key) => !localeKeys.has(key))
+    const allMissingSummary = [...cleanUsedKeys].filter((key) => !localeKeys.has(key))
+    const missingSummary = allMissingSummary.filter((key) => !isIgnoredMissingKey(key))
+    const ignoredSummary = allMissingSummary.length - missingSummary.length
     const unusedKeys = [...localeKeys].filter((key) => !cleanUsedKeys.has(key))
     const duplicates = findDuplicateValues(localeData)
 
@@ -852,7 +917,7 @@ async function main() {
     console.log(
       `Fichiers analysés: ${allFiles.length} (${vueFiles.length} Vue, ${tsFiles.length} TS, ${jsFiles.length} JS)`
     )
-    console.log(`Clés manquantes: ${missingKeys.length}`)
+    console.log(`Clés manquantes: ${missingSummary.length}`)
     console.log(`Clés inutilisées: ${unusedKeys.length}`)
     console.log(`Valeurs dupliquées: ${duplicates.length}`)
     console.log(`Fichiers Vue avec textes hardcodés: ${hardcodedTexts.length}`)

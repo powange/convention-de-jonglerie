@@ -57,94 +57,79 @@
         </UCard>
       </div>
 
-      <div v-else class="space-y-4">
+      <div v-else class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
         <UCard
           v-for="showCall in showCalls"
           :key="showCall.id"
           class="hover:shadow-md transition-shadow"
+          :ui="{ root: 'flex flex-col h-full', body: 'flex flex-col flex-1' }"
         >
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-3 mb-2">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                  {{ showCall.name }}
-                </h3>
-                <UBadge :color="getVisibilityColor(showCall.visibility)" variant="soft" size="sm">
-                  {{ getVisibilityLabel(showCall.visibility) }}
-                </UBadge>
-                <UBadge
-                  :color="showCall.mode === 'INTERNAL' ? 'primary' : 'warning'"
-                  variant="subtle"
-                  size="sm"
+          <div class="flex-1">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                {{ showCall.name }}
+              </h3>
+              <UBadge :color="getVisibilityColor(showCall.visibility)" variant="soft" size="sm">
+                {{ getVisibilityLabel(showCall.visibility) }}
+              </UBadge>
+              <UBadge
+                :color="showCall.mode === 'INTERNAL' ? 'primary' : 'warning'"
+                variant="subtle"
+                size="sm"
+              >
+                {{
+                  showCall.mode === 'INTERNAL'
+                    ? $t('gestion.shows_call.mode_internal_badge')
+                    : $t('gestion.shows_call.mode_external_badge')
+                }}
+              </UBadge>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+              <div v-if="showCall.deadline" class="flex items-center gap-1">
+                <UIcon name="i-heroicons-calendar" />
+                <span
+                  >{{ $t('gestion.shows_call.deadline_label') }}:
+                  {{ formatDate(showCall.deadline) }}</span
                 >
-                  {{
-                    showCall.mode === 'INTERNAL'
-                      ? $t('gestion.shows_call.mode_internal_badge')
-                      : $t('gestion.shows_call.mode_external_badge')
-                  }}
+              </div>
+              <div v-if="showCall.stats?.pending" class="flex items-center gap-1">
+                <UBadge color="warning" variant="soft" size="xs">
+                  {{ showCall.stats.pending }} {{ $t('gestion.shows_call.pending_short') }}
                 </UBadge>
               </div>
-
-              <p
-                v-if="showCall.description"
-                class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3"
-              >
-                {{ showCall.description }}
-              </p>
-
-              <div
-                class="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
-              >
-                <div v-if="showCall.deadline" class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-calendar" />
-                  <span
-                    >{{ $t('gestion.shows_call.deadline_label') }}:
-                    {{ formatDate(showCall.deadline) }}</span
-                  >
-                </div>
-                <div class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-document-text" />
-                  <span
-                    >{{ showCall.stats?.total || 0 }}
-                    {{ $t('gestion.shows_call.applications_count') }}</span
-                  >
-                </div>
-                <div v-if="showCall.stats?.pending" class="flex items-center gap-1">
-                  <UBadge color="warning" variant="soft" size="xs">
-                    {{ showCall.stats.pending }} {{ $t('gestion.shows_call.pending_short') }}
-                  </UBadge>
-                </div>
-              </div>
             </div>
+          </div>
 
-            <div class="flex items-center gap-2">
-              <UButton
-                icon="i-heroicons-document-text"
-                variant="soft"
-                color="neutral"
-                size="sm"
-                :to="`/editions/${editionId}/gestion/shows-call/${showCall.id}/applications`"
-              >
-                {{ $t('gestion.shows_call.applications_title') }}
-              </UButton>
-              <UButton
-                icon="i-heroicons-cog-6-tooth"
-                variant="soft"
-                color="primary"
-                size="sm"
-                :to="`/editions/${editionId}/gestion/shows-call/${showCall.id}`"
-              >
-                {{ $t('common.configure') }}
-              </UButton>
-              <UDropdownMenu :items="getActionItems(showCall)">
-                <UButton
-                  icon="i-heroicons-ellipsis-vertical"
-                  variant="ghost"
-                  color="neutral"
-                  size="sm"
-                />
-              </UDropdownMenu>
-            </div>
+          <div
+            class="flex items-center gap-2 mt-auto pt-4 border-t border-gray-200 dark:border-gray-700"
+          >
+            <UButton
+              icon="i-heroicons-cog-6-tooth"
+              :aria-label="$t('common.configure')"
+              variant="soft"
+              color="neutral"
+              size="sm"
+              :to="`/editions/${editionId}/gestion/shows-call/${showCall.id}`"
+            />
+            <UButton
+              icon="i-heroicons-trash"
+              :aria-label="$t('common.delete')"
+              variant="soft"
+              color="error"
+              size="sm"
+              @click="openDeleteModal(showCall)"
+            />
+            <UButton
+              icon="i-heroicons-document-text"
+              variant="soft"
+              color="primary"
+              size="sm"
+              class="ml-auto"
+              :to="`/editions/${editionId}/gestion/shows-call/${showCall.id}/applications`"
+            >
+              {{ showCall.stats?.total || 0 }} {{ $t('gestion.shows_call.applications_count') }}
+            </UButton>
           </div>
         </UCard>
       </div>
@@ -199,35 +184,22 @@
     </UModal>
 
     <!-- Modal de confirmation de suppression -->
-    <UModal v-model:open="deleteModalOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-exclamation-triangle" class="text-red-500" />
-              <h3 class="text-lg font-semibold">
-                {{ $t('gestion.shows_call.delete_confirm_title') }}
-              </h3>
-            </div>
-          </template>
-
-          <p class="text-gray-600 dark:text-gray-400">
-            {{ $t('gestion.shows_call.delete_confirm_message', { name: showCallToDelete?.name }) }}
-          </p>
-
-          <template #footer>
-            <div class="flex justify-end gap-2">
-              <UButton variant="ghost" color="neutral" @click="deleteModalOpen = false">
-                {{ $t('common.cancel') }}
-              </UButton>
-              <UButton color="error" :loading="deleting" @click="confirmDelete">
-                {{ $t('common.delete') }}
-              </UButton>
-            </div>
-          </template>
-        </UCard>
-      </template>
-    </UModal>
+    <UiConfirmModal
+      v-model="deleteModalOpen"
+      :title="$t('gestion.shows_call.delete_confirm_title')"
+      :description="
+        $t('gestion.shows_call.delete_confirm_message', { name: showCallToDelete?.name })
+      "
+      :confirm-label="$t('common.delete')"
+      confirm-color="error"
+      icon-name="i-heroicons-exclamation-triangle"
+      icon-color="text-red-500"
+      :loading="deleting"
+      require-name-confirmation
+      :expected-name="showCallToDelete?.name"
+      @confirm="confirmDelete"
+      @cancel="deleteModalOpen = false"
+    />
   </div>
 </template>
 
@@ -339,30 +311,6 @@ const formatDate = (dateString: string) => {
     minute: '2-digit',
   })
 }
-
-// Actions du dropdown
-const getActionItems = (showCall: EditionShowCallWithStats) => [
-  [
-    {
-      label: t('common.configure'),
-      icon: 'i-heroicons-cog-6-tooth',
-      to: `/editions/${editionId}/gestion/shows-call/${showCall.id}`,
-    },
-    {
-      label: t('gestion.shows_call.applications_title'),
-      icon: 'i-heroicons-document-text',
-      to: `/editions/${editionId}/gestion/shows-call/${showCall.id}/applications`,
-    },
-  ],
-  [
-    {
-      label: t('common.delete'),
-      icon: 'i-heroicons-trash',
-      color: 'error' as const,
-      onSelect: () => openDeleteModal(showCall),
-    },
-  ],
-]
 
 // Ouvrir la modal de création
 const openCreateModal = () => {

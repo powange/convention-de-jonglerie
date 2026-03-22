@@ -6,7 +6,7 @@
       </div>
 
       <div v-else-if="editions.length === 0" class="text-center py-8 text-gray-500">
-        {{ $t('edition.no_editions') }}
+        {{ $t('conventions.no_editions') }}
       </div>
 
       <div v-else class="space-y-3">
