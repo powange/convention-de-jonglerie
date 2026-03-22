@@ -241,14 +241,23 @@ watch(
   { immediate: true }
 )
 
+// Mode preview pour les organisateurs
+const preview = route.query.preview === 'true'
+
 // Charger les détails de l'appel à spectacles
 const {
   data: showCall,
   pending: loading,
   error,
 } = await useFetch<EditionShowCallPublic>(
-  `/api/editions/${editionId}/shows-call/${showCallId}/public`
+  `/api/editions/${editionId}/shows-call/${showCallId}/public`,
+  { query: preview ? { preview: 'true' } : undefined }
 )
+
+// Rediriger vers la liste si l'appel est hors ligne (403)
+if (error.value?.statusCode === 403) {
+  await navigateTo(`/editions/${editionId}/shows-call`)
+}
 
 const isDeadlinePassed = computed(() => {
   if (!showCall.value?.deadline) return false

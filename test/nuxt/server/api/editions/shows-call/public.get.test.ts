@@ -38,6 +38,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/public GET', () => {
       if (param === 'showCallId') return '1'
       return null
     })
+    global.getQuery = vi.fn().mockReturnValue({})
   })
 
   describe('Accès public', () => {

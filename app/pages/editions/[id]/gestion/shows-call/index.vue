@@ -113,6 +113,15 @@
               :to="`/editions/${editionId}/gestion/shows-call/${showCall.id}`"
             />
             <UButton
+              icon="i-heroicons-eye"
+              :aria-label="$t('common.view')"
+              variant="soft"
+              color="neutral"
+              size="sm"
+              :href="`/editions/${editionId}/shows-call/${showCall.id}?preview=true`"
+              target="_blank"
+            />
+            <UButton
               icon="i-heroicons-trash"
               :aria-label="$t('common.delete')"
               variant="soft"

@@ -1,14 +1,21 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { optionalAuth } from '#server/utils/auth-utils'
+import {
+  getEditionWithPermissions,
+  canManageArtists,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
  * Récupère les informations publiques d'un appel à spectacles
  * Accessible par tout le monde (pas besoin d'authentification)
+ * Avec ?preview=true, les organisateurs peuvent voir les appels OFFLINE
  */
 export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
     const showCallId = Number(getRouterParam(event, 'showCallId'))
+    const preview = getQuery(event).preview === 'true'
 
     if (isNaN(showCallId)) {
       throw createError({
@@ -60,11 +67,34 @@ export default wrapApiHandler(
     }
 
     // Les appels hors ligne ne sont pas accessibles publiquement
+    // sauf en mode preview pour les organisateurs
     if (showCall.visibility === 'OFFLINE') {
-      throw createError({
-        status: 404,
-        message: 'Appel à spectacles non trouvé',
+      if (!preview) {
+        throw createError({
+          status: 403,
+          message: 'Appel à spectacles hors ligne',
+        })
+      }
+
+      // Vérifier que l'utilisateur est organisateur
+      const user = optionalAuth(event)
+      if (!user) {
+        throw createError({
+          status: 403,
+          message: 'Appel à spectacles hors ligne',
+        })
+      }
+
+      const editionWithPerms = await getEditionWithPermissions(editionId, {
+        userId: user.id,
       })
+
+      if (!editionWithPerms || !canManageArtists(editionWithPerms, user)) {
+        throw createError({
+          status: 403,
+          message: 'Appel à spectacles hors ligne',
+        })
+      }
     }
 
     // Retourner les informations publiques
