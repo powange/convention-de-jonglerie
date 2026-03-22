@@ -72,133 +72,81 @@
           </p>
 
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <UCard
+            <NuxtLink
               v-for="call in showCalls"
               :key="call.id"
-              variant="subtle"
-              class="border border-gray-200 dark:border-gray-700"
+              :to="`/editions/${editionId}/shows-call/${call.id}`"
+              class="block"
             >
-              <div class="space-y-3">
-                <!-- En-tête avec nom et statut -->
-                <div class="flex items-start justify-between gap-2">
-                  <h4 class="font-semibold text-lg">{{ call.name }}</h4>
-                  <div class="flex items-center gap-2">
-                    <UBadge v-if="call.mode === 'EXTERNAL'" color="info" variant="soft" size="xs">
-                      {{ t('gestion.shows_call.mode_external_badge') }}
+              <UCard
+                variant="subtle"
+                class="border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-primary-300 dark:hover:border-primary-600 transition-all cursor-pointer h-full"
+              >
+                <div class="space-y-3">
+                  <!-- En-tête avec nom et statut -->
+                  <div class="flex items-start justify-between gap-2">
+                    <h4 class="font-semibold text-lg">{{ call.name }}</h4>
+                    <div class="flex items-center gap-2">
+                      <UBadge v-if="call.mode === 'EXTERNAL'" color="info" variant="soft" size="xs">
+                        {{ t('gestion.shows_call.mode_external_badge') }}
+                      </UBadge>
+                      <UBadge
+                        :color="
+                          call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
+                            ? 'success'
+                            : 'neutral'
+                        "
+                        variant="soft"
+                        size="xs"
+                      >
+                        {{
+                          call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
+                            ? t('shows_call.open')
+                            : t('shows_call.closed')
+                        }}
+                      </UBadge>
+                    </div>
+                  </div>
+
+                  <!-- Date limite -->
+                  <div v-if="call.deadline" class="flex items-center gap-2 text-sm">
+                    <UIcon name="i-heroicons-clock" class="text-gray-400" />
+                    <span class="text-gray-600 dark:text-gray-400">
+                      {{ t('shows_call.deadline') }} :
+                      <strong :class="isDeadlinePassed(call.deadline) ? 'text-red-500' : ''">
+                        {{ formatDate(call.deadline) }}
+                      </strong>
+                    </span>
+                  </div>
+
+                  <!-- Champs demandés -->
+                  <div class="flex flex-wrap gap-1">
+                    <UBadge v-if="call.askPortfolioUrl" color="neutral" variant="outline" size="xs">
+                      {{ t('gestion.shows_call.field_portfolio') }}
+                    </UBadge>
+                    <UBadge v-if="call.askVideoUrl" color="neutral" variant="outline" size="xs">
+                      {{ t('gestion.shows_call.field_video') }}
                     </UBadge>
                     <UBadge
-                      :color="
-                        call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
-                          ? 'success'
-                          : 'neutral'
-                      "
-                      variant="soft"
+                      v-if="call.askTechnicalNeeds"
+                      color="neutral"
+                      variant="outline"
                       size="xs"
                     >
-                      {{
-                        call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
-                          ? t('shows_call.open')
-                          : t('shows_call.closed')
-                      }}
+                      {{ t('gestion.shows_call.field_technical') }}
+                    </UBadge>
+                    <UBadge
+                      v-if="call.askAccommodation"
+                      color="neutral"
+                      variant="outline"
+                      size="xs"
+                    >
+                      {{ t('gestion.shows_call.field_accommodation') }}
                     </UBadge>
                   </div>
                 </div>
-
-                <!-- Date limite -->
-                <div v-if="call.deadline" class="flex items-center gap-2 text-sm">
-                  <UIcon name="i-heroicons-clock" class="text-gray-400" />
-                  <span class="text-gray-600 dark:text-gray-400">
-                    {{ t('shows_call.deadline') }} :
-                    <strong :class="isDeadlinePassed(call.deadline) ? 'text-red-500' : ''">
-                      {{ formatDate(call.deadline) }}
-                    </strong>
-                  </span>
-                </div>
-
-                <!-- Champs demandés -->
-                <div class="flex flex-wrap gap-1">
-                  <UBadge v-if="call.askPortfolioUrl" color="neutral" variant="outline" size="xs">
-                    {{ t('gestion.shows_call.field_portfolio') }}
-                  </UBadge>
-                  <UBadge v-if="call.askVideoUrl" color="neutral" variant="outline" size="xs">
-                    {{ t('gestion.shows_call.field_video') }}
-                  </UBadge>
-                  <UBadge v-if="call.askTechnicalNeeds" color="neutral" variant="outline" size="xs">
-                    {{ t('gestion.shows_call.field_technical') }}
-                  </UBadge>
-                  <UBadge v-if="call.askAccommodation" color="neutral" variant="outline" size="xs">
-                    {{ t('gestion.shows_call.field_accommodation') }}
-                  </UBadge>
-                </div>
-
-                <!-- Bouton d'action -->
-                <div class="pt-2">
-                  <!-- Mode externe : lien vers URL externe -->
-                  <UButton
-                    v-if="
-                      call.mode === 'EXTERNAL' &&
-                      call.externalUrl &&
-                      (call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE')
-                    "
-                    :to="call.externalUrl"
-                    target="_blank"
-                    color="primary"
-                    icon="i-heroicons-arrow-top-right-on-square"
-                    block
-                  >
-                    {{ t('shows_call.apply_external') }}
-                  </UButton>
-
-                  <!-- Mode interne : lien vers formulaire -->
-                  <UButton
-                    v-else-if="
-                      call.mode === 'INTERNAL' &&
-                      (call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE') &&
-                      authStore.isArtist
-                    "
-                    :to="`/editions/${editionId}/shows-call/${call.id}/apply`"
-                    color="primary"
-                    icon="i-heroicons-pencil-square"
-                    block
-                    :disabled="hasApplied(call.id) || isDeadlinePassed(call.deadline)"
-                  >
-                    <template v-if="hasApplied(call.id)">
-                      {{ t('shows_call.already_applied') }}
-                    </template>
-                    <template v-else-if="isDeadlinePassed(call.deadline)">
-                      {{ t('shows_call.deadline_passed') }}
-                    </template>
-                    <template v-else>
-                      {{ t('shows_call.apply') }}
-                    </template>
-                  </UButton>
-
-                  <!-- Appel fermé -->
-                  <UButton
-                    v-else-if="call.visibility === 'CLOSED'"
-                    color="neutral"
-                    variant="soft"
-                    icon="i-heroicons-lock-closed"
-                    block
-                    disabled
-                  >
-                    {{ t('shows_call.closed') }}
-                  </UButton>
-
-                  <!-- Non artiste -->
-                  <UButton
-                    v-else-if="!authStore.isArtist && authStore.isAuthenticated"
-                    color="neutral"
-                    variant="soft"
-                    icon="i-heroicons-exclamation-triangle"
-                    block
-                    disabled
-                  >
-                    {{ t('shows_call.artist_required_short') }}
-                  </UButton>
-                </div>
-              </div>
-            </UCard>
+              </UCard>
+            </NuxtLink>
           </div>
         </div>
 
@@ -342,10 +290,6 @@ async function loadMyApplications() {
   } catch {
     // Silencieux - les candidatures ne sont pas critiques
   }
-}
-
-function hasApplied(showCallId: number): boolean {
-  return myApplications.value.some((app) => app.showCallId === showCallId)
 }
 
 function canEditApplication(showCallId: number): boolean {
