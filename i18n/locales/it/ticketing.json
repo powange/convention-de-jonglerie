@@ -46,6 +46,7 @@
       "info_title": "Informazioni",
       "last_update": "Ultimo aggiornamento",
       "loading": "Caricamento contatori...",
+      "loading_error": "Errore durante il caricamento dei contatori",
       "no_counters": "Nessun contatore",
       "no_counters_description": "Crea un contatore per iniziare a contare la capienza",
       "pending_operations": "{count} operazione/i in attesa | {count} operazione in attesa | {count} operazioni in attesa",
@@ -169,7 +170,9 @@
         "pending": "Non pagato",
         "pendingSubtitle": "In attesa"
       },
-      "selectMethod": "Seleziona il metodo di pagamento"
+      "open_sumup": "Apri SumUp",
+      "selectMethod": "Seleziona il metodo di pagamento",
+      "sumup_hint": "Conferma il pagamento su SumUp poi conferma qui"
     },
     "quotas": {
       "created": "Quota creata con successo",

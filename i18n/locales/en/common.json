@@ -43,6 +43,7 @@
     "close": "Close",
     "columns": "Columns",
     "configure": "Configure",
+    "configured": "Configured",
     "confirm": "Confirm",
     "confirm_delete": "Confirm deletion",
     "confirmation": "Confirmation",
@@ -64,6 +65,7 @@
     "deleted": "Deleted",
     "description": "Description",
     "dinner": "Dinner",
+    "dissociate": "Dissociate",
     "download": "Download",
     "edit": "Edit",
     "edition": {

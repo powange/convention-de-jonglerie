@@ -46,6 +46,7 @@
       "info_title": "Informação",
       "last_update": "Última atualização",
       "loading": "Carregando contadores...",
+      "loading_error": "Erro ao carregar os contadores",
       "no_counters": "Nenhum contador",
       "no_counters_description": "Crie um contador para começar a contar a capacidade",
       "pending_operations": "{count} operação(ões) pendente(s) | {count} operação pendente | {count} operações pendentes",
@@ -169,7 +170,9 @@
         "pending": "Não pago",
         "pendingSubtitle": "Pendente"
       },
-      "selectMethod": "Selecione o método de pagamento"
+      "open_sumup": "Abrir SumUp",
+      "selectMethod": "Selecione o método de pagamento",
+      "sumup_hint": "Confirme o pagamento no SumUp e depois confirme aqui"
     },
     "quotas": {
       "created": "Quota criada com sucesso",

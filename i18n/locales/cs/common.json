@@ -43,6 +43,7 @@
     "close": "Zavřít",
     "columns": "Sloupce",
     "configure": "Nastavit",
+    "configured": "Nakonfigurováno",
     "confirm": "Potvrďte",
     "confirm_delete": "Potvrdit smazání",
     "confirmation": "Potvrzení",
@@ -64,6 +65,7 @@
     "deleted": "Smazáno",
     "description": "Popis",
     "dinner": "Večeře",
+    "dissociate": "Odpojit",
     "download": "Stáhnout",
     "edit": "Upravit",
     "edition": {

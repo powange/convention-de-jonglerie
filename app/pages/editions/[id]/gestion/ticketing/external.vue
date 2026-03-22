@@ -73,56 +73,45 @@
             <!-- Résumé de la configuration (si existante) -->
             <div
               v-if="hasExistingConfig"
-              class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4"
+              class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4 space-y-3"
             >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-check-circle"
-                  class="text-success-600 dark:text-success-400 h-5 w-5 mt-0.5"
-                />
-                <div class="flex-1 min-w-0">
-                  <p class="font-medium text-success-900 dark:text-success-100 mb-2">
-                    Configuration active
-                  </p>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                    <div class="flex items-center gap-2">
-                      <span class="text-success-700 dark:text-success-300 font-medium">
-                        Organisation :
-                      </span>
-                      <span class="text-success-600 dark:text-success-400">
-                        {{ helloAssoOrganizationSlug }}
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-success-700 dark:text-success-300 font-medium">
-                        Formulaire :
-                      </span>
-                      <span class="text-success-600 dark:text-success-400">
-                        {{ helloAssoFormSlug }}
-                      </span>
-                    </div>
-                  </div>
+              <div class="space-y-2 text-sm">
+                <div>
+                  <span class="text-success-700 dark:text-success-300 font-medium">
+                    Organisation :
+                  </span>
+                  <span class="text-success-600 dark:text-success-400 ml-1">
+                    {{ helloAssoOrganizationSlug }}
+                  </span>
                 </div>
-                <div class="flex gap-2">
-                  <UButton
-                    variant="ghost"
-                    color="error"
-                    size="sm"
-                    icon="i-heroicons-trash"
-                    @click="confirmDisconnect"
-                  >
-                    Désassocier
-                  </UButton>
-                  <UButton
-                    variant="ghost"
-                    color="neutral"
-                    size="sm"
-                    icon="i-heroicons-pencil"
-                    @click="openConfigModal"
-                  >
-                    Modifier
-                  </UButton>
+                <div>
+                  <span class="text-success-700 dark:text-success-300 font-medium">
+                    Formulaire :
+                  </span>
+                  <span class="text-success-600 dark:text-success-400 ml-1">
+                    {{ helloAssoFormSlug }}
+                  </span>
                 </div>
+              </div>
+              <div class="flex gap-2">
+                <UButton
+                  variant="outline"
+                  color="neutral"
+                  size="sm"
+                  icon="i-heroicons-pencil"
+                  @click="openConfigModal"
+                >
+                  Modifier
+                </UButton>
+                <UButton
+                  variant="outline"
+                  color="error"
+                  size="sm"
+                  icon="i-heroicons-trash"
+                  @click="confirmDisconnect"
+                >
+                  {{ $t('common.dissociate') }}
+                </UButton>
               </div>
             </div>
 
@@ -742,58 +731,92 @@
             <!-- Résumé de la configuration (si existante) -->
             <div
               v-if="hasInfomaniakConfig"
-              class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4"
+              class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4 space-y-3"
             >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-check-circle"
-                  class="text-success-600 dark:text-success-400 mt-0.5 flex-shrink-0"
-                />
-                <div class="text-sm space-y-1">
-                  <p class="font-medium text-success-900 dark:text-success-100">
-                    {{ $t('gestion.ticketing.infomaniak_connected') }}
-                  </p>
-                  <p v-if="infomaniakEventName" class="text-success-700 dark:text-success-300">
+              <div class="space-y-2 text-sm">
+                <div v-if="infomaniakEventName">
+                  <span class="text-success-700 dark:text-success-300 font-medium">
                     {{ $t('gestion.ticketing.infomaniak_event_label') }} :
-                    <span class="font-semibold">{{ infomaniakEventName }}</span>
-                  </p>
-                  <p class="text-success-700 dark:text-success-300">
-                    {{ $t('gestion.ticketing.infomaniak_currency_label') }} :
-                    <span class="font-semibold">{{
-                      infomaniakCurrency === '1' ? 'CHF' : 'EUR'
-                    }}</span>
-                  </p>
+                  </span>
+                  <span class="text-success-600 dark:text-success-400 ml-1">
+                    {{ infomaniakEventName }}
+                  </span>
                 </div>
+                <div>
+                  <span class="text-success-700 dark:text-success-300 font-medium">
+                    {{ $t('gestion.ticketing.infomaniak_currency_label') }} :
+                  </span>
+                  <span class="text-success-600 dark:text-success-400 ml-1">
+                    {{ infomaniakCurrency === '1' ? 'CHF' : 'EUR' }}
+                  </span>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <UButton
+                  variant="outline"
+                  color="neutral"
+                  size="sm"
+                  icon="i-heroicons-pencil"
+                  @click="openInfomaniakConfigModal"
+                >
+                  {{ $t('common.edit') }}
+                </UButton>
+                <UButton
+                  variant="outline"
+                  color="error"
+                  size="sm"
+                  icon="i-heroicons-trash"
+                  @click="disconnectInfomaniak"
+                >
+                  {{ $t('common.dissociate') }}
+                </UButton>
               </div>
             </div>
 
-            <!-- Boutons d'action -->
-            <div class="flex flex-wrap gap-3">
+            <!-- Bouton configurer (si pas de config) -->
+            <div v-if="!hasInfomaniakConfig">
               <UButton
-                v-if="!hasInfomaniakConfig"
                 icon="i-heroicons-cog-6-tooth"
                 color="primary"
                 @click="openInfomaniakConfigModal"
               >
                 {{ $t('gestion.ticketing.infomaniak_configure') }}
               </UButton>
-              <template v-else>
+            </div>
+
+            <!-- Section sync (visible si configuré) -->
+            <div v-if="hasInfomaniakConfig" class="space-y-3">
+              <h3 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                {{ $t('gestion.ticketing.infomaniak_sync_title') }}
+              </h3>
+              <div class="flex flex-wrap gap-2">
                 <UButton
-                  icon="i-heroicons-pencil-square"
-                  variant="outline"
-                  @click="openInfomaniakConfigModal"
+                  color="primary"
+                  variant="soft"
+                  icon="i-heroicons-arrow-down-tray"
+                  size="sm"
+                  disabled
                 >
-                  {{ $t('common.edit') }}
+                  {{ $t('gestion.ticketing.infomaniak_load_tiers') }}
+                </UButton>
+                <UButton color="success" variant="soft" icon="i-heroicons-users" size="sm" disabled>
+                  {{ $t('gestion.ticketing.infomaniak_load_participants') }}
                 </UButton>
                 <UButton
-                  icon="i-heroicons-trash"
-                  color="error"
-                  variant="outline"
-                  @click="disconnectInfomaniak"
+                  v-if="authStore.isAdminModeActive"
+                  color="neutral"
+                  variant="soft"
+                  icon="i-heroicons-code-bracket"
+                  size="sm"
+                  :loading="loadingInfomaniakRawJson"
+                  @click="loadInfomaniakRawJson"
                 >
-                  {{ $t('common.disconnect') }}
+                  JSON brut
                 </UButton>
-              </template>
+              </div>
+              <p class="text-xs text-gray-400 italic">
+                {{ $t('gestion.ticketing.infomaniak_sync_coming_soon') }}
+              </p>
             </div>
           </div>
         </UCard>
@@ -1287,6 +1310,30 @@ const disconnectInfomaniak = async () => {
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
+  }
+}
+
+// JSON brut Infomaniak
+const loadingInfomaniakRawJson = ref(false)
+
+const loadInfomaniakRawJson = async () => {
+  loadingInfomaniakRawJson.value = true
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/infomaniak/raw`)
+    const data = result.data || result
+    rawJsonFormData.value = JSON.stringify({ event: data.event, zones: data.zones }, null, 2)
+    rawJsonOrdersData.value = ''
+    rawJsonActiveTab.value = 'form'
+    showRawJsonModal.value = true
+  } catch (error: any) {
+    toast.add({
+      title: t('common.error'),
+      description: error.data?.message || 'Erreur lors du chargement',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingInfomaniakRawJson.value = false
   }
 }
 

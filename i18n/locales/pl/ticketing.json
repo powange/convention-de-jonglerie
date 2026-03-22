@@ -46,6 +46,7 @@
       "info_title": "Informacje",
       "last_update": "Ostatnia aktualizacja",
       "loading": "Ładowanie liczników...",
+      "loading_error": "Błąd podczas ładowania liczników",
       "no_counters": "Brak liczników",
       "no_counters_description": "Utwórz licznik, aby rozpocząć liczenie pojemności",
       "pending_operations": "{count} oczekująca(-e) operacja(-e) | {count} oczekująca operacja | {count} oczekujących operacji",
@@ -169,7 +170,9 @@
         "pending": "Nieopłacone",
         "pendingSubtitle": "Oczekujące"
       },
-      "selectMethod": "Wybierz metodę płatności"
+      "open_sumup": "Otwórz SumUp",
+      "selectMethod": "Wybierz metodę płatności",
+      "sumup_hint": "Potwierdź płatność w SumUp, a następnie potwierdź tutaj"
     },
     "quotas": {
       "created": "Limit utworzony pomyślnie",

@@ -43,6 +43,7 @@
     "close": "Nära",
     "columns": "Kolumner",
     "configure": "Konfigurera",
+    "configured": "Konfigurerad",
     "confirm": "Bekräfta",
     "confirm_delete": "Bekräfta borttagning",
     "confirmation": "Bekräftelse",
@@ -64,6 +65,7 @@
     "deleted": "Raderad",
     "description": "Beskrivning",
     "dinner": "Middag",
+    "dissociate": "Avkoppla",
     "download": "Nedladdningar",
     "edit": "Modifiera",
     "edition": {

@@ -43,6 +43,7 @@
     "close": "Sluiten",
     "columns": "Kolommen",
     "configure": "Configureren",
+    "configured": "Geconfigureerd",
     "confirm": "Bevestigen",
     "confirm_delete": "Verwijdering bevestigen",
     "confirmation": "Bevestiging",
@@ -64,6 +65,7 @@
     "deleted": "Verwijderd",
     "description": "Beschrijving",
     "dinner": "Diner",
+    "dissociate": "Ontkoppelen",
     "download": "Downloaden",
     "edit": "Bewerken",
     "edition": {

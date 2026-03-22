@@ -43,6 +43,7 @@
     "close": "Закрыть",
     "columns": "Столбцы",
     "configure": "Настроить",
+    "configured": "Настроено",
     "confirm": "Подтвердить",
     "confirm_delete": "Подтвердить удаление",
     "confirmation": "Подтверждение",
@@ -64,6 +65,7 @@
     "deleted": "Удалено",
     "description": "Описание",
     "dinner": "Ужин",
+    "dissociate": "Отвязать",
     "download": "Скачать",
     "edit": "Редактировать",
     "edition": {

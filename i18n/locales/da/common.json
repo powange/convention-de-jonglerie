@@ -43,6 +43,7 @@
     "close": "Luk",
     "columns": "Kolonner",
     "configure": "Konfigurer",
+    "configured": "Konfigureret",
     "confirm": "Bekræft",
     "confirm_delete": "Bekræft sletning",
     "confirmation": "Bekræftelse",
@@ -64,6 +65,7 @@
     "deleted": "Slettet",
     "description": "Beskrivelse",
     "dinner": "Middag",
+    "dissociate": "Afkobl",
     "download": "Download",
     "edit": "Rediger",
     "edition": {

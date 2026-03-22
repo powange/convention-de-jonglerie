@@ -46,6 +46,7 @@
       "info_title": "Informations",
       "last_update": "Dernière mise à jour",
       "loading": "Chargement des compteurs...",
+      "loading_error": "Erreur lors du chargement des compteurs",
       "no_counters": "Aucun compteur",
       "no_counters_description": "Créez un compteur pour commencer à compter les jauges",
       "pending_operations": "{count} opération(s) en attente | {count} opération en attente | {count} opérations en attente",
@@ -162,8 +163,6 @@
       "change_to_give": "Monnaie à rendre",
       "checkNumber": "Numéro du chèque",
       "insufficient_amount": "Montant insuffisant",
-      "open_sumup": "Ouvrir SumUp",
-      "sumup_hint": "Validez le paiement sur SumUp puis confirmez ici",
       "methods": {
         "card": "Carte bancaire",
         "cash": "Liquide",
@@ -171,7 +170,9 @@
         "pending": "Non payé",
         "pendingSubtitle": "En attente"
       },
-      "selectMethod": "Sélectionnez le mode de paiement"
+      "open_sumup": "Ouvrir SumUp",
+      "selectMethod": "Sélectionnez le mode de paiement",
+      "sumup_hint": "Validez le paiement sur SumUp puis confirmez ici"
     },
     "quotas": {
       "created": "Quota créé avec succès",

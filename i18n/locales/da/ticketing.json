@@ -46,6 +46,7 @@
       "info_title": "Informationer",
       "last_update": "Seneste opdatering",
       "loading": "Indlæser tællere...",
+      "loading_error": "Fejl ved indlæsning af tællere",
       "no_counters": "Ingen tællere",
       "no_counters_description": "Opret en tæller for at begynde at tælle kapacitet",
       "pending_operations": "{count} afventende operation(er) | {count} afventende operation | {count} afventende operationer",
@@ -169,7 +170,9 @@
         "pending": "Ikke betalt",
         "pendingSubtitle": "Afventer"
       },
-      "selectMethod": "Vælg betalingsmetode"
+      "open_sumup": "Åbn SumUp",
+      "selectMethod": "Vælg betalingsmetode",
+      "sumup_hint": "Bekræft betalingen på SumUp og bekræft derefter her"
     },
     "quotas": {
       "created": "Kvote oprettet med succes",

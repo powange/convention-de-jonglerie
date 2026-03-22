@@ -130,75 +130,64 @@ GET https://etickets.infomaniak.com/api/shop/event/{id}
 }
 ```
 
-#### PASS CATEGORIES — Lister les catégories de tarifs
+#### EVENT ZONES — Zones et tarifs d'un événement (endpoint principal pour les tarifs)
+
+```
+GET https://etickets.infomaniak.com/api/shop/event/{id}/zones
+```
+
+**Réponse :** tableau de zones, chaque zone contenant ses catégories de tarifs
+
+```json
+[
+  {
+    "zone_id": 118271,
+    "name": "Catégorie 1",
+    "status": "visible",
+    "bg_color": "87C070",
+    "numbered": 1,
+    "free_seats": 961,
+    "categories": [
+      {
+        "category_id": 283338,
+        "name": "Plein tarif",
+        "status": "visible",
+        "amount": 59,
+        "free_seats": 961,
+        "limit": 2
+      },
+      {
+        "category_id": 283346,
+        "name": "Etudiant",
+        "status": "visible",
+        "amount": 49,
+        "free_seats": 961
+      }
+    ]
+  }
+]
+```
+
+**Note importante :** Les tarifs dans Infomaniak sont organisés par **zones** (`zone_id`) contenant des **catégories** (`category_id`). Ce n'est pas le même concept que les "pass categories" qui sont des abonnements multi-événements. Pour la billetterie événementielle, il faut utiliser cet endpoint.
+
+**Mapping vers TicketingTier :**
+
+| Infomaniak (zone.category) | TicketingTier                                             |
+| -------------------------- | --------------------------------------------------------- |
+| `category_id`              | `infomaniakCategoryId` (nouveau champ)                    |
+| `name`                     | `name`                                                    |
+| `amount`                   | `price` (attention : peut être en euros, pas en centimes) |
+| `status`                   | `isActive` (`visible` → true)                             |
+| `free_seats`               | quota disponible                                          |
+| zone `name`                | regroupement logique                                      |
+
+#### PASS CATEGORIES — Catégories de pass (abonnements multi-événements)
 
 ```
 GET https://etickets.infomaniak.com/api/shop/categorypasses
 ```
 
-**Paramètres (optionnels) :**
-
-| Paramètre       | Type   | Description                                                                     |
-| --------------- | ------ | ------------------------------------------------------------------------------- |
-| `ids`           | String | Filtrer par IDs (séparateur `,`)                                                |
-| `search`        | String | Rechercher par nom                                                              |
-| `search_fields` | String | Champs de recherche : lastname, firstname, email, city, phone, zipcode, country |
-| `limit`         | Number | Nombre de résultats                                                             |
-| `offset`        | Number | Offset du premier résultat                                                      |
-| `sort`          | String | Trier par : `id`, `name`. Préfixe `-` pour DESC                                 |
-
-**Réponse :** tableau de pass categories (= nos TicketingTier)
-
-```json
-[
-  {
-    "category_id": 283359,
-    "name": "Abonnement général",
-    "status": "visible",
-    "amount": 149,
-    "max_tickets": 2,
-    "min_tickets": 2,
-    "max_tickets_performance": 0,
-    "max_tickets_per_day": 0,
-    "fixed_seat": false,
-    "choose_event": false,
-    "form": {
-      "civility": "HIDDEN",
-      "firstname": "HIDDEN",
-      "lastname": "MANDATORY",
-      "email": "HIDDEN",
-      "firm": "HIDDEN",
-      "phone": "HIDDEN",
-      "birthday": "HIDDEN",
-      "address": "HIDDEN",
-      "zipcode": "HIDDEN",
-      "city": "HIDDEN",
-      "country": "HIDDEN",
-      "freefield": "HIDDEN",
-      "picture": "HIDDEN",
-      "shipping": ["office"]
-    },
-    "freefield_name": null
-  }
-]
-```
-
-**Mapping vers TicketingTier :**
-
-| Infomaniak    | TicketingTier                          |
-| ------------- | -------------------------------------- |
-| `category_id` | `infomaniakCategoryId` (nouveau champ) |
-| `name`        | `name`                                 |
-| `amount`      | `price` (déjà en centimes)             |
-| `status`      | `isActive` (`visible` → true)          |
-
-#### PASS CATEGORY — Détails d'une catégorie
-
-```
-GET https://etickets.infomaniak.com/api/shop/categorypass/{id}
-```
-
-Retourne les mêmes champs que dans la liste, avec plus de détails sur le formulaire.
+Les pass categories sont des abonnements donnant accès à plusieurs événements. À ne pas confondre avec les tarifs d'un événement (qui sont dans les zones).
 
 #### ORDERS — Lister les commandes (guichet)
 

@@ -43,6 +43,7 @@
     "close": "Закрити",
     "columns": "Стовпці",
     "configure": "Налаштувати",
+    "configured": "Налаштовано",
     "confirm": "Підтвердити",
     "confirm_delete": "Підтвердити видалення",
     "confirmation": "Підтвердження",
@@ -64,6 +65,7 @@
     "deleted": "Видалено",
     "description": "Опис",
     "dinner": "Вечеря",
+    "dissociate": "Від'єднати",
     "download": "Завантажити",
     "edit": "Редагувати",
     "edition": {

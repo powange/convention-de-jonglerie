@@ -46,6 +46,7 @@
       "info_title": "Information",
       "last_update": "Senaste uppdatering",
       "loading": "Laddar räknare...",
+      "loading_error": "Fel vid laddning av räknare",
       "no_counters": "Inga räknare",
       "no_counters_description": "Skapa en räknare för att börja räkna kapacitet",
       "pending_operations": "{count} väntande operation(er) | {count} väntande operation | {count} väntande operationer",
@@ -169,7 +170,9 @@
         "pending": "Ej betald",
         "pendingSubtitle": "Väntar"
       },
-      "selectMethod": "Välj betalningsmetod"
+      "open_sumup": "Öppna SumUp",
+      "selectMethod": "Välj betalningsmetod",
+      "sumup_hint": "Bekräfta betalningen på SumUp och bekräfta sedan här"
     },
     "quotas": {
       "created": "Kvot skapad framgångsrikt",

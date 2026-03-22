@@ -46,6 +46,7 @@
       "info_title": "Informace",
       "last_update": "Poslední aktualizace",
       "loading": "Načítání čítačů...",
+      "loading_error": "Chyba při načítání počítadel",
       "no_counters": "Žádné čítače",
       "no_counters_description": "Vytvořte čítač pro začátek počítání kapacity",
       "pending_operations": "{count} operace čekající | {count} operace čekající | {count} operací čekajících",
@@ -169,7 +170,9 @@
         "pending": "Nezaplaceno",
         "pendingSubtitle": "Čeká na vyřízení"
       },
-      "selectMethod": "Vyberte způsob platby"
+      "open_sumup": "Otevřít SumUp",
+      "selectMethod": "Vyberte způsob platby",
+      "sumup_hint": "Potvrďte platbu na SumUp a poté potvrďte zde"
     },
     "quotas": {
       "created": "Kvóta úspěšně vytvořena",

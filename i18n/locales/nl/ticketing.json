@@ -46,6 +46,7 @@
       "info_title": "Informatie",
       "last_update": "Laatste update",
       "loading": "Tellers laden...",
+      "loading_error": "Fout bij het laden van de tellers",
       "no_counters": "Geen tellers",
       "no_counters_description": "Maak een teller om capaciteit te beginnen tellen",
       "pending_operations": "{count} wachtende bewerking(en) | {count} wachtende bewerking | {count} wachtende bewerkingen",
@@ -169,7 +170,9 @@
         "pending": "Niet betaald",
         "pendingSubtitle": "In afwachting"
       },
-      "selectMethod": "Selecteer betaalmethode"
+      "open_sumup": "SumUp openen",
+      "selectMethod": "Selecteer betaalmethode",
+      "sumup_hint": "Bevestig de betaling op SumUp en bevestig dan hier"
     },
     "quotas": {
       "created": "Quotum succesvol aangemaakt",

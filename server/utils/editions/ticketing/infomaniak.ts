@@ -106,6 +106,40 @@ export async function getInfomaniakPassCategories(
   return Array.isArray(response) ? response : []
 }
 
+export interface InfomaniakZoneCategory {
+  category_id: number
+  name: string
+  status: string
+  amount: number
+  free_seats: number
+  limit?: number
+}
+
+export interface InfomaniakZone {
+  zone_id: number
+  name: string
+  status: string
+  bg_color: string
+  numbered: number
+  free_seats: number
+  categories: InfomaniakZoneCategory[]
+}
+
+/**
+ * Récupérer les zones et tarifs d'un événement
+ */
+export async function getInfomaniakEventZones(
+  apiKey: string,
+  eventId: number,
+  currency: string = '2'
+): Promise<InfomaniakZone[]> {
+  const response = await $fetch<InfomaniakZone[]>(`${INFOMANIAK_API_URL}/event/${eventId}/zones`, {
+    method: 'GET',
+    headers: buildHeaders(apiKey, currency),
+  })
+  return Array.isArray(response) ? response : []
+}
+
 /**
  * Tester la connexion à l'API Infomaniak
  * Retourne la liste des événements si la connexion est réussie

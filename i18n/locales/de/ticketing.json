@@ -46,6 +46,7 @@
       "info_title": "Informationen",
       "last_update": "Letzte Aktualisierung",
       "loading": "Zähler werden geladen...",
+      "loading_error": "Fehler beim Laden der Zähler",
       "no_counters": "Keine Zähler",
       "no_counters_description": "Erstellen Sie einen Zähler, um mit dem Zählen der Kapazität zu beginnen",
       "pending_operations": "{count} ausstehende Operation(en) | {count} ausstehende Operation | {count} ausstehende Operationen",
@@ -169,7 +170,9 @@
         "pending": "Nicht bezahlt",
         "pendingSubtitle": "Ausstehend"
       },
-      "selectMethod": "Zahlungsmethode auswählen"
+      "open_sumup": "SumUp öffnen",
+      "selectMethod": "Zahlungsmethode auswählen",
+      "sumup_hint": "Bestätigen Sie die Zahlung auf SumUp und bestätigen Sie dann hier"
     },
     "quotas": {
       "created": "Kontingent erfolgreich erstellt",
