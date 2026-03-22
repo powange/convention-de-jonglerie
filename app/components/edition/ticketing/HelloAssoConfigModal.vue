@@ -177,35 +177,34 @@
     </template>
 
     <template #footer>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-heroicons-x-mark"
-          size="lg"
-          class="flex-1 justify-center"
-          @click="handleCancel"
-        >
-          Annuler
-        </UButton>
-        <UButton
-          variant="outline"
-          icon="i-heroicons-arrow-path"
-          :disabled="!canSave"
-          :loading="testing"
-          size="lg"
-          class="flex-1 justify-center"
-          @click="handleTest"
-        >
-          Tester la connexion
-        </UButton>
+      <div class="flex flex-col sm:flex-row gap-3 justify-between w-full">
+        <div class="flex gap-3">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-heroicons-x-mark"
+            size="lg"
+            @click="handleCancel"
+          >
+            Annuler
+          </UButton>
+          <UButton
+            variant="outline"
+            icon="i-heroicons-arrow-path"
+            :disabled="!canSave"
+            :loading="testing"
+            size="lg"
+            @click="handleTest"
+          >
+            Tester la connexion
+          </UButton>
+        </div>
         <UButton
           color="primary"
           icon="i-heroicons-check-circle"
           :disabled="!canSave"
           :loading="saving"
           size="lg"
-          class="flex-1 justify-center"
           @click="handleSave"
         >
           {{ isEditing ? 'Mettre à jour' : 'Enregistrer' }}

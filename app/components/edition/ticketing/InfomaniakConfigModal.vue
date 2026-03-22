@@ -63,7 +63,7 @@
           >
             <UInput
               v-model="localConfig.apiKey"
-              placeholder="4b4fecf75273a943519..."
+              :placeholder="isEditing ? '••••••••••••••••' : ''"
               icon="i-heroicons-key"
               type="password"
               size="lg"
@@ -127,35 +127,36 @@
     </template>
 
     <template #footer>
-      <div class="flex flex-col sm:flex-row gap-3">
+      <div class="flex flex-col sm:flex-row gap-3 justify-between w-full">
         <UButton
           color="neutral"
           variant="outline"
           icon="i-heroicons-x-mark"
           size="lg"
-          class="flex-1 justify-center"
           @click="handleCancel"
         >
           {{ $t('common.cancel') }}
         </UButton>
+        <!-- Avant connexion : bouton Se connecter -->
         <UButton
-          variant="outline"
-          icon="i-heroicons-arrow-path"
+          v-if="!connected"
+          color="primary"
+          icon="i-heroicons-arrow-right-circle"
           :disabled="!canTest"
           :loading="testing"
           size="lg"
-          class="flex-1 justify-center"
           @click="handleTest"
         >
-          {{ $t('gestion.ticketing.infomaniak_test_connection') }}
+          {{ $t('gestion.ticketing.infomaniak_connect') }}
         </UButton>
+        <!-- Après connexion : bouton Enregistrer -->
         <UButton
+          v-else
           color="primary"
           icon="i-heroicons-check-circle"
           :disabled="!canSave"
           :loading="saving"
           size="lg"
-          class="flex-1 justify-center"
           @click="handleSave"
         >
           {{ $t('common.save') }}
@@ -215,6 +216,17 @@ const currencyOptions = [
 const availableEvents = ref<InfomaniakEventSummary[]>([])
 const selectedEventId = ref<number | undefined>()
 
+// Réinitialiser la connexion si la clé API ou la devise change
+watch(
+  () => [localConfig.value.apiKey, localConfig.value.currency],
+  () => {
+    if (availableEvents.value.length > 0) {
+      availableEvents.value = []
+      selectedEventId.value = undefined
+    }
+  }
+)
+
 const eventOptions = computed(() =>
   availableEvents.value.map((e) => ({
     label: `${e.name}${e.city ? ` — ${e.city}` : ''}`,
@@ -225,9 +237,10 @@ const eventOptions = computed(() =>
 const isEditing = computed(() => !!props.config)
 const saving = ref(false)
 const testing = ref(false)
+const connected = computed(() => availableEvents.value.length > 0)
 
 const canTest = computed(() => localConfig.value.apiKey.trim() !== '')
-const canSave = computed(() => localConfig.value.apiKey.trim() !== '')
+const canSave = computed(() => localConfig.value.apiKey.trim() !== '' && !!selectedEventId.value)
 
 watch(
   () => props.config,

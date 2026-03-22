@@ -388,6 +388,7 @@
       "infomaniak_api_guide_title": "Obtenir votre clé API",
       "infomaniak_api_key": "Clé API",
       "infomaniak_api_key_hint": "Clé secrète (chiffrée après enregistrement)",
+      "infomaniak_connect": "Se connecter",
       "infomaniak_config_error": "Impossible de sauvegarder la configuration",
       "infomaniak_config_saved": "Configuration Infomaniak enregistrée",
       "infomaniak_configure": "Configurer Infomaniak",

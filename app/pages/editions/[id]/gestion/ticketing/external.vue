@@ -30,16 +30,18 @@
       </div>
 
       <!-- Contenu de la page -->
-      <div class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <!-- HelloAsso -->
         <UCard>
           <div class="space-y-6">
             <!-- En-tête avec statut -->
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <img src="~/assets/img/helloasso/logo.svg" alt="HelloAsso" class="h-8 w-8" />
-                </div>
+                <img
+                  src="~/assets/img/helloasso/logo.svg"
+                  alt="HelloAsso"
+                  class="h-14 w-14 rounded-lg"
+                />
                 <div>
                   <h2 class="text-lg font-semibold">HelloAsso</h2>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -887,6 +889,7 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
+const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
