@@ -31,6 +31,17 @@ export default wrapApiHandler(
             // Ne pas retourner clientSecret
           },
         },
+        infomaniakConfig: {
+          select: {
+            id: true,
+            currency: true,
+            eventId: true,
+            eventName: true,
+            createdAt: true,
+            updatedAt: true,
+            // Ne pas retourner apiKey
+          },
+        },
       },
     })
 

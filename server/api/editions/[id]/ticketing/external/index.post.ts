@@ -5,7 +5,7 @@ import { encrypt } from '#server/utils/encryption'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
 const bodySchema = z.object({
-  provider: z.enum(['HELLOASSO', 'BILLETWEB', 'WEEZEVENT', 'OTHER']),
+  provider: z.enum(['HELLOASSO', 'INFOMANIAK', 'BILLETWEB', 'WEEZEVENT', 'OTHER']),
   helloAsso: z
     .object({
       clientId: z.string().min(1),
@@ -13,6 +13,14 @@ const bodySchema = z.object({
       organizationSlug: z.string().min(1),
       formType: z.string().min(1),
       formSlug: z.string().min(1),
+    })
+    .optional(),
+  infomaniak: z
+    .object({
+      apiKey: z.string().min(1),
+      currency: z.string().default('2'),
+      eventId: z.number().optional(),
+      eventName: z.string().optional(),
     })
     .optional(),
 })
@@ -134,6 +142,89 @@ export default wrapApiHandler(
         })
 
         return createSuccessResponse({ config: created }, 'Configuration HelloAsso créée')
+      }
+    }
+
+    // Infomaniak
+    if (body.provider === 'INFOMANIAK') {
+      if (!body.infomaniak) {
+        throw createError({
+          status: 400,
+          message: 'Configuration Infomaniak requise',
+        })
+      }
+
+      const encryptedApiKey = encrypt(body.infomaniak.apiKey)
+
+      if (existingConfig) {
+        const updated = await prisma.externalTicketing.update({
+          where: { id: existingConfig.id },
+          data: {
+            provider: body.provider,
+            status: 'ACTIVE',
+            updatedAt: new Date(),
+            infomaniakConfig: {
+              upsert: {
+                create: {
+                  apiKey: encryptedApiKey,
+                  currency: body.infomaniak.currency,
+                  eventId: body.infomaniak.eventId,
+                  eventName: body.infomaniak.eventName,
+                },
+                update: {
+                  apiKey: encryptedApiKey,
+                  currency: body.infomaniak.currency,
+                  eventId: body.infomaniak.eventId,
+                  eventName: body.infomaniak.eventName,
+                },
+              },
+            },
+          },
+          include: {
+            infomaniakConfig: {
+              select: {
+                id: true,
+                currency: true,
+                eventId: true,
+                eventName: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        })
+
+        return createSuccessResponse({ config: updated }, 'Configuration Infomaniak mise à jour')
+      } else {
+        const created = await prisma.externalTicketing.create({
+          data: {
+            editionId,
+            provider: body.provider,
+            status: 'ACTIVE',
+            infomaniakConfig: {
+              create: {
+                apiKey: encryptedApiKey,
+                currency: body.infomaniak.currency,
+                eventId: body.infomaniak.eventId,
+                eventName: body.infomaniak.eventName,
+              },
+            },
+          },
+          include: {
+            infomaniakConfig: {
+              select: {
+                id: true,
+                currency: true,
+                eventId: true,
+                eventName: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        })
+
+        return createSuccessResponse({ config: created }, 'Configuration Infomaniak créée')
       }
     }
 

@@ -25,7 +25,7 @@
           Lier une billeterie externe
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Connectez votre billetterie HelloAsso ou autre plateforme externe
+          Connectez votre billetterie HelloAsso, Infomaniak ou autre plateforme externe
         </p>
       </div>
 
@@ -38,10 +38,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <UIcon
-                    name="i-heroicons-ticket"
-                    class="h-8 w-8 text-orange-600 dark:text-orange-400"
-                  />
+                  <img src="~/assets/img/helloasso/logo.svg" alt="HelloAsso" class="h-8 w-8" />
                 </div>
                 <div>
                   <h2 class="text-lg font-semibold">HelloAsso</h2>
@@ -701,22 +698,100 @@
           </div>
         </UCard>
 
-        <!-- Autres plateformes (à venir) -->
+        <!-- Infomaniak -->
         <UCard>
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-ellipsis-horizontal-circle" class="text-gray-500" />
-              <h2 class="text-lg font-semibold">Autres plateformes</h2>
+          <div class="space-y-6">
+            <!-- En-tête avec statut -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <img
+                  src="~/assets/img/infomaniak/logo.svg"
+                  alt="Infomaniak"
+                  class="h-14 w-14 rounded-lg"
+                />
+                <div>
+                  <h2 class="text-lg font-semibold">Infomaniak</h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('gestion.ticketing.infomaniak_description') }}
+                  </p>
+                </div>
+              </div>
+              <UBadge
+                v-if="hasInfomaniakConfig"
+                color="success"
+                variant="soft"
+                size="lg"
+                class="flex items-center gap-1.5"
+              >
+                <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
+                {{ $t('common.configured') }}
+              </UBadge>
             </div>
 
-            <div class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <UIcon
-                name="i-heroicons-rocket-launch"
-                class="mx-auto h-12 w-12 text-gray-400 mb-2"
-              />
-              <p class="text-sm text-gray-500">
-                D'autres plateformes de billetterie seront bientôt disponibles
-              </p>
+            <!-- Alerte d'information -->
+            <UAlert
+              v-if="!hasInfomaniakConfig"
+              icon="i-heroicons-information-circle"
+              color="info"
+              variant="soft"
+              :description="$t('gestion.ticketing.infomaniak_info')"
+            />
+
+            <!-- Résumé de la configuration (si existante) -->
+            <div
+              v-if="hasInfomaniakConfig"
+              class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon
+                  name="i-heroicons-check-circle"
+                  class="text-success-600 dark:text-success-400 mt-0.5 flex-shrink-0"
+                />
+                <div class="text-sm space-y-1">
+                  <p class="font-medium text-success-900 dark:text-success-100">
+                    {{ $t('gestion.ticketing.infomaniak_connected') }}
+                  </p>
+                  <p v-if="infomaniakEventName" class="text-success-700 dark:text-success-300">
+                    {{ $t('gestion.ticketing.infomaniak_event_label') }} :
+                    <span class="font-semibold">{{ infomaniakEventName }}</span>
+                  </p>
+                  <p class="text-success-700 dark:text-success-300">
+                    {{ $t('gestion.ticketing.infomaniak_currency_label') }} :
+                    <span class="font-semibold">{{
+                      infomaniakCurrency === '1' ? 'CHF' : 'EUR'
+                    }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex flex-wrap gap-3">
+              <UButton
+                v-if="!hasInfomaniakConfig"
+                icon="i-heroicons-cog-6-tooth"
+                color="primary"
+                @click="openInfomaniakConfigModal"
+              >
+                {{ $t('gestion.ticketing.infomaniak_configure') }}
+              </UButton>
+              <template v-else>
+                <UButton
+                  icon="i-heroicons-pencil-square"
+                  variant="outline"
+                  @click="openInfomaniakConfigModal"
+                >
+                  {{ $t('common.edit') }}
+                </UButton>
+                <UButton
+                  icon="i-heroicons-trash"
+                  color="error"
+                  variant="outline"
+                  @click="disconnectInfomaniak"
+                >
+                  {{ $t('common.disconnect') }}
+                </UButton>
+              </template>
             </div>
           </div>
         </UCard>
@@ -730,6 +805,15 @@
         :ticketing-url="edition?.ticketingUrl || undefined"
         @save="handleConfigSave"
         @test="handleConfigTest"
+      />
+
+      <!-- Modal de configuration Infomaniak -->
+      <InfomaniakConfigModal
+        ref="infomaniakConfigModalRef"
+        v-model:open="showInfomaniakConfigModal"
+        :config="currentInfomaniakConfig"
+        @save="handleInfomaniakConfigSave"
+        @test="handleInfomaniakConfigTest"
       />
 
       <!-- Modal JSON brut (admin only) -->
@@ -792,6 +876,8 @@ import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import HelloAssoConfigModal from '~/components/edition/ticketing/HelloAssoConfigModal.vue'
+import InfomaniakConfigModal from '~/components/edition/ticketing/InfomaniakConfigModal.vue'
+import type { InfomaniakConfig } from '~/components/edition/ticketing/InfomaniakConfigModal.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -864,7 +950,13 @@ const loadExistingConfig = async () => {
       helloAssoFormType.value = haConfig.formType
       helloAssoFormSlug.value = haConfig.formSlug
       hasExistingConfig.value = true
-      // Le clientSecret n'est pas retourné pour des raisons de sécurité
+    }
+    if (response.data.hasConfig && response.data.config?.infomaniakConfig) {
+      const ikConfig = response.data.config.infomaniakConfig
+      infomaniakCurrency.value = ikConfig.currency
+      infomaniakEventId.value = ikConfig.eventId ?? undefined
+      infomaniakEventName.value = ikConfig.eventName ?? undefined
+      hasInfomaniakConfig.value = true
     }
   } catch (error) {
     console.error('Failed to load config:', error)
@@ -983,6 +1075,24 @@ const loadedTiers = ref<any[]>([])
 const loadedOptions = ref<any[]>([])
 const hasExistingConfig = ref(false)
 
+// Infomaniak
+const showInfomaniakConfigModal = ref(false)
+const infomaniakConfigModalRef = ref<InstanceType<typeof InfomaniakConfigModal> | null>(null)
+const hasInfomaniakConfig = ref(false)
+const infomaniakCurrency = ref('2')
+const infomaniakEventId = ref<number | undefined>()
+const infomaniakEventName = ref<string | undefined>()
+
+const currentInfomaniakConfig = computed<InfomaniakConfig | undefined>(() => {
+  if (!hasInfomaniakConfig.value) return undefined
+  return {
+    apiKey: '', // Ne pas retourner la clé API
+    currency: infomaniakCurrency.value,
+    eventId: infomaniakEventId.value,
+    eventName: infomaniakEventName.value,
+  }
+})
+
 // Ouvrir la modal de configuration
 const openConfigModal = () => {
   showConfigModal.value = true
@@ -1068,6 +1178,116 @@ const handleConfigTest = async (config: any) => {
     configModalRef.value?.setTesting(false)
   }
 }
+
+// ─── Infomaniak ──────────────────────────────────────────────
+
+const openInfomaniakConfigModal = () => {
+  showInfomaniakConfigModal.value = true
+}
+
+const handleInfomaniakConfigSave = async (config: InfomaniakConfig) => {
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
+      method: 'POST',
+      body: {
+        provider: 'INFOMANIAK',
+        infomaniak: {
+          apiKey: config.apiKey,
+          currency: config.currency,
+          eventId: config.eventId,
+          eventName: config.eventName,
+        },
+      },
+    })
+
+    infomaniakCurrency.value = config.currency
+    infomaniakEventId.value = config.eventId
+    infomaniakEventName.value = config.eventName
+    hasInfomaniakConfig.value = true
+
+    toast.add({
+      title: t('common.saved'),
+      description: t('gestion.ticketing.infomaniak_config_saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    showInfomaniakConfigModal.value = false
+  } catch (error: any) {
+    console.error('Failed to save Infomaniak config:', error)
+    toast.add({
+      title: t('common.error'),
+      description: error.data?.message || t('gestion.ticketing.infomaniak_config_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    infomaniakConfigModalRef.value?.setSaving(false)
+  }
+}
+
+const handleInfomaniakConfigTest = async (config: { apiKey: string; currency: string }) => {
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/infomaniak/test`, {
+      method: 'POST',
+      body: {
+        apiKey: config.apiKey,
+        currency: config.currency,
+      },
+    })
+
+    const events = result.data?.events || []
+    infomaniakConfigModalRef.value?.setEvents(events)
+
+    toast.add({
+      title: t('gestion.ticketing.infomaniak_test_success'),
+      description: t('gestion.ticketing.infomaniak_connection_ok', { count: events.length }),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Infomaniak test error:', error)
+    toast.add({
+      title: t('gestion.ticketing.infomaniak_test_failed'),
+      description: error.data?.message || t('gestion.ticketing.infomaniak_config_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    infomaniakConfigModalRef.value?.setTesting(false)
+  }
+}
+
+const disconnectInfomaniak = async () => {
+  if (!confirm(t('gestion.ticketing.infomaniak_disconnect_confirm'))) return
+
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
+      method: 'DELETE',
+    })
+
+    hasInfomaniakConfig.value = false
+    infomaniakCurrency.value = '2'
+    infomaniakEventId.value = undefined
+    infomaniakEventName.value = undefined
+
+    toast.add({
+      title: t('common.saved'),
+      description: t('gestion.ticketing.infomaniak_disconnected'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    toast.add({
+      title: t('common.error'),
+      description: error.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+// ─── HelloAsso ──────────────────────────────────────────────
 
 // Construit le payload pour sauvegarder la config HelloAsso
 const buildHelloAssoConfigPayload = () => ({

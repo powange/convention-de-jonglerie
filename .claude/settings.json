@@ -35,12 +35,16 @@
       "Bash(node scripts/show-help.mjs 2 3)",
       "Bash(node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''scripts/translation/translations-all.json'',''utf8''\\)\\)\")",
       "WebFetch(domain:developer.sumup.com)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "WebFetch(domain:etickets.infomaniak.com)",
+      "WebFetch(domain:www.infomaniak.com)",
+      "WebFetch(domain:developer.infomaniak.com)"
     ],
     "additionalDirectories": [
       "/tmp",
       "/root/projets/convention-de-jonglerie/.claude/commands",
-      "/root/projets/convention-de-jonglerie/.claude/skills"
+      "/root/projets/convention-de-jonglerie/.claude/skills",
+      "/root/projets/convention-de-jonglerie/server/api/editions/[id]/ticketing"
     ]
   }
 }
