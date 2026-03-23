@@ -87,7 +87,7 @@
                   <div class="flex items-start justify-between gap-2">
                     <h4 class="font-semibold text-lg">{{ call.name }}</h4>
                     <div class="flex items-center gap-2">
-                      <UBadge v-if="call.mode === 'EXTERNAL'" color="info" variant="soft" size="xs">
+                      <UBadge v-if="call.mode === 'EXTERNAL'" color="info" variant="soft" size="sm">
                         {{ t('gestion.shows_call.mode_external_badge') }}
                       </UBadge>
                       <UBadge
@@ -97,7 +97,7 @@
                             : 'neutral'
                         "
                         variant="soft"
-                        size="xs"
+                        size="sm"
                       >
                         {{
                           call.visibility === 'PUBLIC' || call.visibility === 'PRIVATE'
@@ -117,32 +117,6 @@
                         {{ formatDate(call.deadline) }}
                       </strong>
                     </span>
-                  </div>
-
-                  <!-- Champs demandés -->
-                  <div class="flex flex-wrap gap-1">
-                    <UBadge v-if="call.askPortfolioUrl" color="neutral" variant="outline" size="xs">
-                      {{ t('gestion.shows_call.field_portfolio') }}
-                    </UBadge>
-                    <UBadge v-if="call.askVideoUrl" color="neutral" variant="outline" size="xs">
-                      {{ t('gestion.shows_call.field_video') }}
-                    </UBadge>
-                    <UBadge
-                      v-if="call.askTechnicalNeeds"
-                      color="neutral"
-                      variant="outline"
-                      size="xs"
-                    >
-                      {{ t('gestion.shows_call.field_technical') }}
-                    </UBadge>
-                    <UBadge
-                      v-if="call.askAccommodation"
-                      color="neutral"
-                      variant="outline"
-                      size="xs"
-                    >
-                      {{ t('gestion.shows_call.field_accommodation') }}
-                    </UBadge>
                   </div>
                 </div>
               </UCard>

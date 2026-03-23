@@ -48,21 +48,16 @@
                 <UBadge v-if="showCall.mode === 'EXTERNAL'" color="info" variant="soft" size="xs">
                   {{ t('gestion.shows_call.mode_external_badge') }}
                 </UBadge>
-                <UBadge
-                  :color="
-                    showCall.visibility === 'PUBLIC' || showCall.visibility === 'PRIVATE'
-                      ? 'success'
-                      : 'neutral'
-                  "
-                  variant="soft"
-                  size="xs"
-                >
-                  {{
-                    showCall.visibility === 'PUBLIC' || showCall.visibility === 'PRIVATE'
-                      ? t('shows_call.open')
-                      : t('shows_call.closed')
-                  }}
-                </UBadge>
+                <ClientOnly>
+                  <UButton
+                    icon="i-heroicons-share"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    :aria-label="t('common.share')"
+                    @click="shareShowCall"
+                  />
+                </ClientOnly>
               </div>
             </div>
           </template>
@@ -84,22 +79,6 @@
                   {{ formatDate(showCall.deadline) }}
                 </strong>
               </span>
-            </div>
-
-            <!-- Champs demandés -->
-            <div class="flex flex-wrap gap-1">
-              <UBadge v-if="showCall.askPortfolioUrl" color="neutral" variant="outline" size="xs">
-                {{ t('gestion.shows_call.field_portfolio') }}
-              </UBadge>
-              <UBadge v-if="showCall.askVideoUrl" color="neutral" variant="outline" size="xs">
-                {{ t('gestion.shows_call.field_video') }}
-              </UBadge>
-              <UBadge v-if="showCall.askTechnicalNeeds" color="neutral" variant="outline" size="xs">
-                {{ t('gestion.shows_call.field_technical') }}
-              </UBadge>
-              <UBadge v-if="showCall.askAccommodation" color="neutral" variant="outline" size="xs">
-                {{ t('gestion.shows_call.field_accommodation') }}
-              </UBadge>
             </div>
           </div>
         </UCard>
@@ -280,6 +259,32 @@ async function renderDescription() {
 }
 
 watch(() => showCall.value?.description, renderDescription, { immediate: true })
+
+// Partage
+const toast = useToast()
+const shareShowCall = async () => {
+  const url = `${window.location.origin}/editions/${editionId}/shows-call/${showCallId}`
+  const title = showCall.value?.name || ''
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url })
+    } catch {
+      // L'utilisateur a annulé le partage
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.add({
+        title: t('common.link_copied'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    } catch {
+      // Fallback silencieux
+    }
+  }
+}
 
 // SEO
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))

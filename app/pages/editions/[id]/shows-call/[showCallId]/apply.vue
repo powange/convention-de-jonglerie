@@ -2,7 +2,7 @@
   <div v-if="edition">
     <EditionHeader :edition="edition" current-page="shows-call" />
 
-    <div class="max-w-3xl mx-auto space-y-6">
+    <div class="max-w-3xl 2xl:max-w-full mx-auto space-y-6">
       <!-- Message si l'utilisateur n'est pas connecté -->
       <UAlert
         v-if="!authStore.isAuthenticated"
@@ -167,104 +167,559 @@
           (!hasAlreadyApplied || isEditMode)
         "
       >
-        <!-- En-tête -->
-        <UCard variant="soft">
-          <template #header>
-            <div class="flex items-center gap-3">
-              <UButton
-                icon="i-heroicons-arrow-left"
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                :to="`/editions/${editionId}/shows-call`"
-              />
-              <div>
-                <h1 class="text-xl font-bold">{{ showCall.name }}</h1>
-                <p class="text-sm text-gray-500">
-                  {{ t('shows_call.apply_to') }} {{ getEditionDisplayName(edition) }}
-                </p>
+        <div
+          class="2xl:grid 2xl:grid-cols-[1fr_2fr] 2xl:gap-6 2xl:items-start space-y-6 2xl:space-y-0"
+        >
+          <!-- Colonne gauche : info + presets -->
+          <div class="space-y-6 2xl:sticky 2xl:top-4">
+            <!-- En-tête -->
+            <UCard variant="soft">
+              <template #header>
+                <div class="flex items-center gap-3">
+                  <UButton
+                    icon="i-heroicons-arrow-left"
+                    variant="ghost"
+                    color="neutral"
+                    size="sm"
+                    :to="`/editions/${editionId}/shows-call`"
+                  />
+                  <div>
+                    <h1 class="text-xl font-bold">{{ showCall.name }}</h1>
+                    <p class="text-sm text-gray-500">
+                      {{ t('shows_call.apply_to') }} {{ getEditionDisplayName(edition) }}
+                    </p>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Description de l'appel -->
+              <div v-if="descriptionHtml" class="prose prose-sm dark:prose-invert max-w-none mb-4">
+                <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-html="descriptionHtml" />
               </div>
-            </div>
-          </template>
 
-          <!-- Description de l'appel -->
-          <div v-if="descriptionHtml" class="prose prose-sm dark:prose-invert max-w-none mb-4">
-            <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-html="descriptionHtml" />
+              <!-- Date limite -->
+              <div v-if="showCall.deadline" class="flex items-center gap-2 text-sm text-gray-500">
+                <UIcon name="i-heroicons-clock" />
+                <span>
+                  {{ t('shows_call.deadline') }} :
+                  <strong>{{ formatDate(showCall.deadline) }}</strong>
+                </span>
+              </div>
+            </UCard>
           </div>
 
-          <!-- Date limite -->
-          <div v-if="showCall.deadline" class="flex items-center gap-2 text-sm text-gray-500">
-            <UIcon name="i-heroicons-clock" />
-            <span>
-              {{ t('shows_call.deadline') }} :
-              <strong>{{ formatDate(showCall.deadline) }}</strong>
-            </span>
-          </div>
-        </UCard>
+          <!-- Colonne droite : formulaire -->
+          <div>
+            <!-- Formulaire -->
+            <UCard variant="soft">
+              <template #header>
+                <div class="space-y-3">
+                  <h2 class="text-lg font-semibold">
+                    {{ isEditMode ? t('shows_call.edit_form_title') : t('shows_call.form_title') }}
+                  </h2>
+                  <div v-if="authStore.isArtist && presets.length > 0" class="flex items-end gap-3">
+                    <UFormField :label="t('shows_call.presets.load_preset')" class="flex-1">
+                      <USelect
+                        v-model="selectedPresetId"
+                        :items="presetItems"
+                        :placeholder="t('shows_call.presets.select_placeholder')"
+                        value-key="value"
+                        size="lg"
+                        class="w-full"
+                        @update:model-value="loadPreset"
+                      />
+                    </UFormField>
+                    <UButton
+                      v-if="selectedPresetId"
+                      variant="soft"
+                      color="error"
+                      icon="i-heroicons-trash"
+                      size="lg"
+                      :loading="deletingPreset"
+                      @click="confirmDeletePreset"
+                    />
+                  </div>
+                </div>
+              </template>
 
-        <!-- Section: Presets de spectacle -->
-        <UCard v-if="authStore.isArtist && presets.length > 0" variant="soft">
-          <div class="flex items-end gap-3">
-            <UFormField :label="t('shows_call.presets.load_preset')" class="flex-1">
-              <USelect
-                v-model="selectedPresetId"
-                :items="presetItems"
-                :placeholder="t('shows_call.presets.select_placeholder')"
-                value-key="value"
-                size="lg"
-                class="w-full"
-                @update:model-value="loadPreset"
-              />
-            </UFormField>
-            <UButton
-              variant="soft"
-              color="neutral"
-              icon="i-heroicons-bookmark"
-              size="lg"
-              @click="showSavePresetModal = true"
-            >
-              {{ t('shows_call.presets.save_as_preset') }}
-            </UButton>
-            <UButton
-              v-if="selectedPresetId"
-              variant="soft"
-              color="error"
-              icon="i-heroicons-trash"
-              size="lg"
-              :loading="deletingPreset"
-              @click="confirmDeletePreset"
-            />
-          </div>
-        </UCard>
+              <UForm
+                :state="formState"
+                :validate="validate"
+                class="space-y-6"
+                @submit="submitApplication"
+              >
+                <div class="2xl:grid 2xl:grid-cols-2 2xl:gap-6 space-y-6 2xl:space-y-0">
+                  <!-- Section: Informations personnelles -->
+                  <div class="space-y-4">
+                    <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                      {{ t('shows_call.personal_info') }}
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ t('shows_call.personal_info_desc') }}
+                    </p>
 
-        <!-- Modal de sauvegarde de preset -->
-        <UModal v-model:open="showSavePresetModal" :title="t('shows_call.presets.save_preset')">
+                    <div class="grid grid-cols-2 gap-4">
+                      <UFormField :label="t('common.last_name')" name="lastName" required>
+                        <UInput
+                          v-model="formState.lastName"
+                          :placeholder="t('shows_call.form.last_name_placeholder')"
+                          size="lg"
+                          class="w-full"
+                        />
+                      </UFormField>
+
+                      <UFormField :label="t('common.first_name')" name="firstName" required>
+                        <UInput
+                          v-model="formState.firstName"
+                          :placeholder="t('shows_call.form.first_name_placeholder')"
+                          size="lg"
+                          class="w-full"
+                        />
+                      </UFormField>
+                    </div>
+
+                    <UFormField :label="t('common.phone')" name="phone" required>
+                      <UInput
+                        v-model="formState.phone"
+                        type="tel"
+                        :placeholder="t('shows_call.form.phone_placeholder')"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+                  </div>
+
+                  <!-- Section: Informations artiste -->
+                  <div class="space-y-4">
+                    <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                      {{ t('gestion.shows_call.artist_info') }}
+                    </h3>
+
+                    <UFormField
+                      :label="t('gestion.shows_call.form.artist_name')"
+                      name="artistName"
+                      required
+                    >
+                      <UInput
+                        v-model="formState.artistName"
+                        :placeholder="t('shows_call.form.artist_name_placeholder')"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+
+                    <UFormField :label="t('gestion.shows_call.form.artist_bio')" name="artistBio">
+                      <UTextarea
+                        v-model="formState.artistBio"
+                        :placeholder="t('shows_call.form.artist_bio_placeholder')"
+                        :rows="3"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      v-if="showCall.askPortfolioUrl"
+                      :label="t('gestion.shows_call.form.portfolio_url')"
+                      name="portfolioUrl"
+                    >
+                      <UInput
+                        v-model="formState.portfolioUrl"
+                        type="url"
+                        placeholder="https://"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      v-if="showCall.askVideoUrl"
+                      :label="t('gestion.shows_call.form.video_url')"
+                      name="videoUrl"
+                    >
+                      <UInput
+                        v-model="formState.videoUrl"
+                        type="url"
+                        placeholder="https://"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      v-if="showCall.askSocialLinks"
+                      :label="t('shows_call.form.social_links')"
+                      name="socialLinks"
+                    >
+                      <UTextarea
+                        v-model="formState.socialLinks"
+                        :placeholder="t('shows_call.form.social_links_placeholder')"
+                        :rows="3"
+                        size="lg"
+                        class="w-full"
+                      />
+                      <template #hint>
+                        <span class="text-xs text-gray-500">
+                          {{ t('shows_call.form.social_links_hint') }}
+                        </span>
+                      </template>
+                    </UFormField>
+                  </div>
+                </div>
+
+                <div class="2xl:grid 2xl:grid-cols-2 2xl:gap-6 space-y-6 2xl:space-y-0">
+                  <!-- Section: Informations spectacle -->
+                  <div class="space-y-4">
+                    <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                      {{ t('gestion.shows_call.show_info') }}
+                    </h3>
+
+                    <UFormField
+                      :label="t('gestion.shows_call.form.show_title')"
+                      name="showTitle"
+                      required
+                    >
+                      <UInput
+                        v-model="formState.showTitle"
+                        :placeholder="t('shows_call.form.show_title_placeholder')"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      :label="t('gestion.shows_call.form.description')"
+                      name="showDescription"
+                      required
+                    >
+                      <UTextarea
+                        v-model="formState.showDescription"
+                        :placeholder="t('shows_call.form.show_description_placeholder')"
+                        :rows="5"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <UFormField
+                        :label="t('gestion.shows_call.form.duration')"
+                        name="showDuration"
+                        required
+                      >
+                        <UInput
+                          v-model.number="formState.showDuration"
+                          type="number"
+                          min="1"
+                          max="180"
+                          :placeholder="t('shows_call.form.duration_placeholder')"
+                          size="lg"
+                          class="w-full"
+                        />
+                      </UFormField>
+
+                      <UFormField
+                        :label="t('gestion.shows_call.form.category')"
+                        name="showCategory"
+                      >
+                        <UInput
+                          v-model="formState.showCategory"
+                          :placeholder="t('shows_call.form.category_placeholder')"
+                          size="lg"
+                          class="w-full"
+                        />
+                      </UFormField>
+                    </div>
+
+                    <UFormField
+                      v-if="showCall.askTechnicalNeeds"
+                      :label="t('gestion.shows_call.form.technical_needs')"
+                      name="technicalNeeds"
+                    >
+                      <UTextarea
+                        v-model="formState.technicalNeeds"
+                        :placeholder="t('shows_call.form.technical_needs_placeholder')"
+                        :rows="3"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+                  </div>
+
+                  <!-- Section: Artistes du spectacle -->
+                  <div class="space-y-4">
+                    <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                      {{ t('shows_call.performers_section') }}
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ t('shows_call.performers_section_desc') }}
+                    </p>
+
+                    <!-- Sélecteur du nombre d'artistes -->
+                    <UFormField
+                      :label="t('shows_call.form.performers_count')"
+                      name="additionalPerformersCount"
+                      required
+                    >
+                      <div class="flex items-center gap-2">
+                        <UButton
+                          v-for="n in 5"
+                          :key="n"
+                          :color="formState.additionalPerformersCount === n ? 'primary' : 'neutral'"
+                          :variant="formState.additionalPerformersCount === n ? 'solid' : 'outline'"
+                          size="lg"
+                          @click="selectPerformersCount(n)"
+                        >
+                          {{ n }}
+                        </UButton>
+                        <UButton
+                          v-if="!showCustomCount && formState.additionalPerformersCount <= 5"
+                          color="neutral"
+                          variant="outline"
+                          size="lg"
+                          icon="i-heroicons-plus"
+                          @click="showCustomCount = true"
+                        />
+                        <UInputNumber
+                          v-if="showCustomCount || formState.additionalPerformersCount > 5"
+                          v-model="formState.additionalPerformersCount"
+                          :min="1"
+                          :max="50"
+                          size="lg"
+                          class="w-28"
+                        />
+                      </div>
+                    </UFormField>
+
+                    <!-- Liste des artistes -->
+                    <div v-if="formState.additionalPerformersCount > 0" class="space-y-4">
+                      <div
+                        v-for="(performer, index) in formState.additionalPerformers"
+                        :key="index"
+                        class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3"
+                      >
+                        <div class="flex items-center justify-between">
+                          <h4 class="font-medium text-gray-700 dark:text-gray-300">
+                            {{ t('shows_call.form.performer_number', { number: index + 1 }) }}
+                          </h4>
+                        </div>
+
+                        <!-- Coche "Je participe" sur la première personne -->
+                        <UCheckbox
+                          v-if="index === 0"
+                          v-model="applicantIsPerformer"
+                          :label="t('shows_call.form.i_am_performer')"
+                        />
+
+                        <div class="grid grid-cols-2 gap-3">
+                          <UFormField
+                            :label="t('common.last_name')"
+                            :name="`additionalPerformers.${index}.lastName`"
+                            required
+                          >
+                            <UInput
+                              v-model="performer.lastName"
+                              :placeholder="t('shows_call.form.last_name_placeholder')"
+                              size="lg"
+                              class="w-full"
+                              :disabled="index === 0 && applicantIsPerformer"
+                            />
+                          </UFormField>
+
+                          <UFormField
+                            :label="t('common.first_name')"
+                            :name="`additionalPerformers.${index}.firstName`"
+                            required
+                          >
+                            <UInput
+                              v-model="performer.firstName"
+                              :placeholder="t('shows_call.form.first_name_placeholder')"
+                              size="lg"
+                              class="w-full"
+                              :disabled="index === 0 && applicantIsPerformer"
+                            />
+                          </UFormField>
+                        </div>
+
+                        <UFormField
+                          :label="t('common.email')"
+                          :name="`additionalPerformers.${index}.email`"
+                          required
+                        >
+                          <UInput
+                            v-model="performer.email"
+                            type="email"
+                            :placeholder="t('shows_call.form.email_placeholder')"
+                            size="lg"
+                            class="w-full"
+                            :disabled="index === 0 && applicantIsPerformer"
+                          />
+                        </UFormField>
+
+                        <UFormField
+                          :label="t('common.phone')"
+                          :name="`additionalPerformers.${index}.phone`"
+                          required
+                        >
+                          <UInput
+                            v-model="performer.phone"
+                            type="tel"
+                            :placeholder="t('shows_call.form.phone_placeholder')"
+                            size="lg"
+                            class="w-full"
+                            :disabled="index === 0 && applicantIsPerformer"
+                          />
+                        </UFormField>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section: Logistique -->
+                <div
+                  v-if="showCall.askAccommodation || showCall.askDepartureCity"
+                  class="space-y-4 2xl:w-1/2"
+                >
+                  <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                    {{ t('gestion.shows_call.logistics') }}
+                  </h3>
+
+                  <!-- Ville de départ -->
+                  <UFormField
+                    v-if="showCall.askDepartureCity"
+                    :label="t('shows_call.form.departure_city')"
+                    name="departureCity"
+                  >
+                    <UInput
+                      v-model="formState.departureCity"
+                      :placeholder="t('shows_call.form.departure_city_placeholder')"
+                      size="lg"
+                      class="w-full"
+                    />
+                    <template #hint>
+                      <span class="text-xs text-gray-500">
+                        {{ t('shows_call.form.departure_city_hint') }}
+                      </span>
+                    </template>
+                  </UFormField>
+
+                  <!-- Hébergement -->
+                  <template v-if="showCall.askAccommodation">
+                    <UFormField name="accommodationNeeded">
+                      <UCheckbox
+                        v-model="formState.accommodationNeeded"
+                        :label="t('shows_call.form.accommodation_needed')"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      v-if="formState.accommodationNeeded"
+                      :label="t('shows_call.form.accommodation_notes')"
+                      name="accommodationNotes"
+                    >
+                      <UTextarea
+                        v-model="formState.accommodationNotes"
+                        :placeholder="t('shows_call.form.accommodation_notes_placeholder')"
+                        :rows="2"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
+                  </template>
+                </div>
+
+                <!-- Bouton de soumission -->
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                  <UButton
+                    type="button"
+                    color="neutral"
+                    variant="ghost"
+                    :to="`/editions/${editionId}/shows-call`"
+                  >
+                    {{ t('common.cancel') }}
+                  </UButton>
+                  <UButton
+                    type="submit"
+                    color="primary"
+                    :loading="submitting"
+                    icon="i-heroicons-paper-airplane"
+                  >
+                    {{
+                      isEditMode
+                        ? t('shows_call.update_application')
+                        : t('shows_call.submit_application')
+                    }}
+                  </UButton>
+                </div>
+              </UForm>
+            </UCard>
+          </div>
+        </div>
+
+        <!-- Modal de sauvegarde de preset (en dehors du UForm) -->
+        <UModal
+          v-model:open="showSavePresetModal"
+          :title="t('shows_call.presets.save_before_submit')"
+        >
           <template #body>
             <div class="space-y-4">
-              <UFormField :label="t('shows_call.presets.preset_name')" required>
-                <UInput
-                  v-model="presetName"
-                  :placeholder="t('shows_call.presets.preset_name_placeholder')"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ t('shows_call.presets.save_before_submit_desc') }}
+              </p>
 
-              <!-- Option de mise à jour si des presets existent -->
-              <div v-if="presets.length > 0" class="space-y-2">
-                <UFormField :label="t('shows_call.presets.update_existing')">
-                  <USelect
-                    v-model="updatePresetId"
-                    :items="updatePresetItems"
-                    :placeholder="t('shows_call.presets.new_preset')"
-                    value-key="value"
+              <!-- Cas : preset modifié → proposer mise à jour ou nouveau -->
+              <template v-if="presetModified">
+                <div class="space-y-3">
+                  <UButton
+                    block
+                    color="primary"
+                    variant="soft"
+                    icon="i-heroicons-arrow-path"
+                    :loading="savingPreset"
+                    @click="savePresetAndSubmit('update')"
+                  >
+                    {{
+                      t('shows_call.presets.update_preset_name', {
+                        name: loadedPresetName,
+                      })
+                    }}
+                  </UButton>
+
+                  <UFormField :label="t('shows_call.presets.or_save_new')">
+                    <div class="flex gap-2">
+                      <UInput
+                        v-model="presetName"
+                        :placeholder="t('shows_call.presets.preset_name_placeholder')"
+                        size="lg"
+                        class="flex-1"
+                      />
+                      <UButton
+                        color="primary"
+                        icon="i-heroicons-bookmark"
+                        :loading="savingPreset"
+                        :disabled="!presetName.trim()"
+                        @click="savePresetAndSubmit('new')"
+                      >
+                        {{ t('common.save') }}
+                      </UButton>
+                    </div>
+                  </UFormField>
+                </div>
+              </template>
+
+              <!-- Cas : pas de preset → proposer de sauvegarder comme nouveau -->
+              <template v-else>
+                <UFormField :label="t('shows_call.presets.preset_name')">
+                  <UInput
+                    v-model="presetName"
+                    :placeholder="t('shows_call.presets.preset_name_placeholder')"
                     size="lg"
                     class="w-full"
                   />
                 </UFormField>
-              </div>
+              </template>
             </div>
           </template>
 
@@ -273,417 +728,28 @@
               <UButton color="neutral" variant="ghost" @click="showSavePresetModal = false">
                 {{ t('common.cancel') }}
               </UButton>
+              <!-- Bouton sauvegarder + envoyer (cas sans preset) -->
               <UButton
+                v-if="!presetModified && presetName.trim()"
                 color="primary"
                 :loading="savingPreset"
-                :disabled="!presetName.trim() && !updatePresetId"
                 icon="i-heroicons-bookmark"
-                @click="savePreset"
+                @click="savePresetAndSubmit('new')"
               >
-                {{
-                  updatePresetId
-                    ? t('shows_call.presets.update_preset')
-                    : t('shows_call.presets.save_preset')
-                }}
+                {{ t('shows_call.presets.save_and_submit') }}
+              </UButton>
+              <UButton
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-paper-airplane"
+                :loading="submitting"
+                @click="submitWithoutSaving"
+              >
+                {{ t('shows_call.presets.submit_without_saving') }}
               </UButton>
             </div>
           </template>
         </UModal>
-
-        <!-- Formulaire -->
-        <UCard variant="soft">
-          <template #header>
-            <h2 class="text-lg font-semibold">
-              {{ isEditMode ? t('shows_call.edit_form_title') : t('shows_call.form_title') }}
-            </h2>
-          </template>
-
-          <UForm
-            :state="formState"
-            :validate="validate"
-            class="space-y-6"
-            @submit="submitApplication"
-          >
-            <!-- Section: Informations personnelles -->
-            <div class="space-y-4">
-              <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                {{ t('shows_call.personal_info') }}
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ t('shows_call.personal_info_desc') }}
-              </p>
-
-              <div class="grid grid-cols-2 gap-4">
-                <UFormField :label="t('common.last_name')" name="lastName" required>
-                  <UInput
-                    v-model="formState.lastName"
-                    :placeholder="t('shows_call.form.last_name_placeholder')"
-                    size="lg"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField :label="t('common.first_name')" name="firstName" required>
-                  <UInput
-                    v-model="formState.firstName"
-                    :placeholder="t('shows_call.form.first_name_placeholder')"
-                    size="lg"
-                    class="w-full"
-                  />
-                </UFormField>
-              </div>
-
-              <UFormField :label="t('common.phone')" name="phone" required>
-                <UInput
-                  v-model="formState.phone"
-                  type="tel"
-                  :placeholder="t('shows_call.form.phone_placeholder')"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
-
-            <!-- Section: Informations artiste -->
-            <div class="space-y-4">
-              <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                {{ t('gestion.shows_call.artist_info') }}
-              </h3>
-
-              <UFormField
-                :label="t('gestion.shows_call.form.artist_name')"
-                name="artistName"
-                required
-              >
-                <UInput
-                  v-model="formState.artistName"
-                  :placeholder="t('shows_call.form.artist_name_placeholder')"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField :label="t('gestion.shows_call.form.artist_bio')" name="artistBio">
-                <UTextarea
-                  v-model="formState.artistBio"
-                  :placeholder="t('shows_call.form.artist_bio_placeholder')"
-                  :rows="3"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField
-                v-if="showCall.askPortfolioUrl"
-                :label="t('gestion.shows_call.form.portfolio_url')"
-                name="portfolioUrl"
-              >
-                <UInput
-                  v-model="formState.portfolioUrl"
-                  type="url"
-                  placeholder="https://"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField
-                v-if="showCall.askVideoUrl"
-                :label="t('gestion.shows_call.form.video_url')"
-                name="videoUrl"
-              >
-                <UInput
-                  v-model="formState.videoUrl"
-                  type="url"
-                  placeholder="https://"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField
-                v-if="showCall.askSocialLinks"
-                :label="t('shows_call.form.social_links')"
-                name="socialLinks"
-              >
-                <UTextarea
-                  v-model="formState.socialLinks"
-                  :placeholder="t('shows_call.form.social_links_placeholder')"
-                  :rows="3"
-                  size="lg"
-                  class="w-full"
-                />
-                <template #hint>
-                  <span class="text-xs text-gray-500">
-                    {{ t('shows_call.form.social_links_hint') }}
-                  </span>
-                </template>
-              </UFormField>
-            </div>
-
-            <!-- Section: Informations spectacle -->
-            <div class="space-y-4">
-              <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                {{ t('gestion.shows_call.show_info') }}
-              </h3>
-
-              <UFormField
-                :label="t('gestion.shows_call.form.show_title')"
-                name="showTitle"
-                required
-              >
-                <UInput
-                  v-model="formState.showTitle"
-                  :placeholder="t('shows_call.form.show_title_placeholder')"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField
-                :label="t('gestion.shows_call.form.description')"
-                name="showDescription"
-                required
-              >
-                <UTextarea
-                  v-model="formState.showDescription"
-                  :placeholder="t('shows_call.form.show_description_placeholder')"
-                  :rows="5"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <div class="grid grid-cols-2 gap-4">
-                <UFormField
-                  :label="t('gestion.shows_call.form.duration')"
-                  name="showDuration"
-                  required
-                >
-                  <UInput
-                    v-model.number="formState.showDuration"
-                    type="number"
-                    min="1"
-                    max="180"
-                    :placeholder="t('shows_call.form.duration_placeholder')"
-                    size="lg"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField :label="t('gestion.shows_call.form.category')" name="showCategory">
-                  <UInput
-                    v-model="formState.showCategory"
-                    :placeholder="t('shows_call.form.category_placeholder')"
-                    size="lg"
-                    class="w-full"
-                  />
-                </UFormField>
-              </div>
-
-              <UFormField
-                v-if="showCall.askTechnicalNeeds"
-                :label="t('gestion.shows_call.form.technical_needs')"
-                name="technicalNeeds"
-              >
-                <UTextarea
-                  v-model="formState.technicalNeeds"
-                  :placeholder="t('shows_call.form.technical_needs_placeholder')"
-                  :rows="3"
-                  size="lg"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
-
-            <!-- Section: Personnes supplémentaires -->
-            <div class="space-y-4">
-              <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                {{ t('shows_call.additional_performers') }}
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ t('shows_call.additional_performers_desc') }}
-              </p>
-
-              <UFormField
-                :label="t('shows_call.form.additional_performers_count')"
-                name="additionalPerformersCount"
-                required
-              >
-                <UInput
-                  v-model.number="formState.additionalPerformersCount"
-                  type="number"
-                  min="0"
-                  max="50"
-                  :placeholder="t('shows_call.form.additional_performers_count_placeholder')"
-                  size="lg"
-                  class="w-full max-w-xs"
-                />
-                <template #hint>
-                  <span class="text-xs text-gray-500">
-                    {{ t('shows_call.form.additional_performers_count_hint') }}
-                  </span>
-                </template>
-              </UFormField>
-
-              <!-- Liste des personnes supplémentaires -->
-              <div v-if="formState.additionalPerformersCount > 0" class="space-y-4">
-                <div
-                  v-for="(performer, index) in formState.additionalPerformers"
-                  :key="index"
-                  class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3"
-                >
-                  <div class="flex items-center justify-between">
-                    <h4 class="font-medium text-gray-700 dark:text-gray-300">
-                      {{ t('shows_call.form.performer_number', { number: index + 1 }) }}
-                    </h4>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3">
-                    <UFormField
-                      :label="t('common.last_name')"
-                      :name="`additionalPerformers.${index}.lastName`"
-                      required
-                    >
-                      <UInput
-                        v-model="performer.lastName"
-                        :placeholder="t('shows_call.form.last_name_placeholder')"
-                        size="lg"
-                        class="w-full"
-                      />
-                    </UFormField>
-
-                    <UFormField
-                      :label="t('common.first_name')"
-                      :name="`additionalPerformers.${index}.firstName`"
-                      required
-                    >
-                      <UInput
-                        v-model="performer.firstName"
-                        :placeholder="t('shows_call.form.first_name_placeholder')"
-                        size="lg"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <UFormField
-                    :label="t('common.email')"
-                    :name="`additionalPerformers.${index}.email`"
-                    required
-                  >
-                    <UInput
-                      v-model="performer.email"
-                      type="email"
-                      :placeholder="t('shows_call.form.email_placeholder')"
-                      size="lg"
-                      class="w-full"
-                    />
-                  </UFormField>
-
-                  <UFormField
-                    :label="t('common.phone')"
-                    :name="`additionalPerformers.${index}.phone`"
-                    required
-                  >
-                    <UInput
-                      v-model="performer.phone"
-                      type="tel"
-                      :placeholder="t('shows_call.form.phone_placeholder')"
-                      size="lg"
-                      class="w-full"
-                    />
-                  </UFormField>
-                </div>
-              </div>
-            </div>
-
-            <!-- Section: Logistique -->
-            <div v-if="showCall.askAccommodation || showCall.askDepartureCity" class="space-y-4">
-              <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                {{ t('gestion.shows_call.logistics') }}
-              </h3>
-
-              <!-- Ville de départ -->
-              <UFormField
-                v-if="showCall.askDepartureCity"
-                :label="t('shows_call.form.departure_city')"
-                name="departureCity"
-              >
-                <UInput
-                  v-model="formState.departureCity"
-                  :placeholder="t('shows_call.form.departure_city_placeholder')"
-                  size="lg"
-                  class="w-full"
-                />
-                <template #hint>
-                  <span class="text-xs text-gray-500">
-                    {{ t('shows_call.form.departure_city_hint') }}
-                  </span>
-                </template>
-              </UFormField>
-
-              <!-- Hébergement -->
-              <template v-if="showCall.askAccommodation">
-                <UFormField name="accommodationNeeded">
-                  <UCheckbox
-                    v-model="formState.accommodationNeeded"
-                    :label="t('shows_call.form.accommodation_needed')"
-                  />
-                </UFormField>
-
-                <UFormField
-                  v-if="formState.accommodationNeeded"
-                  :label="t('shows_call.form.accommodation_notes')"
-                  name="accommodationNotes"
-                >
-                  <UTextarea
-                    v-model="formState.accommodationNotes"
-                    :placeholder="t('shows_call.form.accommodation_notes_placeholder')"
-                    :rows="2"
-                    size="lg"
-                    class="w-full"
-                  />
-                </UFormField>
-              </template>
-            </div>
-
-            <!-- Bouton de soumission -->
-            <div class="flex justify-end gap-3 pt-4 border-t">
-              <UButton
-                v-if="authStore.isArtist"
-                type="button"
-                variant="soft"
-                color="neutral"
-                icon="i-heroicons-bookmark"
-                @click="showSavePresetModal = true"
-              >
-                {{ t('shows_call.presets.save_as_preset') }}
-              </UButton>
-              <div class="flex-1" />
-              <UButton
-                type="button"
-                color="neutral"
-                variant="ghost"
-                :to="`/editions/${editionId}/shows-call`"
-              >
-                {{ t('common.cancel') }}
-              </UButton>
-              <UButton
-                type="submit"
-                color="primary"
-                :loading="submitting"
-                icon="i-heroicons-paper-airplane"
-              >
-                {{
-                  isEditMode
-                    ? t('shows_call.update_application')
-                    : t('shows_call.submit_application')
-                }}
-              </UButton>
-            </div>
-          </UForm>
-        </UCard>
       </template>
     </div>
   </div>
@@ -735,28 +801,86 @@ const formState = reactive({
   accommodationNeeded: false,
   accommodationNotes: '',
   departureCity: '',
-  // Personnes supplémentaires
-  additionalPerformersCount: 0,
+  // Artistes du spectacle
+  additionalPerformersCount: 1,
   additionalPerformers: [] as AdditionalPerformer[],
 })
 
 const existingApplication = ref<ShowApplication | null>(null)
+const applicantIsPerformer = ref(false)
+const showCustomCount = ref(false)
+
+function selectPerformersCount(n: number) {
+  formState.additionalPerformersCount = n
+  showCustomCount.value = false
+}
+
+// Pré-remplir Personne 1 quand la coche "Je participe" est activée
+watch(applicantIsPerformer, (isPerformer) => {
+  if (formState.additionalPerformers.length === 0) return
+  if (isPerformer) {
+    const user = authStore.user
+    if (user) {
+      formState.additionalPerformers[0].lastName = user.nom || ''
+      formState.additionalPerformers[0].firstName = user.prenom || ''
+      formState.additionalPerformers[0].email = user.email || ''
+      formState.additionalPerformers[0].phone = user.telephone || user.phone || ''
+    }
+  } else {
+    formState.additionalPerformers[0].lastName = ''
+    formState.additionalPerformers[0].firstName = ''
+    formState.additionalPerformers[0].email = ''
+    formState.additionalPerformers[0].phone = ''
+  }
+})
 
 // Presets de spectacle
 const presets = ref<ShowPreset[]>([])
 const selectedPresetId = ref<number | null>(null)
 const showSavePresetModal = ref(false)
 const presetName = ref('')
-const updatePresetId = ref<number | null>(null)
 const savingPreset = ref(false)
 const deletingPreset = ref(false)
 
+// Snapshot du preset chargé pour détecter les modifications
+const loadedPresetSnapshot = ref<Record<string, string> | null>(null)
+const loadedPresetName = ref('')
+
 const presetItems = computed(() => presets.value.map((p) => ({ label: p.name, value: p.id })))
 
-const updatePresetItems = computed(() => [
-  { label: t('shows_call.presets.new_preset'), value: null },
-  ...presets.value.map((p) => ({ label: p.name, value: p.id })),
-])
+// Champs du preset à comparer (uniquement les champs que le preset gère)
+const presetFieldKeys = [
+  'artistName',
+  'artistBio',
+  'portfolioUrl',
+  'videoUrl',
+  'socialLinks',
+  'showTitle',
+  'showDescription',
+  'showDuration',
+  'showCategory',
+  'technicalNeeds',
+  'additionalPerformersCount',
+] as const
+
+function buildSnapshot(source: Record<string, any>, performers: any[]): Record<string, string> {
+  const snap: Record<string, string> = {}
+  for (const key of presetFieldKeys) {
+    snap[key] = JSON.stringify(source[key] ?? '')
+  }
+  snap.additionalPerformers = JSON.stringify(performers.map((p: any) => ({ ...toRaw(p) })))
+  return snap
+}
+
+function getPresetSnapshot(): Record<string, string> {
+  return buildSnapshot(formState, toRaw(formState.additionalPerformers))
+}
+
+const presetModified = computed(() => {
+  if (!loadedPresetSnapshot.value) return false
+  const current = getPresetSnapshot()
+  return Object.keys(current).some((key) => current[key] !== loadedPresetSnapshot.value![key])
+})
 
 function loadPreset(presetId: number | null) {
   const preset = presets.value.find((p) => p.id === presetId)
@@ -777,6 +901,13 @@ function loadPreset(presetId: number | null) {
     formState.additionalPerformers = preset.additionalPerformers.map((p) => ({ ...p }))
   }
 
+  // Sauvegarder le snapshot directement depuis les données du preset (pas du formulaire réactif)
+  loadedPresetName.value = preset.name
+  loadedPresetSnapshot.value = buildSnapshot(
+    preset as any,
+    Array.isArray(preset.additionalPerformers) ? preset.additionalPerformers : []
+  )
+
   useToast().add({
     title: t('shows_call.presets.preset_loaded'),
     description: t('shows_call.presets.preset_loaded_desc'),
@@ -786,9 +917,7 @@ function loadPreset(presetId: number | null) {
 
 function buildPresetBody() {
   return {
-    name: updatePresetId.value
-      ? presets.value.find((p) => p.id === updatePresetId.value)?.name || presetName.value.trim()
-      : presetName.value.trim(),
+    name: presetName.value.trim(),
     artistName: formState.artistName,
     artistBio: formState.artistBio || null,
     portfolioUrl: formState.portfolioUrl || null,
@@ -809,30 +938,25 @@ function buildPresetBody() {
   }
 }
 
-async function savePreset() {
-  const isUpdate = !!updatePresetId.value
-  const name = isUpdate
-    ? presets.value.find((p) => p.id === updatePresetId.value)?.name
-    : presetName.value.trim()
-
-  if (!name) return
-
+async function savePresetAndSubmit(mode: 'update' | 'new') {
   savingPreset.value = true
   try {
     const body = buildPresetBody()
-    if (isUpdate) {
+    if (mode === 'update' && selectedPresetId.value) {
+      body.name = loadedPresetName.value
       const response = await $fetch<{ data: { preset: ShowPreset } }>(
-        `/api/profile/show-presets/${updatePresetId.value}`,
+        `/api/profile/show-presets/${selectedPresetId.value}`,
         { method: 'PUT', body }
       )
-      const idx = presets.value.findIndex((p) => p.id === updatePresetId.value)
+      const idx = presets.value.findIndex((p) => p.id === selectedPresetId.value)
       if (idx !== -1) presets.value[idx] = response.data.preset
       useToast().add({
         title: t('shows_call.presets.preset_updated'),
         description: t('shows_call.presets.preset_updated_desc'),
         color: 'success',
       })
-    } else {
+    } else if (presetName.value.trim()) {
+      body.name = presetName.value.trim()
       const response = await $fetch<{ data: { preset: ShowPreset } }>('/api/profile/show-presets', {
         method: 'POST',
         body,
@@ -847,7 +971,8 @@ async function savePreset() {
     }
     showSavePresetModal.value = false
     presetName.value = ''
-    updatePresetId.value = null
+    // Envoyer la candidature après la sauvegarde du preset
+    doSubmitApplication()
   } catch {
     useToast().add({
       title: t('shows_call.presets.preset_save_error'),
@@ -856,6 +981,11 @@ async function savePreset() {
   } finally {
     savingPreset.value = false
   }
+}
+
+function submitWithoutSaving() {
+  showSavePresetModal.value = false
+  doSubmitApplication()
 }
 
 async function confirmDeletePreset() {
@@ -1206,13 +1336,26 @@ const { execute: executeUpdateApplication, loading: isUpdating } = useApiAction(
 
 const submitting = computed(() => isCreating.value || isUpdating.value)
 
-// Soumettre ou modifier la candidature
-function submitApplication(_event: FormSubmitEvent<typeof formState>) {
+// Envoi effectif de la candidature
+function doSubmitApplication() {
   if (isEditMode.value) {
     executeUpdateApplication()
   } else {
     executeCreateApplication()
   }
+}
+
+// Intercepter la soumission pour proposer la sauvegarde de preset
+function submitApplication(_event: FormSubmitEvent<typeof formState>) {
+  // Si un preset est chargé et non modifié → envoi direct
+  if (selectedPresetId.value && !presetModified.value) {
+    doSubmitApplication()
+    return
+  }
+
+  // Sinon → afficher la modal de sauvegarde preset
+  presetName.value = ''
+  showSavePresetModal.value = true
 }
 
 // SEO
