@@ -468,6 +468,22 @@
         "rate_updated": "Taryfa zaktualizowana",
         "updated": "Wydatek zaktualizowany"
       },
+      "time_estimate": {
+        "current_estimate": "Bieżące oszacowanie: ~{count}h",
+        "description": "Skonfiguruj licznik czasu zainwestowanego w projekt.",
+        "fixed_hours": "Zarejestrowane godziny",
+        "fixed_hours_hint": "Liczba godzin przepracowanych na dzień referencyjny",
+        "load_error": "Błąd podczas ładowania szacunku czasu",
+        "not_configured": "Szacunek czasu nieskonfigurowany",
+        "per_week": "h/tydz.",
+        "reference_date": "Data referencyjna",
+        "reference_date_hint": "Data, na którą licznik stały jest ważny",
+        "save_error": "Błąd podczas zapisywania",
+        "save_success": "Szacunek czasu zapisany",
+        "title": "Szacunek poświęconego czasu",
+        "weekly_hours": "Godziny tygodniowo",
+        "weekly_hours_hint": "Szacowany czas poświęcany tygodniowo od daty referencyjnej"
+      },
       "title": "Koszty projektu"
     },
     "promote_to_admin": "Nadaj uprawnienia super administratora",

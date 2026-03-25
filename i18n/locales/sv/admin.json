@@ -468,6 +468,22 @@
         "rate_updated": "Tariff uppdaterad",
         "updated": "Utgift uppdaterad"
       },
+      "time_estimate": {
+        "current_estimate": "Nuvarande uppskattning: ~{count}h",
+        "description": "Konfigurera räknaren för tid investerad i projektet.",
+        "fixed_hours": "Registrerade timmar",
+        "fixed_hours_hint": "Antal timmar nedlagda vid referensdatumet",
+        "load_error": "Fel vid laddning av tidsuppskattning",
+        "not_configured": "Tidsuppskattning ej konfigurerad",
+        "per_week": "h/vecka",
+        "reference_date": "Referensdatum",
+        "reference_date_hint": "Datum då den fasta räknaren är giltig",
+        "save_error": "Fel vid sparande",
+        "save_success": "Tidsuppskattning sparad",
+        "title": "Uppskattning av nedlagd tid",
+        "weekly_hours": "Timmar per vecka",
+        "weekly_hours_hint": "Uppskattad tid per vecka sedan referensdatumet"
+      },
       "title": "Projektkostnader"
     },
     "promote_to_admin": "Befordra superadministratör",

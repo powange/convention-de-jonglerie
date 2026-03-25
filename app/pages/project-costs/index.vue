@@ -62,15 +62,21 @@
           >
             {{ Math.abs(balance).toFixed(2) }} {{ mainCurrency }}
           </p>
+          <p
+            v-if="balance > 0 && totalMonthly > 0"
+            class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+          >
+            {{ t('project_costs.months_covered') }} : {{ autonomyLabel }}
+          </p>
         </div>
       </UCard>
-      <UCard v-if="balance > 0 && totalMonthly > 0" variant="soft">
+      <UCard v-if="donations && donations.estimatedHours" variant="soft">
         <div class="text-center">
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
-            {{ t('project_costs.months_covered') }}
+            {{ t('project_costs.estimated_time') }}
           </p>
-          <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {{ autonomyLabel }}
+          <p class="text-2xl font-bold text-violet-600 dark:text-violet-400">
+            ~{{ t('project_costs.estimated_time_hours', { count: donations.estimatedHours }) }}
           </p>
         </div>
       </UCard>
@@ -112,17 +118,15 @@
           </div>
 
           <!-- Tarif actuel -->
-          <template v-for="currentRate in [getCurrentRate(expense)]" :key="expense.id">
-            <div v-if="currentRate" class="text-right shrink-0">
-              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                {{ parseFloat(currentRate.amount).toFixed(2) }}
-                {{ currentRate.currency }}
-              </p>
-              <p class="text-sm text-gray-500">
-                {{ periodLabel(currentRate.period) }}
-              </p>
-            </div>
-          </template>
+          <div v-if="getCurrentRate(expense)" class="text-right shrink-0">
+            <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+              {{ parseFloat(getCurrentRate(expense)!.amount).toFixed(2) }}
+              {{ getCurrentRate(expense)!.currency }}
+            </p>
+            <p class="text-sm text-gray-500">
+              {{ periodLabel(getCurrentRate(expense)!.period) }}
+            </p>
+          </div>
         </div>
 
         <!-- Historique des tarifs -->
@@ -431,6 +435,7 @@ const { data: donationsData } = await useFetch<{
   totalCents: number
   totalNetCents: number
   totalCostCents: number
+  estimatedHours: number | null
 }>('/api/project-costs/donations')
 
 const donations = computed(() => donationsData.value)

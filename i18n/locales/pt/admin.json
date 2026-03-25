@@ -468,6 +468,22 @@
         "rate_updated": "Tarifa atualizada",
         "updated": "Despesa atualizada"
       },
+      "time_estimate": {
+        "current_estimate": "Estimativa atual: ~{count}h",
+        "description": "Configure o contador de tempo investido no projeto.",
+        "fixed_hours": "Horas registadas",
+        "fixed_hours_hint": "Número de horas gastas na data de referência",
+        "load_error": "Erro ao carregar a estimativa de tempo",
+        "not_configured": "Estimativa de tempo não configurada",
+        "per_week": "h/sem.",
+        "reference_date": "Data de referência",
+        "reference_date_hint": "Data em que o contador fixo é válido",
+        "save_error": "Erro ao guardar",
+        "save_success": "Estimativa de tempo guardada",
+        "title": "Estimativa do tempo dedicado",
+        "weekly_hours": "Horas por semana",
+        "weekly_hours_hint": "Estimativa do tempo dedicado por semana desde a data de referência"
+      },
       "title": "Custos do projeto"
     },
     "promote_to_admin": "Promover a super administrador",

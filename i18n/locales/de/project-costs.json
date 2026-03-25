@@ -33,6 +33,8 @@
       "total_received": "{amount} € erhalten"
     },
     "description": "Transparenz über die tatsächlichen Betriebskosten der Plattform.",
+    "estimated_time": "Investierte Zeit",
+    "estimated_time_hours": "{count} Stunden",
     "months_covered": "Geschätzte Autonomie",
     "no_expenses": "Noch keine Ausgaben erfasst.",
     "one_time": "Einmalig",

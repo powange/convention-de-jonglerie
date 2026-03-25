@@ -468,6 +468,22 @@
         "rate_updated": "Tarief bijgewerkt",
         "updated": "Uitgave bijgewerkt"
       },
+      "time_estimate": {
+        "current_estimate": "Huidige schatting: ~{count}u",
+        "description": "Configureer de teller voor geïnvesteerde tijd in het project.",
+        "fixed_hours": "Geregistreerde uren",
+        "fixed_hours_hint": "Aantal bestede uren op de referentiedatum",
+        "load_error": "Fout bij het laden van de tijdschatting",
+        "not_configured": "Tijdschatting niet geconfigureerd",
+        "per_week": "u/week",
+        "reference_date": "Referentiedatum",
+        "reference_date_hint": "Datum waarop de vaste teller geldig is",
+        "save_error": "Fout bij het opslaan",
+        "save_success": "Tijdschatting opgeslagen",
+        "title": "Schatting van bestede tijd",
+        "weekly_hours": "Uren per week",
+        "weekly_hours_hint": "Geschatte tijd per week sinds de referentiedatum"
+      },
       "title": "Projectkosten"
     },
     "promote_to_admin": "Promoveren tot super beheerder",

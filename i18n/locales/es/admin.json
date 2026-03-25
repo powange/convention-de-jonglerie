@@ -468,6 +468,22 @@
         "rate_updated": "Tarifa actualizada",
         "updated": "Gasto actualizado"
       },
+      "time_estimate": {
+        "current_estimate": "Estimación actual: ~{count}h",
+        "description": "Configure el contador de tiempo invertido en el proyecto.",
+        "fixed_hours": "Horas registradas",
+        "fixed_hours_hint": "Número de horas dedicadas a la fecha de referencia",
+        "load_error": "Error al cargar la estimación de tiempo",
+        "not_configured": "Estimación de tiempo no configurada",
+        "per_week": "h/sem.",
+        "reference_date": "Fecha de referencia",
+        "reference_date_hint": "Fecha en la que el contador fijo es válido",
+        "save_error": "Error al guardar",
+        "save_success": "Estimación de tiempo guardada",
+        "title": "Estimación del tiempo dedicado",
+        "weekly_hours": "Horas por semana",
+        "weekly_hours_hint": "Estimación del tiempo dedicado por semana desde la fecha de referencia"
+      },
       "title": "Costes del proyecto"
     },
     "promote_to_admin": "Promover a super admin",

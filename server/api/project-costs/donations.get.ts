@@ -55,7 +55,7 @@ export default wrapApiHandler(
       select: { id: true },
     })
 
-    const [donationsResult, expenses] = await Promise.all([
+    const [donationsResult, expenses, timeEstimate] = await Promise.all([
       prisma.coffeeDonation.aggregate({
         _sum: { quantity: true, totalCents: true, netCents: true },
         _count: true,
@@ -68,6 +68,7 @@ export default wrapApiHandler(
           },
         },
       }),
+      prisma.timeEstimateConfig.findFirst(),
     ])
 
     // Calculer le coût total cumulé exact depuis le début
@@ -78,6 +79,21 @@ export default wrapApiHandler(
       }
     }
 
+    // Calcul du temps estimé
+    let estimatedHours: number | null = null
+    if (timeEstimate) {
+      const refDate = new Date(timeEstimate.referenceDate)
+      const now = new Date()
+      const weeksSinceRef = Math.max(
+        0,
+        (now.getTime() - refDate.getTime()) / (7 * 24 * 60 * 60 * 1000)
+      )
+      estimatedHours = Math.round(
+        parseFloat(String(timeEstimate.fixedHours)) +
+          weeksSinceRef * parseFloat(String(timeEstimate.weeklyHours))
+      )
+    }
+
     return {
       donationsEnabled: !!stripeConfig,
       totalCoffees: donationsResult._sum.quantity || 0,
@@ -85,6 +101,7 @@ export default wrapApiHandler(
       totalCents: donationsResult._sum.totalCents || 0,
       totalNetCents: donationsResult._sum.netCents || 0,
       totalCostCents,
+      estimatedHours,
     }
   },
   { operationName: 'GET project-costs donations' }

@@ -468,6 +468,22 @@
         "rate_updated": "Tarif opdateret",
         "updated": "Udgift opdateret"
       },
+      "time_estimate": {
+        "current_estimate": "Nuværende estimat: ~{count}t",
+        "description": "Konfigurer tælleren for tid investeret i projektet.",
+        "fixed_hours": "Registrerede timer",
+        "fixed_hours_hint": "Antal timer brugt pr. referencedato",
+        "load_error": "Fejl ved indlæsning af tidsestimat",
+        "not_configured": "Tidsestimat ikke konfigureret",
+        "per_week": "t/uge",
+        "reference_date": "Referencedato",
+        "reference_date_hint": "Dato hvor den faste tæller er gyldig",
+        "save_error": "Fejl ved lagring",
+        "save_success": "Tidsestimat gemt",
+        "title": "Estimat af brugt tid",
+        "weekly_hours": "Timer pr. uge",
+        "weekly_hours_hint": "Estimeret tid brugt pr. uge siden referencedatoen"
+      },
       "title": "Projektomkostninger"
     },
     "promote_to_admin": "Forfrem til superadmin",

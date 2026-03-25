@@ -33,6 +33,8 @@
       "total_received": "€ {amount} ontvangen"
     },
     "description": "Transparantie over de werkelijke exploitatiekosten van het platform.",
+    "estimated_time": "Geïnvesteerde tijd",
+    "estimated_time_hours": "{count} uur",
     "months_covered": "Geschatte autonomie",
     "no_expenses": "Nog geen uitgaven geregistreerd.",
     "one_time": "Eenmalig",

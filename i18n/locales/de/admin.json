@@ -468,6 +468,22 @@
         "rate_updated": "Tarif aktualisiert",
         "updated": "Ausgabe aktualisiert"
       },
+      "time_estimate": {
+        "current_estimate": "Aktuelle Schätzung: ~{count}h",
+        "description": "Konfigurieren Sie den Zähler für die in das Projekt investierte Zeit.",
+        "fixed_hours": "Erfasste Stunden",
+        "fixed_hours_hint": "Anzahl der Stunden zum Referenzdatum",
+        "load_error": "Fehler beim Laden der Zeitschätzung",
+        "not_configured": "Zeitschätzung nicht konfiguriert",
+        "per_week": "h/Wo.",
+        "reference_date": "Referenzdatum",
+        "reference_date_hint": "Datum, an dem der feste Zähler gültig ist",
+        "save_error": "Fehler beim Speichern",
+        "save_success": "Zeitschätzung gespeichert",
+        "title": "Schätzung der aufgewendeten Zeit",
+        "weekly_hours": "Stunden pro Woche",
+        "weekly_hours_hint": "Geschätzte wöchentliche Zeit seit dem Referenzdatum"
+      },
       "title": "Projektkosten"
     },
     "promote_to_admin": "Zum Super-Admin befördern",

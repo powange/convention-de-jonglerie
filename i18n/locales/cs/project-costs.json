@@ -33,6 +33,8 @@
       "total_received": "{amount} € přijato"
     },
     "description": "Transparentnost skutečných provozních nákladů platformy.",
+    "estimated_time": "Investovaný čas",
+    "estimated_time_hours": "{count} hodin",
     "months_covered": "Odhadovaná autonomie",
     "no_expenses": "Zatím žádné výdaje zaznamenány.",
     "one_time": "Jednorázově",

@@ -33,6 +33,8 @@
       "total_received": "{amount} € modtaget"
     },
     "description": "Gennemsigtighed om de reelle driftsomkostninger for platformen.",
+    "estimated_time": "Investeret tid",
+    "estimated_time_hours": "{count} timer",
     "months_covered": "Estimeret autonomi",
     "no_expenses": "Ingen udgifter registreret endnu.",
     "one_time": "Engangs",

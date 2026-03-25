@@ -181,6 +181,150 @@
       </div>
     </UCard>
 
+    <!-- Estimation du temps passé -->
+    <UCard variant="outline" class="mb-8">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <UIcon name="i-heroicons-clock" class="w-6 h-6 text-violet-600" />
+            <div>
+              <h3 class="text-lg font-semibold">
+                {{ t('admin.project_costs.time_estimate.title') }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                {{ t('admin.project_costs.time_estimate.description') }}
+              </p>
+            </div>
+          </div>
+          <UBadge
+            v-if="timeEstimate && currentEstimatedHours !== null"
+            :label="
+              t('admin.project_costs.time_estimate.current_estimate', {
+                count: currentEstimatedHours,
+              })
+            "
+            color="info"
+            variant="subtle"
+          />
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <div v-if="timeEstimate && !editingTimeEstimate" class="space-y-2 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="font-medium w-48">{{
+              t('admin.project_costs.time_estimate.fixed_hours')
+            }}</span>
+            <span>{{ timeEstimate.fixedHours }}h</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-medium w-48">{{
+              t('admin.project_costs.time_estimate.reference_date')
+            }}</span>
+            <span>{{ formatDate(timeEstimate.referenceDate) }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-medium w-48">{{
+              t('admin.project_costs.time_estimate.weekly_hours')
+            }}</span>
+            <span
+              >{{ timeEstimate.weeklyHours
+              }}{{ t('admin.project_costs.time_estimate.per_week') }}</span
+            >
+          </div>
+          <div class="mt-4">
+            <UButton
+              variant="soft"
+              color="neutral"
+              icon="i-heroicons-pencil-square"
+              @click="startEditTimeEstimate"
+            >
+              {{ t('common.edit') }}
+            </UButton>
+          </div>
+        </div>
+
+        <div v-else class="space-y-4">
+          <p v-if="!timeEstimate" class="text-sm text-gray-500 italic">
+            {{ t('admin.project_costs.time_estimate.not_configured') }}
+          </p>
+          <UFormField
+            :label="t('admin.project_costs.time_estimate.fixed_hours')"
+            :hint="t('admin.project_costs.time_estimate.fixed_hours_hint')"
+            required
+          >
+            <UInput
+              v-model.number="timeEstimateForm.fixedHours"
+              type="number"
+              step="0.5"
+              min="0"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField
+            :label="t('admin.project_costs.time_estimate.reference_date')"
+            :hint="t('admin.project_costs.time_estimate.reference_date_hint')"
+            required
+          >
+            <UPopover :popper="{ placement: 'bottom-start' }" class="w-full">
+              <UButton
+                icon="i-heroicons-calendar-days"
+                size="lg"
+                color="neutral"
+                variant="outline"
+                class="w-full justify-start text-left font-normal"
+                :label="
+                  timeEstimateForm.referenceDate
+                    ? formatCalendarDate(timeEstimateForm.referenceDate)
+                    : t('admin.project_costs.rates.select_date')
+                "
+                block
+              />
+              <template #content>
+                <UCalendar v-model="timeEstimateForm.referenceDate" class="p-2" />
+              </template>
+            </UPopover>
+          </UFormField>
+          <UFormField
+            :label="t('admin.project_costs.time_estimate.weekly_hours')"
+            :hint="t('admin.project_costs.time_estimate.weekly_hours_hint')"
+            required
+          >
+            <UInput
+              v-model.number="timeEstimateForm.weeklyHours"
+              type="number"
+              step="0.5"
+              min="0"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <div class="flex gap-3">
+            <UButton
+              v-if="timeEstimate"
+              variant="soft"
+              color="neutral"
+              @click="editingTimeEstimate = false"
+            >
+              {{ $t('common.cancel') }}
+            </UButton>
+            <UButton
+              color="primary"
+              :loading="savingTimeEstimate"
+              :disabled="
+                (!timeEstimateForm.fixedHours && timeEstimateForm.fixedHours !== 0) ||
+                !timeEstimateForm.referenceDate
+              "
+              @click="saveTimeEstimate"
+            >
+              {{ $t('common.save') }}
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </UCard>
+
     <!-- État vide -->
     <div
       v-if="!loading && expenses.length === 0"
@@ -576,6 +720,84 @@ const currencyOptions = [
   { label: 'USD ($)', value: 'USD' },
 ]
 
+// Time estimate config
+interface TimeEstimateData {
+  id: number
+  fixedHours: string
+  referenceDate: string
+  weeklyHours: string
+}
+
+const timeEstimate = ref<TimeEstimateData | null>(null)
+const editingTimeEstimate = ref(false)
+const savingTimeEstimate = ref(false)
+const timeEstimateForm = ref<{
+  fixedHours: number
+  referenceDate: CalendarDate | null
+  weeklyHours: number
+}>({
+  fixedHours: 0,
+  referenceDate: null,
+  weeklyHours: 0,
+})
+
+const currentEstimatedHours = computed(() => {
+  if (!timeEstimate.value) return null
+  const refDate = new Date(timeEstimate.value.referenceDate)
+  const now = new Date()
+  const weeksSinceRef = Math.max(0, (now.getTime() - refDate.getTime()) / (7 * 24 * 60 * 60 * 1000))
+  return Math.round(
+    parseFloat(timeEstimate.value.fixedHours) +
+      weeksSinceRef * parseFloat(timeEstimate.value.weeklyHours)
+  )
+})
+
+const startEditTimeEstimate = () => {
+  if (timeEstimate.value) {
+    timeEstimateForm.value = {
+      fixedHours: parseFloat(timeEstimate.value.fixedHours),
+      referenceDate: dateToCalendarDate(timeEstimate.value.referenceDate),
+      weeklyHours: parseFloat(timeEstimate.value.weeklyHours),
+    }
+  }
+  editingTimeEstimate.value = true
+}
+
+const loadTimeEstimate = async () => {
+  try {
+    const result: any = await $fetch('/api/admin/project-costs/time-estimate')
+    timeEstimate.value = result.data?.config || result.config || null
+  } catch {
+    toast.add({
+      title: t('admin.project_costs.time_estimate.load_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+const saveTimeEstimate = async () => {
+  if (!timeEstimateForm.value.referenceDate) return
+  savingTimeEstimate.value = true
+  try {
+    await $fetch('/api/admin/project-costs/time-estimate', {
+      method: 'POST',
+      body: {
+        fixedHours: timeEstimateForm.value.fixedHours,
+        referenceDate: timeEstimateForm.value.referenceDate.toString(),
+        weeklyHours: timeEstimateForm.value.weeklyHours,
+      },
+    })
+    toast.add({ title: t('admin.project_costs.time_estimate.save_success'), color: 'success' })
+    editingTimeEstimate.value = false
+    await loadTimeEstimate()
+  } catch {
+    toast.add({ title: t('admin.project_costs.time_estimate.save_error'), color: 'error' })
+  } finally {
+    savingTimeEstimate.value = false
+  }
+}
+
 // Stripe config
 interface StripeConfigData {
   id: number
@@ -662,6 +884,7 @@ const loadExpenses = async () => {
 onMounted(() => {
   loadExpenses()
   loadStripeConfig()
+  loadTimeEstimate()
 })
 
 // Dépense : modal création/édition

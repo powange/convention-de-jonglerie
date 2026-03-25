@@ -33,6 +33,8 @@
       "donations_paused": "Les dons sont actuellement suspendus. Merci pour votre soutien passé !"
     },
     "description": "Transparence sur les coûts réels de fonctionnement de la plateforme.",
+    "estimated_time": "Temps investi",
+    "estimated_time_hours": "{count} heures",
     "months_covered": "Autonomie estimée",
     "no_expenses": "Aucune dépense enregistrée pour le moment.",
     "one_time": "Ponctuel",

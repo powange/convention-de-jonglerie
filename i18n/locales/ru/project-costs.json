@@ -33,6 +33,8 @@
       "total_received": "{amount} € получено"
     },
     "description": "Прозрачность реальных эксплуатационных расходов платформы.",
+    "estimated_time": "Затраченное время",
+    "estimated_time_hours": "{count} часов",
     "months_covered": "Расчётная автономия",
     "no_expenses": "Расходы пока не зарегистрированы.",
     "one_time": "Разовый",

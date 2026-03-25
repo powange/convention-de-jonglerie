@@ -468,6 +468,22 @@
         "rate_updated": "Rate updated",
         "updated": "Expense updated"
       },
+      "time_estimate": {
+        "current_estimate": "Current estimate: ~{count}h",
+        "description": "Configure the time invested counter for the project.",
+        "fixed_hours": "Recorded hours",
+        "fixed_hours_hint": "Number of hours spent as of the reference date",
+        "load_error": "Error loading time estimate",
+        "not_configured": "Time estimate not configured",
+        "per_week": "h/wk",
+        "reference_date": "Reference date",
+        "reference_date_hint": "Date at which the fixed counter is valid",
+        "save_error": "Error saving",
+        "save_success": "Time estimate saved",
+        "title": "Time spent estimate",
+        "weekly_hours": "Hours per week",
+        "weekly_hours_hint": "Estimated time spent per week since the reference date"
+      },
       "title": "Project costs"
     },
     "promote_to_admin": "Promote to super admin",

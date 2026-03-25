@@ -33,6 +33,8 @@
       "total_received": "{amount} € ricevuti"
     },
     "description": "Trasparenza sui costi reali di funzionamento della piattaforma.",
+    "estimated_time": "Tempo investito",
+    "estimated_time_hours": "{count} ore",
     "months_covered": "Autonomia stimata",
     "no_expenses": "Nessuna spesa registrata al momento.",
     "one_time": "Una tantum",

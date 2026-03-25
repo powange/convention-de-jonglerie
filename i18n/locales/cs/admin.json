@@ -468,6 +468,22 @@
         "rate_updated": "Tarif aktualizován",
         "updated": "Výdaj aktualizován"
       },
+      "time_estimate": {
+        "current_estimate": "Aktuální odhad: ~{count}h",
+        "description": "Nastavte počítadlo času investovaného do projektu.",
+        "fixed_hours": "Zaúčtované hodiny",
+        "fixed_hours_hint": "Počet hodin odpracovaných k referenčnímu datu",
+        "load_error": "Chyba při načítání odhadu času",
+        "not_configured": "Odhad času není nakonfigurován",
+        "per_week": "h/týd.",
+        "reference_date": "Referenční datum",
+        "reference_date_hint": "Datum, ke kterému je pevný počítadlo platné",
+        "save_error": "Chyba při ukládání",
+        "save_success": "Odhad času uložen",
+        "title": "Odhad stráveného času",
+        "weekly_hours": "Hodiny za týden",
+        "weekly_hours_hint": "Odhad času stráveného za týden od referenčního data"
+      },
       "title": "Náklady projektu"
     },
     "promote_to_admin": "Povyšování superadmina",

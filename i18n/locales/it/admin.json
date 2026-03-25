@@ -468,6 +468,22 @@
         "rate_updated": "Tariffa aggiornata",
         "updated": "Spesa aggiornata"
       },
+      "time_estimate": {
+        "current_estimate": "Stima attuale: ~{count}h",
+        "description": "Configura il contatore del tempo investito nel progetto.",
+        "fixed_hours": "Ore registrate",
+        "fixed_hours_hint": "Numero di ore trascorse alla data di riferimento",
+        "load_error": "Errore durante il caricamento della stima del tempo",
+        "not_configured": "Stima del tempo non configurata",
+        "per_week": "h/sett.",
+        "reference_date": "Data di riferimento",
+        "reference_date_hint": "Data in cui il contatore fisso è valido",
+        "save_error": "Errore durante il salvataggio",
+        "save_success": "Stima del tempo salvata",
+        "title": "Stima del tempo dedicato",
+        "weekly_hours": "Ore a settimana",
+        "weekly_hours_hint": "Stima del tempo dedicato a settimana dalla data di riferimento"
+      },
       "title": "Costi del progetto"
     },
     "promote_to_admin": "Promuovi super admin",
