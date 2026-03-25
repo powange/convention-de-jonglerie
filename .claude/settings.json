@@ -39,7 +39,8 @@
       "WebFetch(domain:etickets.infomaniak.com)",
       "WebFetch(domain:www.infomaniak.com)",
       "WebFetch(domain:developer.infomaniak.com)",
-      "Bash(node scripts/check-i18n.js --help)"
+      "Bash(node scripts/check-i18n.js --help)",
+      "Bash(npx vue-tsc:*)"
     ],
     "additionalDirectories": [
       "/tmp",

@@ -71,6 +71,42 @@
             />
           </UFormField>
 
+          <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+            <legend class="px-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              {{ $t('gestion.ticketing.infomaniak_guichet_section') }}
+            </legend>
+
+            <UFormField
+              :label="$t('gestion.ticketing.infomaniak_api_key_guichet')"
+              :hint="$t('gestion.ticketing.infomaniak_api_key_guichet_hint')"
+            >
+              <UInput
+                v-model="localConfig.apiKeyGuichet"
+                :placeholder="isEditing && props.config?.hasGuichetKey ? '••••••••••••••••' : ''"
+                icon="i-heroicons-key"
+                type="password"
+                size="lg"
+                class="font-mono w-full"
+              />
+            </UFormField>
+
+            <UFormField
+              :label="$t('gestion.ticketing.infomaniak_app_password')"
+              :hint="$t('gestion.ticketing.infomaniak_app_password_hint')"
+            >
+              <UInput
+                v-model="localConfig.applicationPassword"
+                :placeholder="
+                  isEditing && props.config?.hasApplicationPassword ? '••••••••••••••••' : ''
+                "
+                icon="i-heroicons-lock-closed"
+                type="password"
+                size="lg"
+                class="font-mono w-full"
+              />
+            </UFormField>
+          </fieldset>
+
           <UFormField
             :label="$t('gestion.ticketing.infomaniak_currency')"
             :hint="$t('gestion.ticketing.infomaniak_currency_hint')"
@@ -171,9 +207,13 @@ import { computed, ref, watch } from 'vue'
 
 export interface InfomaniakConfig {
   apiKey: string
+  apiKeyGuichet?: string
+  applicationPassword?: string
   currency: string
   eventId?: number
   eventName?: string
+  hasGuichetKey?: boolean
+  hasApplicationPassword?: boolean
 }
 
 interface InfomaniakEventSummary {
@@ -205,6 +245,8 @@ const isOpen = computed({
 
 const localConfig = ref<InfomaniakConfig>({
   apiKey: '',
+  apiKeyGuichet: '',
+  applicationPassword: '',
   currency: '2',
 })
 
@@ -239,8 +281,10 @@ const saving = ref(false)
 const testing = ref(false)
 const connected = computed(() => availableEvents.value.length > 0)
 
-const canTest = computed(() => localConfig.value.apiKey.trim() !== '')
-const canSave = computed(() => localConfig.value.apiKey.trim() !== '' && !!selectedEventId.value)
+const canTest = computed(() => localConfig.value.apiKey.trim() !== '' || isEditing.value)
+const canSave = computed(
+  () => (localConfig.value.apiKey.trim() !== '' || isEditing.value) && !!selectedEventId.value
+)
 
 watch(
   () => props.config,
@@ -263,7 +307,7 @@ watch(
         localConfig.value = { ...props.config }
         selectedEventId.value = props.config.eventId
       } else {
-        localConfig.value = { apiKey: '', currency: '2' }
+        localConfig.value = { apiKey: '', apiKeyGuichet: '', currency: '2' }
         selectedEventId.value = undefined
         availableEvents.value = []
       }

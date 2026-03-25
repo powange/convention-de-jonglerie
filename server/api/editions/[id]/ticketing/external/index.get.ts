@@ -39,7 +39,7 @@ export default wrapApiHandler(
             eventName: true,
             createdAt: true,
             updatedAt: true,
-            // Ne pas retourner apiKey
+            // Ne pas retourner apiKey, apiKeyGuichet, applicationPassword
           },
         },
       },
@@ -52,9 +52,29 @@ export default wrapApiHandler(
       })
     }
 
+    // Vérifier l'existence des clés guichet séparément (sans les exposer)
+    let hasGuichetKey = false
+    let hasApplicationPassword = false
+    if (config.infomaniakConfig) {
+      const keyCheck = await prisma.infomaniakConfig.findUnique({
+        where: { id: config.infomaniakConfig.id },
+        select: {
+          apiKeyGuichet: true,
+          applicationPassword: true,
+        },
+      })
+      hasGuichetKey = !!keyCheck?.apiKeyGuichet
+      hasApplicationPassword = !!keyCheck?.applicationPassword
+    }
+
     return createSuccessResponse({
       hasConfig: true,
-      config,
+      config: {
+        ...config,
+        infomaniakConfig: config.infomaniakConfig
+          ? { ...config.infomaniakConfig, hasGuichetKey, hasApplicationPassword }
+          : null,
+      },
     })
   },
   { operationName: 'GET ticketing external index' }

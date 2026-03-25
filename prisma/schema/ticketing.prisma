@@ -58,7 +58,9 @@ model HelloAssoConfig {
 model InfomaniakConfig {
   id                  String   @id @default(cuid())
   externalTicketingId String   @unique
-  apiKey              String // Encrypted (AES-256-GCM)
+  apiKey              String // Encrypted (AES-256-GCM) — clé API shop (événements, zones, tarifs)
+  apiKeyGuichet       String? // Encrypted (AES-256-GCM) — clé API guichet (commandes, billets)
+  applicationPassword String? // Encrypted (AES-256-GCM) — mot de passe applicatif (header Authorization)
   currency            String   @default("2") // 1 = CHF, 2 = EUR
   eventId             Int? // ID de l'événement sélectionné
   eventName           String? // Nom de l'événement (pour affichage)

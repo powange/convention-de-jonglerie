@@ -1,8 +1,10 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
   getInfomaniakEvent,
-  getInfomaniakEvents,
   getInfomaniakEventZones,
+  getInfomaniakOrders,
+  getInfomaniakPassCategories,
+  getInfomaniakTickets,
 } from '#server/utils/editions/ticketing/infomaniak'
 import { decrypt } from '#server/utils/encryption'
 
@@ -30,24 +32,56 @@ export default wrapApiHandler(
 
     try {
       const apiKey = decrypt(ikConfig.apiKey)
+      const apiKeyGuichet = ikConfig.apiKeyGuichet ? decrypt(ikConfig.apiKeyGuichet) : null
+      const appPassword = ikConfig.applicationPassword
+        ? decrypt(ikConfig.applicationPassword)
+        : null
+      const { currency } = ikConfig
 
-      // Récupérer l'événement configuré (ou la liste si pas d'événement sélectionné)
-      const eventData = ikConfig.eventId
-        ? await getInfomaniakEvent(apiKey, ikConfig.eventId, ikConfig.currency)
-        : await getInfomaniakEvents(apiKey, ikConfig.currency)
+      // Requêtes shop (clé boutique)
+      const shopPromises = Promise.all([
+        ikConfig.eventId
+          ? getInfomaniakEvent(apiKey, ikConfig.eventId, currency)
+          : Promise.resolve(null),
+        ikConfig.eventId
+          ? getInfomaniakEventZones(apiKey, ikConfig.eventId, currency)
+          : Promise.resolve([]),
+        getInfomaniakPassCategories(apiKey, currency),
+      ])
 
-      // Récupérer les zones et tarifs de l'événement configuré
-      const zones = ikConfig.eventId
-        ? await getInfomaniakEventZones(apiKey, ikConfig.eventId, ikConfig.currency)
-        : []
+      // Requêtes guichet (clé guichet + mot de passe applicatif)
+      const canAccessGuichet = apiKeyGuichet && appPassword
+      const guichetPromises = canAccessGuichet
+        ? Promise.all([
+            getInfomaniakOrders(apiKeyGuichet, appPassword, currency, { limit: 20 }).catch(
+              (e: any) => ({
+                error: e.message || 'Erreur lors de la récupération des commandes',
+              })
+            ),
+            getInfomaniakTickets(apiKeyGuichet, appPassword, currency, { limit: 20 }).catch(
+              (e: any) => ({
+                error: e.message || 'Erreur lors de la récupération des billets',
+              })
+            ),
+          ])
+        : Promise.resolve([null, null])
+
+      const [[eventData, zones, passCategories], [orders, tickets]] = await Promise.all([
+        shopPromises,
+        guichetPromises,
+      ])
 
       return createSuccessResponse({
         event: eventData,
         zones,
+        passCategories,
+        orders,
+        tickets,
         config: {
           currency: ikConfig.currency,
           eventId: ikConfig.eventId,
           eventName: ikConfig.eventName,
+          hasGuichetKey: !!canAccessGuichet,
         },
       })
     } catch (error: any) {

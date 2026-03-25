@@ -17,7 +17,9 @@ const bodySchema = z.object({
     .optional(),
   infomaniak: z
     .object({
-      apiKey: z.string().min(1),
+      apiKey: z.string().optional(),
+      apiKeyGuichet: z.string().optional(),
+      applicationPassword: z.string().optional(),
       currency: z.string().default('2'),
       eventId: z.number().optional(),
       eventName: z.string().optional(),
@@ -154,9 +156,39 @@ export default wrapApiHandler(
         })
       }
 
-      const encryptedApiKey = encrypt(body.infomaniak.apiKey)
+      // La clé API est obligatoire pour une nouvelle configuration
+      if (!existingConfig && !body.infomaniak.apiKey) {
+        throw createError({
+          status: 400,
+          message: 'Clé API requise pour une nouvelle configuration Infomaniak',
+        })
+      }
+
+      const encryptedApiKey = body.infomaniak.apiKey ? encrypt(body.infomaniak.apiKey) : undefined
+      const encryptedApiKeyGuichet = body.infomaniak.apiKeyGuichet
+        ? encrypt(body.infomaniak.apiKeyGuichet)
+        : undefined // undefined = ne pas modifier la valeur existante
+      const encryptedAppPassword = body.infomaniak.applicationPassword
+        ? encrypt(body.infomaniak.applicationPassword)
+        : undefined
 
       if (existingConfig) {
+        const updateData: Record<string, unknown> = {
+          currency: body.infomaniak.currency,
+          eventId: body.infomaniak.eventId,
+          eventName: body.infomaniak.eventName,
+        }
+        // Ne mettre à jour les clés que si elles sont fournies
+        if (encryptedApiKey !== undefined) {
+          updateData.apiKey = encryptedApiKey
+        }
+        if (encryptedApiKeyGuichet !== undefined) {
+          updateData.apiKeyGuichet = encryptedApiKeyGuichet
+        }
+        if (encryptedAppPassword !== undefined) {
+          updateData.applicationPassword = encryptedAppPassword
+        }
+
         const updated = await prisma.externalTicketing.update({
           where: { id: existingConfig.id },
           data: {
@@ -166,17 +198,14 @@ export default wrapApiHandler(
             infomaniakConfig: {
               upsert: {
                 create: {
-                  apiKey: encryptedApiKey,
+                  apiKey: encryptedApiKey ?? '',
+                  apiKeyGuichet: encryptedApiKeyGuichet ?? null,
+                  applicationPassword: encryptedAppPassword ?? null,
                   currency: body.infomaniak.currency,
                   eventId: body.infomaniak.eventId,
                   eventName: body.infomaniak.eventName,
                 },
-                update: {
-                  apiKey: encryptedApiKey,
-                  currency: body.infomaniak.currency,
-                  eventId: body.infomaniak.eventId,
-                  eventName: body.infomaniak.eventName,
-                },
+                update: updateData,
               },
             },
           },
@@ -203,7 +232,9 @@ export default wrapApiHandler(
             status: 'ACTIVE',
             infomaniakConfig: {
               create: {
-                apiKey: encryptedApiKey,
+                apiKey: encryptedApiKey!, // Garanti non-undefined par la validation ci-dessus
+                apiKeyGuichet: encryptedApiKeyGuichet ?? null,
+                applicationPassword: encryptedAppPassword ?? null,
                 currency: body.infomaniak.currency,
                 eventId: body.infomaniak.eventId,
                 eventName: body.infomaniak.eventName,

@@ -20,17 +20,24 @@ Infomaniak propose un service de billetterie en ligne (eTickets) avec une API RE
 
 ### Authentification
 
-La clé API est passée dans le **header HTTP** de chaque requête.
+L'API Infomaniak utilise **deux types de clés API** avec des périmètres différents :
+
+| Clé         | Périmètre                                  | Endpoints                             |
+| ----------- | ------------------------------------------ | ------------------------------------- |
+| **Shop**    | Événements, zones, tarifs, pass categories | `events`, `event/{id}`, `zones`, etc. |
+| **Guichet** | Commandes, billets, rapports, scan         | `orders`, `tickets`, `login`, etc.    |
+
+Les deux clés ne sont **pas interchangeables** : la clé shop n'a pas accès aux endpoints guichet et inversement.
 
 **Headers communs à toutes les requêtes :**
 
-| Header            | Type   | Description                                  |
-| ----------------- | ------ | -------------------------------------------- |
-| `key`             | String | Clé API générée depuis le Manager Infomaniak |
-| `currency`        | String | ID de la devise : `1` = CHF, `2` = EUR       |
-| `Accept-Language` | String | Langue : `fr_FR`, `en_GB`, `de_DE`           |
+| Header            | Type   | Description                                |
+| ----------------- | ------ | ------------------------------------------ |
+| `key`             | String | Clé API (shop ou guichet selon l'endpoint) |
+| `currency`        | String | ID de la devise : `1` = CHF, `2` = EUR     |
+| `Accept-Language` | String | Langue : `fr_FR`, `en_GB`, `de_DE`         |
 
-**Création de la clé API :**
+**Création des clés API :**
 
 1. Accéder au Manager Infomaniak → produit Billetterie
 2. Menu latéral → "Boutique / Mise en ligne" → "Accès API"
@@ -39,6 +46,7 @@ La clé API est passée dans le **header HTTP** de chaque requête.
    - **Nom de la clé** : identifiant pour la reconnaître
    - **Adresse(s) IP interdite(s)** (optionnel) : bloquer certaines IPs
    - **Accès guichet** : autoriser ou non la vente de billets (mode guichet)
+5. Créer **deux clés** : une sans accès guichet (shop) et une avec accès guichet
 
 ### Base URL
 
@@ -189,13 +197,46 @@ GET https://etickets.infomaniak.com/api/shop/categorypasses
 
 Les pass categories sont des abonnements donnant accès à plusieurs événements. À ne pas confondre avec les tarifs d'un événement (qui sont dans les zones).
 
+#### LOGIN — Obtenir un credential/token guichet
+
+```
+GET https://etickets.infomaniak.com/api/shop/login
+```
+
+L'authentification guichet est nécessaire pour accéder aux endpoints de commandes, billets et rapports. Il existe **deux méthodes** pour obtenir l'accès :
+
+**Méthode 1 — Authorization (recommandée) :**
+
+1. Activer la double authentification sur le compte manager Infomaniak
+2. Créer un mot de passe applicatif : "Mon profil > Mot(s) de passe applicatif(s)"
+3. Passer ce mot de passe applicatif dans le header `Authorization` des requêtes
+
+**Méthode 2 — Credential (login) :**
+
+1. Appeler `GET /api/shop/login` avec les headers ci-dessous
+2. Utiliser le credential retourné dans le header `Credential` des requêtes suivantes
+3. **Note :** incompatible avec la double authentification
+
+**Headers du login :**
+
+| Header     | Type   | Description                                    |
+| ---------- | ------ | ---------------------------------------------- |
+| `key`      | String | Clé API (avec droits de vente / accès guichet) |
+| `user`     | String | Identifiant du compte manager                  |
+| `password` | String | Mot de passe du compte manager                 |
+
+**Notes importantes :**
+
+- Le credential/token reste valide jusqu'à révocation ou expiration — ne pas appeler login de manière excessive (risque de blocage temporaire)
+- Le compte utilisé doit avoir les permissions nécessaires pour accéder au produit billetterie
+
 #### ORDERS — Lister les commandes (guichet)
 
 ```
 GET https://etickets.infomaniak.com/api/shop/orders
 ```
 
-**Note :** Cet endpoint nécessite le header `Credential/Authorization` en plus de `key` (token obtenu via login).
+**Note :** Cet endpoint nécessite le header `Credential` ou `Authorization` en plus de `key` (voir section LOGIN ci-dessus).
 
 #### ORDER — Détails d'une commande
 
@@ -275,19 +316,20 @@ prisma/schema/
 
 ```prisma
 model InfomaniakConfig {
-  id                  Int               @id @default(autoincrement())
-  externalTicketingId Int               @unique
-  apiKey              String            // Clé API chiffrée (AES-256-GCM)
+  id                  String            @id @default(cuid())
+  externalTicketingId String            @unique
+  apiKey              String            // Clé API shop chiffrée (AES-256-GCM)
+  apiKeyGuichet       String?           // Clé API guichet chiffrée (AES-256-GCM)
+  applicationPassword String?           // Mot de passe applicatif chiffré (AES-256-GCM) — header Authorization
   currency            String            @default("2") // 1 = CHF, 2 = EUR
   eventId             Int?              // ID de l'événement sélectionné
+  eventName           String?           // Nom de l'événement (pour affichage)
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
   externalTicketing   ExternalTicketing  @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
 }
 ```
-
-Nécessite l'ajout de `INFOMANIAK` dans l'enum `TicketingProvider`.
 
 ## Plan d'implémentation
 

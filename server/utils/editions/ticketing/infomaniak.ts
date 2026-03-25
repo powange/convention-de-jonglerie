@@ -52,14 +52,23 @@ interface InfomaniakHeaders {
   'Accept-Language': string
   key: string
   currency: string
+  Authorization?: string
 }
 
-function buildHeaders(apiKey: string, currency: string = '2'): InfomaniakHeaders {
-  return {
+function buildHeaders(
+  apiKey: string,
+  currency: string = '2',
+  applicationPassword?: string
+): InfomaniakHeaders {
+  const headers: InfomaniakHeaders = {
     'Accept-Language': 'fr_FR',
     key: apiKey,
     currency,
   }
+  if (applicationPassword) {
+    headers.Authorization = applicationPassword
+  }
+  return headers
 }
 
 /**
@@ -136,6 +145,46 @@ export async function getInfomaniakEventZones(
   const response = await $fetch<InfomaniakZone[]>(`${INFOMANIAK_API_URL}/event/${eventId}/zones`, {
     method: 'GET',
     headers: buildHeaders(apiKey, currency),
+  })
+  return Array.isArray(response) ? response : []
+}
+
+/**
+ * Récupérer les commandes (nécessite la clé API guichet + mot de passe applicatif)
+ */
+export async function getInfomaniakOrders(
+  apiKeyGuichet: string,
+  applicationPassword: string,
+  currency: string = '2',
+  options: { limit?: number; offset?: number } = {}
+): Promise<unknown[]> {
+  const response = await $fetch<unknown[]>(`${INFOMANIAK_API_URL}/orders`, {
+    method: 'GET',
+    headers: buildHeaders(apiKeyGuichet, currency, applicationPassword),
+    params: {
+      limit: options.limit ?? 20,
+      offset: options.offset ?? 0,
+    },
+  })
+  return Array.isArray(response) ? response : []
+}
+
+/**
+ * Récupérer les billets (nécessite la clé API guichet + mot de passe applicatif)
+ */
+export async function getInfomaniakTickets(
+  apiKeyGuichet: string,
+  applicationPassword: string,
+  currency: string = '2',
+  options: { limit?: number; offset?: number } = {}
+): Promise<unknown[]> {
+  const response = await $fetch<unknown[]>(`${INFOMANIAK_API_URL}/tickets`, {
+    method: 'GET',
+    headers: buildHeaders(apiKeyGuichet, currency, applicationPassword),
+    params: {
+      limit: options.limit ?? 20,
+      offset: options.offset ?? 0,
+    },
   })
   return Array.isArray(response) ? response : []
 }

@@ -841,57 +841,18 @@
         @test="handleInfomaniakConfigTest"
       />
 
-      <!-- Modal JSON brut (admin only) -->
-      <UModal
-        v-model:open="showRawJsonModal"
-        title="JSON brut HelloAsso"
-        :ui="{ width: 'sm:max-w-4xl' }"
-      >
-        <template #body>
-          <div class="space-y-4">
-            <UAlert
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              description="Ce sont les données brutes retournées par l'API HelloAsso. Seules les 10 premières commandes sont affichées."
-            />
-            <!-- Onglets pour basculer entre Form et Orders -->
-            <div class="flex gap-2">
-              <UButton
-                :color="rawJsonActiveTab === 'form' ? 'primary' : 'neutral'"
-                :variant="rawJsonActiveTab === 'form' ? 'solid' : 'soft'"
-                size="sm"
-                @click="rawJsonActiveTab = 'form'"
-              >
-                Formulaire
-              </UButton>
-              <UButton
-                :color="rawJsonActiveTab === 'orders' ? 'primary' : 'neutral'"
-                :variant="rawJsonActiveTab === 'orders' ? 'solid' : 'soft'"
-                size="sm"
-                @click="rawJsonActiveTab = 'orders'"
-              >
-                Commandes (10 premières)
-              </UButton>
-            </div>
-            <div class="max-h-[60vh] overflow-auto">
-              <pre
-                class="text-xs bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto whitespace-pre-wrap"
-                >{{ currentRawJson }}</pre
-              >
-            </div>
-          </div>
-        </template>
-        <template #footer>
-          <div class="flex justify-end gap-2">
-            <UButton variant="soft" color="neutral" @click="copyRawJson">
-              <UIcon name="i-heroicons-clipboard" class="mr-1" />
-              Copier
-            </UButton>
-            <UButton color="primary" @click="showRawJsonModal = false"> Fermer </UButton>
-          </div>
-        </template>
-      </UModal>
+      <!-- Modal JSON brut HelloAsso (admin only) -->
+      <EditionTicketingHelloAssoRawJsonModal
+        v-model:open="showHelloAssoRawJsonModal"
+        :form-data="rawJsonFormData"
+        :orders-data="rawJsonOrdersData"
+      />
+
+      <!-- Modal JSON brut Infomaniak (admin only) -->
+      <EditionTicketingInfomaniakRawJsonModal
+        v-model:open="showInfomaniakRawJsonModal"
+        :data="infomaniakRawData"
+      />
     </div>
   </div>
 </template>
@@ -982,6 +943,8 @@ const loadExistingConfig = async () => {
       infomaniakCurrency.value = ikConfig.currency
       infomaniakEventId.value = ikConfig.eventId ?? undefined
       infomaniakEventName.value = ikConfig.eventName ?? undefined
+      infomaniakHasGuichetKey.value = !!ikConfig.hasGuichetKey
+      infomaniakHasApplicationPassword.value = !!ikConfig.hasApplicationPassword
       hasInfomaniakConfig.value = true
     }
   } catch (error) {
@@ -1108,6 +1071,8 @@ const hasInfomaniakConfig = ref(false)
 const infomaniakCurrency = ref('2')
 const infomaniakEventId = ref<number | undefined>()
 const infomaniakEventName = ref<string | undefined>()
+const infomaniakHasGuichetKey = ref(false)
+const infomaniakHasApplicationPassword = ref(false)
 
 const currentInfomaniakConfig = computed<InfomaniakConfig | undefined>(() => {
   if (!hasInfomaniakConfig.value) return undefined
@@ -1116,6 +1081,8 @@ const currentInfomaniakConfig = computed<InfomaniakConfig | undefined>(() => {
     currency: infomaniakCurrency.value,
     eventId: infomaniakEventId.value,
     eventName: infomaniakEventName.value,
+    hasGuichetKey: infomaniakHasGuichetKey.value,
+    hasApplicationPassword: infomaniakHasApplicationPassword.value,
   }
 })
 
@@ -1219,6 +1186,8 @@ const handleInfomaniakConfigSave = async (config: InfomaniakConfig) => {
         provider: 'INFOMANIAK',
         infomaniak: {
           apiKey: config.apiKey,
+          apiKeyGuichet: config.apiKeyGuichet || undefined,
+          applicationPassword: config.applicationPassword || undefined,
           currency: config.currency,
           eventId: config.eventId,
           eventName: config.eventName,
@@ -1314,6 +1283,15 @@ const disconnectInfomaniak = async () => {
 }
 
 // JSON brut Infomaniak
+const showInfomaniakRawJsonModal = ref(false)
+const infomaniakRawData = ref<{
+  event: unknown
+  zones: unknown[]
+  passCategories: unknown[]
+  orders: unknown[] | { error: string } | null
+  tickets: unknown[] | { error: string } | null
+  config: { currency: string; eventId?: number; eventName?: string; hasGuichetKey: boolean }
+} | null>(null)
 const loadingInfomaniakRawJson = ref(false)
 
 const loadInfomaniakRawJson = async () => {
@@ -1321,10 +1299,15 @@ const loadInfomaniakRawJson = async () => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/infomaniak/raw`)
     const data = result.data || result
-    rawJsonFormData.value = JSON.stringify({ event: data.event, zones: data.zones }, null, 2)
-    rawJsonOrdersData.value = ''
-    rawJsonActiveTab.value = 'form'
-    showRawJsonModal.value = true
+    infomaniakRawData.value = {
+      event: data.event,
+      zones: data.zones || [],
+      passCategories: data.passCategories || [],
+      orders: data.orders ?? null,
+      tickets: data.tickets ?? null,
+      config: data.config,
+    }
+    showInfomaniakRawJsonModal.value = true
   } catch (error: any) {
     toast.add({
       title: t('common.error'),
@@ -1497,10 +1480,9 @@ const loadOrdersFromHelloAsso = () => {
 const loadedCustomFields = ref<any[]>([])
 
 // JSON brut HelloAsso (admin only)
-const showRawJsonModal = ref(false)
+const showHelloAssoRawJsonModal = ref(false)
 const rawJsonFormData = ref<string>('')
 const rawJsonOrdersData = ref<string>('')
-const rawJsonActiveTab = ref<'form' | 'orders'>('form')
 
 // Action pour charger le JSON brut HelloAsso
 const { execute: executeLoadRawJson, loading: loadingRawJson } = useApiAction<
@@ -1516,38 +1498,13 @@ const { execute: executeLoadRawJson, loading: loadingRawJson } = useApiAction<
   onSuccess: (response) => {
     rawJsonFormData.value = JSON.stringify(response.form, null, 2)
     rawJsonOrdersData.value = JSON.stringify(response.orders, null, 2)
-    rawJsonActiveTab.value = 'form'
-    showRawJsonModal.value = true
+    showHelloAssoRawJsonModal.value = true
   },
 })
 
 const loadRawHelloAssoJson = () => {
   if (loadingRawJson.value) return
   executeLoadRawJson()
-}
-
-const currentRawJson = computed(() =>
-  rawJsonActiveTab.value === 'form' ? rawJsonFormData.value : rawJsonOrdersData.value
-)
-
-const copyRawJson = async () => {
-  try {
-    await navigator.clipboard.writeText(currentRawJson.value)
-    toast.add({
-      title: $t('ticketing.external.json_copied'),
-      description: $t('ticketing.external.json_copied_description'),
-      icon: 'i-heroicons-clipboard-document-check',
-      color: 'success',
-    })
-  } catch (error) {
-    console.error('Failed to copy:', error)
-    toast.add({
-      title: $t('common.error'),
-      description: $t('ticketing.external.json_copy_error'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  }
 }
 
 const items = computed(
