@@ -12,7 +12,7 @@
     </div>
 
     <!-- Résumé des coûts -->
-    <div v-if="expenses.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+    <div v-if="expenses.length > 0" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
       <UCard variant="soft">
         <div class="text-center">
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
@@ -40,6 +40,37 @@
           </p>
           <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
             {{ totalOneTime.toFixed(2) }} {{ mainCurrency }}
+          </p>
+        </div>
+      </UCard>
+      <UCard v-if="donations" variant="soft">
+        <div class="text-center">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            {{
+              balance >= 0
+                ? t('project_costs.balance_positive')
+                : t('project_costs.balance_negative')
+            }}
+          </p>
+          <p
+            class="text-2xl font-bold"
+            :class="
+              balance >= 0
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : 'text-red-600 dark:text-red-400'
+            "
+          >
+            {{ Math.abs(balance).toFixed(2) }} {{ mainCurrency }}
+          </p>
+        </div>
+      </UCard>
+      <UCard v-if="balance > 0 && totalMonthly > 0" variant="soft">
+        <div class="text-center">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            {{ t('project_costs.months_covered') }}
+          </p>
+          <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+            {{ autonomyLabel }}
           </p>
         </div>
       </UCard>
@@ -81,19 +112,21 @@
           </div>
 
           <!-- Tarif actuel -->
-          <div v-if="getCurrentRate(expense)" class="text-right shrink-0">
-            <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-              {{ parseFloat(getCurrentRate(expense)!.amount).toFixed(2) }}
-              {{ getCurrentRate(expense)!.currency }}
-            </p>
-            <p class="text-sm text-gray-500">
-              {{ periodLabel(getCurrentRate(expense)!.period) }}
-            </p>
-          </div>
+          <template v-if="getCurrentRate(expense) as currentRate">
+            <div class="text-right shrink-0">
+              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                {{ parseFloat(currentRate.amount).toFixed(2) }}
+                {{ currentRate.currency }}
+              </p>
+              <p class="text-sm text-gray-500">
+                {{ periodLabel(currentRate.period) }}
+              </p>
+            </div>
+          </template>
         </div>
 
         <!-- Historique des tarifs -->
-        <div v-if="expense.rates.length > 1" class="mt-4 pt-4 border-t dark:border-gray-700">
+        <div v-if="expense.rates.length > 0" class="mt-4 pt-4 border-t dark:border-gray-700">
           <button
             class="text-sm text-primary hover:underline flex items-center gap-1"
             @click="toggleHistory(expense.id)"
@@ -106,7 +139,7 @@
               "
               class="w-4 h-4"
             />
-            {{ t('project_costs.price_history') }} ({{ expense.rates.length }})
+            {{ t('project_costs.rate_details') }} ({{ expense.rates.length }})
           </button>
           <div v-if="expandedExpenses.has(expense.id)" class="mt-3 space-y-2">
             <div
@@ -147,6 +180,104 @@
               </span>
             </div>
           </div>
+        </div>
+      </UCard>
+    </div>
+
+    <!-- Section "Un café pour Pierre" -->
+    <div
+      v-if="donations && (donations.donationsEnabled || donations.totalCoffees > 0)"
+      class="mt-12 pt-8 border-t dark:border-gray-700"
+    >
+      <UCard
+        variant="soft"
+        class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800"
+      >
+        <div class="text-center space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold">{{ t('project_costs.coffee.title') }}</h2>
+            <p class="text-gray-600 dark:text-gray-400 mt-2 max-w-xl mx-auto">
+              {{ t('project_costs.coffee.description') }}
+            </p>
+          </div>
+
+          <!-- Compteur -->
+          <div v-if="donations.totalCoffees > 0" class="flex items-center justify-center gap-6">
+            <div class="text-center">
+              <p class="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                {{ donations.totalCoffees }} ☕
+              </p>
+              <p class="text-sm text-gray-500">
+                {{ t('project_costs.coffee.total_coffees', { count: donations.totalCoffees }) }}
+              </p>
+            </div>
+            <div v-if="donations.totalNetCents > 0" class="text-center">
+              <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                {{ (donations.totalNetCents / 100).toFixed(2) }} €
+              </p>
+              <p class="text-sm text-gray-500">
+                {{
+                  t('project_costs.coffee.total_received', {
+                    amount: (donations.totalNetCents / 100).toFixed(2),
+                  })
+                }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Formulaire de don (uniquement si les dons sont actifs) -->
+          <template v-if="donations.donationsEnabled">
+            <!-- Sélecteur de quantité -->
+            <div class="space-y-3">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ t('project_costs.coffee.quantity_label') }}
+                <span class="text-gray-500"
+                  >({{ t('project_costs.coffee.price_per_coffee') }})</span
+                >
+              </p>
+              <div class="flex items-center justify-center gap-2 flex-wrap">
+                <!-- prettier-ignore -->
+                <UButton
+                  v-for="qty in [1, 2, 3, 5, 10]"
+                  :key="qty"
+                  :color="selectedQuantity === qty ? 'primary' : 'neutral'"
+                  :variant="selectedQuantity === qty ? 'solid' : 'soft'"
+                  size="lg"
+                  @click="selectedQuantity = qty; customQuantity = ''"
+                >
+                  {{ qty }} ☕
+                </UButton>
+                <UInput
+                  v-model.number="customQuantity"
+                  type="number"
+                  min="1"
+                  max="50"
+                  :placeholder="t('project_costs.coffee.custom_quantity')"
+                  size="lg"
+                  class="w-24"
+                  @input="selectedQuantity = 0"
+                />
+              </div>
+            </div>
+
+            <!-- Bouton d'achat -->
+            <UButton
+              color="primary"
+              size="xl"
+              icon="i-heroicons-heart"
+              :loading="checkoutLoading"
+              :disabled="finalQuantity < 1"
+              @click="handleCheckout"
+            >
+              {{ t('project_costs.coffee.donate_button', { count: finalQuantity }) }}
+              ({{ finalQuantity }} €)
+            </UButton>
+          </template>
+
+          <!-- Message quand les dons sont désactivés -->
+          <p v-else class="text-sm text-gray-500 italic">
+            {{ t('project_costs.coffee.donations_paused') }}
+          </p>
         </div>
       </UCard>
     </div>
@@ -265,11 +396,76 @@ const totalOneTime = computed(() => {
   }, 0)
 })
 
+// Période d'autonomie couverte par les dons en avance
+const autonomyLabel = computed(() => {
+  if (balance.value <= 0 || totalMonthly.value <= 0) return ''
+  const totalMonths = Math.floor(balance.value / totalMonthly.value)
+  if (totalMonths < 1) return t('project_costs.autonomy_less_than_month')
+  const years = Math.floor(totalMonths / 12)
+  const months = totalMonths % 12
+  if (years === 0) return t('project_costs.autonomy_months', { count: months })
+  if (months === 0) return t('project_costs.autonomy_years', { count: years })
+  return t('project_costs.autonomy_years_months', { years, months })
+})
+
+// Solde exact : dons nets - coût total cumulé depuis le début
+const balance = computed(() => {
+  const donationsNetCents = donations.value?.totalNetCents || 0
+  const totalCostCents = donations.value?.totalCostCents || 0
+  return (donationsNetCents - totalCostCents) / 100
+})
+
 const formatDate = (dateStr: string): string => {
   return new Date(dateStr).toLocaleDateString(locale.value, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
+}
+
+// Donations café
+const { data: donationsData } = await useFetch<{
+  donationsEnabled: boolean
+  totalCoffees: number
+  totalDonations: number
+  totalCents: number
+  totalNetCents: number
+  totalCostCents: number
+}>('/api/project-costs/donations')
+
+const donations = computed(() => donationsData.value)
+
+const selectedQuantity = ref(1)
+const customQuantity = ref<number | string>('')
+const checkoutLoading = ref(false)
+const toast = useToast()
+
+const finalQuantity = computed(() => {
+  if (customQuantity.value && Number(customQuantity.value) > 0) {
+    return Math.min(Math.floor(Number(customQuantity.value)), 50)
+  }
+  return selectedQuantity.value
+})
+
+const handleCheckout = async () => {
+  if (finalQuantity.value < 1) return
+  checkoutLoading.value = true
+  try {
+    const result: any = await $fetch('/api/project-costs/checkout', {
+      method: 'POST',
+      body: { quantity: finalQuantity.value },
+    })
+    if (result.url) {
+      navigateTo(result.url, { external: true })
+    }
+  } catch {
+    toast.add({
+      title: t('project_costs.coffee.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    checkoutLoading.value = false
+  }
 }
 </script>

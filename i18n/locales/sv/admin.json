@@ -446,6 +446,20 @@
         "start_date": "Startdatum"
       },
       "sort_order": "Visningsordning",
+      "stripe_config": {
+        "configured": "Stripe konfigurerad",
+        "description": "Konfigurera Stripe-nycklarna för att aktivera kaffedonationer.",
+        "is_active": "Donationer aktiva",
+        "keep_current": "Lämna tomt för att behålla det nuvarande värdet",
+        "load_error": "Fel vid laddning av Stripe-konfiguration",
+        "not_configured": "Stripe inte konfigurerad — ställ in nycklarna för att aktivera donationer",
+        "public_key": "Publik nyckel (pk_...)",
+        "save_error": "Fel vid sparning",
+        "save_success": "Stripe-konfiguration sparad",
+        "secret_key": "Hemlig nyckel (sk_...)",
+        "title": "Stripe-konfiguration",
+        "webhook_secret": "Webhook-hemlighet (whsec_...)"
+      },
       "success": {
         "created": "Utgift skapad",
         "deleted": "Utgift borttagen",

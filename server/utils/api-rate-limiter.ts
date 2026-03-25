@@ -43,6 +43,25 @@ export const commentRateLimiter = createRateLimiter({
 })
 
 /**
+ * Rate limiter pour le checkout Stripe (donations)
+ * 10 tentatives par heure par IP
+ */
+export const checkoutRateLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 10,
+  message: 'Trop de tentatives de paiement, veuillez réessayer plus tard',
+  keyGenerator: (event) => {
+    const ip =
+      String(event.node.req.headers['x-forwarded-for'] || '')
+        .split(',')[0]
+        .trim() ||
+      event.node.req.socket.remoteAddress ||
+      'unknown'
+    return `checkout:${ip}`
+  },
+})
+
+/**
  * Rate limiter pour les API de recherche
  * 60 requêtes par minute par IP
  */
@@ -52,7 +71,11 @@ export const searchRateLimiter = createRateLimiter({
   message: 'Trop de recherches, veuillez réessayer dans une minute',
   keyGenerator: (event) => {
     const ip =
-      event.node.req.headers['x-forwarded-for'] || event.node.req.socket.remoteAddress || 'unknown'
+      String(event.node.req.headers['x-forwarded-for'] || '')
+        .split(',')[0]
+        .trim() ||
+      event.node.req.socket.remoteAddress ||
+      'unknown'
     return `search:${ip}`
   },
 })

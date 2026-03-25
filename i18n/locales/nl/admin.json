@@ -446,6 +446,20 @@
         "start_date": "Startdatum"
       },
       "sort_order": "Weergavevolgorde",
+      "stripe_config": {
+        "configured": "Stripe geconfigureerd",
+        "description": "Configureer de Stripe-sleutels om koffiedonaties te activeren.",
+        "is_active": "Donaties actief",
+        "keep_current": "Leeg laten om de huidige waarde te behouden",
+        "load_error": "Fout bij het laden van de Stripe-configuratie",
+        "not_configured": "Stripe niet geconfigureerd — stel de sleutels in om donaties te activeren",
+        "public_key": "Publieke sleutel (pk_...)",
+        "save_error": "Fout bij opslaan",
+        "save_success": "Stripe-configuratie opgeslagen",
+        "secret_key": "Geheime sleutel (sk_...)",
+        "title": "Stripe-configuratie",
+        "webhook_secret": "Webhook-geheim (whsec_...)"
+      },
       "success": {
         "created": "Uitgave succesvol aangemaakt",
         "deleted": "Uitgave verwijderd",

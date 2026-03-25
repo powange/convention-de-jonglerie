@@ -1,0 +1,108 @@
+import type Stripe from 'stripe'
+
+import { getStripeClientWithWebhookSecret } from '#server/utils/stripe'
+
+export default wrapApiHandler(
+  async (event) => {
+    const rawBody = await readRawBody(event)
+    if (!rawBody) {
+      throw createError({ status: 400, message: 'Corps de la requête manquant' })
+    }
+
+    const signature = getHeader(event, 'stripe-signature')
+    if (!signature) {
+      throw createError({ status: 400, message: 'Signature Stripe manquante' })
+    }
+
+    const { stripe, webhookSecret } = await getStripeClientWithWebhookSecret()
+
+    let stripeEvent: Stripe.Event
+    try {
+      stripeEvent = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
+    } catch {
+      throw createError({ status: 400, message: 'Signature Stripe invalide' })
+    }
+
+    // Paiement checkout terminé → enregistrer le don
+    if (stripeEvent.type === 'checkout.session.completed') {
+      const session = stripeEvent.data.object as Stripe.Checkout.Session
+      const quantity = parseInt(session.metadata?.quantity || '0')
+
+      if (quantity > 0) {
+        // Tenter de récupérer les frais Stripe (peut ne pas être disponible immédiatement)
+        let feeCents: number | null = null
+        let netCents: number | null = null
+
+        if (session.payment_intent) {
+          try {
+            const paymentIntent = await stripe.paymentIntents.retrieve(
+              session.payment_intent as string,
+              { expand: ['latest_charge.balance_transaction'] }
+            )
+            const charge = paymentIntent.latest_charge as Stripe.Charge
+            if (charge?.balance_transaction && typeof charge.balance_transaction === 'object') {
+              const balanceTx = charge.balance_transaction as Stripe.BalanceTransaction
+              feeCents = balanceTx.fee
+              netCents = balanceTx.net
+            }
+          } catch {
+            // Les frais seront récupérés via l'événement charge.succeeded
+          }
+        }
+
+        await prisma.coffeeDonation.upsert({
+          where: { stripeSessionId: session.id },
+          create: {
+            stripeSessionId: session.id,
+            quantity,
+            totalCents: session.amount_total || quantity * 100,
+            feeCents,
+            netCents,
+            email: session.customer_details?.email || null,
+            customerName: session.customer_details?.name || null,
+          },
+          update: {
+            // Mettre à jour les frais s'ils étaient null
+            ...(feeCents !== null && { feeCents }),
+            ...(netCents !== null && { netCents }),
+          },
+        })
+      }
+    }
+
+    // Charge réussie → mettre à jour les frais si manquants
+    if (stripeEvent.type === 'charge.succeeded') {
+      const charge = stripeEvent.data.object as Stripe.Charge
+
+      if (charge.payment_intent && charge.balance_transaction) {
+        try {
+          const balanceTx =
+            typeof charge.balance_transaction === 'object'
+              ? (charge.balance_transaction as Stripe.BalanceTransaction)
+              : await stripe.balanceTransactions.retrieve(charge.balance_transaction)
+
+          // Retrouver la session checkout associée
+          const sessions = await stripe.checkout.sessions.list({
+            payment_intent: charge.payment_intent as string,
+            limit: 1,
+          })
+
+          if (sessions.data.length > 0) {
+            await prisma.coffeeDonation.updateMany({
+              where: { stripeSessionId: sessions.data[0].id, feeCents: null },
+              data: {
+                feeCents: balanceTx.fee,
+                netCents: balanceTx.net,
+              },
+            })
+          }
+        } catch {
+          // Pas critique
+        }
+      }
+    }
+
+    return { received: true }
+  },
+  { operationName: 'POST project-costs webhook' }
+)

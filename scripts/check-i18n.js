@@ -84,6 +84,13 @@ const IGNORED_MISSING_KEYS = [
   'convention.name',
   'convention.email',
   'convention.description',
+  // Préfixes de clés API Stripe et types d'événements (pas des clés i18n)
+  'pk_.*',
+  'sk_.*',
+  'whsec_.*',
+  'checkout.session.completed',
+  'latest_charge.balance_transaction',
+  'charge.succeeded',
 ]
 
 /**

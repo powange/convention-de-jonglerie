@@ -104,4 +104,10 @@ export const publicRoutes: PublicRoute[] = [
   // ====== Carte (zones et marqueurs) ======
   { pattern: /^\/api\/editions\/\d+\/zones$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/editions\/\d+\/markers$/, methods: ['GET'], hydrateSession: true },
+
+  // ====== Coûts du projet & donations ======
+  { path: '/api/project-costs', methods: ['GET'] },
+  { path: '/api/project-costs/donations', methods: ['GET'] },
+  { path: '/api/project-costs/checkout', methods: ['POST'] },
+  { path: '/api/project-costs/webhook', methods: ['POST'] },
 ]

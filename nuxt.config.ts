@@ -345,6 +345,7 @@ export default defineNuxtConfig({
     recaptchaExpectedHostname: process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME || '', // optionnel: valider le hostname retourné par Google
     recaptchaDevBypass:
       process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
+    stripeCoffeeProductName: process.env.STRIPE_COFFEE_PRODUCT_NAME || 'Un café pour le projet', // Nom du produit affiché sur Stripe
     public: {
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*

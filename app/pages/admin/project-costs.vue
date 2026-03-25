@@ -39,6 +39,148 @@
       </UButton>
     </div>
 
+    <!-- Configuration Stripe -->
+    <UCard variant="outline" class="mb-8">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <UIcon name="i-heroicons-credit-card" class="w-6 h-6 text-indigo-600" />
+            <div>
+              <h3 class="text-lg font-semibold">
+                {{ t('admin.project_costs.stripe_config.title') }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                {{ t('admin.project_costs.stripe_config.description') }}
+              </p>
+            </div>
+          </div>
+          <UBadge
+            v-if="stripeConfig"
+            :label="t('admin.project_costs.stripe_config.configured')"
+            color="success"
+            variant="subtle"
+          />
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <div v-if="stripeConfig && !editingStripe" class="space-y-2 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="font-medium w-40">{{
+              t('admin.project_costs.stripe_config.public_key')
+            }}</span>
+            <code class="text-gray-500">{{ stripeConfig.publicKey }}</code>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-medium w-40">{{
+              t('admin.project_costs.stripe_config.secret_key')
+            }}</span>
+            <code class="text-gray-500">{{ stripeConfig.secretKey }}</code>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-medium w-40">{{
+              t('admin.project_costs.stripe_config.webhook_secret')
+            }}</span>
+            <code class="text-gray-500">{{ stripeConfig.webhookSecret }}</code>
+          </div>
+          <div class="flex items-center gap-2 mt-3">
+            <UBadge
+              :label="
+                stripeConfig.isActive
+                  ? t('admin.project_costs.stripe_config.is_active')
+                  : t('admin.project_costs.inactive')
+              "
+              :color="stripeConfig.isActive ? 'success' : 'neutral'"
+              variant="subtle"
+            />
+          </div>
+          <div class="mt-4">
+            <UButton
+              variant="soft"
+              color="neutral"
+              icon="i-heroicons-pencil-square"
+              @click="startEditStripe"
+            >
+              {{ t('common.edit') }}
+            </UButton>
+          </div>
+        </div>
+
+        <div v-else class="space-y-4">
+          <p v-if="!stripeConfig" class="text-sm text-gray-500 italic">
+            {{ t('admin.project_costs.stripe_config.not_configured') }}
+          </p>
+          <UFormField
+            :label="t('admin.project_costs.stripe_config.public_key')"
+            :required="!stripeConfig"
+          >
+            <UInput
+              v-model="stripeForm.publicKey"
+              :placeholder="
+                stripeConfig ? t('admin.project_costs.stripe_config.keep_current') : 'pk_...'
+              "
+              type="password"
+              size="lg"
+              class="w-full font-mono"
+            />
+          </UFormField>
+          <UFormField
+            :label="t('admin.project_costs.stripe_config.secret_key')"
+            :required="!stripeConfig"
+          >
+            <UInput
+              v-model="stripeForm.secretKey"
+              :placeholder="
+                stripeConfig ? t('admin.project_costs.stripe_config.keep_current') : 'sk_...'
+              "
+              type="password"
+              size="lg"
+              class="w-full font-mono"
+            />
+          </UFormField>
+          <UFormField
+            :label="t('admin.project_costs.stripe_config.webhook_secret')"
+            :required="!stripeConfig"
+          >
+            <UInput
+              v-model="stripeForm.webhookSecret"
+              :placeholder="
+                stripeConfig ? t('admin.project_costs.stripe_config.keep_current') : 'whsec_...'
+              "
+              type="password"
+              size="lg"
+              class="w-full font-mono"
+            />
+          </UFormField>
+          <USwitch
+            v-model="stripeForm.isActive"
+            :label="t('admin.project_costs.stripe_config.is_active')"
+          />
+          <div class="flex gap-3">
+            <UButton
+              v-if="stripeConfig"
+              variant="soft"
+              color="neutral"
+              @click="editingStripe = false"
+            >
+              {{ $t('common.cancel') }}
+            </UButton>
+            <UButton
+              color="primary"
+              :loading="savingStripe"
+              :disabled="
+                !stripeConfig &&
+                (!stripeForm.publicKey || !stripeForm.secretKey || !stripeForm.webhookSecret)
+              "
+              @click="saveStripeConfig"
+            >
+              {{ $t('common.save') }}
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </UCard>
+
     <!-- État vide -->
     <div
       v-if="!loading && expenses.length === 0"
@@ -240,10 +382,7 @@
             <UInput v-model.number="expenseForm.sortOrder" type="number" size="lg" class="w-full" />
           </UFormField>
 
-          <div class="flex items-center gap-2">
-            <input id="isActive" v-model="expenseForm.isActive" type="checkbox" class="rounded" />
-            <label for="isActive">{{ t('admin.project_costs.is_active') }}</label>
-          </div>
+          <USwitch v-model="expenseForm.isActive" :label="t('admin.project_costs.is_active')" />
         </div>
       </template>
 
@@ -437,6 +576,72 @@ const currencyOptions = [
   { label: 'USD ($)', value: 'USD' },
 ]
 
+// Stripe config
+interface StripeConfigData {
+  id: number
+  publicKey: string
+  secretKey: string
+  webhookSecret: string
+  isActive: boolean
+}
+
+const stripeConfig = ref<StripeConfigData | null>(null)
+const editingStripe = ref(false)
+const savingStripe = ref(false)
+const stripeForm = ref({
+  publicKey: '',
+  secretKey: '',
+  webhookSecret: '',
+  isActive: true,
+})
+
+const startEditStripe = () => {
+  if (stripeConfig.value) {
+    stripeForm.value = {
+      publicKey: '',
+      secretKey: '',
+      webhookSecret: '',
+      isActive: stripeConfig.value.isActive,
+    }
+  }
+  editingStripe.value = true
+}
+
+const loadStripeConfig = async () => {
+  try {
+    const result: any = await $fetch('/api/admin/project-costs/stripe-config')
+    stripeConfig.value = result.data?.config || result.config || null
+  } catch {
+    toast.add({
+      title: t('admin.project_costs.stripe_config.load_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+const saveStripeConfig = async () => {
+  savingStripe.value = true
+  try {
+    const body: Record<string, unknown> = { isActive: stripeForm.value.isActive }
+    if (stripeForm.value.publicKey) body.publicKey = stripeForm.value.publicKey
+    if (stripeForm.value.secretKey) body.secretKey = stripeForm.value.secretKey
+    if (stripeForm.value.webhookSecret) body.webhookSecret = stripeForm.value.webhookSecret
+    await $fetch('/api/admin/project-costs/stripe-config', {
+      method: 'POST',
+      body,
+    })
+    toast.add({ title: t('admin.project_costs.stripe_config.save_success'), color: 'success' })
+    editingStripe.value = false
+    stripeForm.value = { publicKey: '', secretKey: '', webhookSecret: '', isActive: true }
+    await loadStripeConfig()
+  } catch {
+    toast.add({ title: t('admin.project_costs.stripe_config.save_error'), color: 'error' })
+  } finally {
+    savingStripe.value = false
+  }
+}
+
 // Charger les dépenses
 const loadExpenses = async () => {
   loading.value = true
@@ -454,7 +659,10 @@ const loadExpenses = async () => {
   }
 }
 
-onMounted(loadExpenses)
+onMounted(() => {
+  loadExpenses()
+  loadStripeConfig()
+})
 
 // Dépense : modal création/édition
 const showExpenseModal = ref(false)

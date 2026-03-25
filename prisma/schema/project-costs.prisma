@@ -51,3 +51,32 @@ model ProjectExpenseRate {
   @@index([expenseId], map: "idx_project_expense_rate_expense")
   @@index([startDate])
 }
+
+// =============================================================================
+// Donations café — Configuration Stripe et historique des dons
+// =============================================================================
+
+model StripeConfig {
+  id            Int      @id @default(autoincrement())
+  publicKey     String   @db.Text // Encrypted (AES-256-GCM)
+  secretKey     String   @db.Text // Encrypted (AES-256-GCM)
+  webhookSecret String   @db.Text // Encrypted (AES-256-GCM)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CoffeeDonation {
+  id              Int      @id @default(autoincrement())
+  stripeSessionId String   @unique
+  quantity        Int
+  totalCents      Int
+  feeCents        Int?
+  netCents        Int?
+  email           String?
+  customerName    String?
+  status          String   @default("completed")
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
+}

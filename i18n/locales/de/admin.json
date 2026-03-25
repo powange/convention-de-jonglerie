@@ -446,6 +446,20 @@
         "start_date": "Startdatum"
       },
       "sort_order": "Anzeigereihenfolge",
+      "stripe_config": {
+        "configured": "Stripe konfiguriert",
+        "description": "Konfigurieren Sie die Stripe-Schlüssel, um Kaffee-Spenden zu aktivieren.",
+        "is_active": "Spenden aktiv",
+        "keep_current": "Leer lassen, um den aktuellen Wert beizubehalten",
+        "load_error": "Fehler beim Laden der Stripe-Konfiguration",
+        "not_configured": "Stripe nicht konfiguriert — richten Sie die Schlüssel ein, um Spenden zu aktivieren",
+        "public_key": "Öffentlicher Schlüssel (pk_...)",
+        "save_error": "Fehler beim Speichern",
+        "save_success": "Stripe-Konfiguration gespeichert",
+        "secret_key": "Geheimer Schlüssel (sk_...)",
+        "title": "Stripe-Konfiguration",
+        "webhook_secret": "Webhook-Geheimnis (whsec_...)"
+      },
       "success": {
         "created": "Ausgabe erfolgreich erstellt",
         "deleted": "Ausgabe gelöscht",

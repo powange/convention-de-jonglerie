@@ -434,10 +434,10 @@
       },
       "rates": {
         "add": "Ajouter un tarif",
-        "edit": "Modifier le tarif",
         "amount": "Montant",
         "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce tarif ?",
         "currency": "Devise",
+        "edit": "Modifier le tarif",
         "end_date": "Date de fin",
         "end_date_hint": "Laisser vide si le tarif est toujours en vigueur",
         "note": "Note",
@@ -446,6 +446,20 @@
         "start_date": "Date de début"
       },
       "sort_order": "Ordre d'affichage",
+      "stripe_config": {
+        "configured": "Stripe configuré",
+        "description": "Configurez les clés Stripe pour activer les donations par café.",
+        "is_active": "Donations actives",
+        "keep_current": "Laisser vide pour conserver la valeur actuelle",
+        "load_error": "Erreur lors du chargement de la configuration Stripe",
+        "not_configured": "Stripe non configuré — configurez les clés pour activer les donations",
+        "public_key": "Clé publique (pk_...)",
+        "save_error": "Erreur lors de la sauvegarde",
+        "save_success": "Configuration Stripe sauvegardée",
+        "secret_key": "Clé secrète (sk_...)",
+        "title": "Configuration Stripe",
+        "webhook_secret": "Secret du webhook (whsec_...)"
+      },
       "success": {
         "created": "Dépense créée avec succès",
         "deleted": "Dépense supprimée",

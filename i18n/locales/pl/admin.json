@@ -446,6 +446,20 @@
         "start_date": "Data rozpoczęcia"
       },
       "sort_order": "Kolejność wyświetlania",
+      "stripe_config": {
+        "configured": "Stripe skonfigurowany",
+        "description": "Skonfiguruj klucze Stripe, aby aktywować darowizny na kawę.",
+        "is_active": "Darowizny aktywne",
+        "keep_current": "Pozostaw puste, aby zachować bieżącą wartość",
+        "load_error": "Błąd podczas ładowania konfiguracji Stripe",
+        "not_configured": "Stripe nie skonfigurowany — ustaw klucze, aby aktywować darowizny",
+        "public_key": "Klucz publiczny (pk_...)",
+        "save_error": "Błąd podczas zapisywania",
+        "save_success": "Konfiguracja Stripe zapisana",
+        "secret_key": "Klucz tajny (sk_...)",
+        "title": "Konfiguracja Stripe",
+        "webhook_secret": "Sekret webhooka (whsec_...)"
+      },
       "success": {
         "created": "Wydatek utworzony pomyślnie",
         "deleted": "Wydatek usunięty",

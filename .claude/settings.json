@@ -41,7 +41,10 @@
       "WebFetch(domain:developer.infomaniak.com)",
       "Bash(node scripts/check-i18n.js --help)",
       "Bash(npx vue-tsc:*)",
-      "Bash(do cp:*)"
+      "Bash(do cp:*)",
+      "Edit(/.claude/skills/full-pipeline/**)",
+      "Skill(code-review)",
+      "Skill(code-review:*)"
     ],
     "additionalDirectories": [
       "/tmp",

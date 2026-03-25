@@ -446,6 +446,20 @@
         "start_date": "Data di inizio"
       },
       "sort_order": "Ordine di visualizzazione",
+      "stripe_config": {
+        "configured": "Stripe configurato",
+        "description": "Configura le chiavi Stripe per attivare le donazioni caffè.",
+        "is_active": "Donazioni attive",
+        "keep_current": "Lasciare vuoto per mantenere il valore attuale",
+        "load_error": "Errore durante il caricamento della configurazione Stripe",
+        "not_configured": "Stripe non configurato — configura le chiavi per attivare le donazioni",
+        "public_key": "Chiave pubblica (pk_...)",
+        "save_error": "Errore durante il salvataggio",
+        "save_success": "Configurazione Stripe salvata",
+        "secret_key": "Chiave segreta (sk_...)",
+        "title": "Configurazione Stripe",
+        "webhook_secret": "Segreto del webhook (whsec_...)"
+      },
       "success": {
         "created": "Spesa creata con successo",
         "deleted": "Spesa eliminata",

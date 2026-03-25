@@ -446,6 +446,20 @@
         "start_date": "Datum zahájení"
       },
       "sort_order": "Pořadí zobrazení",
+      "stripe_config": {
+        "configured": "Stripe nakonfigurován",
+        "description": "Nakonfigurujte klíče Stripe pro aktivaci darování kávy.",
+        "is_active": "Dary aktivní",
+        "keep_current": "Ponechte prázdné pro zachování aktuální hodnoty",
+        "load_error": "Chyba při načítání konfigurace Stripe",
+        "not_configured": "Stripe není nakonfigurován — nastavte klíče pro aktivaci darů",
+        "public_key": "Veřejný klíč (pk_...)",
+        "save_error": "Chyba při ukládání",
+        "save_success": "Konfigurace Stripe uložena",
+        "secret_key": "Tajný klíč (sk_...)",
+        "title": "Konfigurace Stripe",
+        "webhook_secret": "Tajemství webhooku (whsec_...)"
+      },
       "success": {
         "created": "Výdaj úspěšně vytvořen",
         "deleted": "Výdaj smazán",

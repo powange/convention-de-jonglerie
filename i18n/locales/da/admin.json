@@ -446,6 +446,20 @@
         "start_date": "Startdato"
       },
       "sort_order": "Visningsrækkefølge",
+      "stripe_config": {
+        "configured": "Stripe konfigureret",
+        "description": "Konfigurer Stripe-nøglerne for at aktivere kaffedonationer.",
+        "is_active": "Donationer aktive",
+        "keep_current": "Efterlad tomt for at beholde den nuværende værdi",
+        "load_error": "Fejl ved indlæsning af Stripe-konfiguration",
+        "not_configured": "Stripe ikke konfigureret — opsæt nøglerne for at aktivere donationer",
+        "public_key": "Offentlig nøgle (pk_...)",
+        "save_error": "Fejl ved lagring",
+        "save_success": "Stripe-konfiguration gemt",
+        "secret_key": "Hemmelig nøgle (sk_...)",
+        "title": "Stripe-konfiguration",
+        "webhook_secret": "Webhook-hemmelighed (whsec_...)"
+      },
       "success": {
         "created": "Udgift oprettet",
         "deleted": "Udgift slettet",

@@ -446,6 +446,20 @@
         "start_date": "Start date"
       },
       "sort_order": "Display order",
+      "stripe_config": {
+        "configured": "Stripe configured",
+        "description": "Configure Stripe keys to enable coffee donations.",
+        "is_active": "Donations active",
+        "keep_current": "Leave empty to keep the current value",
+        "load_error": "Error loading Stripe configuration",
+        "not_configured": "Stripe not configured — set up the keys to enable donations",
+        "public_key": "Public key (pk_...)",
+        "save_error": "Error saving configuration",
+        "save_success": "Stripe configuration saved",
+        "secret_key": "Secret key (sk_...)",
+        "title": "Stripe Configuration",
+        "webhook_secret": "Webhook secret (whsec_...)"
+      },
       "success": {
         "created": "Expense created successfully",
         "deleted": "Expense deleted",
