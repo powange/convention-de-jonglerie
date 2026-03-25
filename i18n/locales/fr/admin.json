@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Cliquez pour ajouter une photo de profil",
     "profile_picture_update_error": "Erreur lors de la mise à jour de la photo de profil",
     "profile_picture_updated": "Photo de profil mise à jour avec succès",
+    "project_costs": {
+      "add_expense": "Ajouter une dépense",
+      "categories": {
+        "DOMAIN": "Nom de domaine",
+        "ELECTRICITY": "Électricité",
+        "HARDWARE": "Matériel",
+        "HOSTING": "Hébergement",
+        "OTHER": "Autre",
+        "SERVICE": "Service",
+        "SOFTWARE": "Logiciel"
+      },
+      "category": "Catégorie",
+      "confirm_delete_expense": "Êtes-vous sûr de vouloir supprimer cette dépense et tous ses tarifs associés ?",
+      "description": "Gérer les postes de dépense et leurs tarifs",
+      "description_field": "Description",
+      "edit_expense": "Modifier la dépense",
+      "empty": "Aucune dépense configurée",
+      "error": {
+        "create": "Erreur lors de la création",
+        "delete": "Erreur lors de la suppression",
+        "load": "Impossible de charger les dépenses",
+        "rate_add": "Erreur lors de l'ajout du tarif",
+        "rate_delete": "Erreur lors de la suppression du tarif",
+        "rate_update": "Erreur lors de la mise à jour du tarif",
+        "update": "Erreur lors de la mise à jour"
+      },
+      "icon": "Icône",
+      "icon_hint": "Nom de l'icône Heroicons (ex: i-heroicons-server)",
+      "inactive": "Inactif",
+      "is_active": "Actif",
+      "name": "Nom",
+      "no_rates": "Aucun tarif défini",
+      "ongoing": "En cours",
+      "periods": {
+        "MONTHLY": "Mensuel",
+        "ONE_TIME": "Ponctuel",
+        "YEARLY": "Annuel"
+      },
+      "rates": {
+        "add": "Ajouter un tarif",
+        "edit": "Modifier le tarif",
+        "amount": "Montant",
+        "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce tarif ?",
+        "currency": "Devise",
+        "end_date": "Date de fin",
+        "end_date_hint": "Laisser vide si le tarif est toujours en vigueur",
+        "note": "Note",
+        "period": "Période",
+        "select_date": "Sélectionner une date",
+        "start_date": "Date de début"
+      },
+      "sort_order": "Ordre d'affichage",
+      "success": {
+        "created": "Dépense créée avec succès",
+        "deleted": "Dépense supprimée",
+        "rate_added": "Tarif ajouté",
+        "rate_deleted": "Tarif supprimé",
+        "rate_updated": "Tarif mis à jour",
+        "updated": "Dépense mise à jour"
+      },
+      "title": "Coûts du projet"
+    },
     "promote_to_admin": "Promouvoir super admin",
     "promotion_error": "Erreur lors de la promotion",
     "push_notifications_disabled": "Notifications push désactivées",

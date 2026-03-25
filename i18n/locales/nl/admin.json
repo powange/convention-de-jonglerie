@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Klik om een profielfoto toe te voegen",
     "profile_picture_update_error": "Fout bij het bijwerken van profielfoto",
     "profile_picture_updated": "Profielfoto succesvol bijgewerkt",
+    "project_costs": {
+      "add_expense": "Uitgave toevoegen",
+      "categories": {
+        "DOMAIN": "Domeinnaam",
+        "ELECTRICITY": "Elektriciteit",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Hosting",
+        "OTHER": "Overig",
+        "SERVICE": "Dienst",
+        "SOFTWARE": "Software"
+      },
+      "category": "Categorie",
+      "confirm_delete_expense": "Weet u zeker dat u deze uitgave en alle bijbehorende tarieven wilt verwijderen?",
+      "description": "Uitgavenposten en hun tarieven beheren",
+      "description_field": "Beschrijving",
+      "edit_expense": "Uitgave bewerken",
+      "empty": "Geen uitgaven geconfigureerd",
+      "error": {
+        "create": "Fout bij aanmaken",
+        "delete": "Fout bij verwijderen",
+        "load": "Kan uitgaven niet laden",
+        "rate_add": "Fout bij toevoegen van tarief",
+        "rate_delete": "Fout bij verwijderen van tarief",
+        "rate_update": "Fout bij bijwerken van tarief",
+        "update": "Fout bij bijwerken"
+      },
+      "icon": "Pictogram",
+      "icon_hint": "Heroicons-pictogramnaam (bijv. i-heroicons-server)",
+      "inactive": "Inactief",
+      "is_active": "Actief",
+      "name": "Naam",
+      "no_rates": "Geen tarieven gedefinieerd",
+      "ongoing": "Lopend",
+      "periods": {
+        "MONTHLY": "Maandelijks",
+        "ONE_TIME": "Eenmalig",
+        "YEARLY": "Jaarlijks"
+      },
+      "rates": {
+        "add": "Tarief toevoegen",
+        "amount": "Bedrag",
+        "confirm_delete": "Weet u zeker dat u dit tarief wilt verwijderen?",
+        "currency": "Valuta",
+        "edit": "Tarief bewerken",
+        "end_date": "Einddatum",
+        "end_date_hint": "Leeg laten als het tarief nog geldt",
+        "note": "Opmerking",
+        "period": "Periode",
+        "select_date": "Selecteer een datum",
+        "start_date": "Startdatum"
+      },
+      "sort_order": "Weergavevolgorde",
+      "success": {
+        "created": "Uitgave succesvol aangemaakt",
+        "deleted": "Uitgave verwijderd",
+        "rate_added": "Tarief toegevoegd",
+        "rate_deleted": "Tarief verwijderd",
+        "rate_updated": "Tarief bijgewerkt",
+        "updated": "Uitgave bijgewerkt"
+      },
+      "title": "Projectkosten"
+    },
     "promote_to_admin": "Promoveren tot super beheerder",
     "promotion_error": "Fout tijdens promotie",
     "push_notifications_disabled": "Push-notificaties uitgeschakeld",

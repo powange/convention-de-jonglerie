@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Klicken Sie hier, um ein Profilbild hinzuzufügen",
     "profile_picture_update_error": "Fehler beim Aktualisieren des Profilbilds",
     "profile_picture_updated": "Profilbild erfolgreich aktualisiert",
+    "project_costs": {
+      "add_expense": "Ausgabe hinzufügen",
+      "categories": {
+        "DOMAIN": "Domainname",
+        "ELECTRICITY": "Strom",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Hosting",
+        "OTHER": "Sonstiges",
+        "SERVICE": "Dienstleistung",
+        "SOFTWARE": "Software"
+      },
+      "category": "Kategorie",
+      "confirm_delete_expense": "Möchten Sie diese Ausgabe und alle zugehörigen Tarife wirklich löschen?",
+      "description": "Ausgabenposten und deren Tarife verwalten",
+      "description_field": "Beschreibung",
+      "edit_expense": "Ausgabe bearbeiten",
+      "empty": "Keine Ausgaben konfiguriert",
+      "error": {
+        "create": "Fehler beim Erstellen",
+        "delete": "Fehler beim Löschen",
+        "load": "Ausgaben konnten nicht geladen werden",
+        "rate_add": "Fehler beim Hinzufügen des Tarifs",
+        "rate_delete": "Fehler beim Löschen des Tarifs",
+        "rate_update": "Fehler beim Aktualisieren des Tarifs",
+        "update": "Fehler beim Aktualisieren"
+      },
+      "icon": "Symbol",
+      "icon_hint": "Heroicons-Symbolname (z.B. i-heroicons-server)",
+      "inactive": "Inaktiv",
+      "is_active": "Aktiv",
+      "name": "Name",
+      "no_rates": "Keine Tarife definiert",
+      "ongoing": "Laufend",
+      "periods": {
+        "MONTHLY": "Monatlich",
+        "ONE_TIME": "Einmalig",
+        "YEARLY": "Jährlich"
+      },
+      "rates": {
+        "add": "Tarif hinzufügen",
+        "amount": "Betrag",
+        "confirm_delete": "Möchten Sie diesen Tarif wirklich löschen?",
+        "currency": "Währung",
+        "edit": "Tarif bearbeiten",
+        "end_date": "Enddatum",
+        "end_date_hint": "Leer lassen, wenn der Tarif noch gilt",
+        "note": "Hinweis",
+        "period": "Zeitraum",
+        "select_date": "Datum auswählen",
+        "start_date": "Startdatum"
+      },
+      "sort_order": "Anzeigereihenfolge",
+      "success": {
+        "created": "Ausgabe erfolgreich erstellt",
+        "deleted": "Ausgabe gelöscht",
+        "rate_added": "Tarif hinzugefügt",
+        "rate_deleted": "Tarif gelöscht",
+        "rate_updated": "Tarif aktualisiert",
+        "updated": "Ausgabe aktualisiert"
+      },
+      "title": "Projektkosten"
+    },
     "promote_to_admin": "Zum Super-Admin befördern",
     "promotion_error": "Fehler bei der Beförderung",
     "push_notifications_disabled": "Push-Benachrichtigungen deaktiviert",

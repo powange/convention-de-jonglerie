@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Haz clic para añadir una foto de perfil",
     "profile_picture_update_error": "Error al actualizar la foto de perfil",
     "profile_picture_updated": "Foto de perfil actualizada con éxito",
+    "project_costs": {
+      "add_expense": "Añadir gasto",
+      "categories": {
+        "DOMAIN": "Nombre de dominio",
+        "ELECTRICITY": "Electricidad",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Alojamiento",
+        "OTHER": "Otro",
+        "SERVICE": "Servicio",
+        "SOFTWARE": "Software"
+      },
+      "category": "Categoría",
+      "confirm_delete_expense": "¿Está seguro de que desea eliminar este gasto y todas las tarifas asociadas?",
+      "description": "Gestionar las partidas de gastos y sus tarifas",
+      "description_field": "Descripción",
+      "edit_expense": "Editar gasto",
+      "empty": "Ningún gasto configurado",
+      "error": {
+        "create": "Error al crear",
+        "delete": "Error al eliminar",
+        "load": "No se pudieron cargar los gastos",
+        "rate_add": "Error al añadir la tarifa",
+        "rate_delete": "Error al eliminar la tarifa",
+        "rate_update": "Error al actualizar la tarifa",
+        "update": "Error al actualizar"
+      },
+      "icon": "Icono",
+      "icon_hint": "Nombre del icono Heroicons (ej: i-heroicons-server)",
+      "inactive": "Inactivo",
+      "is_active": "Activo",
+      "name": "Nombre",
+      "no_rates": "Sin tarifas definidas",
+      "ongoing": "En curso",
+      "periods": {
+        "MONTHLY": "Mensual",
+        "ONE_TIME": "Puntual",
+        "YEARLY": "Anual"
+      },
+      "rates": {
+        "add": "Añadir tarifa",
+        "amount": "Importe",
+        "confirm_delete": "¿Está seguro de que desea eliminar esta tarifa?",
+        "currency": "Moneda",
+        "edit": "Editar tarifa",
+        "end_date": "Fecha de fin",
+        "end_date_hint": "Dejar vacío si la tarifa sigue vigente",
+        "note": "Nota",
+        "period": "Período",
+        "select_date": "Seleccionar una fecha",
+        "start_date": "Fecha de inicio"
+      },
+      "sort_order": "Orden de visualización",
+      "success": {
+        "created": "Gasto creado con éxito",
+        "deleted": "Gasto eliminado",
+        "rate_added": "Tarifa añadida",
+        "rate_deleted": "Tarifa eliminada",
+        "rate_updated": "Tarifa actualizada",
+        "updated": "Gasto actualizado"
+      },
+      "title": "Costes del proyecto"
+    },
     "promote_to_admin": "Promover a super admin",
     "promotion_error": "Error durante la promoción",
     "push_notifications_disabled": "Notificaciones push desactivadas",

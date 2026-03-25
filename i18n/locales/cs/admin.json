@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Kliknutím přidáte profilovou fotografii",
     "profile_picture_update_error": "Chyba při aktualizaci profilové fotografie",
     "profile_picture_updated": "Úspěšná aktualizace profilové fotografie",
+    "project_costs": {
+      "add_expense": "Přidat výdaj",
+      "categories": {
+        "DOMAIN": "Doménové jméno",
+        "ELECTRICITY": "Elektřina",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Hosting",
+        "OTHER": "Ostatní",
+        "SERVICE": "Služba",
+        "SOFTWARE": "Software"
+      },
+      "category": "Kategorie",
+      "confirm_delete_expense": "Opravdu chcete smazat tento výdaj a všechny přidružené tarify?",
+      "description": "Správa výdajových položek a jejich tarifů",
+      "description_field": "Popis",
+      "edit_expense": "Upravit výdaj",
+      "empty": "Žádné výdaje nakonfigurovány",
+      "error": {
+        "create": "Chyba při vytváření",
+        "delete": "Chyba při mazání",
+        "load": "Nelze načíst výdaje",
+        "rate_add": "Chyba při přidávání tarifu",
+        "rate_delete": "Chyba při mazání tarifu",
+        "rate_update": "Chyba při aktualizaci tarifu",
+        "update": "Chyba při aktualizaci"
+      },
+      "icon": "Ikona",
+      "icon_hint": "Název ikony Heroicons (např. i-heroicons-server)",
+      "inactive": "Neaktivní",
+      "is_active": "Aktivní",
+      "name": "Název",
+      "no_rates": "Žádné tarify definovány",
+      "ongoing": "Probíhající",
+      "periods": {
+        "MONTHLY": "Měsíčně",
+        "ONE_TIME": "Jednorázově",
+        "YEARLY": "Ročně"
+      },
+      "rates": {
+        "add": "Přidat tarif",
+        "amount": "Částka",
+        "confirm_delete": "Opravdu chcete smazat tento tarif?",
+        "currency": "Měna",
+        "edit": "Upravit tarif",
+        "end_date": "Datum ukončení",
+        "end_date_hint": "Ponechte prázdné, pokud tarif stále platí",
+        "note": "Poznámka",
+        "period": "Období",
+        "select_date": "Vybrat datum",
+        "start_date": "Datum zahájení"
+      },
+      "sort_order": "Pořadí zobrazení",
+      "success": {
+        "created": "Výdaj úspěšně vytvořen",
+        "deleted": "Výdaj smazán",
+        "rate_added": "Tarif přidán",
+        "rate_deleted": "Tarif smazán",
+        "rate_updated": "Tarif aktualizován",
+        "updated": "Výdaj aktualizován"
+      },
+      "title": "Náklady projektu"
+    },
     "promote_to_admin": "Povyšování superadmina",
     "promotion_error": "Chyba při propagaci",
     "push_notifications_disabled": "Push notifikace zakázány",

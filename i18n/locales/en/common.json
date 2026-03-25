@@ -951,7 +951,8 @@
     "feedback": "Give us feedback",
     "guide": "User guide",
     "language_selector": "Change language",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "project_costs": "Project costs"
   },
   "log": {
     "add_admin_notes": "Add notes about this error...",

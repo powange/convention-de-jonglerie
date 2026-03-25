@@ -951,7 +951,8 @@
     "feedback": "Feedback geben",
     "guide": "Benutzerhandbuch",
     "language_selector": "Sprache wechseln",
-    "privacy": "Datenschutzrichtlinie"
+    "privacy": "Datenschutzrichtlinie",
+    "project_costs": "Projektkosten"
   },
   "log": {
     "add_admin_notes": "Notizen zu diesem Fehler hinzufügen...",

@@ -1,0 +1,26 @@
+{
+  "project_costs": {
+    "categories": {
+      "DOMAIN": "Domænenavn",
+      "ELECTRICITY": "Elektricitet",
+      "HARDWARE": "Hardware",
+      "HOSTING": "Hosting",
+      "OTHER": "Andet",
+      "SERVICE": "Tjeneste",
+      "SOFTWARE": "Software"
+    },
+    "description": "Gennemsigtighed om de reelle driftsomkostninger for platformen.",
+    "no_expenses": "Ingen udgifter registreret endnu.",
+    "one_time": "Engangs",
+    "one_time_total": "Engangsudgifter",
+    "ongoing": "Igangværende",
+    "per_month": "/måned",
+    "per_year": "/år",
+    "price_history": "Prishistorik",
+    "since": "Siden",
+    "title": "Projektomkostninger",
+    "total_monthly": "Estimeret månedligt total",
+    "total_yearly": "Estimeret årligt total",
+    "until": "Til"
+  }
+}

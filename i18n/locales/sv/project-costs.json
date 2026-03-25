@@ -1,0 +1,26 @@
+{
+  "project_costs": {
+    "categories": {
+      "DOMAIN": "Domännamn",
+      "ELECTRICITY": "Elektricitet",
+      "HARDWARE": "Hårdvara",
+      "HOSTING": "Hosting",
+      "OTHER": "Övrigt",
+      "SERVICE": "Tjänst",
+      "SOFTWARE": "Programvara"
+    },
+    "description": "Transparens om plattformens verkliga driftskostnader.",
+    "no_expenses": "Inga utgifter registrerade ännu.",
+    "one_time": "Engångs",
+    "one_time_total": "Engångsutgifter",
+    "ongoing": "Pågående",
+    "per_month": "/månad",
+    "per_year": "/år",
+    "price_history": "Prishistorik",
+    "since": "Sedan",
+    "title": "Projektkostnader",
+    "total_monthly": "Beräknad månadskostnad",
+    "total_yearly": "Beräknad årskostnad",
+    "until": "Till"
+  }
+}

@@ -24,6 +24,8 @@ export type ResourceType =
   | 'objet'
   | 'créneau'
   | 'assignation'
+  | 'dépense'
+  | 'tarif'
 
 /**
  * Messages d'erreur pour les ressources
@@ -49,6 +51,8 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   objet: "ID d'objet invalide",
   créneau: 'ID de créneau invalide',
   assignation: "ID d'assignation invalide",
+  dépense: 'ID de dépense invalide',
+  tarif: 'ID de tarif invalide',
 }
 
 /**

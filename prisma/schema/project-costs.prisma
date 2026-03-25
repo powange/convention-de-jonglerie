@@ -1,0 +1,53 @@
+// =============================================================================
+// Coûts du projet — Postes de dépense et historique des tarifs
+// =============================================================================
+
+enum ProjectExpenseCategory {
+  DOMAIN
+  HOSTING
+  HARDWARE
+  ELECTRICITY
+  SOFTWARE
+  SERVICE
+  OTHER
+}
+
+enum ProjectExpensePeriod {
+  MONTHLY
+  YEARLY
+  ONE_TIME
+}
+
+model ProjectExpense {
+  id          Int                    @id @default(autoincrement())
+  name        String
+  description String?                @db.Text
+  category    ProjectExpenseCategory
+  icon        String?
+  isActive    Boolean                @default(true)
+  sortOrder   Int                    @default(0)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  rates ProjectExpenseRate[]
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model ProjectExpenseRate {
+  id        Int                  @id @default(autoincrement())
+  expenseId Int
+  amount    Decimal              @db.Decimal(10, 2)
+  currency  String               @default("EUR")
+  period    ProjectExpensePeriod
+  startDate DateTime
+  endDate   DateTime?
+  note      String?              @db.Text
+  createdAt DateTime             @default(now())
+
+  expense ProjectExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@index([expenseId], map: "idx_project_expense_rate_expense")
+  @@index([startDate])
+}

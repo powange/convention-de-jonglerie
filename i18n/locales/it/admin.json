@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Clicca per aggiungere una foto profilo",
     "profile_picture_update_error": "Errore nell'aggiornamento della foto profilo",
     "profile_picture_updated": "Foto profilo aggiornata con successo",
+    "project_costs": {
+      "add_expense": "Aggiungi spesa",
+      "categories": {
+        "DOMAIN": "Nome di dominio",
+        "ELECTRICITY": "Elettricità",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Hosting",
+        "OTHER": "Altro",
+        "SERVICE": "Servizio",
+        "SOFTWARE": "Software"
+      },
+      "category": "Categoria",
+      "confirm_delete_expense": "Sei sicuro di voler eliminare questa spesa e tutte le tariffe associate?",
+      "description": "Gestire le voci di spesa e le relative tariffe",
+      "description_field": "Descrizione",
+      "edit_expense": "Modifica spesa",
+      "empty": "Nessuna spesa configurata",
+      "error": {
+        "create": "Errore durante la creazione",
+        "delete": "Errore durante l'eliminazione",
+        "load": "Impossibile caricare le spese",
+        "rate_add": "Errore durante l'aggiunta della tariffa",
+        "rate_delete": "Errore durante l'eliminazione della tariffa",
+        "rate_update": "Errore durante l'aggiornamento della tariffa",
+        "update": "Errore durante l'aggiornamento"
+      },
+      "icon": "Icona",
+      "icon_hint": "Nome icona Heroicons (es: i-heroicons-server)",
+      "inactive": "Inattivo",
+      "is_active": "Attivo",
+      "name": "Nome",
+      "no_rates": "Nessuna tariffa definita",
+      "ongoing": "In corso",
+      "periods": {
+        "MONTHLY": "Mensile",
+        "ONE_TIME": "Una tantum",
+        "YEARLY": "Annuale"
+      },
+      "rates": {
+        "add": "Aggiungi tariffa",
+        "amount": "Importo",
+        "confirm_delete": "Sei sicuro di voler eliminare questa tariffa?",
+        "currency": "Valuta",
+        "edit": "Modifica tariffa",
+        "end_date": "Data di fine",
+        "end_date_hint": "Lasciare vuoto se la tariffa è ancora in vigore",
+        "note": "Nota",
+        "period": "Periodo",
+        "select_date": "Seleziona una data",
+        "start_date": "Data di inizio"
+      },
+      "sort_order": "Ordine di visualizzazione",
+      "success": {
+        "created": "Spesa creata con successo",
+        "deleted": "Spesa eliminata",
+        "rate_added": "Tariffa aggiunta",
+        "rate_deleted": "Tariffa eliminata",
+        "rate_updated": "Tariffa aggiornata",
+        "updated": "Spesa aggiornata"
+      },
+      "title": "Costi del progetto"
+    },
     "promote_to_admin": "Promuovi super admin",
     "promotion_error": "Errore durante la promozione",
     "push_notifications_disabled": "Notifiche push disattivate",

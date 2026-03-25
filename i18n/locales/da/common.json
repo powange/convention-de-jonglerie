@@ -951,7 +951,8 @@
     "feedback": "Giv os feedback",
     "guide": "Brugervejledning",
     "language_selector": "Skift sprog",
-    "privacy": "Privatlivspolitik"
+    "privacy": "Privatlivspolitik",
+    "project_costs": "Projektomkostninger"
   },
   "log": {
     "add_admin_notes": "Tilføj noter om denne fejl...",

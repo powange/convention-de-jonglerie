@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Klicka för att lägga till ett profilfoto",
     "profile_picture_update_error": "Fel vid uppdatering av profilfoto",
     "profile_picture_updated": "Profilfoto har uppdaterats framgångsrikt",
+    "project_costs": {
+      "add_expense": "Lägg till utgift",
+      "categories": {
+        "DOMAIN": "Domännamn",
+        "ELECTRICITY": "Elektricitet",
+        "HARDWARE": "Hårdvara",
+        "HOSTING": "Hosting",
+        "OTHER": "Övrigt",
+        "SERVICE": "Tjänst",
+        "SOFTWARE": "Programvara"
+      },
+      "category": "Kategori",
+      "confirm_delete_expense": "Är du säker på att du vill ta bort denna utgift och alla tillhörande tariffer?",
+      "description": "Hantera utgiftsposter och deras tariffer",
+      "description_field": "Beskrivning",
+      "edit_expense": "Redigera utgift",
+      "empty": "Inga utgifter konfigurerade",
+      "error": {
+        "create": "Fel vid skapande",
+        "delete": "Fel vid borttagning",
+        "load": "Kunde inte ladda utgifter",
+        "rate_add": "Fel vid tillägg av tariff",
+        "rate_delete": "Fel vid borttagning av tariff",
+        "rate_update": "Fel vid uppdatering av tariff",
+        "update": "Fel vid uppdatering"
+      },
+      "icon": "Ikon",
+      "icon_hint": "Heroicons-ikonnamn (t.ex. i-heroicons-server)",
+      "inactive": "Inaktiv",
+      "is_active": "Aktiv",
+      "name": "Namn",
+      "no_rates": "Inga tariffer definierade",
+      "ongoing": "Pågående",
+      "periods": {
+        "MONTHLY": "Månadsvis",
+        "ONE_TIME": "Engångs",
+        "YEARLY": "Årsvis"
+      },
+      "rates": {
+        "add": "Lägg till tariff",
+        "amount": "Belopp",
+        "confirm_delete": "Är du säker på att du vill ta bort denna tariff?",
+        "currency": "Valuta",
+        "edit": "Redigera tariff",
+        "end_date": "Slutdatum",
+        "end_date_hint": "Lämna tomt om tariffen fortfarande gäller",
+        "note": "Anteckning",
+        "period": "Period",
+        "select_date": "Välj ett datum",
+        "start_date": "Startdatum"
+      },
+      "sort_order": "Visningsordning",
+      "success": {
+        "created": "Utgift skapad",
+        "deleted": "Utgift borttagen",
+        "rate_added": "Tariff tillagd",
+        "rate_deleted": "Tariff borttagen",
+        "rate_updated": "Tariff uppdaterad",
+        "updated": "Utgift uppdaterad"
+      },
+      "title": "Projektkostnader"
+    },
     "promote_to_admin": "Befordra superadministratör",
     "promotion_error": "Fel i marknadsföringen",
     "push_notifications_disabled": "Push-notiser inaktiverade",

@@ -951,7 +951,8 @@
     "feedback": "Skicka oss feedback",
     "guide": "Användarguide",
     "language_selector": "Ändra språk",
-    "privacy": "Integritetspolicy"
+    "privacy": "Integritetspolicy",
+    "project_costs": "Projektkostnader"
   },
   "log": {
     "add_admin_notes": "Lägg till anteckningar om detta fel...",

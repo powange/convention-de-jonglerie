@@ -1,0 +1,26 @@
+{
+  "project_costs": {
+    "categories": {
+      "DOMAIN": "Nazwa domeny",
+      "ELECTRICITY": "Elektryczność",
+      "HARDWARE": "Sprzęt",
+      "HOSTING": "Hosting",
+      "OTHER": "Inne",
+      "SERVICE": "Usługa",
+      "SOFTWARE": "Oprogramowanie"
+    },
+    "description": "Przejrzystość kosztów rzeczywistego funkcjonowania platformy.",
+    "no_expenses": "Brak zarejestrowanych wydatków.",
+    "one_time": "Jednorazowo",
+    "one_time_total": "Wydatki jednorazowe",
+    "ongoing": "W toku",
+    "per_month": "/miesiąc",
+    "per_year": "/rok",
+    "price_history": "Historia cen",
+    "since": "Od",
+    "title": "Koszty projektu",
+    "total_monthly": "Szacunkowy miesięczny koszt",
+    "total_yearly": "Szacunkowy roczny koszt",
+    "until": "Do"
+  }
+}

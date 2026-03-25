@@ -951,7 +951,8 @@
     "feedback": "Danos tu opinión",
     "guide": "Guía de uso",
     "language_selector": "Cambiar idioma",
-    "privacy": "Política de Privacidad"
+    "privacy": "Política de Privacidad",
+    "project_costs": "Costes del proyecto"
   },
   "log": {
     "add_admin_notes": "Añadir notas sobre este error...",

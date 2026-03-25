@@ -1,0 +1,26 @@
+{
+  "project_costs": {
+    "categories": {
+      "DOMAIN": "Nome de domínio",
+      "ELECTRICITY": "Eletricidade",
+      "HARDWARE": "Hardware",
+      "HOSTING": "Alojamento",
+      "OTHER": "Outro",
+      "SERVICE": "Serviço",
+      "SOFTWARE": "Software"
+    },
+    "description": "Transparência sobre os custos reais de funcionamento da plataforma.",
+    "no_expenses": "Nenhuma despesa registada de momento.",
+    "one_time": "Pontual",
+    "one_time_total": "Despesas pontuais",
+    "ongoing": "Em curso",
+    "per_month": "/mês",
+    "per_year": "/ano",
+    "price_history": "Histórico de tarifas",
+    "since": "Desde",
+    "title": "Custos do projeto",
+    "total_monthly": "Total mensal estimado",
+    "total_yearly": "Total anual estimado",
+    "until": "Até"
+  }
+}

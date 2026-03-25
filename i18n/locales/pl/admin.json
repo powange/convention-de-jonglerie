@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Kliknij, aby dodać zdjęcie profilowe",
     "profile_picture_update_error": "Błąd podczas aktualizacji zdjęcia profilowego",
     "profile_picture_updated": "Zdjęcie profilowe zaktualizowane pomyślnie",
+    "project_costs": {
+      "add_expense": "Dodaj wydatek",
+      "categories": {
+        "DOMAIN": "Nazwa domeny",
+        "ELECTRICITY": "Elektryczność",
+        "HARDWARE": "Sprzęt",
+        "HOSTING": "Hosting",
+        "OTHER": "Inne",
+        "SERVICE": "Usługa",
+        "SOFTWARE": "Oprogramowanie"
+      },
+      "category": "Kategoria",
+      "confirm_delete_expense": "Czy na pewno chcesz usunąć ten wydatek i wszystkie powiązane taryfy?",
+      "description": "Zarządzaj pozycjami wydatków i ich taryfami",
+      "description_field": "Opis",
+      "edit_expense": "Edytuj wydatek",
+      "empty": "Brak skonfigurowanych wydatków",
+      "error": {
+        "create": "Błąd podczas tworzenia",
+        "delete": "Błąd podczas usuwania",
+        "load": "Nie udało się załadować wydatków",
+        "rate_add": "Błąd podczas dodawania taryfy",
+        "rate_delete": "Błąd podczas usuwania taryfy",
+        "rate_update": "Błąd podczas aktualizacji taryfy",
+        "update": "Błąd podczas aktualizacji"
+      },
+      "icon": "Ikona",
+      "icon_hint": "Nazwa ikony Heroicons (np. i-heroicons-server)",
+      "inactive": "Nieaktywny",
+      "is_active": "Aktywny",
+      "name": "Nazwa",
+      "no_rates": "Brak zdefiniowanych taryf",
+      "ongoing": "W toku",
+      "periods": {
+        "MONTHLY": "Miesięcznie",
+        "ONE_TIME": "Jednorazowo",
+        "YEARLY": "Rocznie"
+      },
+      "rates": {
+        "add": "Dodaj taryfę",
+        "amount": "Kwota",
+        "confirm_delete": "Czy na pewno chcesz usunąć tę taryfę?",
+        "currency": "Waluta",
+        "edit": "Edytuj taryfę",
+        "end_date": "Data zakończenia",
+        "end_date_hint": "Zostaw puste, jeśli taryfa nadal obowiązuje",
+        "note": "Notatka",
+        "period": "Okres",
+        "select_date": "Wybierz datę",
+        "start_date": "Data rozpoczęcia"
+      },
+      "sort_order": "Kolejność wyświetlania",
+      "success": {
+        "created": "Wydatek utworzony pomyślnie",
+        "deleted": "Wydatek usunięty",
+        "rate_added": "Taryfa dodana",
+        "rate_deleted": "Taryfa usunięta",
+        "rate_updated": "Taryfa zaktualizowana",
+        "updated": "Wydatek zaktualizowany"
+      },
+      "title": "Koszty projektu"
+    },
     "promote_to_admin": "Nadaj uprawnienia super administratora",
     "promotion_error": "Błąd podczas promocji",
     "push_notifications_disabled": "Powiadomienia push wyłączone",

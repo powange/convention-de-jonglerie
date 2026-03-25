@@ -1,0 +1,26 @@
+{
+  "project_costs": {
+    "categories": {
+      "DOMAIN": "Domeinnaam",
+      "ELECTRICITY": "Elektriciteit",
+      "HARDWARE": "Hardware",
+      "HOSTING": "Hosting",
+      "OTHER": "Overig",
+      "SERVICE": "Dienst",
+      "SOFTWARE": "Software"
+    },
+    "description": "Transparantie over de werkelijke exploitatiekosten van het platform.",
+    "no_expenses": "Nog geen uitgaven geregistreerd.",
+    "one_time": "Eenmalig",
+    "one_time_total": "Eenmalige uitgaven",
+    "ongoing": "Lopend",
+    "per_month": "/maand",
+    "per_year": "/jaar",
+    "price_history": "Prijsgeschiedenis",
+    "since": "Sinds",
+    "title": "Projectkosten",
+    "total_monthly": "Geschat maandelijks totaal",
+    "total_yearly": "Geschat jaarlijks totaal",
+    "until": "Tot"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "project_costs": {
+    "categories": {
+      "DOMAIN": "Doménové jméno",
+      "ELECTRICITY": "Elektřina",
+      "HARDWARE": "Hardware",
+      "HOSTING": "Hosting",
+      "OTHER": "Ostatní",
+      "SERVICE": "Služba",
+      "SOFTWARE": "Software"
+    },
+    "description": "Transparentnost skutečných provozních nákladů platformy.",
+    "no_expenses": "Zatím žádné výdaje zaznamenány.",
+    "one_time": "Jednorázově",
+    "one_time_total": "Jednorázové výdaje",
+    "ongoing": "Probíhající",
+    "per_month": "/měsíc",
+    "per_year": "/rok",
+    "price_history": "Historie cen",
+    "since": "Od",
+    "title": "Náklady projektu",
+    "total_monthly": "Odhadované měsíční náklady",
+    "total_yearly": "Odhadované roční náklady",
+    "until": "Do"
+  }
+}

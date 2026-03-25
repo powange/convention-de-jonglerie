@@ -21,6 +21,12 @@
           >
             {{ t('footer.guide') }}
           </NuxtLink>
+          <NuxtLink
+            to="/project-costs"
+            class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          >
+            {{ t('footer.project_costs') }}
+          </NuxtLink>
           <UButton variant="ghost" color="neutral" size="sm" @click="openFeedbackModal">
             {{ t('footer.feedback') }}
           </UButton>

@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Click to add a profile picture",
     "profile_picture_update_error": "Error updating profile picture",
     "profile_picture_updated": "Profile picture updated successfully",
+    "project_costs": {
+      "add_expense": "Add expense",
+      "categories": {
+        "DOMAIN": "Domain name",
+        "ELECTRICITY": "Electricity",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Hosting",
+        "OTHER": "Other",
+        "SERVICE": "Service",
+        "SOFTWARE": "Software"
+      },
+      "category": "Category",
+      "confirm_delete_expense": "Are you sure you want to delete this expense and all associated rates?",
+      "description": "Manage expense items and their rates",
+      "description_field": "Description",
+      "edit_expense": "Edit expense",
+      "empty": "No expenses configured",
+      "error": {
+        "create": "Error creating expense",
+        "delete": "Error deleting expense",
+        "load": "Unable to load expenses",
+        "rate_add": "Error adding rate",
+        "rate_delete": "Error deleting rate",
+        "rate_update": "Error updating rate",
+        "update": "Error updating expense"
+      },
+      "icon": "Icon",
+      "icon_hint": "Heroicons icon name (e.g. i-heroicons-server)",
+      "inactive": "Inactive",
+      "is_active": "Active",
+      "name": "Name",
+      "no_rates": "No rates defined",
+      "ongoing": "Ongoing",
+      "periods": {
+        "MONTHLY": "Monthly",
+        "ONE_TIME": "One-time",
+        "YEARLY": "Yearly"
+      },
+      "rates": {
+        "add": "Add rate",
+        "amount": "Amount",
+        "confirm_delete": "Are you sure you want to delete this rate?",
+        "currency": "Currency",
+        "edit": "Edit rate",
+        "end_date": "End date",
+        "end_date_hint": "Leave empty if the rate is still in effect",
+        "note": "Note",
+        "period": "Period",
+        "select_date": "Select a date",
+        "start_date": "Start date"
+      },
+      "sort_order": "Display order",
+      "success": {
+        "created": "Expense created successfully",
+        "deleted": "Expense deleted",
+        "rate_added": "Rate added",
+        "rate_deleted": "Rate deleted",
+        "rate_updated": "Rate updated",
+        "updated": "Expense updated"
+      },
+      "title": "Project costs"
+    },
     "promote_to_admin": "Promote to super admin",
     "promotion_error": "Error during promotion",
     "push_notifications_disabled": "Push notifications disabled",

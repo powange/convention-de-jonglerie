@@ -951,7 +951,8 @@
     "feedback": "Geef ons feedback",
     "guide": "Gebruikershandleiding",
     "language_selector": "Taal wijzigen",
-    "privacy": "Privacybeleid"
+    "privacy": "Privacybeleid",
+    "project_costs": "Projectkosten"
   },
   "log": {
     "add_admin_notes": "Voeg notities toe over deze fout...",

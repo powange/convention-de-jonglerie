@@ -394,6 +394,68 @@
     "profile_picture_placeholder": "Klik for at tilføje et profilbillede",
     "profile_picture_update_error": "Fejl ved opdatering af profilbillede",
     "profile_picture_updated": "Profilbillede opdateret succesfuldt",
+    "project_costs": {
+      "add_expense": "Tilføj udgift",
+      "categories": {
+        "DOMAIN": "Domænenavn",
+        "ELECTRICITY": "Elektricitet",
+        "HARDWARE": "Hardware",
+        "HOSTING": "Hosting",
+        "OTHER": "Andet",
+        "SERVICE": "Tjeneste",
+        "SOFTWARE": "Software"
+      },
+      "category": "Kategori",
+      "confirm_delete_expense": "Er du sikker på, at du vil slette denne udgift og alle tilknyttede tariffer?",
+      "description": "Administrer udgiftsposter og deres tariffer",
+      "description_field": "Beskrivelse",
+      "edit_expense": "Rediger udgift",
+      "empty": "Ingen udgifter konfigureret",
+      "error": {
+        "create": "Fejl ved oprettelse",
+        "delete": "Fejl ved sletning",
+        "load": "Kan ikke indlæse udgifter",
+        "rate_add": "Fejl ved tilføjelse af tarif",
+        "rate_delete": "Fejl ved sletning af tarif",
+        "rate_update": "Fejl ved opdatering af tarif",
+        "update": "Fejl ved opdatering"
+      },
+      "icon": "Ikon",
+      "icon_hint": "Heroicons-ikonnavn (f.eks. i-heroicons-server)",
+      "inactive": "Inaktiv",
+      "is_active": "Aktiv",
+      "name": "Navn",
+      "no_rates": "Ingen tariffer defineret",
+      "ongoing": "Igangværende",
+      "periods": {
+        "MONTHLY": "Månedligt",
+        "ONE_TIME": "Engangs",
+        "YEARLY": "Årligt"
+      },
+      "rates": {
+        "add": "Tilføj tarif",
+        "amount": "Beløb",
+        "confirm_delete": "Er du sikker på, at du vil slette denne tarif?",
+        "currency": "Valuta",
+        "edit": "Rediger tarif",
+        "end_date": "Slutdato",
+        "end_date_hint": "Lad stå tomt, hvis tariffen stadig gælder",
+        "note": "Note",
+        "period": "Periode",
+        "select_date": "Vælg en dato",
+        "start_date": "Startdato"
+      },
+      "sort_order": "Visningsrækkefølge",
+      "success": {
+        "created": "Udgift oprettet",
+        "deleted": "Udgift slettet",
+        "rate_added": "Tarif tilføjet",
+        "rate_deleted": "Tarif slettet",
+        "rate_updated": "Tarif opdateret",
+        "updated": "Udgift opdateret"
+      },
+      "title": "Projektomkostninger"
+    },
     "promote_to_admin": "Forfrem til superadmin",
     "promotion_error": "Fejl under forfremmelse",
     "push_notifications_disabled": "Push-notifikationer deaktiveret",

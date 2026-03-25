@@ -40,13 +40,15 @@
       "WebFetch(domain:www.infomaniak.com)",
       "WebFetch(domain:developer.infomaniak.com)",
       "Bash(node scripts/check-i18n.js --help)",
-      "Bash(npx vue-tsc:*)"
+      "Bash(npx vue-tsc:*)",
+      "Bash(do cp:*)"
     ],
     "additionalDirectories": [
       "/tmp",
       "/root/projets/convention-de-jonglerie/.claude/commands",
       "/root/projets/convention-de-jonglerie/.claude/skills",
-      "/root/projets/convention-de-jonglerie/server/api/editions/[id]/ticketing"
+      "/root/projets/convention-de-jonglerie/server/api/editions/[id]/ticketing",
+      "/root/projets/convention-de-jonglerie/server/api/admin/project-costs/[id]"
     ]
   }
 }
