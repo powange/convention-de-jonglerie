@@ -29,8 +29,8 @@
       "success_message": "Ваше пожертвування зареєстровано. Дякуємо за вашу підтримку!",
       "success_title": "Дякуємо за вашу каву! ☕",
       "title": "Кава для П'єра ☕",
-      "total_coffees": "{count} кав подаровано",
-      "total_received": "{amount} € отримано"
+      "total_coffees_label": "подарованих кав",
+      "total_received_label": "отримано"
     },
     "description": "Прозорість реальних експлуатаційних витрат платформи.",
     "estimated_time": "Витрачений час",

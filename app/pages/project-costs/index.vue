@@ -212,7 +212,7 @@
                 {{ donations.totalCoffees }} ☕
               </p>
               <p class="text-sm text-gray-500">
-                {{ t('project_costs.coffee.total_coffees', { count: donations.totalCoffees }) }}
+                {{ t('project_costs.coffee.total_coffees_label') }}
               </p>
             </div>
             <div v-if="donations.totalNetCents > 0" class="text-center">
@@ -220,11 +220,7 @@
                 {{ (donations.totalNetCents / 100).toFixed(2) }} €
               </p>
               <p class="text-sm text-gray-500">
-                {{
-                  t('project_costs.coffee.total_received', {
-                    amount: (donations.totalNetCents / 100).toFixed(2),
-                  })
-                }}
+                {{ t('project_costs.coffee.total_received_label') }}
               </p>
             </div>
           </div>

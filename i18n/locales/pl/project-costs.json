@@ -29,8 +29,8 @@
       "success_message": "Twoja darowizna została zarejestrowana. Dziękujemy za wsparcie!",
       "success_title": "Dziękujemy za kawę! ☕",
       "title": "Kawa dla Pierre'a ☕",
-      "total_coffees": "{count} kaw postawionych",
-      "total_received": "{amount} € otrzymanych"
+      "total_coffees_label": "podarowanych kaw",
+      "total_received_label": "otrzymano"
     },
     "description": "Przejrzystość kosztów rzeczywistego funkcjonowania platformy.",
     "estimated_time": "Zainwestowany czas",

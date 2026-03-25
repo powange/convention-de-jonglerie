@@ -29,8 +29,8 @@
       "success_message": "Váš dar byl zaznamenán. Děkujeme za vaši podporu!",
       "success_title": "Děkujeme za vaši kávu! ☕",
       "title": "Káva pro Pierra ☕",
-      "total_coffees": "{count} káv darováno",
-      "total_received": "{amount} € přijato"
+      "total_coffees_label": "darovaných káv",
+      "total_received_label": "přijato"
     },
     "description": "Transparentnost skutečných provozních nákladů platformy.",
     "estimated_time": "Investovaný čas",

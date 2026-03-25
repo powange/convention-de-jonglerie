@@ -29,8 +29,8 @@
       "success_message": "A sua doação foi registada. Obrigado pelo seu apoio!",
       "success_title": "Obrigado pelo seu café! ☕",
       "title": "Um café para Pierre ☕",
-      "total_coffees": "{count} café(s) oferecido(s)",
-      "total_received": "{amount} € recebidos"
+      "total_coffees_label": "café(s) oferecido(s)",
+      "total_received_label": "recebidos"
     },
     "description": "Transparência sobre os custos reais de funcionamento da plataforma.",
     "estimated_time": "Tempo investido",

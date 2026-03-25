@@ -22,15 +22,15 @@
       "custom_quantity": "Autre",
       "description": "Ce projet est développé bénévolement. Si vous souhaitez soutenir le développement, vous pouvez offrir un café !",
       "donate_button": "Offrir {count} café(s)",
+      "donations_paused": "Les dons sont actuellement suspendus. Merci pour votre soutien passé !",
       "error": "Impossible de créer la session de paiement",
       "price_per_coffee": "1 € par café",
       "quantity_label": "Nombre de cafés",
       "success_message": "Votre don a bien été enregistré. Merci pour votre soutien !",
       "success_title": "Merci pour votre café ! ☕",
       "title": "Un café pour Pierre ☕",
-      "total_coffees": "{count} café(s) offert(s)",
-      "total_received": "{amount} € perçus",
-      "donations_paused": "Les dons sont actuellement suspendus. Merci pour votre soutien passé !"
+      "total_coffees_label": "café(s) offert(s)",
+      "total_received_label": "perçus"
     },
     "description": "Transparence sur les coûts réels de fonctionnement de la plateforme.",
     "estimated_time": "Temps investi",

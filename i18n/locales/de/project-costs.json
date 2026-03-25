@@ -29,8 +29,8 @@
       "success_message": "Ihre Spende wurde erfasst. Vielen Dank für Ihre Unterstützung!",
       "success_title": "Danke für Ihren Kaffee! ☕",
       "title": "Ein Kaffee für Pierre ☕",
-      "total_coffees": "{count} Kaffee(s) gespendet",
-      "total_received": "{amount} € erhalten"
+      "total_coffees_label": "gespendete(r) Kaffee(s)",
+      "total_received_label": "erhalten"
     },
     "description": "Transparenz über die tatsächlichen Betriebskosten der Plattform.",
     "estimated_time": "Investierte Zeit",

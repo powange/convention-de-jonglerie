@@ -29,8 +29,8 @@
       "success_message": "Din donation er registreret. Tak for din støtte!",
       "success_title": "Tak for din kaffe! ☕",
       "title": "En kaffe til Pierre ☕",
-      "total_coffees": "{count} kaffe(r) givet",
-      "total_received": "{amount} € modtaget"
+      "total_coffees_label": "donerede kaffe(r)",
+      "total_received_label": "modtaget"
     },
     "description": "Gennemsigtighed om de reelle driftsomkostninger for platformen.",
     "estimated_time": "Investeret tid",

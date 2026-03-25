@@ -469,20 +469,20 @@
         "updated": "Dépense mise à jour"
       },
       "time_estimate": {
-        "title": "Estimation du temps passé",
+        "current_estimate": "Estimation actuelle : ~{count}h",
         "description": "Configurez le compteur de temps investi dans le projet.",
         "fixed_hours": "Heures comptabilisées",
         "fixed_hours_hint": "Nombre d'heures passées à la date de référence",
+        "load_error": "Erreur lors du chargement de l'estimation de temps",
+        "not_configured": "Estimation de temps non configurée",
+        "per_week": "h/sem.",
         "reference_date": "Date de référence",
         "reference_date_hint": "Date à laquelle le compteur fixe est valable",
-        "weekly_hours": "Heures par semaine",
-        "weekly_hours_hint": "Estimation du temps passé par semaine depuis la date de référence",
-        "current_estimate": "Estimation actuelle : ~{count}h",
-        "per_week": "h/sem.",
-        "not_configured": "Estimation de temps non configurée",
-        "load_error": "Erreur lors du chargement de l'estimation de temps",
+        "save_error": "Erreur lors de la sauvegarde",
         "save_success": "Estimation de temps sauvegardée",
-        "save_error": "Erreur lors de la sauvegarde"
+        "title": "Estimation du temps passé",
+        "weekly_hours": "Heures par semaine",
+        "weekly_hours_hint": "Estimation du temps passé par semaine depuis la date de référence"
       },
       "title": "Coûts du projet"
     },

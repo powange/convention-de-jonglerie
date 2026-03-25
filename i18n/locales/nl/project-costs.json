@@ -29,8 +29,8 @@
       "success_message": "Uw donatie is geregistreerd. Bedankt voor uw steun!",
       "success_title": "Bedankt voor uw koffie! ☕",
       "title": "Een koffie voor Pierre ☕",
-      "total_coffees": "{count} koffie(s) aangeboden",
-      "total_received": "€ {amount} ontvangen"
+      "total_coffees_label": "gedoneerde koffie(s)",
+      "total_received_label": "ontvangen"
     },
     "description": "Transparantie over de werkelijke exploitatiekosten van het platform.",
     "estimated_time": "Geïnvesteerde tijd",
