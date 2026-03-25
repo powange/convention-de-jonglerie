@@ -94,15 +94,15 @@
     <!-- Liste des dépenses -->
     <div class="space-y-4">
       <UCard v-for="expense in expenses" :key="expense.id" variant="outline">
-        <div class="flex items-start justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div class="flex items-start gap-3">
-            <div class="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg mt-0.5">
+            <div class="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg mt-0.5 shrink-0">
               <UIcon
                 :name="expense.icon || categoryIcons[expense.category]"
                 class="w-5 h-5 text-primary"
               />
             </div>
-            <div>
+            <div class="min-w-0">
               <h3 class="font-semibold text-lg">{{ expense.name }}</h3>
               <UBadge
                 :label="t(`project_costs.categories.${expense.category}`)"
@@ -118,7 +118,7 @@
           </div>
 
           <!-- Tarif actuel -->
-          <div v-if="getCurrentRate(expense)" class="text-right shrink-0">
+          <div v-if="getCurrentRate(expense)" class="text-right shrink-0 pl-10 sm:pl-0">
             <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {{ parseFloat(getCurrentRate(expense)!.amount).toFixed(2) }}
               {{ getCurrentRate(expense)!.currency }}
@@ -149,7 +149,7 @@
             <div
               v-for="rate in expense.rates"
               :key="rate.id"
-              class="flex items-center justify-between text-sm py-1.5 px-3 rounded"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 text-sm py-1.5 px-3 rounded"
               :class="
                 isCurrentRate(rate)
                   ? 'bg-emerald-50 dark:bg-emerald-900/10'
@@ -157,7 +157,7 @@
               "
             >
               <div class="flex items-center gap-3">
-                <span class="font-medium">
+                <span class="font-medium whitespace-nowrap">
                   {{ parseFloat(rate.amount).toFixed(2) }} {{ rate.currency }}
                 </span>
                 <UBadge
@@ -167,7 +167,7 @@
                   size="sm"
                 />
               </div>
-              <span class="text-gray-500">
+              <span class="text-gray-500 text-xs sm:text-sm">
                 {{ t('project_costs.since') }} {{ formatDate(rate.startDate) }}
                 <template v-if="rate.endDate">
                   — {{ t('project_costs.until') }} {{ formatDate(rate.endDate) }}
