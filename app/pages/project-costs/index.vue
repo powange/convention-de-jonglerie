@@ -112,8 +112,8 @@
           </div>
 
           <!-- Tarif actuel -->
-          <template v-if="getCurrentRate(expense) as currentRate">
-            <div class="text-right shrink-0">
+          <template v-for="currentRate in [getCurrentRate(expense)]" :key="expense.id">
+            <div v-if="currentRate" class="text-right shrink-0">
               <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                 {{ parseFloat(currentRate.amount).toFixed(2) }}
                 {{ currentRate.currency }}
