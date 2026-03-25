@@ -81,17 +81,15 @@
           </div>
 
           <!-- Tarif actuel -->
-          <template v-if="getCurrentRate(expense) as currentRate">
-            <div class="text-right shrink-0">
-              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                {{ parseFloat(currentRate.amount).toFixed(2) }}
-                {{ currentRate.currency }}
-              </p>
-              <p class="text-sm text-gray-500">
-                {{ periodLabel(currentRate.period) }}
-              </p>
-            </div>
-          </template>
+          <div v-if="getCurrentRate(expense)" class="text-right shrink-0">
+            <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+              {{ parseFloat(getCurrentRate(expense)!.amount).toFixed(2) }}
+              {{ getCurrentRate(expense)!.currency }}
+            </p>
+            <p class="text-sm text-gray-500">
+              {{ periodLabel(getCurrentRate(expense)!.period) }}
+            </p>
+          </div>
         </div>
 
         <!-- Historique des tarifs -->
