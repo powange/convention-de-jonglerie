@@ -888,7 +888,8 @@ export const NotificationHelpers = {
     artistName: string,
     showTitle: string,
     editionName: string,
-    editionId: number
+    editionId: number,
+    showCallId: number
   ) {
     return await NotificationService.create({
       userId,
@@ -900,7 +901,7 @@ export const NotificationHelpers = {
       category: 'artist',
       entityType: 'Edition',
       entityId: editionId.toString(),
-      actionUrl: `/editions/${editionId}/gestion/artists/shows`,
+      actionUrl: `/editions/${editionId}/gestion/shows-call/${showCallId}/applications`,
       notificationType: 'show_application_submitted',
     })
   },

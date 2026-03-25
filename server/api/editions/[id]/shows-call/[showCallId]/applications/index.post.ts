@@ -194,7 +194,8 @@ export default wrapApiHandler(
             validatedData.artistName,
             validatedData.showTitle,
             editionName,
-            editionId
+            editionId,
+            showCallId
           ),
         'notification candidature artiste soumise'
       )
