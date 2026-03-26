@@ -82,7 +82,7 @@ export default wrapApiHandler(
       }
     }
 
-    // Charge réussie → mettre à jour les frais si manquants
+    // Charge réussie → mettre à jour les frais (même si déjà présents, pour gérer la race condition)
     if (stripeEvent.type === 'charge.succeeded') {
       const charge = stripeEvent.data.object as Stripe.Charge
 
@@ -100,13 +100,28 @@ export default wrapApiHandler(
           })
 
           if (sessions.data.length > 0) {
-            await prisma.coffeeDonation.updateMany({
-              where: { stripeSessionId: sessions.data[0].id, feeCents: null },
+            const sessionId = sessions.data[0].id
+
+            // Tenter la mise à jour — si le don n'existe pas encore (race condition),
+            // réessayer après un court délai pour laisser le temps au checkout.session.completed
+            const updated = await prisma.coffeeDonation.updateMany({
+              where: { stripeSessionId: sessionId },
               data: {
                 feeCents: balanceTx.fee,
                 netCents: balanceTx.net,
               },
             })
+
+            if (updated.count === 0) {
+              await new Promise((resolve) => setTimeout(resolve, 3000))
+              await prisma.coffeeDonation.updateMany({
+                where: { stripeSessionId: sessionId },
+                data: {
+                  feeCents: balanceTx.fee,
+                  netCents: balanceTx.net,
+                },
+              })
+            }
           }
         } catch {
           // Pas critique
