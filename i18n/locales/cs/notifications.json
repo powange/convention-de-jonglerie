@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Zobrazit mé kandidatury",
         "message": "Vaše představení \"{showTitle}\" bylo vybráno pro \"{editionName}\".",
-        "title": "Kandidatura přijata! ✅"
+        "title": "Vystoupení vybráno! ✅"
       },
       "application_rejected": {
         "action": "Zobrazit mé kandidatury",
         "message": "Vaše představení \"{showTitle}\" nebylo vybráno pro \"{editionName}\".",
-        "title": "Kandidatura nevybrána"
+        "title": "Vystoupení nevybráno"
       },
       "application_submitted": {
         "action": "Zobrazit kandidatury",
@@ -67,6 +67,13 @@
       "registered_at": "Přidáno {date}",
       "title": "Registrovaná zařízení"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Zobrazit dary",
+        "message": "{donorName} daroval(a) {quantity} kávu/káv ({amount} €).",
+        "title": "Nový dar obdržen ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "Do platformy byla právě přidána konvence \"{conventionName}\".",
@@ -117,17 +124,17 @@
         "message_complete": "Vaše žádost o \"{editionName}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n• {teams}\n\nZpráva od organizátora:\n\"{note}\"",
         "message_with_note": "Vaše žádost o \"{editionName}\" byla přijata.\n\nZpráva od organizátora:\n\"{note}\"",
         "message_with_teams": "Vaše žádost o \"{editionName}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n• {teams}",
-        "title": "Přihláška přijata! ✅"
+        "title": "Dobrovolnická přihláška přijata! ✅"
       },
       "application_rejected": {
         "action": "Viz vydání",
         "message": "Vaše žádost o dobrovolnictví pro \"{editionName}\" nebyla tentokrát přijata.",
-        "title": "Žádost nebyla přijata"
+        "title": "Dobrovolnická přihláška nepřijata"
       },
       "application_submitted": {
         "action": "Podívejte se na mé aplikace",
-        "message": "Vaše žádost o \"{editionName}\" byla úspěšně odeslána. Organizátoři ji prověří.",
-        "title": "Přihláška odeslána! 🎉"
+        "message": "Vaše dobrovolnická přihláška na \"{editionName}\" byla úspěšně odeslána. Organizátoři ji posoudí.",
+        "title": "Dobrovolnická přihláška odeslána! 🎉"
       },
       "arrival": {
         "action": "Zobrazit rozvrh",

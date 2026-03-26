@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Zobacz moje kandydatury",
         "message": "Twój spektakl \"{showTitle}\" został wybrany na \"{editionName}\".",
-        "title": "Kandydatura zaakceptowana! ✅"
+        "title": "Występ wybrany! ✅"
       },
       "application_rejected": {
         "action": "Zobacz moje kandydatury",
         "message": "Twój spektakl \"{showTitle}\" nie został wybrany na \"{editionName}\".",
-        "title": "Kandydatura niewylosowana"
+        "title": "Występ niewybrany"
       },
       "application_submitted": {
         "action": "Zobacz kandydatury",
@@ -67,6 +67,13 @@
       "registered_at": "Dodano {date}",
       "title": "Zarejestrowane urządzenia"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Zobacz darowizny",
+        "message": "{donorName} podarował(a) {quantity} kaw(ę) ({amount} €).",
+        "title": "Nowa darowizna otrzymana ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "Konwencja \"{conventionName}\" została właśnie dodana do platformy.",
@@ -117,17 +124,17 @@
         "message_complete": "Twoje zgłoszenie do \"{editionName}\" zostało zaakceptowane.\n\nZostałeś przypisany do następujących zespołów:\n• {teams}\n\nWiadomość od organizatora:\n\"{note}\"",
         "message_with_note": "Twoje zgłoszenie do \"{editionName}\" zostało zaakceptowane.\n\nWiadomość od organizatora:\n\"{note}\"",
         "message_with_teams": "Twoje zgłoszenie do \"{editionName}\" zostało zaakceptowane.\n\nZostałeś przypisany do następujących zespołów:\n• {teams}",
-        "title": "Zgłoszenie zaakceptowane! ✅"
+        "title": "Zgłoszenie wolontariusza przyjęte! ✅"
       },
       "application_rejected": {
         "action": "Zobacz edycję",
         "message": "Twoje zgłoszenie wolontariusza do \"{editionName}\" nie zostało tym razem zaakceptowane.",
-        "title": "Zgłoszenie odrzucone"
+        "title": "Zgłoszenie wolontariusza nieprzyjęte"
       },
       "application_submitted": {
         "action": "Zobacz moje zgłoszenia",
-        "message": "Twoje zgłoszenie do \"{editionName}\" zostało wysłane pomyślnie. Organizatorzy je sprawdzą.",
-        "title": "Zgłoszenie wysłane! 🎉"
+        "message": "Twoje zgłoszenie wolontariusza na \"{editionName}\" zostało wysłane pomyślnie. Organizatorzy je rozpatrzą.",
+        "title": "Zgłoszenie wolontariusza wysłane! 🎉"
       },
       "arrival": {
         "action": "Zobacz harmonogram",

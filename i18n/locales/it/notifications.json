@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Vedi le mie candidature",
         "message": "Il tuo spettacolo \"{showTitle}\" è stato selezionato per \"{editionName}\".",
-        "title": "Candidatura accettata! ✅"
+        "title": "Spettacolo selezionato! ✅"
       },
       "application_rejected": {
         "action": "Vedi le mie candidature",
         "message": "Il tuo spettacolo \"{showTitle}\" non è stato selezionato per \"{editionName}\".",
-        "title": "Candidatura non selezionata"
+        "title": "Spettacolo non selezionato"
       },
       "application_submitted": {
         "action": "Vedi le candidature",
@@ -67,6 +67,13 @@
       "registered_at": "Aggiunto il {date}",
       "title": "Dispositivi registrati"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Vedi le donazioni",
+        "message": "{donorName} ha offerto {quantity} caffè ({amount} €).",
+        "title": "Nuova donazione ricevuta ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "La convention \"{conventionName}\" è appena stata aggiunta alla piattaforma.",
@@ -117,17 +124,17 @@
         "message_complete": "La tua candidatura per \"{editionName}\" è stata accettata.\n\nSei stato assegnato ai seguenti team:\n• {teams}\n\nMessaggio dall'organizzatore:\n\"{note}\"",
         "message_with_note": "La tua candidatura per \"{editionName}\" è stata accettata.\n\nMessaggio dall'organizzatore:\n\"{note}\"",
         "message_with_teams": "La tua candidatura per \"{editionName}\" è stata accettata.\n\nSei stato assegnato ai seguenti team:\n• {teams}",
-        "title": "Candidatura accettata! ✅"
+        "title": "Candidatura volontario accettata! ✅"
       },
       "application_rejected": {
         "action": "Vedi edizione",
         "message": "La tua candidatura da volontario per \"{editionName}\" non è stata accettata questa volta.",
-        "title": "Candidatura non accettata"
+        "title": "Candidatura volontario non accettata"
       },
       "application_submitted": {
         "action": "Vedi le mie candidature",
-        "message": "La tua candidatura per \"{editionName}\" è stata inviata con successo. Gli organizzatori la esamineranno.",
-        "title": "Candidatura inviata! 🎉"
+        "message": "La tua candidatura di volontario per \"{editionName}\" è stata inviata con successo. Gli organizzatori la esamineranno.",
+        "title": "Candidatura volontario inviata! 🎉"
       },
       "arrival": {
         "action": "Vedi la pianificazione",

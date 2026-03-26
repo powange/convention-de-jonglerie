@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "View my applications",
         "message": "Your show \"{showTitle}\" has been selected for \"{editionName}\".",
-        "title": "Application accepted! ✅"
+        "title": "Show selected! ✅"
       },
       "application_rejected": {
         "action": "View my applications",
         "message": "Your show \"{showTitle}\" was not selected for \"{editionName}\".",
-        "title": "Application not selected"
+        "title": "Show not selected"
       },
       "application_submitted": {
         "action": "View applications",
@@ -67,6 +67,13 @@
       "registered_at": "Added on {date}",
       "title": "Registered devices"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "View donations",
+        "message": "{donorName} donated {quantity} coffee(s) ({amount} €).",
+        "title": "New donation received ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "The convention \"{conventionName}\" has just been added to the platform.",
@@ -117,17 +124,17 @@
         "message_complete": "Your application for \"{editionName}\" has been accepted.\n\nYou have been assigned to the following teams:\n• {teams}\n\nMessage from the organizer:\n\"{note}\"",
         "message_with_note": "Your application for \"{editionName}\" has been accepted.\n\nMessage from the organizer:\n\"{note}\"",
         "message_with_teams": "Your application for \"{editionName}\" has been accepted.\n\nYou have been assigned to the following teams:\n• {teams}",
-        "title": "Application accepted! ✅"
+        "title": "Volunteer application accepted! ✅"
       },
       "application_rejected": {
         "action": "View edition",
         "message": "Your volunteer application for \"{editionName}\" was not accepted this time.",
-        "title": "Application not accepted"
+        "title": "Volunteer application not accepted"
       },
       "application_submitted": {
         "action": "View my applications",
-        "message": "Your application for \"{editionName}\" has been successfully submitted. The organizers will review it.",
-        "title": "Application submitted! 🎉"
+        "message": "Your volunteer application for \"{editionName}\" has been submitted successfully. The organizers will review it.",
+        "title": "Volunteer application submitted! 🎉"
       },
       "arrival": {
         "action": "View schedule",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Text, Button, Section } from '@vue-email/components'
+import { Text, Button, Section, Hr } from '@vue-email/components'
 
 import BaseEmail from './BaseEmail.vue'
 
@@ -13,49 +13,60 @@ defineProps<Props>()
 </script>
 
 <template>
-  <BaseEmail title="🔐 Réinitialisation de mot de passe" :base-url="baseUrl">
-    <Text>Bonjour {{ prenom }},</Text>
+  <BaseEmail
+    title="R&#233;initialisation de mot de passe"
+    :base-url="baseUrl"
+    preheader="Un lien pour r&#233;initialiser votre mot de passe Juggling Convention"
+  >
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">Bonjour {{ prenom }},</Text>
 
-    <Text
-      >Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Juggling
-      Convention.</Text
-    >
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">
+      Vous avez demand&#233; la r&#233;initialisation de votre mot de passe pour votre compte
+      Juggling Convention.
+    </Text>
 
-    <Text>Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe :</Text>
+    <Text :style="{ color: '#374151', margin: '0 0 20px' }">
+      Cliquez sur le bouton ci-dessous pour d&#233;finir un nouveau mot de passe :
+    </Text>
 
-    <Section :style="{ textAlign: 'center' }">
+    <Section :style="{ textAlign: 'center', margin: '0 0 24px' }">
       <Button
         :href="resetLink"
         :style="{
           display: 'inline-block',
-          background: 'oklch(79.2% .209 151.711)',
-          color: 'white',
-          padding: '12px 30px',
+          backgroundColor: '#10b981',
+          color: '#ffffff',
+          padding: '12px 32px',
           textDecoration: 'none',
           borderRadius: '6px',
-          fontWeight: 'bold',
-          margin: '20px 0',
+          fontWeight: '600',
+          fontSize: '14px',
         }"
       >
-        Réinitialiser mon mot de passe
+        R&#233;initialiser mon mot de passe
       </Button>
     </Section>
 
-    <Text><strong>Ce lien est valide pendant 1 heure.</strong></Text>
+    <Text :style="{ color: '#374151', margin: '0 0 12px' }">
+      <strong>Ce lien est valide pendant 1 heure.</strong>
+    </Text>
 
-    <Text
-      >Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre
-      navigateur :</Text
-    >
-    <Text :style="{ wordBreak: 'break-all', color: '#a78bfa', fontSize: '14px' }">{{
-      resetLink
-    }}</Text>
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0 0 8px' }">
+      Si le bouton ne fonctionne pas, copiez et collez le lien suivant dans votre navigateur :
+    </Text>
+    <Text :style="{ color: '#10b981', fontSize: '13px', margin: '0 0 20px' }">
+      {{ resetLink }}
+    </Text>
 
-    <Text
-      >Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email. Votre mot
-      de passe restera inchangé.</Text
-    >
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0 0 20px' }">
+      Si vous n'avez pas demand&#233; cette r&#233;initialisation, vous pouvez ignorer cet email.
+      Votre mot de passe restera inchang&#233;.
+    </Text>
 
-    <Text>Cordialement,<br />L'équipe de Juggling Convention</Text>
+    <Hr :style="{ borderColor: '#e5e7eb', margin: '0 0 20px' }" />
+
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0' }">
+      &#8212; L'&#233;quipe de Juggling Convention
+    </Text>
   </BaseEmail>
 </template>

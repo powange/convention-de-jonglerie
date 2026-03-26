@@ -953,4 +953,32 @@ export const NotificationHelpers = {
       notificationType: 'show_application_rejected',
     })
   },
+
+  /**
+   * Notification de don café reçu (envoyée à tous les global admins)
+   */
+  async coffeeDonationReceived(quantity: number, totalCents: number, donorName: string | null) {
+    const admins = await prisma.user.findMany({
+      where: { isGlobalAdmin: true },
+      select: { id: true },
+    })
+
+    const amount = (totalCents / 100).toFixed(2)
+
+    return await Promise.all(
+      admins.map((admin) =>
+        NotificationService.create({
+          userId: admin.id,
+          type: 'SUCCESS',
+          titleKey: 'notifications.donation.coffee_received.title',
+          messageKey: 'notifications.donation.coffee_received.message',
+          translationParams: { quantity, amount, donorName: donorName || '?' },
+          actionTextKey: 'notifications.donation.coffee_received.action',
+          category: 'system',
+          actionUrl: '/admin/project-costs',
+          notificationType: 'coffee_donation_received',
+        })
+      )
+    )
+  },
 }

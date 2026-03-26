@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Voir mes candidatures",
         "message": "Votre spectacle \"{showTitle}\" a été retenu pour \"{editionName}\".",
-        "title": "Candidature acceptée ! ✅"
+        "title": "Spectacle retenu ! ✅"
       },
       "application_rejected": {
         "action": "Voir mes candidatures",
         "message": "Votre spectacle \"{showTitle}\" n'a pas été retenu pour \"{editionName}\".",
-        "title": "Candidature non retenue"
+        "title": "Spectacle non retenu"
       },
       "application_submitted": {
         "action": "Voir les candidatures",
@@ -102,6 +102,13 @@
       "test_button": "Tester une notification",
       "title": "Notifications push"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Voir les dons",
+        "message": "{donorName} a offert {quantity} café(s) ({amount} €).",
+        "title": "Nouveau don reçu ☕"
+      }
+    },
     "system": {
       "error": {
         "message": "Une erreur s'est produite : {errorMessage}",
@@ -117,17 +124,17 @@
         "message_complete": "Votre candidature pour \"{editionName}\" a été acceptée.\n\nVous avez été assigné aux équipes suivantes :\n• {teams}\n\nMessage de l'organisateur :\n\"{note}\"",
         "message_with_note": "Votre candidature pour \"{editionName}\" a été acceptée.\n\nMessage de l'organisateur :\n\"{note}\"",
         "message_with_teams": "Votre candidature pour \"{editionName}\" a été acceptée.\n\nVous avez été assigné aux équipes suivantes :\n• {teams}",
-        "title": "Candidature acceptée ! ✅"
+        "title": "Candidature bénévole acceptée ! ✅"
       },
       "application_rejected": {
         "action": "Voir l'édition",
         "message": "Votre candidature de bénévole pour \"{editionName}\" n'a pas été acceptée cette fois.",
-        "title": "Candidature non acceptée"
+        "title": "Candidature bénévole non acceptée"
       },
       "application_submitted": {
         "action": "Voir mes candidatures",
-        "message": "Votre candidature pour \"{editionName}\" a été envoyée avec succès. Les organisateurs vont l'examiner.",
-        "title": "Candidature envoyée ! 🎉"
+        "message": "Votre candidature de bénévole pour \"{editionName}\" a été envoyée avec succès. Les organisateurs vont l'examiner.",
+        "title": "Candidature bénévole envoyée ! 🎉"
       },
       "arrival": {
         "action": "Voir le planning",

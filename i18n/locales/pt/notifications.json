@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Ver minhas candidaturas",
         "message": "O seu espetáculo \"{showTitle}\" foi selecionado para \"{editionName}\".",
-        "title": "Candidatura aceite! ✅"
+        "title": "Espetáculo selecionado! ✅"
       },
       "application_rejected": {
         "action": "Ver minhas candidaturas",
         "message": "O seu espetáculo \"{showTitle}\" não foi selecionado para \"{editionName}\".",
-        "title": "Candidatura não selecionada"
+        "title": "Espetáculo não selecionado"
       },
       "application_submitted": {
         "action": "Ver candidaturas",
@@ -67,6 +67,13 @@
       "registered_at": "Adicionado em {date}",
       "title": "Dispositivos registados"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Ver doações",
+        "message": "{donorName} doou {quantity} café(s) ({amount} €).",
+        "title": "Nova doação recebida ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "A convenção \"{conventionName}\" acabou de ser adicionada à plataforma.",
@@ -117,17 +124,17 @@
         "message_complete": "A sua candidatura para \"{editionName}\" foi aceite.\n\nFoi atribuído às seguintes equipas:\n• {teams}\n\nMensagem do organizador:\n\"{note}\"",
         "message_with_note": "A sua candidatura para \"{editionName}\" foi aceite.\n\nMensagem do organizador:\n\"{note}\"",
         "message_with_teams": "A sua candidatura para \"{editionName}\" foi aceite.\n\nFoi atribuído às seguintes equipas:\n• {teams}",
-        "title": "Candidatura aceite! ✅"
+        "title": "Candidatura de voluntário aceite! ✅"
       },
       "application_rejected": {
         "action": "Ver edição",
         "message": "A sua candidatura de voluntário para \"{editionName}\" não foi aceite desta vez.",
-        "title": "Candidatura não aceite"
+        "title": "Candidatura de voluntário não aceite"
       },
       "application_submitted": {
         "action": "Ver as minhas candidaturas",
-        "message": "A sua candidatura para \"{editionName}\" foi enviada com sucesso. Os organizadores irão analisá-la.",
-        "title": "Candidatura enviada! 🎉"
+        "message": "A sua candidatura de voluntário para \"{editionName}\" foi enviada com sucesso. Os organizadores irão analisá-la.",
+        "title": "Candidatura de voluntário enviada! 🎉"
       },
       "arrival": {
         "action": "Ver o planeamento",

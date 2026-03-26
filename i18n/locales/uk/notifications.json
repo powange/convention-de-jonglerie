@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Переглянути мої заявки",
         "message": "Ваш виступ \"{showTitle}\" було відібрано для \"{editionName}\".",
-        "title": "Заявку прийнято! ✅"
+        "title": "Виступ відібрано! ✅"
       },
       "application_rejected": {
         "action": "Переглянути мої заявки",
         "message": "Ваш виступ \"{showTitle}\" не було відібрано для \"{editionName}\".",
-        "title": "Заявку не відібрано"
+        "title": "Виступ не відібрано"
       },
       "application_submitted": {
         "action": "Переглянути заявки",
@@ -67,6 +67,13 @@
       "registered_at": "Додано {date}",
       "title": "Зареєстровані пристрої"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Переглянути пожертви",
+        "message": "{donorName} подарував(ла) {quantity} каву ({amount} €).",
+        "title": "Отримано нову пожертву ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "Конвенцію \"{conventionName}\" щойно додано на платформу.",
@@ -117,17 +124,17 @@
         "message_complete": "Вашу заявку на \"{editionName}\" прийнято.\n\nВас призначено до таких команд:\n• {teams}\n\nПовідомлення від організатора:\n\"{note}\"",
         "message_with_note": "Вашу заявку на \"{editionName}\" прийнято.\n\nПовідомлення від організатора:\n\"{note}\"",
         "message_with_teams": "Вашу заявку на \"{editionName}\" прийнято.\n\nВас призначено до таких команд:\n• {teams}",
-        "title": "Заявку прийнято! ✅"
+        "title": "Заявку волонтера прийнято! ✅"
       },
       "application_rejected": {
         "action": "Переглянути видання",
         "message": "Вашу заявку волонтера на \"{editionName}\" не прийнято цього разу.",
-        "title": "Заявку не прийнято"
+        "title": "Заявку волонтера не прийнято"
       },
       "application_submitted": {
         "action": "Переглянути мої заявки",
-        "message": "Вашу заявку на \"{editionName}\" успішно надіслано. Організатори розглянуть її.",
-        "title": "Заявку надіслано! 🎉"
+        "message": "Вашу заявку волонтера на \"{editionName}\" успішно надіслано. Організатори розглянуть її.",
+        "title": "Заявку волонтера надіслано! 🎉"
       },
       "arrival": {
         "action": "Переглянути розклад",

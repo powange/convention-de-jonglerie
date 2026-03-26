@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Text, Button, Section } from '@vue-email/components'
+import { Text, Button, Section, Hr } from '@vue-email/components'
 
 import BaseEmail from './BaseEmail.vue'
 
@@ -16,41 +16,48 @@ defineProps<Props>()
 </script>
 
 <template>
-  <BaseEmail :title="title" :base-url="baseUrl">
-    <Text>Bonjour {{ prenom }},</Text>
+  <BaseEmail
+    :title="title"
+    :base-url="baseUrl"
+    :preheader="message.replace(/<[^>]*>/g, '').substring(0, 120)"
+  >
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">Bonjour {{ prenom }},</Text>
 
     <Section
       :style="{
-        background: '#141837',
-        padding: '20px',
-        borderRadius: '8px',
-        margin: '20px 0',
-        border: '1px solid rgba(124, 58, 237, 0.2)',
-        color: '#e5e7eb',
+        backgroundColor: '#f9fafb',
+        padding: '16px 20px',
+        borderRadius: '6px',
+        borderLeft: '4px solid #10b981',
+        margin: '0 0 24px',
       }"
     >
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div v-html="message" />
+      <div :style="{ color: '#374151', fontSize: '14px', lineHeight: '1.6' }" v-html="message" />
     </Section>
 
-    <Section v-if="actionUrl && actionText" :style="{ textAlign: 'center' }">
+    <Section v-if="actionUrl && actionText" :style="{ textAlign: 'center', margin: '0 0 24px' }">
       <Button
         :href="`${baseUrl}${actionUrl}`"
         :style="{
           display: 'inline-block',
-          background: 'oklch(79.2% .209 151.711)',
-          color: 'white',
-          padding: '12px 30px',
+          backgroundColor: '#10b981',
+          color: '#ffffff',
+          padding: '12px 32px',
           textDecoration: 'none',
           borderRadius: '6px',
-          fontWeight: 'bold',
-          margin: '20px 0',
+          fontWeight: '600',
+          fontSize: '14px',
         }"
       >
         {{ actionText }}
       </Button>
     </Section>
 
-    <Text>Cordialement,<br />L'équipe de Juggling Convention</Text>
+    <Hr :style="{ borderColor: '#e5e7eb', margin: '0 0 20px' }" />
+
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0' }">
+      &#8212; L'&#233;quipe de Juggling Convention
+    </Text>
   </BaseEmail>
 </template>

@@ -70,18 +70,31 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     }
 
     // Mode envoi réel
-    if (!smtpUser || !smtpPass) {
-      console.error('❌ Variables SMTP manquantes (SMTP_USER, SMTP_PASS)')
-      return false
-    }
+    const smtpHost = process.env.SMTP_HOST || ''
+    const smtpPort = parseInt(process.env.SMTP_PORT || '587')
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    })
+    // Si un host SMTP custom est configuré (ex: Mailpit), pas besoin d'auth
+    const transporter = smtpHost
+      ? nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: false,
+        })
+      : (() => {
+          if (!smtpUser || !smtpPass) {
+            console.error('❌ Variables SMTP manquantes (SMTP_USER, SMTP_PASS)')
+            return null
+          }
+          return nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: smtpUser,
+              pass: smtpPass,
+            },
+          })
+        })()
+
+    if (!transporter) return false
 
     const mailOptions = {
       from: `"Juggling Convention" <${smtpFrom}>`,

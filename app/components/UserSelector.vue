@@ -1,91 +1,106 @@
 <template>
-  <div class="flex gap-2">
-    <USelectMenu
-      v-model="internalValue"
-      :search-term="searchTerm"
-      :items="displayedItems"
-      :loading="searchingUsers"
-      ignore-filter
-      option-attribute="label"
-      :placeholder="placeholder"
-      icon="i-heroicons-user"
-      :ui="{ content: 'min-w-fit' }"
-      class="flex-1"
-      @update:search-term="(v) => emit('update:searchTerm', v)"
-    >
-      <template #leading="{ modelValue: selectedValue }">
-        <UiUserAvatar
-          v-if="selectedValue"
-          :user="{
-            id: selectedValue.id,
-            pseudo: selectedValue.pseudo,
-            profilePicture: selectedValue.profilePicture,
-            emailHash: selectedValue.emailHash,
-          }"
-          size="xs"
-        />
-        <UIcon v-else name="i-heroicons-user-circle" class="text-gray-400 h-4 w-4" />
-      </template>
-
-      <template #item-leading="{ item }">
-        <UiUserAvatar
-          :user="{
-            id: item.id,
-            pseudo: item.pseudo,
-            profilePicture: item.profilePicture,
-            emailHash: item.emailHash,
-          }"
-          size="xs"
-        />
-      </template>
-
-      <template #empty>
-        <div class="py-4 text-center text-xs text-gray-500">
-          {{
-            searchTerm.length < 2 ? 'Commencez à taper pour rechercher' : 'Aucun utilisateur trouvé'
-          }}
-        </div>
-      </template>
-    </USelectMenu>
-
-    <UButton
-      v-if="internalValue && showClearButton"
-      variant="outline"
-      color="neutral"
-      size="sm"
-      icon="i-heroicons-x-mark"
-      class="shrink-0"
-      @click="internalValue = undefined"
-    />
-  </div>
-
-  <!-- Suggestions rapides (optionnel) -->
-  <div v-if="testUsers && testUsers.length > 0" class="mt-3">
-    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-      {{ testUsersLabel || 'Utilisateurs de test disponibles :' }}
-    </p>
-    <div class="flex flex-wrap gap-2">
-      <UButton
-        v-for="user in testUsers"
-        :key="user.id"
-        variant="soft"
-        size="sm"
-        :color="internalValue?.id === user.id ? 'primary' : 'neutral'"
-        class="transition-colors"
-        @click="internalValue = user"
+  <div>
+    <div class="flex gap-2">
+      <USelectMenu
+        v-model="internalValue"
+        :search-term="searchTerm"
+        :items="displayedItems"
+        :loading="searchingUsers"
+        ignore-filter
+        option-attribute="label"
+        :placeholder="placeholder"
+        icon="i-heroicons-user"
+        :ui="{ content: 'min-w-fit' }"
+        class="flex-1"
+        @update:search-term="(v) => emit('update:searchTerm', v)"
       >
-        <UiUserAvatar
-          :user="{
-            id: user.id,
-            pseudo: user.pseudo,
-            profilePicture: user.profilePicture,
-            emailHash: user.emailHash,
-          }"
-          size="xs"
-          class="mr-1"
-        />
-        {{ user.pseudo }}
+        <template #leading="{ modelValue: selectedValue }">
+          <UiUserAvatar
+            v-if="selectedValue"
+            :user="{
+              id: selectedValue.id,
+              pseudo: selectedValue.pseudo,
+              profilePicture: selectedValue.profilePicture,
+              emailHash: selectedValue.emailHash,
+            }"
+            size="xs"
+          />
+          <UIcon v-else name="i-heroicons-user-circle" class="text-gray-400 h-4 w-4" />
+        </template>
+
+        <template #item-leading="{ item }">
+          <UiUserAvatar
+            :user="{
+              id: item.id,
+              pseudo: item.pseudo,
+              profilePicture: item.profilePicture,
+              emailHash: item.emailHash,
+            }"
+            size="xs"
+          />
+        </template>
+
+        <template #empty>
+          <div class="py-4 text-center text-xs text-gray-500">
+            {{
+              searchTerm.length < 2
+                ? 'Commencez à taper pour rechercher'
+                : 'Aucun utilisateur trouvé'
+            }}
+          </div>
+        </template>
+      </USelectMenu>
+
+      <UButton
+        v-if="currentUser"
+        variant="outline"
+        color="neutral"
+        icon="i-heroicons-user"
+        title="Me sélectionner"
+        class="shrink-0"
+        @click="selectCurrentUser"
+      >
+        Moi
       </UButton>
+      <UButton
+        v-if="internalValue && showClearButton"
+        variant="outline"
+        color="neutral"
+        size="sm"
+        icon="i-heroicons-x-mark"
+        class="shrink-0"
+        @click="internalValue = undefined"
+      />
+    </div>
+
+    <!-- Suggestions rapides (optionnel) -->
+    <div v-if="testUsers && testUsers.length > 0" class="mt-3">
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+        {{ testUsersLabel || 'Utilisateurs de test disponibles :' }}
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="user in testUsers"
+          :key="user.id"
+          variant="soft"
+          size="sm"
+          :color="internalValue?.id === user.id ? 'primary' : 'neutral'"
+          class="transition-colors"
+          @click="internalValue = user"
+        >
+          <UiUserAvatar
+            :user="{
+              id: user.id,
+              pseudo: user.pseudo,
+              profilePicture: user.profilePicture,
+              emailHash: user.emailHash,
+            }"
+            size="xs"
+            class="mr-1"
+          />
+          {{ user.pseudo }}
+        </UButton>
+      </div>
     </div>
   </div>
 </template>
@@ -103,6 +118,12 @@ export interface UserSelectItem {
   isRealUser?: boolean
 }
 
+interface CurrentUser {
+  id: number
+  pseudo: string
+  email: string
+}
+
 interface Props {
   modelValue: UserSelectItem | null
   searchTerm: string
@@ -112,6 +133,7 @@ interface Props {
   showClearButton?: boolean
   testUsers?: UserSelectItem[]
   testUsersLabel?: string
+  currentUser?: CurrentUser | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -137,6 +159,19 @@ const {
 
 // Prevent mutating the incoming prop directly: use an internal ref bound to the select
 const internalValue = ref<UserSelectItem | undefined>(props.modelValue ?? undefined)
+
+const selectCurrentUser = () => {
+  if (props.currentUser) {
+    internalValue.value = {
+      id: props.currentUser.id,
+      label: props.currentUser.pseudo,
+      pseudo: props.currentUser.pseudo,
+      email: props.currentUser.email,
+      emailHash: '',
+      isRealUser: true,
+    }
+  }
+}
 
 // Ensure items passed to USelectMenu include the email in the label so
 // built-in filtering (which usually matches on label) also matches emails.

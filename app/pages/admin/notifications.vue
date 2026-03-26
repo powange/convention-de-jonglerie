@@ -166,7 +166,7 @@
               {{ stats?.activeTypes || 0 }}
             </p>
           </div>
-          <UIcon name="i-heroicons-squares-2x2" class="h-8 w-8 text-purple-500" />
+          <UIcon name="i-heroicons-device-phone-mobile" class="h-8 w-8 text-purple-500" />
         </div>
       </UCard>
     </div>
@@ -426,7 +426,7 @@
         class="w-full"
       >
         <template #name-cell="{ row }">
-          <UiUserDisplayForAdmin :user="row.original.user" />
+          <UiUserDisplayForAdmin :key="row.original.user.id" :user="row.original.user" />
         </template>
         <template #type-cell="{ row }">
           <div class="flex items-center gap-2">
@@ -592,12 +592,11 @@
           </UButton>
 
           <UPagination
-            :model-value="pagination.page"
-            :page-count="pagination.limit"
+            v-model:page="pagination.page"
+            :items-per-page="pagination.limit"
             :total="pagination.total"
             size="sm"
             class="flex-shrink-0"
-            @update:model-value="handlePageChange"
           />
 
           <UButton
@@ -781,6 +780,7 @@
               :searching-users="searchingUsers"
               placeholder="Rechercher un utilisateur..."
               :test-users="testUserItems"
+              :current-user="authStore.user"
             />
           </UFormField>
 
@@ -897,7 +897,11 @@
             </h4>
 
             <UFormField label="Titre" required>
-              <UInput v-model="firebaseTestForm.title" placeholder="Titre de la notification..." />
+              <UInput
+                v-model="firebaseTestForm.title"
+                placeholder="Titre de la notification..."
+                class="w-full"
+              />
             </UFormField>
 
             <UFormField label="Message" required>
@@ -905,11 +909,16 @@
                 v-model="firebaseTestForm.body"
                 placeholder="Message de la notification..."
                 :rows="3"
+                class="w-full"
               />
             </UFormField>
 
             <UFormField label="URL d'action" description="URL de redirection lors du clic">
-              <UInput v-model="firebaseTestForm.actionUrl" placeholder="/notifications" />
+              <UInput
+                v-model="firebaseTestForm.actionUrl"
+                placeholder="/notifications"
+                class="w-full"
+              />
             </UFormField>
           </div>
         </div>
@@ -943,7 +952,10 @@
 import { formatTimeAgoIntl } from '@vueuse/core'
 import { z } from 'zod'
 
+import { useAuthStore } from '~/stores/auth'
+
 const { requestPermissionAndGetToken, isAvailable } = useFirebaseMessaging()
+const authStore = useAuthStore()
 
 // Protection admin
 definePageMeta({
@@ -1312,13 +1324,6 @@ const formatTimeAgoCustom = (dateString: string) => {
   })
 }
 
-const handlePageChange = (newPage: number) => {
-  console.log('handlePageChange called with page:', newPage)
-  pagination.value.page = newPage
-  // Force le rechargement immédiatement
-  loadRecentNotifications()
-}
-
 // Actions
 const { execute: executeSendReminders, loading: sendingReminders } = useApiAction(
   '/api/admin/notifications/send-reminders',
@@ -1614,7 +1619,7 @@ const { execute: executeLoadStats } = useApiAction('/api/admin/notifications/sta
       totalSent: response.totalSent || 0,
       totalUnread: response.unreadCount || 0,
       sentToday: response.thisWeekCount || 0,
-      activeTypes: response.pushSubscriptionsActive || 0,
+      activeTypes: response.fcmTokensActive || 0,
     }
   },
 })
@@ -1676,17 +1681,14 @@ const resetFilters = () => {
   loadRecentNotifications()
 }
 
-// Watchers pour la pagination - Désactivé car on utilise handlePageChange
-// watch(
-//   () => pagination.value.page,
-//   (newPage, oldPage) => {
-//     console.log('Page changed from', oldPage, 'to', newPage)
-//     // Recharger les données quand on change de page
-//     if (newPage !== undefined && newPage !== oldPage) {
-//       loadRecentNotifications()
-//     }
-//   }
-// )
+watch(
+  () => pagination.value.page,
+  (newPage, oldPage) => {
+    if (newPage !== undefined && newPage !== oldPage) {
+      loadRecentNotifications()
+    }
+  }
+)
 
 watch(
   () => pagination.value.limit,

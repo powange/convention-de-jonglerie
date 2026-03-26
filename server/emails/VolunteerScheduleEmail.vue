@@ -1,35 +1,76 @@
 <template>
-  <BaseEmail :title="title" :base-url="baseUrl">
-    <Text class="text-gray-700 mb-4">
+  <BaseEmail :title="title" :base-url="baseUrl" :preheader="preheaderText">
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">
       Bonjour <strong>{{ prenom }}</strong
       >,
     </Text>
 
-    <Text class="text-gray-700 mb-4">
-      Vos créneaux de bénévolat pour <strong>{{ conventionName }}</strong>
+    <Text :style="{ color: '#374151', margin: '0 0 20px' }">
+      Vos cr&#233;neaux de b&#233;n&#233;volat pour <strong>{{ conventionName }}</strong>
       {{ editionName !== conventionName ? `(${editionName})` : '' }} sont maintenant disponibles !
     </Text>
 
-    <Section v-if="timeSlots && timeSlots.length > 0" class="mb-6">
-      <Text class="text-gray-700 mb-3 font-semibold">📅 Vos créneaux :</Text>
+    <Section v-if="timeSlots && timeSlots.length > 0" :style="{ margin: '0 0 24px' }">
+      <Text :style="{ color: '#374151', fontWeight: '600', margin: '0 0 12px' }">
+        Vos cr&#233;neaux :
+      </Text>
 
-      <table class="w-full border-collapse">
+      <table
+        :style="{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: '14px',
+        }"
+      >
         <thead>
-          <tr class="bg-gray-100">
-            <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Créneau</th>
-            <th class="border border-gray-300 px-4 py-2 text-left">Équipe</th>
+          <tr>
+            <th
+              :style="{
+                backgroundColor: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                padding: '10px 12px',
+                textAlign: 'left',
+                color: '#374151',
+                fontWeight: '600',
+              }"
+            >
+              Date
+            </th>
+            <th
+              :style="{
+                backgroundColor: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                padding: '10px 12px',
+                textAlign: 'left',
+                color: '#374151',
+                fontWeight: '600',
+              }"
+            >
+              Cr&#233;neau
+            </th>
+            <th
+              :style="{
+                backgroundColor: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                padding: '10px 12px',
+                textAlign: 'left',
+                color: '#374151',
+                fontWeight: '600',
+              }"
+            >
+              &#201;quipe
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(slot, index) in timeSlots" :key="index" class="border-b">
-            <td class="border border-gray-300 px-4 py-2">
+          <tr v-for="(slot, index) in timeSlots" :key="index">
+            <td :style="{ border: '1px solid #e5e7eb', padding: '10px 12px', color: '#374151' }">
               {{ formatDate(slot.date) }}
             </td>
-            <td class="border border-gray-300 px-4 py-2">
+            <td :style="{ border: '1px solid #e5e7eb', padding: '10px 12px', color: '#374151' }">
               {{ getTimeLabel(slot) }}
             </td>
-            <td class="border border-gray-300 px-4 py-2">
+            <td :style="{ border: '1px solid #e5e7eb', padding: '10px 12px', color: '#374151' }">
               {{ slot.teamName }}
             </td>
           </tr>
@@ -37,45 +78,55 @@
       </table>
     </Section>
 
-    <Section v-else class="mb-6">
-      <Text class="text-gray-700">
-        Vos créneaux seront bientôt attribués. Consultez régulièrement votre espace bénévole pour
-        rester informé.
+    <Section v-else :style="{ margin: '0 0 24px' }">
+      <Text :style="{ color: '#6b7280', fontSize: '14px' }">
+        Vos cr&#233;neaux seront bient&#244;t attribu&#233;s. Consultez r&#233;guli&#232;rement
+        votre espace b&#233;n&#233;vole pour rester inform&#233;.
       </Text>
     </Section>
 
-    <Section :style="{ textAlign: 'center', marginBottom: '24px' }">
+    <Section :style="{ textAlign: 'center', margin: '0 0 24px' }">
       <Button
         :href="actionUrl"
         :style="{
           display: 'inline-block',
-          background: 'oklch(79.2% .209 151.711)',
-          color: 'white',
-          padding: '12px 30px',
+          backgroundColor: '#10b981',
+          color: '#ffffff',
+          padding: '12px 32px',
           textDecoration: 'none',
           borderRadius: '6px',
-          fontWeight: 'bold',
-          margin: '20px 0',
+          fontWeight: '600',
+          fontSize: '14px',
         }"
       >
-        Voir mes créneaux
+        Voir mes cr&#233;neaux
       </Button>
     </Section>
 
-    <Text class="text-gray-600 text-sm mb-2">
-      💡 <strong>Astuce :</strong> N'oubliez pas de consulter votre espace bénévole pour plus de
-      détails sur vos missions et les consignes à suivre.
-    </Text>
+    <Section
+      :style="{
+        backgroundColor: '#f0fdf4',
+        padding: '12px 16px',
+        borderRadius: '6px',
+        margin: '0 0 20px',
+      }"
+    >
+      <Text :style="{ color: '#166534', fontSize: '13px', margin: '0' }">
+        <strong>Astuce :</strong> Consultez votre espace b&#233;n&#233;vole pour plus de
+        d&#233;tails sur vos missions et les consignes &#224; suivre.
+      </Text>
+    </Section>
 
-    <Text class="text-gray-600 text-sm">
-      Si vous avez des questions ou besoin de modifications, contactez les organisateurs via la
-      plateforme.
+    <Hr :style="{ borderColor: '#e5e7eb', margin: '0 0 20px' }" />
+
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0' }">
+      &#8212; L'&#233;quipe de Juggling Convention
     </Text>
   </BaseEmail>
 </template>
 
 <script setup lang="ts">
-import { Button, Section, Text } from '@vue-email/components'
+import { Button, Hr, Section, Text } from '@vue-email/components'
 
 import BaseEmail from './BaseEmail.vue'
 
@@ -96,7 +147,8 @@ const props = defineProps<{
   baseUrl: string
 }>()
 
-const title = `Vos créneaux de bénévolat - ${props.conventionName}`
+const title = `Vos cr\u00e9neaux de b\u00e9n\u00e9volat - ${props.conventionName}`
+const preheaderText = `Vos cr\u00e9neaux pour ${props.conventionName} sont disponibles`
 
 const formatDate = (date: Date) => {
   return new Date(date).toLocaleDateString('fr-FR', {
@@ -112,9 +164,9 @@ const getTimeLabel = (slot: TimeSlot) => {
     return `${slot.startTime} - ${slot.endTime}`
   }
   const labels = {
-    MORNING: '🌅 Matin',
-    AFTERNOON: '☀️ Après-midi',
-    EVENING: '🌙 Soir',
+    MORNING: 'Matin',
+    AFTERNOON: 'Apr\u00e8s-midi',
+    EVENING: 'Soir',
   }
   return labels[slot.timeOfDay] || slot.timeOfDay
 }

@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Se mine ansøgninger",
         "message": "Dit show \"{showTitle}\" er blevet udvalgt til \"{editionName}\".",
-        "title": "Ansøgning accepteret! ✅"
+        "title": "Forestilling udvalgt! ✅"
       },
       "application_rejected": {
         "action": "Se mine ansøgninger",
         "message": "Dit show \"{showTitle}\" blev ikke udvalgt til \"{editionName}\".",
-        "title": "Ansøgning ikke udvalgt"
+        "title": "Forestilling ikke udvalgt"
       },
       "application_submitted": {
         "action": "Se ansøgninger",
@@ -67,6 +67,13 @@
       "registered_at": "Tilføjet {date}",
       "title": "Registrerede enheder"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Se donationer",
+        "message": "{donorName} donerede {quantity} kaffe(r) ({amount} €).",
+        "title": "Ny donation modtaget ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "Festivalen \"{conventionName}\" er lige blevet tilføjet til platformen.",
@@ -117,17 +124,17 @@
         "message_complete": "Din ansøgning til \"{editionName}\" er blevet accepteret.\n\nDu er tildelt følgende hold:\n• {teams}\n\nBesked fra arrangøren:\n\"{note}\"",
         "message_with_note": "Din ansøgning til \"{editionName}\" er blevet accepteret.\n\nBesked fra arrangøren:\n\"{note}\"",
         "message_with_teams": "Din ansøgning til \"{editionName}\" er blevet accepteret.\n\nDu er tildelt følgende hold:\n• {teams}",
-        "title": "Ansøgning accepteret! ✅"
+        "title": "Frivilligansøgning accepteret! ✅"
       },
       "application_rejected": {
         "action": "Se udgaven",
         "message": "Din frivillig-ansøgning til \"{editionName}\" blev desværre ikke accepteret denne gang.",
-        "title": "Ansøgning ikke accepteret"
+        "title": "Frivilligansøgning ikke accepteret"
       },
       "application_submitted": {
         "action": "Se mine ansøgninger",
-        "message": "Din ansøgning til \"{editionName}\" er blevet indsendt. Arrangørerne vil gennemgå den.",
-        "title": "Ansøgning indsendt! 🎉"
+        "message": "Din frivilligansøgning til \"{editionName}\" er sendt. Arrangørerne vil gennemgå den.",
+        "title": "Frivilligansøgning indsendt! 🎉"
       },
       "arrival": {
         "action": "Se planlægningen",

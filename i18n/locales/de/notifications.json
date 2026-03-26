@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Meine Bewerbungen ansehen",
         "message": "Ihre Show \"{showTitle}\" wurde für \"{editionName}\" ausgewählt.",
-        "title": "Bewerbung angenommen! ✅"
+        "title": "Aufführung ausgewählt! ✅"
       },
       "application_rejected": {
         "action": "Meine Bewerbungen ansehen",
         "message": "Ihre Show \"{showTitle}\" wurde für \"{editionName}\" nicht ausgewählt.",
-        "title": "Bewerbung nicht ausgewählt"
+        "title": "Aufführung nicht ausgewählt"
       },
       "application_submitted": {
         "action": "Bewerbungen ansehen",
@@ -67,6 +67,13 @@
       "registered_at": "Hinzugefügt am {date}",
       "title": "Registrierte Geräte"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Spenden ansehen",
+        "message": "{donorName} hat {quantity} Kaffee(s) gespendet ({amount} €).",
+        "title": "Neue Spende erhalten ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "Die Convention \"{conventionName}\" wurde gerade zur Plattform hinzugefügt.",
@@ -117,17 +124,17 @@
         "message_complete": "Ihre Bewerbung für \"{editionName}\" wurde angenommen.\n\nSie wurden den folgenden Teams zugewiesen:\n• {teams}\n\nNachricht vom Organisator:\n\"{note}\"",
         "message_with_note": "Ihre Bewerbung für \"{editionName}\" wurde angenommen.\n\nNachricht vom Organisator:\n\"{note}\"",
         "message_with_teams": "Ihre Bewerbung für \"{editionName}\" wurde angenommen.\n\nSie wurden den folgenden Teams zugewiesen:\n• {teams}",
-        "title": "Bewerbung angenommen! ✅"
+        "title": "Freiwilligenbewerbung angenommen! ✅"
       },
       "application_rejected": {
         "action": "Edition ansehen",
         "message": "Ihre Freiwilligenbewerbung für \"{editionName}\" wurde dieses Mal leider nicht angenommen.",
-        "title": "Bewerbung nicht angenommen"
+        "title": "Freiwilligenbewerbung nicht angenommen"
       },
       "application_submitted": {
         "action": "Meine Bewerbungen ansehen",
-        "message": "Ihre Bewerbung für \"{editionName}\" wurde erfolgreich eingereicht. Die Organisatoren werden sie prüfen.",
-        "title": "Bewerbung eingereicht! 🎉"
+        "message": "Ihre Freiwilligenbewerbung für \"{editionName}\" wurde erfolgreich eingereicht. Die Organisatoren werden sie prüfen.",
+        "title": "Freiwilligenbewerbung eingereicht! 🎉"
       },
       "arrival": {
         "action": "Planung ansehen",

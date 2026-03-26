@@ -121,6 +121,9 @@ export const NotificationTypeMapping = {
   show_application_accepted: 'artistUpdates' as const,
   show_application_rejected: 'artistUpdates' as const,
 
+  // Dons
+  coffee_donation_received: 'systemNotifications' as const,
+
   // Système
   system_notification: 'systemNotifications' as const,
   welcome: 'systemNotifications' as const,

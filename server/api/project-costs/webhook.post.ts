@@ -1,5 +1,6 @@
 import type Stripe from 'stripe'
 
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { getStripeClientWithWebhookSecret } from '#server/utils/stripe'
 
 export default wrapApiHandler(
@@ -67,6 +68,17 @@ export default wrapApiHandler(
             ...(netCents !== null && { netCents }),
           },
         })
+
+        // Notifier les administrateurs
+        await safeNotify(
+          () =>
+            NotificationHelpers.coffeeDonationReceived(
+              quantity,
+              session.amount_total || quantity * 100,
+              session.customer_details?.name || null
+            ),
+          'notification don café reçu'
+        )
       }
     }
 

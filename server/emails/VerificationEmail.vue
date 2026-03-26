@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Text, Button, Section } from '@vue-email/components'
+import { Text, Button, Section, Hr } from '@vue-email/components'
 
 import BaseEmail from './BaseEmail.vue'
 
@@ -16,58 +16,76 @@ const verifyUrl = `${props.baseUrl}/verify-email?email=${encodeURIComponent(prop
 </script>
 
 <template>
-  <BaseEmail title="Vérification de votre compte" :base-url="baseUrl">
-    <Text>Bonjour {{ prenom }},</Text>
+  <BaseEmail
+    title="V&#233;rification de votre compte"
+    :base-url="baseUrl"
+    preheader="Votre code de v&#233;rification pour Juggling Convention"
+  >
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">Bonjour {{ prenom }},</Text>
 
-    <Text>Bienvenue dans la communauté des conventions de jonglerie ! 🎪</Text>
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">
+      Bienvenue dans la communaut&#233; des conventions de jonglerie !
+    </Text>
 
-    <Text>Pour finaliser votre inscription, vous pouvez :</Text>
+    <Text :style="{ color: '#374151', margin: '0 0 20px' }">
+      Pour finaliser votre inscription, vous pouvez :
+    </Text>
 
-    <Section :style="{ textAlign: 'center' }">
+    <Section :style="{ textAlign: 'center', margin: '0 0 16px' }">
       <Button
         :href="verifyUrl"
         :style="{
           display: 'inline-block',
-          background: 'oklch(79.2% .209 151.711)',
-          color: 'white',
-          padding: '12px 30px',
+          backgroundColor: '#10b981',
+          color: '#ffffff',
+          padding: '12px 32px',
           textDecoration: 'none',
           borderRadius: '6px',
-          fontWeight: 'bold',
-          margin: '20px 0',
+          fontWeight: '600',
+          fontSize: '14px',
         }"
       >
-        Vérifier mon compte
+        V&#233;rifier mon compte
       </Button>
     </Section>
 
-    <Text :style="{ textAlign: 'center', margin: '20px 0', color: '#9ca3af' }">
+    <Text :style="{ textAlign: 'center', color: '#9ca3af', margin: '16px 0', fontSize: '13px' }">
       <strong>OU</strong>
     </Text>
 
-    <Text>Saisir manuellement ce code de vérification :</Text>
+    <Text :style="{ color: '#374151', margin: '0 0 12px' }">
+      Saisir manuellement ce code de v&#233;rification :
+    </Text>
 
     <Section
       :style="{
-        background: '#141837',
-        color: '#a78bfa',
-        padding: '15px',
+        backgroundColor: '#f9fafb',
+        color: '#111827',
+        padding: '16px',
         fontSize: '28px',
-        fontWeight: 'bold',
+        fontWeight: '700',
         textAlign: 'center',
-        borderRadius: '8px',
-        letterSpacing: '3px',
-        margin: '20px 0',
-        border: '2px solid rgba(124, 58, 237, 0.4)',
+        borderRadius: '6px',
+        letterSpacing: '4px',
+        margin: '0 0 20px',
+        border: '1px solid #e5e7eb',
       }"
     >
       {{ code }}
     </Section>
 
-    <Text><strong>Ce code est valide pendant 15 minutes.</strong></Text>
+    <Text :style="{ color: '#374151', margin: '0 0 12px' }">
+      <strong>Ce code est valide pendant 15 minutes.</strong>
+    </Text>
 
-    <Text>Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.</Text>
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0 0 20px' }">
+      Si vous n'avez pas cr&#233;&#233; de compte, vous pouvez ignorer cet email.
+    </Text>
 
-    <Text>À bientôt sur la plateforme !<br />L'équipe de Juggling Convention</Text>
+    <Hr :style="{ borderColor: '#e5e7eb', margin: '0 0 20px' }" />
+
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0' }">
+      &#8212; L'&#233;quipe de Juggling Convention
+    </Text>
   </BaseEmail>
 </template>

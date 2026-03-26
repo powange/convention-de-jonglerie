@@ -4,12 +4,12 @@
       "application_accepted": {
         "action": "Visa mina ansökningar",
         "message": "Din föreställning \"{showTitle}\" har valts ut för \"{editionName}\".",
-        "title": "Ansökan godkänd! ✅"
+        "title": "Föreställning utvald! ✅"
       },
       "application_rejected": {
         "action": "Visa mina ansökningar",
         "message": "Din föreställning \"{showTitle}\" valdes inte ut för \"{editionName}\".",
-        "title": "Ansökan ej utvald"
+        "title": "Föreställning ej utvald"
       },
       "application_submitted": {
         "action": "Visa ansökningar",
@@ -67,6 +67,13 @@
       "registered_at": "Tillagt {date}",
       "title": "Registrerade enheter"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Visa donationer",
+        "message": "{donorName} donerade {quantity} kaffe(n) ({amount} €).",
+        "title": "Ny donation mottagen ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "Konventionen \"{conventionName}\" har just lagts till i plattformen.",
@@ -117,17 +124,17 @@
         "message_complete": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {teams}\n\nMeddelande från arrangören:\n\"{note}\"",
         "message_with_note": "Din ansökan om \"{editionName}\" har accepterats.\n\nMeddelande från arrangören:\n\"{note}\"",
         "message_with_teams": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {teams}",
-        "title": "Ansökan accepterad! ✅"
+        "title": "Volontäransökan godkänd! ✅"
       },
       "application_rejected": {
         "action": "Se upplagan",
         "message": "Din ansökan om att bli volontär för \"{editionName}\" har inte accepterats den här gången.",
-        "title": "Ansökan har inte accepterats"
+        "title": "Volontäransökan ej godkänd"
       },
       "application_submitted": {
         "action": "Se mina ansökningar",
-        "message": "Din ansökan till \"{editionName}\" har skickats in. Arrangörerna kommer att granska den.",
-        "title": "Ansökan skickad! 🎉"
+        "message": "Din volontäransökan för \"{editionName}\" har skickats in. Arrangörerna kommer att granska den.",
+        "title": "Volontäransökan skickad! 🎉"
       },
       "arrival": {
         "action": "Visa schemat",

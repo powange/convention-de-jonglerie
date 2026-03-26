@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Text, Button, Section } from '@vue-email/components'
+import { Text, Button, Section, Hr } from '@vue-email/components'
 
 import BaseEmail from './BaseEmail.vue'
 
@@ -14,65 +14,71 @@ defineProps<Props>()
 </script>
 
 <template>
-  <BaseEmail title="⚠️ Suppression de votre compte" header-color="error" :base-url="baseUrl">
-    <Text>Bonjour {{ prenom }},</Text>
+  <BaseEmail
+    title="Suppression de votre compte"
+    header-color="error"
+    :base-url="baseUrl"
+    preheader="Votre compte Juggling Convention a &#233;t&#233; supprim&#233;"
+  >
+    <Text :style="{ color: '#374151', margin: '0 0 16px' }">Bonjour {{ prenom }},</Text>
 
-    <Text
-      >Nous vous informons que votre compte sur la plateforme Juggling Convention a été supprimé par
-      nos administrateurs.</Text
-    >
+    <Text :style="{ color: '#374151', margin: '0 0 20px' }">
+      Nous vous informons que votre compte sur la plateforme Juggling Convention a &#233;t&#233;
+      supprim&#233; par nos administrateurs.
+    </Text>
 
     <Section
       :style="{
-        background: '#2d1f2e',
+        backgroundColor: '#fef2f2',
         borderLeft: '4px solid #dc2626',
-        padding: '20px',
-        margin: '20px 0',
-        borderRadius: '0 8px 8px 0',
+        padding: '16px 20px',
+        margin: '0 0 20px',
+        borderRadius: '0 6px 6px 0',
       }"
     >
-      <Text :style="{ fontWeight: 'bold', color: '#fca5a5', marginBottom: '10px' }"
-        >Motif de la suppression :</Text
-      >
-      <Text
-        ><strong>{{ reasonTitle }}</strong></Text
-      >
-      <Text :style="{ marginTop: '10px' }">{{ reasonMessage }}</Text>
+      <Text :style="{ fontWeight: '600', color: '#991b1b', margin: '0 0 8px', fontSize: '14px' }">
+        Motif de la suppression :
+      </Text>
+      <Text :style="{ color: '#374151', margin: '0 0 4px' }">
+        <strong>{{ reasonTitle }}</strong>
+      </Text>
+      <Text :style="{ color: '#6b7280', margin: '0', fontSize: '14px' }">
+        {{ reasonMessage }}
+      </Text>
     </Section>
 
-    <Text
-      ><strong>Cette action est définitive.</strong> Toutes vos données personnelles ont été
-      supprimées de nos serveurs conformément à notre politique de confidentialité.</Text
-    >
+    <Text :style="{ color: '#374151', margin: '0 0 12px' }">
+      <strong>Cette action est d&#233;finitive.</strong> Toutes vos donn&#233;es personnelles ont
+      &#233;t&#233; supprim&#233;es de nos serveurs conform&#233;ment &#224; notre politique de
+      confidentialit&#233;.
+    </Text>
 
-    <Text
-      >Si vous pensez que cette suppression est une erreur ou si vous avez des questions, vous
-      pouvez nous contacter :</Text
-    >
+    <Text :style="{ color: '#374151', margin: '0 0 20px' }">
+      Si vous pensez que cette suppression est une erreur ou si vous avez des questions :
+    </Text>
 
-    <Section :style="{ textAlign: 'center' }">
+    <Section :style="{ textAlign: 'center', margin: '0 0 24px' }">
       <Button
         href="mailto:contact@conventionsdejonglerie.fr"
         :style="{
           display: 'inline-block',
-          background: 'oklch(79.2% .209 151.711)',
-          color: 'white',
-          padding: '12px 30px',
+          backgroundColor: '#374151',
+          color: '#ffffff',
+          padding: '12px 32px',
           textDecoration: 'none',
           borderRadius: '6px',
-          fontWeight: 'bold',
-          margin: '20px 0',
+          fontWeight: '600',
+          fontSize: '14px',
         }"
       >
         Nous contacter
       </Button>
     </Section>
 
-    <Text
-      >Nous vous remercions pour votre participation à la communauté des conventions de
-      jonglerie.</Text
-    >
+    <Hr :style="{ borderColor: '#e5e7eb', margin: '0 0 20px' }" />
 
-    <Text>Cordialement,<br />L'équipe de Juggling Convention</Text>
+    <Text :style="{ color: '#6b7280', fontSize: '14px', margin: '0' }">
+      &#8212; L'&#233;quipe de Juggling Convention
+    </Text>
   </BaseEmail>
 </template>
