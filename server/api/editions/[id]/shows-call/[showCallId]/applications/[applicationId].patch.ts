@@ -104,6 +104,11 @@ export default wrapApiHandler(
       updateData.organizerNotes = validatedData.organizerNotes
     }
 
+    // Mettre à jour la description du spectacle si fournie
+    if (validatedData.showDescription !== undefined) {
+      updateData.showDescription = validatedData.showDescription
+    }
+
     // Associer ou dissocier un spectacle
     if (validatedData.showId !== undefined) {
       if (validatedData.showId !== null) {

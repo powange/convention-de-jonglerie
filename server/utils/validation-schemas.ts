@@ -781,4 +781,8 @@ export const showApplicationStatusSchema = z.object({
     .nullable()
     .optional(),
   showId: z.number().int().positive().nullable().optional(),
+  showDescription: z
+    .string()
+    .max(10000, 'La description ne peut pas dépasser 10000 caractères')
+    .optional(),
 })

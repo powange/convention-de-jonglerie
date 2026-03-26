@@ -218,249 +218,422 @@
       direction="bottom"
     >
       <template v-if="selectedApplication" #body>
-        <div class="space-y-6">
-          <!-- Statut actuel -->
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-500">{{ $t('common.status') }}</span>
-            <UBadge :color="getStatusColor(selectedApplication.status)" variant="soft">
-              {{ $t(`gestion.shows_call.status_${selectedApplication.status.toLowerCase()}`) }}
-            </UBadge>
-          </div>
-
-          <!-- Info artiste -->
-          <div class="space-y-3">
-            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-user" class="text-amber-500" />
-              {{ $t('gestion.shows_call.artist_info') }}
-            </h4>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span class="text-gray-500">{{ $t('gestion.shows_call.form.artist_name') }}</span>
-                <p class="font-medium">{{ selectedApplication.artistName }}</p>
+        <div class="xl:grid xl:grid-cols-5 xl:gap-8">
+          <!-- Colonne gauche : informations de la candidature -->
+          <div class="xl:col-span-3 space-y-6">
+            <!-- Statut et actions -->
+            <div class="flex items-center justify-between">
+              <UBadge :color="getStatusColor(selectedApplication.status)" variant="soft" size="lg">
+                {{ $t(`gestion.shows_call.status_${selectedApplication.status.toLowerCase()}`) }}
+              </UBadge>
+              <div class="flex gap-2">
+                <UButton
+                  v-if="selectedApplication.status !== 'REJECTED'"
+                  color="error"
+                  variant="soft"
+                  icon="i-heroicons-x-mark"
+                  :loading="updatingStatus"
+                  @click="confirmStatusChange('REJECTED')"
+                >
+                  {{ $t('gestion.shows_call.reject') }}
+                </UButton>
+                <UButton
+                  v-if="selectedApplication.status !== 'ACCEPTED'"
+                  color="success"
+                  icon="i-heroicons-check"
+                  :loading="updatingStatus"
+                  @click="confirmStatusChange('ACCEPTED')"
+                >
+                  {{ $t('gestion.shows_call.accept') }}
+                </UButton>
               </div>
-              <div>
-                <span class="text-gray-500">{{ $t('gestion.shows_call.submitted_by') }}</span>
-                <div class="flex items-center gap-2 mt-1">
-                  <UiUserAvatar :user="selectedApplication.user" size="sm" />
-                  <span class="font-medium">
-                    {{ selectedApplication.user?.prenom }} {{ selectedApplication.user?.nom }}
-                  </span>
+            </div>
+
+            <!-- Info artiste -->
+            <UCard>
+              <template #header>
+                <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <UIcon name="i-heroicons-user" class="text-amber-500" />
+                  {{ $t('gestion.shows_call.artist_info') }}
+                </h4>
+              </template>
+              <div class="space-y-5">
+                <div class="text-sm pl-3">
+                  <span
+                    class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                    >{{ $t('gestion.shows_call.form.artist_name') }}</span
+                  >
+                  <p class="mt-1">{{ selectedApplication.artistName }}</p>
+                </div>
+                <div v-if="selectedApplication.artistBio" class="pl-3">
+                  <span
+                    class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                    >{{ $t('gestion.shows_call.form.artist_bio') }}</span
+                  >
+                  <p class="mt-1 text-sm">{{ selectedApplication.artistBio }}</p>
+                </div>
+                <div class="flex flex-wrap gap-4 text-sm">
+                  <a
+                    v-if="selectedApplication.portfolioUrl"
+                    :href="selectedApplication.portfolioUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-primary-500 hover:underline flex items-center gap-1"
+                  >
+                    <UIcon name="i-heroicons-globe-alt" />
+                    Portfolio
+                  </a>
+                  <a
+                    v-if="selectedApplication.videoUrl"
+                    :href="selectedApplication.videoUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-primary-500 hover:underline flex items-center gap-1"
+                  >
+                    <UIcon name="i-heroicons-play-circle" />
+                    {{ $t('gestion.shows_call.form.video_url') }}
+                  </a>
+                </div>
+                <!-- Lecteur YouTube intégré -->
+                <div
+                  v-if="selectedApplication.videoUrl && getYouTubeId(selectedApplication.videoUrl)"
+                  class="mt-2"
+                >
+                  <div class="relative w-full max-w-lg aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      :src="`https://www.youtube-nocookie.com/embed/${getYouTubeId(selectedApplication.videoUrl)}`"
+                      class="absolute inset-0 w-full h-full"
+                      frameborder="0"
+                      allow="
+                        accelerometer;
+                        autoplay;
+                        clipboard-write;
+                        encrypted-media;
+                        gyroscope;
+                        picture-in-picture;
+                      "
+                      allowfullscreen
+                    />
+                  </div>
+                </div>
+                <div v-if="selectedApplication.socialLinks" class="pl-3">
+                  <span
+                    class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                    >{{ $t('gestion.shows_call.form.social_links') }}</span
+                  >
+                  <div class="mt-1 flex flex-wrap gap-2">
+                    <a
+                      v-for="(link, index) in parseSocialLinks(selectedApplication.socialLinks)"
+                      :key="index"
+                      :href="link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary-500 hover:underline text-sm flex items-center gap-1"
+                    >
+                      <UIcon name="i-heroicons-link" />
+                      {{ getSocialLinkLabel(link) }}
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div v-if="selectedApplication.artistBio">
-              <span class="text-gray-500 text-sm">{{
-                $t('gestion.shows_call.form.artist_bio')
-              }}</span>
-              <p class="mt-1 text-sm">{{ selectedApplication.artistBio }}</p>
-            </div>
-            <div class="flex flex-wrap gap-4 text-sm">
-              <a
-                v-if="selectedApplication.portfolioUrl"
-                :href="selectedApplication.portfolioUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-primary-500 hover:underline flex items-center gap-1"
-              >
-                <UIcon name="i-heroicons-globe-alt" />
-                Portfolio
-              </a>
-              <a
-                v-if="selectedApplication.videoUrl"
-                :href="selectedApplication.videoUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-primary-500 hover:underline flex items-center gap-1"
-              >
-                <UIcon name="i-heroicons-play-circle" />
-                {{ $t('gestion.shows_call.form.video_url') }}
-              </a>
-            </div>
-            <div v-if="selectedApplication.socialLinks" class="mt-2">
-              <span class="text-gray-500 text-sm">{{
-                $t('gestion.shows_call.form.social_links')
-              }}</span>
-              <div class="mt-1 flex flex-wrap gap-2">
-                <a
-                  v-for="(link, index) in parseSocialLinks(selectedApplication.socialLinks)"
-                  :key="index"
-                  :href="link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-primary-500 hover:underline text-sm flex items-center gap-1"
-                >
-                  <UIcon name="i-heroicons-link" />
-                  {{ getSocialLinkLabel(link) }}
-                </a>
+            </UCard>
+
+            <!-- Info spectacle -->
+            <UCard>
+              <template #header>
+                <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
+                  {{ $t('gestion.shows_call.show_info') }}
+                </h4>
+              </template>
+              <div class="space-y-5">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div class="pl-3">
+                    <span
+                      class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                      >{{ $t('gestion.shows_call.form.show_title') }}</span
+                    >
+                    <p class="mt-1">{{ selectedApplication.showTitle }}</p>
+                  </div>
+                  <div class="pl-3">
+                    <span
+                      class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                      >{{ $t('gestion.shows_call.form.duration') }}</span
+                    >
+                    <p class="mt-1">{{ selectedApplication.showDuration }} min</p>
+                  </div>
+                  <div v-if="selectedApplication.showCategory" class="pl-3">
+                    <span
+                      class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                      >{{ $t('gestion.shows_call.form.category') }}</span
+                    >
+                    <p class="mt-1">{{ selectedApplication.showCategory }}</p>
+                  </div>
+                </div>
+                <div class="pl-3">
+                  <div class="flex items-center justify-between">
+                    <span
+                      class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3 flex items-center gap-2"
+                    >
+                      {{ $t('gestion.shows_call.form.description') }}
+                      <UButton
+                        v-if="!editingDescription"
+                        color="neutral"
+                        variant="ghost"
+                        icon="i-heroicons-pencil-square"
+                        size="xs"
+                        @click="editingDescription = true"
+                      />
+                    </span>
+                    <UButton
+                      v-if="editingDescription && descriptionChanged"
+                      color="primary"
+                      variant="soft"
+                      icon="i-heroicons-document-check"
+                      size="xs"
+                      :loading="savingDescription"
+                      @click="saveDescription"
+                    >
+                      {{ $t('common.save') }}
+                    </UButton>
+                    <UButton
+                      v-if="editingDescription && !descriptionChanged"
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-heroicons-x-mark"
+                      size="xs"
+                      @click="editingDescription = false"
+                    />
+                  </div>
+                  <UTextarea
+                    v-if="editingDescription"
+                    v-model="editableDescription"
+                    :rows="4"
+                    class="mt-1 w-full text-sm"
+                  />
+                  <p v-else class="mt-1 text-sm whitespace-pre-wrap">
+                    {{ selectedApplication.showDescription }}
+                  </p>
+                </div>
+                <div v-if="selectedApplication.technicalNeeds" class="pl-3">
+                  <span
+                    class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                  >
+                    {{ $t('gestion.shows_call.form.technical_needs') }}
+                  </span>
+                  <p class="mt-1 text-sm whitespace-pre-wrap">
+                    {{ selectedApplication.technicalNeeds }}
+                  </p>
+                </div>
+                <div v-if="selectedApplication.additionalPerformersCount > 0" class="pl-3">
+                  <span
+                    class="text-gray-900 dark:text-white text-sm font-semibold flex items-center gap-2 mb-2 border-l-2 border-primary pl-2 -ml-3"
+                  >
+                    {{ $t('gestion.shows_call.additional_performers') }}
+                    <UBadge color="neutral" variant="subtle" size="sm">
+                      {{ selectedApplication.additionalPerformersCount }}
+                    </UBadge>
+                  </span>
+                  <div
+                    v-if="
+                      selectedApplication.additionalPerformers &&
+                      selectedApplication.additionalPerformers.length > 0
+                    "
+                    class="space-y-2"
+                  >
+                    <div
+                      v-for="(performer, index) in selectedApplication.additionalPerformers"
+                      :key="index"
+                      class="flex items-center gap-3 text-sm bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
+                    >
+                      <UIcon name="i-heroicons-user" class="text-gray-400 shrink-0" />
+                      <div class="min-w-0 flex-1">
+                        <p class="font-medium">
+                          {{ performer.firstName }} {{ performer.lastName }}
+                        </p>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-gray-500 text-xs mt-0.5">
+                          <span v-if="performer.email" class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-envelope" class="w-3 h-3" />
+                            {{ performer.email }}
+                          </span>
+                          <span v-if="performer.phone" class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-phone" class="w-3 h-3" />
+                            {{ performer.phone }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            </UCard>
+
+            <!-- Logistique -->
+            <UCard
+              v-if="selectedApplication.accommodationNeeded || selectedApplication.departureCity"
+            >
+              <template #header>
+                <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <UIcon name="i-heroicons-truck" class="text-amber-500" />
+                  {{ $t('gestion.shows_call.logistics') }}
+                </h4>
+              </template>
+              <div class="text-sm space-y-5">
+                <div v-if="selectedApplication.departureCity" class="pl-3">
+                  <span
+                    class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                    >{{ $t('gestion.shows_call.field_departure_city') }}</span
+                  >
+                  <p class="mt-1">{{ selectedApplication.departureCity }}</p>
+                </div>
+                <div v-if="selectedApplication.accommodationNeeded">
+                  <UBadge color="info" variant="soft">
+                    {{ $t('gestion.shows_call.accommodation_needed') }}
+                  </UBadge>
+                  <p v-if="selectedApplication.accommodationNotes" class="mt-1 text-sm">
+                    {{ selectedApplication.accommodationNotes }}
+                  </p>
+                </div>
+              </div>
+            </UCard>
           </div>
 
-          <!-- Info spectacle -->
-          <div class="space-y-3">
-            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
-              {{ $t('gestion.shows_call.show_info') }}
-            </h4>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span class="text-gray-500">{{ $t('gestion.shows_call.form.show_title') }}</span>
-                <p class="font-medium">{{ selectedApplication.showTitle }}</p>
-              </div>
-              <div>
-                <span class="text-gray-500">{{ $t('gestion.shows_call.form.duration') }}</span>
-                <p class="font-medium">{{ selectedApplication.showDuration }} min</p>
-              </div>
-              <div v-if="selectedApplication.showCategory">
-                <span class="text-gray-500">{{ $t('gestion.shows_call.form.category') }}</span>
-                <p class="font-medium">{{ selectedApplication.showCategory }}</p>
-              </div>
-            </div>
-            <div>
-              <span class="text-gray-500 text-sm">{{
-                $t('gestion.shows_call.form.description')
-              }}</span>
-              <p class="mt-1 text-sm whitespace-pre-wrap">
-                {{ selectedApplication.showDescription }}
-              </p>
-            </div>
-            <div v-if="selectedApplication.technicalNeeds">
-              <span class="text-gray-500 text-sm">{{
-                $t('gestion.shows_call.form.technical_needs')
-              }}</span>
-              <p class="mt-1 text-sm whitespace-pre-wrap">
-                {{ selectedApplication.technicalNeeds }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Logistique -->
-          <div v-if="selectedApplication.accommodationNeeded" class="space-y-3">
-            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-truck" class="text-amber-500" />
-              {{ $t('gestion.shows_call.logistics') }}
-            </h4>
-            <div class="text-sm space-y-2">
-              <div v-if="selectedApplication.accommodationNeeded">
-                <UBadge color="info" variant="soft">
-                  {{ $t('gestion.shows_call.accommodation_needed') }}
-                </UBadge>
-                <p v-if="selectedApplication.accommodationNotes" class="mt-1 text-sm">
-                  {{ selectedApplication.accommodationNotes }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contact -->
+          <!-- Colonne droite : outils organisateur -->
           <div
-            v-if="selectedApplication.contactPhone || selectedApplication.user?.email"
-            class="space-y-3"
+            class="xl:col-span-2 space-y-6 mt-6 xl:mt-0 border-t xl:border-t-0 xl:border-l xl:pl-8 pt-6 xl:pt-0 border-gray-200 dark:border-gray-700"
           >
-            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-phone" class="text-amber-500" />
-              {{ $t('gestion.shows_call.contact') }}
-            </h4>
-            <div class="text-sm space-y-1">
-              <p v-if="selectedApplication.user?.email">
-                <span class="text-gray-500">Email:</span>
-                <a :href="`mailto:${selectedApplication.user.email}`" class="text-primary-500 ml-1">
-                  {{ selectedApplication.user.email }}
-                </a>
-              </p>
-              <p v-if="selectedApplication.contactPhone">
-                <span class="text-gray-500">{{ $t('gestion.shows_call.form.phone') }}:</span>
-                <span class="ml-1">{{ selectedApplication.contactPhone }}</span>
-              </p>
-            </div>
-          </div>
+            <!-- Contact -->
+            <UCard v-if="selectedApplication.user">
+              <template #header>
+                <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <UIcon name="i-heroicons-phone" class="text-amber-500" />
+                  {{ $t('gestion.shows_call.contact') }}
+                </h4>
+              </template>
+              <div class="text-sm space-y-2">
+                <div class="flex items-center gap-3">
+                  <UiUserAvatar :user="selectedApplication.user" size="md" />
+                  <p
+                    v-if="selectedApplication.user.prenom || selectedApplication.user.nom"
+                    class="font-medium"
+                  >
+                    {{ selectedApplication.user.prenom }} {{ selectedApplication.user.nom }}
+                  </p>
+                </div>
+                <p v-if="selectedApplication.user.email">
+                  <a
+                    :href="`mailto:${selectedApplication.user.email}`"
+                    class="text-primary-500 hover:underline"
+                  >
+                    {{ selectedApplication.user.email }}
+                  </a>
+                </p>
+                <UButton
+                  v-if="selectedApplication.contactPhone || selectedApplication.user.phone"
+                  :to="`tel:${selectedApplication.contactPhone || selectedApplication.user.phone}`"
+                  icon="i-heroicons-phone"
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                >
+                  {{ selectedApplication.contactPhone || selectedApplication.user.phone }}
+                </UButton>
+              </div>
+            </UCard>
 
-          <!-- Spectacle associé -->
-          <div class="space-y-3 border-t pt-4">
-            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
-              {{ $t('gestion.shows_call.linked_show') }}
-            </h4>
-            <UFormField :label="$t('gestion.shows_call.linked_show_select')">
-              <USelect
-                v-model="linkedShowId"
-                :items="showSelectItems"
-                :placeholder="$t('gestion.shows_call.linked_show_placeholder')"
-                :loading="loadingShows"
+            <!-- Spectacle associé -->
+            <UCard>
+              <template #header>
+                <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
+                  {{ $t('gestion.shows_call.linked_show') }}
+                </h4>
+              </template>
+              <UFormField :label="$t('gestion.shows_call.linked_show_select')">
+                <USelect
+                  v-model="linkedShowId"
+                  :items="showSelectItems"
+                  :placeholder="$t('gestion.shows_call.linked_show_placeholder')"
+                  :loading="loadingShows || savingLinkedShow"
+                  class="w-full"
+                  @update:model-value="saveLinkedShow"
+                />
+              </UFormField>
+            </UCard>
+
+            <!-- Notes organisateur -->
+            <UCard>
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <UIcon name="i-heroicons-pencil-square" class="text-amber-500" />
+                    {{ $t('gestion.shows_call.organizer_notes') }}
+                  </h4>
+                  <UButton
+                    v-if="notesChanged"
+                    color="primary"
+                    variant="soft"
+                    icon="i-heroicons-document-check"
+                    size="xs"
+                    :loading="savingNotes"
+                    @click="saveNotes"
+                  >
+                    {{ $t('common.save') }}
+                  </UButton>
+                </div>
+              </template>
+              <UTextarea
+                v-model="organizerNotes"
+                :placeholder="$t('gestion.shows_call.organizer_notes_placeholder')"
+                :rows="3"
                 class="w-full"
               />
-            </UFormField>
-          </div>
+            </UCard>
 
-          <!-- Notes organisateur -->
-          <div class="space-y-3 border-t pt-4">
-            <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <UIcon name="i-heroicons-pencil-square" class="text-amber-500" />
-              {{ $t('gestion.shows_call.organizer_notes') }}
-            </h4>
-            <UTextarea
-              v-model="organizerNotes"
-              :placeholder="$t('gestion.shows_call.organizer_notes_placeholder')"
-              :rows="3"
-              class="w-full"
-            />
-          </div>
+            <!-- Conversation avec l'artiste -->
+            <ShowApplicationChat :application-id="selectedApplication.id" class="max-h-80" />
 
-          <!-- Conversation avec l'artiste -->
-          <div class="space-y-3 border-t pt-4">
-            <ShowApplicationChat :application-id="selectedApplication.id" class="h-80" />
-          </div>
-
-          <!-- Décision -->
-          <div v-if="selectedApplication.decidedAt" class="text-xs text-gray-400 border-t pt-3">
-            {{ $t('gestion.shows_call.decided_info') }}
-            {{ formatDate(selectedApplication.decidedAt) }}
-            <span v-if="selectedApplication.decidedBy">
-              {{ $t('common.by') }} {{ selectedApplication.decidedBy.pseudo }}
-            </span>
-          </div>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-between gap-3">
-          <UButton color="neutral" variant="ghost" @click="showDetailsModal = false">
-            {{ $t('common.close') }}
-          </UButton>
-
-          <div class="flex gap-2">
-            <UButton
-              color="primary"
-              variant="soft"
-              icon="i-heroicons-document-check"
-              :loading="updatingStatus"
-              @click="saveApplicationDetails"
-            >
-              {{ $t('common.save') }}
-            </UButton>
-            <UButton
-              v-if="selectedApplication?.status !== 'REJECTED'"
-              color="error"
-              variant="soft"
-              icon="i-heroicons-x-mark"
-              :loading="updatingStatus"
-              @click="updateApplicationStatus('REJECTED')"
-            >
-              {{ $t('gestion.shows_call.reject') }}
-            </UButton>
-            <UButton
-              v-if="selectedApplication?.status !== 'ACCEPTED'"
-              color="success"
-              icon="i-heroicons-check"
-              :loading="updatingStatus"
-              @click="updateApplicationStatus('ACCEPTED')"
-            >
-              {{ $t('gestion.shows_call.accept') }}
-            </UButton>
+            <!-- Décision -->
+            <div v-if="selectedApplication.decidedAt" class="text-xs text-gray-400 border-t pt-3">
+              {{ $t('gestion.shows_call.decided_info') }}
+              {{ formatDate(selectedApplication.decidedAt) }}
+              <span v-if="selectedApplication.decidedBy">
+                {{ $t('common.by') }} {{ selectedApplication.decidedBy.pseudo }}
+              </span>
+            </div>
           </div>
         </div>
       </template>
     </UDrawer>
+
+    <!-- Modal de confirmation de changement de statut -->
+    <UiConfirmModal
+      v-model="showConfirmModal"
+      :title="
+        confirmingStatus === 'ACCEPTED'
+          ? $t('gestion.shows_call.confirm_accept_title')
+          : $t('gestion.shows_call.confirm_reject_title')
+      "
+      :description="
+        confirmingStatus === 'ACCEPTED'
+          ? $t('gestion.shows_call.confirm_accept_desc', { title: selectedApplication?.showTitle })
+          : $t('gestion.shows_call.confirm_reject_desc', { title: selectedApplication?.showTitle })
+      "
+      :confirm-label="
+        confirmingStatus === 'ACCEPTED'
+          ? $t('gestion.shows_call.accept')
+          : $t('gestion.shows_call.reject')
+      "
+      :confirm-color="confirmingStatus === 'ACCEPTED' ? 'success' : 'error'"
+      :confirm-icon="confirmingStatus === 'ACCEPTED' ? 'i-heroicons-check' : 'i-heroicons-x-mark'"
+      :icon-name="
+        confirmingStatus === 'ACCEPTED' ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'
+      "
+      :icon-color="confirmingStatus === 'ACCEPTED' ? 'text-green-500' : 'text-red-500'"
+      :loading="updatingStatus"
+      @confirm="executeConfirmedStatusChange"
+      @cancel="showConfirmModal = false"
+    />
   </div>
 </template>
 
@@ -501,11 +674,19 @@ const searchQuery = ref('')
 const showDetailsModal = ref(false)
 const selectedApplication = ref<ShowApplication | null>(null)
 const organizerNotes = ref('')
+const initialOrganizerNotes = ref('')
+const editableDescription = ref('')
+const initialDescription = ref('')
+const editingDescription = ref(false)
 
 // Spectacle associé
 const linkedShowId = ref<number | null>(null)
 const loadingShows = ref(false)
 const editionShows = ref<{ id: number; title: string }[]>([])
+
+// Confirmation de changement de statut
+const showConfirmModal = ref(false)
+const confirmingStatus = ref<ShowApplicationStatus>('PENDING')
 
 // Refs pour les actions useApiAction avec paramètres dynamiques
 const quickUpdateTarget = ref<{ appId: number; status: ShowApplicationStatus } | null>(null)
@@ -593,6 +774,22 @@ const getSocialLinkLabel = (url: string): string => {
     return hostname
   } catch {
     return url
+  }
+}
+
+// Extract YouTube video ID from various URL formats
+const getYouTubeId = (url: string): string | null => {
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname === 'youtu.be') {
+      return parsed.pathname.slice(1) || null
+    }
+    if (parsed.hostname.includes('youtube.com')) {
+      return parsed.searchParams.get('v') || null
+    }
+    return null
+  } catch {
+    return null
   }
 }
 
@@ -688,6 +885,10 @@ const openApplicationDetails = async (application: ShowApplication) => {
     )
     selectedApplication.value = details
     organizerNotes.value = details.organizerNotes || ''
+    initialOrganizerNotes.value = details.organizerNotes || ''
+    editableDescription.value = details.showDescription || ''
+    initialDescription.value = details.showDescription || ''
+    editingDescription.value = false
     linkedShowId.value = details.showId ?? null
     if (editionShows.value.length === 0) {
       fetchEditionShows()
@@ -720,25 +921,69 @@ const quickUpdateStatus = (application: ShowApplication, status: ShowApplication
   executeQuickUpdate()
 }
 
-// Enregistrer les notes et le spectacle associé sans changer le statut
-const { execute: executeSaveDetails, loading: savingDetails } = useApiAction(
+// Sauvegarde automatique du spectacle associé
+const { execute: executeSaveLinkedShow, loading: savingLinkedShow } = useApiAction(
   () =>
     `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value?.id}`,
   {
     method: 'PATCH',
-    body: () => ({
-      organizerNotes: organizerNotes.value || null,
-      showId: linkedShowId.value,
-    }),
+    body: () => ({ showId: linkedShowId.value }),
     successMessage: { title: t('common.saved') },
     errorMessages: { default: t('common.error') },
     onSuccess: () => fetchApplications(),
   }
 )
 
-const saveApplicationDetails = () => {
+const saveLinkedShow = () => {
   if (!selectedApplication.value) return
-  executeSaveDetails()
+  executeSaveLinkedShow()
+}
+
+// Sauvegarde de la description du spectacle
+const descriptionChanged = computed(() => editableDescription.value !== initialDescription.value)
+
+const { execute: executeSaveDescription, loading: savingDescription } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value?.id}`,
+  {
+    method: 'PATCH',
+    body: () => ({ showDescription: editableDescription.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      initialDescription.value = editableDescription.value
+      editingDescription.value = false
+      fetchApplications()
+    },
+  }
+)
+
+const saveDescription = () => {
+  if (!selectedApplication.value) return
+  executeSaveDescription()
+}
+
+// Sauvegarde des notes organisateur
+const notesChanged = computed(() => organizerNotes.value !== initialOrganizerNotes.value)
+
+const { execute: executeSaveNotes, loading: savingNotes } = useApiAction(
+  () =>
+    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${selectedApplication.value?.id}`,
+  {
+    method: 'PATCH',
+    body: () => ({ organizerNotes: organizerNotes.value || null }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
+      initialOrganizerNotes.value = organizerNotes.value
+      fetchApplications()
+    },
+  }
+)
+
+const saveNotes = () => {
+  if (!selectedApplication.value) return
+  executeSaveNotes()
 }
 
 // Mise à jour du statut depuis la modal
@@ -750,7 +995,7 @@ const { execute: executeUpdateStatus, loading: updatingStatusFromModal } = useAp
     body: () => ({
       status: pendingStatus.value,
       organizerNotes: organizerNotes.value || null,
-      showId: linkedShowId.value,
+      ...(linkedShowId.value !== null ? { showId: linkedShowId.value } : {}),
     }),
     successMessage: { title: t('common.saved') },
     errorMessages: { default: t('common.error') },
@@ -761,14 +1006,20 @@ const { execute: executeUpdateStatus, loading: updatingStatusFromModal } = useAp
   }
 )
 
-const updateApplicationStatus = (status: ShowApplicationStatus) => {
+const confirmStatusChange = (status: ShowApplicationStatus) => {
+  confirmingStatus.value = status
+  showConfirmModal.value = true
+}
+
+const executeConfirmedStatusChange = () => {
   if (!selectedApplication.value) return
-  pendingStatus.value = status
+  pendingStatus.value = confirmingStatus.value
+  showConfirmModal.value = false
   executeUpdateStatus()
 }
 
 // Computed combiné pour le loading des actions dans le drawer
-const updatingStatus = computed(() => savingDetails.value || updatingStatusFromModal.value)
+const updatingStatus = computed(() => updatingStatusFromModal.value)
 
 // Charger les données au montage
 onMounted(async () => {

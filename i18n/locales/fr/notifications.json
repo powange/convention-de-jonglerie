@@ -67,6 +67,13 @@
       "registered_at": "Ajouté le {date}",
       "title": "Appareils enregistrés"
     },
+    "donation": {
+      "coffee_received": {
+        "action": "Voir les dons",
+        "message": "{donorName} a offert {quantity} café(s) ({amount} €).",
+        "title": "Nouveau don reçu ☕"
+      }
+    },
     "edition": {
       "new_convention": {
         "message": "La convention \"{conventionName}\" vient d'être ajoutée à la plateforme.",
@@ -101,13 +108,6 @@
       "not_supported": "Notifications push non supportées sur ce navigateur",
       "test_button": "Tester une notification",
       "title": "Notifications push"
-    },
-    "donation": {
-      "coffee_received": {
-        "action": "Voir les dons",
-        "message": "{donorName} a offert {quantity} café(s) ({amount} €).",
-        "title": "Nouveau don reçu ☕"
-      }
     },
     "system": {
       "error": {
