@@ -45,7 +45,8 @@
       "Edit(/.claude/skills/full-pipeline/**)",
       "Skill(code-review)",
       "Skill(code-review:*)",
-      "Read(//^model ShowApplication/**)"
+      "Read(//^model ShowApplication/**)",
+      "Bash(do node:*)"
     ],
     "additionalDirectories": [
       "/tmp",

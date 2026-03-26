@@ -125,77 +125,42 @@
           <div
             v-for="application in applications"
             :key="application.id"
-            class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+            @click="openApplicationDetails(application)"
           >
-            <div class="flex items-start justify-between gap-4">
-              <!-- Info principale -->
-              <div class="flex items-start gap-4 flex-1">
-                <UiUserAvatar :user="application.user" size="lg" />
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <h3 class="font-semibold text-gray-900 dark:text-white">
-                      {{ application.showTitle }}
-                    </h3>
-                    <UBadge :color="getStatusColor(application.status)" variant="soft" size="sm">
-                      {{ $t(`gestion.shows_call.status_${application.status.toLowerCase()}`) }}
-                    </UBadge>
-                  </div>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $t('gestion.shows_call.by_artist') }}
-                    <span class="font-medium">{{ application.artistName }}</span>
-                  </p>
-                  <p class="text-sm text-gray-500 mt-1">
-                    {{ $t('gestion.shows_call.duration') }}: {{ application.showDuration }} min
-                    <span v-if="application.showCategory" class="ml-2">
-                      | {{ application.showCategory }}
-                    </span>
-                  </p>
-                  <div v-if="application.show" class="mt-1">
-                    <UBadge color="warning" variant="subtle" size="sm">
-                      <UIcon name="i-heroicons-sparkles" class="mr-1" />
-                      {{ application.show.title }}
-                    </UBadge>
-                  </div>
-                  <p class="text-xs text-gray-400 mt-1">
-                    {{ $t('gestion.shows_call.submitted_at') }}
-                    {{ formatDate(application.createdAt) }}
-                  </p>
+            <div class="flex items-start gap-4">
+              <UiUserAvatar :user="application.user" size="lg" />
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-semibold text-gray-900 dark:text-white">
+                    {{ application.showTitle }}
+                  </h3>
+                  <UBadge :color="getStatusColor(application.status)" variant="soft" size="sm">
+                    {{ $t(`gestion.shows_call.status_${application.status.toLowerCase()}`) }}
+                  </UBadge>
                 </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex items-center gap-2">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-eye"
-                  size="sm"
-                  @click="openApplicationDetails(application)"
-                >
-                  {{ $t('common.view') }}
-                </UButton>
-
-                <UDropdownMenu
-                  v-if="application.status === 'PENDING'"
-                  :items="getActionItems(application)"
-                >
-                  <UButton
-                    color="neutral"
-                    variant="soft"
-                    icon="i-heroicons-ellipsis-vertical"
-                    size="sm"
-                  />
-                </UDropdownMenu>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.shows_call.by_artist') }}
+                  <span class="font-medium">{{ application.artistName }}</span>
+                </p>
+                <p class="text-sm text-gray-500 mt-1">
+                  {{ $t('gestion.shows_call.duration') }}: {{ application.showDuration }} min
+                  <span v-if="application.showCategory" class="ml-2">
+                    | {{ application.showCategory }}
+                  </span>
+                </p>
+                <div v-if="application.show" class="mt-1">
+                  <UBadge color="warning" variant="subtle" size="sm">
+                    <UIcon name="i-heroicons-sparkles" class="mr-1" />
+                    {{ application.show.title }}
+                  </UBadge>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">
+                  {{ $t('gestion.shows_call.submitted_at') }}
+                  {{ formatDate(application.createdAt) }}
+                </p>
               </div>
             </div>
-
-            <!-- Description courte -->
-            <p
-              v-if="application.showDescription"
-              class="mt-3 text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
-            >
-              {{ application.showDescription }}
-            </p>
           </div>
 
           <!-- Pagination -->
@@ -689,7 +654,6 @@ const showConfirmModal = ref(false)
 const confirmingStatus = ref<ShowApplicationStatus>('PENDING')
 
 // Refs pour les actions useApiAction avec paramètres dynamiques
-const quickUpdateTarget = ref<{ appId: number; status: ShowApplicationStatus } | null>(null)
 const pendingStatus = ref<ShowApplicationStatus>('PENDING')
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize))
@@ -793,21 +757,6 @@ const getYouTubeId = (url: string): string | null => {
   }
 }
 
-const getActionItems = (application: ShowApplication) => [
-  [
-    {
-      label: t('gestion.shows_call.accept'),
-      icon: 'i-heroicons-check',
-      onSelect: () => quickUpdateStatus(application, 'ACCEPTED'),
-    },
-    {
-      label: t('gestion.shows_call.reject'),
-      icon: 'i-heroicons-x-mark',
-      onSelect: () => quickUpdateStatus(application, 'REJECTED'),
-    },
-  ],
-]
-
 // Charger les spectacles de l'édition
 const fetchEditionShows = async () => {
   loadingShows.value = true
@@ -901,24 +850,6 @@ const openApplicationDetails = async (application: ShowApplication) => {
       color: 'error',
     })
   }
-}
-
-// Mise à jour rapide du statut
-const { execute: executeQuickUpdate } = useApiAction(
-  () =>
-    `/api/editions/${editionId}/shows-call/${showCallId}/applications/${quickUpdateTarget.value?.appId}`,
-  {
-    method: 'PATCH',
-    body: () => ({ status: quickUpdateTarget.value?.status }),
-    successMessage: { title: t('common.saved') },
-    errorMessages: { default: t('common.error') },
-    onSuccess: () => fetchApplications(),
-  }
-)
-
-const quickUpdateStatus = (application: ShowApplication, status: ShowApplicationStatus) => {
-  quickUpdateTarget.value = { appId: application.id, status }
-  executeQuickUpdate()
 }
 
 // Sauvegarde automatique du spectacle associé
