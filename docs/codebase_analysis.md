@@ -1,7 +1,7 @@
 # Analyse complète du Codebase — Convention de Jonglerie
 
-> **Dernière mise à jour** : 20 mars 2026
-> **Taille du projet** : ~389 000 lignes de code | ~2 835 fichiers de code
+> **Dernière mise à jour** : 27 mars 2026
+> **Taille du projet** : ~165 Mo | ~2 884 fichiers de code
 > **Version Node.js** : >=22 <26
 
 ## Table des matières
@@ -61,25 +61,27 @@
 
 ## 3. Statistiques du codebase
 
-| Métrique             | Valeur               |
-| -------------------- | -------------------- |
-| Lignes de code total | ~389 000             |
-| Composants Vue       | 141                  |
-| Pages                | 95                   |
-| Endpoints API        | 374                  |
-| Modèles Prisma       | 74                   |
-| Migrations           | 150                  |
-| Clés i18n            | 3 321                |
-| Langues supportées   | 13                   |
-| Tests unitaires      | 367 (18 fichiers)    |
-| Tests Nuxt           | 1 605 (161 fichiers) |
-| Tests d'intégration  | 7 fichiers           |
-| Stores Pinia         | 5                    |
-| Composables          | 50                   |
-| Layouts              | 4                    |
-| Middleware           | 6                    |
-| Plugins              | 7                    |
-| Utilitaires serveur  | 69                   |
+| Métrique            | Valeur               |
+| ------------------- | -------------------- |
+| Fichiers de code    | ~2 884               |
+| Composants Vue      | 144                  |
+| Pages               | 99                   |
+| Endpoints API       | 391                  |
+| Modèles Prisma      | 80                   |
+| Migrations          | 157                  |
+| Clés i18n           | 3 525                |
+| Langues supportées  | 13                   |
+| Tests unitaires     | 367 (18 fichiers)    |
+| Tests Nuxt          | 1 605 (161 fichiers) |
+| Tests d'intégration | 7 fichiers           |
+| Stores Pinia        | 5                    |
+| Composables         | 48                   |
+| Layouts             | 4                    |
+| Middleware client   | 6                    |
+| Middleware serveur  | 3                    |
+| Plugins             | 7                    |
+| Scripts utilitaires | 29                   |
+| Docker compose      | 9                    |
 
 ---
 
@@ -110,7 +112,7 @@ L'application suit un pattern **monolithique full-stack** avec séparation clair
 convention-de-jonglerie/
 ├── app/                          # Frontend Nuxt
 │   ├── assets/                   # CSS, images statiques
-│   ├── components/               # 141 composants Vue (organisés par domaine)
+│   ├── components/               # 144 composants Vue (organisés par domaine)
 │   │   ├── admin/                # Composants admin
 │   │   ├── artists/              # Gestion artistes
 │   │   ├── convention/           # Composants convention
@@ -124,17 +126,17 @@ convention-de-jonglerie/
 │   │   ├── ui/                   # Composants UI réutilisables
 │   │   ├── volunteers/           # Bénévoles
 │   │   └── workshops/            # Ateliers
-│   ├── composables/              # 50 composables Vue
+│   ├── composables/              # 48 composables Vue
 │   ├── config/                   # Configuration app (app.config.ts)
 │   ├── layouts/                  # 4 layouts (default, edition-dashboard, guide, ...)
 │   ├── middleware/                # 6 middleware (auth-protected, super-admin, ...)
-│   ├── pages/                    # 95 pages (routes automatiques)
+│   ├── pages/                    # 99 pages (routes automatiques)
 │   ├── plugins/                  # 7 plugins (auth, firebase, etc.)
 │   ├── stores/                   # 5 stores Pinia (auth, editions, favorites, ...)
 │   ├── types/                    # Types TypeScript frontend
 │   └── utils/                    # Utilitaires frontend
 ├── server/                       # Backend Nitro
-│   ├── api/                      # 374 endpoints API RESTful
+│   ├── api/                      # 391 endpoints API RESTful
 │   │   ├── admin/                # Endpoints administration
 │   │   ├── auth/                 # Authentification
 │   │   ├── carpool-*/            # Covoiturage
@@ -158,7 +160,7 @@ convention-de-jonglerie/
 │   │   ├── ticketing.prisma      # Modèles billetterie
 │   │   ├── messenger.prisma      # Modèles messagerie
 │   │   └── misc.prisma           # Modèles divers
-│   └── migrations/               # 150 migrations
+│   └── migrations/               # 157 migrations
 ├── i18n/                         # Internationalisation
 │   └── locales/                  # 13 langues × 7 domaines
 │       ├── fr/                   # Français (référence)
@@ -179,7 +181,7 @@ convention-de-jonglerie/
 
 ## 6. Couche données (Prisma)
 
-### Modèles principaux (74 au total)
+### Modèles principaux (80 au total)
 
 Les modèles sont organisés en domaines :
 
@@ -210,11 +212,11 @@ Les modèles sont organisés en domaines :
 
 ### Vue d'ensemble
 
-- **374 endpoints** organisés par ressource dans `server/api/`
-- **100%** utilisent `wrapApiHandler` (gestion d'erreurs standardisée)
-- **~246** (67%) utilisent `createSuccessResponse` pour le format uniforme
-- **10** utilisent `createPaginatedResponse` pour les listes paginées
-- **~107** GETs retournent des données brutes (intentionnel)
+- **391 endpoints** organisés par ressource dans `server/api/`
+- **100%** utilisent `wrapApiHandler` (708 usages, gestion d'erreurs standardisée)
+- **316** (~81%) utilisent `createSuccessResponse` pour le format uniforme
+- **~10** utilisent `createPaginatedResponse` pour les listes paginées
+- **~126** GETs retournent des données brutes (intentionnel)
 
 ### Patterns API
 
@@ -241,37 +243,39 @@ export default wrapApiHandler(
 
 ### Endpoints principaux par domaine
 
-| Domaine     | Préfixe                             | Nombre estimé |
-| ----------- | ----------------------------------- | ------------- |
-| Éditions    | `/api/editions/[id]/...`            | ~200          |
-| Bénévoles   | `/api/editions/[id]/volunteers/...` | ~50           |
-| Billetterie | `/api/editions/[id]/ticketing/...`  | ~50           |
-| Admin       | `/api/admin/...`                    | ~30           |
-| Conventions | `/api/conventions/...`              | ~15           |
-| Messagerie  | `/api/messenger/...`                | ~10           |
-| Covoiturage | `/api/carpool-*/...`                | ~15           |
-| Auth        | `/api/auth/...`                     | ~10           |
+| Domaine       | Préfixe                       | Endpoints | %     |
+| ------------- | ----------------------------- | --------- | ----- |
+| Éditions      | `/api/editions/[id]/...`      | 217       | 55.5% |
+| Admin         | `/api/admin/...`              | 62        | 15.8% |
+| Conventions   | `/api/conventions/...`        | 21        | 5.4%  |
+| Messagerie    | `/api/messenger/...`          | 16        | 4.1%  |
+| Covoiturage   | `/api/carpool-*/...`          | 15        | 3.8%  |
+| Profil        | `/api/profile/...`            | 13        | 3.3%  |
+| Notifications | `/api/notifications/...`      | 12        | 3.1%  |
+| Auth          | `/api/auth/...`               | 10        | 2.6%  |
+| Autres        | fichiers, project-costs, etc. | 25        | 6.4%  |
 
 ---
 
 ## 8. Frontend
 
-### Composants (141)
+### Composants (144)
 
-Organisés par domaine fonctionnel avec auto-import Nuxt. Composants UI réutilisables dans `ui/` (UserAvatar, ImageUpload, SelectLanguage, etc.).
+Organisés par domaine fonctionnel (18 répertoires) avec auto-import Nuxt. Composants UI réutilisables dans `ui/` (UserDisplay, ConfirmModal, LazyFullCalendar, LogoJc, ImpersonationBanner, etc.).
 
-### Pages (95)
+### Pages (99)
 
 Routes automatiques par convention de fichiers Nuxt :
 
-| Section                      | Pages | Description                                    |
-| ---------------------------- | ----- | ---------------------------------------------- |
-| `/`                          | 1     | Accueil avec scroll infini                     |
-| `/editions/[id]/...`         | ~30   | Détails édition, posts, covoiturage, bénévoles |
-| `/editions/[id]/gestion/...` | ~40   | Dashboard gestion (sidebar)                    |
-| `/admin/...`                 | ~10   | Administration super admin                     |
-| `/auth/...`                  | ~5    | Login, register, reset password                |
-| Autres                       | ~10   | Profil, favoris, conventions, guide            |
+| Section                      | Pages | Description                                              |
+| ---------------------------- | ----- | -------------------------------------------------------- |
+| `/`                          | 1     | Accueil avec scroll infini                               |
+| `/editions/[id]/...`         | ~30   | Détails édition, posts, covoiturage, bénévoles, ateliers |
+| `/editions/[id]/gestion/...` | ~40   | Dashboard gestion (sidebar)                              |
+| `/admin/...`                 | ~10   | Administration super admin                               |
+| `/auth/...`                  | ~5    | Login, register, reset password                          |
+| `/guide/...`                 | ~4    | Guides organisateur, artiste, bénévole, utilisateur      |
+| Autres                       | ~9    | Profil, favoris, conventions, messagerie, notifications  |
 
 ### Stores Pinia (5)
 
@@ -283,7 +287,7 @@ Routes automatiques par convention de fichiers Nuxt :
 | `notifications`     | Notifications in-app                     |
 | `impersonation`     | Mode impersonation admin                 |
 
-### Composables clés (50)
+### Composables clés (48)
 
 | Composable                                    | Rôle                                       |
 | --------------------------------------------- | ------------------------------------------ |
@@ -314,7 +318,7 @@ Routes automatiques par convention de fichiers Nuxt :
 ### Structure
 
 - **13 langues** : fr (référence), en, de, es, it, pt, nl, pl, cs, da, sv, ru, uk
-- **3 321 clés** par langue
+- **3 525 clés** par langue
 - **7 domaines** par langue : `common`, `admin`, `edition`, `auth`, `public`, `components`, `app`
 - **Lazy loading** par domaine selon les routes
 
@@ -345,7 +349,7 @@ Routes automatiques par convention de fichiers Nuxt :
 | Nuxt        | 161      | 1 605      | Composants, pages, API handlers, middleware |
 | Intégration | 7        | -          | Tests avec vraie BDD (Docker)               |
 | E2E         | 1        | -          | Tests end-to-end                            |
-| **Total**   | **187**  | **1 972+** |                                             |
+| **Total**   | **187+** | **1 972+** |                                             |
 
 ### Organisation
 
@@ -410,7 +414,7 @@ graph TB
     end
 
     subgraph Server["⚙️ Serveur Nitro"]
-        API["API RESTful (374 endpoints)"]
+        API["API RESTful (391 endpoints)"]
         Auth["Auth (Sessions scellées)"]
         MW["Middleware (auth, admin)"]
         Cron["Tâches CRON"]
@@ -420,7 +424,7 @@ graph TB
 
     subgraph Data["💾 Données"]
         MySQL["MySQL / MariaDB"]
-        Prisma["Prisma ORM (74 modèles)"]
+        Prisma["Prisma ORM (80 modèles)"]
         Uploads["Stockage fichiers"]
     end
 
@@ -488,8 +492,9 @@ sequenceDiagram
 
 ### Axes d'amélioration possibles
 
-1. **Migration `$fetch` → `useApiAction`** : ~14 fichiers encore à migrer (voir `docs/migration-fetch-to-useApiAction.md`)
+1. **Migration `$fetch` → `useApiAction`** : Des `$fetch` directs coexistent encore avec `useApiAction` côté client. La migration progressive améliorerait la cohérence (gestion auto du loading, toasts, erreurs)
 2. **Tests E2E** : Couverture E2E minimale — envisager Playwright pour les parcours critiques
+3. **Watchers de formulaire** : Après analyse, seul `ParticipantDetailsModal.vue` avait un vrai bug (champs éditables non rafraîchis lors d'un `reloadParticipant` avec le modal ouvert) — corrigé. Les 5 autres composants identifiés (ShowModal, CustomFieldModal, OptionModal, TierModal, CustomFieldAssociationsModal) ne sont pas montés avec `v-if` et fonctionnent correctement
 
 ### Sécurité
 

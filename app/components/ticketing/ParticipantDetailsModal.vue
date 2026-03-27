@@ -1066,34 +1066,48 @@ const returnableItemsToDistribute = computed(() => {
   return itemsList
 })
 
+// Synchroniser les champs éditables avec les données du participant
+const populateEditableFields = () => {
+  if (props.participant && 'volunteer' in props.participant) {
+    editableFirstName.value = props.participant.volunteer.user.firstName || null
+    editableLastName.value = props.participant.volunteer.user.lastName || null
+    editableEmail.value = props.participant.volunteer.user.email || null
+    editablePhone.value = props.participant.volunteer.user.phone || null
+  } else if (props.participant && 'artist' in props.participant) {
+    editableFirstName.value = props.participant.artist.user.firstName || null
+    editableLastName.value = props.participant.artist.user.lastName || null
+    editableEmail.value = props.participant.artist.user.email || null
+    editablePhone.value = props.participant.artist.user.phone || null
+  } else if (props.participant && 'organizer' in props.participant) {
+    editableFirstName.value = props.participant.organizer.user.firstName || null
+    editableLastName.value = props.participant.organizer.user.lastName || null
+    editableEmail.value = props.participant.organizer.user.email || null
+    editablePhone.value = props.participant.organizer.user.phone || null
+  } else {
+    editableFirstName.value = null
+    editableLastName.value = null
+    editableEmail.value = null
+    editablePhone.value = null
+  }
+}
+
 // Réinitialiser la sélection quand la modal s'ouvre
 watch(
   () => props.open,
   (newValue) => {
     if (newValue) {
       selectedParticipants.value = []
-      // Initialiser les champs éditables pour bénévoles, artistes et organisateurs
-      if (props.participant && 'volunteer' in props.participant) {
-        editableFirstName.value = props.participant.volunteer.user.firstName || null
-        editableLastName.value = props.participant.volunteer.user.lastName || null
-        editableEmail.value = props.participant.volunteer.user.email || null
-        editablePhone.value = props.participant.volunteer.user.phone || null
-      } else if (props.participant && 'artist' in props.participant) {
-        editableFirstName.value = props.participant.artist.user.firstName || null
-        editableLastName.value = props.participant.artist.user.lastName || null
-        editableEmail.value = props.participant.artist.user.email || null
-        editablePhone.value = props.participant.artist.user.phone || null
-      } else if (props.participant && 'organizer' in props.participant) {
-        editableFirstName.value = props.participant.organizer.user.firstName || null
-        editableLastName.value = props.participant.organizer.user.lastName || null
-        editableEmail.value = props.participant.organizer.user.email || null
-        editablePhone.value = props.participant.organizer.user.phone || null
-      } else {
-        editableFirstName.value = null
-        editableLastName.value = null
-        editableEmail.value = null
-        editablePhone.value = null
-      }
+      populateEditableFields()
+    }
+  }
+)
+
+// Mettre à jour les champs éditables quand le participant change (ex: reloadParticipant)
+watch(
+  () => props.participant,
+  () => {
+    if (props.open) {
+      populateEditableFields()
     }
   }
 )
