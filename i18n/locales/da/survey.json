@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Gennemsnit",
+    "closed_badge": "Afstemning lukket",
+    "closed_notice": "Afstemningen er lukket. Du kan se resultaterne, men du kan ikke længere stemme.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Luk afstemning",
+      "copy_link": "Kopiér link",
+      "generate_link": "Opret en afstemning",
+      "link_copied": "Link kopieret!",
+      "no_survey": "Der er ikke oprettet nogen afstemning for dette opkald.",
+      "open_survey": "Åbn afstemning",
+      "regenerate_confirm": "At genskabe linket vil ugyldiggøre det gamle. Fortsæt?",
+      "regenerate_link": "Genskab link",
+      "results_title": "Afstemningsresultater",
+      "status_closed": "Afstemningen er lukket. Stemmegivere kan se resultaterne.",
+      "status_error": "Fejl ved opdatering af status",
+      "status_open": "Afstemningen er i øjeblikket åben for stemmer.",
+      "status_updated": "Afstemningsstatus opdateret",
+      "title": "Afstemning",
+      "token_error": "Fejl ved generering af link",
+      "token_generated": "Afstemningslink genereret"
+    },
+    "no_applications": "Ingen ventende ansøgninger",
+    "no_applications_description": "Der er ingen ansøgninger at vurdere i øjeblikket.",
+    "not_found": "Afstemning ikke fundet",
+    "not_found_description": "Dette afstemningslink er ugyldigt eller udløbet.",
+    "open_badge": "Afstemning åben",
+    "performers_count": "{count} deltagende kunstner | {count} deltagende kunstnere",
+    "portfolio": "Portfolio",
+    "results": "Resultater",
+    "show_info": "Show",
+    "subtitle": "Stem på showansøgningerne",
+    "title": "Afstemning — {showCallName}",
+    "video": "Video",
+    "vote_error": "Fejl ved lagring af stemme",
+    "vote_saved": "Stemme gemt",
+    "votes_count": "{count} stemme | {count} stemmer",
+    "your_vote": "Din vurdering"
+  }
+}

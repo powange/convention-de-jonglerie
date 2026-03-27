@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Media",
+    "closed_badge": "Sondaggio chiuso",
+    "closed_notice": "Il sondaggio è chiuso. Puoi consultare i risultati ma non puoi più votare.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Chiudi sondaggio",
+      "copy_link": "Copia link",
+      "generate_link": "Crea un sondaggio",
+      "link_copied": "Link copiato!",
+      "no_survey": "Nessun sondaggio è stato creato per questa convocatoria.",
+      "open_survey": "Apri sondaggio",
+      "regenerate_confirm": "Rigenerare il link renderà quello precedente non valido. Continuare?",
+      "regenerate_link": "Rigenera link",
+      "results_title": "Risultati del sondaggio",
+      "status_closed": "Il sondaggio è chiuso. I votanti possono consultare i risultati.",
+      "status_error": "Errore durante l'aggiornamento dello stato",
+      "status_open": "Il sondaggio è attualmente aperto alle votazioni.",
+      "status_updated": "Stato del sondaggio aggiornato",
+      "title": "Sondaggio",
+      "token_error": "Errore durante la generazione del link",
+      "token_generated": "Link del sondaggio generato"
+    },
+    "no_applications": "Nessuna candidatura in sospeso",
+    "no_applications_description": "Non ci sono candidature da valutare al momento.",
+    "not_found": "Sondaggio non trovato",
+    "not_found_description": "Questo link del sondaggio non è valido o è scaduto.",
+    "open_badge": "Sondaggio aperto",
+    "performers_count": "{count} artista partecipante | {count} artisti partecipanti",
+    "portfolio": "Portfolio",
+    "results": "Risultati",
+    "show_info": "Spettacolo",
+    "subtitle": "Vota per le candidature degli spettacoli",
+    "title": "Sondaggio — {showCallName}",
+    "video": "Video",
+    "vote_error": "Errore durante il salvataggio del voto",
+    "vote_saved": "Voto salvato",
+    "votes_count": "{count} voto | {count} voti",
+    "your_vote": "La tua valutazione"
+  }
+}

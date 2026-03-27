@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Média",
+    "closed_badge": "Sondagem encerrada",
+    "closed_notice": "A sondagem está encerrada. Pode consultar os resultados mas já não pode votar.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Encerrar sondagem",
+      "copy_link": "Copiar link",
+      "generate_link": "Criar uma sondagem",
+      "link_copied": "Link copiado!",
+      "no_survey": "Nenhuma sondagem foi criada para esta convocatória.",
+      "open_survey": "Abrir sondagem",
+      "regenerate_confirm": "Regenerar o link tornará o anterior inválido. Continuar?",
+      "regenerate_link": "Regenerar link",
+      "results_title": "Resultados da sondagem",
+      "status_closed": "A sondagem está encerrada. Os votantes podem consultar os resultados.",
+      "status_error": "Erro ao atualizar o estado",
+      "status_open": "A sondagem está atualmente aberta para votação.",
+      "status_updated": "Estado da sondagem atualizado",
+      "title": "Sondagem",
+      "token_error": "Erro ao gerar o link",
+      "token_generated": "Link da sondagem gerado"
+    },
+    "no_applications": "Sem candidaturas pendentes",
+    "no_applications_description": "Não há candidaturas para avaliar neste momento.",
+    "not_found": "Sondagem não encontrada",
+    "not_found_description": "Este link de sondagem é inválido ou expirou.",
+    "open_badge": "Sondagem aberta",
+    "performers_count": "{count} artista participante | {count} artistas participantes",
+    "portfolio": "Portfolio",
+    "results": "Resultados",
+    "show_info": "Espetáculo",
+    "subtitle": "Vote nas candidaturas de espetáculos",
+    "title": "Sondagem — {showCallName}",
+    "video": "Vídeo",
+    "vote_error": "Erro ao guardar o voto",
+    "vote_saved": "Voto guardado",
+    "votes_count": "{count} voto | {count} votos",
+    "your_vote": "A sua avaliação"
+  }
+}

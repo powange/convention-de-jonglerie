@@ -68,6 +68,120 @@
         </UBadge>
       </div>
 
+      <!-- Section Sondage -->
+      <UCard v-if="canManageArtists" class="mb-6">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-chart-bar" class="text-primary-500" />
+              {{ $t('survey.manage.title') }}
+            </h3>
+            <UBadge v-if="surveyToken" :color="surveyOpen ? 'success' : 'warning'" variant="soft">
+              {{ surveyOpen ? $t('survey.open_badge') : $t('survey.closed_badge') }}
+            </UBadge>
+          </div>
+        </template>
+
+        <!-- No survey yet -->
+        <div v-if="!surveyToken" class="space-y-3">
+          <p class="text-sm text-gray-500">{{ $t('survey.manage.no_survey') }}</p>
+          <UButton
+            color="primary"
+            icon="i-heroicons-link"
+            :loading="generatingToken"
+            @click="generateSurveyToken"
+          >
+            {{ $t('survey.manage.generate_link') }}
+          </UButton>
+        </div>
+
+        <!-- Survey exists -->
+        <div v-else class="space-y-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ surveyOpen ? $t('survey.manage.status_open') : $t('survey.manage.status_closed') }}
+          </p>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap items-center gap-2">
+            <UButton
+              :color="surveyOpen ? 'warning' : 'success'"
+              variant="soft"
+              :icon="surveyOpen ? 'i-heroicons-lock-closed' : 'i-heroicons-lock-open'"
+              :loading="updatingSurveyStatus"
+              @click="toggleSurveyStatus"
+            >
+              {{ surveyOpen ? $t('survey.manage.close_survey') : $t('survey.manage.open_survey') }}
+            </UButton>
+
+            <UButton
+              color="neutral"
+              variant="soft"
+              icon="i-heroicons-arrow-path"
+              :loading="generatingToken"
+              @click="regenerateSurveyToken"
+            >
+              {{ $t('survey.manage.regenerate_link') }}
+            </UButton>
+          </div>
+
+          <!-- Copy link -->
+          <div class="flex items-center gap-2">
+            <UInput :model-value="surveyUrl" readonly class="flex-1 font-mono text-xs" />
+            <UButton
+              color="neutral"
+              variant="soft"
+              icon="i-heroicons-clipboard-document"
+              @click="copySurveyLink"
+            >
+              {{ $t('survey.manage.copy_link') }}
+            </UButton>
+          </div>
+
+          <!-- Results summary -->
+          <div v-if="surveyResults.length > 0" class="mt-4">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              {{ $t('survey.manage.results_title') }}
+            </h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th class="text-left py-2 pr-4 font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('gestion.shows.show_title') }}
+                    </th>
+                    <th class="text-left py-2 pr-4 font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('gestion.shows_call.by_artist') }}
+                    </th>
+                    <th class="text-center py-2 pr-4 font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('survey.avg_score') }}
+                    </th>
+                    <th class="text-center py-2 font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('survey.results') }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="result in surveyResults"
+                    :key="result.applicationId"
+                    class="border-b border-gray-100 dark:border-gray-800"
+                  >
+                    <td class="py-2 pr-4">{{ result.showTitle }}</td>
+                    <td class="py-2 pr-4 text-gray-500">{{ result.artistName }}</td>
+                    <td class="py-2 pr-4 text-center font-semibold text-yellow-500">
+                      {{ result.avgScore != null ? result.avgScore.toFixed(1) : '—' }}
+                    </td>
+                    <td class="py-2 text-center text-gray-500">
+                      {{ $t('survey.votes_count', { count: result.voteCount }) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </UCard>
+
       <!-- Filtres -->
       <UCard class="mb-6">
         <div class="flex flex-wrap items-center gap-4">
@@ -964,7 +1078,87 @@ onMounted(async () => {
 
   await fetchShowCall()
   await fetchApplications()
+  fetchSurveyResults()
 })
+
+// ============================
+// Section Sondage
+// ============================
+interface SurveyResultItem {
+  applicationId: number
+  showTitle: string
+  artistName: string
+  avgScore: number | null
+  voteCount: number
+}
+
+const surveyToken = ref<string | null>(null)
+const surveyOpen = ref(false)
+const surveyUrl = ref('')
+const surveyResults = ref<SurveyResultItem[]>([])
+
+const fetchSurveyResults = async () => {
+  try {
+    const data = await $fetch<{
+      surveyOpen: boolean
+      surveyToken: string | null
+      surveyUrl: string | null
+      results: SurveyResultItem[]
+    }>(`/api/editions/${editionId}/shows-call/${showCallId}/survey/results`)
+    surveyToken.value = data.surveyToken
+    surveyOpen.value = data.surveyOpen
+    surveyUrl.value = data.surveyUrl || ''
+    surveyResults.value = data.results || []
+  } catch {
+    // Pas de sondage ou pas de droits - c'est OK
+  }
+}
+
+const { execute: executeGenerateToken, loading: generatingToken } = useApiAction(
+  () => `/api/editions/${editionId}/shows-call/${showCallId}/survey/token`,
+  {
+    method: 'POST',
+    successMessage: { title: t('survey.manage.token_generated') },
+    errorMessages: { default: t('survey.manage.token_error') },
+    onSuccess: (data: { surveyToken: string; surveyUrl: string }) => {
+      surveyToken.value = data.surveyToken
+      surveyUrl.value = data.surveyUrl
+      surveyOpen.value = true
+    },
+  }
+)
+
+const generateSurveyToken = () => executeGenerateToken()
+
+const regenerateSurveyToken = async () => {
+  if (!confirm(t('survey.manage.regenerate_confirm'))) return
+  await generateSurveyToken()
+}
+
+const { execute: executeToggleStatus, loading: updatingSurveyStatus } = useApiAction(
+  () => `/api/editions/${editionId}/shows-call/${showCallId}/survey/status`,
+  {
+    method: 'PATCH',
+    body: () => ({ open: !surveyOpen.value }),
+    successMessage: { title: t('survey.manage.status_updated') },
+    errorMessages: { default: t('survey.manage.status_error') },
+    onSuccess: async (data: { surveyOpen: boolean }) => {
+      surveyOpen.value = data.surveyOpen
+      await fetchSurveyResults()
+    },
+  }
+)
+
+const toggleSurveyStatus = () => executeToggleStatus()
+
+const copySurveyLink = async () => {
+  try {
+    await navigator.clipboard.writeText(surveyUrl.value)
+    toast.add({ title: t('survey.manage.link_copied'), color: 'success' })
+  } catch {
+    toast.add({ title: t('survey.manage.link_copied'), color: 'info' })
+  }
+}
 
 useSeoMeta({
   title: () =>

@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Średnia",
+    "closed_badge": "Ankieta zamknięta",
+    "closed_notice": "Ankieta jest zamknięta. Możesz przeglądać wyniki, ale nie możesz już głosować.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Zamknij ankietę",
+      "copy_link": "Kopiuj link",
+      "generate_link": "Utwórz ankietę",
+      "link_copied": "Link skopiowany!",
+      "no_survey": "Nie utworzono ankiety dla tego naboru.",
+      "open_survey": "Otwórz ankietę",
+      "regenerate_confirm": "Ponowne wygenerowanie linku unieważni poprzedni. Kontynuować?",
+      "regenerate_link": "Wygeneruj nowy link",
+      "results_title": "Wyniki ankiety",
+      "status_closed": "Ankieta jest zamknięta. Głosujący mogą przeglądać wyniki.",
+      "status_error": "Błąd podczas aktualizacji statusu",
+      "status_open": "Ankieta jest obecnie otwarta do głosowania.",
+      "status_updated": "Status ankiety zaktualizowany",
+      "title": "Ankieta",
+      "token_error": "Błąd podczas generowania linku",
+      "token_generated": "Link do ankiety wygenerowany"
+    },
+    "no_applications": "Brak oczekujących kandydatur",
+    "no_applications_description": "Obecnie nie ma kandydatur do oceny.",
+    "not_found": "Nie znaleziono ankiety",
+    "not_found_description": "Ten link do ankiety jest nieprawidłowy lub wygasł.",
+    "open_badge": "Ankieta otwarta",
+    "performers_count": "{count} uczestniczący artysta | {count} uczestniczących artystów",
+    "portfolio": "Portfolio",
+    "results": "Wyniki",
+    "show_info": "Spektakl",
+    "subtitle": "Głosuj na kandydatury spektakli",
+    "title": "Ankieta — {showCallName}",
+    "video": "Wideo",
+    "vote_error": "Błąd podczas zapisywania głosu",
+    "vote_saved": "Głos zapisany",
+    "votes_count": "{count} głos | {count} głosów",
+    "your_vote": "Twoja ocena"
+  }
+}

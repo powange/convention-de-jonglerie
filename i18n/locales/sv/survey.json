@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Genomsnitt",
+    "closed_badge": "Omröstning stängd",
+    "closed_notice": "Omröstningen är stängd. Du kan se resultaten men kan inte längre rösta.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Stäng omröstning",
+      "copy_link": "Kopiera länk",
+      "generate_link": "Skapa en omröstning",
+      "link_copied": "Länk kopierad!",
+      "no_survey": "Ingen omröstning har skapats för denna utlysning.",
+      "open_survey": "Öppna omröstning",
+      "regenerate_confirm": "Att återskapa länken gör den gamla ogiltig. Fortsätta?",
+      "regenerate_link": "Återskapa länk",
+      "results_title": "Omröstningsresultat",
+      "status_closed": "Omröstningen är stängd. Röstande kan se resultaten.",
+      "status_error": "Fel vid uppdatering av status",
+      "status_open": "Omröstningen är för närvarande öppen för röstning.",
+      "status_updated": "Omröstningsstatus uppdaterad",
+      "title": "Omröstning",
+      "token_error": "Fel vid generering av länk",
+      "token_generated": "Omröstningslänk genererad"
+    },
+    "no_applications": "Inga väntande ansökningar",
+    "no_applications_description": "Det finns inga ansökningar att bedöma just nu.",
+    "not_found": "Omröstning hittades inte",
+    "not_found_description": "Denna omröstningslänk är ogiltig eller har gått ut.",
+    "open_badge": "Omröstning öppen",
+    "performers_count": "{count} deltagande artist | {count} deltagande artister",
+    "portfolio": "Portfolio",
+    "results": "Resultat",
+    "show_info": "Show",
+    "subtitle": "Rösta på showansökningarna",
+    "title": "Omröstning — {showCallName}",
+    "video": "Video",
+    "vote_error": "Fel vid sparande av röst",
+    "vote_saved": "Röst sparad",
+    "votes_count": "{count} röst | {count} röster",
+    "your_vote": "Ditt betyg"
+  }
+}

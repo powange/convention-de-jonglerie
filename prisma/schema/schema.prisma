@@ -75,6 +75,7 @@ model User {
   showApplications                   ShowApplication[]
   decidedShowApplications            ShowApplication[]                   @relation("ShowApplicationDecider")
   showPresets                        ShowPreset[]
+  showCallSurveyVotes                ShowCallSurveyVote[]
 }
 
 // =============================================================================

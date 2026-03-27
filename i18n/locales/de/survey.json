@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Durchschnitt",
+    "closed_badge": "Umfrage geschlossen",
+    "closed_notice": "Die Umfrage ist geschlossen. Sie können die Ergebnisse einsehen, aber nicht mehr abstimmen.",
+    "duration_minutes": "{duration} Min.",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Umfrage schließen",
+      "copy_link": "Link kopieren",
+      "generate_link": "Umfrage erstellen",
+      "link_copied": "Link kopiert!",
+      "no_survey": "Für diesen Aufruf wurde keine Umfrage erstellt.",
+      "open_survey": "Umfrage öffnen",
+      "regenerate_confirm": "Das Neugenerieren des Links macht den alten ungültig. Fortfahren?",
+      "regenerate_link": "Link neu generieren",
+      "results_title": "Umfrageergebnisse",
+      "status_closed": "Die Umfrage ist geschlossen. Abstimmende können die Ergebnisse einsehen.",
+      "status_error": "Fehler beim Aktualisieren des Status",
+      "status_open": "Die Umfrage ist derzeit für Abstimmungen geöffnet.",
+      "status_updated": "Umfragestatus aktualisiert",
+      "title": "Umfrage",
+      "token_error": "Fehler beim Generieren des Links",
+      "token_generated": "Umfragelink generiert"
+    },
+    "no_applications": "Keine ausstehenden Bewerbungen",
+    "no_applications_description": "Es gibt derzeit keine Bewerbungen zu bewerten.",
+    "not_found": "Umfrage nicht gefunden",
+    "not_found_description": "Dieser Umfragelink ist ungültig oder abgelaufen.",
+    "open_badge": "Umfrage geöffnet",
+    "performers_count": "{count} teilnehmender Künstler | {count} teilnehmende Künstler",
+    "portfolio": "Portfolio",
+    "results": "Ergebnisse",
+    "show_info": "Show",
+    "subtitle": "Stimmen Sie für die Showbewerbungen ab",
+    "title": "Umfrage — {showCallName}",
+    "video": "Video",
+    "vote_error": "Fehler beim Speichern der Abstimmung",
+    "vote_saved": "Abstimmung gespeichert",
+    "votes_count": "{count} Stimme | {count} Stimmen",
+    "your_vote": "Ihre Bewertung"
+  }
+}

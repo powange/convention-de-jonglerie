@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Promedio",
+    "closed_badge": "Encuesta cerrada",
+    "closed_notice": "La encuesta está cerrada. Puede consultar los resultados pero ya no puede votar.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Cerrar encuesta",
+      "copy_link": "Copiar enlace",
+      "generate_link": "Crear una encuesta",
+      "link_copied": "¡Enlace copiado!",
+      "no_survey": "No se ha creado ninguna encuesta para esta convocatoria.",
+      "open_survey": "Abrir encuesta",
+      "regenerate_confirm": "Regenerar el enlace invalidará el anterior. ¿Continuar?",
+      "regenerate_link": "Regenerar enlace",
+      "results_title": "Resultados de la encuesta",
+      "status_closed": "La encuesta está cerrada. Los votantes pueden ver los resultados.",
+      "status_error": "Error al actualizar el estado",
+      "status_open": "La encuesta está actualmente abierta para votaciones.",
+      "status_updated": "Estado de la encuesta actualizado",
+      "title": "Encuesta",
+      "token_error": "Error al generar el enlace",
+      "token_generated": "Enlace de encuesta generado"
+    },
+    "no_applications": "Sin candidaturas pendientes",
+    "no_applications_description": "No hay candidaturas que evaluar en este momento.",
+    "not_found": "Encuesta no encontrada",
+    "not_found_description": "Este enlace de encuesta es inválido o ha expirado.",
+    "open_badge": "Encuesta abierta",
+    "performers_count": "{count} artista participante | {count} artistas participantes",
+    "portfolio": "Portfolio",
+    "results": "Resultados",
+    "show_info": "Espectáculo",
+    "subtitle": "Vote por las candidaturas de espectáculos",
+    "title": "Encuesta — {showCallName}",
+    "video": "Vídeo",
+    "vote_error": "Error al guardar el voto",
+    "vote_saved": "Voto guardado",
+    "votes_count": "{count} voto | {count} votos",
+    "your_vote": "Su puntuación"
+  }
+}

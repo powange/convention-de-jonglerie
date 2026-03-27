@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Average",
+    "closed_badge": "Survey closed",
+    "closed_notice": "The survey is closed. You can view the results but can no longer vote.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Close survey",
+      "copy_link": "Copy link",
+      "generate_link": "Create a survey",
+      "link_copied": "Link copied!",
+      "no_survey": "No survey has been created for this call.",
+      "open_survey": "Open survey",
+      "regenerate_confirm": "Regenerating the link will invalidate the old one. Continue?",
+      "regenerate_link": "Regenerate link",
+      "results_title": "Survey results",
+      "status_closed": "The survey is closed. Voters can view the results.",
+      "status_error": "Error updating status",
+      "status_open": "The survey is currently open for voting.",
+      "status_updated": "Survey status updated",
+      "title": "Survey",
+      "token_error": "Error generating link",
+      "token_generated": "Survey link generated"
+    },
+    "no_applications": "No pending applications",
+    "no_applications_description": "There are no applications to evaluate at this time.",
+    "not_found": "Survey not found",
+    "not_found_description": "This survey link is invalid or has expired.",
+    "open_badge": "Survey open",
+    "performers_count": "{count} participating artist | {count} participating artists",
+    "portfolio": "Portfolio",
+    "results": "Results",
+    "show_info": "Show",
+    "subtitle": "Vote for show applications",
+    "title": "Survey — {showCallName}",
+    "video": "Video",
+    "vote_error": "Error saving vote",
+    "vote_saved": "Vote saved",
+    "votes_count": "{count} vote | {count} votes",
+    "your_vote": "Your rating"
+  }
+}

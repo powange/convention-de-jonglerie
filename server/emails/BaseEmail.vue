@@ -39,26 +39,28 @@ defineProps<Props>()
       <Section :style="{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px 20px' }">
         <!-- Logo + nom -->
         <table :style="{ margin: '0 0 24px', border: '0' }" cellpadding="0" cellspacing="0">
-          <tr>
-            <td :style="{ verticalAlign: 'middle', paddingRight: '12px' }">
-              <Img
-                :src="`${baseUrl}/favicons/android-chrome-192x192.png`"
-                alt="Juggling Convention"
-                :width="36"
-                :height="36"
-              />
-            </td>
-            <td
-              :style="{
-                verticalAlign: 'middle',
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#111827',
-              }"
-            >
-              Juggling Convention
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td :style="{ verticalAlign: 'middle', paddingRight: '12px' }">
+                <Img
+                  :src="`${baseUrl}/favicons/android-chrome-192x192.png`"
+                  alt="Juggling Convention"
+                  :width="36"
+                  :height="36"
+                />
+              </td>
+              <td
+                :style="{
+                  verticalAlign: 'middle',
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: '#111827',
+                }"
+              >
+                Juggling Convention
+              </td>
+            </tr>
+          </tbody>
         </table>
 
         <!-- Card -->

@@ -161,8 +161,13 @@ model EditionShowCall {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
-  edition      Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  // Sondage
+  surveyToken String?  @unique
+  surveyOpen  Boolean  @default(false)
+
+  edition      Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
   applications ShowApplication[]
+  surveyVotes  ShowCallSurveyVote[]
 
   @@unique([editionId, name])
   @@index([editionId])
@@ -239,14 +244,35 @@ model ShowApplication {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  showCall     EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  decidedBy    User?           @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
-  show         Show?           @relation(fields: [showId], references: [id], onDelete: SetNull)
+  showCall     EditionShowCall    @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy    User?              @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  show         Show?              @relation(fields: [showId], references: [id], onDelete: SetNull)
   conversation Conversation? // Conversation avec les organisateurs
+  surveyVotes  ShowCallSurveyVote[]
 
   @@unique([showCallId, userId])
   @@index([showCallId])
   @@index([userId])
   @@index([status])
+}
+
+// Vote dans un sondage de candidatures spectacles
+model ShowCallSurveyVote {
+  id            Int      @id @default(autoincrement())
+  showCallId    Int
+  applicationId Int
+  userId        Int
+  score         Int // 1 à 5
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  showCall    EditionShowCall @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  application ShowApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([showCallId, applicationId, userId])
+  @@index([showCallId])
+  @@index([applicationId])
+  @@index([userId])
 }

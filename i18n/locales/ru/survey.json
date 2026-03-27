@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Среднее",
+    "closed_badge": "Опрос закрыт",
+    "closed_notice": "Опрос закрыт. Вы можете просмотреть результаты, но больше не можете голосовать.",
+    "duration_minutes": "{duration} мин",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Закрыть опрос",
+      "copy_link": "Копировать ссылку",
+      "generate_link": "Создать опрос",
+      "link_copied": "Ссылка скопирована!",
+      "no_survey": "Для этого набора не создан опрос.",
+      "open_survey": "Открыть опрос",
+      "regenerate_confirm": "Перегенерация ссылки сделает предыдущую недействительной. Продолжить?",
+      "regenerate_link": "Перегенерировать ссылку",
+      "results_title": "Результаты опроса",
+      "status_closed": "Опрос закрыт. Голосовавшие могут просмотреть результаты.",
+      "status_error": "Ошибка при обновлении статуса",
+      "status_open": "Опрос в данный момент открыт для голосования.",
+      "status_updated": "Статус опроса обновлён",
+      "title": "Опрос",
+      "token_error": "Ошибка при генерации ссылки",
+      "token_generated": "Ссылка на опрос сгенерирована"
+    },
+    "no_applications": "Нет ожидающих заявок",
+    "no_applications_description": "На данный момент нет заявок для оценки.",
+    "not_found": "Опрос не найден",
+    "not_found_description": "Эта ссылка на опрос недействительна или истекла.",
+    "open_badge": "Опрос открыт",
+    "performers_count": "{count} участвующий артист | {count} участвующих артистов",
+    "portfolio": "Портфолио",
+    "results": "Результаты",
+    "show_info": "Спектакль",
+    "subtitle": "Голосуйте за заявки на спектакли",
+    "title": "Опрос — {showCallName}",
+    "video": "Видео",
+    "vote_error": "Ошибка при сохранении голоса",
+    "vote_saved": "Голос сохранён",
+    "votes_count": "{count} голос | {count} голосов",
+    "your_vote": "Ваша оценка"
+  }
+}

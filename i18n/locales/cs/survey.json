@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Průměr",
+    "closed_badge": "Anketa uzavřena",
+    "closed_notice": "Anketa je uzavřena. Můžete si prohlédnout výsledky, ale již nemůžete hlasovat.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Uzavřít anketu",
+      "copy_link": "Kopírovat odkaz",
+      "generate_link": "Vytvořit anketu",
+      "link_copied": "Odkaz zkopírován!",
+      "no_survey": "Pro tuto výzvu nebyla vytvořena žádná anketa.",
+      "open_survey": "Otevřít anketu",
+      "regenerate_confirm": "Opětovné vygenerování odkazu zneplatní předchozí. Pokračovat?",
+      "regenerate_link": "Znovu vygenerovat odkaz",
+      "results_title": "Výsledky ankety",
+      "status_closed": "Anketa je uzavřena. Hlasující si mohou prohlédnout výsledky.",
+      "status_error": "Chyba při aktualizaci stavu",
+      "status_open": "Anketa je aktuálně otevřena pro hlasování.",
+      "status_updated": "Stav ankety aktualizován",
+      "title": "Anketa",
+      "token_error": "Chyba při generování odkazu",
+      "token_generated": "Odkaz na anketu vygenerován"
+    },
+    "no_applications": "Žádné čekající kandidatury",
+    "no_applications_description": "Momentálně nejsou žádné kandidatury k hodnocení.",
+    "not_found": "Anketa nenalezena",
+    "not_found_description": "Tento odkaz na anketu je neplatný nebo vypršel.",
+    "open_badge": "Anketa otevřena",
+    "performers_count": "{count} účinkující umělec | {count} účinkujících umělců",
+    "portfolio": "Portfolio",
+    "results": "Výsledky",
+    "show_info": "Představení",
+    "subtitle": "Hlasujte pro kandidatury představení",
+    "title": "Anketa — {showCallName}",
+    "video": "Video",
+    "vote_error": "Chyba při ukládání hlasu",
+    "vote_saved": "Hlas uložen",
+    "votes_count": "{count} hlas | {count} hlasů",
+    "your_vote": "Vaše hodnocení"
+  }
+}

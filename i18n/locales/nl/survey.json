@@ -1,0 +1,43 @@
+{
+  "survey": {
+    "avg_score": "Gemiddelde",
+    "closed_badge": "Enquête gesloten",
+    "closed_notice": "De enquête is gesloten. U kunt de resultaten bekijken maar niet meer stemmen.",
+    "duration_minutes": "{duration} min",
+    "edition_info": "{conventionName} — {editionName}",
+    "manage": {
+      "close_survey": "Enquête sluiten",
+      "copy_link": "Link kopiëren",
+      "generate_link": "Enquête aanmaken",
+      "link_copied": "Link gekopieerd!",
+      "no_survey": "Er is geen enquête aangemaakt voor deze oproep.",
+      "open_survey": "Enquête openen",
+      "regenerate_confirm": "Het opnieuw genereren van de link maakt de oude ongeldig. Doorgaan?",
+      "regenerate_link": "Link opnieuw genereren",
+      "results_title": "Enquêteresultaten",
+      "status_closed": "De enquête is gesloten. Stemmers kunnen de resultaten bekijken.",
+      "status_error": "Fout bij het bijwerken van de status",
+      "status_open": "De enquête is momenteel open voor stemmen.",
+      "status_updated": "Enquêtestatus bijgewerkt",
+      "title": "Enquête",
+      "token_error": "Fout bij het genereren van de link",
+      "token_generated": "Enquêtelink gegenereerd"
+    },
+    "no_applications": "Geen openstaande kandidaturen",
+    "no_applications_description": "Er zijn momenteel geen kandidaturen om te beoordelen.",
+    "not_found": "Enquête niet gevonden",
+    "not_found_description": "Deze enquêtelink is ongeldig of verlopen.",
+    "open_badge": "Enquête open",
+    "performers_count": "{count} deelnemende artiest | {count} deelnemende artiesten",
+    "portfolio": "Portfolio",
+    "results": "Resultaten",
+    "show_info": "Show",
+    "subtitle": "Stem op de showkandidaturen",
+    "title": "Enquête — {showCallName}",
+    "video": "Video",
+    "vote_error": "Fout bij het opslaan van de stem",
+    "vote_saved": "Stem opgeslagen",
+    "votes_count": "{count} stem | {count} stemmen",
+    "your_vote": "Uw beoordeling"
+  }
+}

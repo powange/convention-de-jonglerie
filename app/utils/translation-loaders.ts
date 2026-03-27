@@ -60,6 +60,14 @@ export function getTranslationsToLoad(path: string): string[] {
       translations: ['artists'],
     },
     {
+      pattern: /^\/editions\/\d+\/gestion\/shows-call/,
+      translations: ['survey'],
+    },
+    {
+      pattern: /^\/survey\//,
+      translations: ['survey'],
+    },
+    {
       pattern: /^\/editions\/\d+\/artist-space/,
       translations: ['artists'],
     },
@@ -215,5 +223,20 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/messenger.json'),
     cs: () => import('~~/i18n/locales/cs/messenger.json'),
     sv: () => import('~~/i18n/locales/sv/messenger.json'),
+  },
+  survey: {
+    en: () => import('~~/i18n/locales/en/survey.json'),
+    da: () => import('~~/i18n/locales/da/survey.json'),
+    de: () => import('~~/i18n/locales/de/survey.json'),
+    es: () => import('~~/i18n/locales/es/survey.json'),
+    fr: () => import('~~/i18n/locales/fr/survey.json'),
+    it: () => import('~~/i18n/locales/it/survey.json'),
+    nl: () => import('~~/i18n/locales/nl/survey.json'),
+    pl: () => import('~~/i18n/locales/pl/survey.json'),
+    pt: () => import('~~/i18n/locales/pt/survey.json'),
+    ru: () => import('~~/i18n/locales/ru/survey.json'),
+    uk: () => import('~~/i18n/locales/uk/survey.json'),
+    cs: () => import('~~/i18n/locales/cs/survey.json'),
+    sv: () => import('~~/i18n/locales/sv/survey.json'),
   },
 }
