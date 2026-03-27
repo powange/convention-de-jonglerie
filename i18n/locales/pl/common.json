@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Twoje imię",
       "i_am_performer": "Uczestniczę w spektaklu",
       "last_name_placeholder": "Twoje nazwisko",
-      "performer_number": "Osoba {number}",
+      "performer_number": "Artysta {number}",
       "performers_count": "Liczba artistów w spektaklu",
       "phone_placeholder": "+48 123 456 789",
       "show_description_placeholder": "Opisz swój spektakl: koncepcja, styl, grupa docelowa...",

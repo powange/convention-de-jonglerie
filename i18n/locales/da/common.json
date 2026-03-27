@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Dit fornavn",
       "i_am_performer": "Jeg deltager i forestillingen",
       "last_name_placeholder": "Dit efternavn",
-      "performer_number": "Deltager {number}",
+      "performer_number": "Kunstner {number}",
       "performers_count": "Antal kunstnere i forestillingen",
       "phone_placeholder": "+45 12 34 56 78",
       "show_description_placeholder": "Beskriv din forestilling: koncept, stil, målgruppe...",

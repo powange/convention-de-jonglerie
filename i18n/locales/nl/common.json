@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Uw voornaam",
       "i_am_performer": "Ik neem deel aan de show",
       "last_name_placeholder": "Uw achternaam",
-      "performer_number": "Persoon {number}",
+      "performer_number": "Artiest {number}",
       "performers_count": "Aantal artiesten in de show",
       "phone_placeholder": "+31 6 12 34 56 78",
       "show_description_placeholder": "Beschrijf uw show: concept, stijl, doelgroep...",

@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Su nombre",
       "i_am_performer": "Participo en el espectáculo",
       "last_name_placeholder": "Su apellido",
-      "performer_number": "Persona {number}",
+      "performer_number": "Artista {number}",
       "performers_count": "Número de artistas en el espectáculo",
       "phone_placeholder": "+34 612 345 678",
       "show_description_placeholder": "Describa su espectáculo: concepto, estilo, público objetivo...",

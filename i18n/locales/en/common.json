@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Your first name",
       "i_am_performer": "I am part of the show",
       "last_name_placeholder": "Your last name",
-      "performer_number": "Person {number}",
+      "performer_number": "Artist {number}",
       "performers_count": "Number of performers in the show",
       "phone_placeholder": "+1 234 567 8900",
       "show_description_placeholder": "Describe your show: concept, style, target audience...",

@@ -513,65 +513,78 @@
                           :label="t('shows_call.form.i_am_performer')"
                         />
 
-                        <div class="grid grid-cols-2 gap-3">
-                          <UFormField
-                            :label="t('common.last_name')"
-                            :name="`additionalPerformers.${index}.lastName`"
-                            required
-                          >
-                            <UInput
-                              v-model="performer.lastName"
-                              :placeholder="t('shows_call.form.last_name_placeholder')"
-                              size="lg"
-                              class="w-full"
-                              :disabled="index === 0 && applicantIsPerformer"
-                            />
-                          </UFormField>
-
-                          <UFormField
-                            :label="t('common.first_name')"
-                            :name="`additionalPerformers.${index}.firstName`"
-                            required
-                          >
-                            <UInput
-                              v-model="performer.firstName"
-                              :placeholder="t('shows_call.form.first_name_placeholder')"
-                              size="lg"
-                              class="w-full"
-                              :disabled="index === 0 && applicantIsPerformer"
-                            />
-                          </UFormField>
+                        <!-- Affichage texte quand l'utilisateur participe lui-même -->
+                        <div
+                          v-if="index === 0 && applicantIsPerformer"
+                          class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400"
+                        >
+                          <span class="font-medium text-gray-900 dark:text-gray-100">
+                            {{ authStore.user?.prenom }} {{ authStore.user?.nom }}
+                          </span>
+                          <span>{{ authStore.user?.email }}</span>
+                          <span v-if="authStore.user?.telephone || authStore.user?.phone">
+                            {{ authStore.user?.telephone || authStore.user?.phone }}
+                          </span>
                         </div>
 
-                        <UFormField
-                          :label="t('common.email')"
-                          :name="`additionalPerformers.${index}.email`"
-                          required
-                        >
-                          <UInput
-                            v-model="performer.email"
-                            type="email"
-                            :placeholder="t('shows_call.form.email_placeholder')"
-                            size="lg"
-                            class="w-full"
-                            :disabled="index === 0 && applicantIsPerformer"
-                          />
-                        </UFormField>
+                        <!-- Formulaire pour les autres artistes -->
+                        <template v-else>
+                          <div class="grid grid-cols-2 gap-3">
+                            <UFormField
+                              :label="t('common.last_name')"
+                              :name="`additionalPerformers.${index}.lastName`"
+                              required
+                            >
+                              <UInput
+                                v-model="performer.lastName"
+                                :placeholder="t('shows_call.form.last_name_placeholder')"
+                                size="lg"
+                                class="w-full"
+                              />
+                            </UFormField>
 
-                        <UFormField
-                          :label="t('common.phone')"
-                          :name="`additionalPerformers.${index}.phone`"
-                          required
-                        >
-                          <UInput
-                            v-model="performer.phone"
-                            type="tel"
-                            :placeholder="t('shows_call.form.phone_placeholder')"
-                            size="lg"
-                            class="w-full"
-                            :disabled="index === 0 && applicantIsPerformer"
-                          />
-                        </UFormField>
+                            <UFormField
+                              :label="t('common.first_name')"
+                              :name="`additionalPerformers.${index}.firstName`"
+                              required
+                            >
+                              <UInput
+                                v-model="performer.firstName"
+                                :placeholder="t('shows_call.form.first_name_placeholder')"
+                                size="lg"
+                                class="w-full"
+                              />
+                            </UFormField>
+                          </div>
+
+                          <UFormField
+                            :label="t('common.email')"
+                            :name="`additionalPerformers.${index}.email`"
+                            required
+                          >
+                            <UInput
+                              v-model="performer.email"
+                              type="email"
+                              :placeholder="t('shows_call.form.email_placeholder')"
+                              size="lg"
+                              class="w-full"
+                            />
+                          </UFormField>
+
+                          <UFormField
+                            :label="t('common.phone')"
+                            :name="`additionalPerformers.${index}.phone`"
+                            required
+                          >
+                            <UInput
+                              v-model="performer.phone"
+                              type="tel"
+                              :placeholder="t('shows_call.form.phone_placeholder')"
+                              size="lg"
+                              class="w-full"
+                            />
+                          </UFormField>
+                        </template>
                       </div>
                     </div>
                   </div>

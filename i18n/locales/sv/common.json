@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Ditt förnamn",
       "i_am_performer": "Jag deltar i föreställningen",
       "last_name_placeholder": "Ditt efternamn",
-      "performer_number": "Deltagare {number}",
+      "performer_number": "Artist {number}",
       "performers_count": "Antal artister i föreställningen",
       "phone_placeholder": "+46 70 123 45 67",
       "show_description_placeholder": "Beskriv din föreställning: koncept, stil, målgrupp...",

@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Ваше имя",
       "i_am_performer": "Я участвую в представлении",
       "last_name_placeholder": "Ваша фамилия",
-      "performer_number": "Участник {number}",
+      "performer_number": "Артист {number}",
       "performers_count": "Количество артистов в представлении",
       "phone_placeholder": "+7 912 345 67 89",
       "show_description_placeholder": "Опишите ваше выступление: концепция, стиль, целевая аудитория...",

@@ -1060,7 +1060,7 @@
       "first_name_placeholder": "Il tuo nome",
       "i_am_performer": "Partecipo allo spettacolo",
       "last_name_placeholder": "Il tuo cognome",
-      "performer_number": "Persona {number}",
+      "performer_number": "Artista {number}",
       "performers_count": "Numero di artisti nello spettacolo",
       "phone_placeholder": "+39 123 456 7890",
       "show_description_placeholder": "Descrivi il tuo spettacolo: concept, stile, pubblico target...",
