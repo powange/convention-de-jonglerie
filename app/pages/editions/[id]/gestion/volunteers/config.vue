@@ -251,7 +251,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()

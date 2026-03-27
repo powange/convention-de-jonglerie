@@ -34,7 +34,7 @@ const { t } = useI18n()
 
 // Middleware pour s'assurer que l'utilisateur est authentifié
 definePageMeta({
-  middleware: 'authenticated',
+  middleware: 'auth-protected',
 })
 
 // Métadonnées de la page

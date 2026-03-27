@@ -218,7 +218,7 @@ import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallWithStats, ShowCallVisibility } from '~/types'
 
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()

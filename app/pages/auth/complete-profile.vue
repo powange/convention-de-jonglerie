@@ -99,7 +99,7 @@ const authStore = useAuthStore()
 
 // Middleware pour s'assurer que l'utilisateur est connecté
 definePageMeta({
-  middleware: 'authenticated',
+  middleware: 'auth-protected',
 })
 
 const selectedCategories = ref<string[]>([])

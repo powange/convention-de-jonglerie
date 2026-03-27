@@ -84,7 +84,7 @@ export function createRateLimiter(config: RateLimitConfig) {
  */
 export const authRateLimiter = createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
-  max: 5,
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 5,
   message: 'Trop de tentatives de connexion, veuillez réessayer dans une minute',
 })
 

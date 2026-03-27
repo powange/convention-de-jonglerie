@@ -402,7 +402,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['authenticated', 'super-admin'],
+  middleware: ['auth-protected', 'super-admin'],
 })
 
 const { t } = useI18n()

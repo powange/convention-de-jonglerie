@@ -45,24 +45,30 @@ test.describe('Authentification', () => {
 })
 
 test.describe('Pages protégées', () => {
-  test('redirige vers login si non connecté — /profile', async ({ page, goto }) => {
+  test('redirige vers login avec returnTo si non connecté — /profile', async ({ page, goto }) => {
     await goto('/profile', { waitUntil: 'hydration' })
 
     await page.waitForURL(/login/, { timeout: 5000 })
     expect(page.url()).toContain('/login')
+    expect(page.url()).toMatch(/returnTo=.*profile/)
   })
 
-  test('redirige vers login si non connecté — /favorites', async ({ page, goto }) => {
+  test('redirige vers login avec returnTo si non connecté — /favorites', async ({ page, goto }) => {
     await goto('/favorites', { waitUntil: 'hydration' })
 
     await page.waitForURL(/login/, { timeout: 5000 })
     expect(page.url()).toContain('/login')
+    expect(page.url()).toMatch(/returnTo=.*favorites/)
   })
 
-  test('redirige vers login si non connecté — /my-conventions', async ({ page, goto }) => {
+  test('redirige vers login avec returnTo si non connecté — /my-conventions', async ({
+    page,
+    goto,
+  }) => {
     await goto('/my-conventions', { waitUntil: 'hydration' })
 
     await page.waitForURL(/login/, { timeout: 5000 })
     expect(page.url()).toContain('/login')
+    expect(page.url()).toMatch(/returnTo=.*my-conventions/)
   })
 })

@@ -324,7 +324,7 @@ import { useEditionStore } from '~/stores/editions'
 import { countrySelectOptions } from '~/utils/countries'
 
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()

@@ -2,7 +2,7 @@ import fs from 'node:fs'
 
 import { expect } from '@nuxt/test-utils/playwright'
 
-import { conventionStateFile } from '../../../playwright.config'
+import { conventionStateFile, credentialsFile } from '../../../playwright.config'
 
 const BASE_URL = 'http://localhost:3000'
 
@@ -41,6 +41,52 @@ export function loadFromState<T = string>(key: string): T | undefined {
   if (!fs.existsSync(conventionStateFile)) return undefined
   const state = JSON.parse(fs.readFileSync(conventionStateFile, 'utf-8'))
   return state[key] as T | undefined
+}
+
+// ──────────────────────────────────────────────
+// Auth helpers
+// ──────────────────────────────────────────────
+
+export interface E2ECredentials {
+  email: string
+  password: string
+  pseudo: string
+}
+
+export function loadCredentials(): E2ECredentials {
+  if (!fs.existsSync(credentialsFile)) {
+    throw new Error(
+      `Fichier de credentials introuvable: ${credentialsFile}. Lancer le setup d'abord.`
+    )
+  }
+  return JSON.parse(fs.readFileSync(credentialsFile, 'utf-8'))
+}
+
+/**
+ * Effectue un login complet (email + mot de passe) depuis la page /login
+ */
+export async function loginWith(
+  page: import('@playwright/test').Page,
+  email: string,
+  password: string
+) {
+  await page.locator('input[type="email"]').fill(email)
+
+  await Promise.all([
+    page.waitForResponse(
+      (res) => res.url().includes('/api/auth/check-email') && res.status() === 200
+    ),
+    page.getByRole('button', { name: /confirmer/i }).click(),
+  ])
+
+  const passwordInput = page.locator('input[type="password"]')
+  await expect(passwordInput).toBeVisible({ timeout: 5000 })
+  await passwordInput.fill(password)
+
+  await Promise.all([
+    page.waitForResponse((res) => res.url().includes('/api/auth/login') && res.status() === 200),
+    page.getByRole('button', { name: /se connecter/i }).click(),
+  ])
 }
 
 // ──────────────────────────────────────────────

@@ -515,7 +515,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()

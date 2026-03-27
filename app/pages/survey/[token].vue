@@ -114,7 +114,7 @@ interface SurveyData {
 }
 
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()

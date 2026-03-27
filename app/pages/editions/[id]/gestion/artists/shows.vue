@@ -264,7 +264,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()

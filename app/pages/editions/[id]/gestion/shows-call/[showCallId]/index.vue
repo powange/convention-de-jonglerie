@@ -360,7 +360,7 @@ import type { EditionShowCall, ShowCallVisibility } from '~/types'
 import { formatDateTimeLocal } from '~/utils/date'
 
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ['auth-protected'],
 })
 
 const route = useRoute()
