@@ -1305,7 +1305,8 @@ watch(
     if (newValue) {
       populateForm()
     }
-  }
+  },
+  { immediate: true }
 )
 
 // Watch for changes in existingApplication to repopulate form
