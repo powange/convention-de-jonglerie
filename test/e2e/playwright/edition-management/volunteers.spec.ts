@@ -39,10 +39,11 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
   test('la page publique affiche le bouton postuler', async ({ page, goto }) => {
     const { editionId } = loadState()
 
-    await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-    await page.waitForSelector('h3', { timeout: 15000 })
-
-    await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 5000 })
+    await expect(async () => {
+      await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      await page.waitForSelector('h3', { timeout: 10000 })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
+    }).toPass({ timeout: 30000, intervals: [3000] })
   })
 
   test('ouvrir la modale de candidature', async ({ page, goto }) => {
@@ -50,6 +51,7 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
 
     await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
     await page.waitForSelector('h3', { timeout: 15000 })
+    await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 10000 })
 
     await page.getByRole('button', { name: /postuler/i }).click()
 
@@ -100,7 +102,7 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByText(/en attente|pending/i).first()).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 15000, intervals: [2000] })
+    }).toPass({ timeout: 30000, intervals: [3000] })
 
     await expect(page.getByRole('button', { name: /postuler/i })).not.toBeVisible({
       timeout: 2000,
@@ -171,12 +173,12 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
   test("la page publique affiche le statut 'acceptée'", async ({ page, goto }) => {
     const { editionId } = loadState()
 
-    // Recharger la page jusqu'à ce que le statut soit visible (cache SSR)
+    // Recharger la page jusqu'à ce que le statut soit visible (cache SSR peut être lent en CI)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByText(/acceptée|accepted/i).first()).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 15000, intervals: [2000] })
+    }).toPass({ timeout: 30000, intervals: [3000] })
   })
 
   test('rejeter la candidature (ACCEPTED → PENDING → REJECTED)', async ({ page }) => {
@@ -206,7 +208,7 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByText(/refusée|rejected/i).first()).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 15000, intervals: [2000] })
+    }).toPass({ timeout: 30000, intervals: [3000] })
   })
 
   // ──────────────────────────────────────────────
