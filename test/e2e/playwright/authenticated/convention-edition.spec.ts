@@ -54,9 +54,15 @@ test.describe.serial('Création convention + édition (parcours UI)', () => {
       .first()
       .click()
     const futureDay = today.getDate() + 2
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+    if (futureDay > lastDay) {
+      // Naviguer vers le mois suivant si la date dépasse le mois courant
+      await page.getByRole('button', { name: 'Next page' }).click()
+    }
+    const displayDay = futureDay > lastDay ? (futureDay - lastDay).toString() : futureDay.toString()
     await page
       .locator('table td')
-      .getByText(futureDay <= 28 ? futureDay.toString() : '5', { exact: true })
+      .getByText(displayDay, { exact: true })
       .first()
       .click()
 
