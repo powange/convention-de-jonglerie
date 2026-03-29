@@ -519,11 +519,11 @@
                           class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400"
                         >
                           <span class="font-medium text-gray-900 dark:text-gray-100">
-                            {{ authStore.user?.prenom }} {{ authStore.user?.nom }}
+                            {{ formState.firstName }} {{ formState.lastName }}
                           </span>
                           <span>{{ authStore.user?.email }}</span>
-                          <span v-if="authStore.user?.telephone || authStore.user?.phone">
-                            {{ authStore.user?.telephone || authStore.user?.phone }}
+                          <span v-if="formState.phone">
+                            {{ formState.phone }}
                           </span>
                         </div>
 
@@ -846,6 +846,18 @@ watch(applicantIsPerformer, (isPerformer) => {
     formState.additionalPerformers[0].phone = ''
   }
 })
+
+// Synchroniser l'artiste 1 quand les infos personnelles changent et "Je participe" est coché
+watch(
+  () => [formState.lastName, formState.firstName, formState.phone],
+  ([lastName, firstName, phone]) => {
+    if (!applicantIsPerformer.value) return
+    if (formState.additionalPerformers.length === 0) return
+    formState.additionalPerformers[0].lastName = lastName
+    formState.additionalPerformers[0].firstName = firstName
+    formState.additionalPerformers[0].phone = phone
+  }
+)
 
 // Presets de spectacle
 const presets = ref<ShowPreset[]>([])
