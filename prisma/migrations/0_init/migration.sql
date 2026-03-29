@@ -1,5 +1,3 @@
-Loaded Prisma config from prisma.config.ts.
-
 -- CreateTable
 CREATE TABLE `EditionArtist` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
