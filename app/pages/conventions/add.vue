@@ -56,7 +56,7 @@ const { execute: executeCreate, loading } = useApiAction<ConventionFormData, { n
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
-      router.push('/my-conventions')
+      router.push('/profile/mes-conventions')
     },
   }
 )

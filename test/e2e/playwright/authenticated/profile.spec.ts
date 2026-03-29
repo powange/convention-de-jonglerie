@@ -19,7 +19,7 @@ test.describe('Profil (connecté)', () => {
   })
 
   test('la page mes conventions est accessible', async ({ page, goto }) => {
-    await goto('/my-conventions', { waitUntil: 'hydration' })
+    await goto('/profile/mes-conventions', { waitUntil: 'hydration' })
 
     expect(page.url()).not.toContain('/login')
   })

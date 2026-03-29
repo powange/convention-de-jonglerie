@@ -27,7 +27,7 @@ test.describe.serial('Création convention + édition (parcours UI)', () => {
     conventionId = (body.data?.id || body.id).toString()
     expect(conventionId).toBeTruthy()
 
-    await page.waitForURL(/my-conventions/, { timeout: 10000 })
+    await page.waitForURL(/profile\/mes-conventions/, { timeout: 10000 })
   })
 
   test('créer une édition via le formulaire stepper', async ({ page, goto }) => {
@@ -60,11 +60,7 @@ test.describe.serial('Création convention + édition (parcours UI)', () => {
       await page.getByRole('button', { name: 'Next page' }).click()
     }
     const displayDay = futureDay > lastDay ? (futureDay - lastDay).toString() : futureDay.toString()
-    await page
-      .locator('table td')
-      .getByText(displayDay, { exact: true })
-      .first()
-      .click()
+    await page.locator('table td').getByText(displayDay, { exact: true }).first().click()
 
     // Adresse
     const addressInput = page.locator('input[name="addressLine1"]')
@@ -116,14 +112,14 @@ test.describe.serial('Création convention + édition (parcours UI)', () => {
     ])
 
     expect(editionResponse.ok()).toBe(true)
-    await page.waitForURL(/my-conventions/, { timeout: 10000 })
+    await page.waitForURL(/profile\/mes-conventions/, { timeout: 10000 })
   })
 
   test('la convention et son édition sont visibles dans mes conventions', async ({
     page,
     goto,
   }) => {
-    await goto('/my-conventions', { waitUntil: 'hydration' })
+    await goto('/profile/mes-conventions', { waitUntil: 'hydration' })
 
     await expect(page.getByText(CONVENTION_NAME).first()).toBeVisible({ timeout: 10000 })
     await expect(page.getByText(/éditions?\s*\(0\)/i)).not.toBeVisible()

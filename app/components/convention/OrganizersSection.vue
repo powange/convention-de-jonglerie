@@ -6,12 +6,20 @@
         {{ $t('conventions.organizers') }} ({{ organizers.length }})
       </h4>
       <div v-if="canManage" class="flex gap-2">
-        <UButton size="xs" variant="ghost" icon="i-heroicons-clock" @click="emit('showHistory')">
-          {{ $t('conventions.history.title') }}
-        </UButton>
-        <UButton size="xs" variant="outline" icon="i-heroicons-plus" @click="emit('addOrganizer')">
-          {{ $t('common.add') }}
-        </UButton>
+        <UButton
+          size="xs"
+          variant="ghost"
+          icon="i-heroicons-clock"
+          :label="smAndUp ? $t('conventions.history.title') : undefined"
+          @click="emit('showHistory')"
+        />
+        <UButton
+          size="xs"
+          variant="outline"
+          icon="i-heroicons-plus"
+          :label="smAndUp ? $t('common.add') : undefined"
+          @click="emit('addOrganizer')"
+        />
       </div>
     </div>
 
@@ -50,6 +58,9 @@ interface Props {
 }
 
 defineProps<Props>()
+
+const { width: windowWidth } = useWindowSize()
+const smAndUp = computed(() => windowWidth.value >= 640)
 
 const emit = defineEmits<{
   (e: 'editOrganizer', organizer: DashboardOrganizer): void

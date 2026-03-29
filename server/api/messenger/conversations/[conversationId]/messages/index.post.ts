@@ -326,7 +326,7 @@ export default wrapApiHandler(
           let notificationUrl: string
           if (conversationType === 'ARTIST_APPLICATION' && showApplication?.id) {
             // Pour les candidatures artistes, pointer vers la page "Mes candidatures"
-            notificationUrl = `/my-artist-applications?applicationId=${showApplication.id}`
+            notificationUrl = `/profile/mes-candidatures-artiste?applicationId=${showApplication.id}`
           } else if (editionId) {
             notificationUrl = `/messenger?editionId=${editionId}&conversationId=${conversationId}`
           } else {

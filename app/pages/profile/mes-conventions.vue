@@ -13,14 +13,14 @@
             :ui="{ rounded: 'rounded-full' }"
             @click="openFeaturesModal"
           />
-          <span class="text-xs text-gray-500">({{ myConventions.length }} conventions)</span>
+          <span class="text-xs text-gray-500">({{ myConventions.length }})</span>
         </div>
         <UButton
           icon="i-heroicons-plus"
           size="sm"
           color="primary"
           variant="outline"
-          :label="t('conventions.create')"
+          :label="smAndUp ? t('conventions.create') : undefined"
           to="/conventions/add"
         />
       </div>
@@ -246,6 +246,7 @@ await useLazyI18n('edition')
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
+  layout: 'profile',
   middleware: 'auth-protected',
 })
 
@@ -254,6 +255,8 @@ const toast = useToast()
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { width: windowWidth } = useWindowSize()
+const smAndUp = computed(() => windowWidth.value >= 640)
 
 // Détail chargé pour une convention
 interface ConventionDetailData {

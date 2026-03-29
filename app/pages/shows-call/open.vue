@@ -13,7 +13,7 @@
 
       <!-- Bouton vers mes candidatures -->
       <UButton
-        to="/my-artist-applications"
+        to="/profile/mes-candidatures-artiste"
         color="primary"
         variant="outline"
         icon="i-heroicons-folder"

@@ -483,6 +483,7 @@ interface ContactOrganizerResponse {
 }
 
 definePageMeta({
+  layout: 'profile',
   middleware: 'auth-protected',
 })
 

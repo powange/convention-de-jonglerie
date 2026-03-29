@@ -130,7 +130,7 @@
                       color="primary"
                       variant="soft"
                       icon="i-heroicons-list-bullet"
-                      :to="'/my-volunteer-applications'"
+                      :to="'/profile/mes-candidatures-benevole'"
                     >
                       {{ t('edition.volunteers.view_all_applications') || 'Voir mes candidatures' }}
                     </UButton>

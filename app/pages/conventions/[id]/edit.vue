@@ -132,7 +132,7 @@ const { execute: executeUpdate, loading: updating } = useApiAction(
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
-      navigateTo(`/my-conventions?convention=${conventionId}`)
+      navigateTo(`/profile/mes-conventions?convention=${conventionId}`)
     },
   }
 )

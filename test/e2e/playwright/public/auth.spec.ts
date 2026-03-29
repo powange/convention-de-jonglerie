@@ -61,14 +61,14 @@ test.describe('Pages protégées', () => {
     expect(page.url()).toMatch(/returnTo=.*favorites/)
   })
 
-  test('redirige vers login avec returnTo si non connecté — /my-conventions', async ({
+  test('redirige vers login avec returnTo si non connecté — /profile/mes-conventions', async ({
     page,
     goto,
   }) => {
-    await goto('/my-conventions', { waitUntil: 'hydration' })
+    await goto('/profile/mes-conventions', { waitUntil: 'hydration' })
 
     await page.waitForURL(/login/, { timeout: 5000 })
     expect(page.url()).toContain('/login')
-    expect(page.url()).toMatch(/returnTo=.*my-conventions/)
+    expect(page.url()).toMatch(/returnTo=.*mes-conventions/)
   })
 })

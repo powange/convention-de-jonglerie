@@ -100,10 +100,6 @@
     "objets_trouves": {
       "photo_alt": "Photo de l'objet trouvé"
     },
-    "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
-    },
     "volunteers": {
       "accepted": "Acceptées",
       "allergies": "Allergies",

@@ -67,7 +67,7 @@ export default defineTask({
                 category: 'volunteer',
                 entityType: 'VolunteerTimeSlot',
                 entityId: slot.id,
-                actionUrl: `/my-volunteer-applications`,
+                actionUrl: `/profile/mes-candidatures-benevole`,
                 actionText: 'Voir mes candidatures',
                 notificationType: 'volunteer_reminder',
               })

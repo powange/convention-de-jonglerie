@@ -11,10 +11,9 @@
         size="sm"
         variant="outline"
         icon="i-heroicons-plus"
+        :label="smAndUp ? $t('conventions.add_edition') : undefined"
         :to="`/conventions/${convention.id}/editions/add`"
-      >
-        {{ $t('conventions.add_edition') }}
-      </UButton>
+      />
     </div>
 
     <!-- Grille d'éditions -->
@@ -151,6 +150,8 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const authStore = useAuthStore()
 const { statusOptions } = useEditionStatus()
+const { width: windowWidth } = useWindowSize()
+const smAndUp = computed(() => windowWidth.value >= 640)
 
 // Helpers de droits
 function findCurrentCollab(): DashboardOrganizer | undefined {

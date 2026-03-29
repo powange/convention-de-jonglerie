@@ -210,7 +210,7 @@ export default wrapApiHandler(
               category: 'volunteer',
               entityType: 'Edition',
               entityId: editionId.toString(),
-              actionUrl: `/my-volunteer-applications`,
+              actionUrl: `/profile/mes-candidatures-benevole`,
               actionText: 'Voir ma candidature',
               notificationType: 'volunteer_application_modified',
             }),

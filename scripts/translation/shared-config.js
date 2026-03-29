@@ -33,7 +33,8 @@ export const SPLIT_CONFIG = {
   ],
   admin: ['admin'],
   edition: ['editions', 'conventions', 'organizers', 'carpool', 'diet'],
-  auth: ['auth', 'profile'],
+  auth: ['auth'],
+  profil: ['profile'],
   permissions: ['permissions'], // Chargé au niveau composant via useLazyI18n('permissions')
   feedback: ['feedback'], // Chargé au niveau composant via useLazyI18n('feedback')
   public: ['homepage', 'pages', 'seo'],

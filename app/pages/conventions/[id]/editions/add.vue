@@ -120,7 +120,7 @@ const handleAddEdition = async (data: EditionFormData) => {
     })
 
     // Rediriger vers la page des conventions de l'utilisateur
-    router.push('/my-conventions')
+    router.push('/profile/mes-conventions')
   } catch (error: unknown) {
     const httpError = error as HttpError
     const errorMessage =

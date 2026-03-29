@@ -129,7 +129,7 @@ export default wrapApiHandler(async (event) => {
         type: 'INFO',
         title: notificationTitle,
         message: notificationMessage,
-        actionUrl: '/my-volunteer-applications',
+        actionUrl: '/profile/mes-candidatures-benevole',
         actionText: 'Voir mes créneaux',
         entityType: 'Edition',
         entityId: editionId.toString(),
@@ -174,14 +174,14 @@ export default wrapApiHandler(async (event) => {
         edition.convention.name,
         edition.name || edition.convention.name,
         emailTimeSlots,
-        `${siteUrl}/my-volunteer-applications`
+        `${siteUrl}/profile/mes-candidatures-benevole`
       )
 
       const emailSent = await sendEmail({
         to: volunteer.user.email,
         subject: `🤹 Vos créneaux de bénévolat - ${edition.convention.name}`,
         html: emailHtml,
-        text: `Bonjour ${prenom},\n\n${notificationMessage}\n\nLien : ${siteUrl}/my-volunteer-applications`,
+        text: `Bonjour ${prenom},\n\n${notificationMessage}\n\nLien : ${siteUrl}/profile/mes-candidatures-benevole`,
       })
 
       if (!emailSent) {

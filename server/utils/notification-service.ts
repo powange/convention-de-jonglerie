@@ -451,7 +451,7 @@ export const NotificationHelpers = {
       category: 'edition',
       entityType: 'Convention',
       entityId: conventionId.toString(),
-      actionUrl: `/my-conventions?convention=${conventionId}`,
+      actionUrl: `/profile/mes-conventions?convention=${conventionId}`,
       notificationType: 'new_convention',
     })
   },
@@ -470,7 +470,7 @@ export const NotificationHelpers = {
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
-      actionUrl: '/my-volunteer-applications',
+      actionUrl: '/profile/mes-candidatures-benevole',
       notificationType: 'volunteer_application_submitted',
     })
   },
@@ -554,7 +554,7 @@ export const NotificationHelpers = {
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
-      actionUrl: '/my-volunteer-applications',
+      actionUrl: '/profile/mes-candidatures-benevole',
       notificationType: 'volunteer_application_modified',
     })
   },
@@ -827,7 +827,7 @@ export const NotificationHelpers = {
       category: 'convention',
       entityType: 'Convention',
       entityId: conventionId.toString(),
-      actionUrl: `/my-conventions?convention=${conventionId}`,
+      actionUrl: `/profile/mes-conventions?convention=${conventionId}`,
       notificationType: 'organizer_added',
     })
   },
@@ -925,7 +925,7 @@ export const NotificationHelpers = {
       category: 'artist',
       entityType: 'Edition',
       entityId: editionId.toString(),
-      actionUrl: `/my-artist-applications`,
+      actionUrl: `/profile/mes-candidatures-artiste`,
       notificationType: 'show_application_accepted',
     })
   },
@@ -949,7 +949,7 @@ export const NotificationHelpers = {
       category: 'artist',
       entityType: 'Edition',
       entityId: editionId.toString(),
-      actionUrl: `/my-artist-applications`,
+      actionUrl: `/profile/mes-candidatures-artiste`,
       notificationType: 'show_application_rejected',
     })
   },

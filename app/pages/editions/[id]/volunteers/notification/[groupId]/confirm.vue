@@ -89,7 +89,7 @@
           <div class="flex justify-between items-center text-xs text-gray-500">
             <span>{{ notification.editionName }}</span>
             <NuxtLink
-              to="/my-volunteer-applications"
+              to="/profile/mes-candidatures-benevole"
               class="text-primary-600 hover:text-primary-700"
             >
               {{ t('edition.volunteers.back_to_my_applications') }}

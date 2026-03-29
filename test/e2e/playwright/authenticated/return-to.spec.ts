@@ -57,19 +57,19 @@ test.describe('Redirection returnTo après login', () => {
     const { email, password } = loadCredentials()
 
     // Accéder directement à une page protégée sans être connecté
-    await goto('/my-conventions', { waitUntil: 'hydration' })
+    await goto('/profile/mes-conventions', { waitUntil: 'hydration' })
 
-    // Le middleware doit rediriger vers /login?returnTo=/my-conventions
+    // Le middleware doit rediriger vers /login?returnTo=/profile/mes-conventions
     await page.waitForURL(/\/login/, { timeout: 10000 })
     expect(page.url()).toContain('returnTo')
-    expect(page.url()).toContain('my-conventions')
+    expect(page.url()).toContain('mes-conventions')
 
     // Se connecter
     await loginWith(page, email, password)
 
     // Doit rediriger vers la page demandée initialement
-    await page.waitForURL(/\/my-conventions/, { timeout: 10000 })
-    expect(page.url()).toContain('/my-conventions')
+    await page.waitForURL(/\/profile\/mes-conventions/, { timeout: 10000 })
+    expect(page.url()).toContain('/profile/mes-conventions')
   })
 
   test('préserve le returnTo depuis /notifications (page protégée)', async ({ page, goto }) => {

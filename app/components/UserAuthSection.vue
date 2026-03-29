@@ -246,7 +246,7 @@ const baseNavItems = computed(() => {
     {
       label: t('navigation.my_conventions'),
       icon: 'i-heroicons-calendar-days',
-      to: '/my-conventions',
+      to: '/profile/mes-conventions',
     },
   ]
 
@@ -254,7 +254,7 @@ const baseNavItems = computed(() => {
     items.push({
       label: t('navigation.my_volunteer_applications'),
       icon: 'i-heroicons-hand-raised',
-      to: '/my-volunteer-applications',
+      to: '/profile/mes-candidatures-benevole',
     })
   }
 
@@ -262,7 +262,7 @@ const baseNavItems = computed(() => {
     items.push({
       label: t('navigation.my_artist_applications'),
       icon: 'i-heroicons-sparkles',
-      to: '/my-artist-applications',
+      to: '/profile/mes-candidatures-artiste',
     })
   }
 
