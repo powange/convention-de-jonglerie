@@ -107,9 +107,9 @@
                 color="blue"
               />
 
-              <!-- Mise à jour IA (conventions non revendiquées) -->
+              <!-- Mise à jour IA (conventions non revendiquées ou admin) -->
               <ManagementNavigationCard
-                v-if="isUnclaimedConvention"
+                v-if="isUnclaimedConvention || authStore.isAdminModeActive"
                 :to="`/editions/${edition.id}/gestion/ai-update`"
                 icon="i-lucide-sparkles"
                 :title="$t('gestion.ai_update.title')"

@@ -281,7 +281,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-lucide-toggle-right',
           to: `/editions/${editionId.value}/gestion/features`,
         },
-        ...(isUnclaimedConvention.value
+        ...(isUnclaimedConvention.value || authStore.isAdminModeActive
           ? [
               {
                 label: t('gestion.ai_update.title'),
