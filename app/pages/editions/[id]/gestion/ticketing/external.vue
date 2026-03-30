@@ -1100,7 +1100,7 @@ const handleConfigSave = async (config: any) => {
         provider: 'HELLOASSO',
         helloAsso: {
           clientId: config.clientId,
-          clientSecret: config.clientSecret,
+          ...(config.clientSecret ? { clientSecret: config.clientSecret } : {}),
           organizationSlug: config.organizationSlug,
           formType: config.formType,
           formSlug: config.formSlug,
@@ -1142,15 +1142,17 @@ const handleConfigSave = async (config: any) => {
 // Gestion du test de connexion depuis la modal
 const handleConfigTest = async (config: any) => {
   try {
+    const body: Record<string, string> = {
+      clientId: config.clientId,
+      organizationSlug: config.organizationSlug,
+      formType: config.formType,
+      formSlug: config.formSlug,
+    }
+    if (config.clientSecret) body.clientSecret = config.clientSecret
+
     const result = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/test`, {
       method: 'POST',
-      body: {
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
-        organizationSlug: config.organizationSlug,
-        formType: config.formType,
-        formSlug: config.formSlug,
-      },
+      body,
     })
 
     toast.add({

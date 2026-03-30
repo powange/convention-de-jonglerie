@@ -9,7 +9,7 @@ const bodySchema = z.object({
   helloAsso: z
     .object({
       clientId: z.string().min(1),
-      clientSecret: z.string().min(1),
+      clientSecret: z.string().optional(),
       organizationSlug: z.string().min(1),
       formType: z.string().min(1),
       formSlug: z.string().min(1),
@@ -66,11 +66,32 @@ export default wrapApiHandler(
         })
       }
 
-      // Chiffrer le client secret
-      const encryptedSecret = encrypt(body.helloAsso.clientSecret)
+      // Le client secret est obligatoire pour une nouvelle configuration
+      if (!existingConfig && !body.helloAsso.clientSecret) {
+        throw createError({
+          status: 400,
+          message: 'Client Secret requis pour une nouvelle configuration HelloAsso',
+        })
+      }
+
+      // Chiffrer le client secret uniquement s'il est fourni
+      const encryptedSecret = body.helloAsso.clientSecret
+        ? encrypt(body.helloAsso.clientSecret)
+        : undefined
 
       if (existingConfig) {
         // Mettre à jour la configuration existante
+        const updateData: Record<string, unknown> = {
+          clientId: body.helloAsso.clientId,
+          organizationSlug: body.helloAsso.organizationSlug,
+          formType: body.helloAsso.formType,
+          formSlug: body.helloAsso.formSlug,
+        }
+        // Ne mettre à jour le secret que s'il est fourni
+        if (encryptedSecret !== undefined) {
+          updateData.clientSecret = encryptedSecret
+        }
+
         const updated = await prisma.externalTicketing.update({
           where: { id: existingConfig.id },
           data: {
@@ -81,18 +102,12 @@ export default wrapApiHandler(
               upsert: {
                 create: {
                   clientId: body.helloAsso.clientId,
-                  clientSecret: encryptedSecret,
+                  clientSecret: encryptedSecret!,
                   organizationSlug: body.helloAsso.organizationSlug,
                   formType: body.helloAsso.formType,
                   formSlug: body.helloAsso.formSlug,
                 },
-                update: {
-                  clientId: body.helloAsso.clientId,
-                  clientSecret: encryptedSecret,
-                  organizationSlug: body.helloAsso.organizationSlug,
-                  formType: body.helloAsso.formType,
-                  formSlug: body.helloAsso.formSlug,
-                },
+                update: updateData,
               },
             },
           },

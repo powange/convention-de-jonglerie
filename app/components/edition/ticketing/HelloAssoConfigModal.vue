@@ -70,12 +70,16 @@
 
           <UFormField
             label="Client Secret"
-            hint="Clé secrète (chiffrée après enregistrement)"
-            required
+            :hint="
+              isEditing
+                ? 'Laisser vide pour conserver le secret actuel'
+                : 'Clé secrète (chiffrée après enregistrement)'
+            "
+            :required="!isEditing"
           >
             <UInput
               v-model="localConfig.clientSecret"
-              placeholder="••••••••••••••••"
+              :placeholder="isEditing ? 'Secret actuel conservé' : '••••••••••••••••'"
               icon="i-heroicons-lock-closed"
               type="password"
               size="lg"
@@ -95,8 +99,24 @@
             <h3 class="font-semibold text-base">Identifier votre formulaire</h3>
           </div>
 
+          <UFormField
+            label="URL de votre billetterie HelloAsso"
+            :hint="urlParseError || undefined"
+            :status="urlParseError ? 'error' : parsedUrl ? 'success' : undefined"
+            required
+          >
+            <UInput
+              v-model="helloAssoUrl"
+              placeholder="https://www.helloasso.com/associations/mon-asso/evenements/mon-event"
+              icon="i-heroicons-link"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+
+          <!-- Résultat de la détection -->
           <div
-            v-if="detectedFromUrl"
+            v-if="parsedUrl"
             class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4"
           >
             <div class="flex items-start gap-2">
@@ -104,73 +124,24 @@
                 name="i-heroicons-check-circle"
                 class="text-success-600 dark:text-success-400 mt-0.5 flex-shrink-0"
               />
-              <div class="text-sm">
-                <p class="font-medium text-success-900 dark:text-success-100 mb-1">
-                  Configuration détectée automatiquement
-                </p>
-                <p class="text-success-700 dark:text-success-300">
-                  Les informations du formulaire ont été pré-remplies depuis l'URL de billeterie de
-                  l'édition. Vous pouvez les modifier si nécessaire.
-                </p>
+              <div class="text-sm space-y-1">
+                <p class="font-medium text-success-900 dark:text-success-100">Formulaire détecté</p>
+                <ul class="text-success-700 dark:text-success-300 space-y-0.5">
+                  <li>
+                    <span class="font-medium">Organisation :</span>
+                    {{ localConfig.organizationSlug }}
+                  </li>
+                  <li>
+                    <span class="font-medium">Type :</span>
+                    {{
+                      formTypeOptions.find((o) => o.value === localConfig.formType)?.label ||
+                      localConfig.formType
+                    }}
+                  </li>
+                  <li><span class="font-medium">Formulaire :</span> {{ localConfig.formSlug }}</li>
+                </ul>
               </div>
             </div>
-          </div>
-
-          <div
-            v-else
-            class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-          >
-            <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
-              <span class="font-medium">Exemple d'URL HelloAsso :</span>
-            </p>
-            <code
-              class="block text-xs bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700 font-mono break-all"
-            >
-              https://www.helloasso.com/associations/<span class="text-primary-600 font-semibold"
-                >slug-organisation</span
-              >/evenements/<span class="text-primary-600 font-semibold">slug-formulaire</span>
-            </code>
-          </div>
-
-          <div class="space-y-4">
-            <UFormField
-              label="Slug de l'organisation"
-              hint="Le nom de votre association dans l'URL"
-              required
-            >
-              <UInput
-                v-model="localConfig.organizationSlug"
-                placeholder="ex: juggling-convention"
-                icon="i-heroicons-building-office"
-                size="lg"
-              />
-            </UFormField>
-
-            <UFormField
-              label="Type de formulaire"
-              hint="Le type visible dans l'URL HelloAsso"
-              required
-            >
-              <USelect
-                v-model="localConfig.formType"
-                :items="formTypeOptions"
-                placeholder="Sélectionnez un type"
-                size="lg"
-              />
-            </UFormField>
-
-            <UFormField
-              label="Slug du formulaire"
-              hint="Le nom de votre formulaire dans l'URL"
-              required
-            >
-              <UInput
-                v-model="localConfig.formSlug"
-                placeholder="ex: billeterie-convention-2025"
-                icon="i-heroicons-document-text"
-                size="lg"
-              />
-            </UFormField>
           </div>
         </div>
       </div>
@@ -217,7 +188,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { parseHelloAssoUrl } from '~/utils/helloasso'
+import { buildHelloAssoUrl, parseHelloAssoUrl } from '~/utils/helloasso'
 
 interface HelloAssoConfig {
   clientId: string
@@ -267,13 +238,34 @@ const isEditing = computed(() => !!props.config)
 const saving = ref(false)
 const testing = ref(false)
 
-// Indiquer si les champs ont été détectés depuis l'URL
-const detectedFromUrl = ref(false)
+// URL saisie par l'utilisateur
+const helloAssoUrl = ref('')
+
+// Parsing réactif de l'URL
+const parsedUrl = computed(() =>
+  helloAssoUrl.value ? parseHelloAssoUrl(helloAssoUrl.value) : null
+)
+
+const urlParseError = computed(() => {
+  if (!helloAssoUrl.value || helloAssoUrl.value.length < 10) return ''
+  if (!parsedUrl.value)
+    return 'URL HelloAsso invalide — format attendu : https://www.helloasso.com/associations/.../evenements/...'
+  return ''
+})
+
+// Mettre à jour localConfig quand l'URL est parsée
+watch(parsedUrl, (parsed) => {
+  if (parsed) {
+    localConfig.value.organizationSlug = parsed.organizationSlug
+    localConfig.value.formType = parsed.formType
+    localConfig.value.formSlug = parsed.formSlug
+  }
+})
 
 const canSave = computed(() => {
   return (
     localConfig.value.clientId.trim() !== '' &&
-    localConfig.value.clientSecret.trim() !== '' &&
+    (isEditing.value || localConfig.value.clientSecret.trim() !== '') &&
     localConfig.value.organizationSlug.trim() !== '' &&
     localConfig.value.formType !== '' &&
     localConfig.value.formSlug.trim() !== ''
@@ -298,21 +290,19 @@ watch(
     if (isOpen) {
       if (props.config) {
         localConfig.value = { ...props.config }
-        detectedFromUrl.value = false
+        // Reconstruire l'URL depuis la config existante
+        helloAssoUrl.value = buildHelloAssoUrl(props.config)
       } else {
-        // Détecter automatiquement les slugs depuis ticketingUrl si disponible
-        const parsedUrl = props.ticketingUrl ? parseHelloAssoUrl(props.ticketingUrl) : null
+        // Pré-remplir depuis ticketingUrl si disponible
+        helloAssoUrl.value = props.ticketingUrl || ''
 
         localConfig.value = {
           clientId: '',
           clientSecret: '',
-          organizationSlug: parsedUrl?.organizationSlug || '',
-          formType: parsedUrl?.formType || 'Event',
-          formSlug: parsedUrl?.formSlug || '',
+          organizationSlug: '',
+          formType: 'Event',
+          formSlug: '',
         }
-
-        // Indiquer si on a détecté les informations depuis l'URL
-        detectedFromUrl.value = !!parsedUrl
       }
       saving.value = false
       testing.value = false
