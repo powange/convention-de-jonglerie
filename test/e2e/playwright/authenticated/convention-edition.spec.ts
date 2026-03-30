@@ -57,7 +57,7 @@ test.describe.serial('Création convention + édition (parcours UI)', () => {
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
     if (futureDay > lastDay) {
       // Naviguer vers le mois suivant si la date dépasse le mois courant
-      await page.getByRole('button', { name: /mois suivant|next month/i }).click()
+      await page.getByRole('button', { name: /mois suivant|next month/i }).first().click()
     }
     const displayDay = futureDay > lastDay ? (futureDay - lastDay).toString() : futureDay.toString()
     await page.locator('table td').getByText(displayDay, { exact: true }).first().click()
