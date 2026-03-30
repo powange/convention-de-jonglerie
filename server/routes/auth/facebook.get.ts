@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const authUrl = new URL('https://www.facebook.com/v18.0/dialog/oauth')
+    const authUrl = new URL('https://www.facebook.com/v25.0/dialog/oauth')
     authUrl.searchParams.set('client_id', clientId)
     authUrl.searchParams.set('redirect_uri', redirectUri)
     authUrl.searchParams.set('response_type', 'code')
@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Échanger le code contre un access_token
-  const tokenEndpoint = 'https://graph.facebook.com/v18.0/oauth/access_token'
+  const tokenEndpoint = 'https://graph.facebook.com/v25.0/oauth/access_token'
   const tokenParams = new URLSearchParams()
   tokenParams.set('client_id', clientId)
   tokenParams.set('client_secret', clientSecret)
