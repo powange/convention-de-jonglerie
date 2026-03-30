@@ -16,7 +16,7 @@ export function getTranslationsToLoad(path: string): string[] {
 
   // Routes statiques
   const routeTranslations: Record<string, string[]> = {
-    '/admin': ['admin', 'auth'],
+    '/admin': ['admin', 'auth', 'profil'],
     '/editions': ['edition'],
     '/project-costs': ['project-costs'],
     '/auth': ['auth'],

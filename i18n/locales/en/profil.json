@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Activate to access administrator privileges",
-    "admin_access_all": "You have access to all administrator features",
-    "admin_active": "👑 Admin active",
-    "admin_mode": "Administrator",
     "cannot_change_password": "Cannot change password",
     "cannot_change_photo": "Cannot change photo",
     "cannot_save_preferences": "Unable to save your preferences",
@@ -49,7 +45,6 @@
     "new_password": "New password",
     "new_password_placeholder": "Your new password",
     "no_password_set": "No password set",
-    "normal_active": "👤 Normal mode",
     "notification_preferences_updated": "Your notification preferences have been updated",
     "notifications": {
       "application_updates": "Volunteer applications",

@@ -28,13 +28,13 @@
           </div>
           <div>
             <h4 class="font-medium text-gray-900 dark:text-white">
-              {{ $t('profile.admin_mode') }}
+              {{ $t('admin.admin_mode') }}
             </h4>
             <p class="text-sm text-gray-500 dark:text-gray-400">
               {{
                 authStore.isAdminModeActive
-                  ? $t('profile.admin_access_all')
-                  : $t('profile.activate_admin_privileges')
+                  ? $t('admin.admin_access_all')
+                  : $t('admin.activate_admin_privileges')
               }}
             </p>
           </div>
@@ -45,9 +45,7 @@
             variant="soft"
             size="sm"
           >
-            {{
-              authStore.isAdminModeActive ? $t('profile.admin_active') : $t('profile.normal_active')
-            }}
+            {{ authStore.isAdminModeActive ? $t('admin.admin_active') : $t('admin.normal_active') }}
           </UBadge>
           <USwitch
             v-model="adminModeToggle"

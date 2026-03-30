@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Activa para acceder a privilegios de administrador",
-    "admin_access_all": "Tienes acceso a todas las funcionalidades de administrador",
-    "admin_active": "👑 Admin activo",
-    "admin_mode": "Administrador",
     "cannot_change_password": "No se puede cambiar la contraseña",
     "cannot_change_photo": "No se puede cambiar la foto",
     "cannot_save_preferences": "No se pueden guardar las preferencias",
@@ -49,7 +45,6 @@
     "new_password": "Nueva contraseña",
     "new_password_placeholder": "Tu nueva contraseña",
     "no_password_set": "Sin contraseña establecida",
-    "normal_active": "👤 Modo normal",
     "notification_preferences_updated": "Sus preferencias de notificación han sido actualizadas",
     "notifications": {
       "application_updates": "Candidaturas de voluntariado",

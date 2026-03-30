@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Activeer om toegang te krijgen tot beheerdersrechten",
-    "admin_access_all": "Je hebt toegang tot alle beheerdersfuncties",
-    "admin_active": "👑 Beheer actief",
-    "admin_mode": "Beheerder",
     "cannot_change_password": "Kan wachtwoord niet wijzigen",
     "cannot_change_photo": "Kan foto niet wijzigen",
     "cannot_save_preferences": "Kan voorkeuren niet opslaan",
@@ -49,7 +45,6 @@
     "new_password": "Nieuw wachtwoord",
     "new_password_placeholder": "Je nieuwe wachtwoord",
     "no_password_set": "Geen wachtwoord ingesteld",
-    "normal_active": "👤 Normale modus",
     "notification_preferences_updated": "Uw meldingsvoorkeuren zijn bijgewerkt",
     "notifications": {
       "application_updates": "Vrijwilligerssollicitaties",

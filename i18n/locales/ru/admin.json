@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Активировать для доступа к привилегиям администратора",
     "active": "Активный",
     "active_administrators": "Активные администраторы",
     "active_conventions": "Активные конвенции",
     "active_types": "Активные типы",
     "activity": "Активность",
+    "admin_access_all": "У вас есть доступ ко всем функциям администратора",
+    "admin_active": "👑 Админ активен",
+    "admin_mode": "Администратор",
     "administration_tools": "Инструменты Администрирования",
     "all_emails": "Все email",
     "all_users": "Все пользователи",
@@ -368,6 +372,7 @@
     "no_errors_found": "Ошибок не найдено",
     "no_linked_data": "Нет данных, связанных с этим пользователем",
     "no_recent_activity": "Нет недавней активности",
+    "normal_active": "👤 Обычный режим",
     "normal_users": "Обычные пользователи",
     "not_verified": "Не подтвержден",
     "notification_management": "Управление уведомлениями",

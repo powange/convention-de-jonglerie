@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Aktiver for at få adgang til administratorprivilegier",
-    "admin_access_all": "Du har adgang til alle administratorfunktioner",
-    "admin_active": "👑 Admin aktiv",
-    "admin_mode": "Administrator",
     "cannot_change_password": "Kan ikke ændre adgangskode",
     "cannot_change_photo": "Kan ikke ændre foto",
     "cannot_save_preferences": "Kan ikke gemme præferencer",
@@ -49,7 +45,6 @@
     "new_password": "Ny adgangskode",
     "new_password_placeholder": "Din nye adgangskode",
     "no_password_set": "Ingen adgangskode indstillet",
-    "normal_active": "👤 Normal tilstand",
     "notification_preferences_updated": "Dine notifikationspræferencer er blevet opdateret",
     "notifications": {
       "application_updates": "Frivilligansøgninger",

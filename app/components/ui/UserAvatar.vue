@@ -54,11 +54,18 @@ const pixelSize = computed(() => {
   return typeof props.size === 'number' ? props.size : sizeMap[props.size]
 })
 
-// Utiliser la nouvelle fonction avec cache et retry automatique
-const { currentUrl } = getUserAvatarWithCache(props.user, pixelSize.value)
+// Avatar réactif : recalculer quand l'utilisateur change (ex: impersonation)
+const avatarState = shallowRef(getUserAvatarWithCache(props.user, pixelSize.value))
+
+watch(
+  () => [props.user.id, props.user.emailHash, props.user.profilePicture, pixelSize.value] as const,
+  () => {
+    avatarState.value = getUserAvatarWithCache(props.user, pixelSize.value)
+  }
+)
 
 // URL finale à afficher
-const displayUrl = computed(() => currentUrl.value)
+const displayUrl = computed(() => avatarState.value.currentUrl.value)
 
 const altText = computed(() => {
   if (props.user.pseudo) {

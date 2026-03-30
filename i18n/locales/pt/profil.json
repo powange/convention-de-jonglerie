@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Active para aceder aos privilégios de administrador",
-    "admin_access_all": "Tem acesso a todas as funcionalidades de administrador",
-    "admin_active": "👑 Admin activo",
-    "admin_mode": "Administrador",
     "cannot_change_password": "Impossível alterar a palavra-passe",
     "cannot_change_photo": "Impossível alterar a foto",
     "cannot_save_preferences": "Não foi possível guardar as preferências",
@@ -49,7 +45,6 @@
     "new_password": "Nova palavra-passe",
     "new_password_placeholder": "A sua nova palavra-passe",
     "no_password_set": "Sem palavra-passe definida",
-    "normal_active": "👤 Modo normal",
     "notification_preferences_updated": "As suas preferências de notificação foram atualizadas",
     "notifications": {
       "application_updates": "Candidaturas de voluntariado",

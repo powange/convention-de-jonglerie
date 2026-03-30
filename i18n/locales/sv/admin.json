@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Aktivera för att få tillgång till administratörsbehörighet",
     "active": "Tillgångar",
     "active_administrators": "Aktiva styrelseledamöter",
     "active_conventions": "Aktiva konventioner",
     "active_types": "Aktiva typer",
     "activity": "Aktivitet",
+    "admin_access_all": "Du har tillgång till alla administratörsfunktioner",
+    "admin_active": "👑 Admin aktiv",
+    "admin_mode": "Direktör",
     "administration_tools": "Verktyg för administration",
     "all_emails": "Alla e-postmeddelanden",
     "all_users": "Alla användare",
@@ -368,6 +372,7 @@
     "no_errors_found": "Inga fel hittades",
     "no_linked_data": "Inga data kopplade till denna användare",
     "no_recent_activity": "Ingen aktivitet nyligen",
+    "normal_active": "👤 Normalt läge",
     "normal_users": "Normala användare",
     "not_verified": "Ej verifierad",
     "notification_management": "Hantering av meddelanden",

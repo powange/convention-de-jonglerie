@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Активировать для доступа к привилегиям администратора",
-    "admin_access_all": "У вас есть доступ ко всем функциям администратора",
-    "admin_active": "👑 Админ активен",
-    "admin_mode": "Администратор",
     "cannot_change_password": "Невозможно изменить пароль",
     "cannot_change_photo": "Невозможно изменить фото",
     "cannot_save_preferences": "Не удалось сохранить настройки",
@@ -49,7 +45,6 @@
     "new_password": "Новый пароль",
     "new_password_placeholder": "Ваш новый пароль",
     "no_password_set": "Пароль не установлен",
-    "normal_active": "👤 Обычный режим",
     "notification_preferences_updated": "Настройки уведомлений обновлены",
     "notifications": {
       "application_updates": "Волонтёрские заявки",

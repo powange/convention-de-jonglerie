@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Povolení přístupu k oprávněním správce",
-    "admin_access_all": "Máte přístup ke všem funkcím správce",
-    "admin_active": "👑 Admin aktivní",
-    "admin_mode": "Ředitel",
     "cannot_change_password": "Nelze změnit heslo",
     "cannot_change_photo": "Nelze změnit fotografii",
     "cannot_save_preferences": "Nelze uložit předvolby",
@@ -49,7 +45,6 @@
     "new_password": "Nové heslo",
     "new_password_placeholder": "Vaše nové heslo",
     "no_password_set": "Není definováno žádné heslo",
-    "normal_active": "👤 Normální režim",
     "notification_preferences_updated": "Vaše předvolby oznámení byly aktualizovány",
     "notifications": {
       "application_updates": "Dobrovolnické přihlášky",

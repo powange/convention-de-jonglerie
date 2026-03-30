@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Активувати для доступу до прав адміністратора",
     "active": "Активний",
     "active_administrators": "Активні адміністратори",
     "active_conventions": "Активні конвенції",
     "active_types": "Активні типи",
     "activity": "Активність",
+    "admin_access_all": "Ви маєте доступ до всіх функцій адміністратора",
+    "admin_active": "👑 Адмін активний",
+    "admin_mode": "Адміністратор",
     "administration_tools": "Інструменти адміністрування",
     "all_emails": "Всі електронні пошти",
     "all_users": "Всі користувачі",
@@ -368,6 +372,7 @@
     "no_errors_found": "Помилок не знайдено",
     "no_linked_data": "Немає даних, пов'язаних з цим користувачем",
     "no_recent_activity": "Немає нещодавньої активності",
+    "normal_active": "👤 Звичайний режим",
     "normal_users": "Звичайні користувачі",
     "not_verified": "Не підтверджено",
     "notification_management": "Керування сповіщеннями",

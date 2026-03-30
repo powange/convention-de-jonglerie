@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Aktiver for at få adgang til administratorprivilegier",
     "active": "Aktiv",
     "active_administrators": "Aktive administratorer",
     "active_conventions": "Aktive konventioner",
     "active_types": "Aktive typer",
     "activity": "Aktivitet",
+    "admin_access_all": "Du har adgang til alle administratorfunktioner",
+    "admin_active": "👑 Admin aktiv",
+    "admin_mode": "Administrator",
     "administration_tools": "Administrationsværktøjer",
     "all_emails": "Alle emails",
     "all_users": "Alle brugere",
@@ -368,6 +372,7 @@
     "no_errors_found": "Ingen fejl fundet",
     "no_linked_data": "Ingen data tilknyttet denne bruger",
     "no_recent_activity": "Ingen seneste aktivitet",
+    "normal_active": "👤 Normal tilstand",
     "normal_users": "Normale brugere",
     "not_verified": "Ikke bekræftet",
     "notification_management": "Meddelelseshåndtering",

@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Povolení přístupu k oprávněním správce",
     "active": "Majetek",
     "active_administrators": "Aktivní ředitelé",
     "active_conventions": "Aktivní konvence",
     "active_types": "Aktivní typy",
     "activity": "Aktivita",
+    "admin_access_all": "Máte přístup ke všem funkcím správce",
+    "admin_active": "👑 Admin aktivní",
+    "admin_mode": "Ředitel",
     "administration_tools": "Nástroje pro správu",
     "all_emails": "Všechny e-maily",
     "all_users": "Všichni uživatelé",
@@ -368,6 +372,7 @@
     "no_errors_found": "Nebyly nalezeny žádné chyby",
     "no_linked_data": "Žádná data propojená s tímto uživatelem",
     "no_recent_activity": "Žádná nedávná aktivita",
+    "normal_active": "👤 Normální režim",
     "normal_users": "Běžní uživatelé",
     "not_verified": "Neověřeno",
     "notification_management": "Správa oznámení",

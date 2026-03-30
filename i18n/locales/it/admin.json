@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Attiva per accedere ai privilegi amministratore",
     "active": "Attivo",
     "active_administrators": "Amministratori attivi",
     "active_conventions": "Convegni attivi",
     "active_types": "Tipi attivi",
     "activity": "Attività",
+    "admin_access_all": "Hai accesso a tutte le funzionalità amministratore",
+    "admin_active": "👑 Admin attivo",
+    "admin_mode": "Amministratore",
     "administration_tools": "Strumenti di Amministrazione",
     "all_emails": "Tutte le email",
     "all_users": "Tutti gli utenti",
@@ -368,6 +372,7 @@
     "no_errors_found": "Nessun errore trovato",
     "no_linked_data": "Nessun dato collegato a questo utente",
     "no_recent_activity": "Nessuna attività recente",
+    "normal_active": "👤 Modalità normale",
     "normal_users": "Utenti normali",
     "not_verified": "Non verificato",
     "notification_management": "Gestione Notifiche",

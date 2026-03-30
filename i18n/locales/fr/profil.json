@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Activez pour accéder aux privilèges d'administrateur",
-    "admin_access_all": "Vous avez accès à toutes les fonctionnalités administrateur",
-    "admin_active": "👑 Admin actif",
-    "admin_mode": "Administrateur",
     "cannot_change_password": "Impossible de changer le mot de passe",
     "cannot_change_photo": "Impossible de changer la photo",
     "cannot_save_preferences": "Impossible de sauvegarder vos préférences",
@@ -35,7 +31,6 @@
     "new_password": "Nouveau mot de passe",
     "new_password_placeholder": "Votre nouveau mot de passe",
     "no_password_set": "Aucun mot de passe défini",
-    "normal_active": "👤 Mode normal",
     "notification_preferences_updated": "Vos préférences de notifications ont été mises à jour",
     "oauth_password_info": "Vous vous êtes connecté via Google. Vous pouvez définir un mot de passe pour pouvoir vous connecter avec votre email.",
     "optional_section_title": "Informations facultatives",

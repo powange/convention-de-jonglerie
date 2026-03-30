@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Activate to access administrator privileges",
     "active": "Active",
     "active_administrators": "Active administrators",
     "active_conventions": "Active conventions",
     "active_types": "Active types",
     "activity": "Activity",
+    "admin_access_all": "You have access to all administrator features",
+    "admin_active": "👑 Admin active",
+    "admin_mode": "Administrator",
     "administration_tools": "Administration Tools",
     "all_emails": "All emails",
     "all_users": "All users",
@@ -368,6 +372,7 @@
     "no_errors_found": "No errors found",
     "no_linked_data": "No data linked to this user",
     "no_recent_activity": "No recent activity",
+    "normal_active": "👤 Normal mode",
     "normal_users": "Normal users",
     "not_verified": "Not verified",
     "notification_management": "Notification Management",

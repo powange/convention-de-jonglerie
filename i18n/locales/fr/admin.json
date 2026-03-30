@@ -1,10 +1,14 @@
 {
   "admin": {
+    "activate_admin_privileges": "Activez pour accéder aux privilèges d'administrateur",
     "active": "Actif",
     "active_administrators": "Administrateurs actifs",
     "active_conventions": "Conventions actives",
     "active_types": "Appareils push actifs",
     "activity": "Activité",
+    "admin_access_all": "Vous avez accès à toutes les fonctionnalités administrateur",
+    "admin_active": "👑 Admin actif",
+    "admin_mode": "Administrateur",
     "administration_tools": "Outils d'Administration",
     "all_emails": "Tous les emails",
     "all_users": "Tous les utilisateurs",
@@ -368,6 +372,7 @@
     "no_errors_found": "Aucune erreur trouvée",
     "no_linked_data": "Aucune donnée liée à cet utilisateur",
     "no_recent_activity": "Aucune activité récente",
+    "normal_active": "👤 Mode normal",
     "normal_users": "Utilisateurs normaux",
     "not_verified": "Non vérifié",
     "notification_management": "Gestion des Notifications",

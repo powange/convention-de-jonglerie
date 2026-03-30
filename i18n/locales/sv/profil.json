@@ -1,9 +1,5 @@
 {
   "profile": {
-    "activate_admin_privileges": "Aktivera för att få tillgång till administratörsbehörighet",
-    "admin_access_all": "Du har tillgång till alla administratörsfunktioner",
-    "admin_active": "👑 Admin aktiv",
-    "admin_mode": "Direktör",
     "cannot_change_password": "Det går inte att ändra lösenord",
     "cannot_change_photo": "Det går inte att ändra foto",
     "cannot_save_preferences": "Kan inte spara inställningar",
@@ -49,7 +45,6 @@
     "new_password": "Nytt lösenord",
     "new_password_placeholder": "Ditt nya lösenord",
     "no_password_set": "Inget lösenord definierat",
-    "normal_active": "👤 Normalt läge",
     "notification_preferences_updated": "Dina aviseringsinställningar har uppdaterats",
     "notifications": {
       "application_updates": "Volontäransökningar",
