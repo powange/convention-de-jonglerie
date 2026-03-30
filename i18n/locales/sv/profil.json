@@ -17,6 +17,20 @@
     "current_password_placeholder": "Ditt nuvarande lösenord",
     "current_password_required": "Aktuellt lösenord krävs",
     "customize_avatar": "Anpassa din avatar",
+    "delete_account": {
+      "confirm_button": "Radera mitt konto permanent",
+      "confirm_description": "För att bekräfta raderingen av ditt konto, ange ditt användarnamn: {pseudo}",
+      "confirm_placeholder": "Ange ditt användarnamn",
+      "confirm_title": "Bekräfta radering",
+      "deleting": "Raderar...",
+      "description": "Radering av ditt konto är oåterkalleligt. Alla dina uppgifter kommer att raderas permanent.",
+      "error": "Kan inte radera kontot",
+      "success": "Konto raderat",
+      "success_description": "Ditt konto har raderats.",
+      "title": "Radera mitt konto",
+      "warning": "Denna åtgärd är oåterkallelig",
+      "warning_details": "Radering av ditt konto leder till permanent förlust av alla dina uppgifter: skapade conventions, ansökningar, favoriter, meddelanden och inställningar."
+    },
     "direct_access": "Direkt tillgång till funktioner",
     "favorites": "Favoriter",
     "favorites_received": "Favoriter mottagna",
@@ -37,6 +51,24 @@
     "no_password_set": "Inget lösenord definierat",
     "normal_active": "👤 Normalt läge",
     "notification_preferences_updated": "Dina aviseringsinställningar har uppdaterats",
+    "notifications": {
+      "application_updates": "Volontäransökningar",
+      "application_updates_desc": "Godkännande, avslag eller ändringar av dina ansökningar",
+      "carpool_updates": "Samåkning",
+      "carpool_updates_desc": "Samåkningsförfrågningar, bekräftelser och avbokningar",
+      "convention_news": "Nya conventions",
+      "convention_news_desc": "Notiser om nyligen tillagda conventions",
+      "manage_preferences": "Hantera dina notisinställningar",
+      "preferences_description": "Välj vilka typer av notiser du vill ta emot",
+      "preferences_title": "Notisinställningar",
+      "receive_by_email": "Ta emot via e-post",
+      "save_preferences": "Spara inställningar",
+      "saving_preferences": "Sparar...",
+      "system_notifications": "Systemnotiser",
+      "system_notifications_desc": "Viktiga uppdateringar och underhåll",
+      "volunteer_reminders": "Påminnelser om volontärpass",
+      "volunteer_reminders_desc": "Notiser 30 minuter före dina pass"
+    },
     "oauth_password_info": "Du har loggat in via Google. Du kan ange ett lösenord för att logga in med din e-post.",
     "optional_section_title": "Frivillig information",
     "password_changed": "Lösenord ändrat",
@@ -80,44 +112,6 @@
     "username_help": "Offentligt synliga för andra användare",
     "username_min_3": "Användarnamnet måste innehålla minst 3 tecken",
     "username_placeholder": "Ditt unika användarnamn",
-    "welcome": "Välkommen!",
-    "notifications": {
-      "manage_preferences": "Hantera dina notisinställningar",
-      "preferences_title": "Notisinställningar",
-      "preferences_description": "Välj vilka typer av notiser du vill ta emot",
-      "receive_by_email": "Ta emot via e-post",
-      "save_preferences": "Spara inställningar",
-      "saving_preferences": "Sparar...",
-      "volunteer_reminders": "Påminnelser om volontärpass",
-      "volunteer_reminders_desc": "Notiser 30 minuter före dina pass",
-      "application_updates": "Volontäransökningar",
-      "application_updates_desc": "Godkännande, avslag eller ändringar av dina ansökningar",
-      "convention_news": "Nya conventions",
-      "convention_news_desc": "Notiser om nyligen tillagda conventions",
-      "carpool_updates": "Samåkning",
-      "carpool_updates_desc": "Samåkningsförfrågningar, bekräftelser och avbokningar",
-      "system_notifications": "Systemnotiser",
-      "system_notifications_desc": "Viktiga uppdateringar och underhåll"
-    },
-    "delete_account": {
-      "title": "Radera mitt konto",
-      "description": "Radering av ditt konto är oåterkalleligt. Alla dina uppgifter kommer att raderas permanent.",
-      "warning": "Denna åtgärd är oåterkallelig",
-      "warning_details": "Radering av ditt konto leder till permanent förlust av alla dina uppgifter: skapade conventions, ansökningar, favoriter, meddelanden och inställningar.",
-      "confirm_title": "Bekräfta radering",
-      "confirm_description": "För att bekräfta raderingen av ditt konto, ange ditt användarnamn: {pseudo}",
-      "confirm_placeholder": "Ange ditt användarnamn",
-      "confirm_button": "Radera mitt konto permanent",
-      "deleting": "Raderar...",
-      "success": "Konto raderat",
-      "success_description": "Ditt konto har raderats.",
-      "error": "Kan inte radera kontot"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Profilbild",
-      "photo_placeholder": "Klicka för att ändra ditt profilfoto"
-    }
+    "welcome": "Välkommen!"
   }
 }

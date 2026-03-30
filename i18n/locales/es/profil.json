@@ -17,6 +17,20 @@
     "current_password_placeholder": "Tu contraseña actual",
     "current_password_required": "Contraseña actual requerida",
     "customize_avatar": "Personaliza tu avatar",
+    "delete_account": {
+      "confirm_button": "Eliminar definitivamente mi cuenta",
+      "confirm_description": "Para confirmar la eliminación de su cuenta, introduzca su nombre de usuario: {pseudo}",
+      "confirm_placeholder": "Introduzca su nombre de usuario",
+      "confirm_title": "Confirmar eliminación",
+      "deleting": "Eliminando...",
+      "description": "La eliminación de su cuenta es irreversible. Todos sus datos serán eliminados permanentemente.",
+      "error": "No se puede eliminar la cuenta",
+      "success": "Cuenta eliminada",
+      "success_description": "Su cuenta ha sido eliminada con éxito.",
+      "title": "Eliminar mi cuenta",
+      "warning": "Esta acción es irreversible",
+      "warning_details": "La eliminación de su cuenta supondrá la pérdida definitiva de todos sus datos: convenciones creadas, candidaturas, favoritos, mensajes y preferencias."
+    },
     "direct_access": "Acceso directo a funcionalidades",
     "favorites": "Favoritos",
     "favorites_received": "Favoritos recibidos",
@@ -37,6 +51,24 @@
     "no_password_set": "Sin contraseña establecida",
     "normal_active": "👤 Modo normal",
     "notification_preferences_updated": "Sus preferencias de notificación han sido actualizadas",
+    "notifications": {
+      "application_updates": "Candidaturas de voluntariado",
+      "application_updates_desc": "Aceptación, rechazo o modificaciones de sus candidaturas",
+      "carpool_updates": "Viaje compartido",
+      "carpool_updates_desc": "Solicitudes, confirmaciones y cancelaciones de viajes compartidos",
+      "convention_news": "Nuevas convenciones",
+      "convention_news_desc": "Notificaciones de nuevas convenciones añadidas",
+      "manage_preferences": "Gestionar sus preferencias de notificaciones",
+      "preferences_description": "Elija los tipos de notificaciones que desea recibir",
+      "preferences_title": "Preferencias de notificaciones",
+      "receive_by_email": "Recibir por correo electrónico",
+      "save_preferences": "Guardar preferencias",
+      "saving_preferences": "Guardando...",
+      "system_notifications": "Notificaciones del sistema",
+      "system_notifications_desc": "Actualizaciones importantes y mantenimiento",
+      "volunteer_reminders": "Recordatorios de turnos de voluntariado",
+      "volunteer_reminders_desc": "Notificaciones 30 minutos antes de sus turnos"
+    },
     "oauth_password_info": "Has iniciado sesión con Google. Puedes establecer una contraseña para iniciar sesión con tu correo electrónico.",
     "optional_section_title": "Sección opcional",
     "password_changed": "Contraseña cambiada",
@@ -80,44 +112,6 @@
     "username_help": "Visible públicamente por otros usuarios",
     "username_min_3": "El nombre de usuario debe contener al menos 3 caracteres",
     "username_placeholder": "Tu nombre de usuario único",
-    "welcome": "¡Bienvenido!",
-    "notifications": {
-      "manage_preferences": "Gestionar sus preferencias de notificaciones",
-      "preferences_title": "Preferencias de notificaciones",
-      "preferences_description": "Elija los tipos de notificaciones que desea recibir",
-      "receive_by_email": "Recibir por correo electrónico",
-      "save_preferences": "Guardar preferencias",
-      "saving_preferences": "Guardando...",
-      "volunteer_reminders": "Recordatorios de turnos de voluntariado",
-      "volunteer_reminders_desc": "Notificaciones 30 minutos antes de sus turnos",
-      "application_updates": "Candidaturas de voluntariado",
-      "application_updates_desc": "Aceptación, rechazo o modificaciones de sus candidaturas",
-      "convention_news": "Nuevas convenciones",
-      "convention_news_desc": "Notificaciones de nuevas convenciones añadidas",
-      "carpool_updates": "Viaje compartido",
-      "carpool_updates_desc": "Solicitudes, confirmaciones y cancelaciones de viajes compartidos",
-      "system_notifications": "Notificaciones del sistema",
-      "system_notifications_desc": "Actualizaciones importantes y mantenimiento"
-    },
-    "delete_account": {
-      "title": "Eliminar mi cuenta",
-      "description": "La eliminación de su cuenta es irreversible. Todos sus datos serán eliminados permanentemente.",
-      "warning": "Esta acción es irreversible",
-      "warning_details": "La eliminación de su cuenta supondrá la pérdida definitiva de todos sus datos: convenciones creadas, candidaturas, favoritos, mensajes y preferencias.",
-      "confirm_title": "Confirmar eliminación",
-      "confirm_description": "Para confirmar la eliminación de su cuenta, introduzca su nombre de usuario: {pseudo}",
-      "confirm_placeholder": "Introduzca su nombre de usuario",
-      "confirm_button": "Eliminar definitivamente mi cuenta",
-      "deleting": "Eliminando...",
-      "success": "Cuenta eliminada",
-      "success_description": "Su cuenta ha sido eliminada con éxito.",
-      "error": "No se puede eliminar la cuenta"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Foto de perfil",
-      "photo_placeholder": "Haga clic para cambiar su foto de perfil"
-    }
+    "welcome": "¡Bienvenido!"
   }
 }

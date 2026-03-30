@@ -629,7 +629,7 @@ export const showApplicationSchema = z
     additionalPerformersCount: z.coerce
       .number()
       .int('Le nombre doit être un entier')
-      .min(0, 'Le nombre ne peut pas être négatif')
+      .min(1, 'Le spectacle doit avoir au moins 1 artiste')
       .max(50, 'Le nombre ne peut pas dépasser 50'),
     additionalPerformers: z
       .array(

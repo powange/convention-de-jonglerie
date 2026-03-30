@@ -17,6 +17,20 @@
     "current_password_placeholder": "Din nuværende adgangskode",
     "current_password_required": "Nuværende adgangskode påkrævet",
     "customize_avatar": "Tilpas din avatar",
+    "delete_account": {
+      "confirm_button": "Slet min konto permanent",
+      "confirm_description": "For at bekræfte sletningen af din konto, indtast dit brugernavn: {pseudo}",
+      "confirm_placeholder": "Indtast dit brugernavn",
+      "confirm_title": "Bekræft sletning",
+      "deleting": "Sletter...",
+      "description": "Sletning af din konto er uigenkaldelig. Alle dine data vil blive permanent slettet.",
+      "error": "Kan ikke slette kontoen",
+      "success": "Konto slettet",
+      "success_description": "Din konto er blevet slettet.",
+      "title": "Slet min konto",
+      "warning": "Denne handling er uigenkaldelig",
+      "warning_details": "Sletning af din konto vil medføre permanent tab af alle dine data: oprettede conventions, ansøgninger, favoritter, beskeder og præferencer."
+    },
     "direct_access": "Direkte adgang til funktioner",
     "favorites": "Favoritter",
     "favorites_received": "Modtagne favoritter",
@@ -37,6 +51,24 @@
     "no_password_set": "Ingen adgangskode indstillet",
     "normal_active": "👤 Normal tilstand",
     "notification_preferences_updated": "Dine notifikationspræferencer er blevet opdateret",
+    "notifications": {
+      "application_updates": "Frivilligansøgninger",
+      "application_updates_desc": "Accept, afvisning eller ændringer af dine ansøgninger",
+      "carpool_updates": "Samkørsel",
+      "carpool_updates_desc": "Samkørselsanmodninger, bekræftelser og aflysninger",
+      "convention_news": "Nye conventions",
+      "convention_news_desc": "Notifikationer om nyligt tilføjede conventions",
+      "manage_preferences": "Administrer dine notifikationspræferencer",
+      "preferences_description": "Vælg de typer notifikationer, du ønsker at modtage",
+      "preferences_title": "Notifikationspræferencer",
+      "receive_by_email": "Modtag via e-mail",
+      "save_preferences": "Gem præferencer",
+      "saving_preferences": "Gemmer...",
+      "system_notifications": "Systemnotifikationer",
+      "system_notifications_desc": "Vigtige opdateringer og vedligeholdelse",
+      "volunteer_reminders": "Påmindelser om frivilligvagter",
+      "volunteer_reminders_desc": "Notifikationer 30 minutter før dine vagter"
+    },
     "oauth_password_info": "Du loggede ind med Google. Du kan indstille en adgangskode for at logge ind med din email.",
     "optional_section_title": "Valgfri sektion",
     "password_changed": "Adgangskode ændret",
@@ -80,44 +112,6 @@
     "username_help": "Synlig offentligt for andre brugere",
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
     "username_placeholder": "Dit unikke brugernavn",
-    "welcome": "Velkommen!",
-    "notifications": {
-      "manage_preferences": "Administrer dine notifikationspræferencer",
-      "preferences_title": "Notifikationspræferencer",
-      "preferences_description": "Vælg de typer notifikationer, du ønsker at modtage",
-      "receive_by_email": "Modtag via e-mail",
-      "save_preferences": "Gem præferencer",
-      "saving_preferences": "Gemmer...",
-      "volunteer_reminders": "Påmindelser om frivilligvagter",
-      "volunteer_reminders_desc": "Notifikationer 30 minutter før dine vagter",
-      "application_updates": "Frivilligansøgninger",
-      "application_updates_desc": "Accept, afvisning eller ændringer af dine ansøgninger",
-      "convention_news": "Nye conventions",
-      "convention_news_desc": "Notifikationer om nyligt tilføjede conventions",
-      "carpool_updates": "Samkørsel",
-      "carpool_updates_desc": "Samkørselsanmodninger, bekræftelser og aflysninger",
-      "system_notifications": "Systemnotifikationer",
-      "system_notifications_desc": "Vigtige opdateringer og vedligeholdelse"
-    },
-    "delete_account": {
-      "title": "Slet min konto",
-      "description": "Sletning af din konto er uigenkaldelig. Alle dine data vil blive permanent slettet.",
-      "warning": "Denne handling er uigenkaldelig",
-      "warning_details": "Sletning af din konto vil medføre permanent tab af alle dine data: oprettede conventions, ansøgninger, favoritter, beskeder og præferencer.",
-      "confirm_title": "Bekræft sletning",
-      "confirm_description": "For at bekræfte sletningen af din konto, indtast dit brugernavn: {pseudo}",
-      "confirm_placeholder": "Indtast dit brugernavn",
-      "confirm_button": "Slet min konto permanent",
-      "deleting": "Sletter...",
-      "success": "Konto slettet",
-      "success_description": "Din konto er blevet slettet.",
-      "error": "Kan ikke slette kontoen"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Profilbillede",
-      "photo_placeholder": "Klik for at ændre dit profilbillede"
-    }
+    "welcome": "Velkommen!"
   }
 }

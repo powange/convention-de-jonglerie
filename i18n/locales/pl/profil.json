@@ -17,6 +17,20 @@
     "current_password_placeholder": "Twoje obecne hasło",
     "current_password_required": "Obecne hasło jest wymagane",
     "customize_avatar": "Dostosuj swój awatar",
+    "delete_account": {
+      "confirm_button": "Trwale usuń moje konto",
+      "confirm_description": "Aby potwierdzić usunięcie konta, wpisz swoją nazwę użytkownika: {pseudo}",
+      "confirm_placeholder": "Wpisz swoją nazwę użytkownika",
+      "confirm_title": "Potwierdź usunięcie",
+      "deleting": "Usuwanie...",
+      "description": "Usunięcie konta jest nieodwracalne. Wszystkie Twoje dane zostaną trwale usunięte.",
+      "error": "Nie można usunąć konta",
+      "success": "Konto usunięte",
+      "success_description": "Twoje konto zostało pomyślnie usunięte.",
+      "title": "Usuń moje konto",
+      "warning": "Ta akcja jest nieodwracalna",
+      "warning_details": "Usunięcie konta spowoduje trwałą utratę wszystkich danych: utworzonych konwentów, kandydatur, ulubionych, wiadomości i preferencji."
+    },
     "direct_access": "Bezpośredni dostęp do funkcji",
     "favorites": "Ulubione",
     "favorites_received": "Otrzymane polubienia",
@@ -37,6 +51,24 @@
     "no_password_set": "Brak ustawionego hasła",
     "normal_active": "👤 Tryb normalny",
     "notification_preferences_updated": "Twoje preferencje powiadomień zostały zaktualizowane",
+    "notifications": {
+      "application_updates": "Kandydatury wolontariackie",
+      "application_updates_desc": "Akceptacja, odrzucenie lub zmiany w Twoich kandydaturach",
+      "carpool_updates": "Wspólne przejazdy",
+      "carpool_updates_desc": "Prośby, potwierdzenia i anulowania wspólnych przejazdów",
+      "convention_news": "Nowe konwenty",
+      "convention_news_desc": "Powiadomienia o nowo dodanych konwentach",
+      "manage_preferences": "Zarządzaj preferencjami powiadomień",
+      "preferences_description": "Wybierz rodzaje powiadomień, które chcesz otrzymywać",
+      "preferences_title": "Preferencje powiadomień",
+      "receive_by_email": "Otrzymuj e-mailem",
+      "save_preferences": "Zapisz preferencje",
+      "saving_preferences": "Zapisywanie...",
+      "system_notifications": "Powiadomienia systemowe",
+      "system_notifications_desc": "Ważne aktualizacje i konserwacja",
+      "volunteer_reminders": "Przypomnienia o zmianach wolontariackich",
+      "volunteer_reminders_desc": "Powiadomienia 30 minut przed Twoimi zmianami"
+    },
     "oauth_password_info": "Zalogowałeś się przez Google. Możesz ustawić hasło, aby logować się za pomocą swojego adresu e-mail.",
     "optional_section_title": "Sekcja opcjonalna",
     "password_changed": "Hasło zmienione",
@@ -80,44 +112,6 @@
     "username_help": "Widoczne publicznie przez innych użytkowników",
     "username_min_3": "Pseudonim musi zawierać co najmniej 3 znaki",
     "username_placeholder": "Twój unikalny pseudonim",
-    "welcome": "Witamy!",
-    "notifications": {
-      "manage_preferences": "Zarządzaj preferencjami powiadomień",
-      "preferences_title": "Preferencje powiadomień",
-      "preferences_description": "Wybierz rodzaje powiadomień, które chcesz otrzymywać",
-      "receive_by_email": "Otrzymuj e-mailem",
-      "save_preferences": "Zapisz preferencje",
-      "saving_preferences": "Zapisywanie...",
-      "volunteer_reminders": "Przypomnienia o zmianach wolontariackich",
-      "volunteer_reminders_desc": "Powiadomienia 30 minut przed Twoimi zmianami",
-      "application_updates": "Kandydatury wolontariackie",
-      "application_updates_desc": "Akceptacja, odrzucenie lub zmiany w Twoich kandydaturach",
-      "convention_news": "Nowe konwenty",
-      "convention_news_desc": "Powiadomienia o nowo dodanych konwentach",
-      "carpool_updates": "Wspólne przejazdy",
-      "carpool_updates_desc": "Prośby, potwierdzenia i anulowania wspólnych przejazdów",
-      "system_notifications": "Powiadomienia systemowe",
-      "system_notifications_desc": "Ważne aktualizacje i konserwacja"
-    },
-    "delete_account": {
-      "title": "Usuń moje konto",
-      "description": "Usunięcie konta jest nieodwracalne. Wszystkie Twoje dane zostaną trwale usunięte.",
-      "warning": "Ta akcja jest nieodwracalna",
-      "warning_details": "Usunięcie konta spowoduje trwałą utratę wszystkich danych: utworzonych konwentów, kandydatur, ulubionych, wiadomości i preferencji.",
-      "confirm_title": "Potwierdź usunięcie",
-      "confirm_description": "Aby potwierdzić usunięcie konta, wpisz swoją nazwę użytkownika: {pseudo}",
-      "confirm_placeholder": "Wpisz swoją nazwę użytkownika",
-      "confirm_button": "Trwale usuń moje konto",
-      "deleting": "Usuwanie...",
-      "success": "Konto usunięte",
-      "success_description": "Twoje konto zostało pomyślnie usunięte.",
-      "error": "Nie można usunąć konta"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Zdjęcie profilowe",
-      "photo_placeholder": "Kliknij, aby zmienić swoje zdjęcie profilowe"
-    }
+    "welcome": "Witamy!"
   }
 }

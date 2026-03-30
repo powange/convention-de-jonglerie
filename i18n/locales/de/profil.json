@@ -17,6 +17,20 @@
     "current_password_placeholder": "Dein aktuelles Passwort",
     "current_password_required": "Aktuelles Passwort erforderlich",
     "customize_avatar": "Avatar anpassen",
+    "delete_account": {
+      "confirm_button": "Mein Konto endgültig löschen",
+      "confirm_description": "Um die Löschung Ihres Kontos zu bestätigen, geben Sie Ihren Benutzernamen ein: {pseudo}",
+      "confirm_placeholder": "Geben Sie Ihren Benutzernamen ein",
+      "confirm_title": "Löschung bestätigen",
+      "deleting": "Löschung läuft...",
+      "description": "Die Löschung Ihres Kontos ist unwiderruflich. Alle Ihre Daten werden endgültig gelöscht.",
+      "error": "Konto kann nicht gelöscht werden",
+      "success": "Konto gelöscht",
+      "success_description": "Ihr Konto wurde erfolgreich gelöscht.",
+      "title": "Mein Konto löschen",
+      "warning": "Diese Aktion ist unwiderruflich",
+      "warning_details": "Die Löschung Ihres Kontos führt zum endgültigen Verlust aller Ihrer Daten: erstellte Conventions, Bewerbungen, Favoriten, Nachrichten und Einstellungen."
+    },
     "direct_access": "Direkter Zugang zu Funktionen",
     "favorites": "Favoriten",
     "favorites_received": "Erhaltene Favoriten",
@@ -37,6 +51,24 @@
     "no_password_set": "Kein Passwort festgelegt",
     "normal_active": "👤 Normaler Modus",
     "notification_preferences_updated": "Ihre Benachrichtigungseinstellungen wurden aktualisiert",
+    "notifications": {
+      "application_updates": "Freiwilligenbewerbungen",
+      "application_updates_desc": "Annahme, Ablehnung oder Änderungen Ihrer Bewerbungen",
+      "carpool_updates": "Fahrgemeinschaft",
+      "carpool_updates_desc": "Fahrgemeinschaftsanfragen, Bestätigungen und Stornierungen",
+      "convention_news": "Neue Conventions",
+      "convention_news_desc": "Benachrichtigungen über neu hinzugefügte Conventions",
+      "manage_preferences": "Verwalten Sie Ihre Benachrichtigungseinstellungen",
+      "preferences_description": "Wählen Sie die Arten von Benachrichtigungen, die Sie erhalten möchten",
+      "preferences_title": "Benachrichtigungseinstellungen",
+      "receive_by_email": "Per E-Mail erhalten",
+      "save_preferences": "Einstellungen speichern",
+      "saving_preferences": "Speichern...",
+      "system_notifications": "Systembenachrichtigungen",
+      "system_notifications_desc": "Wichtige Updates und Wartung",
+      "volunteer_reminders": "Erinnerungen an Freiwilligenschichten",
+      "volunteer_reminders_desc": "Benachrichtigungen 30 Minuten vor Ihren Schichten"
+    },
     "oauth_password_info": "Du hast dich mit Google angemeldet. Du kannst ein Passwort festlegen, um dich mit deiner E-Mail anzumelden.",
     "optional_section_title": "Optionaler Bereich",
     "password_changed": "Passwort geändert",
@@ -80,44 +112,6 @@
     "username_help": "Öffentlich für andere Benutzer sichtbar",
     "username_min_3": "Der Benutzername muss mindestens 3 Zeichen enthalten",
     "username_placeholder": "Dein eindeutiger Benutzername",
-    "welcome": "Willkommen!",
-    "notifications": {
-      "manage_preferences": "Verwalten Sie Ihre Benachrichtigungseinstellungen",
-      "preferences_title": "Benachrichtigungseinstellungen",
-      "preferences_description": "Wählen Sie die Arten von Benachrichtigungen, die Sie erhalten möchten",
-      "receive_by_email": "Per E-Mail erhalten",
-      "save_preferences": "Einstellungen speichern",
-      "saving_preferences": "Speichern...",
-      "volunteer_reminders": "Erinnerungen an Freiwilligenschichten",
-      "volunteer_reminders_desc": "Benachrichtigungen 30 Minuten vor Ihren Schichten",
-      "application_updates": "Freiwilligenbewerbungen",
-      "application_updates_desc": "Annahme, Ablehnung oder Änderungen Ihrer Bewerbungen",
-      "convention_news": "Neue Conventions",
-      "convention_news_desc": "Benachrichtigungen über neu hinzugefügte Conventions",
-      "carpool_updates": "Fahrgemeinschaft",
-      "carpool_updates_desc": "Fahrgemeinschaftsanfragen, Bestätigungen und Stornierungen",
-      "system_notifications": "Systembenachrichtigungen",
-      "system_notifications_desc": "Wichtige Updates und Wartung"
-    },
-    "delete_account": {
-      "title": "Mein Konto löschen",
-      "description": "Die Löschung Ihres Kontos ist unwiderruflich. Alle Ihre Daten werden endgültig gelöscht.",
-      "warning": "Diese Aktion ist unwiderruflich",
-      "warning_details": "Die Löschung Ihres Kontos führt zum endgültigen Verlust aller Ihrer Daten: erstellte Conventions, Bewerbungen, Favoriten, Nachrichten und Einstellungen.",
-      "confirm_title": "Löschung bestätigen",
-      "confirm_description": "Um die Löschung Ihres Kontos zu bestätigen, geben Sie Ihren Benutzernamen ein: {pseudo}",
-      "confirm_placeholder": "Geben Sie Ihren Benutzernamen ein",
-      "confirm_button": "Mein Konto endgültig löschen",
-      "deleting": "Löschung läuft...",
-      "success": "Konto gelöscht",
-      "success_description": "Ihr Konto wurde erfolgreich gelöscht.",
-      "error": "Konto kann nicht gelöscht werden"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Profilfoto",
-      "photo_placeholder": "Klicken Sie, um Ihr Profilfoto zu ändern"
-    }
+    "welcome": "Willkommen!"
   }
 }

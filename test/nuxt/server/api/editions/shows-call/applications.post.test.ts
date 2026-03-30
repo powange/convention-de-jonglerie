@@ -45,6 +45,13 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
     askAccommodation: true,
   }
 
+  const defaultPerformer = {
+    lastName: 'Dupont',
+    firstName: 'Jean',
+    email: 'artist@example.com',
+    phone: '+33612345678',
+  }
+
   const mockApplication = {
     id: 1,
     showCallId: 1,
@@ -148,7 +155,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         accommodationNeeded: true,
         accommodationNotes: 'Notes hébergement',
         contactPhone: '+33123456789',
-        additionalPerformersCount: 0,
+        additionalPerformersCount: 1,
+        additionalPerformers: [defaultPerformer],
       }
 
       prismaMock.showApplication.create.mockResolvedValue(mockApplication)
@@ -187,7 +195,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         showTitle: 'Spectacle Social',
         showDescription: 'Description du spectacle avec suffisamment de caractères',
         showDuration: 25,
-        additionalPerformersCount: 0,
+        additionalPerformersCount: 1,
+        additionalPerformers: [defaultPerformer],
         socialLinks: 'https://instagram.com/artist\nhttps://youtube.com/@artist',
       }
 
@@ -224,7 +233,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         showTitle: 'Spectacle Simple',
         showDescription: 'Description minimale du spectacle avec suffisamment de caractères',
         showDuration: 15,
-        additionalPerformersCount: 0,
+        additionalPerformersCount: 1,
+        additionalPerformers: [defaultPerformer],
       }
 
       prismaMock.showApplication.create.mockResolvedValue({
@@ -348,7 +358,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         showTitle: 'Spectacle',
         showDescription: 'Description du spectacle avec au moins 20 caractères',
         showDuration: 30,
-        additionalPerformersCount: 0,
+        additionalPerformersCount: 1,
+        additionalPerformers: [defaultPerformer],
       })
 
       const mockEvent = { context: { user: mockUser } }
@@ -694,7 +705,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow()
     })
 
-    it('devrait accepter 0 personnes supplémentaires avec tableau vide', async () => {
+    it('devrait rejeter 0 personnes supplémentaires', async () => {
       const applicationData = {
         lastName: 'Dupont',
         firstName: 'Jean',
@@ -707,27 +718,10 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
         additionalPerformers: [],
       }
 
-      prismaMock.user.update.mockResolvedValue(mockUser)
-      prismaMock.showApplication.create.mockResolvedValue({
-        ...mockApplication,
-        artistName: 'Artiste Solo',
-        additionalPerformersCount: 0,
-        additionalPerformers: [],
-      })
-
       global.readBody.mockResolvedValue(applicationData)
       const mockEvent = { context: { user: mockUser } }
 
-      const result = await handler(mockEvent as any)
-
-      expect(result.success).toBe(true)
-      expect(prismaMock.showApplication.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          additionalPerformersCount: 0,
-          additionalPerformers: [],
-        }),
-        include: expect.any(Object),
-      })
+      await expect(handler(mockEvent as any)).rejects.toThrow()
     })
   })
 })

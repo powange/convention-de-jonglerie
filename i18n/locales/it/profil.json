@@ -17,6 +17,20 @@
     "current_password_placeholder": "La tua password attuale",
     "current_password_required": "Password attuale richiesta",
     "customize_avatar": "Personalizza il tuo avatar",
+    "delete_account": {
+      "confirm_button": "Elimina definitivamente il mio account",
+      "confirm_description": "Per confermare l'eliminazione del tuo account, inserisci il tuo nome utente: {pseudo}",
+      "confirm_placeholder": "Inserisci il tuo nome utente",
+      "confirm_title": "Conferma eliminazione",
+      "deleting": "Eliminazione in corso...",
+      "description": "L'eliminazione del tuo account è irreversibile. Tutti i tuoi dati saranno eliminati definitivamente.",
+      "error": "Impossibile eliminare l'account",
+      "success": "Account eliminato",
+      "success_description": "Il tuo account è stato eliminato con successo.",
+      "title": "Elimina il mio account",
+      "warning": "Questa azione è irreversibile",
+      "warning_details": "L'eliminazione del tuo account comporterà la perdita definitiva di tutti i tuoi dati: convention create, candidature, preferiti, messaggi e preferenze."
+    },
     "direct_access": "Accesso diretto alle funzionalità",
     "favorites": "Preferiti",
     "favorites_received": "Preferiti ricevuti",
@@ -37,6 +51,24 @@
     "no_password_set": "Nessuna password impostata",
     "normal_active": "👤 Modalità normale",
     "notification_preferences_updated": "Le preferenze di notifica sono state aggiornate",
+    "notifications": {
+      "application_updates": "Candidature volontari",
+      "application_updates_desc": "Accettazione, rifiuto o modifiche alle tue candidature",
+      "carpool_updates": "Condivisione auto",
+      "carpool_updates_desc": "Richieste, conferme e annullamenti di condivisione auto",
+      "convention_news": "Nuove convention",
+      "convention_news_desc": "Notifiche sulle nuove convention aggiunte",
+      "manage_preferences": "Gestisci le tue preferenze di notifica",
+      "preferences_description": "Scegli i tipi di notifiche che desideri ricevere",
+      "preferences_title": "Preferenze di notifica",
+      "receive_by_email": "Ricevi via email",
+      "save_preferences": "Salva preferenze",
+      "saving_preferences": "Salvataggio...",
+      "system_notifications": "Notifiche di sistema",
+      "system_notifications_desc": "Aggiornamenti importanti e manutenzione",
+      "volunteer_reminders": "Promemoria turni volontari",
+      "volunteer_reminders_desc": "Notifiche 30 minuti prima dei tuoi turni"
+    },
     "oauth_password_info": "Hai effettuato l'accesso con Google. Puoi impostare una password per accedere con la tua email.",
     "optional_section_title": "Sezione opzionale",
     "password_changed": "Password cambiata",
@@ -80,44 +112,6 @@
     "username_help": "Visibile pubblicamente dagli altri utenti",
     "username_min_3": "Il nome utente deve contenere almeno 3 caratteri",
     "username_placeholder": "Il tuo nome utente unico",
-    "welcome": "Benvenuto!",
-    "notifications": {
-      "manage_preferences": "Gestisci le tue preferenze di notifica",
-      "preferences_title": "Preferenze di notifica",
-      "preferences_description": "Scegli i tipi di notifiche che desideri ricevere",
-      "receive_by_email": "Ricevi via email",
-      "save_preferences": "Salva preferenze",
-      "saving_preferences": "Salvataggio...",
-      "volunteer_reminders": "Promemoria turni volontari",
-      "volunteer_reminders_desc": "Notifiche 30 minuti prima dei tuoi turni",
-      "application_updates": "Candidature volontari",
-      "application_updates_desc": "Accettazione, rifiuto o modifiche alle tue candidature",
-      "convention_news": "Nuove convention",
-      "convention_news_desc": "Notifiche sulle nuove convention aggiunte",
-      "carpool_updates": "Condivisione auto",
-      "carpool_updates_desc": "Richieste, conferme e annullamenti di condivisione auto",
-      "system_notifications": "Notifiche di sistema",
-      "system_notifications_desc": "Aggiornamenti importanti e manutenzione"
-    },
-    "delete_account": {
-      "title": "Elimina il mio account",
-      "description": "L'eliminazione del tuo account è irreversibile. Tutti i tuoi dati saranno eliminati definitivamente.",
-      "warning": "Questa azione è irreversibile",
-      "warning_details": "L'eliminazione del tuo account comporterà la perdita definitiva di tutti i tuoi dati: convention create, candidature, preferiti, messaggi e preferenze.",
-      "confirm_title": "Conferma eliminazione",
-      "confirm_description": "Per confermare l'eliminazione del tuo account, inserisci il tuo nome utente: {pseudo}",
-      "confirm_placeholder": "Inserisci il tuo nome utente",
-      "confirm_button": "Elimina definitivamente il mio account",
-      "deleting": "Eliminazione in corso...",
-      "success": "Account eliminato",
-      "success_description": "Il tuo account è stato eliminato con successo.",
-      "error": "Impossibile eliminare l'account"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Foto profilo",
-      "photo_placeholder": "Clicca per cambiare la tua foto profilo"
-    }
+    "welcome": "Benvenuto!"
   }
 }

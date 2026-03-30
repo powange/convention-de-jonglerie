@@ -245,6 +245,7 @@
               </template>
 
               <UForm
+                ref="formRef"
                 :state="formState"
                 :validate="validate"
                 class="space-y-6"
@@ -769,6 +770,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ApiError } from '~/composables/useApiAction'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition, EditionShowCallPublic, ShowApplication, ShowPreset } from '~/types'
@@ -819,9 +821,95 @@ const formState = reactive({
   additionalPerformers: [] as AdditionalPerformer[],
 })
 
+const formRef = useTemplateRef('formRef')
 const existingApplication = ref<ShowApplication | null>(null)
 const applicantIsPerformer = ref(false)
 const showCustomCount = ref(false)
+
+// --- Brouillon automatique (localStorage) ---
+const draftKey = computed(() => {
+  const userId = authStore.user?.id
+  if (!userId) return null
+  return `draft-show-application-${userId}-${editionId}-${showCallId}`
+})
+const draftReady = ref(false)
+
+function saveDraft() {
+  if (!draftReady.value || !draftKey.value || !import.meta.client) return
+  try {
+    const draft = {
+      ...toRaw(formState),
+      additionalPerformers: toRaw(formState.additionalPerformers).map((p) => ({ ...toRaw(p) })),
+      applicantIsPerformer: applicantIsPerformer.value,
+      _savedAt: Date.now(),
+    }
+    localStorage.setItem(draftKey.value, JSON.stringify(draft))
+  } catch {
+    // Quota dépassé ou localStorage indisponible — ignorer silencieusement
+  }
+}
+
+function loadDraft(): boolean {
+  if (!draftKey.value || !import.meta.client) return false
+  try {
+    const raw = localStorage.getItem(draftKey.value)
+    if (!raw) return false
+    const draft = JSON.parse(raw)
+
+    // Restaurer les champs du formulaire
+    formState.lastName = draft.lastName || ''
+    formState.firstName = draft.firstName || ''
+    formState.phone = draft.phone || ''
+    formState.artistName = draft.artistName || ''
+    formState.artistBio = draft.artistBio || ''
+    formState.portfolioUrl = draft.portfolioUrl || ''
+    formState.videoUrl = draft.videoUrl || ''
+    formState.socialLinks = draft.socialLinks || ''
+    formState.showTitle = draft.showTitle || ''
+    formState.showDescription = draft.showDescription || ''
+    formState.showDuration = draft.showDuration ?? null
+    formState.showCategory = draft.showCategory || ''
+    formState.technicalNeeds = draft.technicalNeeds || ''
+    formState.accommodationNeeded = draft.accommodationNeeded ?? false
+    formState.accommodationNotes = draft.accommodationNotes || ''
+    formState.departureCity = draft.departureCity || ''
+    formState.additionalPerformersCount = draft.additionalPerformersCount ?? 1
+    if (Array.isArray(draft.additionalPerformers)) {
+      formState.additionalPerformers = draft.additionalPerformers.map((p: any) => ({
+        lastName: p.lastName || '',
+        firstName: p.firstName || '',
+        email: p.email || '',
+        phone: p.phone || '',
+      }))
+    }
+    if (draft.applicantIsPerformer !== undefined) {
+      applicantIsPerformer.value = draft.applicantIsPerformer
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
+function clearDraft() {
+  if (!draftKey.value || !import.meta.client) return
+  try {
+    localStorage.removeItem(draftKey.value)
+  } catch {
+    // Ignorer
+  }
+}
+
+const saveDraftDebounced = useDebounceFn(saveDraft, 1000)
+
+// Observer les changements du formulaire pour sauvegarder le brouillon
+watch(
+  [() => formState, applicantIsPerformer],
+  () => {
+    saveDraftDebounced()
+  },
+  { deep: true }
+)
 
 function selectPerformersCount(n: number) {
   formState.additionalPerformersCount = n
@@ -1113,16 +1201,31 @@ onMounted(async () => {
             email: p.email || '',
             phone: p.phone || '',
           }))
+
+          // Cocher "Je participe" si l'artiste 1 correspond à l'utilisateur
+          const firstPerformer = app.additionalPerformers[0]
+          if (
+            firstPerformer?.email &&
+            authStore.user?.email &&
+            firstPerformer.email.toLowerCase() === authStore.user.email.toLowerCase()
+          ) {
+            applicantIsPerformer.value = true
+          }
         }
       } else if (!response.application) {
-        // Nouvelle candidature : pré-remplir avec les données du profil utilisateur
-        const user = authStore.user
-        if (user) {
-          if (user.nom) formState.lastName = user.nom
-          if (user.prenom) formState.firstName = user.prenom
-          if (user.telephone || user.phone) formState.phone = user.telephone || user.phone || ''
-          if (user.pseudo && !formState.artistName) {
-            formState.artistName = user.pseudo
+        // Nouvelle candidature : tenter de restaurer un brouillon
+        const draftLoaded = loadDraft()
+
+        if (!draftLoaded) {
+          // Pas de brouillon : pré-remplir avec les données du profil utilisateur
+          const user = authStore.user
+          if (user) {
+            if (user.nom) formState.lastName = user.nom
+            if (user.prenom) formState.firstName = user.prenom
+            if (user.telephone || user.phone) formState.phone = user.telephone || user.phone || ''
+            if (user.pseudo && !formState.artistName) {
+              formState.artistName = user.pseudo
+            }
           }
         }
       }
@@ -1141,6 +1244,11 @@ onMounted(async () => {
         // Ignorer les erreurs de chargement des presets
       }
     }
+
+    // Activer la sauvegarde du brouillon après le pré-remplissage initial
+    nextTick(() => {
+      draftReady.value = true
+    })
   }
 })
 
@@ -1201,12 +1309,22 @@ function validate(state: typeof formState) {
       name: 'lastName',
       message: t('shows_call.validation.last_name_required'),
     })
+  } else if (state.lastName.trim().length > 100) {
+    errors.push({
+      name: 'lastName',
+      message: t('shows_call.validation.last_name_max_length'),
+    })
   }
 
   if (!state.firstName || state.firstName.trim().length < 2) {
     errors.push({
       name: 'firstName',
       message: t('shows_call.validation.first_name_required'),
+    })
+  } else if (state.firstName.trim().length > 100) {
+    errors.push({
+      name: 'firstName',
+      message: t('shows_call.validation.first_name_max_length'),
     })
   }
 
@@ -1215,27 +1333,81 @@ function validate(state: typeof formState) {
       name: 'phone',
       message: t('shows_call.validation.phone_required'),
     })
+  } else if (state.phone.trim().length > 20) {
+    errors.push({
+      name: 'phone',
+      message: t('shows_call.validation.phone_max_length'),
+    })
   }
 
   // Informations artiste
-  if (!state.artistName || state.artistName.length < 2) {
+  if (!state.artistName || state.artistName.trim().length < 2) {
     errors.push({
       name: 'artistName',
       message: t('shows_call.validation.artist_name_required'),
     })
+  } else if (state.artistName.trim().length > 100) {
+    errors.push({
+      name: 'artistName',
+      message: t('shows_call.validation.artist_name_max_length'),
+    })
   }
 
-  if (!state.showTitle || state.showTitle.length < 3) {
+  // Validation des URLs (seulement si le champ est affiché et non vide)
+  if (
+    showCall.value?.askPortfolioUrl &&
+    state.portfolioUrl &&
+    !/^https?:\/\/.+/.test(state.portfolioUrl)
+  ) {
+    errors.push({
+      name: 'portfolioUrl',
+      message: t('shows_call.validation.url_invalid'),
+    })
+  }
+
+  if (showCall.value?.askVideoUrl && state.videoUrl && !/^https?:\/\/.+/.test(state.videoUrl)) {
+    errors.push({
+      name: 'videoUrl',
+      message: t('shows_call.validation.url_invalid'),
+    })
+  }
+
+  // Longueurs maximales des champs optionnels
+  if (state.artistBio && state.artistBio.length > 3000) {
+    errors.push({
+      name: 'artistBio',
+      message: t('shows_call.validation.artist_bio_max_length'),
+    })
+  }
+
+  if (state.socialLinks && state.socialLinks.length > 2000) {
+    errors.push({
+      name: 'socialLinks',
+      message: t('shows_call.validation.social_links_max_length'),
+    })
+  }
+
+  if (!state.showTitle || state.showTitle.trim().length < 3) {
     errors.push({
       name: 'showTitle',
       message: t('shows_call.validation.show_title_required'),
     })
+  } else if (state.showTitle.length > 200) {
+    errors.push({
+      name: 'showTitle',
+      message: t('shows_call.validation.show_title_max_length'),
+    })
   }
 
-  if (!state.showDescription || state.showDescription.length < 20) {
+  if (!state.showDescription || state.showDescription.trim().length < 20) {
     errors.push({
       name: 'showDescription',
       message: t('shows_call.validation.show_description_required'),
+    })
+  } else if (state.showDescription.length > 5000) {
+    errors.push({
+      name: 'showDescription',
+      message: t('shows_call.validation.show_description_max_length'),
     })
   }
 
@@ -1243,6 +1415,30 @@ function validate(state: typeof formState) {
     errors.push({
       name: 'showDuration',
       message: t('shows_call.validation.duration_required'),
+    })
+  } else if (!Number.isInteger(state.showDuration)) {
+    errors.push({
+      name: 'showDuration',
+      message: t('shows_call.validation.duration_integer'),
+    })
+  } else if (state.showDuration > 180) {
+    errors.push({
+      name: 'showDuration',
+      message: t('shows_call.validation.duration_max'),
+    })
+  }
+
+  if (state.showCategory && state.showCategory.length > 100) {
+    errors.push({
+      name: 'showCategory',
+      message: t('shows_call.validation.show_category_max_length'),
+    })
+  }
+
+  if (state.technicalNeeds && state.technicalNeeds.length > 3000) {
+    errors.push({
+      name: 'technicalNeeds',
+      message: t('shows_call.validation.technical_needs_max_length'),
     })
   }
 
@@ -1254,9 +1450,11 @@ function validate(state: typeof formState) {
     })
   }
 
-  // Valider chaque personne supplémentaire
+  // Valider chaque personne supplémentaire (skip performer[0] quand "Je participe" est coché)
   if (state.additionalPerformersCount > 0) {
     state.additionalPerformers.forEach((performer, index) => {
+      if (index === 0 && applicantIsPerformer.value) return
+
       if (!performer.lastName || performer.lastName.trim().length < 2) {
         errors.push({
           name: `additionalPerformers.${index}.lastName`,
@@ -1284,6 +1482,21 @@ function validate(state: typeof formState) {
     })
   }
 
+  // Logistique
+  if (state.accommodationNotes && state.accommodationNotes.length > 1000) {
+    errors.push({
+      name: 'accommodationNotes',
+      message: t('shows_call.validation.accommodation_notes_max_length'),
+    })
+  }
+
+  if (state.departureCity && state.departureCity.length > 100) {
+    errors.push({
+      name: 'departureCity',
+      message: t('shows_call.validation.departure_city_max_length'),
+    })
+  }
+
   return errors
 }
 
@@ -1294,16 +1507,16 @@ const buildApplicationBody = () => ({
   firstName: formState.firstName.trim(),
   phone: formState.phone.trim(),
   // Informations artiste
-  artistName: formState.artistName,
-  artistBio: formState.artistBio || null,
-  portfolioUrl: formState.portfolioUrl || null,
-  videoUrl: formState.videoUrl || null,
-  socialLinks: formState.socialLinks || null,
-  showTitle: formState.showTitle,
-  showDescription: formState.showDescription,
+  artistName: formState.artistName.trim(),
+  artistBio: formState.artistBio?.trim() || null,
+  portfolioUrl: formState.portfolioUrl?.trim() || null,
+  videoUrl: formState.videoUrl?.trim() || null,
+  socialLinks: formState.socialLinks?.trim() || null,
+  showTitle: formState.showTitle.trim(),
+  showDescription: formState.showDescription.trim(),
   showDuration: formState.showDuration,
-  showCategory: formState.showCategory || null,
-  technicalNeeds: formState.technicalNeeds || null,
+  showCategory: formState.showCategory?.trim() || null,
+  technicalNeeds: formState.technicalNeeds?.trim() || null,
   accommodationNeeded: formState.accommodationNeeded,
   accommodationNotes: formState.accommodationNotes || null,
   departureCity: formState.departureCity || null,
@@ -1318,6 +1531,9 @@ const buildApplicationBody = () => ({
 })
 
 const onApplicationSuccess = async () => {
+  // Supprimer le brouillon après soumission réussie
+  clearDraft()
+
   // Mettre à jour les données utilisateur dans le store (ne pas bloquer si erreur)
   try {
     await authStore.fetchUser()
@@ -1327,6 +1543,19 @@ const onApplicationSuccess = async () => {
 
   // Rediriger vers la liste des appels
   await navigateTo(`/editions/${editionId}/shows-call`)
+}
+
+// Propager les erreurs serveur vers le formulaire
+function handleServerErrors(apiError: ApiError) {
+  if (apiError.data?.errors && formRef.value) {
+    const serverErrors = Object.entries(apiError.data.errors).map(([name, message]) => ({
+      name,
+      message: String(message),
+    }))
+    if (serverErrors.length > 0) {
+      formRef.value.setErrors(serverErrors)
+    }
+  }
 }
 
 // Action pour créer une candidature
@@ -1341,6 +1570,7 @@ const { execute: executeCreateApplication, loading: isCreating } = useApiAction(
     },
     errorMessages: { default: t('shows_call.submit_error') },
     onSuccess: onApplicationSuccess,
+    onError: handleServerErrors,
   }
 )
 
@@ -1356,6 +1586,7 @@ const { execute: executeUpdateApplication, loading: isUpdating } = useApiAction(
     },
     errorMessages: { default: t('shows_call.submit_error') },
     onSuccess: onApplicationSuccess,
+    onError: handleServerErrors,
   }
 )
 

@@ -17,6 +17,20 @@
     "current_password_placeholder": "A sua palavra-passe actual",
     "current_password_required": "Palavra-passe actual obrigatória",
     "customize_avatar": "Personalize o seu avatar",
+    "delete_account": {
+      "confirm_button": "Eliminar definitivamente a minha conta",
+      "confirm_description": "Para confirmar a eliminação da sua conta, introduza o seu nome de utilizador: {pseudo}",
+      "confirm_placeholder": "Introduza o seu nome de utilizador",
+      "confirm_title": "Confirmar eliminação",
+      "deleting": "A eliminar...",
+      "description": "A eliminação da sua conta é irreversível. Todos os seus dados serão eliminados permanentemente.",
+      "error": "Não é possível eliminar a conta",
+      "success": "Conta eliminada",
+      "success_description": "A sua conta foi eliminada com sucesso.",
+      "title": "Eliminar a minha conta",
+      "warning": "Esta ação é irreversível",
+      "warning_details": "A eliminação da sua conta resultará na perda definitiva de todos os seus dados: convenções criadas, candidaturas, favoritos, mensagens e preferências."
+    },
     "direct_access": "Acesso directo às funcionalidades",
     "favorites": "Favoritos",
     "favorites_received": "Favoritos recebidos",
@@ -37,6 +51,24 @@
     "no_password_set": "Sem palavra-passe definida",
     "normal_active": "👤 Modo normal",
     "notification_preferences_updated": "As suas preferências de notificação foram atualizadas",
+    "notifications": {
+      "application_updates": "Candidaturas de voluntariado",
+      "application_updates_desc": "Aceitação, rejeição ou alterações às suas candidaturas",
+      "carpool_updates": "Boleias",
+      "carpool_updates_desc": "Pedidos, confirmações e cancelamentos de boleias",
+      "convention_news": "Novas convenções",
+      "convention_news_desc": "Notificações de novas convenções adicionadas",
+      "manage_preferences": "Gerir as suas preferências de notificações",
+      "preferences_description": "Escolha os tipos de notificações que deseja receber",
+      "preferences_title": "Preferências de notificações",
+      "receive_by_email": "Receber por email",
+      "save_preferences": "Guardar preferências",
+      "saving_preferences": "A guardar...",
+      "system_notifications": "Notificações do sistema",
+      "system_notifications_desc": "Atualizações importantes e manutenção",
+      "volunteer_reminders": "Lembretes de turnos de voluntariado",
+      "volunteer_reminders_desc": "Notificações 30 minutos antes dos seus turnos"
+    },
     "oauth_password_info": "Iniciou sessão com o Google. Pode definir uma palavra-passe para iniciar sessão com o seu email.",
     "optional_section_title": "Seção opcional",
     "password_changed": "Palavra-passe alterada",
@@ -80,44 +112,6 @@
     "username_help": "Visível publicamente pelos outros utilizadores",
     "username_min_3": "A alcunha deve conter pelo menos 3 caracteres",
     "username_placeholder": "A sua alcunha única",
-    "welcome": "Bem-vindo!",
-    "notifications": {
-      "manage_preferences": "Gerir as suas preferências de notificações",
-      "preferences_title": "Preferências de notificações",
-      "preferences_description": "Escolha os tipos de notificações que deseja receber",
-      "receive_by_email": "Receber por email",
-      "save_preferences": "Guardar preferências",
-      "saving_preferences": "A guardar...",
-      "volunteer_reminders": "Lembretes de turnos de voluntariado",
-      "volunteer_reminders_desc": "Notificações 30 minutos antes dos seus turnos",
-      "application_updates": "Candidaturas de voluntariado",
-      "application_updates_desc": "Aceitação, rejeição ou alterações às suas candidaturas",
-      "convention_news": "Novas convenções",
-      "convention_news_desc": "Notificações de novas convenções adicionadas",
-      "carpool_updates": "Boleias",
-      "carpool_updates_desc": "Pedidos, confirmações e cancelamentos de boleias",
-      "system_notifications": "Notificações do sistema",
-      "system_notifications_desc": "Atualizações importantes e manutenção"
-    },
-    "delete_account": {
-      "title": "Eliminar a minha conta",
-      "description": "A eliminação da sua conta é irreversível. Todos os seus dados serão eliminados permanentemente.",
-      "warning": "Esta ação é irreversível",
-      "warning_details": "A eliminação da sua conta resultará na perda definitiva de todos os seus dados: convenções criadas, candidaturas, favoritos, mensagens e preferências.",
-      "confirm_title": "Confirmar eliminação",
-      "confirm_description": "Para confirmar a eliminação da sua conta, introduza o seu nome de utilizador: {pseudo}",
-      "confirm_placeholder": "Introduza o seu nome de utilizador",
-      "confirm_button": "Eliminar definitivamente a minha conta",
-      "deleting": "A eliminar...",
-      "success": "Conta eliminada",
-      "success_description": "A sua conta foi eliminada com sucesso.",
-      "error": "Não é possível eliminar a conta"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Foto de perfil",
-      "photo_placeholder": "Clique para mudar a sua foto de perfil"
-    }
+    "welcome": "Bem-vindo!"
   }
 }

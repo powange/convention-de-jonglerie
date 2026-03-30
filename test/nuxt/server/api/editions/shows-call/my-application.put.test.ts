@@ -31,6 +31,13 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
     askDepartureCity: false,
   }
 
+  const defaultPerformer = {
+    lastName: 'Nom',
+    firstName: 'Prénom',
+    email: 'artist@example.com',
+    phone: '+33123456789',
+  }
+
   const mockExistingApplication = {
     id: 1,
     showCallId: 1,
@@ -47,8 +54,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
     technicalNeeds: 'Besoins techniques',
     accommodationNeeded: true,
     accommodationNotes: 'Notes hébergement',
-    additionalPerformersCount: 0,
-    additionalPerformers: null,
+    additionalPerformersCount: 1,
+    additionalPerformers: [defaultPerformer],
     departureCity: null,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -70,8 +77,8 @@ describe('/api/editions/[id]/shows-call/[showCallId]/my-application PUT', () => 
     accommodationNeeded: false,
     accommodationNotes: null,
     departureCity: 'Paris',
-    additionalPerformersCount: 0,
-    additionalPerformers: [],
+    additionalPerformersCount: 1,
+    additionalPerformers: [defaultPerformer],
   }
 
   beforeEach(() => {

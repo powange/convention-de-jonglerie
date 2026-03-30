@@ -17,6 +17,20 @@
     "current_password_placeholder": "Your current password",
     "current_password_required": "Current password required",
     "customize_avatar": "Customize your avatar",
+    "delete_account": {
+      "confirm_button": "Permanently delete my account",
+      "confirm_description": "To confirm the deletion of your account, enter your username: {pseudo}",
+      "confirm_placeholder": "Enter your username",
+      "confirm_title": "Confirm deletion",
+      "deleting": "Deleting...",
+      "description": "Deleting your account is irreversible. All your data will be permanently deleted.",
+      "error": "Unable to delete account",
+      "success": "Account deleted",
+      "success_description": "Your account has been successfully deleted.",
+      "title": "Delete my account",
+      "warning": "This action is irreversible",
+      "warning_details": "Deleting your account will permanently remove all your data: created conventions, applications, favorites, messages and preferences."
+    },
     "direct_access": "Direct access to features",
     "favorites": "Favorites",
     "favorites_received": "Favorites received",
@@ -37,6 +51,24 @@
     "no_password_set": "No password set",
     "normal_active": "👤 Normal mode",
     "notification_preferences_updated": "Your notification preferences have been updated",
+    "notifications": {
+      "application_updates": "Volunteer applications",
+      "application_updates_desc": "Acceptance, rejection or changes to your applications",
+      "carpool_updates": "Carpooling",
+      "carpool_updates_desc": "Carpooling requests, confirmations and cancellations",
+      "convention_news": "New conventions",
+      "convention_news_desc": "Notifications for newly added conventions",
+      "manage_preferences": "Manage your notification preferences",
+      "preferences_description": "Choose the types of notifications you want to receive",
+      "preferences_title": "Notification preferences",
+      "receive_by_email": "Receive by email",
+      "save_preferences": "Save preferences",
+      "saving_preferences": "Saving...",
+      "system_notifications": "System notifications",
+      "system_notifications_desc": "Important updates and maintenance",
+      "volunteer_reminders": "Volunteer slot reminders",
+      "volunteer_reminders_desc": "Notifications 30 minutes before your slots"
+    },
     "oauth_password_info": "You signed in with Google. You can set a password to sign in with your email.",
     "optional_section_title": "Optional Information",
     "password_changed": "Password changed",
@@ -80,44 +112,6 @@
     "username_help": "Publicly visible to other users",
     "username_min_3": "Username must contain at least 3 characters",
     "username_placeholder": "Your unique username",
-    "welcome": "Welcome!",
-    "notifications": {
-      "manage_preferences": "Manage your notification preferences",
-      "preferences_title": "Notification preferences",
-      "preferences_description": "Choose the types of notifications you want to receive",
-      "receive_by_email": "Receive by email",
-      "save_preferences": "Save preferences",
-      "saving_preferences": "Saving...",
-      "volunteer_reminders": "Volunteer slot reminders",
-      "volunteer_reminders_desc": "Notifications 30 minutes before your slots",
-      "application_updates": "Volunteer applications",
-      "application_updates_desc": "Acceptance, rejection or changes to your applications",
-      "convention_news": "New conventions",
-      "convention_news_desc": "Notifications for newly added conventions",
-      "carpool_updates": "Carpooling",
-      "carpool_updates_desc": "Carpooling requests, confirmations and cancellations",
-      "system_notifications": "System notifications",
-      "system_notifications_desc": "Important updates and maintenance"
-    },
-    "delete_account": {
-      "title": "Delete my account",
-      "description": "Deleting your account is irreversible. All your data will be permanently deleted.",
-      "warning": "This action is irreversible",
-      "warning_details": "Deleting your account will permanently remove all your data: created conventions, applications, favorites, messages and preferences.",
-      "confirm_title": "Confirm deletion",
-      "confirm_description": "To confirm the deletion of your account, enter your username: {pseudo}",
-      "confirm_placeholder": "Enter your username",
-      "confirm_button": "Permanently delete my account",
-      "deleting": "Deleting...",
-      "success": "Account deleted",
-      "success_description": "Your account has been successfully deleted.",
-      "error": "Unable to delete account"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Profile photo",
-      "photo_placeholder": "Click to change your profile photo"
-    }
+    "welcome": "Welcome!"
   }
 }

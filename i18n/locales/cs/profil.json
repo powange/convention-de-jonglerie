@@ -17,6 +17,20 @@
     "current_password_placeholder": "Vaše aktuální heslo",
     "current_password_required": "Vyžaduje se aktuální heslo",
     "customize_avatar": "Přizpůsobte si svého avatara",
+    "delete_account": {
+      "confirm_button": "Trvale smazat můj účet",
+      "confirm_description": "Pro potvrzení smazání vašeho účtu zadejte své uživatelské jméno: {pseudo}",
+      "confirm_placeholder": "Zadejte své uživatelské jméno",
+      "confirm_title": "Potvrdit smazání",
+      "deleting": "Mazání...",
+      "description": "Smazání vašeho účtu je nevratné. Všechna vaše data budou trvale smazána.",
+      "error": "Nelze smazat účet",
+      "success": "Účet smazán",
+      "success_description": "Váš účet byl úspěšně smazán.",
+      "title": "Smazat můj účet",
+      "warning": "Tato akce je nevratná",
+      "warning_details": "Smazání vašeho účtu povede k trvalé ztrátě všech vašich dat: vytvořených konvencí, přihlášek, oblíbených, zpráv a předvoleb."
+    },
     "direct_access": "Přímý přístup k funkcím",
     "favorites": "Oblíbené stránky",
     "favorites_received": "Oblíbené položky",
@@ -37,6 +51,24 @@
     "no_password_set": "Není definováno žádné heslo",
     "normal_active": "👤 Normální režim",
     "notification_preferences_updated": "Vaše předvolby oznámení byly aktualizovány",
+    "notifications": {
+      "application_updates": "Dobrovolnické přihlášky",
+      "application_updates_desc": "Přijetí, odmítnutí nebo změny vašich přihlášek",
+      "carpool_updates": "Spolujízda",
+      "carpool_updates_desc": "Žádosti, potvrzení a zrušení spolujízdy",
+      "convention_news": "Nové konvence",
+      "convention_news_desc": "Upozornění na nově přidané konvence",
+      "manage_preferences": "Spravujte své předvolby oznámení",
+      "preferences_description": "Vyberte typy oznámení, které chcete dostávat",
+      "preferences_title": "Předvolby oznámení",
+      "receive_by_email": "Dostávat e-mailem",
+      "save_preferences": "Uložit předvolby",
+      "saving_preferences": "Ukládání...",
+      "system_notifications": "Systémová oznámení",
+      "system_notifications_desc": "Důležité aktualizace a údržba",
+      "volunteer_reminders": "Připomínky dobrovolnických směn",
+      "volunteer_reminders_desc": "Oznámení 30 minut před vašimi směnami"
+    },
     "oauth_password_info": "Přihlásili jste se přes Google. Heslo pro přihlášení si můžete nastavit pomocí e-mailu.",
     "optional_section_title": "Nepovinné informace",
     "password_changed": "Změna hesla",
@@ -80,44 +112,6 @@
     "username_help": "Veřejně viditelné pro ostatní uživatele",
     "username_min_3": "Uživatelské jméno musí obsahovat alespoň 3 znaky.",
     "username_placeholder": "Vaše jedinečné uživatelské jméno",
-    "welcome": "Vítejte!",
-    "notifications": {
-      "manage_preferences": "Spravujte své předvolby oznámení",
-      "preferences_title": "Předvolby oznámení",
-      "preferences_description": "Vyberte typy oznámení, které chcete dostávat",
-      "receive_by_email": "Dostávat e-mailem",
-      "save_preferences": "Uložit předvolby",
-      "saving_preferences": "Ukládání...",
-      "volunteer_reminders": "Připomínky dobrovolnických směn",
-      "volunteer_reminders_desc": "Oznámení 30 minut před vašimi směnami",
-      "application_updates": "Dobrovolnické přihlášky",
-      "application_updates_desc": "Přijetí, odmítnutí nebo změny vašich přihlášek",
-      "convention_news": "Nové konvence",
-      "convention_news_desc": "Upozornění na nově přidané konvence",
-      "carpool_updates": "Spolujízda",
-      "carpool_updates_desc": "Žádosti, potvrzení a zrušení spolujízdy",
-      "system_notifications": "Systémová oznámení",
-      "system_notifications_desc": "Důležité aktualizace a údržba"
-    },
-    "delete_account": {
-      "title": "Smazat můj účet",
-      "description": "Smazání vašeho účtu je nevratné. Všechna vaše data budou trvale smazána.",
-      "warning": "Tato akce je nevratná",
-      "warning_details": "Smazání vašeho účtu povede k trvalé ztrátě všech vašich dat: vytvořených konvencí, přihlášek, oblíbených, zpráv a předvoleb.",
-      "confirm_title": "Potvrdit smazání",
-      "confirm_description": "Pro potvrzení smazání vašeho účtu zadejte své uživatelské jméno: {pseudo}",
-      "confirm_placeholder": "Zadejte své uživatelské jméno",
-      "confirm_button": "Trvale smazat můj účet",
-      "deleting": "Mazání...",
-      "success": "Účet smazán",
-      "success_description": "Váš účet byl úspěšně smazán.",
-      "error": "Nelze smazat účet"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Profilový obrázek",
-      "photo_placeholder": "Klikněte pro změnu profilové fotografie"
-    }
+    "welcome": "Vítejte!"
   }
 }

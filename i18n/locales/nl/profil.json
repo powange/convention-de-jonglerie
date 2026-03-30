@@ -17,6 +17,20 @@
     "current_password_placeholder": "Je huidige wachtwoord",
     "current_password_required": "Huidig wachtwoord vereist",
     "customize_avatar": "Pas je avatar aan",
+    "delete_account": {
+      "confirm_button": "Mijn account definitief verwijderen",
+      "confirm_description": "Om de verwijdering van uw account te bevestigen, voer uw gebruikersnaam in: {pseudo}",
+      "confirm_placeholder": "Voer uw gebruikersnaam in",
+      "confirm_title": "Verwijdering bevestigen",
+      "deleting": "Verwijderen...",
+      "description": "Het verwijderen van uw account is onomkeerbaar. Al uw gegevens worden permanent verwijderd.",
+      "error": "Kan account niet verwijderen",
+      "success": "Account verwijderd",
+      "success_description": "Uw account is succesvol verwijderd.",
+      "title": "Mijn account verwijderen",
+      "warning": "Deze actie is onomkeerbaar",
+      "warning_details": "Het verwijderen van uw account leidt tot het definitieve verlies van al uw gegevens: aangemaakte conventions, sollicitaties, favorieten, berichten en voorkeuren."
+    },
     "direct_access": "Directe toegang tot functies",
     "favorites": "Favorieten",
     "favorites_received": "Ontvangen favorieten",
@@ -37,6 +51,24 @@
     "no_password_set": "Geen wachtwoord ingesteld",
     "normal_active": "👤 Normale modus",
     "notification_preferences_updated": "Uw meldingsvoorkeuren zijn bijgewerkt",
+    "notifications": {
+      "application_updates": "Vrijwilligerssollicitaties",
+      "application_updates_desc": "Acceptatie, afwijzing of wijzigingen van uw sollicitaties",
+      "carpool_updates": "Carpoolen",
+      "carpool_updates_desc": "Carpoolverzoeken, bevestigingen en annuleringen",
+      "convention_news": "Nieuwe conventions",
+      "convention_news_desc": "Meldingen over nieuw toegevoegde conventions",
+      "manage_preferences": "Beheer uw meldingsvoorkeuren",
+      "preferences_description": "Kies de soorten meldingen die u wilt ontvangen",
+      "preferences_title": "Meldingsvoorkeuren",
+      "receive_by_email": "Per e-mail ontvangen",
+      "save_preferences": "Voorkeuren opslaan",
+      "saving_preferences": "Opslaan...",
+      "system_notifications": "Systeemmeldingen",
+      "system_notifications_desc": "Belangrijke updates en onderhoud",
+      "volunteer_reminders": "Herinneringen vrijwilligersdiensten",
+      "volunteer_reminders_desc": "Meldingen 30 minuten voor uw diensten"
+    },
     "oauth_password_info": "Je bent ingelogd met Google. Je kunt een wachtwoord instellen om in te loggen met je e-mail.",
     "optional_section_title": "Optionele sectie",
     "password_changed": "Wachtwoord gewijzigd",
@@ -80,44 +112,6 @@
     "username_help": "Publiekelijk zichtbaar voor andere gebruikers",
     "username_min_3": "Gebruikersnaam moet minimaal 3 tekens bevatten",
     "username_placeholder": "Je unieke gebruikersnaam",
-    "welcome": "Welkom!",
-    "notifications": {
-      "manage_preferences": "Beheer uw meldingsvoorkeuren",
-      "preferences_title": "Meldingsvoorkeuren",
-      "preferences_description": "Kies de soorten meldingen die u wilt ontvangen",
-      "receive_by_email": "Per e-mail ontvangen",
-      "save_preferences": "Voorkeuren opslaan",
-      "saving_preferences": "Opslaan...",
-      "volunteer_reminders": "Herinneringen vrijwilligersdiensten",
-      "volunteer_reminders_desc": "Meldingen 30 minuten voor uw diensten",
-      "application_updates": "Vrijwilligerssollicitaties",
-      "application_updates_desc": "Acceptatie, afwijzing of wijzigingen van uw sollicitaties",
-      "convention_news": "Nieuwe conventions",
-      "convention_news_desc": "Meldingen over nieuw toegevoegde conventions",
-      "carpool_updates": "Carpoolen",
-      "carpool_updates_desc": "Carpoolverzoeken, bevestigingen en annuleringen",
-      "system_notifications": "Systeemmeldingen",
-      "system_notifications_desc": "Belangrijke updates en onderhoud"
-    },
-    "delete_account": {
-      "title": "Mijn account verwijderen",
-      "description": "Het verwijderen van uw account is onomkeerbaar. Al uw gegevens worden permanent verwijderd.",
-      "warning": "Deze actie is onomkeerbaar",
-      "warning_details": "Het verwijderen van uw account leidt tot het definitieve verlies van al uw gegevens: aangemaakte conventions, sollicitaties, favorieten, berichten en voorkeuren.",
-      "confirm_title": "Verwijdering bevestigen",
-      "confirm_description": "Om de verwijdering van uw account te bevestigen, voer uw gebruikersnaam in: {pseudo}",
-      "confirm_placeholder": "Voer uw gebruikersnaam in",
-      "confirm_button": "Mijn account definitief verwijderen",
-      "deleting": "Verwijderen...",
-      "success": "Account verwijderd",
-      "success_description": "Uw account is succesvol verwijderd.",
-      "error": "Kan account niet verwijderen"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Profielfoto",
-      "photo_placeholder": "Klik om je profielfoto te wijzigen"
-    }
+    "welcome": "Welkom!"
   }
 }
