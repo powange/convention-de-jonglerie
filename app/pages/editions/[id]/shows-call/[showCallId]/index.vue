@@ -163,6 +163,9 @@
             <template v-if="isDeadlinePassed">
               {{ t('shows_call.deadline_passed') }}
             </template>
+            <template v-else-if="hasExistingApplication">
+              {{ t('shows_call.update_application') }}
+            </template>
             <template v-else>
               {{ t('shows_call.apply') }}
             </template>
@@ -242,6 +245,19 @@ const isDeadlinePassed = computed(() => {
   if (!showCall.value?.deadline) return false
   return new Date() > new Date(showCall.value.deadline)
 })
+
+// Vérifier si l'utilisateur a déjà candidaté
+const hasExistingApplication = ref(false)
+if (authStore.isAuthenticated && authStore.isArtist) {
+  try {
+    const response = await $fetch<{ application: unknown }>(
+      `/api/editions/${editionId}/shows-call/${showCallId}/my-application`
+    )
+    hasExistingApplication.value = !!response?.application
+  } catch {
+    // Pas de candidature existante
+  }
+}
 
 // Rendu markdown de la description
 const descriptionHtml = ref('')

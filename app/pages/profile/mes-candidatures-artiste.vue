@@ -344,7 +344,7 @@
                         application.showCall.visibility === 'PUBLIC') ||
                       application.showCall.visibility === 'PRIVATE'
                     "
-                    :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply?edit=${application.id}`"
+                    :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply`"
                     size="sm"
                     color="info"
                     variant="outline"
@@ -455,7 +455,7 @@
                       application.showCall.visibility === 'PUBLIC') ||
                     application.showCall.visibility === 'PRIVATE'
                   "
-                  :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply?edit=${application.id}`"
+                  :to="`/editions/${application.showCall.edition.id}/shows-call/${application.showCall.id}/apply`"
                   size="xs"
                   color="info"
                   variant="ghost"
