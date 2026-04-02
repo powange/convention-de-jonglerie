@@ -12,7 +12,6 @@
 - **Niveau de log Prisma configurable** - Utiliser la variable d'environnement `PRISMA_LOG_LEVEL` dans `.env` pour ajuster les logs (valeurs: `error,warn` par défaut, `query,error,warn,info` pour verbose, `error` pour minimal)
 - L'url de l'application en développement est : http://localhost:3000
 - Avant de modifier un fichier, lis 3 autres fichiers pour comprendre le style de code et les conventions utilisées
-- **A chaque fois que tu utilises un composant Nuxt UI, tu DOIS OBLIGATOIREMENT consulter sa documentation via le MCP Nuxt UI** (`mcp__nuxt-ui__get_component`) pour vérifier la syntaxe exacte des props, slots et événements avant de l'utiliser. Ne jamais deviner ou supposer l'API d'un composant.
 - Toujours utiliser les composants Nuxt UI pour les éléments d'interface utilisateur courants (boutons, modals, cartes, etc.) au lieu de créer des composants personnalisés.
 - Toujours utiliser les icônes de la bibliothèque Nuxt Icon pour les icônes (https://nuxt.com/modules/icon) et éviter d'importer des SVG ou d'utiliser des images pour les icônes.
 - Toujours utiliser les classes utilitaires de Tailwind CSS pour le style et la mise en page

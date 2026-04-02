@@ -259,6 +259,17 @@ const sections = [
       },
     ],
   },
+  {
+    title: 'Outils IA',
+    icon: '🤖',
+    color: colors.cyan,
+    scripts: [
+      {
+        name: 'jcodemunch:watch',
+        desc: 'Lance le watcher jCodemunch (index auto)',
+      },
+    ],
+  },
 ]
 
 // Mode liste statique (ancien comportement)
@@ -397,16 +408,14 @@ async function interactiveMenu() {
 }
 
 /**
- * Résout un raccourci clavier en index de section/script.
- * "1" → 0, "9" → 8, "0" → 9, "a" → 10, "b" → 11, etc.
+ * Résout un raccourci en index de section/script.
+ * "1" → 0, "12" → 11, etc. (numérotation 1-based)
  */
 function resolveShortcutIndex(shortcut) {
-  if (!shortcut || shortcut.length !== 1) return -1
-  const code = shortcut.charCodeAt(0)
-  if (code >= 49 && code <= 57) return code - 49 // '1'-'9' → 0-8
-  if (code === 48) return 9 // '0' → 9
-  if (code >= 97 && code <= 122) return code - 97 + 10 // 'a'-'z' → 10+
-  return -1
+  if (!shortcut) return -1
+  const num = parseInt(shortcut, 10)
+  if (isNaN(num) || num < 1) return -1
+  return num - 1
 }
 
 /**
@@ -416,7 +425,7 @@ async function directMode(categoryShortcut, scriptShortcut) {
   const categoryIndex = resolveShortcutIndex(categoryShortcut)
   if (categoryIndex < 0 || categoryIndex >= sections.length) {
     console.log(`${colors.red}❌ Catégorie "${categoryShortcut}" invalide${colors.reset}`)
-    console.log(`${colors.dim}Catégories disponibles : 1-${Math.min(9, sections.length)}${sections.length > 9 ? ', 0' : ''}${sections.length > 10 ? ', a-' + String.fromCharCode(96 + sections.length - 10) : ''}${colors.reset}`)
+    console.log(`${colors.dim}Catégories disponibles : 1-${sections.length}${colors.reset}`)
     process.exit(1)
   }
 
@@ -460,7 +469,7 @@ async function directMode(categoryShortcut, scriptShortcut) {
   const scriptIndex = resolveShortcutIndex(scriptShortcut)
   if (scriptIndex < 0 || scriptIndex >= section.scripts.length) {
     console.log(`${colors.red}❌ Script "${scriptShortcut}" invalide dans ${section.title}${colors.reset}`)
-    console.log(`${colors.dim}Scripts disponibles : 1-${Math.min(9, section.scripts.length)}${colors.reset}`)
+    console.log(`${colors.dim}Scripts disponibles : 1-${section.scripts.length}${colors.reset}`)
     process.exit(1)
   }
 

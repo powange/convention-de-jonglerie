@@ -54,7 +54,18 @@
       "Bash(npm outdated:*)",
       "WebFetch(domain:pinia.vuejs.org)",
       "WebFetch(domain:devtools.vuejs.org)",
-      "WebFetch(domain:devtools.nuxt.com)"
+      "WebFetch(domain:devtools.nuxt.com)",
+      "WebFetch(domain:developers.facebook.com)",
+      "Read(//root/.local/**)",
+      "mcp__jcodemunch__index_repo",
+      "mcp__jcodemunch__index_folder",
+      "mcp__jcodemunch__get_file_tree",
+      "mcp__jcodemunch__get_file_outline",
+      "mcp__jcodemunch__resolve_repo",
+      "Read(//root/.claude/**)",
+      "Read(//root/**)",
+      "mcp__jcodemunch__invalidate_cache",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "additionalDirectories": [
       "/tmp",
