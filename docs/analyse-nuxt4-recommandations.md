@@ -109,66 +109,50 @@ export default defineNuxtConfig({
   modules: ['nuxt-security' /* ...autres modules */],
 
   security: {
-    // Nonce dynamique pour les scripts inline en SSR
     nonce: true,
-
+    sri: true,
     headers: {
       contentSecurityPolicy: {
-        // Scripts : strict-dynamic avec nonce pour SSR
         'script-src': [
           "'self'",
           "'strict-dynamic'",
           "'nonce-{{nonce}}'",
           'https:',
-          "'unsafe-inline'", // fallback navigateurs anciens (ignore si strict-dynamic supporte)
+          "'unsafe-inline'",
         ],
-        // Styles : unsafe-inline necessaire pour Nuxt UI / Tailwind
         'style-src': ["'self'", 'https:', "'unsafe-inline'"],
-        // Images : self + data URIs + domaines externes
         'img-src': ["'self'", 'data:', 'https:'],
-        // Polices : self + Google Fonts si utilise
         'font-src': ["'self'", 'https:', 'data:'],
-        // Connexions API : self + services tiers
         'connect-src': [
           "'self'",
           'https://*.googleapis.com',
-          'https://*.stripe.com',
-          'https://*.google.com',
           'https://*.firebaseio.com',
           'wss://*.firebaseio.com',
+          'https://fcm.googleapis.com',
+          'https://api.stripe.com',
+          'https://www.google.com',
         ],
-        // Frames : Stripe checkout, reCAPTCHA
-        'frame-src': ['https://*.stripe.com', 'https://*.google.com'],
+        'frame-src': [
+          'https://js.stripe.com',
+          'https://hooks.stripe.com',
+          'https://www.google.com/recaptcha/',
+          'https://recaptcha.google.com',
+        ],
         'base-uri': ["'none'"],
         'object-src': ["'none'"],
         'script-src-attr': ["'none'"],
         'upgrade-insecure-requests': true,
       },
-      // Protection clickjacking
-      // X-Frame-Options est aussi ajoute automatiquement
-      crossOriginEmbedderPolicy: false, // incompatible avec certains services tiers (Stripe, Firebase)
+      crossOriginEmbedderPolicy: false,
     },
-
-    // Subresource Integrity : hash de verification sur les scripts externes
-    sri: true,
-
-    // Desactiver les fonctionnalites deja gerees par le projet
-    rateLimiter: false, // rate limiter custom deja en place
-    xssValidator: false, // reCAPTCHA + rehype-sanitize deja en place
-  },
-
-  // Desactiver les headers de securite pour les routes API internes si besoin
-  routeRules: {
-    '/api/**': {
-      security: {
-        headers: {
-          contentSecurityPolicy: false, // les API n'ont pas besoin de CSP
-        },
-      },
-    },
+    rateLimiter: false,
+    xssValidator: false,
+    removeLoggers: false, // gere par vite.esbuild.pure
   },
 })
 ```
+
+**Note importante** : L'obfuscation email de Cloudflare doit etre desactivee (Scrape Shield > Email Address Obfuscation = off) car le script injecte par Cloudflare n'a pas de nonce et est bloque par `strict-dynamic`.
 
 **Headers ajoutes automatiquement par `nuxt-security`** :
 
@@ -435,24 +419,16 @@ experimental: {
 // nuxt.config.ts
 vite: {
   esbuild: {
-    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
-  },
-}
-```
-
-**Note** : Cette configuration supprime **tous** les `console.*` cote client en production. Les logs serveur (Nitro) ne sont pas affectes.
-
-**Alternative** : Si certains `console.warn` ou `console.error` doivent etre conserves en production, utiliser `pure` au lieu de `drop` :
-
-```typescript
-vite: {
-  esbuild: {
     pure: process.env.NODE_ENV === 'production' ? ['console.log', 'console.debug'] : [],
   },
 }
 ```
 
-**Impact** : Reduction de la taille du bundle client + securite (pas d'informations exposees dans la console).
+**Note** : On utilise `pure` plutot que `drop` pour conserver `console.error` et `console.warn` en production (utiles pour le monitoring). Seuls `console.log` et `console.debug` sont supprimes.
+
+**Important** : `nuxt-security` active `removeLoggers: true` par defaut, ce qui supprime **tous** les `console.*` y compris en environnement de test. Il faut le desactiver (`removeLoggers: false`) et utiliser cette config Vite a la place pour un controle plus fin.
+
+**Impact** : Reduction de la taille du bundle client + securite (pas d'informations de debug exposees dans la console).
 
 **Effort** : 1 ligne de code.
 
