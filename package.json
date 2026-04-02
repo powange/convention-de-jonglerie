@@ -121,6 +121,7 @@
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "^0.5.29",
     "nuxt-qrcode": "^0.4.8",
+    "nuxt-security": "^2.5.1",
     "pinia": "^3.0.4",
     "rehype-sanitize": "^6.0.0",
     "rehype-stringify": "^10.0.1",

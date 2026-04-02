@@ -59,6 +59,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@pinia/nuxt',
     'nuxt-auth-utils',
+    'nuxt-security',
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
     'nuxt-file-storage',
@@ -66,13 +67,69 @@ export default defineNuxtConfig({
     'nuxt-qrcode',
   ].filter(Boolean),
 
+  // Optimisation des images (WebP/AVIF avec qualité 80)
+  image: {
+    quality: 80,
+    format: ['webp', 'avif'],
+  },
+
+  // Destructuration réactive des props dans <script setup>
+  vue: {
+    propsDestructure: true,
+  },
+
   // Restreindre les collections d'icônes empaquetées côté serveur
   icon: {
     // Utiliser le mode `remote` pour éviter d'empaqueter les collections locales volumineuses
     // et ne récupérer que les icônes utilisées à l'exécution (taille serveur fortement réduite)
     serverBundle: 'remote',
   },
+  // Sécurité HTTP — CSP + headers de protection
+  security: {
+    nonce: true,
+    sri: true,
+    headers: {
+      contentSecurityPolicy: {
+        'script-src': [
+          "'self'",
+          "'strict-dynamic'",
+          "'nonce-{{nonce}}'",
+          'https:',
+          "'unsafe-inline'",
+        ],
+        'style-src': ["'self'", 'https:', "'unsafe-inline'"],
+        'img-src': ["'self'", 'data:', 'https:'],
+        'font-src': ["'self'", 'https:', 'data:'],
+        'connect-src': [
+          "'self'",
+          'https://*.googleapis.com',
+          'https://*.firebaseio.com',
+          'wss://*.firebaseio.com',
+          'https://fcm.googleapis.com',
+          'https://api.stripe.com',
+          'https://www.google.com',
+        ],
+        'frame-src': [
+          'https://js.stripe.com',
+          'https://hooks.stripe.com',
+          'https://www.google.com/recaptcha/',
+          'https://recaptcha.google.com',
+        ],
+        'base-uri': ["'none'"],
+        'object-src': ["'none'"],
+        'script-src-attr': ["'none'"],
+        'upgrade-insecure-requests': true,
+      },
+      crossOriginEmbedderPolicy: false,
+    },
+    rateLimiter: false,
+    xssValidator: false,
+    removeLoggers: false,
+  },
+
   nitro: {
+    // Preset explicite pour builds déterministes en Docker
+    preset: 'node-server',
     ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
     // Routes avec timeout étendu pour les appels IA longs
     routeRules: {
@@ -362,6 +419,10 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    // Supprimer les console.log/debug en production (conserve console.error/warn)
+    esbuild: {
+      pure: process.env.NODE_ENV === 'production' ? ['console.log', 'console.debug'] : [],
+    },
     css: {
       devSourcemap: true,
     },
@@ -437,6 +498,19 @@ export default defineNuxtConfig({
     lazyHydration: true,
     // Optimiser la gestion d'erreur des chunks
     emitRouteChunkError: 'automatic',
+    // Cache des artefacts de build (accélère les rebuilds)
+    buildCache: true,
+    // Transitions natives du navigateur entre pages (respecte prefers-reduced-motion)
+    viewTransition: true,
+    // Prefetching cross-origin via Speculation Rules API
+    crossOriginPrefetch: true,
+    // Defaults NuxtLink : prefetch au premier signe d'interaction
+    defaults: {
+      nuxtLink: {
+        prefetch: true,
+        prefetchOn: { interaction: true },
+      },
+    },
   },
 
   // Configuration des modules SEO
