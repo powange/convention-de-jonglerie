@@ -473,12 +473,33 @@ export async function handleFileUpload(
     return null
   }
 
-  // Cas 3: Fichier existant non modifié
+  // Cas 3: URL externe (http/https) — télécharger et stocker localement
+  if (newFileUrl && typeof newFileUrl === 'string' && newFileUrl.startsWith('http')) {
+    const result = await downloadAndStoreImage(
+      newFileUrl,
+      options.resourceId,
+      options.resourceType,
+      options.verbose
+    )
+
+    if (result.success && result.filename) {
+      // Supprimer l'ancien fichier si le téléchargement a réussi
+      if (oldFileUrl) {
+        await deleteOldFile(oldFileUrl, options.resourceId, options.resourceType, options.verbose)
+      }
+      return result.filename
+    }
+
+    // En cas d'échec du téléchargement, conserver l'ancien fichier
+    return oldFileUrl || null
+  }
+
+  // Cas 4: Fichier existant non modifié (nom de fichier local)
   if (newFileUrl && !newFileUrl.includes('/temp/')) {
-    // Extraire juste le nom de fichier si c'est une URL complète
+    // Extraire juste le nom de fichier si c'est une URL complète locale
     return newFileUrl.split('/').pop() || newFileUrl
   }
 
-  // Cas 4: Pas de changement
+  // Cas 5: Pas de changement
   return oldFileUrl || null
 }
