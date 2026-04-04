@@ -24,17 +24,17 @@ export default defineNuxtConfig({
     head: {
       titleTemplate: '%s | Juggling Convention',
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/logos/logo-jc.svg?v=3' },
-        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png?v=3' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/logos/logo-jc.svg?v=4' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png?v=4' },
         {
           rel: 'icon',
           type: 'image/png',
           sizes: '192x192',
-          href: '/favicons/favicon-192x192.png?v=3',
+          href: '/favicons/favicon-192x192.png?v=4',
         },
-        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png?v=3' },
-        { rel: 'manifest', href: '/api/site.webmanifest?v=3' },
-        { rel: 'alternate icon', href: '/favicon.ico?v=3' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png?v=4' },
+        { rel: 'manifest', href: '/api/site.webmanifest?v=4' },
+        { rel: 'alternate icon', href: '/favicon.ico?v=4' },
       ],
     },
   },

@@ -6,7 +6,7 @@ export default wrapApiHandler(
     const nuxtEnv = process.env.NUXT_ENV || nodeEnv
 
     // Version pour forcer la mise à jour du cache des icônes
-    const iconVersion = 'v2' // Incrémenter cette version pour forcer la mise à jour des icônes
+    const iconVersion = 'v3' // Incrémenter cette version pour forcer la mise à jour des icônes
 
     // Déterminer le nom selon l'environnement
     let appName = 'Juggling Convention'
