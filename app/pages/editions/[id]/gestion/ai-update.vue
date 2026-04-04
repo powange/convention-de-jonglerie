@@ -200,7 +200,7 @@
                   />
                   <p v-else class="text-gray-400 mt-1">-</p>
                 </template>
-                <p v-else class="text-gray-700 dark:text-gray-300 mt-1 break-words">
+                <p v-else class="text-gray-700 dark:text-gray-300 mt-1 break-words whitespace-pre-line">
                   {{ formatDiffValue(diff.field, diff.currentValue) }}
                 </p>
               </div>
@@ -217,7 +217,7 @@
                   />
                   <p v-else class="text-gray-400 mt-1">-</p>
                 </template>
-                <p v-else class="text-gray-700 dark:text-gray-300 mt-1 break-words">
+                <p v-else class="text-gray-700 dark:text-gray-300 mt-1 break-words whitespace-pre-line">
                   {{ formatDiffValue(diff.field, diff.newValue) }}
                 </p>
               </div>
