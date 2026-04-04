@@ -5,6 +5,7 @@
  */
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
+import pngToIco from 'png-to-ico'
 import sharp from 'sharp'
 
 async function run() {
@@ -111,9 +112,35 @@ async function run() {
     })
   )
 
+  // Générer notification-badge.png à partir du SVG monochrome
+  const badgeSvg = path.resolve('public/favicons/notification-badge.svg')
+  const badgeSvgContent = await readFile(badgeSvg, 'utf8')
+  await sharp(Buffer.from(badgeSvgContent))
+    .resize(96, 96)
+    .png({ compressionLevel: 9 })
+    .toFile(path.join(outDir, 'notification-badge.png'))
+
+  // Générer favicon.ico (vrai ICO multi-tailles : 16, 32, 48)
+  const icoSizes = [16, 32, 48]
+  const icoPngs = await Promise.all(
+    icoSizes.map(async (size) => {
+      const logoBuffer = await sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer()
+      return sharp({
+        create: { width: size, height: size, channels: 4, background: backgroundColorRgb },
+      })
+        .composite([{ input: logoBuffer, top: 0, left: 0 }])
+        .png()
+        .toBuffer()
+    })
+  )
+  const icoBuffer = await pngToIco(icoPngs)
+  await writeFile(path.resolve('public/favicon.ico'), icoBuffer)
+
   // Note: Le manifest web est maintenant généré dynamiquement via /api/site.webmanifest
   // selon l'environnement (DEV/TEST/PROD). Voir server/api/site.webmanifest.get.ts
   console.log('Favicons générés dans public/favicons')
+  console.log('favicon.ico généré : public/favicon.ico')
+  console.log('Badge de notification généré : notification-badge.png')
   console.log('Le manifest est généré dynamiquement via /api/site.webmanifest')
 }
 

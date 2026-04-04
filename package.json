@@ -161,6 +161,7 @@
     "glob": "^13.0.6",
     "happy-dom": "^20.8.4",
     "nuxt-file-storage": "^0.3.2",
+    "png-to-ico": "^3.0.1",
     "prettier": "^3.8.1",
     "prisma": "^7.5.0",
     "typescript": "^5.9.3",

@@ -2,25 +2,28 @@
   <UApp>
     <!-- Loading Screen -->
     <div v-if="isLoading" class="loading-screen">
-      <img src="/logos/logo-jc-anim-orbit.svg" :alt="$t('common.loading')" class="loading-logo" />
+      <LoadingLogo :loaded="siteLoaded" />
     </div>
 
-    <ClientOnly>
-      <!-- Bannière d'impersonation -->
-      <UiImpersonationBanner />
+    <!-- Contenu masqué pendant le chargement pour éviter les sauts de layout -->
+    <div v-show="!isLoading">
+      <ClientOnly>
+        <!-- Bannière d'impersonation -->
+        <UiImpersonationBanner />
 
-      <!-- Bannière d'installation PWA -->
-      <PWAInstallBanner />
+        <!-- Bannière d'installation PWA -->
+        <PWAInstallBanner />
 
-      <!-- Modale de promotion des notifications push -->
-      <NotificationsPushPromoModal />
-    </ClientOnly>
+        <!-- Modale de promotion des notifications push -->
+        <NotificationsPushPromoModal />
+      </ClientOnly>
 
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
 
-    <UToast />
+    <UToast v-show="!isLoading" />
   </UApp>
 </template>
 
@@ -29,34 +32,36 @@ import { computed, onMounted } from 'vue'
 
 // État de chargement
 const isLoading = ref(true)
+const siteLoaded = ref(false)
 
-// Utiliser nextTick pour s'assurer que nous sommes côté client après hydration
+// Durée de l'animation settle (doit correspondre au CSS du composant LoadingLogo)
+const SETTLE_DURATION = 3000
+
 onMounted(async () => {
-  // Le plugin auth.client.ts s'occupe maintenant de l'initialisation de l'authentification
-
   await nextTick()
 
-  // Attendre que tout soit chargé
-  const hideLoading = () => {
-    // Petit délai pour s'assurer que l'hydration est complète
+  const triggerSettle = () => {
+    // Le site est chargé : déclenche la transition du logo (phase 2+3)
+    siteLoaded.value = true
+
+    // Masque le loading screen après la fin de l'animation settle
     setTimeout(() => {
       isLoading.value = false
-    }, 500)
+    }, SETTLE_DURATION)
   }
 
   // Utiliser useEventListener de VueUse pour gérer automatiquement le cleanup
   useEventListener(document, 'readystatechange', () => {
     if (document.readyState === 'complete') {
-      hideLoading()
+      triggerSettle()
     }
   })
 
   // Si tout est déjà chargé
   if (document.readyState === 'complete') {
-    hideLoading()
+    triggerSettle()
   } else {
-    // Attendre que tout soit chargé (images, CSS, etc.)
-    useEventListener(window, 'load', hideLoading)
+    useEventListener(window, 'load', triggerSettle)
   }
 })
 
@@ -89,29 +94,16 @@ if (shouldDisallowIndexing.value) {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* viewport dynamique, evite le saut sur mobile */
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  overflow: hidden;
 
   /* Transition fluide à la sortie */
   transition: opacity 0.8s ease-out;
-}
-
-.loading-logo {
-  width: 200px;
-  height: 200px;
-  max-width: 50vw;
-  max-height: 50vh;
-}
-
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-  }
 }
 
 /* Support du dark mode */
