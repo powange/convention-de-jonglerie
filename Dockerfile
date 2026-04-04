@@ -29,7 +29,9 @@ RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
 # Copier le reste du code et construire
 COPY . .
 # Augmenter la limite de mémoire pour le build Docker (8GB)
-RUN NODE_OPTIONS='--max-old-space-size=8192' npx nuxt build
+# --mount=type=cache : persiste le cache Nuxt/Vite entre les builds Docker (accélère les rebuilds via Portainer)
+RUN --mount=type=cache,target=/app/node_modules/.cache \
+    NODE_OPTIONS='--max-old-space-size=8192' npx nuxt build
 
 # Conserver uniquement les dépendances de prod
 RUN npm prune --omit=dev

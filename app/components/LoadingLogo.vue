@@ -68,21 +68,6 @@ defineProps<{
   max-width: 50vw;
   max-height: 50vh;
   overflow: visible;
-  color: #000000;
-}
-
-@media (prefers-color-scheme: dark) {
-  .loading-logo-svg {
-    color: #ffffff;
-  }
-}
-
-:global(.dark) .loading-logo-svg {
-  color: #ffffff;
-}
-
-:global(.light) .loading-logo-svg {
-  color: #000000;
 }
 
 /* =============================================
@@ -321,5 +306,26 @@ defineProps<{
 }
 .loaded .logo-white {
   animation: white-appear 3s linear forwards;
+}
+</style>
+
+<!-- Style non-scoped pour que .dark/.light sur <html> puisse cibler le SVG -->
+<style>
+.loading-logo-svg {
+  color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  .loading-logo-svg {
+    color: #ffffff;
+  }
+}
+
+.dark .loading-logo-svg {
+  color: #ffffff !important;
+}
+
+.light .loading-logo-svg {
+  color: #000000 !important;
 }
 </style>
