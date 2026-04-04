@@ -194,7 +194,7 @@
                 <template v-if="isImageField(diff.field)">
                   <img
                     v-if="diff.currentValue"
-                    :src="diff.currentValue"
+                    :src="resolveImageUrl(diff.field, diff.currentValue)"
                     :alt="$t('gestion.ai_update.current_value')"
                     class="mt-1 max-h-40 rounded object-contain"
                   />
@@ -211,7 +211,7 @@
                 <template v-if="isImageField(diff.field)">
                   <img
                     v-if="diff.newValue"
-                    :src="diff.newValue"
+                    :src="resolveImageUrl(diff.field, diff.newValue)"
                     :alt="$t('gestion.ai_update.new_value')"
                     class="mt-1 max-h-40 rounded object-contain"
                   />
@@ -256,6 +256,7 @@ const { t } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 
+const { getImageUrl } = useImageUrl()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
@@ -401,6 +402,17 @@ const DATE_FIELDS = ['edition.startDate', 'edition.endDate']
 const isImageField = (field: string) => IMAGE_FIELDS.includes(field)
 const isDateField = (field: string) => DATE_FIELDS.includes(field)
 
+const resolveImageUrl = (field: string, value: string): string | null => {
+  if (!value) return null
+  if (field === 'edition.imageUrl') {
+    return getImageUrl(value, 'edition', editionId)
+  }
+  if (field === 'convention.logo') {
+    return getImageUrl(value, 'convention', edition.value?.convention?.id)
+  }
+  return value
+}
+
 const formatDiffValue = (field: string, value: string): string => {
   if (!value) return '-'
   if (isDateField(field)) {
@@ -419,9 +431,7 @@ const formatDiffValue = (field: string, value: string): string => {
       return value
     }
   }
-  if (field === 'edition.description' && value.length > 200) {
-    return value.substring(0, 200) + '...'
-  }
+  // Ne plus tronquer la description pour faciliter la comparaison
   return value
 }
 
