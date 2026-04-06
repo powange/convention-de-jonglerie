@@ -139,6 +139,106 @@ export async function getEditionStatus(
 }
 
 // ──────────────────────────────────────────────
+// Shows call helpers
+// ──────────────────────────────────────────────
+
+/**
+ * Crée un appel à spectacles via l'API
+ */
+export async function createShowCall(
+  page: APIRequestContext,
+  editionId: string,
+  data: { name: string; description?: string }
+) {
+  const response = await page.request.post(`${BASE_URL}/api/editions/${editionId}/shows-call`, {
+    data,
+  })
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  const showCall = body.data?.showCall || body.showCall || body.data || body
+  return showCall
+}
+
+/**
+ * Met à jour un appel à spectacles via l'API
+ */
+export async function updateShowCall(
+  page: APIRequestContext,
+  editionId: string,
+  showCallId: string,
+  data: Record<string, unknown>
+) {
+  const response = await page.request.put(
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}`,
+    { data }
+  )
+  expect(response.ok()).toBe(true)
+  return response
+}
+
+/**
+ * Supprime un appel à spectacles via l'API
+ */
+export async function deleteShowCall(
+  page: APIRequestContext,
+  editionId: string,
+  showCallId: string
+) {
+  const response = await page.request.delete(
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}`
+  )
+  expect(response.ok()).toBe(true)
+  return response
+}
+
+/**
+ * Récupère les candidatures d'un appel à spectacles via l'API
+ */
+export async function getShowCallApplications(
+  page: APIRequestContext,
+  editionId: string,
+  showCallId: string,
+  status?: string
+) {
+  const url = new URL(`${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/applications`)
+  if (status) url.searchParams.set('status', status)
+
+  const response = await page.request.get(url.toString())
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Met à jour le statut d'une candidature
+ */
+export async function updateShowCallApplicationStatus(
+  page: APIRequestContext,
+  editionId: string,
+  showCallId: string,
+  applicationId: string,
+  data: { status?: string; organizerNotes?: string }
+) {
+  const response = await page.request.patch(
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/applications/${applicationId}`,
+    { data }
+  )
+  expect(response.ok()).toBe(true)
+  return response
+}
+
+/**
+ * Active le profil artiste pour l'utilisateur courant
+ */
+export async function enableArtistProfile(page: APIRequestContext) {
+  const response = await page.request.put(`${BASE_URL}/api/profile`, {
+    data: { isArtist: true },
+  })
+  expect(response.ok()).toBe(true)
+  return response
+}
+
+// ──────────────────────────────────────────────
 // Volunteers settings helpers
 // ──────────────────────────────────────────────
 
