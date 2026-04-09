@@ -12,7 +12,7 @@ import { generateImportJson } from './generate-import-json.post'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
   AI_TIMEOUTS,
-  getEffectiveAIConfig,
+  getEffectiveAIConfigAsync,
   getMaxContentSizeForProvider,
 } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -681,8 +681,8 @@ export async function runAgentExploration(
     }
   }
 
-  // Récupérer la config IA effective (lit process.env en priorité)
-  const effectiveConfig = getEffectiveAIConfig()
+  // Récupérer la config IA effective (BDD en priorité, fallback env)
+  const effectiveConfig = await getEffectiveAIConfigAsync()
 
   // Provider IA à utiliser (paramètre > config serveur > défaut)
   const aiProvider = provider || effectiveConfig.aiProvider || 'lmstudio'

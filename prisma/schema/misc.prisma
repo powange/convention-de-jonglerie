@@ -183,3 +183,38 @@ model FcmToken {
   @@index([token])
   @@index([deviceId])
 }
+
+// ========== CONFIGURATION IA ==========
+
+model AiConfig {
+  id String @id @default("default") // Singleton — une seule ligne
+
+  // Provider actif
+  provider String @default("lmstudio") // "lmstudio", "anthropic", "ollama"
+
+  // LM Studio
+  lmstudioBaseUrl     String  @default("http://host.docker.internal:1234")
+  lmstudioModelId     String? // ID du modèle vision sélectionné (référence AiModel.modelId)
+  lmstudioTextModelId String? // ID du modèle texte sélectionné
+
+  // Anthropic
+  anthropicApiKey String? @db.Text
+
+  // Ollama
+  ollamaBaseUrl String @default("http://localhost:11434")
+  ollamaModel   String @default("llava")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AiModel {
+  id        Int      @id @default(autoincrement())
+  provider  String // "lmstudio" (extensible à "ollama" plus tard)
+  modelId   String // Identifiant du modèle (ex: "gemma-3-12b-it")
+  name      String // Nom d'affichage (ex: "Gemma 3 12B IT")
+  createdAt DateTime @default(now())
+
+  @@unique([provider, modelId])
+  @@index([provider])
+}

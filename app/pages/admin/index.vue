@@ -259,6 +259,43 @@
           </UCard>
         </NuxtLink>
 
+        <!-- Configuration IA -->
+        <NuxtLink to="/admin/ai-config" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-cpu-chip"
+                      class="h-6 w-6 text-purple-600 dark:text-purple-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.ai_config') }}</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  {{ $t('admin.ai_config_description') }}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-computer-desktop" class="h-4 w-4" />
+                    LM Studio
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-sparkles" class="h-4 w-4" />
+                    Anthropic
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-cube" class="h-4 w-4" />
+                    Ollama
+                  </span>
+                </div>
+              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+            </div>
+          </UCard>
+        </NuxtLink>
+
         <!-- Configuration Système -->
         <NuxtLink to="/admin/system-config" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">

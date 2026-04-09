@@ -11,7 +11,7 @@ import { loadPrompt } from '../../lib/prompt-loader'
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import {
   AI_TIMEOUTS,
-  getEffectiveAIConfig,
+  getEffectiveAIConfigAsync,
   getMaxContentSizeForProvider,
 } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -132,8 +132,8 @@ export async function generateImportJson(
   options: GenerateImportOptions = {}
 ): Promise<GenerateImportResult> {
   const { taskId, onProgress, previewedImageUrl, provider } = options
-  // Récupérer la config IA effective (lit process.env en priorité)
-  const effectiveConfig = getEffectiveAIConfig()
+  // Récupérer la config IA effective (BDD en priorité, fallback env)
+  const effectiveConfig = await getEffectiveAIConfigAsync()
 
   const browserlessUrl = effectiveConfig.browserlessUrl
   const useBrowserless = browserlessUrl && (await isBrowserlessAvailable(browserlessUrl))

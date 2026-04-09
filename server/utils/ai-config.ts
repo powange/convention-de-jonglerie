@@ -49,7 +49,7 @@ export const AGENT_LIMITS = {
 } as const
 
 /**
- * Récupère la configuration IA effective en lisant process.env en priorité
+ * Récupère la configuration IA depuis les variables d'environnement (synchrone, fallback)
  */
 export function getEffectiveAIConfig() {
   const config = useRuntimeConfig()
@@ -84,9 +84,98 @@ export function getEffectiveAIConfig() {
 }
 
 /**
+ * Type de la config IA en BDD
+ */
+interface DbAiConfig {
+  id: string
+  provider: string
+  lmstudioBaseUrl: string
+  lmstudioModelId: string | null
+  lmstudioTextModelId: string | null
+  anthropicApiKey: string | null
+  ollamaBaseUrl: string
+  ollamaModel: string
+}
+
+/**
+ * Cache mémoire pour la config IA depuis la BDD
+ * Évite les requêtes Prisma répétées lors des explorations multi-pages
+ */
+let cachedDbConfig: DbAiConfig | null | undefined = undefined
+let dbConfigCacheTimestamp: number = 0
+const DB_CONFIG_CACHE_TTL = 30_000 // 30 secondes
+
+/**
+ * Récupère la configuration IA depuis la BDD (crée l'entrée par défaut si absente)
+ */
+export async function getEffectiveAIConfigAsync() {
+  const now = Date.now()
+  let dbConfig = cachedDbConfig
+
+  if (
+    dbConfig === undefined ||
+    dbConfig === null ||
+    now - dbConfigCacheTimestamp > DB_CONFIG_CACHE_TTL
+  ) {
+    dbConfig = await prisma.aiConfig.upsert({
+      where: { id: 'default' },
+      update: {},
+      create: { id: 'default' },
+    })
+    cachedDbConfig = dbConfig
+    dbConfigCacheTimestamp = now
+  }
+
+  const config = useRuntimeConfig()
+
+  return {
+    aiProvider: dbConfig.provider,
+    lmstudioBaseUrl: dbConfig.lmstudioBaseUrl,
+    lmstudioModel: dbConfig.lmstudioModelId,
+    lmstudioTextModel: dbConfig.lmstudioTextModelId,
+    anthropicApiKey: dbConfig.anthropicApiKey,
+    ollamaBaseUrl: dbConfig.ollamaBaseUrl,
+    ollamaModel: dbConfig.ollamaModel,
+    browserlessUrl:
+      process.env.BROWSERLESS_URL || process.env.NUXT_BROWSERLESS_URL || config.browserlessUrl,
+  }
+}
+
+/**
+ * Invalide le cache de la config IA en BDD (à appeler après modification)
+ */
+export function invalidateDbConfigCache(): void {
+  cachedDbConfig = undefined
+  dbConfigCacheTimestamp = 0
+}
+
+/**
  * Type de retour de getEffectiveAIConfig
  */
 export type EffectiveAIConfig = ReturnType<typeof getEffectiveAIConfig>
+
+/**
+ * Sérialise la config IA pour l'API (masque la clé API Anthropic)
+ */
+export function serializeAiConfig(config: {
+  provider: string
+  lmstudioBaseUrl: string
+  lmstudioModelId: string | null
+  lmstudioTextModelId: string | null
+  anthropicApiKey: string | null
+  ollamaBaseUrl: string
+  ollamaModel: string
+}) {
+  return {
+    provider: config.provider,
+    lmstudioBaseUrl: config.lmstudioBaseUrl,
+    lmstudioModelId: config.lmstudioModelId,
+    lmstudioTextModelId: config.lmstudioTextModelId,
+    anthropicApiKey: config.anthropicApiKey ? '****' : null,
+    ollamaBaseUrl: config.ollamaBaseUrl,
+    ollamaModel: config.ollamaModel,
+  }
+}
 
 /**
  * Cache pour le context length du modèle LM Studio

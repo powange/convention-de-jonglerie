@@ -1,5 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
-import { getEffectiveAIConfig } from '#server/utils/ai-config'
+import { getEffectiveAIConfigAsync } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 
 /**
@@ -22,7 +22,7 @@ export default wrapApiHandler(
     // Vérifier que l'utilisateur est un admin
     await requireGlobalAdminWithDbCheck(event)
 
-    const config = getEffectiveAIConfig()
+    const config = await getEffectiveAIConfigAsync()
     const providers: AIProvider[] = []
 
     // Déterminer le provider par défaut
