@@ -103,31 +103,6 @@
                 <span class="ml-2 font-mono">{{ config.server.ai.anthropicApiKey }}</span>
               </div>
 
-              <!-- LM Studio -->
-              <div
-                class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800"
-              >
-                <div class="font-medium text-blue-700 dark:text-blue-300 mb-2">LM Studio</div>
-                <div class="space-y-1">
-                  <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">URL:</span>
-                    <span class="font-mono text-xs">{{ config.server.ai.lmstudioBaseUrl }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-600 dark:text-gray-400">Vision (images):</span>
-                    <UBadge color="purple" variant="soft" size="xs">
-                      {{ config.server.ai.lmstudioModel }}
-                    </UBadge>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-gray-600 dark:text-gray-400">Texte (JSON):</span>
-                    <UBadge color="success" variant="soft" size="xs">
-                      {{ config.server.ai.lmstudioTextModel }}
-                    </UBadge>
-                  </div>
-                </div>
-              </div>
-
               <!-- Ollama -->
               <div
                 class="bg-orange-50 dark:bg-orange-900/20 p-3 rounded border border-orange-200 dark:border-orange-800"
@@ -288,23 +263,6 @@
             </div>
           </div>
 
-          <!-- VAPID & Notifications push -->
-          <div>
-            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Notifications push (VAPID)
-            </h3>
-            <div class="space-y-2 text-sm">
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">Private Key:</span>
-                <span class="ml-2 font-mono">{{ config.server.vapid.privateKey }}</span>
-              </div>
-              <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-                <span class="text-gray-600 dark:text-gray-400">Subject:</span>
-                <span class="ml-2 font-mono">{{ config.server.vapid.subject }}</span>
-              </div>
-            </div>
-          </div>
-
           <!-- Cron -->
           <div>
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cron</h3>
@@ -356,10 +314,6 @@
           <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
             <span class="text-gray-600 dark:text-gray-400">reCAPTCHA Site Key:</span>
             <span class="ml-2 font-mono">{{ config.public.recaptchaSiteKey }}</span>
-          </div>
-          <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
-            <span class="text-gray-600 dark:text-gray-400">VAPID Public Key:</span>
-            <span class="ml-2 font-mono">{{ config.public.vapidPublicKey }}</span>
           </div>
           <div class="bg-gray-50 dark:bg-gray-800 p-2 rounded">
             <span class="text-gray-600 dark:text-gray-400">Firebase API Key:</span>

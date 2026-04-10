@@ -176,7 +176,7 @@ export const NotificationService = {
 
       const pushSent = await unifiedPushService.sendToUser(notification.userId, pushData)
       console.log(
-        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push (FCM+VAPID, langue: ${userLang})`
+        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push (FCM, langue: ${userLang})`
       )
     } catch (error) {
       console.error('[NotificationService] Erreur envoi Push:', error)

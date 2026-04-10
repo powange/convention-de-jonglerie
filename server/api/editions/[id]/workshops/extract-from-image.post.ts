@@ -1,3 +1,4 @@
+import { getEffectiveAIConfigAsync } from '#server/utils/ai-config'
 import { createAIProvider, type ExtractedWorkshop } from '#server/utils/ai-providers'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -61,20 +62,16 @@ export default wrapApiHandler(
     const imageType = base64Match[1] as 'png' | 'jpeg' | 'gif' | 'webp'
     const base64Data = base64Match[2]
 
-    // Récupérer la configuration
-    const config = useRuntimeConfig()
+    // Récupérer la configuration IA depuis la BDD
+    const effectiveConfig = await getEffectiveAIConfigAsync()
 
-    // Lire directement depuis process.env au runtime (plus fiable en production)
     const aiProvider = createAIProvider({
-      provider:
-        (process.env.AI_PROVIDER as 'anthropic' | 'ollama' | 'lmstudio') ||
-        (config.aiProvider as 'anthropic' | 'ollama' | 'lmstudio') ||
-        'anthropic',
-      anthropicApiKey: process.env.ANTHROPIC_API_KEY || config.anthropicApiKey,
-      ollamaBaseUrl: process.env.OLLAMA_BASE_URL || config.ollamaBaseUrl,
-      ollamaModel: process.env.OLLAMA_MODEL || config.ollamaModel,
-      lmstudioBaseUrl: process.env.LMSTUDIO_BASE_URL || config.lmstudioBaseUrl,
-      lmstudioModel: process.env.LMSTUDIO_MODEL || config.lmstudioModel,
+      provider: effectiveConfig.aiProvider as 'anthropic' | 'ollama' | 'lmstudio',
+      anthropicApiKey: effectiveConfig.anthropicApiKey || undefined,
+      ollamaBaseUrl: effectiveConfig.ollamaBaseUrl,
+      ollamaModel: effectiveConfig.ollamaModel,
+      lmstudioBaseUrl: effectiveConfig.lmstudioBaseUrl,
+      lmstudioModel: effectiveConfig.lmstudioModel || undefined,
     })
 
     // Créer le prompt pour l'IA

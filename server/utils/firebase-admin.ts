@@ -50,7 +50,7 @@ class FirebaseAdminService {
         }
       } else {
         console.warn(
-          '[Firebase Admin] Configuration Firebase manquante - FCM désactivé (utilisation de web-push VAPID uniquement)'
+          '[Firebase Admin] Configuration Firebase manquante - FCM désactivé, notifications push indisponibles'
         )
         return
       }

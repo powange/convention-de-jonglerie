@@ -135,7 +135,6 @@
     "unified": "^11.0.5",
     "vue-chartjs": "^5.3.3",
     "vue3-json-viewer": "^2.4.1",
-    "web-push": "^3.6.7",
     "zod": "^4.3.6"
   },
   "devDependencies": {

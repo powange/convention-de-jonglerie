@@ -87,15 +87,6 @@ FIREBASE_SERVICE_ACCOUNT='{"type":"service_account","project_id":"juggling-conve
 }
 ```
 
-## Coexistence avec VAPID
-
-Le système est conçu pour coexister avec le système VAPID existant :
-
-- **Si `FIREBASE_SERVICE_ACCOUNT` n'est pas configuré** : Le système utilise web-push VAPID (système actuel)
-- **Si `FIREBASE_SERVICE_ACCOUNT` est configuré** : Firebase Cloud Messaging est disponible en parallèle
-
-Tu peux utiliser les deux systèmes simultanément et migrer progressivement.
-
 ## Test de l'intégration
 
 ### Test côté client
@@ -153,17 +144,6 @@ const result = await firebaseAdmin.sendToTokens(
 )
 ```
 
-## Migration depuis VAPID
-
-Pour migrer progressivement :
-
-1. Garder VAPID actif pour les utilisateurs existants
-2. Détecter le support FCM côté client
-3. Si supporté, enregistrer le token FCM
-4. Stocker les tokens FCM dans une nouvelle table ou colonne
-5. Envoyer via FCM si token disponible, sinon via VAPID
-6. Une fois tous les utilisateurs migrés, désactiver VAPID
-
 ## Sécurité
 
 - Les clés API Firebase client sont **publiques** et peuvent être exposées
@@ -183,7 +163,6 @@ Pour migrer progressivement :
 
 - **Opera** : Bug général avec le Push API (affecte toutes les technologies de notifications push)
   - Affecte Firebase Cloud Messaging ([Issue #9380](https://github.com/firebase/firebase-js-sdk/issues/9380))
-  - Affecte également Web Push VAPID
   - Erreur : `AbortError: Registration failed - push service error`
   - **Cause** : Bug dans l'implémentation du Push API d'Opera
   - **Solution** : Utiliser Chrome, Edge ou Firefox

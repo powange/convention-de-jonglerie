@@ -215,7 +215,7 @@ async function callOllama(
  *
  * @example
  * const result = await callLLM(
- *   getEffectiveAIConfig(),
+ *   await getEffectiveAIConfigAsync(),
  *   'Tu es un assistant qui extrait des informations...',
  *   [{ role: 'user', content: 'Voici le contenu...' }],
  *   { temperature: 0.3 }
@@ -258,7 +258,7 @@ export async function callLLM(
  *
  * @example
  * const result = await callLLMSimple(
- *   getEffectiveAIConfig(),
+ *   await getEffectiveAIConfigAsync(),
  *   'Tu extrais des caractéristiques depuis une description...',
  *   'Description de l\'événement: ...'
  * )

@@ -63,6 +63,7 @@ const EXCLUDED_DIRS = [
 const IGNORED_MISSING_KEYS = [
   // Noms de domaine détectés comme clés i18n (dans useUrlValidation.ts et emailService.ts)
   'facebook.com',
+  'youtu.be',
   'example.*',
   // Noms de champs Prisma utilisés dans ai-update.vue (pas des clés i18n)
   'edition.imageUrl',
