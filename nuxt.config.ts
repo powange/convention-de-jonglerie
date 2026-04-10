@@ -491,6 +491,16 @@ export default defineNuxtConfig({
     '/editions/*/gestion/**': { appLayout: 'edition-dashboard', ssr: false },
     // Pages admin : pas de SSR
     '/admin/**': { ssr: false },
+    // Upload de backup : autoriser jusqu'à 100 MB (surcharge la limite par défaut de nuxt-security)
+    '/api/admin/backup/restore': {
+      security: {
+        requestSizeLimiter: {
+          maxRequestSizeInBytes: 100_000_000,
+          maxUploadFileRequestInBytes: 100_000_000,
+          throwError: true,
+        },
+      },
+    },
   },
 
   experimental: {
