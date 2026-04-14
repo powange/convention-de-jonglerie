@@ -13,63 +13,61 @@ const testFirebaseSchema = z.object({
  * API pour tester l'envoi de notifications via Firebase Cloud Messaging
  * POST /api/admin/notifications/test-firebase
  */
-export default wrapApiHandler(
-  defineEventHandler(async (event) => {
-    // Valider les permissions admin
-    requireSuperAdmin(event, 'Accès refusé')
+export default wrapApiHandler(async (event) => {
+  // Valider les permissions admin avec vérification en BDD
+  await requireGlobalAdminWithDbCheck(event)
 
-    // Parser et valider le body
-    const body = await readBody(event)
-    const validatedData = testFirebaseSchema.parse(body)
+  // Parser et valider le body
+  const body = await readBody(event)
+  const validatedData = testFirebaseSchema.parse(body)
 
-    const { token, title, body: message, actionUrl } = validatedData
+  const { token, title, body: message, actionUrl } = validatedData
 
-    // Vérifier que Firebase Admin est disponible
-    if (!firebaseAdmin.isInitialized()) {
+  // Vérifier que Firebase Admin est disponible
+  if (!firebaseAdmin.isInitialized()) {
+    throw createError({
+      status: 503,
+      message:
+        'Firebase Admin SDK non configuré. Veuillez configurer FIREBASE_SERVICE_ACCOUNT dans .env',
+    })
+  }
+
+  // Envoyer la notification via Firebase
+  const result = await firebaseAdmin.sendToTokens(
+    [token],
+    {
+      title,
+      body: message,
+    },
+    {
+      actionUrl: actionUrl || '/notifications',
+      type: 'info',
+    }
+  )
+
+  // Vérifier si l'envoi a réussi
+  if (result.success === 0) {
+    // Vérifier si le token est invalide
+    if (result.invalidTokens.length > 0) {
       throw createError({
-        status: 503,
-        message:
-          'Firebase Admin SDK non configuré. Veuillez configurer FIREBASE_SERVICE_ACCOUNT dans .env',
+        status: 400,
+        message: 'Token FCM invalide ou expiré',
       })
     }
 
-    // Envoyer la notification via Firebase
-    const result = await firebaseAdmin.sendToTokens(
-      [token],
-      {
-        title,
-        body: message,
+    throw createError({
+      status: 500,
+      message: "Échec de l'envoi de la notification Firebase",
+    })
+  }
+
+  return createSuccessResponse(
+    {
+      result: {
+        successCount: result.success,
+        failureCount: result.failure,
       },
-      {
-        actionUrl: actionUrl || '/notifications',
-        type: 'info',
-      }
-    )
-
-    // Vérifier si l'envoi a réussi
-    if (result.success === 0) {
-      // Vérifier si le token est invalide
-      if (result.invalidTokens.length > 0) {
-        throw createError({
-          status: 400,
-          message: 'Token FCM invalide ou expiré',
-        })
-      }
-
-      throw createError({
-        status: 500,
-        message: "Échec de l'envoi de la notification Firebase",
-      })
-    }
-
-    return createSuccessResponse(
-      {
-        result: {
-          successCount: result.success,
-          failureCount: result.failure,
-        },
-      },
-      'Notification Firebase envoyée avec succès'
-    )
-  })
-)
+    },
+    'Notification Firebase envoyée avec succès'
+  )
+})

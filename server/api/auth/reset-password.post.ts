@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
+import { authRateLimiter } from '#server/utils/rate-limiter'
 import { passwordSchema } from '#server/utils/validation-schemas'
 
 const resetPasswordSchema = z.object({
@@ -12,6 +13,9 @@ const resetPasswordSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
+    // Rate limiting
+    await authRateLimiter(event)
+
     const body = await readBody(event)
     const { token, newPassword } = resetPasswordSchema.parse(body)
 

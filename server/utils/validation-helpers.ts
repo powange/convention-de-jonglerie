@@ -229,6 +229,15 @@ export function sanitizeString(value: string | null | undefined): string | null 
 }
 
 /**
+ * Échappe les caractères HTML dangereux dans du contenu utilisateur (UGC).
+ * À utiliser pour les contenus stockés en BDD qui pourraient être affichés via v-html
+ * ou consommés par des clients tiers (commentaires, messages, posts).
+ */
+export function sanitizeUserContent(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').trim()
+}
+
+/**
  * Sanitise un email (lowercase + trim)
  */
 export function sanitizeEmail(email: string): string {

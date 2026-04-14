@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { validateEditionId } from '#server/utils/validation-helpers'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { sanitizeUserContent, validateEditionId } from '#server/utils/validation-helpers'
 import { editionPostSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
@@ -9,10 +9,14 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    // Vérifier que l'édition existe
-    await fetchResourceOrFail(prisma.edition, editionId, {
-      errorMessage: 'Édition non trouvée',
-    })
+    // Vérifier que l'utilisateur est organisateur de cette édition
+    const hasPermission = await canAccessEditionData(editionId, user.id, event)
+    if (!hasPermission) {
+      throw createError({
+        status: 403,
+        message: "Vous n'êtes pas autorisé à créer un post sur cette édition",
+      })
+    }
 
     // Valider les données
     const body = await readBody(event)
@@ -21,7 +25,7 @@ export default wrapApiHandler(
     // Créer le post
     const newPost = await prisma.editionPost.create({
       data: {
-        content: validatedData.content,
+        content: sanitizeUserContent(validatedData.content),
         editionId,
         userId: user.id,
       },

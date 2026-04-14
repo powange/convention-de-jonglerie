@@ -9,6 +9,7 @@ import {
   messengerUnreadService,
 } from '#server/utils/messenger-unread-service'
 import { unifiedPushService } from '#server/utils/unified-push-service'
+import { sanitizeUserContent } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   content: z.string().min(1).max(10000),
@@ -117,7 +118,7 @@ export default wrapApiHandler(
       data: {
         conversationId,
         participantId: participant.id,
-        content,
+        content: sanitizeUserContent(content),
         replyToId,
       },
       include: {

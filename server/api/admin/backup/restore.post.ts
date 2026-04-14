@@ -83,7 +83,9 @@ export default wrapApiHandler(
         })
       }
 
-      const backupPath = path.join(process.cwd(), 'backups', filename)
+      // Protection path traversal : ne garder que le nom de fichier
+      const safeFilename = path.basename(filename)
+      const backupPath = path.join(process.cwd(), 'backups', safeFilename)
 
       // Gérer les archives tar.gz ou les fichiers SQL
       if (filename.endsWith('.tar.gz')) {

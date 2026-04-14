@@ -1,21 +1,11 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { requireAuth } from '#server/utils/auth-utils'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateConventionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    // Vérifier l'authentification et droits admin
-    const user = requireAuth(event)
-
-    // Vérifier que l'utilisateur est admin global
-    if (!user.isGlobalAdmin) {
-      throw createError({
-        status: 403,
-        message:
-          'Droits insuffisants - seuls les admins globaux peuvent supprimer définitivement des conventions',
-      })
-    }
+    // Vérifier l'authentification et droits admin avec vérification en BDD
+    const user = await requireGlobalAdminWithDbCheck(event)
 
     const conventionId = validateConventionId(event)
 

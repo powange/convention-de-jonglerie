@@ -30,8 +30,8 @@ export default wrapApiHandler<SessionMeResponse>(
       },
     })
 
-    // Récupérer les informations d'impersonation depuis le cookie séparé
-    const impersonation = getImpersonationCookie(event)
+    // Récupérer les informations d'impersonation depuis la session scellée
+    const impersonation = await getImpersonationCookie(event)
 
     return {
       user: full || session.user,

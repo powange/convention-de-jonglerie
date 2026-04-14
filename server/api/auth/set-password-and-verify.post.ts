@@ -6,6 +6,7 @@ import { setUserSession } from '#imports'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { NotificationHelpers } from '#server/utils/notification-service'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
+import { verificationCodeRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 import { passwordSchema } from '#server/utils/validation-schemas'
 
@@ -20,6 +21,9 @@ const setPasswordSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
+    // Rate limiting : protection brute force sur code à 6 chiffres
+    await verificationCodeRateLimiter(event)
+
     const body = await readBody(event)
 
     // Validation des données

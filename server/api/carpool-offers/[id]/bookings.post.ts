@@ -1,9 +1,17 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithProfileSelect } from '#server/utils/prisma-select-helpers'
-import { validateResourceId } from '#server/utils/validation-helpers'
+import { sanitizeUserContent, validateResourceId } from '#server/utils/validation-helpers'
+
+const bookingSchema = z.object({
+  seats: z.number().int().min(1).max(8),
+  message: z.string().max(500).optional(),
+  requestId: z.number().int().positive().optional(),
+})
 
 export default wrapApiHandler(
   async (event) => {
@@ -11,13 +19,8 @@ export default wrapApiHandler(
     const offerId = validateResourceId(event, 'id', 'offre')
 
     const body = await readBody(event)
-    const seats = Number(body?.seats)
-    const message = typeof body?.message === 'string' ? body.message.trim() : undefined
-    const requestId = body?.requestId ? Number(body.requestId) : undefined
-
-    if (!seats || seats < 1 || seats > 8) {
-      throw createError({ status: 400, message: 'Nombre de places invalide' })
-    }
+    const { seats, message: rawMessage, requestId } = bookingSchema.parse(body)
+    const message = rawMessage ? sanitizeUserContent(rawMessage) : undefined
 
     // Récupérer l'offre et vérifier droits/capacité
     const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {

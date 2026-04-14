@@ -138,6 +138,9 @@ vi.mock('../server/utils/rate-limiter', () => {
     authRateLimiter: vi.fn(),
     registerRateLimiter: vi.fn(),
     emailRateLimiter: vi.fn(),
+    verificationCodeRateLimiter: vi.fn(),
+    checkEmailRateLimiter: vi.fn(),
+    passwordResetRateLimiter: vi.fn(),
   }
 })
 

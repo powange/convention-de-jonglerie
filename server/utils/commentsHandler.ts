@@ -1,6 +1,7 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
 import { carpoolUserSelect } from './prisma-select-helpers'
+import { sanitizeUserContent } from './validation-helpers'
 
 import type { H3Event } from 'h3'
 
@@ -120,7 +121,7 @@ export async function createCommentForEntity(
 
     // Construire les données du commentaire dynamiquement
     const commentData: any = {
-      content: body.content.trim(),
+      content: sanitizeUserContent(body.content),
       userId: event.context.user?.id,
     }
     commentData[config.entityIdField] = parsedId
@@ -177,8 +178,13 @@ export async function deleteCommentForEntity(
       throw createError({ status: 400, message: 'ID du commentaire manquant' })
     }
 
+    // Utiliser le bon modèle Prisma selon le type d'entité
+    const modelName =
+      config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
+    const model: any = (prisma as any)[modelName]
+
     // Vérifier que le commentaire existe et appartient à l'utilisateur
-    const comment = await prisma.carpoolComment.findUnique({
+    const comment = await model.findUnique({
       where: { id: commentId },
       select: { userId: true },
     })
@@ -198,7 +204,7 @@ export async function deleteCommentForEntity(
     }
 
     // Supprimer le commentaire
-    await prisma.carpoolComment.delete({ where: { id: commentId } })
+    await model.delete({ where: { id: commentId } })
 
     return {
       success: true,

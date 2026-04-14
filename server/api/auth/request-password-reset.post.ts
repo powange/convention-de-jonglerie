@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { sendEmail, generatePasswordResetEmailHtml } from '#server/utils/emailService'
+import { passwordResetRateLimiter } from '#server/utils/rate-limiter'
 
 const requestPasswordResetSchema = z.object({
   email: z.string().email(),
@@ -12,6 +13,9 @@ const requestPasswordResetSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
+    // Rate limiting IP-based : protection spam d'emails de reset
+    await passwordResetRateLimiter(event)
+
     const body = await readBody(event)
     const { email } = requestPasswordResetSchema.parse(body)
 

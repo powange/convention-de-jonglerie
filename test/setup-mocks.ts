@@ -146,6 +146,10 @@ vi.mock('../server/utils/rate-limiter', () => ({
   authRateLimiter: vi.fn().mockResolvedValue(undefined),
   registerRateLimiter: vi.fn().mockResolvedValue(undefined),
   resetPasswordRateLimiter: vi.fn().mockResolvedValue(undefined),
+  emailRateLimiter: vi.fn().mockResolvedValue(undefined),
+  verificationCodeRateLimiter: vi.fn().mockResolvedValue(undefined),
+  checkEmailRateLimiter: vi.fn().mockResolvedValue(undefined),
+  passwordResetRateLimiter: vi.fn().mockResolvedValue(undefined),
 }))
 
 export {}

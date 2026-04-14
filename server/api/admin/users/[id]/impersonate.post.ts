@@ -1,4 +1,4 @@
-import { getUserSession, setUserSession } from '#imports'
+import { setUserSession } from '#imports'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { setImpersonationCookie } from '#server/utils/impersonation-helpers'
@@ -7,21 +7,8 @@ import { validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    // Vérifier l'authentification et les droits super admin
-    const session = await getUserSession(event)
-    if (!session?.user) {
-      throw createError({
-        status: 401,
-        message: 'Non authentifié',
-      })
-    }
-
-    if (!session.user.isGlobalAdmin) {
-      throw createError({
-        status: 403,
-        message: 'Accès refusé. Seuls les super administrateurs peuvent utiliser cette fonction.',
-      })
-    }
+    // Vérifier l'authentification et les droits super admin avec vérification en BDD
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
 
     const userId = validateResourceId(event, 'id', 'utilisateur')
 
@@ -38,14 +25,14 @@ export default wrapApiHandler(
       })
     }
 
-    // Stocker les informations d'impersonation dans un cookie séparé
-    setImpersonationCookie(event, {
+    // Stocker les informations d'impersonation dans une session scellée
+    await setImpersonationCookie(event, {
       active: true,
-      originalUserId: session.user.id,
-      originalUserEmail: session.user.email,
-      originalUserPseudo: session.user.pseudo,
-      originalUserNom: session.user.nom,
-      originalUserPrenom: session.user.prenom,
+      originalUserId: adminUser.id,
+      originalUserEmail: adminUser.email,
+      originalUserPseudo: adminUser.pseudo,
+      originalUserNom: adminUser.nom,
+      originalUserPrenom: adminUser.prenom,
       targetUserId: targetUser.id,
       targetUserEmail: targetUser.email,
       startedAt: new Date().toISOString(),
@@ -93,9 +80,9 @@ export default wrapApiHandler(
         impersonation: {
           active: true,
           originalUser: {
-            id: session.user.id,
-            pseudo: session.user.pseudo,
-            email: session.user.email,
+            id: adminUser.id,
+            pseudo: adminUser.pseudo,
+            email: adminUser.email,
           },
         },
       },

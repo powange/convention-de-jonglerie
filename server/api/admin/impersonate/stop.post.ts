@@ -10,7 +10,7 @@ import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 export default wrapApiHandler(
   async (event) => {
     // Vérifier qu'une impersonation est active
-    const impersonation = getImpersonationCookie(event)
+    const impersonation = await getImpersonationCookie(event)
 
     if (!impersonation?.active) {
       throw createError({
@@ -25,8 +25,8 @@ export default wrapApiHandler(
       errorMessage: 'Utilisateur administrateur original non trouvé',
     })
 
-    // Supprimer le cookie d'impersonation
-    clearImpersonationCookie(event)
+    // Supprimer la session d'impersonation
+    await clearImpersonationCookie(event)
 
     // Restaurer la session de l'admin original
     await setUserSession(event, {

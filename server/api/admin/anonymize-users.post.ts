@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
@@ -94,13 +95,9 @@ export default wrapApiHandler(
         }
 
         // Nullifier le champ JSON additionalPerformers via raw SQL
-        // (Prisma.DbNull non importable dans le build Nitro de production)
         if (showApplications.length > 0) {
-          const placeholders = showApplications.map(() => '?').join(',')
-          await tx.$executeRawUnsafe(
-            `UPDATE ShowApplication SET additionalPerformers = NULL WHERE id IN (${placeholders})`,
-            ...showApplications.map((s) => s.id)
-          )
+          const ids = showApplications.map((s) => s.id)
+          await tx.$executeRaw`UPDATE ShowApplication SET additionalPerformers = NULL WHERE id IN (${Prisma.join(ids)})`
         }
 
         return {

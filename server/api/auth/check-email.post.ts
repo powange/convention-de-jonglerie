@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { checkEmailRateLimiter } from '#server/utils/rate-limiter'
 
 const checkEmailSchema = z.object({
   email: z.string().email(),
@@ -9,6 +10,9 @@ const checkEmailSchema = z.object({
 
 export default wrapApiHandler(
   async (event) => {
+    // Rate limiting : protection enumeration d'emails
+    await checkEmailRateLimiter(event)
+
     const body = await readBody(event).catch(() => ({}))
     const parse = checkEmailSchema.safeParse(body)
     if (!parse.success) {

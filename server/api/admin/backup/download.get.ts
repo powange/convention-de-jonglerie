@@ -18,8 +18,9 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que le fichier existe dans le dossier backup
-    const backupPath = path.join(process.cwd(), 'backups', filename)
+    // Protection path traversal : ne garder que le nom de fichier
+    const safeFilename = path.basename(filename)
+    const backupPath = path.join(process.cwd(), 'backups', safeFilename)
 
     try {
       const fileContent = await readFile(backupPath)

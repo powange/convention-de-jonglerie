@@ -99,8 +99,30 @@ export const registerRateLimiter = createRateLimiter({
 })
 
 /**
+ * Rate limiter pré-configuré pour la vérification de codes (6 chiffres)
+ * 5 tentatives par 15 minutes par IP (protection brute force sur codes courts)
+ */
+export const verificationCodeRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 5,
+  message: 'Trop de tentatives de vérification, veuillez réessayer dans 15 minutes',
+})
+
+/**
+ * Rate limiter pré-configuré pour la vérification d'existence d'emails
+ * 10 requêtes par minute par IP (protection enumeration)
+ */
+export const checkEmailRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 10,
+  message: 'Trop de requêtes, veuillez réessayer plus tard',
+})
+
+/**
  * Rate limiter pré-configuré pour l'envoi d'emails
  * 3 emails par 15 minutes par utilisateur
+ * Note : nécessite que `event.context.user` soit défini (utilisateur authentifié)
+ *        ou `event.context.body.email` (rarement rempli avant readBody)
  */
 export const emailRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -112,4 +134,14 @@ export const emailRateLimiter = createRateLimiter({
     const user = event.context.user
     return body?.email || user?.id || 'unknown'
   },
+})
+
+/**
+ * Rate limiter pré-configuré pour les demandes de reset de mot de passe
+ * 3 demandes par 15 minutes par IP (utilisateur non authentifié → clé IP)
+ */
+export const passwordResetRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 3,
+  message: 'Trop de demandes de réinitialisation, veuillez réessayer plus tard',
 })

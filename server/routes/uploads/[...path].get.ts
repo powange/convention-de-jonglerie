@@ -13,10 +13,26 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Protection path traversal
+  if (path.includes('..') || path.includes('//')) {
+    throw createError({
+      status: 403,
+      message: 'Access denied',
+    })
+  }
+
   // Construire le chemin complet du fichier
   // nuxt-file-storage stocke dans le mount configuré
   const uploadDir = process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads'
   const filePath = join(uploadDir, path)
+
+  // Vérifier que le chemin ne sort pas du dossier uploads
+  if (!filePath.startsWith(uploadDir)) {
+    throw createError({
+      status: 403,
+      message: 'Access denied',
+    })
+  }
 
   // Vérifier que le fichier existe
   try {
@@ -63,6 +79,13 @@ export default defineEventHandler(async (event) => {
     // Si le fichier n'existe pas, essayer dans public/uploads (ancien système)
     try {
       const publicPath = join(process.cwd(), 'public/uploads', path)
+      const publicUploadsDir = join(process.cwd(), 'public/uploads')
+
+      // Protection path traversal sur le fallback
+      if (!publicPath.startsWith(publicUploadsDir)) {
+        throw createError({ status: 403, message: 'Access denied' })
+      }
+
       const publicStats = await stat(publicPath)
 
       if (publicStats.isFile()) {

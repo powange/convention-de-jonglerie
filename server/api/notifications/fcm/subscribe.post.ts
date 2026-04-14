@@ -1,5 +1,12 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+
+const fcmSubscribeSchema = z.object({
+  token: z.string().min(1, 'Token FCM requis').max(500),
+  deviceId: z.string().max(200).optional(),
+})
 
 /**
  * POST /api/notifications/fcm/subscribe
@@ -9,14 +16,8 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
 
-    const { token, deviceId } = await readBody(event)
-
-    if (!token || typeof token !== 'string') {
-      throw createError({
-        status: 400,
-        message: 'Token FCM requis',
-      })
-    }
+    const body = await readBody(event)
+    const { token, deviceId } = fcmSubscribeSchema.parse(body)
 
     const userAgent = getHeader(event, 'user-agent') || null
 
