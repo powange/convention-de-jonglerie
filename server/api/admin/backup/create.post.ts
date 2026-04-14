@@ -1,8 +1,11 @@
-import { execSync } from 'child_process'
-import { mkdir, writeFile, stat } from 'fs/promises'
+import { execFile } from 'child_process'
+import { mkdir, writeFile, stat, unlink } from 'fs/promises'
 import path from 'path'
+import { promisify } from 'util'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+
+const execFileAsync = promisify(execFile)
 
 export default wrapApiHandler(
   async (event) => {
@@ -42,27 +45,28 @@ export default wrapApiHandler(
     const dbUser = dbUrl.username
     const dbPassword = dbUrl.password
 
-    // Construire la commande mysqldump (sans options nécessitant PROCESS privilege)
-    const mysqldumpCmd = [
-      'mysqldump',
-      `-h${dbHost}`,
-      `-P${dbPort}`,
-      `-u${dbUser}`,
-      `-p${dbPassword}`,
-      '--single-transaction',
-      '--add-drop-table',
-      '--quick',
-      '--extended-insert',
-      '--no-tablespaces',
-      dbName,
-    ].join(' ')
-
-    // Exécuter mysqldump
+    // Exécuter mysqldump via execFile (arguments en tableau, pas d'injection shell)
+    // MYSQL_PWD évite d'exposer le mot de passe dans la liste des processus
     console.log('Création du dump SQL en cours...')
-    const dumpOutput = execSync(mysqldumpCmd, {
-      encoding: 'utf8',
-      maxBuffer: 1024 * 1024 * 50, // 50MB buffer
-    })
+    const { stdout: dumpOutput } = await execFileAsync(
+      'mysqldump',
+      [
+        `-h${dbHost}`,
+        `-P${dbPort}`,
+        `-u${dbUser}`,
+        '--single-transaction',
+        '--add-drop-table',
+        '--quick',
+        '--extended-insert',
+        '--no-tablespaces',
+        dbName,
+      ],
+      {
+        encoding: 'utf8',
+        maxBuffer: 1024 * 1024 * 50, // 50MB buffer
+        env: { ...process.env, MYSQL_PWD: dbPassword },
+      }
+    )
 
     // Écrire le fichier SQL
     await writeFile(sqlPath, dumpOutput)
@@ -84,27 +88,25 @@ export default wrapApiHandler(
     }
 
     // Créer l'archive tar.gz avec le SQL et les uploads (si présents)
+    // execFile avec arguments en tableau → pas de shell injection possible
     console.log("Création de l'archive tar.gz...")
 
-    let tarCmd: string
+    const tarArgs: string[] = ['-czf', archivePath, '-C', backupsDir, sqlFilename]
     if (hasUploads) {
-      // Si le chemin est absolu (/uploads), on archive directement depuis la racine
-      // Sinon, on archive depuis le dossier du projet
       if (path.isAbsolute(uploadsMountPath)) {
-        tarCmd = `tar -czf "${archivePath}" -C "${backupsDir}" "${sqlFilename}" -C / "${uploadsMountPath.replace(/^\//, '')}"`
+        // Archive depuis la racine pour les chemins absolus (/uploads)
+        tarArgs.push('-C', '/', uploadsMountPath.replace(/^\//, ''))
       } else {
-        tarCmd = `tar -czf "${archivePath}" -C "${backupsDir}" "${sqlFilename}" -C "${process.cwd()}" "${uploadsMountPath}"`
+        tarArgs.push('-C', process.cwd(), uploadsMountPath)
       }
-    } else {
-      tarCmd = `tar -czf "${archivePath}" -C "${backupsDir}" "${sqlFilename}"`
     }
 
-    execSync(tarCmd, {
+    await execFileAsync('tar', tarArgs, {
       maxBuffer: 1024 * 1024 * 100, // 100MB buffer
     })
 
-    // Supprimer le fichier SQL temporaire
-    execSync(`rm "${sqlPath}"`)
+    // Supprimer le fichier SQL temporaire (remplace execSync rm)
+    await unlink(sqlPath)
 
     // Obtenir la taille de l'archive
     const archiveStats = await stat(archivePath)

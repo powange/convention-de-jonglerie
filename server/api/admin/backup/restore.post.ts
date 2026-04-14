@@ -1,9 +1,32 @@
-import { execSync } from 'child_process'
-import { readFile, writeFile, mkdir, rm } from 'fs/promises'
+import { execFile, spawn } from 'child_process'
+import { createReadStream } from 'fs'
+import { readFile, writeFile, mkdir, rm, readdir, unlink, cp } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
+import { promisify } from 'util'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+
+const execFileAsync = promisify(execFile)
+
+/**
+ * Trouve récursivement le premier fichier .sql dans un dossier.
+ * Remplace l'usage non-sécurisé de `find` via execSync.
+ */
+async function findFirstSqlFile(dir: string): Promise<string | null> {
+  const entries = await readdir(dir, { withFileTypes: true })
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name)
+    if (entry.isFile() && entry.name.endsWith('.sql')) {
+      return fullPath
+    }
+    if (entry.isDirectory()) {
+      const found = await findFirstSqlFile(fullPath)
+      if (found) return found
+    }
+  }
+  return null
+}
 
 export default wrapApiHandler(
   async (event) => {
@@ -39,21 +62,19 @@ export default wrapApiHandler(
 
       // Gérer les archives tar.gz ou les fichiers SQL
       if (filename.endsWith('.tar.gz')) {
-        // Extraire l'archive
+        // Extraire l'archive via execFile (pas d'injection shell)
         tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
         await mkdir(tempExtractDir, { recursive: true })
 
         const tempArchivePath = path.join(tempExtractDir, 'backup.tar.gz')
         await writeFile(tempArchivePath, fileData.data)
 
-        // Extraire l'archive
-        execSync(`tar -xzf "${tempArchivePath}" -C "${tempExtractDir}"`, {
+        await execFileAsync('tar', ['-xzf', tempArchivePath, '-C', tempExtractDir], {
           maxBuffer: 1024 * 1024 * 100,
         })
 
-        // Trouver le fichier SQL dans l'archive
-        const files = execSync(`find "${tempExtractDir}" -name "*.sql"`, { encoding: 'utf8' })
-        const sqlFile = files.trim().split('\n')[0]
+        // Trouver le fichier SQL dans l'archive (recherche native, pas d'exec de find)
+        const sqlFile = await findFirstSqlFile(tempExtractDir)
 
         if (!sqlFile) {
           throw createError({
@@ -89,17 +110,16 @@ export default wrapApiHandler(
 
       // Gérer les archives tar.gz ou les fichiers SQL
       if (filename.endsWith('.tar.gz')) {
-        // Extraire l'archive
+        // Extraire l'archive via execFile (pas d'injection shell)
         tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
         await mkdir(tempExtractDir, { recursive: true })
 
-        execSync(`tar -xzf "${backupPath}" -C "${tempExtractDir}"`, {
+        await execFileAsync('tar', ['-xzf', backupPath, '-C', tempExtractDir], {
           maxBuffer: 1024 * 1024 * 100,
         })
 
-        // Trouver le fichier SQL dans l'archive
-        const files = execSync(`find "${tempExtractDir}" -name "*.sql"`, { encoding: 'utf8' })
-        const sqlFile = files.trim().split('\n')[0]
+        // Trouver le fichier SQL dans l'archive (recherche native)
+        const sqlFile = await findFirstSqlFile(tempExtractDir)
 
         if (!sqlFile) {
           throw createError({
@@ -141,22 +161,31 @@ export default wrapApiHandler(
     await writeFile(tempFilePath, sqlContent)
 
     try {
-      // Construire la commande mysql pour restaurer
-      const mysqlCmd = [
-        'mysql',
-        `-h${dbHost}`,
-        `-P${dbPort}`,
-        `-u${dbUser}`,
-        `-p${dbPassword}`,
-        dbName,
-        `< ${tempFilePath}`,
-      ].join(' ')
-
-      // Exécuter la restauration
+      // Exécuter la restauration via spawn avec pipe stdin
+      // - arguments en tableau (pas d'injection shell)
+      // - MYSQL_PWD évite d'exposer le mot de passe dans la liste des processus
       console.log('Restauration de la base de données en cours...')
-      execSync(mysqlCmd, {
-        encoding: 'utf8',
-        maxBuffer: 1024 * 1024 * 100, // 100MB buffer
+      await new Promise<void>((resolve, reject) => {
+        const mysqlProcess = spawn('mysql', [`-h${dbHost}`, `-P${dbPort}`, `-u${dbUser}`, dbName], {
+          env: { ...process.env, MYSQL_PWD: dbPassword },
+        })
+
+        const sqlStream = createReadStream(tempFilePath)
+        sqlStream.pipe(mysqlProcess.stdin)
+
+        let stderr = ''
+        mysqlProcess.stderr.on('data', (chunk) => {
+          stderr += chunk.toString()
+        })
+
+        mysqlProcess.on('error', reject)
+        mysqlProcess.on('close', (code) => {
+          if (code === 0) {
+            resolve()
+          } else {
+            reject(new Error(`mysql restore failed (exit ${code}): ${stderr}`))
+          }
+        })
       })
 
       console.log('Base de données restaurée avec succès')
@@ -183,11 +212,8 @@ export default wrapApiHandler(
           // Créer le dossier de destination
           await mkdir(uploadsDestPath, { recursive: true })
 
-          // Copier le CONTENU du dossier uploads de l'archive vers la destination
-          // On utilise /* pour copier le contenu et pas le dossier lui-même
-          execSync(`cp -r "${extractedUploadsPath}"/* "${uploadsDestPath}"/`, {
-            maxBuffer: 1024 * 1024 * 100,
-          })
+          // Copier le contenu via fs.cp natif (pas d'exec de cp -r)
+          await cp(extractedUploadsPath, uploadsDestPath, { recursive: true })
 
           console.log('Fichiers uploads restaurés avec succès')
         } catch (error) {
@@ -197,7 +223,7 @@ export default wrapApiHandler(
     } finally {
       // Nettoyer les fichiers temporaires
       try {
-        await import('fs').then((fs) => fs.promises.unlink(tempFilePath))
+        await unlink(tempFilePath)
       } catch (cleanupError) {
         console.warn('Impossible de supprimer le fichier SQL temporaire:', cleanupError)
       }

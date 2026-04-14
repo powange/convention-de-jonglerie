@@ -1,4 +1,6 @@
 // Service d'envoi d'emails avec support simulation/réel
+import { randomInt } from 'node:crypto'
+
 import { render } from '@vue-email/render'
 import nodemailer from 'nodemailer'
 
@@ -114,8 +116,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 }
 
 export function generateVerificationCode(): string {
-  // Générer un code à 6 chiffres
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
+  // Générer un code à 6 chiffres avec un CSPRNG (cryptographiquement sûr)
+  const code = randomInt(100000, 1000000).toString()
   if (import.meta.dev || process.env.E2E_TEST === 'true') {
     console.log(`[DEV_VERIFICATION_CODE] ${code}`)
   }

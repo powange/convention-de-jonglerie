@@ -1,7 +1,10 @@
+import { randomBytes } from 'node:crypto'
+
 import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
 import { getEmailHash } from '../../utils/email-hash'
+import { sanitizeReturnTo } from '../../utils/safe-redirect'
 
 function slugifyPseudo(base: string) {
   const clean =
@@ -39,7 +42,8 @@ export default defineEventHandler(async (event) => {
 
   // Étape 1: Rediriger vers Facebook si absence de code
   if (!query.code) {
-    const state = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+    // Token OAuth state cryptographiquement sûr (protection CSRF OAuth)
+    const state = randomBytes(32).toString('hex')
     // Conserver un état court (10 min)
     setCookie(event, 'oauth_state_fb', state, {
       httpOnly: true,
@@ -211,8 +215,7 @@ export default defineEventHandler(async (event) => {
     setCookie(event, 'oauth_returnTo_fb', '', { maxAge: 0 }) // Supprimer le cookie
   }
 
-  // Valider et utiliser returnTo ou rediriger vers la page d'accueil
-  const finalRedirect =
-    returnTo && !returnTo.includes('/login') && !returnTo.includes('/auth/') ? returnTo : '/'
+  // Valider returnTo : chemin relatif interne uniquement (protection Open Redirect)
+  const finalRedirect = sanitizeReturnTo(returnTo)
   return sendRedirect(event, finalRedirect)
 })

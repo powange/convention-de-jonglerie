@@ -1,3 +1,5 @@
+import { randomInt } from 'node:crypto'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
@@ -44,8 +46,8 @@ export default wrapApiHandler(
     // On permet de renvoyer un nouveau code même si une demande existe déjà
     // Le upsert ci-dessous gère automatiquement ce cas
 
-    // Générer un code de vérification à 6 chiffres
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    // Générer un code de vérification à 6 chiffres avec un CSPRNG
+    const code = randomInt(100000, 1000000).toString()
 
     // Créer ou mettre à jour la demande de revendication
     await prisma.conventionClaimRequest.upsert({

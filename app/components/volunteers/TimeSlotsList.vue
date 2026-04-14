@@ -220,19 +220,38 @@ const exportToIcal = () => {
   window.URL.revokeObjectURL(url)
 }
 
+// Échappement HTML pour prévenir les injections XSS stockées via export PDF
+// (les champs comme title, description, editionName peuvent contenir du HTML malveillant
+// saisi par un organisateur)
+const escapeHtml = (str: string | null | undefined): string => {
+  if (!str) return ''
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+// Valide qu'une couleur est un format hex sûr pour éviter les injections CSS
+const sanitizeColor = (color: string | null | undefined): string => {
+  if (!color) return '#3b82f6'
+  return /^#[0-9a-fA-F]{3,8}$/.test(color) ? color : '#3b82f6'
+}
+
 // Fonction pour exporter en PDF
 const exportToPdf = () => {
   // Créer un contenu HTML pour l'impression
   const printWindow = window.open('', '_blank')
   if (!printWindow) return
 
-  // Générer le HTML
+  // Générer le HTML (toutes les interpolations UGC sont échappées)
   let html = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Planning - ${props.editionName || 'Convention de Jonglerie'}</title>
+      <title>Planning - ${escapeHtml(props.editionName) || 'Convention de Jonglerie'}</title>
       <style>
         body {
           font-family: system-ui, -apple-system, sans-serif;
@@ -316,7 +335,7 @@ const exportToPdf = () => {
       </style>
     </head>
     <body>
-      <h1>Planning Bénévole${props.volunteerName ? ` - ${props.volunteerName}` : ''}${props.editionName ? ` - ${props.editionName}` : ''}</h1>
+      <h1>Planning Bénévole${props.volunteerName ? ` - ${escapeHtml(props.volunteerName)}` : ''}${props.editionName ? ` - ${escapeHtml(props.editionName)}` : ''}</h1>
 
       <div class="stats">
         <div class="stat">
@@ -358,21 +377,22 @@ const exportToPdf = () => {
       })
     }
 
-    const teamColor = slot.team?.color || '#3b82f6'
+    const teamColor = sanitizeColor(slot.team?.color)
+    const delayMinutes = Number(slot.delayMinutes) || 0
 
     html += `
       <div class="time-slot">
         <div class="time-slot-header">
           <div class="time-slot-title">
-            ${slot.title}
-            ${slot.delayMinutes ? `<span class="delay-badge">Retard: ${slot.delayMinutes}min</span>` : ''}
+            ${escapeHtml(slot.title)}
+            ${delayMinutes ? `<span class="delay-badge">Retard: ${delayMinutes}min</span>` : ''}
           </div>
         </div>
         <div class="time-slot-time">
           ${formatTime(start)} → ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
         </div>
-        ${slot.team ? `<div class="time-slot-team" style="background-color: ${teamColor}22; color: ${teamColor};">${slot.team.name}</div>` : ''}
-        ${slot.description ? `<div class="time-slot-description">${slot.description}</div>` : ''}
+        ${slot.team ? `<div class="time-slot-team" style="background-color: ${teamColor}22; color: ${teamColor};">${escapeHtml(slot.team.name)}</div>` : ''}
+        ${slot.description ? `<div class="time-slot-description">${escapeHtml(slot.description)}</div>` : ''}
       </div>
     `
   })
