@@ -231,8 +231,8 @@ export async function updateShowCallApplicationStatus(
  * Active le profil artiste pour l'utilisateur courant
  */
 export async function enableArtistProfile(page: APIRequestContext) {
-  const response = await page.request.put(`${BASE_URL}/api/profile`, {
-    data: { isArtist: true },
+  const response = await page.request.put(`${BASE_URL}/api/profile/categories`, {
+    data: { isVolunteer: false, isArtist: true, isOrganizer: false },
   })
   expect(response.ok()).toBe(true)
   return response

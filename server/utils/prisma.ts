@@ -1,7 +1,9 @@
 import 'dotenv/config'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient, Prisma } from '../generated/prisma/client'
+
+export { Prisma }
 
 /**
  * Singleton Prisma Client pour éviter les multiples connexions à la base de données

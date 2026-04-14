@@ -37,16 +37,20 @@ test.describe("Filtres de la page d'accueil", () => {
   test('les filtres temporels sont disponibles', async ({ page, goto }) => {
     await goto('/', { waitUntil: 'hydration' })
 
-    // Les checkboxes ou toggles pour les filtres temporels doivent exister
-    const pastFilter = page.getByText(/passée|terminée/i).first()
-    const currentFilter = page.getByText(/en cours/i).first()
-    const futureFilter = page.getByText(/à venir|futur/i).first()
+    // Attendre que le panneau de filtres soit chargé (indication d'hydratation complète)
+    await expect(page.getByText(/filtres/i).first()).toBeVisible({ timeout: 15000 })
 
     // Au moins un filtre temporel doit être visible
-    const hasPast = await pastFilter.isVisible().catch(() => false)
-    const hasCurrent = await currentFilter.isVisible().catch(() => false)
-    const hasFuture = await futureFilter.isVisible().catch(() => false)
+    await expect(async () => {
+      const pastFilter = page.getByText(/passée|terminée/i).first()
+      const currentFilter = page.getByText(/en cours/i).first()
+      const futureFilter = page.getByText(/à venir|futur/i).first()
 
-    expect(hasPast || hasCurrent || hasFuture).toBe(true)
+      const hasPast = await pastFilter.isVisible().catch(() => false)
+      const hasCurrent = await currentFilter.isVisible().catch(() => false)
+      const hasFuture = await futureFilter.isVisible().catch(() => false)
+
+      expect(hasPast || hasCurrent || hasFuture).toBe(true)
+    }).toPass({ timeout: 10000 })
   })
 })

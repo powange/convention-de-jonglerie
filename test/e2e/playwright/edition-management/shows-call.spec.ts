@@ -140,16 +140,14 @@ test.describe
       timeout: 10000,
     })
 
-    // Section : Informations personnelles
-    const lastNameField = page.getByLabel(/nom de famille/i)
+    // Section : Informations personnelles (candidat principal)
+    // On cible par attribut name pour éviter les conflits avec additionalPerformers.*
+    const lastNameField = page.locator('input[name="lastName"]')
     await expect(lastNameField).toBeVisible({ timeout: 5000 })
     await lastNameField.fill('E2E-Nom-Artiste')
 
-    await page.getByLabel(/^prénom$/i).fill('E2E-Prénom-Artiste')
-    await page
-      .getByLabel(/^téléphone$/i)
-      .first()
-      .fill('+33698765432')
+    await page.locator('input[name="firstName"]').fill('E2E-Prénom-Artiste')
+    await page.locator('input[name="phone"]').fill('+33698765432')
 
     // Section : Informations artiste
     await page.getByLabel(/nom de scène/i).fill('E2E Artiste Jongleur')
@@ -170,13 +168,15 @@ test.describe
     await page.getByLabel(/besoins techniques/i).fill('Scène 4x4m, sono, éclairage')
 
     // Section : Nombre d'artistes — sélectionner 1
-    await page.getByRole('button', { name: '1', exact: true }).click()
+    // Scoper au main pour éviter le bouton "1" du compteur de notifications dans le header
+    await page.getByRole('main').getByRole('button', { name: '1', exact: true }).click()
 
-    // Cocher "Je participe au spectacle" (case à cocher sur le premier artiste)
-    const iAmPerformerCheckbox = page.getByLabel(/je participe/i)
-    if (await iAmPerformerCheckbox.isVisible()) {
-      await iAmPerformerCheckbox.check()
-    }
+    // Remplir manuellement les champs du premier artiste additionnel
+    // (ne pas utiliser "Je participe" car l'utilisateur E2E n'a pas nom/prenom dans le profil)
+    await page.locator('input[name="additionalPerformers.0.lastName"]').fill('E2E-Artist-Last')
+    await page.locator('input[name="additionalPerformers.0.firstName"]').fill('E2E-Artist-First')
+    await page.locator('input[name="additionalPerformers.0.email"]').fill('e2e-artist@example.com')
+    await page.locator('input[name="additionalPerformers.0.phone"]').fill('+33687654321')
 
     // Soumettre le formulaire
     const submitButton = page.getByRole('button', { name: /envoyer ma candidature/i })
@@ -193,14 +193,18 @@ test.describe
         (res) =>
           res.url().includes('/shows-call/') &&
           res.url().includes('/applications') &&
-          res.request().method() === 'POST' &&
-          res.status() === 200
+          res.request().method() === 'POST'
       ),
       presetModal.getByRole('button', { name: /envoyer sans enregistrer/i }).click(),
     ])
 
-    // Vérifier la réponse de l'API
-    expect(applicationResponse.ok()).toBe(true)
+    // Afficher le body en cas d'erreur pour faciliter le debug
+    if (!applicationResponse.ok()) {
+      const errorBody = await applicationResponse.text()
+      throw new Error(
+        `API returned ${applicationResponse.status()} ${applicationResponse.statusText()}: ${errorBody}`
+      )
+    }
     const responseBody = await applicationResponse.json()
     const application = responseBody.data?.application || responseBody.data || responseBody
     expect(application.status).toBe('PENDING')

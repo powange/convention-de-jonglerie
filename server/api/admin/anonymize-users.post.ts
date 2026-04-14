@@ -1,8 +1,8 @@
-import { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { getEmailHash } from '#server/utils/email-hash'
+import { Prisma } from '#server/utils/prisma'
 
 export default wrapApiHandler(
   async (event) => {
