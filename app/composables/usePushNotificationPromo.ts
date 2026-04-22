@@ -59,13 +59,17 @@ export const usePushNotificationPromo = () => {
     }
   }
 
-  // Vérifier si l'utilisateur a un token FCM actif
+  // Vérifier si l'utilisateur a un token FCM actif sur CET appareil
   const checkSubscription = async () => {
     if (!import.meta.client || !authStore.isAuthenticated) return
 
     try {
+      const { getDeviceId } = useDeviceId()
+      const deviceId = getDeviceId()
+
       const response = await $fetch<{ data: { hasActiveToken: boolean } }>(
-        '/api/notifications/fcm/check'
+        '/api/notifications/fcm/check',
+        { query: deviceId ? { deviceId } : undefined }
       )
       state.isSubscribed = response.data.hasActiveToken
     } catch (error) {
