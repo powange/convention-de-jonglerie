@@ -109,8 +109,9 @@
 ### 4.3 Rate limiter en memoire
 
 - **Fichier :** `server/utils/rate-limiter.ts`
-- **Description :** `Map` en memoire avec nettoyage toutes les 10 minutes. En multi-instances, chaque instance a son propre compteur.
-- **Correction :** Migrer vers Redis en production.
+- **Statut : ACCEPTE** (mono-instance en production)
+- **Description :** `Map` en memoire avec nettoyage toutes les 10 minutes. En multi-instances, chaque instance aurait son propre compteur, ce qui diluerait l'efficacite du rate limiting.
+- **Decision :** L'application est deployee sur **une seule instance** en production. Le rate limiter en memoire est donc suffisant. A migrer vers Redis (via `@unjs/storage` driver redis ou `ioredis`) le jour ou l'application passera en multi-instances.
 
 ### 4.4 Fixation de session
 
