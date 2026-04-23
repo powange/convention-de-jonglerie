@@ -24,7 +24,8 @@ export default wrapApiHandler(
       })
     }
 
-    console.log(`🚀 Exécution manuelle de la tâche: ${taskName} par ${user.pseudo} (${user.email})`)
+    // Audit log : exécution de tâche admin (sans email pour éviter de logger des données sensibles)
+    console.log(`🚀 Exécution manuelle de la tâche: ${taskName} par user #${user.id}`)
 
     const startTime = Date.now()
     const result = await runTask(taskName)

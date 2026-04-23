@@ -250,7 +250,7 @@ describe('API Register', () => {
     await registerHandler(mockEvent)
 
     // Vérifier que bcrypt.hash a été appelé avec le mot de passe
-    expect(bcrypt.hash).toHaveBeenCalledWith('Password123!', 10)
+    expect(bcrypt.hash).toHaveBeenCalledWith('Password123!', 12)
 
     // Vérifier que le mot de passe haché a été utilisé
     expect(prismaMock.user.create).toHaveBeenCalledWith({

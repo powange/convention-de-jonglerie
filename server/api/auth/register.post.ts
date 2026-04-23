@@ -32,7 +32,7 @@ export default wrapApiHandler(
     // Extraire les catégories utilisateur
     const { isVolunteer, isArtist, isOrganizer } = validatedData
 
-    const hashedPassword = await bcrypt.hash(validatedData.password, 10)
+    const hashedPassword = await bcrypt.hash(validatedData.password, 12)
 
     // Générer le code de vérification
     const verificationCode = generateVerificationCode()

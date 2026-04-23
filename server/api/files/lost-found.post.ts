@@ -3,6 +3,7 @@ import type { ServerFile } from 'nuxt-file-storage'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import { validateUploadedFile } from '#server/utils/upload-validation'
 
 interface RequestBody {
   files: ServerFile[]
@@ -27,6 +28,7 @@ export default wrapApiHandler(
     }
 
     const file = files[0] // Prendre le premier fichier
+    validateUploadedFile(file)
     const { entityId, editionId } = metadata
     const targetEditionId = entityId || editionId
 

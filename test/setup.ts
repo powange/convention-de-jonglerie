@@ -127,6 +127,8 @@ vi.mock('#imports', async () => {
     // Stubs par défaut pour l'auth par session (nuxt-auth-utils)
     requireUserSession: vi.fn(async () => ({ user: { id: 1 } })),
     getUserSession: vi.fn(async () => ({ user: { id: 1 } })),
+    clearUserSession: vi.fn(async () => undefined),
+    setUserSession: vi.fn(async () => undefined),
   }
 })
 

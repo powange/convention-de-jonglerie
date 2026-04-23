@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import { validateUploadedFile } from '#server/utils/upload-validation'
 
 export default wrapApiHandler(
   async (event) => {
@@ -65,6 +66,7 @@ export default wrapApiHandler(
 
     for (const file of body.files) {
       try {
+        validateUploadedFile(file)
         const storedFilename = await storeFileLocally(file, 8, `temp/shows/${editionId}`)
 
         const temporaryUrl = `/uploads/temp/shows/${editionId}/${storedFilename}`

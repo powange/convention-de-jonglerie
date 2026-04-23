@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import { validateUploadedFile } from '#server/utils/upload-validation'
 
 export default wrapApiHandler(
   async (event) => {
@@ -70,26 +71,21 @@ export default wrapApiHandler(
     }
     // Pour les nouvelles éditions (isNewEdition = true), on laisse passer
 
-    console.log('=== UPLOAD EDITION FILES ===')
-    console.log('Edition ID:', editionId)
-    console.log('Files count:', body.files.length)
-
     // Stocker les fichiers dans le dossier temporaire pour les éditions
     const results = []
     const storageId = isNewEdition ? 'NEW_EDITION' : editionId
 
     for (const file of body.files) {
-      console.log(`Stockage fichier: ${file.name}`)
-
       try {
+        // Validation MIME type, extension et taille
+        validateUploadedFile(file)
+
         // Utiliser nuxt-file-storage pour stocker le fichier dans temp/editions/[id]
         const storedFilename = await storeFileLocally(
           file,
           8, // Longueur du suffixe aléatoire
           `temp/editions/${storageId}` // Dossier temporaire pour cette édition
         )
-
-        console.log(`Fichier stocké: ${storedFilename}`)
 
         // Construire l'URL temporaire
         const temporaryUrl = `/uploads/temp/editions/${storageId}/${storedFilename}`
@@ -115,9 +111,6 @@ export default wrapApiHandler(
     if (successfulUploads.length > 0) {
       // Pour l'instant, retourner l'URL du premier fichier (éditions ont une seule image)
       const firstUpload = successfulUploads[0]
-
-      console.log('=== UPLOAD EDITION SUCCESS ===')
-      console.log('Temporary URL:', firstUpload.temporaryUrl)
 
       return createSuccessResponse({
         imageUrl: firstUpload.temporaryUrl,

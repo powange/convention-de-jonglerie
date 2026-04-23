@@ -34,18 +34,9 @@ export default wrapApiHandler(
 
     const haConfig = config.helloAssoConfig
 
-    console.log("📦 [Endpoint] Récupération des commandes HelloAsso pour l'édition:", editionId)
-    console.log('📦 [Endpoint] Configuration HelloAsso ID:', haConfig.id)
-
     try {
       // Déchiffrer le client secret
       const clientSecret = decrypt(haConfig.clientSecret)
-
-      console.log('📦 [Endpoint] Client ID:', haConfig.clientId)
-      console.log('📦 [Endpoint] Client Secret déchiffré:', clientSecret ? '✓ OK' : '✗ ERREUR')
-      console.log('📦 [Endpoint] Organization Slug:', haConfig.organizationSlug)
-      console.log('📦 [Endpoint] Form Type:', haConfig.formType)
-      console.log('📦 [Endpoint] Form Slug:', haConfig.formSlug)
 
       // Récupérer les commandes via l'utilitaire (toutes les pages)
       const result = await fetchOrdersFromHelloAsso(

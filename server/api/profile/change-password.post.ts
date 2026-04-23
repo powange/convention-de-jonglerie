@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs'
 
+import { clearUserSession } from '#imports'
+
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
@@ -68,6 +70,11 @@ export default wrapApiHandler(
         password: hashedNewPassword,
       },
     })
+
+    // Invalider la session courante : force la re-authentification après un changement
+    // de mot de passe. Note : pour invalider également les sessions sur d'autres appareils,
+    // implémenter un mécanisme de versionning (User.sessionVersion en BDD + middleware).
+    await clearUserSession(event)
 
     return createSuccessResponse(null, 'Mot de passe mis à jour avec succès')
   },

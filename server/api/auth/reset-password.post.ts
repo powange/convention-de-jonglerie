@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
+import { clearUserSession } from '#imports'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
@@ -50,8 +52,8 @@ export default wrapApiHandler(
       })
     }
 
-    // Hasher le nouveau mot de passe
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    // Hasher le nouveau mot de passe (salt rounds 12, harmonisé avec change-password)
+    const hashedPassword = await bcrypt.hash(newPassword, 12)
 
     // Mettre à jour le mot de passe de l'utilisateur
     await prisma.user.update({
@@ -59,11 +61,16 @@ export default wrapApiHandler(
       data: { password: hashedPassword },
     })
 
-    // Marquer le token comme utilisé
-    await prisma.passwordResetToken.update({
-      where: { id: resetToken.id },
-      data: { used: true },
+    // Invalider TOUS les tokens de reset de cet utilisateur (sécurité + nettoyage BDD)
+    // Empêche la réutilisation d'un autre token actif et nettoie les tokens obsolètes.
+    await prisma.passwordResetToken.deleteMany({
+      where: { userId: resetToken.userId },
     })
+
+    // Invalider la session courante : si l'utilisateur était connecté, force la re-authentification.
+    // Note : pour invalider également les sessions sur d'autres appareils, implémenter
+    // un mécanisme de versionning (User.sessionVersion en BDD + middleware).
+    await clearUserSession(event)
 
     return createSuccessResponse(null, 'Votre mot de passe a été réinitialisé avec succès')
   },

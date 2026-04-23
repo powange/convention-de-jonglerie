@@ -51,6 +51,8 @@ const mockFile = {
   name: 'objet-trouve.jpg',
   filename: 'objet-trouve.jpg',
   type: 'image/jpeg',
+  size: '15',
+  content: 'data:image/jpeg;base64,ZmFrZSBpbWFnZSBkYXRh', // base64 de 'fake image data'
   data: Buffer.from('fake image data'),
 }
 

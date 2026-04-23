@@ -2,6 +2,7 @@ import type { ServerFile } from 'nuxt-file-storage'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { validateUploadedFile } from '#server/utils/upload-validation'
 
 interface RequestBody {
   files: ServerFile[]
@@ -26,6 +27,7 @@ export default wrapApiHandler(
     }
 
     const file = files[0] // Prendre le premier fichier
+    validateUploadedFile(file)
     const { entityId } = metadata
 
     // Stocker le fichier dans un dossier générique ou temporaire

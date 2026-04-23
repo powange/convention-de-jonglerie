@@ -1,6 +1,10 @@
 import bcrypt from 'bcryptjs'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+vi.mock('nuxt-auth-utils', () => ({
+  clearUserSession: vi.fn(),
+}))
+
 import resetPasswordHandler from '../../../../../server/api/auth/reset-password.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
@@ -50,9 +54,9 @@ describe('API Reset Password', () => {
       data: { password: 'hashed_NewPassword123!' },
     })
 
-    expect(prismaMock.passwordResetToken.update).toHaveBeenCalledWith({
-      where: { id: mockToken.id },
-      data: { used: true },
+    // Désormais on supprime tous les tokens de l'utilisateur (au lieu de marquer used: true)
+    expect(prismaMock.passwordResetToken.deleteMany).toHaveBeenCalledWith({
+      where: { userId: mockToken.userId },
     })
   })
 
@@ -138,7 +142,7 @@ describe('API Reset Password', () => {
 
     await resetPasswordHandler(mockEvent)
 
-    expect(hashSpy).toHaveBeenCalledWith('NewPassword123!', 10)
+    expect(hashSpy).toHaveBeenCalledWith('NewPassword123!', 12)
   })
 
   it('devrait gérer les dates UTC correctement', async () => {

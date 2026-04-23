@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canEditConvention } from '#server/utils/permissions/convention-permissions'
+import { validateUploadedFile } from '#server/utils/upload-validation'
 
 interface RequestBody {
   files: any[]
@@ -17,9 +18,6 @@ export default wrapApiHandler(
 
     const { files, metadata } = await readBody<RequestBody>(event)
 
-    console.log('Received files:', files)
-    console.log('Metadata:', metadata)
-
     if (!files || files.length === 0) {
       throw createError({
         status: 400,
@@ -28,7 +26,7 @@ export default wrapApiHandler(
     }
 
     const file = files[0] // Prendre le premier fichier
-    console.log('Processing file:', file.name, 'type:', file.type)
+    validateUploadedFile(file)
     const { entityId, conventionId } = metadata
 
     // Si c'est pour une convention existante, vérifier les permissions
@@ -64,11 +62,6 @@ export default wrapApiHandler(
 
       // Retourner l'URL temporaire - la DB ne sera mise à jour qu'au PUT
       const imageUrl = `/uploads/temp/conventions/${targetId}/${filename}`
-
-      console.log('=== UPLOAD CONVENTION ===')
-      console.log('Fichier stocké:', filename)
-      console.log('URL retournée:', imageUrl)
-      console.log('Convention ID:', targetId)
 
       return createSuccessResponse({
         imageUrl,

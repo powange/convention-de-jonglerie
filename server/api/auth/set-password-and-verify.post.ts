@@ -71,7 +71,7 @@ export default wrapApiHandler(
     }
 
     // Hacher le mot de passe
-    const hashedPassword = await bcrypt.hash(validatedData.password, 10)
+    const hashedPassword = await bcrypt.hash(validatedData.password, 12)
 
     // Activer le compte et définir le mot de passe
     const updatedUser = await prisma.user.update({
