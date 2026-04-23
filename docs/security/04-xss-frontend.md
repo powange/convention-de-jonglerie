@@ -2,6 +2,7 @@
 
 **Date :** 13 avril 2026
 **Perimetre :** Vulnerabilites cote client (XSS, injection, stockage, CSP, open redirect)
+**Derniere mise a jour :** 23 avril 2026
 
 ---
 
@@ -9,28 +10,15 @@
 
 ### 1.1 XSS via `document.write` dans l'export PDF
 
-- **Fichier :** `app/components/volunteers/TimeSlotsList.vue` (lignes 226-397)
+- **Fichier :** `app/components/volunteers/TimeSlotsList.vue`
 - **Severite : HAUTE**
-- **Description :** La fonction `exportToPdf()` construit du HTML par concatenation de template literals et l'injecte via `printWindow.document.write(html)`. Les donnees suivantes sont injectees sans echappement :
-  ```typescript
-  ${slot.title}
-  ${slot.team?.name}
-  ${slot.description}
-  ${props.editionName}
-  ${props.volunteerName}
-  ```
-- **Vecteur d'attaque :** XSS stocke. Un organisateur malveillant cree un creneau avec un titre contenant du JavaScript (`<img src=x onerror="alert(document.cookie)">`), et tout benevole qui exporte en PDF declenche le payload.
-- **Correction :** Creer et appliquer une fonction `escapeHtml()` a toutes les interpolations :
-  ```typescript
-  function escapeHtml(str: string): string {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-  }
-  ```
+- **Statut : CORRIGE**
+- **Description :** La fonction `exportToPdf()` construisait du HTML par concatenation de template literals et l'injectait via `printWindow.document.write(html)`. Les donnees `slot.title`, `slot.team?.name`, `slot.description`, `props.editionName`, `props.volunteerName` etaient injectees sans echappement.
+- **Vecteur d'attaque :** XSS stocke. Un organisateur malveillant creait un creneau avec un titre contenant du JavaScript (`<img src=x onerror="alert(document.cookie)">`), et tout benevole qui exportait en PDF declenchait le payload.
+- **Correction appliquee :**
+  - Helper `escapeHtml()` qui echappe `&`, `<`, `>`, `"`, `'` -- applique a toutes les interpolations UGC
+  - Helper `sanitizeColor()` qui valide que la couleur d'equipe est un format hex strict (anti-injection CSS)
+  - `delayMinutes` casse en `Number()` pour eviter toute interpolation arbitraire
 
 ---
 
@@ -38,25 +26,19 @@
 
 ### 2.1 Open Redirect sur les routes OAuth
 
-- **Fichiers :** `server/routes/auth/google.get.ts` (lignes 237-239), `server/routes/auth/facebook.get.ts` (lignes 214-217)
+- **Fichiers :** `server/routes/auth/google.get.ts`, `server/routes/auth/facebook.get.ts`
 - **Severite : MOYENNE**
-- **Description :** La validation du `returnTo` se limite a :
-  ```typescript
-  returnTo && !returnTo.includes('/login') && !returnTo.includes('/auth/') ? returnTo : '/'
-  ```
-  Cette validation est insuffisante :
-  - `returnTo=https://evil.com` (URL absolue externe) passerait
-  - `returnTo=//evil.com` (protocol-relative URL) passerait
-  - `returnTo=/login-phishing` passerait (ne contient pas `/login` exact)
+- **Statut : CORRIGE**
+- **Description :** La validation du `returnTo` etait insuffisante :
+  - `returnTo=https://evil.com` (URL absolue externe) passait
+  - `returnTo=//evil.com` (protocol-relative URL) passait
+  - `returnTo=/login-phishing` passait (ne contient pas `/login` exact)
 - **Impact :** Phishing post-authentification OAuth.
-- **Correction :**
-  ```typescript
-  const isRelativePath = returnTo.startsWith('/') && !returnTo.startsWith('//')
-  const finalRedirect =
-    returnTo && isRelativePath && !returnTo.includes('/login') && !returnTo.includes('/auth/')
-      ? returnTo
-      : '/'
-  ```
+- **Correction appliquee :** Helper centralise `sanitizeReturnTo()` dans `server/utils/safe-redirect.ts` :
+  - Rejette les URL absolues (http://, https://, //evil.com)
+  - Rejette les chemins contenant `\\` (interprete comme `/` par certains navigateurs)
+  - Rejette les pages d'authentification (`/login`, `/auth/*`)
+  - Fallback vers `/` si invalide
 
 ---
 
@@ -64,25 +46,49 @@
 
 ### 3.1 `xssValidator: false` dans nuxt-security
 
-- **Fichier :** `nuxt.config.ts` (ligne 126)
+- **Fichier :** `nuxt.config.ts`
 - **Severite : FAIBLE**
-- **Description :** Le validateur XSS est desactive. La protection est assuree par d'autres mecanismes (CSP, sanitisation markdown).
+- **Statut : ACCEPTE**
+- **Description :** Le validateur XSS est desactive volontairement pour ne pas bloquer les contenus utilisateur legitimes (markdown, descriptions, posts).
+- **Decision :** La defense XSS est assuree par plusieurs mecanismes complementaires :
+  - **CSP stricte** (nonce + strict-dynamic + base-uri none + object-src none)
+  - **Sanitisation serveur** des contenus stockes via `sanitizeUserContent()` (commentaires, messages, posts, bookings)
+  - **Sanitisation markdown** via `rehype-sanitize` (whitelist stricte)
+  - **Echappement Vue.js** par defaut sur l'interpolation `{{ }}`
+  - **Echappement explicite** dans l'export PDF (`escapeHtml`)
 
 ### 3.2 Donnees utilisateur en localStorage
 
-- **Fichier :** `app/stores/auth.ts` (ligne 59)
+- **Fichier :** `app/stores/auth.ts`
 - **Severite : FAIBLE**
-- **Description :** L'objet utilisateur (email, pseudo, nom, prenom, phone, roles) est stocke dans `localStorage` sous `authUser`. C'est purement UX (cache local). Les donnees ne sont pas des secrets.
+- **Statut : ACCEPTE**
+- **Description :** L'objet utilisateur (email, pseudo, nom, prenom, phone, roles) est stocke dans `localStorage` sous `authUser`. C'est purement UX (cache local pour eviter un flash non-authentifie au chargement).
+- **Decision :** Aucun secret (token, mot de passe) n'est stocke. La protection contre les fuites repose sur la CSP qui empeche les scripts tiers d'acceder au DOM.
 - **Autres donnees en localStorage (non sensibles) :** `pwa-dismissed`, `calendar-current-date`, `device-id`, brouillon de candidature artiste.
 
 ### 3.3 npm audit non execute
 
 - **Severite : INFO**
+- **Statut : NON TRAITE** (recommandation)
 - **Recommandation :** Executer regulierement `npm audit` et integrer `npm audit --audit-level=high` dans le pipeline CI.
 
 ---
 
-## 4. Points positifs
+## Resume des corrections
+
+| #   | Faille                              | Severite | Statut                      |
+| --- | ----------------------------------- | -------- | --------------------------- |
+| 1.1 | XSS via document.write export PDF   | HAUTE    | CORRIGE                     |
+| 2.1 | Open Redirect routes OAuth          | MOYENNE  | CORRIGE                     |
+| 3.1 | xssValidator desactive              | FAIBLE   | ACCEPTE                     |
+| 3.2 | Donnees utilisateur en localStorage | FAIBLE   | ACCEPTE                     |
+| 3.3 | npm audit non execute               | INFO     | NON TRAITE (recommandation) |
+
+**Score : 2 corrigees / 2 acceptees / 1 recommandation**
+
+---
+
+## Points positifs
 
 ### Utilisation de `v-html` -- Correcte (30 occurrences)
 
@@ -122,6 +128,10 @@ Seule occurrence dans `test/nuxt/utils/renderPage.ts`.
 
 Cookies scelles via `nuxt-auth-utils`. Cookies OAuth temporaires avec `httpOnly: true`, `sameSite: 'lax'`, `secure: true` en production, `maxAge: 600`.
 
-### Pas de CSRF via `SameSite=Lax`
+### Protection CSRF Double Submit Cookie
 
-Les cookies de session utilisent `SameSite=Lax`, ce qui protege contre les attaques CSRF basiques sur les requetes POST cross-origin.
+Au-dela de la protection partielle de `SameSite=Lax`, un middleware CSRF (`server/middleware/00.csrf.ts`) valide un header `x-csrf-token` correspondant a un cookie sur toutes les mutations. Le plugin client (`app/plugins/csrf.client.ts`) injecte automatiquement le header sur toutes les requetes via un wrapper `$fetch`.
+
+### Echappement systematique dans l'export PDF
+
+Helper `escapeHtml()` applique sur toutes les interpolations UGC dans `TimeSlotsList.vue::exportToPdf()`. Helper `sanitizeColor()` valide les couleurs au format hex strict (anti-injection CSS).

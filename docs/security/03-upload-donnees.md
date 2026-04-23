@@ -2,6 +2,7 @@
 
 **Date :** 13 avril 2026
 **Perimetre :** Gestion des fichiers uploades, systeme de backup/restore, exposition de donnees sensibles, logs
+**Derniere mise a jour :** 23 avril 2026
 
 ---
 
@@ -9,30 +10,25 @@
 
 ### 1.1 Injection de commandes OS dans le systeme de backup/restore
 
-- **Fichiers :** `server/api/admin/backup/restore.post.ts` (lignes 50, 94, 155, 186), `server/api/admin/backup/create.post.ts` (lignes 62, 94, 96, 102, 107)
+- **Fichiers :** `server/api/admin/backup/restore.post.ts`, `server/api/admin/backup/create.post.ts`
 - **Severite : CRITIQUE**
-- **Description :** Utilisation massive de `execSync()` avec des valeurs concatenees dans des commandes shell :
-  ```typescript
-  execSync(`tar -xzf "${tempArchivePath}" -C "${tempExtractDir}"`)
-  execSync(`cp -r "${extractedUploadsPath}"/* "${uploadsDestPath}"/`)
-  ```
-  La commande `mysql` est construite avec le mot de passe en clair dans les arguments :
-  ```typescript
-  const mysqlCmd = ['mysql', `-h${dbHost}`, `-p${dbPassword}`, dbName, `< ${tempFilePath}`].join(
-    ' '
-  )
-  execSync(mysqlCmd)
-  ```
-- **Impact :** Un admin malveillant pourrait injecter des commandes via un nom de fichier forge. Le mot de passe BDD est visible dans `ps aux`.
-- **Attenuation :** Seuls les super-admins ont acces.
-- **Correction :** Utiliser `execFile`/`spawn` avec arguments en tableau. Pour MySQL, utiliser un fichier `.my.cnf` temporaire.
+- **Statut : CORRIGE**
+- **Description :** Utilisation massive de `execSync()` avec des valeurs concatenees dans des commandes shell. La commande `mysql` etait construite avec le mot de passe en clair dans les arguments (visible dans `ps aux`).
+- **Correction appliquee :**
+  - `mysqldump` : `execFile` avec arguments en tableau + `MYSQL_PWD` en env var (password non visible dans `ps aux`)
+  - `tar` : `execFile` avec arguments en tableau (pas d'injection shell possible)
+  - `find` : remplace par fonction native recursive `findFirstSqlFile` (helper `fs/promises`)
+  - `mysql` (restore) : `spawn` avec pipe stdin depuis le fichier SQL + `MYSQL_PWD`
+  - `cp -r` : remplace par `fs.cp` natif avec `{ recursive: true }`
+  - `rm` : remplace par `fs.unlink` natif
 
 ### 1.2 Path traversal dans backup download/delete/restore
 
-- **Fichiers :** `server/api/admin/backup/download.get.ts:22`, `delete.delete.ts:22`, `restore.post.ts:86`
+- **Fichiers :** `server/api/admin/backup/download.get.ts`, `delete.delete.ts`, `restore.post.ts`
 - **Severite : CRITIQUE** (attenuee par la protection admin)
-- **Description :** Le parametre `filename` est directement utilise dans `path.join(process.cwd(), 'backups', filename)`. La seule validation est sur l'extension. `../../etc/passwd.sql` passerait la validation.
-- **Correction :** Ajouter `path.basename(filename)` ou verifier que le chemin resolu reste dans `backups/`.
+- **Statut : CORRIGE**
+- **Description :** Le parametre `filename` etait directement utilise dans `path.join(process.cwd(), 'backups', filename)`. La seule validation etait sur l'extension. `../../etc/passwd.sql` passait la validation.
+- **Correction appliquee :** `path.basename(filename)` dans les 3 fichiers pour ne garder que le nom de fichier, rendant le path traversal impossible.
 
 ---
 
@@ -46,24 +42,31 @@
   - `server/api/files/profile.post.ts`
   - `server/api/files/generic.post.ts`
   - `server/api/files/lost-found.post.ts`
+  - `server/api/files/show.post.ts`
 - **Severite : HAUTE**
-- **Description :** Aucun de ces endpoints ne valide le type MIME ou l'extension. Un utilisateur authentifie pourrait uploader un `.html`, `.js`, `.php` ou tout autre type arbitraire.
-- **Note :** Seul `downloadAndStoreImage()` dans `server/utils/file-helpers.ts` valide les types MIME (`ALLOWED_IMAGE_TYPES`), mais uniquement pour les telechargements depuis des URL externes.
-- **Correction :** Ajouter une validation MIME (whitelist `image/jpeg`, `image/png`, `image/webp`, `image/gif`) et d'extension dans chaque endpoint ou dans un middleware centralise.
+- **Statut : CORRIGE**
+- **Description :** Aucun de ces endpoints ne validait le type MIME ou l'extension. Un utilisateur authentifie pouvait uploader un `.html`, `.js`, `.php` ou tout autre type arbitraire.
+- **Correction appliquee :** Helper centralise `validateUploadedFile()` dans `server/utils/upload-validation.ts` :
+  - Whitelist MIME : `image/jpeg`, `image/png`, `image/webp`, `image/gif`
+  - Whitelist extensions : `jpg`, `jpeg`, `png`, `webp`, `gif`
+  - Taille max configurable (defaut 10 MB)
+  - Appele dans les 6 endpoints d'upload AVANT `storeFileLocally()`
 
 ### 2.2 Route de service de fichiers sans protection path traversal
 
 - **Fichier :** `server/routes/uploads/[...path].get.ts`
 - **Severite : HAUTE**
-- **Description :** Contrairement a `server/api/uploads/[...path].get.ts` qui a une protection complete (verification de `..`, `//`, et `startsWith`), cette route n'a aucune verification.
-- **Correction :** Ajouter les memes verifications ou supprimer cette route doublon (commentaire "ancien systeme" present).
+- **Statut : CORRIGE**
+- **Description :** Contrairement a `server/api/uploads/[...path].get.ts` qui avait une protection complete, cette route n'avait aucune verification.
+- **Correction appliquee :** Ajout des memes protections : verification de `..` et `//`, verification `startsWith(uploadDir)`, et protection sur le fallback `public/uploads`.
 
 ### 2.3 Injection SQL via restauration de backup
 
 - **Fichier :** `server/api/admin/backup/restore.post.ts`
 - **Severite : HAUTE**
+- **Statut : NON TRAITE** (risque assume)
 - **Description :** Le contenu SQL du fichier de restauration est execute directement sans validation. Un backup malveillant pourrait contenir `DROP DATABASE`, `CREATE USER`, etc.
-- **Correction :** Ajouter une validation basique du contenu SQL et journaliser l'action.
+- **Decision :** L'endpoint est protege par `requireGlobalAdminWithDbCheck` (super-admin uniquement). Le risque est considere comme acceptable car le super-admin est par nature autorise a executer du SQL arbitraire (il a aussi acces a la BDD directement). Validation basique du contenu SQL non ajoutee car elle serait trivialement contournable et donnerait une fausse impression de securite.
 
 ---
 
@@ -72,31 +75,60 @@
 ### 3.1 Logs excessifs avec donnees debug en production
 
 - **Fichiers :**
-  - `server/api/files/profile.post.ts` (lignes 53-56) : log les cles de l'objet fichier
-  - `server/api/files/convention.post.ts` (lignes 20-21, 31) : `console.log('Received files:', files)` -- log potentiellement le contenu base64 complet
-  - `server/api/editions/[id]/ticketing/helloasso/orders.get.ts` (ligne 45) : log le statut du Client Secret
-  - `server/api/admin/tasks/[taskName].post.ts` (ligne 27) : log l'email de l'admin
-- **Correction :** Conditionner avec `process.env.NODE_ENV === 'development'` ou utiliser un logger avec niveaux.
+  - `server/api/files/profile.post.ts` (logs cles de l'objet fichier)
+  - `server/api/files/convention.post.ts` (`console.log('Received files:', files)` -- contenu base64)
+  - `server/api/files/edition.post.ts` (logs files count + storage)
+  - `server/api/editions/[id]/ticketing/helloasso/orders.get.ts` (statut Client Secret)
+  - `server/api/admin/tasks/[taskName].post.ts` (email de l'admin)
+- **Severite : MOYENNE**
+- **Statut : CORRIGE**
+- **Correction appliquee :** Suppression des `console.log` debug. L'audit log de tasks admin garde seulement `user #id` (sans email).
 
 ### 3.2 Exposition d'email dans `userWithGravatarSelect`
 
-- **Fichier :** `server/utils/prisma-select-helpers.ts` (lignes 74-80)
-- **Description :** Inclut `email` en plus de `emailHash`. Le `emailHash` seul suffit pour Gravatar.
-- **Correction :** Supprimer `email` de ce select et creer un select separe pour les contextes admin.
+- **Fichier :** `server/utils/prisma-select-helpers.ts`
+- **Severite : MOYENNE**
+- **Statut : NON TRAITE** (risque mineur)
+- **Description :** Le select inclut `email` en plus de `emailHash`. Le `emailHash` seul suffit pour Gravatar.
+- **Decision :** Le helper n'est utilise que dans des contextes ou l'email est deja accessible (organisateurs d'une convention, admins). Refactoring possible mais non prioritaire.
 
 ### 3.3 Configuration `xssValidator: false` et `rateLimiter: false`
 
-- **Fichier :** `nuxt.config.ts` (lignes 125-126)
+- **Fichier :** `nuxt.config.ts`
+- **Severite : MOYENNE**
+- **Statut : ACCEPTE** (defense en profondeur assuree par d'autres mecanismes)
 - **Description :** Le validateur XSS et le limiteur de taux de `nuxt-security` sont desactives.
-- **Correction :** Reactiver ou configurer des exceptions plutot que de desactiver globalement.
+- **Decision :**
+  - **`xssValidator: false`** : desactive volontairement pour ne pas bloquer les contenus utilisateur legitimes (markdown, descriptions, posts). La defense XSS est assuree par : CSP stricte (nonce + strict-dynamic), `sanitizeUserContent()` cote serveur, `rehype-sanitize` pour markdown, echappement Vue.js par defaut.
+  - **`rateLimiter: false`** : remplace par notre rate limiter custom (`server/utils/rate-limiter.ts`) plus granulaire et configure par endpoint critique.
 
 ---
 
-## 4. Points positifs
+## Resume des corrections
+
+| #   | Faille                                        | Severite | Statut                     |
+| --- | --------------------------------------------- | -------- | -------------------------- |
+| 1.1 | Injection commandes OS dans backup/restore    | CRITIQUE | CORRIGE                    |
+| 1.2 | Path traversal backup download/delete/restore | CRITIQUE | CORRIGE                    |
+| 2.1 | Validation MIME/extension uploads             | HAUTE    | CORRIGE                    |
+| 2.2 | Path traversal route uploads                  | HAUTE    | CORRIGE                    |
+| 2.3 | Injection SQL via restore backup              | HAUTE    | NON TRAITE (risque assume) |
+| 3.1 | Logs debug en production                      | MOYENNE  | CORRIGE                    |
+| 3.2 | Email expose dans userWithGravatarSelect      | MOYENNE  | NON TRAITE (mineur)        |
+| 3.3 | xssValidator / rateLimiter desactives         | MOYENNE  | ACCEPTE                    |
+
+**Score : 5 corrigees / 1 acceptee / 2 non traitees (risques assumes/mineurs)**
+
+---
+
+## Points positifs
 
 - Fichiers `.env` correctement exclus de Git et Docker
 - Selects Prisma bien limites (pas de `select *` implicite)
 - CSP et SRI en place
 - Authentification admin (`requireGlobalAdminWithDbCheck`) sur tous les endpoints de backup
-- Protection path traversal correcte sur `server/api/uploads/[...path].get.ts`
+- Protection path traversal sur toutes les routes de fichiers (api + routes)
+- Validation MIME/extension/taille centralisee sur tous les uploads
+- Mot de passe BDD jamais expose dans `ps aux` (`MYSQL_PWD` env var)
+- Aucun `execSync` avec interpolation shell
 - Secrets masques avec `***SET***` dans `server/api/admin/config.get.ts`

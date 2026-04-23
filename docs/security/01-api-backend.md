@@ -106,9 +106,10 @@
 
 - **Fichier :** `server/api/editions/[id]/ticketing/helloasso/orders.post.ts`
 - **Severite : MOYENNE**
-- **Statut : NON CORRIGE** (changement architectural necessaire)
-- **Description :** Le `clientId` et `clientSecret` HelloAsso sont envoyes depuis le frontend dans le body de la requete.
-- **Correction recommandee :** Stocker les credentials cote serveur (variables d'environnement ou configuration chiffree en BDD). Ce changement implique des modifications frontend, backend et potentiellement du schema de base de donnees.
+- **Statut : CORRIGE**
+- **Description :** Le `clientId` et `clientSecret` HelloAsso etaient envoyes depuis le frontend dans le body de la requete.
+- **Correction appliquee :** Le endpoint ne recoit plus les credentials du body. Il les charge desormais cote serveur depuis la BDD via `prisma.externalTicketing.findUnique` + `decrypt(haConfig.clientSecret)`, comme `orders.get.ts`. Ajout de `canAccessEditionData` pour la verification des droits (cohérent avec le GET).
+- **Note :** L'endpoint `test.post.ts` continue d'accepter les credentials du body car son objet est de tester de **nouveaux** credentials avant sauvegarde en BDD (cas legitime).
 
 ---
 
@@ -145,11 +146,11 @@
 | 3.2 | Validation Zod manquante          | MOYENNE  | PARTIEL (3/~33) |
 | 3.3 | Controle d'acces posts            | MOYENNE  | CORRIGE         |
 | 3.4 | Bug deleteComment modele          | MOYENNE  | CORRIGE         |
-| 3.5 | Credentials HelloAsso cote client | MOYENNE  | NON CORRIGE     |
+| 3.5 | Credentials HelloAsso cote client | MOYENNE  | CORRIGE         |
 | 4.1 | requireSuperAdmin inexistante     | BASSE    | CORRIGE         |
 | 4.2 | $executeRawUnsafe                 | BASSE    | CORRIGE         |
 
-**Score : 10/12 corrigees (dont 1 partielle)**
+**Score : 11/12 corrigees + 1 partielle (M7)**
 
 ---
 
