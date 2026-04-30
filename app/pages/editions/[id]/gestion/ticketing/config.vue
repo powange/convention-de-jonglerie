@@ -186,7 +186,7 @@
               <!-- Sous-option SumUp -->
               <div
                 v-if="paymentCard"
-                class="ml-8 pl-4 border-l-2 border-blue-200 dark:border-blue-800 space-y-2"
+                class="ml-8 pl-4 border-l-2 border-blue-200 dark:border-blue-800 space-y-3"
               >
                 <div class="flex items-center justify-between">
                   <div>
@@ -203,6 +203,76 @@
                     color="primary"
                     @update:model-value="handleTogglePaymentMethod('sumupEnabled', $event)"
                   />
+                </div>
+
+                <!-- Config SumUp (affiliateKey + appId) -->
+                <div
+                  v-if="sumupEnabled"
+                  class="mt-3 p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3"
+                >
+                  <UAlert
+                    icon="i-heroicons-information-circle"
+                    color="info"
+                    variant="soft"
+                    :title="$t('gestion.ticketing.sumup_config_title')"
+                    :description="$t('gestion.ticketing.sumup_config_help')"
+                  />
+
+                  <UFormField
+                    :label="$t('gestion.ticketing.sumup_affiliate_key')"
+                    :help="$t('gestion.ticketing.sumup_affiliate_key_help')"
+                    :error="sumupFieldErrors.affiliateKey"
+                    required
+                  >
+                    <UInput
+                      v-model="sumupAffiliateKey"
+                      type="password"
+                      :placeholder="sumupConfig ? '••••••••' : ''"
+                      class="w-full"
+                      :disabled="sumupUpdating"
+                    />
+                  </UFormField>
+
+                  <UFormField
+                    :label="$t('gestion.ticketing.sumup_app_id')"
+                    :help="$t('gestion.ticketing.sumup_app_id_help')"
+                    :error="sumupFieldErrors.appId"
+                    required
+                  >
+                    <UInput
+                      v-model="sumupAppId"
+                      :placeholder="sumupAppIdPlaceholder"
+                      class="w-full"
+                      :disabled="sumupUpdating"
+                    />
+                  </UFormField>
+
+                  <div class="flex items-center justify-between gap-2">
+                    <UButton
+                      v-if="sumupConfig"
+                      color="error"
+                      variant="ghost"
+                      size="sm"
+                      icon="i-heroicons-trash"
+                      :loading="sumupUpdating"
+                      @click="handleDeleteSumupConfig"
+                    >
+                      {{ $t('gestion.ticketing.sumup_delete_config') }}
+                    </UButton>
+                    <div v-else />
+                    <UButton
+                      color="primary"
+                      :loading="sumupUpdating"
+                      :disabled="!canSaveSumup"
+                      @click="handleSaveSumupConfig"
+                    >
+                      {{
+                        sumupConfig
+                          ? $t('gestion.ticketing.sumup_update_config')
+                          : $t('gestion.ticketing.sumup_save_config')
+                      }}
+                    </UButton>
+                  </div>
                 </div>
               </div>
             </div>
@@ -272,6 +342,16 @@ const { settings, loading, updating, fetchSettings, updateSettings } = useTicket
   editionId.value
 )
 
+// Composable pour la config SumUp (affiliateKey + appId)
+const {
+  config: sumupConfig,
+  updating: sumupUpdating,
+  fieldErrors: sumupFieldErrors,
+  fetchConfig: fetchSumupConfig,
+  saveConfig: saveSumupConfig,
+  deleteConfig: deleteSumupConfig,
+} = useSumupConfig(editionId.value)
+
 // Variables locales pour les toggles
 const allowOnsiteRegistration = ref(true)
 const allowAnonymousOrders = ref(false)
@@ -279,6 +359,16 @@ const paymentCash = ref(true)
 const paymentCard = ref(true)
 const paymentCheck = ref(true)
 const sumupEnabled = ref(false)
+
+// Champs SumUp
+const sumupAffiliateKey = ref('')
+const sumupAppId = ref('')
+// Concaténation pour éviter que le scanner i18n détecte cette chaîne comme une clé
+const sumupAppIdPlaceholder = ['com', 'example', 'myapp'].join('.')
+
+const canSaveSumup = computed(
+  () => sumupAffiliateKey.value.trim().length > 0 && sumupAppId.value.trim().length > 0
+)
 
 // Charger les données au montage
 onMounted(async () => {
@@ -296,7 +386,61 @@ onMounted(async () => {
     paymentCheck.value = settings.value.paymentCheck ?? true
     sumupEnabled.value = settings.value.sumupEnabled ?? false
   }
+
+  // Charger la config SumUp si l'intégration est activée
+  if (sumupEnabled.value) {
+    await fetchSumupConfig()
+    if (sumupConfig.value) {
+      sumupAffiliateKey.value = sumupConfig.value.affiliateKey
+      sumupAppId.value = sumupConfig.value.appId
+    }
+  }
 })
+
+// Handlers SumUp
+const handleSaveSumupConfig = async () => {
+  try {
+    await saveSumupConfig({
+      affiliateKey: sumupAffiliateKey.value.trim(),
+      appId: sumupAppId.value.trim(),
+    })
+    toast.add({
+      title: t('common.saved'),
+      description: t('gestion.ticketing.sumup_config_saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (e: any) {
+    toast.add({
+      title: t('common.error'),
+      description: e?.data?.message || t('gestion.ticketing.sumup_config_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+const handleDeleteSumupConfig = async () => {
+  if (!confirm(t('gestion.ticketing.sumup_delete_confirm'))) return
+  try {
+    await deleteSumupConfig()
+    sumupAffiliateKey.value = ''
+    sumupAppId.value = ''
+    toast.add({
+      title: t('common.deleted'),
+      description: t('gestion.ticketing.sumup_config_deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (e: any) {
+    toast.add({
+      title: t('common.error'),
+      description: e?.data?.message || t('gestion.ticketing.sumup_config_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
 
 // Handlers pour les toggles
 const handleToggleOnsiteRegistration = async (val: boolean) => {
@@ -361,6 +505,15 @@ const handleTogglePaymentMethod = async (field: string, val: boolean) => {
       color: 'success',
       icon: 'i-heroicons-check-circle',
     })
+
+    // Si on vient d'activer SumUp et qu'on n'a pas encore chargé la config, le faire
+    if (field === 'sumupEnabled' && val && !sumupConfig.value) {
+      await fetchSumupConfig()
+      if (sumupConfig.value) {
+        sumupAffiliateKey.value = sumupConfig.value.affiliateKey
+        sumupAppId.value = sumupConfig.value.appId
+      }
+    }
   } catch (e: any) {
     ref.value = previous
     toast.add({

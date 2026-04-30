@@ -172,7 +172,8 @@
       },
       "open_sumup": "SumUp openen",
       "selectMethod": "Selecteer betaalmethode",
-      "sumup_hint": "Bevestig de betaling op SumUp en bevestig dan hier"
+      "sumup_hint": "Bevestig de betaling op SumUp en bevestig dan hier",
+      "sumup_not_configured": "De SumUp-affiliatesleutel en App ID moeten in de ticketinginstellingen worden geconfigureerd om het vooraf invullen van het bedrag te activeren."
     },
     "quotas": {
       "created": "Quotum succesvol aangemaakt",

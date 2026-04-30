@@ -163,7 +163,12 @@
       "WebFetch(domain:lucide.dev)",
       "WebFetch(domain:unpkg.com)",
       "Bash(openssl rand:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(pip3 install:*)",
+      "mcp__jcodemunch__get_repo_outline",
+      "mcp__jcodemunch__find_references",
+      "Bash(pkill -f playwright)",
+      "Bash(pkill -f chrome-headless-shell)"
     ],
     "deny": [],
     "ask": [],

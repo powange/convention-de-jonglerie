@@ -26,10 +26,10 @@ model ExternalTicketing {
   createdAt  DateTime                  @default(now())
   updatedAt  DateTime                  @updatedAt
 
-  edition            Edition                    @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  helloAssoConfig    HelloAssoConfig?
-  infomaniakConfig   InfomaniakConfig?
-  tiers              TicketingTier[]
+  edition          Edition                    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  helloAssoConfig  HelloAssoConfig?
+  infomaniakConfig InfomaniakConfig?
+  tiers            TicketingTier[]
   options          TicketingOption[]
   orders           TicketingOrder[]
   tierCustomFields TicketingTierCustomField[]
@@ -53,6 +53,24 @@ model HelloAssoConfig {
   externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
 
   @@index([externalTicketingId])
+}
+
+// Configuration SumUp pour les paiements par carte via deep link `sumupmerchant://`
+// Les credentials sont propres à chaque organisateur d'édition.
+model SumupConfig {
+  id           Int      @id @default(autoincrement())
+  editionId    Int      @unique
+  // Encrypted (AES-256-GCM) — clé d'affiliation SumUp du marchand.
+  // Type Text car la valeur chiffrée (iv:encrypted:authTag en base64) peut dépasser
+  // la limite VARCHAR(191) par défaut de Prisma + MySQL utf8mb4.
+  affiliateKey String   @db.Text
+  appId        String // App ID déclaré sur le dashboard SumUp (ex: com.example.myapp)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@index([editionId])
 }
 
 model InfomaniakConfig {

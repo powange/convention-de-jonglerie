@@ -14,6 +14,11 @@ services:
       - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
+      # Scripts SQL exécutés au PREMIER démarrage (volume mysql_data vide).
+      # Inclut les GRANT nécessaires à `prisma migrate dev` (shadow database).
+      # Pour appliquer sur une base existante : `npm run docker:dev:down -v` puis `npm run docker:dev`
+      # (attention : supprime les données) — ou exécuter le SQL manuellement.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
       timeout: 2s

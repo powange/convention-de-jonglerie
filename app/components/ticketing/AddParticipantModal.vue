@@ -663,6 +663,8 @@
             :amount="totalAmount"
             :enabled-methods="props.enabledPaymentMethods"
             :sumup-enabled="props.sumupEnabled"
+            :sumup-affiliate-key="props.sumupAffiliateKey"
+            :sumup-app-id="props.sumupAppId"
             :sumup-title="props.editionName"
             show-title
           />
@@ -794,6 +796,8 @@ interface Props {
   allowAnonymousOrders?: boolean
   enabledPaymentMethods?: ('cash' | 'card' | 'check')[]
   sumupEnabled?: boolean
+  sumupAffiliateKey?: string
+  sumupAppId?: string
   editionName?: string
 }
 

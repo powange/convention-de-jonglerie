@@ -201,12 +201,13 @@ export const useLeafletEditable = (
       }).setView(center, zoom)
 
       // Couches de tuiles
-      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         zIndex: 1,
         maxZoom: 22,
         maxNativeZoom: 19,
+        referrerPolicy: 'strict-origin-when-cross-origin',
       })
 
       const satelliteLayer = L.tileLayer(

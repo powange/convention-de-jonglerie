@@ -172,7 +172,8 @@
       },
       "open_sumup": "Öppna SumUp",
       "selectMethod": "Välj betalningsmetod",
-      "sumup_hint": "Bekräfta betalningen på SumUp och bekräfta sedan här"
+      "sumup_hint": "Bekräfta betalningen på SumUp och bekräfta sedan här",
+      "sumup_not_configured": "SumUp-affiliate-nyckeln och App ID måste vara konfigurerade i biljettinställningarna för att aktivera förifyllning av beloppet."
     },
     "quotas": {
       "created": "Kvot skapad framgångsrikt",

@@ -172,7 +172,8 @@
       },
       "open_sumup": "Abrir SumUp",
       "selectMethod": "Seleccione el método de pago",
-      "sumup_hint": "Confirme el pago en SumUp y luego confirme aquí"
+      "sumup_hint": "Confirme el pago en SumUp y luego confirme aquí",
+      "sumup_not_configured": "La clave de afiliado y el App ID de SumUp deben estar configurados en los ajustes de venta de entradas para activar el rellenado previo del importe."
     },
     "quotas": {
       "created": "Cuota creada con éxito",

@@ -172,7 +172,8 @@
       },
       "open_sumup": "Abrir SumUp",
       "selectMethod": "Selecione o método de pagamento",
-      "sumup_hint": "Confirme o pagamento no SumUp e depois confirme aqui"
+      "sumup_hint": "Confirme o pagamento no SumUp e depois confirme aqui",
+      "sumup_not_configured": "A chave de afiliação e o App ID SumUp devem ser configurados nas definições de bilheteira para ativar o preenchimento automático do valor."
     },
     "quotas": {
       "created": "Quota criada com sucesso",

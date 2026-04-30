@@ -71,7 +71,15 @@
       "mcp__jcodemunch__get_file_content",
       "mcp__jcodemunch__search_text",
       "mcp__jcodemunch__search_symbols",
-      "WebFetch(domain:codepen.io)"
+      "WebFetch(domain:codepen.io)",
+      "Read(//usr/local/bin/**)",
+      "Bash(npm exec *)",
+      "Bash(node /tmp/check_plugin_order.js)",
+      "mcp__jcodemunch__plan_turn",
+      "mcp__jcodemunch__get_symbol_source",
+      "mcp__jcodemunch__register_edit",
+      "Read(//home/powange/.docker/**)",
+      "Bash(git show *)"
     ],
     "additionalDirectories": [
       "/tmp",
@@ -81,7 +89,8 @@
       "/root/projets/convention-de-jonglerie/server/api/admin/project-costs/[id]",
       "/root/projets/convention-de-jonglerie/server/api/editions/[id]/shows-call/[showCallId]",
       "/root/projets/convention-de-jonglerie/server/api/survey",
-      "/root/projets/convention-de-jonglerie/i18n/locales"
+      "/root/projets/convention-de-jonglerie/i18n/locales",
+      "/home/powange/projects/convention-de-jonglerie/server/api/editions/[id]/ticketing"
     ]
   }
 }

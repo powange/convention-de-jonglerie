@@ -172,7 +172,8 @@
       },
       "open_sumup": "Apri SumUp",
       "selectMethod": "Seleziona il metodo di pagamento",
-      "sumup_hint": "Conferma il pagamento su SumUp poi conferma qui"
+      "sumup_hint": "Conferma il pagamento su SumUp poi conferma qui",
+      "sumup_not_configured": "La chiave di affiliazione e l'App ID SumUp devono essere configurati nelle impostazioni della biglietteria per attivare la precompilazione dell'importo."
     },
     "quotas": {
       "created": "Quota creata con successo",

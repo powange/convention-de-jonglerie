@@ -172,7 +172,8 @@
       },
       "open_sumup": "Open SumUp",
       "selectMethod": "Select payment method",
-      "sumup_hint": "Confirm the payment on SumUp then confirm here"
+      "sumup_hint": "Confirm the payment on SumUp then confirm here",
+      "sumup_not_configured": "The SumUp affiliate key and App ID must be configured in the ticketing settings to enable amount pre-filling."
     },
     "quotas": {
       "created": "Quota created successfully",

@@ -67,12 +67,12 @@ model StripeConfig {
 }
 
 model TimeEstimateConfig {
-  id              Int      @id @default(autoincrement())
-  fixedHours      Decimal  @db.Decimal(10, 1) // Heures comptabilisées à la date de référence
-  referenceDate   DateTime                    // Date à laquelle le compteur fixe est valable
-  weeklyHours     Decimal  @db.Decimal(5, 1)  // Heures estimées par semaine après la date de référence
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  fixedHours    Decimal  @db.Decimal(10, 1) // Heures comptabilisées à la date de référence
+  referenceDate DateTime // Date à laquelle le compteur fixe est valable
+  weeklyHours   Decimal  @db.Decimal(5, 1) // Heures estimées par semaine après la date de référence
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model CoffeeDonation {

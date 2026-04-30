@@ -162,10 +162,10 @@ model EditionShowCall {
   updatedAt         DateTime           @updatedAt
 
   // Sondage
-  surveyToken String?  @unique
-  surveyOpen  Boolean  @default(false)
+  surveyToken String? @unique
+  surveyOpen  Boolean @default(false)
 
-  edition      Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition      Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
   applications ShowApplication[]
   surveyVotes  ShowCallSurveyVote[]
 
@@ -175,9 +175,9 @@ model EditionShowCall {
 
 // Preset de spectacle réutilisable pour les candidatures
 model ShowPreset {
-  id                        Int      @id @default(autoincrement())
-  userId                    Int
-  name                      String
+  id     Int    @id @default(autoincrement())
+  userId Int
+  name   String
 
   // Infos artiste
   artistName   String // Nom de scène
@@ -244,10 +244,10 @@ model ShowApplication {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  showCall     EditionShowCall    @relation(fields: [showCallId], references: [id], onDelete: Cascade)
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  decidedBy    User?              @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
-  show         Show?              @relation(fields: [showId], references: [id], onDelete: SetNull)
+  showCall     EditionShowCall      @relation(fields: [showCallId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy    User?                @relation("ShowApplicationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  show         Show?                @relation(fields: [showId], references: [id], onDelete: SetNull)
   conversation Conversation? // Conversation avec les organisateurs
   surveyVotes  ShowCallSurveyVote[]
 

@@ -172,7 +172,8 @@
       },
       "open_sumup": "Otwórz SumUp",
       "selectMethod": "Wybierz metodę płatności",
-      "sumup_hint": "Potwierdź płatność w SumUp, a następnie potwierdź tutaj"
+      "sumup_hint": "Potwierdź płatność w SumUp, a następnie potwierdź tutaj",
+      "sumup_not_configured": "Klucz afiliacyjny i App ID SumUp muszą zostać skonfigurowane w ustawieniach biletów, aby aktywować automatyczne wypełnianie kwoty."
     },
     "quotas": {
       "created": "Limit utworzony pomyślnie",

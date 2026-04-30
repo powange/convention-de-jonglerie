@@ -140,6 +140,7 @@
         color="primary"
         variant="soft"
         class="w-full justify-center"
+        :disabled="!sumupAppLink"
         @click="openSumup"
       >
         {{ $t('ticketing.payment.open_sumup') }}
@@ -147,6 +148,14 @@
       <p class="text-xs text-gray-500 mt-2 text-center">
         {{ $t('ticketing.payment.sumup_hint') }}
       </p>
+      <UAlert
+        v-if="!sumupAppLink"
+        class="mt-2"
+        icon="i-heroicons-exclamation-triangle"
+        color="warning"
+        variant="soft"
+        :description="$t('ticketing.payment.sumup_not_configured')"
+      />
     </div>
 
     <!-- Champ pour le numéro de chèque -->
@@ -218,6 +227,10 @@ const props = withDefaults(
     enabledMethods?: ('cash' | 'card' | 'check')[]
     sumupEnabled?: boolean
     sumupTitle?: string
+    /** Clé d'affiliation SumUp (déchiffrée côté serveur, requise pour pré-remplir le montant) */
+    sumupAffiliateKey?: string
+    /** App ID déclaré sur le dashboard SumUp (requise sur Android) */
+    sumupAppId?: string
   }>(),
   {
     enabledMethods: () => ['cash', 'card', 'check'],
@@ -253,11 +266,25 @@ function selectMethod(method: PaymentMethod) {
 }
 
 // Lien SumUp App Link
+// Doc : https://github.com/sumup/sumup-ios-url-scheme et sumup-android-api
+// Paramètres requis : affiliate-key, app-id (Android), total OU amount, currency
+// On envoie `total` ET `amount` pour compatibilité (total sur app ≥ 1.88, amount sur anciennes)
 const sumupAppLink = computed(() => {
-  if (!props.amount) return ''
+  if (!props.amount || props.amount <= 0) return ''
+  if (!props.sumupAffiliateKey || !props.sumupAppId) return ''
+
   const amountInEuros = (props.amount / 100).toFixed(2)
-  const title = encodeURIComponent(props.sumupTitle || 'Billetterie')
-  return `sumupmerchant://pay/1.0?amount=${amountInEuros}&currency=EUR&title=${title}`
+  // Limiter le titre à 100 caractères (limite sûre pour SumUp et l'URL deep link)
+  const safeTitle = (props.sumupTitle || 'Billetterie').substring(0, 100)
+  const params = new URLSearchParams({
+    'affiliate-key': props.sumupAffiliateKey,
+    'app-id': props.sumupAppId,
+    total: amountInEuros,
+    amount: amountInEuros,
+    currency: 'EUR',
+    title: safeTitle,
+  })
+  return `sumupmerchant://pay/1.0?${params.toString()}`
 })
 
 function openSumup() {

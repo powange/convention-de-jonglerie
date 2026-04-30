@@ -172,7 +172,8 @@
       },
       "open_sumup": "Otevřít SumUp",
       "selectMethod": "Vyberte způsob platby",
-      "sumup_hint": "Potvrďte platbu na SumUp a poté potvrďte zde"
+      "sumup_hint": "Potvrďte platbu na SumUp a poté potvrďte zde",
+      "sumup_not_configured": "Affiliate klíč a App ID SumUp musí být nakonfigurovány v nastavení vstupenek, aby bylo možné předvyplnit částku."
     },
     "quotas": {
       "created": "Kvóta úspěšně vytvořena",

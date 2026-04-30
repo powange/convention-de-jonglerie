@@ -172,7 +172,8 @@
       },
       "open_sumup": "Åbn SumUp",
       "selectMethod": "Vælg betalingsmetode",
-      "sumup_hint": "Bekræft betalingen på SumUp og bekræft derefter her"
+      "sumup_hint": "Bekræft betalingen på SumUp og bekræft derefter her",
+      "sumup_not_configured": "SumUp affiliate-nøglen og App ID skal konfigureres i billetindstillingerne for at aktivere forudfyldning af beløbet."
     },
     "quotas": {
       "created": "Kvote oprettet med succes",

@@ -116,9 +116,11 @@ export const useLeafletMap = (
       map.value = L.map(mapContainer.value).setView(center, zoom)
 
       // Ajouter le layer de tuiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+        referrerPolicy: 'strict-origin-when-cross-origin',
       }).addTo(map.value)
 
       // Ajouter les marqueurs initiaux

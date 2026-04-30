@@ -488,6 +488,8 @@
         :allow-anonymous-orders="allowAnonymousOrders"
         :enabled-payment-methods="enabledPaymentMethods"
         :sumup-enabled="sumupEnabled"
+        :sumup-affiliate-key="sumupAffiliateKey"
+        :sumup-app-id="sumupAppId"
         :edition-name="edition?.name"
         @order-created="handleOrderCreated"
       />
@@ -701,6 +703,7 @@ const { lastUpdate } = useRealtimeStats(editionId)
 // Paramètres de billetterie
 const { settings: ticketingSettings, fetchSettings: fetchTicketingSettings } =
   useTicketingSettings(editionId)
+const { config: sumupConfig, fetchConfig: fetchSumupConfig } = useSumupConfig(editionId)
 
 const allowOnsiteRegistration = computed(
   () => ticketingSettings.value?.allowOnsiteRegistration ?? true
@@ -714,6 +717,8 @@ const enabledPaymentMethods = computed(() => {
   return methods
 })
 const sumupEnabled = computed(() => ticketingSettings.value?.sumupEnabled ?? false)
+const sumupAffiliateKey = computed(() => sumupConfig.value?.affiliateKey || '')
+const sumupAppId = computed(() => sumupConfig.value?.appId || '')
 
 const scannerOpen = ref(false)
 const participantModalOpen = ref(false)
@@ -758,6 +763,11 @@ onMounted(async () => {
 
   // Charger les paramètres de billetterie
   await fetchTicketingSettings()
+
+  // Charger la config SumUp (clé d'affiliation + app ID) si l'intégration est activée
+  if (ticketingSettings.value?.sumupEnabled) {
+    await fetchSumupConfig()
+  }
 
   // Charger les statistiques et les dernières validations
   await Promise.all([loadStats(), loadRecentValidations(), checkHelloAssoConfig(), checkHasTiers()])
