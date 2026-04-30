@@ -349,7 +349,12 @@
                     class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
                     >{{ $t('gestion.shows_call.form.artist_bio') }}</span
                   >
-                  <p class="mt-1 text-sm">{{ selectedApplication.artistBio }}</p>
+                  <!-- Markdown rendu + liens cliquables target=_blank (rehype-sanitize + rehypeExternalLinks) -->
+                  <!-- eslint-disable vue/no-v-html -->
+                  <div
+                    class="mt-1 text-sm prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap"
+                    v-html="artistBioHtml"
+                  />
                 </div>
                 <div class="flex flex-wrap gap-4 text-sm">
                   <a
@@ -490,9 +495,14 @@
                     :rows="4"
                     class="mt-1 w-full text-sm"
                   />
-                  <p v-else class="mt-1 text-sm whitespace-pre-wrap">
-                    {{ selectedApplication.showDescription }}
-                  </p>
+                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize)
+                       + liens cliquables target=_blank rel=noopener via rehypeExternalLinks -->
+                  <!-- eslint-disable vue/no-v-html -->
+                  <div
+                    v-else
+                    class="mt-1 text-sm prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap"
+                    v-html="descriptionHtml"
+                  />
                 </div>
                 <div v-if="selectedApplication.technicalNeeds" class="pl-3">
                   <span
@@ -500,9 +510,12 @@
                   >
                     {{ $t('gestion.shows_call.form.technical_needs') }}
                   </span>
-                  <p class="mt-1 text-sm whitespace-pre-wrap">
-                    {{ selectedApplication.technicalNeeds }}
-                  </p>
+                  <!-- Markdown rendu + liens cliquables target=_blank (rehype-sanitize + rehypeExternalLinks) -->
+                  <!-- eslint-disable vue/no-v-html -->
+                  <div
+                    class="mt-1 text-sm prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap"
+                    v-html="technicalNeedsHtml"
+                  />
                 </div>
                 <div v-if="selectedApplication.additionalPerformersCount > 0" class="pl-3">
                   <span
@@ -720,6 +733,7 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallBasic, ShowApplication, ShowApplicationStatus } from '~/types'
+import { markdownToHtml } from '~/utils/markdown'
 
 definePageMeta({
   middleware: ['auth-protected'],
@@ -757,6 +771,33 @@ const initialOrganizerNotes = ref('')
 const editableDescription = ref('')
 const initialDescription = ref('')
 const editingDescription = ref(false)
+
+// Champs UGC rendus en HTML (markdown + autolink des URLs + liens target=_blank rel=noopener)
+const descriptionHtml = ref('')
+const artistBioHtml = ref('')
+const technicalNeedsHtml = ref('')
+
+watch(
+  () => selectedApplication.value?.showDescription,
+  async (text) => {
+    descriptionHtml.value = text ? await markdownToHtml(text) : ''
+  },
+  { immediate: true }
+)
+watch(
+  () => selectedApplication.value?.artistBio,
+  async (text) => {
+    artistBioHtml.value = text ? await markdownToHtml(text) : ''
+  },
+  { immediate: true }
+)
+watch(
+  () => selectedApplication.value?.technicalNeeds,
+  async (text) => {
+    technicalNeedsHtml.value = text ? await markdownToHtml(text) : ''
+  },
+  { immediate: true }
+)
 
 // Spectacle associé
 const linkedShowId = ref<number | null>(null)
