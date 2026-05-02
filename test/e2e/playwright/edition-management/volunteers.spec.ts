@@ -1,6 +1,8 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
 import {
+  apiPatch,
+  apiPost,
   disableVolunteers,
   enableVolunteers,
   loadFromState,
@@ -68,7 +70,8 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
   test('soumettre une candidature via API', async ({ page }) => {
     const { editionId } = loadState()
 
-    const response = await page.request.post(
+    const response = await apiPost(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteers/applications`,
       {
         data: {
@@ -144,7 +147,8 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
     const applicationId = loadFromState('volunteerApplicationId')
     expect(applicationId).toBeTruthy()
 
-    const patchResponse = await page.request.patch(
+    const patchResponse = await apiPatch(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteers/applications/${applicationId}`,
       { data: { status: 'ACCEPTED' } }
     )
@@ -187,14 +191,16 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
     expect(applicationId).toBeTruthy()
 
     // ACCEPTED → PENDING
-    const pendingResponse = await page.request.patch(
+    const pendingResponse = await apiPatch(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteers/applications/${applicationId}`,
       { data: { status: 'PENDING' } }
     )
     expect(pendingResponse.ok()).toBe(true)
 
     // PENDING → REJECTED
-    const rejectResponse = await page.request.patch(
+    const rejectResponse = await apiPatch(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteers/applications/${applicationId}`,
       { data: { status: 'REJECTED' } }
     )

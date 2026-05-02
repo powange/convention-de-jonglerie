@@ -1,6 +1,9 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
 import {
+  apiDelete,
+  apiPatch,
+  apiPut,
   disableVolunteers,
   enableVolunteers,
   loadState,
@@ -120,7 +123,8 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
 
     expect(createdTeamId).toBeTruthy()
 
-    const response = await page.request.put(
+    const response = await apiPut(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteer-teams/${createdTeamId}`,
       {
         data: {
@@ -170,7 +174,8 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
   test("rendre l'équipe obligatoire", async ({ page }) => {
     const { editionId } = loadState()
 
-    const response = await page.request.put(
+    const response = await apiPut(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteer-teams/${createdTeamId}`,
       { data: { isRequired: true } }
     )
@@ -215,13 +220,15 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
         for (const app of apps) {
           // Repasser en PENDING si nécessaire avant suppression
           if (app.status !== 'PENDING') {
-            await page.request.patch(
+            await apiPatch(
+              page,
               `http://localhost:3000/api/editions/${editionId}/volunteers/applications/${app.id}`,
               { data: { status: 'PENDING' } }
             )
           }
           // Retirer la candidature (endpoint utilisateur)
-          await page.request.delete(
+          await apiDelete(
+            page,
             `http://localhost:3000/api/editions/${editionId}/volunteers/applications`
           )
         }
@@ -272,7 +279,8 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
 
     // L'équipe est encore obligatoire (isRequired: true du test précédent)
     // Masquer la visibilité doit forcer isRequired à false côté API
-    const response = await page.request.put(
+    const response = await apiPut(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteer-teams/${createdTeamId}`,
       { data: { isVisibleToVolunteers: false } }
     )
@@ -326,7 +334,8 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
   test("rétablir la visibilité de l'équipe", async ({ page }) => {
     const { editionId } = loadState()
 
-    const response = await page.request.put(
+    const response = await apiPut(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteer-teams/${createdTeamId}`,
       { data: { isVisibleToVolunteers: true } }
     )
@@ -342,7 +351,8 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
 
     expect(createdTeamId).toBeTruthy()
 
-    const response = await page.request.delete(
+    const response = await apiDelete(
+      page,
       `http://localhost:3000/api/editions/${editionId}/volunteer-teams/${createdTeamId}`
     )
     expect(response.ok()).toBe(true)

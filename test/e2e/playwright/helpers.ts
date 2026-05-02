@@ -8,6 +8,64 @@ import { conventionStateFile, credentialsFile } from '../../../playwright.config
 const BASE_URL = 'http://localhost:3000'
 
 // ──────────────────────────────────────────────
+// CSRF helpers
+// ──────────────────────────────────────────────
+
+type Page = import('@playwright/test').Page
+type RequestOptions = Parameters<Page['request']['post']>[1]
+
+/**
+ * Récupère le token CSRF depuis le cookie `csrf_token` du context. Si absent,
+ * effectue un GET (sur `/`) pour que le serveur le pose puis le relit.
+ *
+ * Indispensable pour toutes les mutations API depuis Playwright : le serveur
+ * applique le pattern Double Submit Cookie et exige `x-csrf-token` en header.
+ */
+async function getCsrfToken(page: Page): Promise<string> {
+  const findToken = async () =>
+    (await page.context().cookies()).find((c) => c.name === 'csrf_token')?.value
+
+  let token = await findToken()
+  if (!token) {
+    // Toute requête non interne déclenche `ensureCsrfToken` côté serveur
+    await page.request.get(BASE_URL).catch(() => {})
+    token = await findToken()
+  }
+  if (!token) {
+    throw new Error('CSRF token introuvable après GET — vérifier le middleware csrf')
+  }
+  return token
+}
+
+async function withCsrf(page: Page, options: RequestOptions = {}): Promise<RequestOptions> {
+  const token = await getCsrfToken(page)
+  return {
+    ...options,
+    headers: { ...options?.headers, 'x-csrf-token': token },
+  }
+}
+
+/**
+ * Wrappers `page.request.X` qui injectent automatiquement le header CSRF.
+ * À utiliser pour toutes les mutations API depuis les tests E2E.
+ */
+export async function apiPost(page: Page, url: string, options?: RequestOptions) {
+  return page.request.post(url, await withCsrf(page, options))
+}
+
+export async function apiPut(page: Page, url: string, options?: RequestOptions) {
+  return page.request.put(url, await withCsrf(page, options))
+}
+
+export async function apiPatch(page: Page, url: string, options?: RequestOptions) {
+  return page.request.patch(url, await withCsrf(page, options))
+}
+
+export async function apiDelete(page: Page, url: string, options?: RequestOptions) {
+  return page.request.delete(url, await withCsrf(page, options))
+}
+
+// ──────────────────────────────────────────────
 // Verification code helpers
 // ──────────────────────────────────────────────
 
@@ -123,18 +181,12 @@ export async function loginWith(
 // Edition helpers
 // ──────────────────────────────────────────────
 
-type APIRequestContext = { request: import('@playwright/test').APIRequestContext }
-
 /**
  * Met à jour les champs d'une édition via PUT /api/editions/{id}
  * Utile pour activer/désactiver les features (volunteersEnabled, ticketingEnabled, etc.)
  */
-export async function updateEdition(
-  page: APIRequestContext,
-  editionId: string,
-  data: Record<string, unknown>
-) {
-  const response = await page.request.put(`${BASE_URL}/api/editions/${editionId}`, { data })
+export async function updateEdition(page: Page, editionId: string, data: Record<string, unknown>) {
+  const response = await apiPut(page, `${BASE_URL}/api/editions/${editionId}`, { data })
   expect(response.ok()).toBe(true)
   return response
 }
@@ -143,11 +195,11 @@ export async function updateEdition(
  * Change le statut d'une édition (OFFLINE, PUBLISHED, PLANNED, CANCELLED)
  */
 export async function setEditionStatus(
-  page: APIRequestContext,
+  page: Page,
   editionId: string,
   status: 'OFFLINE' | 'PUBLISHED' | 'PLANNED' | 'CANCELLED'
 ) {
-  const response = await page.request.patch(`${BASE_URL}/api/editions/${editionId}/status`, {
+  const response = await apiPatch(page, `${BASE_URL}/api/editions/${editionId}/status`, {
     data: { status },
   })
   expect(response.ok()).toBe(true)
@@ -157,10 +209,7 @@ export async function setEditionStatus(
 /**
  * Récupère le statut actuel d'une édition
  */
-export async function getEditionStatus(
-  page: APIRequestContext,
-  editionId: string
-): Promise<string | null> {
+export async function getEditionStatus(page: Page, editionId: string): Promise<string | null> {
   const response = await page.request.get(`${BASE_URL}/api/editions/${editionId}`)
   if (!response.ok()) return null
   const body = await response.json()
@@ -176,11 +225,11 @@ export async function getEditionStatus(
  * Crée un appel à spectacles via l'API
  */
 export async function createShowCall(
-  page: APIRequestContext,
+  page: Page,
   editionId: string,
   data: { name: string; description?: string }
 ) {
-  const response = await page.request.post(`${BASE_URL}/api/editions/${editionId}/shows-call`, {
+  const response = await apiPost(page, `${BASE_URL}/api/editions/${editionId}/shows-call`, {
     data,
   })
   expect(response.ok()).toBe(true)
@@ -193,12 +242,13 @@ export async function createShowCall(
  * Met à jour un appel à spectacles via l'API
  */
 export async function updateShowCall(
-  page: APIRequestContext,
+  page: Page,
   editionId: string,
   showCallId: string,
   data: Record<string, unknown>
 ) {
-  const response = await page.request.put(
+  const response = await apiPut(
+    page,
     `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}`,
     { data }
   )
@@ -209,12 +259,9 @@ export async function updateShowCall(
 /**
  * Supprime un appel à spectacles via l'API
  */
-export async function deleteShowCall(
-  page: APIRequestContext,
-  editionId: string,
-  showCallId: string
-) {
-  const response = await page.request.delete(
+export async function deleteShowCall(page: Page, editionId: string, showCallId: string) {
+  const response = await apiDelete(
+    page,
     `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}`
   )
   expect(response.ok()).toBe(true)
@@ -225,7 +272,7 @@ export async function deleteShowCall(
  * Récupère les candidatures d'un appel à spectacles via l'API
  */
 export async function getShowCallApplications(
-  page: APIRequestContext,
+  page: Page,
   editionId: string,
   showCallId: string,
   status?: string
@@ -243,13 +290,14 @@ export async function getShowCallApplications(
  * Met à jour le statut d'une candidature
  */
 export async function updateShowCallApplicationStatus(
-  page: APIRequestContext,
+  page: Page,
   editionId: string,
   showCallId: string,
   applicationId: string,
   data: { status?: string; organizerNotes?: string }
 ) {
-  const response = await page.request.patch(
+  const response = await apiPatch(
+    page,
     `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/applications/${applicationId}`,
     { data }
   )
@@ -260,8 +308,8 @@ export async function updateShowCallApplicationStatus(
 /**
  * Active le profil artiste pour l'utilisateur courant
  */
-export async function enableArtistProfile(page: APIRequestContext) {
-  const response = await page.request.put(`${BASE_URL}/api/profile/categories`, {
+export async function enableArtistProfile(page: Page) {
+  const response = await apiPut(page, `${BASE_URL}/api/profile/categories`, {
     data: { isVolunteer: false, isArtist: true, isOrganizer: false },
   })
   expect(response.ok()).toBe(true)
@@ -275,14 +323,14 @@ export async function enableArtistProfile(page: APIRequestContext) {
 /**
  * Active les bénévoles sur une édition
  */
-export async function enableVolunteers(page: APIRequestContext, editionId: string) {
+export async function enableVolunteers(page: Page, editionId: string) {
   return updateEdition(page, editionId, { volunteersEnabled: true })
 }
 
 /**
  * Désactive les bénévoles sur une édition
  */
-export async function disableVolunteers(page: APIRequestContext, editionId: string) {
+export async function disableVolunteers(page: Page, editionId: string) {
   return updateEdition(page, editionId, { volunteersEnabled: false })
 }
 
@@ -290,11 +338,12 @@ export async function disableVolunteers(page: APIRequestContext, editionId: stri
  * Met à jour les settings bénévoles (recrutement ouvert/fermé, mode, etc.)
  */
 export async function updateVolunteerSettings(
-  page: APIRequestContext,
+  page: Page,
   editionId: string,
   data: Record<string, unknown>
 ) {
-  const response = await page.request.patch(
+  const response = await apiPatch(
+    page,
     `${BASE_URL}/api/editions/${editionId}/volunteers/settings`,
     { data }
   )
@@ -305,7 +354,7 @@ export async function updateVolunteerSettings(
 /**
  * Récupère les settings bénévoles
  */
-export async function getVolunteerSettings(page: APIRequestContext, editionId: string) {
+export async function getVolunteerSettings(page: Page, editionId: string) {
   const response = await page.request.get(
     `${BASE_URL}/api/editions/${editionId}/volunteers/settings`
   )

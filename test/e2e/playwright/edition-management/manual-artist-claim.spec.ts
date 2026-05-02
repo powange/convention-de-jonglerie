@@ -1,6 +1,6 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { getVerificationCodeFromLogs, loadState } from '../helpers'
+import { apiPost, getVerificationCodeFromLogs, loadState } from '../helpers'
 
 const BASE_URL = 'http://localhost:3000'
 
@@ -33,7 +33,7 @@ test.describe.serial("Activation d'un compte MANUAL via /register", () => {
   test("l'organisateur ajoute un artiste manuel via API", async ({ page }) => {
     const { editionId } = loadState()
 
-    const response = await page.request.post(`${BASE_URL}/api/editions/${editionId}/artists`, {
+    const response = await apiPost(page, `${BASE_URL}/api/editions/${editionId}/artists`, {
       data: {
         email: ARTIST_EMAIL,
         prenom: ARTIST_PRENOM,

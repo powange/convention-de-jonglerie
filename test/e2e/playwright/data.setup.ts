@@ -4,6 +4,7 @@ import path from 'node:path'
 import { test as setup } from '@nuxt/test-utils/playwright'
 
 import { conventionStateFile } from '../../../playwright.config'
+import { apiPost } from './helpers'
 
 const timestamp = Date.now()
 const CONVENTION_NAME = `E2E Convention ${timestamp}`
@@ -13,10 +14,10 @@ const CONVENTION_NAME = `E2E Convention ${timestamp}`
  * Plus rapide et fiable que de passer par l'UI.
  */
 setup('create convention and edition via API', async ({ page }) => {
-  // page.request utilise les cookies du storageState automatiquement
+  // apiPost injecte automatiquement le header CSRF (Double Submit Cookie)
 
   // Créer la convention via l'API
-  const conventionResponse = await page.request.post('http://localhost:3000/api/conventions', {
+  const conventionResponse = await apiPost(page, 'http://localhost:3000/api/conventions', {
     data: { name: CONVENTION_NAME },
   })
 
@@ -35,7 +36,7 @@ setup('create convention and edition via API', async ({ page }) => {
   const endDate = new Date()
   endDate.setDate(endDate.getDate() + 9)
 
-  const editionResponse = await page.request.post('http://localhost:3000/api/editions', {
+  const editionResponse = await apiPost(page, 'http://localhost:3000/api/editions', {
     data: {
       conventionId,
       startDate: startDate.toISOString(),
