@@ -562,8 +562,10 @@ watch(debouncedEmail, async (email) => {
     const res = (await $fetch('/api/auth/check-email', {
       method: 'POST',
       body: { email },
-    })) as { data: { exists: boolean } }
-    emailExists.value = res.data.exists
+    })) as { data: { exists: boolean; canActivate?: boolean } }
+    // Un compte MANUAL non vérifié est traité comme "à inscrire" pour permettre
+    // l'activation via /register (claim d'un compte créé par un organisateur).
+    emailExists.value = res.data.exists && !res.data.canActivate
     emailValidationStatus.value = 'valid'
   } catch {
     emailValidationStatus.value = 'invalid'
@@ -577,8 +579,10 @@ const handleEmailSubmit = async () => {
     const res = (await $fetch('/api/auth/check-email', {
       method: 'POST',
       body: { email: emailState.email },
-    })) as { data: { exists: boolean } }
-    step.value = res.data.exists ? 'password' : 'register'
+    })) as { data: { exists: boolean; canActivate?: boolean } }
+    // canActivate = compte MANUAL non vérifié → on présente le formulaire
+    // d'inscription pour permettre le claim via /register
+    step.value = res.data.exists && !res.data.canActivate ? 'password' : 'register'
   } catch {
     toast.add({ title: t('errors.network_error'), icon: 'i-heroicons-x-circle', color: 'error' })
   } finally {

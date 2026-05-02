@@ -1,44 +1,16 @@
-import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
 import { expect, test as setup } from '@nuxt/test-utils/playwright'
 
 import { authFile, credentialsFile } from '../../../playwright.config'
+import { getVerificationCodeFromLogs } from './helpers'
 
 // Génère un email unique pour chaque exécution des tests
 const timestamp = Date.now()
 const TEST_EMAIL = `e2e-test-${timestamp}@example.com`
 const TEST_PASSWORD = 'TestPass123!'
 const TEST_PSEUDO = `E2ETest${timestamp}`
-
-/**
- * Extrait le code de vérification depuis les logs.
- * - En CI : lit le fichier de log défini par NUXT_SERVER_LOG
- * - En local : lit les logs Docker
- * Le serveur log "[DEV_VERIFICATION_CODE] XXXXXX" en mode dev ou E2E_TEST=true.
- */
-function getVerificationCodeFromLogs(): string {
-  let logs: string
-
-  const serverLogFile = process.env.NUXT_SERVER_LOG
-  if (serverLogFile) {
-    // CI : lire le fichier de log du serveur
-    logs = fs.readFileSync(serverLogFile, 'utf-8')
-  } else {
-    // Local : lire les logs Docker
-    logs = execSync('docker compose -f docker-compose.dev.yml logs app --tail=200 2>&1', {
-      encoding: 'utf-8',
-      timeout: 10000,
-    })
-  }
-
-  const matches = [...logs.matchAll(/\[DEV_VERIFICATION_CODE]\s*(\d{6})/g)]
-  if (matches.length === 0) {
-    throw new Error('Code de vérification non trouvé dans les logs')
-  }
-  return matches[matches.length - 1][1]
-}
 
 setup('create account and authenticate', async ({ page, goto }) => {
   // Étape 1 : Page de login → saisir l'email

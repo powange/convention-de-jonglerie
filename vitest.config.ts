@@ -115,7 +115,9 @@ export default defineConfig({
           },
           setupFiles: ['./test/setup-common.ts', './test/setup.ts'],
           testTimeout: 20000,
-          hookTimeout: 20000,
+          // 60s pour éviter les flakes setupNuxt en parallèle (le hook init
+          // Nuxt peut dépasser 20s sur des fichiers isolés ou en CI chargée)
+          hookTimeout: 60000,
           globals: true,
         },
       }),

@@ -28,8 +28,15 @@ export default wrapApiHandler(
           notIn: excludeUserIds,
         },
       },
+      select: { authProvider: true, isEmailVerified: true },
     })
-    return createSuccessResponse({ exists: !!user })
+
+    // canActivate : l'email correspond à un compte MANUAL non vérifié (créé par
+    // un organisateur). Le formulaire de login peut alors basculer vers
+    // l'inscription pour permettre le claim via /register.
+    const canActivate = !!user && user.authProvider === 'MANUAL' && !user.isEmailVerified
+
+    return createSuccessResponse({ exists: !!user, canActivate })
   },
   { operationName: 'CheckEmail' }
 )

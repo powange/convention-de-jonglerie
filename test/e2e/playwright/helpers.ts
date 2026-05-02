@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 
 import { expect } from '@nuxt/test-utils/playwright'
@@ -5,6 +6,35 @@ import { expect } from '@nuxt/test-utils/playwright'
 import { conventionStateFile, credentialsFile } from '../../../playwright.config'
 
 const BASE_URL = 'http://localhost:3000'
+
+// ──────────────────────────────────────────────
+// Verification code helpers
+// ──────────────────────────────────────────────
+
+/**
+ * Extrait le dernier code de vérification (6 chiffres) émis par le serveur.
+ * - En CI : lit le fichier de log défini par NUXT_SERVER_LOG
+ * - En local : lit les logs Docker du conteneur app
+ *
+ * Le serveur log "[DEV_VERIFICATION_CODE] XXXXXX" en mode dev / E2E_TEST=true.
+ */
+export function getVerificationCodeFromLogs(): string {
+  let logs: string
+  const serverLogFile = process.env.NUXT_SERVER_LOG
+  if (serverLogFile) {
+    logs = fs.readFileSync(serverLogFile, 'utf-8')
+  } else {
+    logs = execSync('docker compose -f docker-compose.dev.yml logs app --tail=200 2>&1', {
+      encoding: 'utf-8',
+      timeout: 10000,
+    })
+  }
+  const matches = [...logs.matchAll(/\[DEV_VERIFICATION_CODE]\s*(\d{6})/g)]
+  if (matches.length === 0) {
+    throw new Error('Code de vérification non trouvé dans les logs')
+  }
+  return matches[matches.length - 1][1]
+}
 
 // ──────────────────────────────────────────────
 // State
