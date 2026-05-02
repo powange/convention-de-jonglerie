@@ -451,4 +451,185 @@ describe('API Register', () => {
 
     await expect(registerHandler(mockEvent)).rejects.toThrow()
   })
+
+  describe("Activation d'un compte MANUAL existant", () => {
+    it('devrait activer un user MANUAL non vérifié au lieu de créer un doublon', async () => {
+      // Un organisateur a déjà ajouté cette personne comme artiste
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'NomOrga',
+        prenom: 'PrenomOrga',
+        authProvider: 'MANUAL',
+        isEmailVerified: false,
+      })
+      prismaMock.user.update.mockResolvedValue({
+        id: 42,
+        email: 'artist@example.com',
+        pseudo: 'artisteuser',
+        nom: 'NomOrga',
+        prenom: 'PrenomOrga',
+        isEmailVerified: false,
+      })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'artisteuser',
+        isVolunteer: true,
+        isArtist: true,
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      const result = await registerHandler(mockEvent)
+
+      expect(result).toEqual({
+        success: true,
+        message:
+          'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
+        data: {
+          requiresVerification: true,
+          email: 'artist@example.com',
+        },
+      })
+
+      // Aucune création — on a mis à jour le user existant
+      expect(prismaMock.user.create).not.toHaveBeenCalled()
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 42 },
+        data: expect.objectContaining({
+          password: 'hashed_Password123!',
+          pseudo: 'artisteuser',
+          isEmailVerified: false,
+          emailVerificationCode: '123456',
+          isVolunteer: true,
+          isArtist: true,
+          isOrganizer: false,
+          // nom/prenom non fournis → on conserve les valeurs de l'organisateur
+          nom: 'NomOrga',
+          prenom: 'PrenomOrga',
+        }),
+      })
+
+      // authProvider reste MANUAL tant que l'email n'est pas vérifié
+      expect(prismaMock.user.update.mock.calls[0][0].data).not.toHaveProperty('authProvider')
+
+      // Email de vérification envoyé
+      expect(mockSendEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ to: 'artist@example.com' })
+      )
+    })
+
+    it("devrait écraser nom/prénom du MANUAL si l'utilisateur les fournit", async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'NomOrga',
+        prenom: 'PrenomOrga',
+        authProvider: 'MANUAL',
+        isEmailVerified: false,
+      })
+      prismaMock.user.update.mockResolvedValue({ id: 42 })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'artisteuser',
+        nom: 'NomReel',
+        prenom: 'PrenomReel',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      await registerHandler(mockEvent)
+
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 42 },
+        data: expect.objectContaining({
+          nom: 'NomReel',
+          prenom: 'PrenomReel',
+        }),
+      })
+    })
+
+    it('ne devrait PAS activer un user MANUAL déjà vérifié', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'X',
+        prenom: 'Y',
+        authProvider: 'MANUAL',
+        isEmailVerified: true, // déjà vérifié = ne plus laisser réactiver
+      })
+      // Le create sera appelé puis échouera avec P2002 sur l'email
+      prismaMock.user.create.mockRejectedValue({
+        code: 'P2002',
+        meta: { target: ['email'] },
+      })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'artisteuser',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
+      expect(prismaMock.user.update).not.toHaveBeenCalled()
+    })
+
+    it('ne devrait PAS activer un user authProvider=email/google/facebook', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'X',
+        prenom: 'Y',
+        authProvider: 'email',
+        isEmailVerified: false,
+      })
+      prismaMock.user.create.mockRejectedValue({
+        code: 'P2002',
+        meta: { target: ['email'] },
+      })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'artisteuser',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
+      expect(prismaMock.user.update).not.toHaveBeenCalled()
+    })
+
+    it('devrait renvoyer 409 si le pseudo choisi entre en collision avec un autre user', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'X',
+        prenom: 'Y',
+        authProvider: 'MANUAL',
+        isEmailVerified: false,
+      })
+      // Le pseudo choisi est déjà pris par quelqu'un d'autre
+      prismaMock.user.update.mockRejectedValue({
+        code: 'P2002',
+        meta: { target: ['pseudo'] },
+      })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'pseudo_pris',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
+    })
+  })
 })

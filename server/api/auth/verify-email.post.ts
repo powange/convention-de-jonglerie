@@ -72,7 +72,10 @@ export default wrapApiHandler(
 
     // Si l'utilisateur a déjà un mot de passe, activer le compte directement
     if (!needsPassword) {
-      // Activer le compte et mettre à jour la date de connexion
+      // Activer le compte et mettre à jour la date de connexion.
+      // Si l'utilisateur avait été créé manuellement par un organisateur
+      // (authProvider = MANUAL), on bascule maintenant vers 'email' :
+      // la vérification du code à 6 chiffres prouve qu'il contrôle l'email.
       const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -80,6 +83,7 @@ export default wrapApiHandler(
           emailVerificationCode: null,
           verificationCodeExpiry: null,
           lastLoginAt: new Date(),
+          ...(user.authProvider === 'MANUAL' ? { authProvider: 'email' } : {}),
         },
       })
 

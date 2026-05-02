@@ -82,7 +82,8 @@
       "Bash(git show *)",
       "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/list-todo-keys.js)",
       "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/generate-todo-files.js)",
-      "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/apply-translations.js)"
+      "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/apply-translations.js)",
+      "mcp__jcodemunch__list_repos"
     ],
     "additionalDirectories": [
       "/tmp",

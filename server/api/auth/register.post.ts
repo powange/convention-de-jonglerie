@@ -47,25 +47,68 @@ export default wrapApiHandler(
       ? preferredLanguage
       : 'fr'
 
+    // Si un utilisateur MANUAL non vérifié existe avec cet email (ex: ajouté
+    // comme artiste/bénévole par un organisateur), on le réactive plutôt que
+    // de bloquer l'inscription. Le code de vérification envoyé à l'email
+    // garantit que c'est bien le propriétaire qui revendique le compte.
+    const existingUser = await prisma.user.findUnique({
+      where: { email: cleanEmail },
+      select: {
+        id: true,
+        nom: true,
+        prenom: true,
+        authProvider: true,
+        isEmailVerified: true,
+      },
+    })
+
+    const isClaimingManualAccount =
+      existingUser && existingUser.authProvider === 'MANUAL' && !existingUser.isEmailVerified
+
     try {
-      await prisma.user.create({
-        data: {
-          email: cleanEmail,
-          emailHash: getEmailHash(cleanEmail),
-          password: hashedPassword,
-          pseudo: cleanPseudo,
-          nom: cleanNom,
-          prenom: cleanPrenom,
-          authProvider: 'email',
-          isEmailVerified: false,
-          emailVerificationCode: verificationCode,
-          verificationCodeExpiry: verificationExpiry,
-          preferredLanguage: userLanguage,
-          isVolunteer,
-          isArtist,
-          isOrganizer,
-        },
-      })
+      if (isClaimingManualAccount) {
+        // Note : authProvider reste 'MANUAL' tant que l'email n'est pas vérifié.
+        // La bascule vers 'email' se fait dans verify-email.post.ts pour préserver
+        // les droits d'édition de l'organisateur dans la fenêtre où le claim
+        // n'est pas encore confirmé.
+        await prisma.user.update({
+          where: { id: existingUser.id },
+          data: {
+            password: hashedPassword,
+            pseudo: cleanPseudo,
+            // Préserver les valeurs saisies par l'organisateur si l'utilisateur
+            // ne les a pas fournies dans le formulaire d'inscription
+            nom: cleanNom ?? existingUser.nom,
+            prenom: cleanPrenom ?? existingUser.prenom,
+            isEmailVerified: false,
+            emailVerificationCode: verificationCode,
+            verificationCodeExpiry: verificationExpiry,
+            preferredLanguage: userLanguage,
+            isVolunteer,
+            isArtist,
+            isOrganizer,
+          },
+        })
+      } else {
+        await prisma.user.create({
+          data: {
+            email: cleanEmail,
+            emailHash: getEmailHash(cleanEmail),
+            password: hashedPassword,
+            pseudo: cleanPseudo,
+            nom: cleanNom,
+            prenom: cleanPrenom,
+            authProvider: 'email',
+            isEmailVerified: false,
+            emailVerificationCode: verificationCode,
+            verificationCodeExpiry: verificationExpiry,
+            preferredLanguage: userLanguage,
+            isVolunteer,
+            isArtist,
+            isOrganizer,
+          },
+        })
+      }
     } catch (error) {
       // Gestion des erreurs Prisma
       if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {

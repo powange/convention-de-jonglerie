@@ -150,6 +150,47 @@ describe('/api/auth/verify-email POST', () => {
     expect(prismaMock.user.update).not.toHaveBeenCalled()
   })
 
+  it("devrait basculer authProvider de MANUAL à 'email' lors de la vérification (claim d'un compte d'artiste)", async () => {
+    const manualUser = { ...mockUser, authProvider: 'MANUAL' }
+    const requestBody = {
+      email: 'user@example.com',
+      code: '123456',
+    }
+
+    global.readBody.mockResolvedValue(requestBody)
+    prismaMock.user.findUnique.mockResolvedValue(manualUser)
+    prismaMock.user.update.mockResolvedValue({ ...mockVerifiedUser, authProvider: 'email' })
+
+    await handler(mockEvent as any)
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: expect.objectContaining({
+          isEmailVerified: true,
+          authProvider: 'email',
+        }),
+      })
+    )
+  })
+
+  it("ne devrait PAS modifier authProvider si l'utilisateur est déjà 'email'", async () => {
+    const requestBody = {
+      email: 'user@example.com',
+      code: '123456',
+    }
+
+    global.readBody.mockResolvedValue(requestBody)
+    // mockUser n'a pas authProvider défini → il faut l'expliciter à 'email'
+    prismaMock.user.findUnique.mockResolvedValue({ ...mockUser, authProvider: 'email' })
+    prismaMock.user.update.mockResolvedValue(mockVerifiedUser)
+
+    await handler(mockEvent as any)
+
+    // authProvider ne doit PAS être présent dans les data du update
+    expect(prismaMock.user.update.mock.calls[0][0].data).not.toHaveProperty('authProvider')
+  })
+
   it("devrait normaliser l'email (trim et lowercase)", async () => {
     const requestBody = {
       email: 'USER@EXAMPLE.COM', // Email valide pour Zod (sans espaces)
