@@ -116,6 +116,11 @@ export default defineNuxtConfig({
           'https://hooks.stripe.com',
           'https://www.google.com/recaptcha/',
           'https://recaptcha.google.com',
+          // Lecteur YouTube intégré (candidatures artistes, etc.)
+          'https://www.youtube.com',
+          'https://www.youtube-nocookie.com',
+          // Lecteur Vimeo intégré (candidatures artistes, etc.)
+          'https://player.vimeo.com',
         ],
         'base-uri': ["'none'"],
         'object-src': ["'none'"],

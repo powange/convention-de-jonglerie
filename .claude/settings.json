@@ -79,7 +79,10 @@
       "mcp__jcodemunch__get_symbol_source",
       "mcp__jcodemunch__register_edit",
       "Read(//home/powange/.docker/**)",
-      "Bash(git show *)"
+      "Bash(git show *)",
+      "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/list-todo-keys.js)",
+      "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/generate-todo-files.js)",
+      "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/apply-translations.js)"
     ],
     "additionalDirectories": [
       "/tmp",
@@ -90,7 +93,8 @@
       "/root/projets/convention-de-jonglerie/server/api/editions/[id]/shows-call/[showCallId]",
       "/root/projets/convention-de-jonglerie/server/api/survey",
       "/root/projets/convention-de-jonglerie/i18n/locales",
-      "/home/powange/projects/convention-de-jonglerie/server/api/editions/[id]/ticketing"
+      "/home/powange/projects/convention-de-jonglerie/server/api/editions/[id]/ticketing",
+      "/home/powange/projects/convention-de-jonglerie/app/pages/editions/[id]/gestion/shows-call/[showCallId]"
     ]
   }
 }

@@ -52,19 +52,24 @@
           </span>
         </div>
 
-        <!-- Artist bio -->
-        <p v-if="application.artistBio" class="line-clamp-3">
-          {{ application.artistBio }}
-        </p>
+        <!-- Artist bio + show description : markdown rendu (rehype-sanitize + rehypeExternalLinks) -->
+        <!-- eslint-disable vue/no-v-html -->
+        <div
+          v-if="application.artistBio"
+          class="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap"
+          v-html="artistBioHtml"
+        />
 
-        <!-- Show description -->
         <details v-if="application.showDescription" class="group">
           <summary
             class="cursor-pointer text-primary-500 hover:text-primary-600 font-medium text-xs"
           >
             {{ t('survey.show_info') }}
           </summary>
-          <p class="mt-2 whitespace-pre-line">{{ application.showDescription }}</p>
+          <div
+            class="mt-2 prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap"
+            v-html="showDescriptionHtml"
+          />
         </details>
       </div>
 
@@ -99,6 +104,8 @@
 </template>
 
 <script setup lang="ts">
+import { markdownToHtml } from '~/utils/markdown'
+
 interface SurveyApplication {
   id: number
   artistName: string
@@ -119,7 +126,7 @@ interface SurveyResult {
   voteCount: number
 }
 
-defineProps<{
+const props = defineProps<{
   application: SurveyApplication
   score: number | null
   surveyOpen: boolean
@@ -131,4 +138,23 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+// Champs UGC rendus en HTML (markdown + liens cliquables target=_blank rel=noopener)
+const artistBioHtml = ref('')
+const showDescriptionHtml = ref('')
+
+watch(
+  () => props.application.artistBio,
+  async (text) => {
+    artistBioHtml.value = text ? await markdownToHtml(text) : ''
+  },
+  { immediate: true }
+)
+watch(
+  () => props.application.showDescription,
+  async (text) => {
+    showDescriptionHtml.value = text ? await markdownToHtml(text) : ''
+  },
+  { immediate: true }
+)
 </script>

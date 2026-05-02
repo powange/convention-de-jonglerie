@@ -89,13 +89,13 @@ export default wrapApiHandler(
         (validatedData.status === 'ACCEPTED' || validatedData.status === 'REJECTED')
       ) {
         updateData.decidedAt = new Date()
-        updateData.decidedById = user.id
+        updateData.decidedBy = { connect: { id: user.id } }
       }
 
       // Si on repasse en PENDING, effacer les informations de décision
       if (validatedData.status === 'PENDING') {
         updateData.decidedAt = null
-        updateData.decidedById = null
+        updateData.decidedBy = { disconnect: true }
       }
     }
 

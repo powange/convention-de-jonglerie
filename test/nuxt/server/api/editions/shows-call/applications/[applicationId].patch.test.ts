@@ -139,7 +139,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId
         data: expect.objectContaining({
           status: 'ACCEPTED',
           decidedAt: expect.any(Date),
-          decidedById: mockUser.id,
+          decidedBy: { connect: { id: mockUser.id } },
         }),
         include: expect.any(Object),
       })
@@ -163,7 +163,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId
         data: expect.objectContaining({
           status: 'REJECTED',
           decidedAt: expect.any(Date),
-          decidedById: mockUser.id,
+          decidedBy: { connect: { id: mockUser.id } },
         }),
         include: expect.any(Object),
       })
@@ -191,7 +191,7 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId
         data: expect.objectContaining({
           status: 'PENDING',
           decidedAt: null,
-          decidedById: null,
+          decidedBy: { disconnect: true },
         }),
         include: expect.any(Object),
       })
@@ -212,13 +212,13 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications/[applicationId
 
       await handler(mockEvent as any)
 
-      // Pas de decidedAt/decidedById car le statut ne change pas de manière significative
+      // Pas de decidedAt/decidedBy car le statut ne change pas de manière significative
       expect(prismaMock.showApplication.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: expect.objectContaining({
           status: 'PENDING',
           decidedAt: null,
-          decidedById: null,
+          decidedBy: { disconnect: true },
         }),
         include: expect.any(Object),
       })

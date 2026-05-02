@@ -65,6 +65,7 @@ const IGNORED_MISSING_KEYS = [
   'facebook.com',
   'youtu.be',
   'example.*',
+  'player.vimeo.com',
   // Noms de champs Prisma utilisés dans ai-update.vue (pas des clés i18n)
   'edition.imageUrl',
   'edition.startDate',
