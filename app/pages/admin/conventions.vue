@@ -484,7 +484,6 @@ import type { Convention } from '~/types'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
-const { $fetch } = useNuxtApp()
 
 // Métadonnées de la page
 definePageMeta({

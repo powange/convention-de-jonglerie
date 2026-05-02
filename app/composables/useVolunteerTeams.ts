@@ -33,8 +33,6 @@ export function useVolunteerTeams(
   editionId: MaybeRefOrGetter<number | undefined>,
   options?: { leaderOnly?: boolean }
 ) {
-  const { $fetch } = useNuxtApp()
-
   // État réactif
   const teams = ref<VolunteerTeam[]>([])
   const loading = ref(false)

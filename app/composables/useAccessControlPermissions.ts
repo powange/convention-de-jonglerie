@@ -15,7 +15,6 @@ export interface ActiveAccessControlSlot {
  * Vérifie si l'utilisateur est actuellement en créneau de contrôle d'accès (±15 minutes)
  */
 export function useAccessControlPermissions(editionId: MaybeRefOrGetter<number | undefined>) {
-  const { $fetch } = useNuxtApp()
   const authStore = useAuthStore()
 
   // État réactif

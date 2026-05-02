@@ -42,8 +42,6 @@ export interface CreateTimeSlotData {
 export type UpdateTimeSlotData = Partial<CreateTimeSlotData>
 
 export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undefined>) {
-  const { $fetch } = useNuxtApp()
-
   // État réactif
   const timeSlots = ref<VolunteerTimeSlotAPI[]>([])
   const loading = ref(false)

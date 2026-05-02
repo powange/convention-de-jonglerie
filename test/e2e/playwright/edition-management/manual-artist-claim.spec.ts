@@ -58,7 +58,7 @@ test.describe.serial("Activation d'un compte MANUAL via /register", () => {
     browser,
   }) => {
     // Nouveau context sans aucun cookie de session organisateur
-    const context = await browser.newContext()
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
     const page = await context.newPage()
 
     // 1. Aller sur /login et saisir l'email du MANUAL
@@ -134,7 +134,7 @@ test.describe.serial("Activation d'un compte MANUAL via /register", () => {
   test('le compte activé peut se connecter via UI avec le mot de passe choisi', async ({
     browser,
   }) => {
-    const context = await browser.newContext()
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
     const page = await context.newPage()
 
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' })
