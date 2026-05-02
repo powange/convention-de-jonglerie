@@ -606,6 +606,98 @@ describe('API Register', () => {
       expect(prismaMock.user.update).not.toHaveBeenCalled()
     })
 
+    it("devrait renouveler verificationCodeExpiry lors de l'activation", async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'X',
+        prenom: 'Y',
+        authProvider: 'MANUAL',
+        isEmailVerified: false,
+      })
+      prismaMock.user.update.mockResolvedValue({ id: 42 })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'artisteuser',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      const before = Date.now()
+      await registerHandler(mockEvent)
+      const after = Date.now()
+
+      const updateData = prismaMock.user.update.mock.calls[0][0].data
+      expect(updateData.verificationCodeExpiry).toBeInstanceOf(Date)
+      // L'expiration doit être dans le futur (sinon le code est invalide dès l'envoi)
+      expect((updateData.verificationCodeExpiry as Date).getTime()).toBeGreaterThan(after)
+      // Sanity check : un expiry trop éloigné serait suspect (>30 jours)
+      expect((updateData.verificationCodeExpiry as Date).getTime()).toBeLessThan(
+        before + 30 * 24 * 60 * 60 * 1000
+      )
+    })
+
+    it("ne devrait PAS modifier lastLoginAt lors de l'activation (le claim n'est pas une connexion)", async () => {
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'X',
+        prenom: 'Y',
+        authProvider: 'MANUAL',
+        isEmailVerified: false,
+      })
+      prismaMock.user.update.mockResolvedValue({ id: 42 })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'Password123!',
+        pseudo: 'artisteuser',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      await registerHandler(mockEvent)
+
+      expect(prismaMock.user.update.mock.calls[0][0].data).not.toHaveProperty('lastLoginAt')
+    })
+
+    it("devrait permettre une 2e activation (last write wins) si l'email n'est toujours pas vérifié", async () => {
+      // Scénario : un attaquant a déjà 'claimé' le compte avec son propre password
+      // (authProvider toujours MANUAL, isEmailVerified toujours false). Le vrai
+      // propriétaire doit pouvoir re-déclencher /register et écraser le password.
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 42,
+        nom: 'X',
+        prenom: 'Y',
+        authProvider: 'MANUAL',
+        isEmailVerified: false,
+      })
+      prismaMock.user.update.mockResolvedValue({ id: 42 })
+
+      const requestBody = {
+        email: 'artist@example.com',
+        password: 'NouveauVrai123!',
+        pseudo: 'vraiowner',
+      }
+
+      const mockEvent = {}
+      global.readBody.mockResolvedValue(requestBody)
+
+      await registerHandler(mockEvent)
+
+      // Le password est bien remplacé par celui de la 2e activation
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: 42 },
+        data: expect.objectContaining({
+          password: 'hashed_NouveauVrai123!',
+          pseudo: 'vraiowner',
+        }),
+      })
+      expect(prismaMock.user.create).not.toHaveBeenCalled()
+    })
+
     it('devrait renvoyer 409 si le pseudo choisi entre en collision avec un autre user', async () => {
       prismaMock.user.findUnique.mockResolvedValue({
         id: 42,

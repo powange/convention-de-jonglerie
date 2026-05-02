@@ -174,6 +174,24 @@ describe('/api/auth/verify-email POST', () => {
     )
   })
 
+  it('ne devrait PAS toucher au password lors de la bascule MANUAL → email', async () => {
+    // Le password vient d'être posé via /register (claim). verify-email ne doit
+    // surtout pas le réinitialiser/effacer dans la même update.
+    const manualUser = { ...mockUser, authProvider: 'MANUAL' }
+    const requestBody = {
+      email: 'user@example.com',
+      code: '123456',
+    }
+
+    global.readBody.mockResolvedValue(requestBody)
+    prismaMock.user.findUnique.mockResolvedValue(manualUser)
+    prismaMock.user.update.mockResolvedValue({ ...mockVerifiedUser, authProvider: 'email' })
+
+    await handler(mockEvent as any)
+
+    expect(prismaMock.user.update.mock.calls[0][0].data).not.toHaveProperty('password')
+  })
+
   it("ne devrait PAS modifier authProvider si l'utilisateur est déjà 'email'", async () => {
     const requestBody = {
       email: 'user@example.com',
