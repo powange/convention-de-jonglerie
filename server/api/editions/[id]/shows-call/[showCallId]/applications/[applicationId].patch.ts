@@ -109,7 +109,9 @@ export default wrapApiHandler(
       updateData.showDescription = validatedData.showDescription
     }
 
-    // Associer ou dissocier un spectacle
+    // Associer ou dissocier un spectacle. La relation est désormais N:1
+    // (plusieurs candidatures peuvent pointer vers le même spectacle, par
+    // exemple pour un spectacle collectif où chaque artiste postule).
     if (validatedData.showId !== undefined) {
       if (validatedData.showId !== null) {
         // Vérifier que le spectacle existe et appartient à la même édition
@@ -120,20 +122,6 @@ export default wrapApiHandler(
           throw createError({
             status: 404,
             message: 'Spectacle non trouvé dans cette édition',
-          })
-        }
-
-        // Vérifier que le spectacle n'est pas déjà lié à une autre candidature
-        const existingLink = await prisma.showApplication.findFirst({
-          where: {
-            showId: validatedData.showId,
-            id: { not: applicationId },
-          },
-        })
-        if (existingLink) {
-          throw createError({
-            status: 400,
-            message: 'Ce spectacle est déjà associé à une autre candidature',
           })
         }
       }

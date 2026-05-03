@@ -100,7 +100,7 @@ model Show {
   marker          EditionMarker?       @relation(fields: [markerId], references: [id], onDelete: SetNull)
   artists         ShowArtist[]
   returnableItems ShowReturnableItem[]
-  application     ShowApplication?
+  applications    ShowApplication[]
 
   @@index([editionId])
   @@index([editionId, isPublic])
@@ -237,8 +237,10 @@ model ShowApplication {
   decidedAt      DateTime?
   decidedById    Int?
 
-  // Lien vers le spectacle créé (rempli quand l'organisateur associe un spectacle)
-  showId Int? @unique
+  // Lien vers un spectacle de l'édition (un même spectacle peut être lié à
+  // plusieurs candidatures — cas d'un spectacle collectif où chaque artiste
+  // postule séparément)
+  showId Int?
 
   // Traçabilité
   createdAt DateTime @default(now())
@@ -255,6 +257,7 @@ model ShowApplication {
   @@index([showCallId])
   @@index([userId])
   @@index([status])
+  @@index([showId])
 }
 
 // Vote dans un sondage de candidatures spectacles
