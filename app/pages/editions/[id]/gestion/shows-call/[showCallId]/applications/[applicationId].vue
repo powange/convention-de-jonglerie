@@ -323,6 +323,42 @@
                         </span>
                       </div>
                     </div>
+                    <!-- Bouton/badge import : visible uniquement si la candidature est ACCEPTED -->
+                    <template v-if="application.status === 'ACCEPTED'">
+                      <UBadge
+                        v-if="
+                          isPerformerImported(performer.email) &&
+                          isPerformerLinkedToCurrentShow(performer.email)
+                        "
+                        color="success"
+                        variant="soft"
+                        icon="i-heroicons-check-circle"
+                      >
+                        {{ $t('gestion.shows_call.performer_imported') }}
+                      </UBadge>
+                      <UButton
+                        v-else-if="isPerformerImported(performer.email)"
+                        color="primary"
+                        variant="soft"
+                        size="sm"
+                        icon="i-heroicons-link"
+                        :loading="importingPerformerIndex === index"
+                        @click="confirmImportPerformer(index)"
+                      >
+                        {{ $t('gestion.shows_call.link_performer_to_show') }}
+                      </UButton>
+                      <UButton
+                        v-else
+                        color="primary"
+                        variant="soft"
+                        size="sm"
+                        icon="i-heroicons-user-plus"
+                        :loading="importingPerformerIndex === index"
+                        @click="confirmImportPerformer(index)"
+                      >
+                        {{ $t('gestion.shows_call.import_performer') }}
+                      </UButton>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -475,6 +511,28 @@
       @confirm="executeConfirmedStatusChange"
       @cancel="showConfirmModal = false"
     />
+
+    <!-- Modal de confirmation d'import d'un performer -->
+    <UiConfirmModal
+      v-model="showImportPerformerModal"
+      :title="importPerformerModalTexts.title"
+      :description="importPerformerModalTexts.description"
+      :confirm-label="importPerformerModalTexts.confirmLabel"
+      :confirm-icon="importPerformerModalTexts.confirmIcon"
+      :icon-name="importPerformerModalTexts.iconName"
+      confirm-color="primary"
+      icon-color="text-primary-500"
+      :loading="importingPerformerIndex !== null"
+      @confirm="executeImportPerformer"
+      @cancel="cancelImportPerformer"
+    >
+      <UFormField :label="$t('gestion.shows_call.apply_application_data_label')">
+        <USwitch v-model="applyApplicationData" />
+        <template #help>
+          {{ $t('gestion.shows_call.apply_application_data_help') }}
+        </template>
+      </UFormField>
+    </UiConfirmModal>
   </div>
 </template>
 
@@ -771,6 +829,146 @@ const videoEmbed = computed<{ src: string; allow: string } | null>(() => {
   return null
 })
 
+// Index des artistes déjà importés sur l'édition (par email → showIds liés)
+// Utilisé pour 3 états du bouton d'import par performer :
+//   - non importé          → bouton "Importer comme artiste"
+//   - importé, pas lié     → bouton "Lier au spectacle" (cas où on accepte une
+//                            2e candidature impliquant le même performer pour
+//                            un autre spectacle)
+//   - importé et lié       → badge "Déjà importé"
+type ArtistShowIndex = Map<string, { showIds: Set<number> }>
+const editionArtistsIndex = ref<ArtistShowIndex>(new Map())
+
+const fetchEditionArtistEmails = async () => {
+  try {
+    const response = await $fetch<{
+      data: {
+        artists: {
+          user: { email: string }
+          shows?: { show: { id: number } }[]
+        }[]
+      }
+    }>(`/api/editions/${editionId}/artists`)
+    const artists = response.data?.artists || []
+    const next: ArtistShowIndex = new Map()
+    for (const a of artists) {
+      next.set(a.user.email.toLowerCase(), {
+        showIds: new Set((a.shows || []).map((s) => s.show.id)),
+      })
+    }
+    editionArtistsIndex.value = next
+  } catch (error) {
+    console.error('Error fetching edition artists:', error)
+  }
+}
+
+const isPerformerImported = (email?: string) => {
+  if (!email) return false
+  return editionArtistsIndex.value.has(email.toLowerCase())
+}
+
+const isPerformerLinkedToCurrentShow = (email?: string) => {
+  if (!email) return false
+  const entry = editionArtistsIndex.value.get(email.toLowerCase())
+  if (!entry) return false
+  // Pas de spectacle lié à la candidature → considéré comme "lié" (rien à attacher)
+  if (!application.value?.showId) return true
+  return entry.showIds.has(application.value.showId)
+}
+
+// Import d'un performer comme EditionArtist (avec liaison ShowArtist si la
+// candidature est liée à un spectacle)
+type AdditionalPerformer = {
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+}
+
+const showImportPerformerModal = ref(false)
+const importingPerformerIndex = ref<number | null>(null)
+const pendingImportIndex = ref<number | null>(null)
+// Toggle dans la modale : appliquer les infos de la candidature à l'EditionArtist
+// (accommodationAutonomous + append organizerNotes avec préférences artiste + ville)
+const applyApplicationData = ref(true)
+const pendingImportPerformer = computed<AdditionalPerformer | null>(() => {
+  if (pendingImportIndex.value === null) return null
+  const performers = (application.value?.additionalPerformers || []) as AdditionalPerformer[]
+  return performers[pendingImportIndex.value] || null
+})
+
+const importPerformerModalTexts = computed(() => {
+  const performer = pendingImportPerformer.value
+  const name = performer ? `${performer.firstName} ${performer.lastName}` : ''
+  const alreadyImported = performer ? isPerformerImported(performer.email) : false
+
+  if (alreadyImported && application.value?.showId) {
+    // Cas "lier au spectacle" : l'artiste est déjà importé sur l'édition mais
+    // pas encore lié au spectacle de cette candidature.
+    return {
+      title: t('gestion.shows_call.confirm_link_performer_to_show_title'),
+      description: t('gestion.shows_call.confirm_link_performer_to_show_desc', { name }),
+      confirmLabel: t('gestion.shows_call.link_performer_to_show'),
+      confirmIcon: 'i-heroicons-link',
+      iconName: 'i-heroicons-link',
+    }
+  }
+
+  return {
+    title: t('gestion.shows_call.confirm_import_performer_title'),
+    description: t(
+      application.value?.showId
+        ? 'gestion.shows_call.confirm_import_performer_with_show_desc'
+        : 'gestion.shows_call.confirm_import_performer_desc',
+      { name }
+    ),
+    confirmLabel: t('gestion.shows_call.import_performer'),
+    confirmIcon: 'i-heroicons-user-plus',
+    iconName: 'i-heroicons-user-plus',
+  }
+})
+
+const confirmImportPerformer = (index: number) => {
+  pendingImportIndex.value = index
+  applyApplicationData.value = true
+  showImportPerformerModal.value = true
+}
+
+const cancelImportPerformer = () => {
+  showImportPerformerModal.value = false
+  pendingImportIndex.value = null
+}
+
+const executeImportPerformer = async () => {
+  if (pendingImportIndex.value === null || !application.value) return
+  const index = pendingImportIndex.value
+  importingPerformerIndex.value = index
+  showImportPerformerModal.value = false
+  try {
+    await $fetch(
+      `/api/editions/${editionId}/shows-call/${showCallId}/applications/${application.value.id}/import-performer`,
+      {
+        method: 'POST',
+        body: { performerIndex: index, applyApplicationData: applyApplicationData.value },
+      }
+    )
+    // Rafraîchir la liste locale pour basculer le bouton en badge "Déjà importé"
+    await fetchEditionArtistEmails()
+    toast.add({
+      title: t('common.saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    const message =
+      error?.data?.message || error?.statusMessage || error?.message || t('common.error')
+    toast.add({ title: message, icon: 'i-heroicons-x-circle', color: 'error' })
+  } finally {
+    importingPerformerIndex.value = null
+    pendingImportIndex.value = null
+  }
+}
+
 // Charger les spectacles de l'édition (pour le select "linked show")
 const fetchEditionShows = async () => {
   loadingShows.value = true
@@ -968,6 +1166,7 @@ onMounted(async () => {
     fetchApplication(applicationId.value),
     fetchApplicationIds(),
     fetchEditionShows(),
+    fetchEditionArtistEmails(),
   ])
 })
 

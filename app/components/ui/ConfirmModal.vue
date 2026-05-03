@@ -13,6 +13,9 @@
           {{ computedDescription }}
         </p>
 
+        <!-- Slot par défaut pour insérer du contenu custom (toggles, options, etc.) -->
+        <slot />
+
         <!-- Champ de validation par nom -->
         <div v-if="requireNameConfirmation" class="space-y-2">
           <p class="text-sm text-gray-600 dark:text-gray-400">
