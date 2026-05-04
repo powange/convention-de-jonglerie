@@ -1,83 +1,88 @@
 <template>
-  <UCard variant="subtle">
-    <template #header>
-      <div class="flex items-start justify-between">
-        <div class="flex items-start gap-3">
-          <div v-if="displayImageUrl" class="flex-shrink-0">
-            <img
-              :src="displayImageUrl"
-              :alt="displayImageAlt"
-              loading="lazy"
-              class="w-16 h-auto object-contain rounded-lg"
-            />
-          </div>
-          <div
-            v-else
-            class="flex-shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
-          >
-            <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
-          </div>
-          <div class="flex-1">
-            <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
-            <UBadge
-              v-if="showStatus"
-              :color="getStatusColor(edition)"
-              variant="soft"
-              size="lg"
-              class="mt-2 px-3 py-1"
+  <!--
+    Pattern "stretched link" : la carte entière est cliquable via un
+    NuxtLink en absolute inset-0 placé en dernier (donc au-dessus en
+    z-stack). Les boutons d'actions injectés dans les slots restent
+    interactifs grâce à `relative z-10` sur leur wrapper.
+  -->
+  <div class="relative group h-full">
+    <UCard variant="subtle" class="h-full transition-shadow group-hover:shadow-lg cursor-pointer">
+      <template #header>
+        <div class="flex items-start justify-between">
+          <div class="flex items-start gap-3">
+            <div v-if="displayImageUrl" class="flex-shrink-0">
+              <img
+                :src="displayImageUrl"
+                :alt="displayImageAlt"
+                loading="lazy"
+                class="w-16 h-auto object-contain rounded-lg"
+              />
+            </div>
+            <div
+              v-else
+              class="flex-shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
             >
-              {{ getStatusText(edition) }}
-            </UBadge>
+              <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
+            </div>
+            <div class="flex-1">
+              <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
+              <UBadge
+                v-if="showStatus"
+                :color="getStatusColor(edition)"
+                variant="soft"
+                size="lg"
+                class="mt-2 px-3 py-1"
+              >
+                {{ getStatusText(edition) }}
+              </UBadge>
+            </div>
+          </div>
+          <!-- Slot pour boutons d'actions (au-dessus du stretched link) -->
+          <div class="flex items-center gap-2 relative z-10">
+            <slot name="actions" :edition="edition" />
           </div>
         </div>
-        <!-- Slot pour boutons d'actions -->
-        <div class="flex items-center gap-2">
-          <slot name="actions" :edition="edition" />
+      </template>
+
+      <!-- Informations principales -->
+      <div class="space-y-2">
+        <p class="text-sm font-semibold">
+          {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
+        </p>
+        <p class="text-sm font-semibold flex items-center gap-1">
+          <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
+          {{ edition.city }},
+          <FlagIcon :code="getCountryCode(edition.country)" size="sm" class="mx-1" />
+          {{ translateCountryName(edition.country) }}
+        </p>
+      </div>
+
+      <!-- Services avec pictos -->
+      <div class="flex flex-wrap gap-1 mt-4">
+        <UIcon
+          v-for="activeService in getActiveServices(edition)"
+          :key="activeService.key"
+          :name="activeService.icon"
+          :class="activeService.color"
+          size="20"
+          :title="activeService.label"
+        />
+      </div>
+
+      <template v-if="$slots['footer-actions']" #footer>
+        <div class="flex justify-end relative z-10">
+          <slot name="footer-actions" :edition="edition" />
         </div>
-      </div>
-    </template>
+      </template>
+    </UCard>
 
-    <!-- Informations principales -->
-    <div class="space-y-2">
-      <p class="text-sm font-semibold">
-        {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
-      </p>
-      <p class="text-sm font-semibold flex items-center gap-1">
-        <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
-        {{ edition.city }},
-        <FlagIcon :code="getCountryCode(edition.country)" size="sm" class="mx-1" />
-        {{ translateCountryName(edition.country) }}
-      </p>
-    </div>
-
-    <!-- Services avec pictos -->
-    <div class="flex flex-wrap gap-1 mt-4">
-      <UIcon
-        v-for="activeService in getActiveServices(edition)"
-        :key="activeService.key"
-        :name="activeService.icon"
-        :class="activeService.color"
-        size="20"
-        :title="activeService.label"
-      />
-    </div>
-
-    <template #footer>
-      <div class="flex justify-end">
-        <slot name="footer-actions" :edition="edition">
-          <NuxtLink :to="`/editions/${edition.id}`">
-            <UButton
-              icon="i-heroicons-eye"
-              size="sm"
-              color="info"
-              variant="solid"
-              :label="t('common.view')"
-            />
-          </NuxtLink>
-        </slot>
-      </div>
-    </template>
-  </UCard>
+    <!-- Stretched link : rend toute la carte cliquable -->
+    <NuxtLink
+      :to="`/editions/${edition.id}`"
+      :aria-label="`${t('common.view')} ${getEditionDisplayName(edition)}`"
+      class="absolute inset-0 rounded-lg focus-visible:ring-2 focus-visible:ring-primary-500"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
