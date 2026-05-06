@@ -518,7 +518,7 @@ async function fetchAndExtractContent(
   try {
     if (taskId) {
       updateTaskMetadata(taskId, {
-        statusText: `Exploration: ${new URL(url).hostname}${new URL(url).pathname.substring(0, 30)}...`,
+        statusText: `Exploration: ${url}`,
       })
     }
 
@@ -757,7 +757,7 @@ export async function runAgentExploration(
       updateTaskStatus(taskId, 'processing', progressPercent)
       updateTaskMetadata(taskId, {
         pagesVisited: visitedUrls.length,
-        statusText: `Exploration ${i + 1}/${urls.length}: ${new URL(url).hostname}...`,
+        statusText: `Exploration ${i + 1}/${urls.length}: ${url}`,
       })
     }
     notifyProgress(i, urls.length, url)
@@ -848,7 +848,7 @@ export async function runAgentExploration(
         updateTaskStatus(taskId, 'processing', progressPercent)
         updateTaskMetadata(taskId, {
           pagesVisited: visitedUrls.length,
-          statusText: `Exploration lien externe ${i + 1}/${externalLinksToExplore.length}: ${new URL(extUrl).hostname}...`,
+          statusText: `Exploration lien externe ${i + 1}/${externalLinksToExplore.length}: ${extUrl}`,
         })
       }
       notifyProgress(visitedUrls.length, MAX_AGENT_ITERATIONS, extUrl)

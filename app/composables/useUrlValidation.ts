@@ -53,27 +53,6 @@ export const useUrlValidation = () => {
   }
 
   /**
-   * Extrait le hostname d'une URL
-   * @param url - URL à parser
-   * @returns Hostname sans "www."
-   */
-  const getHostname = (url: string): string => {
-    try {
-      const parsed = new URL(url)
-      const hostname = parsed.hostname.replace('www.', '')
-
-      if (hostname === 'facebook.com') {
-        if (parsed.pathname.includes('/events/')) return 'facebook.com (event)'
-        return 'facebook.com (page)'
-      }
-
-      return hostname
-    } catch {
-      return url
-    }
-  }
-
-  /**
    * Vérifie si une URL est valide
    * @param url - URL à vérifier
    * @returns true si l'URL est valide
@@ -89,7 +68,6 @@ export const useUrlValidation = () => {
 
   return {
     parseAndValidateUrls,
-    getHostname,
     isValidUrl,
   }
 }

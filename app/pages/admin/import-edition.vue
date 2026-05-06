@@ -102,7 +102,6 @@
           :format-ms="formatMs"
           :format-duration="formatDuration"
           :format-sub-step="formatSubStepWrapper"
-          :get-hostname="getHostname"
         />
 
         <!-- Erreur de génération -->
@@ -367,7 +366,6 @@ const {
   isCurrentStep,
   currentStepIcon,
   currentStepIconClass,
-  getHostname,
   generate,
   // Providers IA
   availableProviders,

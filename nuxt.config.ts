@@ -108,6 +108,8 @@ export default defineNuxtConfig({
           'https://fcm.googleapis.com',
           'https://api.stripe.com',
           'https://www.google.com',
+          // Geocoding OSM utilisé pour l'autocomplétion d'adresses
+          'https://nominatim.openstreetmap.org',
           // WebSocket pour le HMR Vite en dev (ws:) et la production HTTPS (wss:)
           ...(process.env.NODE_ENV === 'production' ? ['wss:'] : ['ws:', 'wss:']),
         ],

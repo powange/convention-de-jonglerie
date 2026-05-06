@@ -68,7 +68,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   } = useElapsedTimer()
 
   // Validation des URLs
-  const { parseAndValidateUrls, getHostname } = useUrlValidation()
+  const { parseAndValidateUrls } = useUrlValidation()
 
   // État de génération
   const generating = ref(false)
@@ -399,7 +399,6 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     isCurrentStep,
     currentStepIcon,
     currentStepIconClass,
-    getHostname,
     getStepLabel,
 
     // Actions

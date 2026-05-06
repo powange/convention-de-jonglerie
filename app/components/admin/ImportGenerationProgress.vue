@@ -31,9 +31,9 @@
         :key="`${idx}-${subIdx}`"
         class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 ml-6"
       >
-        <UIcon name="i-heroicons-arrow-right-circle" class="text-gray-400" />
-        <span class="font-mono w-14">{{ formatSubStep(entry, subStep, subIdx) }}</span>
-        <span>{{ getHostname(subStep.url) }}</span>
+        <UIcon name="i-heroicons-arrow-right-circle" class="text-gray-400 shrink-0" />
+        <span class="font-mono w-14 shrink-0">{{ formatSubStep(entry, subStep, subIdx) }}</span>
+        <span class="break-all">{{ subStep.url }}</span>
       </div>
     </template>
 
@@ -73,7 +73,5 @@ defineProps<{
   formatDuration: (entry: StepHistoryEntry, idx: number) => string
   /** Fonction pour formater la durée d'une sous-étape */
   formatSubStep: (parent: StepHistoryEntry, subStep: SubStepEntry, subIdx: number) => string
-  /** Fonction pour extraire le hostname d'une URL */
-  getHostname: (url: string) => string
 }>()
 </script>

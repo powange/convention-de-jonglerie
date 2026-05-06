@@ -145,7 +145,6 @@
             :format-ms="formatMs"
             :format-duration="formatDuration"
             :format-sub-step="formatSubStepWrapper"
-            :get-hostname="getHostname"
           />
 
           <!-- Erreur -->
@@ -281,7 +280,6 @@ const {
   formatDuration,
   formatSubStepWrapper,
   isCurrentStep,
-  getHostname,
   generate,
   availableProviders,
   selectedProvider,
