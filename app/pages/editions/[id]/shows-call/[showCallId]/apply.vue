@@ -282,12 +282,10 @@
                     </div>
 
                     <UFormField :label="t('common.phone')" name="phone" :required="phoneRequired">
-                      <UInput
+                      <UiPhoneInput
                         v-model="formState.phone"
-                        type="tel"
                         :placeholder="t('shows_call.form.phone_placeholder')"
                         size="lg"
-                        class="w-full"
                       />
                     </UFormField>
                   </div>
@@ -577,12 +575,10 @@
                             :name="`additionalPerformers.${index}.phone`"
                             :required="phoneRequired"
                           >
-                            <UInput
+                            <UiPhoneInput
                               v-model="performer.phone"
-                              type="tel"
                               :placeholder="t('shows_call.form.phone_placeholder')"
                               size="lg"
-                              class="w-full"
                             />
                           </UFormField>
                         </template>
@@ -1331,28 +1327,12 @@ function validate(state: typeof formState) {
     })
   }
 
-  const trimmedPhone = (state.phone || '').trim()
-  if (phoneRequired.value) {
-    if (!trimmedPhone || trimmedPhone.length < 6) {
-      errors.push({
-        name: 'phone',
-        message: t('shows_call.validation.phone_required'),
-      })
-    } else if (trimmedPhone.length > 20) {
-      errors.push({
-        name: 'phone',
-        message: t('shows_call.validation.phone_max_length'),
-      })
-    }
-  } else if (trimmedPhone.length > 0 && trimmedPhone.length < 6) {
+  // Validation présence uniquement (le format E.164 est validé côté serveur via
+  // libphonenumber-js et le message d'erreur remonte au bon champ via Zod)
+  if (phoneRequired.value && !(state.phone || '').trim()) {
     errors.push({
       name: 'phone',
       message: t('shows_call.validation.phone_required'),
-    })
-  } else if (trimmedPhone.length > 20) {
-    errors.push({
-      name: 'phone',
-      message: t('shows_call.validation.phone_max_length'),
     })
   }
 
@@ -1489,16 +1469,8 @@ function validate(state: typeof formState) {
           message: t('shows_call.validation.performer_email_required'),
         })
       }
-      // Téléphone : seulement si le show call exige le tél, ou si saisi mais < 6 chars
-      const performerPhone = (performer.phone || '').trim()
-      if (phoneRequired.value) {
-        if (!performerPhone || performerPhone.length < 6) {
-          errors.push({
-            name: `additionalPerformers.${index}.phone`,
-            message: t('shows_call.validation.performer_phone_required'),
-          })
-        }
-      } else if (performerPhone.length > 0 && performerPhone.length < 6) {
+      // Présence uniquement si requirePhone (format E.164 validé côté serveur)
+      if (phoneRequired.value && !(performer.phone || '').trim()) {
         errors.push({
           name: `additionalPerformers.${index}.phone`,
           message: t('shows_call.validation.performer_phone_required'),

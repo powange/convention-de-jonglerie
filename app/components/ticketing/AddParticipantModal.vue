@@ -343,9 +343,8 @@
 
                       <!-- Phone -->
                       <div v-else-if="option.type === 'Phone'">
-                        <UInput
+                        <UiPhoneInput
                           :model-value="getOptionAnswer(item, option.name)"
-                          type="tel"
                           placeholder="Numéro de téléphone"
                           @update:model-value="
                             (value: string) => setOptionAnswer(item, option.id, option.name, value)

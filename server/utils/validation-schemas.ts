@@ -1,6 +1,29 @@
+import { isValidPhoneNumber, parsePhoneNumberFromString } from 'libphonenumber-js'
 import { z } from 'zod'
 
 import { getSupportedLocalesCodes } from '~/utils/locales'
+
+/**
+ * Validation d'un numéro de téléphone international.
+ * Accepte uniquement le format E.164 (`+[code pays][numéro]`) parsable par
+ * libphonenumber-js. La chaîne vide / null est gérée par les schémas appelants
+ * (optionnel ou non).
+ */
+export function isInternationalPhoneValid(value: string): boolean {
+  if (!value) return false
+  const trimmed = value.trim()
+  if (!trimmed.startsWith('+')) return false
+  return isValidPhoneNumber(trimmed)
+}
+
+/**
+ * Normalise un numéro en E.164 si possible, sinon retourne la valeur trimée.
+ */
+export function normalizePhoneE164(value: string | null | undefined): string {
+  if (!value) return ''
+  const parsed = parsePhoneNumberFromString(value.trim())
+  return parsed?.isValid() ? parsed.number : value.trim()
+}
 
 // Schémas de base réutilisables
 export const emailSchema = z.string().email('Email invalide').min(1, 'Email requis')
@@ -21,7 +44,7 @@ export const phoneSchema = z
   .string()
   .nullable()
   .optional()
-  .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), 'Numéro de téléphone invalide')
+  .refine((val) => !val || isInternationalPhoneValid(val), 'Numéro de téléphone invalide')
 export const urlSchema = z.string().url('URL invalide').nullable().optional().or(z.literal(''))
 // Schéma pour les dates - accepte ISO strict et datetime-local pour la transition
 export const dateSchema = z
@@ -580,16 +603,14 @@ export function createShowApplicationSchema(
   options: { phoneRequired: boolean } = { phoneRequired: true }
 ) {
   const phoneSchema = options.phoneRequired
-    ? z
-        .string()
-        .min(6, 'Le numéro de téléphone doit contenir au moins 6 caractères')
-        .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères')
-    : z
-        .string()
-        .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères')
-        .refine((v) => v === '' || v.length >= 6, {
-          message: 'Le numéro de téléphone doit contenir au moins 6 caractères',
-        })
+    ? z.string().refine(isInternationalPhoneValid, {
+        message:
+          'Numéro de téléphone invalide (format international attendu, ex: +33 6 12 34 56 78)',
+      })
+    : z.string().refine((v) => v === '' || isInternationalPhoneValid(v), {
+        message:
+          'Numéro de téléphone invalide (format international attendu, ex: +33 6 12 34 56 78)',
+      })
 
   return z
     .object({

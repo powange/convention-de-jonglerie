@@ -33,7 +33,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       availableSeats: 3,
       direction: 'TO_EVENT',
       description: 'Voyage sympa vers la convention',
-      phoneNumber: '0123456789',
+      phoneNumber: '+33123456789',
     }
 
     const mockEdition = {

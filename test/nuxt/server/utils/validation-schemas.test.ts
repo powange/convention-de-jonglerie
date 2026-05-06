@@ -81,15 +81,14 @@ describe('Validation Schemas', () => {
     })
 
     describe('phoneSchema', () => {
-      it('devrait valider des numéros de téléphone valides', () => {
+      it('devrait valider des numéros de téléphone E.164 valides', () => {
         const validPhones = [
-          '0612345678',
-          '+33612345678',
-          '06 12 34 56 78',
-          '(06) 12-34-56-78',
+          '+33612345678', // FR
+          '+4915123456789', // DE
+          '+12025550123', // US
           undefined, // Optionnel
           null, // Nullable
-          '',
+          '', // Vide accepté (optionnel)
         ]
 
         validPhones.forEach((phone) => {
@@ -97,9 +96,12 @@ describe('Validation Schemas', () => {
         })
       })
 
-      it('devrait rejeter des numéros invalides', () => {
+      it("devrait rejeter les numéros sans format E.164 ou invalides", () => {
+        // Plus de format national accepté : on exige E.164 (commence par +)
+        expect(() => schemas.phoneSchema.parse('0612345678')).toThrow()
+        expect(() => schemas.phoneSchema.parse('06 12 34 56 78')).toThrow()
         expect(() => schemas.phoneSchema.parse('notaphone')).toThrow()
-        expect(() => schemas.phoneSchema.parse('123-abc-456')).toThrow()
+        expect(() => schemas.phoneSchema.parse('+33000')).toThrow() // trop court / invalide
       })
     })
 
@@ -315,7 +317,7 @@ describe('Validation Schemas', () => {
           availableSeats: 3,
           direction: 'FROM_EVENT',
           description: 'Départ depuis la gare',
-          phoneNumber: '0612345678',
+          phoneNumber: '+33612345678',
         }
 
         expect(() => schemas.carpoolOfferSchema.parse(fullOffer)).not.toThrow()

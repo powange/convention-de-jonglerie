@@ -122,12 +122,10 @@
           </div>
 
           <UFormField :label="$t('edition.ticketing.phone')">
-            <UInput
+            <UiPhoneInput
               v-model="formData.phone"
-              type="tel"
               :placeholder="$t('edition.ticketing.phone')"
               :disabled="!isManualUser || !!existingUserMatch"
-              class="w-full"
             />
           </UFormField>
 

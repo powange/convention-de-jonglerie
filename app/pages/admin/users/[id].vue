@@ -200,7 +200,7 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {{ $t('profile.phone') }} ({{ $t('common.optional') }})
                 </label>
-                <UInput v-model="editForm.phone" type="tel" size="md" />
+                <UiPhoneInput v-model="editForm.phone" size="md" />
               </div>
             </div>
           </div>

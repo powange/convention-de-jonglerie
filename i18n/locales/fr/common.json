@@ -1132,7 +1132,6 @@
       "performer_first_name_required": "Le prénom est requis (minimum 2 caractères)",
       "performer_last_name_required": "Le nom est requis (minimum 2 caractères)",
       "performer_phone_required": "Le téléphone est requis (minimum 6 caractères)",
-      "phone_max_length": "Le numéro de téléphone ne peut pas dépasser 20 caractères",
       "phone_required": "Le numéro de téléphone est requis (minimum 6 caractères)",
       "show_category_max_length": "La catégorie ne peut pas dépasser 100 caractères",
       "show_description_max_length": "La description ne peut pas dépasser 5000 caractères",

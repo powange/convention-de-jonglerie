@@ -45,11 +45,9 @@
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
           {{ $t('ticketing.participant.phone') }}
         </p>
-        <UInput
+        <UiPhoneInput
           :model-value="phone"
-          type="tel"
           placeholder="06 12 34 56 78"
-          icon="i-heroicons-phone"
           size="sm"
           @update:model-value="$emit('update:phone', $event)"
         />

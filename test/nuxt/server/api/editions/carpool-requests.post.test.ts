@@ -32,7 +32,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       direction: 'TO_EVENT',
       seatsNeeded: 2,
       description: 'Cherche covoiturage sympa',
-      phoneNumber: '0987654321',
+      phoneNumber: '+33987654321',
     }
 
     const mockEdition = {

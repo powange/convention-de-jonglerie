@@ -180,13 +180,10 @@
             name="phoneNumber"
             :description="$t('carpool.phone_description')"
           >
-            <UInput
+            <UiPhoneInput
               v-model="form.phoneNumber"
               :placeholder="$t('carpool.phone_placeholder')"
-              icon="i-heroicons-phone"
-              type="tel"
               size="lg"
-              class="w-full"
             />
           </UFormField>
         </div>

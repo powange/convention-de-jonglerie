@@ -83,7 +83,10 @@
       "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/list-todo-keys.js)",
       "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/generate-todo-files.js)",
       "Bash(node /home/powange/projects/convention-de-jonglerie/scripts/translation/apply-translations.js)",
-      "mcp__jcodemunch__list_repos"
+      "mcp__jcodemunch__list_repos",
+      "mcp__nuxt-ui__search-components",
+      "Bash(sed -i \"s/phoneNumber: '0987654321'/phoneNumber: '+33987654321'/g\" /home/powange/projects/convention-de-jonglerie/test/nuxt/server/api/editions/carpool-requests.post.test.ts)",
+      "Bash(sed -i \"s/phoneNumber: '0123456789'/phoneNumber: '+33123456789'/g\" /home/powange/projects/convention-de-jonglerie/test/nuxt/server/api/editions/carpool-offers.post.test.ts)"
     ],
     "additionalDirectories": [
       "/tmp",

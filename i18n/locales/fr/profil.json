@@ -13,6 +13,20 @@
     "current_password_placeholder": "Votre mot de passe actuel",
     "current_password_required": "Mot de passe actuel requis",
     "customize_avatar": "Personnalisez votre avatar",
+    "delete_account": {
+      "confirm_button": "Supprimer définitivement mon compte",
+      "confirm_description": "Pour confirmer la suppression de votre compte, saisissez votre pseudo : {pseudo}",
+      "confirm_placeholder": "Saisissez votre pseudo",
+      "confirm_title": "Confirmer la suppression",
+      "deleting": "Suppression en cours...",
+      "description": "La suppression de votre compte est irréversible. Toutes vos données seront définitivement supprimées.",
+      "error": "Impossible de supprimer le compte",
+      "success": "Compte supprimé",
+      "success_description": "Votre compte a été supprimé avec succès.",
+      "title": "Supprimer mon compte",
+      "warning": "Cette action est irréversible",
+      "warning_details": "La suppression de votre compte entraînera la perte définitive de toutes vos données : conventions créées, candidatures, favoris, messages et préférences."
+    },
     "direct_access": "Accès direct aux fonctionnalités",
     "favorites": "Favoris",
     "favorites_received": "Favoris reçus",
@@ -32,6 +46,24 @@
     "new_password_placeholder": "Votre nouveau mot de passe",
     "no_password_set": "Aucun mot de passe défini",
     "notification_preferences_updated": "Vos préférences de notifications ont été mises à jour",
+    "notifications": {
+      "application_updates": "Candidatures bénévoles",
+      "application_updates_desc": "Acceptation, refus ou modifications de vos candidatures",
+      "carpool_updates": "Covoiturage",
+      "carpool_updates_desc": "Demandes, confirmations et annulations de covoiturage",
+      "convention_news": "Nouvelles conventions",
+      "convention_news_desc": "Notifications des nouvelles conventions ajoutées",
+      "manage_preferences": "Gérer vos préférences de notifications",
+      "preferences_description": "Choisissez les types de notifications que vous souhaitez recevoir",
+      "preferences_title": "Préférences de notifications",
+      "receive_by_email": "Recevoir par email",
+      "save_preferences": "Sauvegarder les préférences",
+      "saving_preferences": "Sauvegarde...",
+      "system_notifications": "Notifications système",
+      "system_notifications_desc": "Mises à jour importantes et maintenance",
+      "volunteer_reminders": "Rappels de créneaux bénévoles",
+      "volunteer_reminders_desc": "Notifications 30 minutes avant vos créneaux"
+    },
     "oauth_password_info": "Vous vous êtes connecté via Google. Vous pouvez définir un mot de passe pour pouvoir vous connecter avec votre email.",
     "optional_section_title": "Informations facultatives",
     "password_changed": "Mot de passe changé",
@@ -75,44 +107,6 @@
     "username_help": "Visible publiquement par les autres utilisateurs",
     "username_min_3": "Le pseudo doit contenir au moins 3 caractères",
     "username_placeholder": "Votre pseudo unique",
-    "welcome": "Bienvenue !",
-    "notifications": {
-      "manage_preferences": "Gérer vos préférences de notifications",
-      "preferences_title": "Préférences de notifications",
-      "preferences_description": "Choisissez les types de notifications que vous souhaitez recevoir",
-      "receive_by_email": "Recevoir par email",
-      "save_preferences": "Sauvegarder les préférences",
-      "saving_preferences": "Sauvegarde...",
-      "volunteer_reminders": "Rappels de créneaux bénévoles",
-      "volunteer_reminders_desc": "Notifications 30 minutes avant vos créneaux",
-      "application_updates": "Candidatures bénévoles",
-      "application_updates_desc": "Acceptation, refus ou modifications de vos candidatures",
-      "convention_news": "Nouvelles conventions",
-      "convention_news_desc": "Notifications des nouvelles conventions ajoutées",
-      "carpool_updates": "Covoiturage",
-      "carpool_updates_desc": "Demandes, confirmations et annulations de covoiturage",
-      "system_notifications": "Notifications système",
-      "system_notifications_desc": "Mises à jour importantes et maintenance"
-    },
-    "delete_account": {
-      "title": "Supprimer mon compte",
-      "description": "La suppression de votre compte est irréversible. Toutes vos données seront définitivement supprimées.",
-      "warning": "Cette action est irréversible",
-      "warning_details": "La suppression de votre compte entraînera la perte définitive de toutes vos données : conventions créées, candidatures, favoris, messages et préférences.",
-      "confirm_title": "Confirmer la suppression",
-      "confirm_description": "Pour confirmer la suppression de votre compte, saisissez votre pseudo : {pseudo}",
-      "confirm_placeholder": "Saisissez votre pseudo",
-      "confirm_button": "Supprimer définitivement mon compte",
-      "deleting": "Suppression en cours...",
-      "success": "Compte supprimé",
-      "success_description": "Votre compte a été supprimé avec succès.",
-      "error": "Impossible de supprimer le compte"
-    }
-  },
-  "pages": {
-    "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
-    }
+    "welcome": "Bienvenue !"
   }
 }

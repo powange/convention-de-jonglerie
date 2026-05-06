@@ -84,13 +84,10 @@
             </UFormField>
 
             <UFormField :label="t('profile.phone')" name="telephone">
-              <UInput
+              <UiPhoneInput
                 v-model="state.telephone"
-                icon="i-heroicons-phone"
-                type="tel"
                 :placeholder="t('profile.phone_placeholder')"
                 size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
               />
             </UFormField>
 
