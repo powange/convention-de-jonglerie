@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Richiedere la città di partenza per il calcolo del rimborso viaggio",
       "field_portfolio": "Portfolio / Sito web",
       "field_portfolio_desc": "Richiedere un link al portfolio o sito web dell'artista",
+      "field_require_phone": "Telefono obbligatorio",
+      "field_require_phone_desc": "Se disattivato, il numero di telefono (contatto principale e artisti partecipanti) è facoltativo nel modulo di candidatura",
       "field_social_links": "Social network",
       "field_social_links_desc": "Richiedere i link ai social network dell'artista",
       "field_technical": "Requisiti tecnici",

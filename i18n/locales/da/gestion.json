@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Bed om afrejseby til beregning af rejsegodtgørelse",
       "field_portfolio": "Portfolio / Hjemmeside",
       "field_portfolio_desc": "Bed om link til kunstnerens portfolio eller hjemmeside",
+      "field_require_phone": "Telefon obligatorisk",
+      "field_require_phone_desc": "Når deaktiveret bliver telefonnummeret (hovedkontakt og medvirkende) valgfrit i ansøgningsskemaet",
       "field_social_links": "Sociale medier",
       "field_social_links_desc": "Bed om links til kunstnerens sociale medier",
       "field_technical": "Tekniske krav",

@@ -158,6 +158,7 @@ model EditionShowCall {
   askAccommodation  Boolean            @default(false)
   askDepartureCity  Boolean            @default(false) // Demander la ville de départ pour le défraiement
   askSocialLinks    Boolean            @default(false) // Demander les réseaux sociaux
+  requirePhone      Boolean            @default(true) // Téléphone obligatoire dans le formulaire de candidature (contact + performers)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 

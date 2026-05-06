@@ -501,6 +501,7 @@ export interface EditionShowCallPublic extends EditionShowCallBasic {
   askAccommodation: boolean
   askDepartureCity: boolean
   askSocialLinks: boolean
+  requirePhone: boolean
 }
 
 // Candidature avec le nom de l'appel (pour "Mes candidatures")

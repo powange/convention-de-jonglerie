@@ -320,6 +320,21 @@
                 </div>
                 <USwitch v-model="askSocialLinksLocal" :disabled="saving" />
               </div>
+
+              <!-- Phone required -->
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+              >
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.shows_call.field_require_phone') }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ $t('gestion.shows_call.field_require_phone_desc') }}
+                  </p>
+                </div>
+                <USwitch v-model="requirePhoneLocal" :disabled="saving" />
+              </div>
             </div>
           </div>
         </UCard>
@@ -391,6 +406,7 @@ const askTechnicalNeedsLocal = ref(true)
 const askAccommodationLocal = ref(false)
 const askDepartureCityLocal = ref(false)
 const askSocialLinksLocal = ref(false)
+const requirePhoneLocal = ref(true)
 
 const fieldErrors = ref<Record<string, string>>({})
 const initialized = ref(false)
@@ -437,6 +453,7 @@ const initialState = ref({
   askAccommodation: false,
   askDepartureCity: false,
   askSocialLinks: false,
+  requirePhone: true,
 })
 
 // Détecter si des changements ont été faits
@@ -454,7 +471,8 @@ const hasChanges = computed(() => {
     askTechnicalNeedsLocal.value !== initialState.value.askTechnicalNeeds ||
     askAccommodationLocal.value !== initialState.value.askAccommodation ||
     askDepartureCityLocal.value !== initialState.value.askDepartureCity ||
-    askSocialLinksLocal.value !== initialState.value.askSocialLinks
+    askSocialLinksLocal.value !== initialState.value.askSocialLinks ||
+    requirePhoneLocal.value !== initialState.value.requirePhone
   )
 })
 
@@ -548,6 +566,7 @@ const fetchSettings = async () => {
     askAccommodationLocal.value = response.askAccommodation ?? false
     askDepartureCityLocal.value = response.askDepartureCity ?? false
     askSocialLinksLocal.value = response.askSocialLinks ?? false
+    requirePhoneLocal.value = response.requirePhone ?? true
 
     // Formater la date pour le DateTimePicker
     if (response.deadline) {
@@ -584,6 +603,7 @@ const updateInitialState = () => {
     askAccommodation: askAccommodationLocal.value,
     askDepartureCity: askDepartureCityLocal.value,
     askSocialLinks: askSocialLinksLocal.value,
+    requirePhone: requirePhoneLocal.value,
   }
 }
 
@@ -601,6 +621,7 @@ const buildSettingsBody = () => {
     askAccommodation: askAccommodationLocal.value,
     askDepartureCity: askDepartureCityLocal.value,
     askSocialLinks: askSocialLinksLocal.value,
+    requirePhone: requirePhoneLocal.value,
   }
 
   if (modeLocal.value === 'EXTERNAL') {

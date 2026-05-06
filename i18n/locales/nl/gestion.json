@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Vraag vertrekplaats voor berekening reiskostenvergoeding",
       "field_portfolio": "Portfolio / Website",
       "field_portfolio_desc": "Vraag om link naar portfolio of website van de artiest",
+      "field_require_phone": "Telefoon verplicht",
+      "field_require_phone_desc": "Indien uitgeschakeld is het telefoonnummer (hoofdcontact en deelnemende artiesten) optioneel in het aanmeldformulier",
       "field_social_links": "Sociale netwerken",
       "field_social_links_desc": "Vraag om links naar sociale netwerken van de artiest",
       "field_technical": "Technische vereisten",

@@ -3,7 +3,10 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { handleValidationError, showApplicationSchema } from '#server/utils/validation-schemas'
+import {
+  createShowApplicationSchema,
+  handleValidationError,
+} from '#server/utils/validation-schemas'
 
 /**
  * Modifier sa candidature à un appel à spectacles
@@ -79,12 +82,14 @@ export default wrapApiHandler(
       })
     }
 
-    // Valider les données — handleValidationError formate les erreurs Zod
-    // sous { path: message } dans error.data.errors pour affichage frontend
+    // Valider les données — schéma adapté au réglage requirePhone du show call
+    const applicationSchema = createShowApplicationSchema({
+      phoneRequired: showCall.requirePhone,
+    })
     const body = await readBody(event)
-    let validatedData: z.infer<typeof showApplicationSchema>
+    let validatedData: z.infer<typeof applicationSchema>
     try {
-      validatedData = showApplicationSchema.parse(body)
+      validatedData = applicationSchema.parse(body)
     } catch (error) {
       if (error instanceof z.ZodError) {
         handleValidationError(error)

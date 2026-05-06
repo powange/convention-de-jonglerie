@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Be om avresestad för beräkning av resebidrag",
       "field_portfolio": "Portfolio / Webbplats",
       "field_portfolio_desc": "Be om länk till artistens portfolio eller webbplats",
+      "field_require_phone": "Telefon obligatoriskt",
+      "field_require_phone_desc": "När det är avaktiverat blir telefonnumret (huvudkontakt och medverkande artister) valfritt i ansökningsformuläret",
       "field_social_links": "Sociala medier",
       "field_social_links_desc": "Be om länkar till artistens sociala medier",
       "field_technical": "Tekniska krav",

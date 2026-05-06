@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Ask for departure city for travel allowance calculation",
       "field_portfolio": "Portfolio / Website",
       "field_portfolio_desc": "Ask for a link to the artist's portfolio or website",
+      "field_require_phone": "Phone required",
+      "field_require_phone_desc": "When disabled, the phone number (main contact and additional performers) becomes optional in the application form",
       "field_social_links": "Social networks",
       "field_social_links_desc": "Ask for links to the artist's social networks",
       "field_technical": "Technical requirements",

@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Abfahrtsort für die Berechnung der Reisekostenpauschale erfragen",
       "field_portfolio": "Portfolio / Website",
       "field_portfolio_desc": "Link zum Portfolio oder zur Website des Künstlers erfragen",
+      "field_require_phone": "Telefon erforderlich",
+      "field_require_phone_desc": "Wenn deaktiviert, wird die Telefonnummer (Hauptkontakt und Mitwirkende) im Bewerbungsformular optional",
       "field_social_links": "Soziale Netzwerke",
       "field_social_links_desc": "Links zu den sozialen Netzwerken des Künstlers erfragen",
       "field_technical": "Technische Anforderungen",

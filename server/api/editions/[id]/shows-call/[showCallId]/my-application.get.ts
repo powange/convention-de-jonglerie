@@ -60,6 +60,7 @@ export default wrapApiHandler(
         askTechnicalNeeds: showCall.askTechnicalNeeds,
         askAccommodation: showCall.askAccommodation,
         askDepartureCity: showCall.askDepartureCity,
+        requirePhone: showCall.requirePhone,
       },
     }
   },

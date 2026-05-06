@@ -281,7 +281,7 @@
                       </UFormField>
                     </div>
 
-                    <UFormField :label="t('common.phone')" name="phone" required>
+                    <UFormField :label="t('common.phone')" name="phone" :required="phoneRequired">
                       <UInput
                         v-model="formState.phone"
                         type="tel"
@@ -575,7 +575,7 @@
                           <UFormField
                             :label="t('common.phone')"
                             :name="`additionalPerformers.${index}.phone`"
-                            required
+                            :required="phoneRequired"
                           >
                             <UInput
                               v-model="performer.phone"
@@ -1160,6 +1160,9 @@ const {
   `/api/editions/${editionId}/shows-call/${showCallId}/public`
 )
 
+// Téléphone obligatoire ou facultatif selon le réglage du show call
+const phoneRequired = computed(() => showCall.value?.requirePhone ?? true)
+
 // Vérifier si l'utilisateur a déjà candidaté et pré-remplir le formulaire
 onMounted(async () => {
   if (authStore.isAuthenticated) {
@@ -1328,12 +1331,25 @@ function validate(state: typeof formState) {
     })
   }
 
-  if (!state.phone || state.phone.trim().length < 6) {
+  const trimmedPhone = (state.phone || '').trim()
+  if (phoneRequired.value) {
+    if (!trimmedPhone || trimmedPhone.length < 6) {
+      errors.push({
+        name: 'phone',
+        message: t('shows_call.validation.phone_required'),
+      })
+    } else if (trimmedPhone.length > 20) {
+      errors.push({
+        name: 'phone',
+        message: t('shows_call.validation.phone_max_length'),
+      })
+    }
+  } else if (trimmedPhone.length > 0 && trimmedPhone.length < 6) {
     errors.push({
       name: 'phone',
       message: t('shows_call.validation.phone_required'),
     })
-  } else if (state.phone.trim().length > 20) {
+  } else if (trimmedPhone.length > 20) {
     errors.push({
       name: 'phone',
       message: t('shows_call.validation.phone_max_length'),
@@ -1473,7 +1489,16 @@ function validate(state: typeof formState) {
           message: t('shows_call.validation.performer_email_required'),
         })
       }
-      if (!performer.phone || performer.phone.trim().length < 6) {
+      // Téléphone : seulement si le show call exige le tél, ou si saisi mais < 6 chars
+      const performerPhone = (performer.phone || '').trim()
+      if (phoneRequired.value) {
+        if (!performerPhone || performerPhone.length < 6) {
+          errors.push({
+            name: `additionalPerformers.${index}.phone`,
+            message: t('shows_call.validation.performer_phone_required'),
+          })
+        }
+      } else if (performerPhone.length > 0 && performerPhone.length < 6) {
         errors.push({
           name: `additionalPerformers.${index}.phone`,
           message: t('shows_call.validation.performer_phone_required'),

@@ -314,6 +314,8 @@
       "field_departure_city_desc": "Demander la ville de départ pour le calcul du défraiement",
       "field_portfolio": "Portfolio / Site web",
       "field_portfolio_desc": "Demander un lien vers le portfolio ou site web de l'artiste",
+      "field_require_phone": "Téléphone obligatoire",
+      "field_require_phone_desc": "Lorsque désactivé, le numéro de téléphone (contact principal et artistes participants) devient facultatif dans le formulaire de candidature",
       "field_social_links": "Réseaux sociaux",
       "field_social_links_desc": "Demander les liens vers les réseaux sociaux de l'artiste",
       "field_technical": "Besoins techniques",
