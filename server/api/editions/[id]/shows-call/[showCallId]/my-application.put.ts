@@ -1,7 +1,9 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { showApplicationSchema } from '#server/utils/validation-schemas'
+import { handleValidationError, showApplicationSchema } from '#server/utils/validation-schemas'
 
 /**
  * Modifier sa candidature à un appel à spectacles
@@ -77,9 +79,18 @@ export default wrapApiHandler(
       })
     }
 
-    // Valider les données
+    // Valider les données — handleValidationError formate les erreurs Zod
+    // sous { path: message } dans error.data.errors pour affichage frontend
     const body = await readBody(event)
-    const validatedData = showApplicationSchema.parse(body)
+    let validatedData: z.infer<typeof showApplicationSchema>
+    try {
+      validatedData = showApplicationSchema.parse(body)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        handleValidationError(error)
+      }
+      throw error
+    }
 
     // Mettre à jour le profil utilisateur avec les informations personnelles
     await prisma.user.update({

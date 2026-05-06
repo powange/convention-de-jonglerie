@@ -458,7 +458,7 @@ export function validateAndSanitize<T>(schema: z.ZodSchema<T>, data: unknown): T
 }
 
 // Fonction pour gérer les erreurs de validation Zod
-export function handleValidationError(error: z.ZodError) {
+export function handleValidationError(error: z.ZodError): never {
   const formattedErrors = (error.issues || []).reduce(
     (acc, err) => {
       const path = err.path.join('.')
