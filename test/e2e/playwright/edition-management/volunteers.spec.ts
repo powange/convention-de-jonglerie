@@ -60,6 +60,9 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
 
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      // L'affichage du statut est dans <ClientOnly> + dépend d'un fetch
+      // client-side après hydration → on attend que le réseau soit idle
+      await page.waitForLoadState('networkidle', { timeout: 15000 })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 5000 })
     }).toPass({ timeout: 60000, intervals: [5000] })
@@ -151,6 +154,9 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
 
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      // L'affichage du statut est dans <ClientOnly> + dépend d'un fetch
+      // client-side après hydration → on attend que le réseau soit idle
+      await page.waitForLoadState('networkidle', { timeout: 15000 })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByText(/en attente|pending/i).first()).toBeVisible({ timeout: 5000 })
     }).toPass({ timeout: 60000, intervals: [5000] })
@@ -241,6 +247,9 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
 
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      // L'affichage du statut est dans <ClientOnly> + dépend d'un fetch
+      // client-side après hydration → on attend que le réseau soit idle
+      await page.waitForLoadState('networkidle', { timeout: 15000 })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByText(/acceptée|accepted/i).first()).toBeVisible({ timeout: 5000 })
     }).toPass({ timeout: 60000, intervals: [5000] })
@@ -287,6 +296,9 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
 
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
+      // L'affichage du statut est dans <ClientOnly> + dépend d'un fetch
+      // client-side après hydration → on attend que le réseau soit idle
+      await page.waitForLoadState('networkidle', { timeout: 15000 })
       await page.waitForSelector('h3', { timeout: 10000 })
       await expect(page.getByText(/refusée|rejected/i).first()).toBeVisible({ timeout: 5000 })
     }).toPass({ timeout: 60000, intervals: [5000] })
