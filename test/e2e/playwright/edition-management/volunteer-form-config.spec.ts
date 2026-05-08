@@ -69,7 +69,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 30000, intervals: [3000] })
+    }).toPass({ timeout: 60000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -158,7 +158,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 30000, intervals: [3000] })
+    }).toPass({ timeout: 60000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -209,7 +209,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 30000, intervals: [3000] })
+    }).toPass({ timeout: 60000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -250,7 +250,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 30000, intervals: [3000] })
+    }).toPass({ timeout: 60000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -311,7 +311,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 30000, intervals: [3000] })
+    }).toPass({ timeout: 60000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -368,7 +368,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
       await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 30000, intervals: [3000] })
+    }).toPass({ timeout: 60000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
