@@ -73,6 +73,10 @@ export default defineConfig<ConfigOptions>({
       testMatch: /edition-management\//,
       dependencies: ['data-setup'],
       fullyParallel: false,
+      // 2 minutes par test : certains tests font expect.poll(30s) + toPass(60s)
+      // pour rendre déterministes les assertions sur la page publique des
+      // bénévoles (cf. volunteers.spec.ts). Le défaut 30s coupe avant.
+      timeout: 120000,
       use: {
         ...devices['Desktop Chrome'],
         locale: 'fr-FR',
