@@ -147,7 +147,10 @@ test.describe
     await lastNameField.fill('E2E-Nom-Artiste')
 
     await page.locator('input[name="firstName"]').fill('E2E-Prénom-Artiste')
-    await page.locator('input[name="phone"]').fill('+33698765432')
+    // UiPhoneInput rend 1 sélecteur de pays + 1 input type="tel". On cible
+    // l'input téléphone précisément pour éviter une collision avec le hidden
+    // input du USelectMenu (qui hérite aussi du name via UFormField).
+    await page.locator('input[name="phone"][type="tel"]').fill('+33698765432')
 
     // Section : Informations artiste
     await page.getByLabel(/nom de scène/i).fill('E2E Artiste Jongleur')
@@ -176,7 +179,9 @@ test.describe
     await page.locator('input[name="additionalPerformers.0.lastName"]').fill('E2E-Artist-Last')
     await page.locator('input[name="additionalPerformers.0.firstName"]').fill('E2E-Artist-First')
     await page.locator('input[name="additionalPerformers.0.email"]').fill('e2e-artist@example.com')
-    await page.locator('input[name="additionalPerformers.0.phone"]').fill('+33687654321')
+    await page
+      .locator('input[name="additionalPerformers.0.phone"][type="tel"]')
+      .fill('+33687654321')
 
     // Soumettre le formulaire
     const submitButton = page.getByRole('button', { name: /envoyer ma candidature/i })
