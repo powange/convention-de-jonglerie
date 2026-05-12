@@ -1,129 +1,52 @@
 import {
   conventionServices,
-  getServiceByKey,
   getActiveServices,
-  getServicesGrouped,
+  getServiceByKey,
   getServicesByCategory,
+  SERVICE_CATEGORIES,
+  type ConventionService,
 } from '~/utils/convention-services'
 
+/**
+ * Composable d'accès non-traduit aux services. Utiliser
+ * `useTranslatedConventionServices` dès qu'on a besoin des labels affichables.
+ */
 export const useConventionServices = () => {
-  const services = readonly(conventionServices)
-  const servicesGrouped = readonly(getServicesGrouped())
-  const servicesByCategory = readonly(getServicesByCategory())
-
   return {
-    services,
-    servicesGrouped,
-    servicesByCategory,
+    services: readonly(conventionServices),
+    servicesByCategory: readonly(getServicesByCategory()),
     getServiceByKey,
     getActiveServices,
   }
 }
 
-// Mapping des clés vers les clés de traduction i18n
-const serviceTranslationKeys: Record<string, string> = {
-  hasFoodTrucks: 'services.food_trucks',
-  hasKidsZone: 'services.kids_zone',
-  acceptsPets: 'services.pets_accepted',
-  hasTentCamping: 'services.tent_camping',
-  hasTruckCamping: 'services.truck_camping',
-  hasFamilyCamping: 'services.family_camping',
-  hasSleepingRoom: 'services.sleeping_room',
-  hasGym: 'services.gym',
-  hasFireSpace: 'services.fire_space',
-  hasGala: 'services.gala',
-  hasOpenStage: 'services.open_stage',
-  hasLongShow: 'services.long_show',
-  hasConcert: 'services.concert',
-  hasCantine: 'services.canteen',
-  hasAerialSpace: 'services.aerial_space',
-  hasSlacklineSpace: 'services.slackline_space',
-  hasUnicycleSpace: 'services.unicycle_space',
-  hasToilets: 'services.toilets',
-  hasShowers: 'services.showers',
-  hasAccessibility: 'services.accessibility',
-  hasWorkshops: 'services.workshops',
-  hasCashPayment: 'services.cash_payment',
-  hasCreditCardPayment: 'services.credit_card_payment',
-  hasAfjTokenPayment: 'services.afj_token_payment',
-  hasATM: 'services.atm',
-}
-
-// Nouvelle fonction pour obtenir les services traduits
+/**
+ * Variante traduite : retourne les services et leur regroupement par
+ * catégorie avec les labels (service + catégorie) résolus dans la locale
+ * active. Utilisé dans les filtres et les formulaires.
+ */
 export const useTranslatedConventionServices = () => {
   const { t } = useI18n()
 
-  const getTranslatedServices = computed(() =>
+  const getTranslatedServices = computed<
+    Array<Pick<ConventionService, 'key' | 'icon' | 'color' | 'category'> & { label: string }>
+  >(() =>
     conventionServices.map((service) => ({
       key: service.key,
-      label: t(serviceTranslationKeys[service.key] || service.label),
       icon: service.icon,
       color: service.color,
+      category: service.category,
+      label: t(service.i18nKey),
     }))
   )
 
   const getTranslatedServicesByCategory = computed(() => {
-    // Vérifier que t est disponible
-    if (!t) {
-      console.warn('i18n t function not available')
-      return []
-    }
-
     const services = getTranslatedServices.value
-    const grouped = {
-      accommodation: {
-        label: t('services.categories.accommodation'),
-        services: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping', 'hasSleepingRoom'],
-      },
-      food: {
-        label: t('services.categories.food'),
-        services: ['hasFoodTrucks', 'hasCantine'],
-      },
-      activities: {
-        label: t('services.categories.activities'),
-        services: [
-          'hasGym',
-          'hasFireSpace',
-          'hasGala',
-          'hasOpenStage',
-          'hasLongShow',
-          'hasConcert',
-          'hasWorkshops',
-          'hasAerialSpace',
-          'hasSlacklineSpace',
-          'hasUnicycleSpace',
-        ],
-      },
-      amenities: {
-        label: t('services.categories.amenities'),
-        services: [
-          'hasKidsZone',
-          'acceptsPets',
-          'hasToilets',
-          'hasShowers',
-          'hasAccessibility',
-          'hasATM',
-        ],
-      },
-      payment: {
-        label: t('services.categories.payment'),
-        services: ['hasCashPayment', 'hasCreditCardPayment', 'hasAfjTokenPayment'],
-      },
-    }
-
-    const result = []
-    for (const [category, { label, services: serviceKeys }] of Object.entries(grouped)) {
-      const categoryServices = serviceKeys.map(
-        (key) => services.find((service) => service.key === key)!
-      )
-      result.push({
-        category,
-        label,
-        services: categoryServices,
-      })
-    }
-
-    return result
+    return SERVICE_CATEGORIES.map((category) => ({
+      category,
+      label: t(`services.categories.${category}`),
+      services: services.filter((s) => s.category === category),
+    }))
   })
 
   return {

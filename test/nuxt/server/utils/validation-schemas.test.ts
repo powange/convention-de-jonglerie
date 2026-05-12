@@ -96,7 +96,7 @@ describe('Validation Schemas', () => {
         })
       })
 
-      it("devrait rejeter les numéros sans format E.164 ou invalides", () => {
+      it('devrait rejeter les numéros sans format E.164 ou invalides', () => {
         // Plus de format national accepté : on exige E.164 (commence par +)
         expect(() => schemas.phoneSchema.parse('0612345678')).toThrow()
         expect(() => schemas.phoneSchema.parse('06 12 34 56 78')).toThrow()

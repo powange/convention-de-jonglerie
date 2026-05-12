@@ -113,7 +113,8 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon'
 
-import { getActiveServices, type ConventionService } from '~/utils/convention-services'
+import { useTranslatedConventionServices } from '~/composables/useConventionServices'
+import type { ConventionServiceKeys } from '~/utils/convention-services'
 import { getEditionDisplayName } from '~/utils/editionName'
 
 interface EditionLike {
@@ -129,6 +130,7 @@ interface EditionLike {
 const props = defineProps<{ editions: EditionLike[] }>()
 const { t, locale } = useI18n()
 const { translateCountryName } = useCountryTranslation()
+const { getTranslatedServices } = useTranslatedConventionServices()
 
 const editionsRef = toRef(props, 'editions')
 
@@ -162,10 +164,10 @@ const selectedEdition = computed(
   () => props.editions.find((e) => e.id === selectedEditionId.value) || null
 )
 
-const activeServices = computed<ConventionService[]>(() => {
+const activeServices = computed(() => {
   if (!selectedEdition.value) return []
-  // On filtre uniquement les clés présentes sur l'édition
-  return getActiveServices(selectedEdition.value as any)
+  const edition = selectedEdition.value as Partial<ConventionServiceKeys>
+  return getTranslatedServices.value.filter((s) => edition[s.key])
 })
 
 function openEdition(id: number) {

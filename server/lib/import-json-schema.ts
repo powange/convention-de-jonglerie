@@ -7,6 +7,8 @@
  * et les fonctions qui assemblent les prompts finaux via loadPrompt().
  */
 
+import { conventionServices } from '~/utils/convention-services'
+
 import { loadPrompt } from '#server/lib/prompt-loader'
 import { EDITION_FEATURES_DESCRIPTIONS } from '#server/utils/edition-features-extractor'
 
@@ -170,32 +172,9 @@ export function generateJsonExample(): string {
         volunteersOpen: false,
         volunteersDescription: '',
         volunteersExternalUrl: '',
-        // Caractéristiques (mettre true si mentionné)
-        hasTentCamping: false,
-        hasTruckCamping: false,
-        hasFamilyCamping: false,
-        hasSleepingRoom: false,
-        hasFoodTrucks: false,
-        hasCantine: false,
-        hasGym: false,
-        hasFireSpace: false,
-        hasAerialSpace: false,
-        hasSlacklineSpace: false,
-        hasUnicycleSpace: false,
-        hasWorkshops: false,
-        hasKidsZone: false,
-        hasGala: false,
-        hasOpenStage: false,
-        hasConcert: false,
-        hasLongShow: false,
-        hasToilets: false,
-        hasShowers: false,
-        hasAccessibility: false,
-        acceptsPets: false,
-        hasCashPayment: false,
-        hasCreditCardPayment: false,
-        hasAfjTokenPayment: false,
-        hasATM: false,
+        // Caractéristiques (mettre true si mentionné) — généré depuis la liste
+        // centrale conventionServices pour rester en phase quand on ajoute un service.
+        ...Object.fromEntries(conventionServices.map((s) => [s.key, false])),
       },
     },
     null,
@@ -216,37 +195,17 @@ export function generateFeaturesDescription(): string {
 }
 
 /**
- * Liste des caractéristiques avec leurs labels pour le prompt compact
- * Centralisé ici pour être utilisé par ED et EI
+ * Liste des caractéristiques avec leurs labels pour le prompt compact.
+ * Dérivée de la source unique `conventionServices` : ajouter un service =
+ * il apparaît automatiquement dans le prompt IA.
+ *
+ * Note: status n'est pas inclus car une édition importée est toujours
+ * publiée (PUBLISHED).
  */
-export const COMPACT_FEATURES_LIST = [
-  { key: 'hasTentCamping', label: 'camping tente' },
-  { key: 'hasTruckCamping', label: 'camping-car' },
-  { key: 'hasFamilyCamping', label: 'camping famille' },
-  { key: 'hasSleepingRoom', label: 'dortoir' },
-  { key: 'hasFoodTrucks', label: 'food trucks' },
-  { key: 'hasCantine', label: 'cantine' },
-  { key: 'hasGym', label: 'gymnase' },
-  { key: 'hasFireSpace', label: 'espace feu' },
-  { key: 'hasAerialSpace', label: 'espace aérien/trapèze' },
-  { key: 'hasSlacklineSpace', label: 'slackline' },
-  { key: 'hasUnicycleSpace', label: 'espace monocycle' },
-  { key: 'hasWorkshops', label: 'ateliers' },
-  { key: 'hasKidsZone', label: 'zone enfants' },
-  { key: 'hasGala', label: 'gala' },
-  { key: 'hasOpenStage', label: 'scène ouverte' },
-  { key: 'hasConcert', label: 'concert' },
-  { key: 'hasLongShow', label: 'spectacle long' },
-  { key: 'hasShowers', label: 'douches' },
-  { key: 'hasToilets', label: 'WC' },
-  { key: 'hasAccessibility', label: 'accessibilité PMR' },
-  { key: 'acceptsPets', label: 'animaux acceptés' },
-  { key: 'hasCashPayment', label: 'paiement espèces' },
-  { key: 'hasCreditCardPayment', label: 'paiement CB' },
-  { key: 'hasAfjTokenPayment', label: 'jetons AFJ' },
-  { key: 'hasATM', label: 'distributeur' },
-  // Note: status n'est pas inclus car une édition importée est toujours publiée (PUBLISHED)
-] as const
+export const COMPACT_FEATURES_LIST = conventionServices.map((s) => ({
+  key: s.key,
+  label: s.importLabel || s.key,
+}))
 
 /**
  * Génère la description compacte des caractéristiques pour les prompts à contexte limité
