@@ -155,6 +155,7 @@
     "start_date": "Data rozpoczęcia",
     "status": "Stan",
     "success": "Sukces",
+    "tasks_short": "Zadania",
     "teardown": "Demontaż",
     "ticket": "Bilet",
     "ticketing_short": "Bilety",

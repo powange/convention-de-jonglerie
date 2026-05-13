@@ -455,6 +455,26 @@
           </div>
         </UCard>
 
+        <!-- Tâches -->
+        <UCard v-if="edition.tasksEnabled && canManageTasks">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.tasks.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/tasks`"
+                icon="i-heroicons-clipboard-document-check"
+                :title="$t('gestion.tasks.manage_title')"
+                :description="$t('gestion.tasks.manage_description')"
+                color="rose"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
         <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
           <div class="space-y-4">
@@ -587,6 +607,25 @@ const canManageOrganizers = computed(() => {
 const isOrganizer = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.isOrganizer(edition.value, authStore.user.id)
+})
+
+// Vérifier si l'utilisateur peut gérer les tâches de cette édition
+const canManageTasks = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  const userId = authStore.user.id
+  if (authStore.isAdminModeActive) return true
+  if (edition.value.creatorId === userId) return true
+  if (edition.value.convention?.authorId === userId) return true
+  const organizers = edition.value.convention?.organizers || []
+  return organizers.some((collab: any) => {
+    if (collab.user?.id !== userId) return false
+    if (collab.rights?.manageTasks || collab.rights?.editConvention) return true
+    if (collab.perEditionRights) {
+      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
+      if (per?.canManageTasks || per?.canEdit) return true
+    }
+    return false
+  })
 })
 
 // Vérifier si l'utilisateur peut accéder à la validation des repas

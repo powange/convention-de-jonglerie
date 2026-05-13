@@ -9,14 +9,34 @@
 
 import { randomBytes } from 'crypto'
 
-import { PrismaClient } from '@prisma/client'
+import 'dotenv/config'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+
+import { PrismaClient } from '../server/generated/prisma/client'
 
 // Fonction de génération de token (copie locale pour éviter les problèmes d'imports avec tsx)
 function generateVolunteerQrCodeToken(): string {
   return randomBytes(16).toString('hex') // 16 bytes = 32 hex chars
 }
 
-const prisma = new PrismaClient()
+const databaseUrl = process.env.DATABASE_URL
+if (!databaseUrl) {
+  console.error('❌ DATABASE_URL non définie')
+  process.exit(1)
+}
+
+const url = new URL(databaseUrl)
+const adapter = new PrismaMariaDb({
+  host: url.hostname,
+  port: parseInt(url.port) || 3306,
+  user: url.username,
+  password: url.password,
+  database: url.pathname.slice(1),
+  connectionLimit: 2,
+  bigIntAsNumber: true,
+  allowPublicKeyRetrieval: true,
+})
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   console.log('🚀 Début de la génération des tokens QR code pour les organisateurs...\n')

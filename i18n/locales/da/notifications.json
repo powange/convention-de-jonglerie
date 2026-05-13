@@ -115,6 +115,13 @@
         "title": "Systemfejl"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Se opgaven",
+        "message": "Du er blevet tildelt opgaven „{taskTitle}\" for udgaven {editionName}.",
+        "title": "Ny opgave tildelt 📋"
+      }
+    },
     "this_week": "Denne uge",
     "unread": "Ulæst",
     "volunteer": {

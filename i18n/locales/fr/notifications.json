@@ -115,6 +115,13 @@
         "title": "Erreur système"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Voir la tâche",
+        "message": "Vous avez été assigné(e) à la tâche « {taskTitle} » de l'édition {editionName}.",
+        "title": "Nouvelle tâche assignée 📋"
+      }
+    },
     "this_week": "Cette semaine",
     "unread": "Non lues",
     "volunteer": {

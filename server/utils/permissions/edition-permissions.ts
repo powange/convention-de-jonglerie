@@ -380,6 +380,33 @@ export function canManageArtists(
 }
 
 /**
+ * Vérifie si un utilisateur peut gérer les tâches d'une édition
+ */
+export function canManageTasks(edition: EditionWithPermissions, user: UserForPermissions): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  const hasConventionTasksRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageTasks
+    ) || false
+
+  const hasEditionTasksRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageTasks === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionTasksRights ||
+    hasEditionTasksRights ||
+    isGlobalAdmin
+  )
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les repas d'une édition
  */
 export function canManageMeals(edition: EditionWithPermissions, user: UserForPermissions): boolean {

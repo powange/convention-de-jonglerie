@@ -115,6 +115,13 @@
         "title": "Błąd systemu"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Zobacz zadanie",
+        "message": "Zostałeś(-aś) przypisany(-a) do zadania „{taskTitle}\" edycji {editionName}.",
+        "title": "Nowe zadanie przypisane 📋"
+      }
+    },
     "this_week": "W tym tygodniu",
     "unread": "Nieprzeczytane",
     "volunteer": {

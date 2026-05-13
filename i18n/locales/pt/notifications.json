@@ -115,6 +115,13 @@
         "title": "Erro do sistema"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Ver tarefa",
+        "message": "Foi atribuído(a) à tarefa «{taskTitle}» da edição {editionName}.",
+        "title": "Nova tarefa atribuída 📋"
+      }
+    },
     "this_week": "Esta semana",
     "unread": "Não lidas",
     "volunteer": {

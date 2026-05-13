@@ -115,6 +115,13 @@
         "title": "System error"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "View task",
+        "message": "You have been assigned to the task \"{taskTitle}\" of the {editionName} edition.",
+        "title": "New task assigned 📋"
+      }
+    },
     "this_week": "This week",
     "unread": "Unread",
     "volunteer": {

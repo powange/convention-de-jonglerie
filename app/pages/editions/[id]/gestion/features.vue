@@ -171,6 +171,30 @@
             />
           </div>
         </UCard>
+
+        <!-- Tâches -->
+        <UCard>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500 size-5" />
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.tasks.title') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.features.tasks_description') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="tasksEnabledLocal"
+              :loading="savingTasks"
+              :disabled="savingTasks"
+              color="primary"
+              @update:model-value="handleToggleTasks"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
@@ -206,6 +230,9 @@ const workshopsEnabledLocal = ref(false)
 // Gestion de l'activation de la carte du site
 const siteMapEnabledLocal = ref(false)
 
+// Gestion de l'activation des tâches
+const tasksEnabledLocal = ref(false)
+
 watch(
   edition,
   (newEdition) => {
@@ -216,6 +243,7 @@ watch(
       ticketingEnabledLocal.value = newEdition.ticketingEnabled || false
       workshopsEnabledLocal.value = newEdition.workshopsEnabled || false
       siteMapEnabledLocal.value = newEdition.siteMapEnabled || false
+      tasksEnabledLocal.value = (newEdition as any).tasksEnabled || false
     }
   },
   { immediate: true }
@@ -339,6 +367,26 @@ const { execute: executeToggleSiteMap, loading: savingSiteMap } = useApiAction(
 
 const handleToggleSiteMap = () => {
   executeToggleSiteMap()
+}
+
+const { execute: executeToggleTasks, loading: savingTasks } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ tasksEnabled: tasksEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      tasksEnabledLocal.value = !tasksEnabledLocal.value
+    },
+  }
+)
+
+const handleToggleTasks = () => {
+  executeToggleTasks()
 }
 
 // Vérifier l'accès à cette page

@@ -197,6 +197,24 @@ const _canManageArtists = computed(() => {
   return editionStore.canManageArtists(edition.value, authStore.user.id)
 })
 
+const canManageTasks = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  const userId = authStore.user.id
+  if (authStore.isAdminModeActive) return true
+  if (edition.value.creatorId === userId) return true
+  if (edition.value.convention?.authorId === userId) return true
+  const organizers = edition.value.convention?.organizers || []
+  return organizers.some((collab: any) => {
+    if (collab.user?.id !== userId) return false
+    if (collab.rights?.canManageTasks || collab.rights?.editConvention) return true
+    if (collab.perEditionRights) {
+      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
+      if (per?.canManageTasks || per?.canEdit) return true
+    }
+    return false
+  })
+})
+
 // Vérifier si l'utilisateur est team leader
 const isTeamLeader = ref(false)
 const canAccessMealValidation = ref(false)
@@ -485,6 +503,16 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-academic-cap',
       to: `/editions/${editionId.value}/gestion/workshops`,
       tooltip: { content: t('gestion.workshops.title') },
+    })
+  }
+
+  // Tâches
+  if (edition.value?.tasksEnabled && canManageTasks.value) {
+    managementSection.push({
+      label: t('gestion.tasks.title'),
+      icon: 'i-heroicons-clipboard-document-check',
+      to: `/editions/${editionId.value}/gestion/tasks`,
+      tooltip: { content: t('gestion.tasks.title') },
     })
   }
 

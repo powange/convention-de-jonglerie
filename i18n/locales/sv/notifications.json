@@ -115,6 +115,13 @@
         "title": "Systemfel"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Visa uppgift",
+        "message": "Du har tilldelats uppgiften ”{taskTitle}” för utgåvan {editionName}.",
+        "title": "Ny uppgift tilldelad 📋"
+      }
+    },
     "this_week": "Denna vecka",
     "unread": "Oläst",
     "volunteer": {

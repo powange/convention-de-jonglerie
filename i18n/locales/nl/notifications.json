@@ -115,6 +115,13 @@
         "title": "Systeemfout"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Taak bekijken",
+        "message": "Je bent toegewezen aan de taak „{taskTitle}\" van editie {editionName}.",
+        "title": "Nieuwe taak toegewezen 📋"
+      }
+    },
     "this_week": "Deze week",
     "unread": "Ongelezen",
     "volunteer": {

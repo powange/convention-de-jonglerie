@@ -215,6 +215,7 @@ interface AddConventionOrganizerInput {
     manageArtists: boolean
     manageMeals: boolean
     manageTicketing: boolean
+    manageTasks: boolean
   }>
   title?: string
   perEdition?: Array<{
@@ -225,6 +226,7 @@ interface AddConventionOrganizerInput {
     canManageArtists?: boolean
     canManageMeals?: boolean
     canManageTicketing?: boolean
+    canManageTasks?: boolean
   }>
 }
 
@@ -271,6 +273,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
         canManageArtists: rights?.manageArtists ?? false,
         canManageMeals: rights?.manageMeals ?? false,
         canManageTicketing: rights?.manageTicketing ?? false,
+        canManageTasks: rights?.manageTasks ?? false,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
@@ -284,7 +287,8 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             p.canManageVolunteers ||
             p.canManageArtists ||
             p.canManageMeals ||
-            p.canManageTicketing)
+            p.canManageTicketing ||
+            p.canManageTasks)
       )
       if (filtered.length) {
         await tx.editionOrganizerPermission.createMany({
@@ -297,6 +301,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             canManageArtists: !!p.canManageArtists,
             canManageMeals: !!p.canManageMeals,
             canManageTicketing: !!p.canManageTicketing,
+            canManageTasks: !!p.canManageTasks,
           })),
           skipDuplicates: true,
         })
@@ -506,6 +511,7 @@ export async function updateOrganizerRights(params: {
     manageArtists: boolean
     manageMeals: boolean
     manageTicketing: boolean
+    manageTasks: boolean
   }>
   title?: string
   perEdition?: Array<{
@@ -516,6 +522,7 @@ export async function updateOrganizerRights(params: {
     canManageArtists?: boolean
     canManageMeals?: boolean
     canManageTicketing?: boolean
+    canManageTasks?: boolean
   }>
 }) {
   const { conventionId, organizerId, userId, rights, title, perEdition } = params
@@ -541,6 +548,7 @@ export async function updateOrganizerRights(params: {
         canManageArtists: rights?.manageArtists ?? organizer.canManageArtists,
         canManageMeals: rights?.manageMeals ?? organizer.canManageMeals,
         canManageTicketing: rights?.manageTicketing ?? organizer.canManageTicketing,
+        canManageTasks: rights?.manageTasks ?? organizer.canManageTasks,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
@@ -561,7 +569,8 @@ export async function updateOrganizerRights(params: {
             p.canManageVolunteers ||
             p.canManageArtists ||
             p.canManageMeals ||
-            p.canManageTicketing)
+            p.canManageTicketing ||
+            p.canManageTasks)
       )
       if (filtered.length > 0) {
         await tx.editionOrganizerPermission.createMany({
@@ -574,6 +583,7 @@ export async function updateOrganizerRights(params: {
             canManageArtists: !!p.canManageArtists,
             canManageMeals: !!p.canManageMeals,
             canManageTicketing: !!p.canManageTicketing,
+            canManageTasks: !!p.canManageTasks,
           })),
           skipDuplicates: true,
         })

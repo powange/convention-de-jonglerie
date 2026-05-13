@@ -85,6 +85,7 @@ export interface Edition {
   ticketingEnabled?: boolean
   workshopsEnabled?: boolean
   siteMapEnabled?: boolean
+  tasksEnabled?: boolean
   mapPublic?: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
@@ -138,6 +139,9 @@ export interface ConventionOrganizerWithRights {
     canDelete?: boolean
     canManageVolunteers?: boolean
     canManageArtists?: boolean
+    canManageMeals?: boolean
+    canManageTicketing?: boolean
+    canManageTasks?: boolean
   }[]
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
@@ -152,6 +156,9 @@ export interface EditionOrganizer {
     canDelete?: boolean
     canManageVolunteers?: boolean
     canManageArtists?: boolean
+    canManageMeals?: boolean
+    canManageTicketing?: boolean
+    canManageTasks?: boolean
   }[]
   title?: string | null
 }

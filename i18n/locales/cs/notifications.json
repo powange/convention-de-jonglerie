@@ -115,6 +115,13 @@
         "title": "Chyba systému"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Zobrazit úkol",
+        "message": "Byli jste přiřazeni k úkolu „{taskTitle}\" ročníku {editionName}.",
+        "title": "Nový přiřazený úkol 📋"
+      }
+    },
     "this_week": "Tento týden",
     "unread": "Nepřečtené",
     "volunteer": {

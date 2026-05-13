@@ -115,6 +115,13 @@
         "title": "Systemfehler"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Aufgabe ansehen",
+        "message": "Sie wurden der Aufgabe „{taskTitle}\" der Ausgabe {editionName} zugewiesen.",
+        "title": "Neue Aufgabe zugewiesen 📋"
+      }
+    },
     "this_week": "Diese Woche",
     "unread": "Ungelesen",
     "volunteer": {

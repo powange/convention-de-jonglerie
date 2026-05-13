@@ -82,6 +82,9 @@
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.ticketing_short') }}
                 </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.tasks_short') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -157,6 +160,17 @@
                       color="primary"
                       :model-value="localValue.rights.manageTicketing"
                       @update:model-value="(val) => updateRight('manageTicketing', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageTasks')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageTasks"
+                      @update:model-value="(val) => updateRight('manageTasks', val)"
                     />
                   </div>
                 </td>
@@ -248,6 +262,18 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.tasks_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageTasks"
+                      :model-value="hasEditionFlag(ed.id, 'canManageTasks')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageTasks', val)"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -273,6 +299,7 @@ interface PerEditionRight {
   canManageArtists?: boolean
   canManageMeals?: boolean
   canManageTicketing?: boolean
+  canManageTasks?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -308,6 +335,7 @@ const props = withDefaults(
       { key: 'manageArtists', label: 'permissions.manageArtists' },
       { key: 'manageMeals', label: 'permissions.manageMeals' },
       { key: 'manageTicketing', label: 'permissions.manageTicketing' },
+      { key: 'manageTasks', label: 'permissions.manageTasks' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -363,6 +391,7 @@ const globalRightsOutsideTable = computed(() =>
         'manageArtists',
         'manageMeals',
         'manageTicketing',
+        'manageTasks',
       ].includes(p.key)
   )
 )
@@ -443,6 +472,12 @@ function updateRight(key: string, value: any) {
       if (p.canManageTicketing) p.canManageTicketing = false
     })
   }
+  // If enabling manageTasks we clean perEdition tasks flags
+  if (key === 'manageTasks' && localValue.rights.manageTasks) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageTasks) p.canManageTasks = false
+    })
+  }
   // Clean up empty entries
   localValue.perEdition = localValue.perEdition.filter(
     (p) =>
@@ -451,7 +486,8 @@ function updateRight(key: string, value: any) {
       p.canManageVolunteers ||
       p.canManageArtists ||
       p.canManageMeals ||
-      p.canManageTicketing
+      p.canManageTicketing ||
+      p.canManageTasks
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
@@ -464,6 +500,7 @@ function hasEditionFlag(
     | 'canManageArtists'
     | 'canManageMeals'
     | 'canManageTicketing'
+    | 'canManageTasks'
 ) {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
@@ -475,7 +512,8 @@ function toggleEdition(
     | 'canManageVolunteers'
     | 'canManageArtists'
     | 'canManageMeals'
-    | 'canManageTicketing',
+    | 'canManageTicketing'
+    | 'canManageTasks',
   value: any
 ) {
   const boolVal = !!value
@@ -489,6 +527,7 @@ function toggleEdition(
       canManageArtists: false,
       canManageMeals: false,
       canManageTicketing: false,
+      canManageTasks: false,
     }
     localValue.perEdition.push(entry)
   }
@@ -501,7 +540,8 @@ function toggleEdition(
     !entry.canManageVolunteers &&
     !entry.canManageArtists &&
     !entry.canManageMeals &&
-    !entry.canManageTicketing
+    !entry.canManageTicketing &&
+    !entry.canManageTasks
   ) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }

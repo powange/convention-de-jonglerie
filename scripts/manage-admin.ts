@@ -1,6 +1,26 @@
-import { PrismaClient } from '@prisma/client'
+import 'dotenv/config'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
-const prisma = new PrismaClient()
+import { PrismaClient } from '../server/generated/prisma/client'
+
+const databaseUrl = process.env.DATABASE_URL
+if (!databaseUrl) {
+  console.error('❌ DATABASE_URL non définie')
+  process.exit(1)
+}
+
+const url = new URL(databaseUrl)
+const adapter = new PrismaMariaDb({
+  host: url.hostname,
+  port: parseInt(url.port) || 3306,
+  user: url.username,
+  password: url.password,
+  database: url.pathname.slice(1),
+  connectionLimit: 2,
+  bigIntAsNumber: true,
+  allowPublicKeyRetrieval: true,
+})
+const prisma = new PrismaClient({ adapter })
 
 async function manageAdmin() {
   const args = process.argv.slice(2)

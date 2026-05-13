@@ -155,6 +155,7 @@
     "start_date": "Startdatum",
     "status": "Status",
     "success": "Succes",
+    "tasks_short": "Taken",
     "teardown": "Ontmanteling",
     "ticket": "Ticket",
     "ticketing_short": "Kaartverkoop",

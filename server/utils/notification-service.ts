@@ -955,6 +955,31 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification d'assignation à une tâche
+   */
+  async taskAssigned(
+    userId: number,
+    taskTitle: string,
+    editionName: string,
+    editionId: number,
+    taskId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.task.assigned.title',
+      messageKey: 'notifications.task.assigned.message',
+      translationParams: { taskTitle, editionName },
+      actionTextKey: 'notifications.task.assigned.action',
+      category: 'task',
+      entityType: 'Task',
+      entityId: taskId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/tasks`,
+      notificationType: 'task_assigned',
+    })
+  },
+
+  /**
    * Notification de don café reçu (envoyée à tous les global admins)
    */
   async coffeeDonationReceived(quantity: number, totalCents: number, donorName: string | null) {

@@ -1,0 +1,61 @@
+// Tâches : organisation interne du travail des organisateurs d'une édition.
+// Les tâches sont regroupées dans des TaskGroup pour permettre une
+// catégorisation libre (par phase, par équipe, etc.). Chaque tâche peut
+// être assignée à un ou plusieurs users (organisateurs ou bénévoles
+// ACCEPTED de l'édition).
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model TaskGroup {
+  id           Int      @id @default(autoincrement())
+  editionId    Int
+  name         String
+  description  String?  @db.Text
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tasks   Task[]
+
+  @@index([editionId])
+  @@index([editionId, displayOrder])
+}
+
+model Task {
+  id           Int        @id @default(autoincrement())
+  taskGroupId  Int
+  title        String
+  description  String?    @db.Text
+  status       TaskStatus @default(TODO)
+  deadline     DateTime?
+  displayOrder Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  group       TaskGroup        @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
+  assignments TaskAssignment[]
+
+  @@index([taskGroupId])
+  @@index([taskGroupId, displayOrder])
+  @@index([status])
+}
+
+model TaskAssignment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
+}

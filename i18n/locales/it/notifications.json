@@ -115,6 +115,13 @@
         "title": "Errore di sistema"
       }
     },
+    "task": {
+      "assigned": {
+        "action": "Vedi attività",
+        "message": "Sei stato/a assegnato/a all'attività «{taskTitle}» dell'edizione {editionName}.",
+        "title": "Nuova attività assegnata 📋"
+      }
+    },
     "this_week": "Questa settimana",
     "unread": "Non lette",
     "volunteer": {

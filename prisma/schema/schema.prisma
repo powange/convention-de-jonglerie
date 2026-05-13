@@ -76,6 +76,7 @@ model User {
   decidedShowApplications            ShowApplication[]                   @relation("ShowApplicationDecider")
   showPresets                        ShowPreset[]
   showCallSurveyVotes                ShowCallSurveyVote[]
+  taskAssignments                    TaskAssignment[]
 }
 
 // =============================================================================
@@ -177,6 +178,7 @@ model Edition {
   workshopLocationsFreeInput        Boolean                          @default(false)
   siteMapEnabled                    Boolean                          @default(false)
   mapPublic                         Boolean                          @default(false)
+  tasksEnabled                      Boolean                          @default(false)
   carpoolOffers                     CarpoolOffer[]
   carpoolRequests                   CarpoolRequest[]
   convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
@@ -212,6 +214,7 @@ model Edition {
   showCalls                         EditionShowCall[]
   zones                             EditionZone[]
   markers                           EditionMarker[]
+  taskGroups                        TaskGroup[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -289,6 +292,7 @@ model ConventionOrganizer {
   canManageArtists      Boolean                      @default(false)
   canManageMeals        Boolean                      @default(false)
   canManageTicketing    Boolean                      @default(false)
+  canManageTasks        Boolean                      @default(false)
   addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
   convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -310,6 +314,7 @@ model EditionOrganizerPermission {
   canManageArtists    Boolean             @default(false)
   canManageMeals      Boolean             @default(false)
   canManageTicketing  Boolean             @default(false)
+  canManageTasks      Boolean             @default(false)
   organizer           ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   edition             Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
 
