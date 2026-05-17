@@ -1,111 +1,131 @@
-# Documentation du Projet Convention de Jonglerie
+# Documentation du projet Convention de Jonglerie
 
-Cette documentation technique décrit l'architecture, les systèmes et les patterns utilisés dans le projet.
+Documentation technique de l'architecture, des modules métier et des intégrations.
 
-## 📁 Structure de la documentation
+## 📦 Modules métier
 
-### 🔧 [system/](./system/) - Systèmes Core (8 fichiers)
+Documentation des grandes fonctionnalités de l'application :
 
-Documentation des systèmes fondamentaux de l'application :
+- **[shows-call.md](./shows-call.md)** — Appels à spectacles, candidatures artistes et sondage de notation
+- **[tasks.md](./tasks.md)** — Module Tâches (TaskGroup / Task / TaskAssignment) pour l'organisation interne
+- **[meals.md](./meals.md)** — Repas (configuration, sélections bénévoles/artistes, validation, intégration billetterie)
+- **[workshops.md](./workshops.md)** — Ateliers proposés par les participants
+- **[carpool.md](./carpool.md)** — Covoiturage (offres, demandes, réservations, commentaires)
+- **[messenger.md](./messenger.md)** — Messagerie (conversations typées, temps réel, présence)
+- **[lost-found.md](./lost-found.md)** — Objets trouvés et perdus
+- **[project-costs.md](./project-costs.md)** — Coûts du projet et donations café (Stripe)
+- **[volunteer-qr-code-tokens.md](./volunteer-qr-code-tokens.md)** — Tokens QR pour les bénévoles
+- **[volunteers/](./volunteers/)** — Sous-dossier dédié au système de bénévolat
+- **[ticketing/](./ticketing/)** — Sous-dossier dédié à la billetterie
 
-- **API_PROFILE_STATS.md** - Statistiques de profil utilisateur
-- **AUTH_SESSIONS.md** - Système d'authentification et sessions
-- **CRON_SYSTEM.md** - Tâches planifiées et cron jobs
-- **ERROR_LOGGING_SYSTEM.md** - Système de logs d'erreurs
-- **NOTIFICATION_SYSTEM.md** - Système de notifications
-- **ORGANIZER_PERMISSIONS.md** - Système de permissions des organisateurs
-- **api-utils-refactoring.md** - Utilitaires API centralisés
-- **feedback.md** - Système de feedback utilisateur
+## 🔧 Systèmes core
 
-### 🎫 [ticketing/](./ticketing/) - Billetterie (8 fichiers)
+Voir **[system/](./system/)** :
 
-Documentation complète du système de billetterie :
+- **[ORGANIZER_PERMISSIONS.md](./system/ORGANIZER_PERMISSIONS.md)** — Système de permissions granulaires (convention + per-edition)
+- **[NOTIFICATION_SYSTEM.md](./system/NOTIFICATION_SYSTEM.md)** — Notifications in-app, email et push
+- **[AUTH_SESSIONS.md](./system/AUTH_SESSIONS.md)** — Authentification et sessions cookies scellés
+- **[CRON_SYSTEM.md](./system/CRON_SYSTEM.md)** — Tâches planifiées
+- **[ERROR_LOGGING_SYSTEM.md](./system/ERROR_LOGGING_SYSTEM.md)** — Logs d'erreurs centralisés
+- **[error-handling.md](./system/error-handling.md)** — Gestion d'erreurs côté serveur
+- **[API_PROFILE_STATS.md](./system/API_PROFILE_STATS.md)** — Statistiques de profil utilisateur
+- **[feedback.md](./system/feedback.md)** — Système de feedback utilisateur
 
-- **README.md** - Vue d'ensemble du système
-- **access-control.md** - Contrôle d'accès et validation
-- **external-integration.md** - Intégrations externes (HelloAsso, etc.)
-- **options.md** - Options de billets
-- **orders.md** - Gestion des commandes
-- **quotas.md** - Système de quotas
-- **returnable-items.md** - Objets consignés
-- **tiers.md** - Tarifs et catégories
+## 🎫 Billetterie
 
-### 👥 [volunteers/](./volunteers/) - Bénévoles (7 fichiers)
+Voir **[ticketing/](./ticketing/)** :
 
-Documentation du système de gestion des bénévoles :
+- [README.md](./ticketing/README.md) — Vue d'ensemble
+- [tiers.md](./ticketing/tiers.md), [options.md](./ticketing/options.md), [quotas.md](./ticketing/quotas.md)
+- [orders.md](./ticketing/orders.md) — Commandes
+- [access-control.md](./ticketing/access-control.md) — Contrôle d'accès
+- [returnable-items.md](./ticketing/returnable-items.md) — Articles à restituer
+- [external-integration.md](./ticketing/external-integration.md) — Intégrations HelloAsso, etc.
 
-- **allergy-severity-utility.md** - Gestion des allergies
-- **teams-utils.md** - Utilitaires pour les équipes
-- **volunteer-application-api-utility.md** - Utilitaires API candidatures
-- **volunteer-application-diff-utility.md** - Comparaison de candidatures
-- **volunteer-application-edit-mode.md** - Mode édition des candidatures
-- **volunteer-auto-assignment-system.md** - Système d'assignation automatique
-- **volunteer-returnable-items-by-team.md** - Objets consignés par équipe
+## 👥 Bénévoles
 
-### 🔌 [integrations/](./integrations/) - Intégrations (3 fichiers)
+Voir **[volunteers/](./volunteers/)** :
 
-Documentation des intégrations avec services externes :
+- [allergy-severity-utility.md](./volunteers/allergy-severity-utility.md)
+- [teams-utils.md](./volunteers/teams-utils.md)
+- [volunteer-application-api-utility.md](./volunteers/volunteer-application-api-utility.md)
+- [volunteer-application-diff-utility.md](./volunteers/volunteer-application-diff-utility.md)
+- [volunteer-application-edit-mode.md](./volunteers/volunteer-application-edit-mode.md)
+- [volunteer-auto-assignment-system.md](./volunteers/volunteer-auto-assignment-system.md)
+- [volunteer-returnable-items-by-team.md](./volunteers/volunteer-returnable-items-by-team.md)
 
-- **anthropic-integration.md** - Intégration API Anthropic Claude
-- **backup-system.md** - Système de sauvegarde
-- **helloasso-integration.md** - Intégration HelloAsso (paiements)
+## 🔌 Intégrations externes
 
-### ⚡ [optimization/](./optimization/) - Optimisations (8 fichiers)
+Voir **[integrations/](./integrations/)** :
 
-Documentation des optimisations de performance :
+- [anthropic-integration.md](./integrations/anthropic-integration.md) — Intégration API Anthropic Claude
+- [backup-system.md](./integrations/backup-system.md) — Système de sauvegarde
+- [helloasso-integration.md](./integrations/helloasso-integration.md) — Intégration HelloAsso (paiements)
+- [infomaniak-ticketing.md](./integrations/infomaniak-ticketing.md) — Intégration Infomaniak (billetterie externe)
+- [sumup-integration.md](./sumup-integration.md) — Intégration SumUp
+- [firebase-setup.md](./firebase-setup.md), [firebase-multi-environment.md](./firebase-multi-environment.md), [firebase-test-mocks.md](./firebase-test-mocks.md) — Firebase (push notifications)
 
-- **cache-http-assets.md** - Cache HTTP des assets statiques
-- **i18n-component-lazy-loading.md** - Lazy loading i18n composants
-- **i18n-lazy-loading.md** - Lazy loading i18n général
-- **image-loading-cache.md** - Cache de chargement d'images
-- **lazy-loading-libraries.md** - Lazy loading des bibliothèques
-- **notification-i18n.md** - Internationalisation des notifications
-- **prisma-log-configuration.md** - Configuration des logs Prisma
-- **push-notifications-browser-support.md** - Support des push notifications
+## 🔐 Sécurité
 
-### 🔍 Audits et analyses
+Voir **[security/](./security/)** :
 
-- **[audit-logique-metier.md](./audit-logique-metier.md)** - Audit complet de la logique metier (fevrier 2026) : 7 problemes critiques, 10 majeurs, 11 moyens
+- [00-synthese-audit.md](./security/00-synthese-audit.md) — Synthèse de l'audit
+- [01-api-backend.md](./security/01-api-backend.md) — API & backend
+- [02-auth-sessions.md](./security/02-auth-sessions.md) — Authentification & sessions
+- [03-upload-donnees.md](./security/03-upload-donnees.md) — Uploads & données
+- [04-xss-frontend.md](./security/04-xss-frontend.md) — XSS & frontend
 
-### 📦 [archive/](./archive/) - Archives (3 fichiers)
+## ⚡ Optimisations
 
-Documentation historique et guides de migration terminés :
+Voir **[optimization/](./optimization/)** :
 
-- **README.md** - Vue d'ensemble des archives
-- **logs-erreur-api-ameliorations.md** - Migration logs d'erreur (terminée)
-- **notification-i18n-migration-guide.md** - Migration notifications i18n (terminée)
+- [cache-http-assets.md](./optimization/cache-http-assets.md)
+- [caching-implementation-opportunities.md](./optimization/caching-implementation-opportunities.md)
+- [i18n-lazy-loading.md](./optimization/i18n-lazy-loading.md), [i18n-component-lazy-loading.md](./optimization/i18n-component-lazy-loading.md)
+- [lazy-loading-libraries.md](./optimization/lazy-loading-libraries.md)
+- [memory-optimization.md](./optimization/memory-optimization.md)
+- [notification-i18n.md](./optimization/notification-i18n.md)
+- [prisma-log-configuration.md](./optimization/prisma-log-configuration.md)
 
-## 🔍 Navigation rapide
+## 🐳 Docker
 
-### Par thématique
+Voir **[docker/](./docker/)** :
 
-- **Authentification** → [system/AUTH_SESSIONS.md](./system/AUTH_SESSIONS.md)
-- **Billetterie** → [ticketing/README.md](./ticketing/README.md)
-- **Bénévoles** → [volunteers/](./volunteers/)
-- **Notifications** → [system/NOTIFICATION_SYSTEM.md](./system/NOTIFICATION_SYSTEM.md)
-- **Permissions** → [system/ORGANIZER_PERMISSIONS.md](./system/ORGANIZER_PERMISSIONS.md)
-- **Performance** → [optimization/](./optimization/)
-- **Intégrations** → [integrations/](./integrations/)
+- [README-DOCKER.md](./docker/README-DOCKER.md) — Vue d'ensemble Docker
+- [DOCKER.md](./docker/DOCKER.md), [DOCKER-WINDOWS.md](./docker/DOCKER-WINDOWS.md)
+- [TESTS-DOCKER.md](./docker/TESTS-DOCKER.md) — Tests sous Docker
 
-### Par type de documentation
+## 🛠️ Patterns et utilitaires transverses
 
-- **Architecture système** → [system/](./system/)
-- **Guides de migration** → [archive/](./archive/)
-- **Optimisations** → [optimization/](./optimization/)
-- **APIs et utilitaires** → [system/api-utils-refactoring.md](./system/api-utils-refactoring.md)
+- **[prisma-select-helpers.md](./prisma-select-helpers.md)** — Helpers de sélection Prisma standardisés
+- **[migration-fetch-to-useApiAction.md](./migration-fetch-to-useApiAction.md)** — Migration vers le composable `useApiAction`
+- **[prisma-migration-log.md](./prisma-migration-log.md)** — Journal des migrations Prisma
+- **[nuxt-config-audit.md](./nuxt-config-audit.md)** — Audit de la configuration Nuxt
+- **[analyse-nuxt4-recommandations.md](./analyse-nuxt4-recommandations.md)** — Recommandations Nuxt 4
+- **[codebase_analysis.md](./codebase_analysis.md)** — Analyse de la base de code
 
-## 📊 Statistiques
+## 🔍 Audits
 
-- **Total** : 37 fichiers de documentation
-- **Systèmes core** : 8 fichiers
-- **Billetterie** : 8 fichiers
-- **Bénévoles** : 7 fichiers
-- **Intégrations** : 3 fichiers
-- **Optimisations** : 8 fichiers
-- **Archives** : 3 fichiers
+- **[audit-logique-metier.md](./audit-logique-metier.md)** — Audit logique métier (février 2026)
+- **[security/](./security/)** — Audit de sécurité
+
+## 📦 Archive
+
+Voir **[archive/](./archive/)** pour les documents historiques (plans achevés, migrations terminées, instructions obsolètes).
+
+---
 
 ## 🔄 Maintenance
 
-Cette documentation est maintenue activement. Les fichiers obsolètes sont déplacés dans `archive/` pour référence historique.
+Cette documentation est maintenue à jour avec le code. Lorsqu'une fonctionnalité est ajoutée/modifiée, mettre à jour la doc correspondante (et l'archiver si remplacée).
 
-**Dernière réorganisation** : 12 novembre 2025
+Convention :
+
+- **Modules métier** → fichier dédié à la racine de `docs/`
+- **Systèmes transverses** → `docs/system/`
+- **Intégrations externes** → `docs/integrations/`
+- **Optimisations** → `docs/optimization/`
+- **Sécurité** → `docs/security/`
+- **Docs obsolètes** → `docs/archive/`
+
+**Dernière mise à jour** : 2026-05-13.

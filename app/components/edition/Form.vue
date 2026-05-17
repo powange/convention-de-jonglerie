@@ -402,7 +402,7 @@
               :endpoint="uploadEndpoint"
               :options="{
                 validation: {
-                  maxSize: 5 * 1024 * 1024, // 5MB
+                  maxSize: 10 * 1024 * 1024, // 10MB
                   allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
                   allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
                 },

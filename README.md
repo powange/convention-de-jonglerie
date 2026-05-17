@@ -17,56 +17,83 @@ L'application permet aux utilisateurs de :
 ## Technologies Utilisées
 
 - **Frontend :**
-  - [Nuxt.js](https://nuxt.com/) (v4.0.1) : Framework Vue.js pour le développement d'applications universelles.
-  - [Nuxt UI](https://ui.nuxt.com/) (v3.3.0) : Bibliothèque de composants UI basée sur Tailwind CSS et Headless UI.
-  - [Pinia](https://pinia.vuejs.org/) : Solution de gestion d'état pour Vue.js.
+  - [Nuxt 4](https://nuxt.com/) (v4.4.2+) : Framework Vue.js (Vue 3) universel
+  - [Nuxt UI 4](https://ui.nuxt.com/) (v4.5.1+) : Bibliothèque de composants UI basée sur Tailwind CSS
+  - [Pinia](https://pinia.vuejs.org/) (v3.x) : Gestion d'état pour Vue.js
+  - [@nuxtjs/i18n](https://i18n.nuxtjs.org/) : Internationalisation (12 langues, lazy loading par domaine)
+  - [Chart.js](https://www.chartjs.org/), [FullCalendar](https://fullcalendar.io/), [Leaflet](https://leafletjs.com/)
 - **Backend :**
-  - [Nitro](https://nitro.unjs.io/) : Moteur de serveur de Nuxt.js pour la création d'API RESTful.
+  - [Nitro](https://nitro.unjs.io/) : Moteur de serveur de Nuxt pour la création d'API RESTful
 - **Base de Données :**
-  - MySQL : Système de gestion de base de données relationnelle.
-  - [Prisma](https://www.prisma.io/) : ORM (Object-Relational Mapper) pour interagir avec la base de données.
+  - MySQL / MariaDB
+  - [Prisma](https://www.prisma.io/) (v7.x) : ORM
 - **Langage :**
-  - [TypeScript](https://www.typescriptlang.org/) : Langage de programmation typé pour une meilleure maintenabilité.
+  - [TypeScript](https://www.typescriptlang.org/) (v5.x)
 - **Authentification :**
-  - Sessions scellées via nuxt-auth-utils (remplace JWT). Voir `docs/AUTH_SESSIONS.md`.
+  - Sessions scellées par cookie via [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils). Voir [`docs/system/AUTH_SESSIONS.md`](docs/system/AUTH_SESSIONS.md).
+- **Tests :**
+  - [Vitest](https://vitest.dev/) (unit + Nuxt) et [Playwright](https://playwright.dev/) (e2e)
 
 ## Fonctionnalités Clés
 
-- **Gestion des Utilisateurs :**
-  - Inscription avec vérification email par code à 6 chiffres
-  - Connexion, déconnexion, et gestion des profils
-  - Système de renvoi de code de vérification
-- **Gestion des Conventions :**
-  - **CRUD complet :** Création, lecture, mise à jour et suppression de conventions.
-  - **Détails riches :** Nom, description, dates, adresse complète, liens externes (billetterie, réseaux sociaux), et services disponibles (restauration, zone enfants, animaux, camping, salle de sport).
-  - **Filtrage :** Recherche et filtrage des conventions par nom et dates.
-  - **Géolocalisation :** Géocodage automatique des adresses pour affichage sur carte.
-- **Favoris :** Possibilité pour les utilisateurs authentifiés de marquer des conventions comme favorites.
-- **Cartes Interactives :**
-  - Visualisation géographique des éditions favorites à venir avec Leaflet
-  - Carte des éditions filtrées sur la page d'accueil
-  - Marqueurs colorés selon le statut temporel (passé/en cours/à venir)
-- **Interface Utilisateur :** Navigation intuitive et réactive, notifications via toasts.
-- **Sécurité :** Middleware d'authentification pour protéger les routes et les API.
+### Gestion des utilisateurs
+
+- Inscription avec vérification email par code à 6 chiffres
+- Connexion / déconnexion / réinitialisation de mot de passe
+- Profil utilisateur (avatar Gravatar, préférences notifications)
+
+### Conventions & éditions
+
+- **CRUD complet** sur conventions et éditions
+- **Métadonnées riches** : adresse, dates, fuseau horaire, liens externes (billetterie, réseaux sociaux), services (restauration, zone enfants, camping, gym, etc.)
+- **Géocodage automatique** des adresses (Nominatim/OpenStreetMap)
+- **Favoris** par utilisateur
+- **Statuts** : `PLANNED`, `PUBLISHED`, `OFFLINE`, `CANCELLED`
+
+### Modules optionnels (activables par édition)
+
+- **Bénévoles** ([`docs/volunteers/`](docs/volunteers/)) — Candidatures, équipes, créneaux, planning, notifications, mode interne ou externe
+- **Artistes & Spectacles** ([`docs/shows-call.md`](docs/shows-call.md)) — Appels à spectacles, candidatures, sondage de notation
+- **Repas** ([`docs/meals.md`](docs/meals.md)) — Configuration, sélections bénévoles/artistes, validation à l'entrée du buffet, intégration billetterie
+- **Tâches** ([`docs/tasks.md`](docs/tasks.md)) — Organisation interne du travail par groupes (liste + kanban)
+- **Workshops** ([`docs/workshops.md`](docs/workshops.md)) — Ateliers proposés par les participants avec favoris
+- **Billetterie** ([`docs/ticketing/`](docs/ticketing/)) — Tarifs, options, quotas, commandes, contrôle d'accès, intégrations HelloAsso/SumUp
+- **Carte du site** — Plan interactif des éditions avec zones et marqueurs
+- **Covoiturage** ([`docs/carpool.md`](docs/carpool.md)) — Offres / demandes / réservations entre participants
+- **Objets trouvés** ([`docs/lost-found.md`](docs/lost-found.md)) — Signalement et restitution d'objets
+
+### Interactivité
+
+- **Notifications** ([`docs/system/NOTIFICATION_SYSTEM.md`](docs/system/NOTIFICATION_SYSTEM.md)) — In-app, email et push web (Firebase)
+- **Cartes interactives** — Leaflet pour les éditions favorites et la page d'accueil
+- **Calendrier** — FullCalendar pour le planning bénévoles et le calendrier des éditions
+- **Messagerie** ([`docs/messenger.md`](docs/messenger.md)) — Conversations privées, groupes d'équipes, organisateurs, artistes (temps réel via SSE)
+- **Toasts** et **modales** Nuxt UI pour les actions
+- **i18n** — 12 langues synchronisées avec lazy loading par domaine
 
 ### Modèle de Permissions Organisateurs
 
-Le système ne repose plus sur des rôles (ex: ADMINISTRATOR / MODERATOR) mais sur un ensemble de droits granulaires appliqués aux organisateurs d'une convention.
+Le système repose sur un ensemble de droits granulaires appliqués aux organisateurs d'une convention (pas de rôles).
 
 Champs de droits stockés sur `ConventionOrganizer` :
 
-| Droit             | Colonne              | Description                                                                                  |
-| ----------------- | -------------------- | -------------------------------------------------------------------------------------------- |
-| editConvention    | canEditConvention    | Modifier les métadonnées de la convention                                                    |
-| deleteConvention  | canDeleteConvention  | Supprimer la convention                                                                      |
-| manageOrganizers  | canManageOrganizers  | Ajouter / retirer des organisateurs et modifier leurs droits                                 |
-| addEdition        | canAddEdition        | Créer de nouvelles éditions                                                                  |
-| editAllEditions   | canEditAllEditions   | Modifier n'importe quelle édition (sinon seulement celles créées ou permissions spécifiques) |
-| deleteAllEditions | canDeleteAllEditions | Supprimer n'importe quelle édition                                                           |
+| Droit             | Colonne              | Description                                                  |
+| ----------------- | -------------------- | ------------------------------------------------------------ |
+| editConvention    | canEditConvention    | Modifier les métadonnées de la convention                    |
+| deleteConvention  | canDeleteConvention  | Supprimer la convention                                      |
+| manageOrganizers  | canManageOrganizers  | Ajouter / retirer des organisateurs et modifier leurs droits |
+| addEdition        | canAddEdition        | Créer de nouvelles éditions                                  |
+| editAllEditions   | canEditAllEditions   | Modifier toutes les éditions de la convention                |
+| deleteAllEditions | canDeleteAllEditions | Supprimer toutes les éditions de la convention               |
+| manageVolunteers  | canManageVolunteers  | Gérer les bénévoles de toutes les éditions                   |
+| manageArtists     | canManageArtists     | Gérer les artistes de toutes les éditions                    |
+| manageMeals       | canManageMeals       | Gérer les repas de toutes les éditions                       |
+| manageTicketing   | canManageTicketing   | Gérer la billetterie de toutes les éditions                  |
+| manageTasks       | canManageTasks       | Gérer les tâches internes de toutes les éditions             |
 
-Une permission par édition (table `EditionOrganizerPermission`) permet d'accorder `canEdit` / `canDelete` sur une édition précise lorsqu'un organisateur ne possède pas les droits globaux.
+La table `EditionOrganizerPermission` permet d'accorder ces droits **per-édition** lorsqu'un organisateur ne possède pas les droits globaux (`canEdit`, `canDelete`, `canManageVolunteers`, `canManageArtists`, `canManageMeals`, `canManageTicketing`, `canManageTasks` sur une édition précise).
 
-Format d'un organisateur retourné par l'API (détails étendus dans `docs/ORGANIZER_PERMISSIONS.md`) :
+Format d'un organisateur retourné par l'API (détails étendus dans [`docs/system/ORGANIZER_PERMISSIONS.md`](docs/system/ORGANIZER_PERMISSIONS.md)) :
 
 ```jsonc
 {
@@ -95,10 +122,28 @@ Les handlers ignorent désormais tout champ `role` legacy. Les tests garantissen
 
 ## Structure du Projet
 
-- `app/` : Contient le code source du frontend Nuxt.js (pages, composants, stores Pinia, middleware).
-- `server/api/` : Définit les points de terminaison de l'API backend pour l'authentification et la gestion des conventions.
-- `prisma/` : Contient le schéma de base de données Prisma (`schema.prisma`) et les migrations.
-- `public/` : Fichiers statiques (ex: favicon).
+- `app/` — Frontend Nuxt
+  - `components/` — Composants Vue (PascalCase)
+  - `pages/` — Pages et routing
+  - `stores/` — Stores Pinia
+  - `composables/` — Composables réutilisables (ex: `useApiAction`)
+  - `middleware/` — Middlewares Nuxt (`auth-protected`, `guest-only`, `super-admin`, `verify-email-access`)
+  - `layouts/` — Layouts (par défaut, dashboard édition, etc.)
+  - `types/` — Types TypeScript globaux
+- `server/` — Backend Nitro
+  - `api/` — Endpoints REST (organisés par ressource)
+  - `utils/` — Helpers serveur (auth, prisma, permissions, notifications, etc.)
+  - `middleware/` — Middlewares Nitro (CSRF, etc.)
+  - `constants/` — Constantes (permissions, etc.)
+  - `emails/` — Templates d'emails Vue
+- `prisma/` — Schéma multi-fichiers et migrations
+  - `schema/*.prisma` — Schéma découpé par domaine (artists, carpool, meals, messenger, tasks, ticketing, volunteer, workshops, etc.)
+  - `migrations/` — Migrations versionnées
+- `i18n/locales/` — Traductions (12 langues, organisées par domaine : `common`, `admin`, `edition`, `auth`, `gestion`, etc.)
+- `docs/` — Documentation technique ([`docs/README.md`](docs/README.md) sert d'index)
+- `tests/` — Tests Vitest (unit + Nuxt) et Playwright (e2e)
+- `public/` — Fichiers statiques (favicon, etc.)
+- `scripts/` — Scripts utilitaires (géocodage, gestion admin, traduction i18n, etc.)
 
 ## Démarrage Rapide
 
@@ -231,3 +276,11 @@ npm run geocode
 ```
 
 Ce script utilise l'API Nominatim (OpenStreetMap) avec une stratégie de fallback pour maximiser le taux de succès.
+
+## 📚 Documentation
+
+- **[`docs/README.md`](docs/README.md)** — Index complet de la documentation technique
+- **[`CLAUDE.md`](CLAUDE.md)** — Conventions et règles pour les assistants IA (Claude)
+- **[`SCRIPTS.md`](SCRIPTS.md)** — Documentation des scripts utilitaires
+- **[`README.tests.md`](README.tests.md)** — Guide des tests
+- **[`docs/docker/`](docs/docker/)** — Documentation Docker

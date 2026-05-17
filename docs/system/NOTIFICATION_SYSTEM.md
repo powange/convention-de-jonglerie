@@ -365,6 +365,7 @@ Helpers pour créer des notifications typées selon les événements métier. Fi
 | `showApplicationSubmitted`      | Candidature artiste soumise              | Organisateurs (gestion artistes) | INFO    | artist     |
 | `showApplicationAccepted`       | Candidature artiste acceptée             | L'artiste                        | SUCCESS | artist     |
 | `showApplicationRejected`       | Candidature artiste refusée              | L'artiste                        | WARNING | artist     |
+| `taskAssigned`                  | Tâche assignée à un utilisateur          | L'assigné                        | INFO    | task       |
 
 #### Appels directs à NotificationService.create() (texte libre)
 
@@ -452,6 +453,9 @@ await NotificationHelpers.showApplicationAccepted(userId, showTitle, editionName
 
 // Candidature artiste refusée
 await NotificationHelpers.showApplicationRejected(userId, showTitle, editionName, editionId)
+
+// Tâche assignée à un utilisateur
+await NotificationHelpers.taskAssigned(userId, taskTitle, editionName, editionId, taskId)
 ```
 
 #### Helper non utilisé

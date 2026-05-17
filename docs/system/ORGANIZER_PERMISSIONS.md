@@ -25,10 +25,23 @@ L'API retourne désormais un format **normalisé** pour chaque organisateur :
     "editAllEditions": false,
     "deleteAllEditions": false,
     "manageVolunteers": false,
+    "manageArtists": false,
+    "manageMeals": false,
+    "manageTicketing": false,
+    "manageTasks": false,
   },
   "perEdition": [
     { "editionId": 10, "canEdit": true },
-    { "editionId": 11, "canEdit": true, "canDelete": true, "canManageVolunteers": true },
+    {
+      "editionId": 11,
+      "canEdit": true,
+      "canDelete": true,
+      "canManageVolunteers": true,
+      "canManageArtists": true,
+      "canManageMeals": false,
+      "canManageTicketing": false,
+      "canManageTasks": true,
+    },
   ],
 }
 ```
@@ -44,24 +57,36 @@ L'API retourne désormais un format **normalisé** pour chaque organisateur :
 | editAllEditions   | canEditAllEditions   | Modifier toutes les éditions                         |
 | deleteAllEditions | canDeleteAllEditions | Supprimer toutes les éditions                        |
 | manageVolunteers  | canManageVolunteers  | Gérer les bénévoles de toutes les éditions           |
+| manageArtists     | canManageArtists     | Gérer les artistes de toutes les éditions            |
+| manageMeals       | canManageMeals       | Gérer les repas de toutes les éditions               |
+| manageTicketing   | canManageTicketing   | Gérer la billetterie de toutes les éditions          |
+| manageTasks       | canManageTasks       | Gérer les tâches internes de toutes les éditions     |
+
+> Source de vérité : `server/constants/permissions.ts` (constante `ORGANIZER_RIGHTS`).
 
 ## Droits par édition (`perEdition`)
 
 Chaque entrée de `perEdition` correspond à un enregistrement dans `EditionOrganizerPermission` :
 
-| Champ               | Type    | Description                               |
-| ------------------- | ------- | ----------------------------------------- |
-| editionId           | number  | Identifiant de l'édition ciblée           |
-| canEdit             | boolean | Peut modifier cette édition               |
-| canDelete           | boolean | Peut supprimer cette édition              |
-| canManageVolunteers | boolean | Peut gérer les bénévoles de cette édition |
+| Champ               | Type    | Description                                 |
+| ------------------- | ------- | ------------------------------------------- |
+| editionId           | number  | Identifiant de l'édition ciblée             |
+| canEdit             | boolean | Peut modifier cette édition                 |
+| canDelete           | boolean | Peut supprimer cette édition                |
+| canManageVolunteers | boolean | Peut gérer les bénévoles de cette édition   |
+| canManageArtists    | boolean | Peut gérer les artistes de cette édition    |
+| canManageMeals      | boolean | Peut gérer les repas de cette édition       |
+| canManageTicketing  | boolean | Peut gérer la billetterie de cette édition  |
+| canManageTasks      | boolean | Peut gérer les tâches internes de l'édition |
 
-Règle de résolution effective :
+Règle de résolution effective (côté serveur, helpers dans `server/utils/permissions/edition-permissions.ts`) :
 
 - Si `rights.editAllEditions` est `true`, `canEdit` ponctuels deviennent redondants (mais peuvent toujours être renvoyés).
 - Si `rights.deleteAllEditions` est `true`, `canDelete` ponctuels deviennent redondants.
-- Si `rights.manageVolunteers` est `true`, `canManageVolunteers` ponctuels deviennent redondants.
-- Une entrée sans aucun des trois droits (canEdit/canDelete/canManageVolunteers) est filtrée à l'enregistrement.
+- Si `rights.manage<Resource>` est `true`, le `canManage<Resource>` ponctuel devient redondant.
+- Une entrée sans aucun droit per-edition coché est filtrée à l'enregistrement.
+
+Le créateur de l'édition, l'auteur de la convention et les admins globaux contournent toujours cette logique (ont tous les droits).
 
 ## Endpoints
 
@@ -170,6 +195,15 @@ function canManageEditionVolunteers(collab, editionId) {
     collab.perEdition?.some((p) => p.editionId === editionId && p.canManageVolunteers)
   )
 }
+
+// Pattern générique pour artistes / repas / billetterie / tâches
+function canManageEditionResource(collab, editionId, resource) {
+  // resource ∈ 'Volunteers' | 'Artists' | 'Meals' | 'Ticketing' | 'Tasks'
+  return (
+    collab.rights[`manage${resource}`] ||
+    collab.perEdition?.some((p) => p.editionId === editionId && p[`canManage${resource}`])
+  )
+}
 ```
 
 ## Changement par rapport à l'ancien modèle
@@ -197,4 +231,4 @@ function canManageEditionVolunteers(collab, editionId) {
 
 ---
 
-Dernière mise à jour: 2025-08-24.
+Dernière mise à jour: 2026-05-13 (ajout `manageArtists`, `manageMeals`, `manageTicketing`, `manageTasks`).
