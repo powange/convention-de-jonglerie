@@ -380,6 +380,17 @@ const upload = async () => {
 
     // Unwrap createSuccessResponse format: { success, data: { imageUrl, ... } }
     const responseData = response.data ?? response
+    // Une fois l'upload réussi, on libère le Object URL local (preview)
+    // pour basculer sur l'URL serveur. Sur certains mobiles (iOS Safari),
+    // les Object URL deviennent instables après changement du DOM et la
+    // preview disparaît visuellement — l'URL serveur est plus fiable.
+    if (previewUrl.value) {
+      URL.revokeObjectURL(previewUrl.value)
+      previewUrl.value = null
+    }
+    selectedFile.value = null
+    serverFiles.value = []
+    if (fileInput.value) fileInput.value.value = ''
     emit('update:modelValue', responseData.imageUrl || null)
     emit('uploaded', responseData)
   } catch (uploadError: unknown) {
