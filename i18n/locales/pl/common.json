@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Imię jest wymagane (minimum 2 znaki)",
       "performer_last_name_required": "Nazwisko jest wymagane (minimum 2 znaki)",
       "performer_phone_required": "Telefon jest wymagany (minimum 6 znaków)",
-      "phone_max_length": "Numer telefonu nie może przekraczać 20 znaków",
       "phone_required": "Numer telefonu jest wymagany (minimum 6 znaków)",
       "show_category_max_length": "Kategoria nie może przekraczać 100 znaków",
       "show_description_max_length": "Opis nie może przekraczać 5000 znaków",

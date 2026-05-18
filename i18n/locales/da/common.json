@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Fornavn er påkrævet (minimum 2 tegn)",
       "performer_last_name_required": "Efternavn er påkrævet (minimum 2 tegn)",
       "performer_phone_required": "Telefon er påkrævet (minimum 6 tegn)",
-      "phone_max_length": "Telefonnummeret må ikke overstige 20 tegn",
       "phone_required": "Telefonnummer er påkrævet (minimum 6 tegn)",
       "show_category_max_length": "Kategorien må ikke overstige 100 tegn",
       "show_description_max_length": "Beskrivelsen må ikke overstige 5000 tegn",

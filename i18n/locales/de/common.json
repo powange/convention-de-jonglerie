@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Vorname ist erforderlich (mindestens 2 Zeichen)",
       "performer_last_name_required": "Nachname ist erforderlich (mindestens 2 Zeichen)",
       "performer_phone_required": "Telefon ist erforderlich (mindestens 6 Zeichen)",
-      "phone_max_length": "Die Telefonnummer darf 20 Zeichen nicht überschreiten",
       "phone_required": "Telefonnummer ist erforderlich (mindestens 6 Zeichen)",
       "show_category_max_length": "Die Kategorie darf 100 Zeichen nicht überschreiten",
       "show_description_max_length": "Die Beschreibung darf 5000 Zeichen nicht überschreiten",

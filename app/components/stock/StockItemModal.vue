@@ -40,24 +40,18 @@
           </UFormField>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField :label="$t('gestion.stock.item_zone')" :error="fieldErrors.zoneId">
-            <USelect
-              v-model="formData.zoneId"
-              :items="zoneItems"
-              :placeholder="$t('gestion.stock.no_zone')"
-              class="w-full"
-            />
-          </UFormField>
-          <UFormField :label="$t('gestion.stock.item_marker')" :error="fieldErrors.markerId">
-            <USelect
-              v-model="formData.markerId"
-              :items="markerItems"
-              :placeholder="$t('gestion.stock.no_marker')"
-              class="w-full"
-            />
-          </UFormField>
-        </div>
+        <UFormField
+          :label="$t('gestion.stock.item_map_pin')"
+          :error="fieldErrors.zoneId || fieldErrors.markerId"
+          :help="$t('gestion.stock.item_map_pin_help')"
+        >
+          <USelect
+            v-model="formData.mapPin"
+            :items="mapPinItems"
+            :placeholder="$t('gestion.stock.no_map_pin')"
+            class="w-full"
+          />
+        </UFormField>
 
         <UFormField :label="$t('gestion.stock.item_notes')" :error="fieldErrors.notes">
           <UTextarea
@@ -114,22 +108,42 @@ const isOpen = computed({
   set: (v) => emit('update:open', v),
 })
 
-const NONE = -1
-const zoneItems = computed(() => [
-  { label: t('gestion.stock.no_zone'), value: NONE },
-  ...props.zones.map((z) => ({ label: z.name, value: z.id })),
+// Sélecteur unifié zone OU marqueur de la carte du site.
+// La valeur du select est une string :
+//   - '' = aucun
+//   - 'zone:<id>' = lien vers une EditionZone
+//   - 'marker:<id>' = lien vers un EditionMarker
+// Au submit, on dérive zoneId / markerId à envoyer au serveur.
+const NONE_PIN = ''
+const mapPinItems = computed(() => [
+  { label: t('gestion.stock.no_map_pin'), value: NONE_PIN },
+  ...props.zones.map((z) => ({
+    label: `${t('gestion.stock.pin_zone_label')} : ${z.name}`,
+    value: `zone:${z.id}`,
+  })),
+  ...props.markers.map((m) => ({
+    label: `${t('gestion.stock.pin_marker_label')} : ${m.name}`,
+    value: `marker:${m.id}`,
+  })),
 ])
-const markerItems = computed(() => [
-  { label: t('gestion.stock.no_marker'), value: NONE },
-  ...props.markers.map((m) => ({ label: m.name, value: m.id })),
-])
+
+function pinFromItem(item: StockItemLite | null): string {
+  if (item?.zone?.id) return `zone:${item.zone.id}`
+  if (item?.marker?.id) return `marker:${item.marker.id}`
+  return NONE_PIN
+}
+
+function pinToZoneAndMarker(pin: string): { zoneId: number | null; markerId: number | null } {
+  if (pin.startsWith('zone:')) return { zoneId: parseInt(pin.slice(5)), markerId: null }
+  if (pin.startsWith('marker:')) return { zoneId: null, markerId: parseInt(pin.slice(7)) }
+  return { zoneId: null, markerId: null }
+}
 
 const formData = reactive({
   name: '',
   description: '',
   location: '',
-  zoneId: NONE as number,
-  markerId: NONE as number,
+  mapPin: NONE_PIN,
   quantity: 1,
   notes: '',
 })
@@ -147,8 +161,7 @@ watch(
       formData.name = props.item?.name || ''
       formData.description = props.item?.description || ''
       formData.location = props.item?.location || ''
-      formData.zoneId = props.item?.zone?.id ?? NONE
-      formData.markerId = props.item?.marker?.id ?? NONE
+      formData.mapPin = pinFromItem(props.item)
       formData.quantity = props.item?.quantity ?? 1
       formData.notes = props.item?.notes || ''
       resetFieldErrors()
@@ -185,12 +198,13 @@ async function handleSubmit() {
   }
   saving.value = true
   try {
+    const { zoneId, markerId } = pinToZoneAndMarker(formData.mapPin)
     const body: Record<string, unknown> = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
       location: formData.location.trim(),
-      zoneId: formData.zoneId === NONE ? null : formData.zoneId,
-      markerId: formData.markerId === NONE ? null : formData.markerId,
+      zoneId,
+      markerId,
       quantity: formData.quantity,
       notes: formData.notes.trim() || null,
     }

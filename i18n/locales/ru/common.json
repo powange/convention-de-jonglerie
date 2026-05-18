@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Имя обязательно (минимум 2 символа)",
       "performer_last_name_required": "Фамилия обязательна (минимум 2 символа)",
       "performer_phone_required": "Телефон обязателен (минимум 6 символов)",
-      "phone_max_length": "Номер телефона не может превышать 20 символов",
       "phone_required": "Номер телефона обязателен (минимум 6 символов)",
       "show_category_max_length": "Категория не может превышать 100 символов",
       "show_description_max_length": "Описание не может превышать 5000 символов",

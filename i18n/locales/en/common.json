@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "First name is required (minimum 2 characters)",
       "performer_last_name_required": "Last name is required (minimum 2 characters)",
       "performer_phone_required": "Phone is required (minimum 6 characters)",
-      "phone_max_length": "Phone number cannot exceed 20 characters",
       "phone_required": "Phone number is required (minimum 6 characters)",
       "show_category_max_length": "Category cannot exceed 100 characters",
       "show_description_max_length": "Description cannot exceed 5000 characters",

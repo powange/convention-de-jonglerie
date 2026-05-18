@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Voornaam is verplicht (minimaal 2 tekens)",
       "performer_last_name_required": "Achternaam is verplicht (minimaal 2 tekens)",
       "performer_phone_required": "Telefoon is verplicht (minimaal 6 tekens)",
-      "phone_max_length": "Het telefoonnummer mag niet meer dan 20 tekens bevatten",
       "phone_required": "Telefoonnummer is verplicht (minimaal 6 tekens)",
       "show_category_max_length": "De categorie mag niet meer dan 100 tekens bevatten",
       "show_description_max_length": "De beschrijving mag niet meer dan 5000 tekens bevatten",

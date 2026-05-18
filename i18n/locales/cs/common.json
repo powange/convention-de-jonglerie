@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Křestní jméno je povinné (minimum 2 znaky)",
       "performer_last_name_required": "Příjmení je povinné (minimum 2 znaky)",
       "performer_phone_required": "Telefon je povinný (minimum 6 znaků)",
-      "phone_max_length": "Telefonní číslo nemůže překročit 20 znaků",
       "phone_required": "Telefonní číslo je povinné (minimum 6 znaků)",
       "show_category_max_length": "Kategorie nemůže překročit 100 znaků",
       "show_description_max_length": "Popis nemůže překročit 5000 znaků",

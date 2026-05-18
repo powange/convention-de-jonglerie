@@ -1134,7 +1134,6 @@
       "performer_first_name_required": "Il nome è obbligatorio (minimo 2 caratteri)",
       "performer_last_name_required": "Il cognome è obbligatorio (minimo 2 caratteri)",
       "performer_phone_required": "Il telefono è obbligatorio (minimo 6 caratteri)",
-      "phone_max_length": "Il numero di telefono non può superare i 20 caratteri",
       "phone_required": "Il numero di telefono è obbligatorio (minimo 6 caratteri)",
       "show_category_max_length": "La categoria non può superare i 100 caratteri",
       "show_description_max_length": "La descrizione non può superare i 5000 caratteri",
