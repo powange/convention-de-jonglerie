@@ -29,7 +29,7 @@ model StockItem {
   stockGroupId Int
   name         String
   description  String?  @db.Text
-  location     String // Localisation textuelle (ex: "Tente technique B")
+  location     String? // Localisation textuelle (ex: "Tente technique B") — optionnelle si zone/marker défini
   zoneId       Int? // Lien optionnel vers une zone de la carte
   markerId     Int? // Lien optionnel vers un marqueur de la carte
   quantity     Int      @default(1) // Nombre d'exemplaires identiques

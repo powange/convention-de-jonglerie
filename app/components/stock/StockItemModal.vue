@@ -83,7 +83,7 @@ interface StockItemLite {
   id: number
   name: string
   description: string | null
-  location: string
+  location: string | null
   quantity: number
   notes: string | null
   zone?: { id: number } | null

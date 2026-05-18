@@ -98,7 +98,7 @@ export default wrapApiHandler(
         stockGroupId: groupId,
         name: data.name,
         description: data.description?.trim() || null,
-        location: data.location?.trim() || '',
+        location: data.location?.trim() || null,
         zoneId: data.zoneId ?? null,
         markerId: data.markerId ?? null,
         quantity: data.quantity,

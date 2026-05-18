@@ -110,7 +110,7 @@ export default wrapApiHandler(
     const updateData: Record<string, unknown> = {}
     if (data.name !== undefined) updateData.name = data.name
     if (data.description !== undefined) updateData.description = data.description?.trim() || null
-    if (data.location !== undefined) updateData.location = data.location?.trim() || ''
+    if (data.location !== undefined) updateData.location = data.location?.trim() || null
     if (data.zoneId !== undefined) updateData.zoneId = data.zoneId
     if (data.markerId !== undefined) updateData.markerId = data.markerId
     if (data.quantity !== undefined) updateData.quantity = data.quantity

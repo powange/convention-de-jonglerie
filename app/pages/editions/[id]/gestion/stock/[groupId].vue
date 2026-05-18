@@ -172,7 +172,7 @@ interface StockItem {
   id: number
   name: string
   description: string | null
-  location: string
+  location: string | null
   quantity: number
   _count: { reservations: number }
 }

@@ -52,7 +52,7 @@
                 {{ item.description }}
               </p>
               <div class="text-xs text-gray-500 mt-2 flex items-center gap-3 flex-wrap">
-                <span class="flex items-center gap-1">
+                <span v-if="item.location" class="flex items-center gap-1">
                   <UIcon name="i-heroicons-map-pin" class="size-3" />
                   {{ item.location }}
                 </span>
@@ -203,7 +203,7 @@ interface StockItemFull {
   id: number
   name: string
   description: string | null
-  location: string
+  location: string | null
   quantity: number
   notes: string | null
   group: { id: number; name: string }
