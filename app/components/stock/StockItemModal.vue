@@ -25,7 +25,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UFormField :label="$t('gestion.stock.item_quantity')" :error="fieldErrors.quantity">
-            <UInput v-model.number="formData.quantity" type="number" :min="1" class="w-full" />
+            <UInputNumber v-model="formData.quantity" :min="1" :step="1" class="w-full" />
           </UFormField>
           <UFormField
             :label="$t('gestion.stock.item_location')"

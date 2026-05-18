@@ -207,6 +207,7 @@ Cette commande s'arrête si une étape échoue.
 - **UCard** : Composant de carte pour afficher les éditions
 - **UBadge** : Composant d'étiquette pour afficher les compteurs
 - **UInput** : Composant d'entrée pour les formulaires
+- **UInputNumber** : Composant d'entrée numérique (avec boutons +/-, supporte `:min`, `:max`, `:step` pour les entiers)
 - **USelect** : Composant de sélection déroulante
 - **UTextarea** : Composant de zone de texte pour les formulaires
 - **UFormField** : Composant de champ de formulaire avec étiquette et validation

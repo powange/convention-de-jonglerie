@@ -30,11 +30,11 @@
           required
           :error="fieldErrors.quantityReserved"
         >
-          <UInput
-            v-model.number="formData.quantityReserved"
-            type="number"
+          <UInputNumber
+            v-model="formData.quantityReserved"
             :min="1"
             :max="itemQuantity"
+            :step="1"
             class="w-full"
           />
           <template #help>
