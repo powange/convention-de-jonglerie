@@ -135,7 +135,7 @@
       </UCard>
     </div>
 
-    <StockStockItemModal
+    <StockItemModal
       v-if="item"
       v-model:open="itemModalOpen"
       :edition-id="editionId"
@@ -145,7 +145,7 @@
       :markers="markers"
       @saved="fetchItem"
     />
-    <StockStockReservationModal
+    <StockReservationModal
       v-if="item"
       v-model:open="reservationModalOpen"
       :edition-id="editionId"

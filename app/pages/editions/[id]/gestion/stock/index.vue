@@ -91,7 +91,7 @@
       </UCard>
     </div>
 
-    <StockStockGroupModal
+    <StockGroupModal
       v-model:open="groupModalOpen"
       :edition-id="editionId"
       :group="editingGroup"

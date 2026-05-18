@@ -130,14 +130,14 @@
       </div>
     </div>
 
-    <StockStockGroupModal
+    <StockGroupModal
       v-model:open="groupModalOpen"
       :edition-id="editionId"
       :group="group"
       @saved="handleGroupSaved"
       @deleted="handleGroupDeleted"
     />
-    <StockStockItemModal
+    <StockItemModal
       v-if="group"
       v-model:open="itemModalOpen"
       :edition-id="editionId"
