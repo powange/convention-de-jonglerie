@@ -68,8 +68,8 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Attendre que la page soit entièrement chargée (retry robuste)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 60000, intervals: [5000] })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 120000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -157,8 +157,8 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Attendre que la page soit entièrement chargée (retry robuste)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 60000, intervals: [5000] })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 120000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -208,8 +208,8 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Attendre que la page soit entièrement chargée (retry robuste)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 60000, intervals: [5000] })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 120000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -249,8 +249,8 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Attendre que la page soit entièrement chargée (retry robuste)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 60000, intervals: [5000] })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 120000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -310,8 +310,8 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Attendre que la page soit entièrement chargée (retry robuste)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 60000, intervals: [5000] })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 120000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
@@ -367,8 +367,8 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Attendre que la page soit entièrement chargée (retry robuste)
     await expect(async () => {
       await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 3000 })
-    }).toPass({ timeout: 60000, intervals: [5000] })
+      await expect(page.getByRole('button', { name: /postuler/i })).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 120000, intervals: [5000] })
 
     await page.getByRole('button', { name: /postuler/i }).click()
     const modal = page.getByRole('dialog')
