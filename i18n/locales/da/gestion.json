@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Kan ikke længere tildeles",
+      "comments": {
+        "confirm_delete": "Slet denne kommentar?",
+        "edited": "redigeret",
+        "empty": "Ingen kommentarer endnu.",
+        "placeholder": "Tilføj en kommentar...",
+        "post": "Send",
+        "title": "Kommentarer"
+      },
       "confirm_delete_group": "Slet gruppen „{name}\" og dens {count} opgave(r)?",
       "confirm_delete_group_simple": "Slet gruppen „{name}\"?",
       "confirm_delete_task": "Slet opgaven „{title}\"?",

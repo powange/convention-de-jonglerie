@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Niet meer toewijsbaar",
+      "comments": {
+        "confirm_delete": "Deze opmerking verwijderen?",
+        "edited": "bewerkt",
+        "empty": "Nog geen opmerkingen.",
+        "placeholder": "Een opmerking toevoegen...",
+        "post": "Plaatsen",
+        "title": "Opmerkingen"
+      },
       "confirm_delete_group": "Groep „{name}\" en zijn {count} taak/taken verwijderen?",
       "confirm_delete_group_simple": "Groep „{name}\" verwijderen?",
       "confirm_delete_task": "Taak „{title}\" verwijderen?",

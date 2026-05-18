@@ -1,3 +1,21 @@
+import { canManageTasks, type EditionWithPermissions } from './permissions/edition-permissions'
+
+import type { UserForPermissions } from './permissions/types'
+
+/**
+ * Vérifie si un utilisateur peut commenter une tâche :
+ * - soit il a le droit `canManageTasks` (organisateurs)
+ * - soit il est assigné à la tâche
+ */
+export function canCommentTask(
+  edition: EditionWithPermissions,
+  user: UserForPermissions,
+  taskAssigneeIds: number[]
+): boolean {
+  if (canManageTasks(edition, user)) return true
+  return taskAssigneeIds.includes(user.id)
+}
+
 /**
  * Vérifie que tous les `assigneeIds` correspondent à des utilisateurs
  * réellement assignables sur l'édition donnée :

@@ -120,6 +120,11 @@
         "action": "View task",
         "message": "You have been assigned to the task \"{taskTitle}\" of the {editionName} edition.",
         "title": "New task assigned 📋"
+      },
+      "commented": {
+        "action": "View task",
+        "message": "{authorPseudo} commented on the task \"{taskTitle}\" of the {editionName} edition.",
+        "title": "New comment on a task 💬"
       }
     },
     "this_week": "This week",

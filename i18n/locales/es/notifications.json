@@ -120,6 +120,11 @@
         "action": "Ver la tarea",
         "message": "Has sido asignado(a) a la tarea «{taskTitle}» de la edición {editionName}.",
         "title": "Nueva tarea asignada 📋"
+      },
+      "commented": {
+        "action": "Ver la tarea",
+        "message": "{authorPseudo} ha comentado la tarea «{taskTitle}» de la edición {editionName}.",
+        "title": "Nuevo comentario en una tarea 💬"
       }
     },
     "this_week": "Esta semana",

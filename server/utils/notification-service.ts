@@ -980,6 +980,33 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification de nouveau commentaire sur une tâche
+   * Destinée aux autres assignés de la tâche (sauf l'auteur du commentaire).
+   */
+  async taskCommented(
+    userId: number,
+    authorPseudo: string,
+    taskTitle: string,
+    editionName: string,
+    editionId: number,
+    taskId: number
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.task.commented.title',
+      messageKey: 'notifications.task.commented.message',
+      translationParams: { authorPseudo, taskTitle, editionName },
+      actionTextKey: 'notifications.task.commented.action',
+      category: 'task',
+      entityType: 'Task',
+      entityId: taskId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/tasks`,
+      notificationType: 'task_commented',
+    })
+  },
+
+  /**
    * Notification de don café reçu (envoyée à tous les global admins)
    */
   async coffeeDonationReceived(quantity: number, totalCents: number, donorName: string | null) {

@@ -120,6 +120,11 @@
         "action": "Zobacz zadanie",
         "message": "Zostałeś(-aś) przypisany(-a) do zadania „{taskTitle}\" edycji {editionName}.",
         "title": "Nowe zadanie przypisane 📋"
+      },
+      "commented": {
+        "action": "Zobacz zadanie",
+        "message": "{authorPseudo} skomentował(a) zadanie „{taskTitle}\" edycji {editionName}.",
+        "title": "Nowy komentarz do zadania 💬"
       }
     },
     "this_week": "W tym tygodniu",

@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Nie można już przypisać",
+      "comments": {
+        "confirm_delete": "Usunąć ten komentarz?",
+        "edited": "edytowano",
+        "empty": "Brak komentarzy.",
+        "placeholder": "Dodaj komentarz...",
+        "post": "Opublikuj",
+        "title": "Komentarze"
+      },
       "confirm_delete_group": "Usunąć grupę „{name}\" i jej {count} zadań?",
       "confirm_delete_group_simple": "Usunąć grupę „{name}\"?",
       "confirm_delete_task": "Usunąć zadanie „{title}\"?",

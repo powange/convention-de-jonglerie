@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Plus assignable",
+      "comments": {
+        "confirm_delete": "Supprimer ce commentaire ?",
+        "edited": "modifié",
+        "empty": "Aucun commentaire pour le moment.",
+        "placeholder": "Ajouter un commentaire...",
+        "post": "Publier",
+        "title": "Commentaires"
+      },
       "confirm_delete_group": "Supprimer le groupe « {name} » et ses {count} tâche(s) ?",
       "confirm_delete_group_simple": "Supprimer le groupe « {name} » ?",
       "confirm_delete_task": "Supprimer la tâche « {title} » ?",

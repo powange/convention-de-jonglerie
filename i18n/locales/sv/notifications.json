@@ -120,6 +120,11 @@
         "action": "Visa uppgift",
         "message": "Du har tilldelats uppgiften ”{taskTitle}” för utgåvan {editionName}.",
         "title": "Ny uppgift tilldelad 📋"
+      },
+      "commented": {
+        "action": "Visa uppgift",
+        "message": "{authorPseudo} har kommenterat uppgiften ”{taskTitle}” för utgåvan {editionName}.",
+        "title": "Ny kommentar på en uppgift 💬"
       }
     },
     "this_week": "Denna vecka",

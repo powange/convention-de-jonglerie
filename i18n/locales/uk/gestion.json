@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Більше не можна призначати",
+      "comments": {
+        "confirm_delete": "Видалити цей коментар?",
+        "edited": "відредаговано",
+        "empty": "Поки що немає коментарів.",
+        "placeholder": "Додати коментар...",
+        "post": "Опублікувати",
+        "title": "Коментарі"
+      },
       "confirm_delete_group": "Видалити групу «{name}» та її {count} завдань?",
       "confirm_delete_group_simple": "Видалити групу «{name}»?",
       "confirm_delete_task": "Видалити завдання «{title}»?",

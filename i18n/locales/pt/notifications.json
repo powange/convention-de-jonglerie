@@ -120,6 +120,11 @@
         "action": "Ver tarefa",
         "message": "Foi atribuído(a) à tarefa «{taskTitle}» da edição {editionName}.",
         "title": "Nova tarefa atribuída 📋"
+      },
+      "commented": {
+        "action": "Ver tarefa",
+        "message": "{authorPseudo} comentou na tarefa «{taskTitle}» da edição {editionName}.",
+        "title": "Novo comentário numa tarefa 💬"
       }
     },
     "this_week": "Esta semana",

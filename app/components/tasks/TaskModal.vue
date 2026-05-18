@@ -68,6 +68,16 @@
           />
         </UFormField>
       </form>
+
+      <!-- Commentaires (uniquement en édition) -->
+      <div v-if="task" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+        <TasksTaskComments
+          :edition-id="editionId"
+          :task-id="task.id"
+          :can-post="true"
+          :can-moderate="true"
+        />
+      </div>
     </template>
     <template #footer>
       <div class="flex w-full justify-between gap-2">

@@ -120,6 +120,11 @@
         "action": "Se opgaven",
         "message": "Du er blevet tildelt opgaven „{taskTitle}\" for udgaven {editionName}.",
         "title": "Ny opgave tildelt 📋"
+      },
+      "commented": {
+        "action": "Se opgaven",
+        "message": "{authorPseudo} har kommenteret opgaven „{taskTitle}\" for udgaven {editionName}.",
+        "title": "Ny kommentar på en opgave 💬"
       }
     },
     "this_week": "Denne uge",

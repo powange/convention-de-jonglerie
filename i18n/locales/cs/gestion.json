@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Již nelze přiřadit",
+      "comments": {
+        "confirm_delete": "Smazat tento komentář?",
+        "edited": "upraveno",
+        "empty": "Zatím žádné komentáře.",
+        "placeholder": "Přidat komentář...",
+        "post": "Zveřejnit",
+        "title": "Komentáře"
+      },
       "confirm_delete_group": "Smazat skupinu „{name}\" a jejích {count} úkol(ů)?",
       "confirm_delete_group_simple": "Smazat skupinu „{name}\"?",
       "confirm_delete_task": "Smazat úkol „{title}\"?",

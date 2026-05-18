@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "No longer assignable",
+      "comments": {
+        "confirm_delete": "Delete this comment?",
+        "edited": "edited",
+        "empty": "No comments yet.",
+        "placeholder": "Add a comment...",
+        "post": "Post",
+        "title": "Comments"
+      },
       "confirm_delete_group": "Delete the group \"{name}\" and its {count} task(s)?",
       "confirm_delete_group_simple": "Delete the group \"{name}\"?",
       "confirm_delete_task": "Delete the task \"{title}\"?",

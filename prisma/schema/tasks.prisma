@@ -40,6 +40,7 @@ model Task {
 
   group       TaskGroup        @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
   assignments TaskAssignment[]
+  comments    TaskComment[]
 
   @@index([taskGroupId])
   @@index([taskGroupId, displayOrder])
@@ -58,4 +59,21 @@ model TaskAssignment {
   @@unique([taskId, userId])
   @@index([taskId])
   @@index([userId])
+}
+
+model TaskComment {
+  id        Int       @id @default(autoincrement())
+  taskId    Int
+  userId    Int
+  content   String    @db.Text
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([taskId, createdAt])
 }

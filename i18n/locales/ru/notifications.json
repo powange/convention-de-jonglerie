@@ -120,6 +120,11 @@
         "action": "Посмотреть задачу",
         "message": "Вам назначена задача «{taskTitle}» выпуска {editionName}.",
         "title": "Назначена новая задача 📋"
+      },
+      "commented": {
+        "action": "Посмотреть задачу",
+        "message": "{authorPseudo} прокомментировал(а) задачу «{taskTitle}» выпуска {editionName}.",
+        "title": "Новый комментарий к задаче 💬"
       }
     },
     "this_week": "На этой неделе",

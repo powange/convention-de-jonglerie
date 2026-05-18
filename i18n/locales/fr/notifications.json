@@ -120,6 +120,11 @@
         "action": "Voir la tâche",
         "message": "Vous avez été assigné(e) à la tâche « {taskTitle} » de l'édition {editionName}.",
         "title": "Nouvelle tâche assignée 📋"
+      },
+      "commented": {
+        "action": "Voir la tâche",
+        "message": "{authorPseudo} a commenté la tâche « {taskTitle} » de l'édition {editionName}.",
+        "title": "Nouveau commentaire sur une tâche 💬"
       }
     },
     "this_week": "Cette semaine",

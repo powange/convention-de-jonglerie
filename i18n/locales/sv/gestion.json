@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Kan inte längre tilldelas",
+      "comments": {
+        "confirm_delete": "Ta bort denna kommentar?",
+        "edited": "redigerad",
+        "empty": "Inga kommentarer ännu.",
+        "placeholder": "Lägg till en kommentar...",
+        "post": "Publicera",
+        "title": "Kommentarer"
+      },
       "confirm_delete_group": "Ta bort gruppen ”{name}” och dess {count} uppgift(er)?",
       "confirm_delete_group_simple": "Ta bort gruppen ”{name}”?",
       "confirm_delete_task": "Ta bort uppgiften ”{title}”?",

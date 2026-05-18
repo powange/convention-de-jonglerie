@@ -26,6 +26,10 @@ Unité de travail avec :
 
 Association `(Task, User)` représentant qu'un utilisateur est responsable d'une tâche. Une tâche peut avoir 0..N assignés. Les nouveaux assignés reçoivent une notification.
 
+### TaskComment
+
+Commentaire libre sur une tâche, avec **rendu Markdown**. Stocke l'auteur, le contenu, la date de création et la date d'édition (`editedAt` nullable). Les commentaires sont supprimés en cascade lors de la suppression de la tâche.
+
 ## Architecture
 
 ### Modèles Prisma
@@ -69,6 +73,18 @@ model TaskAssignment {
   task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@unique([taskId, userId])
+}
+
+model TaskComment {
+  id        Int       @id @default(autoincrement())
+  taskId    Int
+  userId    Int
+  content   String    @db.Text
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([taskId, createdAt])
 }
 ```
 
@@ -118,6 +134,23 @@ Tous les endpoints exigent une authentification et le droit `canManageTasks` (sa
 | ------- | ------------------------- | ----------------------------------------------------------------- |
 | GET     | `/tasks/assignable-users` | Liste dédupliquée : organisateurs convention + bénévoles ACCEPTED |
 
+### Commentaires
+
+| Méthode | Endpoint                             | Description                                    |
+| ------- | ------------------------------------ | ---------------------------------------------- |
+| GET     | `/tasks/:taskId/comments`            | Liste des commentaires (ordre chronologique)   |
+| POST    | `/tasks/:taskId/comments`            | Ajoute un commentaire                          |
+| PUT     | `/tasks/:taskId/comments/:commentId` | Édite un commentaire (auteur uniquement)       |
+| DELETE  | `/tasks/:taskId/comments/:commentId` | Supprime un commentaire (auteur ou modérateur) |
+
+**Permissions sur les commentaires** :
+
+- **Lire / Poster** : organisateurs avec `canManageTasks` **OU** utilisateur assigné à la tâche (helper `canCommentTask` dans `server/utils/tasks-helpers.ts`).
+- **Éditer** : auteur uniquement.
+- **Supprimer** : auteur OU organisateur avec `canManageTasks` (modération).
+
+À chaque nouveau commentaire, les **autres assignés** de la tâche reçoivent une notification (helper `NotificationHelpers.taskCommented`).
+
 ### Comportements importants
 
 - **POST tasks** : `displayOrder` calculé automatiquement (`max + 1` du groupe) si absent.
@@ -130,15 +163,16 @@ Tous les endpoints exigent une authentification et le droit `canManageTasks` (sa
 
 ## Notifications
 
-Helper : `NotificationHelpers.taskAssigned(userId, taskTitle, editionName, editionId, taskId)`
+| Helper          | Déclencheur                       | Destinataires                     | Type   |
+| --------------- | --------------------------------- | --------------------------------- | ------ |
+| `taskAssigned`  | Nouvelle assignation              | Le nouvel assigné (hors auteur)   | `INFO` |
+| `taskCommented` | Nouveau commentaire sur une tâche | Les autres assignés (hors auteur) | `INFO` |
 
-- **Type** : `INFO`
+Toutes deux ont :
+
 - **Catégorie** : `task`
-- **Action URL** : `/editions/:id/gestion/tasks` (ouvre la liste des groupes)
-- **Clés i18n** :
-  - `notifications.task.assigned.title`
-  - `notifications.task.assigned.message` (params : `taskTitle`, `editionName`)
-  - `notifications.task.assigned.action`
+- **Action URL** : `/editions/:id/gestion/tasks`
+- **Clés i18n** sous `notifications.task.{assigned|commented}.{title,message,action}`
 
 Voir [`docs/system/NOTIFICATION_SYSTEM.md`](system/NOTIFICATION_SYSTEM.md) pour le système global.
 
@@ -160,6 +194,12 @@ Voir [`docs/system/NOTIFICATION_SYSTEM.md`](system/NOTIFICATION_SYSTEM.md) pour 
   - Description Markdown via `MinimalMarkdownEditor`.
   - Affiche un badge **« Plus assignable »** pour les assignés legacy (qui n'apparaissent plus dans `assignable-users` mais sont déjà assignés à la tâche), avec un avertissement.
   - Affichage des erreurs Zod par champ via `:error="fieldErrors.X"` sur les `UFormField`.
+  - Section **commentaires** affichée uniquement en mode édition (`TasksTaskComments`).
+- `app/components/tasks/TaskComments.vue` : fil de discussion d'une tâche.
+  - Liste paginée chronologique avec avatar + pseudo + date.
+  - Ajout via `MinimalMarkdownEditor` + bouton « Publier ».
+  - Édition inline (auteur uniquement) + suppression (auteur ou modérateur).
+  - Badge **« modifié »** sur les commentaires édités.
 
 ### Navigation
 

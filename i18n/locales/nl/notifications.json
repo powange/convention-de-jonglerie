@@ -120,6 +120,11 @@
         "action": "Taak bekijken",
         "message": "Je bent toegewezen aan de taak „{taskTitle}\" van editie {editionName}.",
         "title": "Nieuwe taak toegewezen 📋"
+      },
+      "commented": {
+        "action": "Taak bekijken",
+        "message": "{authorPseudo} heeft commentaar gegeven op de taak „{taskTitle}\" van editie {editionName}.",
+        "title": "Nieuwe opmerking op een taak 💬"
       }
     },
     "this_week": "Deze week",

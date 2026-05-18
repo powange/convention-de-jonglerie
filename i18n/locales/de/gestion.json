@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Nicht mehr zuweisbar",
+      "comments": {
+        "confirm_delete": "Diesen Kommentar löschen?",
+        "edited": "bearbeitet",
+        "empty": "Noch keine Kommentare.",
+        "placeholder": "Kommentar hinzufügen...",
+        "post": "Veröffentlichen",
+        "title": "Kommentare"
+      },
       "confirm_delete_group": "Gruppe „{name}\" und ihre {count} Aufgabe(n) löschen?",
       "confirm_delete_group_simple": "Gruppe „{name}\" löschen?",
       "confirm_delete_task": "Aufgabe „{title}\" löschen?",

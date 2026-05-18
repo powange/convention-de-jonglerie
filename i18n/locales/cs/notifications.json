@@ -120,6 +120,11 @@
         "action": "Zobrazit úkol",
         "message": "Byli jste přiřazeni k úkolu „{taskTitle}\" ročníku {editionName}.",
         "title": "Nový přiřazený úkol 📋"
+      },
+      "commented": {
+        "action": "Zobrazit úkol",
+        "message": "{authorPseudo} okomentoval(a) úkol „{taskTitle}\" ročníku {editionName}.",
+        "title": "Nový komentář k úkolu 💬"
       }
     },
     "this_week": "Tento týden",

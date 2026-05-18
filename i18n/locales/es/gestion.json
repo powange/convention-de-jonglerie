@@ -390,6 +390,14 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Ya no asignable",
+      "comments": {
+        "confirm_delete": "¿Eliminar este comentario?",
+        "edited": "editado",
+        "empty": "Aún no hay comentarios.",
+        "placeholder": "Añadir un comentario...",
+        "post": "Publicar",
+        "title": "Comentarios"
+      },
       "confirm_delete_group": "¿Eliminar el grupo «{name}» y sus {count} tarea(s)?",
       "confirm_delete_group_simple": "¿Eliminar el grupo «{name}»?",
       "confirm_delete_task": "¿Eliminar la tarea «{title}»?",

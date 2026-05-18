@@ -120,6 +120,11 @@
         "action": "Vedi attività",
         "message": "Sei stato/a assegnato/a all'attività «{taskTitle}» dell'edizione {editionName}.",
         "title": "Nuova attività assegnata 📋"
+      },
+      "commented": {
+        "action": "Vedi attività",
+        "message": "{authorPseudo} ha commentato l'attività «{taskTitle}» dell'edizione {editionName}.",
+        "title": "Nuovo commento su un'attività 💬"
       }
     },
     "this_week": "Questa settimana",
