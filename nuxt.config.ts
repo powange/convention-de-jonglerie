@@ -507,6 +507,18 @@ export default defineNuxtConfig({
         },
       },
     },
+    // Uploads de fichiers (affiches, profils, etc.) : le body contient le fichier
+    // encodé en base64, ce qui augmente la taille d'environ 33 %. Pour rester
+    // cohérent avec MAX_IMAGE_SIZE = 10 MB côté serveur, on autorise 15 MB.
+    '/api/files/**': {
+      security: {
+        requestSizeLimiter: {
+          maxRequestSizeInBytes: 15_000_000,
+          maxUploadFileRequestInBytes: 15_000_000,
+          throwError: true,
+        },
+      },
+    },
   },
 
   experimental: {
