@@ -195,6 +195,30 @@
             />
           </div>
         </UCard>
+
+        <!-- Stock matériel -->
+        <UCard>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-heroicons-archive-box" class="text-amber-600 size-5" />
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.stock.title') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.features.stock_description') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="stockEnabledLocal"
+              :loading="savingStock"
+              :disabled="savingStock"
+              color="primary"
+              @update:model-value="handleToggleStock"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
@@ -233,6 +257,9 @@ const siteMapEnabledLocal = ref(false)
 // Gestion de l'activation des tâches
 const tasksEnabledLocal = ref(false)
 
+// Gestion de l'activation du stock matériel
+const stockEnabledLocal = ref(false)
+
 watch(
   edition,
   (newEdition) => {
@@ -244,6 +271,7 @@ watch(
       workshopsEnabledLocal.value = newEdition.workshopsEnabled || false
       siteMapEnabledLocal.value = newEdition.siteMapEnabled || false
       tasksEnabledLocal.value = (newEdition as any).tasksEnabled || false
+      stockEnabledLocal.value = (newEdition as any).stockEnabled || false
     }
   },
   { immediate: true }
@@ -387,6 +415,26 @@ const { execute: executeToggleTasks, loading: savingTasks } = useApiAction(
 
 const handleToggleTasks = () => {
   executeToggleTasks()
+}
+
+const { execute: executeToggleStock, loading: savingStock } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ stockEnabled: stockEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      stockEnabledLocal.value = !stockEnabledLocal.value
+    },
+  }
+)
+
+const handleToggleStock = () => {
+  executeToggleStock()
 }
 
 // Vérifier l'accès à cette page

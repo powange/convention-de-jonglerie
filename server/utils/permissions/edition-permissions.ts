@@ -380,6 +380,35 @@ export function canManageArtists(
 }
 
 /**
+ * Vérifie si un utilisateur peut gérer le stock matériel d'une édition.
+ * Ne couvre PAS les team leaders bénévoles — utiliser `canAccessStock` pour
+ * inclure ce cas (qui nécessite un appel DB asynchrone).
+ */
+export function canManageStock(edition: EditionWithPermissions, user: UserForPermissions): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  const hasConventionStockRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageStock
+    ) || false
+
+  const hasEditionStockRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageStock === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionStockRights ||
+    hasEditionStockRights ||
+    isGlobalAdmin
+  )
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les tâches d'une édition
  */
 export function canManageTasks(edition: EditionWithPermissions, user: UserForPermissions): boolean {

@@ -78,13 +78,13 @@ describe('tasks-helpers', () => {
       expect(canCommentTask(edition, user, [999, 1001])).toBe(true)
     })
 
-    it("refuse un utilisateur sans droit et non assigné", () => {
+    it('refuse un utilisateur sans droit et non assigné', () => {
       const edition = createMockEdition()
       const user = createMockUser({ id: 999 })
       expect(canCommentTask(edition, user, [1001, 1002])).toBe(false)
     })
 
-    it("refuse un organisateur convention sans canManageTasks et non assigné", () => {
+    it('refuse un organisateur convention sans canManageTasks et non assigné', () => {
       const edition = createMockEdition({
         convention: {
           id: 10,

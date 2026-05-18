@@ -87,8 +87,22 @@ describe('POST /api/editions/[id]/tasks/[taskId]/comments', () => {
 
     // 3 assignés - 1 auteur = 2 notifications
     expect(mockTaskCommented).toHaveBeenCalledTimes(2)
-    expect(mockTaskCommented).toHaveBeenCalledWith(2, 'testuser', 'Tâche test', 'Edition Test', 1, 5)
-    expect(mockTaskCommented).toHaveBeenCalledWith(3, 'testuser', 'Tâche test', 'Edition Test', 1, 5)
+    expect(mockTaskCommented).toHaveBeenCalledWith(
+      2,
+      'testuser',
+      'Tâche test',
+      'Edition Test',
+      1,
+      5
+    )
+    expect(mockTaskCommented).toHaveBeenCalledWith(
+      3,
+      'testuser',
+      'Tâche test',
+      'Edition Test',
+      1,
+      5
+    )
   })
 
   it("n'envoie pas de notification à l'auteur du commentaire", async () => {
@@ -106,14 +120,7 @@ describe('POST /api/editions/[id]/tasks/[taskId]/comments', () => {
       name: null,
     })
     await handler(baseEvent as any)
-    expect(mockTaskCommented).toHaveBeenCalledWith(
-      2,
-      'testuser',
-      'Tâche test',
-      'Convention',
-      1,
-      5
-    )
+    expect(mockTaskCommented).toHaveBeenCalledWith(2, 'testuser', 'Tâche test', 'Convention', 1, 5)
   })
 
   it("rejette si l'édition est introuvable", async () => {

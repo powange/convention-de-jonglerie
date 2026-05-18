@@ -85,6 +85,9 @@
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.tasks_short') }}
                 </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.stock_short') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -171,6 +174,17 @@
                       color="primary"
                       :model-value="localValue.rights.manageTasks"
                       @update:model-value="(val) => updateRight('manageTasks', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageStock')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageStock"
+                      @update:model-value="(val) => updateRight('manageStock', val)"
                     />
                   </div>
                 </td>
@@ -274,6 +288,18 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.stock_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageStock"
+                      :model-value="hasEditionFlag(ed.id, 'canManageStock')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageStock', val)"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -300,6 +326,7 @@ interface PerEditionRight {
   canManageMeals?: boolean
   canManageTicketing?: boolean
   canManageTasks?: boolean
+  canManageStock?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -336,6 +363,7 @@ const props = withDefaults(
       { key: 'manageMeals', label: 'permissions.manageMeals' },
       { key: 'manageTicketing', label: 'permissions.manageTicketing' },
       { key: 'manageTasks', label: 'permissions.manageTasks' },
+      { key: 'manageStock', label: 'permissions.manageStock' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -392,6 +420,7 @@ const globalRightsOutsideTable = computed(() =>
         'manageMeals',
         'manageTicketing',
         'manageTasks',
+        'manageStock',
       ].includes(p.key)
   )
 )
@@ -478,6 +507,12 @@ function updateRight(key: string, value: any) {
       if (p.canManageTasks) p.canManageTasks = false
     })
   }
+  // If enabling manageStock we clean perEdition stock flags
+  if (key === 'manageStock' && localValue.rights.manageStock) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageStock) p.canManageStock = false
+    })
+  }
   // Clean up empty entries
   localValue.perEdition = localValue.perEdition.filter(
     (p) =>
@@ -487,7 +522,8 @@ function updateRight(key: string, value: any) {
       p.canManageArtists ||
       p.canManageMeals ||
       p.canManageTicketing ||
-      p.canManageTasks
+      p.canManageTasks ||
+      p.canManageStock
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
@@ -501,6 +537,7 @@ function hasEditionFlag(
     | 'canManageMeals'
     | 'canManageTicketing'
     | 'canManageTasks'
+    | 'canManageStock'
 ) {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
@@ -513,7 +550,8 @@ function toggleEdition(
     | 'canManageArtists'
     | 'canManageMeals'
     | 'canManageTicketing'
-    | 'canManageTasks',
+    | 'canManageTasks'
+    | 'canManageStock',
   value: any
 ) {
   const boolVal = !!value
@@ -528,6 +566,7 @@ function toggleEdition(
       canManageMeals: false,
       canManageTicketing: false,
       canManageTasks: false,
+      canManageStock: false,
     }
     localValue.perEdition.push(entry)
   }
@@ -541,7 +580,8 @@ function toggleEdition(
     !entry.canManageArtists &&
     !entry.canManageMeals &&
     !entry.canManageTicketing &&
-    !entry.canManageTasks
+    !entry.canManageTasks &&
+    !entry.canManageStock
   ) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }

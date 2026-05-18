@@ -154,6 +154,7 @@
     "start": "Anfang",
     "start_date": "Startdatum",
     "status": "Status",
+    "stock_short": "Bestand",
     "success": "Erfolg",
     "tasks_short": "Aufgaben",
     "teardown": "Demontage",

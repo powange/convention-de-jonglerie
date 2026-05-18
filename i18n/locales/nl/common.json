@@ -154,6 +154,7 @@
     "start": "Begin",
     "start_date": "Startdatum",
     "status": "Status",
+    "stock_short": "Voorraad",
     "success": "Succes",
     "tasks_short": "Taken",
     "teardown": "Ontmanteling",

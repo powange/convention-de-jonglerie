@@ -475,6 +475,26 @@
           </div>
         </UCard>
 
+        <!-- Stock matériel -->
+        <UCard v-if="edition.stockEnabled && canAccessStock">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-archive-box" class="text-amber-600" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.stock.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/stock`"
+                icon="i-heroicons-archive-box"
+                :title="$t('gestion.stock.manage_title')"
+                :description="$t('gestion.stock.manage_description')"
+                color="amber"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
         <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
           <div class="space-y-4">
@@ -627,6 +647,27 @@ const canManageTasks = computed(() => {
     return false
   })
 })
+
+// Vérifier si l'utilisateur peut gérer le stock matériel
+const canManageStock = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  const userId = authStore.user.id
+  if (authStore.isAdminModeActive) return true
+  if (edition.value.creatorId === userId) return true
+  if (edition.value.convention?.authorId === userId) return true
+  const organizers = edition.value.convention?.organizers || []
+  return organizers.some((collab: any) => {
+    if (collab.user?.id !== userId) return false
+    if (collab.rights?.manageStock || collab.rights?.editConvention) return true
+    if (collab.perEditionRights) {
+      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
+      if (per?.canManageStock || per?.canEdit) return true
+    }
+    return false
+  })
+})
+
+const canAccessStock = computed(() => canManageStock.value || isTeamLeaderValue.value)
 
 // Vérifier si l'utilisateur peut accéder à la validation des repas
 // (bénévole d'équipe de validation des repas)

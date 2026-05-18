@@ -49,7 +49,7 @@ describe('PUT /api/editions/[id]/tasks/[taskId]/comments/[commentId]', () => {
     global.readBody = vi.fn().mockResolvedValue({ content: 'Updated' })
   })
 
-  it("met à jour le commentaire et fixe editedAt", async () => {
+  it('met à jour le commentaire et fixe editedAt', async () => {
     const result = await handler(baseEvent as any)
     expect(result.success).toBe(true)
     expect(result.data.comment.content).toBe('Updated')
@@ -77,18 +77,18 @@ describe('PUT /api/editions/[id]/tasks/[taskId]/comments/[commentId]', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Édition non trouvée')
   })
 
-  it("rejette si le commentaire est introuvable", async () => {
+  it('rejette si le commentaire est introuvable', async () => {
     prismaMock.taskComment.findFirst.mockResolvedValue(null)
     await expect(handler(baseEvent as any)).rejects.toThrow('Commentaire introuvable')
   })
 
-  it("rejette un contenu vide", async () => {
+  it('rejette un contenu vide', async () => {
     global.readBody = vi.fn().mockResolvedValue({ content: '' })
     await expect(handler(baseEvent as any)).rejects.toThrow()
     expect(prismaMock.taskComment.update).not.toHaveBeenCalled()
   })
 
-  it("rejette un identifiant de commentaire invalide", async () => {
+  it('rejette un identifiant de commentaire invalide', async () => {
     const badEvent = {
       context: { params: { id: '1', taskId: '5', commentId: 'abc' }, user: mockUser },
     }

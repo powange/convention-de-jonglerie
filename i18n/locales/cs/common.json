@@ -154,6 +154,7 @@
     "start": "Začátek",
     "start_date": "Datum zahájení",
     "status": "Stav",
+    "stock_short": "Sklad",
     "success": "Úspěch",
     "tasks_short": "Úkoly",
     "teardown": "Demontáž",

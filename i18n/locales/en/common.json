@@ -154,6 +154,7 @@
     "start": "Start",
     "start_date": "Start date",
     "status": "Status",
+    "stock_short": "Stock",
     "success": "Success",
     "tasks_short": "Tasks",
     "teardown": "Dismantling",

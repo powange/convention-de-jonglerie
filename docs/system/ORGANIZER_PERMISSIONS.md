@@ -41,6 +41,7 @@ L'API retourne désormais un format **normalisé** pour chaque organisateur :
       "canManageMeals": false,
       "canManageTicketing": false,
       "canManageTasks": true,
+      "canManageStock": false,
     },
   ],
 }
@@ -61,6 +62,7 @@ L'API retourne désormais un format **normalisé** pour chaque organisateur :
 | manageMeals       | canManageMeals       | Gérer les repas de toutes les éditions               |
 | manageTicketing   | canManageTicketing   | Gérer la billetterie de toutes les éditions          |
 | manageTasks       | canManageTasks       | Gérer les tâches internes de toutes les éditions     |
+| manageStock       | canManageStock       | Gérer le stock matériel de toutes les éditions       |
 
 > Source de vérité : `server/constants/permissions.ts` (constante `ORGANIZER_RIGHTS`).
 
@@ -78,6 +80,7 @@ Chaque entrée de `perEdition` correspond à un enregistrement dans `EditionOrga
 | canManageMeals      | boolean | Peut gérer les repas de cette édition       |
 | canManageTicketing  | boolean | Peut gérer la billetterie de cette édition  |
 | canManageTasks      | boolean | Peut gérer les tâches internes de l'édition |
+| canManageStock      | boolean | Peut gérer le stock matériel de l'édition   |
 
 Règle de résolution effective (côté serveur, helpers dans `server/utils/permissions/edition-permissions.ts`) :
 
@@ -231,4 +234,4 @@ function canManageEditionResource(collab, editionId, resource) {
 
 ---
 
-Dernière mise à jour: 2026-05-13 (ajout `manageArtists`, `manageMeals`, `manageTicketing`, `manageTasks`).
+Dernière mise à jour: 2026-05-18 (ajout `manageStock`).

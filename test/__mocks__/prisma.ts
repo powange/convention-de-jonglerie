@@ -88,6 +88,11 @@ export const prismaMock = {
   taskAssignment: createModelMock(),
   taskComment: createModelMock(),
 
+  // Modèles stock matériel
+  stockGroup: createModelMock(),
+  stockItem: createModelMock(),
+  stockReservation: createModelMock(),
+
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),

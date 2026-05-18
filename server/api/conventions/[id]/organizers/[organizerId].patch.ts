@@ -21,6 +21,7 @@ const perEditionSchema = z.object({
   canManageMeals: z.boolean().optional(),
   canManageTicketing: z.boolean().optional(),
   canManageTasks: z.boolean().optional(),
+  canManageStock: z.boolean().optional(),
 })
 
 const payloadSchema = z.object({
@@ -35,6 +36,7 @@ const payloadSchema = z.object({
       manageMeals: z.boolean().optional(),
       manageTicketing: z.boolean().optional(),
       manageTasks: z.boolean().optional(),
+      manageStock: z.boolean().optional(),
       addEdition: z.boolean().optional(),
       editAllEditions: z.boolean().optional(),
       deleteAllEditions: z.boolean().optional(),
@@ -77,6 +79,7 @@ export default wrapApiHandler(
         canManageMeals: organizer.canManageMeals,
         canManageTicketing: organizer.canManageTicketing,
         canManageTasks: organizer.canManageTasks,
+        canManageStock: organizer.canManageStock,
         canAddEdition: organizer.canAddEdition,
         canEditAllEditions: organizer.canEditAllEditions,
         canDeleteAllEditions: organizer.canDeleteAllEditions,
@@ -90,6 +93,7 @@ export default wrapApiHandler(
         canManageMeals: p.canManageMeals,
         canManageTicketing: p.canManageTicketing,
         canManageTasks: p.canManageTasks,
+        canManageStock: p.canManageStock,
       })),
     }
 
@@ -112,6 +116,8 @@ export default wrapApiHandler(
         updateData.canManageTicketing = parsed.rights.manageTicketing
       if (parsed.rights.manageTasks !== undefined)
         updateData.canManageTasks = parsed.rights.manageTasks
+      if (parsed.rights.manageStock !== undefined)
+        updateData.canManageStock = parsed.rights.manageStock
       if (parsed.rights.addEdition !== undefined)
         updateData.canAddEdition = parsed.rights.addEdition
       if (parsed.rights.editAllEditions !== undefined)
@@ -146,6 +152,7 @@ export default wrapApiHandler(
                   canManageMeals: !!p.canManageMeals,
                   canManageTicketing: !!p.canManageTicketing,
                   canManageTasks: !!p.canManageTasks,
+                  canManageStock: !!p.canManageStock,
                 },
               })
             )
@@ -164,6 +171,7 @@ export default wrapApiHandler(
           canManageMeals: updated.canManageMeals,
           canManageTicketing: updated.canManageTicketing,
           canManageTasks: updated.canManageTasks,
+          canManageStock: updated.canManageStock,
           canAddEdition: updated.canAddEdition,
           canEditAllEditions: updated.canEditAllEditions,
           canDeleteAllEditions: updated.canDeleteAllEditions,
@@ -177,6 +185,7 @@ export default wrapApiHandler(
           canManageMeals: p.canManageMeals,
           canManageTicketing: p.canManageTicketing,
           canManageTasks: p.canManageTasks,
+          canManageStock: p.canManageStock,
         })),
       }
 
@@ -208,6 +217,7 @@ export default wrapApiHandler(
           manageMeals: result.updated.canManageMeals,
           manageTicketing: result.updated.canManageTicketing,
           manageTasks: result.updated.canManageTasks,
+          manageStock: result.updated.canManageStock,
           addEdition: result.updated.canAddEdition,
           editAllEditions: result.updated.canEditAllEditions,
           deleteAllEditions: result.updated.canDeleteAllEditions,

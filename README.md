@@ -57,6 +57,7 @@ L'application permet aux utilisateurs de :
 - **Repas** ([`docs/meals.md`](docs/meals.md)) — Configuration, sélections bénévoles/artistes, validation à l'entrée du buffet, intégration billetterie
 - **Tâches** ([`docs/tasks.md`](docs/tasks.md)) — Organisation interne du travail par groupes (liste + kanban)
 - **Workshops** ([`docs/workshops.md`](docs/workshops.md)) — Ateliers proposés par les participants avec favoris
+- **Stock matériel** ([`docs/stock.md`](docs/stock.md)) — Inventaire et réservations sur périodes (organisateurs + team leaders)
 - **Billetterie** ([`docs/ticketing/`](docs/ticketing/)) — Tarifs, options, quotas, commandes, contrôle d'accès, intégrations HelloAsso/SumUp
 - **Carte du site** — Plan interactif des éditions avec zones et marqueurs
 - **Covoiturage** ([`docs/carpool.md`](docs/carpool.md)) — Offres / demandes / réservations entre participants
@@ -90,6 +91,7 @@ Champs de droits stockés sur `ConventionOrganizer` :
 | manageMeals       | canManageMeals       | Gérer les repas de toutes les éditions                       |
 | manageTicketing   | canManageTicketing   | Gérer la billetterie de toutes les éditions                  |
 | manageTasks       | canManageTasks       | Gérer les tâches internes de toutes les éditions             |
+| manageStock       | canManageStock       | Gérer le stock matériel de toutes les éditions               |
 
 La table `EditionOrganizerPermission` permet d'accorder ces droits **per-édition** lorsqu'un organisateur ne possède pas les droits globaux (`canEdit`, `canDelete`, `canManageVolunteers`, `canManageArtists`, `canManageMeals`, `canManageTicketing`, `canManageTasks` sur une édition précise).
 

@@ -154,6 +154,7 @@
     "start": "Начало",
     "start_date": "Дата начала",
     "status": "Статус",
+    "stock_short": "Склад",
     "success": "Успех",
     "tasks_short": "Задачи",
     "teardown": "Демонтаж",

@@ -66,19 +66,19 @@ describe('DELETE /api/editions/[id]/tasks/[taskId]/comments/[commentId]', () => 
     await expect(handler(baseEvent as any)).rejects.toThrow('Édition non trouvée')
   })
 
-  it("rejette si le commentaire est introuvable", async () => {
+  it('rejette si le commentaire est introuvable', async () => {
     prismaMock.taskComment.findFirst.mockResolvedValue(null)
     await expect(handler(baseEvent as any)).rejects.toThrow('Commentaire introuvable')
   })
 
-  it("rejette un identifiant invalide", async () => {
+  it('rejette un identifiant invalide', async () => {
     const badEvent = {
       context: { params: { id: '1', taskId: 'abc', commentId: '100' }, user: mockUser },
     }
     await expect(handler(badEvent as any)).rejects.toThrow('Identifiant invalide')
   })
 
-  it("vérifie le scope édition + tâche du commentaire", async () => {
+  it('vérifie le scope édition + tâche du commentaire', async () => {
     prismaMock.taskComment.findFirst.mockResolvedValue({ userId: 1 })
     await handler(baseEvent as any)
     expect(prismaMock.taskComment.findFirst).toHaveBeenCalledWith(

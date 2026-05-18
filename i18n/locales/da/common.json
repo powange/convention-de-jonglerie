@@ -154,6 +154,7 @@
     "start": "Start",
     "start_date": "Startdato",
     "status": "Status",
+    "stock_short": "Lager",
     "success": "Succes",
     "tasks_short": "Opgaver",
     "teardown": "Afmontering",

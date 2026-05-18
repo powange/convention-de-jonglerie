@@ -154,6 +154,7 @@
     "start": "Inizio",
     "start_date": "Data di inizio",
     "status": "Stato",
+    "stock_short": "Magazzino",
     "success": "Successo",
     "tasks_short": "Attività",
     "teardown": "Smontaggio",

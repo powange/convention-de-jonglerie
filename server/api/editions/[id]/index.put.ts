@@ -70,6 +70,7 @@ export default wrapApiHandler(
       workshopLocationsFreeInput,
       siteMapEnabled,
       tasksEnabled,
+      stockEnabled,
       hasATM,
       hasCashPayment,
       hasCreditCardPayment,
@@ -173,6 +174,7 @@ export default wrapApiHandler(
       updatedData.workshopLocationsFreeInput = workshopLocationsFreeInput
     if (siteMapEnabled !== undefined) updatedData.siteMapEnabled = siteMapEnabled
     if (tasksEnabled !== undefined) updatedData.tasksEnabled = tasksEnabled
+    if (stockEnabled !== undefined) updatedData.stockEnabled = stockEnabled
     if (hasATM !== undefined) updatedData.hasATM = hasATM
     if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment

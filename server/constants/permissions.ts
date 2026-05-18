@@ -27,6 +27,7 @@ export const ORGANIZER_RIGHTS = {
   MANAGE_MEALS: 'canManageMeals',
   MANAGE_TICKETING: 'canManageTicketing',
   MANAGE_TASKS: 'canManageTasks',
+  MANAGE_STOCK: 'canManageStock',
 } as const
 
 /**
@@ -80,6 +81,7 @@ export const RESOURCE_RIGHTS = [
   ORGANIZER_RIGHTS.MANAGE_MEALS,
   ORGANIZER_RIGHTS.MANAGE_TICKETING,
   ORGANIZER_RIGHTS.MANAGE_TASKS,
+  ORGANIZER_RIGHTS.MANAGE_STOCK,
 ] as const
 
 /**

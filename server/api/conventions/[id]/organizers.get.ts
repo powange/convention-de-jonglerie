@@ -41,6 +41,7 @@ export default wrapApiHandler(
         manageMeals: c.canManageMeals,
         manageTicketing: c.canManageTicketing,
         manageTasks: c.canManageTasks,
+        manageStock: c.canManageStock,
         addEdition: c.canAddEdition,
         editAllEditions: c.canEditAllEditions,
         deleteAllEditions: c.canDeleteAllEditions,
@@ -54,6 +55,7 @@ export default wrapApiHandler(
         canManageMeals: p.canManageMeals,
         canManageTicketing: p.canManageTicketing,
         canManageTasks: p.canManageTasks,
+        canManageStock: p.canManageStock,
       })),
     }))
   },

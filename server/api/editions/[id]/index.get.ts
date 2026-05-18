@@ -128,6 +128,7 @@ export default wrapApiHandler(
           manageMeals: collab.canManageMeals ?? false,
           manageTicketing: collab.canManageTicketing ?? false,
           manageTasks: collab.canManageTasks ?? false,
+          manageStock: collab.canManageStock ?? false,
           addEdition: collab.canAddEdition ?? false,
           editAllEditions: collab.canEditAllEditions ?? false,
           deleteAllEditions: collab.canDeleteAllEditions ?? false,
@@ -142,6 +143,7 @@ export default wrapApiHandler(
           canManageMeals: per.canManageMeals ?? false,
           canManageTicketing: per.canManageTicketing ?? false,
           canManageTasks: per.canManageTasks ?? false,
+          canManageStock: per.canManageStock ?? false,
         })),
         user: collab.user,
       }))

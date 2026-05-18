@@ -10,6 +10,7 @@ Documentation des grandes fonctionnalités de l'application :
 - **[tasks.md](./tasks.md)** — Module Tâches (TaskGroup / Task / TaskAssignment) pour l'organisation interne
 - **[meals.md](./meals.md)** — Repas (configuration, sélections bénévoles/artistes, validation, intégration billetterie)
 - **[workshops.md](./workshops.md)** — Ateliers proposés par les participants
+- **[stock.md](./stock.md)** — Stock matériel (groupes, items, réservations sur des périodes)
 - **[carpool.md](./carpool.md)** — Covoiturage (offres, demandes, réservations, commentaires)
 - **[messenger.md](./messenger.md)** — Messagerie (conversations typées, temps réel, présence)
 - **[lost-found.md](./lost-found.md)** — Objets trouvés et perdus

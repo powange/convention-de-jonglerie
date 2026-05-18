@@ -86,6 +86,7 @@ export interface Edition {
   workshopsEnabled?: boolean
   siteMapEnabled?: boolean
   tasksEnabled?: boolean
+  stockEnabled?: boolean
   mapPublic?: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
@@ -142,6 +143,7 @@ export interface ConventionOrganizerWithRights {
     canManageMeals?: boolean
     canManageTicketing?: boolean
     canManageTasks?: boolean
+    canManageStock?: boolean
   }[]
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
@@ -159,6 +161,7 @@ export interface EditionOrganizer {
     canManageMeals?: boolean
     canManageTicketing?: boolean
     canManageTasks?: boolean
+    canManageStock?: boolean
   }[]
   title?: string | null
 }
