@@ -172,6 +172,7 @@ export default wrapApiHandler(
       ...editionWithoutVolunteersAskFields,
       // Garder seulement les champs volunteers encore utilisés côté client
       volunteersOpen: edition.volunteersOpen,
+      volunteersPagePublic: edition.volunteersPagePublic,
       volunteersDescription: edition.volunteersDescription,
       volunteersMode: edition.volunteersMode,
       volunteersExternalUrl: edition.volunteersExternalUrl,

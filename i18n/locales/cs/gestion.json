@@ -664,6 +664,10 @@
       "mode_internal": "Interní",
       "mode_internal_badge": "Interní",
       "notifications_description": "Zasílání oznámení dobrovolníkům",
+      "page_public": "Veřejná stránka viditelná",
+      "page_public_description": "Zpřístupnit veřejnou stránku dobrovolníků návštěvníkům (jinak k ní mají přístup pouze organizátoři)",
+      "page_public_hidden": "Stránka skryta — přístup mají pouze organizátoři",
+      "page_public_visible": "Stránka je přístupná všem",
       "planning_description": "Plánování slotů a misí",
       "teams_description": "Organizování týmů dobrovolníků"
     },

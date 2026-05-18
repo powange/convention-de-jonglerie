@@ -664,6 +664,10 @@
       "mode_internal": "Intern",
       "mode_internal_badge": "Intern",
       "notifications_description": "Meldingen naar vrijwilligers sturen",
+      "page_public": "Openbare pagina zichtbaar",
+      "page_public_description": "Maak de openbare vrijwilligerspagina zichtbaar voor bezoekers (anders hebben alleen organisatoren toegang)",
+      "page_public_hidden": "Pagina verborgen — alleen organisatoren hebben toegang",
+      "page_public_visible": "Pagina toegankelijk voor iedereen",
       "planning_description": "Planningsslots en missies",
       "teams_description": "Vrijwilligersteams organiseren"
     },

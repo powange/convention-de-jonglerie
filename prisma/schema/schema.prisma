@@ -146,6 +146,7 @@ model Edition {
   status                            EditionStatus                    @default(OFFLINE)
   volunteersEnabled                 Boolean                          @default(false)
   volunteersDescription             String?                          @db.Text
+  volunteersPagePublic              Boolean                          @default(false)
   volunteersOpen                    Boolean                          @default(false)
   volunteersUpdatedAt               DateTime?
   volunteersExternalUrl             String?

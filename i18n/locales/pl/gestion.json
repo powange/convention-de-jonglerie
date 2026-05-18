@@ -664,6 +664,10 @@
       "mode_internal": "Wewnętrzny",
       "mode_internal_badge": "Wewnętrzny",
       "notifications_description": "Wysyłanie powiadomień do wolontariuszy",
+      "page_public": "Strona publiczna widoczna",
+      "page_public_description": "Udostępnij stronę publiczną wolontariuszy dla odwiedzających (w przeciwnym razie dostęp mają tylko organizatorzy)",
+      "page_public_hidden": "Strona ukryta — dostęp mają tylko organizatorzy",
+      "page_public_visible": "Strona dostępna dla wszystkich",
       "planning_description": "Planowanie przydziałów czasu i misji",
       "teams_description": "Organizowanie zespołów wolontariuszy"
     },

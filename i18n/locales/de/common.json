@@ -695,6 +695,8 @@
       "open": "Öffnen",
       "organizer_addition_title": "Ergänzung des Organisators",
       "page_description": "Überblick über Freiwilligenarbeit für diese Ausgabe",
+      "page_private_visible_as_editor": "Diese Seite ist nicht öffentlich. Sie haben als Organisator dieser Ausgabe Zugriff.",
+      "page_private_visible_as_volunteer_manager": "Diese Seite ist nicht öffentlich. Sie haben als Verwalter der Freiwilligen Zugriff.",
       "pdf_downloaded": "PDF wurde erfolgreich heruntergeladen",
       "pdf_exported": "PDF exportiert",
       "pending": "Ausstehend",

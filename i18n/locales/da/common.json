@@ -695,6 +695,8 @@
       "open": "Åben",
       "organizer_addition_title": "Organisatorens tilføjelse",
       "page_description": "Oversigt over frivilligt arbejde for denne udgave",
+      "page_private_visible_as_editor": "Denne side er ikke offentlig. Du har adgang som arrangør af denne udgave.",
+      "page_private_visible_as_volunteer_manager": "Denne side er ikke offentlig. Du har adgang som frivilligkoordinator.",
       "pdf_downloaded": "PDF er blevet downloadet succesfuldt",
       "pdf_exported": "PDF eksporteret",
       "pending": "Afventer",

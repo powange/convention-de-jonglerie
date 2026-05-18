@@ -192,6 +192,51 @@
               </div>
             </div>
 
+            <!-- Visibilité de la page publique -->
+            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.volunteers.page_public') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('gestion.volunteers.page_public_description') }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UBadge :color="volunteersPagePublicLocal ? 'success' : 'neutral'" variant="soft">
+                    {{
+                      volunteersPagePublicLocal
+                        ? $t('common.visible') || 'Visible'
+                        : $t('common.hidden') || 'Masquée'
+                    }}
+                  </UBadge>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <USwitch
+                  v-model="volunteersPagePublicLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  @update:model-value="handleTogglePagePublic"
+                />
+                <span
+                  :class="
+                    volunteersPagePublicLocal
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  "
+                >
+                  {{
+                    volunteersPagePublicLocal
+                      ? $t('gestion.volunteers.page_public_visible')
+                      : $t('gestion.volunteers.page_public_hidden')
+                  }}
+                </span>
+              </div>
+            </div>
+
             <!-- Ouverture des candidatures -->
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div class="flex items-center justify-between">
@@ -276,7 +321,8 @@ const {
   updateSettings,
 } = useVolunteerSettings(editionId)
 
-// Variables pour les paramètres généraux (mode et ouverture)
+// Variables pour les paramètres généraux (mode, visibilité, ouverture)
+const volunteersPagePublicLocal = ref(false)
 const volunteersOpenLocal = ref(false)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersExternalUrlLocal = ref('')
@@ -312,6 +358,7 @@ const canAccess = computed(() => {
 const applyVolunteerSettings = () => {
   if (volunteersSettings.value) {
     // Appliquer les paramètres généraux
+    volunteersPagePublicLocal.value = !!(volunteersSettings.value as any).pagePublic
     volunteersOpenLocal.value = !!volunteersSettings.value.open
     volunteersModeLocal.value = volunteersSettings.value.mode || 'INTERNAL'
     volunteersExternalUrlLocal.value = volunteersSettings.value.externalUrl || ''
@@ -402,6 +449,31 @@ const persistDateSettings = async (data: Record<string, unknown>) => {
   } catch (error: any) {
     toast.add({
       title: error?.data?.message || error?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
+// Handler pour le toggle de visibilité de la page publique
+const handleTogglePagePublic = async (val: boolean) => {
+  if (!volunteersInitialized.value) return
+  const previous = !val
+  try {
+    const updatedSettings = await updateSettings({ pagePublic: val } as any)
+    if (updatedSettings) {
+      volunteersUpdatedAt.value = new Date()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      toast.add({
+        title: t('common.saved') || 'Sauvegardé',
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+  } catch (e: any) {
+    volunteersPagePublicLocal.value = previous
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })

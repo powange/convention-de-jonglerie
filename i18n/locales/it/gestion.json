@@ -664,6 +664,10 @@
       "mode_internal": "Interno",
       "mode_internal_badge": "Interno",
       "notifications_description": "Inviare notifiche ai volontari",
+      "page_public": "Pagina pubblica visibile",
+      "page_public_description": "Rendi visibile la pagina pubblica dei volontari ai visitatori (altrimenti solo gli organizzatori hanno accesso)",
+      "page_public_hidden": "Pagina nascosta — solo gli organizzatori hanno accesso",
+      "page_public_visible": "Pagina accessibile a tutti",
       "planning_description": "Pianificazione di slot e missioni",
       "teams_description": "Organizzare squadre di volontari"
     },

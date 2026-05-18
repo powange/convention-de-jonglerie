@@ -664,6 +664,10 @@
       "mode_internal": "Internt",
       "mode_internal_badge": "Internt",
       "notifications_description": "Skicka meddelanden till volontärer",
+      "page_public": "Offentlig sida synlig",
+      "page_public_description": "Gör den offentliga volontärsidan synlig för besökare (annars har endast arrangörer åtkomst)",
+      "page_public_hidden": "Sida dold — endast arrangörer har åtkomst",
+      "page_public_visible": "Sida tillgänglig för alla",
       "planning_description": "Planering av slots och uppdrag",
       "teams_description": "Organisera team av volontärer"
     },

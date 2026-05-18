@@ -10,6 +10,7 @@ export default wrapApiHandler(
       errorMessage: 'Edition introuvable',
       select: {
         id: true,
+        volunteersPagePublic: true,
         volunteersOpen: true,
         volunteersDescription: true,
         volunteersMode: true,
@@ -45,6 +46,7 @@ export default wrapApiHandler(
     )
 
     return {
+      pagePublic: edition.volunteersPagePublic,
       open: edition.volunteersOpen,
       description: edition.volunteersDescription || null,
       mode: edition.volunteersMode || 'INTERNAL',

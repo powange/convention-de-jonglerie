@@ -695,6 +695,8 @@
       "open": "Open",
       "organizer_addition_title": "Toevoeging van organisator",
       "page_description": "Overzicht van vrijwilligerswerk voor deze editie",
+      "page_private_visible_as_editor": "Deze pagina is niet openbaar. Je hebt toegang als organisator van deze editie.",
+      "page_private_visible_as_volunteer_manager": "Deze pagina is niet openbaar. Je hebt toegang als vrijwilligersmanager.",
       "pdf_downloaded": "PDF is succesvol gedownload",
       "pdf_exported": "PDF geëxporteerd",
       "pending": "In afwachting",

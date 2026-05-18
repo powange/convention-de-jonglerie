@@ -664,6 +664,10 @@
       "mode_internal": "Internal",
       "mode_internal_badge": "Internal",
       "notifications_description": "Send notifications to volunteers",
+      "page_public": "Public page visible",
+      "page_public_description": "Make the public volunteer page visible to visitors (otherwise only organizers have access)",
+      "page_public_hidden": "Page hidden — only organizers have access",
+      "page_public_visible": "Page accessible to everyone",
       "planning_description": "Planning slots and missions",
       "teams_description": "Organising teams of volunteers"
     },

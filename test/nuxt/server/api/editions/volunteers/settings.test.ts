@@ -415,6 +415,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         select: {
           id: true,
           volunteersOpen: true,
+          volunteersPagePublic: true,
           volunteersDescription: true,
           volunteersMode: true,
           volunteersExternalUrl: true,
@@ -477,6 +478,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
 
       const expectedFields = [
         'open',
+        'pagePublic',
         'description',
         'mode',
         'externalUrl',

@@ -695,6 +695,8 @@
       "open": "Open",
       "organizer_addition_title": "Organizer addition",
       "page_description": "Overview of volunteering for this edition",
+      "page_private_visible_as_editor": "This page is not public. You have access as an organizer of this edition.",
+      "page_private_visible_as_volunteer_manager": "This page is not public. You have access as a volunteer manager.",
       "pdf_downloaded": "PDF has been downloaded successfully",
       "pdf_exported": "PDF exported",
       "pending": "Pending",

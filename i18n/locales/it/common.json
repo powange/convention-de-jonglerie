@@ -695,6 +695,8 @@
       "open": "Apri",
       "organizer_addition_title": "Aggiunta dell'organizzatore",
       "page_description": "Panoramica del volontariato per questa edizione",
+      "page_private_visible_as_editor": "Questa pagina non è pubblica. Hai accesso come organizzatore di questa edizione.",
+      "page_private_visible_as_volunteer_manager": "Questa pagina non è pubblica. Hai accesso come responsabile dei volontari.",
       "pdf_downloaded": "Il PDF è stato scaricato con successo",
       "pdf_exported": "PDF esportato",
       "pending": "In attesa",

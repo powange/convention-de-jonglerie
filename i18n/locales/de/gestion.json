@@ -664,6 +664,10 @@
       "mode_internal": "Intern",
       "mode_internal_badge": "Intern",
       "notifications_description": "Benachrichtigungen an Freiwillige senden",
+      "page_public": "Öffentliche Seite sichtbar",
+      "page_public_description": "Die öffentliche Freiwilligenseite für Besucher sichtbar machen (andernfalls haben nur Organisatoren Zugriff)",
+      "page_public_hidden": "Seite verborgen — nur Organisatoren haben Zugriff",
+      "page_public_visible": "Seite für alle zugänglich",
       "planning_description": "Zeitnischen und Missionen planen",
       "teams_description": "Organisation von Freiwilligenteams"
     },

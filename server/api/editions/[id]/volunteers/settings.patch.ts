@@ -11,6 +11,7 @@ import { handleValidationError } from '#server/utils/validation-schemas'
 
 const bodySchema = z
   .object({
+    pagePublic: z.boolean().optional(),
     open: z.boolean().optional(),
     description: z
       .string()
@@ -157,6 +158,7 @@ export default wrapApiHandler(
 
     // Mapper les champs de l'API vers les champs de la BDD
     const mappedData = {
+      volunteersPagePublic: parsed.pagePublic,
       volunteersOpen: parsed.open,
       volunteersDescription: parsed.description || null,
       volunteersMode: parsed.mode,
@@ -196,6 +198,7 @@ export default wrapApiHandler(
       where: { id: editionId },
       data,
       select: {
+        volunteersPagePublic: true,
         volunteersOpen: true,
         volunteersDescription: true,
         volunteersMode: true,

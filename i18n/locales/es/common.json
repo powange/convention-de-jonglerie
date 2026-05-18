@@ -695,6 +695,8 @@
       "open": "Abrir",
       "organizer_addition_title": "Adición del organizador",
       "page_description": "Resumen del voluntariado para esta edición",
+      "page_private_visible_as_editor": "Esta página no es pública. Tiene acceso como organizador de esta edición.",
+      "page_private_visible_as_volunteer_manager": "Esta página no es pública. Tiene acceso como responsable de los voluntarios.",
       "pdf_downloaded": "El PDF se ha descargado exitosamente",
       "pdf_exported": "PDF exportado",
       "pending": "Pendiente",

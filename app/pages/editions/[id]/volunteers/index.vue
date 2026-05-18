@@ -352,6 +352,24 @@ defineExpose({})
 await editionStore.fetchEditionById(editionId)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
+// La page publique n'est accessible que si volunteersPagePublic est activé.
+// Exception : les utilisateurs avec droits d'édition ou de gestion des
+// bénévoles peuvent toujours y accéder (mode preview), un bandeau les
+// informe que la page n'est pas publique (`closedVisibilityReason`).
+{
+  const e = edition.value as { volunteersPagePublic?: boolean } | undefined
+  const isPagePublic = e?.volunteersPagePublic === true
+  if (!isPagePublic) {
+    const canEditEdition = e ? editionStore.canEditEdition(e as any, authStore.user?.id) : false
+    const canManageVolunteers = e
+      ? editionStore.canManageVolunteers(e as any, authStore.user?.id)
+      : false
+    if (!canEditEdition && !canManageVolunteers) {
+      throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
+    }
+  }
+}
+
 // Métadonnées SEO avec le nom de l'édition
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 
@@ -402,19 +420,30 @@ const canManageEdition = computed(() => {
   )
 })
 
-// Message d'info quand la page est visible grâce aux droits d'éditeur/gestionnaire (mais pas ouverte au public)
+// Message d'info quand la page est visible grâce aux droits d'éditeur/gestionnaire
+// (page publique désactivée OU candidatures fermées)
 const closedVisibilityReason = computed<string | null>(() => {
   if (!edition.value || !authStore.user?.id) return null
-  // Si la page est ouverte au public, pas besoin de message
-  if (edition.value.volunteersOpen === true) return null
+  const e = edition.value as { volunteersOpen?: boolean; volunteersPagePublic?: boolean }
+  const isPagePublic = e.volunteersPagePublic === true
+  const isOpen = e.volunteersOpen === true
+  // Tout est public et ouvert → pas de message
+  if (isPagePublic && isOpen) return null
 
   const canEdit = editionStore.canEditEdition(edition.value, authStore.user.id)
-  if (canEdit) return t('edition.volunteers.closed_visible_as_editor')
-
   const canManage = editionStore.canManageVolunteers(edition.value, authStore.user.id)
-  if (canManage) return t('edition.volunteers.closed_visible_as_volunteer_manager')
+  if (!canEdit && !canManage) return null
 
-  return null
+  // Page publique désactivée → preview "page non publique"
+  if (!isPagePublic) {
+    return canEdit
+      ? t('edition.volunteers.page_private_visible_as_editor')
+      : t('edition.volunteers.page_private_visible_as_volunteer_manager')
+  }
+  // Page publique mais candidatures fermées
+  return canEdit
+    ? t('edition.volunteers.closed_visible_as_editor')
+    : t('edition.volunteers.closed_visible_as_volunteer_manager')
 })
 
 // Volunteer logic reused

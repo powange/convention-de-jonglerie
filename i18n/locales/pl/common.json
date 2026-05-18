@@ -695,6 +695,8 @@
       "open": "Otwórz",
       "organizer_addition_title": "Dodatek organizatora",
       "page_description": "Przegląd wolontariatu dla tej edycji",
+      "page_private_visible_as_editor": "Ta strona nie jest publiczna. Masz do niej dostęp jako organizator tej edycji.",
+      "page_private_visible_as_volunteer_manager": "Ta strona nie jest publiczna. Masz do niej dostęp jako menedżer wolontariuszy.",
       "pdf_downloaded": "PDF został pomyślnie pobrany",
       "pdf_exported": "PDF wyeksportowany",
       "pending": "W toku",

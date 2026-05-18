@@ -695,6 +695,8 @@
       "open": "Otevřít",
       "organizer_addition_title": "Přidat organizátora",
       "page_description": "Přehled letošních dobrovolníků",
+      "page_private_visible_as_editor": "Tato stránka není veřejná. Máte k ní přístup jako organizátor této akce.",
+      "page_private_visible_as_volunteer_manager": "Tato stránka není veřejná. Máte k ní přístup jako správce dobrovolníků.",
       "pdf_downloaded": "PDF soubor byl úspěšně stažen",
       "pdf_exported": "Exportované PDF",
       "pending": "Na počkání",

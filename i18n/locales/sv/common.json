@@ -695,6 +695,8 @@
       "open": "Öppna",
       "organizer_addition_title": "Lägg till organisatör",
       "page_description": "Översikt över årets volontärer",
+      "page_private_visible_as_editor": "Den här sidan är inte offentlig. Du har åtkomst som arrangör av denna utgåva.",
+      "page_private_visible_as_volunteer_manager": "Den här sidan är inte offentlig. Du har åtkomst som volontäransvarig.",
       "pdf_downloaded": "PDF-filen har laddats ner framgångsrikt",
       "pdf_exported": "Exporterad PDF",
       "pending": "I vänteläge",

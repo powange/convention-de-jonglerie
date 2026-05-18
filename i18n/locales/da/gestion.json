@@ -664,6 +664,10 @@
       "mode_internal": "Internt",
       "mode_internal_badge": "Internt",
       "notifications_description": "Send meddelelser til frivillige",
+      "page_public": "Offentlig side synlig",
+      "page_public_description": "Gør den offentlige frivilligside synlig for besøgende (ellers har kun arrangører adgang)",
+      "page_public_hidden": "Side skjult — kun arrangører har adgang",
+      "page_public_visible": "Side tilgængelig for alle",
       "planning_description": "Planlægning af slots og missioner",
       "teams_description": "Organisering af hold af frivillige"
     },

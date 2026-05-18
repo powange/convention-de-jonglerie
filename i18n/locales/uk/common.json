@@ -695,6 +695,8 @@
       "open": "Відкрити",
       "organizer_addition_title": "Доповнення організатора",
       "page_description": "Огляд волонтерства для цього видання",
+      "page_private_visible_as_editor": "Ця сторінка не публічна. У вас є доступ як в організатора цього випуску.",
+      "page_private_visible_as_volunteer_manager": "Ця сторінка не публічна. У вас є доступ як у менеджера волонтерів.",
       "pdf_downloaded": "PDF успішно завантажено",
       "pdf_exported": "PDF експортовано",
       "pending": "Очікує",
