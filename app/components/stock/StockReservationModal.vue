@@ -85,6 +85,10 @@ const props = defineProps<{
   itemQuantity: number
   reservation: StockReservationItem | null
   canModerate: boolean
+  /** Date de début de l'édition (ISO) — utilisée pour le pré-remplissage */
+  editionStartDate?: string | null
+  /** Date de début du montage bénévoles (ISO, optionnelle) — prioritaire sur editionStartDate */
+  editionSetupStartDate?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -129,6 +133,30 @@ function toLocalInput(iso: string): string {
   }
 }
 
+/**
+ * Calcule la date de début à pré-remplir pour une nouvelle réservation :
+ * - priorité 1 : `volunteersSetupStartDate` si renseignée et future (minuit)
+ * - priorité 2 : `startDate` de l'édition si future (minuit)
+ * - sinon : `now`
+ *
+ * Évite de proposer une date passée si l'édition est dans plusieurs mois.
+ */
+function getDefaultStart(): Date {
+  const now = new Date()
+  const candidates = [props.editionSetupStartDate, props.editionStartDate]
+  for (const iso of candidates) {
+    if (!iso) continue
+    const d = new Date(iso)
+    if (isNaN(d.getTime())) continue
+    // Si la date est dans le futur (≥ aujourd'hui), on l'utilise à minuit
+    if (d.getTime() >= now.getTime()) {
+      d.setHours(0, 0, 0, 0)
+      return d
+    }
+  }
+  return now
+}
+
 watch(
   () => [props.open, props.reservation],
   ([open]) => {
@@ -140,10 +168,10 @@ watch(
         formData.quantityReserved = props.reservation.quantityReserved
         formData.status = props.reservation.status
       } else {
-        const now = new Date()
-        const inOneHour = new Date(now.getTime() + 3600_000)
-        formData.startsAt = toLocalInput(now.toISOString())
-        formData.endsAt = toLocalInput(inOneHour.toISOString())
+        const start = getDefaultStart()
+        const end = new Date(start.getTime() + 3600_000)
+        formData.startsAt = toLocalInput(start.toISOString())
+        formData.endsAt = toLocalInput(end.toISOString())
         formData.usage = ''
         formData.quantityReserved = 1
         formData.status = 'RESERVED'

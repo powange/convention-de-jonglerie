@@ -153,6 +153,8 @@
       :item-quantity="item.quantity"
       :reservation="editingReservation"
       :can-moderate="canManage"
+      :edition-start-date="edition?.startDate ?? null"
+      :edition-setup-start-date="(edition as any)?.volunteersSetupStartDate ?? null"
       @saved="fetchItem"
     />
   </UContainer>
