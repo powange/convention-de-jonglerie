@@ -82,6 +82,12 @@ export const prismaMock = {
   editionZone: createModelMock(),
   editionMarker: createModelMock(),
 
+  // Modèles tâches
+  taskGroup: createModelMock(),
+  task: createModelMock(),
+  taskAssignment: createModelMock(),
+  taskComment: createModelMock(),
+
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),
