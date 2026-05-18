@@ -15,6 +15,9 @@ env:
   SEND_EMAILS: false
   # Bypass reCAPTCHA en test
   NUXT_RECAPTCHA_DEV_BYPASS: true
+  # Force les actions GitHub (checkout, cache, setup-node, upload-artifact)
+  # à utiliser le runtime Node 24 (au lieu de Node 20 déprécié)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # Job pour installer les dépendances une seule fois
@@ -33,7 +36,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
@@ -110,7 +113,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
@@ -157,7 +160,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
@@ -232,7 +235,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 

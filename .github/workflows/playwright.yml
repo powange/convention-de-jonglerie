@@ -10,6 +10,9 @@ env:
   NUXT_PUBLIC_SITE_URL: http://localhost:3000
   SEND_EMAILS: false
   NUXT_RECAPTCHA_DEV_BYPASS: true
+  # Force les actions GitHub (checkout, cache, setup-node, upload-artifact)
+  # à utiliser le runtime Node 24 (au lieu de Node 20 déprécié)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   playwright:
@@ -37,7 +40,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
