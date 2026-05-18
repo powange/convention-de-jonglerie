@@ -9,16 +9,22 @@ import {
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
-const bodySchema = z.object({
-  name: z.string().trim().min(1, 'Le nom est requis').max(200),
-  description: z.string().trim().max(2000).nullable().optional(),
-  location: z.string().trim().min(1, 'La localisation est requise').max(200),
-  zoneId: z.number().int().positive().nullable().optional(),
-  markerId: z.number().int().positive().nullable().optional(),
-  quantity: z.number().int().positive().default(1),
-  notes: z.string().trim().max(2000).nullable().optional(),
-  displayOrder: z.number().int().optional(),
-})
+const bodySchema = z
+  .object({
+    name: z.string().trim().min(1, 'Le nom est requis').max(200),
+    description: z.string().trim().max(2000).nullable().optional(),
+    // location, zoneId et markerId : au moins un des trois doit être renseigné
+    location: z.string().trim().max(200).nullable().optional(),
+    zoneId: z.number().int().positive().nullable().optional(),
+    markerId: z.number().int().positive().nullable().optional(),
+    quantity: z.number().int().positive().default(1),
+    notes: z.string().trim().max(2000).nullable().optional(),
+    displayOrder: z.number().int().optional(),
+  })
+  .refine((data) => !!(data.location?.trim() || data.zoneId || data.markerId), {
+    message: 'Indiquez une localisation textuelle ou un emplacement sur la carte',
+    path: ['location'],
+  })
 
 export default wrapApiHandler(
   async (event) => {
@@ -92,7 +98,7 @@ export default wrapApiHandler(
         stockGroupId: groupId,
         name: data.name,
         description: data.description?.trim() || null,
-        location: data.location,
+        location: data.location?.trim() || '',
         zoneId: data.zoneId ?? null,
         markerId: data.markerId ?? null,
         quantity: data.quantity,

@@ -29,8 +29,9 @@
           </UFormField>
           <UFormField
             :label="$t('gestion.stock.item_location')"
-            required
+            :required="!siteMapEnabled || !formData.mapPin"
             :error="fieldErrors.location"
+            :help="siteMapEnabled ? $t('gestion.stock.item_location_help') : undefined"
           >
             <UInput
               v-model="formData.location"
@@ -41,6 +42,7 @@
         </div>
 
         <UFormField
+          v-if="siteMapEnabled"
           :label="$t('gestion.stock.item_map_pin')"
           :error="fieldErrors.zoneId || fieldErrors.markerId"
           :help="$t('gestion.stock.item_map_pin_help')"
@@ -95,6 +97,10 @@ const props = defineProps<{
   item: StockItemLite | null
   zones: { id: number; name: string; color: string }[]
   markers: { id: number; name: string }[]
+  /** Si la fonctionnalité « Carte du site » est activée sur l'édition.
+   * Si false, le sélecteur zone/marqueur est masqué et la localisation
+   * textuelle devient obligatoire. */
+  siteMapEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -188,17 +194,18 @@ async function handleSubmit() {
     fieldErrors.value = { name: t('errors.required_field') }
     return
   }
-  if (!formData.location.trim()) {
-    fieldErrors.value = { location: t('errors.required_field') }
-    return
-  }
   if (!formData.quantity || formData.quantity < 1) {
     fieldErrors.value = { quantity: t('errors.required_field') }
     return
   }
+  // Validation cross-champ : location texte OU épingle carte est obligatoire
+  const { zoneId, markerId } = pinToZoneAndMarker(formData.mapPin)
+  if (!formData.location.trim() && !zoneId && !markerId) {
+    fieldErrors.value = { location: t('gestion.stock.location_or_pin_required') }
+    return
+  }
   saving.value = true
   try {
-    const { zoneId, markerId } = pinToZoneAndMarker(formData.mapPin)
     const body: Record<string, unknown> = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,

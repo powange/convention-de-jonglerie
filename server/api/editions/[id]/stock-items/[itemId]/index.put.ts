@@ -12,7 +12,9 @@ import { handleValidationError } from '#server/utils/validation-schemas'
 const bodySchema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().max(2000).nullable().optional(),
-  location: z.string().trim().min(1).max(200).optional(),
+  // location peut être vide string, à condition qu'une zone/marker soit défini
+  // (cross-validation appliquée après merge avec l'item existant)
+  location: z.string().trim().max(200).nullable().optional(),
   zoneId: z.number().int().positive().nullable().optional(),
   markerId: z.number().int().positive().nullable().optional(),
   quantity: z.number().int().positive().optional(),
@@ -90,10 +92,25 @@ export default wrapApiHandler(
       }
     }
 
+    // Validation cross-champ : après merge, au moins une localisation
+    // (texte OU zone OU marqueur) doit subsister sur l'item.
+    if (data.location !== undefined || data.zoneId !== undefined || data.markerId !== undefined) {
+      const finalLocation =
+        data.location !== undefined ? data.location?.trim() : existing.location?.trim()
+      const finalZoneId = data.zoneId !== undefined ? data.zoneId : existing.zoneId
+      const finalMarkerId = data.markerId !== undefined ? data.markerId : existing.markerId
+      if (!finalLocation && !finalZoneId && !finalMarkerId) {
+        throw createError({
+          status: 400,
+          message: 'Indiquez une localisation textuelle ou un emplacement sur la carte',
+        })
+      }
+    }
+
     const updateData: Record<string, unknown> = {}
     if (data.name !== undefined) updateData.name = data.name
     if (data.description !== undefined) updateData.description = data.description?.trim() || null
-    if (data.location !== undefined) updateData.location = data.location
+    if (data.location !== undefined) updateData.location = data.location?.trim() || ''
     if (data.zoneId !== undefined) updateData.zoneId = data.zoneId
     if (data.markerId !== undefined) updateData.markerId = data.markerId
     if (data.quantity !== undefined) updateData.quantity = data.quantity

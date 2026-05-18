@@ -143,6 +143,7 @@
       :item="item"
       :zones="zones"
       :markers="markers"
+      :site-map-enabled="!!edition?.siteMapEnabled"
       @saved="fetchItem"
     />
     <StockReservationModal

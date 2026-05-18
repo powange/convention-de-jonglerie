@@ -40,6 +40,9 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
       stockGroupId: 2,
       name: 'Old',
       quantity: 3,
+      location: 'Tente A',
+      zoneId: null,
+      markerId: null,
     })
     prismaMock.stockItem.update.mockResolvedValue({ id: 5, name: 'New', quantity: 5 })
     global.readBody = vi.fn().mockResolvedValue({ name: 'New', quantity: 5 })
@@ -87,7 +90,8 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
   })
 
-  it('permet de définir zoneId/markerId à null', async () => {
+  it('permet de définir zoneId/markerId à null si la location texte reste', async () => {
+    // Location existante = 'Tente A' → après merge, on garde une localisation valide
     global.readBody = vi.fn().mockResolvedValue({ zoneId: null, markerId: null })
     await handler(baseEvent as any)
     expect(prismaMock.stockItem.update).toHaveBeenCalledWith(
@@ -96,5 +100,11 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
     // Pas de vérification de zone/marker quand null
     expect(prismaMock.editionZone.findFirst).not.toHaveBeenCalled()
     expect(prismaMock.editionMarker.findFirst).not.toHaveBeenCalled()
+  })
+
+  it('refuse si on supprime à la fois location, zoneId et markerId', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ location: '', zoneId: null, markerId: null })
+    await expect(handler(baseEvent as any)).rejects.toThrow(/localisation/i)
+    expect(prismaMock.stockItem.update).not.toHaveBeenCalled()
   })
 })

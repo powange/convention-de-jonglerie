@@ -106,9 +106,28 @@ describe('POST /api/editions/[id]/stock-groups/[groupId]/items', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow()
   })
 
-  it('rejette location vide via Zod', async () => {
-    global.readBody = vi.fn().mockResolvedValue({ ...validBody, location: '' })
+  it('rejette si ni location ni zoneId ni markerId', async () => {
+    global.readBody = vi
+      .fn()
+      .mockResolvedValue({ ...validBody, location: '', zoneId: null, markerId: null })
+    // Le refine Zod throw via handleValidationError → message "Données invalides"
+    // avec le détail dans data.errors.location
     await expect(handler(baseEvent as any)).rejects.toThrow()
+    expect(prismaMock.stockItem.create).not.toHaveBeenCalled()
+  })
+
+  it('accepte une location vide si zoneId est fourni', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, location: '', zoneId: 10 })
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 10 })
+    await handler(baseEvent as any)
+    expect(prismaMock.stockItem.create).toHaveBeenCalled()
+  })
+
+  it('accepte une location vide si markerId est fourni', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, location: '', markerId: 20 })
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ id: 20 })
+    await handler(baseEvent as any)
+    expect(prismaMock.stockItem.create).toHaveBeenCalled()
   })
 
   it('rejette quantity = 0 via Zod', async () => {

@@ -145,6 +145,7 @@
       :item="editingItem"
       :zones="zones"
       :markers="markers"
+      :site-map-enabled="!!edition?.siteMapEnabled"
       @saved="handleItemSaved"
     />
   </UContainer>
