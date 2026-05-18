@@ -93,6 +93,9 @@ const IGNORED_MISSING_KEYS = [
   'checkout.session.completed',
   'latest_charge.balance_transaction',
   'charge.succeeded',
+  // Propriétés JS détectées par erreur (accès objet, pas des clés i18n)
+  'data.message',
+  'c.renderedHtml',
 ]
 
 /**
