@@ -206,8 +206,15 @@
     "error_message": "Upload-Fehler",
     "errors": {
       "file_too_large": "Datei zu groß",
+      "file_too_large_server": "Die Datei ist zu groß. Maximale Größe: {max} MB. Versuchen Sie es mit einem kleineren Bild.",
+      "forbidden": "Sie haben keine Berechtigung, diese Datei hochzuladen.",
+      "generic": "Der Datei-Upload ist fehlgeschlagen. Bitte erneut versuchen.",
       "invalid_file_extension": "Ungültige Dateierweiterung",
-      "invalid_file_type": "Ungültiger Dateityp"
+      "invalid_file_type": "Ungültiger Dateityp",
+      "network_error": "Netzwerkfehler. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "not_found": "Ressource nicht gefunden. Die Seite wurde möglicherweise verschoben.",
+      "server_error": "Vorübergehender Serverfehler. Versuchen Sie es in Kürze erneut.",
+      "unauthorized": "Sie müssen angemeldet sein, um eine Datei hochzuladen."
     },
     "formats_accepted": "Akzeptierte Formate",
     "logo_url_optional_placeholder": "URL des Convention-Logos (optional)",

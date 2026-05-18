@@ -206,8 +206,15 @@
     "error_message": "Upload fejl",
     "errors": {
       "file_too_large": "Fil for stor. Maksimal størrelse: {maxSize}",
+      "file_too_large_server": "Filen er for stor. Maksimal størrelse: {max} MB. Prøv med et mindre billede.",
+      "forbidden": "Du har ikke rettigheder til at uploade denne fil.",
+      "generic": "Upload af filen mislykkedes. Prøv igen.",
       "invalid_file_extension": "Ugyldig filendelse. Accepterede endelser: {allowedExtensions}",
-      "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}"
+      "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}",
+      "network_error": "Netværksfejl. Kontroller din forbindelse og prøv igen.",
+      "not_found": "Ressource ikke fundet. Siden er muligvis flyttet.",
+      "server_error": "Midlertidig serverfejl. Prøv igen om et øjeblik.",
+      "unauthorized": "Du skal være logget ind for at uploade en fil."
     },
     "formats_accepted": "Accepterede formater",
     "logo_url_optional_placeholder": "URL til convention logo (valgfrit)",

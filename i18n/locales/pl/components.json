@@ -206,8 +206,15 @@
     "error_message": "Błąd przesyłania",
     "errors": {
       "file_too_large": "Plik za duży. Maksymalny rozmiar: {maxSize}",
+      "file_too_large_server": "Plik jest zbyt duży. Maksymalny rozmiar: {max} MB. Spróbuj z mniejszym obrazem.",
+      "forbidden": "Nie masz uprawnień do przesłania tego pliku.",
+      "generic": "Przesłanie pliku nie powiodło się. Spróbuj ponownie.",
       "invalid_file_extension": "Nieprawidłowe rozszerzenie pliku. Akceptowane rozszerzenia: {allowedExtensions}",
-      "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {allowedTypes}"
+      "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {allowedTypes}",
+      "network_error": "Błąd sieci. Sprawdź połączenie i spróbuj ponownie.",
+      "not_found": "Nie znaleziono zasobu. Strona mogła zostać przeniesiona.",
+      "server_error": "Tymczasowy błąd serwera. Spróbuj ponownie za chwilę.",
+      "unauthorized": "Aby przesłać plik, musisz być zalogowany."
     },
     "formats_accepted": "Akceptowane formaty",
     "logo_url_optional_placeholder": "URL logo konwencji (opcjonalne)",

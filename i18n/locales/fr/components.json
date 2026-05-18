@@ -206,8 +206,15 @@
     "error_message": "Erreur d'upload",
     "errors": {
       "file_too_large": "Fichier trop volumineux",
+      "file_too_large_server": "Le fichier est trop volumineux. Taille maximale : {max} Mo. Essayez avec une image plus légère.",
+      "forbidden": "Vous n'avez pas les droits pour téléverser ce fichier.",
+      "generic": "L'envoi du fichier a échoué. Réessayez.",
       "invalid_file_extension": "Extension de fichier invalide",
-      "invalid_file_type": "Type de fichier invalide"
+      "invalid_file_type": "Type de fichier invalide",
+      "network_error": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+      "not_found": "Ressource introuvable. La page a peut-être été déplacée.",
+      "server_error": "Erreur serveur temporaire. Réessayez dans quelques instants.",
+      "unauthorized": "Vous devez être connecté pour téléverser un fichier."
     },
     "formats_accepted": "Formats acceptés",
     "logo_url_optional_placeholder": "URL du logo (optionnel)",

@@ -206,8 +206,15 @@
     "error_message": "Chyba při nahrávání",
     "errors": {
       "file_too_large": "Příliš velký soubor",
+      "file_too_large_server": "Soubor je příliš velký. Maximální velikost: {max} MB. Zkuste menší obrázek.",
+      "forbidden": "Nemáte oprávnění k nahrání tohoto souboru.",
+      "generic": "Nahrání souboru se nezdařilo. Zkuste to znovu.",
       "invalid_file_extension": "Nesprávná přípona souboru",
-      "invalid_file_type": "Nesprávný typ souboru"
+      "invalid_file_type": "Nesprávný typ souboru",
+      "network_error": "Chyba sítě. Zkontrolujte připojení a zkuste to znovu.",
+      "not_found": "Zdroj nenalezen. Stránka mohla být přesunuta.",
+      "server_error": "Dočasná chyba serveru. Zkuste to za chvíli znovu.",
+      "unauthorized": "Pro nahrání souboru musíte být přihlášeni."
     },
     "formats_accepted": "Přijaté formáty",
     "logo_url_optional_placeholder": "Adresa URL loga (nepovinné)",

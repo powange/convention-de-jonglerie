@@ -206,8 +206,15 @@
     "error_message": "Upload fout",
     "errors": {
       "file_too_large": "Bestand te groot. Maximale grootte: {maxSize}",
+      "file_too_large_server": "Het bestand is te groot. Maximale grootte: {max} MB. Probeer een kleinere afbeelding.",
+      "forbidden": "Je hebt geen rechten om dit bestand te uploaden.",
+      "generic": "Het uploaden van het bestand is mislukt. Probeer het opnieuw.",
       "invalid_file_extension": "Ongeldige bestandsextensie. Geaccepteerde extensies: {allowedExtensions}",
-      "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}"
+      "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}",
+      "network_error": "Netwerkfout. Controleer je verbinding en probeer het opnieuw.",
+      "not_found": "Bron niet gevonden. De pagina is mogelijk verplaatst.",
+      "server_error": "Tijdelijke serverfout. Probeer het over een ogenblik opnieuw.",
+      "unauthorized": "Je moet ingelogd zijn om een bestand te uploaden."
     },
     "formats_accepted": "Geaccepteerde formaten",
     "logo_url_optional_placeholder": "URL van het conventie logo (optioneel)",

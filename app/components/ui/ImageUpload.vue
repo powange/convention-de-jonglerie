@@ -250,57 +250,54 @@ const generatePreview = (file: File) => {
   previewUrl.value = URL.createObjectURL(file)
 }
 
-// Sélectionner et valider un fichier
-const selectFile = (file: File): boolean => {
+// Sélectionner et valider un fichier. Retourne une Promise qui se résout
+// seulement quand le FileReader a fini de lire le fichier et que
+// `serverFiles` est prêt pour l'upload. Évite la race condition où
+// `upload()` se lancerait avant que le contenu soit disponible.
+const selectFile = (file: File): Promise<boolean> => {
   error.value = null
 
   const validationResult = validateFile(file)
   if (!validationResult.valid) {
     error.value = validationResult.error || 'Fichier invalide'
-    return false
+    return Promise.resolve(false)
   }
 
   selectedFile.value = file
   generatePreview(file)
 
-  // Créer manuellement le ServerFile avec data URL
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    const dataUrl = e.target?.result as string
-
-    const serverFile = {
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      lastModified: file.lastModified,
-      content: dataUrl, // C'est la clé pour nuxt-file-storage
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string
+      serverFiles.value = [
+        {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: file.lastModified,
+          content: dataUrl, // C'est la clé pour nuxt-file-storage
+        },
+      ]
+      resolve(true)
     }
-
-    serverFiles.value = [serverFile]
-    console.log('Created ServerFile manually:', !!serverFile.content)
-  }
-  reader.readAsDataURL(file)
-
-  return true
+    reader.onerror = () => {
+      error.value = t('upload.errors.generic')
+      resolve(false)
+    }
+    reader.readAsDataURL(file)
+  })
 }
 
 // Gestionnaires d'événements
-const handleFileSelect = (event: Event) => {
-  // Ne plus utiliser handleFileInput qui ne fonctionne pas
-  // Gérer le fichier manuellement
-
+const handleFileSelect = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
+  if (!file) return
 
-  if (file) {
-    console.log('File selected:', file.name)
-
-    if (selectFile(file) && props.autoUpload) {
-      // Attendre que le FileReader finisse avant d'uploader
-      setTimeout(() => {
-        upload()
-      }, 100)
-    }
+  const ok = await selectFile(file)
+  if (ok && props.autoUpload) {
+    await upload()
   }
 }
 
@@ -313,20 +310,15 @@ const onDragLeave = () => {
   isDragOver.value = false
 }
 
-const onDrop = (event: DragEvent) => {
+const onDrop = async (event: DragEvent) => {
   isDragOver.value = false
   const droppedFiles = event.dataTransfer?.files
+  if (!droppedFiles || droppedFiles.length === 0) return
 
-  if (droppedFiles && droppedFiles.length > 0) {
-    const file = droppedFiles[0]
-
-    console.log('File dropped:', file.name)
-
-    if (selectFile(file) && props.autoUpload) {
-      setTimeout(() => {
-        upload()
-      }, 100)
-    }
+  const file = droppedFiles[0]
+  const ok = await selectFile(file)
+  if (ok && props.autoUpload) {
+    await upload()
   }
 }
 
@@ -395,12 +387,48 @@ const upload = async () => {
     emit('uploaded', responseData)
   } catch (uploadError: unknown) {
     console.error('Upload error:', uploadError)
-    const message = uploadError instanceof Error ? uploadError.message : 'Upload failed'
+    const message = resolveUploadErrorMessage(uploadError)
     error.value = message
     emit('error', message)
   } finally {
     uploading.value = false
   }
+}
+
+// Mappe une erreur d'upload (FetchError, network, etc.) sur un message
+// utilisateur clair et i18n. Couvre les cas fréquents : 413 (limite serveur),
+// 401, 403, 404, 500+, erreur réseau, et l'éventuel `data.message` du serveur.
+function resolveUploadErrorMessage(uploadError: unknown): string {
+  const err = uploadError as {
+    statusCode?: number
+    status?: number
+    response?: { status?: number }
+    data?: { message?: string; data?: { message?: string } }
+    message?: string
+    name?: string
+  }
+  const status = err?.statusCode ?? err?.response?.status ?? err?.status
+  const serverMessage = err?.data?.data?.message || err?.data?.message
+
+  if (status === 413) {
+    const maxMb = Math.round(validation.maxSize / 1024 / 1024)
+    return t('upload.errors.file_too_large_server', { max: maxMb })
+  }
+  if (status === 401) return t('upload.errors.unauthorized')
+  if (status === 403) return t('upload.errors.forbidden')
+  if (status === 404) return t('upload.errors.not_found')
+  if (status && status >= 500) return t('upload.errors.server_error')
+
+  // Erreur réseau (offline, DNS, etc.) : pas de status
+  if (!status && (err?.name === 'TypeError' || /network|fetch/i.test(err?.message || ''))) {
+    return t('upload.errors.network_error')
+  }
+
+  // Si le serveur a renvoyé un message custom (validation Zod, etc.), l'utiliser
+  if (serverMessage) return serverMessage
+
+  // Fallback générique
+  return t('upload.errors.generic')
 }
 
 // Fonction de reset

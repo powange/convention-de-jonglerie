@@ -206,8 +206,15 @@
     "error_message": "Upload error",
     "errors": {
       "file_too_large": "File too large",
+      "file_too_large_server": "The file is too large. Maximum size: {max} MB. Try with a smaller image.",
+      "forbidden": "You don't have permission to upload this file.",
+      "generic": "File upload failed. Please try again.",
       "invalid_file_extension": "Invalid file extension",
-      "invalid_file_type": "Invalid file type"
+      "invalid_file_type": "Invalid file type",
+      "network_error": "Network error. Check your connection and try again.",
+      "not_found": "Resource not found. The page may have been moved.",
+      "server_error": "Temporary server error. Please try again in a moment.",
+      "unauthorized": "You must be logged in to upload a file."
     },
     "formats_accepted": "Accepted formats",
     "logo_url_optional_placeholder": "Logo URL (optional)",

@@ -206,8 +206,15 @@
     "error_message": "Fel vid uppladdning",
     "errors": {
       "file_too_large": "Filen är för stor",
+      "file_too_large_server": "Filen är för stor. Maximal storlek: {max} MB. Försök med en mindre bild.",
+      "forbidden": "Du har inte behörighet att ladda upp den här filen.",
+      "generic": "Filuppladdningen misslyckades. Försök igen.",
       "invalid_file_extension": "Ogiltig filändelse",
-      "invalid_file_type": "Ogiltig filtyp"
+      "invalid_file_type": "Ogiltig filtyp",
+      "network_error": "Nätverksfel. Kontrollera anslutningen och försök igen.",
+      "not_found": "Resursen hittades inte. Sidan kan ha flyttats.",
+      "server_error": "Tillfälligt serverfel. Försök igen om en stund.",
+      "unauthorized": "Du måste vara inloggad för att ladda upp en fil."
     },
     "formats_accepted": "Accepterade format",
     "logo_url_optional_placeholder": "URL för logotyp (valfritt)",

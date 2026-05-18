@@ -206,8 +206,15 @@
     "error_message": "Errore di caricamento",
     "errors": {
       "file_too_large": "File troppo grande",
+      "file_too_large_server": "Il file è troppo grande. Dimensione massima: {max} MB. Prova con un'immagine più piccola.",
+      "forbidden": "Non hai i permessi per caricare questo file.",
+      "generic": "Il caricamento del file è fallito. Riprova.",
       "invalid_file_extension": "Estensione file non valida",
-      "invalid_file_type": "Tipo di file non valido"
+      "invalid_file_type": "Tipo di file non valido",
+      "network_error": "Errore di rete. Controlla la connessione e riprova.",
+      "not_found": "Risorsa non trovata. La pagina potrebbe essere stata spostata.",
+      "server_error": "Errore temporaneo del server. Riprova tra poco.",
+      "unauthorized": "Devi essere connesso per caricare un file."
     },
     "formats_accepted": "Formati accettati",
     "logo_url_optional_placeholder": "URL del logo della convention (opzionale)",

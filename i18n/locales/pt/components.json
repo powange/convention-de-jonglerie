@@ -206,8 +206,15 @@
     "error_message": "Erro de upload",
     "errors": {
       "file_too_large": "Arquivo muito grande. Tamanho máximo: {maxSize}",
+      "file_too_large_server": "O ficheiro é demasiado grande. Tamanho máximo: {max} MB. Tente com uma imagem mais leve.",
+      "forbidden": "Não tem permissões para carregar este ficheiro.",
+      "generic": "O carregamento do ficheiro falhou. Tente novamente.",
       "invalid_file_extension": "Extensão de arquivo inválida. Extensões aceitas: {allowedExtensions}",
-      "invalid_file_type": "Tipo de arquivo inválido. Formatos aceitos: {allowedTypes}"
+      "invalid_file_type": "Tipo de arquivo inválido. Formatos aceitos: {allowedTypes}",
+      "network_error": "Erro de rede. Verifique a sua ligação e tente novamente.",
+      "not_found": "Recurso não encontrado. A página pode ter sido movida.",
+      "server_error": "Erro temporário do servidor. Tente novamente em alguns instantes.",
+      "unauthorized": "Tem de iniciar sessão para carregar um ficheiro."
     },
     "formats_accepted": "Formatos aceitos",
     "logo_url_optional_placeholder": "URL do logo da convenção (opcional)",

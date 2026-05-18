@@ -206,8 +206,15 @@
     "error_message": "Error de subida",
     "errors": {
       "file_too_large": "Archivo demasiado grande",
+      "file_too_large_server": "El archivo es demasiado grande. Tamaño máximo: {max} MB. Pruebe con una imagen más pequeña.",
+      "forbidden": "No tiene permisos para cargar este archivo.",
+      "generic": "La carga del archivo falló. Inténtelo de nuevo.",
       "invalid_file_extension": "Extensión de archivo inválida",
-      "invalid_file_type": "Tipo de archivo inválido"
+      "invalid_file_type": "Tipo de archivo inválido",
+      "network_error": "Error de red. Verifique su conexión e inténtelo de nuevo.",
+      "not_found": "Recurso no encontrado. La página puede haber sido movida.",
+      "server_error": "Error temporal del servidor. Inténtelo de nuevo en unos instantes.",
+      "unauthorized": "Debe estar conectado para cargar un archivo."
     },
     "formats_accepted": "Formatos aceptados",
     "logo_url_optional_placeholder": "URL del logo de la convención (opcional)",
