@@ -1,6 +1,96 @@
+import { z } from 'zod'
+
 import { canManageStock, type EditionWithPermissions } from './permissions/edition-permissions'
 
 import type { UserForPermissions } from './permissions/types'
+
+/**
+ * Schéma Zod d'un sous-emplacement de stock envoyé par le client lors d'une
+ * création ou d'une mise à jour d'item. La validation cross-champ (au moins
+ * une localisation parmi texte/zone/marqueur) est faite via `.refine()`.
+ */
+export const stockItemLocationInputSchema = z
+  .object({
+    location: z.string().trim().max(200).nullable().optional(),
+    zoneId: z.number().int().positive().nullable().optional(),
+    markerId: z.number().int().positive().nullable().optional(),
+    quantity: z.number().int().positive(),
+  })
+  .refine((data) => !!(data.location?.trim() || data.zoneId || data.markerId), {
+    message: 'Indiquez une localisation textuelle ou un emplacement sur la carte',
+    path: ['location'],
+  })
+  .refine((data) => !(data.zoneId && data.markerId), {
+    message: 'Un emplacement ne peut pas être à la fois une zone et un marqueur',
+    path: ['zoneId'],
+  })
+
+export type StockItemLocationInput = z.infer<typeof stockItemLocationInputSchema>
+
+/**
+ * Vérifie que chaque sous-emplacement référence une zone/marqueur appartenant
+ * à l'édition, et que la somme des quantités ne dépasse pas la quantité totale
+ * de l'item. Lève une createError sinon.
+ */
+export async function validateStockItemLocations(
+  locations: StockItemLocationInput[],
+  editionId: number,
+  itemQuantity: number
+): Promise<void> {
+  if (locations.length === 0) return
+
+  const totalLocated = locations.reduce((sum, l) => sum + l.quantity, 0)
+  if (totalLocated > itemQuantity) {
+    throw createError({
+      status: 400,
+      message: 'La somme des quantités par emplacement dépasse la quantité totale de l’objet',
+    })
+  }
+
+  const zoneIds = Array.from(
+    new Set(locations.map((l) => l.zoneId).filter((id): id is number => !!id))
+  )
+  const markerIds = Array.from(
+    new Set(locations.map((l) => l.markerId).filter((id): id is number => !!id))
+  )
+
+  if (zoneIds.length > 0) {
+    const zones = await prisma.editionZone.findMany({
+      where: { id: { in: zoneIds }, editionId },
+      select: { id: true },
+    })
+    if (zones.length !== zoneIds.length) {
+      throw createError({
+        status: 400,
+        message: "Une zone référencée n'appartient pas à cette édition",
+      })
+    }
+  }
+  if (markerIds.length > 0) {
+    const markers = await prisma.editionMarker.findMany({
+      where: { id: { in: markerIds }, editionId },
+      select: { id: true },
+    })
+    if (markers.length !== markerIds.length) {
+      throw createError({
+        status: 400,
+        message: "Un marqueur référencé n'appartient pas à cette édition",
+      })
+    }
+  }
+}
+
+/**
+ * Include Prisma standard pour récupérer les sous-emplacements d'un item de
+ * stock avec les infos zone/marker nécessaires pour l'affichage.
+ */
+export const stockItemLocationsInclude = {
+  orderBy: [{ displayOrder: 'asc' as const }, { createdAt: 'asc' as const }],
+  include: {
+    zone: { select: { id: true, name: true, color: true } },
+    marker: { select: { id: true, name: true } },
+  },
+}
 
 /**
  * Vérifie si un utilisateur est responsable d'au moins une équipe bénévole

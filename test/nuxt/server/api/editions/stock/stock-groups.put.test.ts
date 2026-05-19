@@ -51,7 +51,7 @@ describe('PUT /api/editions/[id]/stock-groups/[groupId]', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Groupe introuvable')
   })
 
-  it("vérifie le scope édition dans le findFirst", async () => {
+  it('vérifie le scope édition dans le findFirst', async () => {
     await handler(baseEvent as any)
     expect(prismaMock.stockGroup.findFirst).toHaveBeenCalledWith({
       where: { id: 5, editionId: 1 },

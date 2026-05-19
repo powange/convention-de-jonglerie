@@ -25,7 +25,7 @@ test.describe.serial('Module Stock matériel', () => {
     })
   })
 
-  test("page stock : empty state au démarrage", async ({ page, goto }) => {
+  test('page stock : empty state au démarrage', async ({ page, goto }) => {
     const { editionId } = loadState()
     await goto(`/editions/${editionId}/gestion/stock`, { waitUntil: 'hydration' })
     await expect(page.getByRole('heading', { name: /stock mat/i }).first()).toBeVisible({
@@ -57,7 +57,7 @@ test.describe.serial('Module Stock matériel', () => {
     })
   })
 
-  test("créer un item dans le groupe via API et le voir dans la page groupe", async ({
+  test('créer un item dans le groupe via API et le voir dans la page groupe', async ({
     page,
     goto,
   }) => {
@@ -88,7 +88,7 @@ test.describe.serial('Module Stock matériel', () => {
     await expect(page.getByText(/×5/).first()).toBeVisible({ timeout: 5000 })
   })
 
-  test("page item : disponibilité « 5/5 » par défaut (aucune réservation)", async ({
+  test('page item : disponibilité « 5/5 » par défaut (aucune réservation)', async ({
     page,
     goto,
   }) => {
@@ -157,7 +157,7 @@ test.describe.serial('Module Stock matériel', () => {
     expect(response.status()).toBe(409)
   })
 
-  test("availability via API : 3 disponibles maintenant", async ({ page }) => {
+  test('availability via API : 3 disponibles maintenant', async ({ page }) => {
     const { editionId } = loadState()
     if (!stockItemId) throw new Error('stockItemId manquant')
 
@@ -171,7 +171,7 @@ test.describe.serial('Module Stock matériel', () => {
     expect(body?.data?.available).toBe(3)
   })
 
-  test("supprimer la réservation libère la dispo", async ({ page, goto }) => {
+  test('supprimer la réservation libère la dispo', async ({ page, goto }) => {
     if (!stockReservationId) throw new Error('stockReservationId manquant')
     const { editionId } = loadState()
 

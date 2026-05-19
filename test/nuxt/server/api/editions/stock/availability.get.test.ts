@@ -63,20 +63,20 @@ describe('GET /api/editions/[id]/stock-items/[itemId]/availability', () => {
     expect(result.data.available).toBe(7)
   })
 
-  it("clampe available à 0 (jamais négatif)", async () => {
+  it('clampe available à 0 (jamais négatif)', async () => {
     mockGetReservedQty.mockResolvedValue(15)
     const result = await handler(makeEvent() as any)
     expect(result.data.available).toBe(0)
   })
 
-  it("accepte une période explicite via ?at=...&until=...", async () => {
+  it('accepte une période explicite via ?at=...&until=...', async () => {
     const at = '2026-06-10T10:00:00.000Z'
     const until = '2026-06-10T18:00:00.000Z'
     await handler(makeEvent({ at, until }) as any)
     expect(mockGetReservedQty).toHaveBeenCalledWith(5, new Date(at), new Date(until))
   })
 
-  it("refuse si until <= at", async () => {
+  it('refuse si until <= at', async () => {
     const at = '2026-06-10T10:00:00.000Z'
     await expect(handler(makeEvent({ at, until: at }) as any)).rejects.toThrow('Période invalide')
   })

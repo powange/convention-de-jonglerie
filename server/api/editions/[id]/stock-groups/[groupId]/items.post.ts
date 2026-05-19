@@ -6,25 +6,22 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import {
+  stockItemLocationInputSchema,
+  stockItemLocationsInclude,
+  validateStockItemLocations,
+} from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
-const bodySchema = z
-  .object({
-    name: z.string().trim().min(1, 'Le nom est requis').max(200),
-    description: z.string().trim().max(2000).nullable().optional(),
-    // location, zoneId et markerId : au moins un des trois doit être renseigné
-    location: z.string().trim().max(200).nullable().optional(),
-    zoneId: z.number().int().positive().nullable().optional(),
-    markerId: z.number().int().positive().nullable().optional(),
-    quantity: z.number().int().positive().default(1),
-    notes: z.string().trim().max(2000).nullable().optional(),
-    displayOrder: z.number().int().optional(),
-  })
-  .refine((data) => !!(data.location?.trim() || data.zoneId || data.markerId), {
-    message: 'Indiquez une localisation textuelle ou un emplacement sur la carte',
-    path: ['location'],
-  })
+const bodySchema = z.object({
+  name: z.string().trim().min(1, 'Le nom est requis').max(200),
+  description: z.string().trim().max(2000).nullable().optional(),
+  quantity: z.number().int().positive().default(1),
+  notes: z.string().trim().max(2000).nullable().optional(),
+  displayOrder: z.number().int().optional(),
+  locations: z.array(stockItemLocationInputSchema).max(50).optional(),
+})
 
 export default wrapApiHandler(
   async (event) => {
@@ -60,28 +57,8 @@ export default wrapApiHandler(
       throw error
     }
 
-    // Vérifier que zone / marker appartiennent à l'édition si fournis
-    if (data.zoneId) {
-      const zone = await prisma.editionZone.findFirst({
-        where: { id: data.zoneId, editionId },
-        select: { id: true },
-      })
-      if (!zone) {
-        throw createError({ status: 400, message: "La zone n'appartient pas à cette édition" })
-      }
-    }
-    if (data.markerId) {
-      const marker = await prisma.editionMarker.findFirst({
-        where: { id: data.markerId, editionId },
-        select: { id: true },
-      })
-      if (!marker) {
-        throw createError({
-          status: 400,
-          message: "Le marqueur n'appartient pas à cette édition",
-        })
-      }
-    }
+    const locations = data.locations ?? []
+    await validateStockItemLocations(locations, editionId, data.quantity)
 
     let displayOrder = data.displayOrder
     if (displayOrder === undefined) {
@@ -98,16 +75,21 @@ export default wrapApiHandler(
         stockGroupId: groupId,
         name: data.name,
         description: data.description?.trim() || null,
-        location: data.location?.trim() || null,
-        zoneId: data.zoneId ?? null,
-        markerId: data.markerId ?? null,
         quantity: data.quantity,
         notes: data.notes?.trim() || null,
         displayOrder,
+        locations: {
+          create: locations.map((loc, idx) => ({
+            location: loc.location?.trim() || null,
+            zoneId: loc.zoneId ?? null,
+            markerId: loc.markerId ?? null,
+            quantity: loc.quantity,
+            displayOrder: idx,
+          })),
+        },
       },
       include: {
-        zone: { select: { id: true, name: true, color: true } },
-        marker: { select: { id: true, name: true } },
+        locations: stockItemLocationsInclude,
       },
     })
 

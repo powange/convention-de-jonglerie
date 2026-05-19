@@ -74,7 +74,7 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
     )
   })
 
-  it("refuse si autre user et non modérateur", async () => {
+  it('refuse si autre user et non modérateur', async () => {
     prismaMock.stockReservation.findFirst.mockResolvedValue({
       ...existingReservation,
       userId: 999,
@@ -93,7 +93,7 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
     expect(prismaMock.stockReservation.update).toHaveBeenCalled()
   })
 
-  it("exclut la réservation courante du calcul de dispo (excludeReservationId)", async () => {
+  it('exclut la réservation courante du calcul de dispo (excludeReservationId)', async () => {
     global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 5 })
     mockGetReservedQty.mockResolvedValue(0)
     await handler(baseEvent as any)
@@ -105,25 +105,25 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
     )
   })
 
-  it("refuse 409 si la nouvelle quantité dépasse la dispo restante", async () => {
+  it('refuse 409 si la nouvelle quantité dépasse la dispo restante', async () => {
     global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 8 })
     mockGetReservedQty.mockResolvedValue(5) // 10 - 5 = 5 disponibles, demande 8
     await expect(handler(baseEvent as any)).rejects.toThrow(/Quantité indisponible/)
   })
 
-  it("ne vérifie pas la dispo si statut devient CANCELLED", async () => {
+  it('ne vérifie pas la dispo si statut devient CANCELLED', async () => {
     global.readBody = vi.fn().mockResolvedValue({ status: 'CANCELLED' })
     await handler(baseEvent as any)
     expect(mockGetReservedQty).not.toHaveBeenCalled()
   })
 
-  it("ne vérifie pas la dispo si statut devient RETURNED", async () => {
+  it('ne vérifie pas la dispo si statut devient RETURNED', async () => {
     global.readBody = vi.fn().mockResolvedValue({ status: 'RETURNED' })
     await handler(baseEvent as any)
     expect(mockGetReservedQty).not.toHaveBeenCalled()
   })
 
-  it("rejette 400 si endsAt <= startsAt", async () => {
+  it('rejette 400 si endsAt <= startsAt', async () => {
     global.readBody = vi.fn().mockResolvedValue({
       startsAt: '2026-06-10T20:00:00.000Z',
       endsAt: '2026-06-10T10:00:00.000Z',

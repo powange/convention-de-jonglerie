@@ -9,6 +9,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
 
 vi.mock('#server/utils/stock-helpers', () => ({
   canAccessStock: mockCanAccessStock,
+  stockItemLocationsInclude: {},
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({

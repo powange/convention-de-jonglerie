@@ -453,9 +453,9 @@ model EditionZone {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  shows             Show[]
-  workshopLocations WorkshopLocation[]
-  stockItems        StockItem[]
+  shows              Show[]
+  workshopLocations  WorkshopLocation[]
+  stockItemLocations StockItemLocation[]
 
   @@index([editionId])
 }
@@ -474,9 +474,9 @@ model EditionMarker {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  shows             Show[]
-  workshopLocations WorkshopLocation[]
-  stockItems        StockItem[]
+  shows              Show[]
+  workshopLocations  WorkshopLocation[]
+  stockItemLocations StockItemLocation[]
 
   @@index([editionId])
 }

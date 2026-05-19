@@ -29,37 +29,57 @@ model StockItem {
   stockGroupId Int
   name         String
   description  String?  @db.Text
-  location     String? // Localisation textuelle (ex: "Tente technique B") — optionnelle si zone/marker défini
-  zoneId       Int? // Lien optionnel vers une zone de la carte
-  markerId     Int? // Lien optionnel vers un marqueur de la carte
-  quantity     Int      @default(1) // Nombre d'exemplaires identiques
+  quantity     Int      @default(1) // Nombre d'exemplaires identiques (somme des locations ≤ quantity)
   notes        String?  @db.Text
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  group        StockGroup         @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
-  zone         EditionZone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  marker       EditionMarker?     @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  group        StockGroup          @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
+  locations    StockItemLocation[]
   reservations StockReservation[]
 
   @@index([stockGroupId])
   @@index([stockGroupId, displayOrder])
+}
+
+// Sous-emplacement d'un objet de stock : permet de répartir la quantité
+// sur plusieurs lieux physiques (texte et/ou zone/marqueur de la carte).
+// La somme des `quantity` de ces sous-emplacements doit être ≤ à la
+// `quantity` du StockItem parent (validé côté API). Les unités restantes
+// (quantity - somme) sont considérées comme « non localisées ».
+model StockItemLocation {
+  id           Int      @id @default(autoincrement())
+  stockItemId  Int
+  location     String? // Localisation textuelle (ex: "Tente technique B")
+  zoneId       Int? // Lien optionnel vers une zone de la carte
+  markerId     Int? // Lien optionnel vers un marqueur de la carte
+  quantity     Int      @default(1)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  stockItem StockItem      @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  zone      EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker    EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
+
+  @@index([stockItemId])
+  @@index([stockItemId, displayOrder])
   @@index([zoneId])
   @@index([markerId])
 }
 
 model StockReservation {
-  id                Int                    @id @default(autoincrement())
-  stockItemId       Int
-  userId            Int // Utilisateur qui a posé la réservation
-  startsAt          DateTime
-  endsAt            DateTime
-  usage             String                 @db.Text // Pourquoi : "Spectacle de feu samedi 22h"
-  quantityReserved  Int                    @default(1)
-  status            StockReservationStatus @default(RESERVED)
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @updatedAt
+  id               Int                    @id @default(autoincrement())
+  stockItemId      Int
+  userId           Int // Utilisateur qui a posé la réservation
+  startsAt         DateTime
+  endsAt           DateTime
+  usage            String                 @db.Text // Pourquoi : "Spectacle de feu samedi 22h"
+  quantityReserved Int                    @default(1)
+  status           StockReservationStatus @default(RESERVED)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
   stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)

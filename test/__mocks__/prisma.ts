@@ -3,7 +3,9 @@ import { vi, beforeEach } from 'vitest'
 // Mock centralisé de Prisma pour tests unitaires
 const createModelMock = () => ({
   findUnique: vi.fn(),
+  findUniqueOrThrow: vi.fn(),
   findFirst: vi.fn(),
+  findFirstOrThrow: vi.fn(),
   findMany: vi.fn(),
   create: vi.fn(),
   createMany: vi.fn(),
@@ -91,6 +93,7 @@ export const prismaMock = {
   // Modèles stock matériel
   stockGroup: createModelMock(),
   stockItem: createModelMock(),
+  stockItemLocation: createModelMock(),
   stockReservation: createModelMock(),
 
   // Méthodes Prisma

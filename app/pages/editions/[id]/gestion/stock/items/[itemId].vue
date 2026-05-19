@@ -51,23 +51,6 @@
               <p v-if="item.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {{ item.description }}
               </p>
-              <div class="text-xs text-gray-500 mt-2 flex items-center gap-3 flex-wrap">
-                <span v-if="item.location" class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-map-pin" class="size-3" />
-                  {{ item.location }}
-                </span>
-                <span v-if="item.zone" class="flex items-center gap-1">
-                  <span
-                    class="size-3 rounded-full border border-gray-300"
-                    :style="{ backgroundColor: item.zone.color }"
-                  />
-                  {{ item.zone.name }}
-                </span>
-                <span v-if="item.marker" class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-flag" class="size-3" />
-                  {{ item.marker.name }}
-                </span>
-              </div>
               <p v-if="item.notes" class="text-xs text-gray-500 mt-2 italic whitespace-pre-wrap">
                 {{ item.notes }}
               </p>
@@ -92,6 +75,46 @@
             </UDropdownMenu>
           </div>
         </div>
+      </UCard>
+
+      <!-- Emplacements -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-map-pin" class="size-5 text-gray-500" />
+            <h2 class="font-semibold">{{ $t('gestion.stock.locations') }}</h2>
+          </div>
+        </template>
+        <div v-if="!item.locations.length" class="text-sm text-gray-500 italic text-center py-4">
+          {{ $t('gestion.stock.no_locations_yet') }}
+        </div>
+        <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+          <li v-for="loc in item.locations" :key="loc.id" class="py-2 flex items-center gap-3">
+            <UBadge color="neutral" variant="soft" size="sm" class="shrink-0">
+              ×{{ loc.quantity }}
+            </UBadge>
+            <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span v-if="loc.location" class="flex items-center gap-1">
+                <UIcon name="i-heroicons-map-pin" class="size-3.5 text-gray-400" />
+                {{ loc.location }}
+              </span>
+              <span v-if="loc.zone" class="flex items-center gap-1">
+                <span
+                  class="size-3 rounded-full border border-gray-300"
+                  :style="{ backgroundColor: loc.zone.color }"
+                />
+                {{ loc.zone.name }}
+              </span>
+              <span v-if="loc.marker" class="flex items-center gap-1">
+                <UIcon name="i-heroicons-flag" class="size-3.5 text-gray-400" />
+                {{ loc.marker.name }}
+              </span>
+            </div>
+          </li>
+        </ul>
+        <p v-if="unlocatedUnits > 0" class="text-xs text-gray-500 mt-2">
+          {{ $t('gestion.stock.unlocated_units', { count: unlocatedUnits }, unlocatedUnits) }}
+        </p>
       </UCard>
 
       <!-- Réservations -->
@@ -199,23 +222,28 @@ interface StockReservation {
   status: StockReservationStatus
   user: ReservationUser
 }
+interface StockItemLocation {
+  id: number
+  location: string | null
+  quantity: number
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
+}
 interface StockItemFull {
   id: number
   name: string
   description: string | null
-  location: string | null
   quantity: number
   notes: string | null
   group: { id: number; name: string }
-  zone: { id: number; name: string; color: string } | null
-  marker: { id: number; name: string } | null
+  locations: StockItemLocation[]
   reservations: StockReservation[]
 }
 
 const item = ref<StockItemFull | null>(null)
 const availability = ref<{ available: number; quantity: number } | null>(null)
-const zones = ref<{ id: number; name: string; color: string }[]>([])
-const markers = ref<{ id: number; name: string }[]>([])
+const zones = ref<{ id: number; name: string; color: string; types: string[] }[]>([])
+const markers = ref<{ id: number; name: string; color: string | null; types: string[] }[]>([])
 const loading = ref(true)
 
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -243,6 +271,12 @@ const availabilityColor = computed<'success' | 'warning' | 'error' | 'neutral'>(
   if (availability.value.available === 0) return 'error'
   if (availability.value.available < availability.value.quantity) return 'warning'
   return 'success'
+})
+
+const unlocatedUnits = computed(() => {
+  if (!item.value) return 0
+  const total = item.value.locations.reduce((sum, l) => sum + l.quantity, 0)
+  return Math.max(0, item.value.quantity - total)
 })
 
 const availabilityLabel = computed(() => {
@@ -280,11 +314,21 @@ async function fetchMapData() {
   const zonesData = Array.isArray(zonesRes)
     ? zonesRes
     : (zonesRes?.data?.zones ?? zonesRes?.data ?? [])
-  zones.value = (zonesData || []).map((z: any) => ({ id: z.id, name: z.name, color: z.color }))
+  zones.value = (zonesData || []).map((z: any) => ({
+    id: z.id,
+    name: z.name,
+    color: z.color,
+    types: Array.isArray(z.zoneTypes) ? z.zoneTypes : [],
+  }))
   const markersData = Array.isArray(markersRes)
     ? markersRes
     : (markersRes?.data?.markers ?? markersRes?.data ?? [])
-  markers.value = (markersData || []).map((m: any) => ({ id: m.id, name: m.name }))
+  markers.value = (markersData || []).map((m: any) => ({
+    id: m.id,
+    name: m.name,
+    color: m.color ?? null,
+    types: Array.isArray(m.markerTypes) ? m.markerTypes : [],
+  }))
 }
 
 onMounted(async () => {

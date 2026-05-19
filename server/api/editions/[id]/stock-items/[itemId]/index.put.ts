@@ -6,21 +6,23 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import {
+  stockItemLocationInputSchema,
+  stockItemLocationsInclude,
+  validateStockItemLocations,
+} from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
 const bodySchema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().max(2000).nullable().optional(),
-  // location peut être vide string, à condition qu'une zone/marker soit défini
-  // (cross-validation appliquée après merge avec l'item existant)
-  location: z.string().trim().max(200).nullable().optional(),
-  zoneId: z.number().int().positive().nullable().optional(),
-  markerId: z.number().int().positive().nullable().optional(),
   quantity: z.number().int().positive().optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
   stockGroupId: z.number().int().positive().optional(),
+  // Si fourni, remplace l'intégralité des sous-emplacements de l'item.
+  locations: z.array(stockItemLocationInputSchema).max(50).optional(),
 })
 
 export default wrapApiHandler(
@@ -69,62 +71,96 @@ export default wrapApiHandler(
         })
       }
     }
-    // Vérifier zone / marker si modifiés
-    if (data.zoneId) {
-      const zone = await prisma.editionZone.findFirst({
-        where: { id: data.zoneId, editionId },
-        select: { id: true },
-      })
-      if (!zone) {
-        throw createError({ status: 400, message: "La zone n'appartient pas à cette édition" })
-      }
-    }
-    if (data.markerId) {
-      const marker = await prisma.editionMarker.findFirst({
-        where: { id: data.markerId, editionId },
-        select: { id: true },
-      })
-      if (!marker) {
-        throw createError({
-          status: 400,
-          message: "Le marqueur n'appartient pas à cette édition",
-        })
-      }
-    }
 
-    // Validation cross-champ : après merge, au moins une localisation
-    // (texte OU zone OU marqueur) doit subsister sur l'item.
-    if (data.location !== undefined || data.zoneId !== undefined || data.markerId !== undefined) {
-      const finalLocation =
-        data.location !== undefined ? data.location?.trim() : existing.location?.trim()
-      const finalZoneId = data.zoneId !== undefined ? data.zoneId : existing.zoneId
-      const finalMarkerId = data.markerId !== undefined ? data.markerId : existing.markerId
-      if (!finalLocation && !finalZoneId && !finalMarkerId) {
-        throw createError({
-          status: 400,
-          message: 'Indiquez une localisation textuelle ou un emplacement sur la carte',
-        })
-      }
+    // Validation des sous-emplacements si fournis. La somme est validée contre
+    // la nouvelle quantity si elle change, sinon contre celle existante.
+    if (data.locations !== undefined) {
+      const targetQuantity = data.quantity ?? existing.quantity
+      await validateStockItemLocations(data.locations, editionId, targetQuantity)
     }
 
     const updateData: Record<string, unknown> = {}
     if (data.name !== undefined) updateData.name = data.name
     if (data.description !== undefined) updateData.description = data.description?.trim() || null
-    if (data.location !== undefined) updateData.location = data.location?.trim() || null
-    if (data.zoneId !== undefined) updateData.zoneId = data.zoneId
-    if (data.markerId !== undefined) updateData.markerId = data.markerId
     if (data.quantity !== undefined) updateData.quantity = data.quantity
     if (data.notes !== undefined) updateData.notes = data.notes?.trim() || null
     if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder
     if (data.stockGroupId !== undefined) updateData.stockGroupId = data.stockGroupId
 
-    const item = await prisma.stockItem.update({
-      where: { id: itemId },
-      data: updateData,
-      include: {
-        zone: { select: { id: true, name: true, color: true } },
-        marker: { select: { id: true, name: true } },
-      },
+    // Si la quantité diminue sans nouvelles locations envoyées, on doit
+    // s'assurer que la somme des locations existantes reste ≤ nouvelle quantity.
+    if (data.quantity !== undefined && data.locations === undefined) {
+      const existingLocations = await prisma.stockItemLocation.findMany({
+        where: { stockItemId: itemId },
+        select: { quantity: true },
+      })
+      const totalLocated = existingLocations.reduce((sum, l) => sum + l.quantity, 0)
+      if (totalLocated > data.quantity) {
+        throw createError({
+          status: 400,
+          message:
+            'La nouvelle quantité est inférieure à la somme des quantités déjà réparties par emplacement',
+        })
+      }
+    }
+
+    // Si la quantité diminue, vérifier qu'aucune réservation active/future ne
+    // dépasse la nouvelle quantité sur sa période. Sinon des réservations
+    // existantes deviendraient « impossibles » silencieusement.
+    if (data.quantity !== undefined && data.quantity < existing.quantity) {
+      const futureReservations = await prisma.stockReservation.findMany({
+        where: {
+          stockItemId: itemId,
+          status: { in: ['RESERVED', 'PICKED_UP'] },
+          endsAt: { gt: new Date() },
+        },
+        select: { quantityReserved: true, startsAt: true, endsAt: true },
+        orderBy: { startsAt: 'asc' },
+      })
+      // Calcul du pic de réservation simultanée par balayage d'événements
+      const events: { date: Date; delta: number }[] = []
+      for (const r of futureReservations) {
+        events.push({ date: r.startsAt, delta: r.quantityReserved })
+        events.push({ date: r.endsAt, delta: -r.quantityReserved })
+      }
+      events.sort((a, b) => a.date.getTime() - b.date.getTime() || a.delta - b.delta)
+      let current = 0
+      let peak = 0
+      for (const e of events) {
+        current += e.delta
+        if (current > peak) peak = current
+      }
+      if (peak > data.quantity) {
+        throw createError({
+          status: 400,
+          message: `La nouvelle quantité (${data.quantity}) est inférieure au pic de réservations simultanées (${peak})`,
+        })
+      }
+    }
+
+    const item = await prisma.$transaction(async (tx) => {
+      await tx.stockItem.update({ where: { id: itemId }, data: updateData })
+
+      if (data.locations !== undefined) {
+        await tx.stockItemLocation.deleteMany({ where: { stockItemId: itemId } })
+        if (data.locations.length > 0) {
+          await tx.stockItemLocation.createMany({
+            data: data.locations.map((loc, idx) => ({
+              stockItemId: itemId,
+              location: loc.location?.trim() || null,
+              zoneId: loc.zoneId ?? null,
+              markerId: loc.markerId ?? null,
+              quantity: loc.quantity,
+              displayOrder: idx,
+            })),
+          })
+        }
+      }
+
+      return tx.stockItem.findUniqueOrThrow({
+        where: { id: itemId },
+        include: { locations: stockItemLocationsInclude },
+      })
     })
 
     return createSuccessResponse({ item })

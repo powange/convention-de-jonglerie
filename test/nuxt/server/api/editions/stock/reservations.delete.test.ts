@@ -56,19 +56,19 @@ describe('DELETE /api/editions/[id]/stock-reservations/[reservationId]', () => {
     expect(prismaMock.stockReservation.delete).toHaveBeenCalled()
   })
 
-  it("refuse si autre user et non modérateur", async () => {
+  it('refuse si autre user et non modérateur', async () => {
     prismaMock.stockReservation.findFirst.mockResolvedValue({ userId: 999 })
     mockCanManageStock.mockReturnValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
     expect(prismaMock.stockReservation.delete).not.toHaveBeenCalled()
   })
 
-  it("rejette 404 si réservation introuvable (ou autre édition)", async () => {
+  it('rejette 404 si réservation introuvable (ou autre édition)', async () => {
     prismaMock.stockReservation.findFirst.mockResolvedValue(null)
     await expect(handler(baseEvent as any)).rejects.toThrow('Réservation introuvable')
   })
 
-  it("vérifie le scope édition via stockItem.group.editionId", async () => {
+  it('vérifie le scope édition via stockItem.group.editionId', async () => {
     prismaMock.stockReservation.findFirst.mockResolvedValue({ userId: 1 })
     await handler(baseEvent as any)
     expect(prismaMock.stockReservation.findFirst).toHaveBeenCalledWith(
