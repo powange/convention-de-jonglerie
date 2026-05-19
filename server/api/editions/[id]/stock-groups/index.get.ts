@@ -23,6 +23,7 @@ export default wrapApiHandler(
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 
+    const now = new Date()
     const groups = await prisma.stockGroup.findMany({
       where: { editionId },
       orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
@@ -32,6 +33,30 @@ export default wrapApiHandler(
           include: {
             locations: stockItemLocationsInclude,
             _count: { select: { reservations: true } },
+            // Réservation à afficher : en cours, en retard (PICKED_UP non
+            // rendue après endsAt) ou la prochaine à venir.
+            // - RESERVED : exclure les réservations terminées (endsAt < now)
+            // - PICKED_UP : toujours inclure tant que pas RETURNED (le retard
+            //   est précisément le cas à signaler)
+            // L'ordre asc sur startsAt place les en-cours/retard en tête
+            // (leur startsAt est dans le passé).
+            reservations: {
+              where: {
+                OR: [
+                  { status: 'RESERVED', endsAt: { gt: now } },
+                  { status: 'PICKED_UP' },
+                ],
+              },
+              orderBy: { startsAt: 'asc' },
+              take: 1,
+              select: {
+                id: true,
+                status: true,
+                startsAt: true,
+                endsAt: true,
+                quantityReserved: true,
+              },
+            },
           },
         },
       },

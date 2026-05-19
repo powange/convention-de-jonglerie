@@ -432,6 +432,8 @@
       "no_locations_yet": "Aucun emplacement défini pour le moment",
       "no_map_pin": "Aucun emplacement carte",
       "no_reservations": "Aucune réservation",
+      "ongoing": "En cours",
+      "overdue": "En retard",
       "over_located_error": "La somme des quantités par emplacement dépasse la quantité totale",
       "over_located_units": "{count} unité de trop par rapport à la quantité totale | {count} unités de trop par rapport à la quantité totale",
       "quantity_max": "Maximum {max}",
@@ -447,6 +449,7 @@
       "status_label": "Statut",
       "title": "Stock matériel",
       "unlocated_units": "{count} unité non localisée | {count} unités non localisées",
+      "upcoming": "Prochaine",
       "usage": "Utilisation",
       "usage_placeholder": "Ex: Spectacle de feu samedi 22h"
     },

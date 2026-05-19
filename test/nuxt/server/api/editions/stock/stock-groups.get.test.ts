@@ -62,4 +62,18 @@ describe('GET /api/editions/[id]/stock-groups', () => {
     mockCanAccessStock.mockResolvedValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
   })
+
+  it('inclut les RESERVED non terminées ET les PICKED_UP (overdue inclus)', async () => {
+    await handler(baseEvent as any)
+    const call = prismaMock.stockGroup.findMany.mock.calls[0][0]
+    const resInclude = call.include.items.include.reservations
+    expect(resInclude.where.OR).toEqual([
+      expect.objectContaining({ status: 'RESERVED', endsAt: { gt: expect.any(Date) } }),
+      { status: 'PICKED_UP' },
+    ])
+    expect(resInclude.orderBy).toEqual({ startsAt: 'asc' })
+    expect(resInclude.take).toBe(1)
+    // user.pseudo retiré du select (non utilisé côté UI)
+    expect(resInclude.select).not.toHaveProperty('user')
+  })
 })

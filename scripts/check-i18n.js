@@ -96,6 +96,8 @@ const IGNORED_MISSING_KEYS = [
   // Propriétés JS détectées par erreur (accès objet, pas des clés i18n)
   'data.message',
   'c.renderedHtml',
+  // Path d'erreur Zod (locations.{index}.location) — pas une clé i18n
+  'locations.0.location',
 ]
 
 /**

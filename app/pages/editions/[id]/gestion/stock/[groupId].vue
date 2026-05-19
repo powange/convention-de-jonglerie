@@ -109,32 +109,7 @@
               >
                 <td class="px-4 py-3 align-top">
                   <div class="font-medium">{{ item.name }}</div>
-                  <div v-if="item.description" class="flex items-start gap-1 mt-0.5">
-                    <p
-                      :class="expandedDesc[item.id] ? 'whitespace-pre-wrap' : 'line-clamp-1'"
-                      class="text-xs text-gray-500 dark:text-gray-400 flex-1 min-w-0"
-                    >
-                      {{ item.description }}
-                    </p>
-                    <button
-                      v-if="isDescriptionTruncatable(item.description)"
-                      type="button"
-                      class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 mt-0.5"
-                      :aria-label="
-                        expandedDesc[item.id] ? $t('common.show_less') : $t('common.show_more')
-                      "
-                      @click.stop="toggleDescription(item.id)"
-                    >
-                      <UIcon
-                        :name="
-                          expandedDesc[item.id]
-                            ? 'i-heroicons-chevron-up'
-                            : 'i-heroicons-chevron-down'
-                        "
-                        class="size-3.5"
-                      />
-                    </button>
-                  </div>
+                  <StockItemDescription :text="item.description" />
                 </td>
                 <td class="px-4 py-3 align-top text-right whitespace-nowrap">
                   <span class="font-medium tabular-nums">×{{ item.quantity }}</span>
@@ -146,30 +121,45 @@
                       :key="loc.id"
                       color="neutral"
                       variant="soft"
-                      size="xs"
+                      size="md"
                       class="font-normal"
                     >
-                      <span class="flex items-center gap-1">
+                      <span class="flex items-center gap-1.5">
                         <span
                           v-if="loc.zone"
-                          class="size-2 rounded-full"
+                          class="size-3 rounded-full"
                           :style="{ backgroundColor: loc.zone.color }"
                         />
-                        <UIcon v-else-if="loc.marker" name="i-heroicons-flag" class="size-3" />
-                        <UIcon v-else name="i-heroicons-map-pin" class="size-3" />
+                        <UIcon v-else-if="loc.marker" name="i-heroicons-flag" class="size-4" />
+                        <UIcon v-else name="i-heroicons-map-pin" class="size-4" />
                         {{ loc.zone?.name || loc.marker?.name || loc.location }}
                         <span class="text-gray-500">×{{ loc.quantity }}</span>
                       </span>
                     </UBadge>
                   </div>
-                  <span v-else class="text-xs text-gray-400 italic">
+                  <span v-else class="text-sm text-gray-400 italic">
                     {{ $t('gestion.stock.no_locations_yet') }}
                   </span>
                 </td>
-                <td class="px-4 py-3 align-top text-right whitespace-nowrap tabular-nums">
-                  <span :class="item._count.reservations ? '' : 'text-gray-400'">
+                <td class="px-4 py-3 align-top text-right whitespace-nowrap">
+                  <div :class="item._count.reservations ? '' : 'text-gray-400'" class="tabular-nums">
                     {{ item._count.reservations }}
-                  </span>
+                  </div>
+                  <div
+                    v-if="item.reservations[0]"
+                    class="text-xs text-gray-500 mt-0.5 flex items-center justify-end gap-1"
+                  >
+                    <UBadge
+                      :color="reservationBadgeColor(item.reservations[0])"
+                      variant="soft"
+                      size="xs"
+                    >
+                      {{ reservationBadgeLabel(item.reservations[0]) }}
+                    </UBadge>
+                    <span class="whitespace-nowrap">{{
+                      formatNextDate(item.reservations[0])
+                    }}</span>
+                  </div>
                 </td>
                 <td class="px-2 py-3 align-top text-right">
                   <UIcon name="i-heroicons-chevron-right" class="size-4 text-gray-400" />
@@ -213,7 +203,7 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const editionId = parseInt(route.params.id as string)
@@ -226,12 +216,21 @@ interface StockItemLocationLite {
   zone: { id: number; name: string; color: string } | null
   marker: { id: number; name: string } | null
 }
+type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'
+interface StockItemUpcomingReservation {
+  id: number
+  status: StockReservationStatus
+  startsAt: string
+  endsAt: string
+  quantityReserved: number
+}
 interface StockItem {
   id: number
   name: string
   description: string | null
   quantity: number
   locations: StockItemLocationLite[]
+  reservations: StockItemUpcomingReservation[]
   _count: { reservations: number }
 }
 interface StockGroupItem {
@@ -319,14 +318,51 @@ await fetchAll()
 const groupModalOpen = ref(false)
 const itemModalOpen = ref(false)
 const editingItem = ref<StockItem | null>(null)
-const expandedDesc = reactive<Record<number, boolean>>({})
 
-function toggleDescription(id: number) {
-  expandedDesc[id] = !expandedDesc[id]
+// Tick d'horloge réactif pour que les badges « En cours / Prochaine / En retard »
+// bascule sans refetch quand la page reste ouverte.
+const now = useNow({ interval: 60_000 })
+
+type ReservationState = 'overdue' | 'ongoing' | 'upcoming'
+
+function reservationState(r: StockItemUpcomingReservation): ReservationState {
+  const t = now.value.getTime()
+  if (r.status === 'PICKED_UP' && new Date(r.endsAt).getTime() < t) return 'overdue'
+  if (new Date(r.startsAt).getTime() <= t && new Date(r.endsAt).getTime() > t) return 'ongoing'
+  return 'upcoming'
 }
 
-function isDescriptionTruncatable(text: string): boolean {
-  return text.length > 60 || text.includes('\n')
+function reservationBadgeColor(r: StockItemUpcomingReservation): 'success' | 'info' | 'error' {
+  switch (reservationState(r)) {
+    case 'overdue':
+      return 'error'
+    case 'ongoing':
+      return 'success'
+    case 'upcoming':
+      return 'info'
+  }
+}
+
+function reservationBadgeLabel(r: StockItemUpcomingReservation): string {
+  switch (reservationState(r)) {
+    case 'overdue':
+      return t('gestion.stock.overdue')
+    case 'ongoing':
+      return t('gestion.stock.ongoing')
+    case 'upcoming':
+      return t('gestion.stock.upcoming')
+  }
+}
+
+function formatNextDate(r: StockItemUpcomingReservation): string {
+  const state = reservationState(r)
+  const date = state === 'upcoming' ? r.startsAt : r.endsAt
+  return new Intl.DateTimeFormat(locale.value, {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(date))
 }
 
 function openItemModal(item: StockItem | null) {
