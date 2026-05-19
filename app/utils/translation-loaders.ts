@@ -54,6 +54,14 @@ export function getTranslationsToLoad(path: string): string[] {
       translations: ['gestion'],
     },
     {
+      pattern: /^\/editions\/\d+\/gestion\/stock/,
+      translations: ['gestion'],
+    },
+    {
+      pattern: /^\/editions\/\d+\/gestion\/tasks/,
+      translations: ['gestion'],
+    },
+    {
       pattern: /^\/editions\/\d+\/gestion\/artists/,
       translations: ['artists'],
     },

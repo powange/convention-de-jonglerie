@@ -139,7 +139,11 @@
         <div
           v-for="status in kanbanStatuses"
           :key="status"
-          class="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-3 min-h-50"
+          class="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-3 min-h-50 transition-colors"
+          :class="dragOverStatus === status && draggedFromStatus !== status ? 'ring-2 ring-primary-500' : ''"
+          @dragover.prevent="onColumnDragOver(status)"
+          @dragleave="onColumnDragLeave(status, $event)"
+          @drop="onColumnDrop(status)"
         >
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
@@ -149,13 +153,19 @@
               <span class="text-xs text-gray-500">{{ tasksByStatus(status).length }}</span>
             </div>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-2 min-h-10">
             <UCard
               v-for="task in tasksByStatus(status)"
               :key="task.id"
-              class="cursor-pointer hover:shadow-md transition-shadow"
+              draggable="true"
+              :class="[
+                'cursor-grab active:cursor-grabbing hover:shadow-md transition-all',
+                draggedTaskId === task.id ? 'opacity-50' : '',
+              ]"
               :ui="{ body: 'p-3' }"
-              @click="openTaskModal(task)"
+              @click="onTaskClick(task)"
+              @dragstart="onTaskDragStart(task, $event)"
+              @dragend="onTaskDragEnd"
             >
               <div class="font-medium text-sm mb-2">{{ task.title }}</div>
               <div class="flex items-center justify-between gap-2">
@@ -368,6 +378,77 @@ function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'erro
 function tasksByStatus(status: TaskStatus): TaskItem[] {
   if (!group.value) return []
   return group.value.tasks.filter((t) => t.status === status)
+}
+
+// --- Drag & drop kanban (changement de status) ---
+const draggedTaskId = ref<number | null>(null)
+const draggedFromStatus = ref<TaskStatus | null>(null)
+const dragOverStatus = ref<TaskStatus | null>(null)
+// Bloque le click synthétique émis juste après un drag (selon les navigateurs)
+const justDragged = ref(false)
+
+function onTaskClick(task: TaskItem) {
+  if (justDragged.value) return
+  openTaskModal(task)
+}
+
+function onTaskDragStart(task: TaskItem, event: DragEvent) {
+  draggedTaskId.value = task.id
+  draggedFromStatus.value = task.status
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', String(task.id))
+  }
+}
+
+function onTaskDragEnd() {
+  draggedTaskId.value = null
+  draggedFromStatus.value = null
+  dragOverStatus.value = null
+  // Court délai pour absorber le click synthétique qui suit parfois un drop
+  justDragged.value = true
+  setTimeout(() => {
+    justDragged.value = false
+  }, 50)
+}
+
+function onColumnDragOver(status: TaskStatus) {
+  dragOverStatus.value = status
+}
+
+function onColumnDragLeave(status: TaskStatus, e: DragEvent) {
+  // Ne reset que si on quitte vraiment la colonne (pas une carte enfant)
+  const related = e.relatedTarget as Node | null
+  const current = e.currentTarget as HTMLElement | null
+  if (related && current && current.contains(related)) return
+  if (dragOverStatus.value === status) dragOverStatus.value = null
+}
+
+async function onColumnDrop(status: TaskStatus) {
+  const taskId = draggedTaskId.value
+  const fromStatus = draggedFromStatus.value
+  draggedTaskId.value = null
+  draggedFromStatus.value = null
+  dragOverStatus.value = null
+  if (!taskId || !group.value || fromStatus === status) return
+  const task = group.value.tasks.find((t) => t.id === taskId)
+  if (!task) return
+  // Mise à jour optimiste
+  task.status = status
+  try {
+    await $fetch(`/api/editions/${editionId}/tasks/${taskId}`, {
+      method: 'PUT',
+      body: { status },
+    })
+  } catch (e: any) {
+    // Revert en cas d'erreur API
+    task.status = fromStatus!
+    useToast().add({
+      title: e?.data?.message || t('errors.generic'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
 }
 
 function formatDeadline(d: string | null): string {
