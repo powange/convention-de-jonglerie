@@ -308,11 +308,22 @@ async function handleSubmit() {
         }
       }),
     }
-    await $fetch(`/api/editions/${props.editionId}/stock-items/${props.item.id}`, {
+    const res = await $fetch<{
+      success: boolean
+      data: { item: unknown; mergedLocations?: number }
+    }>(`/api/editions/${props.editionId}/stock-items/${props.item.id}`, {
       method: 'PUT',
       body,
     })
+    const mergedCount = res?.data?.mergedLocations ?? 0
     useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
+    if (mergedCount > 0) {
+      useToast().add({
+        title: t('gestion.stock.locations_merged', { count: mergedCount }, mergedCount),
+        icon: 'i-heroicons-information-circle',
+        color: 'info',
+      })
+    }
     emit('saved')
     isOpen.value = false
   } catch (e: any) {

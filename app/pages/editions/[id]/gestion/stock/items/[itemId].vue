@@ -54,6 +54,12 @@
               <p v-if="item.notes" class="text-xs text-gray-500 mt-2 italic whitespace-pre-wrap">
                 {{ item.notes }}
               </p>
+              <div v-if="item.isExternalLoan" class="mt-2 flex items-center gap-2 flex-wrap">
+                <UBadge :color="loanBadgeColor" variant="soft" size="xs">
+                  <UIcon name="i-heroicons-hand-raised" class="size-3 mr-1" />
+                  {{ loanBadgeLabel }}
+                </UBadge>
+              </div>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
@@ -75,6 +81,60 @@
             </UDropdownMenu>
           </div>
         </div>
+      </UCard>
+
+      <!-- Emprunt externe -->
+      <UCard v-if="item.isExternalLoan">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-hand-raised" class="size-5 text-gray-500" />
+            <h2 class="font-semibold">{{ $t('gestion.stock.external_loan') }}</h2>
+          </div>
+        </template>
+        <dl class="space-y-2 text-sm">
+          <div v-if="item.ownerContact" class="flex flex-col sm:flex-row sm:gap-3">
+            <dt class="text-gray-500 sm:w-40 shrink-0">{{ $t('gestion.stock.owner_contact') }}</dt>
+            <dd class="whitespace-pre-wrap wrap-break-word">{{ item.ownerContact }}</dd>
+          </div>
+          <div v-if="item.returnDueAt" class="flex flex-col sm:flex-row sm:gap-3">
+            <dt class="text-gray-500 sm:w-40 shrink-0">{{ $t('gestion.stock.return_due_at') }}</dt>
+            <dd :class="loanIsOverdue ? 'text-error-600 font-medium' : ''">
+              {{ formatDate(item.returnDueAt) }}
+              <span v-if="loanIsOverdue" class="text-xs ml-1">
+                ({{ $t('gestion.stock.overdue') }})
+              </span>
+            </dd>
+          </div>
+          <div v-if="item.returnedAt" class="flex flex-col sm:flex-row sm:gap-3">
+            <dt class="text-gray-500 sm:w-40 shrink-0">{{ $t('gestion.stock.returned_at') }}</dt>
+            <dd class="text-success-600 dark:text-success-400">
+              {{ formatDate(item.returnedAt) }}
+            </dd>
+          </div>
+        </dl>
+        <template v-if="canManage" #footer>
+          <UButton
+            v-if="!item.returnedAt"
+            icon="i-heroicons-check-circle"
+            color="success"
+            size="sm"
+            :loading="loanActionLoading"
+            @click="markLoanReturned"
+          >
+            {{ $t('gestion.stock.mark_loan_returned') }}
+          </UButton>
+          <UButton
+            v-else
+            icon="i-heroicons-arrow-uturn-left"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            :loading="loanActionLoading"
+            @click="markLoanNotReturned"
+          >
+            {{ $t('gestion.stock.mark_loan_not_returned') }}
+          </UButton>
+        </template>
       </UCard>
 
       <!-- Emplacements -->
@@ -297,6 +357,10 @@ interface StockItemFull {
   description: string | null
   quantity: number
   notes: string | null
+  isExternalLoan: boolean
+  ownerContact: string | null
+  returnDueAt: string | null
+  returnedAt: string | null
   group: { id: number; name: string }
   locations: StockItemLocation[]
   reservations: StockReservation[]
@@ -340,6 +404,82 @@ const unlocatedUnits = computed(() => {
   const total = item.value.locations.reduce((sum, l) => sum + l.quantity, 0)
   return Math.max(0, item.value.quantity - total)
 })
+
+// --- Emprunt externe ---
+const loanIsOverdue = computed(() => {
+  const it = item.value
+  if (!it?.isExternalLoan || it.returnedAt || !it.returnDueAt) return false
+  return new Date(it.returnDueAt).getTime() < Date.now()
+})
+const loanBadgeColor = computed<'success' | 'error' | 'warning' | 'info'>(() => {
+  const it = item.value
+  if (!it?.isExternalLoan) return 'info'
+  if (it.returnedAt) return 'success'
+  if (loanIsOverdue.value) return 'error'
+  return 'warning'
+})
+const loanBadgeLabel = computed(() => {
+  const it = item.value
+  if (!it?.isExternalLoan) return ''
+  if (it.returnedAt) return t('gestion.stock.loan_returned')
+  if (loanIsOverdue.value) return t('gestion.stock.loan_overdue')
+  return t('gestion.stock.loan_to_return')
+})
+const loanActionLoading = ref(false)
+
+async function markLoanReturned() {
+  if (!item.value) return
+  loanActionLoading.value = true
+  try {
+    await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, {
+      method: 'PUT',
+      body: { returnedAt: new Date().toISOString() },
+    })
+    useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
+    await fetchItem()
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loanActionLoading.value = false
+  }
+}
+
+async function markLoanNotReturned() {
+  if (!item.value) return
+  loanActionLoading.value = true
+  try {
+    await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, {
+      method: 'PUT',
+      body: { returnedAt: null },
+    })
+    useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
+    await fetchItem()
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loanActionLoading.value = false
+  }
+}
+
+function formatDate(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat(locale.value, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(iso))
+  } catch {
+    return iso
+  }
+}
 
 const availabilityLabel = computed(() => {
   if (!availability.value) return ''

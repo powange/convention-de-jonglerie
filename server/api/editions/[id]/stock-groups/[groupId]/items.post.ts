@@ -7,6 +7,7 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import {
+  mergeStockItemLocations,
   stockItemLocationInputSchema,
   stockItemLocationsInclude,
   validateStockItemLocations,
@@ -21,6 +22,11 @@ const bodySchema = z.object({
   notes: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
   locations: z.array(stockItemLocationInputSchema).max(50).optional(),
+  // Emprunt externe (optionnel)
+  isExternalLoan: z.boolean().optional(),
+  ownerContact: z.string().trim().max(500).nullable().optional(),
+  returnDueAt: z.string().datetime().nullable().optional(),
+  returnedAt: z.string().datetime().nullable().optional(),
 })
 
 export default wrapApiHandler(
@@ -57,7 +63,8 @@ export default wrapApiHandler(
       throw error
     }
 
-    const locations = data.locations ?? []
+    // Fusionner les emplacements ciblant le même endroit (mêmes zone/marker/texte)
+    const { merged: locations, mergedCount } = mergeStockItemLocations(data.locations ?? [])
     await validateStockItemLocations(locations, editionId, data.quantity)
 
     let displayOrder = data.displayOrder
@@ -70,6 +77,8 @@ export default wrapApiHandler(
       displayOrder = (last?.displayOrder ?? -1) + 1
     }
 
+    // Emprunt externe : si le flag est false, on ignore les autres champs
+    const isExternalLoan = data.isExternalLoan === true
     const item = await prisma.stockItem.create({
       data: {
         stockGroupId: groupId,
@@ -78,6 +87,10 @@ export default wrapApiHandler(
         quantity: data.quantity,
         notes: data.notes?.trim() || null,
         displayOrder,
+        isExternalLoan,
+        ownerContact: isExternalLoan ? data.ownerContact?.trim() || null : null,
+        returnDueAt: isExternalLoan && data.returnDueAt ? new Date(data.returnDueAt) : null,
+        returnedAt: isExternalLoan && data.returnedAt ? new Date(data.returnedAt) : null,
         locations: {
           create: locations.map((loc, idx) => ({
             location: loc.location?.trim() || null,
@@ -93,7 +106,7 @@ export default wrapApiHandler(
       },
     })
 
-    return createSuccessResponse({ item })
+    return createSuccessResponse({ item, mergedLocations: mergedCount })
   },
   { operationName: 'CreateStockItem' }
 )

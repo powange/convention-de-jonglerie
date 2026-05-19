@@ -28,6 +28,46 @@ export const stockItemLocationInputSchema = z
 export type StockItemLocationInput = z.infer<typeof stockItemLocationInputSchema>
 
 /**
+ * Calcule une clé canonique pour un emplacement, utilisée pour la fusion.
+ * Priorité : zoneId > markerId > texte (normalisé : trim + casse). Deux
+ * emplacements ayant la même clé représentent « le même endroit » et peuvent
+ * être fusionnés (quantités additionnées).
+ *
+ * Note : un emplacement texte n'est jamais fusionné avec une zone/marker
+ * (textuel vs lien carte = sémantique différente).
+ */
+function stockItemLocationKey(loc: StockItemLocationInput): string {
+  if (loc.zoneId) return `zone:${loc.zoneId}`
+  if (loc.markerId) return `marker:${loc.markerId}`
+  const text = (loc.location ?? '').trim().toLocaleLowerCase()
+  return `text:${text}`
+}
+
+/**
+ * Fusionne les sous-emplacements qui ciblent le même endroit en additionnant
+ * leurs quantités. Préserve l'ordre du premier doublon rencontré.
+ *
+ * Retourne aussi le nombre d'entrées fusionnées (pour notifier l'utilisateur).
+ */
+export function mergeStockItemLocations(locations: StockItemLocationInput[]): {
+  merged: StockItemLocationInput[]
+  mergedCount: number
+} {
+  const buckets = new Map<string, StockItemLocationInput>()
+  for (const loc of locations) {
+    const key = stockItemLocationKey(loc)
+    const existing = buckets.get(key)
+    if (existing) {
+      existing.quantity += loc.quantity
+    } else {
+      buckets.set(key, { ...loc, location: loc.location?.trim() ?? null })
+    }
+  }
+  const merged = Array.from(buckets.values())
+  return { merged, mergedCount: locations.length - merged.length }
+}
+
+/**
  * Vérifie que chaque sous-emplacement référence une zone/marqueur appartenant
  * à l'édition, et que la somme des quantités ne dépasse pas la quantité totale
  * de l'item. Lève une createError sinon.

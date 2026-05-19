@@ -7,6 +7,7 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import {
+  mergeStockItemLocations,
   stockItemLocationInputSchema,
   stockItemLocationsInclude,
   validateStockItemLocations,
@@ -23,6 +24,11 @@ const bodySchema = z.object({
   stockGroupId: z.number().int().positive().optional(),
   // Si fourni, remplace l'intégralité des sous-emplacements de l'item.
   locations: z.array(stockItemLocationInputSchema).max(50).optional(),
+  // Emprunt externe (optionnel)
+  isExternalLoan: z.boolean().optional(),
+  ownerContact: z.string().trim().max(500).nullable().optional(),
+  returnDueAt: z.string().datetime().nullable().optional(),
+  returnedAt: z.string().datetime().nullable().optional(),
 })
 
 export default wrapApiHandler(
@@ -72,11 +78,16 @@ export default wrapApiHandler(
       }
     }
 
-    // Validation des sous-emplacements si fournis. La somme est validée contre
-    // la nouvelle quantity si elle change, sinon contre celle existante.
+    // Fusionner les emplacements ciblant le même endroit (mêmes zone/marker/texte)
+    // pour éviter les doublons silencieux côté base.
+    let mergedLocations: typeof data.locations | undefined
+    let mergedCount = 0
     if (data.locations !== undefined) {
+      const result = mergeStockItemLocations(data.locations)
+      mergedLocations = result.merged
+      mergedCount = result.mergedCount
       const targetQuantity = data.quantity ?? existing.quantity
-      await validateStockItemLocations(data.locations, editionId, targetQuantity)
+      await validateStockItemLocations(mergedLocations, editionId, targetQuantity)
     }
 
     const updateData: Record<string, unknown> = {}
@@ -86,6 +97,25 @@ export default wrapApiHandler(
     if (data.notes !== undefined) updateData.notes = data.notes?.trim() || null
     if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder
     if (data.stockGroupId !== undefined) updateData.stockGroupId = data.stockGroupId
+    // Emprunt externe : si on désactive le flag, on nettoie les autres champs
+    // pour éviter de garder des données fantômes en base. Si on désactive
+    // explicitement, on ignore aussi les valeurs envoyées sur les 3 champs
+    // (ownerContact / returnDueAt / returnedAt) pour ne pas les ré-écraser.
+    const disablingLoan = data.isExternalLoan === false
+    if (data.isExternalLoan !== undefined) {
+      updateData.isExternalLoan = data.isExternalLoan
+      if (disablingLoan) {
+        updateData.ownerContact = null
+        updateData.returnDueAt = null
+        updateData.returnedAt = null
+      }
+    }
+    if (data.ownerContact !== undefined && !disablingLoan)
+      updateData.ownerContact = data.ownerContact?.trim() || null
+    if (data.returnDueAt !== undefined && !disablingLoan)
+      updateData.returnDueAt = data.returnDueAt ? new Date(data.returnDueAt) : null
+    if (data.returnedAt !== undefined && !disablingLoan)
+      updateData.returnedAt = data.returnedAt ? new Date(data.returnedAt) : null
 
     // Si la quantité diminue sans nouvelles locations envoyées, on doit
     // s'assurer que la somme des locations existantes reste ≤ nouvelle quantity.
@@ -141,11 +171,11 @@ export default wrapApiHandler(
     const item = await prisma.$transaction(async (tx) => {
       await tx.stockItem.update({ where: { id: itemId }, data: updateData })
 
-      if (data.locations !== undefined) {
+      if (mergedLocations !== undefined) {
         await tx.stockItemLocation.deleteMany({ where: { stockItemId: itemId } })
-        if (data.locations.length > 0) {
+        if (mergedLocations.length > 0) {
           await tx.stockItemLocation.createMany({
-            data: data.locations.map((loc, idx) => ({
+            data: mergedLocations.map((loc, idx) => ({
               stockItemId: itemId,
               location: loc.location?.trim() || null,
               zoneId: loc.zoneId ?? null,
@@ -163,7 +193,7 @@ export default wrapApiHandler(
       })
     })
 
-    return createSuccessResponse({ item })
+    return createSuccessResponse({ item, mergedLocations: mergedCount })
   },
   { operationName: 'UpdateStockItem' }
 )

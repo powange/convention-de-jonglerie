@@ -24,7 +24,26 @@
         </UFormField>
 
         <UFormField :label="$t('gestion.stock.item_quantity')" :error="fieldErrors.quantity">
-          <UInputNumber v-model="formData.quantity" :min="1" :step="1" class="w-full" />
+          <div class="flex flex-wrap items-center gap-1">
+            <UButton
+              v-for="n in 10"
+              :key="n"
+              :variant="formData.quantity === n ? 'solid' : 'soft'"
+              :color="formData.quantity === n ? 'primary' : 'neutral'"
+              size="sm"
+              :ui="{ base: 'min-w-9 justify-center' }"
+              @click="formData.quantity = n"
+            >
+              {{ n }}
+            </UButton>
+            <UInputNumber
+              v-model="formData.quantity"
+              :min="1"
+              :step="1"
+              class="w-28 ml-1"
+              :ui="{ base: 'text-center' }"
+            />
+          </div>
         </UFormField>
 
         <UFormField :label="$t('gestion.stock.item_notes')" :error="fieldErrors.notes">
@@ -35,6 +54,29 @@
             class="w-full"
           />
         </UFormField>
+
+        <!-- Bloc Emprunt externe -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-3">
+          <USwitch
+            v-model="formData.isExternalLoan"
+            :label="$t('gestion.stock.external_loan')"
+            :description="$t('gestion.stock.external_loan_help')"
+          />
+
+          <div v-if="formData.isExternalLoan" class="space-y-3 pt-1">
+            <UFormField :label="$t('gestion.stock.owner_contact')">
+              <UTextarea
+                v-model="formData.ownerContact"
+                :placeholder="$t('gestion.stock.owner_contact_placeholder')"
+                :rows="2"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField :label="$t('gestion.stock.return_due_at')">
+              <UInput v-model="formData.returnDueAt" type="date" class="w-full" />
+            </UFormField>
+          </div>
+        </div>
 
         <p v-if="!item" class="text-xs text-gray-500 italic">
           {{ $t('gestion.stock.locations_managed_separately_hint') }}
@@ -61,6 +103,9 @@ interface StockItemLite {
   description: string | null
   quantity: number
   notes: string | null
+  isExternalLoan?: boolean
+  ownerContact?: string | null
+  returnDueAt?: string | null
 }
 
 const props = defineProps<{
@@ -86,7 +131,19 @@ const formData = reactive({
   description: '',
   quantity: 1,
   notes: '',
+  isExternalLoan: false,
+  ownerContact: '',
+  returnDueAt: '',
 })
+
+function toDateInput(iso: string | null | undefined): string {
+  if (!iso) return ''
+  try {
+    return new Date(iso).toISOString().split('T')[0]
+  } catch {
+    return ''
+  }
+}
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
 
@@ -102,6 +159,9 @@ watch(
       formData.description = props.item?.description || ''
       formData.quantity = props.item?.quantity ?? 1
       formData.notes = props.item?.notes || ''
+      formData.isExternalLoan = props.item?.isExternalLoan ?? false
+      formData.ownerContact = props.item?.ownerContact || ''
+      formData.returnDueAt = toDateInput(props.item?.returnDueAt)
       resetFieldErrors()
     }
   },
@@ -137,6 +197,14 @@ async function handleSubmit() {
       description: formData.description.trim() || null,
       quantity: formData.quantity,
       notes: formData.notes.trim() || null,
+      isExternalLoan: formData.isExternalLoan,
+      ownerContact: formData.isExternalLoan
+        ? formData.ownerContact.trim() || null
+        : null,
+      returnDueAt:
+        formData.isExternalLoan && formData.returnDueAt
+          ? new Date(formData.returnDueAt).toISOString()
+          : null,
     }
     if (props.item) {
       await $fetch(`/api/editions/${props.editionId}/stock-items/${props.item.id}`, {

@@ -25,15 +25,21 @@ model StockGroup {
 }
 
 model StockItem {
-  id           Int      @id @default(autoincrement())
-  stockGroupId Int
-  name         String
-  description  String?  @db.Text
-  quantity     Int      @default(1) // Nombre d'exemplaires identiques (somme des locations ≤ quantity)
-  notes        String?  @db.Text
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             Int       @id @default(autoincrement())
+  stockGroupId   Int
+  name           String
+  description    String?   @db.Text
+  quantity       Int       @default(1) // Nombre d'exemplaires identiques (somme des locations ≤ quantity)
+  notes          String?   @db.Text
+  displayOrder   Int       @default(0)
+  // Emprunt externe : matériel prêté par quelqu'un d'extérieur à la convention.
+  // Si `isExternalLoan` est false, les 3 champs suivants sont ignorés.
+  isExternalLoan Boolean   @default(false)
+  ownerContact   String?   @db.Text // Texte libre (ex: "Jean Dupont — 06 12 34 56 78")
+  returnDueAt    DateTime? // Date prévue de retour au propriétaire
+  returnedAt     DateTime? // Date effective du retour. null = pas encore rendu
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   group        StockGroup          @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
   locations    StockItemLocation[]
