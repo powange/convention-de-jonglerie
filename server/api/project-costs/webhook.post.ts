@@ -82,8 +82,10 @@ export default wrapApiHandler(
       }
     }
 
-    // Charge réussie → mettre à jour les frais (même si déjà présents, pour gérer la race condition)
-    if (stripeEvent.type === 'charge.succeeded') {
+    // Charge réussie OU mise à jour : le balance_transaction est calculé de façon asynchrone
+    // par Stripe (SLA jusqu'à 1h), donc il peut être null dans charge.succeeded et n'arriver
+    // que via charge.updated. Voir https://docs.stripe.com/payments/payment-intents/asynchronous-capture
+    if (stripeEvent.type === 'charge.succeeded' || stripeEvent.type === 'charge.updated') {
       const charge = stripeEvent.data.object as Stripe.Charge
 
       if (charge.payment_intent && charge.balance_transaction) {

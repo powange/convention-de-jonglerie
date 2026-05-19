@@ -112,8 +112,35 @@
 
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
+      <!-- Mobile : select navigation -->
+      <nav class="md:hidden p-3" :aria-label="$t('navigation.tabs')">
+        <ClientOnly>
+          <USelect
+            :model-value="props.currentPage"
+            :items="mobileTabItems"
+            :aria-label="$t('navigation.tabs')"
+            size="xl"
+            color="neutral"
+            class="w-full"
+            :ui="{ content: 'max-h-[70vh]', viewport: 'max-h-[70vh]' }"
+            @update:model-value="onMobileTabChange"
+          >
+            <template #leading>
+              <UIcon
+                v-if="currentTabIcon"
+                :name="currentTabIcon"
+                class="size-6 text-primary-500"
+              />
+            </template>
+            <template #item-leading="{ item: opt }">
+              <UIcon :name="(opt as { icon: string }).icon" class="size-5" />
+            </template>
+          </USelect>
+        </ClientOnly>
+      </nav>
+
       <nav
-        class="flex justify-center md:justify-start space-x-2 md:space-x-8"
+        class="hidden md:flex flex-wrap justify-start gap-x-8 gap-y-1"
         :aria-label="$t('navigation.tabs')"
       >
         <NuxtLink
@@ -283,10 +310,6 @@
         </ClientOnly>
       </nav>
 
-      <!-- Titre de la page courante sur mobile -->
-      <div class="md:hidden text-center py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-        {{ getPageTitle(currentPage) }}
-      </div>
     </div>
 
     <!-- Modale d'informations sur la convention -->
@@ -468,6 +491,96 @@ const artistSpaceTabVisible = computed<boolean>(() => {
   return isEditionArtist.value
 })
 
+// Liste unifiée des onglets pour le select mobile (filtrée selon les permissions)
+const mobileTabItems = computed<{ label: string; value: string; icon: string; path: string }[]>(
+  () => {
+    const editionId = props.edition?.id
+    if (!editionId) return []
+    const items: { label: string; value: string; icon: string; path: string }[] = [
+      {
+        label: t('edition.about_this_edition'),
+        value: 'details',
+        icon: 'i-heroicons-information-circle',
+        path: `/editions/${editionId}`,
+      },
+    ]
+    if (mapTabVisible.value) {
+      items.push({
+        label: t('gestion.map.title'),
+        value: 'map',
+        icon: 'i-lucide-map',
+        path: `/editions/${editionId}/map`,
+      })
+    }
+    items.push(
+      {
+        label: t('edition.posts'),
+        value: 'commentaires',
+        icon: 'i-heroicons-chat-bubble-left-right',
+        path: `/editions/${editionId}/commentaires`,
+      },
+      {
+        label: t('edition.carpool'),
+        value: 'carpool',
+        icon: 'i-heroicons-truck',
+        path: `/editions/${editionId}/carpool`,
+      }
+    )
+    if (workshopsTabVisible.value) {
+      items.push({
+        label: 'Workshops',
+        value: 'workshops',
+        icon: 'i-heroicons-academic-cap',
+        path: `/editions/${editionId}/workshops`,
+      })
+    }
+    if (volunteersTabVisible.value) {
+      items.push({
+        label: t('edition.volunteers.title'),
+        value: 'volunteers',
+        icon: 'i-heroicons-hand-raised',
+        path: `/editions/${editionId}/volunteers`,
+      })
+    }
+    if (hasEditionStarted.value) {
+      items.push({
+        label: t('edition.lost_found'),
+        value: 'lost-found',
+        icon: 'i-heroicons-magnifying-glass',
+        path: `/editions/${editionId}/lost-found`,
+      })
+    }
+    if (showsCallTabVisible.value) {
+      items.push({
+        label: t('shows_call.title'),
+        value: 'shows-call',
+        icon: 'i-heroicons-megaphone',
+        path: `/editions/${editionId}/shows-call`,
+      })
+    }
+    if (artistSpaceTabVisible.value) {
+      items.push({
+        label: t('edition.artist_space'),
+        value: 'artist-space',
+        icon: 'i-heroicons-star',
+        path: `/editions/${editionId}/artist-space`,
+      })
+    }
+    return items
+  }
+)
+
+const currentTabIcon = computed<string | null>(
+  () => mobileTabItems.value.find((i) => i.value === props.currentPage)?.icon || null
+)
+
+function onMobileTabChange(value: string) {
+  const target = mobileTabItems.value.find((i) => i.value === value)
+  if (target && target.value !== props.currentPage) {
+    navigateTo(target.path)
+  }
+}
+
 // Visibilité onglet carte: visible si siteMapEnabled + mapPublic sont activés et l'édition a des coordonnées définies
 const mapTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
@@ -594,22 +707,6 @@ const formatDateRange = (start: string, end: string) => {
   }
 
   return `${new Intl.DateTimeFormat(locale.value, shortOptions).format(startDate)} - ${new Intl.DateTimeFormat(locale.value, baseOptions).format(endDate)}`
-}
-
-// Obtenir le titre de la page selon la page courante
-const getPageTitle = (page: string) => {
-  const titles: Record<string, string> = {
-    details: t('edition.about_this_edition'),
-    commentaires: t('edition.posts'),
-    carpool: t('edition.carpool'),
-    map: t('gestion.map.title'),
-    'lost-found': t('edition.lost_found'),
-    volunteers: t('edition.volunteers.title'),
-    workshops: 'Workshops',
-    'shows-call': t('shows_call.title'),
-    'artist-space': t('edition.artist_space'),
-  }
-  return titles[page] || t('edition.about_this_edition')
 }
 
 // Données de l'événement pour le calendrier
