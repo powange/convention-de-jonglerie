@@ -81,6 +81,40 @@ export async function validateStockItemLocations(
 }
 
 /**
+ * Vérifie qu'une zone/un marqueur référencés par une réservation appartiennent
+ * bien à l'édition. Lève une createError sinon.
+ */
+export async function validateReservationLocation(
+  loc: { zoneId: number | null; markerId: number | null },
+  editionId: number
+): Promise<void> {
+  if (loc.zoneId) {
+    const zone = await prisma.editionZone.findFirst({
+      where: { id: loc.zoneId, editionId },
+      select: { id: true },
+    })
+    if (!zone) {
+      throw createError({
+        status: 400,
+        message: "La zone référencée n'appartient pas à cette édition",
+      })
+    }
+  }
+  if (loc.markerId) {
+    const marker = await prisma.editionMarker.findFirst({
+      where: { id: loc.markerId, editionId },
+      select: { id: true },
+    })
+    if (!marker) {
+      throw createError({
+        status: 400,
+        message: "Le marqueur référencé n'appartient pas à cette édition",
+      })
+    }
+  }
+}
+
+/**
  * Include Prisma standard pour récupérer les sous-emplacements d'un item de
  * stock avec les infos zone/marker nécessaires pour l'affichage.
  */

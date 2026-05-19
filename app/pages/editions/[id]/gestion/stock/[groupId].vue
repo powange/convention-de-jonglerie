@@ -40,6 +40,14 @@
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
+            <UTabs
+              v-model="viewMode"
+              :items="viewModeItems"
+              size="sm"
+              color="primary"
+              variant="pill"
+              :ui="{ list: 'w-auto' }"
+            />
             <UButton
               v-if="canManage"
               icon="i-heroicons-plus"
@@ -80,7 +88,7 @@
         </UButton>
       </div>
 
-      <UCard v-else :ui="{ body: 'p-0 sm:p-0' }">
+      <UCard v-else-if="viewMode === 'list'" :ui="{ body: 'p-0 sm:p-0' }">
         <div class="overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead
@@ -169,7 +177,31 @@
           </table>
         </div>
       </UCard>
+
+      <StockPlanning
+        v-else-if="viewMode === 'planning'"
+        :items="planningItems"
+        :start-date="planningStartDate"
+        :end-date="planningEndDate"
+        @reservation-click="openReservationFromPlanning"
+      />
     </div>
+
+    <StockReservationModal
+      v-if="planningReservationContext"
+      v-model:open="reservationModalOpen"
+      :edition-id="editionId"
+      :item-id="planningReservationContext.itemId"
+      :item-quantity="planningReservationContext.itemQuantity"
+      :reservation="planningReservationContext.reservation"
+      :can-moderate="canManage"
+      :zones="zones"
+      :markers="markers"
+      :site-map-enabled="!!edition?.siteMapEnabled"
+      :edition-start-date="edition?.startDate ?? null"
+      :edition-setup-start-date="(edition as any)?.volunteersSetupStartDate ?? null"
+      @saved="refreshPlanning"
+    />
 
     <StockGroupModal
       v-model:open="groupModalOpen"
@@ -184,9 +216,6 @@
       :edition-id="editionId"
       :group-id="group.id"
       :item="editingItem"
-      :zones="zones"
-      :markers="markers"
-      :site-map-enabled="!!edition?.siteMapEnabled"
       @saved="handleItemSaved"
     />
   </UContainer>
@@ -241,10 +270,60 @@ interface StockGroupItem {
   items: StockItem[]
 }
 
+interface PlanningReservationUser {
+  id: number
+  pseudo: string
+  emailHash: string | null
+  profilePicture: string | null
+  updatedAt?: string
+}
+interface PlanningReservation {
+  id: number
+  status: StockReservationStatus
+  startsAt: string
+  endsAt: string
+  quantityReserved: number
+  usage: string
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
+  user: PlanningReservationUser
+}
+interface PlanningItemLocation {
+  id: number
+  location: string | null
+  quantity: number
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
+}
+interface PlanningItem {
+  id: number
+  name: string
+  quantity: number
+  locations: PlanningItemLocation[]
+  reservations: PlanningReservation[]
+}
+
+interface ZoneOption {
+  id: number
+  name: string
+  color: string
+  types: string[]
+}
+interface MarkerOption {
+  id: number
+  name: string
+  color: string | null
+  types: string[]
+}
+
 const allGroups = ref<StockGroupItem[]>([])
-const zones = ref<{ id: number; name: string; color: string; types: string[] }[]>([])
-const markers = ref<{ id: number; name: string; color: string | null; types: string[] }[]>([])
+const zones = ref<ZoneOption[]>([])
+const markers = ref<MarkerOption[]>([])
 const loading = ref(true)
+const viewMode = ref<'list' | 'planning'>('list')
+const planningItems = ref<PlanningItem[]>([])
+const planningLoading = ref(false)
 
 const edition = computed(() => editionStore.getEditionById(editionId))
 const group = computed<StockGroupItem | null>(
@@ -318,6 +397,64 @@ await fetchAll()
 const groupModalOpen = ref(false)
 const itemModalOpen = ref(false)
 const editingItem = ref<StockItem | null>(null)
+const reservationModalOpen = ref(false)
+const planningReservationContext = ref<{
+  itemId: number
+  itemQuantity: number
+  reservation: PlanningReservation
+} | null>(null)
+
+const viewModeItems = computed(() => [
+  { label: t('gestion.stock.list_view'), value: 'list', icon: 'i-heroicons-list-bullet' },
+  {
+    label: t('gestion.stock.planning_view'),
+    value: 'planning',
+    icon: 'i-heroicons-calendar-days',
+  },
+])
+
+// Périmètre temporel : montage → démontage si défini, sinon édition seule
+const planningStartDate = computed<string | null>(() => {
+  const e = edition.value as any
+  return e?.volunteersSetupStartDate || e?.startDate || null
+})
+const planningEndDate = computed<string | null>(() => {
+  const e = edition.value as any
+  return e?.volunteersTeardownEndDate || e?.endDate || null
+})
+
+async function fetchPlanning() {
+  if (!group.value) return
+  try {
+    planningLoading.value = true
+    const res = await $fetch<{ success: boolean; data: { items: PlanningItem[] } }>(
+      `/api/editions/${editionId}/stock-groups/${group.value.id}/planning`
+    )
+    planningItems.value = res?.data?.items || []
+  } finally {
+    planningLoading.value = false
+  }
+}
+
+// Charger les données planning à la 1ère bascule en mode planning, puis garder à jour
+watch(viewMode, (mode) => {
+  if (mode === 'planning' && !planningItems.value.length) {
+    fetchPlanning()
+  }
+})
+
+function openReservationFromPlanning(reservation: PlanningReservation, item: PlanningItem) {
+  planningReservationContext.value = {
+    itemId: item.id,
+    itemQuantity: item.quantity,
+    reservation,
+  }
+  reservationModalOpen.value = true
+}
+
+async function refreshPlanning() {
+  await Promise.all([fetchAll(), fetchPlanning()])
+}
 
 // Tick d'horloge réactif pour que les badges « En cours / Prochaine / En retard »
 // bascule sans refetch quand la page reste ouverte.

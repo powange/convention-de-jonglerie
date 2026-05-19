@@ -78,14 +78,26 @@ model StockReservation {
   usage            String                 @db.Text // Pourquoi : "Spectacle de feu samedi 22h"
   quantityReserved Int                    @default(1)
   status           StockReservationStatus @default(RESERVED)
+  // Emplacement d'utilisation : où le matériel doit être amené pendant la
+  // réservation. Différent du rangement (StockItemLocation). À la fin de la
+  // réservation, le matériel retourne à son emplacement de rangement.
+  // Au moins l'un des trois (location/zoneId/markerId) doit être renseigné
+  // (validé côté API).
+  location         String? // Texte libre (ex: "Scène principale, fond droit")
+  zoneId           Int? // Lien optionnel vers une zone de la carte
+  markerId         Int? // Lien optionnel vers un marqueur de la carte
   createdAt        DateTime               @default(now())
   updatedAt        DateTime               @updatedAt
 
-  stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stockItem StockItem      @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  zone      EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker    EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([stockItemId])
   @@index([userId])
+  @@index([zoneId])
+  @@index([markerId])
   @@index([stockItemId, startsAt, endsAt])
   @@index([status])
 }

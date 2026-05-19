@@ -6,7 +6,11 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
-import { canAccessStock, getReservedQuantityOnPeriod } from '#server/utils/stock-helpers'
+import {
+  canAccessStock,
+  getReservedQuantityOnPeriod,
+  validateReservationLocation,
+} from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -18,6 +22,9 @@ const bodySchema = z.object({
   usage: z.string().trim().min(1).max(500).optional(),
   quantityReserved: z.number().int().positive().optional(),
   status: z.enum(RESERVATION_STATUSES).optional(),
+  location: z.string().trim().max(200).nullable().optional(),
+  zoneId: z.number().int().positive().nullable().optional(),
+  markerId: z.number().int().positive().nullable().optional(),
 })
 
 /**
@@ -100,17 +107,56 @@ export default wrapApiHandler(
       }
     }
 
+    // Validation cross-champ de l'emplacement : si l'un des 3 champs est
+    // touché, on vérifie que la combinaison finale (merge avec l'existant)
+    // contient bien au moins une indication de lieu et qu'on ne mixe pas
+    // zone et marqueur sur la même réservation.
+    const touchedLocation =
+      data.location !== undefined || data.zoneId !== undefined || data.markerId !== undefined
+    if (touchedLocation) {
+      const finalLocation =
+        data.location !== undefined ? data.location?.trim() : reservation.location?.trim()
+      const finalZoneId = data.zoneId !== undefined ? data.zoneId : reservation.zoneId
+      const finalMarkerId = data.markerId !== undefined ? data.markerId : reservation.markerId
+      if (!finalLocation && !finalZoneId && !finalMarkerId) {
+        throw createError({
+          status: 400,
+          message: 'Indiquez où le matériel doit être amené (texte ou emplacement de la carte)',
+        })
+      }
+      if (finalZoneId && finalMarkerId) {
+        throw createError({
+          status: 400,
+          message: 'Une réservation ne peut pas cibler à la fois une zone et un marqueur',
+        })
+      }
+    }
+
+    // Vérifier zone/marker s'ils ont été fournis
+    await validateReservationLocation(
+      {
+        zoneId: data.zoneId ?? null,
+        markerId: data.markerId ?? null,
+      },
+      editionId
+    )
+
     const updateData: Record<string, unknown> = {}
     if (data.startsAt !== undefined) updateData.startsAt = newStartsAt
     if (data.endsAt !== undefined) updateData.endsAt = newEndsAt
     if (data.usage !== undefined) updateData.usage = data.usage
     if (data.quantityReserved !== undefined) updateData.quantityReserved = newQuantity
     if (data.status !== undefined) updateData.status = data.status
+    if (data.location !== undefined) updateData.location = data.location?.trim() || null
+    if (data.zoneId !== undefined) updateData.zoneId = data.zoneId
+    if (data.markerId !== undefined) updateData.markerId = data.markerId
 
     const updated = await prisma.stockReservation.update({
       where: { id: reservationId },
       data: updateData,
       include: {
+        zone: { select: { id: true, name: true, color: true } },
+        marker: { select: { id: true, name: true } },
         user: {
           select: {
             id: true,

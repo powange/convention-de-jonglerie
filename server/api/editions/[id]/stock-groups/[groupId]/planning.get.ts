@@ -5,17 +5,18 @@ import { canAccessStock, stockItemLocationsInclude } from '#server/utils/stock-h
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
- * GET /api/editions/[id]/stock-items/[itemId]
+ * GET /api/editions/[id]/stock-groups/[groupId]/planning
  *
- * Détail d'un item de stock avec ses réservations actives et futures.
+ * Retourne les items d'un groupe avec toutes leurs réservations actives
+ * (RESERVED ou PICKED_UP), pour alimenter une vue timeline/Gantt.
  */
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
-    const itemId = Number(getRouterParam(event, 'itemId'))
-    if (isNaN(itemId)) {
-      throw createError({ status: 400, message: 'Identifiant invalide' })
+    const groupId = Number(getRouterParam(event, 'groupId'))
+    if (isNaN(groupId)) {
+      throw createError({ status: 400, message: 'Identifiant de groupe invalide' })
     }
 
     const edition = await getEditionWithPermissions(editionId, { userId: user.id })
@@ -26,36 +27,50 @@ export default wrapApiHandler(
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 
-    const item = await prisma.stockItem.findFirst({
-      where: { id: itemId, group: { editionId } },
-      include: {
-        group: { select: { id: true, name: true } },
+    const group = await prisma.stockGroup.findFirst({
+      where: { id: groupId, editionId },
+      select: { id: true },
+    })
+    if (!group) {
+      throw createError({ status: 404, message: 'Groupe introuvable' })
+    }
+
+    const items = await prisma.stockItem.findMany({
+      where: { stockGroupId: groupId },
+      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
+      select: {
+        id: true,
+        name: true,
+        quantity: true,
         locations: stockItemLocationsInclude,
         reservations: {
+          where: { status: { in: ['RESERVED', 'PICKED_UP'] } },
           orderBy: { startsAt: 'asc' },
-          include: {
+          select: {
+            id: true,
+            status: true,
+            startsAt: true,
+            endsAt: true,
+            quantityReserved: true,
+            usage: true,
+            location: true,
             zone: { select: { id: true, name: true, color: true } },
             marker: { select: { id: true, name: true } },
             user: {
               select: {
                 id: true,
                 pseudo: true,
-                prenom: true,
-                nom: true,
-                email: true,
                 emailHash: true,
                 profilePicture: true,
+                updatedAt: true,
               },
             },
           },
         },
       },
     })
-    if (!item) {
-      throw createError({ status: 404, message: 'Objet introuvable' })
-    }
 
-    return createSuccessResponse({ item })
+    return createSuccessResponse({ items })
   },
-  { operationName: 'GetStockItem' }
+  { operationName: 'GetStockGroupPlanning' }
 )

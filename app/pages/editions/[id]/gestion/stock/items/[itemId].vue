@@ -80,9 +80,21 @@
       <!-- Emplacements -->
       <UCard>
         <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-map-pin" class="size-5 text-gray-500" />
-            <h2 class="font-semibold">{{ $t('gestion.stock.locations') }}</h2>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-map-pin" class="size-5 text-gray-500" />
+              <h2 class="font-semibold">{{ $t('gestion.stock.locations') }}</h2>
+            </div>
+            <UButton
+              v-if="canManage"
+              icon="i-heroicons-pencil-square"
+              size="xs"
+              variant="soft"
+              color="primary"
+              @click="locationsModalOpen = true"
+            >
+              {{ $t('gestion.stock.manage_locations') }}
+            </UButton>
           </div>
         </template>
         <div v-if="!item.locations.length" class="text-sm text-gray-500 italic text-center py-4">
@@ -130,29 +142,66 @@
           {{ $t('gestion.stock.no_reservations') }}
         </div>
         <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
-          <li v-for="r in item.reservations" :key="r.id" class="py-3 flex items-start gap-3">
-            <UiUserAvatar :user="r.user" size="sm" class="shrink-0 mt-0.5" />
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap text-sm">
-                <span class="font-medium">{{ r.user.pseudo }}</span>
-                <UBadge :color="statusColor(r.status)" variant="soft" size="xs">
-                  {{ $t(`gestion.stock.status.${r.status}`) }}
-                </UBadge>
-                <UBadge color="neutral" variant="soft" size="xs">×{{ r.quantityReserved }}</UBadge>
+          <li
+            v-for="r in item.reservations"
+            :key="r.id"
+            class="py-3 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3"
+          >
+            <div class="flex items-start gap-3 flex-1 min-w-0">
+              <UiUserAvatar :user="r.user" size="sm" class="shrink-0 mt-0.5" />
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap text-sm">
+                  <span class="font-medium">{{ r.user.pseudo }}</span>
+                  <UBadge :color="statusColor(r.status)" variant="soft" size="xs">
+                    {{ $t(`gestion.stock.status.${r.status}`) }}
+                  </UBadge>
+                  <UBadge color="neutral" variant="soft" size="xs">
+                    ×{{ r.quantityReserved }}
+                  </UBadge>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  {{ formatRange(r.startsAt, r.endsAt) }}
+                </div>
+                <div
+                  v-if="r.location || r.zone || r.marker"
+                  class="text-xs text-gray-600 dark:text-gray-400 mt-1 flex items-center flex-wrap gap-x-2 gap-y-1"
+                >
+                  <UIcon name="i-heroicons-map-pin" class="size-3.5" />
+                  <span v-if="r.location">{{ r.location }}</span>
+                  <span v-if="r.zone" class="flex items-center gap-1">
+                    <span
+                      class="size-2.5 rounded-full border border-gray-300"
+                      :style="{ backgroundColor: r.zone.color }"
+                    />
+                    {{ r.zone.name }}
+                  </span>
+                  <span v-if="r.marker" class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-flag" class="size-3.5" />
+                    {{ r.marker.name }}
+                  </span>
+                </div>
+                <div class="text-sm mt-1 whitespace-pre-wrap wrap-break-word">{{ r.usage }}</div>
               </div>
-              <div class="text-xs text-gray-500 mt-1">
-                {{ formatRange(r.startsAt, r.endsAt) }}
-              </div>
-              <div class="text-sm mt-1 whitespace-pre-wrap">{{ r.usage }}</div>
             </div>
-            <UDropdownMenu v-if="canModifyReservation(r)" :items="reservationActions(r)">
-              <UButton
-                icon="i-heroicons-ellipsis-vertical"
-                size="xs"
-                variant="ghost"
-                color="neutral"
+            <div
+              class="flex items-center gap-1 sm:shrink-0 self-end sm:self-start"
+            >
+              <StockReservationStatusButton
+                :edition-id="editionId"
+                :reservation-id="r.id"
+                :status="r.status"
+                :can-edit="canModifyReservation(r)"
+                @updated="fetchItem"
               />
-            </UDropdownMenu>
+              <UDropdownMenu v-if="canModifyReservation(r)" :items="reservationActions(r)">
+                <UButton
+                  icon="i-heroicons-ellipsis-vertical"
+                  size="xs"
+                  variant="ghost"
+                  color="neutral"
+                />
+              </UDropdownMenu>
+            </div>
           </li>
         </ul>
       </UCard>
@@ -163,6 +212,13 @@
       v-model:open="itemModalOpen"
       :edition-id="editionId"
       :group-id="item.group.id"
+      :item="item"
+      @saved="fetchItem"
+    />
+    <StockItemLocationsModal
+      v-if="item"
+      v-model:open="locationsModalOpen"
+      :edition-id="editionId"
       :item="item"
       :zones="zones"
       :markers="markers"
@@ -177,6 +233,9 @@
       :item-quantity="item.quantity"
       :reservation="editingReservation"
       :can-moderate="canManage"
+      :zones="zones"
+      :markers="markers"
+      :site-map-enabled="!!edition?.siteMapEnabled"
       :edition-start-date="edition?.startDate ?? null"
       :edition-setup-start-date="(edition as any)?.volunteersSetupStartDate ?? null"
       @saved="fetchItem"
@@ -220,6 +279,9 @@ interface StockReservation {
   usage: string
   quantityReserved: number
   status: StockReservationStatus
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
   user: ReservationUser
 }
 interface StockItemLocation {
@@ -340,6 +402,7 @@ onMounted(async () => {
 await Promise.all([fetchItem(), fetchMapData()])
 
 const itemModalOpen = ref(false)
+const locationsModalOpen = ref(false)
 const reservationModalOpen = ref(false)
 const editingReservation = ref<StockReservation | null>(null)
 
@@ -379,27 +442,67 @@ function canModifyReservation(r: StockReservation): boolean {
 }
 
 function reservationActions(r: StockReservation) {
-  return [
+  const actions: Array<
+    Array<{
+      label: string
+      icon: string
+      color?: 'error'
+      onSelect: () => void
+    }>
+  > = [
     [
       {
         label: t('common.edit'),
         icon: 'i-heroicons-pencil-square',
         onSelect: () => openReservationModal(r),
       },
-      {
-        label: t('common.delete'),
-        icon: 'i-heroicons-trash',
-        color: 'error' as const,
-        onSelect: () => deleteReservation(r),
-      },
     ],
   ]
+  // Annuler (uniquement si la résa est encore active)
+  if (r.status === 'RESERVED' || r.status === 'PICKED_UP') {
+    actions[0].push({
+      label: t('gestion.stock.cancel_reservation'),
+      icon: 'i-heroicons-x-circle',
+      onSelect: () => cancelReservation(r),
+    })
+  }
+  actions.push([
+    {
+      label: t('common.delete'),
+      icon: 'i-heroicons-trash',
+      color: 'error',
+      onSelect: () => deleteReservation(r),
+    },
+  ])
+  return actions
 }
 
 async function deleteReservation(r: StockReservation) {
   if (!confirm(t('gestion.stock.confirm_delete_reservation'))) return
   await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, { method: 'DELETE' })
   await fetchItem()
+}
+
+async function cancelReservation(r: StockReservation) {
+  if (!confirm(t('gestion.stock.confirm_cancel_reservation'))) return
+  try {
+    await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, {
+      method: 'PUT',
+      body: { status: 'CANCELLED' },
+    })
+    useToast().add({
+      title: t('common.saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+    await fetchItem()
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
 }
 
 function statusColor(s: StockReservationStatus): 'neutral' | 'info' | 'success' | 'error' {
@@ -417,14 +520,26 @@ function statusColor(s: StockReservationStatus): 'neutral' | 'info' | 'success' 
 
 function formatRange(start: string, end: string): string {
   try {
-    const fmt = new Intl.DateTimeFormat(locale.value, {
+    const s = new Date(start)
+    const e = new Date(end)
+    const dateFmt = new Intl.DateTimeFormat(locale.value, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
+    })
+    const timeFmt = new Intl.DateTimeFormat(locale.value, {
       hour: '2-digit',
       minute: '2-digit',
     })
-    return `${fmt.format(new Date(start))} → ${fmt.format(new Date(end))}`
+    // Si même jour, format compact « 10 juin 2026, 10:00 → 18:00 »
+    const sameDay =
+      s.getFullYear() === e.getFullYear() &&
+      s.getMonth() === e.getMonth() &&
+      s.getDate() === e.getDate()
+    if (sameDay) {
+      return `${dateFmt.format(s)}, ${timeFmt.format(s)} → ${timeFmt.format(e)}`
+    }
+    return `${dateFmt.format(s)} ${timeFmt.format(s)} → ${dateFmt.format(e)} ${timeFmt.format(e)}`
   } catch {
     return `${start} → ${end}`
   }

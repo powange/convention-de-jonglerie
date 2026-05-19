@@ -456,6 +456,7 @@ model EditionZone {
   shows              Show[]
   workshopLocations  WorkshopLocation[]
   stockItemLocations StockItemLocation[]
+  stockReservations  StockReservation[]
 
   @@index([editionId])
 }
@@ -477,6 +478,7 @@ model EditionMarker {
   shows              Show[]
   workshopLocations  WorkshopLocation[]
   stockItemLocations StockItemLocation[]
+  stockReservations  StockReservation[]
 
   @@index([editionId])
 }

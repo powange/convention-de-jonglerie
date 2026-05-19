@@ -13,6 +13,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
 vi.mock('#server/utils/stock-helpers', () => ({
   canAccessStock: mockCanAccessStock,
   getReservedQuantityOnPeriod: mockGetReservedQty,
+  validateReservationLocation: vi.fn(),
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({

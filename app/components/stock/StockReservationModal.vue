@@ -44,6 +44,67 @@
           </template>
         </UFormField>
 
+        <!-- Emplacement d'utilisation : où le matériel doit être amené -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-2">
+          <div class="flex items-center gap-2 text-sm font-medium">
+            <UIcon name="i-heroicons-map-pin" class="size-4 text-primary-500" />
+            <span>{{ $t('gestion.stock.reservation_location') }}</span>
+            <span class="text-error-600 dark:text-error-400">*</span>
+          </div>
+          <p class="text-xs text-gray-500">
+            {{ $t('gestion.stock.reservation_location_help') }}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+            <UFormField
+              :label="$t('gestion.stock.item_location')"
+              :class="siteMapEnabled ? 'sm:col-span-7' : 'sm:col-span-12'"
+              :error="fieldErrors.location"
+            >
+              <UInput
+                v-model="formData.location"
+                :placeholder="$t('gestion.stock.reservation_location_placeholder')"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField
+              v-if="siteMapEnabled"
+              :label="$t('gestion.stock.item_map_pin')"
+              class="sm:col-span-5"
+            >
+              <USelect
+                v-model="formData.mapPin"
+                :items="mapPinItems"
+                :placeholder="$t('gestion.stock.no_map_pin')"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon
+                    v-if="getPinMeta(formData.mapPin)?.icon"
+                    :name="getPinMeta(formData.mapPin)!.icon"
+                    :style="
+                      getPinMeta(formData.mapPin)?.color
+                        ? { color: getPinMeta(formData.mapPin)!.color! }
+                        : undefined
+                    "
+                    class="size-5"
+                  />
+                </template>
+                <template #item-leading="{ item: opt }">
+                  <UIcon
+                    :name="(opt as { icon: string }).icon"
+                    :style="
+                      (opt as { color: string | null }).color
+                        ? { color: (opt as { color: string }).color }
+                        : undefined
+                    "
+                    class="size-5"
+                  />
+                </template>
+              </USelect>
+            </UFormField>
+          </div>
+        </div>
+
         <UFormField
           v-if="reservation && canModerate"
           :label="$t('gestion.stock.status_label')"
@@ -67,6 +128,8 @@
 </template>
 
 <script setup lang="ts">
+import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+
 type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'
 
 interface StockReservationItem {
@@ -76,6 +139,9 @@ interface StockReservationItem {
   usage: string
   quantityReserved: number
   status: StockReservationStatus
+  location?: string | null
+  zone?: { id: number; name: string; color: string } | null
+  marker?: { id: number; name: string } | null
 }
 
 const props = defineProps<{
@@ -85,6 +151,12 @@ const props = defineProps<{
   itemQuantity: number
   reservation: StockReservationItem | null
   canModerate: boolean
+  /** Zones de la carte d'édition (pour le sélecteur). */
+  zones?: { id: number; name: string; color: string; types?: string[] }[]
+  /** Marqueurs de la carte d'édition (pour le sélecteur). */
+  markers?: { id: number; name: string; color?: string | null; types?: string[] }[]
+  /** Si la fonctionnalité « Carte du site » est activée. */
+  siteMapEnabled?: boolean
   /** Date de début de l'édition (ISO) — utilisée pour le pré-remplissage */
   editionStartDate?: string | null
   /** Date de début du montage bénévoles (ISO, optionnelle) — prioritaire sur editionStartDate */
@@ -109,12 +181,47 @@ const statusItems = computed(() =>
   }))
 )
 
+const NONE_PIN = 'none'
+const mapPinItems = computed(() => [
+  { label: t('gestion.stock.no_map_pin'), value: NONE_PIN, icon: 'i-lucide-minus', color: null },
+  ...(props.zones || []).map((z) => ({
+    label: z.name,
+    value: `zone:${z.id}`,
+    icon: getZoneTypeIcon(z.types?.[0] || 'OTHER'),
+    color: z.color as string | null,
+  })),
+  ...(props.markers || []).map((m) => ({
+    label: m.name,
+    value: `marker:${m.id}`,
+    icon: getZoneTypeIcon(m.types?.[0] || 'OTHER'),
+    color: (m.color || getZoneTypeColor(m.types?.[0] || 'OTHER')) as string | null,
+  })),
+])
+
+function getPinMeta(pin: string) {
+  return mapPinItems.value.find((i) => i.value === pin) || null
+}
+
+function pinFromReservation(r: StockReservationItem | null): string {
+  if (r?.zone?.id) return `zone:${r.zone.id}`
+  if (r?.marker?.id) return `marker:${r.marker.id}`
+  return NONE_PIN
+}
+
+function pinToZoneAndMarker(pin: string): { zoneId: number | null; markerId: number | null } {
+  if (pin.startsWith('zone:')) return { zoneId: parseInt(pin.slice(5)), markerId: null }
+  if (pin.startsWith('marker:')) return { zoneId: null, markerId: parseInt(pin.slice(7)) }
+  return { zoneId: null, markerId: null }
+}
+
 const formData = reactive({
   startsAt: '',
   endsAt: '',
   usage: '',
   quantityReserved: 1,
   status: 'RESERVED' as StockReservationStatus,
+  location: '',
+  mapPin: NONE_PIN,
 })
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
@@ -167,6 +274,8 @@ watch(
         formData.usage = props.reservation.usage
         formData.quantityReserved = props.reservation.quantityReserved
         formData.status = props.reservation.status
+        formData.location = props.reservation.location || ''
+        formData.mapPin = pinFromReservation(props.reservation)
       } else {
         const start = getDefaultStart()
         const end = new Date(start.getTime() + 3600_000)
@@ -175,6 +284,8 @@ watch(
         formData.usage = ''
         formData.quantityReserved = 1
         formData.status = 'RESERVED'
+        formData.location = ''
+        formData.mapPin = NONE_PIN
       }
       resetFieldErrors()
     }
@@ -204,6 +315,12 @@ async function handleSubmit() {
     fieldErrors.value = { startsAt: t('errors.required_field') }
     return
   }
+  // Validation cross-champ : au moins texte OU pin
+  const { zoneId, markerId } = pinToZoneAndMarker(formData.mapPin)
+  if (!formData.location.trim() && !zoneId && !markerId) {
+    fieldErrors.value = { location: t('gestion.stock.location_or_pin_required') }
+    return
+  }
   saving.value = true
   try {
     const body: Record<string, unknown> = {
@@ -211,6 +328,9 @@ async function handleSubmit() {
       endsAt: new Date(formData.endsAt).toISOString(),
       usage: formData.usage.trim(),
       quantityReserved: formData.quantityReserved,
+      location: formData.location.trim() || null,
+      zoneId,
+      markerId,
     }
     if (props.reservation) {
       if (props.canModerate) body.status = formData.status

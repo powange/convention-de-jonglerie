@@ -12,6 +12,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
 vi.mock('#server/utils/stock-helpers', () => ({
   canAccessStock: mockCanAccessStock,
   getReservedQuantityOnPeriod: mockGetReservedQty,
+  validateReservationLocation: vi.fn(),
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({
@@ -42,6 +43,7 @@ const validBody = {
   endsAt: '2026-06-10T18:00:00.000Z',
   usage: 'Spectacle de feu samedi',
   quantityReserved: 2,
+  location: 'Scène principale',
 }
 
 describe('POST /api/editions/[id]/stock-items/[itemId]/reservations', () => {
@@ -137,5 +139,28 @@ describe('POST /api/editions/[id]/stock-items/[itemId]/reservations', () => {
     global.readBody = vi.fn().mockResolvedValue({ ...validBody, usage: '' })
     await expect(handler(baseEvent as any)).rejects.toThrow()
     expect(prismaMock.stockReservation.create).not.toHaveBeenCalled()
+  })
+
+  it("rejette si aucun emplacement n'est fourni (texte / zone / marker)", async () => {
+    global.readBody = vi.fn().mockResolvedValue({
+      ...validBody,
+      location: '',
+      zoneId: null,
+      markerId: null,
+    })
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+    expect(prismaMock.stockReservation.create).not.toHaveBeenCalled()
+  })
+
+  it('accepte une réservation localisée uniquement par zoneId', async () => {
+    global.readBody = vi
+      .fn()
+      .mockResolvedValue({ ...validBody, location: '', zoneId: 42 })
+    await handler(baseEvent as any)
+    expect(prismaMock.stockReservation.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ zoneId: 42, location: null }),
+      })
+    )
   })
 })

@@ -3,16 +3,33 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
-import { canAccessStock, getReservedQuantityOnPeriod } from '#server/utils/stock-helpers'
+import {
+  canAccessStock,
+  getReservedQuantityOnPeriod,
+  validateReservationLocation,
+} from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
-const bodySchema = z.object({
-  startsAt: z.string().datetime(),
-  endsAt: z.string().datetime(),
-  usage: z.string().trim().min(1, "L'utilisation est requise").max(500),
-  quantityReserved: z.number().int().positive().default(1),
-})
+const bodySchema = z
+  .object({
+    startsAt: z.string().datetime(),
+    endsAt: z.string().datetime(),
+    usage: z.string().trim().min(1, "L'utilisation est requise").max(500),
+    quantityReserved: z.number().int().positive().default(1),
+    // Emplacement d'utilisation : au moins l'un des trois est requis
+    location: z.string().trim().max(200).nullable().optional(),
+    zoneId: z.number().int().positive().nullable().optional(),
+    markerId: z.number().int().positive().nullable().optional(),
+  })
+  .refine((data) => !!(data.location?.trim() || data.zoneId || data.markerId), {
+    message: 'Indiquez où le matériel doit être amené (texte ou emplacement de la carte)',
+    path: ['location'],
+  })
+  .refine((data) => !(data.zoneId && data.markerId), {
+    message: 'Une réservation ne peut pas cibler à la fois une zone et un marqueur',
+    path: ['zoneId'],
+  })
 
 /**
  * POST /api/editions/[id]/stock-items/[itemId]/reservations
@@ -81,6 +98,12 @@ export default wrapApiHandler(
       })
     }
 
+    // Vérifier que zone/marker, si fournis, appartiennent à l'édition.
+    await validateReservationLocation(
+      { zoneId: data.zoneId ?? null, markerId: data.markerId ?? null },
+      editionId
+    )
+
     const reservation = await prisma.stockReservation.create({
       data: {
         stockItemId: itemId,
@@ -89,8 +112,13 @@ export default wrapApiHandler(
         endsAt,
         usage: data.usage,
         quantityReserved: data.quantityReserved,
+        location: data.location?.trim() || null,
+        zoneId: data.zoneId ?? null,
+        markerId: data.markerId ?? null,
       },
       include: {
+        zone: { select: { id: true, name: true, color: true } },
+        marker: { select: { id: true, name: true } },
         user: {
           select: {
             id: true,
