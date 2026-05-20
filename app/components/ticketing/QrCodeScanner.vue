@@ -164,13 +164,25 @@ const startScanning = async () => {
       // Ignorer les erreurs de scan normales (pas de QR code détecté)
     }
 
-    // Démarrer le scan avec la caméra arrière (mobile) ou par défaut (desktop)
-    await html5QrCode.start(
-      { facingMode: 'environment' }, // Préférer la caméra arrière
-      config,
-      onScanSuccess,
-      onScanError
-    )
+    // Tenter d'abord la caméra arrière (mobile), puis fallback sur la
+    // première caméra disponible (desktop sans caméra arrière → AbortError
+    // si on force facingMode: environment).
+    try {
+      await html5QrCode.start(
+        { facingMode: 'environment' },
+        config,
+        onScanSuccess,
+        onScanError
+      )
+    } catch (envErr: any) {
+      console.warn(
+        'Caméra arrière indisponible, tentative avec la première caméra dispo',
+        envErr
+      )
+      const cameras = await Html5Qrcode.getCameras()
+      if (!cameras.length) throw envErr
+      await html5QrCode.start(cameras[0].id, config, onScanSuccess, onScanError)
+    }
 
     // Caméra activée avec succès
     loading.value = false
@@ -189,8 +201,11 @@ const startScanning = async () => {
     } else if (err.name === 'NotReadableError') {
       error.value =
         "Impossible d'accéder à la caméra. Elle est peut-être utilisée par une autre application."
+    } else if (err.name === 'AbortError' || err.message?.includes('Timeout')) {
+      error.value =
+        "La caméra n'a pas démarré dans le délai imparti. Essayez de fermer les autres applications qui pourraient l'utiliser."
     } else {
-      error.value = "Erreur lors de l'activation de la caméra."
+      error.value = `Erreur lors de l'activation de la caméra : ${err.name || err.message || 'inconnue'}`
     }
   }
 }
@@ -234,9 +249,11 @@ const close = () => {
   manualCode.value = ''
 }
 
-// Arrêter le scan si la modal se ferme
+// Démarrer le scan automatiquement à l'ouverture, arrêter à la fermeture
 watch(isOpen, (newValue) => {
-  if (!newValue && scanning.value) {
+  if (newValue && !scanning.value && !loading.value) {
+    startScanning()
+  } else if (!newValue && scanning.value) {
     stopScanning()
   }
 })

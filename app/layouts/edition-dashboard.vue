@@ -31,6 +31,12 @@
               variant="pill"
               highlight
               :collapsible="true"
+              :ui="{
+                link: 'text-base sm:text-sm',
+                linkLeadingIcon: 'size-5 sm:size-4',
+                childLink: 'text-base sm:text-sm',
+                childLinkIcon: 'size-5 sm:size-4',
+              }"
             />
           </template>
 
