@@ -78,27 +78,30 @@
                       ]"
                     >
                       <div class="flex items-center gap-3">
-                        <UCheckbox
-                          v-model="meal.enabled"
-                          :disabled="savingMeals"
-                          @update:model-value="handleMealChange(meal)"
-                        />
                         <div class="flex-1 min-w-0">
                           <p class="text-sm font-medium text-gray-900 dark:text-white">
                             {{ getMealTypeLabel(meal.mealType) }}
                           </p>
-                          <USelectMenu
+                          <UCheckboxGroup
                             v-model="meal.phases"
                             :items="mealPhaseOptions"
                             value-key="value"
-                            multiple
-                            :disabled="savingMeals"
-                            :search-input="false"
+                            orientation="horizontal"
+                            indicator="hidden"
+                            variant="table"
                             size="xs"
-                            class="mt-1 w-full"
+                            color="secondary"
+                            :disabled="savingMeals"
+                            class="mt-1"
                             @update:model-value="handleMealChange(meal)"
                           />
                         </div>
+                        <USwitch
+                          v-model="meal.enabled"
+                          :disabled="savingMeals"
+                          class="shrink-0"
+                          @update:model-value="handleMealChange(meal)"
+                        />
                       </div>
 
                       <!-- Sélection des articles à restituer -->
