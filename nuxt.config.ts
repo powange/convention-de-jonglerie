@@ -130,6 +130,10 @@ export default defineNuxtConfig({
         'upgrade-insecure-requests': true,
       },
       crossOriginEmbedderPolicy: false,
+      // Autoriser l'accès à la caméra (scan QR code billetterie / contrôle d'accès)
+      permissionsPolicy: {
+        camera: ['self'],
+      },
     },
     rateLimiter: false,
     xssValidator: false,

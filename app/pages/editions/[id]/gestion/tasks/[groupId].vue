@@ -97,7 +97,7 @@
               class="py-2 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-800/40 px-2 -mx-2 rounded cursor-pointer"
               @click="openTaskModal(task)"
             >
-              <UBadge :color="statusColor(task.status)" variant="soft" size="xs" class="mt-0.5">
+              <UBadge :color="statusColor(task.status)" variant="soft" size="md" class="mt-0.5">
                 {{ $t(`gestion.tasks.status.${task.status}`) }}
               </UBadge>
               <div class="flex-1 min-w-0">
@@ -116,14 +116,14 @@
                   v-for="a in task.assignments.slice(0, 3)"
                   :key="a.user.id"
                   :user="a.user"
-                  size="xs"
+                  size="md"
                   class="ring-2 ring-white dark:ring-gray-900"
                 />
                 <UBadge
                   v-if="task.assignments.length > 3"
                   color="neutral"
                   variant="soft"
-                  size="xs"
+                  size="md"
                   class="ring-2 ring-white dark:ring-gray-900"
                 >
                   +{{ task.assignments.length - 3 }}
@@ -183,14 +183,14 @@
                     v-for="a in task.assignments.slice(0, 3)"
                     :key="a.user.id"
                     :user="a.user"
-                    size="xs"
+                    size="md"
                     class="ring-2 ring-white dark:ring-gray-900"
                   />
                   <UBadge
                     v-if="task.assignments.length > 3"
                     color="neutral"
                     variant="soft"
-                    size="xs"
+                    size="md"
                     class="ring-2 ring-white dark:ring-gray-900"
                   >
                     +{{ task.assignments.length - 3 }}
