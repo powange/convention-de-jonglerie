@@ -35,31 +35,29 @@ export function getTranslationsToLoad(path: string): string[] {
     }
   }
 
-  // Routes dynamiques avec regex
+  // Routes dynamiques avec regex.
+  // Plusieurs patterns peuvent matcher la même URL : leurs traductions sont
+  // cumulées. Utiliser des patterns « add-on » (sans namespace dupliqué) pour
+  // les sous-routes qui chargent un namespace supplémentaire.
   const dynamicRoutePatterns: Array<{ pattern: RegExp; translations: string[] }> = [
+    // Toutes les pages /gestion/* chargent le namespace gestion
+    {
+      pattern: /^\/editions\/\d+\/gestion/,
+      translations: ['gestion'],
+    },
+    // Vue d'ensemble racine : on charge aussi workshops pour afficher le module
     {
       pattern: /^\/editions\/\d+\/gestion$/,
-      translations: ['gestion', 'workshops'],
+      translations: ['workshops'],
     },
+    // Add-ons par sous-section
     {
       pattern: /^\/editions\/\d+\/gestion\/ticketing/,
       translations: ['ticketing'],
     },
     {
-      pattern: /^\/editions\/\d+\/gestion\/meals/,
-      translations: ['gestion'],
-    },
-    {
-      pattern: /^\/editions\/\d+\/gestion\/volunteers/,
-      translations: ['gestion'],
-    },
-    {
-      pattern: /^\/editions\/\d+\/gestion\/stock/,
-      translations: ['gestion'],
-    },
-    {
-      pattern: /^\/editions\/\d+\/gestion\/tasks/,
-      translations: ['gestion'],
+      pattern: /^\/editions\/\d+\/gestion\/workshops/,
+      translations: ['workshops'],
     },
     {
       pattern: /^\/editions\/\d+\/gestion\/artists/,
@@ -69,6 +67,7 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion\/shows-call/,
       translations: ['survey'],
     },
+    // Routes hors /gestion
     {
       pattern: /^\/survey\//,
       translations: ['survey'],
