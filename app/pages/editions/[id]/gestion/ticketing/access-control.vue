@@ -54,7 +54,7 @@
       <!-- Contenu de la page -->
       <div class="space-y-6">
         <!-- Grille : Recherche/Scan + Statistiques d'entrée -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <!-- Rechercher un billet (ou scanner) -->
           <UCard>
             <div class="space-y-4">
