@@ -29,78 +29,33 @@
             Scanner et valider les billets à l'entrée
           </p>
         </div>
-        <UButton
-          v-if="allowOnsiteRegistration && hasTiers"
-          icon="i-heroicons-user-plus"
-          color="primary"
-          class="sm:flex-shrink-0"
-          @click="showAddParticipantModal = true"
-        >
-          {{ $t('edition.ticketing.add_participant') }}
-        </UButton>
+        <div class="flex items-center gap-2 sm:flex-shrink-0">
+          <UButton
+            v-if="hasHelloAssoConfig"
+            icon="i-heroicons-arrow-path"
+            color="primary"
+            variant="soft"
+            :loading="syncingHelloAsso"
+            @click="syncHelloAsso"
+          >
+            {{ $t('ticketing.access_control.sync_helloasso') }}
+          </UButton>
+          <UButton
+            v-if="allowOnsiteRegistration && hasTiers"
+            icon="i-heroicons-user-plus"
+            color="primary"
+            @click="showAddParticipantModal = true"
+          >
+            {{ $t('edition.ticketing.add_participant') }}
+          </UButton>
+        </div>
       </div>
 
       <!-- Contenu de la page -->
       <div class="space-y-6">
-        <!-- Grille avec Scanner et Recherche -->
+        <!-- Grille : Recherche/Scan + Statistiques d'entrée -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Scanner de billets -->
-          <UCard>
-            <div class="space-y-6">
-              <!-- En-tête -->
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30"
-                >
-                  <UIcon
-                    name="i-heroicons-qr-code"
-                    class="h-6 w-6 text-blue-600 dark:text-blue-400"
-                  />
-                </div>
-                <div>
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ $t('edition.ticketing.scan_ticket') }}
-                  </h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Scanner un QR code ou saisir manuellement
-                  </p>
-                </div>
-              </div>
-
-              <!-- Bouton Scanner -->
-              <UButton
-                icon="i-heroicons-qr-code"
-                color="primary"
-                size="xl"
-                variant="soft"
-                class="w-full justify-center h-[52px]"
-                @click="startScanner"
-              >
-                <span class="font-semibold">{{ $t('ticketing.access_control.scan_qr_code') }}</span>
-              </UButton>
-
-              <!-- Bouton de synchronisation HelloAsso -->
-              <div
-                v-if="hasHelloAssoConfig"
-                class="pt-4 border-t border-gray-200 dark:border-gray-700"
-              >
-                <UButton
-                  icon="i-heroicons-arrow-path"
-                  color="primary"
-                  variant="soft"
-                  class="w-full justify-center"
-                  :loading="syncingHelloAsso"
-                  @click="syncHelloAsso"
-                >
-                  <span class="font-medium">{{
-                    $t('ticketing.access_control.sync_helloasso')
-                  }}</span>
-                </UButton>
-              </div>
-            </div>
-          </UCard>
-
-          <!-- Rechercher un billet -->
+          <!-- Rechercher un billet (ou scanner) -->
           <UCard>
             <div class="space-y-4">
               <div class="flex items-center gap-2">
@@ -110,31 +65,40 @@
                 </h2>
               </div>
 
-              <UAlert
-                icon="i-heroicons-information-circle"
-                color="info"
+              <!-- Bouton Scanner QR -->
+              <UButton
+                icon="i-heroicons-qr-code"
+                color="primary"
+                size="xl"
                 variant="soft"
-                :description="$t('ticketing.access_control.search_description')"
-              />
+                class="w-full justify-center h-13"
+                @click="startScanner"
+              >
+                <span class="font-semibold">{{ $t('ticketing.access_control.scan_qr_code') }}</span>
+              </UButton>
 
               <!-- Zone de recherche -->
               <div class="space-y-4">
-                <UFieldGroup class="w-full">
-                  <UInput
-                    v-model="searchTerm"
-                    :placeholder="$t('ticketing.access_control.search_placeholder')"
-                    icon="i-heroicons-magnifying-glass"
-                    class="w-full"
-                    @keydown.enter="searchTickets"
-                  />
-                  <UButton
-                    icon="i-heroicons-magnifying-glass"
-                    color="primary"
-                    :disabled="!searchTerm || searchTerm.length < 2"
-                    :loading="searching"
-                    @click="searchTickets"
-                  />
-                </UFieldGroup>
+                <UFormField :help="$t('ticketing.access_control.search_description')">
+                  <UFieldGroup class="w-full">
+                    <UInput
+                      v-model="searchTerm"
+                      :placeholder="$t('ticketing.access_control.search_placeholder')"
+                      icon="i-heroicons-magnifying-glass"
+                      class="w-full"
+                      @keydown.enter="searchTickets"
+                    />
+                    <UButton
+                      icon="i-heroicons-magnifying-glass"
+                      color="primary"
+                      :title="$t('ticketing.access_control.search_button_aria')"
+                      :aria-label="$t('ticketing.access_control.search_button_aria')"
+                      :disabled="!searchTerm || searchTerm.length < 2"
+                      :loading="searching"
+                      @click="searchTickets"
+                    />
+                  </UFieldGroup>
+                </UFormField>
 
                 <!-- Résultats de recherche -->
                 <div v-if="searchResults" class="space-y-2">
@@ -349,15 +313,15 @@
               </div>
             </div>
           </UCard>
-        </div>
 
-        <!-- Statistiques -->
-        <TicketingStatsEntryStatsCard
-          :stats="stats"
-          @show-volunteers-not-validated="showVolunteersNotValidatedModal"
-          @show-artists-not-validated="showArtistsNotValidatedModal"
-          @show-organizers-not-validated="showOrganizersNotValidatedModal"
-        />
+          <!-- Statistiques d'entrée -->
+          <TicketingStatsEntryStatsCard
+            :stats="stats"
+            @show-volunteers-not-validated="showVolunteersNotValidatedModal"
+            @show-artists-not-validated="showArtistsNotValidatedModal"
+            @show-organizers-not-validated="showOrganizersNotValidatedModal"
+          />
+        </div>
 
         <!-- Statistiques des quotas (uniquement si des tarifs sont configurés) -->
         <TicketingStatsQuotaStatsCard v-if="hasTiers" :edition-id="editionId" />
