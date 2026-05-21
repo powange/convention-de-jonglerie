@@ -6,12 +6,7 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
-import {
-  mergeStockItemLocations,
-  stockItemLocationInputSchema,
-  stockItemLocationsInclude,
-  validateStockItemLocations,
-} from '#server/utils/stock-helpers'
+import { stockItemLocationInclude, validateReservationLocation } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -21,7 +16,11 @@ const bodySchema = z.object({
   quantity: z.number().int().positive().default(1),
   notes: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
-  locations: z.array(stockItemLocationInputSchema).max(50).optional(),
+  // Emplacement de rangement par défaut (tous les champs sont optionnels :
+  // un item peut ne pas avoir d'emplacement renseigné).
+  location: z.string().trim().max(200).nullable().optional(),
+  zoneId: z.number().int().positive().nullable().optional(),
+  markerId: z.number().int().positive().nullable().optional(),
   // Emprunt externe (optionnel)
   isExternalLoan: z.boolean().optional(),
   ownerContact: z.string().trim().max(500).nullable().optional(),
@@ -63,9 +62,16 @@ export default wrapApiHandler(
       throw error
     }
 
-    // Fusionner les emplacements ciblant le même endroit (mêmes zone/marker/texte)
-    const { merged: locations, mergedCount } = mergeStockItemLocations(data.locations ?? [])
-    await validateStockItemLocations(locations, editionId, data.quantity)
+    if (data.zoneId && data.markerId) {
+      throw createError({
+        status: 400,
+        message: 'Un emplacement ne peut pas être à la fois une zone et un marqueur',
+      })
+    }
+    await validateReservationLocation(
+      { zoneId: data.zoneId ?? null, markerId: data.markerId ?? null },
+      editionId
+    )
 
     let displayOrder = data.displayOrder
     if (displayOrder === undefined) {
@@ -87,26 +93,18 @@ export default wrapApiHandler(
         quantity: data.quantity,
         notes: data.notes?.trim() || null,
         displayOrder,
+        location: data.location?.trim() || null,
+        zoneId: data.zoneId ?? null,
+        markerId: data.markerId ?? null,
         isExternalLoan,
         ownerContact: isExternalLoan ? data.ownerContact?.trim() || null : null,
         returnDueAt: isExternalLoan && data.returnDueAt ? new Date(data.returnDueAt) : null,
         returnedAt: isExternalLoan && data.returnedAt ? new Date(data.returnedAt) : null,
-        locations: {
-          create: locations.map((loc, idx) => ({
-            location: loc.location?.trim() || null,
-            zoneId: loc.zoneId ?? null,
-            markerId: loc.markerId ?? null,
-            quantity: loc.quantity,
-            displayOrder: idx,
-          })),
-        },
       },
-      include: {
-        locations: stockItemLocationsInclude,
-      },
+      include: stockItemLocationInclude,
     })
 
-    return createSuccessResponse({ item, mergedLocations: mergedCount })
+    return createSuccessResponse({ item })
   },
   { operationName: 'CreateStockItem' }
 )

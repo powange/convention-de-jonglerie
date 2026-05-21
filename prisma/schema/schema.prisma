@@ -456,10 +456,10 @@ model EditionZone {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  shows              Show[]
-  workshopLocations  WorkshopLocation[]
-  stockItemLocations StockItemLocation[]
-  stockReservations  StockReservation[]
+  shows             Show[]
+  workshopLocations WorkshopLocation[]
+  stockItems        StockItem[]
+  stockReservations StockReservation[]
 
   @@index([editionId])
 }
@@ -478,10 +478,10 @@ model EditionMarker {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  shows              Show[]
-  workshopLocations  WorkshopLocation[]
-  stockItemLocations StockItemLocation[]
-  stockReservations  StockReservation[]
+  shows             Show[]
+  workshopLocations WorkshopLocation[]
+  stockItems        StockItem[]
+  stockReservations StockReservation[]
 
   @@index([editionId])
 }

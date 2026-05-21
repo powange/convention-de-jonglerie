@@ -55,6 +55,66 @@
           />
         </UFormField>
 
+        <!-- Emplacement de rangement (par défaut, hors réservation) -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-2">
+          <div class="flex items-center gap-2 text-sm font-medium">
+            <UIcon name="i-heroicons-map-pin" class="size-4 text-primary-500" />
+            <span>{{ $t('gestion.stock.item_storage_location') }}</span>
+          </div>
+          <p class="text-xs text-gray-500">
+            {{ $t('gestion.stock.item_storage_location_help') }}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+            <UFormField
+              :label="$t('gestion.stock.item_location')"
+              :class="siteMapEnabled ? 'sm:col-span-7' : 'sm:col-span-12'"
+              :error="fieldErrors.location"
+            >
+              <UInput
+                v-model="formData.location"
+                :placeholder="$t('gestion.stock.item_storage_location_placeholder')"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField
+              v-if="siteMapEnabled"
+              :label="$t('gestion.stock.item_map_pin')"
+              class="sm:col-span-5"
+            >
+              <USelect
+                v-model="formData.mapPin"
+                :items="mapPinItems"
+                :placeholder="$t('gestion.stock.no_map_pin')"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon
+                    v-if="getPinMeta(formData.mapPin)?.icon"
+                    :name="getPinMeta(formData.mapPin)!.icon"
+                    :style="
+                      getPinMeta(formData.mapPin)?.color
+                        ? { color: getPinMeta(formData.mapPin)!.color! }
+                        : undefined
+                    "
+                    class="size-5"
+                  />
+                </template>
+                <template #item-leading="{ item: opt }">
+                  <UIcon
+                    :name="(opt as { icon: string }).icon"
+                    :style="
+                      (opt as { color: string | null }).color
+                        ? { color: (opt as { color: string }).color }
+                        : undefined
+                    "
+                    class="size-5"
+                  />
+                </template>
+              </USelect>
+            </UFormField>
+          </div>
+        </div>
+
         <!-- Bloc Emprunt externe -->
         <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-3">
           <USwitch
@@ -77,10 +137,6 @@
             </UFormField>
           </div>
         </div>
-
-        <p v-if="!item" class="text-xs text-gray-500 italic">
-          {{ $t('gestion.stock.locations_managed_separately_hint') }}
-        </p>
       </form>
     </template>
     <template #footer>
@@ -97,6 +153,8 @@
 </template>
 
 <script setup lang="ts">
+import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+
 interface StockItemLite {
   id: number
   name: string
@@ -106,6 +164,9 @@ interface StockItemLite {
   isExternalLoan?: boolean
   ownerContact?: string | null
   returnDueAt?: string | null
+  location?: string | null
+  zone?: { id: number; name: string; color: string } | null
+  marker?: { id: number; name: string } | null
 }
 
 const props = defineProps<{
@@ -113,6 +174,12 @@ const props = defineProps<{
   editionId: number
   groupId: number
   item: StockItemLite | null
+  /** Zones de la carte d'édition (pour le sélecteur d'emplacement). */
+  zones?: { id: number; name: string; color: string; types?: string[] }[]
+  /** Marqueurs de la carte d'édition (pour le sélecteur d'emplacement). */
+  markers?: { id: number; name: string; color?: string | null; types?: string[] }[]
+  /** Si la fonctionnalité « Carte du site » est activée sur l'édition. */
+  siteMapEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -126,6 +193,39 @@ const isOpen = computed({
   set: (v) => emit('update:open', v),
 })
 
+const NONE_PIN = 'none'
+const mapPinItems = computed(() => [
+  { label: t('gestion.stock.no_map_pin'), value: NONE_PIN, icon: 'i-lucide-minus', color: null },
+  ...(props.zones || []).map((z) => ({
+    label: z.name,
+    value: `zone:${z.id}`,
+    icon: getZoneTypeIcon(z.types?.[0] || 'OTHER'),
+    color: z.color as string | null,
+  })),
+  ...(props.markers || []).map((m) => ({
+    label: m.name,
+    value: `marker:${m.id}`,
+    icon: getZoneTypeIcon(m.types?.[0] || 'OTHER'),
+    color: (m.color || getZoneTypeColor(m.types?.[0] || 'OTHER')) as string | null,
+  })),
+])
+
+function getPinMeta(pin: string) {
+  return mapPinItems.value.find((i) => i.value === pin) || null
+}
+
+function pinFromItem(it: StockItemLite | null): string {
+  if (it?.zone?.id) return `zone:${it.zone.id}`
+  if (it?.marker?.id) return `marker:${it.marker.id}`
+  return NONE_PIN
+}
+
+function pinToZoneAndMarker(pin: string): { zoneId: number | null; markerId: number | null } {
+  if (pin.startsWith('zone:')) return { zoneId: parseInt(pin.slice(5)), markerId: null }
+  if (pin.startsWith('marker:')) return { zoneId: null, markerId: parseInt(pin.slice(7)) }
+  return { zoneId: null, markerId: null }
+}
+
 const formData = reactive({
   name: '',
   description: '',
@@ -134,6 +234,8 @@ const formData = reactive({
   isExternalLoan: false,
   ownerContact: '',
   returnDueAt: '',
+  location: '',
+  mapPin: NONE_PIN,
 })
 
 function toDateInput(iso: string | null | undefined): string {
@@ -162,6 +264,8 @@ watch(
       formData.isExternalLoan = props.item?.isExternalLoan ?? false
       formData.ownerContact = props.item?.ownerContact || ''
       formData.returnDueAt = toDateInput(props.item?.returnDueAt)
+      formData.location = props.item?.location || ''
+      formData.mapPin = pinFromItem(props.item)
       resetFieldErrors()
     }
   },
@@ -192,6 +296,7 @@ async function handleSubmit() {
   }
   saving.value = true
   try {
+    const { zoneId, markerId } = pinToZoneAndMarker(formData.mapPin)
     const body: Record<string, unknown> = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
@@ -203,6 +308,9 @@ async function handleSubmit() {
         formData.isExternalLoan && formData.returnDueAt
           ? new Date(formData.returnDueAt).toISOString()
           : null,
+      location: formData.location.trim() || null,
+      zoneId,
+      markerId,
     }
     if (props.item) {
       await $fetch(`/api/editions/${props.editionId}/stock-items/${props.item.id}`, {

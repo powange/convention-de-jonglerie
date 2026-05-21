@@ -37,18 +37,13 @@ interface PlanningReservation {
   user: ReservationUser
 }
 
-interface PlanningItemLocation {
-  id: number
-  location: string | null
-  quantity: number
-  zone: { id: number; name: string; color: string } | null
-  marker: { id: number; name: string } | null
-}
 interface PlanningItem {
   id: number
   name: string
   quantity: number
-  locations: PlanningItemLocation[]
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
   reservations: PlanningReservation[]
 }
 
@@ -107,13 +102,7 @@ function statusColor(status: StockReservationStatus): string {
 }
 
 function itemLocationsSummary(item: PlanningItem): string {
-  if (!item.locations.length) return ''
-  return item.locations
-    .map((l) => {
-      const place = l.zone?.name || l.marker?.name || l.location || '?'
-      return `${place} ×${l.quantity}`
-    })
-    .join(' · ')
+  return item.zone?.name || item.marker?.name || item.location || ''
 }
 
 function reservationLocationLabel(r: PlanningReservation): string {

@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
-import { canAccessStock, stockItemLocationsInclude } from '#server/utils/stock-helpers'
+import { canAccessStock } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -42,7 +42,9 @@ export default wrapApiHandler(
         id: true,
         name: true,
         quantity: true,
-        locations: stockItemLocationsInclude,
+        location: true,
+        zone: { select: { id: true, name: true, color: true } },
+        marker: { select: { id: true, name: true } },
         reservations: {
           where: { status: { in: ['RESERVED', 'PICKED_UP'] } },
           orderBy: { startsAt: 'asc' },

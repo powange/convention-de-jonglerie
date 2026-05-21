@@ -54,6 +54,26 @@
               <p v-if="item.notes" class="text-xs text-gray-500 mt-2 italic whitespace-pre-wrap">
                 {{ item.notes }}
               </p>
+              <!-- Emplacement de rangement par défaut -->
+              <div
+                v-if="item.location || item.zone || item.marker"
+                class="mt-2 text-xs text-gray-600 dark:text-gray-400 flex items-center flex-wrap gap-x-2 gap-y-1"
+              >
+                <UIcon name="i-heroicons-map-pin" class="size-3.5 text-gray-400" />
+                <span class="font-medium">{{ $t('gestion.stock.item_storage_location') }} :</span>
+                <span v-if="item.location">{{ item.location }}</span>
+                <span v-if="item.zone" class="flex items-center gap-1">
+                  <span
+                    class="size-2.5 rounded-full border border-gray-300"
+                    :style="{ backgroundColor: item.zone.color }"
+                  />
+                  {{ item.zone.name }}
+                </span>
+                <span v-if="item.marker" class="flex items-center gap-1">
+                  <UIcon name="i-heroicons-flag" class="size-3.5" />
+                  {{ item.marker.name }}
+                </span>
+              </div>
               <div v-if="item.isExternalLoan" class="mt-2 flex items-center gap-2 flex-wrap">
                 <UBadge :color="loanBadgeColor" variant="soft" size="xs">
                   <UIcon name="i-heroicons-hand-raised" class="size-3 mr-1" />
@@ -135,58 +155,6 @@
             {{ $t('gestion.stock.mark_loan_not_returned') }}
           </UButton>
         </template>
-      </UCard>
-
-      <!-- Emplacements -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-map-pin" class="size-5 text-gray-500" />
-              <h2 class="font-semibold">{{ $t('gestion.stock.locations') }}</h2>
-            </div>
-            <UButton
-              v-if="canManage"
-              icon="i-heroicons-pencil-square"
-              size="xs"
-              variant="soft"
-              color="primary"
-              @click="locationsModalOpen = true"
-            >
-              {{ $t('gestion.stock.manage_locations') }}
-            </UButton>
-          </div>
-        </template>
-        <div v-if="!item.locations.length" class="text-sm text-gray-500 italic text-center py-4">
-          {{ $t('gestion.stock.no_locations_yet') }}
-        </div>
-        <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
-          <li v-for="loc in item.locations" :key="loc.id" class="py-2 flex items-center gap-3">
-            <UBadge color="neutral" variant="soft" size="sm" class="shrink-0">
-              ×{{ loc.quantity }}
-            </UBadge>
-            <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              <span v-if="loc.location" class="flex items-center gap-1">
-                <UIcon name="i-heroicons-map-pin" class="size-3.5 text-gray-400" />
-                {{ loc.location }}
-              </span>
-              <span v-if="loc.zone" class="flex items-center gap-1">
-                <span
-                  class="size-3 rounded-full border border-gray-300"
-                  :style="{ backgroundColor: loc.zone.color }"
-                />
-                {{ loc.zone.name }}
-              </span>
-              <span v-if="loc.marker" class="flex items-center gap-1">
-                <UIcon name="i-heroicons-flag" class="size-3.5 text-gray-400" />
-                {{ loc.marker.name }}
-              </span>
-            </div>
-          </li>
-        </ul>
-        <p v-if="unlocatedUnits > 0" class="text-xs text-gray-500 mt-2">
-          {{ $t('gestion.stock.unlocated_units', { count: unlocatedUnits }, unlocatedUnits) }}
-        </p>
       </UCard>
 
       <!-- Réservations -->
@@ -271,13 +239,6 @@
       :edition-id="editionId"
       :group-id="item.group.id"
       :item="item"
-      @saved="fetchItem"
-    />
-    <StockItemLocationsModal
-      v-if="item"
-      v-model:open="locationsModalOpen"
-      :edition-id="editionId"
-      :item="item"
       :zones="zones"
       :markers="markers"
       :site-map-enabled="!!edition?.siteMapEnabled"
@@ -342,13 +303,6 @@ interface StockReservation {
   marker: { id: number; name: string } | null
   user: ReservationUser
 }
-interface StockItemLocation {
-  id: number
-  location: string | null
-  quantity: number
-  zone: { id: number; name: string; color: string } | null
-  marker: { id: number; name: string } | null
-}
 interface StockItemFull {
   id: number
   name: string
@@ -360,7 +314,9 @@ interface StockItemFull {
   returnDueAt: string | null
   returnedAt: string | null
   group: { id: number; name: string }
-  locations: StockItemLocation[]
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
   reservations: StockReservation[]
 }
 
@@ -395,12 +351,6 @@ const availabilityColor = computed<'success' | 'warning' | 'error' | 'neutral'>(
   if (availability.value.available === 0) return 'error'
   if (availability.value.available < availability.value.quantity) return 'warning'
   return 'success'
-})
-
-const unlocatedUnits = computed(() => {
-  if (!item.value) return 0
-  const total = item.value.locations.reduce((sum, l) => sum + l.quantity, 0)
-  return Math.max(0, item.value.quantity - total)
 })
 
 // --- Emprunt externe ---
@@ -540,7 +490,6 @@ onMounted(async () => {
 await Promise.all([fetchItem(), fetchMapData()])
 
 const itemModalOpen = ref(false)
-const locationsModalOpen = ref(false)
 const reservationModalOpen = ref(false)
 const editingReservation = ref<StockReservation | null>(null)
 

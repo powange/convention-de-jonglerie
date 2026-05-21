@@ -29,7 +29,7 @@ model StockItem {
   stockGroupId   Int
   name           String
   description    String?   @db.Text
-  quantity       Int       @default(1) // Nombre d'exemplaires identiques (somme des locations ≤ quantity)
+  quantity       Int       @default(1) // Nombre d'exemplaires identiques
   notes          String?   @db.Text
   displayOrder   Int       @default(0)
   // Emprunt externe : matériel prêté par quelqu'un d'extérieur à la convention.
@@ -38,39 +38,22 @@ model StockItem {
   ownerContact   String?   @db.Text // Texte libre (ex: "Jean Dupont — 06 12 34 56 78")
   returnDueAt    DateTime? // Date prévue de retour au propriétaire
   returnedAt     DateTime? // Date effective du retour. null = pas encore rendu
+  // Emplacement de rangement par défaut : où ranger le matériel quand il
+  // n'est pas réservé. Au moins l'un des trois doit être renseigné si l'on
+  // veut afficher un emplacement (validé côté API, tous peuvent rester null).
+  location       String? // Texte libre (ex: "Tente technique B")
+  zoneId         Int? // Lien optionnel vers une zone de la carte
+  markerId       Int? // Lien optionnel vers un marqueur de la carte
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  group        StockGroup          @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
-  locations    StockItemLocation[]
+  group        StockGroup         @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
+  zone         EditionZone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker       EditionMarker?     @relation(fields: [markerId], references: [id], onDelete: SetNull)
   reservations StockReservation[]
 
   @@index([stockGroupId])
   @@index([stockGroupId, displayOrder])
-}
-
-// Sous-emplacement d'un objet de stock : permet de répartir la quantité
-// sur plusieurs lieux physiques (texte et/ou zone/marqueur de la carte).
-// La somme des `quantity` de ces sous-emplacements doit être ≤ à la
-// `quantity` du StockItem parent (validé côté API). Les unités restantes
-// (quantity - somme) sont considérées comme « non localisées ».
-model StockItemLocation {
-  id           Int      @id @default(autoincrement())
-  stockItemId  Int
-  location     String? // Localisation textuelle (ex: "Tente technique B")
-  zoneId       Int? // Lien optionnel vers une zone de la carte
-  markerId     Int? // Lien optionnel vers un marqueur de la carte
-  quantity     Int      @default(1)
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  stockItem StockItem      @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
-  zone      EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  marker    EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
-
-  @@index([stockItemId])
-  @@index([stockItemId, displayOrder])
   @@index([zoneId])
   @@index([markerId])
 }
@@ -85,7 +68,7 @@ model StockReservation {
   quantityReserved Int                    @default(1)
   status           StockReservationStatus @default(RESERVED)
   // Emplacement d'utilisation : où le matériel doit être amené pendant la
-  // réservation. Différent du rangement (StockItemLocation). À la fin de la
+  // réservation. Différent du rangement (StockItem.location). À la fin de la
   // réservation, le matériel retourne à son emplacement de rangement.
   // Au moins l'un des trois (location/zoneId/markerId) doit être renseigné
   // (validé côté API).

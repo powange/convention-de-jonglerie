@@ -92,7 +92,9 @@
       "Bash(mkdir -p /home/powange/projects/convention-de-jonglerie/server/api/editions/\\\\[id\\\\]/faq)",
       "Bash(mkdir -p /home/powange/projects/convention-de-jonglerie/app/pages/editions/\\\\[id\\\\]/gestion/faq)",
       "Bash(sed -i \"s/public\\\\\\\\.faq\\\\\\\\.title/faq.title/g; s/public\\\\\\\\.faq\\\\\\\\.description/faq.description/g; s/public\\\\\\\\.faq\\\\\\\\.empty_state/faq.empty_state/g\" /home/powange/projects/convention-de-jonglerie/app/components/edition/Header.vue /home/powange/projects/convention-de-jonglerie/app/pages/editions/\\\\[id\\\\]/faq.vue)",
-      "Bash(node --input-type=module -e ' *)"
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(grep -rli \"discord\\\\|message.*utilisateur\" /home/powange/.claude/ /home/powange/projects/convention-de-jonglerie/.claude/ /home/powange/projects/convention-de-jonglerie/CLAUDE.md 2>&1 | head -10)",
+      "Read(//home/powange/.claude/**)"
     ],
     "additionalDirectories": [
       "/tmp",

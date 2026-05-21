@@ -2,10 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockGetEditionWithPermissions = vi.hoisted(() => vi.fn())
 const mockCanManageStock = vi.hoisted(() => vi.fn())
+const mockValidateReservationLocation = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
   getEditionWithPermissions: mockGetEditionWithPermissions,
   canManageStock: mockCanManageStock,
+}))
+
+vi.mock('#server/utils/stock-helpers', () => ({
+  validateReservationLocation: mockValidateReservationLocation,
+  stockItemLocationInclude: {},
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({
@@ -30,33 +36,22 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
     vi.clearAllMocks()
     mockGetEditionWithPermissions.mockResolvedValue(mockEdition)
     mockCanManageStock.mockReturnValue(true)
+    mockValidateReservationLocation.mockResolvedValue(undefined)
     prismaMock.stockItem.findFirst.mockReset()
     prismaMock.stockGroup.findFirst.mockReset()
-    prismaMock.editionZone.findMany.mockReset()
-    prismaMock.editionMarker.findMany.mockReset()
     prismaMock.stockItem.update.mockReset()
-    prismaMock.stockItemLocation.deleteMany.mockReset()
-    prismaMock.stockItemLocation.createMany.mockReset()
-    prismaMock.stockItemLocation.findMany.mockReset()
-    prismaMock.stockItemLocation.findMany.mockResolvedValue([])
     prismaMock.stockReservation.findMany.mockReset()
     prismaMock.stockReservation.findMany.mockResolvedValue([])
-    prismaMock.stockItem.findUniqueOrThrow.mockReset()
     prismaMock.stockItem.findFirst.mockResolvedValue({
       id: 5,
       stockGroupId: 2,
       name: 'Old',
       quantity: 3,
+      location: 'Initial',
+      zoneId: null,
+      markerId: null,
     })
     prismaMock.stockItem.update.mockResolvedValue({ id: 5, name: 'New', quantity: 5 })
-    prismaMock.stockItem.findUniqueOrThrow.mockResolvedValue({
-      id: 5,
-      name: 'New',
-      quantity: 5,
-      locations: [],
-    })
-    // Simule l'exécution de la transaction en appelant le callback avec prismaMock
-    prismaMock.$transaction.mockImplementation(async (cb: any) => cb(prismaMock))
     global.readBody = vi.fn().mockResolvedValue({ name: 'New', quantity: 5 })
   })
 
@@ -102,47 +97,40 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
   })
 
-  it('remplace tous les sous-emplacements si locations est fourni', async () => {
-    global.readBody = vi.fn().mockResolvedValue({
-      quantity: 5,
-      locations: [
-        { location: 'A', quantity: 3 },
-        { location: 'B', quantity: 2 },
-      ],
-    })
+  it("met à jour l'emplacement de rangement (location texte)", async () => {
+    global.readBody = vi.fn().mockResolvedValue({ location: 'Nouveau lieu' })
     await handler(baseEvent as any)
-    expect(prismaMock.stockItemLocation.deleteMany).toHaveBeenCalledWith({
-      where: { stockItemId: 5 },
-    })
-    expect(prismaMock.stockItemLocation.createMany).toHaveBeenCalledWith({
-      data: expect.arrayContaining([
-        expect.objectContaining({ stockItemId: 5, location: 'A', quantity: 3 }),
-        expect.objectContaining({ stockItemId: 5, location: 'B', quantity: 2 }),
-      ]),
-    })
+    expect(prismaMock.stockItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { location: 'Nouveau lieu' },
+      })
+    )
+    expect(mockValidateReservationLocation).toHaveBeenCalledWith(
+      { zoneId: null, markerId: null },
+      1
+    )
   })
 
-  it('rejette si la somme des locations dépasse la nouvelle quantité', async () => {
-    global.readBody = vi.fn().mockResolvedValue({
-      quantity: 4,
-      locations: [{ location: 'A', quantity: 5 }],
-    })
-    await expect(handler(baseEvent as any)).rejects.toThrow(/d.passe/)
-    expect(prismaMock.stockItemLocation.createMany).not.toHaveBeenCalled()
+  it("met à jour l'emplacement avec une zone", async () => {
+    global.readBody = vi.fn().mockResolvedValue({ zoneId: 12 })
+    await handler(baseEvent as any)
+    expect(prismaMock.stockItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { zoneId: 12 } })
+    )
+    expect(mockValidateReservationLocation).toHaveBeenCalledWith({ zoneId: 12, markerId: null }, 1)
   })
 
-  it('rejette une baisse de quantité incompatible avec les locations existantes', async () => {
-    // Pas de `locations` dans le body → on vérifie contre les locations existantes
-    global.readBody = vi.fn().mockResolvedValue({ quantity: 2 })
-    prismaMock.stockItemLocation.findMany.mockResolvedValue([{ quantity: 3 }, { quantity: 1 }])
-    await expect(handler(baseEvent as any)).rejects.toThrow(/somme/i)
+  it('rejette zone + marker simultanés', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ zoneId: 12, markerId: 7 })
+    await expect(handler(baseEvent as any)).rejects.toThrow(/zone.*marqueur/i)
   })
 
-  it("rejette si un sous-emplacement n'a aucune localisation", async () => {
-    global.readBody = vi.fn().mockResolvedValue({
-      locations: [{ location: '', zoneId: null, markerId: null, quantity: 1 }],
-    })
-    await expect(handler(baseEvent as any)).rejects.toThrow()
+  it("permet de remettre l'emplacement à vide (location: null)", async () => {
+    global.readBody = vi.fn().mockResolvedValue({ location: null })
+    await handler(baseEvent as any)
+    expect(prismaMock.stockItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { location: null } })
+    )
   })
 
   it('rejette une baisse de quantité incompatible avec une réservation active', async () => {
@@ -156,14 +144,5 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
       },
     ])
     await expect(handler(baseEvent as any)).rejects.toThrow(/pic de r.servations/i)
-  })
-
-  it('permet de vider la liste des emplacements (tout devient non localisé)', async () => {
-    global.readBody = vi.fn().mockResolvedValue({ locations: [] })
-    await handler(baseEvent as any)
-    expect(prismaMock.stockItemLocation.deleteMany).toHaveBeenCalledWith({
-      where: { stockItemId: 5 },
-    })
-    expect(prismaMock.stockItemLocation.createMany).not.toHaveBeenCalled()
   })
 })

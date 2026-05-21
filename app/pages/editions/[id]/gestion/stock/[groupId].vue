@@ -95,12 +95,23 @@
               class="bg-gray-50 dark:bg-gray-800/50 text-xs uppercase text-gray-600 dark:text-gray-400"
             >
               <tr>
+                <th class="px-2 py-2 w-10 text-center">
+                  <UCheckbox
+                    :model-value="allSelectedState"
+                    :indeterminate="someSelected && !allSelected"
+                    :aria-label="$t('common.select_all')"
+                    @update:model-value="toggleSelectAll"
+                  />
+                </th>
                 <th class="px-4 py-2 text-left font-medium">{{ $t('gestion.stock.item_name') }}</th>
                 <th class="px-4 py-2 text-right font-medium whitespace-nowrap">
                   {{ $t('common.quantity') }}
                 </th>
                 <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
-                  {{ $t('gestion.stock.locations') }}
+                  {{ $t('gestion.stock.item_storage_location') }}
+                </th>
+                <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
+                  {{ $t('gestion.stock.item_current_location') }}
                 </th>
                 <th class="px-4 py-2 text-right font-medium whitespace-nowrap">
                   {{ $t('gestion.stock.reservations_title') }}
@@ -112,9 +123,19 @@
               <tr
                 v-for="item in group.items"
                 :key="item.id"
-                class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                :class="[
+                  'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
+                  selectedItemIds.has(item.id) ? 'bg-primary-50/40 dark:bg-primary-950/30' : '',
+                ]"
                 @click="goToItem(item.id)"
               >
+                <td class="px-2 py-3 align-top text-center" @click.stop>
+                  <UCheckbox
+                    :model-value="selectedItemIds.has(item.id)"
+                    :aria-label="$t('common.select')"
+                    @update:model-value="toggleItem(item.id, $event)"
+                  />
+                </td>
                 <td class="px-4 py-3 align-top">
                   <div class="font-medium">{{ item.name }}</div>
                   <StockItemDescription :text="item.description" />
@@ -123,31 +144,49 @@
                   <span class="font-medium tabular-nums">×{{ item.quantity }}</span>
                 </td>
                 <td class="px-4 py-3 align-top">
-                  <div v-if="item.locations.length" class="flex flex-wrap gap-1.5">
-                    <UBadge
-                      v-for="loc in item.locations"
-                      :key="loc.id"
-                      color="neutral"
-                      variant="soft"
-                      size="md"
-                      class="font-normal"
-                    >
-                      <span class="flex items-center gap-1.5">
-                        <span
-                          v-if="loc.zone"
-                          class="size-3 rounded-full"
-                          :style="{ backgroundColor: loc.zone.color }"
-                        />
-                        <UIcon v-else-if="loc.marker" name="i-heroicons-flag" class="size-4" />
-                        <UIcon v-else name="i-heroicons-map-pin" class="size-4" />
-                        {{ loc.zone?.name || loc.marker?.name || loc.location }}
-                        <span class="text-gray-500">×{{ loc.quantity }}</span>
-                      </span>
-                    </UBadge>
+                  <div
+                    v-if="item.location || item.zone || item.marker"
+                    class="flex items-center flex-wrap gap-1.5 text-sm"
+                  >
+                    <span
+                      v-if="item.zone"
+                      class="size-3 rounded-full border border-gray-300"
+                      :style="{ backgroundColor: item.zone.color }"
+                    />
+                    <UIcon v-else-if="item.marker" name="i-heroicons-flag" class="size-4" />
+                    <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
+                    <span>{{ item.zone?.name || item.marker?.name || item.location }}</span>
                   </div>
                   <span v-else class="text-sm text-gray-400 italic">
-                    {{ $t('gestion.stock.no_locations_yet') }}
+                    {{ $t('gestion.stock.no_location') }}
                   </span>
+                </td>
+                <td class="px-4 py-3 align-top">
+                  <ul v-if="currentLocations(item).length" class="space-y-1 text-sm">
+                    <li
+                      v-for="r in currentLocations(item)"
+                      :key="r.id"
+                      class="flex items-center flex-wrap gap-1.5"
+                    >
+                      <UBadge
+                        color="neutral"
+                        variant="soft"
+                        size="xs"
+                        class="tabular-nums shrink-0"
+                      >
+                        ×{{ r.quantityReserved }}
+                      </UBadge>
+                      <span
+                        v-if="r.zone"
+                        class="size-3 rounded-full border border-gray-300"
+                        :style="{ backgroundColor: r.zone.color }"
+                      />
+                      <UIcon v-else-if="r.marker" name="i-heroicons-flag" class="size-4" />
+                      <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
+                      <span>{{ r.zone?.name || r.marker?.name || r.location }}</span>
+                    </li>
+                  </ul>
+                  <span v-else class="text-sm text-gray-400 italic">—</span>
                 </td>
                 <td class="px-4 py-3 align-top text-right whitespace-nowrap">
                   <div
@@ -157,18 +196,18 @@
                     {{ item._count.reservations }}
                   </div>
                   <div
-                    v-if="item.reservations[0]"
+                    v-if="nextReservation(item)"
                     class="text-xs text-gray-500 mt-0.5 flex items-center justify-end gap-1"
                   >
                     <UBadge
-                      :color="reservationBadgeColor(item.reservations[0])"
+                      :color="reservationBadgeColor(nextReservation(item)!)"
                       variant="soft"
                       size="xs"
                     >
-                      {{ reservationBadgeLabel(item.reservations[0]) }}
+                      {{ reservationBadgeLabel(nextReservation(item)!) }}
                     </UBadge>
                     <span class="whitespace-nowrap">{{
-                      formatNextDate(item.reservations[0])
+                      formatNextDate(nextReservation(item)!)
                     }}</span>
                   </div>
                 </td>
@@ -219,8 +258,61 @@
       :edition-id="editionId"
       :group-id="group.id"
       :item="editingItem"
+      :zones="zones"
+      :markers="markers"
+      :site-map-enabled="!!edition?.siteMapEnabled"
       @saved="handleItemSaved"
     />
+
+    <StockBulkReservationModal
+      v-if="group && bulkModalItems.length"
+      v-model:open="bulkModalOpen"
+      :edition-id="editionId"
+      :items="bulkModalItems"
+      :zones="zones"
+      :markers="markers"
+      :site-map-enabled="!!edition?.siteMapEnabled"
+      :edition-start-date="edition?.startDate ?? null"
+      :edition-setup-start-date="(edition as any)?.volunteersSetupStartDate ?? null"
+      @saved="handleBulkSaved"
+    />
+
+    <!-- Barre flottante quand au moins 1 item est sélectionné -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="translate-y-full opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="translate-y-0 opacity-100"
+        leave-to-class="translate-y-full opacity-0"
+      >
+        <div
+          v-if="someSelected"
+          class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-2 flex items-center gap-3"
+        >
+          <span class="text-sm text-gray-700 dark:text-gray-300">
+            {{ $t('gestion.stock.selected_count', { count: selectedItemIds.size }) }}
+          </span>
+          <UButton
+            color="primary"
+            size="sm"
+            icon="i-heroicons-plus"
+            @click="openBulkReservationModal"
+          >
+            {{ $t('gestion.stock.bulk_reserve', { count: selectedItemIds.size }) }}
+          </UButton>
+          <UButton
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            icon="i-heroicons-x-mark"
+            :aria-label="$t('gestion.stock.clear_selection')"
+            @click="clearSelection"
+          />
+        </div>
+      </Transition>
+    </Teleport>
   </UContainer>
 </template>
 
@@ -241,13 +333,6 @@ const editionStore = useEditionStore()
 const editionId = parseInt(route.params.id as string)
 const groupId = computed(() => parseInt(route.params.groupId as string))
 
-interface StockItemLocationLite {
-  id: number
-  location: string | null
-  quantity: number
-  zone: { id: number; name: string; color: string } | null
-  marker: { id: number; name: string } | null
-}
 type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'
 interface StockItemUpcomingReservation {
   id: number
@@ -255,13 +340,18 @@ interface StockItemUpcomingReservation {
   startsAt: string
   endsAt: string
   quantityReserved: number
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
 }
 interface StockItem {
   id: number
   name: string
   description: string | null
   quantity: number
-  locations: StockItemLocationLite[]
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
   reservations: StockItemUpcomingReservation[]
   _count: { reservations: number }
 }
@@ -292,18 +382,13 @@ interface PlanningReservation {
   marker: { id: number; name: string } | null
   user: PlanningReservationUser
 }
-interface PlanningItemLocation {
-  id: number
-  location: string | null
-  quantity: number
-  zone: { id: number; name: string; color: string } | null
-  marker: { id: number; name: string } | null
-}
 interface PlanningItem {
   id: number
   name: string
   quantity: number
-  locations: PlanningItemLocation[]
+  location: string | null
+  zone: { id: number; name: string; color: string } | null
+  marker: { id: number; name: string } | null
   reservations: PlanningReservation[]
 }
 
@@ -401,6 +486,72 @@ const groupModalOpen = ref(false)
 const itemModalOpen = ref(false)
 const editingItem = ref<StockItem | null>(null)
 const reservationModalOpen = ref(false)
+
+// --- Sélection multi-items pour la réservation groupée ---
+const selectedItemIds = ref<Set<number>>(new Set())
+const bulkModalOpen = ref(false)
+const bulkModalItems = ref<{ id: number; name: string; maxQuantity: number }[]>([])
+
+const someSelected = computed(() => selectedItemIds.value.size > 0)
+const allSelected = computed(() => {
+  const items = group.value?.items || []
+  return items.length > 0 && items.every((it) => selectedItemIds.value.has(it.id))
+})
+const allSelectedState = computed(() => allSelected.value)
+
+function toggleItem(id: number, checked: boolean) {
+  const next = new Set(selectedItemIds.value)
+  if (checked) next.add(id)
+  else next.delete(id)
+  selectedItemIds.value = next
+}
+
+function toggleSelectAll(checked: boolean) {
+  const items = group.value?.items || []
+  selectedItemIds.value = checked ? new Set(items.map((it) => it.id)) : new Set()
+}
+
+function clearSelection() {
+  selectedItemIds.value = new Set()
+}
+
+function openBulkReservationModal() {
+  const items = group.value?.items || []
+  bulkModalItems.value = items
+    .filter((it) => selectedItemIds.value.has(it.id))
+    .map((it) => ({ id: it.id, name: it.name, maxQuantity: it.quantity }))
+  if (bulkModalItems.value.length === 0) return
+  bulkModalOpen.value = true
+}
+
+async function handleBulkSaved() {
+  clearSelection()
+  await fetchAll()
+}
+
+// Quand le groupe change (navigation entre groupes), on vide la sélection
+// pour ne pas garder des IDs d'un autre contexte.
+watch(groupId, () => {
+  clearSelection()
+})
+
+// Quand les items du groupe changent (refetch, suppression, etc.), on retire
+// de la sélection les IDs qui n'existent plus pour éviter une barre flottante
+// avec un compteur faussé.
+watch(
+  () => group.value?.items.map((it) => it.id) || [],
+  (ids) => {
+    if (!selectedItemIds.value.size) return
+    const present = new Set(ids)
+    const next = new Set<number>()
+    for (const id of selectedItemIds.value) {
+      if (present.has(id)) next.add(id)
+    }
+    if (next.size !== selectedItemIds.value.size) {
+      selectedItemIds.value = next
+    }
+  }
+)
 const planningReservationContext = ref<{
   itemId: number
   itemQuantity: number
@@ -503,6 +654,36 @@ function formatNextDate(r: StockItemUpcomingReservation): string {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(date))
+}
+
+// Pré-calculs mémoïsés par item pour éviter un re-filtrage à chaque tick
+// d'horloge ou re-rendu (la colonne est appelée plusieurs fois par ligne).
+const itemsComputeMap = computed<
+  Record<
+    number,
+    { next: StockItemUpcomingReservation | null; current: StockItemUpcomingReservation[] }
+  >
+>(() => {
+  const map: Record<
+    number,
+    { next: StockItemUpcomingReservation | null; current: StockItemUpcomingReservation[] }
+  > = {}
+  for (const it of group.value?.items || []) {
+    const pickedUp = it.reservations
+      .filter((r) => r.status === 'PICKED_UP')
+      .slice()
+      .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime())
+    map[it.id] = { next: it.reservations[0] ?? null, current: pickedUp }
+  }
+  return map
+})
+
+function nextReservation(item: StockItem): StockItemUpcomingReservation | null {
+  return itemsComputeMap.value[item.id]?.next ?? null
+}
+
+function currentLocations(item: StockItem): StockItemUpcomingReservation[] {
+  return itemsComputeMap.value[item.id]?.current ?? []
 }
 
 function openItemModal(item: StockItem | null) {

@@ -1,128 +1,10 @@
-import { z } from 'zod'
-
 import { canManageStock, type EditionWithPermissions } from './permissions/edition-permissions'
 
 import type { UserForPermissions } from './permissions/types'
 
 /**
- * Schéma Zod d'un sous-emplacement de stock envoyé par le client lors d'une
- * création ou d'une mise à jour d'item. La validation cross-champ (au moins
- * une localisation parmi texte/zone/marqueur) est faite via `.refine()`.
- */
-export const stockItemLocationInputSchema = z
-  .object({
-    location: z.string().trim().max(200).nullable().optional(),
-    zoneId: z.number().int().positive().nullable().optional(),
-    markerId: z.number().int().positive().nullable().optional(),
-    quantity: z.number().int().positive(),
-  })
-  .refine((data) => !!(data.location?.trim() || data.zoneId || data.markerId), {
-    message: 'Indiquez une localisation textuelle ou un emplacement sur la carte',
-    path: ['location'],
-  })
-  .refine((data) => !(data.zoneId && data.markerId), {
-    message: 'Un emplacement ne peut pas être à la fois une zone et un marqueur',
-    path: ['zoneId'],
-  })
-
-export type StockItemLocationInput = z.infer<typeof stockItemLocationInputSchema>
-
-/**
- * Calcule une clé canonique pour un emplacement, utilisée pour la fusion.
- * Priorité : zoneId > markerId > texte (normalisé : trim + casse). Deux
- * emplacements ayant la même clé représentent « le même endroit » et peuvent
- * être fusionnés (quantités additionnées).
- *
- * Note : un emplacement texte n'est jamais fusionné avec une zone/marker
- * (textuel vs lien carte = sémantique différente).
- */
-function stockItemLocationKey(loc: StockItemLocationInput): string {
-  if (loc.zoneId) return `zone:${loc.zoneId}`
-  if (loc.markerId) return `marker:${loc.markerId}`
-  const text = (loc.location ?? '').trim().toLocaleLowerCase()
-  return `text:${text}`
-}
-
-/**
- * Fusionne les sous-emplacements qui ciblent le même endroit en additionnant
- * leurs quantités. Préserve l'ordre du premier doublon rencontré.
- *
- * Retourne aussi le nombre d'entrées fusionnées (pour notifier l'utilisateur).
- */
-export function mergeStockItemLocations(locations: StockItemLocationInput[]): {
-  merged: StockItemLocationInput[]
-  mergedCount: number
-} {
-  const buckets = new Map<string, StockItemLocationInput>()
-  for (const loc of locations) {
-    const key = stockItemLocationKey(loc)
-    const existing = buckets.get(key)
-    if (existing) {
-      existing.quantity += loc.quantity
-    } else {
-      buckets.set(key, { ...loc, location: loc.location?.trim() ?? null })
-    }
-  }
-  const merged = Array.from(buckets.values())
-  return { merged, mergedCount: locations.length - merged.length }
-}
-
-/**
- * Vérifie que chaque sous-emplacement référence une zone/marqueur appartenant
- * à l'édition, et que la somme des quantités ne dépasse pas la quantité totale
- * de l'item. Lève une createError sinon.
- */
-export async function validateStockItemLocations(
-  locations: StockItemLocationInput[],
-  editionId: number,
-  itemQuantity: number
-): Promise<void> {
-  if (locations.length === 0) return
-
-  const totalLocated = locations.reduce((sum, l) => sum + l.quantity, 0)
-  if (totalLocated > itemQuantity) {
-    throw createError({
-      status: 400,
-      message: 'La somme des quantités par emplacement dépasse la quantité totale de l’objet',
-    })
-  }
-
-  const zoneIds = Array.from(
-    new Set(locations.map((l) => l.zoneId).filter((id): id is number => !!id))
-  )
-  const markerIds = Array.from(
-    new Set(locations.map((l) => l.markerId).filter((id): id is number => !!id))
-  )
-
-  if (zoneIds.length > 0) {
-    const zones = await prisma.editionZone.findMany({
-      where: { id: { in: zoneIds }, editionId },
-      select: { id: true },
-    })
-    if (zones.length !== zoneIds.length) {
-      throw createError({
-        status: 400,
-        message: "Une zone référencée n'appartient pas à cette édition",
-      })
-    }
-  }
-  if (markerIds.length > 0) {
-    const markers = await prisma.editionMarker.findMany({
-      where: { id: { in: markerIds }, editionId },
-      select: { id: true },
-    })
-    if (markers.length !== markerIds.length) {
-      throw createError({
-        status: 400,
-        message: "Un marqueur référencé n'appartient pas à cette édition",
-      })
-    }
-  }
-}
-
-/**
- * Vérifie qu'une zone/un marqueur référencés par une réservation appartiennent
- * bien à l'édition. Lève une createError sinon.
+ * Vérifie qu'une zone/un marqueur référencés par une réservation ou un item
+ * de stock appartiennent bien à l'édition. Lève une createError sinon.
  */
 export async function validateReservationLocation(
   loc: { zoneId: number | null; markerId: number | null },
@@ -155,16 +37,13 @@ export async function validateReservationLocation(
 }
 
 /**
- * Include Prisma standard pour récupérer les sous-emplacements d'un item de
- * stock avec les infos zone/marker nécessaires pour l'affichage.
+ * Include Prisma standard pour récupérer l'emplacement de rangement d'un item
+ * de stock avec les infos zone/marker nécessaires pour l'affichage.
  */
-export const stockItemLocationsInclude = {
-  orderBy: [{ displayOrder: 'asc' as const }, { createdAt: 'asc' as const }],
-  include: {
-    zone: { select: { id: true, name: true, color: true } },
-    marker: { select: { id: true, name: true } },
-  },
-}
+export const stockItemLocationInclude = {
+  zone: { select: { id: true, name: true, color: true } },
+  marker: { select: { id: true, name: true } },
+} as const
 
 /**
  * Vérifie si un utilisateur est responsable d'au moins une équipe bénévole
@@ -210,14 +89,19 @@ export async function canAccessStock(
  *
  * Retourne le nombre total d'exemplaires déjà engagés qui chevauchent
  * la période [startsAt, endsAt].
+ *
+ * Le paramètre `client` permet d'utiliser un client de transaction Prisma
+ * (`tx` dans `prisma.$transaction(async (tx) => …)`) pour serrer la fenêtre
+ * de race condition entre la vérification de dispo et la création.
  */
 export async function getReservedQuantityOnPeriod(
   stockItemId: number,
   startsAt: Date,
   endsAt: Date,
-  excludeReservationId?: number
+  excludeReservationId?: number,
+  client: { stockReservation: typeof prisma.stockReservation } = prisma
 ): Promise<number> {
-  const reservations = await prisma.stockReservation.findMany({
+  const reservations = await client.stockReservation.findMany({
     where: {
       stockItemId,
       status: { in: ['RESERVED', 'PICKED_UP'] },

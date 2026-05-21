@@ -9,7 +9,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
 
 vi.mock('#server/utils/stock-helpers', () => ({
   canAccessStock: mockCanAccessStock,
-  stockItemLocationsInclude: {},
+  stockItemLocationInclude: {},
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({
@@ -63,7 +63,7 @@ describe('GET /api/editions/[id]/stock-groups', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
   })
 
-  it('inclut les RESERVED non terminées ET les PICKED_UP (overdue inclus)', async () => {
+  it('inclut les RESERVED non terminées ET les PICKED_UP avec leur emplacement', async () => {
     await handler(baseEvent as any)
     const call = prismaMock.stockGroup.findMany.mock.calls[0][0]
     const resInclude = call.include.items.include.reservations
@@ -72,7 +72,15 @@ describe('GET /api/editions/[id]/stock-groups', () => {
       { status: 'PICKED_UP' },
     ])
     expect(resInclude.orderBy).toEqual({ startsAt: 'asc' })
-    expect(resInclude.take).toBe(1)
+    // Borne raisonnable pour éviter le sur-fetch sur des items avec un
+    // long historique de PICKED_UP, tout en couvrant la colonne "Emplacement
+    // actuel" et l'aperçu "prochaine réservation".
+    expect(resInclude.take).toBe(20)
+    expect(resInclude.select).toMatchObject({
+      location: true,
+      zone: expect.any(Object),
+      marker: expect.any(Object),
+    })
     // user.pseudo retiré du select (non utilisé côté UI)
     expect(resInclude.select).not.toHaveProperty('user')
   })

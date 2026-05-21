@@ -94,7 +94,7 @@ describe('GET /api/editions/[id]/faq', () => {
     expect(prismaMock.faqEntry.findMany).not.toHaveBeenCalled()
   })
 
-  it("autorise un éditeur à accéder à la FAQ même si la page publique est désactivée", async () => {
+  it('autorise un éditeur à accéder à la FAQ même si la page publique est désactivée', async () => {
     mockOptionalAuth.mockReturnValue({ id: 42 })
     mockCanEditEdition.mockReturnValue(true)
     mockGetEditionWithPermissions.mockResolvedValue({ ...mockEdition, faqPagePublic: false })

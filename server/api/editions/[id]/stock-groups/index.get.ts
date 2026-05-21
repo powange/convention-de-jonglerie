@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
-import { canAccessStock, stockItemLocationsInclude } from '#server/utils/stock-helpers'
+import { canAccessStock, stockItemLocationInclude } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -31,27 +31,34 @@ export default wrapApiHandler(
         items: {
           orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
           include: {
-            locations: stockItemLocationsInclude,
+            ...stockItemLocationInclude,
             _count: { select: { reservations: true } },
-            // Réservation à afficher : en cours, en retard (PICKED_UP non
-            // rendue après endsAt) ou la prochaine à venir.
-            // - RESERVED : exclure les réservations terminées (endsAt < now)
-            // - PICKED_UP : toujours inclure tant que pas RETURNED (le retard
-            //   est précisément le cas à signaler)
-            // L'ordre asc sur startsAt place les en-cours/retard en tête
-            // (leur startsAt est dans le passé).
+            // Réservations à exposer pour les colonnes "Prochaine réservation"
+            // et "Emplacement actuel". On retourne :
+            // - les RESERVED non terminées (endsAt > now) — utilisées pour
+            //   "prochaine" + le retard PICKED_UP éventuel
+            // - toutes les PICKED_UP (sorties non encore rendues) — utilisées
+            //   pour la colonne "Emplacement actuel"
+            // L'ordre asc sur startsAt place les en-cours/retard en tête.
             reservations: {
               where: {
                 OR: [{ status: 'RESERVED', endsAt: { gt: now } }, { status: 'PICKED_UP' }],
               },
               orderBy: { startsAt: 'asc' },
-              take: 1,
+              // Borne pour éviter un sur-fetch sur les items avec un long
+              // historique de PICKED_UP. La colonne "Emplacement actuel" et
+              // l'aperçu "prochaine réservation" sont couverts par les
+              // premières entrées triées par startsAt.
+              take: 20,
               select: {
                 id: true,
                 status: true,
                 startsAt: true,
                 endsAt: true,
                 quantityReserved: true,
+                location: true,
+                zone: { select: { id: true, name: true, color: true } },
+                marker: { select: { id: true, name: true } },
               },
             },
           },

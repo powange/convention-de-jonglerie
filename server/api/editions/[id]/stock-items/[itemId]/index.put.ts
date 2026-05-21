@@ -6,12 +6,7 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
-import {
-  mergeStockItemLocations,
-  stockItemLocationInputSchema,
-  stockItemLocationsInclude,
-  validateStockItemLocations,
-} from '#server/utils/stock-helpers'
+import { stockItemLocationInclude, validateReservationLocation } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -22,8 +17,11 @@ const bodySchema = z.object({
   notes: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
   stockGroupId: z.number().int().positive().optional(),
-  // Si fourni, remplace l'intégralité des sous-emplacements de l'item.
-  locations: z.array(stockItemLocationInputSchema).max(50).optional(),
+  // Emplacement de rangement par défaut. Tous nullable : on autorise de
+  // remettre l'item « sans emplacement ».
+  location: z.string().trim().max(200).nullable().optional(),
+  zoneId: z.number().int().positive().nullable().optional(),
+  markerId: z.number().int().positive().nullable().optional(),
   // Emprunt externe (optionnel)
   isExternalLoan: z.boolean().optional(),
   ownerContact: z.string().trim().max(500).nullable().optional(),
@@ -78,16 +76,23 @@ export default wrapApiHandler(
       }
     }
 
-    // Fusionner les emplacements ciblant le même endroit (mêmes zone/marker/texte)
-    // pour éviter les doublons silencieux côté base.
-    let mergedLocations: typeof data.locations | undefined
-    let mergedCount = 0
-    if (data.locations !== undefined) {
-      const result = mergeStockItemLocations(data.locations)
-      mergedLocations = result.merged
-      mergedCount = result.mergedCount
-      const targetQuantity = data.quantity ?? existing.quantity
-      await validateStockItemLocations(mergedLocations, editionId, targetQuantity)
+    // Validation de l'emplacement de rangement si touché : pas de zone+marker
+    // simultanés, et la zone/marker doit appartenir à l'édition.
+    const touchesLocation =
+      data.location !== undefined || data.zoneId !== undefined || data.markerId !== undefined
+    if (touchesLocation) {
+      const nextZoneId = data.zoneId !== undefined ? data.zoneId : existing.zoneId
+      const nextMarkerId = data.markerId !== undefined ? data.markerId : existing.markerId
+      if (nextZoneId && nextMarkerId) {
+        throw createError({
+          status: 400,
+          message: 'Un emplacement ne peut pas être à la fois une zone et un marqueur',
+        })
+      }
+      await validateReservationLocation(
+        { zoneId: nextZoneId ?? null, markerId: nextMarkerId ?? null },
+        editionId
+      )
     }
 
     const updateData: Record<string, unknown> = {}
@@ -97,6 +102,9 @@ export default wrapApiHandler(
     if (data.notes !== undefined) updateData.notes = data.notes?.trim() || null
     if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder
     if (data.stockGroupId !== undefined) updateData.stockGroupId = data.stockGroupId
+    if (data.location !== undefined) updateData.location = data.location?.trim() || null
+    if (data.zoneId !== undefined) updateData.zoneId = data.zoneId
+    if (data.markerId !== undefined) updateData.markerId = data.markerId
     // Emprunt externe : si on désactive le flag, on nettoie les autres champs
     // pour éviter de garder des données fantômes en base. Si on désactive
     // explicitement, on ignore aussi les valeurs envoyées sur les 3 champs
@@ -116,23 +124,6 @@ export default wrapApiHandler(
       updateData.returnDueAt = data.returnDueAt ? new Date(data.returnDueAt) : null
     if (data.returnedAt !== undefined && !disablingLoan)
       updateData.returnedAt = data.returnedAt ? new Date(data.returnedAt) : null
-
-    // Si la quantité diminue sans nouvelles locations envoyées, on doit
-    // s'assurer que la somme des locations existantes reste ≤ nouvelle quantity.
-    if (data.quantity !== undefined && data.locations === undefined) {
-      const existingLocations = await prisma.stockItemLocation.findMany({
-        where: { stockItemId: itemId },
-        select: { quantity: true },
-      })
-      const totalLocated = existingLocations.reduce((sum, l) => sum + l.quantity, 0)
-      if (totalLocated > data.quantity) {
-        throw createError({
-          status: 400,
-          message:
-            'La nouvelle quantité est inférieure à la somme des quantités déjà réparties par emplacement',
-        })
-      }
-    }
 
     // Si la quantité diminue, vérifier qu'aucune réservation active/future ne
     // dépasse la nouvelle quantité sur sa période. Sinon des réservations
@@ -168,32 +159,13 @@ export default wrapApiHandler(
       }
     }
 
-    const item = await prisma.$transaction(async (tx) => {
-      await tx.stockItem.update({ where: { id: itemId }, data: updateData })
-
-      if (mergedLocations !== undefined) {
-        await tx.stockItemLocation.deleteMany({ where: { stockItemId: itemId } })
-        if (mergedLocations.length > 0) {
-          await tx.stockItemLocation.createMany({
-            data: mergedLocations.map((loc, idx) => ({
-              stockItemId: itemId,
-              location: loc.location?.trim() || null,
-              zoneId: loc.zoneId ?? null,
-              markerId: loc.markerId ?? null,
-              quantity: loc.quantity,
-              displayOrder: idx,
-            })),
-          })
-        }
-      }
-
-      return tx.stockItem.findUniqueOrThrow({
-        where: { id: itemId },
-        include: { locations: stockItemLocationsInclude },
-      })
+    const item = await prisma.stockItem.update({
+      where: { id: itemId },
+      data: updateData,
+      include: stockItemLocationInclude,
     })
 
-    return createSuccessResponse({ item, mergedLocations: mergedCount })
+    return createSuccessResponse({ item })
   },
   { operationName: 'UpdateStockItem' }
 )
