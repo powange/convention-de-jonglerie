@@ -62,6 +62,8 @@ export default wrapApiHandler(
               select: {
                 id: true,
                 pseudo: true,
+                prenom: true,
+                nom: true,
                 emailHash: true,
                 profilePicture: true,
                 updatedAt: true,

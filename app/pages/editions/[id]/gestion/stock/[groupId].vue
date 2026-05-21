@@ -366,6 +366,8 @@ interface StockGroupItem {
 interface PlanningReservationUser {
   id: number
   pseudo: string
+  prenom?: string | null
+  nom?: string | null
   emailHash: string | null
   profilePicture: string | null
   updatedAt?: string
@@ -526,7 +528,7 @@ function openBulkReservationModal() {
 
 async function handleBulkSaved() {
   clearSelection()
-  await fetchAll()
+  await refreshPlanning()
 }
 
 // Quand le groupe change (navigation entre groupes), on vide la sélection
@@ -590,9 +592,10 @@ async function fetchPlanning() {
   }
 }
 
-// Charger les données planning à la 1ère bascule en mode planning, puis garder à jour
+// Recharger les données planning à chaque bascule en mode planning, pour
+// refléter d'éventuelles créations/modifications faites depuis la vue liste.
 watch(viewMode, (mode) => {
-  if (mode === 'planning' && !planningItems.value.length) {
+  if (mode === 'planning') {
     fetchPlanning()
   }
 })
@@ -729,12 +732,12 @@ async function deleteGroup() {
 }
 
 async function handleGroupSaved() {
-  await fetchAll()
+  await refreshPlanning()
 }
 async function handleGroupDeleted() {
   router.push(`/editions/${editionId}/gestion/stock`)
 }
 async function handleItemSaved() {
-  await fetchAll()
+  await refreshPlanning()
 }
 </script>

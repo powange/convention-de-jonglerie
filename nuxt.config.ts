@@ -110,6 +110,9 @@ export default defineNuxtConfig({
           'https://www.google.com',
           // Geocoding OSM utilisé pour l'autocomplétion d'adresses
           'https://nominatim.openstreetmap.org',
+          // Nuxt Icon en mode `serverBundle: 'remote'` : fetch direct
+          // des collections d'icônes depuis le CDN iconify côté client.
+          'https://api.iconify.design',
           // WebSocket pour le HMR Vite en dev (ws:) et la production HTTPS (wss:)
           ...(process.env.NODE_ENV === 'production' ? ['wss:'] : ['ws:', 'wss:']),
         ],

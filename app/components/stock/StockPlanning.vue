@@ -11,6 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAvatar } from '~/utils/avatar'
+
 import type { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core'
 import type { ResourceInput } from '@fullcalendar/resource'
 
@@ -19,6 +21,8 @@ type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED
 interface ReservationUser {
   id: number
   pseudo: string
+  prenom?: string | null
+  nom?: string | null
   emailHash: string | null
   profilePicture: string | null
   updatedAt?: string
@@ -60,6 +64,7 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useI18n()
+const { getUserAvatar, generateInitialsAvatar } = useAvatar()
 
 const plugins = shallowRef<any[]>([])
 const allLocales = shallowRef<any[]>([])
@@ -101,10 +106,6 @@ function statusColor(status: StockReservationStatus): string {
   }
 }
 
-function itemLocationsSummary(item: PlanningItem): string {
-  return item.zone?.name || item.marker?.name || item.location || ''
-}
-
 function reservationLocationLabel(r: PlanningReservation): string {
   const parts: string[] = []
   if (r.location) parts.push(r.location)
@@ -116,9 +117,10 @@ function reservationLocationLabel(r: PlanningReservation): string {
 const events = computed<EventInput[]>(() => {
   const list: EventInput[] = []
   for (const item of props.items) {
-    const stockageLabel = itemLocationsSummary(item)
     for (const r of item.reservations) {
-      // Emplacement d'utilisation (= où le matos doit être amené)
+      // Emplacement d'utilisation de la réservation (= où le matos doit être
+      // amené pendant la sortie). L'emplacement de rangement de l'item n'est
+      // pas affiché ici, il l'est déjà dans la vue liste.
       const useLabel = reservationLocationLabel(r)
       list.push({
         id: `r${r.id}`,
@@ -132,9 +134,8 @@ const events = computed<EventInput[]>(() => {
           itemId: item.id,
           status: r.status,
           quantityReserved: r.quantityReserved,
-          userPseudo: r.user.pseudo,
+          user: r.user,
           useLabel,
-          stockageLabel,
           usage: r.usage,
         },
       })
@@ -196,27 +197,22 @@ const calendarOptions = reactive<CalendarOptions>({
   eventContent: (arg) => {
     const ext = arg.event.extendedProps as {
       quantityReserved: number
-      userPseudo: string
+      user: ReservationUser
       useLabel: string
-      stockageLabel: string
       usage: string
     }
     const container = document.createElement('div')
     container.className = 'stock-event-content'
 
+    // Ligne 1 : quantité + titre (usage)
     const title = document.createElement('div')
     title.className = 'stock-event-title'
-    title.textContent = `×${ext.quantityReserved} · ${ext.userPseudo}`
+    title.textContent = ext.usage
+      ? `×${ext.quantityReserved} · ${ext.usage}`
+      : `×${ext.quantityReserved}`
     container.appendChild(title)
 
-    if (ext.usage) {
-      const usage = document.createElement('div')
-      usage.className = 'stock-event-usage'
-      usage.textContent = ext.usage
-      container.appendChild(usage)
-    }
-
-    // Lieu d'utilisation (où amener le matos) — info principale pour la résa
+    // Ligne 2 : localisation de la réservation
     if (ext.useLabel) {
       const loc = document.createElement('div')
       loc.className = 'stock-event-loc'
@@ -224,12 +220,30 @@ const calendarOptions = reactive<CalendarOptions>({
       container.appendChild(loc)
     }
 
-    // Lieu de stockage de l'item (où aller le chercher) — info secondaire
-    if (ext.stockageLabel) {
-      const stock = document.createElement('div')
-      stock.className = 'stock-event-stockage'
-      stock.textContent = `📦 ${ext.stockageLabel}`
-      container.appendChild(stock)
+    // Ligne 3 : utilisateur (avatar + prénom nom)
+    if (ext.user) {
+      const userLine = document.createElement('div')
+      userLine.className = 'stock-event-user'
+
+      const displayName =
+        [ext.user.prenom, ext.user.nom].filter(Boolean).join(' ') || ext.user.pseudo || ''
+
+      const avatar = document.createElement('img')
+      avatar.src = getUserAvatar(ext.user, 16)
+      avatar.alt = ''
+      avatar.className = 'stock-event-avatar'
+      // Fallback en cas d'échec de chargement (Gravatar 404, image perdue…)
+      avatar.onerror = () => {
+        avatar.onerror = null
+        avatar.src = generateInitialsAvatar(displayName || '?', 16)
+      }
+      userLine.appendChild(avatar)
+
+      const name = document.createElement('span')
+      name.textContent = displayName
+      userLine.appendChild(name)
+
+      container.appendChild(userLine)
     }
 
     return { domNodes: [container] }
@@ -292,34 +306,94 @@ watch(
 )
 </script>
 
-<style scoped>
-.stock-planning-calendar :deep(.fc) {
+<style>
+/* Styles repris du planning bénévoles pour cohérence visuelle.
+   Non-scoped car FullCalendar génère le DOM dynamiquement et certains
+   sélecteurs ne sont pas atteignables via :deep() en mode scoped. */
+.stock-planning-calendar {
+  --fc-border-color: rgb(229 231 235); /* gray-200 */
+  --fc-neutral-bg-color: rgb(249 250 251); /* gray-50 */
+}
+.stock-planning-calendar .fc {
   font-size: 0.875rem;
 }
-.stock-planning-calendar :deep(.fc-event) {
+.stock-planning-calendar .fc-theme-standard .fc-scrollgrid,
+.stock-planning-calendar .fc-theme-standard td,
+.stock-planning-calendar .fc-theme-standard th,
+.stock-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
+  border-color: rgb(229 231 235);
+}
+/* Force la bordure droite sur chaque slot — la ligne « majeure » d'heure
+   est parfois manquante par défaut quand `slotDuration` < `slotLabelInterval`. */
+.stock-planning-calendar .fc-timeline-slot {
+  border-right: 1px solid rgb(229 231 235);
+}
+.stock-planning-calendar .fc-timeline-slot-minor {
+  border-right-style: dotted;
+}
+.stock-planning-calendar .fc-resource {
+  background-color: rgb(249 250 251);
+  color: rgb(17 24 39);
+}
+.stock-planning-calendar .fc-event {
   cursor: pointer;
 }
-.stock-planning-calendar :deep(.stock-event-content) {
+
+/* Variantes dark mode : bordures un peu plus claires pour rester lisibles
+   sur fond sombre. */
+.dark .stock-planning-calendar {
+  --fc-border-color: rgb(75 85 99); /* gray-600 */
+  --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
+}
+.dark .stock-planning-calendar .fc-theme-standard .fc-scrollgrid,
+.dark .stock-planning-calendar .fc-theme-standard td,
+.dark .stock-planning-calendar .fc-theme-standard th,
+.dark .stock-planning-calendar .fc-theme-standard .fc-resource-timeline-divider,
+.dark .stock-planning-calendar .fc-timeline-slot {
+  border-color: rgb(75 85 99);
+}
+.dark .stock-planning-calendar .fc-resource {
+  background-color: rgb(31 41 55);
+  color: rgb(243 244 246);
+}
+.stock-planning-calendar .stock-event-content {
   padding: 2px 4px;
   font-size: 0.75rem;
-  line-height: 1.1;
+  line-height: 1.2;
   overflow: hidden;
 }
-.stock-planning-calendar :deep(.stock-event-title) {
+.stock-planning-calendar .stock-event-title {
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.stock-planning-calendar :deep(.stock-event-usage) {
+.stock-planning-calendar .stock-event-loc {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.stock-planning-calendar .stock-event-user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.7rem;
   opacity: 0.95;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.stock-planning-calendar :deep(.stock-event-loc),
-.stock-planning-calendar :deep(.stock-event-stockage) {
-  font-size: 0.65rem;
-  opacity: 0.85;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.stock-planning-calendar .stock-event-avatar {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 </style>
