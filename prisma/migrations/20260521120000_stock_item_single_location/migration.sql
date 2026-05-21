@@ -48,8 +48,5 @@ ALTER TABLE `StockItem`
     ADD CONSTRAINT `StockItem_markerId_fkey`
         FOREIGN KEY (`markerId`) REFERENCES `EditionMarker`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- 4) On RENOMME l'ancienne table au lieu de la DROP, pour permettre une
---    récupération en cas de problème de backfill détecté après coup. Une
---    migration ultérieure (à créer après confirmation en prod) supprimera
---    `_StockItemLocation_legacy` définitivement.
-ALTER TABLE `StockItemLocation` RENAME TO `_StockItemLocation_legacy`;
+-- 4) Suppression de la table StockItemLocation.
+DROP TABLE `StockItemLocation`;
