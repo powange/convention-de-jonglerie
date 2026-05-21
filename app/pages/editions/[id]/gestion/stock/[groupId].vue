@@ -150,7 +150,10 @@
                   </span>
                 </td>
                 <td class="px-4 py-3 align-top text-right whitespace-nowrap">
-                  <div :class="item._count.reservations ? '' : 'text-gray-400'" class="tabular-nums">
+                  <div
+                    :class="item._count.reservations ? '' : 'text-gray-400'"
+                    class="tabular-nums"
+                  >
                     {{ item._count.reservations }}
                   </div>
                   <div

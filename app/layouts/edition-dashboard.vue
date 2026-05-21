@@ -122,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAccessControlPermissions } from '~/composables/useAccessControlPermissions'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -245,6 +246,10 @@ const canAccessStock = computed(() => canManageStock.value || isTeamLeader.value
 // Vérifier si l'utilisateur est team leader
 const isTeamLeader = ref(false)
 const canAccessMealValidation = ref(false)
+
+// Accès lecture seule pendant un créneau bénévole "contrôle d'accès"
+// (utilisé pour rendre visible la FAQ aux bénévoles en mission).
+const { canAccessAccessControl } = useAccessControlPermissions(editionId)
 
 // Mode bénévoles (INTERNAL ou EXTERNAL)
 const volunteersMode = computed(() => edition.value?.volunteersMode || 'INTERNAL')
@@ -550,6 +555,26 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-archive-box',
       to: `/editions/${editionId.value}/gestion/stock`,
       tooltip: { content: t('gestion.stock.title') },
+    })
+  }
+
+  // FAQ : visible pour les organisateurs (même sans canEdit), les
+  // responsables d'équipe bénévoles et les bénévoles actuellement en
+  // créneau (contrôle d'accès ou validation des repas). Les actions
+  // de modification sont gardées côté page + côté API par `canEditEdition`.
+  if (
+    edition.value?.faqEnabled &&
+    (canEdit.value ||
+      isOrganizer.value ||
+      isTeamLeader.value ||
+      canAccessAccessControl.value ||
+      canAccessMealValidation.value)
+  ) {
+    managementSection.push({
+      label: t('gestion.faq.title'),
+      icon: 'i-heroicons-question-mark-circle',
+      to: `/editions/${editionId.value}/gestion/faq`,
+      tooltip: { content: t('gestion.faq.title') },
     })
   }
 

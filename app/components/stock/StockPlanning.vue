@@ -1,11 +1,7 @@
 <template>
   <UCard :ui="{ body: 'p-0 sm:p-0' }">
     <div class="bg-white dark:bg-gray-800 rounded-lg">
-      <UiLazyFullCalendar
-        v-if="ready"
-        :options="calendarOptions"
-        class="stock-planning-calendar"
-      />
+      <UiLazyFullCalendar v-if="ready" :options="calendarOptions" class="stock-planning-calendar" />
       <div v-else class="flex items-center justify-center py-8">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
         <span class="ml-2 text-sm text-gray-500">{{ $t('common.loading') }}</span>

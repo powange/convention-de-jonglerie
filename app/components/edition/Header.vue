@@ -126,11 +126,7 @@
             @update:model-value="onMobileTabChange"
           >
             <template #leading>
-              <UIcon
-                v-if="currentTabIcon"
-                :name="currentTabIcon"
-                class="size-6 text-primary-500"
-              />
+              <UIcon v-if="currentTabIcon" :name="currentTabIcon" class="size-6 text-primary-500" />
             </template>
             <template #item-leading="{ item: opt }">
               <UIcon :name="(opt as { icon: string }).icon" class="size-5" />
@@ -175,6 +171,26 @@
         >
           <UIcon name="i-lucide-map" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
           <span class="hidden md:inline">{{ t('gestion.map.title') }}</span>
+        </NuxtLink>
+
+        <NuxtLink
+          v-if="faqTabVisible"
+          :to="`/editions/${edition.id}/faq`"
+          :class="[
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'faq'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          :title="t('faq.title')"
+        >
+          <UIcon
+            name="i-heroicons-question-mark-circle"
+            :class="['md:mr-1']"
+            size="24"
+            class="md:w-4! md:h-4!"
+          />
+          <span class="hidden md:inline">{{ t('faq.title') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -309,7 +325,6 @@
           </NuxtLink>
         </ClientOnly>
       </nav>
-
     </div>
 
     <!-- Modale d'informations sur la convention -->
@@ -395,6 +410,7 @@ interface Props {
     | 'shows-call'
     | 'map'
     | 'artist-space'
+    | 'faq'
 }
 
 const props = defineProps<Props>()
@@ -512,6 +528,14 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
         path: `/editions/${editionId}/map`,
       })
     }
+    if (faqTabVisible.value) {
+      items.push({
+        label: t('faq.title'),
+        value: 'faq',
+        icon: 'i-heroicons-question-mark-circle',
+        path: `/editions/${editionId}/faq`,
+      })
+    }
     items.push(
       {
         label: t('edition.posts'),
@@ -580,6 +604,15 @@ function onMobileTabChange(value: string) {
     navigateTo(target.path)
   }
 }
+
+// Visibilité onglet FAQ : module activé ET page publique activée.
+// On ne pré-charge pas les entrées ici : la page /faq retourne 404
+// si la page n'est pas publique ou si le module est désactivé.
+const faqTabVisible = computed<boolean>(() => {
+  if (!props.edition) return false
+  const ed = props.edition as { faqEnabled?: boolean; faqPagePublic?: boolean }
+  return ed.faqEnabled === true && ed.faqPagePublic === true
+})
 
 // Visibilité onglet carte: visible si siteMapEnabled + mapPublic sont activés et l'édition a des coordonnées définies
 const mapTabVisible = computed<boolean>(() => {

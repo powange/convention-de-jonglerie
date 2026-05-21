@@ -132,6 +132,7 @@
     "previous": "Vorige",
     "private": "Privé",
     "program": "Programma",
+    "public": "Openbaar",
     "quantity": "Hoeveelheid",
     "refresh": "Vernieuwen",
     "remove": "Verwijderen",
@@ -948,6 +949,13 @@
     "update_organizer_error": "Fout bij bijwerken medewerker",
     "username_min_3_chars": "Gebruikersnaam moet minimaal 3 tekens bevatten",
     "validation_error": "Validatiefout"
+  },
+  "faq": {
+    "description": "Vind hier antwoorden op de meest gestelde vragen over deze editie.",
+    "empty_state": "Nog geen vraag gepubliceerd.",
+    "no_results": "Geen resultaten voor «{query}»",
+    "search_placeholder": "Zoeken in de FAQ…",
+    "title": "FAQ"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rechten voorbehouden.",

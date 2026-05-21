@@ -132,6 +132,7 @@
     "previous": "Föregående",
     "private": "Privat",
     "program": "Program",
+    "public": "Offentlig",
     "quantity": "Kvantitet",
     "refresh": "Uppdatera",
     "remove": "Ta bort",
@@ -948,6 +949,13 @@
     "update_organizer_error": "Fel vid uppdatering av medarbetaren",
     "username_min_3_chars": "Användarnamnet måste innehålla minst 3 tecken",
     "validation_error": "Valideringsfel"
+  },
+  "faq": {
+    "description": "Hitta här svar på de vanligaste frågorna om denna upplaga.",
+    "empty_state": "Inga frågor publicerade ännu.",
+    "no_results": "Inga resultat för «{query}»",
+    "search_placeholder": "Sök i FAQ…",
+    "title": "FAQ"
   },
   "footer": {
     "copyright": "{year} Jongleringskonvention. Alla rättigheter reserverade.",

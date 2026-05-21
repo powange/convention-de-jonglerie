@@ -153,9 +153,7 @@ describe('POST /api/editions/[id]/stock-items/[itemId]/reservations', () => {
   })
 
   it('accepte une réservation localisée uniquement par zoneId', async () => {
-    global.readBody = vi
-      .fn()
-      .mockResolvedValue({ ...validBody, location: '', zoneId: 42 })
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, location: '', zoneId: 42 })
     await handler(baseEvent as any)
     expect(prismaMock.stockReservation.create).toHaveBeenCalledWith(
       expect.objectContaining({

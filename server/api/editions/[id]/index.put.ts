@@ -71,6 +71,8 @@ export default wrapApiHandler(
       siteMapEnabled,
       tasksEnabled,
       stockEnabled,
+      faqEnabled,
+      faqPagePublic,
       hasATM,
       hasCashPayment,
       hasCreditCardPayment,
@@ -175,6 +177,8 @@ export default wrapApiHandler(
     if (siteMapEnabled !== undefined) updatedData.siteMapEnabled = siteMapEnabled
     if (tasksEnabled !== undefined) updatedData.tasksEnabled = tasksEnabled
     if (stockEnabled !== undefined) updatedData.stockEnabled = stockEnabled
+    if (faqEnabled !== undefined) updatedData.faqEnabled = faqEnabled
+    if (faqPagePublic !== undefined) updatedData.faqPagePublic = faqPagePublic
     if (hasATM !== undefined) updatedData.hasATM = hasATM
     if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment

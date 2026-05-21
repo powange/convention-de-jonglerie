@@ -132,6 +132,7 @@
     "previous": "Anterior",
     "private": "Privado",
     "program": "Programa",
+    "public": "Público",
     "quantity": "Quantidade",
     "refresh": "Atualizar",
     "remove": "Remover",
@@ -948,6 +949,13 @@
     "update_organizer_error": "Erro ao atualizar colaborador",
     "username_min_3_chars": "O nome de utilizador deve ter pelo menos 3 caracteres",
     "validation_error": "Erro de validação"
+  },
+  "faq": {
+    "description": "Encontre aqui as respostas às perguntas mais frequentes sobre esta edição.",
+    "empty_state": "Ainda não foi publicada nenhuma pergunta.",
+    "no_results": "Sem resultados para «{query}»",
+    "search_placeholder": "Pesquisar nas perguntas frequentes…",
+    "title": "FAQ"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Todos os direitos reservados.",

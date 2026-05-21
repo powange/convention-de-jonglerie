@@ -243,9 +243,7 @@
                 <div class="text-sm mt-1 whitespace-pre-wrap wrap-break-word">{{ r.usage }}</div>
               </div>
             </div>
-            <div
-              class="flex items-center gap-1 sm:shrink-0 self-end sm:self-start"
-            >
+            <div class="flex items-center gap-1 sm:shrink-0 self-end sm:self-start">
               <StockReservationStatusButton
                 :edition-id="editionId"
                 :reservation-id="r.id"

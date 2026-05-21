@@ -198,9 +198,7 @@ async function handleSubmit() {
       quantity: formData.quantity,
       notes: formData.notes.trim() || null,
       isExternalLoan: formData.isExternalLoan,
-      ownerContact: formData.isExternalLoan
-        ? formData.ownerContact.trim() || null
-        : null,
+      ownerContact: formData.isExternalLoan ? formData.ownerContact.trim() || null : null,
       returnDueAt:
         formData.isExternalLoan && formData.returnDueAt
           ? new Date(formData.returnDueAt).toISOString()

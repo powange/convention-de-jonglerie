@@ -219,6 +219,29 @@
             />
           </div>
         </UCard>
+
+        <UCard>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-heroicons-question-mark-circle" class="text-primary-500 size-5" />
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.faq.title') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.features.faq_description') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="faqEnabledLocal"
+              :loading="savingFaq"
+              :disabled="savingFaq"
+              color="primary"
+              @update:model-value="handleToggleFaq"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
@@ -260,6 +283,9 @@ const tasksEnabledLocal = ref(false)
 // Gestion de l'activation du stock matériel
 const stockEnabledLocal = ref(false)
 
+// Gestion de l'activation de la FAQ
+const faqEnabledLocal = ref(false)
+
 watch(
   edition,
   (newEdition) => {
@@ -272,6 +298,7 @@ watch(
       siteMapEnabledLocal.value = newEdition.siteMapEnabled || false
       tasksEnabledLocal.value = (newEdition as any).tasksEnabled || false
       stockEnabledLocal.value = (newEdition as any).stockEnabled || false
+      faqEnabledLocal.value = (newEdition as any).faqEnabled || false
     }
   },
   { immediate: true }
@@ -435,6 +462,26 @@ const { execute: executeToggleStock, loading: savingStock } = useApiAction(
 
 const handleToggleStock = () => {
   executeToggleStock()
+}
+
+const { execute: executeToggleFaq, loading: savingFaq } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ faqEnabled: faqEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      faqEnabledLocal.value = !faqEnabledLocal.value
+    },
+  }
+)
+
+const handleToggleFaq = () => {
+  executeToggleFaq()
 }
 
 // Vérifier l'accès à cette page

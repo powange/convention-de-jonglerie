@@ -495,6 +495,26 @@
           </div>
         </UCard>
 
+        <!-- FAQ -->
+        <UCard v-if="edition.faqEnabled && canEdit">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-question-mark-circle" class="text-indigo-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.faq.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/faq`"
+                icon="i-heroicons-question-mark-circle"
+                :title="$t('gestion.faq.title')"
+                :description="$t('gestion.faq.description')"
+                color="indigo"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
         <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
           <div class="space-y-4">

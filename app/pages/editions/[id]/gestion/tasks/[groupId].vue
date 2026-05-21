@@ -140,7 +140,11 @@
           v-for="status in kanbanStatuses"
           :key="status"
           class="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-3 min-h-50 transition-colors"
-          :class="dragOverStatus === status && draggedFromStatus !== status ? 'ring-2 ring-primary-500' : ''"
+          :class="
+            dragOverStatus === status && draggedFromStatus !== status
+              ? 'ring-2 ring-primary-500'
+              : ''
+          "
           @dragover.prevent="onColumnDragOver(status)"
           @dragleave="onColumnDragLeave(status, $event)"
           @drop="onColumnDrop(status)"

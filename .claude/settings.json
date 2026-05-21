@@ -88,7 +88,11 @@
       "Bash(sed -i \"s/phoneNumber: '0987654321'/phoneNumber: '+33987654321'/g\" /home/powange/projects/convention-de-jonglerie/test/nuxt/server/api/editions/carpool-requests.post.test.ts)",
       "Bash(sed -i \"s/phoneNumber: '0123456789'/phoneNumber: '+33123456789'/g\" /home/powange/projects/convention-de-jonglerie/test/nuxt/server/api/editions/carpool-offers.post.test.ts)",
       "Skill(context7-mcp)",
-      "Skill(context7-mcp:*)"
+      "Skill(context7-mcp:*)",
+      "Bash(mkdir -p /home/powange/projects/convention-de-jonglerie/server/api/editions/\\\\[id\\\\]/faq)",
+      "Bash(mkdir -p /home/powange/projects/convention-de-jonglerie/app/pages/editions/\\\\[id\\\\]/gestion/faq)",
+      "Bash(sed -i \"s/public\\\\\\\\.faq\\\\\\\\.title/faq.title/g; s/public\\\\\\\\.faq\\\\\\\\.description/faq.description/g; s/public\\\\\\\\.faq\\\\\\\\.empty_state/faq.empty_state/g\" /home/powange/projects/convention-de-jonglerie/app/components/edition/Header.vue /home/powange/projects/convention-de-jonglerie/app/pages/editions/\\\\[id\\\\]/faq.vue)",
+      "Bash(node --input-type=module -e ' *)"
     ],
     "additionalDirectories": [
       "/tmp",
@@ -100,7 +104,10 @@
       "/root/projets/convention-de-jonglerie/server/api/survey",
       "/root/projets/convention-de-jonglerie/i18n/locales",
       "/home/powange/projects/convention-de-jonglerie/server/api/editions/[id]/ticketing",
-      "/home/powange/projects/convention-de-jonglerie/app/pages/editions/[id]/gestion/shows-call/[showCallId]"
+      "/home/powange/projects/convention-de-jonglerie/app/pages/editions/[id]/gestion/shows-call/[showCallId]",
+      "/home/powange/projects/convention-de-jonglerie/server/api/editions/[id]",
+      "/home/powange/projects/convention-de-jonglerie/app/pages/editions/[id]/gestion",
+      "/home/powange/projects/convention-de-jonglerie/app/pages/editions/[id]"
     ]
   }
 }

@@ -132,6 +132,7 @@
     "previous": "Назад",
     "private": "Частный",
     "program": "Программа",
+    "public": "Публичный",
     "quantity": "Количество",
     "refresh": "Обновить",
     "remove": "Удалить",
@@ -948,6 +949,13 @@
     "update_organizer_error": "Ошибка обновления сотрудника",
     "username_min_3_chars": "Имя пользователя должно содержать минимум 3 символа",
     "validation_error": "Ошибка валидации"
+  },
+  "faq": {
+    "description": "Здесь вы найдёте ответы на часто задаваемые вопросы об этом мероприятии.",
+    "empty_state": "Пока не опубликовано ни одного вопроса.",
+    "no_results": "Нет результатов по запросу «{query}»",
+    "search_placeholder": "Поиск в FAQ…",
+    "title": "FAQ"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Все права защищены.",

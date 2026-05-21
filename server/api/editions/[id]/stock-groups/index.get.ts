@@ -42,10 +42,7 @@ export default wrapApiHandler(
             // (leur startsAt est dans le passé).
             reservations: {
               where: {
-                OR: [
-                  { status: 'RESERVED', endsAt: { gt: now } },
-                  { status: 'PICKED_UP' },
-                ],
+                OR: [{ status: 'RESERVED', endsAt: { gt: now } }, { status: 'PICKED_UP' }],
               },
               orderBy: { startsAt: 'asc' },
               take: 1,

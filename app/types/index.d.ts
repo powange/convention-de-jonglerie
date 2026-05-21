@@ -87,6 +87,8 @@ export interface Edition {
   siteMapEnabled?: boolean
   tasksEnabled?: boolean
   stockEnabled?: boolean
+  faqEnabled?: boolean
+  faqPagePublic?: boolean
   mapPublic?: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean

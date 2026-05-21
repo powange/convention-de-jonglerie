@@ -132,6 +132,7 @@
     "previous": "Forrige",
     "private": "Privat",
     "program": "Program",
+    "public": "Offentlig",
     "quantity": "Antal",
     "refresh": "Opdater",
     "remove": "Fjern",
@@ -948,6 +949,13 @@
     "update_organizer_error": "Fejl ved opdatering af samarbejdspartner",
     "username_min_3_chars": "Brugernavnet skal have mindst 3 tegn",
     "validation_error": "Valideringsfejl"
+  },
+  "faq": {
+    "description": "Find her svar på de oftest stillede spørgsmål om denne udgave.",
+    "empty_state": "Endnu ingen offentliggjorte spørgsmål.",
+    "no_results": "Ingen resultater for «{query}»",
+    "search_placeholder": "Søg i FAQ…",
+    "title": "FAQ"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rettigheder forbeholdes.",

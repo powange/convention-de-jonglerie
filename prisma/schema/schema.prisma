@@ -183,6 +183,8 @@ model Edition {
   mapPublic                         Boolean                          @default(false)
   tasksEnabled                      Boolean                          @default(false)
   stockEnabled                      Boolean                          @default(false)
+  faqEnabled                        Boolean                          @default(false)
+  faqPagePublic                     Boolean                          @default(false)
   carpoolOffers                     CarpoolOffer[]
   carpoolRequests                   CarpoolRequest[]
   convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
@@ -220,6 +222,7 @@ model Edition {
   markers                           EditionMarker[]
   taskGroups                        TaskGroup[]
   stockGroups                       StockGroup[]
+  faqEntries                        FaqEntry[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")

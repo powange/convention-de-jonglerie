@@ -168,17 +168,9 @@ const startScanning = async () => {
     // première caméra disponible (desktop sans caméra arrière → AbortError
     // si on force facingMode: environment).
     try {
-      await html5QrCode.start(
-        { facingMode: 'environment' },
-        config,
-        onScanSuccess,
-        onScanError
-      )
+      await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError)
     } catch (envErr: any) {
-      console.warn(
-        'Caméra arrière indisponible, tentative avec la première caméra dispo',
-        envErr
-      )
+      console.warn('Caméra arrière indisponible, tentative avec la première caméra dispo', envErr)
       const cameras = await Html5Qrcode.getCameras()
       if (!cameras.length) throw envErr
       await html5QrCode.start(cameras[0].id, config, onScanSuccess, onScanError)

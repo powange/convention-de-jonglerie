@@ -105,6 +105,9 @@ export const publicRoutes: PublicRoute[] = [
   { pattern: /^\/api\/editions\/\d+\/zones$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/editions\/\d+\/markers$/, methods: ['GET'], hydrateSession: true },
 
+  // ====== FAQ (entrées publiques) ======
+  { pattern: /^\/api\/editions\/\d+\/faq$/, methods: ['GET'], hydrateSession: true },
+
   // ====== Coûts du projet & donations ======
   { path: '/api/project-costs', methods: ['GET'] },
   { path: '/api/project-costs/donations', methods: ['GET'] },

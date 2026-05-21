@@ -132,6 +132,7 @@
     "previous": "Předchozí",
     "private": "Soukromé",
     "program": "Program",
+    "public": "Veřejný",
     "quantity": "Množství",
     "refresh": "Obnovit",
     "remove": "Odstranění stránky",
@@ -948,6 +949,13 @@
     "update_organizer_error": "Chyba při aktualizaci spolupracovníka",
     "username_min_3_chars": "Uživatelské jméno musí obsahovat alespoň 3 znaky.",
     "validation_error": "Chyba validace"
+  },
+  "faq": {
+    "description": "Najděte zde odpovědi na nejčastější otázky o této edici.",
+    "empty_state": "Zatím nebyla zveřejněna žádná otázka.",
+    "no_results": "Žádné výsledky pro «{query}»",
+    "search_placeholder": "Hledat v FAQ…",
+    "title": "FAQ"
   },
   "footer": {
     "copyright": "{year} Žonglérská konvence. Všechna práva vyhrazena.",
