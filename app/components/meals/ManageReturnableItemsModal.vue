@@ -46,13 +46,13 @@ const itemOptions = computed(() =>
 
 const { execute: loadAvailableItems, loading } = useApiAction<
   unknown,
-  { data: { returnableItems: Array<{ id: number; name: string }> } }
+  { returnableItems: Array<{ id: number; name: string }> }
 >(() => `/api/editions/${props.editionId}/ticketing/returnable-items`, {
   method: 'GET',
   silentSuccess: true,
   errorMessages: { default: t('gestion.organizers.error_loading_items') },
   onSuccess: (result) => {
-    availableItems.value = result?.data?.returnableItems || []
+    availableItems.value = result?.returnableItems || []
   },
 })
 

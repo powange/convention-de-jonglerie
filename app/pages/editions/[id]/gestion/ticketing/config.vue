@@ -124,6 +124,49 @@
                 </span>
               </div>
             </div>
+
+            <!-- Activer les articles à restituer -->
+            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.ticketing.enable_returnable_items') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('gestion.ticketing.enable_returnable_items_description') }}
+                  </p>
+                </div>
+                <UBadge
+                  :color="returnableItemsEnabled ? 'success' : 'neutral'"
+                  variant="soft"
+                  size="sm"
+                >
+                  {{ returnableItemsEnabled ? $t('common.active') : $t('common.inactive') }}
+                </UBadge>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <USwitch
+                  v-model="returnableItemsEnabled"
+                  :disabled="updating"
+                  color="primary"
+                  @update:model-value="handleToggleReturnableItems"
+                />
+                <span
+                  :class="
+                    returnableItemsEnabled
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  "
+                >
+                  {{
+                    returnableItemsEnabled
+                      ? $t('gestion.ticketing.returnable_items_enabled')
+                      : $t('gestion.ticketing.returnable_items_disabled')
+                  }}
+                </span>
+              </div>
+            </div>
           </div>
         </UCard>
 
@@ -359,6 +402,7 @@ const paymentCash = ref(true)
 const paymentCard = ref(true)
 const paymentCheck = ref(true)
 const sumupEnabled = ref(false)
+const returnableItemsEnabled = ref(true)
 
 // Champs SumUp
 const sumupAffiliateKey = ref('')
@@ -385,6 +429,7 @@ onMounted(async () => {
     paymentCard.value = settings.value.paymentCard ?? true
     paymentCheck.value = settings.value.paymentCheck ?? true
     sumupEnabled.value = settings.value.sumupEnabled ?? false
+    returnableItemsEnabled.value = settings.value.returnableItemsEnabled ?? true
   }
 
   // Charger la config SumUp si l'intégration est activée
@@ -477,6 +522,30 @@ const handleToggleAnonymousOrders = async (val: boolean) => {
     })
   } catch (e: any) {
     allowAnonymousOrders.value = previous
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
+const handleToggleReturnableItems = async (val: boolean) => {
+  const previous = !val
+
+  try {
+    await updateSettings({ returnableItemsEnabled: val })
+    // Rafraîchir l'édition pour que le menu et la page de gestion
+    // se mettent à jour avec la nouvelle valeur du flag.
+    await editionStore.fetchEditionById(editionId.value, { force: true })
+
+    toast.add({
+      title: t('common.saved'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (e: any) {
+    returnableItemsEnabled.value = previous
     toast.add({
       title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',

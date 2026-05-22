@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Name des Tarifs",
         "name_placeholder": "Z.B.: 3-Tages-Pass",
-        "no_item_selected": "Kein Artikel ausgewählt",
         "no_meal_selected": "Keine Mahlzeiten ausgewählt",
         "no_quota_selected": "Kein Kontingent ausgewählt",
         "position_label": "Anzeigeposition",
@@ -258,7 +257,6 @@
         "quotas_label": "Zugeordnete Kontingente",
         "quotas_placeholder": "Kontingente auswählen",
         "returnable_items_label": "Zurückzugebende Artikel",
-        "returnable_items_placeholder": "Artikel auswählen",
         "status_label": "Status",
         "title": "HelloAsso-Tarif"
       },

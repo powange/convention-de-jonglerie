@@ -12,12 +12,17 @@
             <UInput v-model="form.label" placeholder="Ex: Taille de t-shirt" class="w-full" />
           </UFormField>
 
-          <UFormField label="Type de champ" required>
+          <UFormField
+            label="Type de champ"
+            required
+            :hint="customField ? 'Non modifiable après création' : undefined"
+          >
             <USelect
               v-model="form.type"
               :items="typeOptions"
               placeholder="Sélectionnez un type"
               value-key="value"
+              :disabled="!!customField"
               @update:model-value="onTypeChange"
             />
           </UFormField>

@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Nazwa taryfy",
         "name_placeholder": "Np: Karnet 3-dniowy",
-        "no_item_selected": "Nie wybrano przedmiotu",
         "no_meal_selected": "Nie wybrano posiłku",
         "no_quota_selected": "Nie wybrano kwoty",
         "position_label": "Pozycja wyświetlania",
@@ -258,7 +257,6 @@
         "quotas_label": "Powiązane kwoty",
         "quotas_placeholder": "Wybierz kwoty",
         "returnable_items_label": "Przedmioty do zwrotu",
-        "returnable_items_placeholder": "Wybierz przedmioty",
         "status_label": "Status",
         "title": "Taryfa HelloAsso"
       },

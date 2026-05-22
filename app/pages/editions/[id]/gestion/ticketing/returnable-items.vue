@@ -206,7 +206,6 @@
                     color="primary"
                     variant="ghost"
                     size="sm"
-                    :disabled="cf.helloAssoCustomFieldId !== null"
                     @click="openCustomFieldItemsModal(cf)"
                   >
                     {{ $t('gestion.organizers.manage_articles') }}

@@ -502,11 +502,15 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-heroicons-currency-euro',
           to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
         },
-        {
-          label: t('gestion.ticketing.returnable_items_title'),
-          icon: 'i-heroicons-gift',
-          to: `/editions/${editionId.value}/gestion/ticketing/returnable-items`,
-        },
+        ...(edition.value?.ticketingReturnableItemsEnabled
+          ? [
+              {
+                label: t('gestion.ticketing.returnable_items_title'),
+                icon: 'i-heroicons-gift',
+                to: `/editions/${editionId.value}/gestion/ticketing/returnable-items`,
+              },
+            ]
+          : []),
         {
           label: t('gestion.ticketing.orders_title'),
           icon: 'i-heroicons-shopping-cart',

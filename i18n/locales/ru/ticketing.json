@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Название тарифа",
         "name_placeholder": "Напр: 3-дневный пропуск",
-        "no_item_selected": "Предмет не выбран",
         "no_meal_selected": "Блюдо не выбрано",
         "no_quota_selected": "Квота не выбрана",
         "position_label": "Позиция отображения",
@@ -258,7 +257,6 @@
         "quotas_label": "Связанные квоты",
         "quotas_placeholder": "Выбрать квоты",
         "returnable_items_label": "Предметы для возврата",
-        "returnable_items_placeholder": "Выбрать предметы",
         "status_label": "Статус",
         "title": "Тариф HelloAsso"
       },

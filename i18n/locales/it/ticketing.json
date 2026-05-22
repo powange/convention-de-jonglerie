@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Nome della tariffa",
         "name_placeholder": "Es: Pass 3 giorni",
-        "no_item_selected": "Nessun articolo selezionato",
         "no_meal_selected": "Nessun pasto selezionato",
         "no_quota_selected": "Nessuna quota selezionata",
         "position_label": "Posizione di visualizzazione",
@@ -258,7 +257,6 @@
         "quotas_label": "Quote associate",
         "quotas_placeholder": "Seleziona quote",
         "returnable_items_label": "Articoli da restituire",
-        "returnable_items_placeholder": "Seleziona articoli",
         "status_label": "Stato",
         "title": "Tariffa HelloAsso"
       },

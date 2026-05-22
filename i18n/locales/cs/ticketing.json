@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0.00",
         "name_label": "Název tarifu",
         "name_placeholder": "Například: 3denní průkaz",
-        "no_item_selected": "Žádné vybrané položky",
         "no_meal_selected": "Žádné jídlo nevybráno",
         "no_quota_selected": "Nebyla vybrána žádná kvóta",
         "position_label": "Pozice displeje",
@@ -258,7 +257,6 @@
         "quotas_label": "Přidružené kvóty",
         "quotas_placeholder": "Výběr kvót",
         "returnable_items_label": "Položky, které se mají vrátit",
-        "returnable_items_placeholder": "Vybrané položky",
         "status_label": "Stav",
         "title": "Sazba HelloAsso"
       },

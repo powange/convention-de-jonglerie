@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Navn på pris",
         "name_placeholder": "F.eks: 3-dages pas",
-        "no_item_selected": "Ingen vare valgt",
         "no_meal_selected": "Ingen måltider valgt",
         "no_quota_selected": "Ingen kvote valgt",
         "position_label": "Visningsposition",
@@ -258,7 +257,6 @@
         "quotas_label": "Tilknyttede kvoter",
         "quotas_placeholder": "Vælg kvoter",
         "returnable_items_label": "Varer til returnering",
-        "returnable_items_placeholder": "Vælg varer",
         "status_label": "Status",
         "title": "HelloAsso pris"
       },

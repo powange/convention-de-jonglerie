@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0.00",
         "name_label": "Tier name",
         "name_placeholder": "E.g: 3-day pass",
-        "no_item_selected": "No item selected",
         "no_meal_selected": "No meal selected",
         "no_quota_selected": "No quota selected",
         "position_label": "Display position",
@@ -258,7 +257,6 @@
         "quotas_label": "Associated quotas",
         "quotas_placeholder": "Select quotas",
         "returnable_items_label": "Items to return",
-        "returnable_items_placeholder": "Select items",
         "status_label": "Status",
         "title": "HelloAsso tier"
       },

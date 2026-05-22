@@ -395,6 +395,16 @@
                 color="orange"
               />
 
+              <!-- Articles à restituer -->
+              <ManagementNavigationCard
+                v-if="edition.ticketingReturnableItemsEnabled"
+                :to="`/editions/${edition.id}/gestion/ticketing/returnable-items`"
+                icon="i-heroicons-gift"
+                :title="$t('gestion.ticketing.returnable_items_title')"
+                :description="$t('gestion.ticketing.returnable_items_card_description')"
+                color="orange"
+              />
+
               <!-- Gérer les commandes -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/orders`"

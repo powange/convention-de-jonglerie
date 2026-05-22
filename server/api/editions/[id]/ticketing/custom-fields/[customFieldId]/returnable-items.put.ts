@@ -36,17 +36,14 @@ export default wrapApiHandler(
 
     const customField = await prisma.ticketingTierCustomField.findFirst({
       where: { id: customFieldId, editionId },
-      select: { id: true, helloAssoCustomFieldId: true },
+      select: { id: true },
     })
     if (!customField) {
       throw createError({ status: 404, message: 'Champ personnalisé introuvable' })
     }
-    if (customField.helloAssoCustomFieldId !== null) {
-      throw createError({
-        status: 403,
-        message: 'Les champs personnalisés synchronisés depuis HelloAsso ne sont pas modifiables',
-      })
-    }
+    // Note : les associations articles à restituer peuvent être modifiées
+    // même pour les champs personnalisés HelloAsso. Seules les propriétés du
+    // champ lui-même (label, type, etc.) sont protégées.
 
     const { items } = bodySchema.parse(await readBody(event))
 

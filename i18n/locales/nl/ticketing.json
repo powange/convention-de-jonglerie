@@ -248,7 +248,6 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Naam van het tarief",
         "name_placeholder": "Bijv: 3-dagen pas",
-        "no_item_selected": "Geen artikel geselecteerd",
         "no_meal_selected": "Geen maaltijden geselecteerd",
         "no_quota_selected": "Geen quotum geselecteerd",
         "position_label": "Weergavepositie",
@@ -258,7 +257,6 @@
         "quotas_label": "Gekoppelde quota",
         "quotas_placeholder": "Selecteer quota",
         "returnable_items_label": "Terug te geven artikelen",
-        "returnable_items_placeholder": "Selecteer artikelen",
         "status_label": "Status",
         "title": "HelloAsso tarief"
       },

@@ -66,6 +66,29 @@ export default wrapApiHandler(
       })
     }
 
+    // Le type d'un champ personnalisé est verrouillé après création :
+    // changer un ChoiceList en autre type laisserait des associations
+    // (quotas / articles à restituer) orphelines pointant vers des
+    // `choiceValue` qui n'existent plus.
+    if (body.type !== existingCustomField.type) {
+      throw createError({
+        status: 400,
+        message:
+          "Le type d'un champ personnalisé ne peut pas être modifié après sa création. Supprimez-le et recréez-en un nouveau si besoin.",
+      })
+    }
+
+    // Pour un ChoiceList : repérer les valeurs supprimées par rapport à
+    // l'existant pour pouvoir nettoyer les associations orphelines.
+    const newValues = body.values ?? []
+    const oldValues = Array.isArray(existingCustomField.values)
+      ? (existingCustomField.values as string[])
+      : []
+    const removedValues =
+      body.type === 'ChoiceList' && body.values !== undefined
+        ? oldValues.filter((v) => !newValues.includes(v))
+        : []
+
     // Mettre à jour le custom field dans une transaction
     const customField = await prisma.$transaction(async (tx) => {
       // Mettre à jour le custom field
@@ -78,6 +101,19 @@ export default wrapApiHandler(
           values: body.values ? body.values : null,
         },
       })
+
+      // Nettoyer les associations orphelines : si on a retiré des valeurs
+      // de la ChoiceList, on supprime les associations quotas / articles
+      // qui ciblaient ces valeurs (on garde celles avec `choiceValue = null`
+      // qui signifient « tous les choix »).
+      if (removedValues.length > 0) {
+        await tx.ticketingTierCustomFieldQuota.deleteMany({
+          where: { customFieldId, choiceValue: { in: removedValues } },
+        })
+        await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+          where: { customFieldId, choiceValue: { in: removedValues } },
+        })
+      }
 
       // Supprimer les anciennes associations avec les tarifs
       await tx.ticketingTierCustomFieldAssociation.deleteMany({

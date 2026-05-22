@@ -6,17 +6,18 @@
   </div>
 
   <div v-else class="space-y-4">
-    <div class="space-y-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
       <!-- Liste des items existants -->
       <div
         v-for="item in items"
         :key="item.id"
         class="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
-        <UFieldGroup>
+        <UFieldGroup class="w-full">
           <UInput
             :model-value="item.name"
             :placeholder="$t('ticketing.returnable_items.list.name_placeholder')"
+            class="flex-1"
             @blur="updateItem(item.id, $event.target.value)"
           />
           <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
@@ -25,10 +26,11 @@
 
       <!-- Ligne d'ajout -->
       <div class="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-        <UFieldGroup>
+        <UFieldGroup class="w-full">
           <UInput
             v-model="form.name"
             :placeholder="$t('ticketing.returnable_items.list.add_placeholder')"
+            class="flex-1"
             @keydown.enter="handleSave"
           />
           <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
