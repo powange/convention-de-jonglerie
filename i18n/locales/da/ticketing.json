@@ -211,8 +211,7 @@
         "delete_label": "Slet",
         "delete_title": "Slet varen",
         "loading": "Indlæser...",
-        "name_placeholder": "Navn på varen",
-        "title": "Varer til udlevering til deltagere"
+        "name_placeholder": "Navn på varen"
       },
       "volunteer": {
         "choose_placeholder": "Vælg en vare til returnering...",

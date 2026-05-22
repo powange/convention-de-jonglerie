@@ -125,39 +125,6 @@
             {{ $t('gestion.shows.no_artists_selected') }}
           </p>
 
-          <!-- Sélection des articles à restituer -->
-          <UFormField :label="$t('gestion.shows.returnable_items')">
-            <USelectMenu
-              v-model="formData.returnableItemIds"
-              :items="returnableItemOptions"
-              value-key="value"
-              multiple
-              :placeholder="$t('gestion.shows.select_returnable_items')"
-              class="w-full"
-            >
-              <template #label>
-                <span v-if="formData.returnableItemIds.length === 0">
-                  {{ $t('gestion.shows.no_items_selected') }}
-                </span>
-                <span v-else
-                  >{{ formData.returnableItemIds.length }} article(s) sélectionné(s)</span
-                >
-              </template>
-            </USelectMenu>
-          </UFormField>
-
-          <!-- Liste des articles sélectionnés -->
-          <div v-if="selectedReturnableItems.length > 0" class="flex flex-wrap gap-2">
-            <UBadge
-              v-for="item in selectedReturnableItems"
-              :key="item.id"
-              color="info"
-              variant="subtle"
-            >
-              {{ item.name }}
-            </UBadge>
-          </div>
-
           <!-- Visibilité publique -->
           <USwitch
             v-model="formData.isPublic"
@@ -214,7 +181,6 @@ const title = computed(() =>
 )
 
 const artists = ref<any[]>([])
-const returnableItems = ref<any[]>([])
 const zones = ref<any[]>([])
 const markers = ref<any[]>([])
 
@@ -228,7 +194,6 @@ const formData = ref({
   zoneId: null as number | null,
   markerId: null as number | null,
   artistIds: [] as number[],
-  returnableItemIds: [] as number[],
   isPublic: false,
 })
 
@@ -330,17 +295,6 @@ const selectedArtists = computed(() => {
   return artists.value.filter((artist) => formData.value.artistIds.includes(artist.id))
 })
 
-const returnableItemOptions = computed(() => {
-  return returnableItems.value.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }))
-})
-
-const selectedReturnableItems = computed(() => {
-  return returnableItems.value.filter((item) => formData.value.returnableItemIds.includes(item.id))
-})
-
 // Charger les artistes disponibles
 const fetchArtists = async () => {
   try {
@@ -348,16 +302,6 @@ const fetchArtists = async () => {
     artists.value = response.data?.artists || []
   } catch (error) {
     console.error('Error fetching artists:', error)
-  }
-}
-
-// Charger les articles à restituer disponibles
-const fetchReturnableItems = async () => {
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    returnableItems.value = response?.data?.returnableItems || []
-  } catch (error) {
-    console.error('Error fetching returnable items:', error)
   }
 }
 
@@ -394,7 +338,6 @@ const buildPayload = () => {
     zoneId: formData.value.zoneId,
     markerId: formData.value.markerId,
     artistIds: formData.value.artistIds,
-    returnableItemIds: formData.value.returnableItemIds,
     isPublic: formData.value.isPublic,
   }
 }
@@ -457,7 +400,6 @@ const resetForm = () => {
     zoneId: null,
     markerId: null,
     artistIds: [],
-    returnableItemIds: [],
     isPublic: false,
   }
 }
@@ -485,7 +427,6 @@ watch(
         zoneId: newShow.zoneId || null,
         markerId: newShow.markerId || null,
         artistIds: newShow.artists?.map((showArtist: any) => showArtist.artistId) || [],
-        returnableItemIds: newShow.returnableItems?.map((item: any) => item.returnableItemId) || [],
         isPublic: newShow.isPublic || false,
       }
 
@@ -510,7 +451,6 @@ watch(
     if (isOpen) {
       await Promise.all([
         artists.value.length === 0 ? fetchArtists() : Promise.resolve(),
-        returnableItems.value.length === 0 ? fetchReturnableItems() : Promise.resolve(),
         zones.value.length === 0 ? fetchZones() : Promise.resolve(),
         markers.value.length === 0 ? fetchMarkers() : Promise.resolve(),
       ])

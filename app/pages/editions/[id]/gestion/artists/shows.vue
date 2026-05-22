@@ -96,11 +96,6 @@
                   {{ $t('gestion.shows.artists') }}
                 </th>
                 <th
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {{ $t('gestion.shows.artists_to_return') }}
-                </th>
-                <th
                   class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   {{ $t('gestion.shows.is_public') }}
@@ -188,25 +183,6 @@
                   <span v-else class="text-gray-400">{{
                     $t('gestion.shows.no_artists_selected')
                   }}</span>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <div
-                    v-if="show.returnableItems && show.returnableItems.length > 0"
-                    class="flex flex-wrap gap-1"
-                  >
-                    <UBadge
-                      v-for="item in show.returnableItems"
-                      :key="item.returnableItem.id"
-                      color="orange"
-                      variant="subtle"
-                      size="sm"
-                    >
-                      {{ item.returnableItem.name }}
-                    </UBadge>
-                  </div>
-                  <span v-else class="text-gray-400 text-xs">
-                    {{ $t('gestion.shows.no_returnable_items') }}
-                  </span>
                 </td>
                 <td class="px-4 py-3 text-sm text-center">
                   <UIcon

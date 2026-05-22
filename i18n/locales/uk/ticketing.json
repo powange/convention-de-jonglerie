@@ -211,8 +211,7 @@
         "delete_label": "Видалити",
         "delete_title": "Видалити елемент",
         "loading": "Завантаження...",
-        "name_placeholder": "Назва елемента",
-        "title": "Предмети для видачі учасникам"
+        "name_placeholder": "Назва елемента"
       },
       "volunteer": {
         "choose_placeholder": "Вибрати предмет для повернення...",

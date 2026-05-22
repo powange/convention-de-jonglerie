@@ -13,7 +13,9 @@ const bodySchema = z.object({
   price: z.number().int().nullable().optional(), // Prix en centimes
   position: z.number().int().min(0).default(0),
   quotaIds: z.array(z.number().int()).optional().default([]),
-  returnableItemIds: z.array(z.number().int()).optional().default([]),
+  // Optionnel SANS default : `updateOption` préserve les associations existantes
+  // si la clé n'est pas envoyée (gestion déléguée à un endpoint dédié).
+  returnableItemIds: z.array(z.number().int()).optional(),
   tierIds: z.array(z.number().int()).optional().default([]),
   mealIds: z.array(z.number().int()).optional().default([]),
 })

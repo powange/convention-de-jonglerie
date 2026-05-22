@@ -6,15 +6,6 @@
   </div>
 
   <div v-else class="space-y-4">
-    <!-- Message d'information -->
-    <UAlert
-      icon="i-heroicons-information-circle"
-      color="info"
-      variant="soft"
-      :title="$t('ticketing.returnable_items.list.title')"
-      description="Listez ici les articles à remettre à l'accueil lors de la validation ou de l'achat d'un billet (bracelets, pass camping, goodies, etc.)"
-    />
-
     <div class="space-y-2">
       <!-- Liste des items existants -->
       <div

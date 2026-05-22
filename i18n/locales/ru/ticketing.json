@@ -211,8 +211,7 @@
         "delete_label": "Удалить",
         "delete_title": "Удалить элемент",
         "loading": "Загрузка...",
-        "name_placeholder": "Название элемента",
-        "title": "Предметы для выдачи участникам"
+        "name_placeholder": "Название элемента"
       },
       "volunteer": {
         "choose_placeholder": "Выбрать предмет для возврата...",

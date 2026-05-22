@@ -211,8 +211,7 @@
         "delete_label": "Verwijderen",
         "delete_title": "Artikel verwijderen",
         "loading": "Laden...",
-        "name_placeholder": "Naam van het artikel",
-        "title": "Artikelen om aan deelnemers te geven"
+        "name_placeholder": "Naam van het artikel"
       },
       "volunteer": {
         "choose_placeholder": "Kies een artikel om terug te geven...",

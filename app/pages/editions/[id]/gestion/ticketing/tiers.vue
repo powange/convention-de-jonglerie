@@ -93,37 +93,6 @@
               @refresh="loadQuotas"
             />
           </template>
-
-          <template #arestituer>
-            <TicketingReturnableItemsList
-              :items="returnableItems"
-              :loading="loadingReturnableItems"
-              :edition-id="editionId"
-              @refresh="onReturnableItemsRefresh"
-            />
-
-            <!-- Articles à restituer pour les bénévoles -->
-            <div v-if="edition?.volunteersEnabled" class="mt-8">
-              <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
-                <div class="mb-4">
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    {{ $t('gestion.ticketing.volunteer_returnable_items_title') }}
-                  </h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {{ $t('gestion.ticketing.volunteer_returnable_items_description') }}
-                  </p>
-                </div>
-
-                <TicketingVolunteerReturnableItemsList
-                  :key="volunteerReturnableItemsKey"
-                  :items="volunteerReturnableItems"
-                  :loading="loadingVolunteerReturnableItems"
-                  :edition-id="editionId"
-                  @refresh="loadVolunteerReturnableItems"
-                />
-              </div>
-            </div>
-          </template>
         </UTabs>
       </div>
     </div>
@@ -168,15 +137,6 @@ const customFields = ref<any[]>([])
 const loadingQuotas = ref(true)
 const quotas = ref<any[]>([])
 
-// Items à restituer
-const loadingReturnableItems = ref(true)
-const returnableItems = ref<any[]>([])
-
-// Items à restituer pour bénévoles
-const loadingVolunteerReturnableItems = ref(true)
-const volunteerReturnableItems = ref<any[]>([])
-const volunteerReturnableItemsKey = ref(0) // Clé pour forcer le rechargement du composant
-
 const lastSyncText = computed(() => {
   if (!lastSync.value) return 'Jamais'
   const now = new Date()
@@ -220,13 +180,6 @@ const tabs = computed(() => [
     value: 'quotas',
     badge: quotas.value.length,
   },
-  {
-    label: 'À restituer',
-    icon: 'i-heroicons-gift',
-    slot: 'arestituer',
-    value: 'arestituer',
-    badge: returnableItems.value.length,
-  },
 ])
 
 onMounted(async () => {
@@ -242,8 +195,6 @@ onMounted(async () => {
     await loadData()
     await loadCustomFields()
     await loadQuotas()
-    await loadReturnableItems()
-    await loadVolunteerReturnableItems()
   }
 })
 
@@ -353,50 +304,12 @@ const loadQuotas = async () => {
   }
 }
 
-// Fonctions pour les items à restituer
-const loadReturnableItems = async () => {
-  loadingReturnableItems.value = true
-  try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
-    returnableItems.value = response.data?.returnableItems || []
-  } catch {
-    // Erreur silencieuse
-  } finally {
-    loadingReturnableItems.value = false
-  }
-}
-
-// Quand les articles à restituer changent, forcer un rechargement des articles bénévoles
-// pour que la liste des articles disponibles se mette à jour
-const onReturnableItemsRefresh = async () => {
-  await loadReturnableItems()
-  // Forcer un rechargement du composant bénévole en changeant la clé
-  volunteerReturnableItemsKey.value++
-}
-
-// Fonctions pour les items à restituer pour bénévoles
-const loadVolunteerReturnableItems = async () => {
-  loadingVolunteerReturnableItems.value = true
-  try {
-    const response = await $fetch(
-      `/api/editions/${editionId}/ticketing/volunteers/returnable-items`
-    )
-    volunteerReturnableItems.value = response.items
-  } catch {
-    // Erreur silencieuse
-  } finally {
-    loadingVolunteerReturnableItems.value = false
-  }
-}
-
 // Recharger les données quand les permissions changent (mode super admin)
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
     await loadData()
     await loadCustomFields()
     await loadQuotas()
-    await loadReturnableItems()
-    await loadVolunteerReturnableItems()
   }
 })
 </script>

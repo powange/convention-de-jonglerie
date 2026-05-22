@@ -211,8 +211,7 @@
         "delete_label": "Excluir",
         "delete_title": "Excluir artigo",
         "loading": "Carregando...",
-        "name_placeholder": "Nome do artigo",
-        "title": "Artigos a serem entregues aos participantes"
+        "name_placeholder": "Nome do artigo"
       },
       "volunteer": {
         "choose_placeholder": "Escolher um artigo para devolver...",

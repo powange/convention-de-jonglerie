@@ -211,8 +211,7 @@
         "delete_label": "Radera",
         "delete_title": "Ta bort objekt",
         "loading": "Laddar...",
-        "name_placeholder": "Artikelns namn",
-        "title": "Föremål som ska delas ut till deltagarna"
+        "name_placeholder": "Artikelns namn"
       },
       "volunteer": {
         "choose_placeholder": "Välja en vara att returnera...",

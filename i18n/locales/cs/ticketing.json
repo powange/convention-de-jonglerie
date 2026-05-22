@@ -211,8 +211,7 @@
         "delete_label": "Odstranit",
         "delete_title": "Odstranit položku",
         "loading": "Načítání...",
-        "name_placeholder": "Název položky",
-        "title": "Předměty, které se předávají účastníkům"
+        "name_placeholder": "Název položky"
       },
       "volunteer": {
         "choose_placeholder": "Výběr položky k vrácení...",

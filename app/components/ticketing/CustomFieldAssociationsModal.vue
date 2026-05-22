@@ -11,9 +11,7 @@
           <template #title>Associations</template>
           <template #description>
             <div class="space-y-1">
-              <p>
-                Configurez les tarifs, quotas et articles à restituer pour ce champ personnalisé.
-              </p>
+              <p>Configurez les tarifs et quotas associés à ce champ personnalisé.</p>
               <p class="text-xs">
                 Pour les champs de type "Liste de choix", vous pouvez associer par choix spécifique
                 ou pour tous les choix.
@@ -112,77 +110,6 @@
             </UCard>
           </div>
         </div>
-
-        <USeparator />
-
-        <!-- Section Articles à restituer -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-gray-900 dark:text-white">Articles à restituer</h4>
-            <UButton
-              icon="i-heroicons-plus"
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="addReturnableItemAssociation"
-            >
-              Ajouter un article
-            </UButton>
-          </div>
-
-          <div v-if="loadingReturnableItems" class="flex justify-center py-4">
-            <UIcon name="i-heroicons-arrow-path" class="h-6 w-6 animate-spin text-primary-500" />
-          </div>
-
-          <div
-            v-else-if="returnableItemAssociations.length === 0"
-            class="text-center py-8 bg-gray-50 dark:bg-gray-900 rounded-lg"
-          >
-            <p class="text-sm text-gray-500 dark:text-gray-400">Aucun article associé</p>
-          </div>
-
-          <div v-else class="space-y-3">
-            <UCard
-              v-for="(assoc, index) in returnableItemAssociations"
-              :key="index"
-              :ui="{ body: { padding: 'p-4' } }"
-            >
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <UFormField label="Article" required>
-                  <USelect
-                    v-model="assoc.returnableItemId"
-                    :items="returnableItemItems"
-                    placeholder="Sélectionnez un article"
-                    value-key="id"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
-
-                <UFormField label="Choix concerné">
-                  <USelect
-                    v-model="assoc.choiceValue"
-                    :items="choiceOptions"
-                    placeholder="Tous les choix"
-                    value-key="value"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
-              </div>
-
-              <div class="flex justify-end mt-3">
-                <UButton
-                  icon="i-heroicons-trash"
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  @click="removeReturnableItemAssociation(index)"
-                >
-                  Supprimer
-                </UButton>
-              </div>
-            </UCard>
-          </div>
-        </div>
       </div>
     </template>
 
@@ -216,13 +143,6 @@ interface CustomField {
     }
     choiceValue?: string | null
   }>
-  returnableItems?: Array<{
-    returnableItem: {
-      id: number
-      name: string
-    }
-    choiceValue?: string | null
-  }>
 }
 
 interface Quota {
@@ -235,18 +155,8 @@ interface Tier {
   name: string
 }
 
-interface ReturnableItem {
-  id: number
-  name: string
-}
-
 interface QuotaAssociation {
   quotaId: number | null
-  choiceValue: string | null
-}
-
-interface ReturnableItemAssociation {
-  returnableItemId: number | null
   choiceValue: string | null
 }
 
@@ -268,14 +178,11 @@ const isOpen = computed({
 
 const loadingTiers = ref(false)
 const loadingQuotas = ref(false)
-const loadingReturnableItems = ref(false)
 const availableTiers = ref<Tier[]>([])
 const availableQuotas = ref<Quota[]>([])
-const availableReturnableItems = ref<ReturnableItem[]>([])
 
 const selectedTierIds = ref<number[]>([])
 const quotaAssociations = ref<QuotaAssociation[]>([])
-const returnableItemAssociations = ref<ReturnableItemAssociation[]>([])
 
 // Items pour le UCheckboxGroup des tarifs
 const tierItems = computed(() =>
@@ -291,15 +198,6 @@ const quotaItems = computed(() => {
   return availableQuotas.value.map((quota) => ({
     label: quota.title,
     id: quota.id,
-  }))
-})
-
-// Items pour les articles à restituer (avec label au lieu de name)
-const returnableItemItems = computed(() => {
-  if (!Array.isArray(availableReturnableItems.value)) return []
-  return availableReturnableItems.value.map((item) => ({
-    label: item.name,
-    id: item.id,
   }))
 })
 
@@ -324,17 +222,6 @@ const addQuotaAssociation = () => {
 
 const removeQuotaAssociation = (index: number) => {
   quotaAssociations.value.splice(index, 1)
-}
-
-const addReturnableItemAssociation = () => {
-  returnableItemAssociations.value.push({
-    returnableItemId: null,
-    choiceValue: null,
-  })
-}
-
-const removeReturnableItemAssociation = (index: number) => {
-  returnableItemAssociations.value.splice(index, 1)
 }
 
 const loadTiers = async () => {
@@ -363,18 +250,6 @@ const loadQuotas = async () => {
   }
 }
 
-const loadReturnableItems = async () => {
-  loadingReturnableItems.value = true
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    availableReturnableItems.value = response?.data?.returnableItems || []
-  } catch (error) {
-    console.error('Erreur lors du chargement des articles:', error)
-  } finally {
-    loadingReturnableItems.value = false
-  }
-}
-
 const buildAssociationsBody = () => {
   const validQuotas = quotaAssociations.value
     .filter((a) => a.quotaId !== null)
@@ -383,17 +258,9 @@ const buildAssociationsBody = () => {
       choiceValue: a.choiceValue || undefined,
     }))
 
-  const validReturnableItems = returnableItemAssociations.value
-    .filter((a) => a.returnableItemId !== null)
-    .map((a) => ({
-      returnableItemId: a.returnableItemId!,
-      choiceValue: a.choiceValue || undefined,
-    }))
-
   return {
     tierIds: selectedTierIds.value,
     quotas: validQuotas,
-    returnableItems: validReturnableItems,
   }
 }
 
@@ -405,7 +272,7 @@ const { execute: save, loading: saving } = useApiAction(
     body: buildAssociationsBody,
     successMessage: {
       title: 'Associations mises à jour',
-      description: 'Les tarifs, quotas et articles ont été enregistrés avec succès',
+      description: 'Les tarifs et quotas ont été enregistrés avec succès',
     },
     errorMessages: { default: 'Impossible de sauvegarder les associations' },
     onSuccess: () => {
@@ -420,7 +287,7 @@ watch(
   () => props.open,
   async (newValue) => {
     if (newValue && props.customField) {
-      await Promise.all([loadTiers(), loadQuotas(), loadReturnableItems()])
+      await Promise.all([loadTiers(), loadQuotas()])
 
       // Charger les associations de tarifs existantes
       selectedTierIds.value = props.customField.tiers?.map((t) => t.tier.id) || []
@@ -433,15 +300,6 @@ watch(
         }))
       } else {
         quotaAssociations.value = []
-      }
-
-      if (props.customField.returnableItems && props.customField.returnableItems.length > 0) {
-        returnableItemAssociations.value = props.customField.returnableItems.map((r) => ({
-          returnableItemId: r.returnableItem.id,
-          choiceValue: r.choiceValue || null,
-        }))
-      } else {
-        returnableItemAssociations.value = []
       }
     }
   }

@@ -252,29 +252,6 @@
         </UFormField>
 
         <UFormField
-          v-if="returnableItems.length > 0"
-          :label="$t('ticketing.tiers.modal.returnable_items_label')"
-          name="returnableItems"
-        >
-          <USelectMenu
-            v-model="form.returnableItemIds"
-            :items="(returnableItems || []).map((item) => ({ label: item.name, value: item.id }))"
-            value-key="value"
-            multiple
-            searchable
-            :placeholder="$t('ticketing.tiers.modal.returnable_items_placeholder')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="form.returnableItemIds.length === 0">{{
-                $t('ticketing.tiers.modal.no_item_selected')
-              }}</span>
-              <span v-else>{{ form.returnableItemIds.length }} article(s) sélectionné(s)</span>
-            </template>
-          </USelectMenu>
-        </UFormField>
-
-        <UFormField
           v-if="edition?.mealsEnabled"
           :label="$t('ticketing.tiers.modal.meals_label')"
           name="meals"
@@ -424,13 +401,11 @@ const form = ref({
   validUntil: null as string | null,
   isAllDay: false,
   quotaIds: [] as number[],
-  returnableItemIds: [] as number[],
   mealIds: [] as number[],
 })
 
-// Charger les quotas, items et repas disponibles
+// Charger les quotas et repas disponibles
 const quotas = ref<any[]>([])
-const returnableItems = ref<any[]>([])
 const meals = ref<any[]>([])
 
 // Utiliser les utilitaires meals pour formater les labels
@@ -457,24 +432,18 @@ const mealsOptions = computed(() => {
 
 const loadQuotasAndItems = async () => {
   try {
-    const promises: Promise<any>[] = [
-      $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
-      $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`),
-    ]
+    const promises: Promise<any>[] = [$fetch(`/api/editions/${props.editionId}/ticketing/quotas`)]
     if (edition.value?.mealsEnabled) {
       promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
     }
-    const [quotasData, itemsResponse, mealsResponse] = await Promise.all(promises)
+    const [quotasData, mealsResponse] = await Promise.all(promises)
     quotas.value = Array.isArray(quotasData?.data?.quotas) ? quotasData.data.quotas : []
-    returnableItems.value = Array.isArray(itemsResponse?.data?.returnableItems)
-      ? itemsResponse.data.returnableItems
-      : []
     meals.value =
       mealsResponse?.data?.meals && Array.isArray(mealsResponse.data.meals)
         ? mealsResponse.data.meals
         : []
   } catch (error) {
-    console.error('Failed to load quotas, items and meals:', error)
+    console.error('Failed to load quotas and meals:', error)
   }
 }
 
@@ -510,7 +479,6 @@ watch(
           validUntil: validUntilLocal,
           isAllDay,
           quotaIds: props.tier.quotas?.map((q: any) => q.quotaId) || [],
-          returnableItemIds: props.tier.returnableItems?.map((r: any) => r.returnableItemId) || [],
           mealIds: props.tier.meals?.map((m: any) => m.mealId) || [],
         }
       } else {
@@ -530,7 +498,6 @@ watch(
           validUntil: null,
           isAllDay: false,
           quotaIds: [],
-          returnableItemIds: [],
           mealIds: [],
         }
       }
@@ -642,7 +609,6 @@ const buildFormData = () => {
     validFrom: finalValidFrom.value,
     validUntil: finalValidUntil.value,
     quotaIds: form.value.quotaIds,
-    returnableItemIds: form.value.returnableItemIds,
     mealIds: form.value.mealIds,
   }
 }

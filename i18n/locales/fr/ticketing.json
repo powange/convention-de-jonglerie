@@ -211,8 +211,7 @@
         "delete_label": "Supprimer",
         "delete_title": "Supprimer l'item",
         "loading": "Chargement...",
-        "name_placeholder": "Nom de l'item",
-        "title": "Articles à remettre aux participants"
+        "name_placeholder": "Nom de l'item"
       },
       "volunteer": {
         "choose_placeholder": "Choisir un article à restituer...",

@@ -99,7 +99,11 @@ export async function updateOption(optionId: number, editionId: number, data: Op
   return await prisma.$transaction(async (tx) => {
     // Supprimer les anciennes relations (sauf tiers pour HelloAsso)
     await tx.ticketingOptionQuota.deleteMany({ where: { optionId } })
-    await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
+    // returnableItems : on ne supprime/recrée que si la clé est explicitement
+    // fournie (édition désormais déléguée à un endpoint dédié).
+    if (data.returnableItemIds !== undefined) {
+      await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
+    }
     await tx.ticketingOptionMeal.deleteMany({ where: { optionId } })
 
     // Pour les options HelloAsso, on met à jour uniquement les relations quotas, returnableItems et meals
@@ -112,11 +116,15 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          returnableItems: {
-            create: (data.returnableItemIds || []).map((returnableItemId) => ({
-              returnableItemId,
-            })),
-          },
+          ...(data.returnableItemIds !== undefined
+            ? {
+                returnableItems: {
+                  create: data.returnableItemIds.map((returnableItemId) => ({
+                    returnableItemId,
+                  })),
+                },
+              }
+            : {}),
           meals: {
             create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },
@@ -140,11 +148,15 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          returnableItems: {
-            create: (data.returnableItemIds || []).map((returnableItemId) => ({
-              returnableItemId,
-            })),
-          },
+          ...(data.returnableItemIds !== undefined
+            ? {
+                returnableItems: {
+                  create: data.returnableItemIds.map((returnableItemId) => ({
+                    returnableItemId,
+                  })),
+                },
+              }
+            : {}),
           tiers: {
             create: (data.tierIds || []).map((tierId) => ({ tierId })),
           },

@@ -503,6 +503,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
         },
         {
+          label: t('gestion.ticketing.returnable_items_title'),
+          icon: 'i-heroicons-gift',
+          to: `/editions/${editionId.value}/gestion/ticketing/returnable-items`,
+        },
+        {
           label: t('gestion.ticketing.orders_title'),
           icon: 'i-heroicons-shopping-cart',
           to: `/editions/${editionId.value}/gestion/ticketing/orders`,

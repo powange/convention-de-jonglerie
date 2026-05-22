@@ -174,7 +174,11 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
   return await prisma.$transaction(async (tx) => {
     // Supprimer les anciennes relations
     await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
-    await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
+    // returnableItems : on ne supprime/recrée que si la clé est explicitement
+    // fournie (édition désormais déléguée à un endpoint dédié).
+    if (data.returnableItemIds !== undefined) {
+      await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
+    }
     await tx.ticketingTierMeal.deleteMany({ where: { tierId } })
 
     // Pour les tarifs HelloAsso, on met à jour le customName, les dates de validité et les relations
@@ -190,11 +194,15 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          returnableItems: {
-            create: (data.returnableItemIds || []).map((returnableItemId) => ({
-              returnableItemId,
-            })),
-          },
+          ...(data.returnableItemIds !== undefined
+            ? {
+                returnableItems: {
+                  create: data.returnableItemIds.map((returnableItemId) => ({
+                    returnableItemId,
+                  })),
+                },
+              }
+            : {}),
           meals: {
             create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },
@@ -218,11 +226,15 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          returnableItems: {
-            create: (data.returnableItemIds || []).map((returnableItemId) => ({
-              returnableItemId,
-            })),
-          },
+          ...(data.returnableItemIds !== undefined
+            ? {
+                returnableItems: {
+                  create: data.returnableItemIds.map((returnableItemId) => ({
+                    returnableItemId,
+                  })),
+                },
+              }
+            : {}),
           meals: {
             create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },

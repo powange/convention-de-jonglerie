@@ -103,51 +103,6 @@
                           @update:model-value="handleMealChange(meal)"
                         />
                       </div>
-
-                      <!-- Sélection des articles à restituer -->
-                      <div
-                        v-if="returnableItems.length > 0"
-                        class="border-t border-gray-200 dark:border-gray-700 pt-3"
-                      >
-                        <div class="flex items-center justify-between mb-1.5">
-                          <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                            {{ $t('gestion.meals.returnable_items_label') }}
-                          </label>
-                          <span class="text-xs text-gray-500 dark:text-gray-400">
-                            {{
-                              $t('gestion.meals.selected_count', {
-                                count: getSelectedReturnableItemIds(meal).length,
-                              })
-                            }}
-                          </span>
-                        </div>
-
-                        <!-- Liste des articles sélectionnés -->
-                        <div
-                          v-if="getSelectedReturnableItemIds(meal).length > 0"
-                          class="mb-2 flex flex-wrap gap-1"
-                        >
-                          <span
-                            v-for="itemId in getSelectedReturnableItemIds(meal)"
-                            :key="itemId"
-                            class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
-                          >
-                            {{ returnableItems.find((item) => item.id === itemId)?.name }}
-                          </span>
-                        </div>
-
-                        <USelectMenu
-                          :model-value="getSelectedReturnableItems(meal)"
-                          :items="returnableItemsForSelect"
-                          multiple
-                          :placeholder="$t('gestion.meals.select_returnable_items')"
-                          :disabled="savingMeals || loadingReturnableItems"
-                          :search-input="{ placeholder: $t('common.search') }"
-                          size="xs"
-                          class="w-full"
-                          @update:model-value="(items) => handleReturnableItemsChange(meal, items)"
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -185,18 +140,6 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 const volunteerMeals = ref<any[]>([])
 const loadingMeals = ref(false)
 const pendingMeal = ref<any>(null)
-
-// Gestion des articles à restituer
-const returnableItems = ref<any[]>([])
-const loadingReturnableItems = ref(false)
-
-// Préparer les items pour SelectMenu
-const returnableItemsForSelect = computed(() => {
-  return returnableItems.value.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }))
-})
 
 // Options pour le select de phase
 const mealPhaseOptions = [
@@ -254,29 +197,7 @@ const fetchVolunteerMeals = async () => {
   }
 }
 
-// Charger les articles à restituer
-const fetchReturnableItems = async () => {
-  if (!editionId) return
-
-  loadingReturnableItems.value = true
-  try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
-    if (response.data?.returnableItems) {
-      returnableItems.value = response.data.returnableItems
-    }
-  } catch (error) {
-    console.error('Failed to fetch returnable items:', error)
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de charger les articles à restituer',
-      color: 'error',
-    })
-  } finally {
-    loadingReturnableItems.value = false
-  }
-}
-
-// Gérer le changement d'un repas (enabled, phase ou articles)
+// Gérer le changement d'un repas (enabled ou phases)
 const { execute: executeSaveMeal, loading: savingMeals } = useApiAction<
   unknown,
   { success: boolean; meals: any[] }
@@ -284,14 +205,12 @@ const { execute: executeSaveMeal, loading: savingMeals } = useApiAction<
   method: 'PUT',
   body: () => {
     const meal = pendingMeal.value
-    const returnableItemIds = meal?.returnableItems?.map((item: any) => item.returnableItemId) || []
     return {
       meals: [
         {
           id: meal?.id,
           enabled: meal?.enabled,
           phases: meal?.phases,
-          returnableItemIds,
         },
       ],
     }
@@ -314,27 +233,6 @@ const { execute: executeSaveMeal, loading: savingMeals } = useApiAction<
 const handleMealChange = async (meal: any) => {
   pendingMeal.value = meal
   await executeSaveMeal()
-}
-
-// Obtenir les IDs des articles sélectionnés pour un repas
-const getSelectedReturnableItemIds = (meal: any) => {
-  return meal.returnableItems?.map((item: any) => item.returnableItemId) || []
-}
-
-// Obtenir les objets complets des articles sélectionnés pour SelectMenu
-const getSelectedReturnableItems = (meal: any) => {
-  const selectedIds = getSelectedReturnableItemIds(meal)
-  return returnableItemsForSelect.value.filter((item) => selectedIds.includes(item.value))
-}
-
-// Gérer le changement de sélection des articles pour un repas
-const handleReturnableItemsChange = async (meal: any, selectedItems: any[]) => {
-  // Mettre à jour temporairement l'état local avec les IDs
-  meal.returnableItems = selectedItems.map((item) => ({
-    returnableItemId: item.value,
-  }))
-
-  await handleMealChange(meal)
 }
 
 // Vérifier l'accès à cette page
@@ -368,7 +266,7 @@ onMounted(async () => {
   }
 
   // Charger les repas et les articles en parallèle
-  await Promise.all([fetchVolunteerMeals(), fetchReturnableItems()])
+  await fetchVolunteerMeals()
 })
 
 // Métadonnées de la page

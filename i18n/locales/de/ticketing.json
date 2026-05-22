@@ -211,8 +211,7 @@
         "delete_label": "Löschen",
         "delete_title": "Artikel löschen",
         "loading": "Lädt...",
-        "name_placeholder": "Name des Artikels",
-        "title": "An Teilnehmer auszuhändigende Artikel"
+        "name_placeholder": "Name des Artikels"
       },
       "volunteer": {
         "choose_placeholder": "Artikel zur Rückgabe auswählen...",

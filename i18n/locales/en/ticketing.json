@@ -211,8 +211,7 @@
         "delete_label": "Delete",
         "delete_title": "Delete item",
         "loading": "Loading...",
-        "name_placeholder": "Item name",
-        "title": "Items to be given to participants"
+        "name_placeholder": "Item name"
       },
       "volunteer": {
         "choose_placeholder": "Choose an item to return...",

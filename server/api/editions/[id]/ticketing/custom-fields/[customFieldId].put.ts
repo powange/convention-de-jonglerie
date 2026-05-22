@@ -110,20 +110,22 @@ export default wrapApiHandler(
         })
       }
 
-      // Supprimer les anciennes associations avec les articles à restituer
-      await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
-        where: { customFieldId },
-      })
-
-      // Créer les nouvelles associations avec les articles à restituer
-      if (body.returnableItems && body.returnableItems.length > 0) {
-        await tx.ticketingTierCustomFieldReturnableItem.createMany({
-          data: body.returnableItems.map((ri) => ({
-            customFieldId: cf.id,
-            returnableItemId: ri.returnableItemId,
-            choiceValue: ri.choiceValue || null,
-          })),
+      // Supprimer / recréer les associations articles à restituer uniquement
+      // si la clé est explicitement fournie (édition désormais déléguée à
+      // un endpoint dédié).
+      if (body.returnableItems !== undefined) {
+        await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+          where: { customFieldId },
         })
+        if (body.returnableItems.length > 0) {
+          await tx.ticketingTierCustomFieldReturnableItem.createMany({
+            data: body.returnableItems.map((ri) => ({
+              customFieldId: cf.id,
+              returnableItemId: ri.returnableItemId,
+              choiceValue: ri.choiceValue || null,
+            })),
+          })
+        }
       }
 
       // Retourner le custom field avec ses relations

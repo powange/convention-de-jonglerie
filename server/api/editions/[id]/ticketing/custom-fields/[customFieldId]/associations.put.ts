@@ -97,10 +97,14 @@ export default wrapApiHandler(
         where: { customFieldId },
       })
 
-      // 4. Supprimer toutes les associations existantes pour les articles à restituer
-      await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
-        where: { customFieldId },
-      })
+      // 4. Supprimer toutes les associations existantes pour les articles
+      // à restituer — uniquement si la clé est explicitement fournie
+      // (édition désormais déléguée à un endpoint dédié).
+      if (returnableItems !== undefined) {
+        await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+          where: { customFieldId },
+        })
+      }
 
       // 5. Créer les nouvelles associations de quotas
       if (quotas && quotas.length > 0) {

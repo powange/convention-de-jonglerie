@@ -181,7 +181,7 @@
         </UButton>
       </UFieldGroup>
       <p
-        v-if="availableReturnableItems.length === 0"
+        v-if="allReturnableItemsLoaded && availableReturnableItems.length === 0"
         class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1"
       >
         <UIcon name="i-heroicons-information-circle" class="h-4 w-4" />
@@ -246,6 +246,9 @@ const itemToDelete = ref<VolunteerReturnableItem | null>(null)
 const selectedItemId = ref<number | null>(null)
 const selectedTeamId = ref<string | null>(null) // null = global par défaut, string = équipe spécifique
 const allReturnableItems = ref<TicketingReturnableItem[]>([])
+// Flag pour éviter d'afficher le message "tous associés" avant le premier
+// chargement (sinon flash visuel : 0 items → message → fetch → message disparait).
+const allReturnableItemsLoaded = ref(false)
 const teams = ref<VolunteerTeam[]>([])
 
 // Initialiser selectedTeamId à null (global) au montage
@@ -311,6 +314,8 @@ const loadAllReturnableItems = async () => {
     allReturnableItems.value = response.data?.returnableItems || []
   } catch (error) {
     console.error('Failed to load all returnable items:', error)
+  } finally {
+    allReturnableItemsLoaded.value = true
   }
 }
 

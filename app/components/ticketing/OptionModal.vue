@@ -134,29 +134,6 @@
         </UFormField>
 
         <UFormField
-          v-if="returnableItems.length > 0"
-          :label="$t('ticketing.tiers.modal.returnable_items_label')"
-          name="returnableItems"
-        >
-          <USelectMenu
-            v-model="form.returnableItemIds"
-            :items="returnableItems.map((item) => ({ label: item.name, value: item.id }))"
-            value-key="value"
-            multiple
-            searchable
-            :placeholder="$t('ticketing.tiers.modal.returnable_items_placeholder')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="form.returnableItemIds.length === 0">{{
-                $t('ticketing.tiers.modal.no_item_selected')
-              }}</span>
-              <span v-else>{{ form.returnableItemIds.length }} article(s) sélectionné(s)</span>
-            </template>
-          </USelectMenu>
-        </UFormField>
-
-        <UFormField
           label="Tarifs associés"
           name="tiers"
           :help="
@@ -282,7 +259,6 @@ const form = ref({
   isRequired: false,
   position: 0,
   quotaIds: [] as number[],
-  returnableItemIds: [] as number[],
   tierIds: [] as number[],
   mealIds: [] as number[],
 })
@@ -290,9 +266,8 @@ const form = ref({
 const choicesText = ref('')
 const priceInEuros = ref<number | null>(null)
 
-// Charger les quotas, items, tarifs et repas disponibles
+// Charger les quotas, tarifs et repas disponibles
 const quotas = ref<any[]>([])
-const returnableItems = ref<any[]>([])
 const tiers = ref<any[]>([])
 const meals = ref<any[]>([])
 
@@ -322,22 +297,18 @@ const loadQuotasAndItems = async () => {
   try {
     const promises: Promise<any>[] = [
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
-      $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/returnable-items`),
       $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/tiers`),
     ]
     if (edition.value?.mealsEnabled) {
       promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
     }
-    const [quotasData, itemsData, tiersData, mealsData] = await Promise.all(promises)
+    const [quotasData, tiersData, mealsData] = await Promise.all(promises)
     quotas.value = Array.isArray(quotasData?.data?.quotas) ? quotasData.data.quotas : []
-    returnableItems.value = Array.isArray(itemsData?.data?.returnableItems)
-      ? itemsData.data.returnableItems
-      : []
     tiers.value = Array.isArray(tiersData?.data?.tiers) ? tiersData.data.tiers : []
     meals.value =
       mealsData?.data?.meals && Array.isArray(mealsData.data.meals) ? mealsData.data.meals : []
   } catch (error) {
-    console.error('Failed to load quotas, items, tiers and meals:', error)
+    console.error('Failed to load quotas, tiers and meals:', error)
   }
 }
 
@@ -357,8 +328,6 @@ watch(
           isRequired: props.option.isRequired,
           position: props.option.position,
           quotaIds: props.option.quotas?.map((q: any) => q.quotaId) || [],
-          returnableItemIds:
-            props.option.returnableItems?.map((r: any) => r.returnableItemId) || [],
           tierIds: props.option.tiers?.map((t: any) => t.tierId) || [],
           mealIds: props.option.meals?.map((m: any) => m.mealId) || [],
         }
@@ -374,7 +343,6 @@ watch(
           isRequired: false,
           position: 0,
           quotaIds: [],
-          returnableItemIds: [],
           tierIds: [],
           mealIds: [],
         }
@@ -398,7 +366,6 @@ const buildFormData = () => ({
       : null,
   price: priceInEuros.value ? Math.round(priceInEuros.value * 100) : null,
   quotaIds: form.value.quotaIds,
-  returnableItemIds: form.value.returnableItemIds,
   tierIds: form.value.tierIds,
   mealIds: form.value.mealIds,
 })

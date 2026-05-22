@@ -211,8 +211,7 @@
         "delete_label": "Usuń",
         "delete_title": "Usuń przedmiot",
         "loading": "Ładowanie...",
-        "name_placeholder": "Nazwa przedmiotu",
-        "title": "Przedmioty do przekazania uczestnikom"
+        "name_placeholder": "Nazwa przedmiotu"
       },
       "volunteer": {
         "choose_placeholder": "Wybierz przedmiot do zwrotu...",
