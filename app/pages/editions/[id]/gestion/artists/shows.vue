@@ -241,6 +241,32 @@
           </table>
         </div>
       </UCard>
+
+      <!-- Card Technique -->
+      <UCard v-if="canEdit" class="mt-6">
+        <template #header>
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-wrench-screwdriver"
+                class="text-amber-600 dark:text-amber-400 size-5"
+              />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.shows.technical_title') }}</h2>
+            </div>
+            <UButton
+              color="primary"
+              icon="i-heroicons-arrow-down-tray"
+              :loading="exportingTechnicalPdf"
+              @click="exportTechnicalNeedsPdf"
+            >
+              {{ $t('gestion.shows.technical_export_pdf') }}
+            </UButton>
+          </div>
+        </template>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{ $t('gestion.shows.technical_export_help') }}
+        </p>
+      </UCard>
     </div>
 
     <!-- Modal spectacle -->
@@ -268,7 +294,7 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { formatDateTime } = useDateFormat()
@@ -341,6 +367,128 @@ const openEditShowModal = (show: any) => {
 // Gérer la sauvegarde
 const handleShowSaved = () => {
   fetchShows()
+}
+
+// --- Export PDF des besoins techniques ---
+interface TechnicalApplication {
+  id: number
+  artistName: string
+  showTitle: string
+  technicalNeeds: string | null
+}
+interface TechnicalGroup {
+  show: { id: number; title: string } | null
+  applications: TechnicalApplication[]
+}
+const exportingTechnicalPdf = ref(false)
+
+function slugify(input: string): string {
+  return input
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+}
+
+async function exportTechnicalNeedsPdf() {
+  exportingTechnicalPdf.value = true
+  try {
+    const res = await $fetch<{
+      success: boolean
+      data: { editionName: string; groups: TechnicalGroup[] }
+    }>(`/api/editions/${editionId.value}/shows-call/technical-needs`)
+    const { editionName, groups } = res.data
+
+    const { jsPDF } = await import('jspdf')
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const marginX = 15
+    const maxY = pageHeight - 15
+    const contentWidth = pageWidth - 2 * marginX
+    let y = 20
+
+    const ensureSpace = (needed: number) => {
+      if (y + needed > maxY) {
+        doc.addPage()
+        y = 20
+      }
+    }
+
+    const writeWrapped = (
+      text: string,
+      opts: { size: number; bold?: boolean; color?: [number, number, number] }
+    ) => {
+      doc.setFont('helvetica', opts.bold ? 'bold' : 'normal')
+      doc.setFontSize(opts.size)
+      if (opts.color) doc.setTextColor(...opts.color)
+      else doc.setTextColor(20, 20, 20)
+      const lines = doc.splitTextToSize(text, contentWidth) as string[]
+      const lineHeight = opts.size * 0.45
+      for (const line of lines) {
+        ensureSpace(lineHeight)
+        doc.text(line, marginX, y)
+        y += lineHeight
+      }
+    }
+
+    // Titre principal
+    const title = editionName
+      ? t('gestion.shows.technical_pdf_title_with_edition', { edition: editionName })
+      : t('gestion.shows.technical_pdf_title')
+    writeWrapped(title, { size: 18, bold: true })
+    y += 2
+    writeWrapped(
+      t('gestion.shows.technical_pdf_generated_on', {
+        date: new Date().toLocaleDateString(locale.value, {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        }),
+      }),
+      { size: 9, color: [110, 110, 110] }
+    )
+    y += 4
+
+    if (!groups.length) {
+      writeWrapped(t('gestion.shows.technical_pdf_empty'), { size: 11 })
+    }
+
+    for (const group of groups) {
+      ensureSpace(10)
+      // Titre du show (ou "Sans spectacle lié")
+      const showTitle = group.show
+        ? group.show.title
+        : t('gestion.shows.technical_pdf_no_show_group')
+      writeWrapped(showTitle, { size: 14, bold: true, color: [80, 50, 130] })
+      y += 1
+
+      for (const app of group.applications) {
+        ensureSpace(8)
+        const sub = `${app.artistName} — ${app.showTitle}`
+        writeWrapped(sub, { size: 11, bold: true })
+        const needs = app.technicalNeeds?.trim() || t('gestion.shows.technical_pdf_no_needs')
+        writeWrapped(needs, { size: 10 })
+        y += 3
+      }
+      y += 3
+    }
+
+    const slug = slugify(editionName || `edition-${editionId.value}`)
+    const date = new Date().toISOString().slice(0, 10)
+    doc.save(`besoins-techniques-${slug}-${date}.pdf`)
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    exportingTechnicalPdf.value = false
+  }
 }
 
 // Confirmer la suppression
