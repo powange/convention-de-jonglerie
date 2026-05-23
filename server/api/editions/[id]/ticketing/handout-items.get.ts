@@ -1,5 +1,4 @@
 import { requireAuth } from '#server/utils/auth-utils'
-import { getReturnableItems } from '#server/utils/editions/ticketing/returnable-items'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
@@ -17,14 +16,19 @@ export default wrapApiHandler(
       })
 
     try {
-      return await getReturnableItems(editionId)
+      const handoutItems = await prisma.ticketingHandoutItem.findMany({
+        where: { editionId },
+        orderBy: { name: 'asc' },
+      })
+
+      return createSuccessResponse({ handoutItems })
     } catch (error: unknown) {
-      console.error('Failed to fetch returnable items:', error)
+      console.error('Failed to fetch handout items:', error)
       throw createError({
         status: 500,
-        message: 'Erreur lors de la récupération des items à restituer',
+        message: 'Erreur lors de la récupération des articles à remettre',
       })
     }
   },
-  { operationName: 'GET ticketing returnable-items index' }
+  { operationName: 'GET ticketing handout-items' }
 )

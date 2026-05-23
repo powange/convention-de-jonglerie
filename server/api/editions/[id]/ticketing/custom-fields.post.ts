@@ -17,10 +17,10 @@ const bodySchema = z.object({
       })
     )
     .optional(),
-  returnableItems: z
+  handoutItems: z
     .array(
       z.object({
-        returnableItemId: z.number(),
+        handoutItemId: z.number(),
         choiceValue: z.string().optional(), // Pour ChoiceList
       })
     )
@@ -76,12 +76,12 @@ export default wrapApiHandler(
         })
       }
 
-      // Associer aux articles à restituer si fournis
-      if (body.returnableItems && body.returnableItems.length > 0) {
-        await tx.ticketingTierCustomFieldReturnableItem.createMany({
-          data: body.returnableItems.map((ri) => ({
+      // Associer aux articles à remettre si fournis
+      if (body.handoutItems && body.handoutItems.length > 0) {
+        await tx.ticketingTierCustomFieldHandoutItem.createMany({
+          data: body.handoutItems.map((ri) => ({
             customFieldId: cf.id,
-            returnableItemId: ri.returnableItemId,
+            handoutItemId: ri.handoutItemId,
             choiceValue: ri.choiceValue || null,
           })),
         })
@@ -111,9 +111,9 @@ export default wrapApiHandler(
               },
             },
           },
-          returnableItems: {
+          handoutItems: {
             include: {
-              returnableItem: {
+              handoutItem: {
                 select: {
                   id: true,
                   name: true,

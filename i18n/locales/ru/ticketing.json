@@ -205,7 +205,7 @@
       },
       "title_required": "Название обязательно"
     },
-    "returnable_items": {
+    "handout_items": {
       "list": {
         "add_placeholder": "Новый элемент...",
         "delete_label": "Удалить",
@@ -214,7 +214,7 @@
         "name_placeholder": "Название элемента"
       },
       "volunteer": {
-        "choose_placeholder": "Выбрать предмет для возврата...",
+        "choose_placeholder": "Выбрать предмет к выдаче...",
         "given_to_all": "Выдано всем волонтёрам",
         "remove_label": "Удалить предмет",
         "remove_title": "Удалить этот предмет?"
@@ -256,7 +256,7 @@
         "price_placeholder": "0,00",
         "quotas_label": "Связанные квоты",
         "quotas_placeholder": "Выбрать квоты",
-        "returnable_items_label": "Предметы для возврата",
+        "handout_items_label": "Предметы к выдаче",
         "status_label": "Статус",
         "title": "Тариф HelloAsso"
       },

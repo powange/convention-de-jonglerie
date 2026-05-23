@@ -502,12 +502,12 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-heroicons-currency-euro',
           to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
         },
-        ...(edition.value?.ticketingReturnableItemsEnabled
+        ...(edition.value?.ticketingHandoutItemsEnabled
           ? [
               {
-                label: t('gestion.ticketing.returnable_items_title'),
+                label: t('gestion.ticketing.handout_items_title'),
                 icon: 'i-heroicons-gift',
-                to: `/editions/${editionId.value}/gestion/ticketing/returnable-items`,
+                to: `/editions/${editionId.value}/gestion/ticketing/handout-items`,
               },
             ]
           : []),

@@ -205,7 +205,7 @@
       },
       "title_required": "Le titre est obligatoire"
     },
-    "returnable_items": {
+    "handout_items": {
       "list": {
         "add_placeholder": "Nouvel item...",
         "delete_label": "Supprimer",
@@ -214,7 +214,7 @@
         "name_placeholder": "Nom de l'item"
       },
       "volunteer": {
-        "choose_placeholder": "Choisir un article à restituer...",
+        "choose_placeholder": "Choisir un article à remettre...",
         "given_to_all": "Remis à tous les bénévoles",
         "remove_label": "Retirer l'article",
         "remove_title": "Retirer cet article ?"
@@ -256,7 +256,7 @@
         "price_placeholder": "0.00",
         "quotas_label": "Quotas associés",
         "quotas_placeholder": "Sélectionner des quotas",
-        "returnable_items_label": "Articles à restituer",
+        "handout_items_label": "Articles à remettre",
         "status_label": "Statut",
         "title": "Tarif HelloAsso"
       },

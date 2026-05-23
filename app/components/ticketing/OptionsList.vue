@@ -89,19 +89,19 @@
           </UBadge>
         </div>
 
-        <!-- Articles à restituer -->
+        <!-- Articles à remettre -->
         <div
-          v-if="option.returnableItems && option.returnableItems.length > 0"
+          v-if="option.handoutItems && option.handoutItems.length > 0"
           class="flex flex-wrap gap-1"
         >
-          <p class="font-medium text-gray-700 dark:text-gray-300">À restituer :</p>
+          <p class="font-medium text-gray-700 dark:text-gray-300">À remettre :</p>
           <UBadge
-            v-for="itemRelation in option.returnableItems"
-            :key="itemRelation.returnableItem.id"
+            v-for="itemRelation in option.handoutItems"
+            :key="itemRelation.handoutItem.id"
             color="info"
             variant="soft"
           >
-            {{ itemRelation.returnableItem.name }}
+            {{ itemRelation.handoutItem.name }}
           </UBadge>
         </div>
 

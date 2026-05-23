@@ -11,7 +11,7 @@ export interface TierData {
   validFrom?: string | null
   validUntil?: string | null
   quotaIds?: number[]
-  returnableItemIds?: number[]
+  handoutItemIds?: number[]
   mealIds?: number[]
 }
 
@@ -75,9 +75,9 @@ export async function getEditionTiers(
           },
         },
       },
-      returnableItems: {
+      handoutItems: {
         include: {
-          returnableItem: true,
+          handoutItem: true,
         },
       },
       customFields: {
@@ -137,9 +137,9 @@ export async function createTier(editionId: number, data: TierData) {
       quotas: {
         create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
       },
-      returnableItems: {
-        create: (data.returnableItemIds || []).map((returnableItemId) => ({
-          returnableItemId,
+      handoutItems: {
+        create: (data.handoutItemIds || []).map((handoutItemId) => ({
+          handoutItemId,
         })),
       },
       meals: {
@@ -174,10 +174,10 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
   return await prisma.$transaction(async (tx) => {
     // Supprimer les anciennes relations
     await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
-    // returnableItems : on ne supprime/recrée que si la clé est explicitement
+    // handoutItems : on ne supprime/recrée que si la clé est explicitement
     // fournie (édition désormais déléguée à un endpoint dédié).
-    if (data.returnableItemIds !== undefined) {
-      await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
+    if (data.handoutItemIds !== undefined) {
+      await tx.ticketingTierHandoutItem.deleteMany({ where: { tierId } })
     }
     await tx.ticketingTierMeal.deleteMany({ where: { tierId } })
 
@@ -194,11 +194,11 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          ...(data.returnableItemIds !== undefined
+          ...(data.handoutItemIds !== undefined
             ? {
-                returnableItems: {
-                  create: data.returnableItemIds.map((returnableItemId) => ({
-                    returnableItemId,
+                handoutItems: {
+                  create: data.handoutItemIds.map((handoutItemId) => ({
+                    handoutItemId,
                   })),
                 },
               }
@@ -226,11 +226,11 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          ...(data.returnableItemIds !== undefined
+          ...(data.handoutItemIds !== undefined
             ? {
-                returnableItems: {
-                  create: data.returnableItemIds.map((returnableItemId) => ({
-                    returnableItemId,
+                handoutItems: {
+                  create: data.handoutItemIds.map((handoutItemId) => ({
+                    handoutItemId,
                   })),
                 },
               }

@@ -138,21 +138,21 @@
                 </div>
               </div>
 
-              <!-- Articles à restituer -->
-              <div v-if="field.returnableItems && field.returnableItems.length > 0" class="text-sm">
+              <!-- Articles à remettre -->
+              <div v-if="field.handoutItems && field.handoutItems.length > 0" class="text-sm">
                 <div class="flex items-start gap-2">
                   <UIcon name="i-heroicons-gift" class="h-4 w-4 text-gray-400 mt-0.5" />
                   <div class="flex-1">
-                    <span class="text-gray-600 dark:text-gray-400">Articles à restituer : </span>
+                    <span class="text-gray-600 dark:text-gray-400">Articles à remettre : </span>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <UBadge
-                        v-for="item in field.returnableItems"
-                        :key="`${item.returnableItem.id}-${item.choiceValue || 'all'}`"
+                        v-for="item in field.handoutItems"
+                        :key="`${item.handoutItem.id}-${item.choiceValue || 'all'}`"
                         color="green"
                         variant="subtle"
                         size="xs"
                       >
-                        {{ item.returnableItem.name }}
+                        {{ item.handoutItem.name }}
                         <span v-if="item.choiceValue"> ({{ item.choiceValue }})</span>
                       </UBadge>
                     </div>
@@ -249,8 +249,8 @@ interface CustomField {
     }
     choiceValue?: string | null
   }>
-  returnableItems?: Array<{
-    returnableItem: {
+  handoutItems?: Array<{
+    handoutItem: {
       id: number
       name: string
     }

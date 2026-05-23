@@ -211,9 +211,9 @@ export default wrapApiHandler(
         include: {
           tier: {
             include: {
-              returnableItems: {
+              handoutItems: {
                 include: {
-                  returnableItem: true,
+                  handoutItem: true,
                 },
               },
             },

@@ -17,9 +17,9 @@ export default wrapApiHandler(
 
     try {
       // Malheureusement, on ne peut pas utiliser include car il n'y a pas de relation
-      // returnableItem dans EditionOrganizerReturnableItem
+      // handoutItem dans EditionOrganizerHandoutItem
       // On doit donc récupérer manuellement les données
-      const rawItems = await prisma.editionOrganizerReturnableItem.findMany({
+      const rawItems = await prisma.editionOrganizerHandoutItem.findMany({
         where: { editionId },
         include: {
           organizer: {
@@ -48,12 +48,12 @@ export default wrapApiHandler(
       })
 
       // Récupérer les IDs uniques des articles
-      const returnableItemIds = [...new Set(rawItems.map((item) => item.returnableItemId))]
+      const handoutItemIds = [...new Set(rawItems.map((item) => item.handoutItemId))]
 
       // Récupérer tous les articles en une seule requête
-      const returnableItems = await prisma.ticketingReturnableItem.findMany({
+      const handoutItems = await prisma.ticketingHandoutItem.findMany({
         where: {
-          id: { in: returnableItemIds },
+          id: { in: handoutItemIds },
         },
         select: {
           id: true,
@@ -62,13 +62,13 @@ export default wrapApiHandler(
       })
 
       // Créer un map pour un accès rapide
-      const returnableItemsMap = new Map(returnableItems.map((item) => [item.id, item.name]))
+      const handoutItemsMap = new Map(handoutItems.map((item) => [item.id, item.name]))
 
       return {
         items: rawItems.map((item) => ({
           id: item.id,
-          returnableItemId: item.returnableItemId,
-          returnableItemName: returnableItemsMap.get(item.returnableItemId) ?? 'Article inconnu',
+          handoutItemId: item.handoutItemId,
+          handoutItemName: handoutItemsMap.get(item.handoutItemId) ?? 'Article inconnu',
           organizerId: item.organizerId,
           organizer: item.organizer
             ? {
@@ -82,7 +82,7 @@ export default wrapApiHandler(
       }
     } catch (error: unknown) {
       console.error(
-        'Erreur lors de la récupération des articles à restituer pour organisateurs:',
+        'Erreur lors de la récupération des articles à remettre pour organisateurs:',
         error
       )
       throw createError({
@@ -91,5 +91,5 @@ export default wrapApiHandler(
       })
     }
   },
-  { operationName: 'GET ticketing organizers returnable-items index' }
+  { operationName: 'GET ticketing organizers handout-items index' }
 )

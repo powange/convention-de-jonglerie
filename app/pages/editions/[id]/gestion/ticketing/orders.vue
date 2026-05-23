@@ -913,7 +913,7 @@
               {{
                 itemToValidate.entryValidated
                   ? "Cette action marquera le billet comme non validé. Le participant pourra à nouveau scanner son billet au contrôle d'accès."
-                  : "Cette action marquera le billet comme validé sans vérifier les objets à restituer. Le participant ne pourra plus scanner son billet au contrôle d'accès."
+                  : "Cette action marquera le billet comme validé sans vérifier les objets à remettre. Le participant ne pourra plus scanner son billet au contrôle d'accès."
               }}
             </template>
           </UAlert>

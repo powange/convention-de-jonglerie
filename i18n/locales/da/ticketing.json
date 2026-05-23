@@ -205,7 +205,7 @@
       },
       "title_required": "Titel er påkrævet"
     },
-    "returnable_items": {
+    "handout_items": {
       "list": {
         "add_placeholder": "Ny vare...",
         "delete_label": "Slet",
@@ -214,7 +214,7 @@
         "name_placeholder": "Navn på varen"
       },
       "volunteer": {
-        "choose_placeholder": "Vælg en vare til returnering...",
+        "choose_placeholder": "Vælg en genstand til udlevering...",
         "given_to_all": "Udleveret til alle frivillige",
         "remove_label": "Fjern varen",
         "remove_title": "Fjern denne vare?"
@@ -256,7 +256,7 @@
         "price_placeholder": "0,00",
         "quotas_label": "Tilknyttede kvoter",
         "quotas_placeholder": "Vælg kvoter",
-        "returnable_items_label": "Varer til returnering",
+        "handout_items_label": "Genstande til udlevering",
         "status_label": "Status",
         "title": "HelloAsso pris"
       },

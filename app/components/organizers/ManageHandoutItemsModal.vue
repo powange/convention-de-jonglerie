@@ -31,7 +31,7 @@ const itemToDelete = ref<{ id: number; name: string } | null>(null)
 
 // Titre du modal
 const modalTitle = computed(() => {
-  if (!props.organizer) return t('gestion.organizers.global_returnable_items')
+  if (!props.organizer) return t('gestion.organizers.global_handout_items')
 
   // Vérification de sécurité pour éviter les erreurs si la structure est incomplète
   if (!props.organizer?.user) {
@@ -49,16 +49,14 @@ async function loadData() {
 
   isLoadingData.value = true
   try {
-    // Charger tous les articles à restituer de l'édition
-    const itemsResponse = await $fetch(
-      `/api/editions/${props.editionId}/ticketing/returnable-items`
-    )
-    // L'API retourne { success: true, data: { returnableItems: [...] } }
-    availableItems.value = itemsResponse.data?.returnableItems || []
+    // Charger tous les articles à remettre de l'édition
+    const itemsResponse = await $fetch(`/api/editions/${props.editionId}/ticketing/handout-items`)
+    // L'API retourne { success: true, data: { handoutItems: [...] } }
+    availableItems.value = itemsResponse.data?.handoutItems || []
 
     // Charger les articles déjà assignés
     const assignedResponse = await $fetch(
-      `/api/editions/${props.editionId}/ticketing/organizers/returnable-items`
+      `/api/editions/${props.editionId}/ticketing/organizers/handout-items`
     )
 
     const allAssignedItems = assignedResponse.items || []
@@ -84,11 +82,11 @@ async function loadData() {
 
 // Action pour ajouter un article
 const { execute: executeAddItem, loading: isAdding } = useApiAction(
-  () => `/api/editions/${props.editionId}/ticketing/organizers/returnable-items`,
+  () => `/api/editions/${props.editionId}/ticketing/organizers/handout-items`,
   {
     method: 'POST',
     body: () => ({
-      returnableItemId: selectedItemId.value,
+      handoutItemId: selectedItemId.value,
       organizerId: props.organizer?.id ?? null,
     }),
     successMessage: { title: t('gestion.organizers.item_added_success') },
@@ -110,7 +108,7 @@ function addItem() {
 function confirmRemoveItem(item: any) {
   itemToDelete.value = {
     id: item.id,
-    name: item.returnableItemName,
+    name: item.handoutItemName,
   }
   deleteConfirmOpen.value = true
 }
@@ -118,7 +116,7 @@ function confirmRemoveItem(item: any) {
 // Action pour retirer un article
 const { execute: executeRemoveItem, loading: isRemoving } = useApiAction(
   () =>
-    `/api/editions/${props.editionId}/ticketing/organizers/returnable-items/${itemToDelete.value?.id}`,
+    `/api/editions/${props.editionId}/ticketing/organizers/handout-items/${itemToDelete.value?.id}`,
   {
     method: 'DELETE',
     successMessage: { title: t('gestion.organizers.item_removed_success') },
@@ -143,10 +141,10 @@ const loading = computed(() => isLoadingData.value || isAdding.value || isRemovi
 // Articles disponibles pour sélection (non encore assignés)
 const availableForSelection = computed(() => {
   // IDs des articles déjà assignés à cet organisateur
-  const assignedIds = new Set(assignedItems.value.map((item) => item.returnableItemId))
+  const assignedIds = new Set(assignedItems.value.map((item) => item.handoutItemId))
 
   // IDs des articles globaux (à exclure pour les organisateurs spécifiques)
-  const globalIds = new Set(globalItems.value.map((item) => item.returnableItemId))
+  const globalIds = new Set(globalItems.value.map((item) => item.handoutItemId))
 
   return availableItems.value
     .filter((item) => {
@@ -197,12 +195,12 @@ watch(
       <div v-else class="space-y-6">
         <!-- Formulaire d'ajout -->
         <div class="space-y-4">
-          <UFormField :label="$t('gestion.organizers.add_returnable_item')">
+          <UFormField :label="$t('gestion.organizers.add_handout_item')">
             <div class="flex gap-2">
               <USelect
                 v-model="selectedItemId"
                 :items="availableForSelection"
-                :placeholder="$t('gestion.organizers.select_returnable_item')"
+                :placeholder="$t('gestion.organizers.select_handout_item')"
                 class="flex-1"
                 :disabled="availableForSelection.length === 0"
               />
@@ -221,7 +219,7 @@ watch(
             v-if="availableForSelection.length === 0 && availableItems.length === 0"
             class="text-sm text-gray-500 dark:text-gray-400"
           >
-            {{ $t('gestion.organizers.no_returnable_items_created') }}
+            {{ $t('gestion.organizers.no_handout_items_created') }}
           </p>
           <p
             v-else-if="availableForSelection.length === 0"
@@ -245,7 +243,7 @@ watch(
             >
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-gift" class="text-orange-500" />
-                <span class="text-sm">{{ item.returnableItemName }}</span>
+                <span class="text-sm">{{ item.handoutItemName }}</span>
               </div>
               <UButton
                 color="red"

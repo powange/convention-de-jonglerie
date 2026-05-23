@@ -16,8 +16,8 @@ export interface TicketingOption {
       quantity: number
     }
   }>
-  returnableItems?: Array<{
-    returnableItem: {
+  handoutItems?: Array<{
+    handoutItem: {
       id: number
       name: string
     }
@@ -49,7 +49,7 @@ export interface OptionFormData {
   price: number | null
   position: number
   quotaIds: number[]
-  returnableItemIds: number[]
+  handoutItemIds: number[]
   tierIds?: number[]
   mealIds?: number[]
 }

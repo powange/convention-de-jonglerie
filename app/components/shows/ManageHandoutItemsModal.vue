@@ -2,9 +2,9 @@
 interface Show {
   id: number
   title: string
-  returnableItems?: Array<{
-    returnableItemId: number
-    returnableItem?: { id: number; name: string }
+  handoutItems?: Array<{
+    handoutItemId: number
+    handoutItem?: { id: number; name: string }
   }>
 }
 
@@ -31,7 +31,7 @@ const selectedItemIds = ref<number[]>([])
 
 const modalTitle = computed(() =>
   props.show
-    ? t('gestion.ticketing.shows_returnable_items_manage_for', { title: props.show.title })
+    ? t('gestion.ticketing.shows_handout_items_manage_for', { title: props.show.title })
     : ''
 )
 
@@ -41,13 +41,13 @@ const itemOptions = computed(() =>
 
 const { execute: loadAvailableItems, loading } = useApiAction<
   unknown,
-  { returnableItems: Array<{ id: number; name: string }> }
->(() => `/api/editions/${props.editionId}/ticketing/returnable-items`, {
+  { handoutItems: Array<{ id: number; name: string }> }
+>(() => `/api/editions/${props.editionId}/ticketing/handout-items`, {
   method: 'GET',
   silentSuccess: true,
   errorMessages: { default: t('gestion.organizers.error_loading_items') },
   onSuccess: (result) => {
-    availableItems.value = result?.returnableItems || []
+    availableItems.value = result?.handoutItems || []
   },
 })
 
@@ -55,7 +55,7 @@ watch(
   () => props.open,
   (open) => {
     if (open) {
-      selectedItemIds.value = props.show?.returnableItems?.map((ri) => ri.returnableItemId) ?? []
+      selectedItemIds.value = props.show?.handoutItems?.map((ri) => ri.handoutItemId) ?? []
       loadAvailableItems()
     }
   },
@@ -66,7 +66,7 @@ const { execute: save, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/shows/${props.show?.id}`,
   {
     method: 'PUT',
-    body: () => ({ returnableItemIds: selectedItemIds.value }),
+    body: () => ({ handoutItemIds: selectedItemIds.value }),
     successMessage: { title: t('common.saved') },
     errorMessages: { default: t('common.error') },
     onSuccess: () => {
@@ -86,16 +86,16 @@ const { execute: save, loading: saving } = useApiAction(
 
       <div v-else class="space-y-4">
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('gestion.ticketing.shows_returnable_items_help') }}
+          {{ $t('gestion.ticketing.shows_handout_items_help') }}
         </p>
 
-        <UFormField :label="$t('gestion.shows.returnable_items')">
+        <UFormField :label="$t('gestion.shows.handout_items')">
           <USelectMenu
             v-model="selectedItemIds"
             :items="itemOptions"
             value-key="value"
             multiple
-            :placeholder="$t('gestion.ticketing.select_returnable_items_placeholder')"
+            :placeholder="$t('gestion.ticketing.select_handout_items_placeholder')"
             class="w-full"
           >
             <template #label>
@@ -112,7 +112,7 @@ const { execute: save, loading: saving } = useApiAction(
         </UFormField>
 
         <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
-          {{ $t('gestion.ticketing.no_returnable_items_created') }}
+          {{ $t('gestion.ticketing.no_handout_items_created') }}
         </p>
       </div>
     </template>

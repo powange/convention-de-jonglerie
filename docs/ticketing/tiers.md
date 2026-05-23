@@ -30,7 +30,7 @@ interface TierData {
   position: number // Ordre d'affichage
   isActive: boolean // Tarif actif ou non
   quotaIds?: number[] // Quotas associés
-  returnableItemIds?: number[] // Items à restituer associés
+  handoutItemIds?: number[] // Items à remettre associés
 }
 ```
 
@@ -57,7 +57,7 @@ model TicketingTier {
   externalTicketing ExternalTicketing?     @relation(...)
   edition           Edition                 @relation(...)
   quotas            TicketingTierQuota[]            // Relations quotas
-  returnableItems   TicketingTierReturnableItem[]   // Relations items
+  handoutItems   TicketingTierHandoutItem[]   // Relations items
   orderItems        TicketingOrderItem[]   // Billets vendus
 
   @@unique([externalTicketingId, helloAssoTierId])
@@ -87,24 +87,24 @@ model TicketingTierQuota {
 
 **Exemple** : Le tarif "Adulte avec repas" consomme le quota "Places totales" ET le quota "Repas".
 
-#### TicketingTierReturnableItem
+#### TicketingTierHandoutItem
 
-Associe un tarif à un ou plusieurs items à restituer.
+Associe un tarif à un ou plusieurs items à remettre.
 
 ```prisma
-model TicketingTierReturnableItem {
+model TicketingTierHandoutItem {
   id               Int @id @default(autoincrement())
   tierId           Int
-  returnableItemId Int
+  handoutItemId Int
 
   tier           TicketingTier  @relation(...)
-  returnableItem TicketingReturnableItem @relation(...)
+  handoutItem TicketingHandoutItem @relation(...)
 
-  @@unique([tierId, returnableItemId])
+  @@unique([tierId, handoutItemId])
 }
 ```
 
-**Exemple** : Le tarif "Pass Weekend" nécessite de restituer un "Badge" et un "T-shirt".
+**Exemple** : Le tarif "Pass Weekend" nécessite de remettre un "Badge" et un "T-shirt".
 
 ## API Routes
 
@@ -117,7 +117,7 @@ model TicketingTierReturnableItem {
 **Réponse** :
 
 ```typescript
-TicketingTier[] // Avec relations quotas et returnableItems
+TicketingTier[] // Avec relations quotas et handoutItems
 ```
 
 **Utilisation** : Liste complète des tarifs pour la gestion
@@ -160,7 +160,7 @@ TicketingTier[] // Avec relations quotas et returnableItems
   position?: number        // Défaut: 0
   isActive?: boolean       // Défaut: true
   quotaIds?: number[]      // Défaut: []
-  returnableItemIds?: number[] // Défaut: []
+  handoutItemIds?: number[] // Défaut: []
 }
 ```
 
@@ -185,7 +185,7 @@ const bodySchema = z.object({
   position: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
   quotaIds: z.array(z.number().int()).optional().default([]),
-  returnableItemIds: z.array(z.number().int()).optional().default([]),
+  handoutItemIds: z.array(z.number().int()).optional().default([]),
 })
 ```
 
@@ -201,7 +201,7 @@ const bodySchema = z.object({
 
 **Comportement** :
 
-- **Tarif HelloAsso** : Seules les relations (quotas, returnableItems) sont modifiables
+- **Tarif HelloAsso** : Seules les relations (quotas, handoutItems) sont modifiables
 - **Tarif manuel** : Tous les champs sont modifiables
 
 **Réponse** :
@@ -254,7 +254,7 @@ Récupère tous les tarifs d'une édition avec leurs relations.
 
 ```typescript
 const tiers = await getEditionTiers(editionId)
-// Retourne: TicketingTier[] avec quotas et returnableItems
+// Retourne: TicketingTier[] avec quotas et handoutItems
 ```
 
 #### `createTier(editionId: number, data: TierData)`
@@ -268,7 +268,7 @@ const tier = await createTier(editionId, {
   position: 2,
   isActive: true,
   quotaIds: [1, 3],
-  returnableItemIds: [2],
+  handoutItemIds: [2],
 })
 ```
 
@@ -289,7 +289,7 @@ const tier = await updateTier(5, editionId, {
   name: 'Tarif Étudiant - Modifié',
   price: 1200, // 12€
   quotaIds: [1], // Supprime le quota 3
-  returnableItemIds: [],
+  handoutItemIds: [],
 })
 ```
 
@@ -339,7 +339,7 @@ await deleteTier(5, editionId)
 
 - Formulaire de création/modification
 - Sélection multiple de quotas
-- Sélection multiple d'items à restituer
+- Sélection multiple d'items à remettre
 - Validation côté client
 - Champs désactivés pour tarifs HelloAsso (sauf relations)
 
@@ -350,7 +350,7 @@ await deleteTier(5, editionId)
   editionId: number
   tier?: TicketingTier | null // Si modification
   quotas: TicketingQuota[]
-  returnableItems: TicketingReturnableItem[]
+  handoutItems: TicketingHandoutItem[]
 }
 ```
 
@@ -395,7 +395,7 @@ const tier = await $fetch(`/api/editions/${editionId}/ticketing/tiers`, {
     position: 3,
     isActive: true,
     quotaIds: [quotaPlacesId],
-    returnableItemIds: [badgeId],
+    handoutItemIds: [badgeId],
   },
 })
 ```
@@ -410,7 +410,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
     name: tier.name, // Obligatoire mais ignoré
     price: tier.price, // Obligatoire mais ignoré
     quotaIds: [1, 2, 5], // Nouvelle liste de quotas
-    returnableItemIds: tier.returnableItems.map((i) => i.id),
+    handoutItemIds: tier.handoutItems.map((i) => i.id),
   },
 })
 ```
@@ -472,13 +472,13 @@ Associez systématiquement les tarifs aux quotas pertinents :
 - Quota "Repas végétarien" → Tarifs avec repas végétarien
 - Quota "Pass 2 jours" → Tarifs multi-jours
 
-### 4. Items à Restituer
+### 4. Items à Remettre
 
 N'associez des items que si nécessaire :
 
-- Badge réutilisable → À restituer
-- T-shirt offert → Pas à restituer
-- Clé de casier → À restituer
+- Badge réutilisable → À remettre
+- T-shirt offert → Pas à remettre
+- Clé de casier → À remettre
 
 ### 5. Synchronisation HelloAsso
 
@@ -508,6 +508,6 @@ Après modification de la configuration HelloAsso, rechargez les tarifs pour syn
 ## Voir Aussi
 
 - [Quotas](./quotas.md) - Gestion des quotas
-- [Items à Restituer](./returnable-items.md) - Gestion des items
+- [Items à Remettre](./handout-items.md) - Gestion des items
 - [Commandes](./orders.md) - Utilisation des tarifs dans les commandes
 - [Intégration HelloAsso](./external-integration.md) - Synchronisation des tarifs

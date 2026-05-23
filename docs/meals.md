@@ -26,9 +26,9 @@ Associations N:N entre un tarif (ou option) de billetterie et un repas. Permet d
 
 Lien entre un participant payant (`TicketingOrderItem`) et un repas, avec `consumedAt` pour la validation individuelle (typiquement après scan QR à l'entrée du buffet).
 
-### VolunteerMealReturnableItem
+### VolunteerMealHandoutItem
 
-Lien entre un repas et un article à restituer (`TicketingReturnableItem`) — par exemple, si chaque petit-déjeuner inclut une consigne pour une éco-tasse.
+Lien entre un repas et un article à remettre (`TicketingHandoutItem`) — par exemple, si chaque petit-déjeuner inclut une consigne pour une éco-tasse.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ model VolunteerMeal {
   // Relations vers tous les sous-systèmes
   mealSelections         VolunteerMealSelection[]
   artistMealSelections   ArtistMealSelection[]
-  returnableItems        VolunteerMealReturnableItem[]
+  handoutItems        VolunteerMealHandoutItem[]
   tiers                  TicketingTierMeal[]
   options                TicketingOptionMeal[]
   participantValidations TicketingOrderItemMeal[]
@@ -111,7 +111,7 @@ Voir [`docs/ticketing/`](ticketing/) pour les détails.
 
 ### Pages organisateur
 
-- `app/pages/editions/[id]/gestion/meals/index.vue` — Configuration des repas (création, dates, phases, articles à restituer, intégration billetterie).
+- `app/pages/editions/[id]/gestion/meals/index.vue` — Configuration des repas (création, dates, phases, articles à remettre, intégration billetterie).
 - `app/pages/editions/[id]/gestion/meals/list.vue` — Vue agrégée (qui prend quoi).
 - `app/pages/editions/[id]/gestion/meals/validate.vue` — Interface de validation à l'entrée du buffet (scan QR, recherche, etc.).
 

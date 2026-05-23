@@ -45,7 +45,7 @@
               {{ item.name }}
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {{ $t('ticketing.returnable_items.volunteer.given_to_all') }}
+              {{ $t('ticketing.handout_items.volunteer.given_to_all') }}
             </p>
           </div>
 
@@ -164,10 +164,10 @@
       <UFieldGroup>
         <USelect
           v-model="selectedItemId"
-          :items="availableReturnableItems"
-          :placeholder="$t('ticketing.returnable_items.volunteer.choose_placeholder')"
+          :items="availableHandoutItems"
+          :placeholder="$t('ticketing.handout_items.volunteer.choose_placeholder')"
           size="lg"
-          :disabled="availableReturnableItems.length === 0"
+          :disabled="availableHandoutItems.length === 0"
         />
         <UButton
           icon="i-heroicons-plus"
@@ -181,7 +181,7 @@
         </UButton>
       </UFieldGroup>
       <p
-        v-if="allReturnableItemsLoaded && availableReturnableItems.length === 0"
+        v-if="allHandoutItemsLoaded && availableHandoutItems.length === 0"
         class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1"
       >
         <UIcon name="i-heroicons-information-circle" class="h-4 w-4" />
@@ -193,9 +193,9 @@
   <!-- Modal de confirmation de suppression -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    :title="$t('ticketing.returnable_items.volunteer.remove_title')"
+    :title="$t('ticketing.handout_items.volunteer.remove_title')"
     :description="`L'article '${itemToDelete?.name}' ne sera plus remis automatiquement aux bénévoles lors de leur validation d'accès.`"
-    :confirm-label="$t('ticketing.returnable_items.volunteer.remove_label')"
+    :confirm-label="$t('ticketing.handout_items.volunteer.remove_label')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"
@@ -207,9 +207,9 @@
 </template>
 
 <script setup lang="ts">
-interface VolunteerReturnableItem {
+interface VolunteerHandoutItem {
   id: number
-  returnableItemId: number
+  handoutItemId: number
   teamId: string | null
   name: string
   team?: {
@@ -219,7 +219,7 @@ interface VolunteerReturnableItem {
   }
 }
 
-interface TicketingReturnableItem {
+interface TicketingHandoutItem {
   id: number
   name: string
 }
@@ -231,7 +231,7 @@ interface VolunteerTeam {
 }
 
 const props = defineProps<{
-  items: VolunteerReturnableItem[]
+  items: VolunteerHandoutItem[]
   loading: boolean
   editionId: number
 }>()
@@ -242,33 +242,33 @@ const emit = defineEmits<{
 
 const toast = useToast()
 const deleteConfirmOpen = ref(false)
-const itemToDelete = ref<VolunteerReturnableItem | null>(null)
+const itemToDelete = ref<VolunteerHandoutItem | null>(null)
 const selectedItemId = ref<number | null>(null)
 const selectedTeamId = ref<string | null>(null) // null = global par défaut, string = équipe spécifique
-const allReturnableItems = ref<TicketingReturnableItem[]>([])
+const allHandoutItems = ref<TicketingHandoutItem[]>([])
 // Flag pour éviter d'afficher le message "tous associés" avant le premier
 // chargement (sinon flash visuel : 0 items → message → fetch → message disparait).
-const allReturnableItemsLoaded = ref(false)
+const allHandoutItemsLoaded = ref(false)
 const teams = ref<VolunteerTeam[]>([])
 
 // Initialiser selectedTeamId à null (global) au montage
 onMounted(() => {
   selectedTeamId.value = null
-  loadAllReturnableItems()
+  loadAllHandoutItems()
   loadTeams()
 })
 
 // Recharger la liste complète des articles quand la portée change
 // Cela permet de récupérer les nouveaux articles créés entre-temps
 watch(selectedTeamId, () => {
-  loadAllReturnableItems()
+  loadAllHandoutItems()
 })
 
 // Séparer les articles globaux des articles par équipe
 const globalItems = computed(() => props.items.filter((item) => !item.teamId))
 
 const itemsByTeam = computed(() => {
-  const teamMap = new Map<string, VolunteerReturnableItem[]>()
+  const teamMap = new Map<string, VolunteerHandoutItem[]>()
 
   props.items
     .filter((item) => item.teamId)
@@ -307,15 +307,15 @@ const teamOptions = computed(() => {
   return options
 })
 
-// Charger tous les articles à restituer disponibles
-const loadAllReturnableItems = async () => {
+// Charger tous les articles à remettre disponibles
+const loadAllHandoutItems = async () => {
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    allReturnableItems.value = response.data?.returnableItems || []
+    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/handout-items`)
+    allHandoutItems.value = response.data?.handoutItems || []
   } catch (error) {
-    console.error('Failed to load all returnable items:', error)
+    console.error('Failed to load all handout items:', error)
   } finally {
-    allReturnableItemsLoaded.value = true
+    allHandoutItemsLoaded.value = true
   }
 }
 
@@ -330,13 +330,13 @@ const loadTeams = async () => {
 }
 
 // Articles disponibles pour la portée sélectionnée
-const availableReturnableItems = computed(() => {
+const availableHandoutItems = computed(() => {
   // Filtrer les articles déjà utilisés pour cette portée spécifique
   const usedIdsForScope = props.items
     .filter((item) => item.teamId === selectedTeamId.value)
-    .map((item) => item.returnableItemId)
+    .map((item) => item.handoutItemId)
 
-  return allReturnableItems.value
+  return allHandoutItems.value
     .filter((item) => !usedIdsForScope.includes(item.id))
     .map((item) => ({
       label: item.name,
@@ -344,19 +344,19 @@ const availableReturnableItems = computed(() => {
     }))
 })
 
-const confirmDeleteItem = (item: VolunteerReturnableItem) => {
+const confirmDeleteItem = (item: VolunteerHandoutItem) => {
   itemToDelete.value = item
   deleteConfirmOpen.value = true
 }
 
 const { execute: executeDeleteItem, loading: deleting } = useApiAction(
   () =>
-    `/api/editions/${props.editionId}/ticketing/volunteers/returnable-items/${itemToDelete.value?.id}`,
+    `/api/editions/${props.editionId}/ticketing/volunteers/handout-items/${itemToDelete.value?.id}`,
   {
     method: 'DELETE',
     successMessage: {
       title: 'Article retiré',
-      description: "L'article a été retiré des articles à restituer pour les bénévoles",
+      description: "L'article a été retiré des articles à remettre pour les bénévoles",
     },
     errorMessages: { default: "Impossible de retirer l'article" },
     onSuccess: () => {
@@ -373,11 +373,11 @@ const deleteItem = () => {
 }
 
 const { execute: executeHandleAdd, loading: saving } = useApiAction(
-  () => `/api/editions/${props.editionId}/ticketing/volunteers/returnable-items`,
+  () => `/api/editions/${props.editionId}/ticketing/volunteers/handout-items`,
   {
     method: 'POST',
     body: () => ({
-      returnableItemId: selectedItemId.value,
+      handoutItemId: selectedItemId.value,
       teamId: selectedTeamId.value,
     }),
     silentSuccess: true,
@@ -404,7 +404,7 @@ const { execute: executeHandleAdd, loading: saving } = useApiAction(
 const handleAdd = async () => {
   if (!selectedItemId.value) return
   // Recharger d'abord la liste complète au cas où de nouveaux articles auraient été créés
-  await loadAllReturnableItems()
+  await loadAllHandoutItems()
   executeHandleAdd()
 }
 </script>

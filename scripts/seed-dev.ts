@@ -1207,7 +1207,7 @@ async function main() {
   let ticketingEditionsCount = 0
   let ticketingTiersCount = 0
   let ticketingQuotasCount = 0
-  let ticketingReturnableItemsCount = 0
+  let ticketingHandoutItemsCount = 0
 
   // Sélectionner 40% des éditions futures pour avoir de la billetterie
   const futureEditions = createdEditions.filter((e) => new Date(e.startDate) > new Date())
@@ -1275,33 +1275,33 @@ async function main() {
       }
 
       // Créer des objets consignés (gobelets, assiettes, etc.)
-      const returnableItemNames = [
+      const handoutItemNames = [
         'Gobelet réutilisable',
         'Assiette réutilisable',
         'Bol réutilisable',
         'Couverts réutilisables',
       ]
 
-      const createdReturnableItems: any[] = []
-      for (const itemName of returnableItemNames) {
-        const returnableItem = await prisma.ticketingReturnableItem.create({
+      const createdHandoutItems: any[] = []
+      for (const itemName of handoutItemNames) {
+        const handoutItem = await prisma.ticketingHandoutItem.create({
           data: {
             editionId: edition.id,
             name: itemName,
           },
         })
-        createdReturnableItems.push(returnableItem)
-        ticketingReturnableItemsCount++
+        createdHandoutItems.push(handoutItem)
+        ticketingHandoutItemsCount++
       }
 
       // Associer les objets consignés aux tarifs plein et réduit
       for (const tier of createdTiers.slice(0, 2)) {
         // Seulement tarif plein et réduit
-        for (const item of createdReturnableItems) {
-          await prisma.ticketingTierReturnableItem.create({
+        for (const item of createdHandoutItems) {
+          await prisma.ticketingTierHandoutItem.create({
             data: {
               tierId: tier.id,
-              returnableItemId: item.id,
+              handoutItemId: item.id,
             },
           })
         }
@@ -1309,12 +1309,12 @@ async function main() {
 
       // Associer certains objets consignés aux bénévoles
       if (Math.random() > 0.5) {
-        for (const item of createdReturnableItems.slice(0, 2)) {
+        for (const item of createdHandoutItems.slice(0, 2)) {
           // Gobelets et assiettes
-          await prisma.editionVolunteerReturnableItem.create({
+          await prisma.editionVolunteerHandoutItem.create({
             data: {
               editionId: edition.id,
-              returnableItemId: item.id,
+              handoutItemId: item.id,
             },
           })
         }
@@ -1345,7 +1345,7 @@ async function main() {
   console.log(`- ${ticketingEditionsCount} éditions avec billetterie`)
   console.log(`- ${ticketingTiersCount} tarifs de billetterie créés`)
   console.log(`- ${ticketingQuotasCount} quotas de billetterie créés`)
-  console.log(`- ${ticketingReturnableItemsCount} objets consignés créés`)
+  console.log(`- ${ticketingHandoutItemsCount} objets consignés créés`)
 }
 
 main()

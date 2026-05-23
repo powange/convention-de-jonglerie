@@ -52,7 +52,7 @@ describe('/api/editions/[id]/shows POST', () => {
   const mockUpdatedShow = {
     ...mockCreatedShow,
     artists: [],
-    returnableItems: [],
+    handoutItems: [],
     zone: null,
     marker: null,
   }
@@ -64,7 +64,7 @@ describe('/api/editions/[id]/shows POST', () => {
     duration: 45,
     location: 'Scène B',
     artistIds: [],
-    returnableItemIds: [],
+    handoutItemIds: [],
   }
 
   beforeEach(() => {
@@ -191,7 +191,7 @@ describe('/api/editions/[id]/shows POST', () => {
       const bodyWithAssociations = {
         ...validBody,
         artistIds: [1, 2],
-        returnableItemIds: [3, 4],
+        handoutItemIds: [3, 4],
       }
       global.readBody.mockResolvedValue(bodyWithAssociations)
       const mockEvent = { context: { user: mockUser } }
@@ -204,8 +204,8 @@ describe('/api/editions/[id]/shows POST', () => {
             artists: {
               create: [{ artistId: 1 }, { artistId: 2 }],
             },
-            returnableItems: {
-              create: [{ returnableItemId: 3 }, { returnableItemId: 4 }],
+            handoutItems: {
+              create: [{ handoutItemId: 3 }, { handoutItemId: 4 }],
             },
           }),
         })

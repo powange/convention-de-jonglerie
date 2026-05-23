@@ -69,16 +69,13 @@
             </div>
 
             <!-- Articles à récupérer -->
-            <div
-              v-if="artist.returnableItems && artist.returnableItems.length > 0"
-              class="space-y-1"
-            >
+            <div v-if="artist.handoutItems && artist.handoutItems.length > 0" class="space-y-1">
               <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {{ $t('gestion.shows.items_to_receive', 'Articles à récupérer') }} :
               </p>
               <div class="flex flex-wrap gap-1">
                 <UBadge
-                  v-for="item in artist.returnableItems"
+                  v-for="item in artist.handoutItems"
                   :key="item.id"
                   color="blue"
                   variant="subtle"
@@ -171,7 +168,7 @@
               </div>
             </div>
             <div
-              v-if="artist.returnableItems && artist.returnableItems.length > 0"
+              v-if="artist.handoutItems && artist.handoutItems.length > 0"
               class="flex items-start gap-2 text-gray-600 dark:text-gray-400"
             >
               <UIcon name="i-heroicons-gift" class="w-4 h-4 mt-0.5" />
@@ -181,7 +178,7 @@
                 </p>
                 <div class="flex flex-wrap gap-1">
                   <UBadge
-                    v-for="item in artist.returnableItems"
+                    v-for="item in artist.handoutItems"
                     :key="item.id"
                     color="blue"
                     variant="subtle"
@@ -207,7 +204,7 @@ interface ArtistShow {
   location: string | null
 }
 
-interface ReturnableItem {
+interface HandoutItem {
   id: number
   name: string
 }
@@ -224,7 +221,7 @@ interface Artist {
   allergies: string | null
   allergySeverity: string | null
   shows: ArtistShow[]
-  returnableItems: ReturnableItem[]
+  handoutItems: HandoutItem[]
 }
 
 const props = defineProps<{

@@ -2,7 +2,7 @@
   <!-- Chargement -->
   <div v-if="loading" class="text-center py-12">
     <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin" />
-    <p class="text-sm text-gray-500 mt-2">{{ $t('ticketing.returnable_items.list.loading') }}</p>
+    <p class="text-sm text-gray-500 mt-2">{{ $t('ticketing.handout_items.list.loading') }}</p>
   </div>
 
   <div v-else class="space-y-4">
@@ -16,7 +16,7 @@
         <UFieldGroup class="w-full">
           <UInput
             :model-value="item.name"
-            :placeholder="$t('ticketing.returnable_items.list.name_placeholder')"
+            :placeholder="$t('ticketing.handout_items.list.name_placeholder')"
             class="flex-1"
             @blur="updateItem(item.id, $event.target.value)"
           />
@@ -29,7 +29,7 @@
         <UFieldGroup class="w-full">
           <UInput
             v-model="form.name"
-            :placeholder="$t('ticketing.returnable_items.list.add_placeholder')"
+            :placeholder="$t('ticketing.handout_items.list.add_placeholder')"
             class="flex-1"
             @keydown.enter="handleSave"
           />
@@ -39,12 +39,12 @@
     </div>
   </div>
 
-  <!-- Modal de confirmation de suppression d'item à restituer -->
+  <!-- Modal de confirmation de suppression d'item à remettre -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    :title="$t('ticketing.returnable_items.list.delete_title')"
+    :title="$t('ticketing.handout_items.list.delete_title')"
     :description="`Êtes-vous sûr de vouloir supprimer l'item '${itemToDelete?.name}' ?`"
-    :confirm-label="$t('ticketing.returnable_items.list.delete_label')"
+    :confirm-label="$t('ticketing.handout_items.list.delete_label')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"
@@ -56,17 +56,17 @@
 </template>
 
 <script setup lang="ts">
-interface TicketingReturnableItem {
+interface TicketingHandoutItem {
   id: number
   name: string
 }
 
-interface ReturnableItemForm {
+interface HandoutItemForm {
   name: string
 }
 
 const props = defineProps<{
-  items: TicketingReturnableItem[]
+  items: TicketingHandoutItem[]
   loading: boolean
   editionId: number
 }>()
@@ -77,24 +77,24 @@ const emit = defineEmits<{
 
 const toast = useToast()
 const deleteConfirmOpen = ref(false)
-const itemToDelete = ref<TicketingReturnableItem | null>(null)
+const itemToDelete = ref<TicketingHandoutItem | null>(null)
 
-const form = ref<ReturnableItemForm>({
+const form = ref<HandoutItemForm>({
   name: '',
 })
 
-const confirmDeleteItem = (item: TicketingReturnableItem) => {
+const confirmDeleteItem = (item: TicketingHandoutItem) => {
   itemToDelete.value = item
   deleteConfirmOpen.value = true
 }
 
 const { execute: executeDeleteItem, loading: deleting } = useApiAction(
-  () => `/api/editions/${props.editionId}/ticketing/returnable-items/${itemToDelete.value?.id}`,
+  () => `/api/editions/${props.editionId}/ticketing/handout-items/${itemToDelete.value?.id}`,
   {
     method: 'DELETE',
     successMessage: {
       title: 'Item supprimé',
-      description: "L'item à restituer a été supprimé avec succès",
+      description: "L'item à remettre a été supprimé avec succès",
     },
     errorMessages: { default: "Impossible de supprimer l'item" },
     onSuccess: () => {
@@ -113,7 +113,7 @@ const deleteItem = () => {
 const pendingUpdateName = ref('')
 
 const { execute: executeUpdateItem } = useApiActionById(
-  (itemId) => `/api/editions/${props.editionId}/ticketing/returnable-items/${itemId}`,
+  (itemId) => `/api/editions/${props.editionId}/ticketing/handout-items/${itemId}`,
   {
     method: 'PUT',
     body: () => ({ name: pendingUpdateName.value }),
@@ -140,13 +140,13 @@ const updateItem = (itemId: number, name: string) => {
 }
 
 const { execute: executeHandleSave, loading: saving } = useApiAction(
-  () => `/api/editions/${props.editionId}/ticketing/returnable-items`,
+  () => `/api/editions/${props.editionId}/ticketing/handout-items`,
   {
     method: 'POST',
     body: () => ({ name: form.value.name.trim() }),
     successMessage: {
       title: 'Item créé',
-      description: "L'item à restituer a été créé avec succès",
+      description: "L'item à remettre a été créé avec succès",
     },
     errorMessages: { default: "Impossible d'enregistrer l'item" },
     onSuccess: () => {

@@ -53,7 +53,7 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
     ...mockExistingShow,
     title: 'Nouveau Titre',
     artists: [],
-    returnableItems: [],
+    handoutItems: [],
     zone: null,
     marker: null,
   }
@@ -193,23 +193,23 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       )
     })
 
-    it('devrait mettre à jour les associations articles à restituer', async () => {
-      prismaMock.showReturnableItem.deleteMany.mockResolvedValue({ count: 1 })
+    it('devrait mettre à jour les associations articles à remettre', async () => {
+      prismaMock.showHandoutItem.deleteMany.mockResolvedValue({ count: 1 })
       prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
 
-      global.readBody.mockResolvedValue({ returnableItemIds: [4, 5] })
+      global.readBody.mockResolvedValue({ handoutItemIds: [4, 5] })
       const mockEvent = { context: { user: mockUser } }
 
       await handler(mockEvent as any)
 
-      expect(prismaMock.showReturnableItem.deleteMany).toHaveBeenCalledWith({
+      expect(prismaMock.showHandoutItem.deleteMany).toHaveBeenCalledWith({
         where: { showId: 1 },
       })
       expect(prismaMock.show.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            returnableItems: {
-              create: [{ returnableItemId: 4 }, { returnableItemId: 5 }],
+            handoutItems: {
+              create: [{ handoutItemId: 4 }, { handoutItemId: 5 }],
             },
           }),
         })

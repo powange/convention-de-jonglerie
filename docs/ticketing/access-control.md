@@ -140,7 +140,7 @@ const bodySchema = z.object({
     order: TicketingOrder
     tier: TicketingTier &
       {
-        returnableItems: Array<{ returnableItem: TicketingReturnableItem }>,
+        handoutItems: Array<{ handoutItem: TicketingHandoutItem }>,
       }
   }
 }
@@ -320,7 +320,7 @@ const bodySchema = z.object({
           user: { firstName, lastName, email },
           teams: Array<{ id, name, isLeader }>,
           timeSlots: Array<{ id, title, team, startDateTime, endDateTime }>,
-          returnableItems: Array<{ id, name }>,
+          handoutItems: Array<{ id, name }>,
           entryValidated: boolean,
           entryValidatedAt: DateTime | null,
           entryValidatedBy: { firstName, lastName } | null
@@ -425,7 +425,7 @@ Les bénévoles qui ont explicitement indiqué être disponibles uniquement pour
 - QR code en grand (pour affichage)
 - Informations de la commande
 - Réponses aux options personnalisées
-- Items à restituer
+- Items à remettre
 - Bouton de validation/invalidation d'entrée
 - Statut de validation (date, validateur)
 
@@ -453,7 +453,7 @@ Les bénévoles qui ont explicitement indiqué être disponibles uniquement pour
 3. **Options Personnalisées**
    - Liste des réponses (`customFields`)
 
-4. **Items à Restituer**
+4. **Items à Remettre**
    - Checklist des items du tarif
    - Items des options
    - Items bénévole (si applicable)
@@ -667,7 +667,7 @@ console.log(`${participants.length} adultes non validés`)
    a. Affiche les détails (modal)
    b. Valide automatiquement (validate-entry)
    c. Affiche confirmation visuelle + sonore
-   d. Indique les items à restituer
+   d. Indique les items à remettre
 5. Si déjà validé :
    a. Affiche erreur avec date/heure de validation
    b. TicketingOption d'invalider (si permission)
@@ -794,5 +794,5 @@ canAccessEditionData() // Pour validation
 ## Voir Aussi
 
 - [Commandes](./orders.md) - Structure des participants
-- [Items à Restituer](./returnable-items.md) - Gestion des items lors de l'entrée
+- [Items à Remettre](./handout-items.md) - Gestion des items lors de l'entrée
 - [Options](./options.md) - Affichage des réponses personnalisées

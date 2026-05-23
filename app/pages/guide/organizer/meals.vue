@@ -188,7 +188,7 @@ useHead({
       },
       "items": {
         "title": "Articles de repas",
-        "content": "Associez des articles à restituer aux repas (ex : tickets repas, bracelets). Ces articles permettent de contrôler l'accès aux repas et de suivre leur distribution."
+        "content": "Associez des articles à remettre aux repas (ex : tickets repas, bracelets). Ces articles permettent de contrôler l'accès aux repas et de suivre leur distribution."
       },
       "list": {
         "title": "Liste récapitulative",

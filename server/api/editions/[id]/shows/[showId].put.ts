@@ -18,7 +18,7 @@ const updateShowSchema = z.object({
   zoneId: z.number().int().positive().optional().nullable(),
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
-  returnableItemIds: z.array(z.number().int().positive()).optional(),
+  handoutItemIds: z.array(z.number().int().positive()).optional(),
   isPublic: z.boolean().optional(),
 })
 
@@ -115,18 +115,18 @@ export default wrapApiHandler(
       }
     }
 
-    // Si des returnableItemIds sont fournis, mettre à jour les associations
-    if (validatedData.returnableItemIds !== undefined) {
+    // Si des handoutItemIds sont fournis, mettre à jour les associations
+    if (validatedData.handoutItemIds !== undefined) {
       // Supprimer les anciennes associations
-      await prisma.showReturnableItem.deleteMany({
+      await prisma.showHandoutItem.deleteMany({
         where: { showId },
       })
 
       // Créer les nouvelles associations
-      if (validatedData.returnableItemIds.length > 0) {
-        updateData.returnableItems = {
-          create: validatedData.returnableItemIds.map((returnableItemId) => ({
-            returnableItemId,
+      if (validatedData.handoutItemIds.length > 0) {
+        updateData.handoutItems = {
+          create: validatedData.handoutItemIds.map((handoutItemId) => ({
+            handoutItemId,
           })),
         }
       }
@@ -153,9 +153,9 @@ export default wrapApiHandler(
             },
           },
         },
-        returnableItems: {
+        handoutItems: {
           include: {
-            returnableItem: {
+            handoutItem: {
               select: {
                 id: true,
                 name: true,

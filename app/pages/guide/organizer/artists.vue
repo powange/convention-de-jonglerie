@@ -322,27 +322,27 @@
 
       <GuideSection
         icon="i-heroicons-archive-box"
-        :title="t('sections.returnableItems.title')"
+        :title="t('sections.handoutItems.title')"
         color="yellow"
       >
-        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.returnableItems.intro') }}</p>
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.handoutItems.intro') }}</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.returnableItems.assign')
+              t('sections.handoutItems.assign')
             }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.returnableItems.examples')
+              t('sections.handoutItems.examples')
             }}</span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.returnableItems.tracking')
+              t('sections.handoutItems.tracking')
             }}</span>
           </li>
         </ul>
@@ -459,12 +459,12 @@ useHead({
         "assign": "Sélectionnez un ou plusieurs artistes pour chaque spectacle depuis la liste des artistes de l'édition.",
         "multiple": "Un spectacle peut impliquer plusieurs artistes (spectacle collectif, collaboration)."
       },
-      "returnableItems": {
-        "title": "Articles à restituer",
-        "intro": "Gérez les articles prêtés aux artistes pendant l'édition.",
+      "handoutItems": {
+        "title": "Articles à remettre",
+        "intro": "Gérez les articles à remettre aux artistes lors de leur arrivée.",
         "assign": "Attribuez des articles spécifiques à chaque spectacle ou artiste.",
         "examples": "Exemples : badges d'accès, pass backstage, clés de loge, matériel technique.",
-        "tracking": "Suivez la restitution des articles à la fin de l'événement."
+        "tracking": "Suivez la remise des articles à l'accueil."
       }
     }
   }

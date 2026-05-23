@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import {
-  calculateReturnableItemsForTicket,
-  returnableItemsIncludes,
-} from '#server/utils/ticketing/returnable-items'
+  calculateHandoutItemsForTicket,
+  handoutItemsIncludes,
+} from '#server/utils/ticketing/handout-items'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -60,15 +60,15 @@ export default wrapApiHandler(
               items: {
                 include: {
                   tier: {
-                    include: returnableItemsIncludes,
+                    include: handoutItemsIncludes,
                   },
                   selectedOptions: {
                     include: {
                       option: {
                         include: {
-                          returnableItems: {
+                          handoutItems: {
                             include: {
-                              returnableItem: true,
+                              handoutItem: true,
                             },
                           },
                         },
@@ -85,9 +85,9 @@ export default wrapApiHandler(
             include: {
               option: {
                 include: {
-                  returnableItems: {
+                  handoutItems: {
                     include: {
-                      returnableItem: true,
+                      handoutItem: true,
                     },
                   },
                 },
@@ -141,9 +141,9 @@ export default wrapApiHandler(
             include: {
               show: {
                 include: {
-                  returnableItems: {
+                  handoutItems: {
                     include: {
-                      returnableItem: true,
+                      handoutItem: true,
                     },
                   },
                 },
@@ -338,8 +338,8 @@ export default wrapApiHandler(
         assignmentsByUserId.get(assignment.userId)!.push(assignment)
       })
 
-      // Récupérer les articles à restituer pour chaque bénévole
-      const returnableItemsByVolunteerId = new Map<number, Array<{ id: number; name: string }>>()
+      // Récupérer les articles à remettre pour chaque bénévole
+      const handoutItemsByVolunteerId = new Map<number, Array<{ id: number; name: string }>>()
       const mealsByVolunteerId = new Map<
         number,
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
@@ -349,45 +349,45 @@ export default wrapApiHandler(
         const teamIds = volunteer.teamAssignments.map((assignment) => assignment.team.id)
 
         // Récupérer d'abord les articles spécifiques aux équipes du bénévole
-        const teamSpecificItems = await prisma.editionVolunteerReturnableItem.findMany({
+        const teamSpecificItems = await prisma.editionVolunteerHandoutItem.findMany({
           where: {
             editionId,
             teamId: { in: teamIds },
           },
           include: {
-            returnableItem: true,
+            handoutItem: true,
             team: true,
           },
         })
 
-        let volunteerReturnableItems
+        let volunteerHandoutItems
         if (teamSpecificItems.length > 0) {
           // Le bénévole a au moins une équipe avec des articles spécifiques
           // On utilise UNIQUEMENT ces articles (surcharge)
-          volunteerReturnableItems = teamSpecificItems
+          volunteerHandoutItems = teamSpecificItems
         } else {
           // Pas d'articles spécifiques, on utilise les articles globaux
-          volunteerReturnableItems = await prisma.editionVolunteerReturnableItem.findMany({
+          volunteerHandoutItems = await prisma.editionVolunteerHandoutItem.findMany({
             where: {
               editionId,
               teamId: null, // Articles globaux uniquement
             },
             include: {
-              returnableItem: true,
+              handoutItem: true,
             },
           })
         }
 
         // Dédupliquer les articles (si le bénévole est dans plusieurs équipes avec le même article)
         const uniqueItems = new Map()
-        volunteerReturnableItems.forEach((item) => {
-          if (!uniqueItems.has(item.returnableItem.id)) {
-            uniqueItems.set(item.returnableItem.id, item.returnableItem)
+        volunteerHandoutItems.forEach((item) => {
+          if (!uniqueItems.has(item.handoutItem.id)) {
+            uniqueItems.set(item.handoutItem.id, item.handoutItem)
           }
         })
         const deduplicatedItems = Array.from(uniqueItems.values())
 
-        returnableItemsByVolunteerId.set(
+        handoutItemsByVolunteerId.set(
           volunteer.id,
           deduplicatedItems.map((item) => ({
             id: item.id,
@@ -407,9 +407,9 @@ export default wrapApiHandler(
           include: {
             meal: {
               include: {
-                returnableItems: {
+                handoutItems: {
                   include: {
-                    returnableItem: true,
+                    handoutItem: true,
                   },
                 },
               },
@@ -432,18 +432,18 @@ export default wrapApiHandler(
           }))
         )
 
-        // Ajouter les articles à restituer des repas aux articles existants
+        // Ajouter les articles à remettre des repas aux articles existants
         volunteerMeals.forEach((selection) => {
-          selection.meal.returnableItems.forEach((mealItem) => {
-            if (!uniqueItems.has(mealItem.returnableItem.id)) {
-              uniqueItems.set(mealItem.returnableItem.id, mealItem.returnableItem)
+          selection.meal.handoutItems.forEach((mealItem) => {
+            if (!uniqueItems.has(mealItem.handoutItem.id)) {
+              uniqueItems.set(mealItem.handoutItem.id, mealItem.handoutItem)
             }
           })
         })
 
         // Mettre à jour les articles dédupliqués avec les articles des repas
         const allDeduplicatedItems = Array.from(uniqueItems.values())
-        returnableItemsByVolunteerId.set(
+        handoutItemsByVolunteerId.set(
           volunteer.id,
           allDeduplicatedItems.map((item) => ({
             id: item.id,
@@ -452,8 +452,8 @@ export default wrapApiHandler(
         )
       }
 
-      // Récupérer les articles à restituer pour chaque organisateur
-      const returnableItemsByOrganizerId = new Map<
+      // Récupérer les articles à remettre pour chaque organisateur
+      const handoutItemsByOrganizerId = new Map<
         number,
         {
           specific: Array<{ id: number; name: string }>
@@ -463,44 +463,44 @@ export default wrapApiHandler(
 
       for (const organizer of organizers) {
         // Articles spécifiques à cet organisateur
-        const organizerSpecificItemIds = await prisma.editionOrganizerReturnableItem.findMany({
+        const organizerSpecificItemIds = await prisma.editionOrganizerHandoutItem.findMany({
           where: {
             editionId,
             organizerId: organizer.id,
           },
           select: {
-            returnableItemId: true,
+            handoutItemId: true,
           },
         })
 
-        const specificItems = await prisma.ticketingReturnableItem.findMany({
+        const specificItems = await prisma.ticketingHandoutItem.findMany({
           where: {
             id: {
-              in: organizerSpecificItemIds.map((item) => item.returnableItemId),
+              in: organizerSpecificItemIds.map((item) => item.handoutItemId),
             },
           },
         })
 
         // Articles globaux (pour tous les organisateurs)
-        const globalItemIds = await prisma.editionOrganizerReturnableItem.findMany({
+        const globalItemIds = await prisma.editionOrganizerHandoutItem.findMany({
           where: {
             editionId,
             organizerId: null,
           },
           select: {
-            returnableItemId: true,
+            handoutItemId: true,
           },
         })
 
-        const globalItems = await prisma.ticketingReturnableItem.findMany({
+        const globalItems = await prisma.ticketingHandoutItem.findMany({
           where: {
             id: {
-              in: globalItemIds.map((item) => item.returnableItemId),
+              in: globalItemIds.map((item) => item.handoutItemId),
             },
           },
         })
 
-        returnableItemsByOrganizerId.set(organizer.id, {
+        handoutItemsByOrganizerId.set(organizer.id, {
           specific: specificItems.map((item) => ({
             id: item.id,
             name: item.name,
@@ -512,20 +512,20 @@ export default wrapApiHandler(
         })
       }
 
-      // Récupérer les articles à restituer pour chaque artiste
-      const returnableItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
+      // Récupérer les articles à remettre pour chaque artiste
+      const handoutItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
       const mealsByArtistId = new Map<
         number,
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
       >()
 
       for (const artist of artists) {
-        // Récupérer et dédupliquer les articles à restituer depuis tous les spectacles
+        // Récupérer et dédupliquer les articles à remettre depuis tous les spectacles
         const uniqueItems = new Map()
         artist.shows.forEach((showArtist) => {
-          showArtist.show.returnableItems.forEach((item) => {
-            if (!uniqueItems.has(item.returnableItem.id)) {
-              uniqueItems.set(item.returnableItem.id, item.returnableItem)
+          showArtist.show.handoutItems.forEach((item) => {
+            if (!uniqueItems.has(item.handoutItem.id)) {
+              uniqueItems.set(item.handoutItem.id, item.handoutItem)
             }
           })
         })
@@ -542,9 +542,9 @@ export default wrapApiHandler(
           include: {
             meal: {
               include: {
-                returnableItems: {
+                handoutItems: {
                   include: {
-                    returnableItem: true,
+                    handoutItem: true,
                   },
                 },
               },
@@ -567,18 +567,18 @@ export default wrapApiHandler(
           }))
         )
 
-        // Ajouter les articles à restituer des repas aux articles existants
+        // Ajouter les articles à remettre des repas aux articles existants
         artistMeals.forEach((selection) => {
-          selection.meal.returnableItems.forEach((mealItem) => {
-            if (!uniqueItems.has(mealItem.returnableItem.id)) {
-              uniqueItems.set(mealItem.returnableItem.id, mealItem.returnableItem)
+          selection.meal.handoutItems.forEach((mealItem) => {
+            if (!uniqueItems.has(mealItem.handoutItem.id)) {
+              uniqueItems.set(mealItem.handoutItem.id, mealItem.handoutItem)
             }
           })
         })
 
         // Mettre à jour les articles dédupliqués avec les articles des repas
         const allDeduplicatedItems = Array.from(uniqueItems.values())
-        returnableItemsByArtistId.set(
+        handoutItemsByArtistId.set(
           artist.id,
           allDeduplicatedItems.map((item) => ({
             id: item.id,
@@ -631,7 +631,7 @@ export default wrapApiHandler(
                     ? {
                         id: orderItem.tier.id,
                         name: orderItem.tier.name,
-                        returnableItems: calculateReturnableItemsForTicket(orderItem),
+                        handoutItems: calculateHandoutItemsForTicket(orderItem),
                       }
                     : null,
                   selectedOptions: orderItem.selectedOptions.map((so) => ({
@@ -642,9 +642,9 @@ export default wrapApiHandler(
                       name: so.option.name,
                       type: so.option.type,
                       price: so.option.price,
-                      returnableItems: so.option.returnableItems.map((ri) => ({
-                        id: ri.returnableItem.id,
-                        name: ri.returnableItem.name,
+                      handoutItems: so.option.handoutItems.map((ri) => ({
+                        id: ri.handoutItem.id,
+                        name: ri.handoutItem.name,
                       })),
                     },
                   })),
@@ -661,9 +661,9 @@ export default wrapApiHandler(
                   name: so.option.name,
                   type: so.option.type,
                   price: so.option.price,
-                  returnableItems: so.option.returnableItems.map((ri) => ({
-                    id: ri.returnableItem.id,
-                    name: ri.returnableItem.name,
+                  handoutItems: so.option.handoutItems.map((ri) => ({
+                    id: ri.handoutItem.id,
+                    name: ri.handoutItem.name,
                   })),
                 },
               })),
@@ -675,7 +675,7 @@ export default wrapApiHandler(
             ? validatorMap.get(application.entryValidatedBy)
             : null
           const assignments = assignmentsByUserId.get(application.user.id) || []
-          const returnableItems = returnableItemsByVolunteerId.get(application.id) || []
+          const handoutItems = handoutItemsByVolunteerId.get(application.id) || []
           const meals = mealsByVolunteerId.get(application.id) || []
           return {
             type: 'volunteer',
@@ -701,7 +701,7 @@ export default wrapApiHandler(
                   startDateTime: assignment.timeSlot.startDateTime,
                   endDateTime: assignment.timeSlot.endDateTime,
                 })),
-                returnableItems: returnableItems,
+                handoutItems: handoutItems,
                 meals: meals,
                 entryValidated: application.entryValidated,
                 entryValidatedAt: application.entryValidatedAt,
@@ -719,7 +719,7 @@ export default wrapApiHandler(
           const validator = artist.entryValidatedBy
             ? artistValidatorMap.get(artist.entryValidatedBy)
             : null
-          const returnableItems = returnableItemsByArtistId.get(artist.id) || []
+          const handoutItems = handoutItemsByArtistId.get(artist.id) || []
           const meals = mealsByArtistId.get(artist.id) || []
           return {
             type: 'artist',
@@ -739,7 +739,7 @@ export default wrapApiHandler(
                   startDateTime: showArtist.show.startDateTime,
                   location: showArtist.show.location,
                 })),
-                returnableItems: returnableItems,
+                handoutItems: handoutItems,
                 meals: meals,
                 entryValidated: artist.entryValidated,
                 entryValidatedAt: artist.entryValidatedAt,
@@ -757,7 +757,7 @@ export default wrapApiHandler(
           const validator = editionOrganizer.entryValidatedBy
             ? organizerValidatorMap.get(editionOrganizer.entryValidatedBy)
             : null
-          const returnableItems = returnableItemsByOrganizerId.get(editionOrganizer.id) || {
+          const handoutItems = handoutItemsByOrganizerId.get(editionOrganizer.id) || {
             specific: [],
             global: [],
           }
@@ -774,8 +774,8 @@ export default wrapApiHandler(
                   phone: editionOrganizer.organizer.user.phone,
                 },
                 title: editionOrganizer.organizer.title,
-                returnableItems: returnableItems.specific,
-                globalReturnableItems: returnableItems.global,
+                handoutItems: handoutItems.specific,
+                globalHandoutItems: handoutItems.global,
                 entryValidated: editionOrganizer.entryValidated,
                 entryValidatedAt: editionOrganizer.entryValidatedAt,
                 entryValidatedBy: validator

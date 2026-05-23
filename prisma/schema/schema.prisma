@@ -177,7 +177,7 @@ model Edition {
   ticketingPaymentCard              Boolean                          @default(true)
   ticketingPaymentCheck             Boolean                          @default(true)
   ticketingSumupEnabled             Boolean                          @default(false)
-  ticketingReturnableItemsEnabled   Boolean                          @default(true)
+  ticketingHandoutItemsEnabled   Boolean                          @default(true)
   workshopsEnabled                  Boolean                          @default(false)
   workshopLocationsFreeInput        Boolean                          @default(false)
   siteMapEnabled                    Boolean                          @default(false)
@@ -203,11 +203,11 @@ model Edition {
   sumupConfig                       SumupConfig?
   tiers                             TicketingTier[]
   ticketingQuotas                   TicketingQuota[]
-  returnableItems                   TicketingReturnableItem[]
+  handoutItems                   TicketingHandoutItem[]
   options                           TicketingOption[]
   orders                            TicketingOrder[]
-  volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
-  organizerTicketingReturnableItems EditionOrganizerReturnableItem[]
+  volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
+  organizerTicketingHandoutItems EditionOrganizerHandoutItem[]
   tierCustomFields                  TicketingTierCustomField[]
   workshops                         Workshop[]
   workshopLocations                 WorkshopLocation[]
@@ -345,7 +345,7 @@ model EditionOrganizer {
   updatedAt        DateTime                         @updatedAt
   edition          Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
   organizer        ConventionOrganizer              @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  returnableItems  EditionOrganizerReturnableItem[]
+  handoutItems  EditionOrganizerHandoutItem[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])

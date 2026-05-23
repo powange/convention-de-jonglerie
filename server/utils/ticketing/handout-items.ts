@@ -1,25 +1,25 @@
 /**
- * Calcule les articles à restituer pour un participant (billet)
+ * Calcule les articles à remettre pour un participant (billet)
  * en combinant les articles du tarif direct et ceux des custom fields
  *
  * @param item - L'item de commande avec tier et customFields
- * @returns Liste dédupliquée des articles à restituer
+ * @returns Liste dédupliquée des articles à remettre
  */
-export function calculateReturnableItemsForTicket(item: any) {
+export function calculateHandoutItemsForTicket(item: any) {
   if (!item.tier) {
     return []
   }
 
-  // Articles à restituer directement associés au tarif
-  const directItems = (item.tier.returnableItems || []).map((ri: any) => ({
-    returnableItem: {
-      id: ri.returnableItem.id,
-      name: ri.returnableItem.name,
+  // Articles à remettre directement associés au tarif
+  const directItems = (item.tier.handoutItems || []).map((ri: any) => ({
+    handoutItem: {
+      id: ri.handoutItem.id,
+      name: ri.handoutItem.name,
     },
     source: 'tier' as const,
   }))
 
-  // Articles à restituer des custom fields
+  // Articles à remettre des custom fields
   const customFieldItems: any[] = []
   if (item.customFields && Array.isArray(item.customFields)) {
     for (const answeredField of item.customFields as any[]) {
@@ -29,16 +29,16 @@ export function calculateReturnableItemsForTicket(item: any) {
       )
 
       if (customFieldAssociation) {
-        // Ajouter les articles à restituer de ce custom field
-        for (const cfItem of customFieldAssociation.customField.returnableItems || []) {
+        // Ajouter les articles à remettre de ce custom field
+        for (const cfItem of customFieldAssociation.customField.handoutItems || []) {
           // Vérifier si l'article est conditionnel à un choix spécifique
           // Si choiceValue est null ou undefined, l'article s'applique à tous les choix
           // Sinon, l'article ne s'applique que si la réponse correspond au choiceValue
           if (!cfItem.choiceValue || cfItem.choiceValue === answeredField.answer) {
             customFieldItems.push({
-              returnableItem: {
-                id: cfItem.returnableItem.id,
-                name: cfItem.returnableItem.name,
+              handoutItem: {
+                id: cfItem.handoutItem.id,
+                name: cfItem.handoutItem.name,
               },
               source: 'customField' as const,
               customFieldName: answeredField.name,
@@ -55,8 +55,8 @@ export function calculateReturnableItemsForTicket(item: any) {
   const allItems = [...directItems, ...customFieldItems]
   const uniqueItemsMap = new Map()
   allItems.forEach((item: any) => {
-    if (!uniqueItemsMap.has(item.returnableItem.id)) {
-      uniqueItemsMap.set(item.returnableItem.id, item)
+    if (!uniqueItemsMap.has(item.handoutItem.id)) {
+      uniqueItemsMap.set(item.handoutItem.id, item)
     }
   })
 
@@ -64,22 +64,22 @@ export function calculateReturnableItemsForTicket(item: any) {
 }
 
 /**
- * Inclusions Prisma nécessaires pour récupérer les articles à restituer d'un tarif
+ * Inclusions Prisma nécessaires pour récupérer les articles à remettre d'un tarif
  * Utilisé dans les requêtes qui récupèrent des OrderItems
  */
-export const returnableItemsIncludes = {
-  returnableItems: {
+export const handoutItemsIncludes = {
+  handoutItems: {
     include: {
-      returnableItem: true,
+      handoutItem: true,
     },
   },
   customFields: {
     include: {
       customField: {
         include: {
-          returnableItems: {
+          handoutItems: {
             include: {
-              returnableItem: true,
+              handoutItem: true,
             },
           },
         },

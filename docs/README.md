@@ -40,7 +40,7 @@ Voir **[ticketing/](./ticketing/)** :
 - [tiers.md](./ticketing/tiers.md), [options.md](./ticketing/options.md), [quotas.md](./ticketing/quotas.md)
 - [orders.md](./ticketing/orders.md) — Commandes
 - [access-control.md](./ticketing/access-control.md) — Contrôle d'accès
-- [returnable-items.md](./ticketing/returnable-items.md) — Articles à restituer
+- [handout-items.md](./ticketing/handout-items.md) — Articles à remettre
 - [external-integration.md](./ticketing/external-integration.md) — Intégrations HelloAsso, etc.
 
 ## 👥 Bénévoles
@@ -53,7 +53,7 @@ Voir **[volunteers/](./volunteers/)** :
 - [volunteer-application-diff-utility.md](./volunteers/volunteer-application-diff-utility.md)
 - [volunteer-application-edit-mode.md](./volunteers/volunteer-application-edit-mode.md)
 - [volunteer-auto-assignment-system.md](./volunteers/volunteer-auto-assignment-system.md)
-- [volunteer-returnable-items-by-team.md](./volunteers/volunteer-returnable-items-by-team.md)
+- [volunteer-handout-items-by-team.md](./volunteers/volunteer-handout-items-by-team.md)
 
 ## 🔌 Intégrations externes
 

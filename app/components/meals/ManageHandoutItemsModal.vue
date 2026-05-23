@@ -1,17 +1,22 @@
 <script setup lang="ts">
-interface Tier {
+interface Meal {
   id: number
-  name: string
-  returnableItems?: Array<{
-    returnableItemId: number
-    returnableItem?: { id: number; name: string }
+  date: string
+  type: string
+  enabled: boolean
+  phases: string[]
+  handoutItems?: Array<{
+    handoutItemId: number
+    handoutItem?: { id: number; name: string }
   }>
 }
 
 const props = defineProps<{
   open: boolean
   editionId: number
-  tier: Tier | null
+  meal: Meal | null
+  /** Label affiché en titre du modal (date + type traduit). */
+  mealLabel?: string
 }>()
 
 const emit = defineEmits<{
@@ -30,9 +35,9 @@ const availableItems = ref<Array<{ id: number; name: string }>>([])
 const selectedItemIds = ref<number[]>([])
 
 const modalTitle = computed(() =>
-  props.tier
-    ? t('gestion.ticketing.tiers_returnable_items_manage_for', { name: props.tier.name })
-    : ''
+  props.mealLabel
+    ? t('gestion.ticketing.meals_handout_items_manage_for', { meal: props.mealLabel })
+    : t('gestion.ticketing.meals_handout_items_title')
 )
 
 const itemOptions = computed(() =>
@@ -41,13 +46,13 @@ const itemOptions = computed(() =>
 
 const { execute: loadAvailableItems, loading } = useApiAction<
   unknown,
-  { returnableItems: Array<{ id: number; name: string }> }
->(() => `/api/editions/${props.editionId}/ticketing/returnable-items`, {
+  { handoutItems: Array<{ id: number; name: string }> }
+>(() => `/api/editions/${props.editionId}/ticketing/handout-items`, {
   method: 'GET',
   silentSuccess: true,
   errorMessages: { default: t('gestion.organizers.error_loading_items') },
   onSuccess: (result) => {
-    availableItems.value = result?.returnableItems || []
+    availableItems.value = result?.handoutItems || []
   },
 })
 
@@ -55,18 +60,31 @@ watch(
   () => props.open,
   (open) => {
     if (open) {
-      selectedItemIds.value = props.tier?.returnableItems?.map((ri) => ri.returnableItemId) ?? []
+      selectedItemIds.value = props.meal?.handoutItems?.map((ri) => ri.handoutItemId) ?? []
       loadAvailableItems()
     }
   },
   { immediate: true }
 )
 
+// L'API PUT /volunteers/meals attend l'objet complet — on renvoie
+// enabled/phases inchangés pour ne pas les écraser.
+const buildSaveBody = () => ({
+  meals: [
+    {
+      id: props.meal?.id,
+      enabled: props.meal?.enabled,
+      phases: props.meal?.phases,
+      handoutItemIds: selectedItemIds.value,
+    },
+  ],
+})
+
 const { execute: save, loading: saving } = useApiAction(
-  () => `/api/editions/${props.editionId}/ticketing/tiers/${props.tier?.id}/returnable-items`,
+  () => `/api/editions/${props.editionId}/volunteers/meals`,
   {
     method: 'PUT',
-    body: () => ({ returnableItemIds: selectedItemIds.value }),
+    body: buildSaveBody,
     successMessage: { title: t('common.saved') },
     errorMessages: { default: t('common.error') },
     onSuccess: () => {
@@ -85,13 +103,17 @@ const { execute: save, loading: saving } = useApiAction(
       </div>
 
       <div v-else class="space-y-4">
-        <UFormField :label="$t('ticketing.tiers.modal.returnable_items_label')">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{ $t('gestion.ticketing.meals_handout_items_help') }}
+        </p>
+
+        <UFormField :label="$t('gestion.meals.handout_items_label')">
           <USelectMenu
             v-model="selectedItemIds"
             :items="itemOptions"
             value-key="value"
             multiple
-            :placeholder="$t('gestion.ticketing.select_returnable_items_placeholder')"
+            :placeholder="$t('gestion.ticketing.select_handout_items_placeholder')"
             class="w-full"
           >
             <template #label>
@@ -108,7 +130,7 @@ const { execute: save, loading: saving } = useApiAction(
         </UFormField>
 
         <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
-          {{ $t('gestion.ticketing.no_returnable_items_created') }}
+          {{ $t('gestion.ticketing.no_handout_items_created') }}
         </p>
       </div>
     </template>

@@ -20,25 +20,25 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-gift" class="text-orange-600 dark:text-orange-400" />
-          {{ $t('gestion.ticketing.returnable_items_title') }}
+          {{ $t('gestion.ticketing.handout_items_title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.ticketing.returnable_items_description') }}
+          {{ $t('gestion.ticketing.handout_items_description') }}
         </p>
       </div>
 
       <div class="space-y-8">
-        <TicketingReturnableItemsList
-          :items="returnableItems"
-          :loading="loadingReturnableItems"
+        <TicketingHandoutItemsList
+          :items="handoutItems"
+          :loading="loadingHandoutItems"
           :edition-id="editionId"
-          @refresh="onReturnableItemsRefresh"
+          @refresh="onHandoutItemsRefresh"
         />
 
         <!-- Onglets par cible (Bénévoles, Organisateurs, plus tard Artistes) -->
         <div v-if="audienceTabs.length" class="border-t border-gray-200 dark:border-gray-800 pt-8">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {{ $t('gestion.ticketing.assign_returnable_items_title') }}
+            {{ $t('gestion.ticketing.assign_handout_items_title') }}
           </h2>
           <UTabs v-model="activeAudienceTab" :items="audienceTabs" variant="link">
             <template #tiers>
@@ -65,17 +65,17 @@
                   <div class="flex-1 min-w-0">
                     <div class="font-medium text-sm">{{ tier.name }}</div>
                     <div
-                      v-if="tier.returnableItems && tier.returnableItems.length > 0"
+                      v-if="tier.handoutItems && tier.handoutItems.length > 0"
                       class="flex flex-wrap gap-1.5 mt-1"
                     >
                       <UBadge
-                        v-for="ri in tier.returnableItems"
-                        :key="ri.returnableItemId"
+                        v-for="ri in tier.handoutItems"
+                        :key="ri.handoutItemId"
                         color="warning"
                         variant="soft"
                         size="md"
                       >
-                        {{ ri.returnableItem?.name }}
+                        {{ ri.handoutItem?.name }}
                       </UBadge>
                     </div>
                     <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -122,17 +122,17 @@
                   <div class="flex-1 min-w-0">
                     <div class="font-medium text-sm">{{ option.name }}</div>
                     <div
-                      v-if="option.returnableItems && option.returnableItems.length > 0"
+                      v-if="option.handoutItems && option.handoutItems.length > 0"
                       class="flex flex-wrap gap-1.5 mt-1"
                     >
                       <UBadge
-                        v-for="ri in option.returnableItems"
-                        :key="ri.returnableItemId"
+                        v-for="ri in option.handoutItems"
+                        :key="ri.handoutItemId"
                         color="warning"
                         variant="soft"
                         size="md"
                       >
-                        {{ ri.returnableItem?.name }}
+                        {{ ri.handoutItem?.name }}
                       </UBadge>
                     </div>
                     <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -181,17 +181,17 @@
                   <div class="flex-1 min-w-0">
                     <div class="font-medium text-sm">{{ cf.label }}</div>
                     <div
-                      v-if="cf.returnableItems && cf.returnableItems.length > 0"
+                      v-if="cf.handoutItems && cf.handoutItems.length > 0"
                       class="flex flex-wrap gap-1.5 mt-1"
                     >
                       <UBadge
-                        v-for="(ri, idx) in cf.returnableItems"
+                        v-for="(ri, idx) in cf.handoutItems"
                         :key="idx"
                         color="warning"
                         variant="soft"
                         size="md"
                       >
-                        {{ ri.returnableItem?.name }}
+                        {{ ri.handoutItem?.name }}
                         <span v-if="ri.choiceValue" class="opacity-75 ml-1"
                           >({{ ri.choiceValue }})</span
                         >
@@ -215,12 +215,12 @@
             </template>
 
             <template #volunteers>
-              <TicketingVolunteerReturnableItemsList
-                :key="volunteerReturnableItemsKey"
-                :items="volunteerReturnableItems"
-                :loading="loadingVolunteerReturnableItems"
+              <TicketingVolunteerHandoutItemsList
+                :key="volunteerHandoutItemsKey"
+                :items="volunteerHandoutItems"
+                :loading="loadingVolunteerHandoutItems"
                 :edition-id="editionId"
-                @refresh="loadVolunteerReturnableItems"
+                @refresh="loadVolunteerHandoutItems"
               />
             </template>
 
@@ -229,7 +229,7 @@
               <div class="space-y-3">
                 <div class="flex items-center justify-between gap-3">
                   <h3 class="text-base font-semibold text-gray-900 dark:text-white">
-                    {{ $t('gestion.organizers.global_returnable_items') }}
+                    {{ $t('gestion.organizers.global_handout_items') }}
                   </h3>
                   <UButton
                     size="sm"
@@ -252,13 +252,13 @@
                     variant="soft"
                     size="md"
                   >
-                    {{ item.returnableItemName }}
+                    {{ item.handoutItemName }}
                   </UBadge>
                 </div>
                 <div v-else class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <UIcon name="i-heroicons-gift" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
                   <p class="text-sm text-gray-500">
-                    {{ $t('gestion.organizers.no_global_returnable_items') }}
+                    {{ $t('gestion.organizers.no_global_handout_items') }}
                   </p>
                 </div>
               </div>
@@ -266,7 +266,7 @@
               <!-- Bloc 2 : articles spécifiques par organisateur présent -->
               <div class="mt-8 space-y-3">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">
-                  {{ $t('gestion.ticketing.per_organizer_returnable_items_title') }}
+                  {{ $t('gestion.ticketing.per_organizer_handout_items_title') }}
                 </h3>
                 <div v-if="loadingEditionOrganizers" class="text-center py-6">
                   <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
@@ -305,7 +305,7 @@
                           variant="soft"
                           size="md"
                         >
-                          {{ item.returnableItemName }}
+                          {{ item.handoutItemName }}
                         </UBadge>
                       </div>
                       <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -351,17 +351,17 @@
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-sm">{{ show.title }}</div>
                       <div
-                        v-if="show.returnableItems && show.returnableItems.length > 0"
+                        v-if="show.handoutItems && show.handoutItems.length > 0"
                         class="flex flex-wrap gap-1.5 mt-1"
                       >
                         <UBadge
-                          v-for="item in show.returnableItems"
-                          :key="item.returnableItem.id"
+                          v-for="item in show.handoutItems"
+                          :key="item.handoutItem.id"
                           color="warning"
                           variant="soft"
                           size="md"
                         >
-                          {{ item.returnableItem.name }}
+                          {{ item.handoutItem.name }}
                         </UBadge>
                       </div>
                       <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -416,17 +416,17 @@
                             {{ getMealTypeLabel(meal.mealType) }}
                           </div>
                           <div
-                            v-if="meal.returnableItems && meal.returnableItems.length > 0"
+                            v-if="meal.handoutItems && meal.handoutItems.length > 0"
                             class="flex flex-wrap gap-1.5 mt-1"
                           >
                             <UBadge
-                              v-for="item in meal.returnableItems"
-                              :key="item.returnableItemId"
+                              v-for="item in meal.handoutItems"
+                              :key="item.handoutItemId"
                               color="warning"
                               variant="soft"
                               size="md"
                             >
-                              {{ item.returnableItem?.name }}
+                              {{ item.handoutItem?.name }}
                             </UBadge>
                           </div>
                           <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -451,21 +451,21 @@
           </UTabs>
         </div>
 
-        <OrganizersManageReturnableItemsModal
+        <OrganizersManageHandoutItemsModal
           v-model:open="organizerItemsModalOpen"
           :edition-id="editionId"
           :organizer="organizerItemsModalTarget"
           @items-updated="loadOrganizerItems"
         />
 
-        <ShowsManageReturnableItemsModal
+        <ShowsManageHandoutItemsModal
           v-model:open="showItemsModalOpen"
           :edition-id="editionId"
           :show="showItemsModalTarget"
           @saved="loadShows"
         />
 
-        <MealsManageReturnableItemsModal
+        <MealsManageHandoutItemsModal
           v-model:open="mealItemsModalOpen"
           :edition-id="editionId"
           :meal="mealItemsModalTarget"
@@ -473,21 +473,21 @@
           @saved="loadMeals"
         />
 
-        <TicketingManageTierReturnableItemsModal
+        <TicketingManageTierHandoutItemsModal
           v-model:open="tierItemsModalOpen"
           :edition-id="editionId"
           :tier="tierItemsModalTarget"
           @saved="loadTiers"
         />
 
-        <TicketingManageOptionReturnableItemsModal
+        <TicketingManageOptionHandoutItemsModal
           v-model:open="optionItemsModalOpen"
           :edition-id="editionId"
           :option="optionItemsModalTarget"
           @saved="loadOptions"
         />
 
-        <TicketingManageCustomFieldReturnableItemsModal
+        <TicketingManageCustomFieldHandoutItemsModal
           v-model:open="customFieldItemsModalOpen"
           :edition-id="editionId"
           :custom-field="customFieldItemsModalTarget"
@@ -581,16 +581,16 @@ const activeAudienceTab = computed({
   },
 })
 
-// Items à restituer
-const loadingReturnableItems = ref(true)
-const returnableItems = ref<any[]>([])
+// Items à remettre
+const loadingHandoutItems = ref(true)
+const handoutItems = ref<any[]>([])
 
-// Items à restituer pour bénévoles
-const loadingVolunteerReturnableItems = ref(true)
-const volunteerReturnableItems = ref<any[]>([])
-const volunteerReturnableItemsKey = ref(0) // Clé pour forcer le rechargement
+// Items à remettre pour bénévoles
+const loadingVolunteerHandoutItems = ref(true)
+const volunteerHandoutItems = ref<any[]>([])
+const volunteerHandoutItemsKey = ref(0) // Clé pour forcer le rechargement
 
-// Articles à restituer pour organisateurs (globaux + spécifiques par organisateur).
+// Articles à remettre pour organisateurs (globaux + spécifiques par organisateur).
 // `allOrganizerItems` contient TOUTES les assignations renvoyées par l'API ;
 // on filtre côté front en globaux (`organizerId === null`) vs spécifiques.
 const loadingOrganizerItems = ref(true)
@@ -692,36 +692,36 @@ const canAccess = computed(() => {
   return false
 })
 
-const loadReturnableItems = async () => {
-  loadingReturnableItems.value = true
+const loadHandoutItems = async () => {
+  loadingHandoutItems.value = true
   try {
-    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/returnable-items`)
-    returnableItems.value = response.data?.returnableItems || []
+    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/handout-items`)
+    handoutItems.value = response.data?.handoutItems || []
   } catch {
     // Erreur silencieuse
   } finally {
-    loadingReturnableItems.value = false
+    loadingHandoutItems.value = false
   }
 }
 
-// Quand les articles à restituer changent, forcer un rechargement des articles
+// Quand les articles à remettre changent, forcer un rechargement des articles
 // bénévoles pour que la liste des articles disponibles se mette à jour.
-const onReturnableItemsRefresh = async () => {
-  await loadReturnableItems()
-  volunteerReturnableItemsKey.value++
+const onHandoutItemsRefresh = async () => {
+  await loadHandoutItems()
+  volunteerHandoutItemsKey.value++
 }
 
-const loadVolunteerReturnableItems = async () => {
-  loadingVolunteerReturnableItems.value = true
+const loadVolunteerHandoutItems = async () => {
+  loadingVolunteerHandoutItems.value = true
   try {
     const response = await $fetch<any>(
-      `/api/editions/${editionId}/ticketing/volunteers/returnable-items`
+      `/api/editions/${editionId}/ticketing/volunteers/handout-items`
     )
-    volunteerReturnableItems.value = response.items
+    volunteerHandoutItems.value = response.items
   } catch {
     // Erreur silencieuse
   } finally {
-    loadingVolunteerReturnableItems.value = false
+    loadingVolunteerHandoutItems.value = false
   }
 }
 
@@ -730,7 +730,7 @@ const loadOrganizerItems = async () => {
   loadingOrganizerItems.value = true
   try {
     const response = await $fetch<any>(
-      `/api/editions/${editionId}/ticketing/organizers/returnable-items`
+      `/api/editions/${editionId}/ticketing/organizers/handout-items`
     )
     allOrganizerItems.value = response.items || []
   } catch {
@@ -869,8 +869,8 @@ onMounted(async () => {
     }
   }
   if (canAccess.value) {
-    await loadReturnableItems()
-    await loadVolunteerReturnableItems()
+    await loadHandoutItems()
+    await loadVolunteerHandoutItems()
     await loadOrganizerItems()
     await loadEditionOrganizers()
     await loadTiers()
@@ -888,8 +888,8 @@ onMounted(async () => {
 // Recharger quand les permissions changent (mode super admin)
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
-    await loadReturnableItems()
-    await loadVolunteerReturnableItems()
+    await loadHandoutItems()
+    await loadVolunteerHandoutItems()
     await loadOrganizerItems()
     await loadEditionOrganizers()
     await loadTiers()

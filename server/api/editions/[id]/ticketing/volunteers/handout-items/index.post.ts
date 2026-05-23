@@ -5,7 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
-  returnableItemId: z.number(),
+  handoutItemId: z.number(),
   teamId: z.string().nullable().optional(), // NULL ou undefined = global, string = équipe spécifique
 })
 
@@ -20,24 +20,24 @@ export default wrapApiHandler(
     if (!allowed)
       throw createError({
         status: 403,
-        message: 'Droits insuffisants pour gérer les articles à restituer',
+        message: 'Droits insuffisants pour gérer les articles à remettre',
       })
 
     const body = bodySchema.parse(await readBody(event))
 
     try {
-      // Vérifier que l'article à restituer existe et appartient à l'édition
-      const returnableItem = await prisma.ticketingReturnableItem.findFirst({
+      // Vérifier que l'article à remettre existe et appartient à l'édition
+      const handoutItem = await prisma.ticketingHandoutItem.findFirst({
         where: {
-          id: body.returnableItemId,
+          id: body.handoutItemId,
           editionId,
         },
       })
 
-      if (!returnableItem) {
+      if (!handoutItem) {
         throw createError({
           status: 404,
-          message: 'Article à restituer introuvable',
+          message: 'Article à remettre introuvable',
         })
       }
 
@@ -61,10 +61,10 @@ export default wrapApiHandler(
       // Vérifier que l'association n'existe pas déjà (même article + même scope)
       // Note: On utilise findFirst au lieu de findUnique car Prisma ne permet pas
       // d'utiliser null dans une contrainte unique composite
-      const existing = await prisma.editionVolunteerReturnableItem.findFirst({
+      const existing = await prisma.editionVolunteerHandoutItem.findFirst({
         where: {
           editionId,
-          returnableItemId: body.returnableItemId,
+          handoutItemId: body.handoutItemId,
           teamId: body.teamId ?? null,
         },
       })
@@ -78,14 +78,14 @@ export default wrapApiHandler(
       }
 
       // Créer l'association
-      const item = await prisma.editionVolunteerReturnableItem.create({
+      const item = await prisma.editionVolunteerHandoutItem.create({
         data: {
           editionId,
-          returnableItemId: body.returnableItemId,
+          handoutItemId: body.handoutItemId,
           teamId: body.teamId ?? null,
         },
         include: {
-          returnableItem: true,
+          handoutItem: true,
           team: {
             select: {
               id: true,
@@ -99,9 +99,9 @@ export default wrapApiHandler(
       return createSuccessResponse({
         item: {
           id: item.id,
-          returnableItemId: item.returnableItemId,
+          handoutItemId: item.handoutItemId,
           teamId: item.teamId,
-          name: item.returnableItem.name,
+          name: item.handoutItem.name,
           team: item.team,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
@@ -116,5 +116,5 @@ export default wrapApiHandler(
       })
     }
   },
-  { operationName: 'POST ticketing volunteers returnable-items index' }
+  { operationName: 'POST ticketing volunteers handout-items index' }
 )

@@ -10,7 +10,7 @@ docs/ticketing/
 ├── tiers.md                     # Gestion des tarifs
 ├── options.md                   # Gestion des options de billets
 ├── quotas.md                    # Gestion des quotas
-├── returnable-items.md          # Gestion des items à restituer
+├── handout-items.md          # Gestion des items à remettre
 ├── orders.md                    # Gestion des commandes
 ├── access-control.md            # Contrôle d'accès et validation
 └── external-integration.md      # Intégration systèmes externes
@@ -42,13 +42,13 @@ Limitations sur le nombre de participants par catégorie (nombre de places, nomb
 - **API** : `server/api/editions/[id]/ticketing/quotas/`
 - **Utilitaire** : `server/utils/editions/ticketing/quota-stats.ts`
 
-### 4. Items à Restituer
+### 4. Items à Remettre
 
-Objets prêtés aux participants qui doivent être restitués (badges, t-shirts, etc.)
+Objets prêtés aux participants qui doivent être remiss (badges, t-shirts, etc.)
 
-- **Documentation** : [returnable-items.md](./returnable-items.md)
-- **API** : `server/api/editions/[id]/ticketing/returnable-items/`
-- **Utilitaire** : `server/utils/editions/ticketing/returnable-items.ts`
+- **Documentation** : [handout-items.md](./handout-items.md)
+- **API** : `server/api/editions/[id]/ticketing/handout-items/`
+- **Utilitaire** : `server/utils/editions/ticketing/handout-items.ts`
 
 ### 5. Commandes
 
@@ -87,20 +87,20 @@ ExternalTicketing          → Configuration de billeterie externe
 ├── TicketingOrder         → Commandes
 │   └── TicketingOrderItem → Participants/billets
 ├── TicketingQuota         → Quotas
-└── TicketingReturnableItem         → Items à restituer
+└── TicketingHandoutItem         → Items à remettre
 
 Relations:
 - TicketingTierQuota             → Lien tarifs ↔ quotas
-- TicketingTierReturnableItem    → Lien tarifs ↔ items à restituer
+- TicketingTierHandoutItem    → Lien tarifs ↔ items à remettre
 - TicketingOptionQuota           → Lien options ↔ quotas
-- TicketingOptionReturnableItem  → Lien options ↔ items à restituer
+- TicketingOptionHandoutItem  → Lien options ↔ items à remettre
 ```
 
 ### Flux de Données
 
 1. **Configuration**
    - L'organisateur configure la billeterie externe OU crée des tarifs manuels
-   - Définit les quotas, options, et items à restituer
+   - Définit les quotas, options, et items à remettre
 
 2. **Synchronisation** (si externe)
    - Les tarifs et options sont synchronisés depuis HelloAsso
@@ -113,7 +113,7 @@ Relations:
 4. **Validation d'Entrée**
    - Scan du QR code OU recherche manuelle
    - Validation de l'entrée avec horodatage
-   - Gestion des items à restituer
+   - Gestion des items à remettre
 
 ## Permissions
 
@@ -129,7 +129,7 @@ Relations:
   - Gérer les tarifs manuels
   - Gérer les options manuelles
   - Gérer les quotas
-  - Gérer les items à restituer
+  - Gérer les items à remettre
   - Configurer la billeterie externe
   - Valider les entrées
   - Ajouter des participants manuellement
@@ -165,7 +165,7 @@ Relations:
 │   ├── stats.get.ts      # Statistiques des quotas
 │   ├── [quotaId].put.ts  # Modifier un quota
 │   └── [quotaId].delete.ts # Supprimer un quota
-├── returnable-items/     # Items à restituer
+├── handout-items/     # Items à remettre
 │   ├── index.get.ts      # Lister les items
 │   ├── index.post.ts     # Créer un item
 │   ├── [itemId].put.ts   # Modifier un item
@@ -196,7 +196,7 @@ Relations:
 - `app/components/ticketing/OptionsList.vue` - Liste des options
 - `app/components/ticketing/OptionModal.vue` - Modal option
 - `app/components/ticketing/QuotasList.vue` - Liste des quotas
-- `app/components/ticketing/ReturnableItemsList.vue` - Liste des items
+- `app/components/ticketing/HandoutItemsList.vue` - Liste des items
 - `app/components/ticketing/AddParticipantModal.vue` - Ajout manuel
 - `app/components/ticketing/ParticipantDetailsModal.vue` - Détails participant
 - `app/components/ticketing/QrCodeScanner.vue` - Scanner QR

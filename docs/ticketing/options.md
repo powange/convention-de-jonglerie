@@ -29,7 +29,7 @@ interface OptionData {
   choices?: string[] | null // Choix possibles (Select, Radio, etc.)
   position: number // Ordre d'affichage
   quotaIds?: number[] // Quotas associés
-  returnableItemIds?: number[] // Items à restituer associés
+  handoutItemIds?: number[] // Items à remettre associés
 }
 ```
 
@@ -70,7 +70,7 @@ model TicketingOption {
   externalTicketing ExternalTicketing?      @relation(...)
   edition           Edition                 @relation(...)
   quotas            TicketingOptionQuota[]           // Relations quotas
-  returnableItems   TicketingOptionReturnableItem[]  // Relations items
+  handoutItems   TicketingOptionHandoutItem[]  // Relations items
 
   @@unique([externalTicketingId, helloAssoOptionId])
   @@index([externalTicketingId])
@@ -99,24 +99,24 @@ model TicketingOptionQuota {
 
 **Exemple** : L'option "Régime alimentaire = Végétarien" consomme le quota "Repas végétariens".
 
-#### TicketingOptionReturnableItem
+#### TicketingOptionHandoutItem
 
-Associe une option (avec une valeur spécifique) à un item à restituer.
+Associe une option (avec une valeur spécifique) à un item à remettre.
 
 ```prisma
-model TicketingOptionReturnableItem {
+model TicketingOptionHandoutItem {
   id               Int @id @default(autoincrement())
   optionId         Int
-  returnableItemId Int
+  handoutItemId Int
 
   option         TicketingOption @relation(...)
-  returnableItem TicketingReturnableItem  @relation(...)
+  handoutItem TicketingHandoutItem  @relation(...)
 
-  @@unique([optionId, returnableItemId])
+  @@unique([optionId, handoutItemId])
 }
 ```
 
-**Exemple** : L'option "T-shirt = Oui" nécessite de restituer un "Badge textile".
+**Exemple** : L'option "T-shirt = Oui" nécessite de remettre un "Badge textile".
 
 ## API Routes
 
@@ -129,7 +129,7 @@ model TicketingOptionReturnableItem {
 **Réponse** :
 
 ```typescript
-TicketingOption[] // Avec relations quotas et returnableItems
+TicketingOption[] // Avec relations quotas et handoutItems
 ```
 
 ---
@@ -151,7 +151,7 @@ TicketingOption[] // Avec relations quotas et returnableItems
   choices?: string[]       // Requis pour Select/Radio/MultipleChoice
   position?: number        // Défaut: 0
   quotaIds?: number[]      // Défaut: []
-  returnableItemIds?: number[] // Défaut: []
+  handoutItemIds?: number[] // Défaut: []
 }
 ```
 
@@ -166,7 +166,7 @@ const bodySchema = z.object({
   choices: z.array(z.string()).nullable().optional(),
   position: z.number().int().min(0).default(0),
   quotaIds: z.array(z.number().int()).optional().default([]),
-  returnableItemIds: z.array(z.number().int()).optional().default([]),
+  handoutItemIds: z.array(z.number().int()).optional().default([]),
 })
 ```
 
@@ -195,7 +195,7 @@ const bodySchema = z.object({
 
 **Comportement** :
 
-- **TicketingOption HelloAsso** : Seules les relations (quotas, returnableItems) sont modifiables
+- **TicketingOption HelloAsso** : Seules les relations (quotas, handoutItems) sont modifiables
 - **TicketingOption manuelle** : Tous les champs sont modifiables
 
 **Réponse** :
@@ -246,7 +246,7 @@ Récupère toutes les options d'une édition avec leurs relations.
 
 ```typescript
 const options = await getEditionOptions(editionId)
-// Retourne: TicketingOption[] avec quotas et returnableItems
+// Retourne: TicketingOption[] avec quotas et handoutItems
 ```
 
 #### `createOption(editionId: number, data: OptionData)`
@@ -285,7 +285,7 @@ const option = await updateOption(5, editionId, {
   isRequired: false,
   choices: ['Omnivore', 'Végétarien', 'Végan'],
   quotaIds: [],
-  returnableItemIds: [],
+  handoutItemIds: [],
 })
 ```
 
@@ -338,7 +338,7 @@ await deleteOption(5, editionId)
 - Sélection du type de champ
 - Édition des choix (pour Select/Radio/MultipleChoice)
 - Sélection multiple de quotas
-- Sélection multiple d'items à restituer
+- Sélection multiple d'items à remettre
 - Validation côté client
 - Champs désactivés pour options HelloAsso (sauf relations)
 
@@ -349,7 +349,7 @@ await deleteOption(5, editionId)
   editionId: number
   option?: TicketingOption | null
   quotas: TicketingQuota[]
-  returnableItems: TicketingReturnableItem[]
+  handoutItems: TicketingHandoutItem[]
 }
 ```
 
@@ -436,7 +436,7 @@ const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
     isRequired: true,
     choices: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     position: 3,
-    returnableItemIds: [tshirtId], // Si le t-shirt doit être restitué
+    handoutItemIds: [tshirtId], // Si le t-shirt doit être remis
   },
 })
 ```
@@ -586,6 +586,6 @@ Utilisez des noms et descriptions explicites :
 ## Voir Aussi
 
 - [Quotas](./quotas.md) - Gestion des quotas
-- [Items à Restituer](./returnable-items.md) - Gestion des items
+- [Items à Remettre](./handout-items.md) - Gestion des items
 - [Commandes](./orders.md) - Stockage des réponses aux options
 - [Intégration HelloAsso](./external-integration.md) - Synchronisation des options

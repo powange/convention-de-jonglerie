@@ -7,7 +7,7 @@ export interface OptionData {
   price?: number | null // Prix en centimes
   position: number
   quotaIds?: number[]
-  returnableItemIds?: number[]
+  handoutItemIds?: number[]
   tierIds?: number[] // Tarifs associés à cette option
   mealIds?: number[] // Repas associés à cette option
 }
@@ -21,7 +21,7 @@ export async function getEditionOptions(editionId: number) {
     orderBy: [{ position: 'asc' }, { name: 'asc' }],
     include: {
       quotas: { include: { quota: true } },
-      returnableItems: { include: { returnableItem: true } },
+      handoutItems: { include: { handoutItem: true } },
       tiers: { include: { tier: true } },
       meals: { include: { meal: true } },
     },
@@ -59,9 +59,9 @@ export async function createOption(editionId: number, data: OptionData) {
       quotas: {
         create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
       },
-      returnableItems: {
-        create: (data.returnableItemIds || []).map((returnableItemId) => ({
-          returnableItemId,
+      handoutItems: {
+        create: (data.handoutItemIds || []).map((handoutItemId) => ({
+          handoutItemId,
         })),
       },
       tiers: {
@@ -99,14 +99,14 @@ export async function updateOption(optionId: number, editionId: number, data: Op
   return await prisma.$transaction(async (tx) => {
     // Supprimer les anciennes relations (sauf tiers pour HelloAsso)
     await tx.ticketingOptionQuota.deleteMany({ where: { optionId } })
-    // returnableItems : on ne supprime/recrée que si la clé est explicitement
+    // handoutItems : on ne supprime/recrée que si la clé est explicitement
     // fournie (édition désormais déléguée à un endpoint dédié).
-    if (data.returnableItemIds !== undefined) {
-      await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
+    if (data.handoutItemIds !== undefined) {
+      await tx.ticketingOptionHandoutItem.deleteMany({ where: { optionId } })
     }
     await tx.ticketingOptionMeal.deleteMany({ where: { optionId } })
 
-    // Pour les options HelloAsso, on met à jour uniquement les relations quotas, returnableItems et meals
+    // Pour les options HelloAsso, on met à jour uniquement les relations quotas, handoutItems et meals
     // Les associations tarif-option sont gérées par la synchronisation HelloAsso
     // Pour les options manuelles, on met à jour tout
     if (isHelloAssoOption) {
@@ -116,11 +116,11 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          ...(data.returnableItemIds !== undefined
+          ...(data.handoutItemIds !== undefined
             ? {
-                returnableItems: {
-                  create: data.returnableItemIds.map((returnableItemId) => ({
-                    returnableItemId,
+                handoutItems: {
+                  create: data.handoutItemIds.map((handoutItemId) => ({
+                    handoutItemId,
                   })),
                 },
               }
@@ -148,11 +148,11 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
-          ...(data.returnableItemIds !== undefined
+          ...(data.handoutItemIds !== undefined
             ? {
-                returnableItems: {
-                  create: data.returnableItemIds.map((returnableItemId) => ({
-                    returnableItemId,
+                handoutItems: {
+                  create: data.handoutItemIds.map((handoutItemId) => ({
+                    handoutItemId,
                   })),
                 },
               }

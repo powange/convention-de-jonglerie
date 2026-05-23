@@ -1,8 +1,8 @@
-# Articles à restituer pour bénévoles - Association par équipe
+# Articles à remettre pour bénévoles - Association par équipe
 
 ## Vue d'ensemble
 
-Amélioration du système d'articles à restituer pour permettre l'association d'articles spécifiques à certaines équipes de bénévoles, avec une logique de surcharge.
+Amélioration du système d'articles à remettre pour permettre l'association d'articles spécifiques à certaines équipes de bénévoles, avec une logique de surcharge.
 
 ## Principe de fonctionnement
 
@@ -36,24 +36,24 @@ Amélioration du système d'articles à restituer pour permettre l'association d
 
 ### 1. Schéma Prisma
 
-**Modèle `EditionVolunteerReturnableItem` modifié :**
+**Modèle `EditionVolunteerHandoutItem` modifié :**
 
 ```prisma
-model EditionVolunteerReturnableItem {
+model EditionVolunteerHandoutItem {
   id               Int      @id @default(autoincrement())
   editionId        Int
-  returnableItemId Int
+  handoutItemId Int
   teamId           String?  // NULL = global, défini = équipe spécifique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   edition        Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
   team           VolunteerTeam?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  @@unique([editionId, returnableItemId, teamId])
+  @@unique([editionId, handoutItemId, teamId])
   @@index([editionId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
   @@index([teamId])
 }
 ```
@@ -63,7 +63,7 @@ model EditionVolunteerReturnableItem {
 ```prisma
 model VolunteerTeam {
   // ... champs existants
-  returnableItems      EditionVolunteerReturnableItem[]
+  handoutItems      EditionVolunteerHandoutItem[]
 }
 ```
 
@@ -72,19 +72,19 @@ model VolunteerTeam {
 **Commande à exécuter (par l'utilisateur) :**
 
 ```bash
-npx prisma migrate dev --name add_team_id_to_volunteer_returnable_items
+npx prisma migrate dev --name add_team_id_to_volunteer_handout_items
 ```
 
 **Changements effectués :**
 
-- Ajout de la colonne `teamId` (nullable) dans `EditionVolunteerReturnableItem`
-- Modification de la contrainte unique : `[editionId, returnableItemId]` → `[editionId, returnableItemId, teamId]`
+- Ajout de la colonne `teamId` (nullable) dans `EditionVolunteerHandoutItem`
+- Modification de la contrainte unique : `[editionId, handoutItemId]` → `[editionId, handoutItemId, teamId]`
 - Ajout d'un index sur `teamId`
 - Ajout de la relation avec `VolunteerTeam`
 
 ### 3. API modifiée
 
-#### GET `/api/editions/[id]/ticketing/volunteers/returnable-items`
+#### GET `/api/editions/[id]/ticketing/volunteers/handout-items`
 
 **Retour :**
 
@@ -93,7 +93,7 @@ npx prisma migrate dev --name add_team_id_to_volunteer_returnable_items
   items: [
     {
       id: number
-      returnableItemId: number
+      handoutItemId: number
       teamId: string | null  // ← NOUVEAU
       name: string
       team?: {               // ← NOUVEAU
@@ -108,26 +108,26 @@ npx prisma migrate dev --name add_team_id_to_volunteer_returnable_items
 }
 ```
 
-#### POST `/api/editions/[id]/ticketing/volunteers/returnable-items`
+#### POST `/api/editions/[id]/ticketing/volunteers/handout-items`
 
 **Body :**
 
 ```typescript
 {
-  returnableItemId: number
+  handoutItemId: number
   teamId?: string | null  // ← NOUVEAU : null/undefined = global, string = équipe spécifique
 }
 ```
 
 **Validation :**
 
-- Vérifie que l'article à restituer existe
+- Vérifie que l'article à remettre existe
 - Si `teamId` fourni, vérifie que l'équipe existe et appartient à l'édition
 - Vérifie qu'il n'y a pas de doublon pour la même portée (édition + article + teamId)
 
 ### 4. Interface utilisateur
 
-#### Composant `TicketingVolunteerReturnableItemsList.vue`
+#### Composant `TicketingVolunteerHandoutItemsList.vue`
 
 **Nouvelles fonctionnalités :**
 
@@ -156,16 +156,16 @@ npx prisma migrate dev --name add_team_id_to_volunteer_returnable_items
 
 ### Ajouter un article global
 
-1. Aller sur `/editions/[id]/gestion/ticketing/tiers#arestituer`
-2. Dans "Articles à restituer pour les bénévoles"
+1. Aller sur `/editions/[id]/gestion/ticketing/tiers#aremettre`
+2. Dans "Articles à remettre pour les bénévoles"
 3. Sélectionner "🌍 Tous les bénévoles (global)"
 4. Choisir un article
 5. Cliquer sur "Ajouter"
 
 ### Ajouter un article pour une équipe
 
-1. Aller sur `/editions/[id]/gestion/ticketing/tiers#arestituer`
-2. Dans "Articles à restituer pour les bénévoles"
+1. Aller sur `/editions/[id]/gestion/ticketing/tiers#aremettre`
+2. Dans "Articles à remettre pour les bénévoles"
 3. Sélectionner "🔹 [Nom de l'équipe]"
 4. Choisir un article
 5. Cliquer sur "Ajouter"
@@ -181,12 +181,12 @@ npx prisma migrate dev --name add_team_id_to_volunteer_returnable_items
 **Logique de résolution (à implémenter dans le code de validation d'accès) :**
 
 ```typescript
-function getReturnableItemsForVolunteer(
+function getHandoutItemsForVolunteer(
   editionId: number,
   volunteerTeams: string[]
-): TicketingReturnableItem[] {
+): TicketingHandoutItem[] {
   // 1. Récupérer tous les articles configurés pour l'édition
-  const allItems = await getVolunteerReturnableItems(editionId)
+  const allItems = await getVolunteerHandoutItems(editionId)
 
   // 2. Chercher des articles spécifiques aux équipes du bénévole
   const teamSpecificItems = allItems.filter(

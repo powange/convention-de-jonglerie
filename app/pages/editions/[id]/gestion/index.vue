@@ -395,13 +395,13 @@
                 color="orange"
               />
 
-              <!-- Articles à restituer -->
+              <!-- Articles à remettre -->
               <ManagementNavigationCard
-                v-if="edition.ticketingReturnableItemsEnabled"
-                :to="`/editions/${edition.id}/gestion/ticketing/returnable-items`"
+                v-if="edition.ticketingHandoutItemsEnabled"
+                :to="`/editions/${edition.id}/gestion/ticketing/handout-items`"
                 icon="i-heroicons-gift"
-                :title="$t('gestion.ticketing.returnable_items_title')"
-                :description="$t('gestion.ticketing.returnable_items_card_description')"
+                :title="$t('gestion.ticketing.handout_items_title')"
+                :description="$t('gestion.ticketing.handout_items_card_description')"
                 color="orange"
               />
 

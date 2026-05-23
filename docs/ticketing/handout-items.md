@@ -1,13 +1,13 @@
-# Gestion des Items à Restituer
+# Gestion des Items à Remettre
 
-Les items à restituer sont des objets prêtés aux participants qui doivent être rendus en fin d'événement (badges, t-shirts, clés, etc.).
+Les items à remettre sont des objets prêtés aux participants qui doivent être rendus en fin d'événement (badges, t-shirts, clés, etc.).
 
 ## Modèle de Données
 
-### Table `TicketingReturnableItem`
+### Table `TicketingHandoutItem`
 
 ```prisma
-model TicketingReturnableItem {
+model TicketingHandoutItem {
   id        Int      @id @default(autoincrement())
   editionId Int
   name      String
@@ -15,9 +15,9 @@ model TicketingReturnableItem {
   updatedAt DateTime @updatedAt
 
   edition                   Edition                          @relation(...)
-  tiers                     TicketingTierReturnableItem[]             // Tarifs liés
-  options                   TicketingOptionReturnableItem[]           // Options liées
-  volunteerReturnableItems  EditionVolunteerReturnableItem[] // Bénévoles
+  tiers                     TicketingTierHandoutItem[]             // Tarifs liés
+  options                   TicketingOptionHandoutItem[]           // Options liées
+  volunteerHandoutItems  EditionVolunteerHandoutItem[] // Bénévoles
 
   @@index([editionId])
 }
@@ -26,7 +26,7 @@ model TicketingReturnableItem {
 ### Propriétés
 
 ```typescript
-interface ReturnableItemData {
+interface HandoutItemData {
   name: string // Nom de l'item (ex: "Badge réutilisable")
 }
 ```
@@ -35,19 +35,19 @@ interface ReturnableItemData {
 
 ### 1. Items Généraux (Tarifs)
 
-Items associés à des tarifs via `TicketingTierReturnableItem`.
+Items associés à des tarifs via `TicketingTierHandoutItem`.
 
 **Exemple** : Tous les participants avec le tarif "Pass Weekend" reçoivent un badge.
 
 ### 2. Items Conditionnels (Options)
 
-Items associés à des options via `TicketingOptionReturnableItem`.
+Items associés à des options via `TicketingOptionHandoutItem`.
 
 **Exemple** : Les participants qui répondent "Oui" à "T-shirt souven ir" reçoivent un badge textile.
 
 ### 3. Items Bénévoles
 
-Items spécifiques aux bénévoles via `EditionVolunteerReturnableItem`.
+Items spécifiques aux bénévoles via `EditionVolunteerHandoutItem`.
 
 **Exemple** : Tous les bénévoles reçoivent une clé de local.
 
@@ -55,21 +55,21 @@ Items spécifiques aux bénévoles via `EditionVolunteerReturnableItem`.
 
 ### Lister les Items
 
-**Route** : `GET /api/editions/:id/ticketing/returnable-items`
+**Route** : `GET /api/editions/:id/ticketing/handout-items`
 
 **Permission** : `canAccessEditionData`
 
 **Réponse** :
 
 ```typescript
-TicketingReturnableItem[]
+TicketingHandoutItem[]
 ```
 
 ---
 
 ### Créer un Item
 
-**Route** : `POST /api/editions/:id/ticketing/returnable-items`
+**Route** : `POST /api/editions/:id/ticketing/handout-items`
 
 **Permission** : `canManageEditionVolunteers`
 
@@ -92,14 +92,14 @@ const createItemSchema = z.object({
 **Réponse** :
 
 ```typescript
-TicketingReturnableItem
+TicketingHandoutItem
 ```
 
 ---
 
 ### Modifier un Item
 
-**Route** : `PUT /api/editions/:id/ticketing/returnable-items/:itemId`
+**Route** : `PUT /api/editions/:id/ticketing/handout-items/:itemId`
 
 **Permission** : `canManageEditionVolunteers`
 
@@ -114,7 +114,7 @@ TicketingReturnableItem
 **Réponse** :
 
 ```typescript
-TicketingReturnableItem
+TicketingHandoutItem
 ```
 
 **Erreurs** :
@@ -126,7 +126,7 @@ TicketingReturnableItem
 
 ### Supprimer un Item
 
-**Route** : `DELETE /api/editions/:id/ticketing/returnable-items/:itemId`
+**Route** : `DELETE /api/editions/:id/ticketing/handout-items/:itemId`
 
 **Permission** : `canManageEditionVolunteers`
 
@@ -144,30 +144,30 @@ TicketingReturnableItem
 
 ## Utilitaire Serveur
 
-**Fichier** : `server/utils/editions/ticketing/returnable-items.ts`
+**Fichier** : `server/utils/editions/ticketing/handout-items.ts`
 
 ### Fonctions Disponibles
 
-#### `getReturnableItems(editionId: number)`
+#### `getHandoutItems(editionId: number)`
 
 Récupère tous les items d'une édition.
 
 ```typescript
-const items = await getReturnableItems(editionId)
-// Retourne: TicketingReturnableItem[]
+const items = await getHandoutItems(editionId)
+// Retourne: TicketingHandoutItem[]
 ```
 
-#### `createReturnableItem(editionId: number, data: ReturnableItemData)`
+#### `createHandoutItem(editionId: number, data: HandoutItemData)`
 
 Crée un nouvel item.
 
 ```typescript
-const item = await createReturnableItem(editionId, {
+const item = await createHandoutItem(editionId, {
   name: 'Badge réutilisable',
 })
 ```
 
-#### `updateReturnableItem(itemId: number, editionId: number, data: ReturnableItemData)`
+#### `updateHandoutItem(itemId: number, editionId: number, data: HandoutItemData)`
 
 Met à jour un item existant.
 
@@ -177,12 +177,12 @@ Met à jour un item existant.
 - L'item doit appartenir à l'édition
 
 ```typescript
-const item = await updateReturnableItem(itemId, editionId, {
+const item = await updateHandoutItem(itemId, editionId, {
   name: 'Badge réutilisable (modifié)',
 })
 ```
 
-#### `deleteReturnableItem(itemId: number, editionId: number)`
+#### `deleteHandoutItem(itemId: number, editionId: number)`
 
 Supprime un item.
 
@@ -192,7 +192,7 @@ Supprime un item.
 - L'item doit appartenir à l'édition
 
 ```typescript
-await deleteReturnableItem(itemId, editionId)
+await deleteHandoutItem(itemId, editionId)
 // Retourne: { success: true }
 ```
 
@@ -200,22 +200,22 @@ await deleteReturnableItem(itemId, editionId)
 
 ## Items pour Bénévoles
 
-### Table `EditionVolunteerReturnableItem`
+### Table `EditionVolunteerHandoutItem`
 
 ```prisma
-model EditionVolunteerReturnableItem {
+model EditionVolunteerHandoutItem {
   id               Int      @id @default(autoincrement())
   editionId        Int
-  returnableItemId Int
+  handoutItemId Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   edition        Edition        @relation(...)
-  returnableItem TicketingReturnableItem @relation(...)
+  handoutItem TicketingHandoutItem @relation(...)
 
-  @@unique([editionId, returnableItemId])
+  @@unique([editionId, handoutItemId])
   @@index([editionId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
 }
 ```
 
@@ -223,7 +223,7 @@ model EditionVolunteerReturnableItem {
 
 #### Lister les Items Bénévoles
 
-**Route** : `GET /api/editions/:id/ticketing/volunteers/returnable-items`
+**Route** : `GET /api/editions/:id/ticketing/volunteers/handout-items`
 
 **Permission** : `canAccessEditionData`
 
@@ -232,13 +232,13 @@ model EditionVolunteerReturnableItem {
 ```typescript
 Array<{
   id: number
-  returnableItem: TicketingReturnableItem
+  handoutItem: TicketingHandoutItem
 }>
 ```
 
 #### Ajouter un Item aux Bénévoles
 
-**Route** : `POST /api/editions/:id/ticketing/volunteers/returnable-items`
+**Route** : `POST /api/editions/:id/ticketing/volunteers/handout-items`
 
 **Permission** : `canManageEditionVolunteers`
 
@@ -246,19 +246,19 @@ Array<{
 
 ```typescript
 {
-  returnableItemId: number
+  handoutItemId: number
 }
 ```
 
 **Réponse** :
 
 ```typescript
-EditionVolunteerReturnableItem
+EditionVolunteerHandoutItem
 ```
 
 #### Retirer un Item des Bénévoles
 
-**Route** : `DELETE /api/editions/:id/ticketing/volunteers/returnable-items/:itemId`
+**Route** : `DELETE /api/editions/:id/ticketing/volunteers/handout-items/:itemId`
 
 **Permission** : `canManageEditionVolunteers`
 
@@ -274,9 +274,9 @@ EditionVolunteerReturnableItem
 
 ## Composants Vue
 
-### `ReturnableItemsList.vue`
+### `HandoutItemsList.vue`
 
-**Localisation** : `app/components/ticketing/ReturnableItemsList.vue`
+**Localisation** : `app/components/ticketing/HandoutItemsList.vue`
 
 **Fonctionnalités** :
 
@@ -292,13 +292,13 @@ EditionVolunteerReturnableItem
 }
 ```
 
-### `TicketingVolunteerReturnableItemsList.vue`
+### `TicketingVolunteerHandoutItemsList.vue`
 
-**Localisation** : `app/components/ticketing/TicketingVolunteerReturnableItemsList.vue`
+**Localisation** : `app/components/ticketing/TicketingVolunteerHandoutItemsList.vue`
 
 **Fonctionnalités** :
 
-- Affiche les items à restituer pour les bénévoles
+- Affiche les items à remettre pour les bénévoles
 - Ajouter/retirer des items
 - Sélection parmi les items existants
 
@@ -317,7 +317,7 @@ EditionVolunteerReturnableItem
 ### 1. Créer un Item "Badge Réutilisable"
 
 ```typescript
-const item = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`, {
+const item = await $fetch(`/api/editions/${editionId}/ticketing/handout-items`, {
   method: 'POST',
   body: { name: 'Badge réutilisable' },
 })
@@ -331,7 +331,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
   method: 'PUT',
   body: {
     ...tier,
-    returnableItemIds: [badgeId, tshirtId],
+    handoutItemIds: [badgeId, tshirtId],
   },
 })
 ```
@@ -344,7 +344,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
   method: 'PUT',
   body: {
     ...option,
-    returnableItemIds: [badgeTextileId],
+    handoutItemIds: [badgeTextileId],
   },
 })
 ```
@@ -352,16 +352,16 @@ await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
 ### 4. Ajouter un Item pour tous les Bénévoles
 
 ```typescript
-await $fetch(`/api/editions/${editionId}/ticketing/volunteers/returnable-items`, {
+await $fetch(`/api/editions/${editionId}/ticketing/volunteers/handout-items`, {
   method: 'POST',
-  body: { returnableItemId: cleLocalId },
+  body: { handoutItemId: cleLocalId },
 })
 ```
 
 ### 5. Renommer un Item
 
 ```typescript
-await $fetch(`/api/editions/${editionId}/ticketing/returnable-items/${itemId}`, {
+await $fetch(`/api/editions/${editionId}/ticketing/handout-items/${itemId}`, {
   method: 'PUT',
   body: { name: 'Badge réutilisable (nouveau nom)' },
 })
@@ -374,7 +374,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/returnable-items/${itemId}`, 
 ### À l'Arrivée du Participant
 
 1. **Scan du QR code** ou recherche manuelle
-2. **Affichage des items à restituer** dans `ParticipantDetailsModal`
+2. **Affichage des items à remettre** dans `ParticipantDetailsModal`
    - Items du tarif
    - Items des options sélectionnées
    - Items bénévole (si applicable)
@@ -383,8 +383,8 @@ await $fetch(`/api/editions/${editionId}/ticketing/returnable-items/${itemId}`, 
 ### Au Départ du Participant
 
 1. **Scan du QR code** ou recherche manuelle
-2. **Affichage des items à restituer**
-3. **Vérification** que tous les items sont restitués
+2. **Affichage des items à remettre**
+3. **Vérification** que tous les items sont remiss
 4. **Validation** du départ (optionnel)
 
 ### Implémentation Recommandée
@@ -392,10 +392,10 @@ await $fetch(`/api/editions/${editionId}/ticketing/returnable-items/${itemId}`, 
 ```vue
 <!-- ParticipantDetailsModal.vue -->
 <template>
-  <div v-if="returnableItems.length > 0">
-    <h3>Items à restituer</h3>
+  <div v-if="handoutItems.length > 0">
+    <h3>Items à remettre</h3>
     <ul>
-      <li v-for="item in returnableItems" :key="item.id">
+      <li v-for="item in handoutItems" :key="item.id">
         <UCheckbox v-model="returnedItems[item.id]" :label="item.name" />
       </li>
     </ul>
@@ -403,12 +403,12 @@ await $fetch(`/api/editions/${editionId}/ticketing/returnable-items/${itemId}`, 
 </template>
 
 <script setup>
-const returnableItems = computed(() => {
+const handoutItems = computed(() => {
   const items = []
 
   // Items du tarif
-  if (participant.tier?.returnableItems) {
-    items.push(...participant.tier.returnableItems.map((r) => r.returnableItem))
+  if (participant.tier?.handoutItems) {
+    items.push(...participant.tier.handoutItems.map((r) => r.handoutItem))
   }
 
   // Items des options (à implémenter selon votre logique)
@@ -438,7 +438,7 @@ Soyez explicite sur le type d'item :
 
 Seuls les items réutilisables doivent être dans cette liste :
 
-- ✅ Badge avec puce RFID (à restituer)
+- ✅ Badge avec puce RFID (à remettre)
 - ❌ Bracelet jetable (ne pas créer d'item)
 
 ### 3. Suivi des Items
@@ -460,7 +460,7 @@ Créez des items spécifiques pour les bénévoles :
 
 ### 5. Validation au Départ
 
-Implementez une validation qui vérifie que tous les items sont restitués avant de valider le départ d'un participant.
+Implementez une validation qui vérifie que tous les items sont remiss avant de valider le départ d'un participant.
 
 ---
 
@@ -469,7 +469,7 @@ Implementez une validation qui vérifie que tous les items sont restitués avant
 ### Item n'apparaît pas dans la liste
 
 **Cause** : L'item n'est pas associé au tarif/option du participant
-**Solution** : Vérifiez les relations `TicketingTierReturnableItem` et `TicketingOptionReturnableItem`.
+**Solution** : Vérifiez les relations `TicketingTierHandoutItem` et `TicketingOptionHandoutItem`.
 
 ### Impossible de supprimer un item
 
@@ -487,4 +487,4 @@ Implementez une validation qui vérifie que tous les items sont restitués avant
 
 - [Tarifs](./tiers.md) - Association tarifs ↔ items
 - [Options](./options.md) - Association options ↔ items
-- [Contrôle d'Accès](./access-control.md) - Remise et restitution des items
+- [Contrôle d'Accès](./access-control.md) - Remise et remise des items

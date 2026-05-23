@@ -100,7 +100,7 @@
         >
           <template #title>Associations quotas/articles</template>
           <template #description>
-            Les associations avec les quotas et articles à restituer pour chaque choix peuvent être
+            Les associations avec les quotas et articles à remettre pour chaque choix peuvent être
             configurées après la création du champ.
           </template>
         </UAlert>

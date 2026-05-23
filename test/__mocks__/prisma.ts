@@ -63,7 +63,7 @@ export const prismaMock = {
   ticketingTier: createModelMock(),
   ticketingQuota: createModelMock(),
   ticketingOption: createModelMock(),
-  ticketingReturnableItem: createModelMock(),
+  ticketingHandoutItem: createModelMock(),
   externalTicketing: createModelMock(),
 
   // Modèles messagerie
@@ -78,7 +78,7 @@ export const prismaMock = {
   // Modèles spectacles
   show: createModelMock(),
   showArtist: createModelMock(),
-  showReturnableItem: createModelMock(),
+  showHandoutItem: createModelMock(),
 
   // Modèles carte (zones et marqueurs)
   editionZone: createModelMock(),

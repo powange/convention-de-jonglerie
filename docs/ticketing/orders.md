@@ -480,7 +480,7 @@ Le QR code est scanné lors du contrôle d'accès via :
 - Affiche le QR code
 - Affiche les informations de la commande
 - Affiche les réponses aux options (`customFields`)
-- Affiche les items à restituer
+- Affiche les items à remettre
 - Bouton de validation d'entrée
 
 **Props** :

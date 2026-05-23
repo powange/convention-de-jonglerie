@@ -36,7 +36,7 @@ L'application est full-stack TypeScript avec Nuxt 4 (frontend + serveur Nitro), 
 ## Modules métier
 
 - **Conventions / Éditions** — Modèles principaux (cf. `prisma/schema/schema.prisma`)
-- **Bénévoles** — Candidatures, équipes, créneaux, repas, restitutions ([`docs/volunteers/`](docs/volunteers/))
+- **Bénévoles** — Candidatures, équipes, créneaux, repas, remises ([`docs/volunteers/`](docs/volunteers/))
 - **Artistes & Spectacles** — Show calls, candidatures, sondages ([`docs/shows-call.md`](docs/shows-call.md))
 - **Repas** — Configuration, validation, intégration billetterie
 - **Tâches** — Organisation interne du travail par groupes ([`docs/tasks.md`](docs/tasks.md))

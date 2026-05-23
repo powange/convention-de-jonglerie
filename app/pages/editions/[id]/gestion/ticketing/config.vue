@@ -125,44 +125,44 @@
               </div>
             </div>
 
-            <!-- Activer les articles à restituer -->
+            <!-- Activer les articles à remettre -->
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-medium text-gray-900 dark:text-white">
-                    {{ $t('gestion.ticketing.enable_returnable_items') }}
+                    {{ $t('gestion.ticketing.enable_handout_items') }}
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $t('gestion.ticketing.enable_returnable_items_description') }}
+                    {{ $t('gestion.ticketing.enable_handout_items_description') }}
                   </p>
                 </div>
                 <UBadge
-                  :color="returnableItemsEnabled ? 'success' : 'neutral'"
+                  :color="handoutItemsEnabled ? 'success' : 'neutral'"
                   variant="soft"
                   size="sm"
                 >
-                  {{ returnableItemsEnabled ? $t('common.active') : $t('common.inactive') }}
+                  {{ handoutItemsEnabled ? $t('common.active') : $t('common.inactive') }}
                 </UBadge>
               </div>
 
               <div class="flex items-center gap-3">
                 <USwitch
-                  v-model="returnableItemsEnabled"
+                  v-model="handoutItemsEnabled"
                   :disabled="updating"
                   color="primary"
-                  @update:model-value="handleToggleReturnableItems"
+                  @update:model-value="handleToggleHandoutItems"
                 />
                 <span
                   :class="
-                    returnableItemsEnabled
+                    handoutItemsEnabled
                       ? 'text-green-600 dark:text-green-400'
                       : 'text-gray-600 dark:text-gray-400'
                   "
                 >
                   {{
-                    returnableItemsEnabled
-                      ? $t('gestion.ticketing.returnable_items_enabled')
-                      : $t('gestion.ticketing.returnable_items_disabled')
+                    handoutItemsEnabled
+                      ? $t('gestion.ticketing.handout_items_enabled')
+                      : $t('gestion.ticketing.handout_items_disabled')
                   }}
                 </span>
               </div>
@@ -402,7 +402,7 @@ const paymentCash = ref(true)
 const paymentCard = ref(true)
 const paymentCheck = ref(true)
 const sumupEnabled = ref(false)
-const returnableItemsEnabled = ref(true)
+const handoutItemsEnabled = ref(true)
 
 // Champs SumUp
 const sumupAffiliateKey = ref('')
@@ -429,7 +429,7 @@ onMounted(async () => {
     paymentCard.value = settings.value.paymentCard ?? true
     paymentCheck.value = settings.value.paymentCheck ?? true
     sumupEnabled.value = settings.value.sumupEnabled ?? false
-    returnableItemsEnabled.value = settings.value.returnableItemsEnabled ?? true
+    handoutItemsEnabled.value = settings.value.handoutItemsEnabled ?? true
   }
 
   // Charger la config SumUp si l'intégration est activée
@@ -530,11 +530,11 @@ const handleToggleAnonymousOrders = async (val: boolean) => {
   }
 }
 
-const handleToggleReturnableItems = async (val: boolean) => {
+const handleToggleHandoutItems = async (val: boolean) => {
   const previous = !val
 
   try {
-    await updateSettings({ returnableItemsEnabled: val })
+    await updateSettings({ handoutItemsEnabled: val })
     // Rafraîchir l'édition pour que le menu et la page de gestion
     // se mettent à jour avec la nouvelle valeur du flag.
     await editionStore.fetchEditionById(editionId.value, { force: true })
@@ -545,7 +545,7 @@ const handleToggleReturnableItems = async (val: boolean) => {
       icon: 'i-heroicons-check-circle',
     })
   } catch (e: any) {
-    returnableItemsEnabled.value = previous
+    handoutItemsEnabled.value = previous
     toast.add({
       title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',

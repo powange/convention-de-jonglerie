@@ -663,7 +663,7 @@
     icon-name="i-heroicons-information-circle"
     icon-color="text-blue-500"
     :loading="validating"
-    :checklist-items="returnableItemsToDistribute"
+    :checklist-items="handoutItemsToDistribute"
     checklist-title="Articles à remettre au participant"
     checklist-icon="i-heroicons-gift"
     checklist-icon-color="text-orange-600 dark:text-orange-400"
@@ -795,8 +795,8 @@ interface TicketData {
         tier?: {
           id: number
           name: string
-          returnableItems?: Array<{
-            returnableItem: {
+          handoutItems?: Array<{
+            handoutItem: {
               id: number
               name: string
             }
@@ -812,7 +812,7 @@ interface TicketData {
             name: string
             type: string
             price: number | null
-            returnableItems?: Array<{
+            handoutItems?: Array<{
               id: number
               name: string
             }>
@@ -848,7 +848,7 @@ interface VolunteerData {
       startDateTime: Date | string
       endDateTime: Date | string
     }>
-    returnableItems?: Array<{
+    handoutItems?: Array<{
       id: number
       name: string
     }>
@@ -882,7 +882,7 @@ interface ArtistData {
       startDateTime: Date | string
       location?: string
     }>
-    returnableItems?: Array<{
+    handoutItems?: Array<{
       id: number
       name: string
     }>
@@ -977,8 +977,8 @@ const editableLastName = ref<string | null>(null)
 const editableEmail = ref<string | null>(null)
 const editablePhone = ref<string | null>(null)
 
-// Gestion des articles à restituer
-const returnableItemsToDistribute = computed(() => {
+// Gestion des articles à remettre
+const handoutItemsToDistribute = computed(() => {
   const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
   let globalIndex = 0 // Compteur global pour garantir l'unicité
 
@@ -994,18 +994,18 @@ const returnableItemsToDistribute = computed(() => {
         `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
 
       // Articles du tarif
-      if (item.tier?.returnableItems) {
-        for (const tierItem of item.tier.returnableItems) {
+      if (item.tier?.handoutItems) {
+        for (const tierItem of item.tier.handoutItems) {
           // Construire le nom avec origine si disponible
-          let itemName = tierItem.returnableItem.name
+          let itemName = tierItem.handoutItem.name
           if (tierItem.source === 'customField' && tierItem.customFieldName) {
-            itemName = `${tierItem.returnableItem.name} (${tierItem.customFieldName})`
+            itemName = `${tierItem.handoutItem.name} (${tierItem.customFieldName})`
           }
 
           // Créer un ID unique en utilisant un index global pour éviter les collisions
           // même si plusieurs billets ont le même tarif et la même réponse au champ personnalisé
           itemsList.push({
-            id: `${item.id}-tier-${tierItem.returnableItem.id}-${globalIndex++}`,
+            id: `${item.id}-tier-${tierItem.handoutItem.id}-${globalIndex++}`,
             name: `${itemName} - ${participantName}`,
             participantName,
           })
@@ -1015,8 +1015,8 @@ const returnableItemsToDistribute = computed(() => {
       // Articles des options sélectionnées
       if (item.selectedOptions) {
         for (const selectedOption of item.selectedOptions) {
-          if (selectedOption.option.returnableItems) {
-            for (const optionItem of selectedOption.option.returnableItems) {
+          if (selectedOption.option.handoutItems) {
+            for (const optionItem of selectedOption.option.handoutItems) {
               itemsList.push({
                 id: `${item.id}-option-${selectedOption.id}-${optionItem.id}-${globalIndex++}`,
                 name: `${optionItem.name} - ${participantName}`,
@@ -1035,8 +1035,8 @@ const returnableItemsToDistribute = computed(() => {
       `${props.participant.volunteer.user.firstName} ${props.participant.volunteer.user.lastName}`.trim() ||
       'Bénévole'
 
-    if (props.participant.volunteer.returnableItems) {
-      for (const item of props.participant.volunteer.returnableItems) {
+    if (props.participant.volunteer.handoutItems) {
+      for (const item of props.participant.volunteer.handoutItems) {
         itemsList.push({
           id: `volunteer-${item.id}-${globalIndex++}`,
           name: `${item.name} - ${volunteerName}`,
@@ -1052,8 +1052,8 @@ const returnableItemsToDistribute = computed(() => {
       `${props.participant.artist.user.firstName} ${props.participant.artist.user.lastName}`.trim() ||
       'Artiste'
 
-    if (props.participant.artist.returnableItems) {
-      for (const item of props.participant.artist.returnableItems) {
+    if (props.participant.artist.handoutItems) {
+      for (const item of props.participant.artist.handoutItems) {
         itemsList.push({
           id: `artist-${item.id}-${globalIndex++}`,
           name: `${item.name} - ${artistName}`,

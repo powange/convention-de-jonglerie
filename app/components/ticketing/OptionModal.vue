@@ -210,7 +210,7 @@ interface TicketingOption {
   position: number
   helloAssoOptionId?: number
   quotas?: any[]
-  returnableItems?: any[]
+  handoutItems?: any[]
   tiers?: any[]
   meals?: any[]
 }

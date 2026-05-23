@@ -13,10 +13,10 @@ const bodySchema = z.object({
       })
     )
     .optional(),
-  returnableItems: z
+  handoutItems: z
     .array(
       z.object({
-        returnableItemId: z.number(),
+        handoutItemId: z.number(),
         choiceValue: z.string().optional(),
       })
     )
@@ -38,7 +38,7 @@ export default wrapApiHandler(
       })
 
     const body = bodySchema.parse(await readBody(event))
-    const { tierIds, quotas, returnableItems } = body
+    const { tierIds, quotas, handoutItems } = body
 
     // Vérifier que le custom field existe et appartient à l'édition
     const customField = await prisma.ticketingTierCustomField.findFirst({
@@ -98,10 +98,10 @@ export default wrapApiHandler(
       })
 
       // 4. Supprimer toutes les associations existantes pour les articles
-      // à restituer — uniquement si la clé est explicitement fournie
+      // à remettre — uniquement si la clé est explicitement fournie
       // (édition désormais déléguée à un endpoint dédié).
-      if (returnableItems !== undefined) {
-        await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+      if (handoutItems !== undefined) {
+        await tx.ticketingTierCustomFieldHandoutItem.deleteMany({
           where: { customFieldId },
         })
       }
@@ -134,13 +134,13 @@ export default wrapApiHandler(
         }
       }
 
-      // 6. Créer les nouvelles associations d'articles à restituer
-      if (returnableItems && returnableItems.length > 0) {
-        for (const item of returnableItems) {
+      // 6. Créer les nouvelles associations d'articles à remettre
+      if (handoutItems && handoutItems.length > 0) {
+        for (const item of handoutItems) {
           // Vérifier que l'article existe et appartient à l'édition
-          const existingItem = await tx.ticketingReturnableItem.findFirst({
+          const existingItem = await tx.ticketingHandoutItem.findFirst({
             where: {
-              id: item.returnableItemId,
+              id: item.handoutItemId,
               editionId,
             },
           })
@@ -148,14 +148,14 @@ export default wrapApiHandler(
           if (!existingItem) {
             throw createError({
               status: 404,
-              message: `Article ${item.returnableItemId} introuvable`,
+              message: `Article ${item.handoutItemId} introuvable`,
             })
           }
 
-          await tx.ticketingTierCustomFieldReturnableItem.create({
+          await tx.ticketingTierCustomFieldHandoutItem.create({
             data: {
               customFieldId,
-              returnableItemId: item.returnableItemId,
+              handoutItemId: item.handoutItemId,
               choiceValue: item.choiceValue || null,
             },
           })

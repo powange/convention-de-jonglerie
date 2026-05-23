@@ -6,13 +6,13 @@ import { canAccessEditionData } from '#server/utils/permissions/edition-permissi
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
-  returnableItemIds: z.array(z.number().int().positive()),
+  handoutItemIds: z.array(z.number().int().positive()),
 })
 
 /**
- * PUT /api/editions/[id]/ticketing/tiers/[tierId]/returnable-items
+ * PUT /api/editions/[id]/ticketing/tiers/[tierId]/handout-items
  *
- * Met à jour uniquement les articles à restituer associés à un tarif.
+ * Met à jour uniquement les articles à remettre associés à un tarif.
  * Remplace l'ensemble des associations existantes.
  */
 export default wrapApiHandler(
@@ -34,14 +34,14 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Tarif introuvable' })
     }
 
-    const { returnableItemIds } = bodySchema.parse(await readBody(event))
+    const { handoutItemIds } = bodySchema.parse(await readBody(event))
 
     // Vérifier que tous les articles appartiennent à l'édition.
-    if (returnableItemIds.length > 0) {
-      const count = await prisma.ticketingReturnableItem.count({
-        where: { id: { in: returnableItemIds }, editionId },
+    if (handoutItemIds.length > 0) {
+      const count = await prisma.ticketingHandoutItem.count({
+        where: { id: { in: handoutItemIds }, editionId },
       })
-      if (count !== returnableItemIds.length) {
+      if (count !== handoutItemIds.length) {
         throw createError({
           status: 400,
           message: "Certains articles n'appartiennent pas à cette édition",
@@ -50,15 +50,15 @@ export default wrapApiHandler(
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
-      if (returnableItemIds.length > 0) {
-        await tx.ticketingTierReturnableItem.createMany({
-          data: returnableItemIds.map((returnableItemId) => ({ tierId, returnableItemId })),
+      await tx.ticketingTierHandoutItem.deleteMany({ where: { tierId } })
+      if (handoutItemIds.length > 0) {
+        await tx.ticketingTierHandoutItem.createMany({
+          data: handoutItemIds.map((handoutItemId) => ({ tierId, handoutItemId })),
         })
       }
     })
 
-    return createSuccessResponse({ tierId, returnableItemIds })
+    return createSuccessResponse({ tierId, handoutItemIds })
   },
-  { operationName: 'PUT ticketing tier returnable-items' }
+  { operationName: 'PUT ticketing tier handout-items' }
 )

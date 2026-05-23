@@ -16,7 +16,7 @@ export default wrapApiHandler(
         ticketingPaymentCard: true,
         ticketingPaymentCheck: true,
         ticketingSumupEnabled: true,
-        ticketingReturnableItemsEnabled: true,
+        ticketingHandoutItemsEnabled: true,
       },
     })
 
@@ -27,7 +27,7 @@ export default wrapApiHandler(
       paymentCard: edition.ticketingPaymentCard ?? true,
       paymentCheck: edition.ticketingPaymentCheck ?? true,
       sumupEnabled: edition.ticketingSumupEnabled ?? false,
-      returnableItemsEnabled: edition.ticketingReturnableItemsEnabled ?? true,
+      handoutItemsEnabled: edition.ticketingHandoutItemsEnabled ?? true,
     }
   },
   { operationName: 'GetTicketingSettings' }

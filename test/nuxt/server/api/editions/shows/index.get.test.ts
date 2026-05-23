@@ -37,10 +37,10 @@ describe('/api/editions/[id]/shows GET', () => {
         },
       },
     ],
-    returnableItems: [
+    handoutItems: [
       {
-        returnableItemId: 1,
-        returnableItem: { id: 1, name: 'Balle de jonglage' },
+        handoutItemId: 1,
+        handoutItem: { id: 1, name: 'Balle de jonglage' },
       },
     ],
     zone: { id: 1, name: 'Scène A', color: '#ff0000', zoneTypes: ['STAGE'] },
@@ -59,7 +59,7 @@ describe('/api/editions/[id]/shows GET', () => {
     zoneId: null,
     markerId: 1,
     artists: [],
-    returnableItems: [],
+    handoutItems: [],
     zone: null,
     marker: { id: 1, name: 'Point Info', color: '#00ff00', markerTypes: ['INFO'] },
   }
@@ -107,7 +107,7 @@ describe('/api/editions/[id]/shows GET', () => {
       )
     })
 
-    it('devrait retourner les artistes et articles à restituer', async () => {
+    it('devrait retourner les artistes et articles à remettre', async () => {
       prismaMock.show.findMany.mockResolvedValue([mockShowWithZone])
 
       const mockEvent = { context: { user: mockUser } }
@@ -115,8 +115,8 @@ describe('/api/editions/[id]/shows GET', () => {
 
       expect(result.data.shows[0].artists).toHaveLength(1)
       expect(result.data.shows[0].artists[0].artist.user.prenom).toBe('Jean')
-      expect(result.data.shows[0].returnableItems).toHaveLength(1)
-      expect(result.data.shows[0].returnableItems[0].returnableItem.name).toBe('Balle de jonglage')
+      expect(result.data.shows[0].handoutItems).toHaveLength(1)
+      expect(result.data.shows[0].handoutItems[0].handoutItem.name).toBe('Balle de jonglage')
     })
 
     it('devrait retourner une liste vide si aucun spectacle', async () => {

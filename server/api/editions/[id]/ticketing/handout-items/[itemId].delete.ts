@@ -1,5 +1,5 @@
 import { requireAuth } from '#server/utils/auth-utils'
-import { deleteReturnableItem } from '#server/utils/editions/ticketing/returnable-items'
+import { deleteHandoutItem } from '#server/utils/editions/ticketing/handout-items'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
@@ -16,7 +16,7 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour modifier ces données',
       })
 
-    return createSuccessResponse(await deleteReturnableItem(itemId, editionId))
+    return createSuccessResponse(await deleteHandoutItem(itemId, editionId))
   },
-  { operationName: 'DELETE ticketing returnable item' }
+  { operationName: 'DELETE ticketing handout item' }
 )

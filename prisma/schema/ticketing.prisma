@@ -1,6 +1,6 @@
 // =============================================================================
 // Billetterie — Configuration externe, tarifs, options, quotas, commandes,
-//               articles à restituer, champs personnalisés, compteurs
+//               articles à remettre, champs personnalisés, compteurs
 // =============================================================================
 
 enum ExternalTicketingProvider {
@@ -112,7 +112,7 @@ model TicketingTier {
   externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
   edition           Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas            TicketingTierQuota[]
-  returnableItems   TicketingTierReturnableItem[]
+  handoutItems   TicketingTierHandoutItem[]
   orderItems        TicketingOrderItem[]
   customFields      TicketingTierCustomFieldAssociation[]
   meals             TicketingTierMeal[]
@@ -141,7 +141,7 @@ model TicketingQuota {
   @@index([editionId])
 }
 
-model TicketingReturnableItem {
+model TicketingHandoutItem {
   id        Int      @id @default(autoincrement())
   editionId Int
   name      String
@@ -149,38 +149,38 @@ model TicketingReturnableItem {
   updatedAt DateTime @updatedAt
 
   edition                           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers                             TicketingTierReturnableItem[]
-  options                           TicketingOptionReturnableItem[]
-  volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
-  customFields                      TicketingTierCustomFieldReturnableItem[]
-  shows                             ShowReturnableItem[]
-  meals                             VolunteerMealReturnableItem[]
+  tiers                             TicketingTierHandoutItem[]
+  options                           TicketingOptionHandoutItem[]
+  volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
+  customFields                      TicketingTierCustomFieldHandoutItem[]
+  shows                             ShowHandoutItem[]
+  meals                             VolunteerMealHandoutItem[]
 
   @@index([editionId])
 }
 
-model EditionVolunteerReturnableItem {
+model EditionVolunteerHandoutItem {
   id               Int      @id @default(autoincrement())
   editionId        Int
-  returnableItemId Int
+  handoutItemId Int
   teamId           String? // NULL = global (tous les bénévoles), défini = équipe spécifique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   edition        Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
   team           VolunteerTeam?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  @@unique([editionId, returnableItemId, teamId])
+  @@unique([editionId, handoutItemId, teamId])
   @@index([editionId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
   @@index([teamId])
 }
 
-model EditionOrganizerReturnableItem {
+model EditionOrganizerHandoutItem {
   id               Int      @id @default(autoincrement())
   editionId        Int
-  returnableItemId Int
+  handoutItemId Int
   organizerId      Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -188,9 +188,9 @@ model EditionOrganizerReturnableItem {
   edition   Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   organizer EditionOrganizer? @relation(fields: [organizerId], references: [id], onDelete: Cascade)
 
-  @@unique([editionId, returnableItemId, organizerId])
+  @@unique([editionId, handoutItemId, organizerId])
   @@index([editionId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
   @@index([organizerId])
 }
 
@@ -207,17 +207,17 @@ model TicketingTierQuota {
   @@index([quotaId])
 }
 
-model TicketingTierReturnableItem {
+model TicketingTierHandoutItem {
   id               Int @id @default(autoincrement())
   tierId           Int
-  returnableItemId Int
+  handoutItemId Int
 
   tier           TicketingTier           @relation(fields: [tierId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
-  @@unique([tierId, returnableItemId])
+  @@unique([tierId, handoutItemId])
   @@index([tierId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
 }
 
 model TicketingTierOption {
@@ -246,17 +246,17 @@ model TicketingOptionQuota {
   @@index([quotaId])
 }
 
-model TicketingOptionReturnableItem {
+model TicketingOptionHandoutItem {
   id               Int @id @default(autoincrement())
   optionId         Int
-  returnableItemId Int
+  handoutItemId Int
 
   option         TicketingOption         @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
-  @@unique([optionId, returnableItemId])
+  @@unique([optionId, handoutItemId])
   @@index([optionId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
 }
 
 model TicketingOption {
@@ -277,7 +277,7 @@ model TicketingOption {
   externalTicketing   ExternalTicketing?              @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
   edition             Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas              TicketingOptionQuota[]
-  returnableItems     TicketingOptionReturnableItem[]
+  handoutItems     TicketingOptionHandoutItem[]
   orderItemSelections TicketingOrderItemOption[]
   tiers               TicketingTierOption[]
   meals               TicketingOptionMeal[]
@@ -378,7 +378,7 @@ model TicketingTierCustomField {
   edition           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers             TicketingTierCustomFieldAssociation[]
   quotas            TicketingTierCustomFieldQuota[]
-  returnableItems   TicketingTierCustomFieldReturnableItem[]
+  handoutItems   TicketingTierCustomFieldHandoutItem[]
 
   @@unique([externalTicketingId, helloAssoCustomFieldId])
   @@index([externalTicketingId])
@@ -413,19 +413,19 @@ model TicketingTierCustomFieldQuota {
   @@index([quotaId])
 }
 
-// Association custom field -> article à restituer (avec choix optionnel pour ChoiceList)
-model TicketingTierCustomFieldReturnableItem {
+// Association custom field -> article à remettre (avec choix optionnel pour ChoiceList)
+model TicketingTierCustomFieldHandoutItem {
   id               Int     @id @default(autoincrement())
   customFieldId    Int
-  returnableItemId Int
-  choiceValue      String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la restitution
+  handoutItemId Int
+  choiceValue      String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la remise
 
   customField    TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem  @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
-  @@unique([customFieldId, returnableItemId, choiceValue])
+  @@unique([customFieldId, handoutItemId, choiceValue])
   @@index([customFieldId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
 }
 
 // Options sélectionnées par les participants (extraOptions HelloAsso)

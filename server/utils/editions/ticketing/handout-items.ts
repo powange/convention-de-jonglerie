@@ -1,22 +1,22 @@
-export interface ReturnableItemData {
+export interface HandoutItemData {
   name: string
 }
 
 /**
- * Récupère tous les items à restituer d'une édition
+ * Récupère tous les items à remettre d'une édition
  */
-export async function getReturnableItems(editionId: number) {
-  return await prisma.ticketingReturnableItem.findMany({
+export async function getHandoutItems(editionId: number) {
+  return await prisma.ticketingHandoutItem.findMany({
     where: { editionId },
     orderBy: { createdAt: 'asc' },
   })
 }
 
 /**
- * Crée un nouvel item à restituer
+ * Crée un nouvel item à remettre
  */
-export async function createReturnableItem(editionId: number, data: ReturnableItemData) {
-  return await prisma.ticketingReturnableItem.create({
+export async function createHandoutItem(editionId: number, data: HandoutItemData) {
+  return await prisma.ticketingHandoutItem.create({
     data: {
       editionId,
       name: data.name,
@@ -25,15 +25,11 @@ export async function createReturnableItem(editionId: number, data: ReturnableIt
 }
 
 /**
- * Met à jour un item à restituer
+ * Met à jour un item à remettre
  */
-export async function updateReturnableItem(
-  itemId: number,
-  editionId: number,
-  data: ReturnableItemData
-) {
+export async function updateHandoutItem(itemId: number, editionId: number, data: HandoutItemData) {
   // Vérifier que l'item existe et appartient à cette édition
-  const existingItem = await prisma.ticketingReturnableItem.findUnique({
+  const existingItem = await prisma.ticketingHandoutItem.findUnique({
     where: { id: itemId },
   })
 
@@ -48,7 +44,7 @@ export async function updateReturnableItem(
     })
   }
 
-  return await prisma.ticketingReturnableItem.update({
+  return await prisma.ticketingHandoutItem.update({
     where: { id: itemId },
     data: {
       name: data.name,
@@ -57,11 +53,11 @@ export async function updateReturnableItem(
 }
 
 /**
- * Supprime un item à restituer
+ * Supprime un item à remettre
  */
-export async function deleteReturnableItem(itemId: number, editionId: number) {
+export async function deleteHandoutItem(itemId: number, editionId: number) {
   // Vérifier que l'item existe et appartient à cette édition
-  const existingItem = await prisma.ticketingReturnableItem.findUnique({
+  const existingItem = await prisma.ticketingHandoutItem.findUnique({
     where: { id: itemId },
   })
 
@@ -76,7 +72,7 @@ export async function deleteReturnableItem(itemId: number, editionId: number) {
     })
   }
 
-  await prisma.ticketingReturnableItem.delete({
+  await prisma.ticketingHandoutItem.delete({
     where: { id: itemId },
   })
 

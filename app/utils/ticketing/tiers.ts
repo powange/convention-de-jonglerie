@@ -22,8 +22,8 @@ export interface TicketingTier {
       quantity: number
     }
   }>
-  returnableItems?: Array<{
-    returnableItem: {
+  handoutItems?: Array<{
+    handoutItem: {
       id: number
       name: string
     }
@@ -77,7 +77,7 @@ export interface TierFormData {
   validFrom?: string | null
   validUntil?: string | null
   quotaIds: number[]
-  returnableItemIds: number[]
+  handoutItemIds: number[]
   mealIds?: number[]
 }
 

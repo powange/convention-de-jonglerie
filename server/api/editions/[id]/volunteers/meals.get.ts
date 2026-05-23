@@ -56,9 +56,9 @@ export default wrapApiHandler(
     const existingMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
       include: {
-        returnableItems: {
+        handoutItems: {
           include: {
-            returnableItem: true,
+            handoutItem: true,
           },
         },
       },
@@ -123,9 +123,9 @@ export default wrapApiHandler(
     const updatedMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
       include: {
-        returnableItems: {
+        handoutItems: {
           include: {
-            returnableItem: true,
+            handoutItem: true,
           },
         },
       },

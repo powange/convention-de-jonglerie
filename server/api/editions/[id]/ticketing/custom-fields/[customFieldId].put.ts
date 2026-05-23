@@ -17,10 +17,10 @@ const bodySchema = z.object({
       })
     )
     .optional(),
-  returnableItems: z
+  handoutItems: z
     .array(
       z.object({
-        returnableItemId: z.number(),
+        handoutItemId: z.number(),
         choiceValue: z.string().optional(), // Pour ChoiceList
       })
     )
@@ -68,7 +68,7 @@ export default wrapApiHandler(
 
     // Le type d'un champ personnalisé est verrouillé après création :
     // changer un ChoiceList en autre type laisserait des associations
-    // (quotas / articles à restituer) orphelines pointant vers des
+    // (quotas / articles à remettre) orphelines pointant vers des
     // `choiceValue` qui n'existent plus.
     if (body.type !== existingCustomField.type) {
       throw createError({
@@ -110,7 +110,7 @@ export default wrapApiHandler(
         await tx.ticketingTierCustomFieldQuota.deleteMany({
           where: { customFieldId, choiceValue: { in: removedValues } },
         })
-        await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+        await tx.ticketingTierCustomFieldHandoutItem.deleteMany({
           where: { customFieldId, choiceValue: { in: removedValues } },
         })
       }
@@ -146,18 +146,18 @@ export default wrapApiHandler(
         })
       }
 
-      // Supprimer / recréer les associations articles à restituer uniquement
+      // Supprimer / recréer les associations articles à remettre uniquement
       // si la clé est explicitement fournie (édition désormais déléguée à
       // un endpoint dédié).
-      if (body.returnableItems !== undefined) {
-        await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+      if (body.handoutItems !== undefined) {
+        await tx.ticketingTierCustomFieldHandoutItem.deleteMany({
           where: { customFieldId },
         })
-        if (body.returnableItems.length > 0) {
-          await tx.ticketingTierCustomFieldReturnableItem.createMany({
-            data: body.returnableItems.map((ri) => ({
+        if (body.handoutItems.length > 0) {
+          await tx.ticketingTierCustomFieldHandoutItem.createMany({
+            data: body.handoutItems.map((ri) => ({
               customFieldId: cf.id,
-              returnableItemId: ri.returnableItemId,
+              handoutItemId: ri.handoutItemId,
               choiceValue: ri.choiceValue || null,
             })),
           })
@@ -188,9 +188,9 @@ export default wrapApiHandler(
               },
             },
           },
-          returnableItems: {
+          handoutItems: {
             include: {
-              returnableItem: {
+              handoutItem: {
                 select: {
                   id: true,
                   name: true,

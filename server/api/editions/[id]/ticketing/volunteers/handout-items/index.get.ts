@@ -16,10 +16,10 @@ export default wrapApiHandler(
       })
 
     try {
-      const items = await prisma.editionVolunteerReturnableItem.findMany({
+      const items = await prisma.editionVolunteerHandoutItem.findMany({
         where: { editionId },
         include: {
-          returnableItem: true,
+          handoutItem: true,
           team: {
             select: {
               id: true,
@@ -33,7 +33,7 @@ export default wrapApiHandler(
             teamId: 'asc', // NULL en premier (global), puis les équipes
           },
           {
-            returnableItem: {
+            handoutItem: {
               name: 'asc',
             },
           },
@@ -43,24 +43,21 @@ export default wrapApiHandler(
       return {
         items: items.map((item) => ({
           id: item.id,
-          returnableItemId: item.returnableItemId,
+          handoutItemId: item.handoutItemId,
           teamId: item.teamId,
-          name: item.returnableItem.name,
+          name: item.handoutItem.name,
           team: item.team,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         })),
       }
     } catch (error: unknown) {
-      console.error(
-        'Erreur lors de la récupération des articles à restituer pour bénévoles:',
-        error
-      )
+      console.error('Erreur lors de la récupération des articles à remettre pour bénévoles:', error)
       throw createError({
         status: 500,
         message: 'Erreur lors de la récupération des articles',
       })
     }
   },
-  { operationName: 'GET ticketing volunteers returnable-items index' }
+  { operationName: 'GET ticketing volunteers handout-items index' }
 )

@@ -15,7 +15,7 @@ const bodySchema = z.object({
   quotaIds: z.array(z.number().int()).optional().default([]),
   // Optionnel SANS default : `updateOption` préserve les associations existantes
   // si la clé n'est pas envoyée (gestion déléguée à un endpoint dédié).
-  returnableItemIds: z.array(z.number().int()).optional(),
+  handoutItemIds: z.array(z.number().int()).optional(),
   tierIds: z.array(z.number().int()).optional().default([]),
   mealIds: z.array(z.number().int()).optional().default([]),
 })

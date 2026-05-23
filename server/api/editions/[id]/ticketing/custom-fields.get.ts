@@ -37,9 +37,9 @@ export default wrapApiHandler(
             },
           },
         },
-        returnableItems: {
+        handoutItems: {
           include: {
-            returnableItem: {
+            handoutItem: {
               select: {
                 id: true,
                 name: true,

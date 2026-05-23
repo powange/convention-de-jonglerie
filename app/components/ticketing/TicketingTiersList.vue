@@ -193,20 +193,20 @@
         <span v-else class="text-xs text-gray-400">-</span>
       </template>
 
-      <!-- Colonne Articles à restituer -->
-      <template #returnableItems-cell="{ row }">
+      <!-- Colonne Articles à remettre -->
+      <template #handoutItems-cell="{ row }">
         <div
-          v-if="row.original.returnableItems && row.original.returnableItems.length > 0"
+          v-if="row.original.handoutItems && row.original.handoutItems.length > 0"
           class="flex flex-wrap gap-1"
         >
           <UBadge
-            v-for="itemRelation in row.original.returnableItems"
-            :key="itemRelation.returnableItem.id"
+            v-for="itemRelation in row.original.handoutItems"
+            :key="itemRelation.handoutItem.id"
             color="info"
             variant="soft"
             size="xs"
           >
-            {{ itemRelation.returnableItem.name }}
+            {{ itemRelation.handoutItem.name }}
           </UBadge>
         </div>
         <span v-else class="text-xs text-gray-400">-</span>
@@ -346,8 +346,8 @@ const columns = computed((): TableColumn<TicketingTier>[] => [
     size: 150,
   },
   {
-    id: 'returnableItems',
-    header: 'Articles à restituer',
+    id: 'handoutItems',
+    header: 'Articles à remettre',
     size: 150,
   },
   ...(edition.value?.mealsEnabled

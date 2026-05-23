@@ -15,8 +15,8 @@ export interface OrderItem {
   tier?: {
     id: number
     name: string
-    returnableItems: Array<{
-      returnableItem: {
+    handoutItems: Array<{
+      handoutItem: {
         id: number
         name: string
       }

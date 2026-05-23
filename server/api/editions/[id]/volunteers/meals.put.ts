@@ -26,12 +26,12 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  // Valider le format des returnableItemIds si fourni
+  // Valider le format des handoutItemIds si fourni
   for (const meal of body.meals) {
-    if (meal.returnableItemIds !== undefined && !Array.isArray(meal.returnableItemIds)) {
+    if (meal.handoutItemIds !== undefined && !Array.isArray(meal.handoutItemIds)) {
       throw createError({
         status: 400,
-        message: 'returnableItemIds doit être un tableau',
+        message: 'handoutItemIds doit être un tableau',
       })
     }
   }
@@ -222,10 +222,10 @@ export default wrapApiHandler(async (event) => {
 
   await Promise.all(syncPromises)
 
-  // Gérer les articles à restituer pour chaque repas
-  const returnableItemsPromises = body.meals.map(async (meal: any) => {
-    // Ignorer si returnableItemIds n'est pas fourni
-    if (meal.returnableItemIds === undefined) {
+  // Gérer les articles à remettre pour chaque repas
+  const handoutItemsPromises = body.meals.map(async (meal: any) => {
+    // Ignorer si handoutItemIds n'est pas fourni
+    if (meal.handoutItemIds === undefined) {
       return
     }
 
@@ -237,34 +237,34 @@ export default wrapApiHandler(async (event) => {
     }
 
     // Supprimer toutes les associations existantes
-    await prisma.volunteerMealReturnableItem.deleteMany({
+    await prisma.volunteerMealHandoutItem.deleteMany({
       where: { mealId: meal.id },
     })
 
     // Créer les nouvelles associations
-    if (meal.returnableItemIds.length > 0) {
-      await prisma.volunteerMealReturnableItem.createMany({
-        data: meal.returnableItemIds.map((itemId: number) => ({
+    if (meal.handoutItemIds.length > 0) {
+      await prisma.volunteerMealHandoutItem.createMany({
+        data: meal.handoutItemIds.map((itemId: number) => ({
           mealId: meal.id,
-          returnableItemId: itemId,
+          handoutItemId: itemId,
         })),
       })
     }
 
     console.log(
-      `[Meals] Articles à restituer mis à jour pour le repas ${meal.id}: ${meal.returnableItemIds.length} articles`
+      `[Meals] Articles à remettre mis à jour pour le repas ${meal.id}: ${meal.handoutItemIds.length} articles`
     )
   })
 
-  await Promise.all(returnableItemsPromises)
+  await Promise.all(handoutItemsPromises)
 
-  // Récupérer tous les repas mis à jour avec les articles à restituer
+  // Récupérer tous les repas mis à jour avec les articles à remettre
   const updatedMeals = await prisma.volunteerMeal.findMany({
     where: { editionId },
     include: {
-      returnableItems: {
+      handoutItems: {
         include: {
-          returnableItem: true,
+          handoutItem: true,
         },
       },
     },

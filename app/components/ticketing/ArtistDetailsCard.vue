@@ -163,7 +163,7 @@ interface Artist {
     startDateTime: Date | string
     location?: string
   }>
-  returnableItems?: Array<{
+  handoutItems?: Array<{
     id: number
     name: string
   }>

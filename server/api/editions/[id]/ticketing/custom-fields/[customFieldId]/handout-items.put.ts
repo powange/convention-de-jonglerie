@@ -10,16 +10,16 @@ const bodySchema = z.object({
   // valeur de réponse conditionnelle (utilisée pour les ChoiceList).
   items: z.array(
     z.object({
-      returnableItemId: z.number().int().positive(),
+      handoutItemId: z.number().int().positive(),
       choiceValue: z.string().nullable().optional(),
     })
   ),
 })
 
 /**
- * PUT /api/editions/[id]/ticketing/custom-fields/[customFieldId]/returnable-items
+ * PUT /api/editions/[id]/ticketing/custom-fields/[customFieldId]/handout-items
  *
- * Met à jour uniquement les associations articles à restituer ↔ champ
+ * Met à jour uniquement les associations articles à remettre ↔ champ
  * personnalisé. Chaque association peut être globale (sans `choiceValue`)
  * ou conditionnée par une valeur de réponse précise.
  */
@@ -41,15 +41,15 @@ export default wrapApiHandler(
     if (!customField) {
       throw createError({ status: 404, message: 'Champ personnalisé introuvable' })
     }
-    // Note : les associations articles à restituer peuvent être modifiées
+    // Note : les associations articles à remettre peuvent être modifiées
     // même pour les champs personnalisés HelloAsso. Seules les propriétés du
     // champ lui-même (label, type, etc.) sont protégées.
 
     const { items } = bodySchema.parse(await readBody(event))
 
     if (items.length > 0) {
-      const ids = Array.from(new Set(items.map((i) => i.returnableItemId)))
-      const count = await prisma.ticketingReturnableItem.count({
+      const ids = Array.from(new Set(items.map((i) => i.handoutItemId)))
+      const count = await prisma.ticketingHandoutItem.count({
         where: { id: { in: ids }, editionId },
       })
       if (count !== ids.length) {
@@ -61,14 +61,14 @@ export default wrapApiHandler(
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
+      await tx.ticketingTierCustomFieldHandoutItem.deleteMany({
         where: { customFieldId },
       })
       if (items.length > 0) {
-        await tx.ticketingTierCustomFieldReturnableItem.createMany({
+        await tx.ticketingTierCustomFieldHandoutItem.createMany({
           data: items.map((i) => ({
             customFieldId,
-            returnableItemId: i.returnableItemId,
+            handoutItemId: i.handoutItemId,
             choiceValue: i.choiceValue || null,
           })),
         })
@@ -77,5 +77,5 @@ export default wrapApiHandler(
 
     return createSuccessResponse({ customFieldId, count: items.length })
   },
-  { operationName: 'PUT ticketing custom-field returnable-items' }
+  { operationName: 'PUT ticketing custom-field handout-items' }
 )

@@ -16,7 +16,7 @@ const bodySchema = z.object({
   paymentCard: z.boolean().optional(),
   paymentCheck: z.boolean().optional(),
   sumupEnabled: z.boolean().optional(),
-  returnableItemsEnabled: z.boolean().optional(),
+  handoutItemsEnabled: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -84,7 +84,7 @@ export default wrapApiHandler(
       ticketingPaymentCard: parsed.paymentCard,
       ticketingPaymentCheck: parsed.paymentCheck,
       ticketingSumupEnabled: parsed.sumupEnabled,
-      ticketingReturnableItemsEnabled: parsed.returnableItemsEnabled,
+      ticketingHandoutItemsEnabled: parsed.handoutItemsEnabled,
     }
 
     // Construire les données de mise à jour avec buildUpdateData
@@ -102,7 +102,7 @@ export default wrapApiHandler(
         ticketingPaymentCard: true,
         ticketingPaymentCheck: true,
         ticketingSumupEnabled: true,
-        ticketingReturnableItemsEnabled: true,
+        ticketingHandoutItemsEnabled: true,
       },
     })
 
@@ -114,7 +114,7 @@ export default wrapApiHandler(
         paymentCard: updated.ticketingPaymentCard ?? true,
         paymentCheck: updated.ticketingPaymentCheck ?? true,
         sumupEnabled: updated.ticketingSumupEnabled ?? false,
-        returnableItemsEnabled: updated.ticketingReturnableItemsEnabled ?? true,
+        handoutItemsEnabled: updated.ticketingHandoutItemsEnabled ?? true,
       },
     })
   },

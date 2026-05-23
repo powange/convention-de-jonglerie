@@ -12,7 +12,7 @@
           color="info"
           variant="soft"
           :title="$t('ticketing.tiers.modal.title')"
-          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas, articles à restituer et dates de validité peuvent être modifiés."
+          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas, articles à remettre et dates de validité peuvent être modifiés."
         />
 
         <UFormField
@@ -309,7 +309,7 @@ interface TicketingTier {
   validUntil?: string | Date | null
   helloAssoTierId?: number
   quotas?: any[]
-  returnableItems?: any[]
+  handoutItems?: any[]
 }
 
 const props = defineProps<{

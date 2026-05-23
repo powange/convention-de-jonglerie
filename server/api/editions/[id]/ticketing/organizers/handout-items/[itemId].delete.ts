@@ -12,11 +12,11 @@ export default wrapApiHandler(
     if (!allowed)
       throw createError({
         status: 403,
-        message: 'Droits insuffisants pour gérer les articles à restituer',
+        message: 'Droits insuffisants pour gérer les articles à remettre',
       })
 
     // Vérifier que l'association existe et appartient à l'édition
-    const item = await prisma.editionVolunteerReturnableItem.findFirst({
+    const item = await prisma.editionOrganizerHandoutItem.findFirst({
       where: {
         id: itemId,
         editionId,
@@ -31,11 +31,11 @@ export default wrapApiHandler(
     }
 
     // Supprimer l'association
-    await prisma.editionVolunteerReturnableItem.delete({
+    await prisma.editionOrganizerHandoutItem.delete({
       where: { id: itemId },
     })
 
-    return createSuccessResponse(null, 'Article retiré des bénévoles avec succès')
+    return createSuccessResponse(null, 'Article retiré des organisateurs avec succès')
   },
-  { operationName: 'DELETE ticketing volunteers returnable item' }
+  { operationName: 'DELETE ticketing organizers handout item' }
 )

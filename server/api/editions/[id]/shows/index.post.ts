@@ -18,7 +18,7 @@ const showSchema = z.object({
   zoneId: z.number().int().positive().optional().nullable(),
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),
-  returnableItemIds: z.array(z.number().int().positive()).optional().default([]),
+  handoutItemIds: z.array(z.number().int().positive()).optional().default([]),
   isPublic: z.boolean().optional().default(false),
 })
 
@@ -72,9 +72,9 @@ export default wrapApiHandler(
             artistId,
           })),
         },
-        returnableItems: {
-          create: validatedData.returnableItemIds.map((returnableItemId) => ({
-            returnableItemId,
+        handoutItems: {
+          create: validatedData.handoutItemIds.map((handoutItemId) => ({
+            handoutItemId,
           })),
         },
       },
@@ -109,9 +109,9 @@ export default wrapApiHandler(
             },
           },
         },
-        returnableItems: {
+        handoutItems: {
           include: {
-            returnableItem: {
+            handoutItem: {
               select: {
                 id: true,
                 name: true,

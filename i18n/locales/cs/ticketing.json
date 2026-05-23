@@ -205,7 +205,7 @@
       },
       "title_required": "Název je povinný"
     },
-    "returnable_items": {
+    "handout_items": {
       "list": {
         "add_placeholder": "Nová položka...",
         "delete_label": "Odstranit",
@@ -214,7 +214,7 @@
         "name_placeholder": "Název položky"
       },
       "volunteer": {
-        "choose_placeholder": "Výběr položky k vrácení...",
+        "choose_placeholder": "Vyberte předmět k vydání...",
         "given_to_all": "Předáno všem dobrovolníkům",
         "remove_label": "Odebrat položku",
         "remove_title": "Stáhnout tento článek?"
@@ -256,7 +256,7 @@
         "price_placeholder": "0.00",
         "quotas_label": "Přidružené kvóty",
         "quotas_placeholder": "Výběr kvót",
-        "returnable_items_label": "Položky, které se mají vrátit",
+        "handout_items_label": "Předměty k vydání",
         "status_label": "Stav",
         "title": "Sazba HelloAsso"
       },

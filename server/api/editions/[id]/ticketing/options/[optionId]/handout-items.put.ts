@@ -6,13 +6,13 @@ import { canAccessEditionData } from '#server/utils/permissions/edition-permissi
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
-  returnableItemIds: z.array(z.number().int().positive()),
+  handoutItemIds: z.array(z.number().int().positive()),
 })
 
 /**
- * PUT /api/editions/[id]/ticketing/options/[optionId]/returnable-items
+ * PUT /api/editions/[id]/ticketing/options/[optionId]/handout-items
  *
- * Met à jour uniquement les articles à restituer associés à une option.
+ * Met à jour uniquement les articles à remettre associés à une option.
  * Remplace l'ensemble des associations existantes.
  */
 export default wrapApiHandler(
@@ -34,13 +34,13 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Option introuvable' })
     }
 
-    const { returnableItemIds } = bodySchema.parse(await readBody(event))
+    const { handoutItemIds } = bodySchema.parse(await readBody(event))
 
-    if (returnableItemIds.length > 0) {
-      const count = await prisma.ticketingReturnableItem.count({
-        where: { id: { in: returnableItemIds }, editionId },
+    if (handoutItemIds.length > 0) {
+      const count = await prisma.ticketingHandoutItem.count({
+        where: { id: { in: handoutItemIds }, editionId },
       })
-      if (count !== returnableItemIds.length) {
+      if (count !== handoutItemIds.length) {
         throw createError({
           status: 400,
           message: "Certains articles n'appartiennent pas à cette édition",
@@ -49,15 +49,15 @@ export default wrapApiHandler(
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
-      if (returnableItemIds.length > 0) {
-        await tx.ticketingOptionReturnableItem.createMany({
-          data: returnableItemIds.map((returnableItemId) => ({ optionId, returnableItemId })),
+      await tx.ticketingOptionHandoutItem.deleteMany({ where: { optionId } })
+      if (handoutItemIds.length > 0) {
+        await tx.ticketingOptionHandoutItem.createMany({
+          data: handoutItemIds.map((handoutItemId) => ({ optionId, handoutItemId })),
         })
       }
     })
 
-    return createSuccessResponse({ optionId, returnableItemIds })
+    return createSuccessResponse({ optionId, handoutItemIds })
   },
-  { operationName: 'PUT ticketing option returnable-items' }
+  { operationName: 'PUT ticketing option handout-items' }
 )

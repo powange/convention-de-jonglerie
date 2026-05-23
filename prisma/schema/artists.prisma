@@ -99,7 +99,7 @@ model Show {
   zone            EditionZone?         @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   marker          EditionMarker?       @relation(fields: [markerId], references: [id], onDelete: SetNull)
   artists         ShowArtist[]
-  returnableItems ShowReturnableItem[]
+  handoutItems ShowHandoutItem[]
   applications    ShowApplication[]
 
   @@index([editionId])
@@ -123,19 +123,19 @@ model ShowArtist {
   @@index([artistId])
 }
 
-model ShowReturnableItem {
+model ShowHandoutItem {
   id               Int      @id @default(autoincrement())
   showId           Int
-  returnableItemId Int
+  handoutItemId Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   show           Show                    @relation(fields: [showId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
-  @@unique([showId, returnableItemId])
+  @@unique([showId, handoutItemId])
   @@index([showId])
-  @@index([returnableItemId])
+  @@index([handoutItemId])
 }
 
 // ========== APPEL À SPECTACLES ==========

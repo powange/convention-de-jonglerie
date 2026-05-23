@@ -191,7 +191,7 @@ useHead({
         "price": "Définissez le prix de chaque tarif (gratuit ou payant).",
         "quota": "Limitez le nombre de places disponibles par tarif si nécessaire.",
         "options": "Ajoutez des options supplémentaires aux tarifs (repas, camping, activités).",
-        "items": "Associez des articles à restituer (bracelets, badges) à chaque tarif."
+        "items": "Associez des articles à remettre (bracelets, badges) à chaque tarif."
       },
       "orders": {
         "title": "Gestion des commandes",

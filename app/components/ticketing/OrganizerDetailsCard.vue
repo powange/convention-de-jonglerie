@@ -100,11 +100,11 @@ interface Organizer {
     phone?: string | null
   }
   title?: string | null
-  returnableItems?: Array<{
+  handoutItems?: Array<{
     id: number
     name: string
   }>
-  globalReturnableItems?: Array<{
+  globalHandoutItems?: Array<{
     id: number
     name: string
   }>

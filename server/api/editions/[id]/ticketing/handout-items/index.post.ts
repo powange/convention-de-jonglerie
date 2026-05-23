@@ -1,18 +1,18 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
-import { updateReturnableItem } from '#server/utils/editions/ticketing/returnable-items'
+import { createHandoutItem } from '#server/utils/editions/ticketing/handout-items'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
-const updateItemSchema = z.object({
+const createItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
 })
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
+
     const editionId = validateEditionId(event)
-    const itemId = validateResourceId(event, 'itemId', 'item')
 
     // Vérifier les permissions
     const allowed = await canAccessEditionData(editionId, user.id, event)
@@ -23,7 +23,7 @@ export default wrapApiHandler(
       })
 
     const body = await readBody(event)
-    const validation = updateItemSchema.safeParse(body)
+    const validation = createItemSchema.safeParse(body)
 
     if (!validation.success) {
       throw createError({
@@ -32,7 +32,15 @@ export default wrapApiHandler(
       })
     }
 
-    return createSuccessResponse(await updateReturnableItem(itemId, editionId, validation.data))
+    try {
+      return createSuccessResponse(await createHandoutItem(editionId, validation.data))
+    } catch (error: unknown) {
+      console.error('Failed to create handout item:', error)
+      throw createError({
+        status: 500,
+        message: "Erreur lors de la création de l'item à remettre",
+      })
+    }
   },
-  { operationName: 'PUT ticketing returnable item' }
+  { operationName: 'POST ticketing handout-items index' }
 )

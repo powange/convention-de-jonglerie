@@ -4,15 +4,15 @@ interface CustomField {
   label: string
   type: string
   values?: string[]
-  returnableItems?: Array<{
-    returnableItemId: number
-    returnableItem?: { id: number; name: string }
+  handoutItems?: Array<{
+    handoutItemId: number
+    handoutItem?: { id: number; name: string }
     choiceValue?: string | null
   }>
 }
 
 interface Association {
-  returnableItemId: number | null
+  handoutItemId: number | null
   choiceValue: string | null
 }
 
@@ -41,7 +41,7 @@ const isChoiceList = computed(() => props.customField?.type === 'ChoiceList')
 
 const modalTitle = computed(() =>
   props.customField
-    ? t('gestion.ticketing.custom_fields_returnable_items_manage_for', {
+    ? t('gestion.ticketing.custom_fields_handout_items_manage_for', {
         label: props.customField.label,
       })
     : ''
@@ -63,13 +63,13 @@ const choiceOptions = computed(() => {
 
 const { execute: loadAvailableItems, loading } = useApiAction<
   unknown,
-  { returnableItems: Array<{ id: number; name: string }> }
->(() => `/api/editions/${props.editionId}/ticketing/returnable-items`, {
+  { handoutItems: Array<{ id: number; name: string }> }
+>(() => `/api/editions/${props.editionId}/ticketing/handout-items`, {
   method: 'GET',
   silentSuccess: true,
   errorMessages: { default: t('gestion.organizers.error_loading_items') },
   onSuccess: (result) => {
-    availableItems.value = result?.returnableItems || []
+    availableItems.value = result?.handoutItems || []
   },
 })
 
@@ -78,8 +78,8 @@ watch(
   (open) => {
     if (open) {
       associations.value =
-        props.customField?.returnableItems?.map((ri) => ({
-          returnableItemId: ri.returnableItemId,
+        props.customField?.handoutItems?.map((ri) => ({
+          handoutItemId: ri.handoutItemId,
           choiceValue: ri.choiceValue ?? null,
         })) ?? []
       loadAvailableItems()
@@ -89,7 +89,7 @@ watch(
 )
 
 function addAssociation() {
-  associations.value.push({ returnableItemId: null, choiceValue: null })
+  associations.value.push({ handoutItemId: null, choiceValue: null })
 }
 
 function removeAssociation(index: number) {
@@ -99,11 +99,10 @@ function removeAssociation(index: number) {
 const buildSaveBody = () => {
   const valid = associations.value
     .filter(
-      (a): a is { returnableItemId: number; choiceValue: string | null } =>
-        a.returnableItemId !== null
+      (a): a is { handoutItemId: number; choiceValue: string | null } => a.handoutItemId !== null
     )
     .map((a) => ({
-      returnableItemId: a.returnableItemId,
+      handoutItemId: a.handoutItemId,
       choiceValue: isChoiceList.value ? a.choiceValue : null,
     }))
   return { items: valid }
@@ -111,7 +110,7 @@ const buildSaveBody = () => {
 
 const { execute: save, loading: saving } = useApiAction(
   () =>
-    `/api/editions/${props.editionId}/ticketing/custom-fields/${props.customField?.id}/returnable-items`,
+    `/api/editions/${props.editionId}/ticketing/custom-fields/${props.customField?.id}/handout-items`,
   {
     method: 'PUT',
     body: buildSaveBody,
@@ -154,7 +153,7 @@ const { execute: save, loading: saving } = useApiAction(
         </div>
 
         <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
-          {{ $t('gestion.ticketing.no_returnable_items_created') }}
+          {{ $t('gestion.ticketing.no_handout_items_created') }}
         </p>
 
         <div
@@ -173,7 +172,7 @@ const { execute: save, loading: saving } = useApiAction(
             >
               <UFormField :label="$t('gestion.ticketing.custom_fields_article_label')" required>
                 <USelect
-                  v-model="assoc.returnableItemId"
+                  v-model="assoc.handoutItemId"
                   :items="itemOptions"
                   :placeholder="$t('gestion.ticketing.custom_fields_select_article')"
                   value-key="value"
