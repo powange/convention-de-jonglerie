@@ -660,6 +660,17 @@ const getUserActions = (user: AdminUserWithConnection) => {
     })
   }
 
+  // Action pour valider l'email (seulement si l'email n'est PAS vérifié)
+  if (!user.isEmailVerified) {
+    actions.push({
+      label: t('admin.validate_email'),
+      icon: 'i-heroicons-check-badge',
+      onSelect: () => {
+        validateUserEmail(user)
+      },
+    })
+  }
+
   // Action pour invalider l'email (seulement si l'email est vérifié)
   if (user.isEmailVerified) {
     actions.push({
@@ -868,6 +879,38 @@ const invalidateUserEmail = (user: AdminUserWithConnection) => {
   if (confirm(confirmMessage)) {
     actionTargetUserId.value = user.id
     executeInvalidateEmail()
+  }
+}
+
+// Fonction pour valider manuellement l'email d'un utilisateur
+const { execute: executeValidateEmail } = useApiAction(
+  () => `/api/admin/users/${actionTargetUserId.value}/validate-email`,
+  {
+    method: 'PUT',
+    successMessage: {
+      title: t('common.success'),
+      description: t('admin.email_validated_successfully'),
+    },
+    errorMessages: { default: t('admin.validate_email_error') },
+    onSuccess: () => {
+      const userIndex = users.value.findIndex((u) => u.id === actionTargetUserId.value)
+      if (userIndex !== -1) {
+        users.value[userIndex] = {
+          ...users.value[userIndex],
+          isEmailVerified: true,
+        }
+      }
+    },
+  }
+)
+
+const validateUserEmail = (user: AdminUserWithConnection) => {
+  const confirmMessage = t('admin.confirm_validate_email', {
+    name: `${user.prenom} ${user.nom}`,
+  })
+  if (confirm(confirmMessage)) {
+    actionTargetUserId.value = user.id
+    executeValidateEmail()
   }
 }
 

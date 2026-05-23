@@ -94,6 +94,21 @@
       "tiers_loaded": "Тарифы загружены",
       "tiers_loaded_description": "Найдено {tiers} тариф(ов), {options} опций и {fields} пользовательских полей"
     },
+    "handout_items": {
+      "list": {
+        "add_placeholder": "Новый элемент...",
+        "delete_label": "Удалить",
+        "delete_title": "Удалить элемент",
+        "loading": "Загрузка...",
+        "name_placeholder": "Название элемента"
+      },
+      "volunteer": {
+        "choose_placeholder": "Выбрать предмет к выдаче...",
+        "given_to_all": "Выдано всем волонтёрам",
+        "remove_label": "Удалить предмет",
+        "remove_title": "Удалить этот предмет?"
+      }
+    },
     "my_ticket": {
       "how_to_use_description": "Покажите этот QR-код на входе для валидации билета.",
       "how_to_use_title": "Как использовать этот QR-код",
@@ -205,21 +220,6 @@
       },
       "title_required": "Название обязательно"
     },
-    "handout_items": {
-      "list": {
-        "add_placeholder": "Новый элемент...",
-        "delete_label": "Удалить",
-        "delete_title": "Удалить элемент",
-        "loading": "Загрузка...",
-        "name_placeholder": "Название элемента"
-      },
-      "volunteer": {
-        "choose_placeholder": "Выбрать предмет к выдаче...",
-        "given_to_all": "Выдано всем волонтёрам",
-        "remove_label": "Удалить предмет",
-        "remove_title": "Удалить этот предмет?"
-      }
-    },
     "stats": {
       "artists": "Художники",
       "organizers": "Организаторы",
@@ -240,6 +240,7 @@
         "description_label": "Описание",
         "description_placeholder": "Описание тарифа (необязательно)",
         "free_price_label": "Свободная цена",
+        "handout_items_label": "Предметы к выдаче",
         "max_amount_label": "Максимальная сумма (€)",
         "max_amount_placeholder": "0,00",
         "meals_label": "Питание включено",
@@ -256,7 +257,6 @@
         "price_placeholder": "0,00",
         "quotas_label": "Связанные квоты",
         "quotas_placeholder": "Выбрать квоты",
-        "handout_items_label": "Предметы к выдаче",
         "status_label": "Статус",
         "title": "Тариф HelloAsso"
       },

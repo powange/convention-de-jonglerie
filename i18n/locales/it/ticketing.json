@@ -94,6 +94,21 @@
       "tiers_loaded": "Tariffe caricate",
       "tiers_loaded_description": "{tiers} tariffa/e, {options} opzione/i e {fields} campo/i personalizzato/i trovato/i"
     },
+    "handout_items": {
+      "list": {
+        "add_placeholder": "Nuovo articolo...",
+        "delete_label": "Elimina",
+        "delete_title": "Elimina articolo",
+        "loading": "Caricamento...",
+        "name_placeholder": "Nome dell'articolo"
+      },
+      "volunteer": {
+        "choose_placeholder": "Scegliere un articolo da consegnare...",
+        "given_to_all": "Consegnato a tutti i volontari",
+        "remove_label": "Rimuovi articolo",
+        "remove_title": "Rimuovere questo articolo?"
+      }
+    },
     "my_ticket": {
       "how_to_use_description": "Mostra questo codice QR all'ingresso per convalidare il tuo biglietto.",
       "how_to_use_title": "Come utilizzare questo codice QR",
@@ -205,21 +220,6 @@
       },
       "title_required": "Il titolo è obbligatorio"
     },
-    "handout_items": {
-      "list": {
-        "add_placeholder": "Nuovo articolo...",
-        "delete_label": "Elimina",
-        "delete_title": "Elimina articolo",
-        "loading": "Caricamento...",
-        "name_placeholder": "Nome dell'articolo"
-      },
-      "volunteer": {
-        "choose_placeholder": "Scegliere un articolo da consegnare...",
-        "given_to_all": "Consegnato a tutti i volontari",
-        "remove_label": "Rimuovi articolo",
-        "remove_title": "Rimuovere questo articolo?"
-      }
-    },
     "stats": {
       "artists": "Artisti",
       "organizers": "Organizzatori",
@@ -240,6 +240,7 @@
         "description_label": "Descrizione",
         "description_placeholder": "Descrizione della tariffa (opzionale)",
         "free_price_label": "Prezzo libero",
+        "handout_items_label": "Articoli da consegnare",
         "max_amount_label": "Importo massimo (€)",
         "max_amount_placeholder": "0,00",
         "meals_label": "Pasti inclusi",
@@ -256,7 +257,6 @@
         "price_placeholder": "0,00",
         "quotas_label": "Quote associate",
         "quotas_placeholder": "Seleziona quote",
-        "handout_items_label": "Articoli da consegnare",
         "status_label": "Stato",
         "title": "Tariffa HelloAsso"
       },
