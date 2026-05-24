@@ -22,13 +22,18 @@ const addOrganizerschema = z
         deleteConvention: z.boolean().optional(),
         manageOrganizers: z.boolean().optional(),
         manageVolunteers: z.boolean().optional(),
+        manageArtists: z.boolean().optional(),
+        manageMeals: z.boolean().optional(),
+        manageTicketing: z.boolean().optional(),
+        manageTasks: z.boolean().optional(),
+        manageStock: z.boolean().optional(),
         addEdition: z.boolean().optional(),
         editAllEditions: z.boolean().optional(),
         deleteAllEditions: z.boolean().optional(),
       })
       .partial()
       .optional(),
-    title: z.string().max(100).optional().nullable(),
+    title: z.string().max(120).optional().nullable(),
     perEdition: z
       .array(
         z.object({
@@ -36,6 +41,11 @@ const addOrganizerschema = z
           canEdit: z.boolean().optional(),
           canDelete: z.boolean().optional(),
           canManageVolunteers: z.boolean().optional(),
+          canManageArtists: z.boolean().optional(),
+          canManageMeals: z.boolean().optional(),
+          canManageTicketing: z.boolean().optional(),
+          canManageTasks: z.boolean().optional(),
+          canManageStock: z.boolean().optional(),
         })
       )
       .optional(),
@@ -118,6 +128,11 @@ export default wrapApiHandler(
           deleteConvention: organizer.canDeleteConvention,
           manageOrganizers: organizer.canManageOrganizers,
           manageVolunteers: organizer.canManageVolunteers,
+          manageArtists: organizer.canManageArtists,
+          manageMeals: organizer.canManageMeals,
+          manageTicketing: organizer.canManageTicketing,
+          manageTasks: organizer.canManageTasks,
+          manageStock: organizer.canManageStock,
           addEdition: organizer.canAddEdition,
           editAllEditions: organizer.canEditAllEditions,
           deleteAllEditions: organizer.canDeleteAllEditions,
@@ -127,6 +142,11 @@ export default wrapApiHandler(
           canEdit: p.canEdit,
           canDelete: p.canDelete,
           canManageVolunteers: p.canManageVolunteers,
+          canManageArtists: p.canManageArtists,
+          canManageMeals: p.canManageMeals,
+          canManageTicketing: p.canManageTicketing,
+          canManageTasks: p.canManageTasks,
+          canManageStock: p.canManageStock,
         })),
         user: organizer.user,
       },

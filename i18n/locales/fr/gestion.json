@@ -228,7 +228,7 @@
       "search_user_placeholder": "Rechercher un utilisateur par email...",
       "select_handout_item": "Sélectionner un article",
       "select_to_add": "Sélectionner un organisateur à ajouter",
-      "status": "Statut",
+      "status": "Statut du billet",
       "title": "Organisateurs",
       "title_required": "Le titre de l'organisateur est requis"
     },

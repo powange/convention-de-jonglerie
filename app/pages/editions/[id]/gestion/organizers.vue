@@ -137,6 +137,30 @@
                   </div>
                 </template>
 
+                <!-- Colonne Email -->
+                <template #email-cell="{ row }">
+                  <a
+                    v-if="row.original.user?.email"
+                    :href="`mailto:${row.original.user.email}`"
+                    class="text-sm text-primary-600 dark:text-primary-400 hover:underline break-all"
+                  >
+                    {{ row.original.user.email }}
+                  </a>
+                  <span v-else class="text-sm text-gray-400">—</span>
+                </template>
+
+                <!-- Colonne Téléphone -->
+                <template #phone-cell="{ row }">
+                  <a
+                    v-if="row.original.user?.phone"
+                    :href="`tel:${row.original.user.phone}`"
+                    class="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                  >
+                    {{ row.original.user.phone }}
+                  </a>
+                  <span v-else class="text-sm text-gray-400">—</span>
+                </template>
+
                 <!-- Colonne Statut -->
                 <template #status-cell="{ row }">
                   <UBadge
@@ -552,6 +576,16 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
     id: 'organizer',
     header: t('gestion.organizers.organizer'),
     size: 300,
+  },
+  {
+    id: 'email',
+    header: t('common.email'),
+    size: 250,
+  },
+  {
+    id: 'phone',
+    header: t('common.phone'),
+    size: 160,
   },
   ...(edition.value?.ticketingEnabled
     ? [
