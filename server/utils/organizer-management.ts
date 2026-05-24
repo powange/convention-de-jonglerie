@@ -24,8 +24,13 @@ export async function checkAdminMode(userId: number, event?: H3Event): Promise<b
     return false
   }
 
-  // Vérifier que le mode admin est activé côté client (header ou query param)
+  // Vérifier que le mode admin est activé côté client.
+  // Priorité : cookie `admin-mode` (envoyé automatiquement par le navigateur),
+  // puis fallback header `x-admin-mode` (legacy) et query param `?adminMode=true`.
   if (event) {
+    const adminModeCookie = getCookie(event, 'admin-mode')
+    if (adminModeCookie === 'true') return true
+
     const adminModeHeader = event.node?.req?.headers?.['x-admin-mode']
     const query = getQuery(event)
     const adminModeQuery = query.adminMode

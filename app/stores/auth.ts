@@ -83,6 +83,8 @@ export const useAuthStore = defineStore('auth', {
         sessionStorage.removeItem('authUser')
         sessionStorage.removeItem('rememberMe')
         sessionStorage.removeItem('adminMode')
+        // Effacer le cookie admin-mode
+        document.cookie = 'admin-mode=; path=/; SameSite=Lax; Secure; max-age=0'
       }
     },
     initializeAuth() {
@@ -99,6 +101,12 @@ export const useAuthStore = defineStore('auth', {
             const adminModeStored = storage.getItem('adminMode')
             if (adminModeStored === 'true' && res.user.isGlobalAdmin) {
               this.adminMode = true
+              // Re-set le cookie pour synchroniser le serveur (au cas où il
+              // aurait été effacé entre-temps).
+              document.cookie = `admin-mode=true; path=/; SameSite=Lax; Secure; max-age=${60 * 60 * 24 * 30}`
+            } else {
+              // S'assurer que le cookie est bien effacé si le mode n'est pas actif.
+              document.cookie = 'admin-mode=; path=/; SameSite=Lax; Secure; max-age=0'
             }
 
             // Toujours synchroniser le store d'impersonation avec la session
@@ -130,6 +138,10 @@ export const useAuthStore = defineStore('auth', {
         if (import.meta.client) {
           const storage = this.rememberMe ? localStorage : sessionStorage
           storage.setItem('adminMode', 'true')
+          // Cookie auto-envoyé par le navigateur pour que le serveur sache que
+          // le mode admin est actif (le plugin d'interception $fetch n'est pas
+          // fiable en Nuxt 4 selon le contexte d'auto-import).
+          document.cookie = `admin-mode=true; path=/; SameSite=Lax; Secure; max-age=${60 * 60 * 24 * 30}`
         }
       }
     },
@@ -140,6 +152,8 @@ export const useAuthStore = defineStore('auth', {
       if (import.meta.client) {
         localStorage.removeItem('adminMode')
         sessionStorage.removeItem('adminMode')
+        // Effacer le cookie en le faisant expirer.
+        document.cookie = 'admin-mode=; path=/; SameSite=Lax; Secure; max-age=0'
       }
     },
   },

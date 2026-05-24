@@ -587,8 +587,9 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  // Objets trouvés
-  if (!isTeamLeader.value || canEdit.value || canManageVolunteers.value) {
+  // Objets trouvés — accessible par : auteur/createur (canEdit),
+  // responsables bénévoles, team leaders, ou tout organisateur de la convention.
+  if (canEdit.value || canManageVolunteers.value || isTeamLeader.value || isOrganizer.value) {
     managementSection.push({
       label: t('edition.lost_found'),
       icon: 'i-heroicons-magnifying-glass',
