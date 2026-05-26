@@ -47,7 +47,7 @@ describe('useEditionZones', () => {
         [48.8576, 2.3532],
         [48.8586, 2.3512],
       ],
-      zoneTypes: ['CAMPING'],
+      zoneTypes: ['TENT_CAMPING'],
       order: 0,
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',
@@ -178,7 +178,7 @@ describe('useEditionZones', () => {
           [48.8576, 2.3532],
           [48.8586, 2.3512],
         ],
-        zoneTypes: ['CAMPING'],
+        zoneTypes: ['TENT_CAMPING'],
       })
 
       expect(mockFetch).toHaveBeenLastCalledWith('/api/editions/1/zones', {

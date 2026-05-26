@@ -35,7 +35,7 @@ describe('API Zones - Création (POST)', () => {
       [48.8576, 2.3532],
       [48.8586, 2.3512],
     ],
-    zoneTypes: ['CAMPING'],
+    zoneTypes: ['TENT_CAMPING'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -65,7 +65,7 @@ describe('API Zones - Création (POST)', () => {
         [48.8576, 2.3532],
         [48.8586, 2.3512],
       ],
-      zoneTypes: ['CAMPING'],
+      zoneTypes: ['TENT_CAMPING'],
     }
 
     prismaMock.editionZone.count.mockResolvedValue(0)
@@ -234,7 +234,7 @@ describe('API Zones - Création (POST)', () => {
     prismaMock.editionZone.aggregate.mockResolvedValue({ _max: { order: null } })
     prismaMock.editionZone.create.mockResolvedValue({
       ...mockZone,
-      zoneTypes: ['CAMPING', 'FOOD', 'TOILETS'],
+      zoneTypes: ['TENT_CAMPING', 'FOOD', 'TOILETS'],
     })
 
     global.readBody.mockResolvedValue({
@@ -245,14 +245,14 @@ describe('API Zones - Création (POST)', () => {
         [48.8576, 2.3532],
         [48.8586, 2.3512],
       ],
-      zoneTypes: ['CAMPING', 'FOOD', 'TOILETS'],
+      zoneTypes: ['TENT_CAMPING', 'FOOD', 'TOILETS'],
     })
 
     await zonesPostHandler(mockEvent as any)
 
     expect(prismaMock.editionZone.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        zoneTypes: ['CAMPING', 'FOOD', 'TOILETS'],
+        zoneTypes: ['TENT_CAMPING', 'FOOD', 'TOILETS'],
       }),
       select: expect.any(Object),
     })

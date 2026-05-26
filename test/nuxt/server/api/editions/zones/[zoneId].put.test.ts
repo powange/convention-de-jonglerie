@@ -35,7 +35,7 @@ describe('API Zones - Mise à jour (PUT)', () => {
       [48.8576, 2.3532],
       [48.8586, 2.3512],
     ],
-    zoneTypes: ['CAMPING'],
+    zoneTypes: ['TENT_CAMPING'],
     order: 0,
     createdAt: new Date(),
     updatedAt: new Date(),

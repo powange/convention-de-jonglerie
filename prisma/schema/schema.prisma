@@ -430,17 +430,26 @@ model PasswordResetToken {
 // =============================================================================
 
 enum EditionZoneType {
-  CAMPING
+  TENT_CAMPING
+  TRUCK_CAMPING
   PARKING
   SHOWS
   WORKSHOPS
   FOOD
+  BAR
   MARKET
   ENTRANCE
   TOILETS
   SHOWER
   INFO
   GYM
+  FIRE_SPACE
+  AERIAL
+  KIDS_ZONE
+  CHILL_SPACE
+  ATM
+  ACCESSIBILITY
+  FORBIDDEN
   OTHER
 }
 
