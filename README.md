@@ -93,7 +93,34 @@ Champs de droits stockés sur `ConventionOrganizer` :
 | manageTasks       | canManageTasks       | Gérer les tâches internes de toutes les éditions             |
 | manageStock       | canManageStock       | Gérer le stock matériel de toutes les éditions               |
 
-La table `EditionOrganizerPermission` permet d'accorder ces droits **per-édition** lorsqu'un organisateur ne possède pas les droits globaux (`canEdit`, `canDelete`, `canManageVolunteers`, `canManageArtists`, `canManageMeals`, `canManageTicketing`, `canManageTasks` sur une édition précise).
+La table `EditionOrganizerPermission` permet d'accorder ces droits **per-édition** lorsqu'un organisateur ne possède pas les droits globaux (`canEdit`, `canDelete`, `canManageVolunteers`, `canManageArtists`, `canManageMeals`, `canManageTicketing`, `canManageTasks`, `canManageStock` sur une édition précise).
+
+#### Matrice : Module édition ↔ Permission requise
+
+Pour chaque module optionnel d'une édition, voici le drapeau d'activation (`Edition.*Enabled`) et la permission requise pour le gérer côté back-office (`/editions/[id]/gestion/...`). Un organisateur a accès au module si **(a)** il possède la permission convention globale (`ConventionOrganizer.canManage*`) **ou** **(b)** la permission per-édition (`EditionOrganizerPermission.canManage*`) sur l'édition concernée.
+
+| Module édition        | Flag d'activation (`Edition`)                                                                                          | Permission convention                            | Permission per-édition | Route gestion                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------------------- | -------------------------------------------------- |
+| Bénévoles             | `volunteersEnabled` (+ `volunteersOpen`, `volunteersPagePublic`, ~15 sous-flags `volunteersAsk*`)                      | `canManageVolunteers`                            | `canManageVolunteers`  | `/editions/[id]/gestion/volunteers`                |
+| Artistes & Spectacles | `artistsEnabled`                                                                                                       | `canManageArtists`                               | `canManageArtists`     | `/editions/[id]/gestion/artists`, `.../shows-call` |
+| Repas                 | `mealsEnabled`                                                                                                         | `canManageMeals`                                 | `canManageMeals`       | `/editions/[id]/gestion/meals`                     |
+| Billetterie           | `ticketingEnabled` (+ `ticketingSumupEnabled`, `ticketingHandoutItemsEnabled`, `ticketingAllow*`, `ticketingPayment*`) | `canManageTicketing`                             | `canManageTicketing`   | `/editions/[id]/gestion/ticketing`                 |
+| Tâches                | `tasksEnabled`                                                                                                         | `canManageTasks`                                 | `canManageTasks`       | `/editions/[id]/gestion/tasks`                     |
+| Stock matériel        | `stockEnabled`                                                                                                         | `canManageStock`                                 | `canManageStock`       | `/editions/[id]/gestion/stock`                     |
+| Workshops             | `workshopsEnabled` (+ `workshopLocationsFreeInput`)                                                                    | `canEditAllEditions`                             | `canEdit`              | `/editions/[id]/gestion/workshops`                 |
+| FAQ                   | `faqEnabled` (+ `faqPagePublic`)                                                                                       | `canEditAllEditions`                             | `canEdit`              | `/editions/[id]/gestion/faq`                       |
+| Carte du site         | `siteMapEnabled` (+ `mapPublic`)                                                                                       | `canEditAllEditions`                             | `canEdit`              | gestion via édition (zones / markers)              |
+| Covoiturage           | _toujours actif_                                                                                                       | _participation libre_ — modération via `canEdit` | `canEdit`              | pas de back-office dédié (modération sur fiche)    |
+| Objets trouvés        | _toujours actif_                                                                                                       | `canEditAllEditions`                             | `canEdit`              | accessible via fiche édition                       |
+| Messenger             | _transversal_                                                                                                          | _aucune_ — conversations privées / équipes       | _aucune_               | `/messenger`                                       |
+
+**Règles de cumul :**
+
+- L'**accès au module** côté participant dépend uniquement du flag `*Enabled` (et éventuellement de la visibilité publique : `volunteersPagePublic`, `faqPagePublic`, `mapPublic`).
+- L'**administration du module** requiert au minimum **soit** la permission convention globale, **soit** la permission per-édition correspondante.
+- Les modules sans `canManage*` dédié (workshops, FAQ, carte, lost-found, carpool) sont gouvernés par `canEdit` (per-édition) ou `canEditAllEditions` (convention).
+- Le **super-admin** (`User.isGlobalAdmin`) court-circuite l'ensemble de la matrice.
+- Le **créateur d'édition** (`Edition.creatorId`) conserve un accès complet à son édition.
 
 Format d'un organisateur retourné par l'API (détails étendus dans [`docs/system/ORGANIZER_PERMISSIONS.md`](docs/system/ORGANIZER_PERMISSIONS.md)) :
 
