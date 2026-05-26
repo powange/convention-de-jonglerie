@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Candidatures bénévoles",
       "application_updates_desc": "Acceptation, refus ou modifications de vos candidatures",
+      "artist_updates": "Artistes et spectacles",
+      "artist_updates_desc": "Appels à spectacles, candidatures artiste et arrivées",
       "carpool_updates": "Covoiturage",
       "carpool_updates_desc": "Demandes, confirmations et annulations de covoiturage",
       "convention_news": "Nouvelles conventions",

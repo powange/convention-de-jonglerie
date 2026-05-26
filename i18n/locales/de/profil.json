@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Freiwilligenbewerbungen",
       "application_updates_desc": "Annahme, Ablehnung oder Änderungen Ihrer Bewerbungen",
+      "artist_updates": "Künstler und Shows",
+      "artist_updates_desc": "Show-Ausschreibungen, Künstlerbewerbungen und Ankünfte",
       "carpool_updates": "Fahrgemeinschaft",
       "carpool_updates_desc": "Fahrgemeinschaftsanfragen, Bestätigungen und Stornierungen",
       "convention_news": "Neue Conventions",

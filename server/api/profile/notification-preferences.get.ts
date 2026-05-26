@@ -1,20 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-
-// Préférences par défaut (tout activé)
-const defaultPreferences = {
-  volunteerReminders: true,
-  applicationUpdates: true,
-  conventionNews: true,
-  systemNotifications: true,
-  carpoolUpdates: true,
-  // Par défaut, les notifications email sont activées
-  emailVolunteerReminders: true,
-  emailApplicationUpdates: true,
-  emailConventionNews: true,
-  emailSystemNotifications: true,
-  emailCarpoolUpdates: true,
-}
+import { defaultPreferences } from '#server/utils/notification-preferences'
 
 export default wrapApiHandler(
   async (event) => {

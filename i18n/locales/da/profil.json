@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Frivilligansøgninger",
       "application_updates_desc": "Accept, afvisning eller ændringer af dine ansøgninger",
+      "artist_updates": "Kunstnere og forestillinger",
+      "artist_updates_desc": "Forestillingsopslag, kunstneransøgninger og ankomster",
       "carpool_updates": "Samkørsel",
       "carpool_updates_desc": "Samkørselsanmodninger, bekræftelser og aflysninger",
       "convention_news": "Nye conventions",

@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Volontäransökningar",
       "application_updates_desc": "Godkännande, avslag eller ändringar av dina ansökningar",
+      "artist_updates": "Artister och föreställningar",
+      "artist_updates_desc": "Föreställningsutlysningar, artistansökningar och ankomster",
       "carpool_updates": "Samåkning",
       "carpool_updates_desc": "Samåkningsförfrågningar, bekräftelser och avbokningar",
       "convention_news": "Nya conventions",

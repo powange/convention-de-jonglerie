@@ -9,12 +9,14 @@ const notificationPreferencesSchema = z.object({
   conventionNews: z.boolean(),
   systemNotifications: z.boolean(),
   carpoolUpdates: z.boolean(),
+  artistUpdates: z.boolean(),
   // Préférences email pour chaque type
   emailVolunteerReminders: z.boolean(),
   emailApplicationUpdates: z.boolean(),
   emailConventionNews: z.boolean(),
   emailSystemNotifications: z.boolean(),
   emailCarpoolUpdates: z.boolean(),
+  emailArtistUpdates: z.boolean(),
 })
 
 export default wrapApiHandler(

@@ -211,6 +211,45 @@
           </div>
         </div>
 
+        <!-- Artistes et spectacles -->
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-musical-note"
+                  class="w-4 h-4 text-pink-600 dark:text-pink-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('profile.notifications.artist_updates') }}
+                </h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ $t('profile.notifications.artist_updates_desc') }}
+                </p>
+              </div>
+            </div>
+            <USwitch v-model="notificationPreferences.artistUpdates" color="primary" size="lg" />
+          </div>
+          <div class="flex items-center justify-between pl-11">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-gray-400" />
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('profile.notifications.receive_by_email')
+              }}</span>
+            </div>
+            <USwitch
+              v-model="notificationPreferences.emailArtistUpdates"
+              :disabled="!notificationPreferences.artistUpdates"
+              color="primary"
+              size="md"
+            />
+          </div>
+        </div>
+
         <!-- Notifications système -->
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
           <div class="flex items-center justify-between">
@@ -292,11 +331,13 @@ const notificationPreferences = reactive({
   conventionNews: true,
   systemNotifications: true,
   carpoolUpdates: true,
-  emailVolunteerReminders: true,
-  emailApplicationUpdates: true,
-  emailConventionNews: true,
-  emailSystemNotifications: true,
-  emailCarpoolUpdates: true,
+  artistUpdates: true,
+  emailVolunteerReminders: false,
+  emailApplicationUpdates: false,
+  emailConventionNews: false,
+  emailSystemNotifications: false,
+  emailCarpoolUpdates: false,
+  emailArtistUpdates: false,
 })
 
 const loadNotificationPreferences = async () => {

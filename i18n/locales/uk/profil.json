@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Волонтерські заявки",
       "application_updates_desc": "Прийняття, відхилення або зміни ваших заявок",
+      "artist_updates": "Артисти та виступи",
+      "artist_updates_desc": "Оголошення про виступи, заявки артистів та прибуття",
       "carpool_updates": "Спільні поїздки",
       "carpool_updates_desc": "Запити, підтвердження та скасування спільних поїздок",
       "convention_news": "Нові конвенції",

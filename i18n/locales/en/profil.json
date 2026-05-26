@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Volunteer applications",
       "application_updates_desc": "Acceptance, rejection or changes to your applications",
+      "artist_updates": "Artists and shows",
+      "artist_updates_desc": "Show calls, artist applications and arrivals",
       "carpool_updates": "Carpooling",
       "carpool_updates_desc": "Carpooling requests, confirmations and cancellations",
       "convention_news": "New conventions",

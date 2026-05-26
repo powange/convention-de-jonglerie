@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Candidaturas de voluntariado",
       "application_updates_desc": "Aceitação, rejeição ou alterações às suas candidaturas",
+      "artist_updates": "Artistas e espetáculos",
+      "artist_updates_desc": "Chamadas para espetáculos, candidaturas de artistas e chegadas",
       "carpool_updates": "Boleias",
       "carpool_updates_desc": "Pedidos, confirmações e cancelamentos de boleias",
       "convention_news": "Novas convenções",

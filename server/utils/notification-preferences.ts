@@ -14,21 +14,22 @@ export interface NotificationPreferences {
   emailArtistUpdates: boolean
 }
 
-// Préférences par défaut (tout activé)
-const defaultPreferences: NotificationPreferences = {
+// Préférences par défaut : notifications in-app activées, emails désactivés
+export const defaultPreferences: NotificationPreferences = {
   volunteerReminders: true,
   applicationUpdates: true,
   conventionNews: true,
   systemNotifications: true,
   carpoolUpdates: true,
   artistUpdates: true,
-  // Par défaut, les notifications email sont activées
-  emailVolunteerReminders: true,
-  emailApplicationUpdates: true,
-  emailConventionNews: true,
-  emailSystemNotifications: true,
-  emailCarpoolUpdates: true,
-  emailArtistUpdates: true,
+  // Les notifications email sont désactivées par défaut pour éviter de spammer ;
+  // chaque utilisateur peut les réactiver depuis ses préférences.
+  emailVolunteerReminders: false,
+  emailApplicationUpdates: false,
+  emailConventionNews: false,
+  emailSystemNotifications: false,
+  emailCarpoolUpdates: false,
+  emailArtistUpdates: false,
 }
 
 /**

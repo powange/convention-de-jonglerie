@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Vrijwilligerssollicitaties",
       "application_updates_desc": "Acceptatie, afwijzing of wijzigingen van uw sollicitaties",
+      "artist_updates": "Artiesten en shows",
+      "artist_updates_desc": "Show-oproepen, artiestensollicitaties en aankomsten",
       "carpool_updates": "Carpoolen",
       "carpool_updates_desc": "Carpoolverzoeken, bevestigingen en annuleringen",
       "convention_news": "Nieuwe conventions",

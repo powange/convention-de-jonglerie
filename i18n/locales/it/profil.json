@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Candidature volontari",
       "application_updates_desc": "Accettazione, rifiuto o modifiche alle tue candidature",
+      "artist_updates": "Artisti e spettacoli",
+      "artist_updates_desc": "Bandi per spettacoli, candidature artisti e arrivi",
       "carpool_updates": "Condivisione auto",
       "carpool_updates_desc": "Richieste, conferme e annullamenti di condivisione auto",
       "convention_news": "Nuove convention",

@@ -49,6 +49,8 @@
     "notifications": {
       "application_updates": "Dobrovolnické přihlášky",
       "application_updates_desc": "Přijetí, odmítnutí nebo změny vašich přihlášek",
+      "artist_updates": "Umělci a vystoupení",
+      "artist_updates_desc": "Výzvy k vystoupením, přihlášky umělců a příjezdy",
       "carpool_updates": "Spolujízda",
       "carpool_updates_desc": "Žádosti, potvrzení a zrušení spolujízdy",
       "convention_news": "Nové konvence",
