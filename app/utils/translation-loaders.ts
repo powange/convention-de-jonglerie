@@ -21,10 +21,10 @@ export function getTranslationsToLoad(path: string): string[] {
     '/project-costs': ['project-costs'],
     '/auth': ['auth', 'profil'],
     '/login': ['auth'],
-    '/register': ['auth'],
+    '/register': ['auth', 'profil'],
     '/profile': ['auth', 'profil'],
     '/verify-email': ['auth'],
-    '/welcome': ['auth'],
+    '/welcome': ['auth', 'profil'],
     '/messenger': ['messenger'],
   }
 
