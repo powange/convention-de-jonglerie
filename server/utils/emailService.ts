@@ -75,12 +75,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     const smtpHost = process.env.SMTP_HOST || ''
     const smtpPort = parseInt(process.env.SMTP_PORT || '587')
 
-    // Si un host SMTP custom est configuré (ex: Mailpit), pas besoin d'auth
+    // Si un host SMTP custom est configuré, ajouter l'auth seulement si user/pass fournis
+    // (permet de garder Mailpit en dev sans auth)
     const transporter = smtpHost
       ? nodemailer.createTransport({
           host: smtpHost,
           port: smtpPort,
-          secure: false,
+          secure: smtpPort === 465,
+          ...(smtpUser && smtpPass ? { auth: { user: smtpUser, pass: smtpPass } } : {}),
         })
       : (() => {
           if (!smtpUser || !smtpPass) {
