@@ -26,6 +26,7 @@
       "error": "Kan ikke oprette betalingssession",
       "price_per_coffee": "1 € pr. kaffe",
       "quantity_label": "Antal kaffer",
+      "stripe_fees_label": "i Stripe-gebyrer",
       "success_message": "Din donation er registreret. Tak for din støtte!",
       "success_title": "Tak for din kaffe! ☕",
       "title": "En kaffe til Pierre ☕",

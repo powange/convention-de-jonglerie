@@ -206,23 +206,32 @@
           </div>
 
           <!-- Compteur -->
-          <div v-if="donations.totalCoffees > 0" class="flex items-center justify-center gap-6">
-            <div class="text-center">
-              <p class="text-3xl font-bold text-amber-600 dark:text-amber-400">
-                {{ donations.totalCoffees }} ☕
-              </p>
-              <p class="text-sm text-gray-500">
-                {{ t('project_costs.coffee.total_coffees_label') }}
-              </p>
+          <div v-if="donations.totalCoffees > 0" class="space-y-2">
+            <div class="flex items-center justify-center gap-6">
+              <div class="text-center">
+                <p class="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                  {{ donations.totalCoffees }} ☕
+                </p>
+                <p class="text-sm text-gray-500">
+                  {{ t('project_costs.coffee.total_coffees_label') }}
+                </p>
+              </div>
+              <div v-if="donations.totalNetCents > 0" class="text-center">
+                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                  {{ (donations.totalNetCents / 100).toFixed(2) }} €
+                </p>
+                <p class="text-sm text-gray-500">
+                  {{ t('project_costs.coffee.total_received_label') }}
+                </p>
+              </div>
             </div>
-            <div v-if="donations.totalNetCents > 0" class="text-center">
-              <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                {{ (donations.totalNetCents / 100).toFixed(2) }} €
-              </p>
-              <p class="text-sm text-gray-500">
-                {{ t('project_costs.coffee.total_received_label') }}
-              </p>
-            </div>
+            <p
+              v-if="donations.totalCents - donations.totalNetCents > 0"
+              class="text-xs text-gray-500 dark:text-gray-400"
+            >
+              − {{ ((donations.totalCents - donations.totalNetCents) / 100).toFixed(2) }} €
+              {{ t('project_costs.coffee.stripe_fees_label') }}
+            </p>
           </div>
 
           <!-- Formulaire de don (uniquement si les dons sont actifs) -->

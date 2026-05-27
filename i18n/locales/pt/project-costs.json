@@ -26,6 +26,7 @@
       "error": "Não foi possível criar a sessão de pagamento",
       "price_per_coffee": "1 € por café",
       "quantity_label": "Número de cafés",
+      "stripe_fees_label": "em comissões Stripe",
       "success_message": "A sua doação foi registada. Obrigado pelo seu apoio!",
       "success_title": "Obrigado pelo seu café! ☕",
       "title": "Um café para Pierre ☕",

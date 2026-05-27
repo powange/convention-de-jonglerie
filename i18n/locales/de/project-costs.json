@@ -26,6 +26,7 @@
       "error": "Zahlungssitzung konnte nicht erstellt werden",
       "price_per_coffee": "1 € pro Kaffee",
       "quantity_label": "Anzahl Kaffees",
+      "stripe_fees_label": "an Stripe-Gebühren",
       "success_message": "Ihre Spende wurde erfasst. Vielen Dank für Ihre Unterstützung!",
       "success_title": "Danke für Ihren Kaffee! ☕",
       "title": "Ein Kaffee für Pierre ☕",

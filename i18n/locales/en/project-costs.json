@@ -26,6 +26,7 @@
       "error": "Unable to create payment session",
       "price_per_coffee": "€1 per coffee",
       "quantity_label": "Number of coffees",
+      "stripe_fees_label": "in Stripe fees",
       "success_message": "Your donation has been recorded. Thank you for your support!",
       "success_title": "Thank you for your coffee! ☕",
       "title": "A coffee for Pierre ☕",

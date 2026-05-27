@@ -26,6 +26,7 @@
       "error": "Nie udało się utworzyć sesji płatności",
       "price_per_coffee": "1 € za kawę",
       "quantity_label": "Liczba kaw",
+      "stripe_fees_label": "prowizji Stripe",
       "success_message": "Twoja darowizna została zarejestrowana. Dziękujemy za wsparcie!",
       "success_title": "Dziękujemy za kawę! ☕",
       "title": "Kawa dla Pierre'a ☕",

@@ -26,6 +26,7 @@
       "error": "Nelze vytvořit platební relaci",
       "price_per_coffee": "1 € za kávu",
       "quantity_label": "Počet káv",
+      "stripe_fees_label": "poplatků Stripe",
       "success_message": "Váš dar byl zaznamenán. Děkujeme za vaši podporu!",
       "success_title": "Děkujeme za vaši kávu! ☕",
       "title": "Káva pro Pierra ☕",

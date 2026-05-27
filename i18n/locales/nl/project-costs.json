@@ -26,6 +26,7 @@
       "error": "Kan geen betalingssessie aanmaken",
       "price_per_coffee": "€ 1 per koffie",
       "quantity_label": "Aantal koffies",
+      "stripe_fees_label": "aan Stripe-kosten",
       "success_message": "Uw donatie is geregistreerd. Bedankt voor uw steun!",
       "success_title": "Bedankt voor uw koffie! ☕",
       "title": "Een koffie voor Pierre ☕",
