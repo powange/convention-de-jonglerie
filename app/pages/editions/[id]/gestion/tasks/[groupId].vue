@@ -75,6 +75,15 @@
         </div>
       </UCard>
 
+      <!-- Filtres et recherche -->
+      <TasksTaskFilters
+        v-if="group.tasks.length"
+        v-model="filters"
+        :assignable-users="assignableUsers"
+        :legacy-assignees="legacyAssignees"
+        :has-deadlines="hasDeadlines"
+      />
+
       <!-- Vue Liste -->
       <div v-if="viewMode === 'list'">
         <div
@@ -89,10 +98,19 @@
             {{ $t('gestion.tasks.new_task') }}
           </UButton>
         </div>
+        <div
+          v-else-if="!filteredTasks.length"
+          class="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+        >
+          <UIcon name="i-heroicons-funnel" class="size-8 text-gray-400 mx-auto mb-2" />
+          <p class="text-gray-600 dark:text-gray-400 text-sm">
+            {{ $t('gestion.tasks.filters.no_match') }}
+          </p>
+        </div>
         <UCard v-else>
           <ul class="divide-y divide-gray-100 dark:divide-gray-800">
             <li
-              v-for="task in group.tasks"
+              v-for="task in filteredTasks"
               :key="task.id"
               class="py-2 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-800/40 px-2 -mx-2 rounded cursor-pointer"
               @click="openTaskModal(task)"
@@ -230,6 +248,8 @@
 </template>
 
 <script setup lang="ts">
+import type { TaskFiltersValue } from '~/components/tasks/TaskFilters.vue'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
@@ -287,6 +307,121 @@ const kanbanStatuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED'
 
 const group = computed<TaskGroupItem | null>(
   () => allGroups.value.find((g) => g.id === groupId.value) || null
+)
+
+// --- Filtres & recherche (persistés en URL via query params) ---
+const VALID_STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED']
+const VALID_DUE = ['overdue', 'today', 'next7', 'next30', 'none'] as const
+
+function parseInitialFilters(): TaskFiltersValue {
+  // route.query.X peut être string | string[] | null — on coerce en string pour éviter
+  // un plantage si l'URL contient plusieurs valeurs (ex: ?q=foo&q=bar).
+  const queryParam = (v: unknown): string =>
+    Array.isArray(v) ? String(v[0] ?? '') : v ? String(v) : ''
+  const q = queryParam(route.query.q)
+  const due = queryParam(route.query.due)
+  const statusesRaw = queryParam(route.query.status)
+  const assigneesRaw = queryParam(route.query.assignees)
+  return {
+    q,
+    statuses: statusesRaw
+      .split(',')
+      .filter((s): s is TaskStatus => VALID_STATUSES.includes(s as TaskStatus)),
+    assigneeIds: assigneesRaw
+      .split(',')
+      .map((n) => parseInt(n, 10))
+      .filter((n) => !isNaN(n)),
+    due: (VALID_DUE as readonly string[]).includes(due) ? (due as TaskFiltersValue['due']) : 'all',
+  }
+}
+
+const filters = ref<TaskFiltersValue>(parseInitialFilters())
+
+const hasDeadlines = computed<boolean>(() => !!group.value?.tasks.some((t) => t.deadline))
+
+const legacyAssignees = computed<AssignableUser[]>(() => {
+  if (!group.value) return []
+  const knownIds = new Set(assignableUsers.value.map((u) => u.id))
+  const map = new Map<number, AssignableUser>()
+  for (const task of group.value.tasks) {
+    for (const a of task.assignments) {
+      if (!knownIds.has(a.user.id) && !map.has(a.user.id)) {
+        map.set(a.user.id, a.user)
+      }
+    }
+  }
+  return Array.from(map.values())
+})
+
+const filteredTasks = computed<TaskItem[]>(() => {
+  if (!group.value) return []
+  let list = group.value.tasks
+
+  const q = filters.value.q.toLowerCase()
+  if (q) {
+    list = list.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) ||
+        (t.description ? t.description.toLowerCase().includes(q) : false)
+    )
+  }
+
+  if (filters.value.statuses.length) {
+    const set = new Set(filters.value.statuses)
+    list = list.filter((t) => set.has(t.status))
+  }
+
+  if (filters.value.assigneeIds.length) {
+    const set = new Set(filters.value.assigneeIds)
+    list = list.filter((t) => t.assignments.some((a) => set.has(a.user.id)))
+  }
+
+  const due = filters.value.due
+  if (due && due !== 'all') {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    list = list.filter((t) => {
+      if (due === 'none') return t.deadline === null
+      if (!t.deadline) return false
+      const d = new Date(t.deadline)
+      if (due === 'overdue') return d < now && t.status !== 'DONE' && t.status !== 'CANCELLED'
+      if (due === 'today') {
+        const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+        return day.getTime() === today.getTime()
+      }
+      if (due === 'next7' || due === 'next30') {
+        const days = due === 'next7' ? 7 : 30
+        const limit = new Date(today)
+        limit.setDate(limit.getDate() + days)
+        limit.setHours(23, 59, 59, 999)
+        return d >= today && d <= limit
+      }
+      return true
+    })
+  }
+
+  return list
+})
+
+// Synchronise les filtres vers l'URL (replace pour ne pas polluer l'historique).
+watch(
+  filters,
+  (f) => {
+    const query: Record<string, string> = {}
+    for (const [k, v] of Object.entries(route.query)) {
+      if (typeof v === 'string') query[k] = v
+    }
+    if (f.q) query.q = f.q
+    else delete query.q
+    if (f.statuses.length) query.status = f.statuses.join(',')
+    else delete query.status
+    if (f.assigneeIds.length) query.assignees = f.assigneeIds.join(',')
+    else delete query.assignees
+    if (f.due && f.due !== 'all') query.due = f.due
+    else delete query.due
+    router.replace({ query })
+  },
+  { deep: true }
 )
 
 const fetchGroups = async () => {
@@ -380,8 +515,7 @@ function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'erro
 }
 
 function tasksByStatus(status: TaskStatus): TaskItem[] {
-  if (!group.value) return []
-  return group.value.tasks.filter((t) => t.status === status)
+  return filteredTasks.value.filter((t) => t.status === status)
 }
 
 // --- Drag & drop kanban (changement de status) ---

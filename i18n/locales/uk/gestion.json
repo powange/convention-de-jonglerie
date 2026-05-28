@@ -527,6 +527,23 @@
       "edit_task": "Редагувати завдання",
       "empty_group": "У цій групі немає завдань",
       "empty_state": "Поки що немає груп завдань",
+      "filters": {
+        "active_count": "{count} активний фільтр | {count} активних фільтрів",
+        "assignee_placeholder": "Призначені",
+        "assignees_count": "{count} призначених",
+        "due": {
+          "all": "Усі терміни",
+          "next30": "Протягом 30 днів",
+          "next7": "Протягом 7 днів",
+          "none": "Без терміну",
+          "overdue": "Прострочено",
+          "today": "Сьогодні"
+        },
+        "no_match": "Жодне завдання не відповідає фільтрам",
+        "search_placeholder": "Пошук завдання...",
+        "status_placeholder": "Статус",
+        "statuses_count": "{count} статусів"
+      },
       "group_description": "Опис",
       "group_description_empty": "Без опису",
       "group_description_placeholder": "Необов'язковий опис...",

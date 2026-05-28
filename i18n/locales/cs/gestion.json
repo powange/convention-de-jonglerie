@@ -527,6 +527,23 @@
       "edit_task": "Upravit úkol",
       "empty_group": "V této skupině nejsou žádné úkoly",
       "empty_state": "Zatím žádné skupiny úkolů",
+      "filters": {
+        "active_count": "{count} aktivní filtr | {count} aktivních filtrů",
+        "assignee_placeholder": "Přiřazení",
+        "assignees_count": "{count} přiřazených",
+        "due": {
+          "all": "Všechny termíny",
+          "next30": "Do 30 dnů",
+          "next7": "Do 7 dnů",
+          "none": "Bez termínu",
+          "overdue": "Zpožděno",
+          "today": "Dnes"
+        },
+        "no_match": "Žádný úkol neodpovídá filtrům",
+        "search_placeholder": "Vyhledat úkol...",
+        "status_placeholder": "Stav",
+        "statuses_count": "{count} stavů"
+      },
       "group_description": "Popis",
       "group_description_empty": "Bez popisu",
       "group_description_placeholder": "Volitelný popis...",

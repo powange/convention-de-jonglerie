@@ -527,6 +527,23 @@
       "edit_task": "Aufgabe bearbeiten",
       "empty_group": "Keine Aufgaben in dieser Gruppe",
       "empty_state": "Noch keine Aufgabengruppen",
+      "filters": {
+        "active_count": "{count} aktiver Filter | {count} aktive Filter",
+        "assignee_placeholder": "Zugewiesene",
+        "assignees_count": "{count} Zugewiesene",
+        "due": {
+          "all": "Alle Fälligkeiten",
+          "next30": "In 30 Tagen",
+          "next7": "In 7 Tagen",
+          "none": "Keine Frist",
+          "overdue": "Überfällig",
+          "today": "Heute"
+        },
+        "no_match": "Keine Aufgabe entspricht den Filtern",
+        "search_placeholder": "Aufgabe suchen...",
+        "status_placeholder": "Status",
+        "statuses_count": "{count} Status"
+      },
       "group_description": "Beschreibung",
       "group_description_empty": "Keine Beschreibung",
       "group_description_placeholder": "Optionale Beschreibung...",

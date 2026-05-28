@@ -219,15 +219,149 @@ Toutes les clés sont sous `gestion.tasks.*` (12 langues synchronisées). Exempl
 - `gestion.features.tasks_description` (description du toggle dans Fonctionnalités)
 - `permissions.manageTasks`
 
+## Vues disponibles
+
+Sur la page détail d'un groupe (`[groupId].vue`), deux vues sont proposées via un toggle :
+
+### Vue Liste
+
+Affichage tabulaire :
+
+- Badge de statut coloré
+- Titre + deadline (couleur selon urgence)
+- Avatars des assignés (3 max + badge `+N`)
+- Click pour ouvrir le modal d'édition
+
+### Vue Kanban
+
+Quatre colonnes statiques (TODO, IN_PROGRESS, DONE, CANCELLED) avec drag-and-drop HTML5 :
+
+- Capture du `taskId` et du statut source dans `onTaskDragStart`
+- Highlight de la colonne cible (`onColumnDragOver`)
+- Sur drop : `PUT /api/editions/:id/tasks/:taskId` avec `{ status }`
+- **Optimistic update** + revert local si l'API échoue
+- Flag `justDragged` (50 ms) pour absorber le click synthétique post-drag
+
+## Filtres et recherche
+
+Sur la page détail d'un groupe, une barre de filtres (composant `TasksTaskFilters`) permet d'affiner les tâches affichées. Le filtrage est **client-side** (les tâches du groupe sont déjà chargées) et s'applique à la fois à la vue Liste et à la vue Kanban.
+
+### Filtres disponibles
+
+- **Recherche texte** (debounced 250 ms) : match insensible à la casse sur `title` et `description`.
+- **Statuts** : multi-sélection parmi `TODO`, `IN_PROGRESS`, `DONE`, `CANCELLED`.
+- **Assignés** : multi-sélection parmi les utilisateurs assignables actuels **+ les assignés legacy** détectés sur les tâches du groupe.
+- **Échéance** : `overdue` (en retard, hors `DONE`/`CANCELLED`), `today`, `next7`, `next30`, `none` (sans échéance).
+
+### Persistance URL
+
+Les filtres sont persistés en query string via `router.replace` (pas de pile d'historique) :
+
+- `?q=<texte>` — recherche
+- `?status=TODO,IN_PROGRESS` — statuts (CSV)
+- `?assignees=12,34` — IDs assignés (CSV)
+- `?due=overdue|today|next7|next30|none` — catégorie d'échéance
+
+Permet de partager un lien filtré ou de revenir en arrière en gardant la sélection. Les query params inconnus sont ignorés au parsing.
+
+### Empty state filtré
+
+Si `group.tasks.length > 0` mais qu'aucune tâche ne correspond aux filtres actifs, un message dédié `gestion.tasks.filters.no_match` s'affiche à la place du listing (distinct de l'empty state « groupe vide »).
+
 ## Évolutions possibles
 
-- Drag & drop pour réordonner les tâches (et changer de groupe / statut au sein du Kanban).
-- Filtrage des tâches par assigné, statut, échéance.
-- Notifications de rappel J-1 sur les échéances.
-- Commentaires sur les tâches.
-- Pièces jointes / liens externes.
-- Vue agrégée multi-édition pour le suivi global d'une convention.
+Propositions classées par valeur métier × effort estimé. Les éléments **planifiés pour la prochaine itération** sont marqués 🚧.
+
+### Quick wins (haute valeur / faible effort)
+
+#### 🚧 2. Vue « Mes tâches »
+
+- Nouvelle page `/editions/[id]/gestion/tasks/mine` (ou widget dashboard) listant uniquement les tâches assignées à l'utilisateur courant, tous groupes confondus.
+- Aujourd'hui, un bénévole assigné (sans `canManageTasks`) ne peut accéder qu'à la tâche reçue via notification : pas de vision d'ensemble de ses propres tâches.
+- **Bénéfice** : ouvre le module aux bénévoles, pas uniquement aux organisateurs.
+- **Effort estimé** : 1 j (endpoint + page).
+
+#### 🚧 3. Rappels automatiques d'échéance
+
+- Job cron quotidien notifiant les assignés à J-1 et le jour J.
+- Notification spécifique pour les tâches en retard (J+1, J+3).
+- **Bénéfice** : transforme le module en vrai outil de suivi, pas uniquement de listing.
+- **Effort estimé** : 1-2 j (réutilise l'infrastructure de notifications existante).
+
+#### 🚧 4. Réordonnancement par drag & drop
+
+- Aujourd'hui le DnD Kanban change uniquement le statut. Permettre :
+  - **(prioritaire)** Réordonner les tâches au sein d'une colonne Kanban (impact sur `displayOrder`).
+  - Réordonner les groupes dans la vue index.
+- **Bénéfice** : UX cohérente avec ce que les utilisateurs attendent d'un Kanban.
+- **Effort estimé** : 1 j (lib `vuedraggable` ou DnD HTML5 natif déjà utilisé).
+
+### Fonctionnalités à fort impact (effort moyen)
+
+#### 🚧 5. Sous-tâches / checklist
+
+- Champ `parentTaskId` sur `Task`, **ou** (préférable) table `TaskChecklistItem` (titre + done) — items légers, sans cycle complet TODO/IN_PROGRESS/DONE.
+- Progression auto-calculée affichée sur la card (ex: « 3/7 »).
+- **Bénéfice** : on découpe les grosses tâches sans polluer le Kanban.
+- **Effort estimé** : 2-3 j.
+
+#### 6. Templates de groupes / tâches
+
+- Les conventions reviennent souvent chaque année avec les mêmes phases (logistique, comm, bénévolat…). Permettre :
+  - Cloner depuis une édition précédente.
+  - Créer des templates réutilisables au niveau convention.
+- **Bénéfice** : gain de temps important inter-éditions.
+- **Effort estimé** : 2 j (endpoint de duplication, modal de sélection source).
+
+#### 7. Journal d'activité (audit log)
+
+- Table `TaskActivity` enregistrant changements de statut, réassignations, modifications de deadline, etc.
+- Affichée dans le modal de la tâche (timeline) à côté des commentaires.
+- **Bénéfice** : traçabilité utile en cas de désaccord ou de turnover dans l'équipe.
+- **Effort estimé** : 2-3 j.
+
+#### 8. Pièces jointes
+
+- Upload de fichiers (devis, plans, contrats…) attachés à une tâche.
+- Réutiliser l'infrastructure Firebase Storage déjà en place dans le projet.
+- **Bénéfice** : centralise les ressources liées à une tâche.
+- **Effort estimé** : 2 j.
+
+### Fonctionnalités avancées (effort important, ROI à valider)
+
+#### 9. Tags / labels personnalisés
+
+- Tags définis au niveau édition (couleurs + nom), liés via une table de liaison `TaskTag`.
+- Filtrage par tag, affichage sur les cards.
+- **Bénéfice** : transversalité (ex: « urgent », « matériel », « à valider RH ») indépendante des groupes.
+- **Effort estimé** : 2 j.
+
+#### 10. Vue calendrier
+
+- 3ᵉ vue (en plus de Liste / Kanban) affichant les tâches sur leur échéance.
+- FullCalendar est déjà dans les dépendances du projet.
+- **Bénéfice** : vision temporelle, utile pour repérer les pics avant l'événement.
+- **Effort estimé** : 2 j.
+
+#### 11. Dépendances entre tâches
+
+- Relation N-N self-referencing : « X dépend de Y ».
+- Empêcher le passage à `DONE` si des dépendances ne sont pas terminées.
+- **Bénéfice** : utile pour les phases logistiques séquentielles.
+- **Effort estimé** : 3-4 j. À valider seulement si la demande terrain est confirmée — risque de complexifier fortement l'UI.
+
+#### 12. Vue agrégée multi-édition (convention)
+
+- Page au niveau convention listant toutes les tâches de toutes les éditions actives.
+- **Bénéfice** : pertinent pour les grosses conventions multi-éditions, faible pour les petites.
+- **Effort estimé** : 2-3 j.
+
+#### 13. Mentions @utilisateur dans les commentaires
+
+- `@pseudo` dans un commentaire déclenche une notification ciblée pour l'utilisateur mentionné.
+- **Bénéfice** : engagement, conversation plus fluide.
+- **Effort estimé** : 2 j.
 
 ---
 
-Dernière mise à jour : 2026-05-13.
+Dernière mise à jour : 2026-05-28.

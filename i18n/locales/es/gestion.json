@@ -527,6 +527,23 @@
       "edit_task": "Editar tarea",
       "empty_group": "No hay tareas en este grupo",
       "empty_state": "Aún no hay grupos de tareas",
+      "filters": {
+        "active_count": "{count} filtro activo | {count} filtros activos",
+        "assignee_placeholder": "Asignados",
+        "assignees_count": "{count} asignados",
+        "due": {
+          "all": "Todos los plazos",
+          "next30": "En 30 días",
+          "next7": "En 7 días",
+          "none": "Sin plazo",
+          "overdue": "Vencidas",
+          "today": "Hoy"
+        },
+        "no_match": "Ninguna tarea coincide con los filtros",
+        "search_placeholder": "Buscar una tarea...",
+        "status_placeholder": "Estado",
+        "statuses_count": "{count} estados"
+      },
       "group_description": "Descripción",
       "group_description_empty": "Sin descripción",
       "group_description_placeholder": "Descripción opcional...",

@@ -34,14 +34,10 @@
             class="w-full"
             :ui="{ content: 'min-w-fit' }"
           >
-            <template #option="{ option }">
-              <div class="flex items-center gap-2">
-                <UiUserAvatar :user="option" size="xs" />
-                <span>{{ option.label }}</span>
-                <UBadge v-if="option.isLegacy" color="warning" variant="soft" size="xs">
-                  {{ $t('gestion.tasks.assignee_legacy_badge') }}
-                </UBadge>
-              </div>
+            <template #item-trailing="{ item }">
+              <UBadge v-if="item.isLegacy" color="warning" variant="soft" size="xs">
+                {{ $t('gestion.tasks.assignee_legacy_badge') }}
+              </UBadge>
             </template>
           </USelectMenu>
           <p v-if="!assignableUsers.length" class="text-xs text-gray-500 mt-1">
@@ -167,13 +163,17 @@ const statusItems = computed(() =>
 interface UserItem extends AssignableUser {
   label: string
   isLegacy?: boolean
+  avatar: { src: string; alt: string; loading: 'lazy' }
 }
+
+const { getUserAvatar } = useAvatar()
 
 function toUserItem(u: AssignableUser, isLegacy = false): UserItem {
   return {
     ...u,
     label: u.pseudo + (u.email ? ' — ' + u.email : ''),
     isLegacy,
+    avatar: { src: getUserAvatar(u, 32), alt: u.pseudo, loading: 'lazy' },
   }
 }
 
