@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Больше нельзя назначать",
+      "checklist": {
+        "add": "Добавить",
+        "add_placeholder": "Новый пункт чек-листа...",
+        "confirm_delete": "Удалить пункт «{title}»?",
+        "empty": "Пока нет пунктов в чек-листе.",
+        "title": "Чек-лист"
+      },
       "comments": {
         "confirm_delete": "Удалить этот комментарий?",
         "edited": "изменено",

@@ -30,6 +30,16 @@ Association `(Task, User)` représentant qu'un utilisateur est responsable d'une
 
 Commentaire libre sur une tâche, avec **rendu Markdown**. Stocke l'auteur, le contenu, la date de création et la date d'édition (`editedAt` nullable). Les commentaires sont supprimés en cascade lors de la suppression de la tâche.
 
+### TaskChecklistItem
+
+Item de checklist (sous-tâche légère) rattaché à une `Task`. Permet de découper une grosse tâche en items cochables sans dupliquer le cycle de statut TODO/IN_PROGRESS/DONE/CANCELLED. Chaque item a :
+
+- **Titre** (max 200 caractères)
+- **`done`** booléen (coché ou non)
+- **`displayOrder`** pour l'ordre dans la checklist
+
+Pas de stockage de l'auteur ni de la date de cochage — les items sont considérés comme état partagé de la tâche.
+
 ## Architecture
 
 ### Modèles Prisma
@@ -301,6 +311,37 @@ Permet de partager un lien filtré ou de revenir en arrière en gardant la séle
 
 Si `group.tasks.length > 0` mais qu'aucune tâche ne correspond aux filtres actifs, un message dédié `gestion.tasks.filters.no_match` s'affiche à la place du listing (distinct de l'empty state « groupe vide »).
 
+## Checklist (sous-tâches légères)
+
+Chaque tâche peut comporter une liste d'items à cocher (modèle `TaskChecklistItem`). Permet de découper une grosse tâche sans polluer le Kanban.
+
+### Endpoints
+
+Sous `/api/editions/:id/tasks/:taskId/checklist-items/` :
+
+| Méthode | Endpoint   | Description                                |
+| ------- | ---------- | ------------------------------------------ |
+| POST    | `/`        | Crée un item (body `{ title }`)            |
+| PUT     | `/:itemId` | Met à jour `title`, `done`, `displayOrder` |
+| DELETE  | `/:itemId` | Supprime l'item                            |
+
+Les items sont aussi retournés inclus dans `GET /api/editions/:id/task-groups` (avec `id`, `title`, `done`, `displayOrder`).
+
+**Permissions** : organisateurs avec `canManageTasks` **OU** assignés à la tâche (helper `canCommentTask`). Les bénévoles assignés peuvent donc à la fois cocher et créer/éditer/supprimer des items.
+
+### Frontend
+
+- **Composant** `TasksTaskChecklist` ([app/components/tasks/TaskChecklist.vue](../app/components/tasks/TaskChecklist.vue)) :
+  - Liste d'items avec `UCheckbox` cliquable, édition inline du titre (bouton crayon), suppression (bouton corbeille, confirmation).
+  - Ajout d'un nouvel item via input + bouton « Ajouter » (ou Enter).
+  - Optimistic update local sur toggle/édition/suppression, revert en cas d'erreur API.
+- **Intégration** : section affichée dans `TasksTaskModal` (gestion) entre la description et les commentaires, uniquement en mode édition (pas à la création).
+- **Progression** : badge `X / Y` (items cochés / total) affiché sur les cards Kanban et la vue Liste de gestion si `task.checklistItems.length > 0`.
+
+### Synchronisation parent
+
+`TaskModal` émet un événement `task-updated` à chaque changement de la checklist (forwarded depuis `TasksTaskChecklist`). Le parent [`[groupId].vue`](../app/pages/editions/%5Bid%5D/gestion/tasks/%5BgroupId%5D.vue) écoute cet événement, refetch les groupes en arrière-plan et re-pointe `editingTask` vers la nouvelle référence — le modal reste ouvert avec les données à jour, et les badges des cards se mettent à jour live.
+
 ## Vue « Mes tâches » (utilisateurs assignés)
 
 La page `/editions/[id]/mes-taches` est destinée aux utilisateurs assignés à des tâches **sans nécessiter le droit `canManageTasks`**. Elle permet aux bénévoles d'avoir une vue d'ensemble de leurs propres tâches sur une édition donnée.
@@ -347,13 +388,6 @@ Propositions classées par valeur métier × effort estimé. Les éléments **pl
 - **Effort estimé** : 0,5 j (réutilise l'endpoint `reorder` ou en créer un dédié pour les groupes).
 
 ### Fonctionnalités à fort impact (effort moyen)
-
-#### 🚧 5. Sous-tâches / checklist
-
-- Champ `parentTaskId` sur `Task`, **ou** (préférable) table `TaskChecklistItem` (titre + done) — items légers, sans cycle complet TODO/IN_PROGRESS/DONE.
-- Progression auto-calculée affichée sur la card (ex: « 3/7 »).
-- **Bénéfice** : on découpe les grosses tâches sans polluer le Kanban.
-- **Effort estimé** : 2-3 j.
 
 #### 6. Templates de groupes / tâches
 

@@ -38,9 +38,10 @@ model Task {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  group       TaskGroup        @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
-  assignments TaskAssignment[]
-  comments    TaskComment[]
+  group          TaskGroup           @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
+  assignments    TaskAssignment[]
+  comments       TaskComment[]
+  checklistItems TaskChecklistItem[]
 
   @@index([taskGroupId])
   @@index([taskGroupId, displayOrder])
@@ -76,4 +77,22 @@ model TaskComment {
   @@index([taskId])
   @@index([userId])
   @@index([taskId, createdAt])
+}
+
+// Item de checklist (sous-tâche légère) rattaché à une Task. Permet de
+// découper une grosse tâche en items cochables sans dupliquer le cycle de
+// statut TODO/IN_PROGRESS/DONE/CANCELLED.
+model TaskChecklistItem {
+  id           Int      @id @default(autoincrement())
+  taskId       Int
+  title        String
+  done         Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([taskId, displayOrder])
 }

@@ -51,6 +51,10 @@ export default wrapApiHandler(
                 },
               },
             },
+            checklistItems: {
+              orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
+              select: { id: true, title: true, done: true, displayOrder: true },
+            },
           },
         },
       },

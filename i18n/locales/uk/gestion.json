@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Більше не можна призначати",
+      "checklist": {
+        "add": "Додати",
+        "add_placeholder": "Новий пункт чек-листа...",
+        "confirm_delete": "Видалити пункт «{title}»?",
+        "empty": "Поки що немає пунктів у чек-листі.",
+        "title": "Чек-лист"
+      },
       "comments": {
         "confirm_delete": "Видалити цей коментар?",
         "edited": "відредаговано",

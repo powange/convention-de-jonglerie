@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Nicht mehr zuweisbar",
+      "checklist": {
+        "add": "Hinzufügen",
+        "add_placeholder": "Neues Checklisten-Element...",
+        "confirm_delete": "Element «{title}» löschen?",
+        "empty": "Noch kein Element in der Checkliste.",
+        "title": "Checkliste"
+      },
       "comments": {
         "confirm_delete": "Diesen Kommentar löschen?",
         "edited": "bearbeitet",

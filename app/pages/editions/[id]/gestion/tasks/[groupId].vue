@@ -120,13 +120,22 @@
               </UBadge>
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-sm truncate">{{ task.title }}</div>
-                <div
-                  v-if="task.deadline"
-                  class="text-xs mt-0.5 flex items-center gap-1"
-                  :class="deadlineClass(task.deadline, task.status)"
-                >
-                  <UIcon name="i-heroicons-calendar" class="size-3" />
-                  {{ formatDeadline(task.deadline) }}
+                <div class="flex items-center gap-3 mt-0.5">
+                  <div
+                    v-if="task.deadline"
+                    class="text-xs flex items-center gap-1"
+                    :class="deadlineClass(task.deadline, task.status)"
+                  >
+                    <UIcon name="i-heroicons-calendar" class="size-3" />
+                    {{ formatDeadline(task.deadline) }}
+                  </div>
+                  <div
+                    v-if="task.checklistItems.length"
+                    class="text-xs flex items-center gap-1 text-gray-500"
+                  >
+                    <UIcon name="i-heroicons-check-circle" class="size-3" />
+                    {{ checklistDone(task) }} / {{ task.checklistItems.length }}
+                  </div>
                 </div>
               </div>
               <div v-if="task.assignments.length" class="flex -space-x-1 shrink-0">
@@ -200,15 +209,29 @@
             >
               <div class="font-medium text-sm mb-2">{{ task.title }}</div>
               <div class="flex items-center justify-between gap-2">
-                <div
-                  v-if="task.deadline"
-                  class="text-xs flex items-center gap-1"
-                  :class="deadlineClass(task.deadline, task.status)"
-                >
-                  <UIcon name="i-heroicons-calendar" class="size-3" />
-                  {{ formatDeadline(task.deadline) }}
+                <div class="flex items-center gap-3 min-w-0">
+                  <div
+                    v-if="task.deadline"
+                    class="text-xs flex items-center gap-1"
+                    :class="deadlineClass(task.deadline, task.status)"
+                  >
+                    <UIcon name="i-heroicons-calendar" class="size-3" />
+                    {{ formatDeadline(task.deadline) }}
+                  </div>
+                  <div
+                    v-if="task.checklistItems.length"
+                    class="text-xs flex items-center gap-1 text-gray-500"
+                  >
+                    <UIcon name="i-heroicons-check-circle" class="size-3" />
+                    {{ checklistDone(task) }} / {{ task.checklistItems.length }}
+                  </div>
+                  <div
+                    v-if="!task.deadline && !task.checklistItems.length"
+                    class="text-xs text-gray-400"
+                  >
+                    —
+                  </div>
                 </div>
-                <div v-else class="text-xs text-gray-400">—</div>
                 <div v-if="task.assignments.length" class="flex -space-x-1">
                   <UiUserAvatar
                     v-for="a in task.assignments.slice(0, 3)"
@@ -252,6 +275,7 @@
       :task-groups="allGroups"
       @saved="handleTaskSaved"
       @deleted="handleTaskDeleted"
+      @task-updated="handleTaskUpdated"
     />
   </UContainer>
 </template>
@@ -283,6 +307,12 @@ interface TaskAssignment {
   id: number
   user: AssignableUser
 }
+interface ChecklistItem {
+  id: number
+  title: string
+  done: boolean
+  displayOrder: number
+}
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 interface TaskItem {
   id: number
@@ -293,6 +323,7 @@ interface TaskItem {
   deadline: string | null
   displayOrder: number
   assignments: TaskAssignment[]
+  checklistItems: ChecklistItem[]
 }
 interface TaskGroupItem {
   id: number
@@ -509,6 +540,21 @@ async function handleTaskSaved() {
 async function handleTaskDeleted() {
   await fetchGroups()
 }
+// Émis par TaskModal quand sa checklist change. Refetch en arrière-plan
+// sans fermer le modal, et re-pointe editingTask vers la nouvelle référence
+// pour que le modal reçoive les items à jour.
+async function handleTaskUpdated() {
+  const currentId = editingTask.value?.id
+  await fetchGroups()
+  if (currentId == null) return
+  for (const g of allGroups.value) {
+    const task = g.tasks.find((t) => t.id === currentId)
+    if (task) {
+      editingTask.value = task
+      return
+    }
+  }
+}
 
 function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'error' {
   switch (status) {
@@ -525,6 +571,10 @@ function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'erro
 
 function tasksByStatus(status: TaskStatus): TaskItem[] {
   return filteredTasks.value.filter((t) => t.status === status)
+}
+
+function checklistDone(task: TaskItem): number {
+  return task.checklistItems.filter((i) => i.done).length
 }
 
 // --- Drag & drop kanban (changement de status + réordonnancement) ---

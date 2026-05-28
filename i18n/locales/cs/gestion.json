@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Již nelze přiřadit",
+      "checklist": {
+        "add": "Přidat",
+        "add_placeholder": "Nová položka checklistu...",
+        "confirm_delete": "Odstranit položku «{title}»?",
+        "empty": "V checklistu zatím nejsou žádné položky.",
+        "title": "Checklist"
+      },
       "comments": {
         "confirm_delete": "Smazat tento komentář?",
         "edited": "upraveno",

@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Nie można już przypisać",
+      "checklist": {
+        "add": "Dodaj",
+        "add_placeholder": "Nowy element listy...",
+        "confirm_delete": "Usunąć element «{title}»?",
+        "empty": "Brak elementów na liście.",
+        "title": "Lista kontrolna"
+      },
       "comments": {
         "confirm_delete": "Usunąć ten komentarz?",
         "edited": "edytowano",

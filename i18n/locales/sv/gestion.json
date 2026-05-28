@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Kan inte längre tilldelas",
+      "checklist": {
+        "add": "Lägg till",
+        "add_placeholder": "Ny punkt i checklistan...",
+        "confirm_delete": "Ta bort punkten «{title}»?",
+        "empty": "Inga punkter i checklistan ännu.",
+        "title": "Checklista"
+      },
       "comments": {
         "confirm_delete": "Ta bort denna kommentar?",
         "edited": "redigerad",

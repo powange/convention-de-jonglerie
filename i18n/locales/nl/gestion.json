@@ -512,6 +512,13 @@
     },
     "tasks": {
       "assignee_legacy_badge": "Niet meer toewijsbaar",
+      "checklist": {
+        "add": "Toevoegen",
+        "add_placeholder": "Nieuw checklist-item...",
+        "confirm_delete": "Item «{title}» verwijderen?",
+        "empty": "Nog geen items in de checklist.",
+        "title": "Checklist"
+      },
       "comments": {
         "confirm_delete": "Deze opmerking verwijderen?",
         "edited": "bewerkt",

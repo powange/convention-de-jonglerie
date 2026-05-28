@@ -65,6 +65,17 @@
         </UFormField>
       </form>
 
+      <!-- Checklist (uniquement en édition) -->
+      <div v-if="task" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+        <TasksTaskChecklist
+          :edition-id="editionId"
+          :task-id="task.id"
+          :items="task.checklistItems || []"
+          :can-edit="true"
+          @updated="emit('task-updated')"
+        />
+      </div>
+
       <!-- Commentaires (uniquement en édition) -->
       <div v-if="task" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
         <TasksTaskComments
@@ -115,6 +126,12 @@ interface TaskAssignment {
   id: number
   user: AssignableUser
 }
+interface ChecklistItem {
+  id: number
+  title: string
+  done: boolean
+  displayOrder: number
+}
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 interface TaskItem {
   id: number
@@ -124,6 +141,7 @@ interface TaskItem {
   status: TaskStatus
   deadline: string | null
   assignments: TaskAssignment[]
+  checklistItems?: ChecklistItem[]
 }
 interface TaskGroupItem {
   id: number
@@ -143,6 +161,7 @@ const emit = defineEmits<{
   'update:open': [v: boolean]
   saved: []
   deleted: []
+  'task-updated': []
 }>()
 
 const { t } = useI18n()
