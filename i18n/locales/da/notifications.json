@@ -125,6 +125,18 @@
         "action": "Se opgaven",
         "message": "{authorPseudo} har kommenteret opgaven „{taskTitle}\" for udgaven {editionName}.",
         "title": "Ny kommentar på en opgave 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Se mine opgaver",
+          "message": "Fristen for opgaven «{taskTitle}» i udgaven {editionName} udløber i dag.",
+          "title": "Forfalder i dag ⏰"
+        },
+        "j_minus_1": {
+          "action": "Se mine opgaver",
+          "message": "Fristen for opgaven «{taskTitle}» i udgaven {editionName} udløber i morgen.",
+          "title": "Forfalder i morgen 🔔"
+        }
       }
     },
     "this_week": "Denne uge",

@@ -125,6 +125,18 @@
         "action": "Посмотреть задачу",
         "message": "{authorPseudo} прокомментировал(а) задачу «{taskTitle}» выпуска {editionName}.",
         "title": "Новый комментарий к задаче 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Посмотреть мои задачи",
+          "message": "Срок задачи «{taskTitle}» выпуска {editionName} истекает сегодня.",
+          "title": "Срок сегодня ⏰"
+        },
+        "j_minus_1": {
+          "action": "Посмотреть мои задачи",
+          "message": "Срок задачи «{taskTitle}» выпуска {editionName} истекает завтра.",
+          "title": "Срок завтра 🔔"
+        }
       }
     },
     "this_week": "На этой неделе",

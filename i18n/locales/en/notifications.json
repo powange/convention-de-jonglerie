@@ -125,6 +125,18 @@
         "action": "View task",
         "message": "{authorPseudo} commented on the task \"{taskTitle}\" of the {editionName} edition.",
         "title": "New comment on a task 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "View my tasks",
+          "message": "The task «{taskTitle}» of the {editionName} edition is due today.",
+          "title": "Due today ⏰"
+        },
+        "j_minus_1": {
+          "action": "View my tasks",
+          "message": "The task «{taskTitle}» of the {editionName} edition is due tomorrow.",
+          "title": "Due tomorrow 🔔"
+        }
       }
     },
     "this_week": "This week",

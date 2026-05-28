@@ -1007,6 +1007,52 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification de rappel d'échéance sur une tâche.
+   * Envoyée par le cron quotidien aux assignés à J-1 et le jour J pour les
+   * tâches non terminées (statut TODO ou IN_PROGRESS). Le `notificationType`
+   * inclut le kind (suffixe `_j_minus_1` ou `_j`) pour permettre la dédup
+   * indépendante de chaque rappel via la table Notification existante.
+   */
+  async taskDeadlineReminder(
+    userId: number,
+    taskTitle: string,
+    editionName: string,
+    editionId: number,
+    taskId: number,
+    kind: 'J_MINUS_1' | 'J'
+  ) {
+    const config =
+      kind === 'J_MINUS_1'
+        ? {
+            type: 'INFO' as const,
+            titleKey: 'notifications.task.deadline_reminder.j_minus_1.title',
+            messageKey: 'notifications.task.deadline_reminder.j_minus_1.message',
+            actionTextKey: 'notifications.task.deadline_reminder.j_minus_1.action',
+            notificationType: 'task_deadline_reminder_j_minus_1',
+          }
+        : {
+            type: 'WARNING' as const,
+            titleKey: 'notifications.task.deadline_reminder.j.title',
+            messageKey: 'notifications.task.deadline_reminder.j.message',
+            actionTextKey: 'notifications.task.deadline_reminder.j.action',
+            notificationType: 'task_deadline_reminder_j',
+          }
+    return await NotificationService.create({
+      userId,
+      type: config.type,
+      titleKey: config.titleKey,
+      messageKey: config.messageKey,
+      translationParams: { taskTitle, editionName },
+      actionTextKey: config.actionTextKey,
+      category: 'task',
+      entityType: 'Task',
+      entityId: taskId.toString(),
+      actionUrl: `/editions/${editionId}/mes-taches`,
+      notificationType: config.notificationType,
+    })
+  },
+
+  /**
    * Notification de don café reçu (envoyée à tous les global admins)
    */
   async coffeeDonationReceived(quantity: number, totalCents: number, donorName: string | null) {

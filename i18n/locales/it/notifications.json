@@ -125,6 +125,18 @@
         "action": "Vedi attività",
         "message": "{authorPseudo} ha commentato l'attività «{taskTitle}» dell'edizione {editionName}.",
         "title": "Nuovo commento su un'attività 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Vedi le mie attività",
+          "message": "L'attività «{taskTitle}» dell'edizione {editionName} scade oggi.",
+          "title": "Scade oggi ⏰"
+        },
+        "j_minus_1": {
+          "action": "Vedi le mie attività",
+          "message": "L'attività «{taskTitle}» dell'edizione {editionName} scade domani.",
+          "title": "Scade domani 🔔"
+        }
       }
     },
     "this_week": "Questa settimana",

@@ -125,6 +125,18 @@
         "action": "Zobrazit úkol",
         "message": "{authorPseudo} okomentoval(a) úkol „{taskTitle}\" ročníku {editionName}.",
         "title": "Nový komentář k úkolu 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Zobrazit mé úkoly",
+          "message": "Termín úkolu «{taskTitle}» z edice {editionName} vyprší dnes.",
+          "title": "Termín dnes ⏰"
+        },
+        "j_minus_1": {
+          "action": "Zobrazit mé úkoly",
+          "message": "Termín úkolu «{taskTitle}» z edice {editionName} vyprší zítra.",
+          "title": "Termín zítra 🔔"
+        }
       }
     },
     "this_week": "Tento týden",

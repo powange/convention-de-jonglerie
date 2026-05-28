@@ -31,6 +31,19 @@ export default defineNitroPlugin(async (_nitroApp) => {
       start: true,
     })
 
+    // Rappels d'échéance sur les tâches d'édition (quotidien à 9h)
+    CronJob.from({
+      cronTime: '0 9 * * *',
+      onTick: async () => {
+        try {
+          await runTask('task-deadlines-reminders')
+        } catch (error) {
+          console.error("Erreur lors de l'exécution de task-deadlines-reminders:", error)
+        }
+      },
+      start: true,
+    })
+
     // Nettoyage des tokens expirés (quotidien à 2h du matin)
     CronJob.from({
       cronTime: '0 2 * * *',

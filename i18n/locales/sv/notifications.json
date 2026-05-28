@@ -125,6 +125,18 @@
         "action": "Visa uppgift",
         "message": "{authorPseudo} har kommenterat uppgiften ”{taskTitle}” för utgåvan {editionName}.",
         "title": "Ny kommentar på en uppgift 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Visa mina uppgifter",
+          "message": "Tidsfristen för uppgiften «{taskTitle}» i utgåvan {editionName} går ut idag.",
+          "title": "Förfaller idag ⏰"
+        },
+        "j_minus_1": {
+          "action": "Visa mina uppgifter",
+          "message": "Tidsfristen för uppgiften «{taskTitle}» i utgåvan {editionName} går ut imorgon.",
+          "title": "Förfaller imorgon 🔔"
+        }
       }
     },
     "this_week": "Denna vecka",

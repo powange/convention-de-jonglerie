@@ -125,6 +125,18 @@
         "action": "Zobacz zadanie",
         "message": "{authorPseudo} skomentował(a) zadanie „{taskTitle}\" edycji {editionName}.",
         "title": "Nowy komentarz do zadania 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Zobacz moje zadania",
+          "message": "Termin zadania «{taskTitle}» z edycji {editionName} upływa dziś.",
+          "title": "Termin dziś ⏰"
+        },
+        "j_minus_1": {
+          "action": "Zobacz moje zadania",
+          "message": "Termin zadania «{taskTitle}» z edycji {editionName} upływa jutro.",
+          "title": "Termin jutro 🔔"
+        }
       }
     },
     "this_week": "W tym tygodniu",

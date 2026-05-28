@@ -125,6 +125,18 @@
         "action": "Переглянути завдання",
         "message": "{authorPseudo} прокоментував(ла) завдання «{taskTitle}» випуску {editionName}.",
         "title": "Новий коментар до завдання 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Переглянути мої завдання",
+          "message": "Термін завдання «{taskTitle}» випуску {editionName} спливає сьогодні.",
+          "title": "Термін сьогодні ⏰"
+        },
+        "j_minus_1": {
+          "action": "Переглянути мої завдання",
+          "message": "Термін завдання «{taskTitle}» випуску {editionName} спливає завтра.",
+          "title": "Термін завтра 🔔"
+        }
       }
     },
     "this_week": "Цього тижня",

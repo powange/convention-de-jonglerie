@@ -125,6 +125,18 @@
         "action": "Aufgabe ansehen",
         "message": "{authorPseudo} hat die Aufgabe „{taskTitle}\" der Ausgabe {editionName} kommentiert.",
         "title": "Neuer Kommentar zu einer Aufgabe 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Meine Aufgaben anzeigen",
+          "message": "Die Aufgabe «{taskTitle}» der Edition {editionName} ist heute fällig.",
+          "title": "Heute fällig ⏰"
+        },
+        "j_minus_1": {
+          "action": "Meine Aufgaben anzeigen",
+          "message": "Die Aufgabe «{taskTitle}» der Edition {editionName} ist morgen fällig.",
+          "title": "Morgen fällig 🔔"
+        }
       }
     },
     "this_week": "Diese Woche",

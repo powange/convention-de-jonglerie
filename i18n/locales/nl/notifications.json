@@ -125,6 +125,18 @@
         "action": "Taak bekijken",
         "message": "{authorPseudo} heeft commentaar gegeven op de taak „{taskTitle}\" van editie {editionName}.",
         "title": "Nieuwe opmerking op een taak 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Mijn taken bekijken",
+          "message": "De taak «{taskTitle}» van de editie {editionName} verloopt vandaag.",
+          "title": "Verloopt vandaag ⏰"
+        },
+        "j_minus_1": {
+          "action": "Mijn taken bekijken",
+          "message": "De taak «{taskTitle}» van de editie {editionName} verloopt morgen.",
+          "title": "Verloopt morgen 🔔"
+        }
       }
     },
     "this_week": "Deze week",

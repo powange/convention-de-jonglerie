@@ -163,16 +163,38 @@ Tous les endpoints exigent une authentification et le droit `canManageTasks` (sa
 
 ## Notifications
 
-| Helper          | Déclencheur                       | Destinataires                     | Type   |
-| --------------- | --------------------------------- | --------------------------------- | ------ |
-| `taskAssigned`  | Nouvelle assignation              | Le nouvel assigné (hors auteur)   | `INFO` |
-| `taskCommented` | Nouveau commentaire sur une tâche | Les autres assignés (hors auteur) | `INFO` |
-
-Toutes deux ont :
+| Helper                 | Déclencheur                       | Destinataires                     | Type               |
+| ---------------------- | --------------------------------- | --------------------------------- | ------------------ |
+| `taskAssigned`         | Nouvelle assignation              | Le nouvel assigné (hors auteur)   | `INFO`             |
+| `taskCommented`        | Nouveau commentaire sur une tâche | Les autres assignés (hors auteur) | `INFO`             |
+| `taskDeadlineReminder` | Cron quotidien (J-1 et jour J)    | Chaque assigné                    | `INFO` / `WARNING` |
 
 - **Catégorie** : `task`
-- **Action URL** : `/editions/:id/gestion/tasks`
-- **Clés i18n** sous `notifications.task.{assigned|commented}.{title,message,action}`
+- **Action URL** : `/editions/:id/gestion/tasks` (assignation/commentaire) ou `/editions/:id/mes-taches` (rappel d'échéance, accessible aux bénévoles)
+- **Clés i18n** sous `notifications.task.{assigned|commented|deadline_reminder.{j_minus_1|j}}.{title,message,action}`
+
+### Rappels automatiques d'échéance
+
+Une tâche cron quotidienne ([server/tasks/task-deadlines-reminders.ts](../server/tasks/task-deadlines-reminders.ts)) tourne à **9h00** (heure serveur) et envoie :
+
+- **J-1** (`notificationType=task_deadline_reminder_j_minus_1`, type `INFO`) : pour chaque tâche **non terminée** (`TODO` ou `IN_PROGRESS`) dont la deadline tombe le lendemain, une notification est envoyée à chaque assigné.
+- **J** (`notificationType=task_deadline_reminder_j`, type `WARNING`) : idem pour les tâches dont la deadline tombe aujourd'hui.
+
+#### Déduplication via la table `Notification`
+
+Pas de table dédiée — la dédup s'appuie sur la table `Notification` existante. Avant d'envoyer un rappel, le cron récupère en **une seule requête** toutes les notifications de type `task_deadline_reminder_*` déjà créées pour les tâches concernées, et skip les couples `(userId, taskId, notificationType)` déjà présents.
+
+Le `notificationType` inclut le suffixe `_j_minus_1` ou `_j` : chaque kind de rappel se déduplique **indépendamment**. Un même utilisateur ne reçoit donc :
+
+- au maximum 1 notification `_j_minus_1` par tâche (toute sa vie)
+- au maximum 1 notification `_j` par tâche (toute sa vie)
+
+> **Limitations acceptées (MVP)** :
+>
+> - Si l'utilisateur supprime explicitement sa notification, il pourrait être re-notifié au prochain cron.
+> - Si la deadline d'une tâche est modifiée et qu'elle retombe dans la fenêtre J-1/J, le rappel correspondant ne sera pas ré-émis.
+>
+> Ces cas edge sont jugés peu fréquents et acceptables pour cette première version.
 
 Voir [`docs/system/NOTIFICATION_SYSTEM.md`](system/NOTIFICATION_SYSTEM.md) pour le système global.
 
@@ -302,12 +324,11 @@ Propositions classées par valeur métier × effort estimé. Les éléments **pl
 
 ### Quick wins (haute valeur / faible effort)
 
-#### 🚧 3. Rappels automatiques d'échéance
+#### Rappels de retard (J+1, J+3)
 
-- Job cron quotidien notifiant les assignés à J-1 et le jour J.
-- Notification spécifique pour les tâches en retard (J+1, J+3).
-- **Bénéfice** : transforme le module en vrai outil de suivi, pas uniquement de listing.
-- **Effort estimé** : 1-2 j (réutilise l'infrastructure de notifications existante).
+- Relances pour les tâches **en retard** (deadline passée, statut non terminé).
+- À ajouter dans la même tâche cron `task-deadlines-reminders` avec un nouveau `kind` (`J_PLUS_1`, `J_PLUS_3`).
+- **Effort estimé** : 0,5 j.
 
 #### 🚧 4. Réordonnancement par drag & drop
 

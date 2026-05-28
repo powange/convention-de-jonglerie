@@ -125,6 +125,18 @@
         "action": "Ver tarefa",
         "message": "{authorPseudo} comentou na tarefa «{taskTitle}» da edição {editionName}.",
         "title": "Novo comentário numa tarefa 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Ver minhas tarefas",
+          "message": "A tarefa «{taskTitle}» da edição {editionName} vence hoje.",
+          "title": "Vence hoje ⏰"
+        },
+        "j_minus_1": {
+          "action": "Ver minhas tarefas",
+          "message": "A tarefa «{taskTitle}» da edição {editionName} vence amanhã.",
+          "title": "Vence amanhã 🔔"
+        }
       }
     },
     "this_week": "Esta semana",

@@ -125,6 +125,18 @@
         "action": "Voir la tâche",
         "message": "{authorPseudo} a commenté la tâche « {taskTitle} » de l'édition {editionName}.",
         "title": "Nouveau commentaire sur une tâche 💬"
+      },
+      "deadline_reminder": {
+        "j": {
+          "action": "Voir mes tâches",
+          "message": "La tâche « {taskTitle} » de l'édition {editionName} arrive à échéance aujourd'hui.",
+          "title": "Échéance aujourd'hui ⏰"
+        },
+        "j_minus_1": {
+          "action": "Voir mes tâches",
+          "message": "La tâche « {taskTitle} » de l'édition {editionName} arrive à échéance demain.",
+          "title": "Échéance demain 🔔"
+        }
       }
     },
     "this_week": "Cette semaine",
