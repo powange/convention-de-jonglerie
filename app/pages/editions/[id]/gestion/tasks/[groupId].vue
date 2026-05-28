@@ -82,6 +82,7 @@
         :assignable-users="assignableUsers"
         :legacy-assignees="legacyAssignees"
         :has-deadlines="hasDeadlines"
+        :available-tags="availableTags"
       />
 
       <!-- Vue Liste -->
@@ -120,7 +121,7 @@
               </UBadge>
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-sm truncate">{{ task.title }}</div>
-                <div class="flex items-center gap-3 mt-0.5">
+                <div class="flex items-center gap-3 mt-0.5 flex-wrap">
                   <div
                     v-if="task.deadline"
                     class="text-xs flex items-center gap-1"
@@ -135,6 +136,13 @@
                   >
                     <UIcon name="i-heroicons-check-circle" class="size-3" />
                     {{ checklistDone(task) }} / {{ task.checklistItems.length }}
+                  </div>
+                  <div v-if="task.tagAssignments.length" class="flex flex-wrap gap-1">
+                    <TasksTaskTagBadge
+                      v-for="a in task.tagAssignments"
+                      :key="a.tag.id"
+                      :tag="a.tag"
+                    />
                   </div>
                 </div>
               </div>
@@ -208,6 +216,9 @@
               @drop.stop="onCardDrop(task)"
             >
               <div class="font-medium text-sm mb-2">{{ task.title }}</div>
+              <div v-if="task.tagAssignments.length" class="flex flex-wrap gap-1 mb-2">
+                <TasksTaskTagBadge v-for="a in task.tagAssignments" :key="a.tag.id" :tag="a.tag" />
+              </div>
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-3 min-w-0">
                   <div
@@ -265,6 +276,13 @@
       @saved="handleGroupSaved"
       @deleted="handleGroupDeleted"
     />
+    <TasksTaskTagsModal
+      v-model:open="tagsModalOpen"
+      :edition-id="editionId"
+      :group-id="groupId"
+      :tags="availableTags"
+      @saved="fetchAvailableTags"
+    />
     <TasksTaskModal
       v-if="group"
       v-model:open="taskModalOpen"
@@ -273,6 +291,7 @@
       :task="editingTask"
       :assignable-users="assignableUsers"
       :task-groups="allGroups"
+      :available-tags="availableTags"
       @saved="handleTaskSaved"
       @deleted="handleTaskDeleted"
       @task-updated="handleTaskUpdated"
@@ -313,6 +332,15 @@ interface ChecklistItem {
   done: boolean
   displayOrder: number
 }
+interface TagItem {
+  id: number
+  name: string
+  color: string
+}
+interface TagAssignment {
+  id: number
+  tag: TagItem
+}
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 interface TaskItem {
   id: number
@@ -324,6 +352,7 @@ interface TaskItem {
   displayOrder: number
   assignments: TaskAssignment[]
   checklistItems: ChecklistItem[]
+  tagAssignments: TagAssignment[]
 }
 interface TaskGroupItem {
   id: number
@@ -335,6 +364,7 @@ interface TaskGroupItem {
 
 const allGroups = ref<TaskGroupItem[]>([])
 const assignableUsers = ref<AssignableUser[]>([])
+const availableTags = ref<TagItem[]>([])
 const loading = ref(true)
 const viewMode = ref<'list' | 'kanban'>('list')
 
@@ -362,12 +392,17 @@ function parseInitialFilters(): TaskFiltersValue {
   const due = queryParam(route.query.due)
   const statusesRaw = queryParam(route.query.status)
   const assigneesRaw = queryParam(route.query.assignees)
+  const tagsRaw = queryParam(route.query.tags)
   return {
     q,
     statuses: statusesRaw
       .split(',')
       .filter((s): s is TaskStatus => VALID_STATUSES.includes(s as TaskStatus)),
     assigneeIds: assigneesRaw
+      .split(',')
+      .map((n) => parseInt(n, 10))
+      .filter((n) => !isNaN(n)),
+    tagIds: tagsRaw
       .split(',')
       .map((n) => parseInt(n, 10))
       .filter((n) => !isNaN(n)),
@@ -416,6 +451,11 @@ const filteredTasks = computed<TaskItem[]>(() => {
     list = list.filter((t) => t.assignments.some((a) => set.has(a.user.id)))
   }
 
+  if (filters.value.tagIds.length) {
+    const set = new Set(filters.value.tagIds)
+    list = list.filter((t) => t.tagAssignments.some((a) => set.has(a.tag.id)))
+  }
+
   const due = filters.value.due
   if (due && due !== 'all') {
     const now = new Date()
@@ -457,6 +497,8 @@ watch(
     else delete query.status
     if (f.assigneeIds.length) query.assignees = f.assigneeIds.join(',')
     else delete query.assignees
+    if (f.tagIds.length) query.tags = f.tagIds.join(',')
+    else delete query.tags
     if (f.due && f.due !== 'all') query.due = f.due
     else delete query.due
     router.replace({ query })
@@ -483,10 +525,28 @@ const fetchAssignableUsers = async () => {
   assignableUsers.value = res?.data?.users || []
 }
 
-await Promise.all([fetchGroups(), fetchAssignableUsers()])
+const fetchAvailableTags = async () => {
+  try {
+    const res = await $fetch<{ success: boolean; data: { tags: TagItem[] } }>(
+      `/api/editions/${editionId}/task-groups/${groupId.value}/tags`
+    )
+    availableTags.value = res?.data?.tags || []
+  } catch {
+    // Si le groupe n'existe pas (ou autre erreur), on ignore.
+    availableTags.value = []
+  }
+}
+
+await Promise.all([fetchGroups(), fetchAssignableUsers(), fetchAvailableTags()])
+
+// Refetch les tags si on change de groupId via navigation
+watch(groupId, () => {
+  fetchAvailableTags()
+})
 
 // Modales
 const groupModalOpen = ref(false)
+const tagsModalOpen = ref(false)
 const taskModalOpen = ref(false)
 const editingTask = ref<TaskItem | null>(null)
 
@@ -502,6 +562,13 @@ const groupActions = computed(() => [
       icon: 'i-heroicons-pencil-square',
       onSelect: () => {
         groupModalOpen.value = true
+      },
+    },
+    {
+      label: t('gestion.tasks.tags.manage'),
+      icon: 'i-heroicons-tag',
+      onSelect: () => {
+        tagsModalOpen.value = true
       },
     },
     {

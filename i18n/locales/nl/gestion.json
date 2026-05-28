@@ -549,7 +549,9 @@
         "no_match": "Geen taak komt overeen met de filters",
         "search_placeholder": "Zoek een taak...",
         "status_placeholder": "Status",
-        "statuses_count": "{count} statussen"
+        "statuses_count": "{count} statussen",
+        "tag_placeholder": "Tags",
+        "tags_count": "{count} tags"
       },
       "group_description": "Beschrijving",
       "group_description_empty": "Geen beschrijving",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "Bezig",
         "TODO": "Te doen"
       },
+      "tags": {
+        "confirm_delete": "Tag «{name}» verwijderen? Hij wordt uit alle taken van de groep verwijderd die hem dragen.",
+        "description": "Met tags kun je de taken van deze groep categoriseren (bv. dringend, materiaal, HR-validatie).",
+        "empty": "Geen tag gedefinieerd voor deze groep.",
+        "manage": "Tags beheren",
+        "modal_title": "Tags van de groep",
+        "name_placeholder": "Naam van de tag...",
+        "new_tag": "Nieuwe tag"
+      },
       "task_assignees": "Toegewezen personen",
       "task_assignees_placeholder": "Personen selecteren...",
       "task_deadline": "Deadline",
       "task_description": "Beschrijving",
       "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Selecteer tags...",
       "task_title": "Titel",
       "task_title_placeholder": "Bijv.: Materiaal reserveren...",
       "tasks_count": "{count} taak | {count} taken",

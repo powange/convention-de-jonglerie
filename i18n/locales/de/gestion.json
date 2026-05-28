@@ -549,7 +549,9 @@
         "no_match": "Keine Aufgabe entspricht den Filtern",
         "search_placeholder": "Aufgabe suchen...",
         "status_placeholder": "Status",
-        "statuses_count": "{count} Status"
+        "statuses_count": "{count} Status",
+        "tag_placeholder": "Tags",
+        "tags_count": "{count} Tags"
       },
       "group_description": "Beschreibung",
       "group_description_empty": "Keine Beschreibung",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "In Bearbeitung",
         "TODO": "Zu erledigen"
       },
+      "tags": {
+        "confirm_delete": "Den Tag «{name}» löschen? Er wird von allen Aufgaben der Gruppe entfernt, die ihn tragen.",
+        "description": "Mit Tags lassen sich die Aufgaben dieser Gruppe kategorisieren (z. B. dringend, Material, HR-Validierung).",
+        "empty": "Kein Tag für diese Gruppe definiert.",
+        "manage": "Tags verwalten",
+        "modal_title": "Tags der Gruppe",
+        "name_placeholder": "Tag-Name...",
+        "new_tag": "Neuer Tag"
+      },
       "task_assignees": "Zugewiesene Personen",
       "task_assignees_placeholder": "Personen auswählen...",
       "task_deadline": "Frist",
       "task_description": "Beschreibung",
       "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Tags auswählen...",
       "task_title": "Titel",
       "task_title_placeholder": "z. B.: Material reservieren...",
       "tasks_count": "{count} Aufgabe | {count} Aufgaben",

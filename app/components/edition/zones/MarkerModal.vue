@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EditionMarker } from '~/composables/useEditionMarkers'
+import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
 
 import { EDITION_ZONE_TYPES, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
@@ -35,24 +36,7 @@ const markerTypes = computed(() =>
   }))
 )
 
-const defaultColors = [
-  '#ef4444', // red-500
-  '#f97316', // orange-500
-  '#eab308', // yellow-500
-  '#22c55e', // green-500
-  '#06b6d4', // cyan-500
-  '#3b82f6', // blue-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
-  '#f59e0b', // amber-500
-  '#10b981', // emerald-500
-  '#0ea5e9', // sky-500
-  '#6366f1', // indigo-500
-  '#a855f7', // purple-500
-  '#f43f5e', // rose-500
-  '#84cc16', // lime-500
-  '#64748b', // slate-500
-]
+const defaultColors = DEFAULT_HEX_PALETTE
 
 const form = reactive({
   name: '',
@@ -141,39 +125,14 @@ const modalTitle = computed(() =>
         </UFormField>
 
         <UFormField :label="t('gestion.map.marker_color')">
-          <div class="space-y-3">
-            <div class="grid grid-cols-8 gap-2 mb-3">
-              <button
-                v-for="color in defaultColors"
-                :key="color"
-                type="button"
-                class="w-8 h-8 rounded-full border-2 shadow-sm hover:scale-110 transition-transform"
-                :class="
-                  form.color === color
-                    ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-gray-500'
-                    : 'border-gray-300'
-                "
-                :style="{ backgroundColor: color }"
-                @click="form.color = color"
-              />
-            </div>
-            <div class="flex items-center gap-3">
-              <label class="block">
-                <span class="sr-only">{{ t('gestion.map.custom_color') }}</span>
-                <input
-                  v-model="form.color"
-                  type="color"
-                  class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-                />
-              </label>
-              <UInput
-                v-model="form.color"
-                placeholder="#3b82f6"
-                class="flex-1"
-                pattern="^#[0-9A-Fa-f]{6}$"
-              />
-            </div>
-          </div>
+          <UiColorPicker
+            v-model="form.color"
+            :palette="[...defaultColors]"
+            format="hex"
+            :columns="8"
+            allow-custom
+            :custom-label="t('gestion.map.custom_color')"
+          />
         </UFormField>
       </div>
     </template>

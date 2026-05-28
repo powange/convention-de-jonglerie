@@ -7,6 +7,7 @@ import {
   canManageTasks,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import { assertTagsBelongToGroup } from '#server/utils/task-tags-helpers'
 import { assertAssigneesAreAssignable } from '#server/utils/tasks-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
@@ -21,6 +22,8 @@ const bodySchema = z.object({
   displayOrder: z.number().int().optional(),
   // Si fourni, remplace entièrement la liste d'assignés (set behavior)
   assigneeIds: z.array(z.number().int().positive()).optional(),
+  // Si fourni, remplace entièrement la liste de tags (set behavior)
+  tagIds: z.array(z.number().int().positive()).optional(),
   // Si fourni, déplace la tâche dans un autre groupe (de la même édition)
   taskGroupId: z.number().int().positive().optional(),
 })
@@ -57,6 +60,7 @@ export default wrapApiHandler(
       where: { id: taskId, group: { editionId } },
       include: {
         assignments: { select: { userId: true } },
+        tagAssignments: { select: { tagId: true } },
       },
     })
     if (!existing) {
@@ -99,6 +103,33 @@ export default wrapApiHandler(
       }
     }
 
+    // Calcul delta tags (set behavior) + vérification d'appartenance au groupe.
+    // Les tags appartiennent au groupe cible — soit le groupe d'origine de la
+    // tâche, soit le nouveau groupe si la tâche est déplacée. Si la tâche est
+    // déplacée, on retire d'office tous les tags actuels (ils appartiennent à
+    // l'ancien groupe et n'auront plus de sens dans le nouveau).
+    let tagsToAdd: number[] = []
+    let tagsToRemove: number[] = []
+    const targetGroupId = data.taskGroupId ?? existing.taskGroupId
+    const isMovedToOtherGroup = targetGroupId !== existing.taskGroupId
+    if (isMovedToOtherGroup) {
+      // Retire tous les tags de l'ancien groupe
+      tagsToRemove = existing.tagAssignments.map((a) => a.tagId)
+      // Si tagIds fourni, valide qu'ils appartiennent au nouveau groupe
+      if (data.tagIds !== undefined && data.tagIds.length > 0) {
+        await assertTagsBelongToGroup(targetGroupId, data.tagIds)
+        tagsToAdd = data.tagIds
+      }
+    } else if (data.tagIds !== undefined) {
+      const previousTagIds = new Set(existing.tagAssignments.map((a) => a.tagId))
+      const targetTagIds = new Set(data.tagIds)
+      tagsToAdd = [...targetTagIds].filter((id) => !previousTagIds.has(id))
+      tagsToRemove = [...previousTagIds].filter((id) => !targetTagIds.has(id))
+      if (tagsToAdd.length > 0) {
+        await assertTagsBelongToGroup(targetGroupId, tagsToAdd)
+      }
+    }
+
     const updateData: Record<string, unknown> = {}
     if (data.title !== undefined) updateData.title = data.title
     if (data.description !== undefined) {
@@ -111,7 +142,7 @@ export default wrapApiHandler(
     if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder
     if (data.taskGroupId !== undefined) updateData.taskGroupId = data.taskGroupId
 
-    // Mise à jour atomique : assignments + task dans une seule transaction
+    // Mise à jour atomique : assignments + tags + task dans une seule transaction
     const task = await prisma.$transaction(async (tx) => {
       if (toRemove.length > 0) {
         await tx.taskAssignment.deleteMany({
@@ -121,6 +152,17 @@ export default wrapApiHandler(
       if (newlyAssignedIds.length > 0) {
         await tx.taskAssignment.createMany({
           data: newlyAssignedIds.map((userId) => ({ taskId, userId })),
+          skipDuplicates: true,
+        })
+      }
+      if (tagsToRemove.length > 0) {
+        await tx.taskTagAssignment.deleteMany({
+          where: { taskId, tagId: { in: tagsToRemove } },
+        })
+      }
+      if (tagsToAdd.length > 0) {
+        await tx.taskTagAssignment.createMany({
+          data: tagsToAdd.map((tagId) => ({ taskId, tagId })),
           skipDuplicates: true,
         })
       }
@@ -141,6 +183,11 @@ export default wrapApiHandler(
                   profilePicture: true,
                 },
               },
+            },
+          },
+          tagAssignments: {
+            include: {
+              tag: { select: { id: true, name: true, color: true } },
             },
           },
         },

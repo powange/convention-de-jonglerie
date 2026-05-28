@@ -20,8 +20,9 @@ model TaskGroup {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition Edition   @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tasks   Task[]
+  tags    TaskTag[]
 
   @@index([editionId])
   @@index([editionId, displayOrder])
@@ -38,10 +39,11 @@ model Task {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  group          TaskGroup           @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
-  assignments    TaskAssignment[]
-  comments       TaskComment[]
-  checklistItems TaskChecklistItem[]
+  group           TaskGroup            @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
+  assignments     TaskAssignment[]
+  comments        TaskComment[]
+  checklistItems  TaskChecklistItem[]
+  tagAssignments  TaskTagAssignment[]
 
   @@index([taskGroupId])
   @@index([taskGroupId, displayOrder])
@@ -95,4 +97,39 @@ model TaskChecklistItem {
 
   @@index([taskId])
   @@index([taskId, displayOrder])
+}
+
+// Tag/label personnalisé défini au niveau d'un groupe de tâches. Permet de
+// catégoriser les tâches d'un groupe (ex: « urgent », « matériel », « à valider
+// RH »). Couleur stockée comme nom Tailwind (red, blue, etc.).
+model TaskTag {
+  id           Int      @id @default(autoincrement())
+  taskGroupId  Int
+  name         String
+  color        String
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  group       TaskGroup           @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
+  assignments TaskTagAssignment[]
+
+  @@unique([taskGroupId, name])
+  @@index([taskGroupId])
+  @@index([taskGroupId, displayOrder])
+}
+
+// Liaison many-to-many entre Task et TaskTag. Une tâche peut porter 0..N tags.
+model TaskTagAssignment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  tagId     Int
+  createdAt DateTime @default(now())
+
+  task Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag  TaskTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, tagId])
+  @@index([taskId])
+  @@index([tagId])
 }

@@ -549,7 +549,9 @@
         "no_match": "Ingen uppgift matchar filtren",
         "search_placeholder": "Sök en uppgift...",
         "status_placeholder": "Status",
-        "statuses_count": "{count} statusar"
+        "statuses_count": "{count} statusar",
+        "tag_placeholder": "Taggar",
+        "tags_count": "{count} taggar"
       },
       "group_description": "Beskrivning",
       "group_description_empty": "Ingen beskrivning",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "Pågår",
         "TODO": "Att göra"
       },
+      "tags": {
+        "confirm_delete": "Ta bort taggen «{name}»? Den tas bort från alla uppgifter i gruppen som har den.",
+        "description": "Taggar gör det möjligt att kategorisera uppgifterna i denna grupp (t.ex. brådskande, material, HR-validering).",
+        "empty": "Ingen tagg definierad för denna grupp.",
+        "manage": "Hantera taggar",
+        "modal_title": "Gruppens taggar",
+        "name_placeholder": "Namn på taggen...",
+        "new_tag": "Ny tagg"
+      },
       "task_assignees": "Tilldelade personer",
       "task_assignees_placeholder": "Välj personer...",
       "task_deadline": "Tidsfrist",
       "task_description": "Beskrivning",
       "task_status": "Status",
+      "task_tags": "Taggar",
+      "task_tags_placeholder": "Välj taggar...",
       "task_title": "Titel",
       "task_title_placeholder": "T.ex.: Boka materialet...",
       "tasks_count": "{count} uppgift | {count} uppgifter",

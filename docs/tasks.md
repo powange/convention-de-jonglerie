@@ -40,6 +40,16 @@ Item de checklist (sous-tâche légère) rattaché à une `Task`. Permet de déc
 
 Pas de stockage de l'auteur ni de la date de cochage — les items sont considérés comme état partagé de la tâche.
 
+### TaskTag
+
+Tag/label personnalisé défini **au niveau d'un groupe de tâches** (ex: « urgent », « matériel », « à valider RH »). Chaque tag a :
+
+- **Nom** (max 50 caractères, unique au sein d'un même groupe)
+- **Couleur** (format hexadécimal `#RRGGBB` — palette fixe de 16 presets + couleur libre via picker)
+- **`displayOrder`** pour l'ordre d'affichage
+
+Lié aux tâches via la table de liaison `TaskTagAssignment(taskId, tagId)` avec contrainte unique `(taskId, tagId)`. La suppression d'un tag retire automatiquement toutes ses assignations (cascade). Quand une tâche est déplacée vers un autre groupe via PUT, **tous ses tags actuels sont retirés** car ils appartiennent à l'ancien groupe.
+
 ## Architecture
 
 ### Modèles Prisma
@@ -311,6 +321,51 @@ Permet de partager un lien filtré ou de revenir en arrière en gardant la séle
 
 Si `group.tasks.length > 0` mais qu'aucune tâche ne correspond aux filtres actifs, un message dédié `gestion.tasks.filters.no_match` s'affiche à la place du listing (distinct de l'empty state « groupe vide »).
 
+## Tags / labels
+
+Chaque **groupe de tâches** peut définir sa propre liste de tags pour catégoriser ses tâches. Couleur stockée en hexadécimal (`#RRGGBB`), badges colorés sur les cards, filtre dédié dans la barre de filtres.
+
+### Endpoints
+
+Sous `/api/editions/:id/task-groups/:groupId/tags/` :
+
+| Méthode | Endpoint  | Description                                    | Permission     |
+| ------- | --------- | ---------------------------------------------- | -------------- |
+| GET     | `/`       | Liste les tags du groupe                       | auth simple    |
+| POST    | `/`       | Crée un tag (body `{ name, color }`)           | canManageTasks |
+| PUT     | `/:tagId` | Met à jour `name`, `color`, `displayOrder`     | canManageTasks |
+| DELETE  | `/:tagId` | Supprime le tag (cascade sur les assignations) | canManageTasks |
+
+Le couple `(taskGroupId, name)` est unique en base : tentative de création d'un tag de même nom dans le même groupe renvoie 409. Deux groupes différents peuvent porter un tag de même nom.
+
+La couleur est validée par regex `^#[0-9a-fA-F]{6}$` côté Zod.
+
+### Assignation aux tâches
+
+L'assignation des tags aux tâches passe par les endpoints existants POST/PUT task via le champ optionnel `tagIds: number[]` :
+
+- **POST task** : si fourni, crée les `TaskTagAssignment` initiaux
+- **PUT task** : comportement **set** (remplace entièrement la liste), delta calculé en transaction
+- **PUT task avec déplacement de groupe** (`taskGroupId` changé) : tous les tags actuels sont retirés (ils appartenaient à l'ancien groupe) ; si `tagIds` est fourni dans le même PUT, les nouveaux tags sont validés contre le nouveau groupe.
+
+Helper `assertTagsBelongToGroup(taskGroupId, tagIds)` ([server/utils/task-tags-helpers.ts](../server/utils/task-tags-helpers.ts)) vérifie que tous les `tagIds` reçus appartiennent bien au groupe (anti-IDOR).
+
+### Frontend
+
+- **Composant** `TasksTaskTagsModal` ([app/components/tasks/TaskTagsModal.vue](../app/components/tasks/TaskTagsModal.vue)) :
+  - Modal CRUD complet (liste + ajout + édition inline avec sélecteur de couleur + suppression)
+  - Accessible via le menu dropdown « Gérer les tags » dans l'en-tête de la page d'un groupe
+- **Composant** `TasksTaskTagBadge` ([app/components/tasks/TaskTagBadge.vue](../app/components/tasks/TaskTagBadge.vue)) :
+  - Badge coloré réutilisable, style inline avec fond alpha 15% (`${color}26`) et texte couleur d'origine — fonctionne en mode clair et sombre sans calcul de contraste
+- **Composant commun** `UiColorPicker` ([app/components/ui/ColorPicker.vue](../app/components/ui/ColorPicker.vue)) :
+  - Sélecteur de couleur dual-format (hex ou nom Tailwind via `swatchClassFn`)
+  - Palette presets + option `allow-custom` qui affiche un input couleur HTML5 + champ hex libre
+  - Mutualisé avec les modales `ZoneModal`, `MarkerModal` (carte du site) et `TeamManagement` (équipes bénévoles)
+- **Palette partagée** : [app/utils/default-palette.ts](../app/utils/default-palette.ts) — `DEFAULT_HEX_PALETTE` (16 hex Tailwind-500) utilisée par les pickers tags, zones, markers et équipes
+- **Intégration TaskModal** : champ multi-select des tags (`USelectMenu`) entre la description et les commentaires
+- **Affichage sur cards** : badges sur la vue Liste, le Kanban (gestion) et la vue Mes tâches
+- **Filtre** : nouveau filtre dans `TasksTaskFilters` (multi-select des tags), persisté en URL via `?tags=1,2,3`
+
 ## Checklist (sous-tâches légères)
 
 Chaque tâche peut comporter une liste d'items à cocher (modèle `TaskChecklistItem`). Permet de découper une grosse tâche sans polluer le Kanban.
@@ -412,13 +467,6 @@ Propositions classées par valeur métier × effort estimé. Les éléments **pl
 - **Effort estimé** : 2 j.
 
 ### Fonctionnalités avancées (effort important, ROI à valider)
-
-#### 9. Tags / labels personnalisés
-
-- Tags définis au niveau édition (couleurs + nom), liés via une table de liaison `TaskTag`.
-- Filtrage par tag, affichage sur les cards.
-- **Bénéfice** : transversalité (ex: « urgent », « matériel », « à valider RH ») indépendante des groupes.
-- **Effort estimé** : 2 j.
 
 #### 10. Vue calendrier
 

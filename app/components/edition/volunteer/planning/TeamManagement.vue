@@ -171,42 +171,14 @@
 
             <!-- Couleur avec palette -->
             <UFormField name="color" :label="t('edition.volunteers.team_color')" required>
-              <!-- Palette de couleurs prédéfinies -->
-              <div class="space-y-3">
-                <div class="grid grid-cols-8 gap-2 mb-3">
-                  <button
-                    v-for="color in predefinedColors"
-                    :key="color"
-                    type="button"
-                    class="w-8 h-8 rounded-full border-2 shadow-sm hover:scale-110 transition-transform"
-                    :class="
-                      teamFormState.color === color
-                        ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-gray-500'
-                        : 'border-gray-300'
-                    "
-                    :style="{ backgroundColor: color }"
-                    @click="teamFormState.color = color"
-                  />
-                </div>
-
-                <!-- Sélecteur de couleur personnalisé -->
-                <div class="flex items-center gap-3">
-                  <label class="block">
-                    <span class="sr-only">{{ t('edition.volunteers.custom_color') }}</span>
-                    <input
-                      v-model="teamFormState.color"
-                      type="color"
-                      class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-                    />
-                  </label>
-                  <UInput
-                    v-model="teamFormState.color"
-                    placeholder="#3b82f6"
-                    class="flex-1"
-                    pattern="^#[0-9A-Fa-f]{6}$"
-                  />
-                </div>
-              </div>
+              <UiColorPicker
+                v-model="teamFormState.color"
+                :palette="predefinedColors"
+                format="hex"
+                :columns="8"
+                allow-custom
+                :custom-label="t('edition.volunteers.custom_color')"
+              />
               <template #hint>
                 <span class="text-xs text-gray-500">{{
                   t('edition.volunteers.team_color_hint')
@@ -338,6 +310,7 @@
 import { z } from 'zod'
 
 import type { VolunteerTeam } from '~/composables/useVolunteerTeams'
+import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
 
 // Props
 interface Props {
@@ -393,25 +366,7 @@ watch(
   }
 )
 
-// Couleurs prédéfinies pour la palette
-const predefinedColors = [
-  '#ef4444', // red-500
-  '#f97316', // orange-500
-  '#eab308', // yellow-500
-  '#22c55e', // green-500
-  '#06b6d4', // cyan-500
-  '#3b82f6', // blue-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
-  '#f59e0b', // amber-500
-  '#10b981', // emerald-500
-  '#0ea5e9', // sky-500
-  '#6366f1', // indigo-500
-  '#a855f7', // purple-500
-  '#f43f5e', // rose-500
-  '#84cc16', // lime-500
-  '#64748b', // slate-500
-]
+const predefinedColors = [...DEFAULT_HEX_PALETTE]
 
 // Computed
 const teamModalTitle = computed(() =>

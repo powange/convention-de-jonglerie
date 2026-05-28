@@ -65,6 +65,31 @@
         </template>
       </USelectMenu>
 
+      <USelectMenu
+        v-if="tagItems.length"
+        v-model="selectedTags"
+        :items="tagItems"
+        multiple
+        :placeholder="$t('gestion.tasks.filters.tag_placeholder')"
+        size="sm"
+        class="min-w-40"
+      >
+        <template #default="{ modelValue: selected }">
+          <span v-if="!selected?.length">
+            {{ $t('gestion.tasks.filters.tag_placeholder') }}
+          </span>
+          <span v-else-if="selected.length === 1">
+            {{ selected[0].label }}
+          </span>
+          <span v-else>
+            {{ $t('gestion.tasks.filters.tags_count', { count: selected.length }) }}
+          </span>
+        </template>
+        <template #item-leading="{ item }">
+          <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }" />
+        </template>
+      </USelectMenu>
+
       <USelect
         v-if="hasDeadlines"
         v-model="dueFilter"
@@ -107,6 +132,12 @@ interface AssignableUser {
   profilePicture: string | null
 }
 
+interface TagOption {
+  id: number
+  name: string
+  color: string
+}
+
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 type DueFilter = 'all' | 'overdue' | 'today' | 'next7' | 'next30' | 'none'
 
@@ -115,6 +146,7 @@ export interface TaskFiltersValue {
   assigneeIds: number[]
   statuses: TaskStatus[]
   due: DueFilter
+  tagIds: number[]
 }
 
 const props = defineProps<{
@@ -126,6 +158,8 @@ const props = defineProps<{
   hasDeadlines?: boolean
   /** Masque le filtre assignés (utile pour la vue « Mes tâches ») */
   hideAssignees?: boolean
+  /** Tags disponibles sur l'édition — si vide, le filtre tag est masqué */
+  availableTags?: TagOption[]
 }>()
 
 const emit = defineEmits<{
@@ -185,6 +219,18 @@ const selectedAssignees = ref<AssigneeItem[]>(
   assigneeItems.value.filter((it) => props.modelValue.assigneeIds.includes(it.value))
 )
 
+interface TagSelectItem {
+  label: string
+  value: number
+  color: string
+}
+const tagItems = computed<TagSelectItem[]>(() =>
+  (props.availableTags || []).map((tg) => ({ label: tg.name, value: tg.id, color: tg.color }))
+)
+const selectedTags = ref<TagSelectItem[]>(
+  tagItems.value.filter((it) => props.modelValue.tagIds.includes(it.value))
+)
+
 const dueItems = computed(() => [
   { label: t('gestion.tasks.filters.due.all'), value: 'all' as DueFilter },
   { label: t('gestion.tasks.filters.due.overdue'), value: 'overdue' as DueFilter },
@@ -200,6 +246,7 @@ const activeCount = computed(() => {
   if (search.value.trim()) n++
   if (selectedStatuses.value.length) n++
   if (selectedAssignees.value.length) n++
+  if (selectedTags.value.length) n++
   if (dueFilter.value !== 'all') n++
   return n
 })
@@ -208,17 +255,19 @@ function reset() {
   search.value = ''
   selectedStatuses.value = []
   selectedAssignees.value = []
+  selectedTags.value = []
   dueFilter.value = 'all'
 }
 
 // Synchronise la valeur émise dès qu'un filtre change (recherche debounced).
 watch(
-  [searchDebounced, selectedStatuses, selectedAssignees, dueFilter],
+  [searchDebounced, selectedStatuses, selectedAssignees, selectedTags, dueFilter],
   () => {
     emit('update:modelValue', {
       q: searchDebounced.value.trim(),
       statuses: selectedStatuses.value.map((it) => it.value),
       assigneeIds: selectedAssignees.value.map((it) => it.value),
+      tagIds: selectedTags.value.map((it) => it.value),
       due: dueFilter.value,
     })
   },
@@ -243,6 +292,13 @@ watch(
       selectedAssignees.value.some((it) => !nextAssigneeSet.has(it.value))
     ) {
       selectedAssignees.value = assigneeItems.value.filter((it) => nextAssigneeSet.has(it.value))
+    }
+    const nextTagSet = new Set(next.tagIds)
+    if (
+      nextTagSet.size !== selectedTags.value.length ||
+      selectedTags.value.some((it) => !nextTagSet.has(it.value))
+    ) {
+      selectedTags.value = tagItems.value.filter((it) => nextTagSet.has(it.value))
     }
     if (next.due !== dueFilter.value) dueFilter.value = next.due
   }

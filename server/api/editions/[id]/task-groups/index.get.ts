@@ -55,6 +55,11 @@ export default wrapApiHandler(
               orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
               select: { id: true, title: true, done: true, displayOrder: true },
             },
+            tagAssignments: {
+              include: {
+                tag: { select: { id: true, name: true, color: true } },
+              },
+            },
           },
         },
       },

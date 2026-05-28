@@ -549,7 +549,9 @@
         "no_match": "Ingen opgave matcher filtrene",
         "search_placeholder": "Søg en opgave...",
         "status_placeholder": "Status",
-        "statuses_count": "{count} statusser"
+        "statuses_count": "{count} statusser",
+        "tag_placeholder": "Tags",
+        "tags_count": "{count} tags"
       },
       "group_description": "Beskrivelse",
       "group_description_empty": "Ingen beskrivelse",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "I gang",
         "TODO": "At gøre"
       },
+      "tags": {
+        "confirm_delete": "Slette tagget «{name}»? Det fjernes fra alle opgaver i gruppen, der bærer det.",
+        "description": "Tags gør det muligt at kategorisere opgaverne i denne gruppe (f.eks. haster, materiel, HR-godkendelse).",
+        "empty": "Intet tag defineret for denne gruppe.",
+        "manage": "Administrér tags",
+        "modal_title": "Gruppens tags",
+        "name_placeholder": "Tag-navn...",
+        "new_tag": "Nyt tag"
+      },
       "task_assignees": "Tildelte personer",
       "task_assignees_placeholder": "Vælg personer...",
       "task_deadline": "Frist",
       "task_description": "Beskrivelse",
       "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Vælg tags...",
       "task_title": "Titel",
       "task_title_placeholder": "F.eks.: Reserver materiale...",
       "tasks_count": "{count} opgave | {count} opgaver",

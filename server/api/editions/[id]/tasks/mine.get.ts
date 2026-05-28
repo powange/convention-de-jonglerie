@@ -49,6 +49,11 @@ export default wrapApiHandler(
             },
           },
         },
+        tagAssignments: {
+          include: {
+            tag: { select: { id: true, name: true, color: true } },
+          },
+        },
       },
     })
 

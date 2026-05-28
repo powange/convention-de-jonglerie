@@ -7,6 +7,7 @@ import {
   canManageTasks,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import { assertTagsBelongToGroup } from '#server/utils/task-tags-helpers'
 import { assertAssigneesAreAssignable } from '#server/utils/tasks-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
@@ -29,6 +30,7 @@ const bodySchema = z.object({
   deadline: z.string().datetime().nullable().optional(),
   displayOrder: z.number().int().optional(),
   assigneeIds: z.array(z.number().int().positive()).optional().default([]),
+  tagIds: z.array(z.number().int().positive()).optional().default([]),
 })
 
 /**
@@ -76,6 +78,11 @@ export default wrapApiHandler(
       await assertAssigneesAreAssignable(editionId, data.assigneeIds)
     }
 
+    // Vérifier que les tags appartiennent bien au groupe
+    if (data.tagIds.length > 0) {
+      await assertTagsBelongToGroup(groupId, data.tagIds)
+    }
+
     let displayOrder = data.displayOrder
     if (displayOrder === undefined) {
       const last = await prisma.task.findFirst({
@@ -99,6 +106,11 @@ export default wrapApiHandler(
             create: data.assigneeIds.map((userId) => ({ userId })),
           },
         }),
+        ...(data.tagIds.length > 0 && {
+          tagAssignments: {
+            create: data.tagIds.map((tagId) => ({ tagId })),
+          },
+        }),
       },
       include: {
         assignments: {
@@ -114,6 +126,11 @@ export default wrapApiHandler(
                 profilePicture: true,
               },
             },
+          },
+        },
+        tagAssignments: {
+          include: {
+            tag: { select: { id: true, name: true, color: true } },
           },
         },
       },

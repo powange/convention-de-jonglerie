@@ -549,7 +549,9 @@
         "no_match": "Nessuna attività corrisponde ai filtri",
         "search_placeholder": "Cerca un'attività...",
         "status_placeholder": "Stato",
-        "statuses_count": "{count} stati"
+        "statuses_count": "{count} stati",
+        "tag_placeholder": "Tag",
+        "tags_count": "{count} tag"
       },
       "group_description": "Descrizione",
       "group_description_empty": "Nessuna descrizione",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "In corso",
         "TODO": "Da fare"
       },
+      "tags": {
+        "confirm_delete": "Eliminare il tag «{name}»? Verrà rimosso da tutte le attività del gruppo che lo riportano.",
+        "description": "I tag permettono di categorizzare le attività di questo gruppo (es: urgente, materiale, da validare HR).",
+        "empty": "Nessun tag definito per questo gruppo.",
+        "manage": "Gestisci i tag",
+        "modal_title": "Tag del gruppo",
+        "name_placeholder": "Nome del tag...",
+        "new_tag": "Nuovo tag"
+      },
       "task_assignees": "Persone assegnate",
       "task_assignees_placeholder": "Seleziona persone...",
       "task_deadline": "Scadenza",
       "task_description": "Descrizione",
       "task_status": "Stato",
+      "task_tags": "Tag",
+      "task_tags_placeholder": "Seleziona dei tag...",
       "task_title": "Titolo",
       "task_title_placeholder": "Es.: Prenotare il materiale...",
       "tasks_count": "{count} attività | {count} attività",

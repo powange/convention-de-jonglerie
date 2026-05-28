@@ -48,6 +48,39 @@
           </p>
         </UFormField>
 
+        <UFormField
+          v-if="tagItems.length"
+          :label="$t('gestion.tasks.task_tags')"
+          :error="fieldErrors.tagIds"
+        >
+          <USelectMenu
+            v-model="selectedTags"
+            :items="tagItems"
+            multiple
+            :placeholder="$t('gestion.tasks.task_tags_placeholder')"
+            searchable
+            :searchable-placeholder="$t('common.search')"
+            class="w-full"
+            :ui="{ content: 'min-w-fit' }"
+          >
+            <template #default="{ modelValue: selected }">
+              <span v-if="!selected?.length" class="text-gray-400">
+                {{ $t('gestion.tasks.task_tags_placeholder') }}
+              </span>
+              <div v-else class="flex flex-wrap gap-1">
+                <TasksTaskTagBadge
+                  v-for="tg in selected"
+                  :key="tg.value"
+                  :tag="{ name: tg.label, color: tg.color }"
+                />
+              </div>
+            </template>
+            <template #item-leading="{ item }">
+              <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }" />
+            </template>
+          </USelectMenu>
+        </UFormField>
+
         <UFormField :label="$t('gestion.tasks.task_description')" :error="fieldErrors.description">
           <MinimalMarkdownEditor v-model="formData.description" :rows="6" :can-edit="true" />
         </UFormField>
@@ -132,6 +165,15 @@ interface ChecklistItem {
   done: boolean
   displayOrder: number
 }
+interface TagItem {
+  id: number
+  name: string
+  color: string
+}
+interface TagAssignment {
+  id: number
+  tag: TagItem
+}
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 interface TaskItem {
   id: number
@@ -142,6 +184,7 @@ interface TaskItem {
   deadline: string | null
   assignments: TaskAssignment[]
   checklistItems?: ChecklistItem[]
+  tagAssignments?: TagAssignment[]
 }
 interface TaskGroupItem {
   id: number
@@ -155,6 +198,7 @@ const props = defineProps<{
   task: TaskItem | null
   assignableUsers: AssignableUser[]
   taskGroups?: TaskGroupItem[]
+  availableTags?: TagItem[]
 }>()
 
 const emit = defineEmits<{
@@ -218,6 +262,17 @@ const formData = reactive({
 })
 const selectedAssignees = ref<UserItem[]>([])
 const hasLegacyAssignees = computed(() => selectedAssignees.value.some((u) => u.isLegacy))
+
+interface TagSelectItem {
+  label: string
+  value: number
+  color: string
+}
+const tagItems = computed<TagSelectItem[]>(() =>
+  (props.availableTags || []).map((t) => ({ label: t.name, value: t.id, color: t.color }))
+)
+const selectedTags = ref<TagSelectItem[]>([])
+
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
 const deleting = ref(false)
@@ -237,6 +292,8 @@ watch(
       formData.taskGroupId = props.task?.taskGroupId || props.group?.id || 0
       const assignedIds = props.task?.assignments.map((a) => a.user.id) || []
       selectedAssignees.value = userItems.value.filter((u) => assignedIds.includes(u.id))
+      const tagIds = props.task?.tagAssignments?.map((a) => a.tag.id) || []
+      selectedTags.value = tagItems.value.filter((tg) => tagIds.includes(tg.value))
       resetFieldErrors()
     }
   },
@@ -280,6 +337,7 @@ async function handleSubmit() {
       status: formData.status,
       deadline: formData.deadline ? new Date(formData.deadline).toISOString() : null,
       assigneeIds: selectedAssignees.value.map((u) => u.id),
+      tagIds: selectedTags.value.map((t) => t.value),
     }
     if (props.task) {
       if (formData.taskGroupId && formData.taskGroupId !== props.task.taskGroupId) {

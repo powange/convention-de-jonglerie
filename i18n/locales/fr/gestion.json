@@ -549,7 +549,9 @@
         "no_match": "Aucune tâche ne correspond aux filtres",
         "search_placeholder": "Rechercher une tâche...",
         "status_placeholder": "Statut",
-        "statuses_count": "{count} statuts"
+        "statuses_count": "{count} statuts",
+        "tag_placeholder": "Tags",
+        "tags_count": "{count} tags"
       },
       "group_description": "Description",
       "group_description_empty": "Aucune description",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "En cours",
         "TODO": "À faire"
       },
+      "tags": {
+        "confirm_delete": "Supprimer le tag « {name} » ? Il sera retiré de toutes les tâches du groupe qui le portent.",
+        "description": "Les tags permettent de catégoriser les tâches de ce groupe (ex: urgent, matériel, à valider RH).",
+        "empty": "Aucun tag défini pour ce groupe.",
+        "manage": "Gérer les tags",
+        "modal_title": "Tags du groupe",
+        "name_placeholder": "Nom du tag...",
+        "new_tag": "Nouveau tag"
+      },
       "task_assignees": "Personnes assignées",
       "task_assignees_placeholder": "Sélectionner des personnes...",
       "task_deadline": "Échéance",
       "task_description": "Description",
       "task_status": "Statut",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Sélectionner des tags...",
       "task_title": "Titre",
       "task_title_placeholder": "Ex: Réserver le matériel...",
       "tasks_count": "{count} tâche | {count} tâches",

@@ -549,7 +549,9 @@
         "no_match": "No task matches the filters",
         "search_placeholder": "Search a task...",
         "status_placeholder": "Status",
-        "statuses_count": "{count} statuses"
+        "statuses_count": "{count} statuses",
+        "tag_placeholder": "Tags",
+        "tags_count": "{count} tags"
       },
       "group_description": "Description",
       "group_description_empty": "No description",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "In progress",
         "TODO": "To do"
       },
+      "tags": {
+        "confirm_delete": "Delete the tag «{name}»? It will be removed from all tasks of the group that carry it.",
+        "description": "Tags categorize the tasks of this group (e.g. urgent, equipment, HR review).",
+        "empty": "No tag defined for this group.",
+        "manage": "Manage tags",
+        "modal_title": "Group tags",
+        "name_placeholder": "Tag name...",
+        "new_tag": "New tag"
+      },
       "task_assignees": "Assigned people",
       "task_assignees_placeholder": "Select people...",
       "task_deadline": "Deadline",
       "task_description": "Description",
       "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Select tags...",
       "task_title": "Title",
       "task_title_placeholder": "E.g.: Book the equipment...",
       "tasks_count": "{count} task | {count} tasks",

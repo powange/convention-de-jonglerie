@@ -549,7 +549,9 @@
         "no_match": "Żadne zadanie nie pasuje do filtrów",
         "search_placeholder": "Wyszukaj zadanie...",
         "status_placeholder": "Status",
-        "statuses_count": "{count} statusów"
+        "statuses_count": "{count} statusów",
+        "tag_placeholder": "Tagi",
+        "tags_count": "{count} tagów"
       },
       "group_description": "Opis",
       "group_description_empty": "Brak opisu",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "W trakcie",
         "TODO": "Do zrobienia"
       },
+      "tags": {
+        "confirm_delete": "Usunąć tag «{name}»? Zostanie usunięty ze wszystkich zadań grupy, które go zawierają.",
+        "description": "Tagi pozwalają kategoryzować zadania tej grupy (np. pilne, materiał, do walidacji HR).",
+        "empty": "Brak zdefiniowanych tagów dla tej grupy.",
+        "manage": "Zarządzaj tagami",
+        "modal_title": "Tagi grupy",
+        "name_placeholder": "Nazwa tagu...",
+        "new_tag": "Nowy tag"
+      },
       "task_assignees": "Przypisane osoby",
       "task_assignees_placeholder": "Wybierz osoby...",
       "task_deadline": "Termin",
       "task_description": "Opis",
       "task_status": "Status",
+      "task_tags": "Tagi",
+      "task_tags_placeholder": "Wybierz tagi...",
       "task_title": "Tytuł",
       "task_title_placeholder": "Np.: Zarezerwować sprzęt...",
       "tasks_count": "{count} zadanie | {count} zadania | {count} zadań",

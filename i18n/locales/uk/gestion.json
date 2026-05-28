@@ -549,7 +549,9 @@
         "no_match": "Жодне завдання не відповідає фільтрам",
         "search_placeholder": "Пошук завдання...",
         "status_placeholder": "Статус",
-        "statuses_count": "{count} статусів"
+        "statuses_count": "{count} статусів",
+        "tag_placeholder": "Теги",
+        "tags_count": "{count} тегів"
       },
       "group_description": "Опис",
       "group_description_empty": "Без опису",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "Виконується",
         "TODO": "Зробити"
       },
+      "tags": {
+        "confirm_delete": "Видалити тег «{name}»? Його буде знято з усіх завдань групи, що його мають.",
+        "description": "Теги дозволяють категоризувати завдання цієї групи (напр.: терміново, матеріал, узгодити з HR).",
+        "empty": "Для цієї групи не визначено жодного тегу.",
+        "manage": "Керувати тегами",
+        "modal_title": "Теги групи",
+        "name_placeholder": "Назва тегу...",
+        "new_tag": "Новий тег"
+      },
       "task_assignees": "Призначені особи",
       "task_assignees_placeholder": "Виберіть людей...",
       "task_deadline": "Термін",
       "task_description": "Опис",
       "task_status": "Статус",
+      "task_tags": "Теги",
+      "task_tags_placeholder": "Виберіть теги...",
       "task_title": "Назва",
       "task_title_placeholder": "Напр.: Забронювати обладнання...",
       "tasks_count": "{count} завдання | {count} завдання | {count} завдань",

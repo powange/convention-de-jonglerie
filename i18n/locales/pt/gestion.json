@@ -549,7 +549,9 @@
         "no_match": "Nenhuma tarefa corresponde aos filtros",
         "search_placeholder": "Pesquisar uma tarefa...",
         "status_placeholder": "Estado",
-        "statuses_count": "{count} estados"
+        "statuses_count": "{count} estados",
+        "tag_placeholder": "Etiquetas",
+        "tags_count": "{count} etiquetas"
       },
       "group_description": "Descrição",
       "group_description_empty": "Sem descrição",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "Em curso",
         "TODO": "A fazer"
       },
+      "tags": {
+        "confirm_delete": "Eliminar a etiqueta «{name}»? Será removida de todas as tarefas do grupo que a contêm.",
+        "description": "As etiquetas permitem categorizar as tarefas deste grupo (ex.: urgente, material, validar RH).",
+        "empty": "Nenhuma etiqueta definida para este grupo.",
+        "manage": "Gerir etiquetas",
+        "modal_title": "Etiquetas do grupo",
+        "name_placeholder": "Nome da etiqueta...",
+        "new_tag": "Nova etiqueta"
+      },
       "task_assignees": "Pessoas atribuídas",
       "task_assignees_placeholder": "Selecionar pessoas...",
       "task_deadline": "Prazo",
       "task_description": "Descrição",
       "task_status": "Estado",
+      "task_tags": "Etiquetas",
+      "task_tags_placeholder": "Selecionar etiquetas...",
       "task_title": "Título",
       "task_title_placeholder": "Ex.: Reservar o material...",
       "tasks_count": "{count} tarefa | {count} tarefas",

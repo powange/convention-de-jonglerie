@@ -549,7 +549,9 @@
         "no_match": "Нет задач, соответствующих фильтрам",
         "search_placeholder": "Поиск задачи...",
         "status_placeholder": "Статус",
-        "statuses_count": "{count} статусов"
+        "statuses_count": "{count} статусов",
+        "tag_placeholder": "Теги",
+        "tags_count": "{count} тегов"
       },
       "group_description": "Описание",
       "group_description_empty": "Без описания",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "В процессе",
         "TODO": "К выполнению"
       },
+      "tags": {
+        "confirm_delete": "Удалить тег «{name}»? Он будет снят со всех задач группы, у которых он есть.",
+        "description": "Теги позволяют классифицировать задачи этой группы (например: срочно, материал, согласовать с HR).",
+        "empty": "Для этой группы не определено ни одного тега.",
+        "manage": "Управление тегами",
+        "modal_title": "Теги группы",
+        "name_placeholder": "Название тега...",
+        "new_tag": "Новый тег"
+      },
       "task_assignees": "Назначенные лица",
       "task_assignees_placeholder": "Выберите людей...",
       "task_deadline": "Срок",
       "task_description": "Описание",
       "task_status": "Статус",
+      "task_tags": "Теги",
+      "task_tags_placeholder": "Выберите теги...",
       "task_title": "Название",
       "task_title_placeholder": "Напр.: Забронировать оборудование...",
       "tasks_count": "{count} задача | {count} задачи | {count} задач",

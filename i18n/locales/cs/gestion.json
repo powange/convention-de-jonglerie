@@ -549,7 +549,9 @@
         "no_match": "Žádný úkol neodpovídá filtrům",
         "search_placeholder": "Vyhledat úkol...",
         "status_placeholder": "Stav",
-        "statuses_count": "{count} stavů"
+        "statuses_count": "{count} stavů",
+        "tag_placeholder": "Štítky",
+        "tags_count": "{count} štítků"
       },
       "group_description": "Popis",
       "group_description_empty": "Bez popisu",
@@ -578,11 +580,22 @@
         "IN_PROGRESS": "Probíhá",
         "TODO": "K vyřízení"
       },
+      "tags": {
+        "confirm_delete": "Odstranit štítek «{name}»? Bude odebrán ze všech úkolů skupiny, které ho mají.",
+        "description": "Štítky umožňují kategorizovat úkoly této skupiny (např. urgentní, materiál, schválit HR).",
+        "empty": "Pro tuto skupinu není definován žádný štítek.",
+        "manage": "Spravovat štítky",
+        "modal_title": "Štítky skupiny",
+        "name_placeholder": "Název štítku...",
+        "new_tag": "Nový štítek"
+      },
       "task_assignees": "Přiřazené osoby",
       "task_assignees_placeholder": "Vyberte osoby...",
       "task_deadline": "Termín",
       "task_description": "Popis",
       "task_status": "Stav",
+      "task_tags": "Štítky",
+      "task_tags_placeholder": "Vybrat štítky...",
       "task_title": "Název",
       "task_title_placeholder": "Např.: Rezervovat vybavení...",
       "tasks_count": "{count} úkol | {count} úkoly | {count} úkolů",

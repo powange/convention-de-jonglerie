@@ -39,6 +39,7 @@
             v-model="filters"
             :assignable-users="[]"
             :has-deadlines="hasDeadlines"
+            :available-tags="availableTags"
             hide-assignees
           />
 
@@ -77,13 +78,22 @@
                     </UBadge>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-sm truncate">{{ task.title }}</div>
-                      <div
-                        v-if="task.deadline"
-                        class="text-xs mt-0.5 flex items-center gap-1"
-                        :class="deadlineClass(task.deadline, task.status)"
-                      >
-                        <UIcon name="i-heroicons-calendar" class="size-3" />
-                        {{ formatDeadline(task.deadline) }}
+                      <div class="flex items-center gap-3 mt-0.5 flex-wrap">
+                        <div
+                          v-if="task.deadline"
+                          class="text-xs flex items-center gap-1"
+                          :class="deadlineClass(task.deadline, task.status)"
+                        >
+                          <UIcon name="i-heroicons-calendar" class="size-3" />
+                          {{ formatDeadline(task.deadline) }}
+                        </div>
+                        <div v-if="task.tagAssignments.length" class="flex flex-wrap gap-1">
+                          <TasksTaskTagBadge
+                            v-for="a in task.tagAssignments"
+                            :key="a.tag.id"
+                            :tag="a.tag"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div
@@ -154,6 +164,15 @@ interface TaskAssignment {
   id: number
   user: AssignedUser
 }
+interface TagItem {
+  id: number
+  name: string
+  color: string
+}
+interface TagAssignment {
+  id: number
+  tag: TagItem
+}
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 interface MyTaskItem {
   id: number
@@ -164,6 +183,7 @@ interface MyTaskItem {
   displayOrder: number
   group: { id: number; name: string } | null
   assignments: TaskAssignment[]
+  tagAssignments: TagAssignment[]
 }
 
 const route = useRoute()
@@ -198,6 +218,18 @@ const fetchTasks = async () => {
   }
 }
 
+// Les tags étant scopés par groupe, on agrège ceux portés par les tâches
+// affichées (dédupliqués par id) au lieu de faire un fetch séparé.
+const availableTags = computed<TagItem[]>(() => {
+  const map = new Map<number, TagItem>()
+  for (const task of tasks.value) {
+    for (const a of task.tagAssignments) {
+      if (!map.has(a.tag.id)) map.set(a.tag.id, a.tag)
+    }
+  }
+  return Array.from(map.values())
+})
+
 // Fetch côté client uniquement : les cookies de session ne sont pas propagés
 // automatiquement en SSR via $fetch — l'endpoint /tasks/mine retournerait 401.
 // On charge aussi l'édition dans le store si l'URL est ouverte directement
@@ -214,6 +246,7 @@ const filters = ref<TaskFiltersValue>({
   q: '',
   statuses: [],
   assigneeIds: [],
+  tagIds: [],
   due: 'all',
 })
 
@@ -234,6 +267,11 @@ const filteredTasks = computed<MyTaskItem[]>(() => {
   if (filters.value.statuses.length) {
     const set = new Set(filters.value.statuses)
     list = list.filter((t) => set.has(t.status))
+  }
+
+  if (filters.value.tagIds.length) {
+    const set = new Set(filters.value.tagIds)
+    list = list.filter((t) => t.tagAssignments.some((a) => set.has(a.tag.id)))
   }
 
   const due = filters.value.due
