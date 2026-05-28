@@ -554,6 +554,14 @@
       "manage_description": "Organizovat interní práci pomocí skupin úkolů",
       "manage_title": "Spravovat úkoly",
       "move_to_group": "Přesunout do skupiny",
+      "my_tasks": {
+        "description": "Úkoly, které vám byly přiřazeny v této edici.",
+        "empty": "V této edici vám není přiřazen žádný úkol.",
+        "no_group": "Bez skupiny",
+        "title": "Moje úkoly",
+        "with": "S",
+        "with_others": "Také přiřazeni: {names}"
+      },
       "new_group": "Nová skupina",
       "new_task": "Nový úkol",
       "no_assignable_users": "Žádný organizátor ani přijatý dobrovolník není k dispozici",

@@ -268,18 +268,39 @@ Permet de partager un lien filtré ou de revenir en arrière en gardant la séle
 
 Si `group.tasks.length > 0` mais qu'aucune tâche ne correspond aux filtres actifs, un message dédié `gestion.tasks.filters.no_match` s'affiche à la place du listing (distinct de l'empty state « groupe vide »).
 
+## Vue « Mes tâches » (utilisateurs assignés)
+
+La page `/editions/[id]/mes-taches` est destinée aux utilisateurs assignés à des tâches **sans nécessiter le droit `canManageTasks`**. Elle permet aux bénévoles d'avoir une vue d'ensemble de leurs propres tâches sur une édition donnée.
+
+### Endpoint
+
+`GET /api/editions/:id/tasks/mine` ([server/api/editions/[id]/tasks/mine.get.ts](../server/api/editions/%5Bid%5D/tasks/mine.get.ts)) :
+
+- **Permission** : auth simple (`requireAuth`), pas de `canManageTasks`
+- **Logique** : `prisma.task.findMany` filtré par `assignments.some.userId = user.id` ET `group.editionId = id`
+- **Retour** : `{ success: true, data: { tasks: [...] } }` — chaque tâche inclut son groupe (`{ id, name }`) et tous ses assignés
+- **404** si l'édition n'existe pas ou si `tasksEnabled` est `false`
+
+### Frontend
+
+- **Page** : [app/pages/editions/[id]/mes-taches.vue](../app/pages/editions/%5Bid%5D/mes-taches.vue)
+  - Liste groupée par `TaskGroup` (header + badge count par groupe)
+  - Filtres `TasksTaskFilters` avec `hide-assignees` (inutile puisque c'est forcément l'utilisateur courant)
+  - Au click sur une tâche : ouvre `TasksTaskViewModal` (lecture seule + commentaires)
+- **Composant** `TasksTaskViewModal` ([app/components/tasks/TaskViewModal.vue](../app/components/tasks/TaskViewModal.vue)) :
+  - Affichage en lecture seule : titre, badges statut/groupe/échéance, assignés (avatars), description Markdown rendue
+  - Section commentaires : réutilise `TasksTaskComments` avec `canPost=true`, `canModerate=false` (le serveur valide via `canCommentTask`)
+- **Lien** dans `EditionHeader` ([app/components/edition/Header.vue](../app/components/edition/Header.vue)) — onglet « Mes tâches » visible si `tasksEnabled && isAuthenticated` (la page elle-même affiche un empty state si l'utilisateur n'a aucune tâche).
+
+### Pourquoi pas dans `/gestion/` ?
+
+Le préfixe `/editions/:id/gestion/` requiert `canManageTasks` (organisateur). Pour permettre à un bénévole assigné d'accéder à ses tâches, la page est placée à `/editions/:id/mes-taches` (hors gestion). Les permissions de lecture des commentaires et de l'endpoint `mine` sont validées côté serveur via les assignations.
+
 ## Évolutions possibles
 
 Propositions classées par valeur métier × effort estimé. Les éléments **planifiés pour la prochaine itération** sont marqués 🚧.
 
 ### Quick wins (haute valeur / faible effort)
-
-#### 🚧 2. Vue « Mes tâches »
-
-- Nouvelle page `/editions/[id]/gestion/tasks/mine` (ou widget dashboard) listant uniquement les tâches assignées à l'utilisateur courant, tous groupes confondus.
-- Aujourd'hui, un bénévole assigné (sans `canManageTasks`) ne peut accéder qu'à la tâche reçue via notification : pas de vision d'ensemble de ses propres tâches.
-- **Bénéfice** : ouvre le module aux bénévoles, pas uniquement aux organisateurs.
-- **Effort estimé** : 1 j (endpoint + page).
 
 #### 🚧 3. Rappels automatiques d'échéance
 

@@ -554,6 +554,14 @@
       "manage_description": "Organizuj wewnętrzną pracę za pomocą grup zadań",
       "manage_title": "Zarządzaj zadaniami",
       "move_to_group": "Przenieś do grupy",
+      "my_tasks": {
+        "description": "Zadania przypisane do Ciebie w tej edycji.",
+        "empty": "Nie masz przypisanych żadnych zadań w tej edycji.",
+        "no_group": "Bez grupy",
+        "title": "Moje zadania",
+        "with": "Z",
+        "with_others": "Również przypisani: {names}"
+      },
       "new_group": "Nowa grupa",
       "new_task": "Nowe zadanie",
       "no_assignable_users": "Brak dostępnego organizatora lub zaakceptowanego wolontariusza",

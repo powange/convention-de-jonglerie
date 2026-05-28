@@ -554,6 +554,14 @@
       "manage_description": "Organizar o trabalho interno através de grupos de tarefas",
       "manage_title": "Gerir tarefas",
       "move_to_group": "Mover para o grupo",
+      "my_tasks": {
+        "description": "As tarefas que lhe foram atribuídas nesta edição.",
+        "empty": "Nenhuma tarefa lhe está atribuída nesta edição.",
+        "no_group": "Sem grupo",
+        "title": "Minhas tarefas",
+        "with": "Com",
+        "with_others": "Também atribuídos: {names}"
+      },
       "new_group": "Novo grupo",
       "new_task": "Nova tarefa",
       "no_assignable_users": "Nenhum organizador ou voluntário aceito disponível",

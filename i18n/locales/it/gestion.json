@@ -554,6 +554,14 @@
       "manage_description": "Organizzare il lavoro interno tramite gruppi di attività",
       "manage_title": "Gestire le attività",
       "move_to_group": "Sposta nel gruppo",
+      "my_tasks": {
+        "description": "Le attività assegnate a te per questa edizione.",
+        "empty": "Nessuna attività ti è assegnata per questa edizione.",
+        "no_group": "Senza gruppo",
+        "title": "Le mie attività",
+        "with": "Con",
+        "with_others": "Assegnati anche: {names}"
+      },
       "new_group": "Nuovo gruppo",
       "new_task": "Nuova attività",
       "no_assignable_users": "Nessun organizzatore o volontario accettato disponibile",

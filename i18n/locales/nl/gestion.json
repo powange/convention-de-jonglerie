@@ -554,6 +554,14 @@
       "manage_description": "Intern werk organiseren via taakgroepen",
       "manage_title": "Taken beheren",
       "move_to_group": "Verplaatsen naar groep",
+      "my_tasks": {
+        "description": "De taken die aan u zijn toegewezen voor deze editie.",
+        "empty": "Er zijn geen taken aan u toegewezen voor deze editie.",
+        "no_group": "Geen groep",
+        "title": "Mijn taken",
+        "with": "Met",
+        "with_others": "Ook toegewezen: {names}"
+      },
       "new_group": "Nieuwe groep",
       "new_task": "Nieuwe taak",
       "no_assignable_users": "Geen organisator of geaccepteerde vrijwilliger beschikbaar",

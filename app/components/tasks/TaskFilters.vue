@@ -42,6 +42,7 @@
       </USelectMenu>
 
       <USelectMenu
+        v-if="!hideAssignees"
         v-model="selectedAssignees"
         :items="assigneeItems"
         multiple
@@ -123,6 +124,8 @@ const props = defineProps<{
   legacyAssignees?: AssignableUser[]
   /** Au moins une tâche du groupe a une échéance — sinon le filtre est masqué */
   hasDeadlines?: boolean
+  /** Masque le filtre assignés (utile pour la vue « Mes tâches ») */
+  hideAssignees?: boolean
 }>()
 
 const emit = defineEmits<{

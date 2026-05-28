@@ -554,6 +554,14 @@
       "manage_description": "Interne Arbeit über Aufgabengruppen organisieren",
       "manage_title": "Aufgaben verwalten",
       "move_to_group": "In Gruppe verschieben",
+      "my_tasks": {
+        "description": "Die Aufgaben, die Ihnen für diese Edition zugewiesen sind.",
+        "empty": "Ihnen ist keine Aufgabe für diese Edition zugewiesen.",
+        "no_group": "Keine Gruppe",
+        "title": "Meine Aufgaben",
+        "with": "Mit",
+        "with_others": "Ebenfalls zugewiesen: {names}"
+      },
       "new_group": "Neue Gruppe",
       "new_task": "Neue Aufgabe",
       "no_assignable_users": "Kein Organisator oder akzeptierter Freiwilliger verfügbar",

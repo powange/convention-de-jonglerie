@@ -554,6 +554,14 @@
       "manage_description": "Organiser internt arbejde via opgavegrupper",
       "manage_title": "Administrer opgaver",
       "move_to_group": "Flyt til gruppe",
+      "my_tasks": {
+        "description": "De opgaver, der er tildelt dig i denne udgave.",
+        "empty": "Ingen opgave er tildelt dig for denne udgave.",
+        "no_group": "Ingen gruppe",
+        "title": "Mine opgaver",
+        "with": "Med",
+        "with_others": "Også tildelt: {names}"
+      },
       "new_group": "Ny gruppe",
       "new_task": "Ny opgave",
       "no_assignable_users": "Ingen arrangør eller accepteret frivillig er tilgængelig",

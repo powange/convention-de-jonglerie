@@ -250,6 +250,26 @@
         <!-- Onglets conditionnels dépendant de l'auth ou de Date.now() (rendu côté client pour éviter le mismatch d'hydration) -->
         <ClientOnly>
           <NuxtLink
+            v-if="myTasksTabVisible"
+            :to="`/editions/${edition.id}/mes-taches`"
+            :class="[
+              'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+              currentPage === 'my-tasks'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            ]"
+            :title="t('gestion.tasks.my_tasks.title')"
+          >
+            <UIcon
+              name="i-heroicons-clipboard-document-check"
+              :class="['md:mr-1']"
+              size="24"
+              class="md:w-4! md:h-4!"
+            />
+            <span class="hidden md:inline">{{ t('gestion.tasks.my_tasks.title') }}</span>
+          </NuxtLink>
+
+          <NuxtLink
             v-if="volunteersTabVisible"
             :to="`/editions/${edition.id}/volunteers`"
             :class="[
@@ -411,6 +431,7 @@ interface Props {
     | 'map'
     | 'artist-space'
     | 'faq'
+    | 'my-tasks'
 }
 
 const props = defineProps<Props>()
@@ -566,6 +587,14 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
         path: `/editions/${editionId}/volunteers`,
       })
     }
+    if (myTasksTabVisible.value) {
+      items.push({
+        label: t('gestion.tasks.my_tasks.title'),
+        value: 'my-tasks',
+        icon: 'i-heroicons-clipboard-document-check',
+        path: `/editions/${editionId}/mes-taches`,
+      })
+    }
     if (hasEditionStarted.value) {
       items.push({
         label: t('edition.lost_found'),
@@ -612,6 +641,15 @@ const faqTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
   const ed = props.edition as { faqEnabled?: boolean; faqPagePublic?: boolean }
   return ed.faqEnabled === true && ed.faqPagePublic === true
+})
+
+// Visibilité onglet « Mes tâches » : module activé + utilisateur authentifié.
+// L'endpoint /tasks/mine filtre lui-même par utilisateur, et la page affiche un
+// empty state si l'utilisateur n'a aucune tâche assignée.
+const myTasksTabVisible = computed<boolean>(() => {
+  if (!props.edition) return false
+  if (!authStore.isAuthenticated) return false
+  return (props.edition as { tasksEnabled?: boolean }).tasksEnabled === true
 })
 
 // Visibilité onglet carte: visible si siteMapEnabled + mapPublic sont activés et l'édition a des coordonnées définies
