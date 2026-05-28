@@ -183,11 +183,20 @@
               :class="[
                 'cursor-grab active:cursor-grabbing hover:shadow-md transition-all',
                 draggedTaskId === task.id ? 'opacity-50' : '',
+                dragOverTaskId === task.id && dragOverPosition === 'before'
+                  ? 'border-t-2 border-t-primary-500'
+                  : '',
+                dragOverTaskId === task.id && dragOverPosition === 'after'
+                  ? 'border-b-2 border-b-primary-500'
+                  : '',
               ]"
               :ui="{ body: 'p-3' }"
               @click="onTaskClick(task)"
               @dragstart="onTaskDragStart(task, $event)"
               @dragend="onTaskDragEnd"
+              @dragover.prevent="onCardDragOver(task, $event)"
+              @dragleave="onCardDragLeave(task)"
+              @drop.stop="onCardDrop(task)"
             >
               <div class="font-medium text-sm mb-2">{{ task.title }}</div>
               <div class="flex items-center justify-between gap-2">
@@ -518,10 +527,12 @@ function tasksByStatus(status: TaskStatus): TaskItem[] {
   return filteredTasks.value.filter((t) => t.status === status)
 }
 
-// --- Drag & drop kanban (changement de status) ---
+// --- Drag & drop kanban (changement de status + réordonnancement) ---
 const draggedTaskId = ref<number | null>(null)
 const draggedFromStatus = ref<TaskStatus | null>(null)
 const dragOverStatus = ref<TaskStatus | null>(null)
+const dragOverTaskId = ref<number | null>(null)
+const dragOverPosition = ref<'before' | 'after' | null>(null)
 // Bloque le click synthétique émis juste après un drag (selon les navigateurs)
 const justDragged = ref(false)
 
@@ -543,6 +554,8 @@ function onTaskDragEnd() {
   draggedTaskId.value = null
   draggedFromStatus.value = null
   dragOverStatus.value = null
+  dragOverTaskId.value = null
+  dragOverPosition.value = null
   // Court délai pour absorber le click synthétique qui suit parfois un drop
   justDragged.value = true
   setTimeout(() => {
@@ -562,27 +575,122 @@ function onColumnDragLeave(status: TaskStatus, e: DragEvent) {
   if (dragOverStatus.value === status) dragOverStatus.value = null
 }
 
+async function changeTaskStatus(taskId: number, fromStatus: TaskStatus, newStatus: TaskStatus) {
+  if (fromStatus === newStatus || !group.value) return
+  const task = group.value.tasks.find((t) => t.id === taskId)
+  if (!task) return
+  // Mise à jour optimiste
+  task.status = newStatus
+  try {
+    await $fetch(`/api/editions/${editionId}/tasks/${taskId}`, {
+      method: 'PUT',
+      body: { status: newStatus },
+    })
+  } catch (e: unknown) {
+    // Revert en cas d'erreur API
+    task.status = fromStatus
+    const err = e as { data?: { message?: string } }
+    useToast().add({
+      title: err?.data?.message || t('errors.generic'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
 async function onColumnDrop(status: TaskStatus) {
   const taskId = draggedTaskId.value
   const fromStatus = draggedFromStatus.value
   draggedTaskId.value = null
   draggedFromStatus.value = null
   dragOverStatus.value = null
-  if (!taskId || !group.value || fromStatus === status) return
-  const task = group.value.tasks.find((t) => t.id === taskId)
-  if (!task) return
-  // Mise à jour optimiste
-  task.status = status
+  dragOverTaskId.value = null
+  dragOverPosition.value = null
+  if (!taskId || !fromStatus) return
+  await changeTaskStatus(taskId, fromStatus, status)
+}
+
+// --- Drop sur une carte : réordonnancement intra-colonne ou changement de statut ---
+
+function onCardDragOver(task: TaskItem, event: DragEvent) {
+  // Uniquement pour le réordonnancement (même colonne).
+  if (draggedFromStatus.value !== task.status) return
+  if (draggedTaskId.value === task.id) return
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const midpoint = rect.top + rect.height / 2
+  dragOverPosition.value = event.clientY < midpoint ? 'before' : 'after'
+  dragOverTaskId.value = task.id
+}
+
+function onCardDragLeave(task: TaskItem) {
+  if (dragOverTaskId.value === task.id) {
+    dragOverTaskId.value = null
+    dragOverPosition.value = null
+  }
+}
+
+async function onCardDrop(task: TaskItem) {
+  const draggedId = draggedTaskId.value
+  const fromStatus = draggedFromStatus.value
+  const position = dragOverPosition.value
+  const targetStatus = task.status
+
+  // Reset du state de drag immédiatement.
+  draggedTaskId.value = null
+  draggedFromStatus.value = null
+  dragOverStatus.value = null
+  dragOverTaskId.value = null
+  dragOverPosition.value = null
+
+  if (!draggedId || !fromStatus || !group.value) return
+  if (draggedId === task.id) return
+
+  // Cas 1 : drop sur une carte d'une autre colonne → changement de statut.
+  if (fromStatus !== targetStatus) {
+    await changeTaskStatus(draggedId, fromStatus, targetStatus)
+    return
+  }
+
+  // Cas 2 : réordonnancement intra-colonne.
+  const tasks = group.value.tasks
+  const draggedIdx = tasks.findIndex((t) => t.id === draggedId)
+  if (draggedIdx === -1) return
+
+  // Calcule le nouvel ordre de la colonne (filtrée par statut).
+  const columnTasks = tasksByStatus(targetStatus)
+  const withoutDragged = columnTasks.filter((t) => t.id !== draggedId)
+  const targetIdx = withoutDragged.findIndex((t) => t.id === task.id)
+  if (targetIdx === -1) return
+  const insertIdx = position === 'before' ? targetIdx : targetIdx + 1
+  const draggedTaskRef = tasks[draggedIdx]!
+  const newColumnOrder = [
+    ...withoutDragged.slice(0, insertIdx),
+    draggedTaskRef,
+    ...withoutDragged.slice(insertIdx),
+  ]
+
+  // Mise à jour optimiste : réorganise les tâches dans le tableau pour que le
+  // filtre `tasksByStatus` reflète immédiatement le nouvel ordre.
+  // Sauvegarde de l'ordre original pour revert en cas d'erreur.
+  const originalOrder = [...tasks]
+  // Retire les tâches de la colonne du tableau global.
+  const columnTaskIds = new Set(columnTasks.map((t) => t.id))
+  const otherTasks = tasks.filter((t) => !columnTaskIds.has(t.id))
+  tasks.length = 0
+  tasks.push(...otherTasks, ...newColumnOrder)
+
   try {
-    await $fetch(`/api/editions/${editionId}/tasks/${taskId}`, {
-      method: 'PUT',
-      body: { status },
+    await $fetch(`/api/editions/${editionId}/task-groups/${groupId.value}/reorder`, {
+      method: 'POST',
+      body: { taskIds: newColumnOrder.map((t) => t.id) },
     })
-  } catch (e: any) {
-    // Revert en cas d'erreur API
-    task.status = fromStatus!
+  } catch (e: unknown) {
+    // Revert
+    tasks.length = 0
+    tasks.push(...originalOrder)
+    const err = e as { data?: { message?: string } }
     useToast().add({
-      title: e?.data?.message || t('errors.generic'),
+      title: err?.data?.message || t('errors.generic'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

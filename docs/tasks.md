@@ -256,13 +256,24 @@ Affichage tabulaire :
 
 ### Vue Kanban
 
-Quatre colonnes statiques (TODO, IN_PROGRESS, DONE, CANCELLED) avec drag-and-drop HTML5 :
+Quatre colonnes statiques (TODO, IN_PROGRESS, DONE, CANCELLED) avec drag-and-drop HTML5 supportant **deux opérations** :
 
-- Capture du `taskId` et du statut source dans `onTaskDragStart`
-- Highlight de la colonne cible (`onColumnDragOver`)
-- Sur drop : `PUT /api/editions/:id/tasks/:taskId` avec `{ status }`
-- **Optimistic update** + revert local si l'API échoue
-- Flag `justDragged` (50 ms) pour absorber le click synthétique post-drag
+#### Changement de statut
+
+Drop sur la zone d'une colonne (ou sur une carte d'une autre colonne) → la tâche change de statut. Implémenté via le helper factorisé `changeTaskStatus` qui appelle `PUT /api/editions/:id/tasks/:taskId` avec `{ status }`. Optimistic update + revert local si l'API échoue.
+
+#### Réordonnancement intra-colonne
+
+Drop sur une carte de la **même colonne** → réordonnancement :
+
+- `onCardDragOver` calcule la position (`before`/`after`) selon la moitié verticale de la carte cible
+- Indicateur visuel : `border-t-2` / `border-b-2` `primary-500` sur la carte cible
+- Sur drop : reconstruit l'ordre de la colonne avec la tâche déplacée à la nouvelle position
+- Appel `POST /api/editions/:id/task-groups/:groupId/reorder` avec les `taskIds` dans le nouvel ordre
+- L'endpoint applique `displayOrder = index` en transaction ; les tâches des autres statuts conservent leur `displayOrder`
+- Optimistic update via mutation du tableau `group.value.tasks` + revert si erreur API
+
+`@drop.stop` sur les cartes empêche la propagation au handler de la colonne — c'est la carte qui décide entre reorder (même colonne) et change-status (autre colonne). Flag `justDragged` (50 ms) pour absorber le click synthétique post-drag.
 
 ## Filtres et recherche
 
@@ -330,13 +341,10 @@ Propositions classées par valeur métier × effort estimé. Les éléments **pl
 - À ajouter dans la même tâche cron `task-deadlines-reminders` avec un nouveau `kind` (`J_PLUS_1`, `J_PLUS_3`).
 - **Effort estimé** : 0,5 j.
 
-#### 🚧 4. Réordonnancement par drag & drop
+#### Réordonnancement des groupes (vue index)
 
-- Aujourd'hui le DnD Kanban change uniquement le statut. Permettre :
-  - **(prioritaire)** Réordonner les tâches au sein d'une colonne Kanban (impact sur `displayOrder`).
-  - Réordonner les groupes dans la vue index.
-- **Bénéfice** : UX cohérente avec ce que les utilisateurs attendent d'un Kanban.
-- **Effort estimé** : 1 j (lib `vuedraggable` ou DnD HTML5 natif déjà utilisé).
+- Le DnD intra-colonne Kanban est implémenté. Il reste à permettre de réordonner les **groupes** dans la page index via drag & drop.
+- **Effort estimé** : 0,5 j (réutilise l'endpoint `reorder` ou en créer un dédié pour les groupes).
 
 ### Fonctionnalités à fort impact (effort moyen)
 
