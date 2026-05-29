@@ -332,9 +332,8 @@
 
                       <!-- Date -->
                       <div v-else-if="option.type === 'Date'">
-                        <UInput
+                        <UiDateField
                           :model-value="getOptionAnswer(item, option.name)"
-                          type="date"
                           @update:model-value="
                             (value: string) => setOptionAnswer(item, option.id, option.name, value)
                           "

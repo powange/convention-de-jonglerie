@@ -16,14 +16,12 @@
           />
         </UFormField>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField :label="$t('gestion.stock.starts_at')" required :error="fieldErrors.startsAt">
-            <UInput v-model="formData.startsAt" type="datetime-local" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('gestion.stock.ends_at')" required :error="fieldErrors.endsAt">
-            <UInput v-model="formData.endsAt" type="datetime-local" class="w-full" />
-          </UFormField>
-        </div>
+        <UFormField :label="$t('gestion.stock.starts_at')" required :error="fieldErrors.startsAt">
+          <UiDateTimePicker v-model="formData.startsAt" />
+        </UFormField>
+        <UFormField :label="$t('gestion.stock.ends_at')" required :error="fieldErrors.endsAt">
+          <UiDateTimePicker v-model="formData.endsAt" />
+        </UFormField>
 
         <UFormField
           :label="$t('gestion.stock.quantity_reserved')"
@@ -230,16 +228,6 @@ function resetFieldErrors() {
   fieldErrors.value = {}
 }
 
-function toLocalInput(iso: string): string {
-  try {
-    const d = new Date(iso)
-    const pad = (n: number) => String(n).padStart(2, '0')
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-  } catch {
-    return ''
-  }
-}
-
 /**
  * Calcule la date de début à pré-remplir pour une nouvelle réservation :
  * - priorité 1 : `volunteersSetupStartDate` si renseignée et future (minuit)
@@ -269,8 +257,8 @@ watch(
   ([open]) => {
     if (open) {
       if (props.reservation) {
-        formData.startsAt = toLocalInput(props.reservation.startsAt)
-        formData.endsAt = toLocalInput(props.reservation.endsAt)
+        formData.startsAt = props.reservation.startsAt
+        formData.endsAt = props.reservation.endsAt
         formData.usage = props.reservation.usage
         formData.quantityReserved = props.reservation.quantityReserved
         formData.status = props.reservation.status
@@ -279,8 +267,8 @@ watch(
       } else {
         const start = getDefaultStart()
         const end = new Date(start.getTime() + 3600_000)
-        formData.startsAt = toLocalInput(start.toISOString())
-        formData.endsAt = toLocalInput(end.toISOString())
+        formData.startsAt = start.toISOString()
+        formData.endsAt = end.toISOString()
         formData.usage = ''
         formData.quantityReserved = 1
         formData.status = 'RESERVED'

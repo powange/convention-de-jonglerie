@@ -121,26 +121,20 @@
           </div>
 
           <!-- Dates et heures -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UFormField name="startDateTime" :label="t('common.start_date')" required>
-              <UInput
-                v-model="formState.startDateTime"
-                type="datetime-local"
-                icon="i-heroicons-play"
-                :disabled="readOnly"
-                @change="onStartDateChange"
-              />
-            </UFormField>
-            <UFormField name="endDateTime" :label="t('common.end_date')" required>
-              <UInput
-                v-model="formState.endDateTime"
-                type="datetime-local"
-                icon="i-heroicons-stop"
-                :disabled="readOnly"
-                :class="dateValidationClass"
-              />
-            </UFormField>
-          </div>
+          <UFormField name="startDateTime" :label="t('common.start_date')" required>
+            <UiDateTimePicker
+              v-model="formState.startDateTime"
+              :disabled="readOnly"
+              @update:model-value="onStartDateChange"
+            />
+          </UFormField>
+          <UFormField name="endDateTime" :label="t('common.end_date')" required>
+            <UiDateTimePicker
+              v-model="formState.endDateTime"
+              :disabled="readOnly"
+              :class="dateValidationClass"
+            />
+          </UFormField>
 
           <!-- Raccourcis durée -->
           <div v-if="!readOnly" class="flex flex-wrap gap-2">

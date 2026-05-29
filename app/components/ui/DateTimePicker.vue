@@ -2,7 +2,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     <!-- Sélecteur de date -->
     <UFormField :label="dateLabel" :name="dateFieldName" :required="required">
-      <UPopover :popper="{ placement: 'bottom-start' }" class="w-full">
+      <UPopover :popper="{ placement: 'bottom-start' }" class="w-full" :disabled="disabled">
         <UButton
           icon="i-heroicons-calendar-days"
           size="lg"
@@ -10,6 +10,7 @@
           variant="outline"
           class="w-full justify-start text-left font-normal"
           :label="displayDate || placeholder"
+          :disabled="disabled"
           block
         />
         <template #content>
@@ -26,7 +27,13 @@
 
     <!-- Sélecteur d'heure -->
     <UFormField :label="timeLabel" :name="timeFieldName" :required="required">
-      <UInputTime v-model="timeValue" :hour-cycle="24" size="lg" icon="i-heroicons-clock" />
+      <UInputTime
+        v-model="timeValue"
+        :hour-cycle="24"
+        size="lg"
+        icon="i-heroicons-clock"
+        :disabled="disabled"
+      />
     </UFormField>
   </div>
 </template>
@@ -58,6 +65,8 @@ interface Props {
   minDate?: Date
   /** Date maximum autorisée */
   maxDate?: Date
+  /** Désactive l'interaction (lecture seule) */
+  disabled?: boolean
 }
 
 const { t } = useI18n()

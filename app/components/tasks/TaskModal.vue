@@ -14,14 +14,13 @@
           />
         </UFormField>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField :label="$t('gestion.tasks.task_status')" :error="fieldErrors.status">
-            <USelect v-model="formData.status" :items="statusItems" class="w-full" />
-          </UFormField>
-          <UFormField :label="$t('gestion.tasks.task_deadline')" :error="fieldErrors.deadline">
-            <UInput v-model="formData.deadline" type="datetime-local" class="w-full" />
-          </UFormField>
-        </div>
+        <UFormField :label="$t('gestion.tasks.task_status')" :error="fieldErrors.status">
+          <USelect v-model="formData.status" :items="statusItems" class="w-full" />
+        </UFormField>
+
+        <UFormField :label="$t('gestion.tasks.task_deadline')" :error="fieldErrors.deadline">
+          <UiDateTimePicker v-model="formData.deadline" />
+        </UFormField>
 
         <UFormField :label="$t('gestion.tasks.task_assignees')" :error="fieldErrors.assigneeIds">
           <USelectMenu
@@ -287,7 +286,7 @@ watch(
     if (open) {
       formData.title = props.task?.title || ''
       formData.status = props.task?.status || 'TODO'
-      formData.deadline = props.task?.deadline ? toLocalInput(props.task.deadline) : ''
+      formData.deadline = props.task?.deadline || ''
       formData.description = props.task?.description || ''
       formData.taskGroupId = props.task?.taskGroupId || props.group?.id || 0
       const assignedIds = props.task?.assignments.map((a) => a.user.id) || []
@@ -299,16 +298,6 @@ watch(
   },
   { immediate: true }
 )
-
-function toLocalInput(iso: string): string {
-  try {
-    const d = new Date(iso)
-    const pad = (n: number) => String(n).padStart(2, '0')
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-  } catch {
-    return ''
-  }
-}
 
 function applyApiErrors(e: any): boolean {
   const errors = e?.data?.data?.errors || e?.data?.errors

@@ -205,27 +205,23 @@
             </UFormField>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField label="Date de début" name="validFrom">
-              <UInput
-                v-model="form.validFrom"
-                :type="form.isAllDay ? 'date' : 'datetime-local'"
-                icon="i-heroicons-calendar"
-                placeholder="Aucune limite"
-                class="w-full"
-              />
-            </UFormField>
+          <UFormField label="Date de début" name="validFrom">
+            <UiDateField
+              v-if="form.isAllDay"
+              v-model="validFromForField"
+              placeholder="Aucune limite"
+            />
+            <UiDateTimePicker v-else v-model="validFromForDateTime" placeholder="Aucune limite" />
+          </UFormField>
 
-            <UFormField label="Date de fin" name="validUntil">
-              <UInput
-                v-model="form.validUntil"
-                :type="form.isAllDay ? 'date' : 'datetime-local'"
-                icon="i-heroicons-calendar"
-                placeholder="Aucune limite"
-                class="w-full"
-              />
-            </UFormField>
-          </div>
+          <UFormField label="Date de fin" name="validUntil">
+            <UiDateField
+              v-if="form.isAllDay"
+              v-model="validUntilForField"
+              placeholder="Aucune limite"
+            />
+            <UiDateTimePicker v-else v-model="validUntilForDateTime" placeholder="Aucune limite" />
+          </UFormField>
         </div>
 
         <UFormField
@@ -403,6 +399,24 @@ const form = ref({
   quotaIds: [] as number[],
   mealIds: [] as number[],
 })
+
+// Proxies pour UiDateField / UiDateTimePicker (qui attendent string non-null)
+// On stocke null en interne quand le champ est vide pour rester compatible
+// avec le payload existant et le watcher isAllDay.
+const validFromForField = computed<string>({
+  get: () => form.value.validFrom || '',
+  set: (v) => {
+    form.value.validFrom = v || null
+  },
+})
+const validFromForDateTime = validFromForField
+const validUntilForField = computed<string>({
+  get: () => form.value.validUntil || '',
+  set: (v) => {
+    form.value.validUntil = v || null
+  },
+})
+const validUntilForDateTime = validUntilForField
 
 // Charger les quotas et repas disponibles
 const quotas = ref<any[]>([])

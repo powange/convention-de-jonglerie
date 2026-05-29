@@ -133,7 +133,7 @@
               />
             </UFormField>
             <UFormField :label="$t('gestion.stock.return_due_at')">
-              <UInput v-model="formData.returnDueAt" type="date" class="w-full" />
+              <UiDateField v-model="formData.returnDueAt" />
             </UFormField>
           </div>
         </div>
@@ -238,14 +238,6 @@ const formData = reactive({
   mapPin: NONE_PIN,
 })
 
-function toDateInput(iso: string | null | undefined): string {
-  if (!iso) return ''
-  try {
-    return new Date(iso).toISOString().split('T')[0]
-  } catch {
-    return ''
-  }
-}
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
 
@@ -263,7 +255,9 @@ watch(
       formData.notes = props.item?.notes || ''
       formData.isExternalLoan = props.item?.isExternalLoan ?? false
       formData.ownerContact = props.item?.ownerContact || ''
-      formData.returnDueAt = toDateInput(props.item?.returnDueAt)
+      formData.returnDueAt = props.item?.returnDueAt
+        ? String(props.item.returnDueAt).slice(0, 10)
+        : ''
       formData.location = props.item?.location || ''
       formData.mapPin = pinFromItem(props.item)
       resetFieldErrors()
