@@ -97,6 +97,7 @@
     "@pinia/nuxt": "^0.11.3",
     "@prisma/adapter-mariadb": "^7.5.0",
     "@prisma/client": "^7.8.0",
+    "@tiptap/extension-emoji": "^3.23.6",
     "@types/nodemailer": "^7.0.11",
     "@vue-email/components": "^0.0.21",
     "@vue-email/render": "^0.0.9",

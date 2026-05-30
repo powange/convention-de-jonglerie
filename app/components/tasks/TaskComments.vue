@@ -52,7 +52,11 @@
 
           <!-- Édition inline -->
           <div v-if="editingId === c.id" class="space-y-2">
-            <MinimalMarkdownEditor v-model="editingContent" :rows="4" :can-edit="true" />
+            <MarkdownEditor
+              v-model="editingContent"
+              :placeholder="$t('gestion.tasks.comments.placeholder')"
+              class="min-h-24"
+            />
             <div class="flex gap-2">
               <UButton size="xs" color="primary" :loading="saving" @click="saveEdit(c)">
                 {{ $t('common.save') }}
@@ -74,11 +78,10 @@
 
     <!-- Formulaire d'ajout -->
     <div v-if="canPost" class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
-      <MinimalMarkdownEditor
+      <MarkdownEditor
         v-model="newContent"
-        :rows="3"
-        :can-edit="true"
         :placeholder="$t('gestion.tasks.comments.placeholder')"
+        class="min-h-20"
       />
       <div class="flex justify-end">
         <UButton

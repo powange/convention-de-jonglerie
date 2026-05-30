@@ -103,7 +103,8 @@
       "Bash([ -f \"/home/powange/projects/convention-de-jonglerie/i18n/locales/$locale/gestion.json\" ])",
       "Bash(git fetch *)",
       "Bash(git rebase *)",
-      "mcp__nuxt-ui__get-example"
+      "mcp__nuxt-ui__get-example",
+      "mcp__nuxt-ui__list-examples"
     ],
     "additionalDirectories": [
       "/tmp",
