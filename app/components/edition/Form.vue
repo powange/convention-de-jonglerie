@@ -421,9 +421,10 @@
             name="description"
             :error="getDescriptionError()"
           >
-            <MinimalMarkdownEditor
+            <MarkdownEditor
               v-model="state.description"
-              :empty-placeholder="$t('components.edition_form.convention_description_placeholder')"
+              :placeholder="$t('components.edition_form.convention_description_placeholder')"
+              class="min-h-40"
               @blur="
                 (() => {
                   touchedFields.description = true
@@ -434,9 +435,10 @@
           </UFormField>
 
           <UFormField :label="$t('common.program')" name="program" :error="getProgramError()">
-            <MinimalMarkdownEditor
+            <MarkdownEditor
               v-model="state.program"
-              :empty-placeholder="$t('components.edition_form.program_placeholder')"
+              :placeholder="$t('components.edition_form.program_placeholder')"
+              class="min-h-40"
               @blur="
                 (() => {
                   touchedFields.program = true

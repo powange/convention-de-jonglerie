@@ -233,13 +233,13 @@ Voir [`docs/system/NOTIFICATION_SYSTEM.md`](system/NOTIFICATION_SYSTEM.md) pour 
 - `app/components/tasks/TaskGroupModal.vue` : création / édition d'un groupe (`name`, `description`).
 - `app/components/tasks/TaskModal.vue` : création / édition d'une tâche.
   - Multi-select des assignés via `USelectMenu` (mode `multiple`).
-  - Description Markdown via `MinimalMarkdownEditor`.
+  - Description Markdown via `MarkdownEditor`.
   - Affiche un badge **« Plus assignable »** pour les assignés legacy (qui n'apparaissent plus dans `assignable-users` mais sont déjà assignés à la tâche), avec un avertissement.
   - Affichage des erreurs Zod par champ via `:error="fieldErrors.X"` sur les `UFormField`.
   - Section **commentaires** affichée uniquement en mode édition (`TasksTaskComments`).
 - `app/components/tasks/TaskComments.vue` : fil de discussion d'une tâche.
   - Liste paginée chronologique avec avatar + pseudo + date.
-  - Ajout via `MinimalMarkdownEditor` + bouton « Publier ».
+  - Ajout via `MarkdownEditor` + bouton « Publier ».
   - Édition inline (auteur uniquement) + suppression (auteur ou modérateur).
   - Badge **« modifié »** sur les commentaires édités.
 

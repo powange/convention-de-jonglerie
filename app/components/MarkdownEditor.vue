@@ -5,15 +5,23 @@
     content-type="markdown"
     :extensions="editorExtensions"
     :placeholder="placeholder"
+    :editable="!disabled"
+    :on-blur="() => emit('blur')"
     class="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 focus-within:border-primary-500"
   >
     <UEditorToolbar
+      v-if="!disabled"
       :editor="editor"
       :items="toolbarItems"
       class="border-b border-muted py-2 px-8 sm:px-16 overflow-x-auto"
     />
-    <UEditorToolbar :editor="editor" :items="bubbleItems" layout="bubble" />
-    <UEditorEmojiMenu :editor="editor" :items="emojiItems" :append-to="appendToBody" />
+    <UEditorToolbar v-if="!disabled" :editor="editor" :items="bubbleItems" layout="bubble" />
+    <UEditorEmojiMenu
+      v-if="!disabled"
+      :editor="editor"
+      :items="emojiItems"
+      :append-to="appendToBody"
+    />
   </UEditor>
 </template>
 
@@ -26,6 +34,11 @@ const model = defineModel<string>({ required: true })
 
 defineProps<{
   placeholder?: string
+  disabled?: boolean
+}>()
+
+const emit = defineEmits<{
+  blur: []
 }>()
 
 const { t } = useI18n()

@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Terug naar bewerken",
       "block_tooltip": "Codeblok",
       "bold_tooltip": "Vetgedrukte tekst (Ctrl+B)",
       "bullet_list_tooltip": "Opsommingslijst",
       "code_tooltip": "Inline code (Ctrl+`)",
-      "edit_mode": "Bewerken",
       "emoji_tooltip": "Emoji invoegen (:)",
-      "exit_fullscreen": "Volledig scherm verlaten",
-      "fullscreen_tooltip": "Volledig scherm (Esc om te verlaten)",
       "heading1_tooltip": "Kop niveau 1",
       "heading2_tooltip": "Kop niveau 2",
       "heading3_tooltip": "Kop niveau 3",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Cursieve tekst (Ctrl+I)",
       "link_tooltip": "Link invoegen (Ctrl+K)",
       "numbered_list_tooltip": "Genummerde lijst",
-      "preview_mode": "Voorbeeld",
       "quote_tooltip": "Citaat",
-      "split_mode": "Gesplitste modus",
-      "split_tooltip": "Bewerken en voorbeeld naast elkaar",
-      "strike_tooltip": "Doorgestreepte tekst",
-      "toggle_preview": "Voorbeeld wisselen"
+      "strike_tooltip": "Doorgestreepte tekst"
     },
     "email": "E-mail",
     "end": "Einde",

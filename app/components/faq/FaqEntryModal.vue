@@ -15,7 +15,7 @@
         </UFormField>
 
         <UFormField :label="$t('gestion.faq.answer')" required :error="fieldErrors.answer">
-          <MinimalMarkdownEditor v-model="formData.answer" :disabled="saving" />
+          <MarkdownEditor v-model="formData.answer" :disabled="saving" class="min-h-32" />
         </UFormField>
 
         <USwitch

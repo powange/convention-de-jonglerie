@@ -59,10 +59,10 @@
                 :error="fieldErrors.description"
               >
                 <div v-if="canEdit || canManageVolunteers" class="space-y-2">
-                  <MinimalMarkdownEditor
+                  <MarkdownEditor
                     v-model="volunteersDescriptionLocal"
-                    :preview="true"
                     :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                    class="min-h-40"
                   />
                 </div>
                 <div v-else class="prose dark:prose-invert max-w-none text-sm">

@@ -211,7 +211,7 @@
               </div>
 
               <UFormField :error="fieldErrors.description">
-                <MinimalMarkdownEditor v-model="descriptionLocal" :disabled="saving" />
+                <MarkdownEditor v-model="descriptionLocal" :disabled="saving" class="min-h-32" />
               </UFormField>
             </div>
           </div>

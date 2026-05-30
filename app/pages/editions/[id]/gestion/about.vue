@@ -61,18 +61,20 @@
 
         <!-- Description -->
         <UFormField :label="$t('common.description')" name="description">
-          <MinimalMarkdownEditor
+          <MarkdownEditor
             v-model="description"
-            :empty-placeholder="$t('components.edition_form.convention_description_placeholder')"
+            :placeholder="$t('components.edition_form.convention_description_placeholder')"
+            class="min-h-40"
             @blur="description = description?.trim() || ''"
           />
         </UFormField>
 
         <!-- Programme -->
         <UFormField :label="$t('common.program')" name="program">
-          <MinimalMarkdownEditor
+          <MarkdownEditor
             v-model="program"
-            :empty-placeholder="$t('components.edition_form.program_placeholder')"
+            :placeholder="$t('components.edition_form.program_placeholder')"
+            class="min-h-40"
             @blur="program = program?.trim() || ''"
           />
         </UFormField>

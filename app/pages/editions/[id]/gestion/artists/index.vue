@@ -67,9 +67,10 @@
         </template>
 
         <template v-if="editingArtistInfo">
-          <MinimalMarkdownEditor
+          <MarkdownEditor
             v-model="artistInfoLocal"
-            :empty-placeholder="$t('artists.artist_info_placeholder')"
+            :placeholder="$t('artists.artist_info_placeholder')"
+            class="min-h-40"
           />
         </template>
 

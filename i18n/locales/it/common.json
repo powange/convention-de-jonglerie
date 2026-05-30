@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Torna alla modifica",
       "block_tooltip": "Blocco di codice",
       "bold_tooltip": "Testo in grassetto (Ctrl+B)",
       "bullet_list_tooltip": "Elenco puntato",
       "code_tooltip": "Codice inline (Ctrl+`)",
-      "edit_mode": "Modifica",
       "emoji_tooltip": "Inserisci emoji (:)",
-      "exit_fullscreen": "Esci da schermo intero",
-      "fullscreen_tooltip": "Modalità a schermo intero (Esc per uscire)",
       "heading1_tooltip": "Intestazione livello 1",
       "heading2_tooltip": "Intestazione livello 2",
       "heading3_tooltip": "Titolo livello 3",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Testo in corsivo (Ctrl+I)",
       "link_tooltip": "Inserisci collegamento (Ctrl+K)",
       "numbered_list_tooltip": "Elenco numerato",
-      "preview_mode": "Anteprima",
       "quote_tooltip": "Citazione",
-      "split_mode": "Modalità divisa",
-      "split_tooltip": "Modifica e anteprima affiancate",
-      "strike_tooltip": "Testo barrato",
-      "toggle_preview": "Attiva anteprima"
+      "strike_tooltip": "Testo barrato"
     },
     "email": "Email",
     "end": "Fine",

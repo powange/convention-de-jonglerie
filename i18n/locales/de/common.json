@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Zurück zur Bearbeitung",
       "block_tooltip": "Codeblock",
       "bold_tooltip": "Fetter Text (Strg+B)",
       "bullet_list_tooltip": "Aufzählungsliste",
       "code_tooltip": "Inline-Code (Strg+`)",
-      "edit_mode": "Bearbeitung",
       "emoji_tooltip": "Emoji einfügen (:)",
-      "exit_fullscreen": "Vollbild verlassen",
-      "fullscreen_tooltip": "Vollbildmodus (Esc zum Beenden)",
       "heading1_tooltip": "Überschrift Ebene 1",
       "heading2_tooltip": "Überschrift Ebene 2",
       "heading3_tooltip": "Überschrift Ebene 3",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Kursiver Text (Strg+I)",
       "link_tooltip": "Link einfügen (Strg+K)",
       "numbered_list_tooltip": "Nummerierte Liste",
-      "preview_mode": "Vorschau",
       "quote_tooltip": "Zitat",
-      "split_mode": "Geteilter Modus",
-      "split_tooltip": "Bearbeitung und Vorschau nebeneinander",
-      "strike_tooltip": "Durchgestrichener Text",
-      "toggle_preview": "Vorschau umschalten"
+      "strike_tooltip": "Durchgestrichener Text"
     },
     "email": "E-Mail",
     "end": "Ende",

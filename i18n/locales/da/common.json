@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Tilbage til redigering",
       "block_tooltip": "Kodeblok",
       "bold_tooltip": "Fed tekst (Ctrl+B)",
       "bullet_list_tooltip": "Punktliste",
       "code_tooltip": "Inline kode (Ctrl+`)",
-      "edit_mode": "Redigering",
       "emoji_tooltip": "Indsæt emoji (:)",
-      "exit_fullscreen": "Afslut fuldskærm",
-      "fullscreen_tooltip": "Fuldskærmstilstand (Esc for at afslutte)",
       "heading1_tooltip": "Overskrift niveau 1",
       "heading2_tooltip": "Overskrift niveau 2",
       "heading3_tooltip": "Overskrift niveau 3",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Kursiv tekst (Ctrl+I)",
       "link_tooltip": "Indsæt link (Ctrl+K)",
       "numbered_list_tooltip": "Nummereret liste",
-      "preview_mode": "Forhåndsvisning",
       "quote_tooltip": "Citat",
-      "split_mode": "Delt tilstand",
-      "split_tooltip": "Redigering og forhåndsvisning side om side",
-      "strike_tooltip": "Gennemstreget tekst",
-      "toggle_preview": "Skift forhåndsvisning"
+      "strike_tooltip": "Gennemstreget tekst"
     },
     "email": "Email",
     "end": "Slut",

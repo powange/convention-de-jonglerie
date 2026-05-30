@@ -189,7 +189,7 @@ Configurations Docker dédiées : `docker-compose.test*.yml` (`-simple`, `-integ
 - **Back-office édition** (`/editions/[id]/gestion/`) : artists, faq, meals, shows-call, stock, tasks, ticketing (avec counter), volunteers, workshops.
 - **Admin** (`/admin/*`) : users, conventions, editions, error-logs, feedback, project-costs, IA tools.
 
-Composants notables : [HomeAgenda.vue](../app/components/HomeAgenda.vue), [FavoritesMap.vue](../app/components/FavoritesMap.vue), [ConventionsFeaturesModal.vue](../app/components/ConventionsFeaturesModal.vue), [MinimalMarkdownEditor.vue](../app/components/MinimalMarkdownEditor.vue), [CountryMultiSelect.vue](../app/components/CountryMultiSelect.vue), [UserSelector.vue](../app/components/UserSelector.vue), [LoadingLogo.vue](../app/components/LoadingLogo.vue).
+Composants notables : [HomeAgenda.vue](../app/components/HomeAgenda.vue), [FavoritesMap.vue](../app/components/FavoritesMap.vue), [ConventionsFeaturesModal.vue](../app/components/ConventionsFeaturesModal.vue), [MarkdownEditor.vue](../app/components/MarkdownEditor.vue), [CountryMultiSelect.vue](../app/components/CountryMultiSelect.vue), [UserSelector.vue](../app/components/UserSelector.vue), [LoadingLogo.vue](../app/components/LoadingLogo.vue).
 
 ### Tests
 

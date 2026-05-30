@@ -100,7 +100,7 @@ remarkParse -> remarkGfm -> remarkRehype -> rehypeExternalLinks -> rehypeSanitiz
 
 Fichiers concernes (tous correctement sanitises) :
 
-- `MinimalMarkdownEditor.vue`
+- `MarkdownEditor.vue`
 - `edition/Header.vue`
 - `editions/[id]/index.vue`
 - `editions/[id]/artist-space.vue`

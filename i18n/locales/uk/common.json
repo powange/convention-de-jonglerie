@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Повернутися до редагування",
       "block_tooltip": "Блок коду",
       "bold_tooltip": "Жирний текст (Ctrl+B)",
       "bullet_list_tooltip": "Маркований список",
       "code_tooltip": "Вбудований код (Ctrl+`)",
-      "edit_mode": "Редагування",
       "emoji_tooltip": "Вставити емодзі (:)",
-      "exit_fullscreen": "Вийти з повного екрану",
-      "fullscreen_tooltip": "Повноекранний режим (Esc для виходу)",
       "heading1_tooltip": "Заголовок рівня 1",
       "heading2_tooltip": "Заголовок рівня 2",
       "heading3_tooltip": "Заголовок 3-го рівня",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Похилий текст (Ctrl+I)",
       "link_tooltip": "Вставити посилання (Ctrl+K)",
       "numbered_list_tooltip": "Нумерований список",
-      "preview_mode": "Попередній перегляд",
       "quote_tooltip": "Цитата",
-      "split_mode": "Розділений режим",
-      "split_tooltip": "Редагування та попередній перегляд поруч",
-      "strike_tooltip": "Закреслений текст",
-      "toggle_preview": "Переключити попередній перегляд"
+      "strike_tooltip": "Закреслений текст"
     },
     "email": "Електронна пошта",
     "end": "Кінець",

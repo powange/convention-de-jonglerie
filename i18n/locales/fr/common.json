@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Revenir à l'édition",
       "block_tooltip": "Bloc de code",
       "bold_tooltip": "Texte en gras (Ctrl+B)",
       "bullet_list_tooltip": "Liste à puces",
       "code_tooltip": "Code en ligne (Ctrl+`)",
-      "edit_mode": "Édition",
       "emoji_tooltip": "Insérer un emoji (:)",
-      "exit_fullscreen": "Quitter le plein écran",
-      "fullscreen_tooltip": "Mode plein écran (Échap pour quitter)",
       "heading1_tooltip": "Titre de niveau 1",
       "heading2_tooltip": "Titre de niveau 2",
       "heading3_tooltip": "Titre de niveau 3",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Texte en italique (Ctrl+I)",
       "link_tooltip": "Insérer un lien (Ctrl+K)",
       "numbered_list_tooltip": "Liste numérotée",
-      "strike_tooltip": "Texte barré",
-      "preview_mode": "Prévisualisation",
       "quote_tooltip": "Citation",
-      "split_mode": "Mode divisé",
-      "split_tooltip": "Édition et prévisualisation côte à côte",
-      "toggle_preview": "Basculer la prévisualisation"
+      "strike_tooltip": "Texte barré"
     },
     "email": "E-mail",
     "end": "Fin",

@@ -75,15 +75,11 @@
       }
     },
     "editor": {
-      "back_to_edit": "Вернуться к редактированию",
       "block_tooltip": "Блок кода",
       "bold_tooltip": "Жирный текст (Ctrl+B)",
       "bullet_list_tooltip": "Маркированный список",
       "code_tooltip": "Встроенный код (Ctrl+`)",
-      "edit_mode": "Редактирование",
       "emoji_tooltip": "Вставить эмодзи (:)",
-      "exit_fullscreen": "Выйти из полного экрана",
-      "fullscreen_tooltip": "Полноэкранный режим (Esc для выхода)",
       "heading1_tooltip": "Заголовок уровня 1",
       "heading2_tooltip": "Заголовок уровня 2",
       "heading3_tooltip": "Заголовок 3-го уровня",
@@ -91,12 +87,8 @@
       "italic_tooltip": "Наклонный текст (Ctrl+I)",
       "link_tooltip": "Вставить ссылку (Ctrl+K)",
       "numbered_list_tooltip": "Нумерованный список",
-      "preview_mode": "Предпросмотр",
       "quote_tooltip": "Цитата",
-      "split_mode": "Разделенный режим",
-      "split_tooltip": "Редактирование и предпросмотр рядом",
-      "strike_tooltip": "Зачёркнутый текст",
-      "toggle_preview": "Переключить предпросмотр"
+      "strike_tooltip": "Зачёркнутый текст"
     },
     "email": "Email",
     "end": "Конец",

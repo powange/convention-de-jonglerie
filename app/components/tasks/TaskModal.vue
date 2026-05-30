@@ -81,7 +81,7 @@
         </UFormField>
 
         <UFormField :label="$t('gestion.tasks.task_description')" :error="fieldErrors.description">
-          <MinimalMarkdownEditor v-model="formData.description" :rows="6" :can-edit="true" />
+          <MarkdownEditor v-model="formData.description" class="min-h-40" />
         </UFormField>
 
         <UFormField
