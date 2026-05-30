@@ -239,9 +239,9 @@ watch(
 )
 
 // Spectacles publics — affichés dans les popups des zones/marqueurs
-const { data: publicShows } = useFetch<any[]>(`/api/editions/${editionId.value}/shows/public`, {
+const { data: publicShows } = useApiFetch<any[]>(`/api/editions/${editionId.value}/shows/public`, {
   lazy: true,
-  transform: (response: any) => response?.data?.shows || response?.shows || [],
+  transform: (payload: any) => payload?.shows || [],
 })
 
 const showsByZone = computed(() => {
@@ -281,9 +281,9 @@ const formatPopupDateTime = (dateTimeStr: string) => {
 }
 
 // Workshops — affichés dans les popups des zones/marqueurs
-const { data: workshops } = useFetch<any[]>(`/api/editions/${editionId.value}/workshops`, {
+const { data: workshops } = useApiFetch<any[]>(`/api/editions/${editionId.value}/workshops`, {
   lazy: true,
-  transform: (response: any) => response?.data?.workshops || response?.workshops || response || [],
+  transform: (payload: any) => payload?.workshops || payload || [],
 })
 
 // Filtrer les workshops non terminés

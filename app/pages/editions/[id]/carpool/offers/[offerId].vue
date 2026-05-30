@@ -74,9 +74,9 @@ const editionId = parseInt(route.params.id as string)
 const offerId = parseInt(route.params.offerId as string)
 
 // Charger l'édition
-const { data: edition, pending: loading } = await useLazyFetch(`/api/editions/${editionId}`, {
-  transform: (response: any) => {
-    const ed = response?.data?.edition || response
+const { data: edition, pending: loading } = await useApiFetch(`/api/editions/${editionId}`, {
+  lazy: true,
+  transform: (ed: any) => {
     if (ed) editionStore.setEdition(ed)
     return ed
   },

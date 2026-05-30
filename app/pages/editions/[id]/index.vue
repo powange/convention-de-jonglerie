@@ -834,10 +834,10 @@ const { data: tiers } = await useFetch<any[]>(`/api/editions/${editionId}/ticket
 })
 
 // Charger les spectacles publics
-const { data: publicShows } = await useFetch<any[]>(`/api/editions/${editionId}/shows/public`, {
+const { data: publicShows } = await useApiFetch<any[]>(`/api/editions/${editionId}/shows/public`, {
   server: true,
   lazy: true,
-  transform: (response: any) => response?.data?.shows || response?.shows || [],
+  transform: (payload: any) => payload?.shows || [],
 })
 
 // Spectacles regroupés par jour
