@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Text, Button, Section, Hr } from '@vue-email/components'
+import { computed } from 'vue'
 
 import BaseEmail from './BaseEmail.vue'
 
@@ -12,7 +13,22 @@ interface Props {
   actionText?: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+// `message` est du texte brut, potentiellement contrôlé par un utilisateur
+// (ex. messageText d'une notification saisie par un organisateur, ou une
+// traduction interpolant des données utilisateur). On l'échappe avant de
+// l'injecter via v-html pour empêcher toute injection HTML/XSS stockée, puis
+// on convertit les sauts de ligne en <br> pour préserver la mise en forme.
+const messageHtml = computed(() =>
+  (props.message || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\r\n|\r|\n/g, '<br>')
+)
 </script>
 
 <template>
@@ -33,7 +49,10 @@ defineProps<Props>()
       }"
     >
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div :style="{ color: '#374151', fontSize: '14px', lineHeight: '1.6' }" v-html="message" />
+      <div
+        :style="{ color: '#374151', fontSize: '14px', lineHeight: '1.6' }"
+        v-html="messageHtml"
+      />
     </Section>
 
     <Section v-if="actionUrl && actionText" :style="{ textAlign: 'center', margin: '0 0 24px' }">
