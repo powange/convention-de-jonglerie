@@ -259,6 +259,8 @@
     "filter_active_conventions": "Активні конвенції",
     "filter_all_conventions": "Всі конвенції",
     "filter_archived_conventions": "Архівовані конвенції",
+    "filter_by_ip": "IP-адреса...",
+    "filter_by_user": "Користувач (псевдонім або електронна пошта)...",
     "filter_sort": "Фільтрувати та сортувати",
     "filter_unclaimed_conventions": "Незатребувані",
     "good_news": "Це хороші новини!",
@@ -552,6 +554,7 @@
       "updated_asc": "Зміна (старе)",
       "updated_desc": "Зміна (нове)"
     },
+    "sort_by": "Сортувати за {column}",
     "stop_impersonation": "Повернутися до мого облікового запису",
     "stop_impersonation_error": "Помилка при зупинці уособлення",
     "success": "Успіх",

@@ -259,6 +259,8 @@
     "filter_active_conventions": "Активные конвенции",
     "filter_all_conventions": "Все конвенции",
     "filter_archived_conventions": "Архивированные конвенции",
+    "filter_by_ip": "IP-адрес...",
+    "filter_by_user": "Пользователь (псевдоним или эл. почта)...",
     "filter_sort": "Фильтровать и сортировать",
     "filter_unclaimed_conventions": "Невостребованные",
     "good_news": "Это хорошие новости!",
@@ -552,6 +554,7 @@
       "updated_asc": "Изменение (старое)",
       "updated_desc": "Изменение (новое)"
     },
+    "sort_by": "Сортировать по {column}",
     "stop_impersonation": "Вернуться к моей учетной записи",
     "stop_impersonation_error": "Ошибка при остановке олицетворения",
     "success": "Успех",

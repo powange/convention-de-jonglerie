@@ -259,6 +259,8 @@
     "filter_active_conventions": "Actieve conventies",
     "filter_all_conventions": "Alle conventies",
     "filter_archived_conventions": "Gearchiveerde conventies",
+    "filter_by_ip": "IP-adres...",
+    "filter_by_user": "Gebruiker (gebruikersnaam of e-mail)...",
     "filter_sort": "Filteren en sorteren",
     "filter_unclaimed_conventions": "Niet geclaimd",
     "good_news": "Dat is goed nieuws!",
@@ -552,6 +554,7 @@
       "updated_asc": "Wijziging (oud)",
       "updated_desc": "Wijziging (nieuw)"
     },
+    "sort_by": "Sorteren op {column}",
     "stop_impersonation": "Terug naar mijn account",
     "stop_impersonation_error": "Fout bij het stoppen van imitatie",
     "success": "Succes",

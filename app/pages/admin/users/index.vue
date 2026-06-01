@@ -278,6 +278,34 @@ const stats = computed(() => {
   return { total, verified, admins, creators, online }
 })
 
+// Helper pour créer un en-tête de colonne cliquable qui pilote le tri serveur
+// (le tableau est paginé côté serveur, on réutilise donc le même sortOption que le USelect "Tri")
+const createSortableHeader = (field: string, label: string) => {
+  return () => {
+    const [currentField, currentOrder] = sortOption.value.split(':')
+    const isActive = currentField === field
+    const icon = !isActive
+      ? 'i-heroicons-arrows-up-down-20-solid'
+      : currentOrder === 'asc'
+        ? 'i-heroicons-bars-arrow-up-20-solid'
+        : 'i-heroicons-bars-arrow-down-20-solid'
+
+    return h(resolveComponent('UButton'), {
+      color: isActive ? 'primary' : 'neutral',
+      variant: 'ghost',
+      size: 'xs',
+      label,
+      trailingIcon: icon,
+      class: '-mx-2.5 data-[state=open]:bg-elevated',
+      'aria-label': t('admin.sort_by', { column: label }),
+      onClick: () => {
+        const newOrder = isActive && currentOrder === 'asc' ? 'desc' : 'asc'
+        sortOption.value = `${field}:${newOrder}`
+      },
+    })
+  }
+}
+
 // Configuration du tableau avec la nouvelle syntaxe
 const columns = [
   {
@@ -319,7 +347,7 @@ const columns = [
   },
   {
     accessorKey: 'identity',
-    header: t('admin.user_column'),
+    header: createSortableHeader('nom', t('admin.user_column')),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
       return h(resolveComponent('UiUserDisplayForAdmin'), {
@@ -332,7 +360,7 @@ const columns = [
   },
   {
     accessorKey: 'email',
-    header: t('common.email'),
+    header: createSortableHeader('email', t('common.email')),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
       return h('div', { class: 'flex items-center gap-2' }, [
@@ -452,7 +480,7 @@ const columns = [
   },
   {
     accessorKey: 'createdAt',
-    header: t('admin.registration'),
+    header: createSortableHeader('createdAt', t('admin.registration')),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
 
@@ -524,7 +552,7 @@ const columns = [
   },
   {
     accessorKey: 'lastLoginAt',
-    header: t('admin.last_login'),
+    header: createSortableHeader('lastLoginAt', t('admin.last_login')),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
 

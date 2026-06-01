@@ -259,6 +259,8 @@
     "filter_active_conventions": "Aktive konventioner",
     "filter_all_conventions": "Alle konventioner",
     "filter_archived_conventions": "Arkiverede konventioner",
+    "filter_by_ip": "IP-adresse...",
+    "filter_by_user": "Bruger (brugernavn eller e-mail)...",
     "filter_sort": "Filtrer og sorter",
     "filter_unclaimed_conventions": "Ikke gjort krav på",
     "good_news": "Det er gode nyheder!",
@@ -552,6 +554,7 @@
       "updated_asc": "Ændring (ældste)",
       "updated_desc": "Ændring (nyeste)"
     },
+    "sort_by": "Sortér efter {column}",
     "stop_impersonation": "Tilbage til min konto",
     "stop_impersonation_error": "Fejl ved stop af impersonifikation",
     "success": "Succes",

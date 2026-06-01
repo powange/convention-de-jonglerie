@@ -166,6 +166,22 @@
           @input="debouncedSearch"
         />
 
+        <UInput
+          v-model="filters.ip"
+          icon="i-heroicons-globe-alt"
+          :placeholder="$t('admin.filter_by_ip')"
+          class="w-48"
+          @input="debouncedSearch"
+        />
+
+        <UInput
+          v-model="filters.user"
+          icon="i-heroicons-user"
+          :placeholder="$t('admin.filter_by_user')"
+          class="w-56"
+          @input="debouncedSearch"
+        />
+
         <UButton icon="i-heroicons-x-mark" variant="outline" color="neutral" @click="clearFilters">
           Effacer
         </UButton>
@@ -591,8 +607,26 @@ const filters = ref({
   errorType: 'all',
   statusCode: 'all',
   path: '',
+  ip: '',
+  user: '',
   timeRange: '7d', // Par défaut, 7 jours
 })
+
+// Valeurs par défaut des filtres (utilisées pour ne pas polluer l'URL)
+const FILTER_DEFAULTS = {
+  search: '',
+  status: 'unresolved',
+  errorType: 'all',
+  statusCode: 'all',
+  path: '',
+  ip: '',
+  user: '',
+  timeRange: '7d',
+} as const
+const DEFAULT_PAGE_SIZE = 20
+
+const route = useRoute()
+const router = useRouter()
 
 // Modal de détails
 const showLogDetails = ref(false)
@@ -684,9 +718,41 @@ const truncateUrl = (url: string, maxLength: number = 50) => {
   }
 }
 
+// Construit l'objet query d'URL en n'incluant que les valeurs différentes des défauts
+const buildUrlQuery = (): Record<string, string> => {
+  const q: Record<string, string> = {}
+  for (const key of Object.keys(FILTER_DEFAULTS) as (keyof typeof FILTER_DEFAULTS)[]) {
+    const value = filters.value[key]
+    if (value && value !== FILTER_DEFAULTS[key]) q[key] = String(value)
+  }
+  if (pagination.value.page && pagination.value.page > 1) q.page = String(pagination.value.page)
+  if (pagination.value.pageSize && pagination.value.pageSize !== DEFAULT_PAGE_SIZE)
+    q.pageSize = String(pagination.value.pageSize)
+  return q
+}
+
+// Reflète l'état courant des filtres dans l'URL (replace pour ne pas polluer l'historique)
+const syncUrl = () => {
+  router.replace({ query: buildUrlQuery() })
+}
+
+// Initialise les filtres et la pagination depuis l'URL (au montage / rechargement)
+const initFiltersFromUrl = () => {
+  const q = route.query
+  for (const key of Object.keys(FILTER_DEFAULTS) as (keyof typeof FILTER_DEFAULTS)[]) {
+    if (typeof q[key] === 'string') filters.value[key] = q[key] as string
+  }
+  const page = parseInt(q.page as string)
+  if (!isNaN(page) && page > 0) pagination.value.page = page
+  const pageSize = parseInt(q.pageSize as string)
+  if (!isNaN(pageSize) && pageSize > 0) pagination.value.pageSize = pageSize
+}
+
 // Chargement des logs
 const loadLogs = async () => {
   loading.value = true
+  // Garder l'URL synchronisée avec l'état des filtres
+  syncUrl()
   try {
     const params = new URLSearchParams()
     params.append('page', (pagination.value.page || 1).toString())
@@ -701,6 +767,8 @@ const loadLogs = async () => {
     if (filters.value.statusCode && filters.value.statusCode !== 'all')
       params.append('statusCode', filters.value.statusCode)
     if (filters.value.path) params.append('path', filters.value.path)
+    if (filters.value.ip) params.append('ip', filters.value.ip)
+    if (filters.value.user) params.append('user', filters.value.user)
 
     const response = await $fetch(`/api/admin/error-logs?${params}`)
 
@@ -776,14 +844,7 @@ const applyFilters = () => {
 }
 
 const clearFilters = () => {
-  filters.value = {
-    search: '',
-    status: 'unresolved', // Par défaut on affiche les non résolues
-    errorType: 'all',
-    statusCode: 'all',
-    path: '',
-    timeRange: '7d', // Par défaut, 7 jours
-  }
+  filters.value = { ...FILTER_DEFAULTS }
   pagination.value.page = 1
   loadLogs()
 }
@@ -887,8 +948,9 @@ const updateAdminNotes = () => {
   executeUpdateNotes()
 }
 
-// Charger les données au montage
+// Charger les données au montage (en restaurant d'abord les filtres depuis l'URL)
 onMounted(() => {
+  initFiltersFromUrl()
   loadLogs()
 })
 </script>

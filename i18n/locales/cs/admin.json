@@ -259,6 +259,8 @@
     "filter_active_conventions": "Aktivní konvence",
     "filter_all_conventions": "Všechny dohody",
     "filter_archived_conventions": "Archivované sjezdy",
+    "filter_by_ip": "IP adresa...",
+    "filter_by_user": "Uživatel (přezdívka nebo e-mail)...",
     "filter_sort": "Filtrování a třídění",
     "filter_unclaimed_conventions": "Nenárokované",
     "good_news": "To je skvělá zpráva!",
@@ -552,6 +554,7 @@
       "updated_asc": "Úprava (nejstarší)",
       "updated_desc": "Úprava (nejnovější)"
     },
+    "sort_by": "Seřadit podle {column}",
     "stop_impersonation": "Zpět na můj účet",
     "stop_impersonation_error": "Chyba při zastavení zosobnění",
     "success": "Úspěch",

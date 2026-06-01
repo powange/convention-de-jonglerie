@@ -48,11 +48,13 @@ const messageHtml = computed(() =>
         margin: '0 0 24px',
       }"
     >
-      <!-- eslint-disable-next-line vue/no-v-html -->
+      <!-- eslint-disable vue/no-v-html -->
+      <!-- messageHtml est échappé (entités HTML) côté script : injection HTML neutralisée -->
       <div
         :style="{ color: '#374151', fontSize: '14px', lineHeight: '1.6' }"
         v-html="messageHtml"
       />
+      <!-- eslint-enable vue/no-v-html -->
     </Section>
 
     <Section v-if="actionUrl && actionText" :style="{ textAlign: 'center', margin: '0 0 24px' }">

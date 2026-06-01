@@ -259,6 +259,8 @@
     "filter_active_conventions": "Aktiva konventioner",
     "filter_all_conventions": "Samtliga avtal",
     "filter_archived_conventions": "Arkiverade konventioner",
+    "filter_by_ip": "IP-adress...",
+    "filter_by_user": "Användare (användarnamn eller e-post)...",
     "filter_sort": "Filtrera och sortera",
     "filter_unclaimed_conventions": "Ej hävdade",
     "good_news": "Det är goda nyheter!",
@@ -552,6 +554,7 @@
       "updated_asc": "Ändring (äldsta)",
       "updated_desc": "Ändring (nyaste)"
     },
+    "sort_by": "Sortera efter {column}",
     "stop_impersonation": "Tillbaka till mitt konto",
     "stop_impersonation_error": "Fel vid stopp av personifiering",
     "success": "Framgång",

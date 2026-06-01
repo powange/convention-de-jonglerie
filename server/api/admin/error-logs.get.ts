@@ -25,7 +25,10 @@ export default wrapApiHandler(
     const errorTypeFilter = query.errorType as string | undefined
     const statusCodeFilter = query.statusCode ? parseInt(query.statusCode as string) : undefined
     const pathFilter = query.path as string | undefined
+    const ipFilter = (query.ip as string)?.trim()
     const userIdFilter = query.userId ? parseInt(query.userId as string) : undefined
+    // Filtre utilisateur libre : recherche dans le pseudo ou l'email de l'utilisateur lié
+    const userFilter = (query.user as string)?.trim()
     const search = (query.search as string)?.trim()
 
     // Filtre de période (pour limiter la charge mémoire)
@@ -80,9 +83,23 @@ export default wrapApiHandler(
       conditions.push({ path: { contains: pathFilter } })
     }
 
-    // Filtre par utilisateur
+    // Filtre par adresse IP (recherche partielle, ex. préfixe de sous-réseau)
+    if (ipFilter) {
+      conditions.push({ ip: { contains: ipFilter } })
+    }
+
+    // Filtre par utilisateur (ID exact)
     if (userIdFilter) {
       conditions.push({ userId: userIdFilter })
+    }
+
+    // Filtre par utilisateur (texte libre sur pseudo ou email de l'utilisateur lié)
+    if (userFilter) {
+      conditions.push({
+        user: {
+          OR: [{ pseudo: { contains: userFilter } }, { email: { contains: userFilter } }],
+        },
+      })
     }
 
     // Recherche textuelle dans le message d'erreur

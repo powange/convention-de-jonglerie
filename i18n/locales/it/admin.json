@@ -259,6 +259,8 @@
     "filter_active_conventions": "Convegni attivi",
     "filter_all_conventions": "Tutti i convegni",
     "filter_archived_conventions": "Convegni archiviati",
+    "filter_by_ip": "Indirizzo IP...",
+    "filter_by_user": "Utente (nickname o email)...",
     "filter_sort": "Filtra e ordina",
     "filter_unclaimed_conventions": "Non rivendicate",
     "good_news": "Sono buone notizie!",
@@ -552,6 +554,7 @@
       "updated_asc": "Modifica (meno recente)",
       "updated_desc": "Modifica (più recente)"
     },
+    "sort_by": "Ordina per {column}",
     "stop_impersonation": "Torna al mio account",
     "stop_impersonation_error": "Errore nell'arresto dell'impersonificazione",
     "success": "Successo",

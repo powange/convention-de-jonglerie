@@ -259,6 +259,8 @@
     "filter_active_conventions": "Aktywne konwencje",
     "filter_all_conventions": "Wszystkie konwencje",
     "filter_archived_conventions": "Zarchiwizowane konwencje",
+    "filter_by_ip": "Adres IP...",
+    "filter_by_user": "Użytkownik (pseudonim lub e-mail)...",
     "filter_sort": "Filtruj i sortuj",
     "filter_unclaimed_conventions": "Niezgłoszone",
     "good_news": "To dobre wieści!",
@@ -552,6 +554,7 @@
       "updated_asc": "Modyfikacja (najstarsze)",
       "updated_desc": "Modyfikacja (najnowsze)"
     },
+    "sort_by": "Sortuj według {column}",
     "stop_impersonation": "Powrót do mojego konta",
     "stop_impersonation_error": "Błąd podczas zatrzymywania personifikacji",
     "success": "Sukces",
