@@ -63,6 +63,18 @@ export const useElapsedTimer = () => {
   }
 
   /**
+   * Calcule la durée LIVE de l'étape en cours (sa propre durée, pas le temps total)
+   * Réactif sur currentElapsedTime (mis à jour toutes les 100ms)
+   * @param entry - Entrée de l'historique (l'étape en cours)
+   * @returns Durée formatée
+   */
+  const formatCurrentStepDuration = (entry: StepHistoryEntry): string => {
+    if (!startTime.value) return ''
+    const stepStartOffset = entry.timestamp.getTime() - startTime.value.getTime()
+    return formatMs(Math.max(0, currentElapsedTime.value - stepStartOffset))
+  }
+
+  /**
    * Calcule la durée d'une sous-étape
    * @param parentEntry - Étape parente
    * @param subStep - Sous-étape
@@ -130,6 +142,7 @@ export const useElapsedTimer = () => {
     currentElapsedTime: readonly(currentElapsedTime),
     formatMs,
     formatStepDuration,
+    formatCurrentStepDuration,
     formatSubStepDuration,
     start,
     stop,

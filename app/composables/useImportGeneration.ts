@@ -60,6 +60,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const {
     formatMs,
     formatStepDuration,
+    formatCurrentStepDuration,
     formatSubStepDuration,
     currentElapsedTime,
     start: startTimer,
@@ -393,6 +394,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     currentElapsedTime,
     formatMs,
     formatDuration,
+    formatCurrentStepDuration,
     formatSubStepWrapper,
 
     // Helpers

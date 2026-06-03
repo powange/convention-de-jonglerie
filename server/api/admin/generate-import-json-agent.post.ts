@@ -44,7 +44,11 @@ import {
   jugglingEdgeEventToImportJson,
   formatJugglingEdgeDataAsContent,
 } from '#server/utils/jugglingedge-scraper'
-import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
+import {
+  extractEmails,
+  extractWebContent,
+  formatExtractionForAI,
+} from '#server/utils/web-content-extractor'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),
@@ -479,13 +483,17 @@ function formatFacebookDataAsContent(fbEvent: FacebookScraperResult, url: string
   if (fbEvent.photo?.imageUri || fbEvent.photo?.url) {
     content += `Image: ${fbEvent.photo.imageUri || fbEvent.photo.url}\n`
   }
+  // Mettre en avant les emails de la description (avant la troncature) pour faciliter l'extraction par l'IA
   if (fbEvent.description) {
-    // Limiter la description pour ne pas dépasser le contexte
-    const truncatedDesc =
-      fbEvent.description.length > 2000
-        ? fbEvent.description.substring(0, 2000) + '...'
-        : fbEvent.description
-    content += `\nDescription:\n${truncatedDesc}\n`
+    const emails = extractEmails(fbEvent.description)
+    if (emails.length > 0) {
+      content += `Emails trouvés: ${emails.join(', ')}\n`
+    }
+  }
+  if (fbEvent.description) {
+    // Pas de troncature ici : le plafond dynamique par page (maxPageContentSize)
+    // borne déjà le contenu en aval, en s'adaptant au context length du modèle
+    content += `\nDescription:\n${fbEvent.description}\n`
   }
 
   return content
@@ -535,7 +543,7 @@ async function fetchAndExtractContent(
         // Stocker les données Facebook pré-remplies
         if (facebookData) {
           facebookData.event = fbEvent
-          facebookData.prefilledJson = facebookEventToImportJson(fbEvent)
+          facebookData.prefilledJson = await facebookEventToImportJson(fbEvent)
         }
 
         logs.push({

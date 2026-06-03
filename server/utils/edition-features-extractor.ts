@@ -25,9 +25,10 @@ export const EDITION_FEATURES_DESCRIPTIONS: Record<string, string> = {
   hasWorkshops: 'Ateliers ou workshops programmés',
 
   // Spectacles
-  hasGala: 'Gala ou spectacle de clôture',
+  hasGala:
+    'Gala explicitement nommé « gala » : grande soirée de spectacle. NE PAS activer pour un simple « spectacle » mentionné dans un programme.',
   hasOpenStage: 'Scène ouverte (open stage) pour les participants',
-  hasConcert: 'Concert ou soirée musicale',
+  hasConcert: 'Concert, DJ, dancefloor ou soirée musicale',
   hasLongShow: 'Spectacles longs ou numéros de plus de 10 minutes',
 
   // Famille et accessibilité

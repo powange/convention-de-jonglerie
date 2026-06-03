@@ -209,6 +209,7 @@ Cette commande s'arrête si une étape échoue.
 - **UInput** : Composant d'entrée pour les formulaires
 - **UInputNumber** : Composant d'entrée numérique (avec boutons +/-, supporte `:min`, `:max`, `:step` pour les entiers)
 - **USelect** : Composant de sélection déroulante
+- **USelectMenu** : Composant de sélection déroulant avancé avec recherche et saisie libre (`create-item`)
 - **UTextarea** : Composant de zone de texte pour les formulaires
 - **UFormField** : Composant de champ de formulaire avec étiquette et validation
 - **UFieldGroup** : Composant de groupe de boutons pour les sélections multiples

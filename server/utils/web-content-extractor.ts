@@ -202,7 +202,7 @@ function parseJsonLdEvent(item: Record<string, unknown>): JsonLdEventData {
 /**
  * Extrait les emails d'un texte
  */
-function extractEmails(text: string): string[] {
+export function extractEmails(text: string): string[] {
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
   const matches = text.match(emailRegex) || []
 

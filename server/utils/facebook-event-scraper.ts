@@ -3,6 +3,9 @@
  */
 import { scrapeFbEvent } from 'facebook-event-scraper'
 
+import { reverseGeocode } from './geocoding'
+import { extractEmails } from './web-content-extractor'
+
 /**
  * Type pour les données retournées par facebook-event-scraper
  */
@@ -118,7 +121,9 @@ export async function scrapeFacebookEvent(url: string): Promise<FacebookScraperR
 /**
  * Convertit les données de facebook-event-scraper en JSON d'import
  */
-export function facebookEventToImportJson(fbEvent: FacebookScraperResult): FacebookImportJson {
+export async function facebookEventToImportJson(
+  fbEvent: FacebookScraperResult
+): Promise<FacebookImportJson> {
   const json: FacebookImportJson = JSON.parse(JSON.stringify(EMPTY_IMPORT_JSON))
 
   // Nom de l'édition (pas de la convention, qui peut être différente)
@@ -200,11 +205,46 @@ export function facebookEventToImportJson(fbEvent: FacebookScraperResult): Faceb
     }
   }
 
+  // Email de contact (Facebook ne l'expose pas en structuré) : extraire de la description
+  if (!json.convention.email && fbEvent.description) {
+    const emails = extractEmails(fbEvent.description)
+    if (emails.length > 0) {
+      json.convention.email = emails[0]
+    }
+  }
+
   // Image
   if (fbEvent.photo?.imageUri) {
     json.edition.imageUrl = fbEvent.photo.imageUri
   } else if (fbEvent.photo?.url) {
     json.edition.imageUrl = fbEvent.photo.url
+  }
+
+  // Facebook ne fournit pas de code postal structuré et l'adresse textuelle en est souvent
+  // dépourvue. Si on a des coordonnées, on complète les champs manquants par géocodage inverse.
+  if (!json.edition.postalCode && fbEvent.location?.coordinates) {
+    const { latitude, longitude } = fbEvent.location.coordinates
+    const geo = await reverseGeocode(latitude, longitude)
+    if (geo) {
+      if (geo.postalCode) json.edition.postalCode = geo.postalCode
+      if (!json.edition.region && geo.region) json.edition.region = geo.region
+      if (!json.edition.city && geo.city) json.edition.city = geo.city
+      if (!json.edition.country && geo.country) json.edition.country = geo.country
+      // addressLine1 vaut souvent juste le nom du lieu Facebook (= la ville). Si le géocodage
+      // fournit une vraie rue, on la privilégie et on bascule l'éventuel nom de lieu en ligne 2.
+      if (geo.addressLine1) {
+        const currentLine1 = json.edition.addressLine1
+        if (
+          currentLine1 &&
+          currentLine1 !== geo.addressLine1 &&
+          currentLine1 !== json.edition.city &&
+          !json.edition.addressLine2
+        ) {
+          json.edition.addressLine2 = currentLine1
+        }
+        json.edition.addressLine1 = geo.addressLine1
+      }
+    }
   }
 
   return json

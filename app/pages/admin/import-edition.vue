@@ -48,7 +48,12 @@
 
         <!-- Choix de la méthode de génération -->
         <UFormField :label="$t('admin.import.generation_method')">
-          <URadioGroup v-model="generationMethod" :items="generationMethodItems" variant="card" />
+          <URadioGroup
+            v-model="generationMethod"
+            :items="generationMethodItems"
+            variant="card"
+            :ui="{ fieldset: 'flex flex-col sm:flex-row gap-2', item: 'sm:flex-1' }"
+          />
         </UFormField>
 
         <!-- Choix du provider IA -->
@@ -88,10 +93,11 @@
           </UButton>
         </div>
 
-        <!-- Progression de génération -->
+        <!-- Progression de génération (conservée après la fin pour comparer les timings) -->
         <AdminImportGenerationProgress
-          v-if="generating"
+          v-if="generating || stepHistory.length > 0"
           :step-history="stepHistory"
+          :is-generating="generating"
           :method="generationMethod"
           :agent-progress="agentProgress"
           :agent-pages-visited="agentPagesVisited"
@@ -101,6 +107,7 @@
           :is-current-step="isCurrentStep"
           :format-ms="formatMs"
           :format-duration="formatDuration"
+          :format-current-step-duration="formatCurrentStepDuration"
           :format-sub-step="formatSubStepWrapper"
         />
 
@@ -362,6 +369,7 @@ const {
   currentElapsedTime,
   formatMs,
   formatDuration,
+  formatCurrentStepDuration,
   formatSubStepWrapper,
   isCurrentStep,
   currentStepIcon,

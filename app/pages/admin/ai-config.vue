@@ -275,7 +275,25 @@
           </UFormField>
 
           <UFormField :label="$t('admin.ai_ollama_model')">
-            <UInput v-model="form.ollamaModel" class="w-full max-w-md" placeholder="llava" />
+            <div class="flex items-center gap-2 max-w-md">
+              <USelectMenu
+                v-model="form.ollamaModel"
+                class="flex-1"
+                :items="ollamaModelItems"
+                :placeholder="$t('admin.ai_ollama_model_placeholder')"
+                create-item
+                :search-input="{ placeholder: $t('admin.ai_select_model') }"
+                @create="onOllamaModelCreate"
+              />
+              <UButton
+                variant="outline"
+                icon="i-heroicons-magnifying-glass"
+                :loading="ollamaDetecting"
+                @click="detectOllamaModels"
+              >
+                {{ $t('admin.ai_detect_models') }}
+              </UButton>
+            </div>
           </UFormField>
         </div>
       </UCard>
@@ -464,6 +482,47 @@ async function addDetectedModel(detected: { modelId: string; name: string }) {
 
 function isModelRegistered(modelId: string): boolean {
   return models.value.some((m) => m.modelId === modelId)
+}
+
+// --- Ollama : détection des modèles installés ---
+
+const ollamaModels = ref<string[]>([])
+
+// Inclut toujours la valeur courante pour qu'elle reste affichée même si non détectée
+const ollamaModelItems = computed(() => {
+  const items = [...ollamaModels.value]
+  if (form.ollamaModel && !items.includes(form.ollamaModel)) {
+    items.unshift(form.ollamaModel)
+  }
+  return items
+})
+
+function onOllamaModelCreate(value: string) {
+  if (!ollamaModels.value.includes(value)) {
+    ollamaModels.value.push(value)
+  }
+  form.ollamaModel = value
+}
+
+const { execute: executeOllamaDetect, loading: ollamaDetecting } = useApiAction(
+  '/api/admin/ai/models/ollama',
+  {
+    method: 'POST',
+    body: () => ({ baseUrl: form.ollamaBaseUrl }),
+    silentSuccess: true,
+    errorMessages: { default: t('admin.ai_detect_error_ollama') },
+    onSuccess: (result) => {
+      const detected: Array<{ modelId: string }> = result.models || []
+      ollamaModels.value = detected.map((m) => m.modelId)
+      if (ollamaModels.value.length === 0) {
+        useToast().add({ title: t('admin.ai_no_models_detected_ollama'), color: 'warning' })
+      }
+    },
+  }
+)
+
+async function detectOllamaModels() {
+  await executeOllamaDetect()
 }
 
 // --- Actions : sauvegarde config ---

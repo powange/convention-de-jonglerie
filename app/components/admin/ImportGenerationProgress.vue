@@ -18,9 +18,9 @@
           class="text-success-500"
         />
         <UIcon v-else name="i-heroicons-check" class="text-success-500" />
-        <!-- Durée depuis le début -->
+        <!-- Durée : propre durée live de l'étape en cours, sinon durée figée -->
         <span class="text-gray-400 font-mono text-xs w-14">
-          {{ isCurrentStep(idx) ? formatMs(currentElapsedTime) : formatDuration(entry, idx) }}
+          {{ isCurrentStep(idx) ? formatCurrentStepDuration(entry) : formatDuration(entry, idx) }}
         </span>
         <!-- Label -->
         <span>{{ entry.label }}</span>
@@ -37,12 +37,22 @@
       </div>
     </template>
 
-    <!-- Barre de progression pour l'exploration (agent uniquement) -->
-    <div v-if="method === 'agent' && agentProgress > 0" class="mt-2">
+    <!-- Barre de progression pour l'exploration (agent uniquement, pendant la génération) -->
+    <div v-if="isGenerating && method === 'agent' && agentProgress > 0" class="mt-2">
       <UProgress :value="agentProgress" size="sm" color="warning" />
       <p class="text-xs text-gray-500 mt-1">
         {{ $t('admin.import.agent_exploring', { count: agentPagesVisited }) }}
       </p>
+    </div>
+
+    <!-- Temps total -->
+    <div
+      v-if="stepHistory.length > 0"
+      class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 mt-2 pt-2 border-t border-gray-200 dark:border-gray-700"
+    >
+      <UIcon name="i-heroicons-clock" class="text-gray-400" />
+      <span class="text-gray-400 font-mono text-xs w-14">{{ formatMs(currentElapsedTime) }}</span>
+      <span>{{ $t('admin.import.total_time') }}</span>
     </div>
   </div>
 </template>
@@ -53,6 +63,8 @@ import type { StepHistoryEntry, SubStepEntry } from '~/composables/useElapsedTim
 defineProps<{
   /** Historique des étapes */
   stepHistory: StepHistoryEntry[]
+  /** Génération en cours (false une fois terminée) */
+  isGenerating: boolean
   /** Méthode de génération */
   method: 'simple' | 'agent'
   /** Progression de l'agent (0-100) */
@@ -71,6 +83,8 @@ defineProps<{
   formatMs: (ms: number) => string
   /** Fonction pour formater la durée d'une étape */
   formatDuration: (entry: StepHistoryEntry, idx: number) => string
+  /** Fonction pour formater la durée live de l'étape en cours (sa propre durée) */
+  formatCurrentStepDuration: (entry: StepHistoryEntry) => string
   /** Fonction pour formater la durée d'une sous-étape */
   formatSubStep: (parent: StepHistoryEntry, subStep: SubStepEntry, subIdx: number) => string
 }>()

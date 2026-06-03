@@ -174,7 +174,7 @@ export async function generateImportJson(
         console.log('[GENERATE-IMPORT] === Fin données Facebook ===')
 
         // Convertir en JSON d'import pré-rempli
-        prefilledJson = facebookEventToImportJson(fbEvent)
+        prefilledJson = await facebookEventToImportJson(fbEvent)
         console.log('[GENERATE-IMPORT] JSON pré-rempli depuis Facebook:')
         console.log(JSON.stringify(prefilledJson, null, 2))
 
