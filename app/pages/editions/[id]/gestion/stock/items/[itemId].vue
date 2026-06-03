@@ -321,6 +321,16 @@ interface StockItemFull {
 }
 
 const item = ref<StockItemFull | null>(null)
+
+// Titre de l'onglet : « {nom de l'article} – Stock matériel », cohérent avec la section /stock.
+// Tant que l'article n'est pas chargé, on retombe sur le titre générique de la section.
+useSeoMeta({
+  title: () =>
+    item.value?.name
+      ? `${item.value.name} – ${t('gestion.stock.title')}`
+      : t('gestion.stock.title'),
+})
+
 const availability = ref<{ available: number; quantity: number } | null>(null)
 const zones = ref<{ id: number; name: string; color: string; types: string[] }[]>([])
 const markers = ref<{ id: number; name: string; color: string | null; types: string[] }[]>([])

@@ -1390,6 +1390,11 @@ const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t: $t } = useI18n()
 
+// Titre de l'onglet : « Commandes - Billetterie », cohérent avec la section Billetterie.
+useSeoMeta({
+  title: () => `${$t('gestion.ticketing.orders_title')} - ${$t('gestion.ticketing.title')}`,
+})
+
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 

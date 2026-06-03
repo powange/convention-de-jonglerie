@@ -117,6 +117,11 @@ const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const editionId = parseInt(route.params.id as string)
 
+// Titre de l'onglet : « Stock matériel » (référence de la section, repris par les sous-pages).
+useSeoMeta({
+  title: () => t('gestion.stock.title'),
+})
+
 interface StockItemLite {
   id: number
 }

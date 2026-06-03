@@ -875,6 +875,11 @@ const authStore = useAuthStore()
 const toast = useToast()
 const { t } = useI18n()
 
+// Titre de l'onglet : « Lier une billetterie externe - Billetterie », cohérent avec la section.
+useSeoMeta({
+  title: () => `${t('gestion.ticketing.external_link_title')} - ${t('gestion.ticketing.title')}`,
+})
+
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 

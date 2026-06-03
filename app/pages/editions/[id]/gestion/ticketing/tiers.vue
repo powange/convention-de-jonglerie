@@ -110,6 +110,12 @@ const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const editionId = parseInt(route.params.id as string)
+const { t } = useI18n()
+
+// Titre de l'onglet : « Tarifs, options & quotas - Billetterie », cohérent avec la section.
+useSeoMeta({
+  title: () => `${t('gestion.ticketing.tiers_title')} - ${t('gestion.ticketing.title')}`,
+})
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // Gestion de l'onglet actif avec hash dans l'URL

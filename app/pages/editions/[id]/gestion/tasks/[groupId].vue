@@ -379,6 +379,15 @@ const group = computed<TaskGroupItem | null>(
   () => allGroups.value.find((g) => g.id === groupId.value) || null
 )
 
+// Titre de l'onglet : « {nom du groupe} – Tâches », cohérent avec la page liste /tasks.
+// Tant que le groupe n'est pas chargé, on retombe sur le titre générique de la section.
+useSeoMeta({
+  title: () =>
+    group.value?.name
+      ? `${group.value.name} – ${t('gestion.tasks.title')}`
+      : t('gestion.tasks.title'),
+})
+
 // --- Filtres & recherche (persistés en URL via query params) ---
 const VALID_STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED']
 const VALID_DUE = ['overdue', 'today', 'next7', 'next30', 'none'] as const

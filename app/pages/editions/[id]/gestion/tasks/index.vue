@@ -103,6 +103,11 @@ const router = useRouter()
 const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 
+// Titre de l'onglet : « Tâches » (référence de la section, repris par la page d'un groupe).
+useSeoMeta({
+  title: () => t('gestion.tasks.title'),
+})
+
 interface TaskGroupItem {
   id: number
   name: string

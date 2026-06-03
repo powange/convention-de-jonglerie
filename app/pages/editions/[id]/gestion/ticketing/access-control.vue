@@ -649,6 +649,11 @@ const toast = useToast()
 const { t } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
 
+// Titre de l'onglet : « Contrôle d'accès - Billetterie », cohérent avec la section Billetterie.
+useSeoMeta({
+  title: () => `${t('gestion.ticketing.access_control_title')} - ${t('gestion.ticketing.title')}`,
+})
+
 // Récupérer les configurations de couleurs
 const ticketConfig = getParticipantTypeConfig('ticket')
 const volunteerConfig = getParticipantTypeConfig('volunteer')

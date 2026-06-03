@@ -369,6 +369,11 @@ const editionStore = useEditionStore()
 const { t } = useI18n()
 const toast = useToast()
 
+// Titre de l'onglet : « Configuration - Billetterie », cohérent avec la section Billetterie.
+useSeoMeta({
+  title: () => `${t('gestion.ticketing.config_title')} - ${t('gestion.ticketing.title')}`,
+})
+
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 

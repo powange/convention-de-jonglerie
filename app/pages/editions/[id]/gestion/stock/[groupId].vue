@@ -420,6 +420,15 @@ const group = computed<StockGroupItem | null>(
   () => allGroups.value.find((g) => g.id === groupId.value) || null
 )
 
+// Titre de l'onglet : « {nom du groupe} – Stock matériel », cohérent avec la page liste /stock.
+// Tant que le groupe n'est pas chargé, on retombe sur le titre générique de la section.
+useSeoMeta({
+  title: () =>
+    group.value?.name
+      ? `${group.value.name} – ${t('gestion.stock.title')}`
+      : t('gestion.stock.title'),
+})
+
 const canManage = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   const userId = authStore.user.id

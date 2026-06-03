@@ -506,6 +506,11 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const editionStore = useEditionStore()
+
+// Titre de l'onglet : « Articles à remettre - Billetterie », cohérent avec la section Billetterie.
+useSeoMeta({
+  title: () => `${t('gestion.ticketing.handout_items_title')} - ${t('gestion.ticketing.title')}`,
+})
 const authStore = useAuthStore()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
