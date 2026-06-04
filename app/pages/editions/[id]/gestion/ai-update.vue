@@ -133,8 +133,9 @@
 
           <!-- Progression -->
           <AdminImportGenerationProgress
-            v-if="generating"
+            v-if="generating || stepHistory.length > 0"
             :step-history="stepHistory"
+            :is-generating="generating"
             method="simple"
             :agent-progress="0"
             :agent-pages-visited="0"
@@ -144,6 +145,7 @@
             :is-current-step="isCurrentStep"
             :format-ms="formatMs"
             :format-duration="formatDuration"
+            :format-current-step-duration="formatCurrentStepDuration"
             :format-sub-step="formatSubStepWrapper"
           />
 
@@ -278,6 +280,7 @@ const {
   currentElapsedTime,
   formatMs,
   formatDuration,
+  formatCurrentStepDuration,
   formatSubStepWrapper,
   isCurrentStep,
   generate,
