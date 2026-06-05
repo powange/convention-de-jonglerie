@@ -53,12 +53,25 @@ export default wrapApiHandler(
       },
     })
 
-    // Ajouter l'URL absolue vers la fiche de l'édition sur le site
-    // (permet au site partenaire de créer un lien retour)
+    // Construire une URL absolue à partir d'un chemin éventuellement relatif.
+    // Les URLs externes (http…) sont laissées telles quelles, null reste null.
     const siteUrl = getSiteUrl()
+    const toAbsoluteUrl = (path: string | null) => {
+      if (!path) return path
+      if (path.startsWith('http')) return path
+      return `${siteUrl}${path.startsWith('/') ? '' : '/'}${path}`
+    }
+
+    // Enrichir chaque édition : URL absolue vers la fiche sur le site
+    // (lien retour pour le partenaire) + imageUrl et logo de convention en URL absolue.
     const editionsWithUrl = editions.map((edition) => ({
       ...edition,
+      imageUrl: toAbsoluteUrl(edition.imageUrl),
       url: `${siteUrl}/editions/${edition.id}`,
+      convention: {
+        ...edition.convention,
+        logo: toAbsoluteUrl(edition.convention.logo),
+      },
     }))
 
     return { editions: editionsWithUrl }

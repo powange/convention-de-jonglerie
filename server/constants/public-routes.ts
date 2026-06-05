@@ -56,6 +56,10 @@ export const publicRoutes: PublicRoute[] = [
   // ====== Feedback (anonyme ou authentifié) ======
   { path: '/api/feedback', methods: ['POST'], hydrateSession: true },
 
+  // ====== API publique (authentifiée par token, pas par session) ======
+  // Le contrôle d'accès est fait dans le handler via le token d'API.
+  { prefix: '/api/public/', methods: ['GET'] },
+
   // ====== Listes publiques ======
   { path: '/api/conventions', methods: ['GET'] },
   { path: '/api/editions', methods: ['GET'] },
