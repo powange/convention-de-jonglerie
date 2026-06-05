@@ -126,6 +126,7 @@ test.describe.serial('Module Stock matériel', () => {
           endsAt: inOneHour.toISOString(),
           usage: 'Test E2E spectacle de feu',
           quantityReserved: 2,
+          location: 'Scène E2E',
         },
       }
     )
@@ -160,6 +161,7 @@ test.describe.serial('Module Stock matériel', () => {
           endsAt: inOneHour.toISOString(),
           usage: 'Trop demandé',
           quantityReserved: 5,
+          location: 'Scène E2E',
         },
       }
     )
