@@ -36,17 +36,12 @@ const props = withDefaults(defineProps<Props>(), {
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 
-// État pour vérifier si l'utilisateur est team leader
-const isTeamLeaderValue = ref(false)
+// Accès « bénévole » à la gestion (team leader, validation des repas, créneau
+// de contrôle d'accès), récupéré via l'endpoint unifié uniquement en repli.
+const hasVolunteerLevelAccess = ref(false)
 
-// État pour vérifier si l'utilisateur peut accéder à la validation des repas
-const canAccessMealValidation = ref(false)
-
-// État pour vérifier si l'utilisateur a un créneau actif de contrôle d'accès
-const canAccessAccessControlPage = ref(false)
-
-// Vérifier l'accès à la page gestion (même logique que dans Header.vue)
-const canAccess = computed(() => {
+// Accès accordé via des critères synchrones, sans appel réseau.
+const hasSyncAccess = computed(() => {
   if (!props.edition || !authStore.user?.id) {
     return false
   }
@@ -73,21 +68,6 @@ const canAccess = computed(() => {
     return true
   }
 
-  // Responsables d'équipe de bénévoles
-  if (isTeamLeaderValue.value) {
-    return true
-  }
-
-  // Bénévoles avec accès à la validation des repas
-  if (canAccessMealValidation.value) {
-    return true
-  }
-
-  // Bénévoles avec créneau actif de contrôle d'accès
-  if (canAccessAccessControlPage.value) {
-    return true
-  }
-
   // Tous les organisateurs de la convention (même sans droits)
   if (props.edition.convention?.organizers) {
     const isOrganizer = props.edition.convention.organizers.some(
@@ -101,24 +81,22 @@ const canAccess = computed(() => {
   return false
 })
 
-// Charger les permissions au montage et lors des changements d'authentification
+// Accès final : critères synchrones OU accès bénévole vérifié côté serveur.
+const canAccess = computed(() => hasSyncAccess.value || hasVolunteerLevelAccess.value)
+
+// Ne charger l'accès bénévole que si l'accès n'est pas déjà acquis
+// synchroniquement, pour éviter un appel réseau inutile.
 watch(
-  () => authStore.isAuthenticated,
-  async (isAuthenticated) => {
-    if (isAuthenticated && authStore.user?.id && props.edition?.id) {
-      // Vérifier si l'utilisateur est team leader
-      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id)
-
-      // Vérifier si l'utilisateur peut accéder à la validation des repas
-      canAccessMealValidation.value = await editionStore.canAccessMealValidation(props.edition.id)
-
-      // Vérifier si l'utilisateur a un créneau actif de contrôle d'accès
-      canAccessAccessControlPage.value = await editionStore.isAccessControlActive(props.edition.id)
-    } else {
-      isTeamLeaderValue.value = false
-      canAccessMealValidation.value = false
-      canAccessAccessControlPage.value = false
+  [() => authStore.isAuthenticated, () => props.edition?.id, hasSyncAccess],
+  async ([isAuthenticated, editionId, syncAccess]) => {
+    if (!isAuthenticated || !authStore.user?.id || !editionId || syncAccess) {
+      hasVolunteerLevelAccess.value = false
+      return
     }
+
+    const access = await editionStore.getManagementAccess(editionId)
+    hasVolunteerLevelAccess.value =
+      access.isTeamLeader || access.canAccessMealValidation || access.isAccessControlActive
   },
   { immediate: true }
 )

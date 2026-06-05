@@ -57,6 +57,13 @@ interface PaginatedResponse {
   }
 }
 
+// Accès « bénévole » groupé à la gestion (renvoyé par l'endpoint unifié)
+interface ManagementAccess {
+  isTeamLeader: boolean
+  canAccessMealValidation: boolean
+  isAccessControlActive: boolean
+}
+
 // Limites mémoire pour éviter l'accumulation non bornée (voir docs/optimization/memory-optimization.md)
 const MAX_CACHED_EDITIONS = 200
 const MAX_ALL_EDITIONS = 1000
@@ -84,6 +91,8 @@ export const useEditionStore = defineStore('editions', {
     _mealValidationCache: {} as Record<number, Promise<boolean> | undefined>,
     // Cache pour accessControlStatus par édition
     _accessControlStatusCache: {} as Record<number, Promise<boolean> | undefined>,
+    // Cache pour l'accès « bénévole » groupé à la gestion (endpoint unifié)
+    _managementAccessCache: {} as Record<number, Promise<ManagementAccess> | undefined>,
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -646,6 +655,37 @@ export const useEditionStore = defineStore('editions', {
       })()
 
       this._accessControlStatusCache[editionId] = promise
+      return promise
+    },
+
+    // Vérifier en un seul appel les accès « bénévole » à la gestion
+    // (team leader, validation des repas, créneau de contrôle d'accès).
+    // Remplace les trois appels séparés isTeamLeader / canAccessMealValidation /
+    // isAccessControlActive lorsqu'on a besoin des trois à la fois.
+    async getManagementAccess(editionId: number): Promise<ManagementAccess> {
+      // Réutiliser la promesse en cours pour éviter les appels doublons
+      if (this._managementAccessCache[editionId]) {
+        return this._managementAccessCache[editionId]!
+      }
+
+      const promise = (async () => {
+        try {
+          const response = await $fetch<{ data: ManagementAccess }>(
+            `/api/editions/${editionId}/permissions/management-access`
+          )
+          return response.data
+        } catch {
+          return {
+            isTeamLeader: false,
+            canAccessMealValidation: false,
+            isAccessControlActive: false,
+          }
+        } finally {
+          this._managementAccessCache[editionId] = undefined
+        }
+      })()
+
+      this._managementAccessCache[editionId] = promise
       return promise
     },
 

@@ -450,17 +450,8 @@ const openEditionsList = (close: () => void) => {
   showEditionsListModal.value = true
 }
 
-// État pour vérifier si l'utilisateur est team leader
-const isTeamLeaderValue = ref(false)
-
 // État pour vérifier si l'utilisateur est un bénévole accepté
 const isAcceptedVolunteer = ref(false)
-
-// État pour vérifier si l'utilisateur peut accéder à la validation des repas
-const canAccessMealValidation = ref(false)
-
-// État pour vérifier si l'utilisateur a un créneau actif de contrôle d'accès
-const canAccessAccessControlPage = ref(false)
 
 // État pour vérifier si l'utilisateur est un artiste enregistré pour cette édition
 const isEditionArtist = ref(false)
@@ -671,10 +662,8 @@ watch(
       await favoritesStore.ensureInitialized()
     }
 
-    // Vérifier si l'utilisateur est team leader quand il se connecte
+    // Charger les statuts spécifiques à l'utilisateur pour cette édition
     if (isAuthenticated && authStore.user?.id && props.edition?.id) {
-      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id)
-
       // Vérifier si l'utilisateur est un bénévole accepté
       try {
         const response = await $fetch(
@@ -684,12 +673,6 @@ watch(
       } catch {
         isAcceptedVolunteer.value = false
       }
-
-      // Vérifier si l'utilisateur peut accéder à la validation des repas
-      canAccessMealValidation.value = await editionStore.canAccessMealValidation(props.edition.id)
-
-      // Vérifier si l'utilisateur a un créneau actif de contrôle d'accès
-      canAccessAccessControlPage.value = await editionStore.isAccessControlActive(props.edition.id)
 
       // Vérifier si l'utilisateur est un artiste enregistré pour cette édition
       try {
@@ -701,10 +684,7 @@ watch(
         isEditionArtist.value = false
       }
     } else {
-      isTeamLeaderValue.value = false
       isAcceptedVolunteer.value = false
-      canAccessMealValidation.value = false
-      canAccessAccessControlPage.value = false
       isEditionArtist.value = false
     }
   },

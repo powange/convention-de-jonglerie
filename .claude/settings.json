@@ -104,7 +104,11 @@
       "Bash(git fetch *)",
       "Bash(git rebase *)",
       "mcp__nuxt-ui__get-example",
-      "mcp__nuxt-ui__list-examples"
+      "mcp__nuxt-ui__list-examples",
+      "Bash(cd /home/powange/projects/convention-de-jonglerie *)",
+      "Read(//home/powange/**)",
+      "Bash(jcodemunch-mcp --help)",
+      "Bash(jcodemunch-mcp index *)"
     ],
     "additionalDirectories": [
       "/tmp",
