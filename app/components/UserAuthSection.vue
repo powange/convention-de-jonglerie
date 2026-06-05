@@ -211,32 +211,18 @@ const drawerOpen = ref(false)
 // Synchroniser avec le store
 const isAdminModeActive = computed(() => authStore.adminMode)
 
-// Statut de messagerie de l'utilisateur
-const messengerStatus = ref({
-  hasConversations: false,
-  unreadCount: 0,
-  conversationsCount: 0,
-})
+// Statut de messagerie : état partagé avec le flux SSE (mutualisé avec
+// MessengerHeaderButton, badge mis à jour en temps réel sur le layout par défaut)
+const { messengerUnreadCount, messengerConversationCount, fetchMessengerUnreadCount } =
+  useNotificationStream()
 
-// Charger le statut de messagerie
-const loadMessengerStatus = async () => {
-  if (!authStore.isAuthenticated) return
+const hasConversations = computed(() => messengerConversationCount.value > 0)
 
-  try {
-    const status = await $fetch('/api/messenger/status')
-    messengerStatus.value = status
-  } catch {
-    messengerStatus.value = {
-      hasConversations: false,
-      unreadCount: 0,
-      conversationsCount: 0,
-    }
-  }
-}
-
-// Charger au montage
+// Charger le compteur initial au montage (mutualisé via dédup in-flight)
 onMounted(() => {
-  loadMessengerStatus()
+  if (authStore.isAuthenticated) {
+    fetchMessengerUnreadCount()
+  }
 })
 
 // Items de navigation partagés entre drawer mobile et dropdown desktop
@@ -266,12 +252,12 @@ const baseNavItems = computed(() => {
     })
   }
 
-  if (messengerStatus.value.hasConversations) {
+  if (hasConversations.value) {
     items.push({
       label: t('navigation.messenger'),
       icon: 'i-heroicons-chat-bubble-left-right',
       to: '/messenger',
-      badge: messengerStatus.value.unreadCount > 0 ? messengerStatus.value.unreadCount : undefined,
+      badge: messengerUnreadCount.value > 0 ? messengerUnreadCount.value : undefined,
     })
   }
 

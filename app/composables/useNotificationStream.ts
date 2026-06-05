@@ -76,6 +76,9 @@ let reconnectTimer: NodeJS.Timeout | null = null
 const maxReconnectAttempts = 5
 let reconnectDelay = 1000 // Start with 1 second
 
+// Promesse en cours du chargement du compteur messenger (évite les appels doublons)
+let messengerUnreadFetch: Promise<void> | null = null
+
 // ============================================
 // Composable
 // ============================================
@@ -347,15 +350,27 @@ export const useNotificationStream = () => {
       return
     }
 
-    try {
-      const response = await $fetch<{
-        success: boolean
-        data: { unreadCount: number; conversationCount: number }
-      }>('/api/messenger/unread-count')
-      messengerUnread.value = response.data
-    } catch (error) {
-      console.error('[SSE Client] Erreur lors de la récupération des messages non lus:', error)
+    // Réutiliser une requête déjà en cours pour mutualiser les appels concurrents
+    // (ex. MessengerHeaderButton + UserAuthSection au montage du header)
+    if (messengerUnreadFetch) {
+      return messengerUnreadFetch
     }
+
+    messengerUnreadFetch = (async () => {
+      try {
+        const response = await $fetch<{
+          success: boolean
+          data: { unreadCount: number; conversationCount: number }
+        }>('/api/messenger/unread-count')
+        messengerUnread.value = response.data
+      } catch (error) {
+        console.error('[SSE Client] Erreur lors de la récupération des messages non lus:', error)
+      } finally {
+        messengerUnreadFetch = null
+      }
+    })()
+
+    return messengerUnreadFetch
   }
 
   /**
