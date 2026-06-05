@@ -26,6 +26,7 @@ export type ResourceType =
   | 'assignation'
   | 'dépense'
   | 'tarif'
+  | 'token'
 
 /**
  * Messages d'erreur pour les ressources
@@ -53,6 +54,7 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   assignation: "ID d'assignation invalide",
   dépense: 'ID de dépense invalide',
   tarif: 'ID de tarif invalide',
+  token: 'ID de token invalide',
 }
 
 /**

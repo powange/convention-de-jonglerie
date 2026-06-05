@@ -159,7 +159,7 @@
     <!-- Navigation des outils d'administration -->
     <div class="mb-8">
       <h2 class="text-xl font-semibold mb-4">{{ $t('admin.administration_tools') }}</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
         <!-- Gestion des utilisateurs -->
         <NuxtLink to="/admin/users" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
@@ -453,6 +453,39 @@
                   <span class="flex items-center gap-1">
                     <UIcon name="i-heroicons-eye" class="h-4 w-4" />
                     {{ $t('admin.monitor_tasks') }}
+                  </span>
+                </div>
+              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+            </div>
+          </UCard>
+        </NuxtLink>
+
+        <!-- Tokens d'API publique -->
+        <NuxtLink to="/admin/api-tokens" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-key"
+                      class="h-6 w-6 text-indigo-600 dark:text-indigo-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.api_tokens.title') }}</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  {{ $t('admin.api_tokens.description') }}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-plus" class="h-4 w-4" />
+                    {{ $t('admin.api_tokens.create') }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-no-symbol" class="h-4 w-4" />
+                    {{ $t('admin.api_tokens.revoke') }}
                   </span>
                 </div>
               </div>

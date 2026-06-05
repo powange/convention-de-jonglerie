@@ -184,6 +184,23 @@ model FcmToken {
   @@index([deviceId])
 }
 
+// ========== TOKENS D'API PUBLIQUE ==========
+
+// Token d'API destiné aux sites partenaires pour consommer l'API publique
+// (ex: liste des éditions à venir). Un token par partenaire, révocable.
+model ApiToken {
+  id          Int       @id @default(autoincrement())
+  name        String // libellé du partenaire (ex: "Site fédération")
+  token       String    @unique // valeur du token, 32 caractères hex
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime? // mis à jour à chaque appel réussi
+  createdAt   DateTime  @default(now())
+  createdById Int?
+  createdBy   User?     @relation(fields: [createdById], references: [id])
+
+  @@index([createdById])
+}
+
 // ========== CONFIGURATION IA ==========
 
 model AiConfig {

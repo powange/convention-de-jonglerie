@@ -79,6 +79,7 @@ model User {
   taskAssignments                    TaskAssignment[]
   taskComments                       TaskComment[]
   stockReservations                  StockReservation[]
+  apiTokens                          ApiToken[]
 }
 
 // =============================================================================
