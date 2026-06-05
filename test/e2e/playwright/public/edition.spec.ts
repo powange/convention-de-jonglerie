@@ -43,7 +43,8 @@ test.describe("Page d'une édition", () => {
   test('affiche les onglets de navigation', async ({ page, goto }) => {
     await navigateToFirstEdition(page, goto)
 
-    // L'onglet "À propos" doit être visible
-    await expect(page.getByText(/à propos/i).first()).toBeVisible()
+    // La section "À propos" doit être visible (cibler le titre, pas la valeur
+    // masquée du sélecteur de navigation mobile qui contient le même texte)
+    await expect(page.getByRole('heading', { name: /à propos/i }).first()).toBeVisible()
   })
 })

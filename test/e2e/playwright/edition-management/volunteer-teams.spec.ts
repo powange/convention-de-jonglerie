@@ -238,6 +238,7 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
     // Prérequis : activer askTeamPreferences, ouvrir le recrutement, publier
     await updateVolunteerSettings(page, editionId, {
       open: true,
+      pagePublic: true,
       askTeamPreferences: true,
     })
     await setEditionStatus(page, editionId, 'PUBLISHED')
@@ -306,6 +307,7 @@ test.describe.serial('Gestion des équipes de bénévoles', () => {
     // Ouvrir le recrutement avec team preferences et publier
     await updateVolunteerSettings(page, editionId, {
       open: true,
+      pagePublic: true,
       askTeamPreferences: true,
     })
     await setEditionStatus(page, editionId, 'PUBLISHED')

@@ -23,6 +23,7 @@ test.describe.serial('Personnalisation du formulaire de candidature bénévole',
     // Réinitialiser tous les toggles à false pour garantir un état propre
     await updateVolunteerSettings(page, editionId, {
       open: true,
+      pagePublic: true,
       askDiet: false,
       askAllergies: false,
       askEmergencyContact: false,

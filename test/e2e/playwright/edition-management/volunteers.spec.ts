@@ -22,7 +22,7 @@ test.describe.serial('Parcours complet bénévoles : configuration → candidatu
     const { editionId } = loadState()
 
     await enableVolunteers(page, editionId)
-    await updateVolunteerSettings(page, editionId, { open: true })
+    await updateVolunteerSettings(page, editionId, { open: true, pagePublic: true })
     await setEditionStatus(page, editionId, 'PUBLISHED')
   })
 

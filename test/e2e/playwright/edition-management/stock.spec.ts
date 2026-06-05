@@ -51,10 +51,14 @@ test.describe.serial('Module Stock matériel', () => {
     stockGroupId = body?.data?.group?.id
     expect(stockGroupId).toBeTruthy()
 
-    await goto(`/editions/${editionId}/gestion/stock`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: /éclairage e2e/i })).toBeVisible({
-      timeout: 10000,
-    })
+    // Re-navigue jusqu'à ce que le groupe fraîchement créé apparaisse
+    // (évite la flakiness de propagation données API → rendu de la page)
+    await expect(async () => {
+      await goto(`/editions/${editionId}/gestion/stock`, { waitUntil: 'hydration' })
+      await expect(page.getByRole('heading', { name: /éclairage e2e/i })).toBeVisible({
+        timeout: 5000,
+      })
+    }).toPass({ timeout: 30000, intervals: [2000, 3000, 5000] })
   })
 
   test('créer un item dans le groupe via API et le voir dans la page groupe', async ({
@@ -80,12 +84,16 @@ test.describe.serial('Module Stock matériel', () => {
     stockItemId = body?.data?.item?.id
     expect(stockItemId).toBeTruthy()
 
-    await goto(`/editions/${editionId}/gestion/stock/${stockGroupId}`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: /rallonge 10m e2e/i })).toBeVisible({
-      timeout: 10000,
-    })
-    // La quantité ×5 doit s'afficher
-    await expect(page.getByText(/×5/).first()).toBeVisible({ timeout: 5000 })
+    // Re-navigue jusqu'à ce que l'item fraîchement créé apparaisse
+    // (évite la flakiness de propagation données API → rendu de la page)
+    await expect(async () => {
+      await goto(`/editions/${editionId}/gestion/stock/${stockGroupId}`, { waitUntil: 'hydration' })
+      await expect(page.getByRole('heading', { name: /rallonge 10m e2e/i })).toBeVisible({
+        timeout: 5000,
+      })
+      // La quantité ×5 doit s'afficher
+      await expect(page.getByText(/×5/).first()).toBeVisible({ timeout: 5000 })
+    }).toPass({ timeout: 30000, intervals: [2000, 3000, 5000] })
   })
 
   test('page item : disponibilité « 5/5 » par défaut (aucune réservation)', async ({
