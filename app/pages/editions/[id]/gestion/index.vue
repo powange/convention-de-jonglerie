@@ -588,14 +588,11 @@ onMounted(async () => {
     console.error('Failed to fetch edition:', error)
   }
 
-  // Vérifier si l'utilisateur est team leader
+  // Charger en un seul appel les accès « bénévole » à la gestion
   if (authStore.user?.id) {
-    isTeamLeaderValue.value = await editionStore.isTeamLeader(editionId)
-  }
-
-  // Vérifier si l'utilisateur peut accéder à la validation des repas
-  if (authStore.user?.id) {
-    canAccessMealValidation.value = await editionStore.canAccessMealValidation(editionId)
+    const access = await editionStore.getManagementAccess(editionId)
+    isTeamLeaderValue.value = access.isTeamLeader
+    canAccessMealValidation.value = access.canAccessMealValidation
   }
 
   initialLoading.value = false

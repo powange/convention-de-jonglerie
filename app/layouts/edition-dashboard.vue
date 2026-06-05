@@ -122,7 +122,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAccessControlPermissions } from '~/composables/useAccessControlPermissions'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -243,13 +242,13 @@ const canManageStock = computed(() => {
 // Affichage du stock : organisateurs avec canManageStock OU team leaders bénévoles
 const canAccessStock = computed(() => canManageStock.value || isTeamLeader.value)
 
-// Vérifier si l'utilisateur est team leader
+// Accès « bénévole » à la gestion, récupérés en un seul appel (endpoint unifié) :
+// - isTeamLeader : responsable d'au moins une équipe de bénévoles
+// - canAccessMealValidation : bénévole d'équipe de validation des repas
+// - canAccessAccessControl : créneau actif de contrôle d'accès (rend la FAQ visible)
 const isTeamLeader = ref(false)
 const canAccessMealValidation = ref(false)
-
-// Accès lecture seule pendant un créneau bénévole "contrôle d'accès"
-// (utilisé pour rendre visible la FAQ aux bénévoles en mission).
-const { canAccessAccessControl } = useAccessControlPermissions(editionId)
+const canAccessAccessControl = ref(false)
 
 // Mode bénévoles (INTERNAL ou EXTERNAL)
 const volunteersMode = computed(() => edition.value?.volunteersMode || 'INTERNAL')
@@ -261,14 +260,12 @@ onMounted(async () => {
     await editionStore.fetchEditionById(editionId.value, { force: true })
   }
 
-  // Vérifier si l'utilisateur est team leader
+  // Charger en un seul appel les accès « bénévole » à la gestion
   if (authStore.user?.id) {
-    isTeamLeader.value = await editionStore.isTeamLeader(editionId.value)
-  }
-
-  // Vérifier si l'utilisateur peut accéder à la validation des repas
-  if (authStore.user?.id) {
-    canAccessMealValidation.value = await editionStore.canAccessMealValidation(editionId.value)
+    const access = await editionStore.getManagementAccess(editionId.value)
+    isTeamLeader.value = access.isTeamLeader
+    canAccessMealValidation.value = access.canAccessMealValidation
+    canAccessAccessControl.value = access.isAccessControlActive
   }
 })
 
