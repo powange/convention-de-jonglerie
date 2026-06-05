@@ -84,11 +84,12 @@ test.describe.serial('Module Stock matériel', () => {
     stockItemId = body?.data?.item?.id
     expect(stockItemId).toBeTruthy()
 
-    // Re-navigue jusqu'à ce que l'item fraîchement créé apparaisse
-    // (évite la flakiness de propagation données API → rendu de la page)
+    // Re-navigue jusqu'à ce que l'item fraîchement créé apparaisse.
+    // L'item est affiché dans une cellule du tableau (vue « Liste »),
+    // pas dans un titre → cibler la cellule.
     await expect(async () => {
       await goto(`/editions/${editionId}/gestion/stock/${stockGroupId}`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('heading', { name: /rallonge 10m e2e/i })).toBeVisible({
+      await expect(page.getByRole('cell', { name: /rallonge 10m e2e/i })).toBeVisible({
         timeout: 5000,
       })
       // La quantité ×5 doit s'afficher
