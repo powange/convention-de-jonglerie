@@ -58,6 +58,7 @@ export function wrapApiHandler<T = any>(
         throw createError({
           status: error.status,
           message: error.message,
+          cause: error,
         })
       }
 
@@ -82,10 +83,13 @@ export function wrapApiHandler<T = any>(
       }
 
       // Convertir en ApiError puis en erreur h3
+      // On conserve l'erreur d'origine via `cause` pour que le logger
+      // enregistre le vrai message/stack plutôt que le message générique.
       const apiError = toApiError(error, defaultErrorMessage)
       throw createError({
         status: apiError.status,
         message: apiError.message,
+        cause: error,
       })
     }
   })
@@ -133,6 +137,7 @@ export function handlePrismaError(error: unknown, context?: string): never {
         throw createError({
           status: 500,
           message: 'Erreur de base de données',
+          cause: error,
         })
     }
   }

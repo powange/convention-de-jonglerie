@@ -12,9 +12,10 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
-    public operationName?: string
+    public operationName?: string,
+    options?: { cause?: unknown }
   ) {
-    super(message)
+    super(message, options)
     this.name = 'ApiError'
     // Maintenir la stack trace correcte
     Error.captureStackTrace?.(this, this.constructor)
@@ -95,8 +96,8 @@ export class ValidationError extends ApiError {
  * Utilisée pour les erreurs serveur inattendues
  */
 export class InternalServerError extends ApiError {
-  constructor(message = 'Erreur serveur interne') {
-    super(500, message)
+  constructor(message = 'Erreur serveur interne', options?: { cause?: unknown }) {
+    super(500, message, undefined, options)
     this.name = 'InternalServerError'
   }
 }
@@ -120,6 +121,7 @@ export function toApiError(error: unknown, defaultMessage = 'Erreur serveur inte
   }
 
   // Toujours utiliser le defaultMessage pour les erreurs génériques
-  // afin d'éviter d'exposer des détails techniques au client
-  return new InternalServerError(defaultMessage)
+  // afin d'éviter d'exposer des détails techniques au client.
+  // L'erreur d'origine est conservée via `cause` pour le logging.
+  return new InternalServerError(defaultMessage, { cause: error })
 }

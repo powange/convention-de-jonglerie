@@ -68,6 +68,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
     throw createError({
       status: 500,
       message: 'Erreur serveur',
+      cause: error,
     })
   }
 }
@@ -152,6 +153,7 @@ export async function createCommentForEntity(
     throw createError({
       status: 500,
       message: 'Erreur lors de la création du commentaire',
+      cause: error,
     })
   }
 }
@@ -221,6 +223,7 @@ export async function deleteCommentForEntity(
     throw createError({
       status: 500,
       message: 'Erreur lors de la suppression du commentaire',
+      cause: error,
     })
   }
 }

@@ -1,11 +1,84 @@
 import { getHeaders, getHeader } from 'h3'
 
+import { firebaseAdmin } from './firebase-admin'
+import { unifiedPushService } from './unified-push-service'
+
 import type { H3Event } from 'h3'
 
 interface ErrorInfo {
   error: Error
   statusCode: number
   event: H3Event
+}
+
+// Anti-spam: cooldown par signature d'erreur pour les alertes admin (en mémoire, par worker)
+const ADMIN_ALERT_COOLDOWN_MS = Number(process.env.ERROR_ALERT_COOLDOWN_MS) || 5 * 60 * 1000
+const lastAdminAlertAt = new Map<string, number>()
+
+/**
+ * Détermine si une nouvelle alerte admin doit être envoyée pour cette signature
+ * d'erreur (limite le flood quand la même erreur se répète rapidement).
+ */
+function shouldAlertAdmins(signature: string): boolean {
+  const now = Date.now()
+  const last = lastAdminAlertAt.get(signature)
+  if (last && now - last < ADMIN_ALERT_COOLDOWN_MS) {
+    return false
+  }
+  lastAdminAlertAt.set(signature, now)
+  // Nettoyage basique pour éviter une croissance illimitée de la map
+  if (lastAdminAlertAt.size > 500) {
+    for (const [key, ts] of lastAdminAlertAt) {
+      if (now - ts > ADMIN_ALERT_COOLDOWN_MS) lastAdminAlertAt.delete(key)
+    }
+  }
+  return true
+}
+
+/**
+ * Envoie une notification push aux admins globaux en cas d'erreur serveur (>= 500).
+ *
+ * Important: ces alertes ne sont PAS enregistrées dans le système de notifications
+ * du site (table Notification). Ce sont de simples push FCM destinées à prévenir
+ * les admins en temps réel d'une erreur serveur.
+ */
+async function alertAdminsOfServerError(params: {
+  message: string
+  errorType: string
+  statusCode: number
+  method: string
+  path: string
+}): Promise<void> {
+  try {
+    // Pas de FCM configuré → rien à faire (évite des requêtes DB inutiles)
+    if (!firebaseAdmin.isInitialized()) return
+
+    // Anti-spam: une alerte par (méthode + path + type d'erreur) toutes les N minutes
+    const signature = `${params.method} ${params.path} ${params.errorType}`
+    if (!shouldAlertAdmins(signature)) return
+
+    const admins = await prisma.user.findMany({
+      where: { isGlobalAdmin: true },
+      select: { id: true },
+    })
+    if (admins.length === 0) return
+
+    const shortMessage =
+      params.message.length > 150 ? `${params.message.slice(0, 147)}...` : params.message
+
+    await unifiedPushService.sendToUsers(
+      admins.map((a) => a.id),
+      {
+        title: `🚨 Erreur ${params.statusCode} — ${params.method} ${params.path}`,
+        message: shortMessage,
+        url: '/admin/error-logs',
+        type: 'error',
+      }
+    )
+  } catch (alertError) {
+    // Ne jamais faire échouer le logging à cause de l'alerte
+    console.error('[Error alert] Échec de la notification push aux admins:', alertError)
+  }
 }
 
 /**
@@ -122,6 +195,30 @@ function extractPrismaDetails(error: any): {
   }
 
   return null
+}
+
+/**
+ * Remonte la chaîne des `cause` pour récupérer l'erreur d'origine.
+ *
+ * Les handlers ré-émettent fréquemment une erreur 500 générique
+ * (ex: « Erreur serveur ») tout en attachant l'erreur réelle via `cause`.
+ * Pour les logs, on veut le message / la stack / le type de cette erreur
+ * d'origine plutôt que le message générique exposé au client.
+ */
+function getRootError(error: any): any {
+  let current = error
+  const seen = new Set<any>()
+  while (
+    current &&
+    typeof current === 'object' &&
+    current.cause &&
+    current.cause !== current &&
+    !seen.has(current.cause)
+  ) {
+    seen.add(current)
+    current = current.cause
+  }
+  return current
 }
 
 /**
@@ -262,16 +359,35 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
       // Ignorer les erreurs de lecture du body
     }
 
+    // Remonter à l'erreur d'origine si l'erreur a été ré-emballée (via `cause`).
+    // Cela évite d'enregistrer un message générique (« Erreur serveur ») à la
+    // place de la vraie erreur, qui n'apparaissait jusqu'ici que dans les logs
+    // du conteneur (console.error).
+    const rootError = getRootError(error)
+    const hasCause =
+      rootError &&
+      rootError !== error &&
+      typeof rootError.message === 'string' &&
+      rootError.message.length > 0
+    const effectiveError = hasCause ? rootError : error
+
+    // Conserver le message générique exposé au client si différent du vrai message
+    const message =
+      hasCause && rootError.message !== error.message
+        ? `${rootError.message} (réponse: ${error.message})`
+        : effectiveError.message
+
     // Extraire les détails Prisma/SQL si c'est une erreur de base de données
-    const prismaDetails = extractPrismaDetails(error)
+    const prismaDetails = extractPrismaDetails(effectiveError) || extractPrismaDetails(error)
+    const errorType = getErrorType(effectiveError)
 
     // Créer l'enregistrement de log
     await prisma.apiErrorLog.create({
       data: {
-        message: error.message,
+        message,
         statusCode,
-        stack: sanitizeStackTrace(error.stack),
-        errorType: getErrorType(error),
+        stack: sanitizeStackTrace(effectiveError.stack || error.stack),
+        errorType,
         method,
         url,
         path,
@@ -286,6 +402,12 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
         userId,
       },
     })
+
+    // Alerter les admins par push en cas d'erreur serveur (>= 500).
+    // Fire-and-forget pour ne pas retarder la réponse d'erreur au client.
+    if (statusCode >= 500) {
+      void alertAdminsOfServerError({ message, errorType, statusCode, method, path })
+    }
   } catch (logError) {
     // Ne pas faire planter l'application si le logging échoue
     console.error('Failed to log API error:', logError)
