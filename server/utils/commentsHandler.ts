@@ -1,5 +1,6 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
+import prisma from './prisma'
 import { carpoolUserSelect } from './prisma-select-helpers'
 import { sanitizeUserContent } from './validation-helpers'
 
