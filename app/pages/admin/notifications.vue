@@ -35,7 +35,7 @@
     </div>
 
     <!-- Actions rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
       <!-- Envoyer des rappels -->
       <UCard>
         <div class="text-center p-6">
@@ -108,6 +108,35 @@
           <UButton variant="outline" color="orange" @click="showFirebaseTestModal = true">
             Tester FCM
           </UButton>
+        </div>
+      </UCard>
+
+      <!-- Test erreur 500 (debug, dev uniquement) -->
+      <UCard v-if="isDev">
+        <div class="text-center p-6">
+          <div
+            class="mx-auto mb-4 w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center"
+          >
+            <UIcon
+              name="i-heroicons-exclamation-triangle"
+              class="h-6 w-6 text-red-600 dark:text-red-400"
+            />
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Test erreur 500</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Générer une erreur serveur pour tester les logs et l'alerte push
+          </p>
+          <div class="flex flex-col gap-2">
+            <USelect v-model="debugErrorKind" :items="debugErrorKinds" size="sm" class="w-full" />
+            <UButton
+              variant="outline"
+              color="error"
+              :loading="throwingError"
+              @click="triggerTestError"
+            >
+              Générer une erreur 500
+            </UButton>
+          </div>
         </div>
       </UCard>
     </div>
@@ -1323,6 +1352,46 @@ const formatTimeAgoCustom = (dateString: string) => {
     },
   })
 }
+
+// Test erreur 500 (debug) — l'endpoint renvoie volontairement un 500,
+// donc l'erreur reçue EST le succès du test.
+const debugErrorKinds = [
+  { label: 'Erreur générique (500)', value: 'generic' },
+  { label: 'TypeError', value: 'type' },
+  { label: 'Erreur Prisma', value: 'prisma' },
+  { label: 'createError direct', value: 'createError' },
+]
+const debugErrorKind = ref('generic')
+// L'endpoint de debug est désactivé en production → on masque la carte
+const isDev = import.meta.dev
+
+const { execute: executeThrowError, loading: throwingError } = useApiAction(
+  '/api/admin/debug/throw-error',
+  {
+    method: 'GET',
+    query: () => ({ kind: debugErrorKind.value }),
+    silentError: true,
+    onError: (err) => {
+      if (err.statusCode === 500) {
+        toast.add({
+          color: 'success',
+          icon: 'i-heroicons-check-circle',
+          title: 'Erreur 500 générée ✅',
+          description: "Consultez /admin/error-logs et vérifiez l'alerte push reçue.",
+        })
+      } else {
+        toast.add({
+          color: 'error',
+          icon: 'i-heroicons-x-circle',
+          title: `Réponse inattendue (${err.statusCode})`,
+          description: err.message || 'Endpoint indisponible (production ?) ou accès refusé.',
+        })
+      }
+    },
+  }
+)
+
+const triggerTestError = () => executeThrowError()
 
 // Actions
 const { execute: executeSendReminders, loading: sendingReminders } = useApiAction(
