@@ -1079,6 +1079,8 @@
       "social_links": "Redes sociales",
       "social_links_hint": "Una URL por línea (Instagram, YouTube, TikTok, etc.)",
       "social_links_placeholder": "https://instagram.com/micuenta\nhttps://youtube.com/{'@'}micanal",
+      "stage_setup_help": "Describe la disposición de tu número en el escenario (entrada, accesorios a colocar, posicionamiento…) y el estado en que dejas el escenario al final (desmontaje, elementos retirados).",
+      "stage_setup_placeholder": "Montaje antes del número y estado del escenario al final...",
       "technical_needs_placeholder": "Espacio escénico, sonido, iluminación, accesorios..."
     },
     "form_title": "Formulario de candidatura",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "El título no puede superar los 200 caracteres",
       "show_title_required": "El título del espectáculo es obligatorio (mínimo 3 caracteres)",
       "social_links_max_length": "Los enlaces de redes sociales no pueden superar los 2000 caracteres",
+      "stage_setup_max_length": "La disposición en el escenario no puede superar los 3000 caracteres",
       "technical_needs_max_length": "Los requisitos técnicos no pueden superar los 3000 caracteres",
       "url_invalid": "La URL debe comenzar con http:// o https://"
     }

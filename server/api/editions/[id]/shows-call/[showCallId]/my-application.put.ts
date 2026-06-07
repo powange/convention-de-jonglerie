@@ -125,6 +125,7 @@ export default wrapApiHandler(
         showDuration: validatedData.showDuration,
         showCategory: validatedData.showCategory || null,
         technicalNeeds: validatedData.technicalNeeds || null,
+        stageSetup: validatedData.stageSetup || null,
         additionalPerformersCount: validatedData.additionalPerformersCount,
         additionalPerformers: validatedData.additionalPerformers || null,
         // Logistique

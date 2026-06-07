@@ -351,6 +351,8 @@
       "field_require_phone_desc": "När det är avaktiverat blir telefonnumret (huvudkontakt och medverkande artister) valfritt i ansökningsformuläret",
       "field_social_links": "Sociala medier",
       "field_social_links_desc": "Be om länkar till artistens sociala medier",
+      "field_stage_setup": "Scenuppställning",
+      "field_stage_setup_desc": "Fråga om numrets uppställning på scenen (förberedelse före och scenens skick efteråt)",
       "field_technical": "Tekniska krav",
       "field_technical_desc": "Be om föreställningens tekniska krav",
       "field_video": "Demonstrationsvideo",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Webbplats",
         "show_title": "Föreställningens titel",
         "social_links": "Sociala medier",
+        "stage_setup": "Scenuppställning",
         "technical_needs": "Tekniska krav",
         "video_url": "Video"
       },

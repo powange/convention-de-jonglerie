@@ -32,6 +32,7 @@ export default wrapApiHandler(
         askPortfolioUrl: true,
         askVideoUrl: true,
         askTechnicalNeeds: true,
+        askStageSetup: true,
         askAccommodation: true,
         edition: {
           select: {

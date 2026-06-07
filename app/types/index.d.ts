@@ -350,6 +350,7 @@ export interface EditionShowCall {
   askPortfolioUrl: boolean
   askVideoUrl: boolean
   askTechnicalNeeds: boolean
+  askStageSetup: boolean
   askAccommodation: boolean
   askDepartureCity: boolean
   askSocialLinks: boolean
@@ -380,6 +381,7 @@ export interface ShowPreset {
   showDuration: number
   showCategory?: string | null
   technicalNeeds?: string | null
+  stageSetup?: string | null
   additionalPerformersCount: number
   additionalPerformers?: AdditionalPerformer[] | null
   createdAt: string
@@ -406,6 +408,7 @@ export interface ShowApplication {
   showDuration: number
   showCategory?: string | null
   technicalNeeds?: string | null
+  stageSetup?: string | null
 
   // Personnes supplémentaires
   additionalPerformersCount: number
@@ -447,6 +450,7 @@ export interface ShowCallSettingsFormData {
   askPortfolioUrl: boolean
   askVideoUrl: boolean
   askTechnicalNeeds: boolean
+  askStageSetup: boolean
   askAccommodation: boolean
   askDepartureCity: boolean
   askSocialLinks: boolean
@@ -467,6 +471,7 @@ export interface ShowApplicationFormData {
   showDuration: number
   showCategory?: string | null
   technicalNeeds?: string | null
+  stageSetup?: string | null
 
   // Personnes supplémentaires
   additionalPerformersCount: number
@@ -510,6 +515,7 @@ export interface EditionShowCallPublic extends EditionShowCallBasic {
   askPortfolioUrl: boolean
   askVideoUrl: boolean
   askTechnicalNeeds: boolean
+  askStageSetup: boolean
   askAccommodation: boolean
   askDepartureCity: boolean
   askSocialLinks: boolean

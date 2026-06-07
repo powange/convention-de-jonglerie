@@ -54,6 +54,7 @@ export default wrapApiHandler(
         askPortfolioUrl: true,
         askVideoUrl: true,
         askTechnicalNeeds: true,
+        askStageSetup: true,
         askAccommodation: true,
       },
       orderBy: [

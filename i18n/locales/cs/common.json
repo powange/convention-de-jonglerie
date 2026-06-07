@@ -1079,6 +1079,8 @@
       "social_links": "Sociální sítě",
       "social_links_hint": "Jedna URL na řádek (Instagram, YouTube, TikTok atd.)",
       "social_links_placeholder": "https://instagram.com/mujucet\nhttps://youtube.com/{'@'}mujkanal",
+      "stage_setup_help": "Popište přípravu svého čísla na jevišti (nástup, rekvizity k rozmístění, umístění…) a stav, v jakém jeviště na konci zanecháte (úklid, odstraněné prvky).",
+      "stage_setup_placeholder": "Příprava před číslem a stav jeviště na konci...",
       "technical_needs_placeholder": "Prostor pro scénu, zvuk, osvětlení, rekvizity..."
     },
     "form_title": "Formulář přihlášky",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Název nemůže překročit 200 znaků",
       "show_title_required": "Název představení je povinný (minimum 3 znaky)",
       "social_links_max_length": "Odkazy na sociální sítě nemohou překročit 2000 znaků",
+      "stage_setup_max_length": "Příprava na jevišti nesmí překročit 3000 znaků",
       "technical_needs_max_length": "Technické požadavky nemohou překročit 3000 znaků",
       "url_invalid": "URL musí začínat http:// nebo https://"
     }

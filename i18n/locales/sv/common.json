@@ -1079,6 +1079,8 @@
       "social_links": "Sociala medier",
       "social_links_hint": "En URL per rad (Instagram, YouTube, TikTok, etc.)",
       "social_links_placeholder": "https://instagram.com/mittkonto\nhttps://youtube.com/{'@'}minkanal",
+      "stage_setup_help": "Beskriv uppställningen av ditt nummer på scenen (entré, rekvisita att lägga fram, placering…) och det skick du lämnar scenen i på slutet (nedmontering, borttagna föremål).",
+      "stage_setup_placeholder": "Förberedelse före numret och scenens skick på slutet...",
       "technical_needs_placeholder": "Scenutrymme, ljud, ljus, rekvisita..."
     },
     "form_title": "Ansökningsformulär",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Titeln får inte överstiga 200 tecken",
       "show_title_required": "Föreställningens titel krävs (minst 3 tecken)",
       "social_links_max_length": "Länkar till sociala medier får inte överstiga 2000 tecken",
+      "stage_setup_max_length": "Scenuppställningen får inte överstiga 3000 tecken",
       "technical_needs_max_length": "Tekniska krav får inte överstiga 3000 tecken",
       "url_invalid": "URL:en måste börja med http:// eller https://"
     }

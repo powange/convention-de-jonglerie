@@ -58,6 +58,7 @@ export default wrapApiHandler(
         askPortfolioUrl: showCall.askPortfolioUrl,
         askVideoUrl: showCall.askVideoUrl,
         askTechnicalNeeds: showCall.askTechnicalNeeds,
+        askStageSetup: showCall.askStageSetup,
         askAccommodation: showCall.askAccommodation,
         askDepartureCity: showCall.askDepartureCity,
         requirePhone: showCall.requirePhone,

@@ -1079,6 +1079,8 @@
       "social_links": "Redes sociais",
       "social_links_hint": "Um URL por linha (Instagram, YouTube, TikTok, etc.)",
       "social_links_placeholder": "https://instagram.com/minhaconta\nhttps://youtube.com/{'@'}meucanal",
+      "stage_setup_help": "Descreva a disposição do seu número no palco (entrada, acessórios a colocar, posicionamento…) e o estado em que deixa o palco no final (desmontagem, elementos retirados).",
+      "stage_setup_placeholder": "Montagem antes do número e estado do palco no final...",
       "technical_needs_placeholder": "Espaço cénico, som, iluminação, acessórios..."
     },
     "form_title": "Formulário de candidatura",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "O título não pode exceder 200 caracteres",
       "show_title_required": "O título do espetáculo é obrigatório (mínimo 3 caracteres)",
       "social_links_max_length": "Os links de redes sociais não podem exceder 2000 caracteres",
+      "stage_setup_max_length": "A disposição no palco não pode exceder 3000 caracteres",
       "technical_needs_max_length": "Os requisitos técnicos não podem exceder 3000 caracteres",
       "url_invalid": "O URL deve começar com http:// ou https://"
     }

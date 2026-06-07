@@ -1079,6 +1079,8 @@
       "social_links": "Réseaux sociaux",
       "social_links_hint": "Une URL par ligne (Instagram, YouTube, TikTok, etc.)",
       "social_links_placeholder": "https://instagram.com/moncompte\nhttps://youtube.com/{'@'}machaîne",
+      "stage_setup_help": "Décrivez la mise en place de votre numéro sur scène (entrée, accessoires à disposer, positionnement…) et l'état dans lequel vous laissez la scène à la fin (démontage, éléments retirés).",
+      "stage_setup_placeholder": "Mise en place avant le numéro, et état de la scène à la fin...",
       "technical_needs_placeholder": "Espace scénique, son, lumière, accessoires..."
     },
     "form_title": "Formulaire de candidature",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Le titre ne peut pas dépasser 200 caractères",
       "show_title_required": "Le titre du spectacle est requis (minimum 3 caractères)",
       "social_links_max_length": "Les liens réseaux sociaux ne peuvent pas dépasser 2000 caractères",
+      "stage_setup_max_length": "La mise en place sur scène ne peut pas dépasser 3000 caractères",
       "technical_needs_max_length": "Les besoins techniques ne peuvent pas dépasser 3000 caractères",
       "url_invalid": "L'URL doit commencer par http:// ou https://"
     }

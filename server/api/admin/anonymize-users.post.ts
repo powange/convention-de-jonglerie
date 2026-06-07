@@ -88,6 +88,7 @@ export default wrapApiHandler(
               socialLinks: null,
               showDescription: 'Description anonymisée',
               technicalNeeds: null,
+              stageSetup: null,
               accommodationNotes: null,
               departureCity: null,
             },

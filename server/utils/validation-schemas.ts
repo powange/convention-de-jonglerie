@@ -675,6 +675,11 @@ export function createShowApplicationSchema(
         .max(3000, 'Les besoins techniques ne peuvent pas dépasser 3000 caractères')
         .nullable()
         .optional(),
+      stageSetup: z
+        .string()
+        .max(3000, 'La mise en place sur scène ne peut pas dépasser 3000 caractères')
+        .nullable()
+        .optional(),
       // Personnes supplémentaires dans le spectacle
       additionalPerformersCount: z.coerce
         .number()
@@ -779,6 +784,11 @@ export const showPresetSchema = z
     technicalNeeds: z
       .string()
       .max(3000, 'Les besoins techniques ne peuvent pas dépasser 3000 caractères')
+      .nullable()
+      .optional(),
+    stageSetup: z
+      .string()
+      .max(3000, 'La mise en place sur scène ne peut pas dépasser 3000 caractères')
       .nullable()
       .optional(),
 

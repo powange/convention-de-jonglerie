@@ -1079,6 +1079,8 @@
       "social_links": "Media społecznościowe",
       "social_links_hint": "Jeden URL na linię (Instagram, YouTube, TikTok itp.)",
       "social_links_placeholder": "https://instagram.com/mojekonto\nhttps://youtube.com/{'@'}mojkanal",
+      "stage_setup_help": "Opisz ustawienie swojego numeru na scenie (wejście, rekwizyty do rozłożenia, pozycjonowanie…) oraz stan, w jakim zostawiasz scenę na końcu (demontaż, usunięte elementy).",
+      "stage_setup_placeholder": "Przygotowanie przed numerem i stan sceny na końcu...",
       "technical_needs_placeholder": "Przestrzeń sceniczna, nagłośnienie, oświetlenie, rekwizyty..."
     },
     "form_title": "Formularz zgłoszeniowy",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Tytuł nie może przekraczać 200 znaków",
       "show_title_required": "Tytuł spektaklu jest wymagany (minimum 3 znaki)",
       "social_links_max_length": "Linki do mediów społecznościowych nie mogą przekraczać 2000 znaków",
+      "stage_setup_max_length": "Ustawienie na scenie nie może przekraczać 3000 znaków",
       "technical_needs_max_length": "Wymagania techniczne nie mogą przekraczać 3000 znaków",
       "url_invalid": "Adres URL musi zaczynać się od http:// lub https://"
     }

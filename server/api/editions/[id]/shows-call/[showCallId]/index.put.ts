@@ -19,6 +19,7 @@ const updateShowCallSchema = z.object({
   askPortfolioUrl: z.boolean().optional(),
   askVideoUrl: z.boolean().optional(),
   askTechnicalNeeds: z.boolean().optional(),
+  askStageSetup: z.boolean().optional(),
   askAccommodation: z.boolean().optional(),
   askDepartureCity: z.boolean().optional(),
   askSocialLinks: z.boolean().optional(),
@@ -134,6 +135,9 @@ export default wrapApiHandler(
         ...(validatedData.askVideoUrl !== undefined && { askVideoUrl: validatedData.askVideoUrl }),
         ...(validatedData.askTechnicalNeeds !== undefined && {
           askTechnicalNeeds: validatedData.askTechnicalNeeds,
+        }),
+        ...(validatedData.askStageSetup !== undefined && {
+          askStageSetup: validatedData.askStageSetup,
         }),
         ...(validatedData.askAccommodation !== undefined && {
           askAccommodation: validatedData.askAccommodation,

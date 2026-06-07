@@ -1079,6 +1079,8 @@
       "social_links": "Sociale netwerken",
       "social_links_hint": "Eén URL per regel (Instagram, YouTube, TikTok, etc.)",
       "social_links_placeholder": "https://instagram.com/mijnaccount\nhttps://youtube.com/{'@'}mijnkanaal",
+      "stage_setup_help": "Beschrijf de opstelling van je nummer op het podium (opkomst, te plaatsen rekwisieten, positionering…) en de staat waarin je het podium aan het einde achterlaat (afbouw, verwijderde elementen).",
+      "stage_setup_placeholder": "Opbouw vóór het nummer en staat van het podium aan het einde...",
       "technical_needs_placeholder": "Podiumruimte, geluid, verlichting, rekwisieten..."
     },
     "form_title": "Aanmeldingsformulier",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "De titel mag niet meer dan 200 tekens bevatten",
       "show_title_required": "Showtitel is verplicht (minimaal 3 tekens)",
       "social_links_max_length": "Sociale media-links mogen niet meer dan 2000 tekens bevatten",
+      "stage_setup_max_length": "De opstelling op het podium mag niet langer zijn dan 3000 tekens",
       "technical_needs_max_length": "De technische vereisten mogen niet meer dan 3000 tekens bevatten",
       "url_invalid": "De URL moet beginnen met http:// of https://"
     }

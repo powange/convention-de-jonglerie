@@ -445,6 +445,21 @@
                         class="w-full"
                       />
                     </UFormField>
+
+                    <UFormField
+                      v-if="showCall.askStageSetup"
+                      :label="t('gestion.shows_call.form.stage_setup')"
+                      :description="t('shows_call.form.stage_setup_help')"
+                      name="stageSetup"
+                    >
+                      <UTextarea
+                        v-model="formState.stageSetup"
+                        :placeholder="t('shows_call.form.stage_setup_placeholder')"
+                        :rows="3"
+                        size="lg"
+                        class="w-full"
+                      />
+                    </UFormField>
                   </div>
 
                   <!-- Section: Artistes du spectacle -->
@@ -809,6 +824,7 @@ const formState = reactive({
   showDuration: null as number | null,
   showCategory: '',
   technicalNeeds: '',
+  stageSetup: '',
   accommodationNeeded: false,
   accommodationNotes: '',
   departureCity: '',
@@ -866,6 +882,7 @@ function loadDraft(): boolean {
     formState.showDuration = draft.showDuration ?? null
     formState.showCategory = draft.showCategory || ''
     formState.technicalNeeds = draft.technicalNeeds || ''
+    formState.stageSetup = draft.stageSetup || ''
     formState.accommodationNeeded = draft.accommodationNeeded ?? false
     formState.accommodationNotes = draft.accommodationNotes || ''
     formState.departureCity = draft.departureCity || ''
@@ -969,6 +986,7 @@ const presetFieldKeys = [
   'showDuration',
   'showCategory',
   'technicalNeeds',
+  'stageSetup',
   'additionalPerformersCount',
 ] as const
 
@@ -1005,6 +1023,7 @@ function loadPreset(presetId: number | null) {
   formState.showDuration = preset.showDuration
   formState.showCategory = preset.showCategory || ''
   formState.technicalNeeds = preset.technicalNeeds || ''
+  formState.stageSetup = preset.stageSetup || ''
   formState.additionalPerformersCount = preset.additionalPerformersCount
   if (preset.additionalPerformers && Array.isArray(preset.additionalPerformers)) {
     formState.additionalPerformers = preset.additionalPerformers.map((p) => ({ ...p }))
@@ -1037,6 +1056,7 @@ function buildPresetBody() {
     showDuration: formState.showDuration,
     showCategory: formState.showCategory || null,
     technicalNeeds: formState.technicalNeeds || null,
+    stageSetup: formState.stageSetup || null,
     additionalPerformersCount: formState.additionalPerformersCount,
     additionalPerformers: formState.additionalPerformers.map((p) => ({
       lastName: p.lastName.trim(),
@@ -1187,6 +1207,7 @@ onMounted(async () => {
         formState.showDuration = app.showDuration
         formState.showCategory = app.showCategory || ''
         formState.technicalNeeds = app.technicalNeeds || ''
+        formState.stageSetup = app.stageSetup || ''
         // Logistique
         formState.accommodationNeeded = app.accommodationNeeded
         formState.accommodationNotes = app.accommodationNotes || ''
@@ -1438,6 +1459,13 @@ function validate(state: typeof formState) {
     })
   }
 
+  if (state.stageSetup && state.stageSetup.length > 3000) {
+    errors.push({
+      name: 'stageSetup',
+      message: t('shows_call.validation.stage_setup_max_length'),
+    })
+  }
+
   // Validation des personnes supplémentaires
   if (state.additionalPerformersCount === null || state.additionalPerformersCount === undefined) {
     errors.push({
@@ -1514,6 +1542,7 @@ const buildApplicationBody = () => ({
   showDuration: formState.showDuration,
   showCategory: formState.showCategory?.trim() || null,
   technicalNeeds: formState.technicalNeeds?.trim() || null,
+  stageSetup: formState.stageSetup?.trim() || null,
   accommodationNeeded: formState.accommodationNeeded,
   accommodationNotes: formState.accommodationNotes || null,
   departureCity: formState.departureCity || null,

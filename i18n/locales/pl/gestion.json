@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Po wyłączeniu numer telefonu (kontakt główny i artyści uczestniczący) staje się opcjonalny w formularzu zgłoszeniowym",
       "field_social_links": "Media społecznościowe",
       "field_social_links_desc": "Zapytaj o linki do mediów społecznościowych artysty",
+      "field_stage_setup": "Ustawienie na scenie",
+      "field_stage_setup_desc": "Zapytaj o ustawienie numeru na scenie (przygotowanie przed i stan sceny po występie)",
       "field_technical": "Wymagania techniczne",
       "field_technical_desc": "Zapytaj o wymagania techniczne spektaklu",
       "field_video": "Film demonstracyjny",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Strona internetowa",
         "show_title": "Tytuł spektaklu",
         "social_links": "Media społecznościowe",
+        "stage_setup": "Ustawienie na scenie",
         "technical_needs": "Wymagania techniczne",
         "video_url": "Film"
       },

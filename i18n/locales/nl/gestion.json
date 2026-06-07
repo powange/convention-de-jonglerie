@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Indien uitgeschakeld is het telefoonnummer (hoofdcontact en deelnemende artiesten) optioneel in het aanmeldformulier",
       "field_social_links": "Sociale netwerken",
       "field_social_links_desc": "Vraag om links naar sociale netwerken van de artiest",
+      "field_stage_setup": "Opstelling op het podium",
+      "field_stage_setup_desc": "Vraag naar de opstelling van het nummer op het podium (opbouw vooraf en staat van het podium achteraf)",
       "field_technical": "Technische vereisten",
       "field_technical_desc": "Vraag om de technische vereisten van de show",
       "field_video": "Demovideo",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Website",
         "show_title": "Showtitel",
         "social_links": "Sociale netwerken",
+        "stage_setup": "Opstelling op het podium",
         "technical_needs": "Technische vereisten",
         "video_url": "Video"
       },

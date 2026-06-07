@@ -187,7 +187,12 @@
     </UCard>
 
     <!-- Modal de confirmation -->
-    <UModal v-model:open="showConfirmModal" :title="$t('admin.backup_restore_confirm_title')">
+    <UModal
+      v-model:open="showConfirmModal"
+      :title="$t('admin.backup_restore_confirm_title')"
+      :dismissible="!restoring"
+      :close="!restoring"
+    >
       <template #body>
         <div class="space-y-4">
           <p class="text-gray-600 dark:text-gray-400">
@@ -206,7 +211,7 @@
 
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton variant="outline" @click="showConfirmModal = false">
+          <UButton variant="outline" :disabled="restoring" @click="showConfirmModal = false">
             {{ $t('common.cancel') }}
           </UButton>
           <UButton color="error" :loading="restoring" @click="confirmRestore">

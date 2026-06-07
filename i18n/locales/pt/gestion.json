@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Quando desativado, o número de telefone (contacto principal e artistas participantes) torna-se opcional no formulário de candidatura",
       "field_social_links": "Redes sociais",
       "field_social_links_desc": "Solicitar links para as redes sociais do artista",
+      "field_stage_setup": "Disposição no palco",
+      "field_stage_setup_desc": "Solicitar a disposição do número no palco (montagem antes e estado do palco depois)",
       "field_technical": "Requisitos técnicos",
       "field_technical_desc": "Solicitar os requisitos técnicos do espetáculo",
       "field_video": "Vídeo de demonstração",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Website",
         "show_title": "Título do espetáculo",
         "social_links": "Redes sociais",
+        "stage_setup": "Disposição no palco",
         "technical_needs": "Requisitos técnicos",
         "video_url": "Vídeo"
       },

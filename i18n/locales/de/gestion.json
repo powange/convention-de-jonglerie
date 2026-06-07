@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Wenn deaktiviert, wird die Telefonnummer (Hauptkontakt und Mitwirkende) im Bewerbungsformular optional",
       "field_social_links": "Soziale Netzwerke",
       "field_social_links_desc": "Links zu den sozialen Netzwerken des Künstlers erfragen",
+      "field_stage_setup": "Bühnenaufbau",
+      "field_stage_setup_desc": "Nach dem Bühnenaufbau der Nummer fragen (Aufbau davor und Zustand der Bühne danach)",
       "field_technical": "Technische Anforderungen",
       "field_technical_desc": "Technische Anforderungen der Show erfragen",
       "field_video": "Demo-Video",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Website",
         "show_title": "Show-Titel",
         "social_links": "Soziale Netzwerke",
+        "stage_setup": "Bühnenaufbau",
         "technical_needs": "Technische Anforderungen",
         "video_url": "Video"
       },

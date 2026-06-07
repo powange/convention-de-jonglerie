@@ -1079,6 +1079,8 @@
       "social_links": "Social networks",
       "social_links_hint": "One URL per line (Instagram, YouTube, TikTok, etc.)",
       "social_links_placeholder": "https://instagram.com/myaccount\nhttps://youtube.com/{'@'}mychannel",
+      "stage_setup_help": "Describe how your act is set up on stage (entrance, props to lay out, positioning…) and the state in which you leave the stage at the end (teardown, items removed).",
+      "stage_setup_placeholder": "Setup before the act, and state of the stage at the end...",
       "technical_needs_placeholder": "Stage space, sound, lighting, props..."
     },
     "form_title": "Application form",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Title cannot exceed 200 characters",
       "show_title_required": "Show title is required (minimum 3 characters)",
       "social_links_max_length": "Social media links cannot exceed 2000 characters",
+      "stage_setup_max_length": "The stage setup cannot exceed 3000 characters",
       "technical_needs_max_length": "Technical requirements cannot exceed 3000 characters",
       "url_invalid": "URL must start with http:// or https://"
     }

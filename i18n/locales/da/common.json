@@ -1079,6 +1079,8 @@
       "social_links": "Sociale medier",
       "social_links_hint": "En URL per linje (Instagram, YouTube, TikTok osv.)",
       "social_links_placeholder": "https://instagram.com/minkonto\nhttps://youtube.com/{'@'}minkanal",
+      "stage_setup_help": "Beskriv opstillingen af dit nummer på scenen (entré, rekvisitter der skal lægges frem, placering…) og den tilstand, du efterlader scenen i til sidst (nedtagning, fjernede elementer).",
+      "stage_setup_placeholder": "Opbygning før nummeret og scenens tilstand til sidst...",
       "technical_needs_placeholder": "Scenerum, lyd, lys, rekvisitter..."
     },
     "form_title": "Ansøgningsformular",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Titlen må ikke overstige 200 tegn",
       "show_title_required": "Forestillingens titel er påkrævet (minimum 3 tegn)",
       "social_links_max_length": "Links til sociale medier må ikke overstige 2000 tegn",
+      "stage_setup_max_length": "Opstillingen på scenen må ikke overstige 3000 tegn",
       "technical_needs_max_length": "Tekniske krav må ikke overstige 3000 tegn",
       "url_invalid": "URL'en skal starte med http:// eller https://"
     }

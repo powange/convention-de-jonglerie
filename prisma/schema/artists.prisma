@@ -155,6 +155,7 @@ model EditionShowCall {
   askPortfolioUrl   Boolean            @default(true)
   askVideoUrl       Boolean            @default(true)
   askTechnicalNeeds Boolean            @default(true)
+  askStageSetup     Boolean            @default(false) // Demander la mise en place sur scène (avant le numéro et état de la scène après)
   askAccommodation  Boolean            @default(false)
   askDepartureCity  Boolean            @default(false) // Demander la ville de départ pour le défraiement
   askSocialLinks    Boolean            @default(false) // Demander les réseaux sociaux
@@ -193,6 +194,7 @@ model ShowPreset {
   showDuration              Int
   showCategory              String?
   technicalNeeds            String? @db.Text
+  stageSetup                String? @db.Text // Mise en place sur scène (avant le numéro et état de la scène après)
   additionalPerformersCount Int     @default(0)
   additionalPerformers      Json?
 
@@ -225,6 +227,7 @@ model ShowApplication {
   showDuration              Int // Durée en minutes
   showCategory              String? // Type (jonglage, acrobatie, magie, etc.)
   technicalNeeds            String? @db.Text // Besoins techniques (espace, son, lumière)
+  stageSetup                String? @db.Text // Mise en place sur scène (avant le numéro et état de la scène après)
   additionalPerformersCount Int     @default(0) // Nombre de personnes supplémentaires dans le spectacle
   additionalPerformers      Json? // Infos de contact des personnes supplémentaires [{lastName, firstName, email, phone}]
 

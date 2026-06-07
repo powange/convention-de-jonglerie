@@ -351,6 +351,8 @@
       "field_require_phone_desc": "When disabled, the phone number (main contact and additional performers) becomes optional in the application form",
       "field_social_links": "Social networks",
       "field_social_links_desc": "Ask for links to the artist's social networks",
+      "field_stage_setup": "Stage setup",
+      "field_stage_setup_desc": "Ask for the act's stage setup (setup before and state of the stage afterwards)",
       "field_technical": "Technical requirements",
       "field_technical_desc": "Ask for the show's technical requirements",
       "field_video": "Demo video",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Website",
         "show_title": "Show title",
         "social_links": "Social networks",
+        "stage_setup": "Stage setup",
         "technical_needs": "Technical requirements",
         "video_url": "Video"
       },

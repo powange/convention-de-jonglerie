@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Pokud je vypnuto, telefonní číslo (hlavní kontakt i účinkující) je v přihlášce nepovinné",
       "field_social_links": "Sociální sítě",
       "field_social_links_desc": "Požádat o odkazy na sociální sítě umělce",
+      "field_stage_setup": "Příprava na jevišti",
+      "field_stage_setup_desc": "Zeptat se na přípravu čísla na jevišti (příprava před a stav jeviště po vystoupení)",
       "field_technical": "Technické požadavky",
       "field_technical_desc": "Požádat o technické požadavky představení",
       "field_video": "Ukázkové video",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Webové stránky",
         "show_title": "Název představení",
         "social_links": "Sociální sítě",
+        "stage_setup": "Příprava na jevišti",
         "technical_needs": "Technické požadavky",
         "video_url": "Video"
       },

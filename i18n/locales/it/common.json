@@ -1079,6 +1079,8 @@
       "social_links": "Social network",
       "social_links_hint": "Un URL per riga (Instagram, YouTube, TikTok, ecc.)",
       "social_links_placeholder": "https://instagram.com/mioaccount\nhttps://youtube.com/{'@'}miocanale",
+      "stage_setup_help": "Descrivi l'allestimento del tuo numero sul palco (entrata, accessori da disporre, posizionamento…) e lo stato in cui lasci il palco alla fine (smontaggio, elementi rimossi).",
+      "stage_setup_placeholder": "Allestimento prima del numero e stato del palco alla fine...",
       "technical_needs_placeholder": "Spazio scenico, suono, luci, accessori..."
     },
     "form_title": "Modulo di candidatura",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Il titolo non può superare i 200 caratteri",
       "show_title_required": "Il titolo dello spettacolo è obbligatorio (minimo 3 caratteri)",
       "social_links_max_length": "I link ai social media non possono superare i 2000 caratteri",
+      "stage_setup_max_length": "L'allestimento del palco non può superare i 3000 caratteri",
       "technical_needs_max_length": "I requisiti tecnici non possono superare i 3000 caratteri",
       "url_invalid": "L'URL deve iniziare con http:// o https://"
     }

@@ -1079,6 +1079,8 @@
       "social_links": "Soziale Netzwerke",
       "social_links_hint": "Eine URL pro Zeile (Instagram, YouTube, TikTok usw.)",
       "social_links_placeholder": "https://instagram.com/meinkonto\nhttps://youtube.com/{'@'}meinkanal",
+      "stage_setup_help": "Beschreibe den Bühnenaufbau deiner Nummer (Auftritt, bereitzulegende Requisiten, Positionierung…) und den Zustand, in dem du die Bühne am Ende hinterlässt (Abbau, entfernte Gegenstände).",
+      "stage_setup_placeholder": "Aufbau vor der Nummer und Zustand der Bühne am Ende...",
       "technical_needs_placeholder": "Bühnenfläche, Ton, Beleuchtung, Requisiten..."
     },
     "form_title": "Bewerbungsformular",
@@ -1150,6 +1152,7 @@
       "show_title_max_length": "Der Titel darf 200 Zeichen nicht überschreiten",
       "show_title_required": "Show-Titel ist erforderlich (mindestens 3 Zeichen)",
       "social_links_max_length": "Social-Media-Links dürfen 2000 Zeichen nicht überschreiten",
+      "stage_setup_max_length": "Der Bühnenaufbau darf 3000 Zeichen nicht überschreiten",
       "technical_needs_max_length": "Die technischen Anforderungen dürfen 3000 Zeichen nicht überschreiten",
       "url_invalid": "Die URL muss mit http:// oder https:// beginnen"
     }

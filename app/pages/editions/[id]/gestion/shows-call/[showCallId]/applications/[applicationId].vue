@@ -289,6 +289,19 @@
                   v-html="technicalNeedsHtml"
                 />
               </div>
+              <div v-if="application.stageSetup" class="pl-3">
+                <span
+                  class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
+                >
+                  {{ $t('gestion.shows_call.form.stage_setup') }}
+                </span>
+                <!-- Markdown rendu + liens cliquables target=_blank (rehype-sanitize + rehypeExternalLinks) -->
+                <!-- eslint-disable vue/no-v-html -->
+                <div
+                  class="mt-1 text-sm prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap"
+                  v-html="stageSetupHtml"
+                />
+              </div>
               <div v-if="application.additionalPerformersCount > 0" class="pl-3">
                 <span
                   class="text-gray-900 dark:text-white text-sm font-semibold flex items-center gap-2 mb-2 border-l-2 border-primary pl-2 -ml-3"
@@ -588,6 +601,7 @@ const nextApplicationId = computed(() => {
 const descriptionHtml = ref('')
 const artistBioHtml = ref('')
 const technicalNeedsHtml = ref('')
+const stageSetupHtml = ref('')
 
 watch(
   () => application.value?.showDescription,
@@ -607,6 +621,13 @@ watch(
   () => application.value?.technicalNeeds,
   async (text) => {
     technicalNeedsHtml.value = text ? await markdownToHtml(text) : ''
+  },
+  { immediate: true }
+)
+watch(
+  () => application.value?.stageSetup,
+  async (text) => {
+    stageSetupHtml.value = text ? await markdownToHtml(text) : ''
   },
   { immediate: true }
 )

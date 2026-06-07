@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Se disattivato, il numero di telefono (contatto principale e artisti partecipanti) è facoltativo nel modulo di candidatura",
       "field_social_links": "Social network",
       "field_social_links_desc": "Richiedere i link ai social network dell'artista",
+      "field_stage_setup": "Allestimento del palco",
+      "field_stage_setup_desc": "Richiedere l'allestimento del numero sul palco (preparazione prima e stato del palco dopo)",
       "field_technical": "Requisiti tecnici",
       "field_technical_desc": "Richiedere i requisiti tecnici dello spettacolo",
       "field_video": "Video dimostrativo",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Sito web",
         "show_title": "Titolo dello spettacolo",
         "social_links": "Social network",
+        "stage_setup": "Allestimento del palco",
         "technical_needs": "Requisiti tecnici",
         "video_url": "Video"
       },

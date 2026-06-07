@@ -351,6 +351,8 @@
       "field_require_phone_desc": "Når deaktiveret bliver telefonnummeret (hovedkontakt og medvirkende) valgfrit i ansøgningsskemaet",
       "field_social_links": "Sociale medier",
       "field_social_links_desc": "Bed om links til kunstnerens sociale medier",
+      "field_stage_setup": "Opstilling på scenen",
+      "field_stage_setup_desc": "Spørg om nummerets opstilling på scenen (opbygning før og scenens tilstand efter)",
       "field_technical": "Tekniske krav",
       "field_technical_desc": "Bed om forestillingens tekniske krav",
       "field_video": "Demonstrationsvideo",
@@ -367,6 +369,7 @@
         "portfolio_url": "Portfolio / Hjemmeside",
         "show_title": "Forestillingens titel",
         "social_links": "Sociale medier",
+        "stage_setup": "Opstilling på scenen",
         "technical_needs": "Tekniske krav",
         "video_url": "Video"
       },

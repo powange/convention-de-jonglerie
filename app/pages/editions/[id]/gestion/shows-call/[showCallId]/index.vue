@@ -276,6 +276,21 @@
                 <USwitch v-model="askTechnicalNeedsLocal" :disabled="saving" />
               </div>
 
+              <!-- Stage Setup -->
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+              >
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.shows_call.field_stage_setup') }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ $t('gestion.shows_call.field_stage_setup_desc') }}
+                  </p>
+                </div>
+                <USwitch v-model="askStageSetupLocal" :disabled="saving" />
+              </div>
+
               <!-- Accommodation -->
               <div
                 class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
@@ -403,6 +418,7 @@ const deadlineLocal = ref('')
 const askPortfolioUrlLocal = ref(true)
 const askVideoUrlLocal = ref(true)
 const askTechnicalNeedsLocal = ref(true)
+const askStageSetupLocal = ref(false)
 const askAccommodationLocal = ref(false)
 const askDepartureCityLocal = ref(false)
 const askSocialLinksLocal = ref(false)
@@ -450,6 +466,7 @@ const initialState = ref({
   askPortfolioUrl: true,
   askVideoUrl: true,
   askTechnicalNeeds: true,
+  askStageSetup: false,
   askAccommodation: false,
   askDepartureCity: false,
   askSocialLinks: false,
@@ -469,6 +486,7 @@ const hasChanges = computed(() => {
     askPortfolioUrlLocal.value !== initialState.value.askPortfolioUrl ||
     askVideoUrlLocal.value !== initialState.value.askVideoUrl ||
     askTechnicalNeedsLocal.value !== initialState.value.askTechnicalNeeds ||
+    askStageSetupLocal.value !== initialState.value.askStageSetup ||
     askAccommodationLocal.value !== initialState.value.askAccommodation ||
     askDepartureCityLocal.value !== initialState.value.askDepartureCity ||
     askSocialLinksLocal.value !== initialState.value.askSocialLinks ||
@@ -563,6 +581,7 @@ const fetchSettings = async () => {
     askPortfolioUrlLocal.value = response.askPortfolioUrl ?? true
     askVideoUrlLocal.value = response.askVideoUrl ?? true
     askTechnicalNeedsLocal.value = response.askTechnicalNeeds ?? true
+    askStageSetupLocal.value = response.askStageSetup ?? false
     askAccommodationLocal.value = response.askAccommodation ?? false
     askDepartureCityLocal.value = response.askDepartureCity ?? false
     askSocialLinksLocal.value = response.askSocialLinks ?? false
@@ -600,6 +619,7 @@ const updateInitialState = () => {
     askPortfolioUrl: askPortfolioUrlLocal.value,
     askVideoUrl: askVideoUrlLocal.value,
     askTechnicalNeeds: askTechnicalNeedsLocal.value,
+    askStageSetup: askStageSetupLocal.value,
     askAccommodation: askAccommodationLocal.value,
     askDepartureCity: askDepartureCityLocal.value,
     askSocialLinks: askSocialLinksLocal.value,
@@ -618,6 +638,7 @@ const buildSettingsBody = () => {
     askPortfolioUrl: askPortfolioUrlLocal.value,
     askVideoUrl: askVideoUrlLocal.value,
     askTechnicalNeeds: askTechnicalNeedsLocal.value,
+    askStageSetup: askStageSetupLocal.value,
     askAccommodation: askAccommodationLocal.value,
     askDepartureCity: askDepartureCityLocal.value,
     askSocialLinks: askSocialLinksLocal.value,
