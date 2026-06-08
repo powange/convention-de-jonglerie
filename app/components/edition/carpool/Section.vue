@@ -1,31 +1,33 @@
 <template>
   <div class="space-y-6">
     <!-- Boutons d'actions (uniquement pour les utilisateurs connectés) -->
-    <div
-      v-if="authStore.isAuthenticated"
-      class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
-    >
-      <!-- Bouton pour proposer un covoiturage -->
-      <UButton
-        :label="$t('components.carpool.propose_carpool')"
-        icon="i-heroicons-plus"
-        color="primary"
-        size="lg"
-        class="w-full sm:w-auto"
-        @click="showOfferModal = true"
-      />
+    <ClientOnly>
+      <div
+        v-if="authStore.isAuthenticated"
+        class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
+      >
+        <!-- Bouton pour proposer un covoiturage -->
+        <UButton
+          :label="$t('components.carpool.propose_carpool')"
+          icon="i-heroicons-plus"
+          color="primary"
+          size="lg"
+          class="w-full sm:w-auto"
+          @click="showOfferModal = true"
+        />
 
-      <!-- Bouton pour demander un covoiturage -->
-      <UButton
-        :label="$t('components.carpool.request_carpool')"
-        icon="i-heroicons-magnifying-glass"
-        color="primary"
-        variant="soft"
-        size="lg"
-        class="w-full sm:w-auto"
-        @click="showRequestModal = true"
-      />
-    </div>
+        <!-- Bouton pour demander un covoiturage -->
+        <UButton
+          :label="$t('components.carpool.request_carpool')"
+          icon="i-heroicons-magnifying-glass"
+          color="primary"
+          variant="soft"
+          size="lg"
+          class="w-full sm:w-auto"
+          @click="showRequestModal = true"
+        />
+      </div>
+    </ClientOnly>
 
     <!-- Bouton toggle pour afficher/masquer les archives -->
     <div class="flex justify-center">

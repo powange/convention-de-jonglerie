@@ -126,7 +126,9 @@
       "Bash(sed -n '48,56p' server/api/__sitemap__/editions.get.ts)",
       "Bash(sed -n '250,258p' app/components/edition/Header.vue)",
       "Bash(sed -n '582,590p' app/components/edition/Header.vue)",
-      "Bash(git restore *)"
+      "Bash(git restore *)",
+      "Bash(sed -n '1,12p' /home/powange/projects/convention-de-jonglerie/app/composables/useApiAction.ts)",
+      "Bash(sed -n '170,178p' /home/powange/projects/convention-de-jonglerie/app/composables/useEditionMarkers.ts)"
     ],
     "additionalDirectories": [
       "/tmp",

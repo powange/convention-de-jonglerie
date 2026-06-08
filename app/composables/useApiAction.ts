@@ -1,4 +1,4 @@
-import { ref, readonly, type Ref } from 'vue'
+import { computed, ref, readonly, type Ref } from 'vue'
 
 /**
  * Structure d'erreur API normalisée
@@ -102,6 +102,9 @@ export interface ApiActionReturn<TResult = unknown> {
 export interface ApiActionByIdReturn<TResult = unknown> {
   /** ID en cours de traitement (null si aucun) */
   loadingId: Readonly<Ref<string | number | null>>
+
+  /** true si une action est en cours pour n'importe quel ID */
+  loading: Readonly<Ref<boolean>>
 
   /** Vérifie si un ID spécifique est en chargement */
   isLoading: (id: string | number) => boolean
@@ -395,6 +398,7 @@ export function useApiActionById<TResult = unknown>(
   const { t } = useI18n()
 
   const loadingId = ref<string | number | null>(null)
+  const loading = computed(() => loadingId.value !== null)
   const error = ref<ApiError | null>(null)
 
   const {
@@ -510,6 +514,7 @@ export function useApiActionById<TResult = unknown>(
 
   return {
     loadingId: readonly(loadingId),
+    loading: readonly(loading),
     isLoading,
     error: readonly(error),
     execute,

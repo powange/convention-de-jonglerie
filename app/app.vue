@@ -23,7 +23,7 @@
       </NuxtLayout>
     </div>
 
-    <UToast v-show="!isLoading" />
+    <UToast />
   </UApp>
 </template>
 

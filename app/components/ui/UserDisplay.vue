@@ -5,9 +5,11 @@
       <p :class="pseudoClasses">
         {{ user.pseudo }}
       </p>
-      <p v-if="datetime" :class="datetimeClasses" :title="formattedDateTime">
-        {{ timeAgo }}
-      </p>
+      <ClientOnly>
+        <p v-if="datetime" :class="datetimeClasses" :title="formattedDateTime">
+          {{ timeAgo }}
+        </p>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -65,6 +67,7 @@ const formattedDateTime = computed(() => {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Paris',
   })
 })
 

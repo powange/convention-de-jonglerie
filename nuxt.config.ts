@@ -113,6 +113,9 @@ export default defineNuxtConfig({
           // Nuxt Icon en mode `serverBundle: 'remote'` : fetch direct
           // des collections d'icônes depuis le CDN iconify côté client.
           'https://api.iconify.design',
+          // Leaflet (carte) chargé dynamiquement depuis unpkg : autorise le
+          // fetch des source maps (.js.map) déclenché quand le devtools est ouvert.
+          'https://unpkg.com',
           // WebSocket pour le HMR Vite en dev (ws:) et la production HTTPS (wss:)
           ...(process.env.NODE_ENV === 'production' ? ['wss:'] : ['ws:', 'wss:']),
         ],

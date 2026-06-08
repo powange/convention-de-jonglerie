@@ -9,24 +9,26 @@
           </div>
 
           <!-- Boutons d'action pour le créateur -->
-          <div v-if="canEdit" class="flex gap-1">
-            <UButton
-              icon="i-heroicons-pencil"
-              size="xs"
-              color="warning"
-              variant="ghost"
-              :title="$t('components.carpool.edit_request')"
-              @click.stop="emit('edit')"
-            />
-            <UButton
-              icon="i-heroicons-trash"
-              size="xs"
-              color="error"
-              variant="ghost"
-              :title="$t('components.carpool.delete_request')"
-              @click.stop="handleDelete"
-            />
-          </div>
+          <ClientOnly>
+            <div v-if="canEdit" class="flex gap-1">
+              <UButton
+                icon="i-heroicons-pencil"
+                size="xs"
+                color="warning"
+                variant="ghost"
+                :title="$t('components.carpool.edit_request')"
+                @click.stop="emit('edit')"
+              />
+              <UButton
+                icon="i-heroicons-trash"
+                size="xs"
+                color="error"
+                variant="ghost"
+                :title="$t('components.carpool.delete_request')"
+                @click.stop="handleDelete"
+              />
+            </div>
+          </ClientOnly>
           <div class="text-right">
             <UBadge color="warning" variant="soft" class="mb-2">
               {{ $t('components.carpool.seats_needed', { count: request.seatsNeeded }) }}

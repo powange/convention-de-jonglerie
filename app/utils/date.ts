@@ -20,7 +20,9 @@ export const formatDate = (date: string | Date, options: DateFormatOptions = {})
     return ''
   }
 
-  const formatOptions: Intl.DateTimeFormatOptions = {}
+  const formatOptions: Intl.DateTimeFormatOptions = {
+    timeZone: 'Europe/Paris',
+  }
 
   // Configuration selon le format
   switch (format) {
