@@ -35,7 +35,7 @@ const isLoading = ref(true)
 const siteLoaded = ref(false)
 
 // Durée de l'animation settle (doit correspondre au CSS du composant LoadingLogo)
-const SETTLE_DURATION = 3000
+const SETTLE_DURATION = 1000
 
 onMounted(async () => {
   await nextTick()

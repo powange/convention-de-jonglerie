@@ -292,20 +292,20 @@ defineProps<{
 /* Quand .loaded est ajoute, on bascule sur les animations settle */
 .loaded .ball-a {
   animation:
-    settle-a 3s ease-in-out forwards,
-    settle-a-opacity 3s linear forwards;
+    settle-a 1s ease-in-out forwards,
+    settle-a-opacity 1s linear forwards;
 }
 .loaded .ball-b {
-  animation: settle-b 3s ease-in-out forwards;
+  animation: settle-b 1s ease-in-out forwards;
 }
 .loaded .ball-c {
-  animation: settle-c 3s ease-in-out forwards;
+  animation: settle-c 1s ease-in-out forwards;
 }
 .loaded .c-final {
-  animation: c-appear 3s linear forwards;
+  animation: c-appear 1s linear forwards;
 }
 .loaded .logo-white {
-  animation: white-appear 3s linear forwards;
+  animation: white-appear 1s linear forwards;
 }
 </style>
 

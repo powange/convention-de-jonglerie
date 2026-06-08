@@ -32,10 +32,12 @@
               highlight
               :collapsible="true"
               :ui="{
-                link: 'text-base sm:text-sm',
-                linkLeadingIcon: 'size-5 sm:size-4',
-                childLink: 'text-base sm:text-sm',
-                childLinkIcon: 'size-5 sm:size-4',
+                link: 'text-base items-start',
+                linkLeadingIcon: 'size-5',
+                linkLabel: 'whitespace-normal',
+                childLink: 'text-base items-start',
+                childLinkIcon: 'size-5',
+                childLinkLabel: 'whitespace-normal',
               }"
             />
           </template>

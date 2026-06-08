@@ -67,6 +67,16 @@ const items = computed<NavigationMenuItem[][]>(() => [
           onSelect: () => emit('navigate'),
         },
         {
+          label: t('nav.tasks'),
+          to: '/guide/organizer/tasks',
+          onSelect: () => emit('navigate'),
+        },
+        {
+          label: t('nav.stock'),
+          to: '/guide/organizer/stock',
+          onSelect: () => emit('navigate'),
+        },
+        {
           label: t('nav.volunteers'),
           to: '/guide/organizer/volunteers',
           onSelect: () => emit('navigate'),
@@ -119,6 +129,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
       "orgOverview": "Vue d'ensemble",
       "conventions": "Conventions & Éditions",
       "organizers": "Co-organisateurs",
+      "tasks": "Gestion des tâches",
+      "stock": "Gestion du matériel",
       "volunteers": "Bénévoles",
       "artists": "Artistes & Spectacles",
       "meals": "Repas",

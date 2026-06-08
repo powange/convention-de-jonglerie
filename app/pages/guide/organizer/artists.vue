@@ -131,6 +131,12 @@
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.formFields.stageSetup')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
               t('sections.config.formFields.accommodation')
             }}</span>
           </li>
@@ -408,6 +414,7 @@ useHead({
           "portfolio": "Portfolio / Site web : lien vers le site ou portfolio de l'artiste.",
           "video": "Vidéo de démonstration : lien vers une vidéo du spectacle (lecture YouTube intégrée).",
           "technical": "Besoins techniques : espace, son, lumière et autres contraintes techniques.",
+          "stageSetup": "Mise en place sur scène : installation du numéro avant le passage et état dans lequel la scène est laissée à la fin.",
           "accommodation": "Hébergement : demander si l'artiste a besoin d'un hébergement.",
           "departureCity": "Ville de départ : pour estimer les frais de déplacement.",
           "social": "Réseaux sociaux : liens vers les réseaux sociaux de l'artiste."
@@ -417,7 +424,7 @@ useHead({
         "title": "Gestion des candidatures",
         "intro": "Traitez les candidatures reçues pour vos appels à spectacles. Un tableau de bord affiche les compteurs en temps réel (total, en attente, acceptées, refusées).",
         "list": "Consultez la liste de toutes les candidatures avec leur statut, filtrez par statut ou recherchez par nom d'artiste ou titre de spectacle.",
-        "details": "Accédez aux détails de chaque proposition : titre, description, durée, artistes supplémentaires, besoins techniques, vidéo intégrée.",
+        "details": "Accédez aux détails de chaque proposition : titre, description, durée, artistes supplémentaires, besoins techniques, mise en place sur scène, vidéo intégrée.",
         "accept": "Acceptez les candidatures qui correspondent à votre programmation.",
         "reject": "Refusez les candidatures qui ne conviennent pas.",
         "notification": "Les artistes sont automatiquement notifiés de votre décision par e-mail et notification push.",

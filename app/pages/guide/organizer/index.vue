@@ -70,6 +70,22 @@ const sections = computed(() => [
     iconClass: 'text-purple-600 dark:text-purple-400',
   },
   {
+    slug: 'tasks',
+    title: t('sections.tasks.title'),
+    description: t('sections.tasks.description'),
+    icon: 'i-heroicons-clipboard-document-list',
+    bgClass: 'bg-indigo-100 dark:bg-indigo-900/30',
+    iconClass: 'text-indigo-600 dark:text-indigo-400',
+  },
+  {
+    slug: 'stock',
+    title: t('sections.stock.title'),
+    description: t('sections.stock.description'),
+    icon: 'i-heroicons-wrench-screwdriver',
+    bgClass: 'bg-amber-100 dark:bg-amber-900/30',
+    iconClass: 'text-amber-600 dark:text-amber-400',
+  },
+  {
     slug: 'volunteers',
     title: t('sections.volunteers.title'),
     description: t('sections.volunteers.description'),
@@ -133,6 +149,14 @@ const sections = computed(() => [
       "organizers": {
         "title": "Co-organisateurs",
         "description": "Inviter des collaborateurs et gérer les permissions."
+      },
+      "tasks": {
+        "title": "Gestion des tâches",
+        "description": "Groupes, assignations, étiquettes, checklists et suivi."
+      },
+      "stock": {
+        "title": "Gestion du matériel",
+        "description": "Inventaire, prêts externes et réservations sur périodes."
       },
       "volunteers": {
         "title": "Bénévoles",

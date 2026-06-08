@@ -53,9 +53,29 @@
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
             <span class="text-gray-600 dark:text-gray-400">{{ t('sections.tiers.options') }}</span>
           </li>
+        </ul>
+      </GuideSection>
+
+      <GuideSection icon="i-heroicons-gift" :title="t('sections.handoutItems.title')" color="blue">
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.handoutItems.intro') }}</p>
+        <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.tiers.items') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.handoutItems.catalog')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.handoutItems.assign')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.handoutItems.recipients')
+            }}</span>
           </li>
         </ul>
       </GuideSection>
@@ -182,7 +202,7 @@ useHead({
       },
       "external": {
         "title": "Billetterie externe",
-        "content": "Si vous utilisez déjà une plateforme de billetterie (HelloAsso, Billetweb, etc.), configurez un lien externe. Les visiteurs seront redirigés vers votre billetterie existante."
+        "content": "Si vous utilisez déjà une plateforme de billetterie (HelloAsso, Infomaniak, etc.), connectez-la à votre édition. Les visiteurs sont redirigés vers votre billetterie existante."
       },
       "tiers": {
         "title": "Tarifs et options",
@@ -190,8 +210,14 @@ useHead({
         "create": "Créez des tarifs (ex : Pass journée, Pass complet, Tarif réduit, Tarif enfant).",
         "price": "Définissez le prix de chaque tarif (gratuit ou payant).",
         "quota": "Limitez le nombre de places disponibles par tarif si nécessaire.",
-        "options": "Ajoutez des options supplémentaires aux tarifs (repas, camping, activités).",
-        "items": "Associez des articles à remettre (bracelets, badges) à chaque tarif."
+        "options": "Ajoutez des options supplémentaires aux tarifs (repas, camping, activités)."
+      },
+      "handoutItems": {
+        "title": "Articles à remettre",
+        "intro": "Gérez le catalogue des articles à remettre à l'accueil, dans une section dédiée distincte des tarifs.",
+        "catalog": "Créez les articles à remettre lors de la validation d'un billet ou à l'arrivée (bracelets, pass camping, goodies, badges, etc.).",
+        "assign": "Attribuez chaque article aux tarifs, options et repas concernés pour qu'il soit remis avec les bonnes entrées.",
+        "recipients": "Les articles peuvent aussi être destinés aux bénévoles, artistes et organisateurs, en plus des participants."
       },
       "orders": {
         "title": "Gestion des commandes",

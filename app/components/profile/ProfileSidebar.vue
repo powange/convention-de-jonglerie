@@ -2,10 +2,10 @@
   <nav>
     <NuxtLink
       to="/profile"
-      class="flex items-center gap-2 text-sm font-semibold mb-4 px-2"
+      class="flex items-center gap-2 text-base font-semibold mb-4 px-2"
       @click="emit('navigate')"
     >
-      <UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-primary-500" />
+      <UIcon name="i-heroicons-user-circle" class="size-5 text-primary-500" />
       {{ t('nav.title') }}
     </NuxtLink>
 
@@ -16,6 +16,14 @@
       variant="pill"
       highlight
       :collapsible="true"
+      :ui="{
+        link: 'text-base items-start',
+        linkLeadingIcon: 'size-5',
+        linkLabel: 'whitespace-normal',
+        childLink: 'text-base items-start',
+        childLinkIcon: 'size-5',
+        childLinkLabel: 'whitespace-normal',
+      }"
     />
   </nav>
 </template>

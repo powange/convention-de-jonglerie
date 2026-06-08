@@ -27,7 +27,7 @@
 
               <div class="flex gap-8">
                 <!-- Sidebar desktop -->
-                <aside class="hidden lg:block w-56 shrink-0">
+                <aside class="hidden lg:block w-64 shrink-0">
                   <div class="sticky top-20">
                     <ProfileSidebar />
                   </div>
