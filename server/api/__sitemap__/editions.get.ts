@@ -49,7 +49,7 @@ export default wrapApiHandler(
 
       // Page des commentaires
       urls.push({
-        loc: `/editions/${edition.id}/commentaires`,
+        loc: `/editions/${edition.id}/comments`,
         lastmod,
         changefreq,
         priority: priority * 0.8,

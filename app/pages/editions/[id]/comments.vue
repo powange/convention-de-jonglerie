@@ -8,7 +8,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader :edition="edition" current-page="commentaires" />
+      <EditionHeader :edition="edition" current-page="comments" />
 
       <!-- Contenu des commentaires -->
       <div class="space-y-6">

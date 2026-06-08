@@ -1047,7 +1047,7 @@ export const NotificationHelpers = {
       category: 'task',
       entityType: 'Task',
       entityId: taskId.toString(),
-      actionUrl: `/editions/${editionId}/mes-taches`,
+      actionUrl: `/editions/${editionId}/my-tasks`,
       notificationType: config.notificationType,
     })
   },

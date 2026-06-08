@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { renderRawPage } from '../utils/renderPage'
 
-describe('Page /editions/[id]/commentaires', () => {
+describe('Page /editions/[id]/comments', () => {
   // Import mis en cache pour éviter de recharger le composant à chaque test
   let pageModule: any
   let renderedPage: any
 
   beforeAll(async () => {
     // Charger le module une seule fois
-    const modulePath = '../../../app/pages/editions/[id]/commentaires.vue'
+    const modulePath = '../../../app/pages/editions/[id]/comments.vue'
     pageModule = await import(modulePath)
 
     // Rendre la page une seule fois
-    renderedPage = await renderRawPage('/editions/1/commentaires')
+    renderedPage = await renderRawPage('/editions/1/comments')
   })
 
   afterAll(() => {

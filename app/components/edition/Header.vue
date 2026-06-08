@@ -194,10 +194,10 @@
         </NuxtLink>
 
         <NuxtLink
-          :to="`/editions/${edition.id}/commentaires`"
+          :to="`/editions/${edition.id}/comments`"
           :class="[
             'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'commentaires'
+            currentPage === 'comments'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
@@ -251,7 +251,7 @@
         <ClientOnly>
           <NuxtLink
             v-if="myTasksTabVisible"
-            :to="`/editions/${edition.id}/mes-taches`"
+            :to="`/editions/${edition.id}/my-tasks`"
             :class="[
               'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
               currentPage === 'my-tasks'
@@ -421,7 +421,7 @@ interface Props {
   edition: Edition
   currentPage:
     | 'details'
-    | 'commentaires'
+    | 'comments'
     | 'carpool'
     | 'gestion'
     | 'lost-found'
@@ -551,9 +551,9 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
     items.push(
       {
         label: t('edition.posts'),
-        value: 'commentaires',
+        value: 'comments',
         icon: 'i-heroicons-chat-bubble-left-right',
-        path: `/editions/${editionId}/commentaires`,
+        path: `/editions/${editionId}/comments`,
       },
       {
         label: t('edition.carpool'),
@@ -583,7 +583,7 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
         label: t('gestion.tasks.my_tasks.title'),
         value: 'my-tasks',
         icon: 'i-heroicons-clipboard-document-check',
-        path: `/editions/${editionId}/mes-taches`,
+        path: `/editions/${editionId}/my-tasks`,
       })
     }
     if (hasEditionStarted.value) {

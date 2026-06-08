@@ -118,7 +118,15 @@
       "Bash(sed -n '304,312p' test/e2e/playwright/edition-management/volunteer-teams.spec.ts)",
       "Bash(sed -n '22,40p' test/e2e/playwright/edition-management/volunteer-form-config.spec.ts)",
       "Bash(sed -n '44,60p' nuxt.config.ts)",
-      "Bash(sed -n '55,67p' server/utils/prisma.ts)"
+      "Bash(sed -n '55,67p' server/utils/prisma.ts)",
+      "Bash(sed -n '195,205p' app/components/edition/Header.vue)",
+      "Bash(sed -n '420,428p' app/components/edition/Header.vue)",
+      "Bash(sed -n '548,560p' app/components/edition/Header.vue)",
+      "Bash(sed -n '1,15p' \"app/pages/editions/[id]/commentaires.vue\")",
+      "Bash(sed -n '48,56p' server/api/__sitemap__/editions.get.ts)",
+      "Bash(sed -n '250,258p' app/components/edition/Header.vue)",
+      "Bash(sed -n '582,590p' app/components/edition/Header.vue)",
+      "Bash(git restore *)"
     ],
     "additionalDirectories": [
       "/tmp",
