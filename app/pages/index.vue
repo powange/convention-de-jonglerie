@@ -292,9 +292,10 @@ useSchemaOrg([
         {
           '@type': 'Offer',
           itemOffered: {
-            '@type': 'Event',
-            name: 'Convention de Jonglerie',
-            description: 'Événements de jonglerie organisés par la communauté',
+            '@type': 'Service',
+            name: 'Référencement de conventions de jonglerie',
+            description:
+              'Plateforme de découverte, de référencement et de gestion de conventions de jonglerie',
           },
         },
       ],
