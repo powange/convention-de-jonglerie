@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Inga zoner eller landmärken definierade",
+    "popup_navigate": "Vägbeskrivning",
+    "zones_list": "Zoner och landmärken",
+    "delete_marker": "Ta bort landmärke",
+    "delete_zone": "Ta bort zon",
+    "edit_marker": "Redigera landmärke",
+    "edit_zone": "Redigera zon",
+    "hide_item": "Dölj på kartan",
+    "open_in_maps": "Öppna i navigeringsapp",
+    "show_item": "Visa på kartan",
+    "delete_success": "Zonen har tagits bort",
+    "save_success": "Zonen har sparats",
+    "marker_delete_success": "Landmärket har tagits bort",
+    "marker_save_success": "Landmärket har sparats",
+    "types": {
+      "accessibility": "Tillgänglighet",
+      "aerial": "Luftakrobatik / Trapets",
+      "atm": "Bankomat",
+      "bar": "Bar",
+      "chill_space": "Chillyta",
+      "entrance": "Ingång",
+      "fire_space": "Eldyta",
+      "food": "Mat",
+      "forbidden": "Förbjudet område",
+      "gym": "Gymnastiksal / Lokal",
+      "info": "Information",
+      "kids_zone": "Barnzon",
+      "market": "Marknad",
+      "other": "Övrigt",
+      "parking": "Parkering",
+      "shower": "Duschar",
+      "shows": "Föreställningar",
+      "tent_camping": "Tältcamping",
+      "toilets": "Toaletter",
+      "truck_camping": "Husbilscamping",
+      "workshops": "Workshops"
+    }
+  }
+}

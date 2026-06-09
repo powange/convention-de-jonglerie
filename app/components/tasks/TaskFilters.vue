@@ -3,7 +3,7 @@
     <div class="flex flex-col lg:flex-row lg:items-center gap-2">
       <UInput
         v-model="search"
-        :placeholder="$t('gestion.tasks.filters.search_placeholder')"
+        :placeholder="$t('tasks.filters.search_placeholder')"
         icon="i-heroicons-magnifying-glass"
         size="sm"
         class="flex-1 min-w-0 lg:max-w-xs"
@@ -24,19 +24,19 @@
         v-model="selectedStatuses"
         :items="statusItems"
         multiple
-        :placeholder="$t('gestion.tasks.filters.status_placeholder')"
+        :placeholder="$t('tasks.filters.status_placeholder')"
         size="sm"
         class="min-w-40"
       >
         <template #default="{ modelValue: selected }">
           <span v-if="!selected?.length">
-            {{ $t('gestion.tasks.filters.status_placeholder') }}
+            {{ $t('tasks.filters.status_placeholder') }}
           </span>
           <span v-else-if="selected.length === 1">
             {{ selected[0].label }}
           </span>
           <span v-else>
-            {{ $t('gestion.tasks.filters.statuses_count', { count: selected.length }) }}
+            {{ $t('tasks.filters.statuses_count', { count: selected.length }) }}
           </span>
         </template>
       </USelectMenu>
@@ -48,19 +48,19 @@
         multiple
         searchable
         :searchable-placeholder="$t('common.search')"
-        :placeholder="$t('gestion.tasks.filters.assignee_placeholder')"
+        :placeholder="$t('tasks.filters.assignee_placeholder')"
         size="sm"
         class="min-w-44"
       >
         <template #default="{ modelValue: selected }">
           <span v-if="!selected?.length">
-            {{ $t('gestion.tasks.filters.assignee_placeholder') }}
+            {{ $t('tasks.filters.assignee_placeholder') }}
           </span>
           <span v-else-if="selected.length === 1">
             {{ selected[0].label }}
           </span>
           <span v-else>
-            {{ $t('gestion.tasks.filters.assignees_count', { count: selected.length }) }}
+            {{ $t('tasks.filters.assignees_count', { count: selected.length }) }}
           </span>
         </template>
       </USelectMenu>
@@ -70,19 +70,19 @@
         v-model="selectedTags"
         :items="tagItems"
         multiple
-        :placeholder="$t('gestion.tasks.filters.tag_placeholder')"
+        :placeholder="$t('tasks.filters.tag_placeholder')"
         size="sm"
         class="min-w-40"
       >
         <template #default="{ modelValue: selected }">
           <span v-if="!selected?.length">
-            {{ $t('gestion.tasks.filters.tag_placeholder') }}
+            {{ $t('tasks.filters.tag_placeholder') }}
           </span>
           <span v-else-if="selected.length === 1">
             {{ selected[0].label }}
           </span>
           <span v-else>
-            {{ $t('gestion.tasks.filters.tags_count', { count: selected.length }) }}
+            {{ $t('tasks.filters.tags_count', { count: selected.length }) }}
           </span>
         </template>
         <template #item-leading="{ item }">
@@ -102,7 +102,7 @@
 
       <div class="flex items-center gap-2 shrink-0">
         <UBadge v-if="activeCount" color="primary" variant="soft" size="sm">
-          {{ $t('gestion.tasks.filters.active_count', { count: activeCount }) }}
+          {{ $t('tasks.filters.active_count', { count: activeCount }) }}
         </UBadge>
         <UButton
           v-if="activeCount"
@@ -177,7 +177,7 @@ interface StatusItem {
 }
 const statusItems = computed<StatusItem[]>(() =>
   (['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED'] as TaskStatus[]).map((s) => ({
-    label: t(`gestion.tasks.status.${s}`),
+    label: t(`tasks.status.${s}`),
     value: s,
   }))
 )
@@ -232,12 +232,12 @@ const selectedTags = ref<TagSelectItem[]>(
 )
 
 const dueItems = computed(() => [
-  { label: t('gestion.tasks.filters.due.all'), value: 'all' as DueFilter },
-  { label: t('gestion.tasks.filters.due.overdue'), value: 'overdue' as DueFilter },
-  { label: t('gestion.tasks.filters.due.today'), value: 'today' as DueFilter },
-  { label: t('gestion.tasks.filters.due.next7'), value: 'next7' as DueFilter },
-  { label: t('gestion.tasks.filters.due.next30'), value: 'next30' as DueFilter },
-  { label: t('gestion.tasks.filters.due.none'), value: 'none' as DueFilter },
+  { label: t('tasks.filters.due.all'), value: 'all' as DueFilter },
+  { label: t('tasks.filters.due.overdue'), value: 'overdue' as DueFilter },
+  { label: t('tasks.filters.due.today'), value: 'today' as DueFilter },
+  { label: t('tasks.filters.due.next7'), value: 'next7' as DueFilter },
+  { label: t('tasks.filters.due.next30'), value: 'next30' as DueFilter },
+  { label: t('tasks.filters.due.none'), value: 'none' as DueFilter },
 ])
 const dueFilter = ref<DueFilter>(props.modelValue.due)
 

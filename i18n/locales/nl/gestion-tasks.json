@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Niet meer toewijsbaar",
+      "checklist": {
+        "add": "Toevoegen",
+        "add_placeholder": "Nieuw checklist-item...",
+        "confirm_delete": "Item «{title}» verwijderen?",
+        "empty": "Nog geen items in de checklist.",
+        "title": "Checklist"
+      },
+      "confirm_delete_group": "Groep „{name}\" en zijn {count} taak/taken verwijderen?",
+      "confirm_delete_group_simple": "Groep „{name}\" verwijderen?",
+      "confirm_delete_task": "Taak „{title}\" verwijderen?",
+      "edit_group": "Groep bewerken",
+      "edit_task": "Taak bewerken",
+      "empty_group": "Geen taken in deze groep",
+      "empty_state": "Nog geen taakgroepen",
+      "group_description": "Beschrijving",
+      "group_description_empty": "Geen beschrijving",
+      "group_description_placeholder": "Optionele beschrijving...",
+      "group_name": "Groepsnaam",
+      "group_name_placeholder": "Bijv.: Logistieke voorbereiding",
+      "group_not_found": "Deze groep bestaat niet of is verwijderd",
+      "legacy_assignees_warning": "Sommige toegewezen personen zijn niet langer organisatoren of geaccepteerde vrijwilligers. Vink ze uit als je ze niet meer wilt behouden.",
+      "move_to_group": "Verplaatsen naar groep",
+      "new_group": "Nieuwe groep",
+      "new_task": "Nieuwe taak",
+      "no_assignable_users": "Geen organisator of geaccepteerde vrijwilliger beschikbaar",
+      "tags": {
+        "confirm_delete": "Tag «{name}» verwijderen? Hij wordt uit alle taken van de groep verwijderd die hem dragen.",
+        "description": "Met tags kun je de taken van deze groep categoriseren (bv. dringend, materiaal, HR-validatie).",
+        "empty": "Geen tag gedefinieerd voor deze groep.",
+        "manage": "Tags beheren",
+        "modal_title": "Tags van de groep",
+        "name_placeholder": "Naam van de tag...",
+        "new_tag": "Nieuwe tag"
+      },
+      "task_assignees_placeholder": "Personen selecteren...",
+      "task_deadline": "Deadline",
+      "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Selecteer tags...",
+      "task_title": "Titel",
+      "task_title_placeholder": "Bijv.: Materiaal reserveren...",
+      "tasks_count": "{count} taak | {count} taken",
+      "view_kanban": "Kanban",
+      "view_list": "Lijst"
+    }
+  }
+}

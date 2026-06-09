@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Supprimer ce commentaire ?",
+      "edited": "modifié",
+      "empty": "Aucun commentaire pour le moment.",
+      "placeholder": "Ajouter un commentaire...",
+      "post": "Publier",
+      "title": "Commentaires"
+    },
+    "filters": {
+      "active_count": "{count} filtre actif | {count} filtres actifs",
+      "assignee_placeholder": "Assignés",
+      "assignees_count": "{count} assignés",
+      "due": {
+        "all": "Toutes les échéances",
+        "next30": "Dans 30 jours",
+        "next7": "Dans 7 jours",
+        "none": "Sans échéance",
+        "overdue": "En retard",
+        "today": "Aujourd'hui"
+      },
+      "no_match": "Aucune tâche ne correspond aux filtres",
+      "search_placeholder": "Rechercher une tâche...",
+      "status_placeholder": "Statut",
+      "statuses_count": "{count} statuts",
+      "tag_placeholder": "Tags",
+      "tags_count": "{count} tags"
+    },
+    "my_tasks": {
+      "description": "Les tâches qui vous sont assignées sur cette édition.",
+      "empty": "Aucune tâche ne vous est assignée pour cette édition.",
+      "no_group": "Sans groupe",
+      "with": "Avec",
+      "with_others": "Également assigné(s) : {names}"
+    },
+    "status": {
+      "CANCELLED": "Annulé",
+      "DONE": "Terminé",
+      "IN_PROGRESS": "En cours",
+      "TODO": "À faire"
+    },
+    "task_assignees": "Personnes assignées",
+    "task_description": "Description"
+  }
+}

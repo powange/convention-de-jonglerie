@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Видалити цей коментар?",
+      "edited": "відредаговано",
+      "empty": "Поки що немає коментарів.",
+      "placeholder": "Додати коментар...",
+      "post": "Опублікувати",
+      "title": "Коментарі"
+    },
+    "filters": {
+      "active_count": "{count} активний фільтр | {count} активних фільтрів",
+      "assignee_placeholder": "Призначені",
+      "assignees_count": "{count} призначених",
+      "due": {
+        "all": "Усі терміни",
+        "next30": "Протягом 30 днів",
+        "next7": "Протягом 7 днів",
+        "none": "Без терміну",
+        "overdue": "Прострочено",
+        "today": "Сьогодні"
+      },
+      "no_match": "Жодне завдання не відповідає фільтрам",
+      "search_placeholder": "Пошук завдання...",
+      "status_placeholder": "Статус",
+      "statuses_count": "{count} статусів",
+      "tag_placeholder": "Теги",
+      "tags_count": "{count} тегів"
+    },
+    "my_tasks": {
+      "description": "Завдання, призначені вам у цьому випуску.",
+      "empty": "Вам не призначено жодного завдання для цього випуску.",
+      "no_group": "Без групи",
+      "with": "З",
+      "with_others": "Також призначені: {names}"
+    },
+    "status": {
+      "CANCELLED": "Скасовано",
+      "DONE": "Виконано",
+      "IN_PROGRESS": "Виконується",
+      "TODO": "Зробити"
+    },
+    "task_assignees": "Призначені особи",
+    "task_description": "Опис"
+  }
+}

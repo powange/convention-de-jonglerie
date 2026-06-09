@@ -30,7 +30,7 @@ const { t } = useI18n()
 
 const markerTypes = computed(() =>
   EDITION_ZONE_TYPES.map((type) => ({
-    label: t(`gestion.map.types.${type.toLowerCase()}`),
+    label: t(`map.types.${type.toLowerCase()}`),
     value: type,
     icon: getZoneTypeIcon(type),
   }))
@@ -85,7 +85,7 @@ const handleClose = () => {
 }
 
 const modalTitle = computed(() =>
-  props.marker ? t('gestion.map.edit_marker') : t('gestion.map.add_marker')
+  props.marker ? t('map.edit_marker') : t('gestion.map.add_marker')
 )
 </script>
 

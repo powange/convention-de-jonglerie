@@ -319,7 +319,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         ...(edition.value?.siteMapEnabled
           ? [
               {
-                label: t('gestion.map.title'),
+                label: t('edition.site_map'),
                 icon: 'i-lucide-map',
                 to: `/editions/${editionId.value}/gestion/map`,
               },
@@ -549,10 +549,10 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   // Tâches
   if (edition.value?.tasksEnabled && canManageTasks.value) {
     managementSection.push({
-      label: t('gestion.tasks.title'),
+      label: t('edition.tasks'),
       icon: 'i-heroicons-clipboard-document-check',
       to: `/editions/${editionId.value}/gestion/tasks`,
-      tooltip: { content: t('gestion.tasks.title') },
+      tooltip: { content: t('edition.tasks') },
     })
   }
 

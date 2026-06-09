@@ -2,7 +2,7 @@
   <div class="space-y-2">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-        {{ $t('gestion.tasks.checklist.title') }}
+        {{ $t('gestion.task.checklist.title') }}
         <span v-if="localItems.length" class="text-xs text-gray-500 ml-2">
           {{ doneCount }} / {{ localItems.length }}
         </span>
@@ -68,13 +68,13 @@
       </li>
     </ul>
     <p v-else class="text-xs text-gray-500">
-      {{ $t('gestion.tasks.checklist.empty') }}
+      {{ $t('gestion.task.checklist.empty') }}
     </p>
 
     <div v-if="canEdit" class="flex items-center gap-2 pt-1">
       <UInput
         v-model="newItemTitle"
-        :placeholder="$t('gestion.tasks.checklist.add_placeholder')"
+        :placeholder="$t('gestion.task.checklist.add_placeholder')"
         size="sm"
         class="flex-1"
         @keydown.enter="addItem"
@@ -88,7 +88,7 @@
         :loading="adding"
         @click="addItem"
       >
-        {{ $t('gestion.tasks.checklist.add') }}
+        {{ $t('gestion.task.checklist.add') }}
       </UButton>
     </div>
   </div>
@@ -216,7 +216,7 @@ async function saveEdit(item: ChecklistItem) {
 }
 
 async function deleteItem(item: ChecklistItem) {
-  if (!confirm(t('gestion.tasks.checklist.confirm_delete', { title: item.title }))) return
+  if (!confirm(t('gestion.task.checklist.confirm_delete', { title: item.title }))) return
   deletingIds.value.add(item.id)
   try {
     await $fetch(

@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Добавить ориентир",
+      "add_zone": "Добавить зону",
+      "click_to_draw": "Нажмите на карту, чтобы нарисовать вершины многоугольника",
+      "custom_color": "Свой цвет",
+      "delete_confirm": "Вы уверены, что хотите удалить эту зону?",
+      "draw_polygon": "Нарисовать зону",
+      "map_public": "Сделать карту публичной",
+      "map_public_error": "Ошибка при обновлении",
+      "map_public_updated": "Видимость карты обновлена",
+      "marker_color": "Цвет",
+      "marker_delete_confirm": "Вы уверены, что хотите удалить этот ориентир?",
+      "marker_description": "Описание",
+      "marker_name": "Название ориентира",
+      "marker_types": "Тип(ы) ориентира",
+      "place_marker": "Разместить ориентир",
+      "popup_delete": "Удалить",
+      "popup_edit": "Редактировать",
+      "stop_drawing": "Отменить рисование",
+      "stop_placing": "Отменить размещение",
+      "zone_color": "Цвет",
+      "zone_description": "Описание",
+      "zone_name": "Название зоны",
+      "zone_types": "Тип(ы) зоны"
+    }
+  }
+}

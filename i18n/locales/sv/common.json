@@ -872,7 +872,10 @@
       "week_view": "Veckan",
       "what_you_can_bring_title": "Vad du kan göra för oss",
       "withdraw": "Återkalla min ansökan"
-    }
+    },
+    "my_tasks": "Mina uppgifter",
+    "tasks": "Uppgifter",
+    "site_map": "Områdeskarta"
   },
   "errors": {
     "access_denied": "Obehörig åtkomst",

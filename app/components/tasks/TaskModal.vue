@@ -1,33 +1,33 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="task ? $t('gestion.tasks.edit_task') : $t('gestion.tasks.new_task')"
+    :title="task ? $t('gestion.task.edit_task') : $t('gestion.task.new_task')"
     :ui="{ content: 'sm:max-w-2xl' }"
   >
     <template #body>
       <form class="space-y-4" @submit.prevent="handleSubmit">
-        <UFormField :label="$t('gestion.tasks.task_title')" required :error="fieldErrors.title">
+        <UFormField :label="$t('gestion.task.task_title')" required :error="fieldErrors.title">
           <UInput
             v-model="formData.title"
-            :placeholder="$t('gestion.tasks.task_title_placeholder')"
+            :placeholder="$t('gestion.task.task_title_placeholder')"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField :label="$t('gestion.tasks.task_status')" :error="fieldErrors.status">
+        <UFormField :label="$t('gestion.task.task_status')" :error="fieldErrors.status">
           <USelect v-model="formData.status" :items="statusItems" class="w-full" />
         </UFormField>
 
-        <UFormField :label="$t('gestion.tasks.task_deadline')" :error="fieldErrors.deadline">
+        <UFormField :label="$t('gestion.task.task_deadline')" :error="fieldErrors.deadline">
           <UiDateTimePicker v-model="formData.deadline" />
         </UFormField>
 
-        <UFormField :label="$t('gestion.tasks.task_assignees')" :error="fieldErrors.assigneeIds">
+        <UFormField :label="$t('tasks.task_assignees')" :error="fieldErrors.assigneeIds">
           <USelectMenu
             v-model="selectedAssignees"
             :items="userItems"
             multiple
-            :placeholder="$t('gestion.tasks.task_assignees_placeholder')"
+            :placeholder="$t('gestion.task.task_assignees_placeholder')"
             searchable
             :searchable-placeholder="$t('common.search')"
             class="w-full"
@@ -35,28 +35,28 @@
           >
             <template #item-trailing="{ item }">
               <UBadge v-if="item.isLegacy" color="warning" variant="soft" size="xs">
-                {{ $t('gestion.tasks.assignee_legacy_badge') }}
+                {{ $t('gestion.task.assignee_legacy_badge') }}
               </UBadge>
             </template>
           </USelectMenu>
           <p v-if="!assignableUsers.length" class="text-xs text-gray-500 mt-1">
-            {{ $t('gestion.tasks.no_assignable_users') }}
+            {{ $t('gestion.task.no_assignable_users') }}
           </p>
           <p v-if="hasLegacyAssignees" class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-            {{ $t('gestion.tasks.legacy_assignees_warning') }}
+            {{ $t('gestion.task.legacy_assignees_warning') }}
           </p>
         </UFormField>
 
         <UFormField
           v-if="tagItems.length"
-          :label="$t('gestion.tasks.task_tags')"
+          :label="$t('gestion.task.task_tags')"
           :error="fieldErrors.tagIds"
         >
           <USelectMenu
             v-model="selectedTags"
             :items="tagItems"
             multiple
-            :placeholder="$t('gestion.tasks.task_tags_placeholder')"
+            :placeholder="$t('gestion.task.task_tags_placeholder')"
             searchable
             :searchable-placeholder="$t('common.search')"
             class="w-full"
@@ -64,7 +64,7 @@
           >
             <template #default="{ modelValue: selected }">
               <span v-if="!selected?.length" class="text-gray-400">
-                {{ $t('gestion.tasks.task_tags_placeholder') }}
+                {{ $t('gestion.task.task_tags_placeholder') }}
               </span>
               <div v-else class="flex flex-wrap gap-1">
                 <TasksTaskTagBadge
@@ -80,13 +80,13 @@
           </USelectMenu>
         </UFormField>
 
-        <UFormField :label="$t('gestion.tasks.task_description')" :error="fieldErrors.description">
+        <UFormField :label="$t('tasks.task_description')" :error="fieldErrors.description">
           <MarkdownEditor v-model="formData.description" class="min-h-40" />
         </UFormField>
 
         <UFormField
           v-if="task && taskGroups.length > 1"
-          :label="$t('gestion.tasks.move_to_group')"
+          :label="$t('gestion.task.move_to_group')"
           :error="fieldErrors.taskGroupId"
         >
           <USelect
@@ -217,7 +217,7 @@ const taskGroups = computed(() => props.taskGroups || (props.group ? [props.grou
 
 const statusItems = computed(() =>
   (['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED'] as TaskStatus[]).map((s) => ({
-    label: t(`gestion.tasks.status.${s}`),
+    label: t(`tasks.status.${s}`),
     value: s,
   }))
 )
@@ -361,7 +361,7 @@ async function handleSubmit() {
 
 async function handleDelete() {
   if (!props.task) return
-  if (!confirm(t('gestion.tasks.confirm_delete_task', { title: props.task.title }))) return
+  if (!confirm(t('gestion.task.confirm_delete_task', { title: props.task.title }))) return
   deleting.value = true
   try {
     await $fetch(`/api/editions/${props.editionId}/tasks/${props.task.id}`, { method: 'DELETE' })

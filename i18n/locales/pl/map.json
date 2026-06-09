@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Brak zdefiniowanych stref lub punktów orientacyjnych",
+    "popup_navigate": "Wyznacz trasę",
+    "zones_list": "Strefy i punkty orientacyjne",
+    "delete_marker": "Usuń punkt orientacyjny",
+    "delete_zone": "Usuń strefę",
+    "edit_marker": "Edytuj punkt orientacyjny",
+    "edit_zone": "Edytuj strefę",
+    "hide_item": "Ukryj na mapie",
+    "open_in_maps": "Otwórz w aplikacji nawigacyjnej",
+    "show_item": "Pokaż na mapie",
+    "delete_success": "Strefa usunięta pomyślnie",
+    "save_success": "Strefa zapisana pomyślnie",
+    "marker_delete_success": "Punkt orientacyjny usunięty pomyślnie",
+    "marker_save_success": "Punkt orientacyjny zapisany pomyślnie",
+    "types": {
+      "accessibility": "Dostępność",
+      "aerial": "Strefa akrobatyki / Trapez",
+      "atm": "Bankomat",
+      "bar": "Bar",
+      "chill_space": "Strefa relaksu",
+      "entrance": "Wejście",
+      "fire_space": "Strefa ognia",
+      "food": "Gastronomia",
+      "forbidden": "Strefa zakazana",
+      "gym": "Sala gimnastyczna / Hala",
+      "info": "Informacja",
+      "kids_zone": "Strefa dla dzieci",
+      "market": "Targ",
+      "other": "Inne",
+      "parking": "Parking",
+      "shower": "Prysznice",
+      "shows": "Występy",
+      "tent_camping": "Kemping namiotowy",
+      "toilets": "Toalety",
+      "truck_camping": "Kemping kamperowy",
+      "workshops": "Warsztaty"
+    }
+  }
+}

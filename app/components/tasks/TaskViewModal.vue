@@ -4,7 +4,7 @@
       <div v-if="task" class="space-y-4">
         <div class="flex flex-wrap items-center gap-2">
           <UBadge :color="statusColor(task.status)" variant="soft" size="md">
-            {{ $t(`gestion.tasks.status.${task.status}`) }}
+            {{ $t(`tasks.status.${task.status}`) }}
           </UBadge>
           <UBadge
             v-if="task.group"
@@ -28,7 +28,7 @@
 
         <div v-if="task.assignments.length">
           <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ $t('gestion.tasks.task_assignees') }}
+            {{ $t('tasks.task_assignees') }}
           </h3>
           <div class="flex flex-wrap gap-2">
             <div
@@ -44,7 +44,7 @@
 
         <div v-if="task.description">
           <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ $t('gestion.tasks.task_description') }}
+            {{ $t('tasks.task_description') }}
           </h3>
           <!-- eslint-disable-next-line vue/no-v-html -->
           <div class="prose prose-sm dark:prose-invert max-w-none" v-html="renderedDescription" />

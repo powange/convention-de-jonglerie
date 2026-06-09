@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "No longer assignable",
+      "checklist": {
+        "add": "Add",
+        "add_placeholder": "New checklist item...",
+        "confirm_delete": "Delete item «{title}»?",
+        "empty": "No item in the checklist yet.",
+        "title": "Checklist"
+      },
+      "confirm_delete_group": "Delete the group \"{name}\" and its {count} task(s)?",
+      "confirm_delete_group_simple": "Delete the group \"{name}\"?",
+      "confirm_delete_task": "Delete the task \"{title}\"?",
+      "edit_group": "Edit group",
+      "edit_task": "Edit task",
+      "empty_group": "No tasks in this group",
+      "empty_state": "No task groups yet",
+      "group_description": "Description",
+      "group_description_empty": "No description",
+      "group_description_placeholder": "Optional description...",
+      "group_name": "Group name",
+      "group_name_placeholder": "E.g.: Logistics preparation",
+      "group_not_found": "This group does not exist or has been deleted",
+      "legacy_assignees_warning": "Some assignees are no longer organizers or accepted volunteers. Uncheck them if you no longer wish to keep them.",
+      "move_to_group": "Move to group",
+      "new_group": "New group",
+      "new_task": "New task",
+      "no_assignable_users": "No organizer or accepted volunteer available",
+      "tags": {
+        "confirm_delete": "Delete the tag «{name}»? It will be removed from all tasks of the group that carry it.",
+        "description": "Tags categorize the tasks of this group (e.g. urgent, equipment, HR review).",
+        "empty": "No tag defined for this group.",
+        "manage": "Manage tags",
+        "modal_title": "Group tags",
+        "name_placeholder": "Tag name...",
+        "new_tag": "New tag"
+      },
+      "task_assignees_placeholder": "Select people...",
+      "task_deadline": "Deadline",
+      "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Select tags...",
+      "task_title": "Title",
+      "task_title_placeholder": "E.g.: Book the equipment...",
+      "tasks_count": "{count} task | {count} tasks",
+      "view_kanban": "Kanban",
+      "view_list": "List"
+    }
+  }
+}

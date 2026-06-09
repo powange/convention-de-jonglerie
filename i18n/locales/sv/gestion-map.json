@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Lägg till landmärke",
+      "add_zone": "Lägg till zon",
+      "click_to_draw": "Klicka på kartan för att rita polygonens hörn",
+      "custom_color": "Anpassad färg",
+      "delete_confirm": "Är du säker på att du vill ta bort denna zon?",
+      "draw_polygon": "Rita en zon",
+      "map_public": "Gör kartan offentlig",
+      "map_public_error": "Fel vid uppdatering",
+      "map_public_updated": "Kartans synlighet uppdaterad",
+      "marker_color": "Färg",
+      "marker_delete_confirm": "Är du säker på att du vill ta bort detta landmärke?",
+      "marker_description": "Beskrivning",
+      "marker_name": "Landmärkets namn",
+      "marker_types": "Landmärkestyp(er)",
+      "place_marker": "Placera ett landmärke",
+      "popup_delete": "Ta bort",
+      "popup_edit": "Redigera",
+      "stop_drawing": "Avbryt ritning",
+      "stop_placing": "Avbryt placering",
+      "zone_color": "Färg",
+      "zone_description": "Beskrivning",
+      "zone_name": "Zonnamn",
+      "zone_types": "Zontyp(er)"
+    }
+  }
+}

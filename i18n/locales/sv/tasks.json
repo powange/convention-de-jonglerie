@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Ta bort denna kommentar?",
+      "edited": "redigerad",
+      "empty": "Inga kommentarer ännu.",
+      "placeholder": "Lägg till en kommentar...",
+      "post": "Publicera",
+      "title": "Kommentarer"
+    },
+    "filters": {
+      "active_count": "{count} aktivt filter | {count} aktiva filter",
+      "assignee_placeholder": "Tilldelade",
+      "assignees_count": "{count} tilldelade",
+      "due": {
+        "all": "Alla deadlines",
+        "next30": "Inom 30 dagar",
+        "next7": "Inom 7 dagar",
+        "none": "Ingen deadline",
+        "overdue": "Försenade",
+        "today": "Idag"
+      },
+      "no_match": "Ingen uppgift matchar filtren",
+      "search_placeholder": "Sök en uppgift...",
+      "status_placeholder": "Status",
+      "statuses_count": "{count} statusar",
+      "tag_placeholder": "Taggar",
+      "tags_count": "{count} taggar"
+    },
+    "my_tasks": {
+      "description": "Uppgifterna som tilldelats dig för denna utgåva.",
+      "empty": "Ingen uppgift är tilldelad dig för denna utgåva.",
+      "no_group": "Ingen grupp",
+      "with": "Med",
+      "with_others": "Också tilldelade: {names}"
+    },
+    "status": {
+      "CANCELLED": "Avbruten",
+      "DONE": "Klar",
+      "IN_PROGRESS": "Pågår",
+      "TODO": "Att göra"
+    },
+    "task_assignees": "Tilldelade personer",
+    "task_description": "Beskrivning"
+  }
+}

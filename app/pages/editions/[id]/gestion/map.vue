@@ -31,7 +31,7 @@
       <!-- En-tête -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold">{{ $t('gestion.map.title') }}</h1>
+          <h1 class="text-2xl font-bold">{{ $t('edition.site_map') }}</h1>
           <p class="text-sm text-gray-500 dark:text-gray-400">
             {{ $t('gestion.map.click_to_draw') }}
           </p>
@@ -102,7 +102,7 @@
             <template #header>
               <div class="flex items-center gap-2">
                 <UIcon name="i-lucide-layers" class="h-5 w-5" />
-                <h2 class="font-semibold">{{ $t('gestion.map.zones_list') }}</h2>
+                <h2 class="font-semibold">{{ $t('map.zones_list') }}</h2>
               </div>
             </template>
 
@@ -322,9 +322,9 @@ const {
   }).value,
   zoom: edition.value?.latitude ? 15 : 6,
   editable: true,
-  typeLabel: (type: string) => t(`gestion.map.types.${type.toLowerCase()}`),
+  typeLabel: (type: string) => t(`map.types.${type.toLowerCase()}`),
   popupLabels: {
-    navigate: t('gestion.map.popup_navigate'),
+    navigate: t('map.popup_navigate'),
     edit: t('gestion.map.popup_edit'),
     delete: t('gestion.map.popup_delete'),
   },

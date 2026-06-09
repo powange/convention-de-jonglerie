@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Додати орієнтир",
+      "add_zone": "Додати зону",
+      "click_to_draw": "Клацніть на карту, щоб намалювати вершини багатокутника",
+      "custom_color": "Власний колір",
+      "delete_confirm": "Ви впевнені, що хочете видалити цю зону?",
+      "draw_polygon": "Намалювати зону",
+      "map_public": "Зробити карту публічною",
+      "map_public_error": "Помилка під час оновлення",
+      "map_public_updated": "Видимість карти оновлено",
+      "marker_color": "Колір",
+      "marker_delete_confirm": "Ви впевнені, що хочете видалити цей орієнтир?",
+      "marker_description": "Опис",
+      "marker_name": "Назва орієнтира",
+      "marker_types": "Тип(и) орієнтира",
+      "place_marker": "Розмістити орієнтир",
+      "popup_delete": "Видалити",
+      "popup_edit": "Редагувати",
+      "stop_drawing": "Скасувати малювання",
+      "stop_placing": "Скасувати розміщення",
+      "zone_color": "Колір",
+      "zone_description": "Опис",
+      "zone_name": "Назва зони",
+      "zone_types": "Тип(и) зони"
+    }
+  }
+}

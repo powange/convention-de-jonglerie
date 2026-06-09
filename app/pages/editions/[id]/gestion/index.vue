@@ -102,7 +102,7 @@
                 v-if="edition.siteMapEnabled"
                 :to="`/editions/${edition.id}/gestion/map`"
                 icon="i-lucide-map"
-                :title="$t('gestion.map.title')"
+                :title="$t('edition.site_map')"
                 :description="$t('gestion.infos.map_description')"
                 color="blue"
               />
@@ -470,15 +470,15 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.tasks.title') }}</h2>
+              <h2 class="text-lg font-semibold">{{ $t('edition.tasks') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/tasks`"
                 icon="i-heroicons-clipboard-document-check"
-                :title="$t('gestion.tasks.manage_title')"
-                :description="$t('gestion.tasks.manage_description')"
+                :title="$t('gestion.task.manage_title')"
+                :description="$t('gestion.task.manage_description')"
                 color="rose"
               />
             </div>

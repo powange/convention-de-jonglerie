@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Oriëntatiepunt toevoegen",
+      "add_zone": "Zone toevoegen",
+      "click_to_draw": "Klik op de kaart om de hoekpunten van de polygoon te tekenen",
+      "custom_color": "Aangepaste kleur",
+      "delete_confirm": "Weet u zeker dat u deze zone wilt verwijderen?",
+      "draw_polygon": "Een zone tekenen",
+      "map_public": "Kaart openbaar maken",
+      "map_public_error": "Fout bij bijwerken",
+      "map_public_updated": "Zichtbaarheid van de kaart bijgewerkt",
+      "marker_color": "Kleur",
+      "marker_delete_confirm": "Weet u zeker dat u dit oriëntatiepunt wilt verwijderen?",
+      "marker_description": "Beschrijving",
+      "marker_name": "Naam van het oriëntatiepunt",
+      "marker_types": "Type(n) oriëntatiepunt",
+      "place_marker": "Een oriëntatiepunt plaatsen",
+      "popup_delete": "Verwijderen",
+      "popup_edit": "Bewerken",
+      "stop_drawing": "Tekenen annuleren",
+      "stop_placing": "Plaatsing annuleren",
+      "zone_color": "Kleur",
+      "zone_description": "Beschrijving",
+      "zone_name": "Zonenaam",
+      "zone_types": "Zonetype(n)"
+    }
+  }
+}

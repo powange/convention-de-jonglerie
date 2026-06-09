@@ -872,7 +872,10 @@
       "week_view": "Week",
       "what_you_can_bring_title": "What you can bring to us",
       "withdraw": "Withdraw my application"
-    }
+    },
+    "my_tasks": "My tasks",
+    "tasks": "Tasks",
+    "site_map": "Site map"
   },
   "errors": {
     "access_denied": "Access denied",

@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "No hay zonas ni puntos de referencia definidos",
+    "popup_navigate": "Cómo llegar",
+    "zones_list": "Zonas y puntos de referencia",
+    "delete_marker": "Eliminar punto de referencia",
+    "delete_zone": "Eliminar zona",
+    "edit_marker": "Editar punto de referencia",
+    "edit_zone": "Editar zona",
+    "hide_item": "Ocultar en el mapa",
+    "open_in_maps": "Abrir en la aplicación de navegación",
+    "show_item": "Mostrar en el mapa",
+    "delete_success": "Zona eliminada con éxito",
+    "save_success": "Zona guardada con éxito",
+    "marker_delete_success": "Punto de referencia eliminado con éxito",
+    "marker_save_success": "Punto de referencia guardado con éxito",
+    "types": {
+      "accessibility": "Accesibilidad PMR",
+      "aerial": "Espacio aéreo / Trapecio",
+      "atm": "Cajero",
+      "bar": "Bar",
+      "chill_space": "Zona chill",
+      "entrance": "Entrada",
+      "fire_space": "Espacio fuego",
+      "food": "Restauración",
+      "forbidden": "Zona prohibida",
+      "gym": "Gimnasio / Sala",
+      "info": "Información",
+      "kids_zone": "Zona infantil",
+      "market": "Mercado",
+      "other": "Otro",
+      "parking": "Aparcamiento",
+      "shower": "Duchas",
+      "shows": "Espectáculos",
+      "tent_camping": "Camping tienda",
+      "toilets": "Aseos",
+      "truck_camping": "Camping autocaravana",
+      "workshops": "Talleres"
+    }
+  }
+}

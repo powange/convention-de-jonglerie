@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Nessuna zona o punto di riferimento definito",
+    "popup_navigate": "Indicazioni",
+    "zones_list": "Zone e punti di riferimento",
+    "delete_marker": "Elimina punto di riferimento",
+    "delete_zone": "Elimina zona",
+    "edit_marker": "Modifica punto di riferimento",
+    "edit_zone": "Modifica zona",
+    "hide_item": "Nascondi sulla mappa",
+    "open_in_maps": "Apri nell'app di navigazione",
+    "show_item": "Mostra sulla mappa",
+    "delete_success": "Zona eliminata con successo",
+    "save_success": "Zona salvata con successo",
+    "marker_delete_success": "Punto di riferimento eliminato con successo",
+    "marker_save_success": "Punto di riferimento salvato con successo",
+    "types": {
+      "accessibility": "Accessibilità PMR",
+      "aerial": "Spazio aereo / Trapezio",
+      "atm": "Bancomat",
+      "bar": "Bar",
+      "chill_space": "Zona relax",
+      "entrance": "Ingresso",
+      "fire_space": "Spazio fuoco",
+      "food": "Ristorazione",
+      "forbidden": "Zona vietata",
+      "gym": "Palestra / Sala",
+      "info": "Informazioni",
+      "kids_zone": "Zona bambini",
+      "market": "Mercato",
+      "other": "Altro",
+      "parking": "Parcheggio",
+      "shower": "Docce",
+      "shows": "Spettacoli",
+      "tent_camping": "Camping tenda",
+      "toilets": "Servizi igienici",
+      "truck_camping": "Camping camper",
+      "workshops": "Laboratori"
+    }
+  }
+}

@@ -872,7 +872,10 @@
       "week_view": "Week",
       "what_you_can_bring_title": "Wat u ons kunt brengen",
       "withdraw": "Trek mijn aanmelding in"
-    }
+    },
+    "my_tasks": "Mijn taken",
+    "tasks": "Taken",
+    "site_map": "Plattegrond"
   },
   "errors": {
     "access_denied": "Toegang geweigerd",

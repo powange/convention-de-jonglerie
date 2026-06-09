@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Smazat tento komentář?",
+      "edited": "upraveno",
+      "empty": "Zatím žádné komentáře.",
+      "placeholder": "Přidat komentář...",
+      "post": "Zveřejnit",
+      "title": "Komentáře"
+    },
+    "filters": {
+      "active_count": "{count} aktivní filtr | {count} aktivních filtrů",
+      "assignee_placeholder": "Přiřazení",
+      "assignees_count": "{count} přiřazených",
+      "due": {
+        "all": "Všechny termíny",
+        "next30": "Do 30 dnů",
+        "next7": "Do 7 dnů",
+        "none": "Bez termínu",
+        "overdue": "Zpožděno",
+        "today": "Dnes"
+      },
+      "no_match": "Žádný úkol neodpovídá filtrům",
+      "search_placeholder": "Vyhledat úkol...",
+      "status_placeholder": "Stav",
+      "statuses_count": "{count} stavů",
+      "tag_placeholder": "Štítky",
+      "tags_count": "{count} štítků"
+    },
+    "my_tasks": {
+      "description": "Úkoly, které vám byly přiřazeny v této edici.",
+      "empty": "V této edici vám není přiřazen žádný úkol.",
+      "no_group": "Bez skupiny",
+      "with": "S",
+      "with_others": "Také přiřazeni: {names}"
+    },
+    "status": {
+      "CANCELLED": "Zrušeno",
+      "DONE": "Hotovo",
+      "IN_PROGRESS": "Probíhá",
+      "TODO": "K vyřízení"
+    },
+    "task_assignees": "Přiřazené osoby",
+    "task_description": "Popis"
+  }
+}

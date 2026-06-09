@@ -1,13 +1,13 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="$t('gestion.tasks.tags.modal_title')"
+    :title="$t('gestion.task.tags.modal_title')"
     :ui="{ content: 'sm:max-w-xl' }"
   >
     <template #body>
       <div class="space-y-3">
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('gestion.tasks.tags.description') }}
+          {{ $t('gestion.task.tags.description') }}
         </p>
 
         <!-- Liste des tags existants -->
@@ -75,16 +75,16 @@
           </li>
         </ul>
         <p v-else class="text-sm text-gray-500 italic">
-          {{ $t('gestion.tasks.tags.empty') }}
+          {{ $t('gestion.task.tags.empty') }}
         </p>
 
         <!-- Création d'un nouveau tag -->
         <div class="pt-3 border-t border-gray-200 dark:border-gray-800 space-y-2">
-          <h4 class="text-sm font-medium">{{ $t('gestion.tasks.tags.new_tag') }}</h4>
+          <h4 class="text-sm font-medium">{{ $t('gestion.task.tags.new_tag') }}</h4>
           <div class="flex items-center gap-2">
             <UInput
               v-model="newTagName"
-              :placeholder="$t('gestion.tasks.tags.name_placeholder')"
+              :placeholder="$t('gestion.task.tags.name_placeholder')"
               size="sm"
               class="flex-1"
               @keydown.enter="addTag"
@@ -241,7 +241,7 @@ async function saveEdit(tag: TagItem) {
 }
 
 async function deleteTag(tag: TagItem) {
-  if (!confirm(t('gestion.tasks.tags.confirm_delete', { name: tag.name }))) return
+  if (!confirm(t('gestion.task.tags.confirm_delete', { name: tag.name }))) return
   deletingIds.value.add(tag.id)
   try {
     await $fetch(`/api/editions/${props.editionId}/task-groups/${props.groupId}/tags/${tag.id}`, {

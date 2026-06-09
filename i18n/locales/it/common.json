@@ -872,7 +872,10 @@
       "week_view": "Settimana",
       "what_you_can_bring_title": "Cosa può portarci",
       "withdraw": "Ritira la mia candidatura"
-    }
+    },
+    "my_tasks": "Le mie attività",
+    "tasks": "Attività",
+    "site_map": "Mappa del sito"
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",

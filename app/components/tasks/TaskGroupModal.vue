@@ -1,21 +1,21 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="group ? $t('gestion.tasks.edit_group') : $t('gestion.tasks.new_group')"
+    :title="group ? $t('gestion.task.edit_group') : $t('gestion.task.new_group')"
   >
     <template #body>
       <form class="space-y-4" @submit.prevent="handleSubmit">
-        <UFormField :label="$t('gestion.tasks.group_name')" required :error="fieldErrors.name">
+        <UFormField :label="$t('gestion.task.group_name')" required :error="fieldErrors.name">
           <UInput
             v-model="formData.name"
-            :placeholder="$t('gestion.tasks.group_name_placeholder')"
+            :placeholder="$t('gestion.task.group_name_placeholder')"
             class="w-full"
           />
         </UFormField>
-        <UFormField :label="$t('gestion.tasks.group_description')" :error="fieldErrors.description">
+        <UFormField :label="$t('gestion.task.group_description')" :error="fieldErrors.description">
           <UTextarea
             v-model="formData.description"
-            :placeholder="$t('gestion.tasks.group_description_placeholder')"
+            :placeholder="$t('gestion.task.group_description_placeholder')"
             :rows="3"
             class="w-full"
           />
@@ -148,7 +148,7 @@ async function handleSubmit() {
 
 async function handleDelete() {
   if (!props.group) return
-  if (!confirm(t('gestion.tasks.confirm_delete_group_simple', { name: props.group.name }))) return
+  if (!confirm(t('gestion.task.confirm_delete_group_simple', { name: props.group.name }))) return
   deleting.value = true
   try {
     await $fetch(`/api/editions/${props.editionId}/task-groups/${props.group.id}`, {

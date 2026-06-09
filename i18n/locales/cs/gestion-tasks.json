@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Již nelze přiřadit",
+      "checklist": {
+        "add": "Přidat",
+        "add_placeholder": "Nová položka checklistu...",
+        "confirm_delete": "Odstranit položku «{title}»?",
+        "empty": "V checklistu zatím nejsou žádné položky.",
+        "title": "Checklist"
+      },
+      "confirm_delete_group": "Smazat skupinu „{name}\" a jejích {count} úkol(ů)?",
+      "confirm_delete_group_simple": "Smazat skupinu „{name}\"?",
+      "confirm_delete_task": "Smazat úkol „{title}\"?",
+      "edit_group": "Upravit skupinu",
+      "edit_task": "Upravit úkol",
+      "empty_group": "V této skupině nejsou žádné úkoly",
+      "empty_state": "Zatím žádné skupiny úkolů",
+      "group_description": "Popis",
+      "group_description_empty": "Bez popisu",
+      "group_description_placeholder": "Volitelný popis...",
+      "group_name": "Název skupiny",
+      "group_name_placeholder": "Např.: Logistická příprava",
+      "group_not_found": "Tato skupina neexistuje nebo byla smazána",
+      "legacy_assignees_warning": "Někteří přiřazení uživatelé již nejsou organizátory ani přijatými dobrovolníky. Pokud je nechcete zachovat, zrušte jejich výběr.",
+      "move_to_group": "Přesunout do skupiny",
+      "new_group": "Nová skupina",
+      "new_task": "Nový úkol",
+      "no_assignable_users": "Žádný organizátor ani přijatý dobrovolník není k dispozici",
+      "tags": {
+        "confirm_delete": "Odstranit štítek «{name}»? Bude odebrán ze všech úkolů skupiny, které ho mají.",
+        "description": "Štítky umožňují kategorizovat úkoly této skupiny (např. urgentní, materiál, schválit HR).",
+        "empty": "Pro tuto skupinu není definován žádný štítek.",
+        "manage": "Spravovat štítky",
+        "modal_title": "Štítky skupiny",
+        "name_placeholder": "Název štítku...",
+        "new_tag": "Nový štítek"
+      },
+      "task_assignees_placeholder": "Vyberte osoby...",
+      "task_deadline": "Termín",
+      "task_status": "Stav",
+      "task_tags": "Štítky",
+      "task_tags_placeholder": "Vybrat štítky...",
+      "task_title": "Název",
+      "task_title_placeholder": "Např.: Rezervovat vybavení...",
+      "tasks_count": "{count} úkol | {count} úkoly | {count} úkolů",
+      "view_kanban": "Kanban",
+      "view_list": "Seznam"
+    }
+  }
+}

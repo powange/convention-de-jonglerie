@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Kan ikke længere tildeles",
+      "checklist": {
+        "add": "Tilføj",
+        "add_placeholder": "Nyt punkt på tjeklisten...",
+        "confirm_delete": "Slet punktet «{title}»?",
+        "empty": "Ingen punkter på tjeklisten endnu.",
+        "title": "Tjekliste"
+      },
+      "confirm_delete_group": "Slet gruppen „{name}\" og dens {count} opgave(r)?",
+      "confirm_delete_group_simple": "Slet gruppen „{name}\"?",
+      "confirm_delete_task": "Slet opgaven „{title}\"?",
+      "edit_group": "Rediger gruppe",
+      "edit_task": "Rediger opgave",
+      "empty_group": "Ingen opgaver i denne gruppe",
+      "empty_state": "Ingen opgavegrupper endnu",
+      "group_description": "Beskrivelse",
+      "group_description_empty": "Ingen beskrivelse",
+      "group_description_placeholder": "Valgfri beskrivelse...",
+      "group_name": "Gruppenavn",
+      "group_name_placeholder": "F.eks.: Logistisk forberedelse",
+      "group_not_found": "Denne gruppe findes ikke eller er blevet slettet",
+      "legacy_assignees_warning": "Nogle tildelte er ikke længere arrangører eller accepterede frivillige. Fravælg dem, hvis du ikke længere ønsker at beholde dem.",
+      "move_to_group": "Flyt til gruppe",
+      "new_group": "Ny gruppe",
+      "new_task": "Ny opgave",
+      "no_assignable_users": "Ingen arrangør eller accepteret frivillig er tilgængelig",
+      "tags": {
+        "confirm_delete": "Slette tagget «{name}»? Det fjernes fra alle opgaver i gruppen, der bærer det.",
+        "description": "Tags gør det muligt at kategorisere opgaverne i denne gruppe (f.eks. haster, materiel, HR-godkendelse).",
+        "empty": "Intet tag defineret for denne gruppe.",
+        "manage": "Administrér tags",
+        "modal_title": "Gruppens tags",
+        "name_placeholder": "Tag-navn...",
+        "new_tag": "Nyt tag"
+      },
+      "task_assignees_placeholder": "Vælg personer...",
+      "task_deadline": "Frist",
+      "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Vælg tags...",
+      "task_title": "Titel",
+      "task_title_placeholder": "F.eks.: Reserver materiale...",
+      "tasks_count": "{count} opgave | {count} opgaver",
+      "view_kanban": "Kanban",
+      "view_list": "Liste"
+    }
+  }
+}

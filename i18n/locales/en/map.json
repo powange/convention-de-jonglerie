@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "No zones or landmarks defined",
+    "popup_navigate": "Directions",
+    "zones_list": "Zones and landmarks",
+    "delete_marker": "Delete landmark",
+    "delete_zone": "Delete zone",
+    "edit_marker": "Edit landmark",
+    "edit_zone": "Edit zone",
+    "hide_item": "Hide on map",
+    "open_in_maps": "Open in navigation app",
+    "show_item": "Show on map",
+    "delete_success": "Zone deleted successfully",
+    "save_success": "Zone saved successfully",
+    "marker_delete_success": "Landmark deleted successfully",
+    "marker_save_success": "Landmark saved successfully",
+    "types": {
+      "accessibility": "Accessibility",
+      "aerial": "Aerial / Trapeze area",
+      "atm": "ATM",
+      "bar": "Bar",
+      "chill_space": "Chill area",
+      "entrance": "Entrance",
+      "fire_space": "Fire area",
+      "food": "Food",
+      "forbidden": "Restricted area",
+      "gym": "Gymnasium / Hall",
+      "info": "Information",
+      "kids_zone": "Kids zone",
+      "market": "Market",
+      "other": "Other",
+      "parking": "Parking",
+      "shower": "Showers",
+      "shows": "Shows",
+      "tent_camping": "Tent camping",
+      "toilets": "Toilets",
+      "truck_camping": "Camper van camping",
+      "workshops": "Workshops"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Geen zones of oriëntatiepunten gedefinieerd",
+    "popup_navigate": "Routebeschrijving",
+    "zones_list": "Zones en oriëntatiepunten",
+    "delete_marker": "Oriëntatiepunt verwijderen",
+    "delete_zone": "Zone verwijderen",
+    "edit_marker": "Oriëntatiepunt bewerken",
+    "edit_zone": "Zone bewerken",
+    "hide_item": "Verbergen op de kaart",
+    "open_in_maps": "Openen in navigatie-app",
+    "show_item": "Tonen op de kaart",
+    "delete_success": "Zone succesvol verwijderd",
+    "save_success": "Zone succesvol opgeslagen",
+    "marker_delete_success": "Oriëntatiepunt succesvol verwijderd",
+    "marker_save_success": "Oriëntatiepunt succesvol opgeslagen",
+    "types": {
+      "accessibility": "Toegankelijkheid",
+      "aerial": "Luchtacrobatiek / Trapeze",
+      "atm": "Geldautomaat",
+      "bar": "Bar",
+      "chill_space": "Chillruimte",
+      "entrance": "Ingang",
+      "fire_space": "Vuurplek",
+      "food": "Horeca",
+      "forbidden": "Verboden zone",
+      "gym": "Sporthal / Zaal",
+      "info": "Informatie",
+      "kids_zone": "Kinderzone",
+      "market": "Markt",
+      "other": "Overig",
+      "parking": "Parkeren",
+      "shower": "Douches",
+      "shows": "Voorstellingen",
+      "tent_camping": "Tentencamping",
+      "toilets": "Toiletten",
+      "truck_camping": "Camper camping",
+      "workshops": "Workshops"
+    }
+  }
+}

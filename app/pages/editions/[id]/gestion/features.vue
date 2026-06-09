@@ -155,7 +155,7 @@
               <UIcon name="i-lucide-map" class="text-blue-500 size-5" />
               <div>
                 <h3 class="font-medium text-gray-900 dark:text-white">
-                  {{ $t('gestion.map.title') }}
+                  {{ $t('edition.site_map') }}
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.features.site_map_description') }}
@@ -179,7 +179,7 @@
               <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500 size-5" />
               <div>
                 <h3 class="font-medium text-gray-900 dark:text-white">
-                  {{ $t('gestion.tasks.title') }}
+                  {{ $t('edition.tasks') }}
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('gestion.features.tasks_description') }}

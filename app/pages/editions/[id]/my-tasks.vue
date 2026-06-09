@@ -13,10 +13,10 @@
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <UIcon name="i-heroicons-clipboard-document-check" class="text-primary-500" />
-            {{ $t('gestion.tasks.my_tasks.title') }}
+            {{ $t('edition.my_tasks') }}
           </h1>
           <p class="text-gray-600 dark:text-gray-400 mt-1">
-            {{ $t('gestion.tasks.my_tasks.description') }}
+            {{ $t('tasks.my_tasks.description') }}
           </p>
         </div>
 
@@ -30,7 +30,7 @@
         >
           <UIcon name="i-heroicons-inbox" class="size-12 text-gray-400 mx-auto mb-3" />
           <p class="text-gray-600 dark:text-gray-400 text-sm">
-            {{ $t('gestion.tasks.my_tasks.empty') }}
+            {{ $t('tasks.my_tasks.empty') }}
           </p>
         </div>
 
@@ -49,7 +49,7 @@
           >
             <UIcon name="i-heroicons-funnel" class="size-8 text-gray-400 mx-auto mb-2" />
             <p class="text-gray-600 dark:text-gray-400 text-sm">
-              {{ $t('gestion.tasks.filters.no_match') }}
+              {{ $t('tasks.filters.no_match') }}
             </p>
           </div>
 
@@ -74,7 +74,7 @@
                       size="md"
                       class="mt-0.5"
                     >
-                      {{ $t(`gestion.tasks.status.${task.status}`) }}
+                      {{ $t(`tasks.status.${task.status}`) }}
                     </UBadge>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-sm truncate">{{ task.title }}</div>
@@ -100,7 +100,7 @@
                       v-if="otherAssignees(task).length"
                       class="flex items-center gap-1 shrink-0"
                       :title="
-                        $t('gestion.tasks.my_tasks.with_others', {
+                        $t('tasks.my_tasks.with_others', {
                           names: otherAssignees(task)
                             .map((a) => a.user.pseudo)
                             .join(', '),
@@ -108,7 +108,7 @@
                       "
                     >
                       <span class="text-xs text-gray-500 hidden sm:inline">
-                        {{ $t('gestion.tasks.my_tasks.with') }}
+                        {{ $t('tasks.my_tasks.with') }}
                       </span>
                       <div class="flex -space-x-1">
                         <UiUserAvatar
@@ -311,7 +311,7 @@ const groupedTasks = computed<GroupedTasks[]>(() => {
   const map = new Map<number, GroupedTasks>()
   for (const task of filteredTasks.value) {
     const gid = task.group?.id ?? 0
-    const gname = task.group?.name ?? t('gestion.tasks.my_tasks.no_group')
+    const gname = task.group?.name ?? t('tasks.my_tasks.no_group')
     if (!map.has(gid)) map.set(gid, { id: gid, name: gname, tasks: [] })
     map.get(gid)!.tasks.push(task)
   }

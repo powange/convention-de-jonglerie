@@ -3,7 +3,7 @@
     <div class="flex items-center gap-2">
       <UIcon name="i-heroicons-chat-bubble-left-right" class="size-5 text-gray-500" />
       <h3 class="text-sm font-semibold">
-        {{ $t('gestion.tasks.comments.title') }}
+        {{ $t('tasks.comments.title') }}
         <span v-if="comments.length" class="text-gray-400 font-normal"
           >({{ comments.length }})</span
         >
@@ -15,7 +15,7 @@
     </div>
 
     <div v-else-if="!comments.length" class="text-sm text-gray-500 italic py-2">
-      {{ $t('gestion.tasks.comments.empty') }}
+      {{ $t('tasks.comments.empty') }}
     </div>
 
     <ul v-else class="space-y-3">
@@ -37,7 +37,7 @@
                 size="xs"
                 :title="formatDate(c.editedAt)"
               >
-                {{ $t('gestion.tasks.comments.edited') }}
+                {{ $t('tasks.comments.edited') }}
               </UBadge>
             </div>
             <UDropdownMenu v-if="canManage(c)" :items="getActions(c)">
@@ -54,7 +54,7 @@
           <div v-if="editingId === c.id" class="space-y-2">
             <MarkdownEditor
               v-model="editingContent"
-              :placeholder="$t('gestion.tasks.comments.placeholder')"
+              :placeholder="$t('tasks.comments.placeholder')"
               class="min-h-24"
             />
             <div class="flex gap-2">
@@ -80,7 +80,7 @@
     <div v-if="canPost" class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
       <MarkdownEditor
         v-model="newContent"
-        :placeholder="$t('gestion.tasks.comments.placeholder')"
+        :placeholder="$t('tasks.comments.placeholder')"
         class="min-h-20"
       />
       <div class="flex justify-end">
@@ -92,7 +92,7 @@
           :disabled="!newContent.trim()"
           @click="postComment"
         >
-          {{ $t('gestion.tasks.comments.post') }}
+          {{ $t('tasks.comments.post') }}
         </UButton>
       </div>
     </div>
@@ -255,7 +255,7 @@ async function saveEdit(c: TaskCommentItem) {
 }
 
 async function deleteComment(c: TaskCommentItem) {
-  if (!confirm(t('gestion.tasks.comments.confirm_delete'))) return
+  if (!confirm(t('tasks.comments.confirm_delete'))) return
   try {
     await $fetch(`/api/editions/${props.editionId}/tasks/${props.taskId}/comments/${c.id}`, {
       method: 'DELETE',

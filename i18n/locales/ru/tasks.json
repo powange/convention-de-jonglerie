@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Удалить этот комментарий?",
+      "edited": "изменено",
+      "empty": "Пока нет комментариев.",
+      "placeholder": "Добавить комментарий...",
+      "post": "Опубликовать",
+      "title": "Комментарии"
+    },
+    "filters": {
+      "active_count": "{count} активный фильтр | {count} активных фильтров",
+      "assignee_placeholder": "Назначенные",
+      "assignees_count": "{count} назначенных",
+      "due": {
+        "all": "Все сроки",
+        "next30": "В течение 30 дней",
+        "next7": "В течение 7 дней",
+        "none": "Без срока",
+        "overdue": "Просрочено",
+        "today": "Сегодня"
+      },
+      "no_match": "Нет задач, соответствующих фильтрам",
+      "search_placeholder": "Поиск задачи...",
+      "status_placeholder": "Статус",
+      "statuses_count": "{count} статусов",
+      "tag_placeholder": "Теги",
+      "tags_count": "{count} тегов"
+    },
+    "my_tasks": {
+      "description": "Задачи, назначенные вам в этом выпуске.",
+      "empty": "Вам не назначено ни одной задачи в этом выпуске.",
+      "no_group": "Без группы",
+      "with": "С",
+      "with_others": "Также назначены: {names}"
+    },
+    "status": {
+      "CANCELLED": "Отменено",
+      "DONE": "Готово",
+      "IN_PROGRESS": "В процессе",
+      "TODO": "К выполнению"
+    },
+    "task_assignees": "Назначенные лица",
+    "task_description": "Описание"
+  }
+}

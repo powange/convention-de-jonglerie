@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Añadir punto de referencia",
+      "add_zone": "Añadir zona",
+      "click_to_draw": "Haga clic en el mapa para dibujar los vértices del polígono",
+      "custom_color": "Color personalizado",
+      "delete_confirm": "¿Está seguro de que desea eliminar esta zona?",
+      "draw_polygon": "Dibujar una zona",
+      "map_public": "Hacer el mapa público",
+      "map_public_error": "Error al actualizar",
+      "map_public_updated": "Visibilidad del mapa actualizada",
+      "marker_color": "Color",
+      "marker_delete_confirm": "¿Está seguro de que desea eliminar este punto de referencia?",
+      "marker_description": "Descripción",
+      "marker_name": "Nombre del punto de referencia",
+      "marker_types": "Tipo(s) de punto de referencia",
+      "place_marker": "Colocar un punto de referencia",
+      "popup_delete": "Eliminar",
+      "popup_edit": "Editar",
+      "stop_drawing": "Cancelar dibujo",
+      "stop_placing": "Cancelar colocación",
+      "zone_color": "Color",
+      "zone_description": "Descripción",
+      "zone_name": "Nombre de la zona",
+      "zone_types": "Tipo(s) de zona"
+    }
+  }
+}

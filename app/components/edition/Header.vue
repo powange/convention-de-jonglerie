@@ -167,10 +167,10 @@
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('gestion.map.title')"
+          :title="t('edition.site_map')"
         >
           <UIcon name="i-lucide-map" :class="['md:mr-1']" size="24" class="md:w-4! md:h-4!" />
-          <span class="hidden md:inline">{{ t('gestion.map.title') }}</span>
+          <span class="hidden md:inline">{{ t('edition.site_map') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -258,7 +258,7 @@
                 ? 'border-primary-500 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
             ]"
-            :title="t('gestion.tasks.my_tasks.title')"
+            :title="t('edition.my_tasks')"
           >
             <UIcon
               name="i-heroicons-clipboard-document-check"
@@ -266,7 +266,7 @@
               size="24"
               class="md:w-4! md:h-4!"
             />
-            <span class="hidden md:inline">{{ t('gestion.tasks.my_tasks.title') }}</span>
+            <span class="hidden md:inline">{{ t('edition.my_tasks') }}</span>
           </NuxtLink>
 
           <NuxtLink
@@ -534,7 +534,7 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
     ]
     if (mapTabVisible.value) {
       items.push({
-        label: t('gestion.map.title'),
+        label: t('edition.site_map'),
         value: 'map',
         icon: 'i-lucide-map',
         path: `/editions/${editionId}/map`,
@@ -580,7 +580,7 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
     }
     if (myTasksTabVisible.value) {
       items.push({
-        label: t('gestion.tasks.my_tasks.title'),
+        label: t('edition.my_tasks'),
         value: 'my-tasks',
         icon: 'i-heroicons-clipboard-document-check',
         path: `/editions/${editionId}/my-tasks`,

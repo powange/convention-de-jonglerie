@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Aucune zone ou point de repère défini",
+    "popup_navigate": "Itinéraire",
+    "zones_list": "Zones et points de repère",
+    "delete_marker": "Supprimer le point de repère",
+    "delete_zone": "Supprimer la zone",
+    "edit_marker": "Modifier le point de repère",
+    "edit_zone": "Modifier la zone",
+    "hide_item": "Masquer sur la carte",
+    "open_in_maps": "Ouvrir dans l'application de navigation",
+    "show_item": "Afficher sur la carte",
+    "delete_success": "Zone supprimée avec succès",
+    "save_success": "Zone enregistrée avec succès",
+    "marker_delete_success": "Point de repère supprimé avec succès",
+    "marker_save_success": "Point de repère enregistré avec succès",
+    "types": {
+      "accessibility": "Accessibilité PMR",
+      "aerial": "Espace aérien / Trapèze",
+      "atm": "Distributeur",
+      "bar": "Bar",
+      "chill_space": "Espace chill",
+      "entrance": "Entrée",
+      "fire_space": "Espace feu",
+      "food": "Restauration",
+      "forbidden": "Espace interdit",
+      "gym": "Gymnase / Salle",
+      "info": "Information",
+      "kids_zone": "Zone enfants",
+      "market": "Marché",
+      "other": "Autre",
+      "parking": "Parking",
+      "shower": "Douches",
+      "shows": "Spectacles",
+      "tent_camping": "Camping tente",
+      "toilets": "Toilettes",
+      "truck_camping": "Camping camion",
+      "workshops": "Ateliers"
+    }
+  }
+}

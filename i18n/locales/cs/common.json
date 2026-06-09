@@ -872,7 +872,10 @@
       "week_view": "Týden",
       "what_you_can_bring_title": "Co pro nás můžete udělat",
       "withdraw": "Stáhnout svou žádost"
-    }
+    },
+    "my_tasks": "Moje úkoly",
+    "tasks": "Úkoly",
+    "site_map": "Mapa areálu"
   },
   "errors": {
     "access_denied": "Neoprávněný přístup",

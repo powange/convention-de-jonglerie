@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Dodaj punkt orientacyjny",
+      "add_zone": "Dodaj strefę",
+      "click_to_draw": "Kliknij na mapę, aby narysować wierzchołki wielokąta",
+      "custom_color": "Niestandardowy kolor",
+      "delete_confirm": "Czy na pewno chcesz usunąć tę strefę?",
+      "draw_polygon": "Narysuj strefę",
+      "map_public": "Ustaw mapę jako publiczną",
+      "map_public_error": "Błąd podczas aktualizacji",
+      "map_public_updated": "Widoczność mapy zaktualizowana",
+      "marker_color": "Kolor",
+      "marker_delete_confirm": "Czy na pewno chcesz usunąć ten punkt orientacyjny?",
+      "marker_description": "Opis",
+      "marker_name": "Nazwa punktu orientacyjnego",
+      "marker_types": "Typ(y) punktu orientacyjnego",
+      "place_marker": "Umieść punkt orientacyjny",
+      "popup_delete": "Usuń",
+      "popup_edit": "Edytuj",
+      "stop_drawing": "Anuluj rysowanie",
+      "stop_placing": "Anuluj umieszczanie",
+      "zone_color": "Kolor",
+      "zone_description": "Opis",
+      "zone_name": "Nazwa strefy",
+      "zone_types": "Typ(y) strefy"
+    }
+  }
+}

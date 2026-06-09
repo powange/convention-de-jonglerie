@@ -872,7 +872,10 @@
       "week_view": "Tydzień",
       "what_you_can_bring_title": "Co możesz nam przynieść",
       "withdraw": "Wycofaj moje zgłoszenie"
-    }
+    },
+    "my_tasks": "Moje zadania",
+    "tasks": "Zadania",
+    "site_map": "Mapa terenu"
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",

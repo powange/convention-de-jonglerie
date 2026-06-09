@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Já não atribuível",
+      "checklist": {
+        "add": "Adicionar",
+        "add_placeholder": "Novo item da checklist...",
+        "confirm_delete": "Eliminar o item «{title}»?",
+        "empty": "Ainda não há itens na checklist.",
+        "title": "Checklist"
+      },
+      "confirm_delete_group": "Eliminar o grupo «{name}» e as suas {count} tarefa(s)?",
+      "confirm_delete_group_simple": "Eliminar o grupo «{name}»?",
+      "confirm_delete_task": "Eliminar a tarefa «{title}»?",
+      "edit_group": "Editar grupo",
+      "edit_task": "Editar tarefa",
+      "empty_group": "Sem tarefas neste grupo",
+      "empty_state": "Ainda sem grupos de tarefas",
+      "group_description": "Descrição",
+      "group_description_empty": "Sem descrição",
+      "group_description_placeholder": "Descrição opcional...",
+      "group_name": "Nome do grupo",
+      "group_name_placeholder": "Ex.: Preparação logística",
+      "group_not_found": "Este grupo não existe ou foi eliminado",
+      "legacy_assignees_warning": "Alguns atribuídos já não são organizadores ou voluntários aceitos. Desmarque-os se já não desejar mantê-los.",
+      "move_to_group": "Mover para o grupo",
+      "new_group": "Novo grupo",
+      "new_task": "Nova tarefa",
+      "no_assignable_users": "Nenhum organizador ou voluntário aceito disponível",
+      "tags": {
+        "confirm_delete": "Eliminar a etiqueta «{name}»? Será removida de todas as tarefas do grupo que a contêm.",
+        "description": "As etiquetas permitem categorizar as tarefas deste grupo (ex.: urgente, material, validar RH).",
+        "empty": "Nenhuma etiqueta definida para este grupo.",
+        "manage": "Gerir etiquetas",
+        "modal_title": "Etiquetas do grupo",
+        "name_placeholder": "Nome da etiqueta...",
+        "new_tag": "Nova etiqueta"
+      },
+      "task_assignees_placeholder": "Selecionar pessoas...",
+      "task_deadline": "Prazo",
+      "task_status": "Estado",
+      "task_tags": "Etiquetas",
+      "task_tags_placeholder": "Selecionar etiquetas...",
+      "task_title": "Título",
+      "task_title_placeholder": "Ex.: Reservar o material...",
+      "tasks_count": "{count} tarefa | {count} tarefas",
+      "view_kanban": "Kanban",
+      "view_list": "Lista"
+    }
+  }
+}

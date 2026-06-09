@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Diesen Kommentar löschen?",
+      "edited": "bearbeitet",
+      "empty": "Noch keine Kommentare.",
+      "placeholder": "Kommentar hinzufügen...",
+      "post": "Veröffentlichen",
+      "title": "Kommentare"
+    },
+    "filters": {
+      "active_count": "{count} aktiver Filter | {count} aktive Filter",
+      "assignee_placeholder": "Zugewiesene",
+      "assignees_count": "{count} Zugewiesene",
+      "due": {
+        "all": "Alle Fälligkeiten",
+        "next30": "In 30 Tagen",
+        "next7": "In 7 Tagen",
+        "none": "Keine Frist",
+        "overdue": "Überfällig",
+        "today": "Heute"
+      },
+      "no_match": "Keine Aufgabe entspricht den Filtern",
+      "search_placeholder": "Aufgabe suchen...",
+      "status_placeholder": "Status",
+      "statuses_count": "{count} Status",
+      "tag_placeholder": "Tags",
+      "tags_count": "{count} Tags"
+    },
+    "my_tasks": {
+      "description": "Die Aufgaben, die Ihnen für diese Edition zugewiesen sind.",
+      "empty": "Ihnen ist keine Aufgabe für diese Edition zugewiesen.",
+      "no_group": "Keine Gruppe",
+      "with": "Mit",
+      "with_others": "Ebenfalls zugewiesen: {names}"
+    },
+    "status": {
+      "CANCELLED": "Abgebrochen",
+      "DONE": "Erledigt",
+      "IN_PROGRESS": "In Bearbeitung",
+      "TODO": "Zu erledigen"
+    },
+    "task_assignees": "Zugewiesene Personen",
+    "task_description": "Beschreibung"
+  }
+}

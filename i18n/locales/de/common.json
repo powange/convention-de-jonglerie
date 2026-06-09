@@ -872,7 +872,10 @@
       "week_view": "Woche",
       "what_you_can_bring_title": "Was Sie uns bringen können",
       "withdraw": "Meine Bewerbung zurückziehen"
-    }
+    },
+    "my_tasks": "Meine Aufgaben",
+    "tasks": "Aufgaben",
+    "site_map": "Geländekarte"
   },
   "errors": {
     "access_denied": "Zugang verweigert",

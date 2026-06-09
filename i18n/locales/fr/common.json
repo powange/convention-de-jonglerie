@@ -872,7 +872,10 @@
       "week_view": "Semaine",
       "what_you_can_bring_title": "Ce que vous pouvez nous apporter",
       "withdraw": "Retirer ma candidature"
-    }
+    },
+    "my_tasks": "Mes tâches",
+    "tasks": "Tâches",
+    "site_map": "Carte du site"
   },
   "errors": {
     "access_denied": "Accès non autorisé",

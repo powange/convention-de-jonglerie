@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Přidat orientační bod",
+      "add_zone": "Přidat zónu",
+      "click_to_draw": "Klikněte na mapu pro nakreslení vrcholů polygonu",
+      "custom_color": "Vlastní barva",
+      "delete_confirm": "Opravdu chcete smazat tuto zónu?",
+      "draw_polygon": "Nakreslit zónu",
+      "map_public": "Zveřejnit mapu",
+      "map_public_error": "Chyba při aktualizaci",
+      "map_public_updated": "Viditelnost mapy aktualizována",
+      "marker_color": "Barva",
+      "marker_delete_confirm": "Opravdu chcete smazat tento orientační bod?",
+      "marker_description": "Popis",
+      "marker_name": "Název orientačního bodu",
+      "marker_types": "Typ(y) orientačního bodu",
+      "place_marker": "Umístit orientační bod",
+      "popup_delete": "Smazat",
+      "popup_edit": "Upravit",
+      "stop_drawing": "Zrušit kreslení",
+      "stop_placing": "Zrušit umístění",
+      "zone_color": "Barva",
+      "zone_description": "Popis",
+      "zone_name": "Název zóny",
+      "zone_types": "Typ(y) zóny"
+    }
+  }
+}

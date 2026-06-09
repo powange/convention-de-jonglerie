@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Nicht mehr zuweisbar",
+      "checklist": {
+        "add": "Hinzufügen",
+        "add_placeholder": "Neues Checklisten-Element...",
+        "confirm_delete": "Element «{title}» löschen?",
+        "empty": "Noch kein Element in der Checkliste.",
+        "title": "Checkliste"
+      },
+      "confirm_delete_group": "Gruppe „{name}\" und ihre {count} Aufgabe(n) löschen?",
+      "confirm_delete_group_simple": "Gruppe „{name}\" löschen?",
+      "confirm_delete_task": "Aufgabe „{title}\" löschen?",
+      "edit_group": "Gruppe bearbeiten",
+      "edit_task": "Aufgabe bearbeiten",
+      "empty_group": "Keine Aufgaben in dieser Gruppe",
+      "empty_state": "Noch keine Aufgabengruppen",
+      "group_description": "Beschreibung",
+      "group_description_empty": "Keine Beschreibung",
+      "group_description_placeholder": "Optionale Beschreibung...",
+      "group_name": "Gruppenname",
+      "group_name_placeholder": "z. B.: Logistische Vorbereitung",
+      "group_not_found": "Diese Gruppe existiert nicht oder wurde gelöscht",
+      "legacy_assignees_warning": "Einige zugewiesene Personen sind keine Organisatoren oder akzeptierten Freiwilligen mehr. Heben Sie ihre Auswahl auf, falls Sie sie nicht behalten möchten.",
+      "move_to_group": "In Gruppe verschieben",
+      "new_group": "Neue Gruppe",
+      "new_task": "Neue Aufgabe",
+      "no_assignable_users": "Kein Organisator oder akzeptierter Freiwilliger verfügbar",
+      "tags": {
+        "confirm_delete": "Den Tag «{name}» löschen? Er wird von allen Aufgaben der Gruppe entfernt, die ihn tragen.",
+        "description": "Mit Tags lassen sich die Aufgaben dieser Gruppe kategorisieren (z. B. dringend, Material, HR-Validierung).",
+        "empty": "Kein Tag für diese Gruppe definiert.",
+        "manage": "Tags verwalten",
+        "modal_title": "Tags der Gruppe",
+        "name_placeholder": "Tag-Name...",
+        "new_tag": "Neuer Tag"
+      },
+      "task_assignees_placeholder": "Personen auswählen...",
+      "task_deadline": "Frist",
+      "task_status": "Status",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Tags auswählen...",
+      "task_title": "Titel",
+      "task_title_placeholder": "z. B.: Material reservieren...",
+      "tasks_count": "{count} Aufgabe | {count} Aufgaben",
+      "view_kanban": "Kanban",
+      "view_list": "Liste"
+    }
+  }
+}

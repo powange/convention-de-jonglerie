@@ -9,7 +9,7 @@
         size="sm"
         icon="i-heroicons-arrow-left"
       >
-        {{ $t('gestion.tasks.title') }}
+        {{ $t('edition.tasks') }}
       </UButton>
     </div>
 
@@ -23,7 +23,7 @@
     >
       <UIcon name="i-heroicons-question-mark-circle" class="size-12 text-gray-400 mx-auto mb-3" />
       <p class="text-gray-600 dark:text-gray-400 mb-4">
-        {{ $t('gestion.tasks.group_not_found') }}
+        {{ $t('gestion.task.group_not_found') }}
       </p>
       <UButton
         :to="`/editions/${editionId}/gestion/tasks`"
@@ -31,7 +31,7 @@
         color="primary"
         size="sm"
       >
-        {{ $t('gestion.tasks.title') }}
+        {{ $t('edition.tasks') }}
       </UButton>
     </div>
 
@@ -61,7 +61,7 @@
               :ui="{ list: 'w-auto' }"
             />
             <UButton icon="i-heroicons-plus" size="sm" color="primary" @click="openTaskModal(null)">
-              {{ $t('gestion.tasks.new_task') }}
+              {{ $t('gestion.task.new_task') }}
             </UButton>
             <UDropdownMenu :items="groupActions">
               <UButton
@@ -93,10 +93,10 @@
         >
           <UIcon name="i-heroicons-inbox" class="size-10 text-gray-400 mx-auto mb-2" />
           <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm">
-            {{ $t('gestion.tasks.empty_group') }}
+            {{ $t('gestion.task.empty_group') }}
           </p>
           <UButton icon="i-heroicons-plus" color="primary" size="sm" @click="openTaskModal(null)">
-            {{ $t('gestion.tasks.new_task') }}
+            {{ $t('gestion.task.new_task') }}
           </UButton>
         </div>
         <div
@@ -105,7 +105,7 @@
         >
           <UIcon name="i-heroicons-funnel" class="size-8 text-gray-400 mx-auto mb-2" />
           <p class="text-gray-600 dark:text-gray-400 text-sm">
-            {{ $t('gestion.tasks.filters.no_match') }}
+            {{ $t('tasks.filters.no_match') }}
           </p>
         </div>
         <UCard v-else>
@@ -117,7 +117,7 @@
               @click="openTaskModal(task)"
             >
               <UBadge :color="statusColor(task.status)" variant="soft" size="md" class="mt-0.5">
-                {{ $t(`gestion.tasks.status.${task.status}`) }}
+                {{ $t(`tasks.status.${task.status}`) }}
               </UBadge>
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-sm truncate">{{ task.title }}</div>
@@ -187,7 +187,7 @@
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
               <UBadge :color="statusColor(status)" variant="soft" size="sm">
-                {{ $t(`gestion.tasks.status.${status}`) }}
+                {{ $t(`tasks.status.${status}`) }}
               </UBadge>
               <span class="text-xs text-gray-500">{{ tasksByStatus(status).length }}</span>
             </div>
@@ -369,8 +369,8 @@ const loading = ref(true)
 const viewMode = ref<'list' | 'kanban'>('list')
 
 const viewItems = computed(() => [
-  { label: t('gestion.tasks.view_list'), value: 'list', icon: 'i-heroicons-list-bullet' },
-  { label: t('gestion.tasks.view_kanban'), value: 'kanban', icon: 'i-heroicons-view-columns' },
+  { label: t('gestion.task.view_list'), value: 'list', icon: 'i-heroicons-list-bullet' },
+  { label: t('gestion.task.view_kanban'), value: 'kanban', icon: 'i-heroicons-view-columns' },
 ])
 
 const kanbanStatuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED']
@@ -383,9 +383,7 @@ const group = computed<TaskGroupItem | null>(
 // Tant que le groupe n'est pas chargé, on retombe sur le titre générique de la section.
 useSeoMeta({
   title: () =>
-    group.value?.name
-      ? `${group.value.name} – ${t('gestion.tasks.title')}`
-      : t('gestion.tasks.title'),
+    group.value?.name ? `${group.value.name} – ${t('edition.tasks')}` : t('edition.tasks'),
 })
 
 // --- Filtres & recherche (persistés en URL via query params) ---
@@ -574,7 +572,7 @@ const groupActions = computed(() => [
       },
     },
     {
-      label: t('gestion.tasks.tags.manage'),
+      label: t('gestion.task.tags.manage'),
       icon: 'i-heroicons-tag',
       onSelect: () => {
         tagsModalOpen.value = true
@@ -593,7 +591,7 @@ async function deleteGroup() {
   if (!group.value) return
   if (
     !confirm(
-      t('gestion.tasks.confirm_delete_group', {
+      t('gestion.task.confirm_delete_group', {
         name: group.value.name,
         count: group.value.tasks.length,
       })

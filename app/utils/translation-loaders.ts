@@ -45,10 +45,21 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion/,
       translations: ['gestion'],
     },
-    // Vue d'ensemble racine : on charge aussi workshops pour afficher le module
+    // Vue d'ensemble racine : workshops (cartes de modules). Le libellé de la carte
+    // « tâches » vit dans le domaine gestion (gestion.task.manage_*), déjà chargé.
     {
       pattern: /^\/editions\/\d+\/gestion$/,
       translations: ['workshops'],
+    },
+    // Gestion des tâches : domaine tasks (partagé) + gestion-tasks (clés management)
+    {
+      pattern: /^\/editions\/\d+\/gestion\/tasks/,
+      translations: ['tasks', 'gestion-tasks'],
+    },
+    // Gestion de la carte : domaine map (partagé) + gestion-map (clés d'édition)
+    {
+      pattern: /^\/editions\/\d+\/gestion\/map/,
+      translations: ['map', 'gestion-map'],
     },
     // Add-ons par sous-section
     {
@@ -68,6 +79,16 @@ export function getTranslationsToLoad(path: string): string[] {
       translations: ['survey'],
     },
     // Routes hors /gestion
+    // Page « Mes tâches » (utilisateur) : réutilise le module de tâches
+    {
+      pattern: /^\/editions\/\d+\/my-tasks/,
+      translations: ['tasks'],
+    },
+    // Carte publique : clés UI carte partagées
+    {
+      pattern: /^\/editions\/\d+\/map/,
+      translations: ['map'],
+    },
     {
       pattern: /^\/survey\//,
       translations: ['survey'],
@@ -198,6 +219,69 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/gestion.json'),
     cs: () => import('~~/i18n/locales/cs/gestion.json'),
     sv: () => import('~~/i18n/locales/sv/gestion.json'),
+  },
+  tasks: {
+    en: () => import('~~/i18n/locales/en/tasks.json'),
+    da: () => import('~~/i18n/locales/da/tasks.json'),
+    de: () => import('~~/i18n/locales/de/tasks.json'),
+    es: () => import('~~/i18n/locales/es/tasks.json'),
+    fr: () => import('~~/i18n/locales/fr/tasks.json'),
+    it: () => import('~~/i18n/locales/it/tasks.json'),
+    nl: () => import('~~/i18n/locales/nl/tasks.json'),
+    pl: () => import('~~/i18n/locales/pl/tasks.json'),
+    pt: () => import('~~/i18n/locales/pt/tasks.json'),
+    ru: () => import('~~/i18n/locales/ru/tasks.json'),
+    uk: () => import('~~/i18n/locales/uk/tasks.json'),
+    cs: () => import('~~/i18n/locales/cs/tasks.json'),
+    sv: () => import('~~/i18n/locales/sv/tasks.json'),
+  },
+  // Clés de tâches utilisées uniquement côté gestion (namespace gestion.task.*)
+  'gestion-tasks': {
+    en: () => import('~~/i18n/locales/en/gestion-tasks.json'),
+    da: () => import('~~/i18n/locales/da/gestion-tasks.json'),
+    de: () => import('~~/i18n/locales/de/gestion-tasks.json'),
+    es: () => import('~~/i18n/locales/es/gestion-tasks.json'),
+    fr: () => import('~~/i18n/locales/fr/gestion-tasks.json'),
+    it: () => import('~~/i18n/locales/it/gestion-tasks.json'),
+    nl: () => import('~~/i18n/locales/nl/gestion-tasks.json'),
+    pl: () => import('~~/i18n/locales/pl/gestion-tasks.json'),
+    pt: () => import('~~/i18n/locales/pt/gestion-tasks.json'),
+    ru: () => import('~~/i18n/locales/ru/gestion-tasks.json'),
+    uk: () => import('~~/i18n/locales/uk/gestion-tasks.json'),
+    cs: () => import('~~/i18n/locales/cs/gestion-tasks.json'),
+    sv: () => import('~~/i18n/locales/sv/gestion-tasks.json'),
+  },
+  // Clés UI de la carte (partagées public + gestion, namespace map.*)
+  map: {
+    en: () => import('~~/i18n/locales/en/map.json'),
+    da: () => import('~~/i18n/locales/da/map.json'),
+    de: () => import('~~/i18n/locales/de/map.json'),
+    es: () => import('~~/i18n/locales/es/map.json'),
+    fr: () => import('~~/i18n/locales/fr/map.json'),
+    it: () => import('~~/i18n/locales/it/map.json'),
+    nl: () => import('~~/i18n/locales/nl/map.json'),
+    pl: () => import('~~/i18n/locales/pl/map.json'),
+    pt: () => import('~~/i18n/locales/pt/map.json'),
+    ru: () => import('~~/i18n/locales/ru/map.json'),
+    uk: () => import('~~/i18n/locales/uk/map.json'),
+    cs: () => import('~~/i18n/locales/cs/map.json'),
+    sv: () => import('~~/i18n/locales/sv/map.json'),
+  },
+  // Clés d'édition de la carte (uniquement côté gestion, namespace gestion.map.*)
+  'gestion-map': {
+    en: () => import('~~/i18n/locales/en/gestion-map.json'),
+    da: () => import('~~/i18n/locales/da/gestion-map.json'),
+    de: () => import('~~/i18n/locales/de/gestion-map.json'),
+    es: () => import('~~/i18n/locales/es/gestion-map.json'),
+    fr: () => import('~~/i18n/locales/fr/gestion-map.json'),
+    it: () => import('~~/i18n/locales/it/gestion-map.json'),
+    nl: () => import('~~/i18n/locales/nl/gestion-map.json'),
+    pl: () => import('~~/i18n/locales/pl/gestion-map.json'),
+    pt: () => import('~~/i18n/locales/pt/gestion-map.json'),
+    ru: () => import('~~/i18n/locales/ru/gestion-map.json'),
+    uk: () => import('~~/i18n/locales/uk/gestion-map.json'),
+    cs: () => import('~~/i18n/locales/cs/gestion-map.json'),
+    sv: () => import('~~/i18n/locales/sv/gestion-map.json'),
   },
   'project-costs': {
     en: () => import('~~/i18n/locales/en/project-costs.json'),

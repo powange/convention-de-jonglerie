@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Usunąć ten komentarz?",
+      "edited": "edytowano",
+      "empty": "Brak komentarzy.",
+      "placeholder": "Dodaj komentarz...",
+      "post": "Opublikuj",
+      "title": "Komentarze"
+    },
+    "filters": {
+      "active_count": "{count} aktywny filtr | {count} aktywne filtry",
+      "assignee_placeholder": "Przypisani",
+      "assignees_count": "{count} przypisanych",
+      "due": {
+        "all": "Wszystkie terminy",
+        "next30": "W ciągu 30 dni",
+        "next7": "W ciągu 7 dni",
+        "none": "Bez terminu",
+        "overdue": "Zaległe",
+        "today": "Dziś"
+      },
+      "no_match": "Żadne zadanie nie pasuje do filtrów",
+      "search_placeholder": "Wyszukaj zadanie...",
+      "status_placeholder": "Status",
+      "statuses_count": "{count} statusów",
+      "tag_placeholder": "Tagi",
+      "tags_count": "{count} tagów"
+    },
+    "my_tasks": {
+      "description": "Zadania przypisane do Ciebie w tej edycji.",
+      "empty": "Nie masz przypisanych żadnych zadań w tej edycji.",
+      "no_group": "Bez grupy",
+      "with": "Z",
+      "with_others": "Również przypisani: {names}"
+    },
+    "status": {
+      "CANCELLED": "Anulowane",
+      "DONE": "Zakończone",
+      "IN_PROGRESS": "W trakcie",
+      "TODO": "Do zrobienia"
+    },
+    "task_assignees": "Przypisane osoby",
+    "task_description": "Opis"
+  }
+}

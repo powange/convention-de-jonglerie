@@ -4,10 +4,10 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div class="flex items-center gap-3">
         <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500 size-6" />
-        <h1 class="text-2xl font-semibold">{{ $t('gestion.tasks.title') }}</h1>
+        <h1 class="text-2xl font-semibold">{{ $t('edition.tasks') }}</h1>
       </div>
       <UButton icon="i-heroicons-plus" color="primary" size="sm" @click="openGroupModal(null)">
-        {{ $t('gestion.tasks.new_group') }}
+        {{ $t('gestion.task.new_group') }}
       </UButton>
     </div>
 
@@ -24,10 +24,10 @@
         class="size-12 text-gray-400 mx-auto mb-3"
       />
       <p class="text-gray-600 dark:text-gray-400 mb-4">
-        {{ $t('gestion.tasks.empty_state') }}
+        {{ $t('gestion.task.empty_state') }}
       </p>
       <UButton icon="i-heroicons-plus" color="primary" size="sm" @click="openGroupModal(null)">
-        {{ $t('gestion.tasks.new_group') }}
+        {{ $t('gestion.task.new_group') }}
       </UButton>
     </div>
 
@@ -62,7 +62,7 @@
           {{ group.description }}
         </p>
         <p v-else class="text-sm text-gray-400 italic min-h-12">
-          {{ $t('gestion.tasks.group_description_empty') }}
+          {{ $t('gestion.task.group_description_empty') }}
         </p>
 
         <template #footer>
@@ -70,7 +70,7 @@
             <div class="flex items-center gap-2 text-gray-500">
               <UIcon name="i-heroicons-clipboard-document-list" class="size-4" />
               {{
-                $t('gestion.tasks.tasks_count', { count: group.tasks.length }, group.tasks.length)
+                $t('gestion.task.tasks_count', { count: group.tasks.length }, group.tasks.length)
               }}
             </div>
             <div class="flex items-center gap-1 text-primary-500">
@@ -105,7 +105,7 @@ const editionId = parseInt(route.params.id as string)
 
 // Titre de l'onglet : « Tâches » (référence de la section, repris par la page d'un groupe).
 useSeoMeta({
-  title: () => t('gestion.tasks.title'),
+  title: () => t('edition.tasks'),
 })
 
 interface TaskGroupItem {
@@ -164,7 +164,7 @@ const getGroupActions = (group: TaskGroupItem) => [
 async function deleteGroup(group: TaskGroupItem) {
   if (
     !confirm(
-      t('gestion.tasks.confirm_delete_group', { name: group.name, count: group.tasks.length })
+      t('gestion.task.confirm_delete_group', { name: group.name, count: group.tasks.length })
     )
   )
     return

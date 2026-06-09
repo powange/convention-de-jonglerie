@@ -872,7 +872,10 @@
       "week_view": "Semana",
       "what_you_can_bring_title": "O que você pode nos trazer",
       "withdraw": "Retirar minha inscrição"
-    }
+    },
+    "my_tasks": "Minhas tarefas",
+    "tasks": "Tarefas",
+    "site_map": "Mapa do local"
   },
   "errors": {
     "access_denied": "Acesso negado",

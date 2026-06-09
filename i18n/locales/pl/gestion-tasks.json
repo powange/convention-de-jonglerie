@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Nie można już przypisać",
+      "checklist": {
+        "add": "Dodaj",
+        "add_placeholder": "Nowy element listy...",
+        "confirm_delete": "Usunąć element «{title}»?",
+        "empty": "Brak elementów na liście.",
+        "title": "Lista kontrolna"
+      },
+      "confirm_delete_group": "Usunąć grupę „{name}\" i jej {count} zadań?",
+      "confirm_delete_group_simple": "Usunąć grupę „{name}\"?",
+      "confirm_delete_task": "Usunąć zadanie „{title}\"?",
+      "edit_group": "Edytuj grupę",
+      "edit_task": "Edytuj zadanie",
+      "empty_group": "Brak zadań w tej grupie",
+      "empty_state": "Nie ma jeszcze grup zadań",
+      "group_description": "Opis",
+      "group_description_empty": "Brak opisu",
+      "group_description_placeholder": "Opcjonalny opis...",
+      "group_name": "Nazwa grupy",
+      "group_name_placeholder": "Np.: Przygotowanie logistyczne",
+      "group_not_found": "Ta grupa nie istnieje lub została usunięta",
+      "legacy_assignees_warning": "Niektórzy przypisani użytkownicy nie są już organizatorami ani zaakceptowanymi wolontariuszami. Odznacz ich, jeśli nie chcesz ich już zachować.",
+      "move_to_group": "Przenieś do grupy",
+      "new_group": "Nowa grupa",
+      "new_task": "Nowe zadanie",
+      "no_assignable_users": "Brak dostępnego organizatora lub zaakceptowanego wolontariusza",
+      "tags": {
+        "confirm_delete": "Usunąć tag «{name}»? Zostanie usunięty ze wszystkich zadań grupy, które go zawierają.",
+        "description": "Tagi pozwalają kategoryzować zadania tej grupy (np. pilne, materiał, do walidacji HR).",
+        "empty": "Brak zdefiniowanych tagów dla tej grupy.",
+        "manage": "Zarządzaj tagami",
+        "modal_title": "Tagi grupy",
+        "name_placeholder": "Nazwa tagu...",
+        "new_tag": "Nowy tag"
+      },
+      "task_assignees_placeholder": "Wybierz osoby...",
+      "task_deadline": "Termin",
+      "task_status": "Status",
+      "task_tags": "Tagi",
+      "task_tags_placeholder": "Wybierz tagi...",
+      "task_title": "Tytuł",
+      "task_title_placeholder": "Np.: Zarezerwować sprzęt...",
+      "tasks_count": "{count} zadanie | {count} zadania | {count} zadań",
+      "view_kanban": "Kanban",
+      "view_list": "Lista"
+    }
+  }
+}

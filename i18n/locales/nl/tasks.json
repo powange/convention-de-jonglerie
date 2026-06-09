@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Deze opmerking verwijderen?",
+      "edited": "bewerkt",
+      "empty": "Nog geen opmerkingen.",
+      "placeholder": "Een opmerking toevoegen...",
+      "post": "Plaatsen",
+      "title": "Opmerkingen"
+    },
+    "filters": {
+      "active_count": "{count} actief filter | {count} actieve filters",
+      "assignee_placeholder": "Toegewezenen",
+      "assignees_count": "{count} toegewezenen",
+      "due": {
+        "all": "Alle deadlines",
+        "next30": "Binnen 30 dagen",
+        "next7": "Binnen 7 dagen",
+        "none": "Geen deadline",
+        "overdue": "Achterstallig",
+        "today": "Vandaag"
+      },
+      "no_match": "Geen taak komt overeen met de filters",
+      "search_placeholder": "Zoek een taak...",
+      "status_placeholder": "Status",
+      "statuses_count": "{count} statussen",
+      "tag_placeholder": "Tags",
+      "tags_count": "{count} tags"
+    },
+    "my_tasks": {
+      "description": "De taken die aan u zijn toegewezen voor deze editie.",
+      "empty": "Er zijn geen taken aan u toegewezen voor deze editie.",
+      "no_group": "Geen groep",
+      "with": "Met",
+      "with_others": "Ook toegewezen: {names}"
+    },
+    "status": {
+      "CANCELLED": "Geannuleerd",
+      "DONE": "Klaar",
+      "IN_PROGRESS": "Bezig",
+      "TODO": "Te doen"
+    },
+    "task_assignees": "Toegewezen personen",
+    "task_description": "Beschrijving"
+  }
+}

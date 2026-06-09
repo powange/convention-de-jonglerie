@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Žádné zóny ani orientační body nejsou definovány",
+    "popup_navigate": "Navigace",
+    "zones_list": "Zóny a orientační body",
+    "delete_marker": "Smazat orientační bod",
+    "delete_zone": "Smazat zónu",
+    "edit_marker": "Upravit orientační bod",
+    "edit_zone": "Upravit zónu",
+    "hide_item": "Skrýt na mapě",
+    "open_in_maps": "Otevřít v navigační aplikaci",
+    "show_item": "Zobrazit na mapě",
+    "delete_success": "Zóna byla úspěšně smazána",
+    "save_success": "Zóna byla úspěšně uložena",
+    "marker_delete_success": "Orientační bod byl úspěšně smazán",
+    "marker_save_success": "Orientační bod byl úspěšně uložen",
+    "types": {
+      "accessibility": "Bezbariérovost",
+      "aerial": "Vzdušná akrobacie / Trapéz",
+      "atm": "Bankomat",
+      "bar": "Bar",
+      "chill_space": "Chill zóna",
+      "entrance": "Vchod",
+      "fire_space": "Ohnivá zóna",
+      "food": "Stravování",
+      "forbidden": "Zakázaná zóna",
+      "gym": "Tělocvična / Sál",
+      "info": "Informace",
+      "kids_zone": "Dětská zóna",
+      "market": "Trh",
+      "other": "Jiné",
+      "parking": "Parkování",
+      "shower": "Sprchy",
+      "shows": "Představení",
+      "tent_camping": "Stanový kemp",
+      "toilets": "Toalety",
+      "truck_camping": "Karavanový kemp",
+      "workshops": "Workshopy"
+    }
+  }
+}

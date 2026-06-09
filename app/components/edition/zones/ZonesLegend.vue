@@ -145,7 +145,7 @@ const hasItems = computed(() => sortedItems.value.length > 0)
 
 const getTypeLabel = (type: string) => {
   const typeKey = type.toLowerCase()
-  return t(`gestion.map.types.${typeKey}`)
+  return t(`map.types.${typeKey}`)
 }
 
 const handleFocus = (item: LegendItem) => {
@@ -182,7 +182,7 @@ const handleDelete = (item: LegendItem) => {
 <template>
   <div class="flex flex-col gap-2">
     <div v-if="!hasItems" class="py-4 text-center text-gray-500 dark:text-gray-400">
-      {{ t('gestion.map.no_items') }}
+      {{ t('map.no_items') }}
     </div>
 
     <!-- Filtres par type -->
@@ -248,7 +248,7 @@ const handleDelete = (item: LegendItem) => {
           size="xs"
           color="neutral"
           variant="ghost"
-          :aria-label="t('gestion.map.open_in_maps')"
+          :aria-label="t('map.open_in_maps')"
           :to="item.navigationUrl"
           target="_blank"
         />
@@ -257,7 +257,7 @@ const handleDelete = (item: LegendItem) => {
           size="xs"
           color="neutral"
           variant="ghost"
-          :aria-label="isVisible(item) ? t('gestion.map.hide_item') : t('gestion.map.show_item')"
+          :aria-label="isVisible(item) ? t('map.hide_item') : t('map.show_item')"
           @click="toggleVisibility(item)"
         />
       </div>
@@ -269,7 +269,7 @@ const handleDelete = (item: LegendItem) => {
           size="xs"
           color="neutral"
           variant="ghost"
-          :aria-label="isVisible(item) ? t('gestion.map.hide_item') : t('gestion.map.show_item')"
+          :aria-label="isVisible(item) ? t('map.hide_item') : t('map.show_item')"
           @click="toggleVisibility(item)"
         />
         <UButton
@@ -277,9 +277,7 @@ const handleDelete = (item: LegendItem) => {
           size="xs"
           color="neutral"
           variant="ghost"
-          :aria-label="
-            item.itemType === 'zone' ? t('gestion.map.edit_zone') : t('gestion.map.edit_marker')
-          "
+          :aria-label="item.itemType === 'zone' ? t('map.edit_zone') : t('map.edit_marker')"
           @click="handleEdit(item)"
         />
         <UButton
@@ -287,9 +285,7 @@ const handleDelete = (item: LegendItem) => {
           size="xs"
           color="error"
           variant="ghost"
-          :aria-label="
-            item.itemType === 'zone' ? t('gestion.map.delete_zone') : t('gestion.map.delete_marker')
-          "
+          :aria-label="item.itemType === 'zone' ? t('map.delete_zone') : t('map.delete_marker')"
           :loading="loading"
           @click="handleDelete(item)"
         />

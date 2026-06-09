@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Plus assignable",
+      "checklist": {
+        "add": "Ajouter",
+        "add_placeholder": "Nouvel item de checklist...",
+        "confirm_delete": "Supprimer l'item « {title} » ?",
+        "empty": "Aucun item dans la checklist pour le moment.",
+        "title": "Checklist"
+      },
+      "confirm_delete_group": "Supprimer le groupe « {name} » et ses {count} tâche(s) ?",
+      "confirm_delete_group_simple": "Supprimer le groupe « {name} » ?",
+      "confirm_delete_task": "Supprimer la tâche « {title} » ?",
+      "edit_group": "Modifier le groupe",
+      "edit_task": "Modifier la tâche",
+      "empty_group": "Aucune tâche dans ce groupe",
+      "empty_state": "Aucun groupe de tâches pour le moment",
+      "group_description": "Description",
+      "group_description_empty": "Aucune description",
+      "group_description_placeholder": "Description optionnelle...",
+      "group_name": "Nom du groupe",
+      "group_name_placeholder": "Ex: Préparation logistique",
+      "group_not_found": "Ce groupe est introuvable ou a été supprimé",
+      "legacy_assignees_warning": "Certains assignés ne font plus partie des organisateurs ou bénévoles acceptés. Décochez-les si vous ne souhaitez plus les conserver.",
+      "move_to_group": "Déplacer vers le groupe",
+      "new_group": "Nouveau groupe",
+      "new_task": "Nouvelle tâche",
+      "no_assignable_users": "Aucun organisateur ni bénévole accepté n'est disponible",
+      "tags": {
+        "confirm_delete": "Supprimer le tag « {name} » ? Il sera retiré de toutes les tâches du groupe qui le portent.",
+        "description": "Les tags permettent de catégoriser les tâches de ce groupe (ex: urgent, matériel, à valider RH).",
+        "empty": "Aucun tag défini pour ce groupe.",
+        "manage": "Gérer les tags",
+        "modal_title": "Tags du groupe",
+        "name_placeholder": "Nom du tag...",
+        "new_tag": "Nouveau tag"
+      },
+      "task_assignees_placeholder": "Sélectionner des personnes...",
+      "task_deadline": "Échéance",
+      "task_status": "Statut",
+      "task_tags": "Tags",
+      "task_tags_placeholder": "Sélectionner des tags...",
+      "task_title": "Titre",
+      "task_title_placeholder": "Ex: Réserver le matériel...",
+      "tasks_count": "{count} tâche | {count} tâches",
+      "view_kanban": "Kanban",
+      "view_list": "Liste"
+    }
+  }
+}

@@ -128,7 +128,11 @@
       "Bash(sed -n '582,590p' app/components/edition/Header.vue)",
       "Bash(git restore *)",
       "Bash(sed -n '1,12p' /home/powange/projects/convention-de-jonglerie/app/composables/useApiAction.ts)",
-      "Bash(sed -n '170,178p' /home/powange/projects/convention-de-jonglerie/app/composables/useEditionMarkers.ts)"
+      "Bash(sed -n '170,178p' /home/powange/projects/convention-de-jonglerie/app/composables/useEditionMarkers.ts)",
+      "Bash(node /tmp/console-check.mjs)",
+      "Bash(node console-check.mjs)",
+      "Bash(node scripts/move-map-i18n.mjs)",
+      "Bash(node _console-check.mjs)"
     ],
     "additionalDirectories": [
       "/tmp",

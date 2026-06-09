@@ -872,7 +872,10 @@
       "week_view": "Неделя",
       "what_you_can_bring_title": "Что вы можете нам принести",
       "withdraw": "Отозвать мою заявку"
-    }
+    },
+    "my_tasks": "Мои задачи",
+    "tasks": "Задачи",
+    "site_map": "Карта площадки"
   },
   "errors": {
     "access_denied": "Доступ запрещен",

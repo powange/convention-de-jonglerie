@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Eliminar este comentário?",
+      "edited": "editado",
+      "empty": "Sem comentários ainda.",
+      "placeholder": "Adicionar um comentário...",
+      "post": "Publicar",
+      "title": "Comentários"
+    },
+    "filters": {
+      "active_count": "{count} filtro ativo | {count} filtros ativos",
+      "assignee_placeholder": "Atribuídos",
+      "assignees_count": "{count} atribuídos",
+      "due": {
+        "all": "Todos os prazos",
+        "next30": "Em 30 dias",
+        "next7": "Em 7 dias",
+        "none": "Sem prazo",
+        "overdue": "Atrasadas",
+        "today": "Hoje"
+      },
+      "no_match": "Nenhuma tarefa corresponde aos filtros",
+      "search_placeholder": "Pesquisar uma tarefa...",
+      "status_placeholder": "Estado",
+      "statuses_count": "{count} estados",
+      "tag_placeholder": "Etiquetas",
+      "tags_count": "{count} etiquetas"
+    },
+    "my_tasks": {
+      "description": "As tarefas que lhe foram atribuídas nesta edição.",
+      "empty": "Nenhuma tarefa lhe está atribuída nesta edição.",
+      "no_group": "Sem grupo",
+      "with": "Com",
+      "with_others": "Também atribuídos: {names}"
+    },
+    "status": {
+      "CANCELLED": "Cancelada",
+      "DONE": "Concluída",
+      "IN_PROGRESS": "Em curso",
+      "TODO": "A fazer"
+    },
+    "task_assignees": "Pessoas atribuídas",
+    "task_description": "Descrição"
+  }
+}

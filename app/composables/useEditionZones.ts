@@ -61,7 +61,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
       method: 'POST',
       body: () => pendingCreateData.value,
       successMessage: {
-        title: t('gestion.map.save_success'),
+        title: t('map.save_success'),
       },
       errorMessages: {
         default: t('common.error'),
@@ -82,7 +82,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
       method: 'PUT',
       body: () => pendingUpdateData.value,
       successMessage: {
-        title: t('gestion.map.save_success'),
+        title: t('map.save_success'),
       },
       errorMessages: {
         default: t('common.error'),
@@ -102,7 +102,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
     {
       method: 'DELETE',
       successMessage: {
-        title: t('gestion.map.delete_success'),
+        title: t('map.delete_success'),
       },
       errorMessages: {
         default: t('common.error'),

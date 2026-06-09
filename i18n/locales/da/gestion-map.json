@@ -1,0 +1,29 @@
+{
+  "gestion": {
+    "map": {
+      "add_marker": "Tilføj vartegn",
+      "add_zone": "Tilføj zone",
+      "click_to_draw": "Klik på kortet for at tegne polygonens hjørner",
+      "custom_color": "Brugerdefineret farve",
+      "delete_confirm": "Er du sikker på, at du vil slette denne zone?",
+      "draw_polygon": "Tegn en zone",
+      "map_public": "Gør kortet offentligt",
+      "map_public_error": "Fejl ved opdatering",
+      "map_public_updated": "Kortets synlighed opdateret",
+      "marker_color": "Farve",
+      "marker_delete_confirm": "Er du sikker på, at du vil slette dette vartegn?",
+      "marker_description": "Beskrivelse",
+      "marker_name": "Vartegnets navn",
+      "marker_types": "Vartegnstype(r)",
+      "place_marker": "Placer et vartegn",
+      "popup_delete": "Slet",
+      "popup_edit": "Rediger",
+      "stop_drawing": "Annuller tegning",
+      "stop_placing": "Annuller placering",
+      "zone_color": "Farve",
+      "zone_description": "Beskrivelse",
+      "zone_name": "Zonenavn",
+      "zone_types": "Zonetype(r)"
+    }
+  }
+}

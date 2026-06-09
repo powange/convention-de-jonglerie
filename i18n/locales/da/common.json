@@ -872,7 +872,10 @@
       "week_view": "Uge",
       "what_you_can_bring_title": "Hvad du kan bringe os",
       "withdraw": "Træk min ansøgning tilbage"
-    }
+    },
+    "my_tasks": "Mine opgaver",
+    "tasks": "Opgaver",
+    "site_map": "Områdekort"
   },
   "errors": {
     "access_denied": "Adgang nægtet",

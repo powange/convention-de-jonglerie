@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Delete this comment?",
+      "edited": "edited",
+      "empty": "No comments yet.",
+      "placeholder": "Add a comment...",
+      "post": "Post",
+      "title": "Comments"
+    },
+    "filters": {
+      "active_count": "{count} active filter | {count} active filters",
+      "assignee_placeholder": "Assignees",
+      "assignees_count": "{count} assignees",
+      "due": {
+        "all": "All deadlines",
+        "next30": "Within 30 days",
+        "next7": "Within 7 days",
+        "none": "No deadline",
+        "overdue": "Overdue",
+        "today": "Today"
+      },
+      "no_match": "No task matches the filters",
+      "search_placeholder": "Search a task...",
+      "status_placeholder": "Status",
+      "statuses_count": "{count} statuses",
+      "tag_placeholder": "Tags",
+      "tags_count": "{count} tags"
+    },
+    "my_tasks": {
+      "description": "The tasks assigned to you for this edition.",
+      "empty": "No task is assigned to you for this edition.",
+      "no_group": "No group",
+      "with": "With",
+      "with_others": "Also assigned: {names}"
+    },
+    "status": {
+      "CANCELLED": "Cancelled",
+      "DONE": "Done",
+      "IN_PROGRESS": "In progress",
+      "TODO": "To do"
+    },
+    "task_assignees": "Assigned people",
+    "task_description": "Description"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "map": {
+    "no_items": "Ingen zoner eller vartegn defineret",
+    "popup_navigate": "Rutevejledning",
+    "zones_list": "Zoner og vartegn",
+    "delete_marker": "Slet vartegn",
+    "delete_zone": "Slet zone",
+    "edit_marker": "Rediger vartegn",
+    "edit_zone": "Rediger zone",
+    "hide_item": "Skjul på kortet",
+    "open_in_maps": "Åbn i navigationsapp",
+    "show_item": "Vis på kortet",
+    "delete_success": "Zonen blev slettet",
+    "save_success": "Zonen blev gemt",
+    "marker_delete_success": "Vartegnet blev slettet",
+    "marker_save_success": "Vartegnet blev gemt",
+    "types": {
+      "accessibility": "Tilgængelighed",
+      "aerial": "Luftakrobatik / Trapez",
+      "atm": "Pengeautomat",
+      "bar": "Bar",
+      "chill_space": "Chillområde",
+      "entrance": "Indgang",
+      "fire_space": "Ildområde",
+      "food": "Bespisning",
+      "forbidden": "Forbudt område",
+      "gym": "Gymnastiksal / Hal",
+      "info": "Information",
+      "kids_zone": "Børnezone",
+      "market": "Marked",
+      "other": "Andet",
+      "parking": "Parkering",
+      "shower": "Brusere",
+      "shows": "Forestillinger",
+      "tent_camping": "Teltcamping",
+      "toilets": "Toiletter",
+      "truck_camping": "Autocampercamping",
+      "workshops": "Workshops"
+    }
+  }
+}

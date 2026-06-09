@@ -1,0 +1,51 @@
+{
+  "gestion": {
+    "task": {
+      "assignee_legacy_badge": "Больше нельзя назначать",
+      "checklist": {
+        "add": "Добавить",
+        "add_placeholder": "Новый пункт чек-листа...",
+        "confirm_delete": "Удалить пункт «{title}»?",
+        "empty": "Пока нет пунктов в чек-листе.",
+        "title": "Чек-лист"
+      },
+      "confirm_delete_group": "Удалить группу «{name}» и её {count} задач(у)?",
+      "confirm_delete_group_simple": "Удалить группу «{name}»?",
+      "confirm_delete_task": "Удалить задачу «{title}»?",
+      "edit_group": "Редактировать группу",
+      "edit_task": "Редактировать задачу",
+      "empty_group": "В этой группе нет задач",
+      "empty_state": "Пока нет групп задач",
+      "group_description": "Описание",
+      "group_description_empty": "Без описания",
+      "group_description_placeholder": "Дополнительное описание...",
+      "group_name": "Название группы",
+      "group_name_placeholder": "Напр.: Логистическая подготовка",
+      "group_not_found": "Эта группа не существует или была удалена",
+      "legacy_assignees_warning": "Некоторые назначенные больше не являются организаторами или принятыми волонтёрами. Снимите выбор, если вы больше не хотите их сохранять.",
+      "move_to_group": "Переместить в группу",
+      "new_group": "Новая группа",
+      "new_task": "Новая задача",
+      "no_assignable_users": "Нет доступных организаторов или принятых волонтёров",
+      "tags": {
+        "confirm_delete": "Удалить тег «{name}»? Он будет снят со всех задач группы, у которых он есть.",
+        "description": "Теги позволяют классифицировать задачи этой группы (например: срочно, материал, согласовать с HR).",
+        "empty": "Для этой группы не определено ни одного тега.",
+        "manage": "Управление тегами",
+        "modal_title": "Теги группы",
+        "name_placeholder": "Название тега...",
+        "new_tag": "Новый тег"
+      },
+      "task_assignees_placeholder": "Выберите людей...",
+      "task_deadline": "Срок",
+      "task_status": "Статус",
+      "task_tags": "Теги",
+      "task_tags_placeholder": "Выберите теги...",
+      "task_title": "Название",
+      "task_title_placeholder": "Напр.: Забронировать оборудование...",
+      "tasks_count": "{count} задача | {count} задачи | {count} задач",
+      "view_kanban": "Канбан",
+      "view_list": "Список"
+    }
+  }
+}

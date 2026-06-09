@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Slet denne kommentar?",
+      "edited": "redigeret",
+      "empty": "Ingen kommentarer endnu.",
+      "placeholder": "Tilføj en kommentar...",
+      "post": "Send",
+      "title": "Kommentarer"
+    },
+    "filters": {
+      "active_count": "{count} aktivt filter | {count} aktive filtre",
+      "assignee_placeholder": "Tildelte",
+      "assignees_count": "{count} tildelte",
+      "due": {
+        "all": "Alle frister",
+        "next30": "Inden for 30 dage",
+        "next7": "Inden for 7 dage",
+        "none": "Ingen frist",
+        "overdue": "Forsinket",
+        "today": "I dag"
+      },
+      "no_match": "Ingen opgave matcher filtrene",
+      "search_placeholder": "Søg en opgave...",
+      "status_placeholder": "Status",
+      "statuses_count": "{count} statusser",
+      "tag_placeholder": "Tags",
+      "tags_count": "{count} tags"
+    },
+    "my_tasks": {
+      "description": "De opgaver, der er tildelt dig i denne udgave.",
+      "empty": "Ingen opgave er tildelt dig for denne udgave.",
+      "no_group": "Ingen gruppe",
+      "with": "Med",
+      "with_others": "Også tildelt: {names}"
+    },
+    "status": {
+      "CANCELLED": "Annulleret",
+      "DONE": "Færdig",
+      "IN_PROGRESS": "I gang",
+      "TODO": "At gøre"
+    },
+    "task_assignees": "Tildelte personer",
+    "task_description": "Beskrivelse"
+  }
+}

@@ -64,7 +64,7 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
       method: 'POST',
       body: () => pendingCreateData.value,
       successMessage: {
-        title: t('gestion.map.marker_save_success'),
+        title: t('map.marker_save_success'),
       },
       errorMessages: {
         default: t('common.error'),
@@ -85,7 +85,7 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
       method: 'PUT',
       body: () => pendingUpdateData.value,
       successMessage: {
-        title: t('gestion.map.marker_save_success'),
+        title: t('map.marker_save_success'),
       },
       errorMessages: {
         default: t('common.error'),
@@ -105,7 +105,7 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
     {
       method: 'DELETE',
       successMessage: {
-        title: t('gestion.map.marker_delete_success'),
+        title: t('map.marker_delete_success'),
       },
       errorMessages: {
         default: t('common.error'),

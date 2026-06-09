@@ -1,0 +1,46 @@
+{
+  "tasks": {
+    "comments": {
+      "confirm_delete": "Eliminare questo commento?",
+      "edited": "modificato",
+      "empty": "Nessun commento ancora.",
+      "placeholder": "Aggiungi un commento...",
+      "post": "Pubblica",
+      "title": "Commenti"
+    },
+    "filters": {
+      "active_count": "{count} filtro attivo | {count} filtri attivi",
+      "assignee_placeholder": "Assegnatari",
+      "assignees_count": "{count} assegnatari",
+      "due": {
+        "all": "Tutte le scadenze",
+        "next30": "Entro 30 giorni",
+        "next7": "Entro 7 giorni",
+        "none": "Senza scadenza",
+        "overdue": "Scadute",
+        "today": "Oggi"
+      },
+      "no_match": "Nessuna attività corrisponde ai filtri",
+      "search_placeholder": "Cerca un'attività...",
+      "status_placeholder": "Stato",
+      "statuses_count": "{count} stati",
+      "tag_placeholder": "Tag",
+      "tags_count": "{count} tag"
+    },
+    "my_tasks": {
+      "description": "Le attività assegnate a te per questa edizione.",
+      "empty": "Nessuna attività ti è assegnata per questa edizione.",
+      "no_group": "Senza gruppo",
+      "with": "Con",
+      "with_others": "Assegnati anche: {names}"
+    },
+    "status": {
+      "CANCELLED": "Annullato",
+      "DONE": "Completato",
+      "IN_PROGRESS": "In corso",
+      "TODO": "Da fare"
+    },
+    "task_assignees": "Persone assegnate",
+    "task_description": "Descrizione"
+  }
+}

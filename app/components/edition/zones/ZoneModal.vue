@@ -30,7 +30,7 @@ const { t } = useI18n()
 
 const zoneTypes = computed(() =>
   EDITION_ZONE_TYPES.map((type) => ({
-    label: t(`gestion.map.types.${type.toLowerCase()}`),
+    label: t(`map.types.${type.toLowerCase()}`),
     value: type,
     icon: getZoneTypeIcon(type),
   }))
@@ -84,9 +84,7 @@ const handleClose = () => {
   emit('close')
 }
 
-const modalTitle = computed(() =>
-  props.zone ? t('gestion.map.edit_zone') : t('gestion.map.add_zone')
-)
+const modalTitle = computed(() => (props.zone ? t('map.edit_zone') : t('gestion.map.add_zone')))
 </script>
 
 <template>
