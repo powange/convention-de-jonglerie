@@ -250,14 +250,25 @@ Voir [`docs/system/NOTIFICATION_SYSTEM.md`](system/NOTIFICATION_SYSTEM.md) pour 
 
 ## i18n
 
-Toutes les clés sont sous `gestion.tasks.*` (12 langues synchronisées). Exemples :
+Les clés du module tâches sont réparties en deux domaines (13 langues synchronisées),
+chargés selon la route (voir `docs/optimization/i18n-lazy-loading.md`) :
 
-- `gestion.tasks.title`
-- `gestion.tasks.new_group`, `gestion.tasks.new_task`
-- `gestion.tasks.status.{TODO,IN_PROGRESS,DONE,CANCELLED}`
-- `gestion.tasks.empty_state`, `gestion.tasks.empty_group`
-- `gestion.tasks.tasks_count` (avec pluriel : `{count} tâche | {count} tâches`)
-- `gestion.tasks.assignee_legacy_badge`, `gestion.tasks.legacy_assignees_warning`
+- **`tasks.json`** → `tasks.*` : clés **partagées** entre la page utilisateur `/my-tasks`
+  et la gestion. Chargé sur `/editions/{id}/my-tasks` et `/editions/{id}/gestion/tasks`.
+  Ex. : `tasks.status.{TODO,IN_PROGRESS,DONE,CANCELLED}`, `tasks.filters.*`,
+  `tasks.comments.*`, `tasks.my_tasks.*`, `tasks.task_assignees`, `tasks.task_description`.
+- **`gestion-tasks.json`** → `gestion.task.*` : clés de **gestion** (création/édition,
+  groupes, tags, checklist…). Chargé sur `/editions/{id}/gestion/tasks` uniquement.
+  Ex. : `gestion.task.new_group`, `gestion.task.new_task`, `gestion.task.empty_state`,
+  `gestion.task.empty_group`, `gestion.task.tasks_count` (pluriel : `{count} tâche | {count} tâches`),
+  `gestion.task.assignee_legacy_badge`, `gestion.task.legacy_assignees_warning`.
+
+Libellés transverses dans `common.json` (toujours chargés) :
+
+- `edition.tasks` (libellé « Tâches » : menu de gestion + carte de l'overview)
+- `edition.my_tasks` (onglet « Mes tâches » du header)
+- `gestion.task.manage_title`, `gestion.task.manage_description` (carte du module sur
+  l'overview — dans `gestion.json`, chargé sur toutes les pages `/gestion`)
 - `gestion.features.tasks_description` (description du toggle dans Fonctionnalités)
 - `permissions.manageTasks`
 
@@ -319,7 +330,7 @@ Permet de partager un lien filtré ou de revenir en arrière en gardant la séle
 
 ### Empty state filtré
 
-Si `group.tasks.length > 0` mais qu'aucune tâche ne correspond aux filtres actifs, un message dédié `gestion.tasks.filters.no_match` s'affiche à la place du listing (distinct de l'empty state « groupe vide »).
+Si `group.tasks.length > 0` mais qu'aucune tâche ne correspond aux filtres actifs, un message dédié `tasks.filters.no_match` s'affiche à la place du listing (distinct de l'empty state « groupe vide »).
 
 ## Tags / labels
 

@@ -2,166 +2,143 @@
 
 ## Vue d'ensemble
 
-Le système de traductions a été optimisé pour charger les fichiers de traduction à la demande (lazy loading), réduisant ainsi la taille du bundle initial et améliorant les performances.
+Les traductions sont organisées **par domaine fonctionnel** et chargées **à la demande
+selon la route**, afin de réduire le bundle initial. Trois mécanismes coexistent :
+
+1. **Fichiers statiques** (toujours chargés) — listés dans `nuxt.config.ts` (`i18n.locales[].files`).
+2. **Chargement par route** — middleware global qui charge des domaines supplémentaires
+   en fonction de l'URL visitée.
+3. **Chargement au niveau composant** — composable `useLazyI18n` (voir
+   [`i18n-component-lazy-loading.md`](./i18n-component-lazy-loading.md)).
+
+13 langues : `cs, da, de, en, es, fr, it, nl, pl, pt, ru, sv, uk`.
 
 ## Structure des fichiers
 
-Les traductions sont maintenant organisées par domaine fonctionnel :
-
 ```
-i18n/locales/
-├── en/
-│   ├── common.json       # Traductions communes (toujours chargées)
-│   ├── components.json   # Composants UI (toujours chargés)
-│   ├── app.json          # PWA et services (toujours chargés)
-│   ├── public.json       # Pages publiques (toujours chargées)
-│   ├── admin.json        # Administration (chargé sur /admin)
-│   ├── edition.json      # Éditions et conventions (chargé sur /editions)
-│   └── auth.json         # Authentification (chargé sur /auth, /login, etc.)
-├── fr/
-│   └── ... (même structure)
-└── ... (autres langues)
-```
-
-## Fichiers chargés par défaut
-
-Ces fichiers sont automatiquement chargés au démarrage de l'application :
-
-- `common.json` : Traductions de base (navigation, footer, erreurs, validation, etc.)
-- `components.json` : Composants UI réutilisables
-- `app.json` : Configuration PWA et services
-- `public.json` : Pages publiques (homepage, SEO, etc.)
-
-## Fichiers chargés à la demande
-
-Ces fichiers sont chargés uniquement lorsque l'utilisateur visite les routes correspondantes :
-
-| Fichier          | Routes                                       | Contenu                                                       |
-| ---------------- | -------------------------------------------- | ------------------------------------------------------------- |
-| `admin.json`     | `/admin/*`                                   | Interface d'administration, feedback                          |
-| `edition.json`   | `/editions/*`                                | Éditions, conventions, organisateurs, calendrier, covoiturage |
-| `auth.json`      | `/auth/*`, `/login`, `/register`, `/profile` | Authentification, profil, permissions                         |
-| `messenger.json` | `/messenger`                                 | Système de messagerie, conversations                          |
-
-## Middleware de chargement
-
-Le middleware `app/middleware/load-translations.global.ts` gère automatiquement le chargement :
-
-```typescript
-// Exemple : visite de /admin
-// → Charge automatiquement admin.json pour la langue courante
-// → Les traductions sont fusionnées avec celles déjà chargées
-// → Le même fichier n'est jamais chargé deux fois
+i18n/locales/{langue}/
+├── common.json          # navigation, footer, erreurs, libellés transverses
+├── components.json      # composants UI réutilisables
+├── app.json             # PWA et services
+├── public.json          # pages publiques (homepage, SEO)
+├── notifications.json   # notifications
+├── feedback.json        # retours / signalements
+├── admin.json           # administration
+├── auth.json            # authentification
+├── profil.json          # profil utilisateur
+├── edition.json         # carpool/conventions/diet/organizers (clés racines)
+├── gestion.json         # interface de gestion (gestion.*)
+├── tasks.json           # module tâches partagé (tasks.*)
+├── gestion-tasks.json   # clés de gestion des tâches (gestion.task.*)
+├── map.json             # UI carte partagée (map.*)
+├── gestion-map.json     # clés d'édition de la carte (gestion.map.*)
+├── ticketing.json       # billetterie
+├── workshops.json       # ateliers
+├── artists.json         # artistes
+├── survey.json          # sondages / shows-call
+├── messenger.json       # messagerie
+├── permissions.json     # droits
+└── project-costs.json   # coûts projet
 ```
 
-**Note technique importante** : Le middleware utilise une map statique d'imports (`translationLoaders`) pour chaque fichier et locale. Cette approche est nécessaire car Vite requiert des chemins d'import statiques pour l'analyse du code. Les imports dynamiques avec des variables ne sont pas supportés.
+> Le **namespace** d'un fichier vient de sa **structure JSON** (clé racine), pas de son
+> nom. Ex. `tasks.json` = `{ "tasks": { … } }` → `tasks.*` ; `gestion-tasks.json`
+> = `{ "gestion": { "task": { … } } }` → `gestion.task.*`. Deux fichiers peuvent ainsi
+> alimenter le même namespace (`gestion.json` + `gestion-tasks.json` + `gestion-map.json`
+> partagent `gestion.*`), fusionnés par deep-merge.
 
-## Avantages
+## Fichiers chargés par défaut (statiques)
 
-### Performance
+Définis dans `nuxt.config.ts`. Cœur commun à toutes les langues :
+`common.json`, `notifications.json`, `components.json`, `app.json`, `public.json`.
 
-- **Bundle initial réduit** : ~50% de réduction pour les utilisateurs ne visitant pas l'admin
-- **Temps de chargement plus rapide** : Moins de JavaScript à parser au démarrage
-- **Chargement asynchrone** : Les traductions sont chargées en parallèle de la navigation
+> ⚠️ Quirk historique : `fr` charge **en plus** `feedback.json` et `gestion.json`
+> statiquement. C'est pourquoi le français a longtemps « marché partout » alors que les
+> autres langues manquaient des clés `gestion.*` sur les pages publiques. La règle saine
+> est de **router** les domaines plutôt que de les charger statiquement (cf. ci-dessous).
 
-### Maintenance
+## Chargement par route
 
-- **Organisation claire** : Séparation logique par domaine fonctionnel
-- **Fichiers plus petits** : Plus facile à maintenir et réviser
-- **Évolutivité** : Facile d'ajouter de nouveaux domaines
+Géré par `app/middleware/load-translations.global.ts`, qui appelle
+`getTranslationsToLoad(path)` défini dans **`app/utils/translation-loaders.ts`**.
+Ce fichier contient deux choses :
 
-### Utilisation
+- `getTranslationsToLoad(path)` : routes statiques (`startsWith`) + patterns dynamiques (regex).
+- `translationLoaders` : map `domaine → { langue → () => import(...) }` (imports **statiques**,
+  requis par Vite ; chemins `~~/i18n/locales/...`).
 
-- **Transparente** : Aucun changement nécessaire dans les composants existants
-- **Cache intelligent** : Les traductions chargées restent en mémoire
-- **Gestion des erreurs** : Fallback automatique en cas d'échec de chargement
+### Routes statiques (`startsWith`)
 
-## Ajouter un nouveau domaine
+| Préfixe                                       | Domaines chargés        |
+| --------------------------------------------- | ----------------------- |
+| `/admin`                                      | admin, auth, profil     |
+| `/editions`                                   | edition                 |
+| `/project-costs`                              | project-costs           |
+| `/auth`, `/verify-email`                      | auth (+ profil)         |
+| `/login`                                      | auth                    |
+| `/register`, `/profile`, `/welcome`           | auth, profil            |
+| `/messenger`                                  | messenger               |
 
-### 1. Modifier le script de séparation
+### Routes dynamiques (regex, cumulatives)
 
-Éditer `scripts/split-i18n.js` :
+| Pattern                              | Domaines             | Notes                                  |
+| ------------------------------------ | -------------------- | -------------------------------------- |
+| `/editions/{id}/gestion`             | gestion              | toutes les sous-pages de gestion       |
+| `/editions/{id}/gestion` (exact)     | workshops, tasks     | overview (cartes de modules)           |
+| `/editions/{id}/gestion/tasks`       | tasks, gestion-tasks | gestion des tâches                     |
+| `/editions/{id}/gestion/map`         | map, gestion-map     | édition de la carte                    |
+| `/editions/{id}/gestion/ticketing`   | ticketing            |                                        |
+| `/editions/{id}/gestion/workshops`   | workshops            |                                        |
+| `/editions/{id}/gestion/artists`     | artists              |                                        |
+| `/editions/{id}/gestion/shows-call`  | survey               |                                        |
+| `/editions/{id}/my-tasks`            | tasks                | page utilisateur (lecture)             |
+| `/editions/{id}/map`                 | map                  | carte publique                         |
+| `/editions/{id}/artist-space`        | artists              |                                        |
+| `/editions/{id}/workshops`           | workshops            |                                        |
+| `/survey/`                           | survey               |                                        |
 
-```javascript
-const SPLIT_CONFIG = {
-  // ... configuration existante
+## Motif « partagé / management »
 
-  // Nouveau domaine
-  nouveauDomaine: ['cle1', 'cle2'],
-}
-```
+Pour les modules présents à la fois côté **public/utilisateur** et côté **gestion**, les
+clés sont séparées en deux domaines afin de ne pas charger les clés d'édition sur les
+pages publiques :
 
-### 2. Re-générer les fichiers
+| Module | Partagé (public + gestion) | Management (gestion uniquement) | Libellé de nav (toujours chargé) |
+| ------ | -------------------------- | ------------------------------- | -------------------------------- |
+| Carte  | `map.*` (`map.json`)       | `gestion.map.*` (`gestion-map.json`) | `common` → `edition.site_map` |
+| Tâches | `tasks.*` (`tasks.json`)   | `gestion.task.*` (`gestion-tasks.json`) | `common` → `edition.my_tasks`, `edition.tasks` |
 
-```bash
-node scripts/split-i18n.js
-```
+Les libellés d'onglets/menu (affichés sur toutes les pages d'édition via `EditionHeader`
+et le layout `edition-dashboard`) vivent dans `common.json` (`edition.*`) car ils doivent
+être disponibles partout sans charger le domaine complet.
 
-### 3. Mettre à jour nuxt.config.ts
+## Ajouter / déplacer un domaine
 
-Ajouter le nouveau fichier aux locales si nécessaire (optionnel, seulement s'il doit être chargé par défaut).
+1. **Créer le fichier** `i18n/locales/{langue}/{domaine}.json` pour les **13 langues**,
+   avec la structure JSON donnant le namespace voulu (cf. note plus haut).
+2. **Ajouter le loader** dans `app/utils/translation-loaders.ts` → `translationLoaders` :
+   une entrée par langue, `() => import('~~/i18n/locales/{langue}/{domaine}.json')`.
+3. **Mapper la route** dans `getTranslationsToLoad` (route statique ou pattern dynamique).
+4. (Optionnel) ajouter aux `files` de `nuxt.config.ts` seulement si le domaine doit être
+   chargé **statiquement** (à éviter sauf cœur commun).
 
-### 4. Ajouter les loaders statiques
+> ⚠️ **Contrainte outillage** : les scripts i18n (`check-i18n.js`,
+> `check-i18n-translations.js`, `mark-todo.js`, …) lisent le dossier de langue **à plat**
+> (`readdirSync`, non récursif). **Pas de sous-dossiers** dans `i18n/locales/{langue}/` :
+> ils seraient invisibles pour ces scripts. Utiliser des fichiers plats à la racine de la
+> langue, le namespace étant porté par la structure JSON.
 
-Ajouter les imports pour toutes les locales dans `translationLoaders` :
+## Vérification
 
-```typescript
-// app/middleware/load-translations.global.ts
-const translationLoaders: Record<string, Record<string, () => Promise<any>>> = {
-  // ... domaines existants
-  nouveauDomaine: {
-    en: () => import('~/i18n/locales/en/nouveauDomaine.json'),
-    da: () => import('~/i18n/locales/da/nouveauDomaine.json'),
-    de: () => import('~/i18n/locales/de/nouveauDomaine.json'),
-    es: () => import('~/i18n/locales/es/nouveauDomaine.json'),
-    fr: () => import('~/i18n/locales/fr/nouveauDomaine.json'),
-    it: () => import('~/i18n/locales/it/nouveauDomaine.json'),
-    nl: () => import('~/i18n/locales/nl/nouveauDomaine.json'),
-    pl: () => import('~/i18n/locales/pl/nouveauDomaine.json'),
-    pt: () => import('~/i18n/locales/pt/nouveauDomaine.json'),
-    ru: () => import('~/i18n/locales/ru/nouveauDomaine.json'),
-    uk: () => import('~/i18n/locales/uk/nouveauDomaine.json'),
-  },
-}
-```
+- `npm run check-i18n` : clés manquantes / inutilisées / mal placées.
+- `npm run check-translations` : couverture et synchronisation des 13 langues.
+- Runtime : DevTools → Network → filtrer `json`, naviguer, vérifier que chaque domaine
+  n'est chargé que sur ses routes.
 
-### 5. Mettre à jour les routes
+## Débogage (clé manquante / `[intlify] Not found`)
 
-Si le nouveau domaine doit être chargé sur certaines routes :
-
-```typescript
-// app/middleware/load-translations.global.ts
-const routeTranslations: Record<string, string[]> = {
-  // ... routes existantes
-  '/nouvelle-route': ['nouveauDomaine'],
-}
-```
-
-## Migration depuis l'ancien système
-
-Les anciens fichiers JSON ont été sauvegardés dans `i18n/locales-backup/` et peuvent être supprimés après vérification.
-
-## Tests
-
-Pour tester le chargement :
-
-1. Ouvrir les DevTools → Network
-2. Filtrer par "i18n" ou "json"
-3. Naviguer vers différentes routes
-4. Vérifier que les fichiers sont chargés uniquement quand nécessaire
-
-## Débogage
-
-En cas de clés manquantes :
-
-1. Vérifier dans quel fichier la clé devrait être (voir `scripts/split-i18n.js`)
-2. S'assurer que le middleware charge bien le fichier pour la route
-3. Vérifier la console pour les erreurs de chargement
-4. En dernier recours, ajouter la clé dans `common.json`
-
-## Performance attendues
-
-- **Bundle initial** : ~60KB → ~30KB (traductions)
-- **Page admin** : +20KB chargé à la demande
-- **Page éditions** : +40KB chargé à la demande
-- **Pages auth** : +10KB chargé à la demande
+1. Vérifier dans quel fichier/namespace la clé est définie (`grep` dans `i18n/locales/fr`).
+2. S'assurer que `getTranslationsToLoad` charge ce domaine pour la route concernée.
+3. Si la clé est un **libellé transverse** (nav, menu) affiché hors de ses routes, la
+   placer dans `common.json` (`edition.*`).
+4. Vérifier la console pour les erreurs de chargement du domaine.

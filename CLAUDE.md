@@ -139,9 +139,11 @@
 
 **Note importante sur l'i18n :**
 
-- Les traductions sont organisées par domaine dans `i18n/locales/{langue}/{domaine}.json`
-- Domaines : `common`, `admin`, `edition`, `auth`, `public`, `components`, `app`
-- Le lazy loading charge automatiquement les traductions selon les routes (voir `docs/i18n-lazy-loading.md`)
+- Les traductions sont organisées par domaine dans `i18n/locales/{langue}/{domaine}.json` (13 langues)
+- Le namespace d'un fichier vient de sa structure JSON (clé racine), pas de son nom (ex. `gestion-tasks.json` = `{ gestion: { task: {…} } }` → `gestion.task.*`)
+- Modules public + gestion séparés en 2 domaines : `map`/`gestion-map`, `tasks`/`gestion-tasks` ; les libellés de nav transverses sont dans `common.json` (`edition.site_map`, `edition.my_tasks`, `edition.tasks`)
+- Le lazy loading charge les traductions selon les routes via `app/utils/translation-loaders.ts` (voir `docs/optimization/i18n-lazy-loading.md` pour la liste complète des domaines et le mapping des routes)
+- Pas de sous-dossiers dans `i18n/locales/{langue}/` : l'outillage i18n lit les fichiers à plat
 - Le script `scripts/check-i18n.js` fusionne automatiquement tous les fichiers pour l'analyse
 
 ## Commandes Claude personnalisées
