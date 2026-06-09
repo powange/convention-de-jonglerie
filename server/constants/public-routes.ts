@@ -64,6 +64,8 @@ export const publicRoutes: PublicRoute[] = [
   { path: '/api/conventions', methods: ['GET'] },
   { path: '/api/editions', methods: ['GET'] },
   { path: '/api/__sitemap__/editions', methods: ['GET'] },
+  { path: '/api/__sitemap__/carpool', methods: ['GET'] },
+  { path: '/api/__sitemap__/volunteers', methods: ['GET'] },
   { path: '/api/countries', methods: ['GET'] },
 
   // ====== Fichiers statiques ======
