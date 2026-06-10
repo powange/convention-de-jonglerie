@@ -118,6 +118,14 @@
     "username_help": "Offentligt synliga för andra användare",
     "username_min_3": "Användarnamnet måste innehålla minst 3 tecken",
     "username_placeholder": "Ditt unika användarnamn",
-    "welcome": "Välkommen!"
+    "welcome": "Välkommen!",
+    "pronouns": "Pronomen",
+    "pronouns_help": "Hur du vill bli tilltalad",
+    "pronouns_none": "Ej angivet",
+    "pronouns_options": {
+      "she": "hon",
+      "he": "han",
+      "they": "hen"
+    }
   }
 }

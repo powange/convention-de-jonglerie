@@ -118,6 +118,14 @@
     "username_help": "Publicly visible to other users",
     "username_min_3": "Username must contain at least 3 characters",
     "username_placeholder": "Your unique username",
-    "welcome": "Welcome!"
+    "welcome": "Welcome!",
+    "pronouns": "Pronoun",
+    "pronouns_help": "How you'd like to be addressed",
+    "pronouns_none": "Not specified",
+    "pronouns_options": {
+      "she": "she",
+      "he": "he",
+      "they": "they"
+    }
   }
 }

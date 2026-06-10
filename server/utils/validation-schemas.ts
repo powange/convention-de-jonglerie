@@ -2,6 +2,7 @@ import { isValidPhoneNumber, parsePhoneNumberFromString } from 'libphonenumber-j
 import { z } from 'zod'
 
 import { getSupportedLocalesCodes } from '~/utils/locales'
+import { isValidPronoun } from '~/utils/pronouns'
 
 /**
  * Validation d'un numéro de téléphone international.
@@ -105,6 +106,7 @@ export const updateProfileSchema = z.object({
   nom: z.string().max(100, 'Ce champ ne peut pas dépasser 100 caractères').optional(),
   email: emailSchema,
   telephone: phoneSchema.optional(),
+  pronouns: z.string().refine(isValidPronoun, 'Pronom invalide').nullable().optional(),
   profilePicture: z.string().nullable().optional(),
   preferredLanguage: z
     .string()

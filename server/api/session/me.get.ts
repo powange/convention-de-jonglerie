@@ -20,6 +20,7 @@ export default wrapApiHandler<SessionMeResponse>(
         nom: true,
         prenom: true,
         phone: true,
+        pronouns: true,
         profilePicture: true,
         isGlobalAdmin: true,
         isVolunteer: true,

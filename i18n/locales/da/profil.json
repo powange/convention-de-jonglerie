@@ -118,6 +118,14 @@
     "username_help": "Synlig offentligt for andre brugere",
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
     "username_placeholder": "Dit unikke brugernavn",
-    "welcome": "Velkommen!"
+    "welcome": "Velkommen!",
+    "pronouns": "Pronomen",
+    "pronouns_help": "Hvordan du gerne vil tiltales",
+    "pronouns_none": "Ikke angivet",
+    "pronouns_options": {
+      "she": "hun",
+      "he": "han",
+      "they": "hen"
+    }
   }
 }

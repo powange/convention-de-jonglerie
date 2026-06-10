@@ -118,6 +118,14 @@
     "username_help": "Visível publicamente pelos outros utilizadores",
     "username_min_3": "A alcunha deve conter pelo menos 3 caracteres",
     "username_placeholder": "A sua alcunha única",
-    "welcome": "Bem-vindo!"
+    "welcome": "Bem-vindo!",
+    "pronouns": "Pronome",
+    "pronouns_help": "Como prefere que se dirijam a si",
+    "pronouns_none": "Não especificado",
+    "pronouns_options": {
+      "she": "ela",
+      "he": "ele",
+      "they": "elu"
+    }
   }
 }

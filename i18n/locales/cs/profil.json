@@ -118,6 +118,14 @@
     "username_help": "Veřejně viditelné pro ostatní uživatele",
     "username_min_3": "Uživatelské jméno musí obsahovat alespoň 3 znaky.",
     "username_placeholder": "Vaše jedinečné uživatelské jméno",
-    "welcome": "Vítejte!"
+    "welcome": "Vítejte!",
+    "pronouns": "Zájmeno",
+    "pronouns_help": "Jak vás máme oslovovat",
+    "pronouns_none": "Neuvedeno",
+    "pronouns_options": {
+      "she": "ona",
+      "he": "on",
+      "they": "ono"
+    }
   }
 }

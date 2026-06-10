@@ -33,6 +33,7 @@ export default wrapApiHandler(
       nom,
       prenom,
       telephone,
+      pronouns,
       profilePicture,
       preferredLanguage,
       isVolunteer,
@@ -153,6 +154,8 @@ export default wrapApiHandler(
         nom: sanitizeString(nom),
         prenom: sanitizeString(prenom),
         phone: sanitizeString(telephone),
+        // Pronom (elle / il / iel) — null si non renseigné
+        ...(pronouns !== undefined && { pronouns: sanitizeString(pronouns) || null }),
         // Ne mettre à jour la photo que si explicitement fournie dans validatedData
         ...(profilePicture !== undefined && { profilePicture: finalProfileFilename }),
         // Mettre à jour la langue préférée si fournie
@@ -172,6 +175,7 @@ export default wrapApiHandler(
         nom: true,
         prenom: true,
         phone: true,
+        pronouns: true,
         profilePicture: true,
         preferredLanguage: true,
         isVolunteer: true,

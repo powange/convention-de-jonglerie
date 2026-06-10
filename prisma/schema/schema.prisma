@@ -29,6 +29,7 @@ model User {
   verificationCodeExpiry             DateTime?
   isGlobalAdmin                      Boolean                             @default(false)
   phone                              String?
+  pronouns                           String?
   preferredLanguage                  String                              @default("fr")
   notificationPreferences            Json?
   isVolunteer                        Boolean                             @default(false)

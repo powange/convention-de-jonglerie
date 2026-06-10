@@ -91,6 +91,19 @@
               />
             </UFormField>
 
+            <UFormField
+              :label="t('profile.pronouns')"
+              name="pronouns"
+              :help="t('profile.pronouns_help')"
+            >
+              <USelect
+                v-model="state.pronouns"
+                icon="i-heroicons-user"
+                :items="pronounsOptions"
+                size="lg"
+              />
+            </UFormField>
+
             <UFormField :label="t('profile.preferred_language')" name="preferredLanguage">
               <USelect
                 v-model="state.preferredLanguage"
@@ -154,6 +167,7 @@ import { z } from 'zod'
 import { useAuthStore } from '~/stores/auth'
 import type { User } from '~/types'
 import { LOCALES_CONFIG } from '~/utils/locales'
+import { USER_PRONOUNS } from '~/utils/pronouns'
 
 definePageMeta({
   layout: 'profile',
@@ -168,6 +182,11 @@ const languageOptions = LOCALES_CONFIG.map((locale) => ({
   label: locale.name,
 }))
 
+const pronounsOptions = computed(() => [
+  { value: '', label: t('profile.pronouns_none') },
+  ...USER_PRONOUNS.map((p) => ({ value: p, label: t(`profile.pronouns_options.${p}`) })),
+])
+
 const schema = z.object({
   email: z.string().email(t('errors.invalid_email')),
   pseudo: z.string().min(3, t('profile.username_min_3')),
@@ -177,6 +196,7 @@ const schema = z.object({
     .string()
     .optional()
     .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), t('errors.invalid_phone_number')),
+  pronouns: z.string().optional(),
   preferredLanguage: z.string().optional(),
 })
 
@@ -186,6 +206,7 @@ const state = reactive({
   nom: (authStore.user as any)?.nom || '',
   prenom: (authStore.user as any)?.prenom || '',
   telephone: (authStore.user as any)?.telephone || (authStore.user as any)?.phone || '',
+  pronouns: (authStore.user as any)?.pronouns || '',
   preferredLanguage: (authStore.user as any)?.preferredLanguage || 'fr',
 })
 
@@ -197,6 +218,7 @@ const hasChanges = computed(() => {
     state.prenom !== ((authStore.user as any)?.prenom || '') ||
     state.telephone !==
       ((authStore.user as any)?.telephone || (authStore.user as any)?.phone || '') ||
+    state.pronouns !== ((authStore.user as any)?.pronouns || '') ||
     state.preferredLanguage !== ((authStore.user as any)?.preferredLanguage || 'fr')
   )
 })
@@ -207,6 +229,7 @@ const resetForm = () => {
   state.nom = (authStore.user as any)?.nom || ''
   state.prenom = (authStore.user as any)?.prenom || ''
   state.telephone = (authStore.user as any)?.telephone || (authStore.user as any)?.phone || ''
+  state.pronouns = (authStore.user as any)?.pronouns || ''
   state.preferredLanguage = (authStore.user as any)?.preferredLanguage || 'fr'
 }
 
@@ -220,6 +243,7 @@ const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
       nom: state.nom || '',
       prenom: state.prenom || '',
       telephone: state.telephone || '',
+      pronouns: state.pronouns || '',
       preferredLanguage: state.preferredLanguage || 'fr',
     }),
     successMessage: {

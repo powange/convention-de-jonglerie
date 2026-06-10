@@ -8,6 +8,7 @@ export interface User {
   nom?: string | null
   telephone?: string | null
   phone?: string | null // compat ancien champ
+  pronouns?: string | null
   profilePicture?: string | null
   isGlobalAdmin?: boolean
   isVolunteer?: boolean

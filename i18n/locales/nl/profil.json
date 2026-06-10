@@ -118,6 +118,14 @@
     "username_help": "Publiekelijk zichtbaar voor andere gebruikers",
     "username_min_3": "Gebruikersnaam moet minimaal 3 tekens bevatten",
     "username_placeholder": "Je unieke gebruikersnaam",
-    "welcome": "Welkom!"
+    "welcome": "Welkom!",
+    "pronouns": "Voornaamwoord",
+    "pronouns_help": "Hoe je aangesproken wilt worden",
+    "pronouns_none": "Niet opgegeven",
+    "pronouns_options": {
+      "she": "zij",
+      "he": "hij",
+      "they": "die"
+    }
   }
 }

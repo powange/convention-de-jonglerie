@@ -118,6 +118,14 @@
     "username_help": "Visibile pubblicamente dagli altri utenti",
     "username_min_3": "Il nome utente deve contenere almeno 3 caratteri",
     "username_placeholder": "Il tuo nome utente unico",
-    "welcome": "Benvenuto!"
+    "welcome": "Benvenuto!",
+    "pronouns": "Pronome",
+    "pronouns_help": "Come preferisci che ci si rivolga a te",
+    "pronouns_none": "Non specificato",
+    "pronouns_options": {
+      "she": "lei",
+      "he": "lui",
+      "they": "loro"
+    }
   }
 }

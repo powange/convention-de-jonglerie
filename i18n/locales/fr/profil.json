@@ -118,6 +118,14 @@
     "username_help": "Visible publiquement par les autres utilisateurs",
     "username_min_3": "Le pseudo doit contenir au moins 3 caractères",
     "username_placeholder": "Votre pseudo unique",
-    "welcome": "Bienvenue !"
+    "welcome": "Bienvenue !",
+    "pronouns": "Pronom",
+    "pronouns_help": "Comment souhaitez-vous qu'on s'adresse à vous",
+    "pronouns_none": "Non renseigné",
+    "pronouns_options": {
+      "she": "elle",
+      "he": "il",
+      "they": "iel"
+    }
   }
 }

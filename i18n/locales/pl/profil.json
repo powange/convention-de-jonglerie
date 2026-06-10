@@ -118,6 +118,14 @@
     "username_help": "Widoczne publicznie przez innych użytkowników",
     "username_min_3": "Pseudonim musi zawierać co najmniej 3 znaki",
     "username_placeholder": "Twój unikalny pseudonim",
-    "welcome": "Witamy!"
+    "welcome": "Witamy!",
+    "pronouns": "Zaimek",
+    "pronouns_help": "Jak chcesz, aby się do Ciebie zwracano",
+    "pronouns_none": "Nie podano",
+    "pronouns_options": {
+      "she": "ona",
+      "he": "on",
+      "they": "ono"
+    }
   }
 }
