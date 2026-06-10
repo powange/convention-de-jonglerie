@@ -38,7 +38,7 @@
               <div class="space-y-2 flex-1">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
                   <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
-                  {{ t('edition.volunteers.management_title') }}
+                  {{ t('volunteers.management_title') }}
                 </h3>
                 <p
                   v-if="volunteersMode === 'INTERNAL'"
@@ -51,8 +51,8 @@
                   />
                   {{
                     canManageVolunteers
-                      ? t('edition.volunteers.admin_only_note')
-                      : t('edition.volunteers.view_only_note')
+                      ? t('volunteers.admin_only_note')
+                      : t('volunteers.view_only_note')
                   }}
                 </p>
               </div>
@@ -75,15 +75,15 @@
                 >{{ t('common.total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
               >
               <UBadge color="warning" variant="soft"
-                >{{ t('edition.volunteers.status_pending') }}:
+                >{{ t('volunteers.status_pending') }}:
                 {{ volunteersInfo.counts.PENDING || 0 }}</UBadge
               >
               <UBadge color="success" variant="soft"
-                >{{ t('edition.volunteers.status_accepted') }}:
+                >{{ t('volunteers.status_accepted') }}:
                 {{ volunteersInfo.counts.ACCEPTED || 0 }}</UBadge
               >
               <UBadge color="error" variant="soft"
-                >{{ t('edition.volunteers.status_rejected') }}:
+                >{{ t('volunteers.status_rejected') }}:
                 {{ volunteersInfo.counts.REJECTED || 0 }}</UBadge
               >
             </div>
@@ -113,7 +113,7 @@
               <div class="text-center py-8">
                 <UIcon name="i-heroicons-link" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                  {{ t('edition.volunteers.external_mode_note') }}
+                  {{ t('volunteers.external_mode_note') }}
                 </p>
               </div>
             </template>
@@ -1183,7 +1183,7 @@ const directAssign = (teamId: string) => {
 // Fonction pour traiter les actions de déplacer/ajouter depuis la modal
 const handleVolunteerAdded = async () => {
   toast.add({
-    title: t('edition.volunteers.volunteer_added_success'),
+    title: t('volunteers.volunteer_added_success'),
     color: 'success',
   })
   // Recharger les données

@@ -1,0 +1,36 @@
+{
+  "gestion": {
+    "volunteers": {
+      "action_add_comment": "Agregar comentario",
+      "applications_open": "Apertura de las candidaturas",
+      "applications_open_description": "Activar o desactivar solicitudes de voluntariado",
+      "comment_delete_error": "No se puede eliminar el comentario",
+      "comment_deleted_success": "Comentario eliminado exitosamente",
+      "comment_hint": "Este comentario solo será visible para los organizadores de la convención",
+      "comment_label": "Comentario",
+      "comment_modal_title": "Comentario sobre el voluntario",
+      "comment_modal_title_for": "Comentario sobre {name}",
+      "comment_placeholder": "Escriba un comentario sobre este voluntario...",
+      "comment_save_error": "No se puede guardar el comentario",
+      "comment_saved_success": "Comentario guardado exitosamente",
+      "comment_warning": "Este comentario está vinculado al voluntario solo para esta edición.",
+      "config_page_description": "Configurar ajustes del sistema de voluntariado",
+      "dates_description": "Defina las fechas de montaje y desmontaje para permitir a los voluntarios indicar su disponibilidad",
+      "dates_title": "Fechas de montaje y desmontaje",
+      "external_link": "Enlace externo",
+      "external_url_description": "Enlace a su formulario o herramienta externa de gestión de voluntarios",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "general_settings": "Configuración general",
+      "management_mode": "Gestión del voluntariado",
+      "management_mode_description": "Elija cómo gestionar a los voluntarios para esta edición",
+      "mode_external": "Exterior",
+      "mode_external_badge": "Exterior",
+      "mode_internal": "Interno",
+      "mode_internal_badge": "Interno",
+      "page_public": "Página pública visible",
+      "page_public_description": "Hacer visible la página pública de voluntarios para los visitantes (de lo contrario, solo los organizadores tienen acceso)",
+      "page_public_hidden": "Página oculta — solo los organizadores tienen acceso",
+      "page_public_visible": "Página accesible para todos"
+    }
+  }
+}

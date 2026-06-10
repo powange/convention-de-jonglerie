@@ -61,6 +61,11 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion\/map/,
       translations: ['map', 'gestion-map'],
     },
+    // Gestion bénévoles : domaine volunteers (partagé) + gestion-volunteers (management)
+    {
+      pattern: /^\/editions\/\d+\/gestion\/volunteers/,
+      translations: ['volunteers', 'gestion-volunteers'],
+    },
     // Add-ons par sous-section
     {
       pattern: /^\/editions\/\d+\/gestion\/ticketing/,
@@ -88,6 +93,16 @@ export function getTranslationsToLoad(path: string): string[] {
     {
       pattern: /^\/editions\/\d+\/map/,
       translations: ['map'],
+    },
+    // Bénévolat public (page d'inscription/candidature) : domaine volunteers partagé
+    {
+      pattern: /^\/editions\/\d+\/volunteers/,
+      translations: ['volunteers'],
+    },
+    // Profil : page « Mes candidatures bénévole » réutilise le domaine volunteers
+    {
+      pattern: /^\/profile\/mes-candidatures-benevole/,
+      translations: ['volunteers'],
     },
     {
       pattern: /^\/survey\//,
@@ -282,6 +297,38 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/gestion-map.json'),
     cs: () => import('~~/i18n/locales/cs/gestion-map.json'),
     sv: () => import('~~/i18n/locales/sv/gestion-map.json'),
+  },
+  // Clés bénévoles partagées (public + gestion, namespace volunteers.*)
+  volunteers: {
+    en: () => import('~~/i18n/locales/en/volunteers.json'),
+    da: () => import('~~/i18n/locales/da/volunteers.json'),
+    de: () => import('~~/i18n/locales/de/volunteers.json'),
+    es: () => import('~~/i18n/locales/es/volunteers.json'),
+    fr: () => import('~~/i18n/locales/fr/volunteers.json'),
+    it: () => import('~~/i18n/locales/it/volunteers.json'),
+    nl: () => import('~~/i18n/locales/nl/volunteers.json'),
+    pl: () => import('~~/i18n/locales/pl/volunteers.json'),
+    pt: () => import('~~/i18n/locales/pt/volunteers.json'),
+    ru: () => import('~~/i18n/locales/ru/volunteers.json'),
+    uk: () => import('~~/i18n/locales/uk/volunteers.json'),
+    cs: () => import('~~/i18n/locales/cs/volunteers.json'),
+    sv: () => import('~~/i18n/locales/sv/volunteers.json'),
+  },
+  // Clés de gestion bénévoles (uniquement côté gestion, namespace gestion.volunteers.*)
+  'gestion-volunteers': {
+    en: () => import('~~/i18n/locales/en/gestion-volunteers.json'),
+    da: () => import('~~/i18n/locales/da/gestion-volunteers.json'),
+    de: () => import('~~/i18n/locales/de/gestion-volunteers.json'),
+    es: () => import('~~/i18n/locales/es/gestion-volunteers.json'),
+    fr: () => import('~~/i18n/locales/fr/gestion-volunteers.json'),
+    it: () => import('~~/i18n/locales/it/gestion-volunteers.json'),
+    nl: () => import('~~/i18n/locales/nl/gestion-volunteers.json'),
+    pl: () => import('~~/i18n/locales/pl/gestion-volunteers.json'),
+    pt: () => import('~~/i18n/locales/pt/gestion-volunteers.json'),
+    ru: () => import('~~/i18n/locales/ru/gestion-volunteers.json'),
+    uk: () => import('~~/i18n/locales/uk/gestion-volunteers.json'),
+    cs: () => import('~~/i18n/locales/cs/gestion-volunteers.json'),
+    sv: () => import('~~/i18n/locales/sv/gestion-volunteers.json'),
   },
   'project-costs': {
     en: () => import('~~/i18n/locales/en/project-costs.json'),

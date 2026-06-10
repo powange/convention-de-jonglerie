@@ -625,44 +625,6 @@
     },
     "title": "Керування",
     "view_edition": "Переглянути випуск",
-    "volunteers": {
-      "action_add_comment": "Додати коментар",
-      "applications_description": "Перегляд та обробка заявок",
-      "applications_open": "Відкриття заявок",
-      "applications_open_description": "Активувати або деактивувати заявки волонтерів",
-      "comment_delete_error": "Неможливо видалити коментар",
-      "comment_deleted_success": "Коментар успішно видалено",
-      "comment_hint": "Цей коментар буде видимим лише для організаторів конференції",
-      "comment_label": "Коментар",
-      "comment_modal_title": "Коментар про волонтера",
-      "comment_modal_title_for": "Коментар про {name}",
-      "comment_placeholder": "Напишіть коментар про цього волонтера...",
-      "comment_save_error": "Неможливо зберегти коментар",
-      "comment_saved_success": "Коментар успішно збережено",
-      "comment_warning": "Цей коментар пов'язаний з волонтером лише для цього видання.",
-      "config_description": "Налаштувати систему волонтерів",
-      "config_page_description": "Налаштувати параметри системи волонтерів",
-      "config_title": "Конфігурація волонтерів",
-      "dates_description": "Вкажіть дати монтажу та демонтажу, щоб волонтери могли вказати свою доступність",
-      "dates_title": "Дати монтажу та демонтажу",
-      "external_link": "Зовнішнє посилання",
-      "external_url_description": "Посилання на вашу форму або зовнішній інструмент управління волонтерами",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Загальні налаштування",
-      "management_mode": "Управління волонтерами",
-      "management_mode_description": "Виберіть, як керувати волонтерами для цього видання",
-      "mode_external": "Зовнішні",
-      "mode_external_badge": "Зовнішні",
-      "mode_internal": "Внутрішній",
-      "mode_internal_badge": "Внутрішній",
-      "notifications_description": "Надсилайте сповіщення волонтерам",
-      "page_public": "Публічна сторінка видима",
-      "page_public_description": "Зробити публічну сторінку волонтерів видимою для відвідувачів (інакше доступ мають лише організатори)",
-      "page_public_hidden": "Сторінку приховано — доступ мають лише організатори",
-      "page_public_visible": "Сторінка доступна для всіх",
-      "planning_description": "Планування слотів і місій",
-      "teams_description": "Організація команд волонтерів"
-    },
     "workshops": {
       "manage_description": "Переглянути та модерувати воркшопи, запропоновані учасниками",
       "manage_title": "Керувати воркшопами",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Керувати завданнями",
       "manage_description": "Організуйте внутрішню роботу за допомогою груп завдань"
+    },
+    "volunteers": {
+      "config_title": "Конфігурація волонтерів",
+      "applications_description": "Перегляд та обробка заявок",
+      "config_description": "Налаштувати систему волонтерів",
+      "notifications_description": "Надсилайте сповіщення волонтерам",
+      "planning_description": "Планування слотів і місій",
+      "teams_description": "Організація команд волонтерів"
     }
   }
 }

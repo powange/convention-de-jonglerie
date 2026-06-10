@@ -159,7 +159,7 @@
                   size="lg"
                 >
                   <UIcon :name="getStatusIcon(application.status)" class="w-3.5 h-3.5" />
-                  {{ $t(`edition.volunteers.status.${application.status.toLowerCase()}`) }}
+                  {{ $t(`volunteers.status.${application.status.toLowerCase()}`) }}
                 </UBadge>
 
                 <!-- Équipes assignées dans le header -->
@@ -225,7 +225,7 @@
                 class="font-medium text-green-800 dark:text-green-200 mb-2 flex items-center gap-2"
               >
                 <UIcon name="i-heroicons-check-circle" class="text-green-600 dark:text-green-400" />
-                {{ $t('edition.volunteers.acceptance_note_title') }}
+                {{ $t('volunteers.acceptance_note_title') }}
               </h4>
               <p class="text-sm text-green-700 dark:text-green-300">
                 {{ application.acceptanceNote }}
@@ -379,7 +379,7 @@
               class="flex items-center gap-1"
             >
               <UIcon :name="getStatusIcon(application.status)" class="w-3 h-3" />
-              {{ $t(`edition.volunteers.status.${application.status.toLowerCase()}`) }}
+              {{ $t(`volunteers.status.${application.status.toLowerCase()}`) }}
             </UBadge>
 
             <!-- Actions rapides -->

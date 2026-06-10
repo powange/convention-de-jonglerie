@@ -264,7 +264,7 @@ const handleSlotUpdate = async (data: {
       maxVolunteers: data.maxVolunteers,
     })
     toast.add({
-      title: t('edition.volunteers.slot_updated'),
+      title: t('volunteers.slot_updated'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -281,11 +281,11 @@ const handleSlotUpdate = async (data: {
 }
 
 const handleSlotDelete = async (slotId: string) => {
-  if (confirm(t('edition.volunteers.confirm_delete_slot'))) {
+  if (confirm(t('volunteers.confirm_delete_slot'))) {
     try {
       await deleteTimeSlot(slotId)
       toast.add({
-        title: t('edition.volunteers.slot_deleted'),
+        title: t('volunteers.slot_deleted'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -316,7 +316,7 @@ const handleSlotSave = async (slotData: any) => {
         maxVolunteers: slotData.maxVolunteers,
       })
       toast.add({
-        title: t('edition.volunteers.slot_updated'),
+        title: t('volunteers.slot_updated'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -331,7 +331,7 @@ const handleSlotSave = async (slotData: any) => {
         maxVolunteers: slotData.maxVolunteers,
       })
       toast.add({
-        title: t('edition.volunteers.slot_created'),
+        title: t('volunteers.slot_created'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -721,7 +721,7 @@ onMounted(async () => {
   } catch {
     toast.add({
       title: t('errors.error_occurred'),
-      description: t('edition.volunteers.loading_error'),
+      description: t('volunteers.loading_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

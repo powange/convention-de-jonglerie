@@ -13,7 +13,7 @@
             </div>
             <div>
               <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ t('edition.volunteers.confirm_notification_title') }}
+                {{ t('volunteers.confirm_notification_title') }}
               </h1>
               <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ notification?.title }}
@@ -32,7 +32,7 @@
 
           <!-- Informations sur l'envoyeur -->
           <div class="text-xs text-gray-500 dark:text-gray-400">
-            {{ t('edition.volunteers.notification_sent_by', { sender: notification.senderName }) }}
+            {{ t('volunteers.notification_sent_by', { sender: notification.senderName }) }}
             • {{ formatDate(notification.sentAt) }}
           </div>
 
@@ -44,11 +44,11 @@
             <div class="flex items-center gap-2 text-green-700 dark:text-green-400">
               <UIcon name="i-heroicons-check" size="16" />
               <span class="text-sm font-medium">
-                {{ t('edition.volunteers.notification_already_confirmed') }}
+                {{ t('volunteers.notification_already_confirmed') }}
               </span>
             </div>
             <p v-if="confirmationDate" class="text-xs text-green-600 dark:text-green-500 mt-1">
-              {{ t('edition.volunteers.confirmed_at', { date: formatDate(confirmationDate) }) }}
+              {{ t('volunteers.confirmed_at', { date: formatDate(confirmationDate) }) }}
             </p>
           </div>
 
@@ -61,7 +61,7 @@
               icon="i-heroicons-check-circle"
               @click="confirmReading"
             >
-              {{ t('edition.volunteers.confirm_reading') }}
+              {{ t('volunteers.confirm_reading') }}
             </UButton>
           </div>
         </div>
@@ -92,7 +92,7 @@
               to="/profile/mes-candidatures-benevole"
               class="text-primary-600 hover:text-primary-700"
             >
-              {{ t('edition.volunteers.back_to_my_applications') }}
+              {{ t('volunteers.back_to_my_applications') }}
             </NuxtLink>
           </div>
         </template>
@@ -136,7 +136,7 @@ const loadNotification = async () => {
       confirmationDate.value = response.confirmedAt
     }
   } catch (err: any) {
-    error.value = err?.data?.message || t('edition.volunteers.notification_load_error')
+    error.value = err?.data?.message || t('volunteers.notification_load_error')
   } finally {
     loading.value = false
   }
@@ -149,10 +149,10 @@ const { execute: executeConfirm, loading: confirming } = useApiAction<
 >(`/api/editions/${editionId}/volunteers/notification/${groupId}/confirm`, {
   method: 'POST',
   successMessage: {
-    title: t('edition.volunteers.confirmation_success'),
-    description: t('edition.volunteers.confirmation_success_desc'),
+    title: t('volunteers.confirmation_success'),
+    description: t('volunteers.confirmation_success_desc'),
   },
-  errorMessages: { default: t('edition.volunteers.confirmation_error') },
+  errorMessages: { default: t('volunteers.confirmation_error') },
   onSuccess: (response) => {
     confirmationStatus.value = 'confirmed'
     if (response?.confirmedAt) {
@@ -179,8 +179,8 @@ const formatDate = (dateString: string) => {
 
 // Meta données de la page
 useSeoMeta({
-  title: () => t('edition.volunteers.confirm_notification_title'),
-  description: () => t('edition.volunteers.confirm_notification_desc'),
+  title: () => t('volunteers.confirm_notification_title'),
+  description: () => t('volunteers.confirm_notification_desc'),
   ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 

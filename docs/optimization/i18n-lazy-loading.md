@@ -32,6 +32,8 @@ i18n/locales/{langue}/
 ├── gestion-tasks.json   # clés de gestion des tâches (gestion.task.*)
 ├── map.json             # UI carte partagée (map.*)
 ├── gestion-map.json     # clés d'édition de la carte (gestion.map.*)
+├── volunteers.json      # UI bénévoles partagée (volunteers.*)
+├── gestion-volunteers.json # clés de gestion bénévoles (gestion.volunteers.*)
 ├── ticketing.json       # billetterie
 ├── workshops.json       # ateliers
 ├── artists.json         # artistes
@@ -69,33 +71,36 @@ Ce fichier contient deux choses :
 
 ### Routes statiques (`startsWith`)
 
-| Préfixe                                       | Domaines chargés        |
-| --------------------------------------------- | ----------------------- |
-| `/admin`                                      | admin, auth, profil     |
-| `/editions`                                   | edition                 |
-| `/project-costs`                              | project-costs           |
-| `/auth`, `/verify-email`                      | auth (+ profil)         |
-| `/login`                                      | auth                    |
-| `/register`, `/profile`, `/welcome`           | auth, profil            |
-| `/messenger`                                  | messenger               |
+| Préfixe                             | Domaines chargés    |
+| ----------------------------------- | ------------------- |
+| `/admin`                            | admin, auth, profil |
+| `/editions`                         | edition             |
+| `/project-costs`                    | project-costs       |
+| `/auth`, `/verify-email`            | auth (+ profil)     |
+| `/login`                            | auth                |
+| `/register`, `/profile`, `/welcome` | auth, profil        |
+| `/messenger`                        | messenger           |
 
 ### Routes dynamiques (regex, cumulatives)
 
-| Pattern                              | Domaines             | Notes                                  |
-| ------------------------------------ | -------------------- | -------------------------------------- |
-| `/editions/{id}/gestion`             | gestion              | toutes les sous-pages de gestion       |
-| `/editions/{id}/gestion` (exact)     | workshops, tasks     | overview (cartes de modules)           |
-| `/editions/{id}/gestion/tasks`       | tasks, gestion-tasks | gestion des tâches                     |
-| `/editions/{id}/gestion/map`         | map, gestion-map     | édition de la carte                    |
-| `/editions/{id}/gestion/ticketing`   | ticketing            |                                        |
-| `/editions/{id}/gestion/workshops`   | workshops            |                                        |
-| `/editions/{id}/gestion/artists`     | artists              |                                        |
-| `/editions/{id}/gestion/shows-call`  | survey               |                                        |
-| `/editions/{id}/my-tasks`            | tasks                | page utilisateur (lecture)             |
-| `/editions/{id}/map`                 | map                  | carte publique                         |
-| `/editions/{id}/artist-space`        | artists              |                                        |
-| `/editions/{id}/workshops`           | workshops            |                                        |
-| `/survey/`                           | survey               |                                        |
+| Pattern                              | Domaines                       | Notes                            |
+| ------------------------------------ | ------------------------------ | -------------------------------- |
+| `/editions/{id}/gestion`             | gestion                        | toutes les sous-pages de gestion |
+| `/editions/{id}/gestion` (exact)     | workshops, tasks               | overview (cartes de modules)     |
+| `/editions/{id}/gestion/tasks`       | tasks, gestion-tasks           | gestion des tâches               |
+| `/editions/{id}/gestion/map`         | map, gestion-map               | édition de la carte              |
+| `/editions/{id}/gestion/volunteers`  | volunteers, gestion-volunteers | gestion bénévoles                |
+| `/editions/{id}/gestion/ticketing`   | ticketing                      |                                  |
+| `/editions/{id}/gestion/workshops`   | workshops                      |                                  |
+| `/editions/{id}/gestion/artists`     | artists                        |                                  |
+| `/editions/{id}/gestion/shows-call`  | survey                         |                                  |
+| `/editions/{id}/my-tasks`            | tasks                          | page utilisateur (lecture)       |
+| `/editions/{id}/map`                 | map                            | carte publique                   |
+| `/editions/{id}/volunteers`          | volunteers                     | bénévolat public                 |
+| `/profile/mes-candidatures-benevole` | volunteers                     | mes candidatures bénévole        |
+| `/editions/{id}/artist-space`        | artists                        |                                  |
+| `/editions/{id}/workshops`           | workshops                      |                                  |
+| `/survey/`                           | survey                         |                                  |
 
 ## Motif « partagé / management »
 
@@ -103,10 +108,11 @@ Pour les modules présents à la fois côté **public/utilisateur** et côté **
 clés sont séparées en deux domaines afin de ne pas charger les clés d'édition sur les
 pages publiques :
 
-| Module | Partagé (public + gestion) | Management (gestion uniquement) | Libellé de nav (toujours chargé) |
-| ------ | -------------------------- | ------------------------------- | -------------------------------- |
-| Carte  | `map.*` (`map.json`)       | `gestion.map.*` (`gestion-map.json`) | `common` → `edition.site_map` |
-| Tâches | `tasks.*` (`tasks.json`)   | `gestion.task.*` (`gestion-tasks.json`) | `common` → `edition.my_tasks`, `edition.tasks` |
+| Module    | Partagé (public + gestion)         | Management (gestion uniquement)                    | Libellé de nav (toujours chargé)                             |
+| --------- | ---------------------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
+| Carte     | `map.*` (`map.json`)               | `gestion.map.*` (`gestion-map.json`)               | `common` → `edition.site_map`                                |
+| Tâches    | `tasks.*` (`tasks.json`)           | `gestion.task.*` (`gestion-tasks.json`)            | `common` → `edition.my_tasks`, `edition.tasks`               |
+| Bénévoles | `volunteers.*` (`volunteers.json`) | `gestion.volunteers.*` (`gestion-volunteers.json`) | `common` → `edition.volunteers.*` (sous-ensemble transverse) |
 
 Les libellés d'onglets/menu (affichés sur toutes les pages d'édition via `EditionHeader`
 et le layout `edition-dashboard`) vivent dans `common.json` (`edition.*`) car ils doivent

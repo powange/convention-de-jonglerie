@@ -625,44 +625,6 @@
     },
     "title": "Gestion",
     "view_edition": "Voir l'édition",
-    "volunteers": {
-      "action_add_comment": "Ajouter un commentaire",
-      "applications_description": "Consulter et traiter les candidatures",
-      "applications_open": "Ouverture des candidatures",
-      "applications_open_description": "Activez ou désactivez les candidatures de bénévoles",
-      "comment_delete_error": "Impossible de supprimer le commentaire",
-      "comment_deleted_success": "Commentaire supprimé avec succès",
-      "comment_hint": "Ce commentaire sera visible uniquement par les organisateurs de la convention",
-      "comment_label": "Commentaire",
-      "comment_modal_title": "Commentaire sur le bénévole",
-      "comment_modal_title_for": "Commentaire sur {name}",
-      "comment_placeholder": "Ajoutez des notes ou observations sur ce bénévole...",
-      "comment_save_error": "Impossible d'enregistrer le commentaire",
-      "comment_saved_success": "Commentaire enregistré avec succès",
-      "comment_warning": "Ce commentaire est lié au bénévole pour cette édition uniquement.",
-      "config_description": "Paramétrer le système de bénévolat",
-      "config_page_description": "Configurer les paramètres du système de bénévolat",
-      "config_title": "Configuration bénévolat",
-      "dates_description": "Définissez les dates de montage et démontage pour permettre aux bénévoles d'indiquer leur disponibilité",
-      "dates_title": "Dates de montage et démontage",
-      "external_link": "Lien externe",
-      "external_url_description": "Lien vers votre formulaire ou outil externe de gestion des bénévoles",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Paramètres généraux",
-      "management_mode": "Mode de gestion des bénévoles",
-      "management_mode_description": "Choisissez comment gérer les bénévoles pour cette édition",
-      "mode_external": "Externe",
-      "mode_external_badge": "Externe",
-      "mode_internal": "Interne",
-      "mode_internal_badge": "Interne",
-      "notifications_description": "Envoyer des notifications aux bénévoles",
-      "page_public": "Page publique visible",
-      "page_public_description": "Rendre la page publique des bénévoles visible aux visiteurs (sinon, seuls les organisateurs y ont accès)",
-      "page_public_hidden": "Page masquée — seuls les organisateurs y ont accès",
-      "page_public_visible": "Page accessible à tous",
-      "planning_description": "Planifier les créneaux et missions",
-      "teams_description": "Organiser les équipes de bénévoles"
-    },
     "workshops": {
       "manage_description": "Consulter et modérer les workshops proposés par les participants",
       "manage_title": "Gérer les workshops",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Gérer les tâches",
       "manage_description": "Organiser le travail interne via des groupes de tâches"
+    },
+    "volunteers": {
+      "config_title": "Configuration bénévolat",
+      "applications_description": "Consulter et traiter les candidatures",
+      "config_description": "Paramétrer le système de bénévolat",
+      "notifications_description": "Envoyer des notifications aux bénévoles",
+      "planning_description": "Planifier les créneaux et missions",
+      "teams_description": "Organiser les équipes de bénévoles"
     }
   }
 }

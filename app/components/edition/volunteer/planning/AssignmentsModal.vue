@@ -8,7 +8,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="w-4 h-4 text-green-600" />
               <h4 class="text-sm font-medium text-green-800 dark:text-green-200">
-                {{ t('edition.volunteers.schedule_info') }}
+                {{ t('volunteers.schedule_info') }}
               </h4>
             </div>
             <div v-if="duration" class="text-xs text-green-600 dark:text-green-400 font-medium">
@@ -38,7 +38,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-plus" class="w-4 h-4 text-orange-600" />
               <h4 class="text-sm font-medium text-orange-800 dark:text-orange-200">
-                {{ t('edition.volunteers.assigned_volunteers') }}
+                {{ t('volunteers.assigned_volunteers') }}
               </h4>
             </div>
             <UBadge color="warning" variant="soft" size="sm">
@@ -78,7 +78,7 @@
           </div>
 
           <div v-else class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
-            {{ t('edition.volunteers.no_assigned_volunteers') }}
+            {{ t('volunteers.no_assigned_volunteers') }}
           </div>
 
           <!-- Ajouter un bénévole -->
@@ -103,7 +103,7 @@
     <template #header>
       <div class="flex items-center gap-3">
         <UIcon name="i-heroicons-user-plus" class="w-5 h-5 text-primary-600" />
-        <h3 class="text-lg font-semibold">{{ t('edition.volunteers.select_volunteer') }}</h3>
+        <h3 class="text-lg font-semibold">{{ t('volunteers.select_volunteer') }}</h3>
       </div>
     </template>
 
@@ -117,8 +117,8 @@
         <p class="text-gray-500 dark:text-gray-400">
           {{
             timeSlot?.teamId && timeSlot.teamId !== 'unassigned'
-              ? t('edition.volunteers.no_volunteers_for_team')
-              : t('edition.volunteers.no_available_volunteers')
+              ? t('volunteers.no_volunteers_for_team')
+              : t('volunteers.no_available_volunteers')
           }}
         </p>
       </div>
@@ -150,7 +150,7 @@
                 {{ volunteer.prenom }} {{ volunteer.nom }}
               </p>
               <p class="text-xs text-gray-400 dark:text-gray-500">
-                {{ volunteer.assignmentsCount }} {{ t('edition.volunteers.current_assignments') }}
+                {{ volunteer.assignmentsCount }} {{ t('volunteers.current_assignments') }}
               </p>
             </div>
           </div>
@@ -160,7 +160,7 @@
             size="sm"
             @click="assignVolunteer(volunteer.userId)"
           >
-            {{ t('edition.volunteers.assign') }}
+            {{ t('volunteers.assign') }}
           </UButton>
         </div>
       </div>
@@ -269,11 +269,11 @@ const duration = computed(() => {
   const mins = diffMins % 60
 
   if (hours > 0 && mins > 0) {
-    return t('edition.volunteers.duration_hours_minutes', { hours, minutes: mins })
+    return t('volunteers.duration_hours_minutes', { hours, minutes: mins })
   } else if (hours > 0) {
-    return t('edition.volunteers.duration_hours', { hours })
+    return t('volunteers.duration_hours', { hours })
   } else {
-    return t('edition.volunteers.duration_minutes', { minutes: mins })
+    return t('volunteers.duration_minutes', { minutes: mins })
   }
 })
 
@@ -342,7 +342,7 @@ const { execute: executeAssign, loading: assignmentLoading } = useApiAction(
   {
     method: 'POST',
     body: () => ({ userId: currentUserId.value }),
-    successMessage: { title: t('edition.volunteers.volunteer_assigned') },
+    successMessage: { title: t('volunteers.volunteer_assigned') },
     errorMessages: { default: t('errors.error_occurred') },
     onSuccess: async () => {
       await fetchAssignments()
@@ -363,7 +363,7 @@ const { execute: unassignVolunteer, isLoading: isUnassigning } = useApiActionByI
     `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot?.id}/assignments/${assignmentId}`,
   {
     method: 'DELETE',
-    successMessage: { title: t('edition.volunteers.volunteer_unassigned') },
+    successMessage: { title: t('volunteers.volunteer_unassigned') },
     errorMessages: { default: t('errors.error_occurred') },
     onSuccess: async () => {
       await fetchAssignments()

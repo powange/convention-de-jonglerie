@@ -14,7 +14,7 @@
           icon="i-heroicons-bell"
           @click="openNotificationModal"
         >
-          {{ t('edition.volunteers.send_notification') }}
+          {{ t('volunteers.send_notification') }}
         </UButton>
       </div>
     </div>

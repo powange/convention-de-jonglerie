@@ -11,7 +11,7 @@
       <h3
         class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
       >
-        {{ t('edition.volunteers.config_presence_title') }}
+        {{ t('volunteers.config_presence_title') }}
       </h3>
 
       <!-- Switch demander participation au montage -->
@@ -20,7 +20,7 @@
           v-model="askSetup"
           :disabled="saving || !hasSetupStartDate"
           color="primary"
-          :label="t('edition.volunteers.ask_setup_label')"
+          :label="t('volunteers.ask_setup_label')"
           size="lg"
           @update:model-value="handleChange('askSetup', $event)"
         />
@@ -41,7 +41,7 @@
           v-model="askTeardown"
           :disabled="saving || !hasTeardownEndDate"
           color="primary"
-          :label="t('edition.volunteers.ask_teardown_label')"
+          :label="t('volunteers.ask_teardown_label')"
           size="lg"
           @update:model-value="handleChange('askTeardown', $event)"
         />
@@ -62,7 +62,7 @@
       <h3
         class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
       >
-        {{ t('edition.volunteers.config_shifts_preferences_title') }}
+        {{ t('volunteers.config_shifts_preferences_title') }}
       </h3>
 
       <!-- Switch demander préférences d'équipes (mode interne uniquement) -->
@@ -73,9 +73,8 @@
         class="mb-2"
         :label="
           volunteerTeams.length === 0
-            ? t('edition.volunteers.ask_team_preferences_label') +
-              ' (définissez d\'abord des équipes)'
-            : t('edition.volunteers.ask_team_preferences_label')
+            ? t('volunteers.ask_team_preferences_label') + ' (définissez d\'abord des équipes)'
+            : t('volunteers.ask_team_preferences_label')
         "
         size="lg"
         @update:model-value="handleChange('askTeamPreferences', $event)"
@@ -87,7 +86,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_time_preferences_label')"
+        :label="t('volunteers.ask_time_preferences_label')"
         size="lg"
         @update:model-value="handleChange('askTimePreferences', $event)"
       />
@@ -98,7 +97,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_companion_label')"
+        :label="t('volunteers.ask_companion_label')"
         size="lg"
         @update:model-value="handleChange('askCompanion', $event)"
       />
@@ -109,7 +108,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_avoid_list_label')"
+        :label="t('volunteers.ask_avoid_list_label')"
         size="lg"
         @update:model-value="handleChange('askAvoidList', $event)"
       />
@@ -120,7 +119,7 @@
       <h3
         class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
       >
-        {{ t('edition.volunteers.config_about_you_title') }}
+        {{ t('volunteers.config_about_you_title') }}
       </h3>
 
       <!-- Switch demander régime alimentaire (mode interne uniquement) -->
@@ -129,7 +128,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_diet_label')"
+        :label="t('volunteers.ask_diet_label')"
         size="lg"
         @update:model-value="handleChange('askDiet', $event)"
       />
@@ -140,7 +139,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_allergies_label')"
+        :label="t('volunteers.ask_allergies_label')"
         size="lg"
         @update:model-value="handleChange('askAllergies', $event)"
       />
@@ -151,7 +150,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_emergency_contact_label')"
+        :label="t('volunteers.ask_emergency_contact_label')"
         size="lg"
         @update:model-value="handleChange('askEmergencyContact', $event)"
       />
@@ -162,7 +161,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_pets_label')"
+        :label="t('volunteers.ask_pets_label')"
         size="lg"
         @update:model-value="handleChange('askPets', $event)"
       />
@@ -173,7 +172,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_minors_label')"
+        :label="t('volunteers.ask_minors_label')"
         size="lg"
         @update:model-value="handleChange('askMinors', $event)"
       />
@@ -184,7 +183,7 @@
       <h3
         class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
       >
-        {{ t('edition.volunteers.config_what_you_can_bring_title') }}
+        {{ t('volunteers.config_what_you_can_bring_title') }}
       </h3>
 
       <!-- Switch demander véhicule (mode interne uniquement) -->
@@ -193,7 +192,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_vehicle_label')"
+        :label="t('volunteers.ask_vehicle_label')"
         size="lg"
         @update:model-value="handleChange('askVehicle', $event)"
       />
@@ -204,7 +203,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_skills_label')"
+        :label="t('volunteers.ask_skills_label')"
         size="lg"
         @update:model-value="handleChange('askSkills', $event)"
       />
@@ -215,7 +214,7 @@
         :disabled="saving"
         color="primary"
         class="mb-2"
-        :label="t('edition.volunteers.ask_experience_label')"
+        :label="t('volunteers.ask_experience_label')"
         size="lg"
         @update:model-value="handleChange('askExperience', $event)"
       />
@@ -226,7 +225,7 @@
       <div class="flex items-center justify-between">
         <div class="space-y-2">
           <h4 class="font-medium text-gray-700 dark:text-gray-300">
-            {{ t('edition.volunteers.teams_label') }}
+            {{ t('volunteers.teams_label') }}
           </h4>
           <p class="text-xs text-gray-500">Liste des équipes de bénévoles configurées</p>
         </div>

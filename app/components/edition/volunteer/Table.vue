@@ -45,10 +45,10 @@
 
           <template #body>
             <div class="space-y-4">
-              <UFormField :label="t('edition.volunteers.search')">
+              <UFormField :label="t('volunteers.search')">
                 <UInput
                   v-model="globalFilter"
-                  :placeholder="t('edition.volunteers.search_placeholder')"
+                  :placeholder="t('volunteers.search_placeholder')"
                   icon="i-heroicons-magnifying-glass"
                   size="lg"
                   class="w-full"
@@ -56,11 +56,11 @@
                 />
               </UFormField>
 
-              <UFormField :label="t('edition.volunteers.filter_status')">
+              <UFormField :label="t('volunteers.filter_status')">
                 <USelect
                   v-model="applicationsFilterStatus"
                   :items="volunteerStatusItems"
-                  :placeholder="t('edition.volunteers.status_all')"
+                  :placeholder="t('volunteers.status_all')"
                   icon="i-heroicons-funnel"
                   size="lg"
                   variant="soft"
@@ -69,11 +69,11 @@
                 />
               </UFormField>
 
-              <UFormField :label="t('edition.volunteers.filter_presence')">
+              <UFormField :label="t('volunteers.filter_presence')">
                 <USelect
                   v-model="applicationsFilterPresence"
                   :items="volunteerPresenceItems"
-                  :placeholder="t('edition.volunteers.presence_all')"
+                  :placeholder="t('volunteers.presence_all')"
                   icon="i-heroicons-clock"
                   size="lg"
                   variant="soft"
@@ -85,12 +85,12 @@
 
               <UFormField
                 v-if="volunteersInfo?.askTeamPreferences && volunteerTeamItems.length > 0"
-                :label="t('edition.volunteers.table_team_preferences')"
+                :label="t('volunteers.table_team_preferences')"
               >
                 <USelect
                   v-model="applicationsFilterTeams"
                   :items="volunteerTeamItems"
-                  :placeholder="t('edition.volunteers.teams_empty')"
+                  :placeholder="t('volunteers.teams_empty')"
                   icon="i-heroicons-user-group"
                   size="lg"
                   variant="soft"
@@ -102,12 +102,12 @@
 
               <UFormField
                 v-if="assignedTeamItems.length > 1"
-                :label="t('edition.volunteers.filter_assigned_teams')"
+                :label="t('volunteers.filter_assigned_teams')"
               >
                 <USelect
                   v-model="applicationsFilterAssignedTeams"
                   :items="assignedTeamItems"
-                  :placeholder="t('edition.volunteers.assigned_teams_all')"
+                  :placeholder="t('volunteers.assigned_teams_all')"
                   icon="i-heroicons-users"
                   size="lg"
                   variant="soft"
@@ -124,7 +124,7 @@
         <div class="hidden xl:flex xl:items-center xl:gap-2 xl:flex-1">
           <UInput
             v-model="globalFilter"
-            :placeholder="t('edition.volunteers.search_placeholder')"
+            :placeholder="t('volunteers.search_placeholder')"
             icon="i-heroicons-magnifying-glass"
             size="md"
             class="w-48"
@@ -134,7 +134,7 @@
           <USelect
             v-model="applicationsFilterStatus"
             :items="volunteerStatusItems"
-            :placeholder="t('edition.volunteers.status_all')"
+            :placeholder="t('volunteers.status_all')"
             icon="i-heroicons-funnel"
             size="md"
             variant="soft"
@@ -146,7 +146,7 @@
           <USelect
             v-model="applicationsFilterPresence"
             :items="volunteerPresenceItems"
-            :placeholder="t('edition.volunteers.presence_all')"
+            :placeholder="t('volunteers.presence_all')"
             icon="i-heroicons-clock"
             size="md"
             variant="soft"
@@ -160,7 +160,7 @@
             v-if="volunteersInfo?.askTeamPreferences && volunteerTeamItems.length > 0"
             v-model="applicationsFilterTeams"
             :items="volunteerTeamItems"
-            :placeholder="t('edition.volunteers.teams_empty')"
+            :placeholder="t('volunteers.teams_empty')"
             icon="i-heroicons-user-group"
             size="md"
             variant="soft"
@@ -174,7 +174,7 @@
             v-if="assignedTeamItems.length > 1"
             v-model="applicationsFilterAssignedTeams"
             :items="assignedTeamItems"
-            :placeholder="t('edition.volunteers.assigned_teams_all')"
+            :placeholder="t('volunteers.assigned_teams_all')"
             icon="i-heroicons-users"
             size="md"
             variant="soft"
@@ -220,7 +220,7 @@
           trailing-icon="i-heroicons-chevron-down"
           class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
         >
-          <span class="hidden sm:inline">{{ t('edition.volunteers.columns') }}</span>
+          <span class="hidden sm:inline">{{ t('volunteers.columns') }}</span>
         </UButton>
       </UDropdownMenu>
     </div>
@@ -237,7 +237,7 @@
         class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
         @click="exportApplications"
       >
-        <span class="hidden sm:inline">{{ t('edition.volunteers.export') }}</span>
+        <span class="hidden sm:inline">{{ t('volunteers.export') }}</span>
       </UButton>
     </div>
 
@@ -327,7 +327,7 @@
             <!-- Actions selon le statut -->
             <div v-if="row.original.status === 'PENDING'" class="flex flex-col items-start gap-1">
               <UButton
-                :label="t('edition.volunteers.action_accept')"
+                :label="t('volunteers.action_accept')"
                 size="xs"
                 color="success"
                 variant="solid"
@@ -335,7 +335,7 @@
                 @click="decideApplication(row.original, 'ACCEPTED')"
               />
               <UButton
-                :label="t('edition.volunteers.action_reject')"
+                :label="t('volunteers.action_reject')"
                 size="xs"
                 color="error"
                 variant="solid"
@@ -344,7 +344,7 @@
               />
               <UButton
                 v-if="row.original.source === 'MANUAL'"
-                :label="t('edition.volunteers.action_delete')"
+                :label="t('volunteers.action_delete')"
                 size="xs"
                 color="error"
                 variant="soft"
@@ -358,7 +358,7 @@
               class="flex flex-col items-start gap-1"
             >
               <UButton
-                :label="t('edition.volunteers.action_edit_teams')"
+                :label="t('volunteers.action_edit_teams')"
                 size="xs"
                 color="primary"
                 variant="solid"
@@ -374,7 +374,7 @@
                 @click="openCommentModal(row.original)"
               />
               <UButton
-                :label="t('edition.volunteers.action_back_pending')"
+                :label="t('volunteers.action_back_pending')"
                 size="xs"
                 color="warning"
                 variant="soft"
@@ -383,7 +383,7 @@
               />
               <UButton
                 v-if="row.original.source === 'MANUAL'"
-                :label="t('edition.volunteers.action_delete')"
+                :label="t('volunteers.action_delete')"
                 size="xs"
                 color="error"
                 variant="soft"
@@ -397,7 +397,7 @@
               class="flex flex-col items-start gap-1"
             >
               <UButton
-                :label="t('edition.volunteers.action_back_pending')"
+                :label="t('volunteers.action_back_pending')"
                 size="xs"
                 color="warning"
                 variant="soft"
@@ -406,7 +406,7 @@
               />
               <UButton
                 v-if="row.original.source === 'MANUAL'"
-                :label="t('edition.volunteers.action_delete')"
+                :label="t('volunteers.action_delete')"
                 size="xs"
                 color="error"
                 variant="soft"
@@ -423,7 +423,7 @@
       </UTable>
     </UContextMenu>
     <div v-if="tableData.length === 0 && !applicationsLoading" class="text-xs text-gray-500 py-2">
-      {{ t('edition.volunteers.no_applications') }}
+      {{ t('volunteers.no_applications') }}
     </div>
   </div>
 
@@ -453,8 +453,8 @@
         <h3 class="font-semibold">
           {{
             modalMode === 'accept'
-              ? t('edition.volunteers.accept_modal_title')
-              : t('edition.volunteers.edit_teams_title')
+              ? t('volunteers.accept_modal_title')
+              : t('volunteers.edit_teams_title')
           }}
         </h3>
       </div>
@@ -475,7 +475,7 @@
         <!-- Sélection des équipes -->
         <div v-if="availableTeamsForModal.length > 0">
           <label class="block text-sm font-medium mb-2">
-            {{ t('edition.volunteers.assign_to_teams') }}
+            {{ t('volunteers.assign_to_teams') }}
           </label>
           <div class="space-y-2 max-h-60 overflow-y-auto">
             <div
@@ -491,18 +491,18 @@
             </div>
           </div>
           <p class="text-xs text-gray-500 mt-2">
-            {{ t('edition.volunteers.teams_selection_hint') }}
+            {{ t('volunteers.teams_selection_hint') }}
           </p>
         </div>
 
         <!-- Note optionnelle (seulement pour l'acceptation) -->
         <div v-if="modalMode === 'accept'">
           <label class="block text-sm font-medium mb-2">
-            {{ t('edition.volunteers.accept_note_label') }}
+            {{ t('volunteers.accept_note_label') }}
           </label>
           <UTextarea
             v-model="acceptNote"
-            :placeholder="t('edition.volunteers.accept_note_placeholder')"
+            :placeholder="t('volunteers.accept_note_placeholder')"
             :rows="3"
             class="w-full"
           />
@@ -519,11 +519,7 @@
           :loading="teamsModalLoading"
           @click="confirmTeamsModal"
         >
-          {{
-            modalMode === 'accept'
-              ? t('edition.volunteers.confirm_accept')
-              : t('edition.volunteers.save_teams')
-          }}
+          {{ modalMode === 'accept' ? t('volunteers.confirm_accept') : t('volunteers.save_teams') }}
         </UButton>
       </div>
     </template>
@@ -546,9 +542,9 @@
   <!-- Modal de confirmation pour remettre en attente -->
   <UiConfirmModal
     v-model="showBackToPendingModal"
-    :title="t('edition.volunteers.confirm_action')"
-    :description="t('edition.volunteers.confirm_back_pending')"
-    :confirm-label="t('edition.volunteers.set_pending')"
+    :title="t('volunteers.confirm_action')"
+    :description="t('volunteers.confirm_back_pending')"
+    :confirm-label="t('volunteers.set_pending')"
     :cancel-label="t('common.cancel')"
     confirm-color="warning"
     icon-name="i-heroicons-arrow-path"
@@ -560,9 +556,9 @@
   <!-- Modal de confirmation pour supprimer une candidature ajoutée manuellement -->
   <UiConfirmModal
     v-model="showDeleteModal"
-    :title="t('edition.volunteers.confirm_delete_title')"
-    :description="t('edition.volunteers.confirm_delete_description')"
-    :confirm-label="t('edition.volunteers.delete_application')"
+    :title="t('volunteers.confirm_delete_title')"
+    :description="t('volunteers.confirm_delete_description')"
+    :confirm-label="t('volunteers.delete_application')"
     :cancel-label="t('common.cancel')"
     confirm-color="error"
     icon-name="i-heroicons-trash"
@@ -657,10 +653,10 @@ const tableRef = ref()
 
 // Items pour les selects
 const volunteerStatusItems = computed(() => [
-  { label: t('edition.volunteers.status_all'), value: 'ALL' },
-  { label: t('edition.volunteers.status_pending'), value: 'PENDING' },
-  { label: t('edition.volunteers.status_accepted'), value: 'ACCEPTED' },
-  { label: t('edition.volunteers.status_rejected'), value: 'REJECTED' },
+  { label: t('volunteers.status_all'), value: 'ALL' },
+  { label: t('volunteers.status_pending'), value: 'PENDING' },
+  { label: t('volunteers.status_accepted'), value: 'ACCEPTED' },
+  { label: t('volunteers.status_rejected'), value: 'REJECTED' },
 ])
 
 const volunteerTeamItems = computed(() => {
@@ -674,9 +670,9 @@ const volunteerTeamItems = computed(() => {
 })
 
 const volunteerPresenceItems = computed(() => [
-  { label: t('edition.volunteers.presence_setup'), value: 'setup' },
-  { label: t('edition.volunteers.presence_event'), value: 'event' },
-  { label: t('edition.volunteers.presence_teardown'), value: 'teardown' },
+  { label: t('volunteers.presence_setup'), value: 'setup' },
+  { label: t('volunteers.presence_event'), value: 'event' },
+  { label: t('volunteers.presence_teardown'), value: 'teardown' },
 ])
 
 const assignedTeamItems = computed(() => {
@@ -684,7 +680,7 @@ const assignedTeamItems = computed(() => {
 
   // Option pour "Sans équipe"
   items.push({
-    label: t('edition.volunteers.filter_no_team'),
+    label: t('volunteers.filter_no_team'),
     value: 'NO_TEAM',
   })
 
@@ -753,7 +749,7 @@ const filteredCountLabel = computed(() => {
   const end = (page - 1) * pageSize + applications.value.length
   const boundedEnd = Math.min(end, filtered)
   const boundedStart = Math.min(start, filtered === 0 ? 0 : filtered)
-  return `${t('edition.volunteers.filtered_count', { filtered, total })} (${boundedStart}–${boundedEnd})`
+  return `${t('volunteers.filtered_count', { filtered, total })} (${boundedStart}–${boundedEnd})`
 })
 
 // Fonctions de gestion du tableau
@@ -876,11 +872,11 @@ const volunteerStatusColor = (s: string) =>
   s === 'PENDING' ? 'warning' : s === 'ACCEPTED' ? 'success' : 'error'
 const volunteerStatusLabel = (s: string) =>
   s === 'PENDING'
-    ? t('edition.volunteers.status_pending')
+    ? t('volunteers.status_pending')
     : s === 'ACCEPTED'
-      ? t('edition.volunteers.status_accepted')
+      ? t('volunteers.status_accepted')
       : s === 'REJECTED'
-        ? t('edition.volunteers.status_rejected')
+        ? t('volunteers.status_rejected')
         : s
 
 const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PENDING') => {
@@ -949,8 +945,8 @@ const { execute: executeDeleteApplicationAction } = useApiAction(
   {
     method: 'DELETE',
     successMessage: {
-      title: t('edition.volunteers.application_deleted'),
-      description: t('edition.volunteers.volunteer_removed_successfully'),
+      title: t('volunteers.application_deleted'),
+      description: t('volunteers.volunteer_removed_successfully'),
     },
     errorMessages: { default: t('common.error') },
     onSuccess: () => {
@@ -1080,10 +1076,10 @@ const confirmTeamsModal = async () => {
       refreshApplications()
 
       toast.add({
-        title: t('edition.volunteers.volunteer_accepted'),
+        title: t('volunteers.volunteer_accepted'),
         description:
           selectedTeams.value.length > 0
-            ? t('edition.volunteers.assigned_to_teams', { count: selectedTeams.value.length })
+            ? t('volunteers.assigned_to_teams', { count: selectedTeams.value.length })
             : undefined,
         color: 'success',
       })
@@ -1098,11 +1094,11 @@ const confirmTeamsModal = async () => {
       refreshApplications()
 
       toast.add({
-        title: t('edition.volunteers.teams_updated'),
+        title: t('volunteers.teams_updated'),
         description:
           selectedTeams.value.length > 0
-            ? t('edition.volunteers.assigned_to_teams', { count: selectedTeams.value.length })
-            : t('edition.volunteers.removed_from_teams'),
+            ? t('volunteers.assigned_to_teams', { count: selectedTeams.value.length })
+            : t('volunteers.removed_from_teams'),
         color: 'success',
       })
     }
@@ -1184,25 +1180,25 @@ const getColumnLabel = (columnId: string): string => {
   const labels: Record<string, string> = {
     id: 'ID',
     status: t('common.status'),
-    pseudo: t('edition.volunteers.table_user'),
-    prenom: t('edition.volunteers.table_first_name'),
-    nom: t('edition.volunteers.table_last_name'),
-    presence: t('edition.volunteers.table_presence'),
-    dietaryPreference: t('edition.volunteers.table_diet'),
-    allergies: t('edition.volunteers.table_allergies'),
+    pseudo: t('volunteers.table_user'),
+    prenom: t('volunteers.table_first_name'),
+    nom: t('volunteers.table_last_name'),
+    presence: t('volunteers.table_presence'),
+    dietaryPreference: t('volunteers.table_diet'),
+    allergies: t('volunteers.table_allergies'),
     emergencyContact: t('pages.volunteers.emergency_contact'),
-    hasPets: t('edition.volunteers.table_pets'),
-    hasMinors: t('edition.volunteers.table_minors'),
-    hasVehicle: t('edition.volunteers.table_vehicle'),
-    companionName: t('edition.volunteers.table_companion'),
-    avoidList: t('edition.volunteers.table_avoid_list'),
-    skills: t('edition.volunteers.table_skills'),
+    hasPets: t('volunteers.table_pets'),
+    hasMinors: t('volunteers.table_minors'),
+    hasVehicle: t('volunteers.table_vehicle'),
+    companionName: t('volunteers.table_companion'),
+    avoidList: t('volunteers.table_avoid_list'),
+    skills: t('volunteers.table_skills'),
     hasExperience: t('pages.volunteers.experience'),
-    timePreferences: t('edition.volunteers.table_time_preferences'),
-    teamPreferences: t('edition.volunteers.table_team_preferences'),
-    assignedTeams: t('edition.volunteers.assigned_team'),
+    timePreferences: t('volunteers.table_time_preferences'),
+    teamPreferences: t('volunteers.table_team_preferences'),
+    assignedTeams: t('volunteers.assigned_team'),
     createdAt: t('common.date'),
-    motivation: t('edition.volunteers.table_motivation'),
+    motivation: t('volunteers.table_motivation'),
     actions: t('common.actions'),
   }
 
@@ -1277,23 +1273,23 @@ const columns = computed((): TableColumn<any>[] => [
   // Infos utilisateur
   {
     accessorKey: 'pseudo',
-    header: ({ column }) => getSortableHeader(column, t('edition.volunteers.table_user')),
+    header: ({ column }) => getSortableHeader(column, t('volunteers.table_user')),
   },
   // Colonnes Prénom et Nom
   {
     accessorKey: 'prenom',
-    header: ({ column }) => getSortableHeader(column, t('edition.volunteers.table_first_name')),
+    header: ({ column }) => getSortableHeader(column, t('volunteers.table_first_name')),
     cell: ({ row }) => row.original.user.prenom || '—',
   },
   {
     accessorKey: 'nom',
-    header: ({ column }) => getSortableHeader(column, t('edition.volunteers.table_last_name')),
+    header: ({ column }) => getSortableHeader(column, t('volunteers.table_last_name')),
     cell: ({ row }) => row.original.user.nom || '—',
   },
   // Colonne présence
   {
     accessorKey: 'presence',
-    header: t('edition.volunteers.table_presence'),
+    header: t('volunteers.table_presence'),
     enableSorting: false,
     cell: ({ row }: any) => {
       const hasSetupAvailability = row.original.setupAvailability
@@ -1365,7 +1361,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne Date d'arrivée
   {
     accessorKey: 'arrivalDateTime',
-    header: ({ column }) => getSortableHeader(column, t('edition.volunteers.table_arrival')),
+    header: ({ column }) => getSortableHeader(column, t('volunteers.table_arrival')),
     enableSorting: true,
     sortingFn: (rowA: any, rowB: any, _columnId: string) => {
       const dateA = rowA.original.arrivalDateTime
@@ -1408,7 +1404,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne Date de départ
   {
     accessorKey: 'departureDateTime',
-    header: ({ column }) => getSortableHeader(column, t('edition.volunteers.table_departure')),
+    header: ({ column }) => getSortableHeader(column, t('volunteers.table_departure')),
     enableSorting: true,
     sortingFn: (rowA: any, rowB: any, _columnId: string) => {
       const dateA = rowA.original.departureDateTime
@@ -1453,7 +1449,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'meals',
-          header: t('edition.volunteers.table_meals'),
+          header: t('volunteers.table_meals'),
           cell: ({ row }: any) => {
             const mealSelections = row.original.mealSelections || []
             const acceptedMealsCount = mealSelections.filter((s: any) => s.accepted).length
@@ -1484,7 +1480,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'timePreferences',
-          header: t('edition.volunteers.table_time_preferences'),
+          header: t('volunteers.table_time_preferences'),
           cell: ({ row }: any) => {
             const preferences = row.original.timePreferences || []
             const allSlots = [
@@ -1532,7 +1528,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'dietaryPreference',
-          header: t('edition.volunteers.table_diet'),
+          header: t('volunteers.table_diet'),
           cell: ({ row }: any) => {
             const val = row.original.dietaryPreference || 'NONE'
             const key =
@@ -1551,8 +1547,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'allergies',
-          header: ({ column }: any) =>
-            getSortableHeader(column, t('edition.volunteers.table_allergies')),
+          header: ({ column }: any) => getSortableHeader(column, t('volunteers.table_allergies')),
           cell: ({ row }: any) => {
             if (!row.original.allergies) return '—'
 
@@ -1618,7 +1613,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'hasPets',
-          header: t('edition.volunteers.table_pets'),
+          header: t('volunteers.table_pets'),
           cell: ({ row }: any) => {
             if (!row.original.hasPets) return h('span', '—')
             const petsDetails = row.original.petsDetails
@@ -1653,7 +1648,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'hasMinors',
-          header: t('edition.volunteers.table_minors'),
+          header: t('volunteers.table_minors'),
           cell: ({ row }: any) => {
             if (!row.original.hasMinors) return h('span', '—')
             const minorsDetails = row.original.minorsDetails
@@ -1688,7 +1683,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'hasVehicle',
-          header: t('edition.volunteers.table_vehicle'),
+          header: t('volunteers.table_vehicle'),
           cell: ({ row }: any) => {
             if (!row.original.hasVehicle) return h('span', '—')
             const vehicleDetails = row.original.vehicleDetails
@@ -1723,7 +1718,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'companionName',
-          header: t('edition.volunteers.table_companion'),
+          header: t('volunteers.table_companion'),
           cell: ({ row }: any) => {
             const companionName = row.original.companionName
             if (!companionName) return h('span', '—')
@@ -1737,7 +1732,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'avoidList',
-          header: t('edition.volunteers.table_avoid_list'),
+          header: t('volunteers.table_avoid_list'),
           cell: ({ row }: any) => {
             const avoidList = row.original.avoidList
             if (!avoidList) return h('span', '—')
@@ -1771,7 +1766,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'skills',
-          header: t('edition.volunteers.table_skills'),
+          header: t('volunteers.table_skills'),
           cell: ({ row }: any) => {
             const skills = row.original.skills
             if (!skills) return h('span', '—')
@@ -1805,7 +1800,7 @@ const columns = computed((): TableColumn<any>[] => [
     ? [
         {
           accessorKey: 'teamPreferences',
-          header: t('edition.volunteers.table_team_preferences'),
+          header: t('volunteers.table_team_preferences'),
           cell: ({ row }: any) => {
             const preferences = row.original.teamPreferences || []
             if (preferences.length === 0) return h('span', '—')
@@ -1842,7 +1837,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne équipes assignées (nouveau système)
   {
     accessorKey: 'assignedTeams',
-    header: t('edition.volunteers.assigned_team'),
+    header: t('volunteers.assigned_team'),
     cell: ({ row }: any) => {
       // Priorité au nouveau système teamAssignments
       const teamAssignments = row.original.teamAssignments
@@ -1933,7 +1928,7 @@ const columns = computed((): TableColumn<any>[] => [
     : []),
   {
     id: 'motivation',
-    header: t('edition.volunteers.table_motivation'),
+    header: t('volunteers.table_motivation'),
     cell: ({ row }) => {
       const mot = row.original.motivation
       if (!mot) return h('span', '—')
@@ -1971,7 +1966,7 @@ const columns = computed((): TableColumn<any>[] => [
   },
   {
     id: 'source',
-    header: t('edition.volunteers.table_source'),
+    header: t('volunteers.table_source'),
     cell: ({ row }) => {
       const source = row.original.source
       const addedBy = row.original.addedBy
@@ -1986,7 +1981,7 @@ const columns = computed((): TableColumn<any>[] => [
             variant: 'soft',
             class: 'text-xs',
           },
-          () => t('edition.volunteers.source_application')
+          () => t('volunteers.source_application')
         )
       }
 
@@ -1998,7 +1993,7 @@ const columns = computed((): TableColumn<any>[] => [
           : t('common.unknown')
         const addedAtFormatted = addedAt ? formatDate(addedAt) : ''
 
-        const tooltipText = t('edition.volunteers.added_manually_tooltip', {
+        const tooltipText = t('volunteers.added_manually_tooltip', {
           name: addedByName,
           date: addedAtFormatted,
         })
@@ -2018,7 +2013,7 @@ const columns = computed((): TableColumn<any>[] => [
                   variant: 'soft',
                   class: 'text-xs cursor-help',
                 },
-                () => t('edition.volunteers.source_manual')
+                () => t('volunteers.source_manual')
               ),
           }
         )
@@ -2054,7 +2049,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
     if (row.original.status === 'PENDING') {
       items.push({ type: 'separator' })
       items.push({
-        label: t('edition.volunteers.action_accept'),
+        label: t('volunteers.action_accept'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
         disabled:
@@ -2064,7 +2059,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
         },
       })
       items.push({
-        label: t('edition.volunteers.action_reject'),
+        label: t('volunteers.action_reject'),
         icon: 'i-heroicons-x-circle',
         color: 'error',
         disabled:
@@ -2076,7 +2071,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
       if (row.original.source === 'MANUAL') {
         items.push({ type: 'separator' })
         items.push({
-          label: t('edition.volunteers.action_delete'),
+          label: t('volunteers.action_delete'),
           icon: 'i-heroicons-trash',
           color: 'error',
           onSelect() {
@@ -2088,7 +2083,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
 
     if (row.original.status === 'ACCEPTED') {
       items.push({
-        label: t('edition.volunteers.action_edit_teams'),
+        label: t('volunteers.action_edit_teams'),
         icon: 'i-heroicons-user-group',
         color: 'primary',
         onSelect() {
@@ -2105,7 +2100,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
       })
       items.push({ type: 'separator' })
       items.push({
-        label: t('edition.volunteers.action_back_pending'),
+        label: t('volunteers.action_back_pending'),
         icon: 'i-heroicons-arrow-uturn-left',
         color: 'warning',
         disabled:
@@ -2117,7 +2112,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
       if (row.original.source === 'MANUAL') {
         items.push({ type: 'separator' })
         items.push({
-          label: t('edition.volunteers.action_delete'),
+          label: t('volunteers.action_delete'),
           icon: 'i-heroicons-trash',
           color: 'error',
           onSelect() {
@@ -2128,7 +2123,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
     } else if (row.original.status === 'REJECTED') {
       items.push({ type: 'separator' })
       items.push({
-        label: t('edition.volunteers.action_back_pending'),
+        label: t('volunteers.action_back_pending'),
         icon: 'i-heroicons-arrow-uturn-left',
         color: 'warning',
         disabled:
@@ -2140,7 +2135,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
       if (row.original.source === 'MANUAL') {
         items.push({ type: 'separator' })
         items.push({
-          label: t('edition.volunteers.action_delete'),
+          label: t('volunteers.action_delete'),
           icon: 'i-heroicons-trash',
           color: 'error',
           onSelect() {
@@ -2216,14 +2211,14 @@ const handleEditApplicationUpdate = async (data: any) => {
     closeEditApplicationModal()
 
     toast.add({
-      title: t('edition.volunteers.application_updated'),
-      description: t('edition.volunteers.notification_sent_to_volunteer'),
+      title: t('volunteers.application_updated'),
+      description: t('volunteers.notification_sent_to_volunteer'),
       color: 'success',
     })
   } catch (error: any) {
     toast.add({
       title: t('common.error'),
-      description: error?.message || t('edition.volunteers.update_error'),
+      description: error?.message || t('volunteers.update_error'),
       color: 'error',
     })
   }

@@ -625,44 +625,6 @@
     },
     "title": "Управление",
     "view_edition": "Просмотр выпуска",
-    "volunteers": {
-      "action_add_comment": "Добавить комментарий",
-      "applications_description": "Просмотр и обработка заявок",
-      "applications_open": "Открытие приема заявок",
-      "applications_open_description": "Активировать или деактивировать заявки добровольцев",
-      "comment_delete_error": "Невозможно удалить комментарий",
-      "comment_deleted_success": "Комментарий успешно удален",
-      "comment_hint": "Этот комментарий будет виден только организаторам конференции",
-      "comment_label": "Комментарий",
-      "comment_modal_title": "Комментарий о волонтере",
-      "comment_modal_title_for": "Комментарий о {name}",
-      "comment_placeholder": "Напишите комментарий об этом волонтере...",
-      "comment_save_error": "Невозможно сохранить комментарий",
-      "comment_saved_success": "Комментарий успешно сохранен",
-      "comment_warning": "Этот комментарий связан с волонтером только для этого издания.",
-      "config_description": "Настроить систему волонтёров",
-      "config_page_description": "Настроить параметры системы волонтёров",
-      "config_title": "Конфигурация волонтёрства",
-      "dates_description": "Укажите даты монтажа и демонтажа, чтобы волонтёры могли указать свою доступность",
-      "dates_title": "Даты монтажа и демонтажа",
-      "external_link": "Внешняя ссылка",
-      "external_url_description": "Ссылка на вашу форму или внешний инструмент управления волонтерами",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Общие настройки",
-      "management_mode": "Управление добровольцами",
-      "management_mode_description": "Выберите способ управления волонтерами для этого издания",
-      "mode_external": "Внешний",
-      "mode_external_badge": "Внешний",
-      "mode_internal": "Внутренний",
-      "mode_internal_badge": "Внутренний",
-      "notifications_description": "Рассылка уведомлений волонтерам",
-      "page_public": "Публичная страница видима",
-      "page_public_description": "Сделать публичную страницу волонтёров видимой для посетителей (иначе доступ имеют только организаторы)",
-      "page_public_hidden": "Страница скрыта — доступ имеют только организаторы",
-      "page_public_visible": "Страница доступна всем",
-      "planning_description": "Планирование слотов и миссий",
-      "teams_description": "Организация команд добровольцев"
-    },
     "workshops": {
       "manage_description": "Просмотр и модерация воркшопов, предложенных участниками",
       "manage_title": "Управление воркшопами",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Управлять задачами",
       "manage_description": "Организуйте внутреннюю работу через группы задач"
+    },
+    "volunteers": {
+      "config_title": "Конфигурация волонтёрства",
+      "applications_description": "Просмотр и обработка заявок",
+      "config_description": "Настроить систему волонтёров",
+      "notifications_description": "Рассылка уведомлений волонтерам",
+      "planning_description": "Планирование слотов и миссий",
+      "teams_description": "Организация команд добровольцев"
     }
   }
 }

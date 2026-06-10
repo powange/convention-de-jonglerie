@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center gap-3">
         <UIcon name="i-heroicons-clock" class="w-5 h-5 text-primary-600" />
-        <h3 class="text-lg font-semibold">{{ t('edition.volunteers.manage_delay') }}</h3>
+        <h3 class="text-lg font-semibold">{{ t('volunteers.manage_delay') }}</h3>
       </div>
     </template>
 
@@ -30,7 +30,7 @@
           <div class="flex items-center gap-2">
             <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4 text-orange-600" />
             <span class="text-sm font-medium text-orange-800 dark:text-orange-200">
-              {{ t('edition.volunteers.current_delay') }}:
+              {{ t('volunteers.current_delay') }}:
             </span>
           </div>
           <span class="text-sm font-semibold text-orange-600 dark:text-orange-400">
@@ -41,7 +41,7 @@
         <!-- Boutons de retard rapide -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {{ t('edition.volunteers.quick_delays') }}
+            {{ t('volunteers.quick_delays') }}
           </label>
           <div class="grid grid-cols-3 gap-2">
             <UButton
@@ -58,20 +58,20 @@
         </div>
 
         <!-- Champ personnalisé -->
-        <UFormField :label="t('edition.volunteers.custom_delay')" name="delayMinutes">
+        <UFormField :label="t('volunteers.custom_delay')" name="delayMinutes">
           <UInput
             v-model.number="delayMinutes"
             type="number"
-            :placeholder="t('edition.volunteers.delay_placeholder')"
+            :placeholder="t('volunteers.delay_placeholder')"
             icon="i-heroicons-clock"
           >
             <template #trailing>
-              <span class="text-xs text-gray-500">{{ t('edition.volunteers.minutes') }}</span>
+              <span class="text-xs text-gray-500">{{ t('volunteers.minutes') }}</span>
             </template>
           </UInput>
           <template #hint>
             <span class="text-xs text-gray-500">
-              {{ t('edition.volunteers.delay_hint') }}
+              {{ t('volunteers.delay_hint') }}
             </span>
           </template>
         </UFormField>
@@ -84,7 +84,7 @@
           <div class="flex items-center gap-2 mb-3">
             <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-600" />
             <span class="text-sm font-semibold text-blue-800 dark:text-blue-200">
-              {{ t('edition.volunteers.preview') }}
+              {{ t('volunteers.preview') }}
             </span>
             <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
               ({{ formatDelay(delayMinutes) }})
@@ -93,7 +93,7 @@
           <div class="space-y-2">
             <div class="flex items-center justify-between">
               <span class="text-sm text-blue-700 dark:text-blue-300">
-                {{ t('edition.volunteers.new_start_time') }}:
+                {{ t('volunteers.new_start_time') }}:
               </span>
               <span class="text-base font-bold text-blue-900 dark:text-blue-100">
                 {{ newStartTime }}
@@ -101,7 +101,7 @@
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-blue-700 dark:text-blue-300">
-                {{ t('edition.volunteers.new_end_time') }}:
+                {{ t('volunteers.new_end_time') }}:
               </span>
               <span class="text-base font-bold text-blue-900 dark:text-blue-100">
                 {{ newEndTime }}
@@ -121,7 +121,7 @@
           icon="i-heroicons-trash"
           @click="removeDelay"
         >
-          {{ t('edition.volunteers.remove_delay') }}
+          {{ t('volunteers.remove_delay') }}
         </UButton>
         <div v-else></div>
         <div class="flex gap-2">
@@ -197,16 +197,16 @@ const formatDateTime = (dateTime: string | undefined) => {
 
 // Formatage du retard
 const formatDelay = (minutes: number) => {
-  if (minutes === 0) return t('edition.volunteers.no_delay')
+  if (minutes === 0) return t('volunteers.no_delay')
   if (minutes > 0) {
     if (minutes >= 60) {
       const hours = Math.floor(minutes / 60)
       const mins = minutes % 60
       return mins > 0
-        ? t('edition.volunteers.delay_hours_minutes', { hours, minutes: mins })
-        : t('edition.volunteers.delay_hours', { hours })
+        ? t('volunteers.delay_hours_minutes', { hours, minutes: mins })
+        : t('volunteers.delay_hours', { hours })
     }
-    return t('edition.volunteers.delay_minutes', { minutes })
+    return t('volunteers.delay_minutes', { minutes })
   }
   // Avance (valeur négative)
   const absoluteMinutes = Math.abs(minutes)
@@ -214,10 +214,10 @@ const formatDelay = (minutes: number) => {
     const hours = Math.floor(absoluteMinutes / 60)
     const mins = absoluteMinutes % 60
     return mins > 0
-      ? t('edition.volunteers.advance_hours_minutes', { hours, minutes: mins })
-      : t('edition.volunteers.advance_hours', { hours })
+      ? t('volunteers.advance_hours_minutes', { hours, minutes: mins })
+      : t('volunteers.advance_hours', { hours })
   }
-  return t('edition.volunteers.advance_minutes', { minutes: absoluteMinutes })
+  return t('volunteers.advance_minutes', { minutes: absoluteMinutes })
 }
 
 // Nouvelles heures avec le retard appliqué
@@ -254,7 +254,7 @@ const { execute: executeSaveDelay, loading: isSaving } = useApiAction(
   {
     method: 'PUT',
     body: () => ({ delayMinutes: delayMinutes.value }),
-    successMessage: { title: t('edition.volunteers.delay_saved') },
+    successMessage: { title: t('volunteers.delay_saved') },
     errorMessages: { default: t('errors.error_occurred') },
     onSuccess,
   }
@@ -266,7 +266,7 @@ const { execute: executeRemoveDelay, loading: isRemoving } = useApiAction(
   {
     method: 'PUT',
     body: () => ({ delayMinutes: null }),
-    successMessage: { title: t('edition.volunteers.delay_removed') },
+    successMessage: { title: t('volunteers.delay_removed') },
     errorMessages: { default: t('errors.error_occurred') },
     onSuccess,
   }

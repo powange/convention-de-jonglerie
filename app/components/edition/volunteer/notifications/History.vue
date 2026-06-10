@@ -4,7 +4,7 @@
     <div class="flex items-center gap-2 mb-4">
       <UIcon name="i-heroicons-clock" class="text-gray-600 dark:text-gray-400" />
       <h4 class="text-base font-medium text-gray-900 dark:text-white">
-        {{ t('edition.volunteers.notifications_history') }}
+        {{ t('volunteers.notifications_history') }}
       </h4>
     </div>
 
@@ -18,7 +18,7 @@
     <div v-else-if="notifications.length === 0" class="text-center py-8">
       <UIcon name="i-heroicons-bell-slash" class="mx-auto text-gray-400" size="32" />
       <p class="mt-2 text-base text-gray-500">
-        {{ t('edition.volunteers.no_notifications_sent') }}
+        {{ t('volunteers.no_notifications_sent') }}
       </p>
     </div>
 
@@ -59,8 +59,8 @@
           <UBadge color="info" variant="soft" size="sm" class="self-start">
             {{
               notification.targetType === 'all'
-                ? t('edition.volunteers.all_accepted_volunteers')
-                : t('edition.volunteers.specific_teams')
+                ? t('volunteers.all_accepted_volunteers')
+                : t('volunteers.specific_teams')
             }}
           </UBadge>
         </div>
@@ -77,7 +77,7 @@
           v-if="notification.targetType === 'teams' && notification.selectedTeams?.length"
           class="mb-3"
         >
-          <p class="text-sm text-gray-500 mb-1">{{ t('edition.volunteers.targeted_teams') }}:</p>
+          <p class="text-sm text-gray-500 mb-1">{{ t('volunteers.targeted_teams') }}:</p>
           <div class="flex flex-wrap gap-1">
             <UBadge
               v-for="team in notification.selectedTeams"
@@ -96,9 +96,7 @@
             <span class="flex items-center gap-1">
               <UIcon name="i-heroicons-users" size="14" />
               <span class="hidden sm:inline">
-                {{
-                  t('edition.volunteers.recipients_count', { count: notification.recipientCount })
-                }}
+                {{ t('volunteers.recipients_count', { count: notification.recipientCount }) }}
               </span>
               <span class="sm:hidden">{{ notification.recipientCount }}</span>
             </span>
@@ -106,7 +104,7 @@
               <UIcon name="i-heroicons-check-circle" size="14" />
               <span class="hidden sm:inline">
                 {{
-                  t('edition.volunteers.confirmations_count', {
+                  t('volunteers.confirmations_count', {
                     count: notification.confirmationsCount,
                   })
                 }}
@@ -131,7 +129,7 @@
               size="sm"
               class="hidden sm:inline-flex"
             >
-              {{ notification.confirmationRate }}% {{ t('edition.volunteers.confirmed') }}
+              {{ notification.confirmationRate }}% {{ t('volunteers.confirmed') }}
             </UBadge>
             <UButton
               size="md"
@@ -141,7 +139,7 @@
               class="sm:!text-xs sm:!py-1 sm:!px-2.5 sm:!gap-1.5"
               @click="openConfirmationsModal(notification)"
             >
-              {{ t('edition.volunteers.view_details') }}
+              {{ t('volunteers.view_details') }}
             </UButton>
           </div>
         </div>

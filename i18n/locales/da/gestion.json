@@ -625,44 +625,6 @@
     },
     "title": "Administration",
     "view_edition": "Se udgaven",
-    "volunteers": {
-      "action_add_comment": "Tilføj kommentar",
-      "applications_description": "Visning og behandling af ansøgninger",
-      "applications_open": "Åbning af ansøgninger",
-      "applications_open_description": "Aktiver eller deaktiver frivillige ansøgninger",
-      "comment_delete_error": "Kan ikke slette kommentar",
-      "comment_deleted_success": "Kommentar slettet med succes",
-      "comment_hint": "Denne kommentar vil kun være synlig for konventionens organisatorer",
-      "comment_label": "Kommentar",
-      "comment_modal_title": "Kommentar om frivillig",
-      "comment_modal_title_for": "Kommentar om {name}",
-      "comment_placeholder": "Skriv en kommentar om denne frivillige...",
-      "comment_save_error": "Kan ikke gemme kommentar",
-      "comment_saved_success": "Kommentar gemt med succes",
-      "comment_warning": "Denne kommentar er kun knyttet til den frivillige for denne udgave.",
-      "config_description": "Konfigurer frivilligsystem",
-      "config_page_description": "Konfigurer indstillinger for frivilligsystem",
-      "config_title": "Frivilligkonfiguration",
-      "dates_description": "Angiv opsætnings- og nedtagningsdatoer, så frivillige kan angive deres tilgængelighed",
-      "dates_title": "Opsætnings- og nedtagningsdatoer",
-      "external_link": "Eksternt link",
-      "external_url_description": "Link til din formular eller et eksternt værktøj til styring af frivillige",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Generelle indstillinger",
-      "management_mode": "Ledelse af frivillige",
-      "management_mode_description": "Vælg, hvordan du vil administrere frivillige til denne udgave",
-      "mode_external": "Eksternt",
-      "mode_external_badge": "Eksternt",
-      "mode_internal": "Internt",
-      "mode_internal_badge": "Internt",
-      "notifications_description": "Send meddelelser til frivillige",
-      "page_public": "Offentlig side synlig",
-      "page_public_description": "Gør den offentlige frivilligside synlig for besøgende (ellers har kun arrangører adgang)",
-      "page_public_hidden": "Side skjult — kun arrangører har adgang",
-      "page_public_visible": "Side tilgængelig for alle",
-      "planning_description": "Planlægning af slots og missioner",
-      "teams_description": "Organisering af hold af frivillige"
-    },
     "workshops": {
       "manage_description": "Se og moderer workshops foreslået af deltagere",
       "manage_title": "Administrer workshops",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Administrer opgaver",
       "manage_description": "Organiser internt arbejde via opgavegrupper"
+    },
+    "volunteers": {
+      "config_title": "Frivilligkonfiguration",
+      "applications_description": "Visning og behandling af ansøgninger",
+      "config_description": "Konfigurer frivilligsystem",
+      "notifications_description": "Send meddelelser til frivillige",
+      "planning_description": "Planlægning af slots og missioner",
+      "teams_description": "Organisering af hold af frivillige"
     }
   }
 }

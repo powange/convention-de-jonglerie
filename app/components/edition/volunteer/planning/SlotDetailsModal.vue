@@ -15,9 +15,9 @@
             <UIcon name="i-heroicons-pencil-square" class="w-5 h-5" />
           </template>
           <div class="flex flex-col items-start">
-            <span class="font-semibold">{{ t('edition.volunteers.edit_slot') }}</span>
+            <span class="font-semibold">{{ t('volunteers.edit_slot') }}</span>
             <span class="text-xs text-gray-500 dark:text-gray-400">{{
-              t('edition.volunteers.edit_slot_description')
+              t('volunteers.edit_slot_description')
             }}</span>
           </div>
         </UButton>
@@ -34,9 +34,9 @@
             <UIcon name="i-heroicons-users" class="w-5 h-5" />
           </template>
           <div class="flex flex-col items-start">
-            <span class="font-semibold">{{ t('edition.volunteers.manage_assignments') }}</span>
+            <span class="font-semibold">{{ t('volunteers.manage_assignments') }}</span>
             <span class="text-xs text-gray-500 dark:text-gray-400">{{
-              t('edition.volunteers.manage_assignments_description')
+              t('volunteers.manage_assignments_description')
             }}</span>
           </div>
         </UButton>
@@ -53,9 +53,9 @@
             <UIcon name="i-heroicons-clock" class="w-5 h-5" />
           </template>
           <div class="flex flex-col items-start">
-            <span class="font-semibold">{{ t('edition.volunteers.manage_delay') }}</span>
+            <span class="font-semibold">{{ t('volunteers.manage_delay') }}</span>
             <span class="text-xs text-gray-500 dark:text-gray-400">{{
-              t('edition.volunteers.manage_delay_description')
+              t('volunteers.manage_delay_description')
             }}</span>
           </div>
         </UButton>
@@ -82,7 +82,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="w-4 h-4 text-green-600" />
               <h4 class="text-sm font-medium text-green-800 dark:text-green-200">
-                {{ t('edition.volunteers.schedule_info') }}
+                {{ t('volunteers.schedule_info') }}
               </h4>
             </div>
             <div v-if="duration" class="text-xs text-green-600 dark:text-green-400 font-medium">
@@ -112,7 +112,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-users" class="w-4 h-4 text-purple-500" />
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ t('edition.volunteers.assigned_volunteers') }}
+                {{ t('volunteers.assigned_volunteers') }}
               </h4>
             </div>
             <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -157,7 +157,7 @@
             class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm text-gray-500 dark:text-gray-400 pl-6"
           >
             <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
-            <span>{{ t('edition.volunteers.no_volunteers_assigned') }}</span>
+            <span>{{ t('volunteers.no_volunteers_assigned') }}</span>
           </div>
         </div>
       </div>
@@ -218,7 +218,7 @@ const modalTitle = computed(() => {
 
 const modalDescription = computed(() => {
   const team = props.teams.find((t) => t.id === props.timeSlot?.teamId)
-  return team?.name || t('edition.volunteers.no_team')
+  return team?.name || t('volunteers.no_team')
 })
 
 // Durée
@@ -232,11 +232,11 @@ const duration = computed(() => {
   const mins = diffMins % 60
 
   if (hours > 0 && mins > 0) {
-    return t('edition.volunteers.duration_hours_minutes', { hours, minutes: mins })
+    return t('volunteers.duration_hours_minutes', { hours, minutes: mins })
   } else if (hours > 0) {
-    return t('edition.volunteers.duration_hours', { hours })
+    return t('volunteers.duration_hours', { hours })
   } else {
-    return t('edition.volunteers.duration_minutes', { minutes: mins })
+    return t('volunteers.duration_minutes', { minutes: mins })
   }
 })
 

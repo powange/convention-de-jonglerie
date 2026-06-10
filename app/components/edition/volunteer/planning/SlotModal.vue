@@ -15,8 +15,8 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">
             {{
               formState.id
-                ? t('edition.volunteers.edit_slot_subtitle')
-                : t('edition.volunteers.create_slot_subtitle')
+                ? t('volunteers.edit_slot_subtitle')
+                : t('volunteers.create_slot_subtitle')
             }}
           </p>
         </div>
@@ -26,11 +26,11 @@
     <template #body>
       <UForm :schema="slotSchema" :state="formState" class="space-y-6" @submit="onSubmit">
         <!-- Titre du créneau -->
-        <UFormField name="title" :label="t('edition.volunteers.slot_title')" class="w-full">
+        <UFormField name="title" :label="t('volunteers.slot_title')" class="w-full">
           <UInput
             ref="titleInput"
             v-model="formState.title"
-            :placeholder="$t('edition.volunteers.slot_title_placeholder')"
+            :placeholder="$t('volunteers.slot_title_placeholder')"
             icon="i-heroicons-tag"
             :autofocus="!readOnly"
             :disabled="readOnly"
@@ -42,7 +42,7 @@
         <UFormField name="description" :label="t('common.description')" class="w-full">
           <UTextarea
             v-model="formState.description"
-            :placeholder="t('edition.volunteers.slot_description_placeholder')"
+            :placeholder="t('volunteers.slot_description_placeholder')"
             :rows="3"
             :disabled="readOnly"
             resize
@@ -55,17 +55,17 @@
           <div class="flex items-center gap-2 mb-3">
             <UIcon name="i-heroicons-user-group" class="w-4 h-4 text-blue-600" />
             <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-              {{ t('edition.volunteers.team_assignment') }}
+              {{ t('volunteers.team_assignment') }}
             </h4>
           </div>
 
           <!-- Équipe assignée -->
-          <UFormField name="teamId" :label="t('edition.volunteers.assigned_team')">
+          <UFormField name="teamId" :label="t('volunteers.assigned_team')">
             <USelect
               v-if="teamOptions.length > 2"
               v-model="formState.teamId"
               :items="enhancedTeamOptions"
-              :placeholder="t('edition.volunteers.select_team')"
+              :placeholder="t('volunteers.select_team')"
               :disabled="readOnly"
               icon="i-heroicons-user-group"
             >
@@ -87,7 +87,7 @@
               <span class="text-sm text-gray-600 dark:text-gray-300">
                 {{
                   teamOptions.find((option) => option.value !== 'unassigned')?.label ||
-                  t('edition.volunteers.no_team')
+                  t('volunteers.no_team')
                 }}
               </span>
             </div>
@@ -97,7 +97,7 @@
             >
               <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4 text-yellow-600" />
               <span class="text-sm text-yellow-700 dark:text-yellow-300">
-                {{ t('edition.volunteers.no_teams_available') }}
+                {{ t('volunteers.no_teams_available') }}
               </span>
             </div>
           </UFormField>
@@ -109,7 +109,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="w-4 h-4 text-green-600" />
               <h4 class="text-sm font-medium text-green-800 dark:text-green-200">
-                {{ t('edition.volunteers.schedule_info') }}
+                {{ t('volunteers.schedule_info') }}
               </h4>
             </div>
             <div
@@ -139,7 +139,7 @@
           <!-- Raccourcis durée -->
           <div v-if="!readOnly" class="flex flex-wrap gap-2">
             <span class="text-xs text-gray-500 dark:text-gray-400 mr-2"
-              >{{ t('edition.volunteers.quick_duration') }}:</span
+              >{{ t('volunteers.quick_duration') }}:</span
             >
             <UButton
               v-for="duration in quickDurations"
@@ -159,19 +159,19 @@
           <div class="flex items-center gap-2 mb-3">
             <UIcon name="i-heroicons-users" class="w-4 h-4 text-purple-600" />
             <h4 class="text-sm font-medium text-purple-800 dark:text-purple-200">
-              {{ t('edition.volunteers.volunteers_needed') }}
+              {{ t('volunteers.volunteers_needed') }}
             </h4>
           </div>
 
           <!-- Nombre de bénévoles -->
-          <UFormField name="maxVolunteers" :label="t('edition.volunteers.max_volunteers')" required>
+          <UFormField name="maxVolunteers" :label="t('volunteers.max_volunteers')" required>
             <div class="flex items-center gap-3">
               <UInput
                 v-model.number="formState.maxVolunteers"
                 type="number"
                 min="1"
                 max="50"
-                :placeholder="$t('edition.volunteers.max_volunteers_placeholder')"
+                :placeholder="$t('volunteers.max_volunteers_placeholder')"
                 :disabled="readOnly"
                 icon="i-heroicons-users"
                 class="flex-1"
@@ -194,7 +194,7 @@
             <template #hint>
               <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                 <UIcon name="i-heroicons-information-circle" class="w-3 h-3" />
-                {{ t('edition.volunteers.max_volunteers_hint') }}
+                {{ t('volunteers.max_volunteers_hint') }}
               </div>
             </template>
           </UFormField>
@@ -297,11 +297,11 @@ const isOpen = computed({
 })
 
 const modalTitle = computed(() =>
-  formState.value.id ? t('edition.volunteers.edit_slot') : t('edition.volunteers.create_slot')
+  formState.value.id ? t('volunteers.edit_slot') : t('volunteers.create_slot')
 )
 
 const teamOptions = computed(() => [
-  { value: 'unassigned', label: t('edition.volunteers.no_team') },
+  { value: 'unassigned', label: t('volunteers.no_team') },
   ...props.teams.map((team) => ({
     value: team.id,
     label: team.name,
@@ -309,7 +309,7 @@ const teamOptions = computed(() => [
 ])
 
 const enhancedTeamOptions = computed(() => [
-  { value: 'unassigned', label: t('edition.volunteers.no_team'), color: '#6b7280' },
+  { value: 'unassigned', label: t('volunteers.no_team'), color: '#6b7280' },
   ...props.teams.map((team) => ({
     value: team.id,
     label: team.name,
@@ -335,7 +335,7 @@ const calculatedDuration = computed(() => {
   const end = new Date(formState.value.endDateTime)
   const diffMs = end.getTime() - start.getTime()
 
-  if (diffMs <= 0) return t('edition.volunteers.invalid_duration')
+  if (diffMs <= 0) return t('volunteers.invalid_duration')
 
   const diffHours = diffMs / (1000 * 60 * 60)
   const hours = Math.floor(diffHours)
@@ -497,7 +497,7 @@ const onSubmit = async () => {
 const onDelete = async () => {
   if (!formState.value.id) return
 
-  if (confirm(t('edition.volunteers.confirm_delete_slot'))) {
+  if (confirm(t('volunteers.confirm_delete_slot'))) {
     try {
       loading.value = true
       emit('delete', formState.value.id)

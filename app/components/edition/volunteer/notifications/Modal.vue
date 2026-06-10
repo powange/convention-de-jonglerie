@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center gap-2">
         <UIcon name="i-heroicons-bell" class="text-primary-500" />
-        <span class="font-semibold">{{ t('edition.volunteers.send_notification') }}</span>
+        <span class="font-semibold">{{ t('volunteers.send_notification') }}</span>
       </div>
     </template>
 
@@ -20,13 +20,13 @@
             />
           </UFormField>
           <p class="text-xs text-gray-500 mt-1">
-            {{ t('edition.volunteers.notification_title_info') }}
+            {{ t('volunteers.notification_title_info') }}
           </p>
         </div>
 
         <!-- Destinataires -->
         <div>
-          <UFormField :label="t('edition.volunteers.notification_recipients')" class="w-full">
+          <UFormField :label="t('volunteers.notification_recipients')" class="w-full">
             <URadioGroup
               v-model="formData.targetType"
               :items="recipientOptions"
@@ -37,7 +37,7 @@
 
         <!-- Sélection d'équipes (si applicable) -->
         <div v-if="formData.targetType === 'teams' && teamsOptions.length > 0">
-          <UFormField :label="t('edition.volunteers.select_teams')" class="w-full">
+          <UFormField :label="t('volunteers.select_teams')" class="w-full">
             <div class="space-y-2 overflow-y-auto">
               <UCheckbox
                 v-for="(team, index) in teamsOptions"
@@ -57,13 +57,13 @@
             <UTextarea
               v-model="formData.message"
               :rows="4"
-              :placeholder="t('edition.volunteers.notification_message_placeholder')"
+              :placeholder="t('volunteers.notification_message_placeholder')"
               :maxlength="messageMaxLength"
               class="w-full"
               @blur="markFieldTouched('message')"
             />
             <div class="text-xs text-gray-500 mt-1 flex justify-between">
-              <span>{{ t('edition.volunteers.notification_message_help') }}</span>
+              <span>{{ t('volunteers.notification_message_help') }}</span>
               <span>{{ formData.message.length }}/{{ messageMaxLength }}</span>
             </div>
           </UFormField>
@@ -74,7 +74,7 @@
           <div class="flex items-center gap-2 text-blue-700 dark:text-blue-300">
             <UIcon name="i-heroicons-users" size="16" />
             <span class="text-sm font-medium">
-              {{ t('edition.volunteers.notification_recipients_count', { count: recipientCount }) }}
+              {{ t('volunteers.notification_recipients_count', { count: recipientCount }) }}
             </span>
           </div>
 
@@ -121,7 +121,7 @@
             :disabled="!canSend"
             icon="i-heroicons-paper-airplane"
           >
-            {{ t('edition.volunteers.send_notification') }}
+            {{ t('volunteers.send_notification') }}
           </UButton>
         </div>
       </form>
@@ -132,17 +132,17 @@
   <Teleport to="body">
     <UiConfirmModal
       v-model="showConfirmation"
-      :title="t('edition.volunteers.confirm_send_notification_title')"
+      :title="t('volunteers.confirm_send_notification_title')"
       :description="
-        t('edition.volunteers.confirm_send_notification_description', {
+        t('volunteers.confirm_send_notification_description', {
           count: recipientCount,
           targetType:
             formData.targetType === 'all'
-              ? t('edition.volunteers.all_accepted_volunteers').toLowerCase()
-              : t('edition.volunteers.selected_teams').toLowerCase(),
+              ? t('volunteers.all_accepted_volunteers').toLowerCase()
+              : t('volunteers.selected_teams').toLowerCase(),
         })
       "
-      :confirm-label="t('edition.volunteers.send_notification')"
+      :confirm-label="t('volunteers.send_notification')"
       :cancel-label="t('common.cancel')"
       confirm-icon="i-heroicons-paper-airplane"
       :loading="sending"
@@ -207,7 +207,7 @@ const touchedFields = ref(new Set<string>())
 const notificationTitle = computed(() => {
   // Utiliser le nom de l'édition si disponible, sinon le nom de la convention
   const displayName = props.edition?.name || props.edition?.convention?.name || ''
-  return `${t('edition.volunteers.notification_title_prefix')} - ${displayName}`
+  return `${t('volunteers.notification_title_prefix')} - ${displayName}`
 })
 
 const recipientOptions = computed(() => {
@@ -216,7 +216,7 @@ const recipientOptions = computed(() => {
     return [
       {
         value: 'teams',
-        label: t('edition.volunteers.specific_teams'),
+        label: t('volunteers.specific_teams'),
         disabled: !teamsOptions.value.length,
       },
     ]
@@ -226,11 +226,11 @@ const recipientOptions = computed(() => {
   return [
     {
       value: 'all',
-      label: t('edition.volunteers.all_accepted_volunteers'),
+      label: t('volunteers.all_accepted_volunteers'),
     },
     {
       value: 'teams',
-      label: t('edition.volunteers.specific_teams'),
+      label: t('volunteers.specific_teams'),
       disabled: !teamsOptions.value.length,
     },
   ]
@@ -352,7 +352,7 @@ const { execute: executeSend, loading: sending } = useApiAction(
       message: formData.value.message.trim(),
     }),
     silentSuccess: true,
-    errorMessages: { default: t('edition.volunteers.notification_send_error') },
+    errorMessages: { default: t('volunteers.notification_send_error') },
     onSuccess: () => {
       emit('sent', {
         targetType: formData.value.targetType,
@@ -363,8 +363,8 @@ const { execute: executeSend, loading: sending } = useApiAction(
       })
 
       toast.add({
-        title: t('edition.volunteers.notification_sent_success'),
-        description: t('edition.volunteers.notification_sent_count', {
+        title: t('volunteers.notification_sent_success'),
+        description: t('volunteers.notification_sent_count', {
           count: recipientCount.value,
         }),
         icon: 'i-heroicons-check-circle',

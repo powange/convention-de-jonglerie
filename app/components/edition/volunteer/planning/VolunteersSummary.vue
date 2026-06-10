@@ -8,10 +8,10 @@
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold flex items-center gap-2">
           <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-          {{ t('edition.volunteers.volunteers_summary') }}
+          {{ t('volunteers.volunteers_summary') }}
         </h3>
         <UBadge color="primary" variant="soft">
-          {{ volunteersStats.totalVolunteers }} {{ t('edition.volunteers.volunteers') }}
+          {{ volunteersStats.totalVolunteers }} {{ t('volunteers.volunteers') }}
         </UBadge>
       </div>
     </template>
@@ -23,20 +23,20 @@
           <div class="text-2xl font-bold text-primary-600">
             {{ volunteersStats.totalHours.toFixed(1) }}h
           </div>
-          <div class="text-sm text-gray-500">{{ t('edition.volunteers.total_hours') }}</div>
+          <div class="text-sm text-gray-500">{{ t('volunteers.total_hours') }}</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-green-600">
             {{ volunteersStats.averageHours.toFixed(1) }}h
           </div>
           <div class="text-sm text-gray-500">
-            {{ t('edition.volunteers.average_per_volunteer') }}
+            {{ t('volunteers.average_per_volunteer') }}
           </div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-blue-600">{{ volunteersStats.totalSlots }}</div>
           <div class="text-sm text-gray-500">
-            {{ t('edition.volunteers.total_assignments') }}
+            {{ t('volunteers.total_assignments') }}
           </div>
         </div>
       </div>
@@ -74,7 +74,7 @@
                   <div class="flex items-center gap-2">
                     <UBadge color="neutral" variant="soft" size="sm">
                       {{ dayStats.totalVolunteers }}
-                      {{ t('edition.volunteers.volunteers_short') }}
+                      {{ t('volunteers.volunteers_short') }}
                     </UBadge>
                     <UBadge color="primary" variant="soft" size="sm">
                       {{ dayStats.totalHours.toFixed(1) }}h
@@ -105,7 +105,7 @@
                         >{{ volunteerStat.hours.toFixed(1) }}h</span
                       >
                       <UBadge color="neutral" variant="soft" size="xs">
-                        {{ volunteerStat.slots }} {{ t('edition.volunteers.slots_short') }}
+                        {{ volunteerStat.slots }} {{ t('volunteers.slots_short') }}
                       </UBadge>
                     </div>
                   </div>
@@ -142,7 +142,7 @@
                       {{ volunteerStat.totalHours.toFixed(1) }}h
                     </UBadge>
                     <UBadge color="neutral" variant="soft">
-                      {{ volunteerStat.totalSlots }} {{ t('edition.volunteers.slots_short') }}
+                      {{ volunteerStat.totalSlots }} {{ t('volunteers.slots_short') }}
                     </UBadge>
                   </div>
                 </div>
@@ -168,7 +168,7 @@
                         {{ dayDetail.hours.toFixed(1) }}h
                       </span>
                       <UBadge color="neutral" variant="soft">
-                        {{ dayDetail.slots }} {{ t('edition.volunteers.slots_short') }}
+                        {{ dayDetail.slots }} {{ t('volunteers.slots_short') }}
                       </UBadge>
                     </div>
                   </div>

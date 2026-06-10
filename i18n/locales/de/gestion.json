@@ -625,44 +625,6 @@
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",
-    "volunteers": {
-      "action_add_comment": "Kommentar hinzufügen",
-      "applications_description": "Bewerbungen einsehen und bearbeiten",
-      "applications_open": "Eröffnung der Bewerbungen",
-      "applications_open_description": "Aktivieren oder deaktivieren Sie Bewerbungen von Freiwilligen",
-      "comment_delete_error": "Kommentar kann nicht gelöscht werden",
-      "comment_deleted_success": "Kommentar erfolgreich gelöscht",
-      "comment_hint": "Dieser Kommentar wird nur für die Organisatoren der Konferenz sichtbar sein",
-      "comment_label": "Kommentar",
-      "comment_modal_title": "Kommentar zum Freiwilligen",
-      "comment_modal_title_for": "Kommentar zu {name}",
-      "comment_placeholder": "Schreiben Sie einen Kommentar zu diesem Freiwilligen...",
-      "comment_save_error": "Kommentar kann nicht gespeichert werden",
-      "comment_saved_success": "Kommentar erfolgreich gespeichert",
-      "comment_warning": "Dieser Kommentar ist nur mit dem Freiwilligen für diese Edition verknüpft.",
-      "config_description": "Freiwilligensystem konfigurieren",
-      "config_page_description": "Einstellungen des Freiwilligensystems konfigurieren",
-      "config_title": "Freiwilligenkonfiguration",
-      "dates_description": "Legen Sie die Auf- und Abbaudaten fest, damit Freiwillige ihre Verfügbarkeit angeben können",
-      "dates_title": "Auf- und Abbaudaten",
-      "external_link": "Externer Link",
-      "external_url_description": "Link zu Ihrem Formular oder externen Tool für das Freiwilligenmanagement",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Allgemeine Einstellungen",
-      "management_mode": "Art der Verwaltung von Freiwilligen",
-      "management_mode_description": "Wählen Sie, wie Sie die Freiwilligen für diese Ausgabe verwalten möchten",
-      "mode_external": "Extern",
-      "mode_external_badge": "Extern",
-      "mode_internal": "Intern",
-      "mode_internal_badge": "Intern",
-      "notifications_description": "Benachrichtigungen an Freiwillige senden",
-      "page_public": "Öffentliche Seite sichtbar",
-      "page_public_description": "Die öffentliche Freiwilligenseite für Besucher sichtbar machen (andernfalls haben nur Organisatoren Zugriff)",
-      "page_public_hidden": "Seite verborgen — nur Organisatoren haben Zugriff",
-      "page_public_visible": "Seite für alle zugänglich",
-      "planning_description": "Zeitnischen und Missionen planen",
-      "teams_description": "Organisation von Freiwilligenteams"
-    },
     "workshops": {
       "manage_description": "Workshops von Teilnehmern ansehen und moderieren",
       "manage_title": "Workshops verwalten",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Aufgaben verwalten",
       "manage_description": "Interne Arbeit über Aufgabengruppen organisieren"
+    },
+    "volunteers": {
+      "config_title": "Freiwilligenkonfiguration",
+      "applications_description": "Bewerbungen einsehen und bearbeiten",
+      "config_description": "Freiwilligensystem konfigurieren",
+      "notifications_description": "Benachrichtigungen an Freiwillige senden",
+      "planning_description": "Zeitnischen und Missionen planen",
+      "teams_description": "Organisation von Freiwilligenteams"
     }
   }
 }

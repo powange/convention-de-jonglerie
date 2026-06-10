@@ -625,44 +625,6 @@
     },
     "title": "Gestão",
     "view_edition": "Ver a edição",
-    "volunteers": {
-      "action_add_comment": "Adicionar comentário",
-      "applications_description": "Visualização e tratamento dos pedidos",
-      "applications_open": "Abertura de candidaturas",
-      "applications_open_description": "Ativar ou desativar candidaturas de voluntários",
-      "comment_delete_error": "Não é possível excluir o comentário",
-      "comment_deleted_success": "Comentário excluído com sucesso",
-      "comment_hint": "Este comentário será visível apenas para os organizadores da convenção",
-      "comment_label": "Comentário",
-      "comment_modal_title": "Comentário sobre o voluntário",
-      "comment_modal_title_for": "Comentário sobre {name}",
-      "comment_placeholder": "Escreva um comentário sobre este voluntário...",
-      "comment_save_error": "Não é possível salvar o comentário",
-      "comment_saved_success": "Comentário salvo com sucesso",
-      "comment_warning": "Este comentário está vinculado ao voluntário apenas para esta edição.",
-      "config_description": "Configurar sistema de voluntariado",
-      "config_page_description": "Configurar definições do sistema de voluntariado",
-      "config_title": "Configuração de voluntariado",
-      "dates_description": "Defina as datas de montagem e desmontagem para permitir aos voluntários indicar a sua disponibilidade",
-      "dates_title": "Datas de montagem e desmontagem",
-      "external_link": "Ligação externa",
-      "external_url_description": "Ligação ao seu formulário ou ferramenta externa de gestão de voluntários",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Configurações gerais",
-      "management_mode": "Gestão de voluntários",
-      "management_mode_description": "Escolha a forma de gerir os voluntários para esta edição",
-      "mode_external": "Externo",
-      "mode_external_badge": "Externo",
-      "mode_internal": "Interno",
-      "mode_internal_badge": "Interno",
-      "notifications_description": "Enviar notificações aos voluntários",
-      "page_public": "Página pública visível",
-      "page_public_description": "Tornar a página pública dos voluntários visível para os visitantes (caso contrário, apenas os organizadores têm acesso)",
-      "page_public_hidden": "Página oculta — apenas os organizadores têm acesso",
-      "page_public_visible": "Página acessível a todos",
-      "planning_description": "Planeamento de faixas horárias e missões",
-      "teams_description": "Organizar equipas de voluntários"
-    },
     "workshops": {
       "manage_description": "Consultar e moderar os workshops propostos pelos participantes",
       "manage_title": "Gerir workshops",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Gerir tarefas",
       "manage_description": "Organizar o trabalho interno através de grupos de tarefas"
+    },
+    "volunteers": {
+      "config_title": "Configuração de voluntariado",
+      "applications_description": "Visualização e tratamento dos pedidos",
+      "config_description": "Configurar sistema de voluntariado",
+      "notifications_description": "Enviar notificações aos voluntários",
+      "planning_description": "Planeamento de faixas horárias e missões",
+      "teams_description": "Organizar equipas de voluntários"
     }
   }
 }

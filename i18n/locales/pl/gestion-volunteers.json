@@ -1,0 +1,36 @@
+{
+  "gestion": {
+    "volunteers": {
+      "action_add_comment": "Dodaj komentarz",
+      "applications_open": "Otwarcie zgłoszeń",
+      "applications_open_description": "Aktywacja lub dezaktywacja aplikacji dla wolontariuszy",
+      "comment_delete_error": "Nie można usunąć komentarza",
+      "comment_deleted_success": "Komentarz został pomyślnie usunięty",
+      "comment_hint": "Ten komentarz będzie widoczny tylko dla organizatorów konwencji",
+      "comment_label": "Komentarz",
+      "comment_modal_title": "Komentarz o wolontariuszu",
+      "comment_modal_title_for": "Komentarz o {name}",
+      "comment_placeholder": "Napisz komentarz o tym wolontariuszu...",
+      "comment_save_error": "Nie można zapisać komentarza",
+      "comment_saved_success": "Komentarz został pomyślnie zapisany",
+      "comment_warning": "Ten komentarz jest powiązany z wolontariuszem tylko dla tej edycji.",
+      "config_page_description": "Skonfiguruj ustawienia systemu wolontariatu",
+      "dates_description": "Ustaw daty montażu i demontażu, aby wolontariusze mogli wskazać swoją dostępność",
+      "dates_title": "Daty montażu i demontażu",
+      "external_link": "Link zewnętrzny",
+      "external_url_description": "Link do formularza lub zewnętrznego narzędzia do zarządzania wolontariuszami",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "general_settings": "Ustawienia ogólne",
+      "management_mode": "Zarządzanie wolontariuszami",
+      "management_mode_description": "Wybierz sposób zarządzania wolontariuszami w tej edycji",
+      "mode_external": "Zewnętrzne",
+      "mode_external_badge": "Zewnętrzne",
+      "mode_internal": "Wewnętrzny",
+      "mode_internal_badge": "Wewnętrzny",
+      "page_public": "Strona publiczna widoczna",
+      "page_public_description": "Udostępnij stronę publiczną wolontariuszy dla odwiedzających (w przeciwnym razie dostęp mają tylko organizatorzy)",
+      "page_public_hidden": "Strona ukryta — dostęp mają tylko organizatorzy",
+      "page_public_visible": "Strona dostępna dla wszystkich"
+    }
+  }
+}

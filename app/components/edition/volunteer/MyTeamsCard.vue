@@ -3,7 +3,7 @@
     <template #header>
       <h3 class="text-lg font-semibold flex items-center gap-2">
         <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-        {{ t('edition.volunteers.my_teams_title') }}
+        {{ t('volunteers.my_teams_title') }}
       </h3>
     </template>
 
@@ -50,7 +50,7 @@
         <div v-if="teamMembers[team.teamId]" class="space-y-2">
           <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{
-              t('edition.volunteers.team_members_count', {
+              t('volunteers.team_members_count', {
                 count: teamMembers[team.teamId]?.length || 0,
               })
             }}
@@ -105,7 +105,7 @@
 
         <!-- Message si aucun membre -->
         <div v-else-if="!loadingTeams[team.teamId]" class="text-xs text-gray-500 italic">
-          {{ t('edition.volunteers.no_team_members') }}
+          {{ t('volunteers.no_team_members') }}
         </div>
       </div>
     </div>

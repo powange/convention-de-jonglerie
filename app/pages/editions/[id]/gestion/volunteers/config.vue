@@ -114,7 +114,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Date de début du montage -->
                 <UFormField
-                  :label="$t('edition.volunteers.setup_start_date_label')"
+                  :label="$t('volunteers.setup_start_date_label')"
                   :error="fieldErrors.setupStartDate"
                 >
                   <UPopover>
@@ -153,7 +153,7 @@
 
                 <!-- Date de fin du démontage -->
                 <UFormField
-                  :label="$t('edition.volunteers.setup_end_date_label')"
+                  :label="$t('volunteers.setup_end_date_label')"
                   :error="fieldErrors.setupEndDate"
                 >
                   <UPopover>
@@ -274,9 +274,7 @@
                   "
                 >
                   {{
-                    volunteersOpenLocal
-                      ? $t('edition.volunteers.open')
-                      : $t('edition.volunteers.closed_message')
+                    volunteersOpenLocal ? $t('volunteers.open') : $t('volunteers.closed_message')
                   }}
                 </span>
               </div>

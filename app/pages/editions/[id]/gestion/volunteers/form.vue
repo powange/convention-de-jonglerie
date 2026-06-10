@@ -40,7 +40,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-cog-6-tooth" class="text-blue-500" />
               <h2 class="text-lg font-semibold">
-                {{ $t('edition.volunteers.internal_mode_options') }}
+                {{ $t('volunteers.internal_mode_options') }}
               </h2>
             </div>
 
@@ -69,10 +69,10 @@
               {{ $t('edition.volunteers.volunteer_form') }}
             </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('edition.volunteers.internal_mode_only') }}
+              {{ $t('volunteers.internal_mode_only') }}
             </p>
             <p class="text-sm text-gray-500 mt-2">
-              {{ $t('edition.volunteers.change_mode_hint') }}
+              {{ $t('volunteers.change_mode_hint') }}
             </p>
           </div>
         </UCard>

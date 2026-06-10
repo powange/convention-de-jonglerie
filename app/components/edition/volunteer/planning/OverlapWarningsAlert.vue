@@ -8,7 +8,7 @@
       icon="i-heroicons-exclamation-triangle"
     >
       <template #title>
-        {{ t('edition.volunteers.scheduling_conflicts') || 'Conflits de planning détectés' }}
+        {{ t('volunteers.scheduling_conflicts') || 'Conflits de planning détectés' }}
       </template>
       <template #description>
         <div class="space-y-2">
@@ -54,9 +54,7 @@
       icon="i-heroicons-information-circle"
     >
       <template #title>
-        {{
-          t('edition.volunteers.team_preference_conflicts') || "Conflits de préférences d'équipe"
-        }}
+        {{ t('volunteers.team_preference_conflicts') || "Conflits de préférences d'équipe" }}
       </template>
       <template #description>
         <div class="space-y-2">
@@ -84,7 +82,7 @@
                 <br />
                 <span class="text-blue-600 dark:text-blue-400">
                   {{
-                    t('edition.volunteers.not_in_team_preferences') ||
+                    t('volunteers.not_in_team_preferences') ||
                     'Cette équipe ne fait pas partie des préférences du bénévole'
                   }}
                 </span>
@@ -103,7 +101,7 @@
       icon="i-heroicons-exclamation-circle"
     >
       <template #title>
-        {{ t('edition.volunteers.meal_time_conflicts') || 'Conflits avec les horaires de repas' }}
+        {{ t('volunteers.meal_time_conflicts') || 'Conflits avec les horaires de repas' }}
       </template>
       <template #description>
         <div class="space-y-2">
@@ -132,9 +130,9 @@
                 <span class="text-orange-600 dark:text-orange-400">
                   {{
                     warning.mealPeriod === 'lunch'
-                      ? t('edition.volunteers.covers_lunch_period') ||
+                      ? t('volunteers.covers_lunch_period') ||
                         'Couvre toute la période du déjeuner (11h30-14h)'
-                      : t('edition.volunteers.covers_dinner_period') ||
+                      : t('volunteers.covers_dinner_period') ||
                         'Couvre toute la période du dîner (19h30-22h)'
                   }}
                 </span>

@@ -1,0 +1,36 @@
+{
+  "gestion": {
+    "volunteers": {
+      "action_add_comment": "Opmerking toevoegen",
+      "applications_open": "Opening van aanvragen",
+      "applications_open_description": "Vrijwilligerstoepassingen activeren of deactiveren",
+      "comment_delete_error": "Kan opmerking niet verwijderen",
+      "comment_deleted_success": "Opmerking succesvol verwijderd",
+      "comment_hint": "Deze opmerking is alleen zichtbaar voor de organisatoren van de conventie",
+      "comment_label": "Opmerking",
+      "comment_modal_title": "Opmerking over vrijwilliger",
+      "comment_modal_title_for": "Opmerking over {name}",
+      "comment_placeholder": "Schrijf een opmerking over deze vrijwilliger...",
+      "comment_save_error": "Kan opmerking niet opslaan",
+      "comment_saved_success": "Opmerking succesvol opgeslagen",
+      "comment_warning": "Deze opmerking is alleen voor deze editie aan de vrijwilliger gekoppeld.",
+      "config_page_description": "Vrijwilligerssysteem instellingen configureren",
+      "dates_description": "Stel de opbouw- en afbreekdata in zodat vrijwilligers hun beschikbaarheid kunnen aangeven",
+      "dates_title": "Opbouw- en afbreekdata",
+      "external_link": "Externe link",
+      "external_url_description": "Link naar je formulier of externe vrijwilligersmanagementtool",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "general_settings": "Algemene instellingen",
+      "management_mode": "Beheer van vrijwilligers",
+      "management_mode_description": "Kies hoe je vrijwilligers voor deze editie wilt beheren",
+      "mode_external": "Extern",
+      "mode_external_badge": "Extern",
+      "mode_internal": "Intern",
+      "mode_internal_badge": "Intern",
+      "page_public": "Openbare pagina zichtbaar",
+      "page_public_description": "Maak de openbare vrijwilligerspagina zichtbaar voor bezoekers (anders hebben alleen organisatoren toegang)",
+      "page_public_hidden": "Pagina verborgen — alleen organisatoren hebben toegang",
+      "page_public_visible": "Pagina toegankelijk voor iedereen"
+    }
+  }
+}

@@ -625,44 +625,6 @@
     },
     "title": "Management",
     "view_edition": "View edition",
-    "volunteers": {
-      "action_add_comment": "Add comment",
-      "applications_description": "Viewing and processing applications",
-      "applications_open": "Opening of applications",
-      "applications_open_description": "Activate or deactivate volunteer applications",
-      "comment_delete_error": "Unable to delete comment",
-      "comment_deleted_success": "Comment successfully deleted",
-      "comment_hint": "This comment will only be visible to the convention organizers",
-      "comment_label": "Comment",
-      "comment_modal_title": "Comment about volunteer",
-      "comment_modal_title_for": "Comment about {name}",
-      "comment_placeholder": "Write a comment about this volunteer...",
-      "comment_save_error": "Unable to save comment",
-      "comment_saved_success": "Comment successfully saved",
-      "comment_warning": "This comment is linked to the volunteer for this edition only.",
-      "config_description": "Configure volunteering system",
-      "config_page_description": "Configure volunteering system settings",
-      "config_title": "Volunteering Configuration",
-      "dates_description": "Set the setup and teardown dates to allow volunteers to indicate their availability",
-      "dates_title": "Setup and teardown dates",
-      "external_link": "External link",
-      "external_url_description": "Link to your form or external volunteer management tool",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "General settings",
-      "management_mode": "Volunteer management",
-      "management_mode_description": "Choose how to manage volunteers for this edition",
-      "mode_external": "External",
-      "mode_external_badge": "External",
-      "mode_internal": "Internal",
-      "mode_internal_badge": "Internal",
-      "notifications_description": "Send notifications to volunteers",
-      "page_public": "Public page visible",
-      "page_public_description": "Make the public volunteer page visible to visitors (otherwise only organizers have access)",
-      "page_public_hidden": "Page hidden — only organizers have access",
-      "page_public_visible": "Page accessible to everyone",
-      "planning_description": "Planning slots and missions",
-      "teams_description": "Organising teams of volunteers"
-    },
     "workshops": {
       "manage_description": "View and moderate workshops proposed by participants",
       "manage_title": "Manage workshops",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Manage tasks",
       "manage_description": "Organize internal work through task groups"
+    },
+    "volunteers": {
+      "config_title": "Volunteering Configuration",
+      "applications_description": "Viewing and processing applications",
+      "config_description": "Configure volunteering system",
+      "notifications_description": "Send notifications to volunteers",
+      "planning_description": "Planning slots and missions",
+      "teams_description": "Organising teams of volunteers"
     }
   }
 }

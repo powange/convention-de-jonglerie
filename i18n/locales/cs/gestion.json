@@ -625,44 +625,6 @@
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",
-    "volunteers": {
-      "action_add_comment": "Přidat komentář",
-      "applications_description": "Prohlížení a zpracování žádostí",
-      "applications_open": "Otevření žádostí",
-      "applications_open_description": "Aktivace nebo deaktivace dobrovolnických aplikací",
-      "comment_delete_error": "Nelze odstranit komentář",
-      "comment_deleted_success": "Komentář byl úspěšně odstraněn",
-      "comment_hint": "Tento komentář bude viditelný pouze pro organizátory konference",
-      "comment_label": "Komentář",
-      "comment_modal_title": "Komentář k dobrovolníkovi",
-      "comment_modal_title_for": "Komentář k {name}",
-      "comment_placeholder": "Napište komentář o tomto dobrovolníkovi...",
-      "comment_save_error": "Nelze uložit komentář",
-      "comment_saved_success": "Komentář byl úspěšně uložen",
-      "comment_warning": "Tento komentář je spojen pouze s dobrovolníkem pro tuto edici.",
-      "config_description": "Nastavit systém dobrovolnictví",
-      "config_page_description": "Nastavit parametry systému dobrovolnictví",
-      "config_title": "Konfigurace dobrovolnictví",
-      "dates_description": "Nastavte data montáže a demontáže, aby dobrovolníci mohli uvést svou dostupnost",
-      "dates_title": "Data montáže a demontáže",
-      "external_link": "Externí odkaz",
-      "external_url_description": "Odkaz na váš formulář nebo externí nástroj pro správu dobrovolníků",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Obecná nastavení",
-      "management_mode": "Řízení dobrovolníků",
-      "management_mode_description": "Zvolte, jak spravovat dobrovolníky pro toto vydání",
-      "mode_external": "Externí",
-      "mode_external_badge": "Externí",
-      "mode_internal": "Interní",
-      "mode_internal_badge": "Interní",
-      "notifications_description": "Zasílání oznámení dobrovolníkům",
-      "page_public": "Veřejná stránka viditelná",
-      "page_public_description": "Zpřístupnit veřejnou stránku dobrovolníků návštěvníkům (jinak k ní mají přístup pouze organizátoři)",
-      "page_public_hidden": "Stránka skryta — přístup mají pouze organizátoři",
-      "page_public_visible": "Stránka je přístupná všem",
-      "planning_description": "Plánování slotů a misí",
-      "teams_description": "Organizování týmů dobrovolníků"
-    },
     "workshops": {
       "manage_description": "Zobrazit a moderovat workshopy navržené účastníky",
       "manage_title": "Spravovat workshopy",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Spravovat úkoly",
       "manage_description": "Organizovat interní práci pomocí skupin úkolů"
+    },
+    "volunteers": {
+      "config_title": "Konfigurace dobrovolnictví",
+      "applications_description": "Prohlížení a zpracování žádostí",
+      "config_description": "Nastavit systém dobrovolnictví",
+      "notifications_description": "Zasílání oznámení dobrovolníkům",
+      "planning_description": "Plánování slotů a misí",
+      "teams_description": "Organizování týmů dobrovolníků"
     }
   }
 }

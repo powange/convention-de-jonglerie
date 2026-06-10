@@ -40,7 +40,7 @@
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-document-text" class="text-blue-500" />
               <h2 class="text-lg font-semibold">
-                {{ $t('edition.volunteers.volunteer_description_title') }}
+                {{ $t('volunteers.volunteer_description_title') }}
               </h2>
             </div>
 
@@ -48,7 +48,7 @@
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
-              :description="$t('edition.volunteers.volunteer_description_help')"
+              :description="$t('volunteers.volunteer_description_help')"
             />
 
             <!-- Description des bénévoles (Markdown) -->
@@ -72,7 +72,7 @@
                     <div v-html="volunteersDescriptionHtml" />
                   </template>
                   <template v-else>
-                    <p class="text-gray-500">{{ $t('edition.volunteers.no_description') }}</p>
+                    <p class="text-gray-500">{{ $t('volunteers.no_description') }}</p>
                   </template>
                 </div>
               </UFormField>

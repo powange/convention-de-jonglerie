@@ -1,0 +1,36 @@
+{
+  "gestion": {
+    "volunteers": {
+      "action_add_comment": "Lägg till kommentar",
+      "applications_open": "Öppnande av ansökningar",
+      "applications_open_description": "Aktivera eller avaktivera volontäransökningar",
+      "comment_delete_error": "Kan inte ta bort kommentar",
+      "comment_deleted_success": "Kommentar har tagits bort",
+      "comment_hint": "Denna kommentar kommer endast att vara synlig för konventionens arrangörer",
+      "comment_label": "Kommentar",
+      "comment_modal_title": "Kommentar om volontär",
+      "comment_modal_title_for": "Kommentar om {name}",
+      "comment_placeholder": "Skriv en kommentar om denna volontär...",
+      "comment_save_error": "Kan inte spara kommentar",
+      "comment_saved_success": "Kommentar har sparats",
+      "comment_warning": "Denna kommentar är länkad till volontären endast för denna utgåva.",
+      "config_page_description": "Konfigurera inställningar för volontärsystem",
+      "dates_description": "Ange uppställnings- och nedmonteringsdatum så att volontärer kan ange sin tillgänglighet",
+      "dates_title": "Uppställnings- och nedmonteringsdatum",
+      "external_link": "Extern länk",
+      "external_url_description": "Länk till ditt formulär eller ett externt verktyg för hantering av volontärer",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "general_settings": "Allmänna inställningar",
+      "management_mode": "Hantering av volontärer",
+      "management_mode_description": "Välj hur du vill hantera volontärer för den här utgåvan",
+      "mode_external": "Extern",
+      "mode_external_badge": "Extern",
+      "mode_internal": "Internt",
+      "mode_internal_badge": "Internt",
+      "page_public": "Offentlig sida synlig",
+      "page_public_description": "Gör den offentliga volontärsidan synlig för besökare (annars har endast arrangörer åtkomst)",
+      "page_public_hidden": "Sida dold — endast arrangörer har åtkomst",
+      "page_public_visible": "Sida tillgänglig för alla"
+    }
+  }
+}

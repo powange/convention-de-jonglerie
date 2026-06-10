@@ -22,10 +22,10 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-bell" class="text-yellow-600 dark:text-yellow-400" />
-          {{ t('edition.volunteers.notifications') }}
+          {{ t('volunteers.notifications') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ t('edition.volunteers.notifications_description') }}
+          {{ t('volunteers.notifications_description') }}
         </p>
       </div>
 
@@ -36,10 +36,10 @@
           <div class="text-center py-12">
             <UIcon name="i-heroicons-user-group" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 class="text-xl font-semibold mb-2">
-              {{ $t('edition.volunteers.no_accepted_volunteers_title') }}
+              {{ $t('volunteers.no_accepted_volunteers_title') }}
             </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('edition.volunteers.no_accepted_volunteers_description') }}
+              {{ $t('volunteers.no_accepted_volunteers_description') }}
             </p>
           </div>
         </UCard>
@@ -51,7 +51,7 @@
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-bell" class="text-orange-500" />
                 <h2 class="text-lg font-semibold">
-                  {{ $t('edition.volunteers.notify_volunteers_slots') }}
+                  {{ $t('volunteers.notify_volunteers_slots') }}
                 </h2>
               </div>
             </template>
@@ -61,7 +61,7 @@
                 icon="i-heroicons-information-circle"
                 color="info"
                 variant="soft"
-                :description="t('edition.volunteers.notify_slots_description')"
+                :description="t('volunteers.notify_slots_description')"
               />
 
               <UButton
@@ -70,7 +70,7 @@
                 :loading="sendingNotifications"
                 @click="showNotifyModal = true"
               >
-                {{ t('edition.volunteers.notify_all_accepted') }}
+                {{ t('volunteers.notify_all_accepted') }}
               </UButton>
             </div>
           </UCard>
@@ -83,14 +83,14 @@
                 icon="i-heroicons-information-circle"
                 color="info"
                 variant="soft"
-                :description="t('edition.volunteers.notifications_info_admin')"
+                :description="t('volunteers.notifications_info_admin')"
               />
               <UAlert
                 v-else-if="isTeamLeaderValue"
                 icon="i-heroicons-information-circle"
                 color="info"
                 variant="soft"
-                :description="t('edition.volunteers.notifications_info_leader')"
+                :description="t('volunteers.notifications_info_leader')"
               />
 
               <EditionVolunteerNotifications
@@ -111,17 +111,17 @@
           <div class="text-center py-12">
             <UIcon name="i-heroicons-lock-closed" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 class="text-xl font-semibold mb-2">
-              {{ $t('edition.volunteers.restricted_access') }}
+              {{ $t('volunteers.restricted_access') }}
             </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ $t('edition.volunteers.restricted_access_description') }}
+              {{ $t('volunteers.restricted_access_description') }}
             </p>
           </div>
         </UCard>
       </div>
 
       <!-- Modal de confirmation pour l'envoi des notifications -->
-      <UModal v-model:open="showNotifyModal" :title="t('edition.volunteers.notify_confirm_title')">
+      <UModal v-model:open="showNotifyModal" :title="t('volunteers.notify_confirm_title')">
         <template #body>
           <div class="space-y-4">
             <UAlert
@@ -129,18 +129,18 @@
               color="warning"
               variant="soft"
               :title="t('common.warning')"
-              :description="t('edition.volunteers.notify_confirm_warning')"
+              :description="t('volunteers.notify_confirm_warning')"
             />
             <p class="text-gray-600 dark:text-gray-400">
-              {{ t('edition.volunteers.notify_confirm_action') }}
+              {{ t('volunteers.notify_confirm_action') }}
             </p>
             <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
-              <li>{{ t('edition.volunteers.notify_confirm_item_notification') }}</li>
-              <li>{{ t('edition.volunteers.notify_confirm_item_email') }}</li>
-              <li>{{ t('edition.volunteers.notify_confirm_item_link') }}</li>
+              <li>{{ t('volunteers.notify_confirm_item_notification') }}</li>
+              <li>{{ t('volunteers.notify_confirm_item_email') }}</li>
+              <li>{{ t('volunteers.notify_confirm_item_link') }}</li>
             </ul>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ t('edition.volunteers.notify_confirm_note') }}
+              {{ t('volunteers.notify_confirm_note') }}
             </p>
           </div>
         </template>
@@ -155,7 +155,7 @@
               :loading="sendingNotifications"
               @click="sendScheduleNotifications"
             >
-              {{ t('edition.volunteers.notify_confirm_send') }}
+              {{ t('volunteers.notify_confirm_send') }}
             </UButton>
           </div>
         </template>
@@ -202,9 +202,9 @@ const { execute: sendScheduleNotifications, loading: sendingNotifications } = us
     method: 'POST',
     successMessage: {
       title: t('common.success'),
-      description: t('edition.volunteers.notifications_sent_success'),
+      description: t('volunteers.notifications_sent_success'),
     },
-    errorMessages: { default: t('edition.volunteers.notifications_sent_error') },
+    errorMessages: { default: t('volunteers.notifications_sent_error') },
     onSuccess: () => {
       showNotifyModal.value = false
     },

@@ -625,44 +625,6 @@
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",
-    "volunteers": {
-      "action_add_comment": "Aggiungi commento",
-      "applications_description": "Visualizzazione ed elaborazione delle domande",
-      "applications_open": "Apertura delle candidature",
-      "applications_open_description": "Attivare o disattivare le domande di volontariato",
-      "comment_delete_error": "Impossibile eliminare il commento",
-      "comment_deleted_success": "Commento eliminato con successo",
-      "comment_hint": "Questo commento sarà visibile solo agli organizzatori della convention",
-      "comment_label": "Commento",
-      "comment_modal_title": "Commento sul volontario",
-      "comment_modal_title_for": "Commento su {name}",
-      "comment_placeholder": "Scrivi un commento su questo volontario...",
-      "comment_save_error": "Impossibile salvare il commento",
-      "comment_saved_success": "Commento salvato con successo",
-      "comment_warning": "Questo commento è collegato al volontario solo per questa edizione.",
-      "config_description": "Configura sistema volontariato",
-      "config_page_description": "Configura impostazioni sistema volontariato",
-      "config_title": "Configurazione volontariato",
-      "dates_description": "Definisci le date di montaggio e smontaggio per consentire ai volontari di indicare la loro disponibilità",
-      "dates_title": "Date di montaggio e smontaggio",
-      "external_link": "Collegamento esterno",
-      "external_url_description": "Link al vostro modulo o a uno strumento esterno di gestione dei volontari",
-      "external_url_placeholder": "https://exemple.com/benevoles",
-      "general_settings": "Impostazioni generali",
-      "management_mode": "Gestione dei volontari",
-      "management_mode_description": "Scegliere come gestire i volontari per questa edizione",
-      "mode_external": "Esterno",
-      "mode_external_badge": "Esterno",
-      "mode_internal": "Interno",
-      "mode_internal_badge": "Interno",
-      "notifications_description": "Inviare notifiche ai volontari",
-      "page_public": "Pagina pubblica visibile",
-      "page_public_description": "Rendi visibile la pagina pubblica dei volontari ai visitatori (altrimenti solo gli organizzatori hanno accesso)",
-      "page_public_hidden": "Pagina nascosta — solo gli organizzatori hanno accesso",
-      "page_public_visible": "Pagina accessibile a tutti",
-      "planning_description": "Pianificazione di slot e missioni",
-      "teams_description": "Organizzare squadre di volontari"
-    },
     "workshops": {
       "manage_description": "Visualizza e modera i workshop proposti dai partecipanti",
       "manage_title": "Gestisci workshop",
@@ -671,6 +633,14 @@
     "task": {
       "manage_title": "Gestire le attività",
       "manage_description": "Organizzare il lavoro interno tramite gruppi di attività"
+    },
+    "volunteers": {
+      "config_title": "Configurazione volontariato",
+      "applications_description": "Visualizzazione ed elaborazione delle domande",
+      "config_description": "Configura sistema volontariato",
+      "notifications_description": "Inviare notifiche ai volontari",
+      "planning_description": "Pianificazione di slot e missioni",
+      "teams_description": "Organizzare squadre di volontari"
     }
   }
 }

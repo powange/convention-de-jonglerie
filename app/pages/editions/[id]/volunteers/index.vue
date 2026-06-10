@@ -98,7 +98,7 @@
                   <div class="flex items-center justify-between">
                     <h4 class="text-sm font-semibold flex items-center gap-1">
                       <UIcon name="i-heroicons-user" class="text-primary-500" />
-                      {{ t('edition.volunteers.my_application_title') }}
+                      {{ t('volunteers.my_application_title') }}
                     </h4>
                     <UBadge
                       :color="volunteerStatusColor(myApplication.status)"
@@ -112,17 +112,17 @@
                     <span
                       v-if="myApplication.status === 'PENDING'"
                       class="block text-gray-600 dark:text-gray-400"
-                      >{{ t('edition.volunteers.my_application_pending') }}</span
+                      >{{ t('volunteers.my_application_pending') }}</span
                     >
                     <span
                       v-else-if="myApplication.status === 'ACCEPTED'"
                       class="block text-gray-600 dark:text-gray-400"
-                      >{{ t('edition.volunteers.my_application_accepted') }}</span
+                      >{{ t('volunteers.my_application_accepted') }}</span
                     >
                     <span
                       v-else-if="myApplication.status === 'REJECTED'"
                       class="block text-gray-600 dark:text-gray-400"
-                      >{{ t('edition.volunteers.my_application_rejected') }}</span
+                      >{{ t('volunteers.my_application_rejected') }}</span
                     >
                   </div>
                   <div class="flex flex-wrap items-center gap-2">
@@ -132,7 +132,7 @@
                       icon="i-heroicons-list-bullet"
                       :to="'/profile/mes-candidatures-benevole'"
                     >
-                      {{ t('edition.volunteers.view_all_applications') || 'Voir mes candidatures' }}
+                      {{ t('volunteers.view_all_applications') || 'Voir mes candidatures' }}
                     </UButton>
                     <UButton
                       v-if="myApplication.status === 'PENDING'"
@@ -142,7 +142,7 @@
                       icon="i-heroicons-pencil"
                       @click="openEditApplicationModal"
                     >
-                      {{ t('edition.volunteers.edit_application') }}
+                      {{ t('volunteers.edit_application') }}
                     </UButton>
                     <UButton
                       v-if="myApplication.status === 'PENDING'"
@@ -152,7 +152,7 @@
                       :loading="volunteersWithdrawing"
                       @click="withdrawApplication"
                     >
-                      {{ t('edition.volunteers.withdraw') }}
+                      {{ t('volunteers.withdraw') }}
                     </UButton>
                   </div>
                 </div>
@@ -198,7 +198,7 @@
                 </div>
               </template>
               <template v-else>
-                <p class="text-gray-500">{{ t('edition.volunteers.no_description') }}</p>
+                <p class="text-gray-500">{{ t('volunteers.no_description') }}</p>
               </template>
             </div>
           </div>
@@ -217,7 +217,7 @@
               :to="volunteersInfo.externalUrl"
               target="_blank"
             >
-              {{ t('edition.volunteers.apply') }}
+              {{ t('volunteers.apply') }}
             </UButton>
             <span class="text-xs text-gray-500 truncate max-w-full">{{
               volunteersInfo.externalUrl
@@ -234,7 +234,7 @@
                 color="warning"
                 variant="subtle"
                 icon="i-heroicons-lock-closed"
-                :title="t('edition.volunteers.closed_message')"
+                :title="t('volunteers.closed_message')"
               />
               <div v-else>
                 <UCard
@@ -243,7 +243,7 @@
                 >
                   <div class="flex items-center justify-between gap-4">
                     <div class="text-xs text-gray-600 dark:text-gray-400">
-                      {{ t('edition.volunteers.apply_description') }}
+                      {{ t('volunteers.apply_description') }}
                     </div>
                     <UButton
                       size="sm"
@@ -251,7 +251,7 @@
                       icon="i-heroicons-hand-raised"
                       @click="openApplyModal"
                     >
-                      {{ t('edition.volunteers.apply') }}
+                      {{ t('volunteers.apply') }}
                     </UButton>
                   </div>
                 </UCard>
@@ -261,7 +261,7 @@
               v-else-if="!authStore.isAuthenticated && volunteersMode === 'INTERNAL'"
               class="text-sm text-gray-500"
             >
-              {{ t('edition.volunteers.login_prompt') }}
+              {{ t('volunteers.login_prompt') }}
             </div>
           </ClientOnly>
         </div>
@@ -437,13 +437,13 @@ const closedVisibilityReason = computed<string | null>(() => {
   // Page publique désactivée → preview "page non publique"
   if (!isPagePublic) {
     return canEdit
-      ? t('edition.volunteers.page_private_visible_as_editor')
-      : t('edition.volunteers.page_private_visible_as_volunteer_manager')
+      ? t('volunteers.page_private_visible_as_editor')
+      : t('volunteers.page_private_visible_as_volunteer_manager')
   }
   // Page publique mais candidatures fermées
   return canEdit
-    ? t('edition.volunteers.closed_visible_as_editor')
-    : t('edition.volunteers.closed_visible_as_volunteer_manager')
+    ? t('volunteers.closed_visible_as_editor')
+    : t('volunteers.closed_visible_as_volunteer_manager')
 })
 
 // Volunteer logic reused
@@ -473,11 +473,11 @@ const volunteerStatusColor = (s: string) =>
   s === 'PENDING' ? 'warning' : s === 'ACCEPTED' ? 'success' : 'error'
 const volunteerStatusLabel = (s: string) =>
   s === 'PENDING'
-    ? t('edition.volunteers.status_pending')
+    ? t('volunteers.status_pending')
     : s === 'ACCEPTED'
-      ? t('edition.volunteers.status_accepted')
+      ? t('volunteers.status_accepted')
       : s === 'REJECTED'
-        ? t('edition.volunteers.status_rejected')
+        ? t('volunteers.status_rejected')
         : s
 const fetchMyApplication = async () => {
   if (!authStore.isAuthenticated) {
@@ -689,14 +689,14 @@ const updateVolunteerApplication = async (data: any) => {
 
     // Afficher un message de succès
     toast.add({
-      title: t('edition.volunteers.application_updated'),
-      description: t('edition.volunteers.changes_saved_successfully'),
+      title: t('volunteers.application_updated'),
+      description: t('volunteers.changes_saved_successfully'),
       color: 'success',
     })
   } catch (error: any) {
     toast.add({
       title: t('common.error'),
-      description: error?.message || t('edition.volunteers.update_error'),
+      description: error?.message || t('volunteers.update_error'),
       color: 'error',
     })
   }
