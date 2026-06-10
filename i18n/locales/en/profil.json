@@ -1,5 +1,14 @@
 {
   "profile": {
+    "sidebar": {
+      "title": "My profile",
+      "personal_info": "Personal information",
+      "notifications": "Notifications",
+      "my_conventions": "My conventions",
+      "my_volunteer_applications": "My volunteer applications",
+      "my_artist_applications": "My artist applications",
+      "security": "Login and security"
+    },
     "cannot_change_password": "Cannot change password",
     "cannot_change_photo": "Cannot change photo",
     "cannot_save_preferences": "Unable to save your preferences",

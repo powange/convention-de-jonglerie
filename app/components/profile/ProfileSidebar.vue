@@ -6,7 +6,7 @@
       @click="emit('navigate')"
     >
       <UIcon name="i-heroicons-user-circle" class="size-5 text-primary-500" />
-      {{ t('nav.title') }}
+      {{ t('profile.sidebar.title') }}
     </NuxtLink>
 
     <UNavigationMenu
@@ -33,7 +33,7 @@ import { useAuthStore } from '~/stores/auth'
 
 import type { NavigationMenuItem } from '@nuxt/ui'
 
-const { t } = useI18n({ useScope: 'local' })
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const emit = defineEmits<{
@@ -43,19 +43,19 @@ const emit = defineEmits<{
 const items = computed<NavigationMenuItem[][]>(() => {
   const navItems: NavigationMenuItem[] = [
     {
-      label: t('nav.personal_info'),
+      label: t('profile.sidebar.personal_info'),
       icon: 'i-heroicons-user',
       to: '/profile/informations',
       onSelect: () => emit('navigate'),
     },
     {
-      label: t('nav.notifications'),
+      label: t('profile.sidebar.notifications'),
       icon: 'i-heroicons-bell',
       to: '/profile/notifications',
       onSelect: () => emit('navigate'),
     },
     {
-      label: t('nav.my_conventions'),
+      label: t('profile.sidebar.my_conventions'),
       icon: 'i-heroicons-calendar-days',
       to: '/profile/mes-conventions',
       onSelect: () => emit('navigate'),
@@ -64,7 +64,7 @@ const items = computed<NavigationMenuItem[][]>(() => {
 
   if (authStore.isVolunteer) {
     navItems.push({
-      label: t('nav.my_volunteer_applications'),
+      label: t('profile.sidebar.my_volunteer_applications'),
       icon: 'i-heroicons-hand-raised',
       to: '/profile/mes-candidatures-benevole',
       onSelect: () => emit('navigate'),
@@ -73,7 +73,7 @@ const items = computed<NavigationMenuItem[][]>(() => {
 
   if (authStore.isArtist) {
     navItems.push({
-      label: t('nav.my_artist_applications'),
+      label: t('profile.sidebar.my_artist_applications'),
       icon: 'i-heroicons-sparkles',
       to: '/profile/mes-candidatures-artiste',
       onSelect: () => emit('navigate'),
@@ -81,7 +81,7 @@ const items = computed<NavigationMenuItem[][]>(() => {
   }
 
   navItems.push({
-    label: t('nav.security'),
+    label: t('profile.sidebar.security'),
     icon: 'i-heroicons-shield-check',
     to: '/profile/securite',
     onSelect: () => emit('navigate'),
@@ -90,20 +90,3 @@ const items = computed<NavigationMenuItem[][]>(() => {
   return [navItems]
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "nav": {
-      "title": "Mon profil",
-      "home": "Accueil",
-      "personal_info": "Informations personnelles",
-      "notifications": "Notifications",
-      "my_conventions": "Mes conventions",
-      "my_volunteer_applications": "Mes candidatures bénévole",
-      "my_artist_applications": "Mes candidatures artiste",
-      "security": "Connexion et sécurité"
-    }
-  }
-}
-</i18n>

@@ -1,5 +1,14 @@
 {
   "profile": {
+    "sidebar": {
+      "title": "Mijn profiel",
+      "personal_info": "Persoonlijke gegevens",
+      "notifications": "Meldingen",
+      "my_conventions": "Mijn conventies",
+      "my_volunteer_applications": "Mijn vrijwilligersaanmeldingen",
+      "my_artist_applications": "Mijn artiestenaanmeldingen",
+      "security": "Inloggen en beveiliging"
+    },
     "cannot_change_password": "Kan wachtwoord niet wijzigen",
     "cannot_change_photo": "Kan foto niet wijzigen",
     "cannot_save_preferences": "Kan voorkeuren niet opslaan",

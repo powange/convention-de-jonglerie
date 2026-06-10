@@ -1,5 +1,14 @@
 {
   "profile": {
+    "sidebar": {
+      "title": "Мой профиль",
+      "personal_info": "Личная информация",
+      "notifications": "Уведомления",
+      "my_conventions": "Мои конвенты",
+      "my_volunteer_applications": "Мои заявки волонтёра",
+      "my_artist_applications": "Мои заявки артиста",
+      "security": "Вход и безопасность"
+    },
     "cannot_change_password": "Невозможно изменить пароль",
     "cannot_change_photo": "Невозможно изменить фото",
     "cannot_save_preferences": "Не удалось сохранить настройки",

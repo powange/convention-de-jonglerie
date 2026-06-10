@@ -1,5 +1,14 @@
 {
   "profile": {
+    "sidebar": {
+      "title": "Min profil",
+      "personal_info": "Personlige oplysninger",
+      "notifications": "Notifikationer",
+      "my_conventions": "Mine konventer",
+      "my_volunteer_applications": "Mine frivilligansøgninger",
+      "my_artist_applications": "Mine kunstneransøgninger",
+      "security": "Login og sikkerhed"
+    },
     "cannot_change_password": "Kan ikke ændre adgangskode",
     "cannot_change_photo": "Kan ikke ændre foto",
     "cannot_save_preferences": "Kan ikke gemme præferencer",

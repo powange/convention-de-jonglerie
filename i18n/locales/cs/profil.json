@@ -1,5 +1,14 @@
 {
   "profile": {
+    "sidebar": {
+      "title": "Můj profil",
+      "personal_info": "Osobní údaje",
+      "notifications": "Oznámení",
+      "my_conventions": "Moje konventy",
+      "my_volunteer_applications": "Moje přihlášky dobrovolníka",
+      "my_artist_applications": "Moje přihlášky umělce",
+      "security": "Přihlášení a zabezpečení"
+    },
     "cannot_change_password": "Nelze změnit heslo",
     "cannot_change_photo": "Nelze změnit fotografii",
     "cannot_save_preferences": "Nelze uložit předvolby",
