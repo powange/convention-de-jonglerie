@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { LOCALES_DIR, loadLocaleFiles, writeLocaleFiles } from './shared-config.js'
+import { LOCALES_DIR, loadLocaleFiles, writeLocaleFiles, flattenObject } from './shared-config.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -218,10 +218,15 @@ function applyTranslations() {
     console.log(`${colors.bold}Traitement de ${lang}/:${colors.reset}`)
 
     let data
+    let fileMapping = null
     let fileModified = false
 
     try {
-      data = loadLocaleFiles(lang)
+      // Charger avec le mapping clé → fichier source pour préserver la répartition
+      // dans les fichiers de domaine découpés (map/tasks/volunteers/gestion-*).
+      const loaded = loadLocaleFiles(lang, true)
+      data = loaded ? loaded.data : null
+      fileMapping = loaded ? loaded.fileMapping : null
       if (!data) {
         console.log(`  ${colors.red}✗ Erreur: Aucun fichier de traduction trouvé${colors.reset}`)
         continue
@@ -273,7 +278,9 @@ function applyTranslations() {
     // Sauvegarder les fichiers si modifiés
     if (fileModified) {
       try {
-        const updatedFiles = writeLocaleFiles(lang, data)
+        // writeLocaleFiles attend des données aplaties + le mapping pour répartir
+        // correctement dans les fichiers de domaine (sinon corruption des splits).
+        const updatedFiles = writeLocaleFiles(lang, flattenObject(data), fileMapping)
         console.log(
           `  ${colors.green}✓ ${updatedFiles} fichier(s) de domaine sauvegardé(s)${colors.reset}`
         )

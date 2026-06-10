@@ -44,6 +44,14 @@ export const SPLIT_CONFIG = {
   workshops: ['workshops'],
   artists: ['artists'],
   gestion: ['gestion'],
+  // Domaines partagés public/gestion (namespace = nom du fichier)
+  map: ['map'],
+  tasks: ['tasks'],
+  volunteers: ['volunteers'],
+  // Note : les domaines gestion-map/gestion-tasks/gestion-volunteers utilisent le
+  // namespace `gestion.*` (sous-clés map/task/volunteers) et ne peuvent pas être
+  // distingués ici (top-level `gestion`). Leur répartition repose sur le mapping
+  // par clé aplatie de la locale de référence (fileMapping), pas sur SPLIT_CONFIG.
   app: ['app', 'pwa', 'services'],
   messenger: ['messenger'],
   'project-costs': ['project_costs'],
@@ -128,10 +136,11 @@ export function writeLocaleFiles(locale, data, fileMapping = null) {
   for (const [file, content] of Object.entries(fileContents)) {
     const filePath = path.join(localeDir, `${file}.json`)
     if (Object.keys(content).length > 0) {
-      // Convertir les données aplaties en structure imbriquée avant d'écrire
+      // Convertir les données aplaties en structure imbriquée avant d'écrire.
+      // On préserve l'ordre existant des clés (pas de tri) pour éviter des diffs
+      // de réordonnancement cosmétiques à chaque écriture.
       const nested = unflattenObject(content)
-      const sorted = sortKeys(nested)
-      fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
+      fs.writeFileSync(filePath, JSON.stringify(nested, null, 2) + '\n', 'utf8')
       updatedFiles++
     } else if (fs.existsSync(filePath)) {
       // Supprimer les fichiers vides

@@ -12,6 +12,7 @@ import {
   getTargetFile,
   flattenObject as sharedFlattenObject,
   writeLocaleFiles,
+  loadLocaleFiles as loadSharedLocaleFiles,
 } from './translation/shared-config.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -846,8 +847,12 @@ async function main() {
             // Aplatir les données pour l'écriture (writeLocaleFiles attend des données aplaties)
             const flatUpdatedData = sharedFlattenObject(updatedLocaleData)
 
+            // Récupérer le mapping clé → fichier source de fr pour répartir correctement
+            // dans les fichiers de domaine découpés (map/tasks/volunteers/gestion-*).
+            const frMapping = loadSharedLocaleFiles('fr', true)?.fileMapping || null
+
             // Écrire les fichiers mis à jour en utilisant la fonction partagée
-            const updatedFiles = writeLocaleFiles('fr', flatUpdatedData)
+            const updatedFiles = writeLocaleFiles('fr', flatUpdatedData, frMapping)
 
             console.log(`${GREEN}✓ ${unusedKeys.length} clé(s) supprimée(s) avec succès !${RESET}`)
             console.log(`${CYAN}${updatedFiles} fichier(s) mis à jour${RESET}`)

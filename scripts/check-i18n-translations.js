@@ -428,7 +428,10 @@ async function main() {
         const rebuilt = unflattenObject(flat)
 
         // Écrire dans les fichiers de domaine (utilise le mapping de la référence si disponible)
-        const updatedFiles = writeLocaleFiles(locale, rebuilt, referenceFileMapping)
+        // writeLocaleFiles attend des données APLATIES (le mapping est par clé aplatie).
+        // Passer `rebuilt` (imbriqué) cassait la répartition vers les fichiers de domaine
+        // découpés (map/tasks/volunteers/gestion-*), corrompant les locales non-référence.
+        const updatedFiles = writeLocaleFiles(locale, flat, referenceFileMapping)
         console.log(
           `${YELLOW}Pruned ${data.extraKeys.length} clé(s) en trop dans ${locale}/ (${updatedFiles} fichier(s) mis à jour)${RESET}`
         )
@@ -483,7 +486,10 @@ async function main() {
           const rebuilt = unflattenObject(flat)
 
           // Écrire dans les fichiers de domaine (utilise le mapping de la référence si disponible)
-          const updatedFiles = writeLocaleFiles(locale, rebuilt, referenceFileMapping)
+          // writeLocaleFiles attend des données APLATIES (le mapping est par clé aplatie).
+          // Passer `rebuilt` (imbriqué) cassait la répartition vers les fichiers de domaine
+          // découpés (map/tasks/volunteers/gestion-*), corrompant les locales non-référence.
+          const updatedFiles = writeLocaleFiles(locale, flat, referenceFileMapping)
           locales[locale] = rebuilt
           const modeNote = fillMode === 'copy' ? '' : ` (mode ${fillMode})`
           console.log(
