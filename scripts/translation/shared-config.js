@@ -136,10 +136,26 @@ export function writeLocaleFiles(locale, data, fileMapping = null) {
   for (const [file, content] of Object.entries(fileContents)) {
     const filePath = path.join(localeDir, `${file}.json`)
     if (Object.keys(content).length > 0) {
+      // Préserver l'ordre des clés du fichier existant pour éviter tout diff de
+      // réordonnancement : on réordonne `content` (aplati) selon l'ordre du fichier
+      // déjà présent, puis on ajoute à la fin les éventuelles nouvelles clés.
+      let orderedContent = content
+      if (fs.existsSync(filePath)) {
+        try {
+          const existingFlat = flattenObject(JSON.parse(fs.readFileSync(filePath, 'utf8')))
+          orderedContent = {}
+          for (const k of Object.keys(existingFlat)) {
+            if (k in content) orderedContent[k] = content[k]
+          }
+          for (const k of Object.keys(content)) {
+            if (!(k in orderedContent)) orderedContent[k] = content[k]
+          }
+        } catch {
+          orderedContent = content
+        }
+      }
       // Convertir les données aplaties en structure imbriquée avant d'écrire.
-      // On préserve l'ordre existant des clés (pas de tri) pour éviter des diffs
-      // de réordonnancement cosmétiques à chaque écriture.
-      const nested = unflattenObject(content)
+      const nested = unflattenObject(orderedContent)
       fs.writeFileSync(filePath, JSON.stringify(nested, null, 2) + '\n', 'utf8')
       updatedFiles++
     } else if (fs.existsSync(filePath)) {
