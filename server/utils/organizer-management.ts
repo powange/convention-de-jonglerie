@@ -262,6 +262,24 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
     })
   }
 
+  // Vérifier que l'utilisateur n'est pas déjà organisateur de cette convention
+  const existingOrganizer = await prisma.conventionOrganizer.findUnique({
+    where: {
+      conventionId_userId: {
+        conventionId,
+        userId: userToAddId,
+      },
+    },
+    select: { id: true },
+  })
+
+  if (existingOrganizer) {
+    throw createError({
+      status: 409,
+      message: 'Cet utilisateur est déjà organisateur de cette convention',
+    })
+  }
+
   // Créer le organisateur
   const result = await prisma.$transaction(async (tx: PrismaTransaction) => {
     const organizer = await tx.conventionOrganizer.create({
