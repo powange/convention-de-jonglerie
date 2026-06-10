@@ -19,143 +19,148 @@
         </div>
       </template>
 
-      <UForm :state="state" :schema="schema" @submit="updateProfile">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <!-- Colonne 1 : Pseudo et email -->
-          <div class="space-y-6">
-            <UFormField
-              :label="t('auth.username')"
-              name="pseudo"
-              :help="t('profile.username_help')"
-            >
-              <UInput
-                v-model="state.pseudo"
-                icon="i-heroicons-at-symbol"
-                required
-                :placeholder="t('profile.username_placeholder')"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
+      <!-- Le formulaire est pré-rempli depuis le store d'auth (client-only) →
+           ClientOnly évite un mismatch d'hydratation sur les valeurs des champs. -->
+      <ClientOnly>
+        <UForm :state="state" :schema="schema" @submit="updateProfile">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Colonne 1 : Pseudo et email -->
+            <div class="space-y-6">
+              <UFormField
+                :label="t('auth.username')"
+                name="pseudo"
+                :help="t('profile.username_help')"
+              >
+                <UInput
+                  v-model="state.pseudo"
+                  icon="i-heroicons-at-symbol"
+                  required
+                  :placeholder="t('profile.username_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
 
-            <UFormField :label="t('common.email')" name="email">
-              <UInput
-                v-model="state.email"
-                type="email"
-                icon="i-heroicons-envelope"
-                required
-                placeholder="votre.email@example.com"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-          </div>
-
-          <!-- Colonne 2 : Informations facultatives -->
-          <div
-            class="border border-gray-100 dark:border-gray-700 rounded-xl p-5 space-y-6 bg-gray-50/50 dark:bg-gray-800/30"
-          >
-            <div class="flex items-center gap-2 mb-2">
-              <UIcon name="i-heroicons-adjustments-horizontal" class="w-5 h-5 text-gray-500" />
-              <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ t('profile.optional_section_title') }}
-              </h3>
-              <UBadge variant="soft" color="neutral" size="xs">{{ t('common.optional') }}</UBadge>
+              <UFormField :label="t('common.email')" name="email">
+                <UInput
+                  v-model="state.email"
+                  type="email"
+                  icon="i-heroicons-envelope"
+                  required
+                  placeholder="votre.email@example.com"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
             </div>
 
-            <UFormField :label="t('auth.first_name')" name="prenom">
-              <UInput
-                v-model="state.prenom"
-                icon="i-heroicons-user"
-                :placeholder="t('profile.first_name_placeholder')"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-
-            <UFormField :label="t('auth.last_name')" name="nom">
-              <UInput
-                v-model="state.nom"
-                icon="i-heroicons-user"
-                :placeholder="t('profile.last_name_placeholder')"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-
-            <UFormField :label="t('profile.phone')" name="telephone">
-              <UiPhoneInput
-                v-model="state.telephone"
-                :placeholder="t('profile.phone_placeholder')"
-                size="lg"
-              />
-            </UFormField>
-
-            <UFormField
-              :label="t('profile.pronouns')"
-              name="pronouns"
-              :help="t('profile.pronouns_help')"
+            <!-- Colonne 2 : Informations facultatives -->
+            <div
+              class="border border-gray-100 dark:border-gray-700 rounded-xl p-5 space-y-6 bg-gray-50/50 dark:bg-gray-800/30"
             >
-              <USelect
-                v-model="state.pronouns"
-                icon="i-heroicons-user"
-                :items="pronounsOptions"
-                size="lg"
-              />
-            </UFormField>
+              <div class="flex items-center gap-2 mb-2">
+                <UIcon name="i-heroicons-adjustments-horizontal" class="w-5 h-5 text-gray-500" />
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('profile.optional_section_title') }}
+                </h3>
+                <UBadge variant="soft" color="neutral" size="xs">{{ t('common.optional') }}</UBadge>
+              </div>
 
-            <UFormField :label="t('profile.preferred_language')" name="preferredLanguage">
-              <USelect
-                v-model="state.preferredLanguage"
-                icon="i-heroicons-language"
-                :items="languageOptions"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-          </div>
-        </div>
+              <UFormField
+                :label="t('profile.pronouns')"
+                name="pronouns"
+                :help="t('profile.pronouns_help')"
+              >
+                <USelect
+                  v-model="state.pronouns"
+                  icon="i-heroicons-user"
+                  :items="pronounsOptions"
+                  size="lg"
+                  :ui="{ content: 'min-w-(--reka-select-trigger-width) w-auto' }"
+                />
+              </UFormField>
 
-        <!-- Actions avec indicateur de modifications -->
-        <div class="mt-8">
-          <div
-            v-if="hasChanges"
-            class="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
-          >
-            <div class="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-              <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
-              <span class="text-sm font-medium">{{ $t('profile.unsaved_changes') }}</span>
+              <UFormField :label="t('auth.first_name')" name="prenom">
+                <UInput
+                  v-model="state.prenom"
+                  icon="i-heroicons-user"
+                  :placeholder="t('profile.first_name_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
+
+              <UFormField :label="t('auth.last_name')" name="nom">
+                <UInput
+                  v-model="state.nom"
+                  icon="i-heroicons-user"
+                  :placeholder="t('profile.last_name_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
+
+              <UFormField :label="t('profile.phone')" name="telephone">
+                <UiPhoneInput
+                  v-model="state.telephone"
+                  :placeholder="t('profile.phone_placeholder')"
+                  size="lg"
+                />
+              </UFormField>
+
+              <UFormField :label="t('profile.preferred_language')" name="preferredLanguage">
+                <USelect
+                  v-model="state.preferredLanguage"
+                  icon="i-heroicons-language"
+                  :items="languageOptions"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3 justify-between">
-            <UButton
-              type="submit"
-              :loading="loading"
-              :disabled="!hasChanges"
-              icon="i-heroicons-check"
-              color="primary"
-              size="lg"
-              class="transition-all duration-200 hover:transform hover:scale-105"
-            >
-              {{ loading ? t('profile.saving') : t('profile.save_changes') }}
-            </UButton>
-
-            <UButton
+          <!-- Actions avec indicateur de modifications -->
+          <div class="mt-8">
+            <div
               v-if="hasChanges"
-              type="button"
-              variant="outline"
-              color="neutral"
-              size="lg"
-              icon="i-heroicons-arrow-path"
-              class="transition-all duration-200 hover:transform hover:scale-105"
-              @click="resetForm"
+              class="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
             >
-              {{ $t('common.cancel') }}
-            </UButton>
+              <div class="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+                <span class="text-sm font-medium">{{ $t('profile.unsaved_changes') }}</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-between">
+              <UButton
+                type="submit"
+                :loading="loading"
+                :disabled="!hasChanges"
+                icon="i-heroicons-check"
+                color="primary"
+                size="lg"
+                class="transition-all duration-200 hover:transform hover:scale-105"
+              >
+                {{ loading ? t('profile.saving') : t('profile.save_changes') }}
+              </UButton>
+
+              <UButton
+                v-if="hasChanges"
+                type="button"
+                variant="outline"
+                color="neutral"
+                size="lg"
+                icon="i-heroicons-arrow-path"
+                class="transition-all duration-200 hover:transform hover:scale-105"
+                @click="resetForm"
+              >
+                {{ $t('common.cancel') }}
+              </UButton>
+            </div>
           </div>
-        </div>
-      </UForm>
+        </UForm>
+      </ClientOnly>
     </UCard>
   </div>
 </template>
@@ -167,7 +172,7 @@ import { z } from 'zod'
 import { useAuthStore } from '~/stores/auth'
 import type { User } from '~/types'
 import { LOCALES_CONFIG } from '~/utils/locales'
-import { USER_PRONOUNS } from '~/utils/pronouns'
+import { USER_PRONOUNS, PRONOUN_NONE } from '~/utils/pronouns'
 
 definePageMeta({
   layout: 'profile',
@@ -183,7 +188,7 @@ const languageOptions = LOCALES_CONFIG.map((locale) => ({
 }))
 
 const pronounsOptions = computed(() => [
-  { value: '', label: t('profile.pronouns_none') },
+  { value: PRONOUN_NONE, label: t('profile.pronouns_none') },
   ...USER_PRONOUNS.map((p) => ({ value: p, label: t(`profile.pronouns_options.${p}`) })),
 ])
 
@@ -206,7 +211,7 @@ const state = reactive({
   nom: (authStore.user as any)?.nom || '',
   prenom: (authStore.user as any)?.prenom || '',
   telephone: (authStore.user as any)?.telephone || (authStore.user as any)?.phone || '',
-  pronouns: (authStore.user as any)?.pronouns || '',
+  pronouns: (authStore.user as any)?.pronouns || PRONOUN_NONE,
   preferredLanguage: (authStore.user as any)?.preferredLanguage || 'fr',
 })
 
@@ -218,7 +223,8 @@ const hasChanges = computed(() => {
     state.prenom !== ((authStore.user as any)?.prenom || '') ||
     state.telephone !==
       ((authStore.user as any)?.telephone || (authStore.user as any)?.phone || '') ||
-    state.pronouns !== ((authStore.user as any)?.pronouns || '') ||
+    (state.pronouns === PRONOUN_NONE ? '' : state.pronouns) !==
+      ((authStore.user as any)?.pronouns || '') ||
     state.preferredLanguage !== ((authStore.user as any)?.preferredLanguage || 'fr')
   )
 })
@@ -229,7 +235,7 @@ const resetForm = () => {
   state.nom = (authStore.user as any)?.nom || ''
   state.prenom = (authStore.user as any)?.prenom || ''
   state.telephone = (authStore.user as any)?.telephone || (authStore.user as any)?.phone || ''
-  state.pronouns = (authStore.user as any)?.pronouns || ''
+  state.pronouns = (authStore.user as any)?.pronouns || PRONOUN_NONE
   state.preferredLanguage = (authStore.user as any)?.preferredLanguage || 'fr'
 }
 
@@ -243,7 +249,7 @@ const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
       nom: state.nom || '',
       prenom: state.prenom || '',
       telephone: state.telephone || '',
-      pronouns: state.pronouns || '',
+      pronouns: state.pronouns === PRONOUN_NONE ? '' : state.pronouns,
       preferredLanguage: state.preferredLanguage || 'fr',
     }),
     successMessage: {

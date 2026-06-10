@@ -9,22 +9,26 @@
       {{ t('profile.sidebar.title') }}
     </NuxtLink>
 
-    <UNavigationMenu
-      :items="items"
-      orientation="vertical"
-      color="primary"
-      variant="pill"
-      highlight
-      :collapsible="true"
-      :ui="{
-        link: 'text-base items-start',
-        linkLeadingIcon: 'size-5',
-        linkLabel: 'whitespace-normal',
-        childLink: 'text-base items-start',
-        childLinkIcon: 'size-5',
-        childLinkLabel: 'whitespace-normal',
-      }"
-    />
+    <!-- Le menu dépend des rôles (isVolunteer/isArtist) du store d'auth, peuplé
+         uniquement côté client → ClientOnly évite un mismatch d'hydratation. -->
+    <ClientOnly>
+      <UNavigationMenu
+        :items="items"
+        orientation="vertical"
+        color="primary"
+        variant="pill"
+        highlight
+        :collapsible="true"
+        :ui="{
+          link: 'text-base items-start',
+          linkLeadingIcon: 'size-5',
+          linkLabel: 'whitespace-normal',
+          childLink: 'text-base items-start',
+          childLinkIcon: 'size-5',
+          childLinkLabel: 'whitespace-normal',
+        }"
+      />
+    </ClientOnly>
   </nav>
 </template>
 

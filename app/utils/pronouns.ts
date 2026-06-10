@@ -9,6 +9,12 @@ export const USER_PRONOUNS = ['she', 'he', 'they'] as const
 
 export type UserPronoun = (typeof USER_PRONOUNS)[number]
 
+/**
+ * Valeur sentinelle pour « non renseigné » dans le `USelect` (Reka UI interdit
+ * la valeur vide `''` comme option). Convertie en `''`/null au stockage.
+ */
+export const PRONOUN_NONE = 'none'
+
 /** Vrai si la valeur est un pronom valide (ou vide = non renseigné). */
 export function isValidPronoun(value: unknown): boolean {
   return value === '' || value === null || USER_PRONOUNS.includes(value as UserPronoun)
