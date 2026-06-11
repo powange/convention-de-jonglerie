@@ -58,13 +58,13 @@
           {{ $t('common.total') }}: {{ stats.pending + stats.accepted + stats.rejected }}
         </UBadge>
         <UBadge color="warning" variant="soft" size="lg">
-          {{ $t('gestion.shows_call.status_pending') }}: {{ stats.pending }}
+          {{ $t('shows_call.status_pending') }}: {{ stats.pending }}
         </UBadge>
         <UBadge color="success" variant="soft" size="lg">
-          {{ $t('gestion.shows_call.status_accepted') }}: {{ stats.accepted }}
+          {{ $t('shows_call.status_accepted') }}: {{ stats.accepted }}
         </UBadge>
         <UBadge color="error" variant="soft" size="lg">
-          {{ $t('gestion.shows_call.status_rejected') }}: {{ stats.rejected }}
+          {{ $t('shows_call.status_rejected') }}: {{ stats.rejected }}
         </UBadge>
       </div>
 
@@ -250,7 +250,7 @@
                     {{ application.showTitle }}
                   </h3>
                   <UBadge :color="getStatusColor(application.status)" variant="soft" size="sm">
-                    {{ $t(`gestion.shows_call.status_${application.status.toLowerCase()}`) }}
+                    {{ $t(`shows_call.status_${application.status.toLowerCase()}`) }}
                   </UBadge>
                 </div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -329,9 +329,9 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize))
 
 const statusOptions = computed(() => [
   { value: null, label: t('gestion.shows_call.filter_all') },
-  { value: 'PENDING', label: t('gestion.shows_call.status_pending') },
-  { value: 'ACCEPTED', label: t('gestion.shows_call.status_accepted') },
-  { value: 'REJECTED', label: t('gestion.shows_call.status_rejected') },
+  { value: 'PENDING', label: t('shows_call.status_pending') },
+  { value: 'ACCEPTED', label: t('shows_call.status_accepted') },
+  { value: 'REJECTED', label: t('shows_call.status_rejected') },
 ])
 
 // Permissions

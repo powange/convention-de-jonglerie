@@ -293,11 +293,11 @@
                   <!-- Section: Informations artiste -->
                   <div class="space-y-4">
                     <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                      {{ t('gestion.shows_call.artist_info') }}
+                      {{ t('shows_call.artist_info') }}
                     </h3>
 
                     <UFormField
-                      :label="t('gestion.shows_call.form.artist_name')"
+                      :label="t('shows_call.form.artist_name')"
                       name="artistName"
                       required
                     >
@@ -309,7 +309,7 @@
                       />
                     </UFormField>
 
-                    <UFormField :label="t('gestion.shows_call.form.artist_bio')" name="artistBio">
+                    <UFormField :label="t('shows_call.form.artist_bio')" name="artistBio">
                       <UTextarea
                         v-model="formState.artistBio"
                         :placeholder="t('shows_call.form.artist_bio_placeholder')"
@@ -321,7 +321,7 @@
 
                     <UFormField
                       v-if="showCall.askPortfolioUrl"
-                      :label="t('gestion.shows_call.form.portfolio_url')"
+                      :label="t('shows_call.form.portfolio_url')"
                       name="portfolioUrl"
                     >
                       <UInput
@@ -335,7 +335,7 @@
 
                     <UFormField
                       v-if="showCall.askVideoUrl"
-                      :label="t('gestion.shows_call.form.video_url')"
+                      :label="t('shows_call.form.video_url')"
                       name="videoUrl"
                     >
                       <UInput
@@ -372,14 +372,10 @@
                   <!-- Section: Informations spectacle -->
                   <div class="space-y-4">
                     <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                      {{ t('gestion.shows_call.show_info') }}
+                      {{ t('shows_call.show_info') }}
                     </h3>
 
-                    <UFormField
-                      :label="t('gestion.shows_call.form.show_title')"
-                      name="showTitle"
-                      required
-                    >
+                    <UFormField :label="t('shows_call.form.show_title')" name="showTitle" required>
                       <UInput
                         v-model="formState.showTitle"
                         :placeholder="t('shows_call.form.show_title_placeholder')"
@@ -389,7 +385,7 @@
                     </UFormField>
 
                     <UFormField
-                      :label="t('gestion.shows_call.form.description')"
+                      :label="t('shows_call.form.description')"
                       name="showDescription"
                       required
                     >
@@ -404,7 +400,7 @@
 
                     <div class="grid grid-cols-2 gap-4">
                       <UFormField
-                        :label="t('gestion.shows_call.form.duration')"
+                        :label="t('shows_call.form.duration')"
                         name="showDuration"
                         required
                       >
@@ -419,10 +415,7 @@
                         />
                       </UFormField>
 
-                      <UFormField
-                        :label="t('gestion.shows_call.form.category')"
-                        name="showCategory"
-                      >
+                      <UFormField :label="t('shows_call.form.category')" name="showCategory">
                         <UInput
                           v-model="formState.showCategory"
                           :placeholder="t('shows_call.form.category_placeholder')"
@@ -434,7 +427,7 @@
 
                     <UFormField
                       v-if="showCall.askTechnicalNeeds"
-                      :label="t('gestion.shows_call.form.technical_needs')"
+                      :label="t('shows_call.form.technical_needs')"
                       name="technicalNeeds"
                     >
                       <UTextarea
@@ -448,7 +441,7 @@
 
                     <UFormField
                       v-if="showCall.askStageSetup"
-                      :label="t('gestion.shows_call.form.stage_setup')"
+                      :label="t('shows_call.form.stage_setup')"
                       :description="t('shows_call.form.stage_setup_help')"
                       name="stageSetup"
                     >
@@ -608,7 +601,7 @@
                   class="space-y-4 2xl:w-1/2"
                 >
                   <h3 class="font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
-                    {{ t('gestion.shows_call.logistics') }}
+                    {{ t('shows_call.logistics') }}
                   </h3>
 
                   <!-- Ville de départ -->
@@ -929,17 +922,18 @@ function selectPerformersCount(n: number) {
   showCustomCount.value = false
 }
 
-// Pré-remplir Personne 1 quand la coche "Je participe" est activée
+// Pré-remplir Personne 1 quand la coche "Je participe" est activée.
+// On recopie depuis formState (ce que l'utilisateur voit et peut éditer dans les
+// infos personnelles), et non depuis le profil brut : sinon un numéro saisi
+// manuellement avant de cocher la case serait écrasé par le téléphone du profil
+// (potentiellement vide). L'email reste celui du compte (non éditable ici).
 watch(applicantIsPerformer, (isPerformer) => {
   if (formState.additionalPerformers.length === 0) return
   if (isPerformer) {
-    const user = authStore.user
-    if (user) {
-      formState.additionalPerformers[0].lastName = user.nom || ''
-      formState.additionalPerformers[0].firstName = user.prenom || ''
-      formState.additionalPerformers[0].email = user.email || ''
-      formState.additionalPerformers[0].phone = user.telephone || user.phone || ''
-    }
+    formState.additionalPerformers[0].lastName = formState.lastName
+    formState.additionalPerformers[0].firstName = formState.firstName
+    formState.additionalPerformers[0].email = authStore.user?.email || ''
+    formState.additionalPerformers[0].phone = formState.phone
   } else {
     formState.additionalPerformers[0].lastName = ''
     formState.additionalPerformers[0].firstName = ''

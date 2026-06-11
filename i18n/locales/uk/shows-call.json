@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Зовнішній",
+    "status_accepted": "Прийнята",
+    "status_pending": "На розгляді",
+    "status_rejected": "Відхилена",
+    "artist_info": "Інформація про артиста або трупу",
+    "show_info": "Інформація про виступ",
+    "logistics": "Логістика",
+    "form": {
+      "artist_bio": "Біографія",
+      "artist_name": "Сценічне ім'я",
+      "category": "Категорія",
+      "description": "Опис виступу",
+      "duration": "Тривалість (хвилини)",
+      "portfolio_url": "Портфоліо / Сайт",
+      "show_title": "Назва виступу",
+      "stage_setup": "Підготовка сцени",
+      "technical_needs": "Технічні вимоги",
+      "video_url": "Відео"
+    }
+  }
+}

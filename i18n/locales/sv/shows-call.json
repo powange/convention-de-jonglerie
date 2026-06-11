@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Extern",
+    "status_accepted": "Accepterad",
+    "status_pending": "Väntar",
+    "status_rejected": "Avslagen",
+    "artist_info": "Information om artisten eller gruppen",
+    "show_info": "Information om föreställningen",
+    "logistics": "Logistik",
+    "form": {
+      "artist_bio": "Biografi",
+      "artist_name": "Artistnamn",
+      "category": "Kategori",
+      "description": "Beskrivning av föreställningen",
+      "duration": "Längd (minuter)",
+      "portfolio_url": "Portfolio / Webbplats",
+      "show_title": "Föreställningens titel",
+      "stage_setup": "Scenuppställning",
+      "technical_needs": "Tekniska krav",
+      "video_url": "Video"
+    }
+  }
+}

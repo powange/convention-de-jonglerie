@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Ekstern",
+    "status_accepted": "Accepteret",
+    "status_pending": "Afventer",
+    "status_rejected": "Afvist",
+    "artist_info": "Information om kunstneren eller gruppen",
+    "show_info": "Information om forestillingen",
+    "logistics": "Logistik",
+    "form": {
+      "artist_bio": "Biografi",
+      "artist_name": "Kunstnernavn",
+      "category": "Kategori",
+      "description": "Beskrivelse af forestillingen",
+      "duration": "Varighed (minutter)",
+      "portfolio_url": "Portfolio / Hjemmeside",
+      "show_title": "Forestillingens titel",
+      "stage_setup": "Opstilling på scenen",
+      "technical_needs": "Tekniske krav",
+      "video_url": "Video"
+    }
+  }
+}

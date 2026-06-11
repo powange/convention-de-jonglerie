@@ -40,7 +40,9 @@ export function getTranslationsToLoad(path: string): string[] {
   // cumulées. Utiliser des patterns « add-on » (sans namespace dupliqué) pour
   // les sous-routes qui chargent un namespace supplémentaire.
   const dynamicRoutePatterns: Array<{ pattern: RegExp; translations: string[] }> = [
-    // Toutes les pages /gestion/* chargent le namespace gestion
+    // Toutes les pages /gestion/* chargent le namespace gestion.
+    // (Le layout edition-dashboard référence gestion.shows_call.title et
+    // .list_description, qui restent dans gestion.json — buckets de nav.)
     {
       pattern: /^\/editions\/\d+\/gestion/,
       translations: ['gestion'],
@@ -79,9 +81,11 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion\/artists/,
       translations: ['artists'],
     },
+    // Gestion appel à spectacles : survey (sondages) + shows-call (clés publiques
+    // partagées shows_call.*) + gestion-shows-call (détail management gestion.shows_call.*)
     {
       pattern: /^\/editions\/\d+\/gestion\/shows-call/,
-      translations: ['survey'],
+      translations: ['survey', 'shows-call', 'gestion-shows-call'],
     },
     // Routes hors /gestion
     // Page « Mes tâches » (utilisateur) : réutilise le module de tâches
@@ -98,6 +102,13 @@ export function getTranslationsToLoad(path: string): string[] {
     {
       pattern: /^\/editions\/\d+\/volunteers/,
       translations: ['volunteers'],
+    },
+    // Appel à spectacles public (liste, détail, candidature) : namespace public
+    // shows_call.* (shows-call.json), partagé avec la gestion. Les clés de détail
+    // gestion (gestion.shows_call.*) ne sont PAS chargées ici.
+    {
+      pattern: /^\/editions\/\d+\/shows-call/,
+      translations: ['shows-call'],
     },
     // Profil : page « Mes candidatures bénévole » réutilise le domaine volunteers
     {
@@ -374,6 +385,40 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('~~/i18n/locales/uk/survey.json'),
     cs: () => import('~~/i18n/locales/cs/survey.json'),
     sv: () => import('~~/i18n/locales/sv/survey.json'),
+  },
+  // Appel à spectacles — clés publiques partagées (namespace shows_call.*),
+  // utilisées par les pages publiques ET la gestion (liste, détail, candidature).
+  'shows-call': {
+    en: () => import('~~/i18n/locales/en/shows-call.json'),
+    da: () => import('~~/i18n/locales/da/shows-call.json'),
+    de: () => import('~~/i18n/locales/de/shows-call.json'),
+    es: () => import('~~/i18n/locales/es/shows-call.json'),
+    fr: () => import('~~/i18n/locales/fr/shows-call.json'),
+    it: () => import('~~/i18n/locales/it/shows-call.json'),
+    nl: () => import('~~/i18n/locales/nl/shows-call.json'),
+    pl: () => import('~~/i18n/locales/pl/shows-call.json'),
+    pt: () => import('~~/i18n/locales/pt/shows-call.json'),
+    ru: () => import('~~/i18n/locales/ru/shows-call.json'),
+    uk: () => import('~~/i18n/locales/uk/shows-call.json'),
+    cs: () => import('~~/i18n/locales/cs/shows-call.json'),
+    sv: () => import('~~/i18n/locales/sv/shows-call.json'),
+  },
+  // Appel à spectacles — clés de détail/management (namespace gestion.shows_call.*),
+  // chargées uniquement sur /editions/:id/gestion/shows-call/*
+  'gestion-shows-call': {
+    en: () => import('~~/i18n/locales/en/gestion-shows-call.json'),
+    da: () => import('~~/i18n/locales/da/gestion-shows-call.json'),
+    de: () => import('~~/i18n/locales/de/gestion-shows-call.json'),
+    es: () => import('~~/i18n/locales/es/gestion-shows-call.json'),
+    fr: () => import('~~/i18n/locales/fr/gestion-shows-call.json'),
+    it: () => import('~~/i18n/locales/it/gestion-shows-call.json'),
+    nl: () => import('~~/i18n/locales/nl/gestion-shows-call.json'),
+    pl: () => import('~~/i18n/locales/pl/gestion-shows-call.json'),
+    pt: () => import('~~/i18n/locales/pt/gestion-shows-call.json'),
+    ru: () => import('~~/i18n/locales/ru/gestion-shows-call.json'),
+    uk: () => import('~~/i18n/locales/uk/gestion-shows-call.json'),
+    cs: () => import('~~/i18n/locales/cs/gestion-shows-call.json'),
+    sv: () => import('~~/i18n/locales/sv/gestion-shows-call.json'),
   },
   profil: {
     en: () => import('~~/i18n/locales/en/profil.json'),

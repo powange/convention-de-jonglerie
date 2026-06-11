@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Externe",
+    "status_accepted": "Acceptée",
+    "status_pending": "En attente",
+    "status_rejected": "Refusée",
+    "artist_info": "Informations sur l'artiste ou la compagnie",
+    "show_info": "Informations sur le spectacle",
+    "logistics": "Logistique",
+    "form": {
+      "artist_bio": "Biographie",
+      "artist_name": "Nom de scène",
+      "category": "Catégorie",
+      "description": "Description du spectacle",
+      "duration": "Durée (minutes)",
+      "portfolio_url": "Portfolio / Site web",
+      "show_title": "Titre du spectacle",
+      "stage_setup": "Mise en place sur scène",
+      "technical_needs": "Besoins techniques",
+      "video_url": "Vidéo"
+    }
+  }
+}

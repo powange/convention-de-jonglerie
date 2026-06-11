@@ -104,7 +104,7 @@
                 trailing-icon="i-heroicons-chevron-down"
                 :loading="updatingStatus"
               >
-                {{ $t(`gestion.shows_call.status_${application.status.toLowerCase()}`) }}
+                {{ $t(`shows_call.status_${application.status.toLowerCase()}`) }}
               </UButton>
             </UDropdownMenu>
           </div>
@@ -114,21 +114,21 @@
             <template #header>
               <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <UIcon name="i-heroicons-user" class="text-amber-500" />
-                {{ $t('gestion.shows_call.artist_info') }}
+                {{ $t('shows_call.artist_info') }}
               </h4>
             </template>
             <div class="space-y-5">
               <div class="text-sm pl-3">
                 <span
                   class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
-                  >{{ $t('gestion.shows_call.form.artist_name') }}</span
+                  >{{ $t('shows_call.form.artist_name') }}</span
                 >
                 <p class="mt-1">{{ application.artistName }}</p>
               </div>
               <div v-if="application.artistBio" class="pl-3">
                 <span
                   class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
-                  >{{ $t('gestion.shows_call.form.artist_bio') }}</span
+                  >{{ $t('shows_call.form.artist_bio') }}</span
                 >
                 <!-- Markdown rendu + liens cliquables target=_blank (rehype-sanitize + rehypeExternalLinks) -->
                 <!-- eslint-disable vue/no-v-html -->
@@ -156,7 +156,7 @@
                   class="text-primary-500 hover:underline flex items-center gap-1"
                 >
                   <UIcon name="i-heroicons-play-circle" />
-                  {{ $t('gestion.shows_call.form.video_url') }}
+                  {{ $t('shows_call.form.video_url') }}
                 </a>
               </div>
               <!-- Lecteur vidéo intégré (YouTube ou Vimeo) -->
@@ -199,7 +199,7 @@
             <template #header>
               <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
-                {{ $t('gestion.shows_call.show_info') }}
+                {{ $t('shows_call.show_info') }}
               </h4>
             </template>
             <div class="space-y-5">
@@ -207,21 +207,21 @@
                 <div class="pl-3">
                   <span
                     class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
-                    >{{ $t('gestion.shows_call.form.show_title') }}</span
+                    >{{ $t('shows_call.form.show_title') }}</span
                   >
                   <p class="mt-1">{{ application.showTitle }}</p>
                 </div>
                 <div class="pl-3">
                   <span
                     class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
-                    >{{ $t('gestion.shows_call.form.duration') }}</span
+                    >{{ $t('shows_call.form.duration') }}</span
                   >
                   <p class="mt-1">{{ application.showDuration }} min</p>
                 </div>
                 <div v-if="application.showCategory" class="pl-3">
                   <span
                     class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
-                    >{{ $t('gestion.shows_call.form.category') }}</span
+                    >{{ $t('shows_call.form.category') }}</span
                   >
                   <p class="mt-1">{{ application.showCategory }}</p>
                 </div>
@@ -231,7 +231,7 @@
                   <span
                     class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3 flex items-center gap-2"
                   >
-                    {{ $t('gestion.shows_call.form.description') }}
+                    {{ $t('shows_call.form.description') }}
                     <UButton
                       v-if="!editingDescription"
                       color="neutral"
@@ -280,7 +280,7 @@
                 <span
                   class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
                 >
-                  {{ $t('gestion.shows_call.form.technical_needs') }}
+                  {{ $t('shows_call.form.technical_needs') }}
                 </span>
                 <!-- Markdown rendu + liens cliquables target=_blank (rehype-sanitize + rehypeExternalLinks) -->
                 <!-- eslint-disable vue/no-v-html -->
@@ -293,7 +293,7 @@
                 <span
                   class="text-gray-900 dark:text-white text-base font-semibold border-l-2 border-primary pl-2 -ml-3"
                 >
-                  {{ $t('gestion.shows_call.form.stage_setup') }}
+                  {{ $t('shows_call.form.stage_setup') }}
                 </span>
                 <!-- Markdown rendu + liens cliquables target=_blank (rehype-sanitize + rehypeExternalLinks) -->
                 <!-- eslint-disable vue/no-v-html -->
@@ -383,7 +383,7 @@
             <template #header>
               <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <UIcon name="i-heroicons-truck" class="text-amber-500" />
-                {{ $t('gestion.shows_call.logistics') }}
+                {{ $t('shows_call.logistics') }}
               </h4>
             </template>
             <div class="text-sm space-y-5">

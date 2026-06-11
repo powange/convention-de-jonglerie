@@ -37,7 +37,9 @@ i18n/locales/{langue}/
 ├── ticketing.json       # billetterie
 ├── workshops.json       # ateliers
 ├── artists.json         # artistes
-├── survey.json          # sondages / shows-call
+├── survey.json          # sondages (survey.*)
+├── shows-call.json      # appel à spectacles — clés publiques partagées (shows_call.*)
+├── gestion-shows-call.json # appel à spectacles — détail/management (gestion.shows_call.*)
 ├── messenger.json       # messagerie
 ├── permissions.json     # droits
 └── project-costs.json   # coûts projet
@@ -83,24 +85,25 @@ Ce fichier contient deux choses :
 
 ### Routes dynamiques (regex, cumulatives)
 
-| Pattern                              | Domaines                       | Notes                            |
-| ------------------------------------ | ------------------------------ | -------------------------------- |
-| `/editions/{id}/gestion`             | gestion                        | toutes les sous-pages de gestion |
-| `/editions/{id}/gestion` (exact)     | workshops, tasks               | overview (cartes de modules)     |
-| `/editions/{id}/gestion/tasks`       | tasks, gestion-tasks           | gestion des tâches               |
-| `/editions/{id}/gestion/map`         | map, gestion-map               | édition de la carte              |
-| `/editions/{id}/gestion/volunteers`  | volunteers, gestion-volunteers | gestion bénévoles                |
-| `/editions/{id}/gestion/ticketing`   | ticketing                      |                                  |
-| `/editions/{id}/gestion/workshops`   | workshops                      |                                  |
-| `/editions/{id}/gestion/artists`     | artists                        |                                  |
-| `/editions/{id}/gestion/shows-call`  | survey                         |                                  |
-| `/editions/{id}/my-tasks`            | tasks                          | page utilisateur (lecture)       |
-| `/editions/{id}/map`                 | map                            | carte publique                   |
-| `/editions/{id}/volunteers`          | volunteers                     | bénévolat public                 |
-| `/profile/mes-candidatures-benevole` | volunteers                     | mes candidatures bénévole        |
-| `/editions/{id}/artist-space`        | artists                        |                                  |
-| `/editions/{id}/workshops`           | workshops                      |                                  |
-| `/survey/`                           | survey                         |                                  |
+| Pattern                              | Domaines                               | Notes                                                                        |
+| ------------------------------------ | -------------------------------------- | ---------------------------------------------------------------------------- |
+| `/editions/{id}/gestion`             | gestion                                | toutes les sous-pages de gestion                                             |
+| `/editions/{id}/gestion` (exact)     | workshops, tasks                       | overview (cartes de modules)                                                 |
+| `/editions/{id}/gestion/tasks`       | tasks, gestion-tasks                   | gestion des tâches                                                           |
+| `/editions/{id}/gestion/map`         | map, gestion-map                       | édition de la carte                                                          |
+| `/editions/{id}/gestion/volunteers`  | volunteers, gestion-volunteers         | gestion bénévoles                                                            |
+| `/editions/{id}/gestion/ticketing`   | ticketing                              |                                                                              |
+| `/editions/{id}/gestion/workshops`   | workshops                              |                                                                              |
+| `/editions/{id}/gestion/artists`     | artists                                |                                                                              |
+| `/editions/{id}/gestion/shows-call`  | survey, shows-call, gestion-shows-call | sondages + clés publiques + détail management                                |
+| `/editions/{id}/my-tasks`            | tasks                                  | page utilisateur (lecture)                                                   |
+| `/editions/{id}/map`                 | map                                    | carte publique                                                               |
+| `/editions/{id}/volunteers`          | volunteers                             | bénévolat public                                                             |
+| `/editions/{id}/shows-call`          | shows-call                             | appel à spectacles public (liste, détail, candidature) — clés `shows_call.*` |
+| `/profile/mes-candidatures-benevole` | volunteers                             | mes candidatures bénévole                                                    |
+| `/editions/{id}/artist-space`        | artists                                |                                                                              |
+| `/editions/{id}/workshops`           | workshops                              |                                                                              |
+| `/survey/`                           | survey                                 |                                                                              |
 
 ## Motif « partagé / management »
 
@@ -108,11 +111,21 @@ Pour les modules présents à la fois côté **public/utilisateur** et côté **
 clés sont séparées en deux domaines afin de ne pas charger les clés d'édition sur les
 pages publiques :
 
-| Module    | Partagé (public + gestion)         | Management (gestion uniquement)                    | Libellé de nav (toujours chargé)                             |
-| --------- | ---------------------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
-| Carte     | `map.*` (`map.json`)               | `gestion.map.*` (`gestion-map.json`)               | `common` → `edition.site_map`                                |
-| Tâches    | `tasks.*` (`tasks.json`)           | `gestion.task.*` (`gestion-tasks.json`)            | `common` → `edition.my_tasks`, `edition.tasks`               |
-| Bénévoles | `volunteers.*` (`volunteers.json`) | `gestion.volunteers.*` (`gestion-volunteers.json`) | `common` → `edition.volunteers.*` (sous-ensemble transverse) |
+| Module             | Partagé (public + gestion)                              | Management (gestion uniquement)                    | Libellé de nav (toujours chargé)                                                             |
+| ------------------ | ------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Carte              | `map.*` (`map.json`)                                    | `gestion.map.*` (`gestion-map.json`)               | `common` → `edition.site_map`                                                                |
+| Tâches             | `tasks.*` (`tasks.json`)                                | `gestion.task.*` (`gestion-tasks.json`)            | `common` → `edition.my_tasks`, `edition.tasks`                                               |
+| Bénévoles          | `volunteers.*` (`volunteers.json`)                      | `gestion.volunteers.*` (`gestion-volunteers.json`) | `common` → `edition.volunteers.*` (sous-ensemble transverse)                                 |
+| Appel à spectacles | `shows_call.*` (`shows-call.json` + base `common.json`) | `gestion.shows_call.*` (`gestion-shows-call.json`) | `gestion.shows_call.title` / `.list_description` (restent dans `gestion.json`, nav/overview) |
+
+> Les libellés partagés entre le formulaire public et la vue gestion (statuts,
+> sections artiste/spectacle/logistique, libellés de champ) vivent dans le namespace public
+> `shows_call.*` (`shows-call.json`), chargé des deux côtés. Le détail management (création,
+> suppression, candidatures, badges de visibilité…) reste en `gestion.shows_call.*`
+> (`gestion-shows-call.json`), chargé uniquement sur `/gestion/shows-call`. Les deux libellés
+> de navigation (`title`, `list_description`), utilisés par le layout et l'overview sur
+> **toutes** les routes gestion, restent dans `gestion.json`. À ne pas confondre avec
+> `survey.json` (namespace `survey.*`, sondages).
 
 Les libellés d'onglets/menu (affichés sur toutes les pages d'édition via `EditionHeader`
 et le layout `edition-dashboard`) vivent dans `common.json` (`edition.*`) car ils doivent

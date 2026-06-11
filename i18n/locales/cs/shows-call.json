@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Externí",
+    "status_accepted": "Přijato",
+    "status_pending": "Čeká",
+    "status_rejected": "Odmítnuto",
+    "artist_info": "Informace o umělci nebo souboru",
+    "show_info": "Informace o představení",
+    "logistics": "Logistika",
+    "form": {
+      "artist_bio": "Životopis",
+      "artist_name": "Umělecké jméno",
+      "category": "Kategorie",
+      "description": "Popis představení",
+      "duration": "Délka (minuty)",
+      "portfolio_url": "Portfolio / Webové stránky",
+      "show_title": "Název představení",
+      "stage_setup": "Příprava na jevišti",
+      "technical_needs": "Technické požadavky",
+      "video_url": "Video"
+    }
+  }
+}

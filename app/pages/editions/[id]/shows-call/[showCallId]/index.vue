@@ -46,7 +46,7 @@
               </div>
               <div class="flex items-center gap-2">
                 <UBadge v-if="showCall.mode === 'EXTERNAL'" color="info" variant="soft" size="xs">
-                  {{ t('gestion.shows_call.mode_external_badge') }}
+                  {{ t('shows_call.mode_external_badge') }}
                 </UBadge>
                 <ClientOnly>
                   <UButton

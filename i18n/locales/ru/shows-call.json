@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Внешний",
+    "status_accepted": "Принята",
+    "status_pending": "На рассмотрении",
+    "status_rejected": "Отклонена",
+    "artist_info": "Информация об артисте или труппе",
+    "show_info": "Информация о выступлении",
+    "logistics": "Логистика",
+    "form": {
+      "artist_bio": "Биография",
+      "artist_name": "Сценическое имя",
+      "category": "Категория",
+      "description": "Описание выступления",
+      "duration": "Продолжительность (минуты)",
+      "portfolio_url": "Портфолио / Сайт",
+      "show_title": "Название выступления",
+      "stage_setup": "Подготовка сцены",
+      "technical_needs": "Технические требования",
+      "video_url": "Видео"
+    }
+  }
+}

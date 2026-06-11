@@ -88,7 +88,7 @@
                     <h4 class="font-semibold text-lg">{{ call.name }}</h4>
                     <div class="flex items-center gap-2">
                       <UBadge v-if="call.mode === 'EXTERNAL'" color="info" variant="soft" size="sm">
-                        {{ t('gestion.shows_call.mode_external_badge') }}
+                        {{ t('shows_call.mode_external_badge') }}
                       </UBadge>
                       <UBadge
                         :color="
@@ -293,11 +293,11 @@ function getStatusColor(status: ShowApplicationStatus): 'warning' | 'success' | 
 function getStatusLabel(status: ShowApplicationStatus): string {
   switch (status) {
     case 'ACCEPTED':
-      return t('gestion.shows_call.status_accepted')
+      return t('shows_call.status_accepted')
     case 'REJECTED':
-      return t('gestion.shows_call.status_rejected')
+      return t('shows_call.status_rejected')
     default:
-      return t('gestion.shows_call.status_pending')
+      return t('shows_call.status_pending')
   }
 }
 

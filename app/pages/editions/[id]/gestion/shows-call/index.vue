@@ -80,7 +80,7 @@
                 {{
                   showCall.mode === 'INTERNAL'
                     ? $t('gestion.shows_call.mode_internal_badge')
-                    : $t('gestion.shows_call.mode_external_badge')
+                    : $t('shows_call.mode_external_badge')
                 }}
               </UBadge>
             </div>

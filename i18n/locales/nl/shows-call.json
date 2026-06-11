@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "Extern",
+    "status_accepted": "Geaccepteerd",
+    "status_pending": "In behandeling",
+    "status_rejected": "Afgewezen",
+    "artist_info": "Informatie over de artiest of gezelschap",
+    "show_info": "Show-informatie",
+    "logistics": "Logistiek",
+    "form": {
+      "artist_bio": "Biografie",
+      "artist_name": "Artiestennaam",
+      "category": "Categorie",
+      "description": "Showbeschrijving",
+      "duration": "Duur (minuten)",
+      "portfolio_url": "Portfolio / Website",
+      "show_title": "Showtitel",
+      "stage_setup": "Opstelling op het podium",
+      "technical_needs": "Technische vereisten",
+      "video_url": "Video"
+    }
+  }
+}

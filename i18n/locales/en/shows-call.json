@@ -1,0 +1,23 @@
+{
+  "shows_call": {
+    "mode_external_badge": "External",
+    "status_accepted": "Accepted",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
+    "artist_info": "Artist or company information",
+    "show_info": "Show information",
+    "logistics": "Logistics",
+    "form": {
+      "artist_bio": "Biography",
+      "artist_name": "Stage name",
+      "category": "Category",
+      "description": "Show description",
+      "duration": "Duration (minutes)",
+      "portfolio_url": "Portfolio / Website",
+      "show_title": "Show title",
+      "stage_setup": "Stage setup",
+      "technical_needs": "Technical requirements",
+      "video_url": "Video"
+    }
+  }
+}
