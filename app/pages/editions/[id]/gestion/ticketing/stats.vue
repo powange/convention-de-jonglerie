@@ -359,7 +359,7 @@
 
         <!-- Totaux -->
         <div v-if="purchasesData" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <UCard v-if="filters.showParticipants">
+          <UCard v-if="purchaseFilters.showParticipants">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -376,7 +376,7 @@
               <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
             </div>
           </UCard>
-          <UCard v-if="filters.showParticipants">
+          <UCard v-if="purchaseFilters.showParticipants">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -393,7 +393,7 @@
               <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
             </div>
           </UCard>
-          <UCard v-if="filters.showOthers">
+          <UCard v-if="purchaseFilters.showOthers">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -408,7 +408,7 @@
               <UIcon name="i-heroicons-user" class="h-8 w-8 text-gray-500" />
             </div>
           </UCard>
-          <UCard v-if="filters.showOthers">
+          <UCard v-if="purchaseFilters.showOthers">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -447,8 +447,8 @@
         <div v-else-if="purchasesData && purchasesData.labels.length > 0">
           <PurchaseChart
             :data="purchasesData"
-            :show-participants="filters.showParticipants"
-            :show-others="filters.showOthers"
+            :show-participants="purchaseFilters.showParticipants"
+            :show-others="purchaseFilters.showOthers"
           />
         </div>
         <div v-else class="text-center py-12">
@@ -620,16 +620,22 @@ const selectedGranularity = ref<number>(60) // Par défaut 1h
 const selectedPurchaseTypes = ref<string[]>(['participants', 'others'])
 const selectedPurchaseGranularity = ref<number>(1440) // Par défaut 1 jour
 
-// Filtres calculés pour compatibilité avec le code existant
+// Filtres du graphique des validations d'entrée (dérivés de selectedTypes)
 const filters = computed(() => ({
-  showParticipants: selectedPurchaseTypes.value.includes('participants'),
-  showOthers: selectedPurchaseTypes.value.includes('others'),
+  showParticipants: selectedTypes.value.includes('participants'),
+  showOthers: selectedTypes.value.includes('others'),
   showVolunteers: selectedTypes.value.includes('volunteers'),
   showArtists: selectedTypes.value.includes('artists') && !!edition.value?.artistsEnabled,
   showOrganizers: selectedTypes.value.includes('organizers'),
   showSetup: selectedPeriods.value.includes('setup'),
   showEvent: selectedPeriods.value.includes('event'),
   showTeardown: selectedPeriods.value.includes('teardown'),
+}))
+
+// Filtres du graphique des achats (dérivés de selectedPurchaseTypes)
+const purchaseFilters = computed(() => ({
+  showParticipants: selectedPurchaseTypes.value.includes('participants'),
+  showOthers: selectedPurchaseTypes.value.includes('others'),
 }))
 
 // Données de validations
