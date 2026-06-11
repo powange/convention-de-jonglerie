@@ -127,7 +127,12 @@
       "validated_lowercase": "validados",
       "validation_description": "Validar o consumo de refeições pelos participantes",
       "validation_title": "Validação de refeições",
-      "volunteers": "Voluntários"
+      "volunteers": "Voluntários",
+      "person_type": {
+        "volunteer": "Voluntário",
+        "artist": "Artista",
+        "participant": "Participante"
+      }
     },
     "organizers": {
       "access_rights": "Direitos de acesso",

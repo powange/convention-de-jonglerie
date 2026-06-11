@@ -265,7 +265,7 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-2">
                       <UBadge :color="getPersonTypeBadgeColor(person.type)" variant="soft">
-                        {{ $t(`gestion.meals.person_type_${person.type}`) }}
+                        {{ $t(`gestion.meals.person_type.${person.type}`) }}
                       </UBadge>
                       <UBadge
                         v-if="person.consumedAt"

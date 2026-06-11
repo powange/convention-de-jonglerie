@@ -127,7 +127,12 @@
       "validated_lowercase": "validados",
       "validation_description": "Validar la toma de comidas por los participantes",
       "validation_title": "Validación de comidas",
-      "volunteers": "Voluntarios"
+      "volunteers": "Voluntarios",
+      "person_type": {
+        "volunteer": "Voluntario",
+        "artist": "Artista",
+        "participant": "Participante"
+      }
     },
     "organizers": {
       "access_rights": "Derechos de acceso",

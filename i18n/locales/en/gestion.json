@@ -127,7 +127,12 @@
       "validated_lowercase": "validated",
       "validation_description": "Validate participant meal consumption",
       "validation_title": "Meal validation",
-      "volunteers": "Volunteers"
+      "volunteers": "Volunteers",
+      "person_type": {
+        "volunteer": "Volunteer",
+        "artist": "Artist",
+        "participant": "Participant"
+      }
     },
     "organizers": {
       "access_rights": "Access rights",

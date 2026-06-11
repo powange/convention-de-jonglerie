@@ -127,7 +127,12 @@
       "validated_lowercase": "validés",
       "validation_description": "Valider la prise des repas par les participants",
       "validation_title": "Validation des repas",
-      "volunteers": "Bénévoles"
+      "volunteers": "Bénévoles",
+      "person_type": {
+        "volunteer": "Bénévole",
+        "artist": "Artiste",
+        "participant": "Participant"
+      }
     },
     "organizers": {
       "access_rights": "Droits d'accès",

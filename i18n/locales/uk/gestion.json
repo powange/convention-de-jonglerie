@@ -127,7 +127,12 @@
       "validated_lowercase": "перевірено",
       "validation_description": "Валідація споживання страв учасниками",
       "validation_title": "Валідація страв",
-      "volunteers": "Волонтери"
+      "volunteers": "Волонтери",
+      "person_type": {
+        "volunteer": "Волонтер",
+        "artist": "Артист",
+        "participant": "Учасник"
+      }
     },
     "organizers": {
       "access_rights": "Права доступу",

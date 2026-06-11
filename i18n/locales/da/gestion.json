@@ -127,7 +127,12 @@
       "validated_lowercase": "valideret",
       "validation_description": "Valider deltagernes måltidsindtagelse",
       "validation_title": "Måltidsvalidering",
-      "volunteers": "Frivillige"
+      "volunteers": "Frivillige",
+      "person_type": {
+        "volunteer": "Frivillig",
+        "artist": "Kunstner",
+        "participant": "Deltager"
+      }
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",

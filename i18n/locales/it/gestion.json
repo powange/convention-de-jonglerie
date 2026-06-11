@@ -127,7 +127,12 @@
       "validated_lowercase": "convalidati",
       "validation_description": "Convalida il consumo dei pasti dei partecipanti",
       "validation_title": "Convalida pasti",
-      "volunteers": "Volontari"
+      "volunteers": "Volontari",
+      "person_type": {
+        "volunteer": "Volontario",
+        "artist": "Artista",
+        "participant": "Partecipante"
+      }
     },
     "organizers": {
       "access_rights": "Diritti di accesso",

@@ -127,7 +127,12 @@
       "validated_lowercase": "zwalidowane",
       "validation_description": "Waliduj spożycie posiłków przez uczestników",
       "validation_title": "Walidacja posiłków",
-      "volunteers": "Wolontariusze"
+      "volunteers": "Wolontariusze",
+      "person_type": {
+        "volunteer": "Wolontariusz",
+        "artist": "Artysta",
+        "participant": "Uczestnik"
+      }
     },
     "organizers": {
       "access_rights": "Prawa dostępu",

@@ -127,7 +127,12 @@
       "validated_lowercase": "validiert",
       "validation_description": "Mahlzeiteinnahme der Teilnehmer validieren",
       "validation_title": "Mahlzeitvalidierung",
-      "volunteers": "Freiwillige"
+      "volunteers": "Freiwillige",
+      "person_type": {
+        "volunteer": "Freiwilliger",
+        "artist": "Künstler",
+        "participant": "Teilnehmer"
+      }
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",

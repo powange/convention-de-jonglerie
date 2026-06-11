@@ -127,7 +127,12 @@
       "validated_lowercase": "validerade",
       "validation_description": "Validera deltagarnas måltidskonsumtion",
       "validation_title": "Måltidsvalidering",
-      "volunteers": "Volontärer"
+      "volunteers": "Volontärer",
+      "person_type": {
+        "volunteer": "Volontär",
+        "artist": "Artist",
+        "participant": "Deltagare"
+      }
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",

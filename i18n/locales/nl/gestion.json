@@ -127,7 +127,12 @@
       "validated_lowercase": "gevalideerd",
       "validation_description": "Valideer maaltijdconsumptie van deelnemers",
       "validation_title": "Maaltijdvalidatie",
-      "volunteers": "Vrijwilligers"
+      "volunteers": "Vrijwilligers",
+      "person_type": {
+        "volunteer": "Vrijwilliger",
+        "artist": "Artiest",
+        "participant": "Deelnemer"
+      }
     },
     "organizers": {
       "access_rights": "Toegangsrechten",

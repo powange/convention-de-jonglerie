@@ -127,7 +127,12 @@
       "validated_lowercase": "validováno",
       "validation_description": "Validovat konzumaci jídel účastníky",
       "validation_title": "Validace jídel",
-      "volunteers": "Dobrovolníci"
+      "volunteers": "Dobrovolníci",
+      "person_type": {
+        "volunteer": "Dobrovolník",
+        "artist": "Umělec",
+        "participant": "Účastník"
+      }
     },
     "organizers": {
       "access_rights": "Přístupová práva",
