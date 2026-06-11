@@ -812,10 +812,16 @@ export const showPresetSchema = z
             .min(2, 'Le prénom doit contenir au moins 2 caractères')
             .max(100, 'Le prénom ne peut pas dépasser 100 caractères'),
           email: z.string().email('Email invalide'),
+          // Téléphone facultatif pour un preset : vide autorisé, sinon 6 à 20 caractères
           phone: z
             .string()
-            .min(6, 'Le numéro de téléphone doit contenir au moins 6 caractères')
-            .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères'),
+            .max(20, 'Le numéro de téléphone ne peut pas dépasser 20 caractères')
+            .refine(
+              (val) => !val || val.length >= 6,
+              'Le numéro de téléphone doit contenir au moins 6 caractères'
+            )
+            .optional()
+            .default(''),
         })
       )
       .optional()
