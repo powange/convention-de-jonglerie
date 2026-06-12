@@ -93,7 +93,16 @@
       "revoke": "Zrušit",
       "revoked": "Zrušeno",
       "title": "Tokeny veřejného API",
-      "toggle_error": "Chyba při aktualizaci tokenu"
+      "toggle_error": "Chyba při aktualizaci tokenu",
+      "endpoints": {
+        "editions": "Seznam nadcházejících ročníků",
+        "error-logs": "Nevyřešené chyby API"
+      },
+      "endpoints_hint": "Zaškrtněte veřejné endpointy, ke kterým má tento token přístup.",
+      "endpoints_label": "Povolené endpointy",
+      "endpoints_updated": "Přístup tokenu aktualizován",
+      "edit_endpoints": "Upravit přístup",
+      "no_endpoints": "Žádný endpoint"
     },
     "archive": "Archiv",
     "archive_convention": "Archivovat dohodu",
@@ -210,7 +219,24 @@
       "need_investigation": "Vyžaduje šetření",
       "origin_domain": "Oblast původu:",
       "referer_page": "Domovská stránka (odkaz):",
-      "unresolved": "Nevyřešené chyby"
+      "unresolved": "Nevyřešené chyby",
+      "action_details": "Zobrazit podrobnosti",
+      "action_resolve": "Označit jako vyřešené",
+      "action_resolve_similar": "Vyřešit podobné",
+      "action_unresolve": "Označit jako nevyřešené",
+      "anonymous": "Anonymní",
+      "col_code": "Kód",
+      "col_date": "Datum",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Zpráva",
+      "col_referer": "Zdrojová stránka",
+      "col_status": "Stav",
+      "col_type": "Typ",
+      "col_user": "Uživatel",
+      "columns_label": "Sloupce",
+      "resolved": "Vyřešeno",
+      "unresolved_short": "Nevyřešeno"
     },
     "errors_24h": "Chyby (24h)",
     "event_reminders": "Připomínky událostí",

@@ -136,6 +136,12 @@ export default defineNuxtConfig({
         'upgrade-insecure-requests': true,
       },
       crossOriginEmbedderPolicy: false,
+      // Le navigateur envoie l'URL complète (avec le path) en `Referer` pour les
+      // requêtes same-origin, mais seulement l'origine vers les destinations
+      // cross-origin. Permet de tracer la page d'origine des appels API dans les
+      // logs d'erreur (cf. ApiErrorLog.referer) sans fuiter d'URL vers des tiers.
+      // Surcharge le défaut de nuxt-security (`no-referrer`).
+      referrerPolicy: 'strict-origin-when-cross-origin',
       // Autoriser l'accès à la caméra (scan QR code billetterie / contrôle d'accès)
       permissionsPolicy: {
         camera: ['self'],

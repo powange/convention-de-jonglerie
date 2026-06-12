@@ -93,7 +93,16 @@
       "revoke": "Revocar",
       "revoked": "Revocado",
       "title": "Tokens de API pública",
-      "toggle_error": "Error al actualizar el token"
+      "toggle_error": "Error al actualizar el token",
+      "endpoints": {
+        "editions": "Lista de ediciones próximas",
+        "error-logs": "Errores de API sin resolver"
+      },
+      "endpoints_hint": "Marca los endpoints públicos a los que este token puede acceder.",
+      "endpoints_label": "Endpoints permitidos",
+      "endpoints_updated": "Acceso del token actualizado",
+      "edit_endpoints": "Editar acceso",
+      "no_endpoints": "Ningún endpoint"
     },
     "archive": "Archivar",
     "archive_convention": "Archivar convención",
@@ -210,7 +219,24 @@
       "need_investigation": "Requieren investigación",
       "origin_domain": "Dominio de origen (origin):",
       "referer_page": "Página de origen (referer):",
-      "unresolved": "Errores sin resolver"
+      "unresolved": "Errores sin resolver",
+      "action_details": "Ver detalles",
+      "action_resolve": "Marcar como resuelto",
+      "action_resolve_similar": "Resolver similares",
+      "action_unresolve": "Marcar como no resuelto",
+      "anonymous": "Anónimo",
+      "col_code": "Código",
+      "col_date": "Fecha",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Mensaje",
+      "col_referer": "Página de origen",
+      "col_status": "Estado",
+      "col_type": "Tipo",
+      "col_user": "Usuario",
+      "columns_label": "Columnas",
+      "resolved": "Resuelto",
+      "unresolved_short": "Sin resolver"
     },
     "errors_24h": "Errores (24h)",
     "event_reminders": "Recordatorios de eventos",

@@ -19,6 +19,9 @@ logs
 .idea
 .history
 
+# État local de la commande /check-error-logs
+.claude/error-logs-monitor.json
+
 # Test coverage
 coverage
 

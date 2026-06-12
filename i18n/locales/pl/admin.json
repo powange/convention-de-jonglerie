@@ -93,7 +93,16 @@
       "revoke": "Unieważnij",
       "revoked": "Unieważniony",
       "title": "Tokeny publicznego API",
-      "toggle_error": "Błąd podczas aktualizacji tokena"
+      "toggle_error": "Błąd podczas aktualizacji tokena",
+      "endpoints": {
+        "editions": "Lista nadchodzących edycji",
+        "error-logs": "Nierozwiązane błędy API"
+      },
+      "endpoints_hint": "Zaznacz publiczne endpointy, do których ten token ma dostęp.",
+      "endpoints_label": "Dozwolone endpointy",
+      "endpoints_updated": "Zaktualizowano dostęp tokena",
+      "edit_endpoints": "Edytuj dostęp",
+      "no_endpoints": "Brak endpointu"
     },
     "archive": "Archiwizuj",
     "archive_convention": "Zarchiwizuj konwencję",
@@ -210,7 +219,24 @@
       "need_investigation": "Wymagają badań",
       "origin_domain": "Domena pochodzenia (origin):",
       "referer_page": "Strona pochodzenia (referer):",
-      "unresolved": "Nierozwiązane błędy"
+      "unresolved": "Nierozwiązane błędy",
+      "action_details": "Zobacz szczegóły",
+      "action_resolve": "Oznacz jako rozwiązane",
+      "action_resolve_similar": "Rozwiąż podobne",
+      "action_unresolve": "Oznacz jako nierozwiązane",
+      "anonymous": "Anonimowy",
+      "col_code": "Kod",
+      "col_date": "Data",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Komunikat",
+      "col_referer": "Strona źródłowa",
+      "col_status": "Status",
+      "col_type": "Typ",
+      "col_user": "Użytkownik",
+      "columns_label": "Kolumny",
+      "resolved": "Rozwiązane",
+      "unresolved_short": "Nierozwiązane"
     },
     "errors_24h": "Błędy (24h)",
     "event_reminders": "Przypomnienia o wydarzeniach",

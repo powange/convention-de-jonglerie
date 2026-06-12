@@ -93,7 +93,16 @@
       "revoke": "Відкликати",
       "revoked": "Відкликано",
       "title": "Токени публічного API",
-      "toggle_error": "Помилка під час оновлення токена"
+      "toggle_error": "Помилка під час оновлення токена",
+      "endpoints": {
+        "editions": "Список майбутніх випусків",
+        "error-logs": "Невирішені помилки API"
+      },
+      "endpoints_hint": "Позначте публічні ендпоінти, до яких має доступ цей токен.",
+      "endpoints_label": "Дозволені ендпоінти",
+      "endpoints_updated": "Доступ токена оновлено",
+      "edit_endpoints": "Змінити доступ",
+      "no_endpoints": "Немає ендпоінтів"
     },
     "archive": "Архівувати",
     "archive_convention": "Архівувати конвенцію",
@@ -210,7 +219,24 @@
       "need_investigation": "Потребують розслідування",
       "origin_domain": "Домен походження (origin):",
       "referer_page": "Сторінка походження (referer):",
-      "unresolved": "Невирішені помилки"
+      "unresolved": "Невирішені помилки",
+      "action_details": "Переглянути деталі",
+      "action_resolve": "Позначити як вирішене",
+      "action_resolve_similar": "Вирішити подібні",
+      "action_unresolve": "Позначити як невирішене",
+      "anonymous": "Анонім",
+      "col_code": "Код",
+      "col_date": "Дата",
+      "col_endpoint": "Ендпоінт",
+      "col_ip": "IP",
+      "col_message": "Повідомлення",
+      "col_referer": "Сторінка-джерело",
+      "col_status": "Статус",
+      "col_type": "Тип",
+      "col_user": "Користувач",
+      "columns_label": "Стовпці",
+      "resolved": "Вирішено",
+      "unresolved_short": "Невирішено"
     },
     "errors_24h": "Помилки (24г)",
     "event_reminders": "Нагадування про події",

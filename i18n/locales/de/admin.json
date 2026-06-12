@@ -93,7 +93,16 @@
       "revoke": "Widerrufen",
       "revoked": "Widerrufen",
       "title": "Öffentliche API-Tokens",
-      "toggle_error": "Fehler beim Aktualisieren des Tokens"
+      "toggle_error": "Fehler beim Aktualisieren des Tokens",
+      "endpoints": {
+        "editions": "Liste der kommenden Ausgaben",
+        "error-logs": "Ungelöste API-Fehler"
+      },
+      "endpoints_hint": "Wählen Sie die öffentlichen Endpunkte aus, auf die dieser Token zugreifen darf.",
+      "endpoints_label": "Erlaubte Endpunkte",
+      "endpoints_updated": "Token-Zugriff aktualisiert",
+      "edit_endpoints": "Zugriff bearbeiten",
+      "no_endpoints": "Kein Endpunkt"
     },
     "archive": "Archivieren",
     "archive_convention": "Konvention archivieren",
@@ -210,7 +219,24 @@
       "need_investigation": "Untersuchung erforderlich",
       "origin_domain": "Ursprungsdomäne (origin):",
       "referer_page": "Ursprungsseite (referer):",
-      "unresolved": "Ungelöste Fehler"
+      "unresolved": "Ungelöste Fehler",
+      "action_details": "Details anzeigen",
+      "action_resolve": "Als gelöst markieren",
+      "action_resolve_similar": "Ähnliche lösen",
+      "action_unresolve": "Als ungelöst markieren",
+      "anonymous": "Anonym",
+      "col_code": "Code",
+      "col_date": "Datum",
+      "col_endpoint": "Endpunkt",
+      "col_ip": "IP",
+      "col_message": "Nachricht",
+      "col_referer": "Ursprungsseite",
+      "col_status": "Status",
+      "col_type": "Typ",
+      "col_user": "Benutzer",
+      "columns_label": "Spalten",
+      "resolved": "Gelöst",
+      "unresolved_short": "Ungelöst"
     },
     "errors_24h": "Fehler (24h)",
     "event_reminders": "Veranstaltungserinnerungen",

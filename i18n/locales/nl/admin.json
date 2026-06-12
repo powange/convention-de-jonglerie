@@ -93,7 +93,16 @@
       "revoke": "Intrekken",
       "revoked": "Ingetrokken",
       "title": "Openbare API-tokens",
-      "toggle_error": "Fout bij het bijwerken van de token"
+      "toggle_error": "Fout bij het bijwerken van de token",
+      "endpoints": {
+        "editions": "Lijst met komende edities",
+        "error-logs": "Onopgeloste API-fouten"
+      },
+      "endpoints_hint": "Vink de openbare endpoints aan waartoe dit token toegang heeft.",
+      "endpoints_label": "Toegestane endpoints",
+      "endpoints_updated": "Tokentoegang bijgewerkt",
+      "edit_endpoints": "Toegang bewerken",
+      "no_endpoints": "Geen endpoint"
     },
     "archive": "Archiveren",
     "archive_convention": "Conventie archiveren",
@@ -210,7 +219,24 @@
       "need_investigation": "Vereisen onderzoek",
       "origin_domain": "Oorsprongsdomein (origin):",
       "referer_page": "Oorsprongspagina (referer):",
-      "unresolved": "Onopgeloste fouten"
+      "unresolved": "Onopgeloste fouten",
+      "action_details": "Details bekijken",
+      "action_resolve": "Markeren als opgelost",
+      "action_resolve_similar": "Vergelijkbare oplossen",
+      "action_unresolve": "Markeren als onopgelost",
+      "anonymous": "Anoniem",
+      "col_code": "Code",
+      "col_date": "Datum",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Bericht",
+      "col_referer": "Bronpagina",
+      "col_status": "Status",
+      "col_type": "Type",
+      "col_user": "Gebruiker",
+      "columns_label": "Kolommen",
+      "resolved": "Opgelost",
+      "unresolved_short": "Onopgelost"
     },
     "errors_24h": "Fouten (24u)",
     "event_reminders": "Evenementherinneringen",

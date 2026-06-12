@@ -93,7 +93,16 @@
       "revoke": "Отозвать",
       "revoked": "Отозван",
       "title": "Токены публичного API",
-      "toggle_error": "Ошибка при обновлении токена"
+      "toggle_error": "Ошибка при обновлении токена",
+      "endpoints": {
+        "editions": "Список предстоящих выпусков",
+        "error-logs": "Нерешённые ошибки API"
+      },
+      "endpoints_hint": "Отметьте публичные эндпоинты, к которым может обращаться этот токен.",
+      "endpoints_label": "Разрешённые эндпоинты",
+      "endpoints_updated": "Доступ токена обновлён",
+      "edit_endpoints": "Изменить доступ",
+      "no_endpoints": "Нет эндпоинтов"
     },
     "archive": "Архивировать",
     "archive_convention": "Архивировать конвенцию",
@@ -210,7 +219,24 @@
       "need_investigation": "Требуют расследования",
       "origin_domain": "Домен происхождения (origin):",
       "referer_page": "Страница происхождения (referer):",
-      "unresolved": "Нерешённые ошибки"
+      "unresolved": "Нерешённые ошибки",
+      "action_details": "Подробнее",
+      "action_resolve": "Отметить как решённое",
+      "action_resolve_similar": "Решить похожие",
+      "action_unresolve": "Отметить как нерешённое",
+      "anonymous": "Аноним",
+      "col_code": "Код",
+      "col_date": "Дата",
+      "col_endpoint": "Эндпоинт",
+      "col_ip": "IP",
+      "col_message": "Сообщение",
+      "col_referer": "Страница-источник",
+      "col_status": "Статус",
+      "col_type": "Тип",
+      "col_user": "Пользователь",
+      "columns_label": "Столбцы",
+      "resolved": "Решено",
+      "unresolved_short": "Не решено"
     },
     "errors_24h": "Ошибки (24ч)",
     "event_reminders": "Напоминания о событиях",

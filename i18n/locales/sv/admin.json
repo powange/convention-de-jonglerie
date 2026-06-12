@@ -93,7 +93,16 @@
       "revoke": "Återkalla",
       "revoked": "Återkallad",
       "title": "Offentliga API-tokens",
-      "toggle_error": "Fel när token skulle uppdateras"
+      "toggle_error": "Fel när token skulle uppdateras",
+      "endpoints": {
+        "editions": "Lista över kommande utgåvor",
+        "error-logs": "Olösta API-fel"
+      },
+      "endpoints_hint": "Markera de offentliga endpoints som detta token har åtkomst till.",
+      "endpoints_label": "Tillåtna endpoints",
+      "endpoints_updated": "Tokenåtkomst uppdaterad",
+      "edit_endpoints": "Redigera åtkomst",
+      "no_endpoints": "Ingen endpoint"
     },
     "archive": "Arkiv",
     "archive_convention": "Arkivera avtalet",
@@ -210,7 +219,24 @@
       "need_investigation": "Kräver utredning",
       "origin_domain": "Ursprungsdomän:",
       "referer_page": "Hemsidan (referent):",
-      "unresolved": "Olösta fel"
+      "unresolved": "Olösta fel",
+      "action_details": "Visa detaljer",
+      "action_resolve": "Markera som löst",
+      "action_resolve_similar": "Lös liknande",
+      "action_unresolve": "Markera som olöst",
+      "anonymous": "Anonym",
+      "col_code": "Kod",
+      "col_date": "Datum",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Meddelande",
+      "col_referer": "Ursprungssida",
+      "col_status": "Status",
+      "col_type": "Typ",
+      "col_user": "Användare",
+      "columns_label": "Kolumner",
+      "resolved": "Löst",
+      "unresolved_short": "Olöst"
     },
     "errors_24h": "Fel (24h)",
     "event_reminders": "Påminnelser om evenemang",

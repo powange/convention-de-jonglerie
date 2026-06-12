@@ -93,7 +93,16 @@
       "revoke": "Revoca",
       "revoked": "Revocato",
       "title": "Token dell'API pubblica",
-      "toggle_error": "Errore durante l'aggiornamento del token"
+      "toggle_error": "Errore durante l'aggiornamento del token",
+      "endpoints": {
+        "editions": "Elenco delle prossime edizioni",
+        "error-logs": "Errori API non risolti"
+      },
+      "endpoints_hint": "Seleziona gli endpoint pubblici a cui questo token può accedere.",
+      "endpoints_label": "Endpoint consentiti",
+      "endpoints_updated": "Accesso del token aggiornato",
+      "edit_endpoints": "Modifica accesso",
+      "no_endpoints": "Nessun endpoint"
     },
     "archive": "Archiviare",
     "archive_convention": "Archivia convegno",
@@ -210,7 +219,24 @@
       "need_investigation": "Richiedono investigazione",
       "origin_domain": "Dominio di origine (origin):",
       "referer_page": "Pagina di origine (referer):",
-      "unresolved": "Errori non risolti"
+      "unresolved": "Errori non risolti",
+      "action_details": "Vedi dettagli",
+      "action_resolve": "Segna come risolto",
+      "action_resolve_similar": "Risolvi simili",
+      "action_unresolve": "Segna come non risolto",
+      "anonymous": "Anonimo",
+      "col_code": "Codice",
+      "col_date": "Data",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Messaggio",
+      "col_referer": "Pagina di origine",
+      "col_status": "Stato",
+      "col_type": "Tipo",
+      "col_user": "Utente",
+      "columns_label": "Colonne",
+      "resolved": "Risolto",
+      "unresolved_short": "Non risolto"
     },
     "errors_24h": "Errori (24h)",
     "event_reminders": "Promemoria eventi",

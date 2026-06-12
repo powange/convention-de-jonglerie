@@ -93,7 +93,16 @@
       "revoke": "Revoke",
       "revoked": "Revoked",
       "title": "Public API tokens",
-      "toggle_error": "Error while updating the token"
+      "toggle_error": "Error while updating the token",
+      "endpoints": {
+        "editions": "List of upcoming editions",
+        "error-logs": "Unresolved API errors"
+      },
+      "endpoints_hint": "Check the public endpoints this token can access.",
+      "endpoints_label": "Allowed endpoints",
+      "endpoints_updated": "Token access updated",
+      "edit_endpoints": "Edit access",
+      "no_endpoints": "No endpoint"
     },
     "archive": "Archive",
     "archive_convention": "Archive convention",
@@ -210,7 +219,24 @@
       "need_investigation": "Need investigation",
       "origin_domain": "Origin domain:",
       "referer_page": "Referer page:",
-      "unresolved": "Unresolved errors"
+      "unresolved": "Unresolved errors",
+      "action_details": "View details",
+      "action_resolve": "Mark as resolved",
+      "action_resolve_similar": "Resolve similar",
+      "action_unresolve": "Mark as unresolved",
+      "anonymous": "Anonymous",
+      "col_code": "Code",
+      "col_date": "Date",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Message",
+      "col_referer": "Origin page",
+      "col_status": "Status",
+      "col_type": "Type",
+      "col_user": "User",
+      "columns_label": "Columns",
+      "resolved": "Resolved",
+      "unresolved_short": "Unresolved"
     },
     "errors_24h": "Errors (24h)",
     "event_reminders": "Event Reminders",

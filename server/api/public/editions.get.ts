@@ -1,37 +1,21 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { getSiteUrl } from '#server/utils/emailService'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
+import { requireApiToken } from '#server/utils/public-api-auth'
 
 /**
  * API publique : liste des éditions à venir (statut PUBLISHED, endDate >= maintenant).
  *
- * Destinée aux sites partenaires. Authentification par token d'API passé en query param :
+ * Destinée aux sites partenaires. Authentification par token d'API :
  *   GET /api/public/editions?token=<token>
+ *   ou en-tête `Authorization: Bearer <token>`
  *
- * Le token est géré depuis l'administration (/admin/api-tokens).
+ * Le token est géré depuis l'administration (/admin/api-tokens) et est partagé
+ * entre tous les endpoints publics.
  */
 export default wrapApiHandler(
   async (event) => {
-    const { token } = getQuery(event)
-
-    if (!token || typeof token !== 'string') {
-      throw createError({ status: 401, message: 'Token requis' })
-    }
-
-    const apiToken = await prisma.apiToken.findUnique({
-      where: { token },
-      select: { id: true, isActive: true },
-    })
-
-    if (!apiToken || !apiToken.isActive) {
-      throw createError({ status: 401, message: 'Token invalide' })
-    }
-
-    // Tracer l'utilisation du token
-    await prisma.apiToken.update({
-      where: { id: apiToken.id },
-      data: { lastUsedAt: new Date() },
-    })
+    await requireApiToken(event, 'editions')
 
     const editions = await prisma.edition.findMany({
       where: {

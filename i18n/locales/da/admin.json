@@ -93,7 +93,16 @@
       "revoke": "Tilbagekald",
       "revoked": "Tilbagekaldt",
       "title": "Offentlige API-tokens",
-      "toggle_error": "Fejl ved opdatering af token"
+      "toggle_error": "Fejl ved opdatering af token",
+      "endpoints": {
+        "editions": "Liste over kommende udgaver",
+        "error-logs": "Uløste API-fejl"
+      },
+      "endpoints_hint": "Markér de offentlige endpoints, som dette token kan tilgå.",
+      "endpoints_label": "Tilladte endpoints",
+      "endpoints_updated": "Token-adgang opdateret",
+      "edit_endpoints": "Rediger adgang",
+      "no_endpoints": "Intet endpoint"
     },
     "archive": "Arkiver",
     "archive_convention": "Arkiver konvention",
@@ -210,7 +219,24 @@
       "need_investigation": "Kræver undersøgelse",
       "origin_domain": "Oprindelsesdomæne (origin):",
       "referer_page": "Oprindelsesside (referer):",
-      "unresolved": "Uløste fejl"
+      "unresolved": "Uløste fejl",
+      "action_details": "Se detaljer",
+      "action_resolve": "Markér som løst",
+      "action_resolve_similar": "Løs lignende",
+      "action_unresolve": "Markér som uløst",
+      "anonymous": "Anonym",
+      "col_code": "Kode",
+      "col_date": "Dato",
+      "col_endpoint": "Endpoint",
+      "col_ip": "IP",
+      "col_message": "Besked",
+      "col_referer": "Oprindelsesside",
+      "col_status": "Status",
+      "col_type": "Type",
+      "col_user": "Bruger",
+      "columns_label": "Kolonner",
+      "resolved": "Løst",
+      "unresolved_short": "Uløst"
     },
     "errors_24h": "Fejl (24t)",
     "event_reminders": "Begivenhedspåmindelser",

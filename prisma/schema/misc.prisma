@@ -193,6 +193,7 @@ model ApiToken {
   name        String // libellé du partenaire (ex: "Site fédération")
   token       String    @unique // valeur du token, 32 caractères hex
   isActive    Boolean   @default(true)
+  scopes      Json? // tableau des clés d'endpoints autorisés (cf. PUBLIC_API_ENDPOINTS) ; null = accès à tous les endpoints (rétrocompatibilité)
   lastUsedAt  DateTime? // mis à jour à chaque appel réussi
   createdAt   DateTime  @default(now())
   createdById Int?

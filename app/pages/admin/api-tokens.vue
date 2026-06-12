@@ -125,9 +125,39 @@
                 {{ token.createdBy.pseudo }}
               </span>
             </div>
+
+            <!-- Endpoints autorisés -->
+            <div class="flex flex-wrap items-center gap-2 mt-3">
+              <span class="text-sm text-gray-500">
+                {{ $t('admin.api_tokens.endpoints_label') }}:
+              </span>
+              <template v-if="tokenScopes(token).length">
+                <UBadge
+                  v-for="key in tokenScopes(token)"
+                  :key="key"
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                >
+                  {{ endpointLabel(key) }}
+                </UBadge>
+              </template>
+              <UBadge v-else color="neutral" variant="soft" size="sm">
+                {{ $t('admin.api_tokens.no_endpoints') }}
+              </UBadge>
+            </div>
           </div>
 
           <div class="flex items-center gap-2 shrink-0">
+            <UButton
+              color="neutral"
+              variant="soft"
+              size="sm"
+              icon="i-heroicons-adjustments-horizontal"
+              @click="openEditModal(token)"
+            >
+              {{ $t('admin.api_tokens.edit_endpoints') }}
+            </UButton>
             <UButton
               :color="token.isActive ? 'warning' : 'success'"
               variant="soft"
@@ -159,15 +189,39 @@
         <h3 class="text-lg font-semibold">{{ $t('admin.api_tokens.create') }}</h3>
       </template>
       <template #body>
-        <UFormField :label="$t('admin.api_tokens.name')" required>
-          <UInput
-            v-model="createForm.name"
-            size="lg"
-            class="w-full"
-            :placeholder="$t('admin.api_tokens.name_placeholder')"
-            @keyup.enter="submitCreate"
-          />
-        </UFormField>
+        <div class="space-y-4">
+          <UFormField :label="$t('admin.api_tokens.name')" required>
+            <UInput
+              v-model="createForm.name"
+              size="lg"
+              class="w-full"
+              :placeholder="$t('admin.api_tokens.name_placeholder')"
+              @keyup.enter="submitCreate"
+            />
+          </UFormField>
+
+          <UFormField :label="$t('admin.api_tokens.endpoints_label')">
+            <p class="text-xs text-gray-500 mb-2">{{ $t('admin.api_tokens.endpoints_hint') }}</p>
+            <div class="space-y-2">
+              <label
+                v-for="endpoint in availableEndpoints"
+                :key="endpoint.key"
+                class="flex items-start gap-2 cursor-pointer"
+              >
+                <UCheckbox
+                  :model-value="createForm.scopes.includes(endpoint.key)"
+                  @update:model-value="(v) => toggleScope(createForm.scopes, endpoint.key, !!v)"
+                />
+                <span class="text-sm">
+                  <span class="font-medium">{{ endpointLabel(endpoint.key) }}</span>
+                  <code class="ml-2 text-xs text-gray-500">
+                    {{ endpoint.method }} {{ endpoint.path }}
+                  </code>
+                </span>
+              </label>
+            </div>
+          </UFormField>
+        </div>
       </template>
       <template #footer>
         <div class="flex justify-end gap-3">
@@ -185,6 +239,46 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal d'édition des endpoints -->
+    <UModal v-model:open="showEditModal">
+      <template #header>
+        <h3 class="text-lg font-semibold">{{ $t('admin.api_tokens.edit_endpoints') }}</h3>
+      </template>
+      <template #body>
+        <UFormField :label="$t('admin.api_tokens.endpoints_label')">
+          <p class="text-xs text-gray-500 mb-2">{{ $t('admin.api_tokens.endpoints_hint') }}</p>
+          <div class="space-y-2">
+            <label
+              v-for="endpoint in availableEndpoints"
+              :key="endpoint.key"
+              class="flex items-start gap-2 cursor-pointer"
+            >
+              <UCheckbox
+                :model-value="editForm.scopes.includes(endpoint.key)"
+                @update:model-value="(v) => toggleScope(editForm.scopes, endpoint.key, !!v)"
+              />
+              <span class="text-sm">
+                <span class="font-medium">{{ endpointLabel(endpoint.key) }}</span>
+                <code class="ml-2 text-xs text-gray-500">
+                  {{ endpoint.method }} {{ endpoint.path }}
+                </code>
+              </span>
+            </label>
+          </div>
+        </UFormField>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton color="neutral" variant="ghost" @click="showEditModal = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="isEditing(editForm.id)" @click="submitEditScopes">
+            {{ $t('common.save') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -198,9 +292,16 @@ interface ApiTokenItem {
   name: string
   token: string
   isActive: boolean
+  scopes: string[] | null
   lastUsedAt: string | null
   createdAt: string
   createdBy: { id: number; pseudo: string } | null
+}
+
+interface ApiEndpoint {
+  key: string
+  method: string
+  path: string
 }
 
 const { t } = useI18n()
@@ -209,24 +310,42 @@ const { copy } = useClipboard()
 
 const baseUrl = computed(() => (import.meta.client ? window.location.origin : ''))
 
-// Liste des tokens
-const { data, pending, error, refresh } = await useFetch<{ tokens: ApiTokenItem[] }>(
-  '/api/admin/api-tokens'
-)
+// Liste des tokens + registre des endpoints publics disponibles
+const { data, pending, error, refresh } = await useFetch<{
+  tokens: ApiTokenItem[]
+  endpoints: ApiEndpoint[]
+}>('/api/admin/api-tokens')
 const tokens = computed(() => data.value?.tokens ?? [])
+const availableEndpoints = computed(() => data.value?.endpoints ?? [])
+
+// Libellé i18n d'un endpoint à partir de sa clé
+const endpointLabel = (key: string) => t(`admin.api_tokens.endpoints.${key}`)
+
+// Endpoints autorisés pour un token (scopes null = accès à tous les endpoints)
+const tokenScopes = (token: ApiTokenItem): string[] =>
+  token.scopes ?? availableEndpoints.value.map((endpoint) => endpoint.key)
+
+// Coche/décoche une clé d'endpoint dans une liste réactive
+const toggleScope = (list: string[], key: string, checked: boolean) => {
+  const index = list.indexOf(key)
+  if (checked && index === -1) list.push(key)
+  else if (!checked && index !== -1) list.splice(index, 1)
+}
 
 // Création
 const showCreateModal = ref(false)
-const createForm = reactive({ name: '' })
+const createForm = reactive<{ name: string; scopes: string[] }>({ name: '', scopes: [] })
 
 const openCreateModal = () => {
   createForm.name = ''
+  // Par défaut, le token a accès à tous les endpoints
+  createForm.scopes = availableEndpoints.value.map((endpoint) => endpoint.key)
   showCreateModal.value = true
 }
 
 const { execute: doCreate, loading: creating } = useApiAction('/api/admin/api-tokens', {
   method: 'POST',
-  body: () => ({ name: createForm.name.trim() }),
+  body: () => ({ name: createForm.name.trim(), scopes: createForm.scopes }),
   successMessage: { title: t('admin.api_tokens.created') },
   errorMessages: { default: t('admin.api_tokens.create_error') },
   onSuccess: async () => {
@@ -239,6 +358,32 @@ const submitCreate = () => {
   if (!createForm.name.trim()) return
   doCreate()
 }
+
+// Édition des endpoints autorisés
+const showEditModal = ref(false)
+const editForm = reactive<{ id: number; scopes: string[] }>({ id: 0, scopes: [] })
+
+const openEditModal = (token: ApiTokenItem) => {
+  editForm.id = token.id
+  editForm.scopes = [...tokenScopes(token)]
+  showEditModal.value = true
+}
+
+const { execute: doEditScopes, isLoading: isEditing } = useApiActionById(
+  (id) => `/api/admin/api-tokens/${id}`,
+  {
+    method: 'PATCH',
+    body: () => ({ scopes: editForm.scopes }),
+    successMessage: { title: t('admin.api_tokens.endpoints_updated') },
+    errorMessages: { default: t('admin.api_tokens.toggle_error') },
+    onSuccess: async () => {
+      showEditModal.value = false
+      await refresh()
+    },
+  }
+)
+
+const submitEditScopes = () => doEditScopes(editForm.id)
 
 // Activation / révocation
 const { execute: doToggle, isLoading: isToggling } = useApiActionById(

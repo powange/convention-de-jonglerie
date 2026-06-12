@@ -16,6 +16,7 @@ Documentation des grandes fonctionnalités de l'application :
 - **[lost-found.md](./lost-found.md)** — Objets trouvés et perdus
 - **[project-costs.md](./project-costs.md)** — Coûts du projet et donations café (Stripe)
 - **[volunteer-qr-code-tokens.md](./volunteer-qr-code-tokens.md)** — Tokens QR pour les bénévoles
+- **[public-api.md](./public-api.md)** — API publique (`/api/public/*`) et tokens d'accès avec scopes par endpoint
 - **[volunteers/](./volunteers/)** — Sous-dossier dédié au système de bénévolat
 - **[ticketing/](./ticketing/)** — Sous-dossier dédié à la billetterie
 

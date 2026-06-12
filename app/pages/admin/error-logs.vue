@@ -199,6 +199,19 @@
               <UBadge color="neutral" variant="soft">{{ pagination.total }}</UBadge>
             </h3>
             <div class="flex items-center gap-4">
+              <!-- Sélecteur de colonnes visibles -->
+              <UDropdownMenu
+                v-if="logs.length"
+                :items="columnVisibilityItems"
+                :content="{ align: 'end' }"
+              >
+                <UButton
+                  icon="i-heroicons-view-columns"
+                  color="neutral"
+                  variant="outline"
+                  :label="$t('admin.error_logs.columns_label')"
+                />
+              </UDropdownMenu>
               <!-- Sélecteur de taille de page -->
               <USelect
                 v-model="pagination.pageSize"
@@ -226,75 +239,156 @@
           <p class="text-sm text-gray-400">{{ $t('admin.good_news') }}</p>
         </div>
 
-        <div v-else class="divide-y divide-gray-200 dark:divide-gray-700">
-          <div
-            v-for="log in logs"
-            :key="log.id"
-            class="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-            @click="openLogDetails(log)"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex-1 min-w-0">
-                <!-- Première ligne : message et métadonnées -->
-                <div class="flex items-start justify-between mb-2">
-                  <div class="flex-1 min-w-0">
-                    <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {{ log.message }}
-                    </h4>
-                    <div class="mt-1 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-                      <span class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-calendar" />
-                        {{ formatDateTime(log.createdAt) }}
-                      </span>
-                      <span class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-link" />
-                        {{ log.method }} {{ log.path }}
-                      </span>
-                      <span v-if="log.user" class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-user" />
-                        {{ log.user.pseudo }}
-                      </span>
-                      <span v-if="log.ip" class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-globe-alt" />
-                        {{ log.ip }}
-                      </span>
-                      <span v-if="log.referer" class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-arrow-left-on-rectangle" />
-                        {{ truncateUrl(log.referer) }}
-                      </span>
-                    </div>
-                  </div>
+        <UTable
+          v-else
+          ref="table"
+          :data="logs"
+          :columns="columns"
+          class="w-full"
+          :ui="{ tr: 'cursor-pointer' }"
+          @select="onRowSelect"
+        >
+          <!-- Statut (résolu / non résolu) -->
+          <template #status-cell="{ row }">
+            <UIcon
+              :name="
+                row.original.resolved
+                  ? 'i-heroicons-check-circle'
+                  : 'i-heroicons-exclamation-circle'
+              "
+              class="h-5 w-5"
+              :class="row.original.resolved ? 'text-green-500' : 'text-red-500'"
+              :title="
+                row.original.resolved
+                  ? $t('admin.error_logs.resolved')
+                  : $t('admin.error_logs.unresolved_short')
+              "
+            />
+          </template>
 
-                  <!-- Badges de statut -->
-                  <div class="flex items-center gap-2 ml-4">
-                    <UBadge :color="getStatusCodeColor(log.statusCode)" variant="subtle">
-                      {{ log.statusCode }}
-                    </UBadge>
-
-                    <UBadge v-if="log.errorType" color="neutral" variant="outline">
-                      {{ log.errorType }}
-                    </UBadge>
-
-                    <UBadge
-                      :color="log.resolved ? 'success' : 'error'"
-                      :variant="log.resolved ? 'subtle' : 'solid'"
-                    >
-                      {{ log.resolved ? 'Résolu' : 'Non résolu' }}
-                    </UBadge>
-                  </div>
-                </div>
-
-                <!-- Notes admin si présentes -->
-                <div v-if="log.adminNotes" class="mt-2">
-                  <p class="text-sm text-blue-600 dark:text-blue-400">
-                    <UIcon name="i-heroicons-chat-bubble-left" class="inline mr-1" />
-                    {{ log.adminNotes }}
-                  </p>
-                </div>
-              </div>
+          <!-- Date (triable) -->
+          <template #createdAt-header>
+            <UButton
+              :label="$t('admin.error_logs.col_date')"
+              :icon="sortIcon('createdAt')"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              class="-mx-1.5"
+              @click="toggleSort('createdAt')"
+            />
+          </template>
+          <template #createdAt-cell="{ row }">
+            <div class="whitespace-nowrap">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ formatRelative(row.original.createdAt) }}
+              </p>
+              <p class="text-xs text-gray-500">{{ formatDateTime(row.original.createdAt) }}</p>
             </div>
-          </div>
-        </div>
+          </template>
+
+          <!-- Code HTTP (triable) -->
+          <template #statusCode-header>
+            <UButton
+              :label="$t('admin.error_logs.col_code')"
+              :icon="sortIcon('statusCode')"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              class="-mx-1.5"
+              @click="toggleSort('statusCode')"
+            />
+          </template>
+          <template #statusCode-cell="{ row }">
+            <UBadge :color="getStatusCodeColor(row.original.statusCode)" variant="subtle">
+              {{ row.original.statusCode }}
+            </UBadge>
+          </template>
+
+          <!-- Type d'erreur -->
+          <template #errorType-cell="{ row }">
+            <UBadge v-if="row.original.errorType" color="neutral" variant="outline">
+              {{ row.original.errorType }}
+            </UBadge>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+
+          <!-- Endpoint (méthode + path, triable par path) -->
+          <template #endpoint-header>
+            <UButton
+              :label="$t('admin.error_logs.col_endpoint')"
+              :icon="sortIcon('path')"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              class="-mx-1.5"
+              @click="toggleSort('path')"
+            />
+          </template>
+          <template #endpoint-cell="{ row }">
+            <div class="flex items-center gap-2 whitespace-nowrap">
+              <UBadge color="neutral" variant="soft" size="sm">{{ row.original.method }}</UBadge>
+              <code class="text-xs text-gray-600 dark:text-gray-300" :title="row.original.path">
+                {{ row.original.path }}
+              </code>
+            </div>
+          </template>
+
+          <!-- Message -->
+          <template #message-cell="{ row }">
+            <p
+              class="max-w-md truncate text-sm text-gray-900 dark:text-white"
+              :title="row.original.message"
+            >
+              {{ row.original.message }}
+            </p>
+          </template>
+
+          <!-- Utilisateur -->
+          <template #user-cell="{ row }">
+            <span v-if="row.original.user" class="text-sm">{{ row.original.user.pseudo }}</span>
+            <span v-else class="text-sm italic text-gray-400">
+              {{ $t('admin.error_logs.anonymous') }}
+            </span>
+          </template>
+
+          <!-- Page d'origine (referer) -->
+          <template #referer-cell="{ row }">
+            <a
+              v-if="row.original.referer"
+              :href="row.original.referer"
+              target="_blank"
+              rel="noopener"
+              class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              :title="row.original.referer"
+              @click.stop
+            >
+              {{ truncateUrl(row.original.referer, 40) }}
+            </a>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+
+          <!-- IP -->
+          <template #ip-cell="{ row }">
+            <span v-if="row.original.ip" class="font-mono text-xs text-gray-600 dark:text-gray-300">
+              {{ row.original.ip }}
+            </span>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+
+          <!-- Actions -->
+          <template #actions-cell="{ row }">
+            <UDropdownMenu :items="rowActions(row.original)" :content="{ align: 'end' }">
+              <UButton
+                icon="i-heroicons-ellipsis-vertical"
+                color="neutral"
+                variant="ghost"
+                square
+                @click.stop
+              />
+            </UDropdownMenu>
+          </template>
+        </UTable>
 
         <!-- Pagination -->
         <div
@@ -563,7 +657,7 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef } from 'vue'
+import { shallowRef, useTemplateRef } from 'vue'
 import { JsonViewer } from 'vue3-json-viewer'
 import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 
@@ -572,7 +666,9 @@ definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
 })
 
+const { t } = useI18n()
 const toast = useToast()
+const table = useTemplateRef('table')
 
 // Copier un JSON dans le presse-papier
 const copyJson = async (data: unknown) => {
@@ -686,6 +782,136 @@ useSeoMeta({
   description: "Surveillance et résolution des erreurs de l'API",
 })
 
+// ===== Tableau (UTable) =====
+
+// Définition des colonnes. Les colonnes optionnelles (user, referer, ip) sont
+// masquables via le sélecteur de colonnes ; statut et actions ne le sont pas.
+const columns = computed(() => [
+  {
+    id: 'status',
+    accessorKey: 'resolved',
+    header: t('admin.error_logs.col_status'),
+    enableHiding: false,
+  },
+  { id: 'createdAt', accessorKey: 'createdAt', header: t('admin.error_logs.col_date') },
+  { id: 'statusCode', accessorKey: 'statusCode', header: t('admin.error_logs.col_code') },
+  { id: 'errorType', accessorKey: 'errorType', header: t('admin.error_logs.col_type') },
+  { id: 'endpoint', accessorKey: 'path', header: t('admin.error_logs.col_endpoint') },
+  { id: 'message', accessorKey: 'message', header: t('admin.error_logs.col_message') },
+  { id: 'user', accessorKey: 'user.pseudo', header: t('admin.error_logs.col_user') },
+  { id: 'referer', accessorKey: 'referer', header: t('admin.error_logs.col_referer') },
+  { id: 'ip', accessorKey: 'ip', header: t('admin.error_logs.col_ip') },
+  { id: 'actions', accessorKey: 'actions', header: '', enableHiding: false },
+])
+
+// Items du menu de visibilité des colonnes (piloté par l'API TanStack du tableau)
+const columnVisibilityItems = computed(() => {
+  const cols = table.value?.tableApi?.getAllColumns?.() ?? []
+  return cols
+    .filter((column: any) => column.getCanHide())
+    .map((column: any) => ({
+      label: typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id,
+      type: 'checkbox' as const,
+      checked: column.getIsVisible(),
+      onUpdateChecked(checked: boolean) {
+        column.toggleVisibility(!!checked)
+      },
+      onSelect(e: Event) {
+        e.preventDefault()
+      },
+    }))
+})
+
+// Tri côté serveur (les seuls champs supportés par l'API sont createdAt/statusCode/path)
+const sort = ref<{ field: 'createdAt' | 'statusCode' | 'path'; dir: 'asc' | 'desc' }>({
+  field: 'createdAt',
+  dir: 'desc',
+})
+
+const toggleSort = (field: 'createdAt' | 'statusCode' | 'path') => {
+  if (sort.value.field === field) {
+    sort.value.dir = sort.value.dir === 'asc' ? 'desc' : 'asc'
+  } else {
+    sort.value.field = field
+    sort.value.dir = 'desc'
+  }
+  pagination.value.page = 1
+  loadLogs()
+}
+
+const sortIcon = (field: 'createdAt' | 'statusCode' | 'path') => {
+  if (sort.value.field !== field) return 'i-heroicons-arrows-up-down'
+  return sort.value.dir === 'asc' ? 'i-heroicons-bars-arrow-up' : 'i-heroicons-bars-arrow-down'
+}
+
+// Clic sur une ligne → ouvre le slideover de détails
+const onRowSelect = (_e: Event, row: any) => {
+  openLogDetails(row.original)
+}
+
+// Menu d'actions par ligne
+const rowActions = (log: any) => [
+  [
+    {
+      label: t('admin.error_logs.action_details'),
+      icon: 'i-heroicons-eye',
+      onSelect: () => openLogDetails(log),
+    },
+    {
+      label: log.resolved
+        ? t('admin.error_logs.action_unresolve')
+        : t('admin.error_logs.action_resolve'),
+      icon: log.resolved ? 'i-heroicons-x-circle' : 'i-heroicons-check-circle',
+      onSelect: () => quickResolve(log, !log.resolved),
+    },
+    {
+      label: t('admin.error_logs.action_resolve_similar'),
+      icon: 'i-heroicons-check-badge',
+      onSelect: () => quickResolveSimilar(log),
+    },
+  ],
+]
+
+// Résolution rapide depuis le tableau (sans ouvrir le slideover)
+const quickResolve = async (log: any, resolved: boolean) => {
+  try {
+    const result: any = await $fetch(`/api/admin/error-logs/${log.id}/resolve`, {
+      method: 'PATCH',
+      body: { resolved, adminNotes: log.adminNotes ?? undefined },
+    })
+    toast.add({ color: 'success', title: 'Succès', description: result.message })
+    loadLogs()
+  } catch {
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Impossible de mettre à jour le statut',
+    })
+  }
+}
+
+const quickResolveSimilar = (log: any) => {
+  const confirmed = confirm(
+    `Êtes-vous sûr de vouloir marquer comme résolus TOUS les logs avec le message d'erreur suivant ?\n\n"${log.message}"\n\nCette action ne peut pas être annulée.`
+  )
+  if (!confirmed) return
+  $fetch('/api/admin/error-logs/resolve-similar', {
+    method: 'POST',
+    body: { message: log.message, adminNotes: 'Résolu en masse - logs identiques' },
+  })
+    .then((result: any) => {
+      toast.add({ color: 'success', title: 'Succès', description: result.message })
+      loadLogs()
+    })
+    .catch(() => {
+      toast.add({
+        color: 'error',
+        title: 'Erreur',
+        description: 'Impossible de résoudre les logs identiques',
+      })
+    })
+}
+
 // Fonctions utilitaires
 const formatDateTime = (dateString: string) => {
   return new Date(dateString).toLocaleString('fr-FR', {
@@ -695,6 +921,20 @@ const formatDateTime = (dateString: string) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+// Date relative (« il y a 5 min ») via Intl, sans dépendance externe
+const relativeTimeFormat = new Intl.RelativeTimeFormat('fr', { numeric: 'auto' })
+const formatRelative = (dateString: string) => {
+  const diffMs = Date.now() - new Date(dateString).getTime()
+  const seconds = Math.round(diffMs / 1000)
+  if (seconds < 60) return relativeTimeFormat.format(-seconds, 'second')
+  const minutes = Math.round(seconds / 60)
+  if (minutes < 60) return relativeTimeFormat.format(-minutes, 'minute')
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return relativeTimeFormat.format(-hours, 'hour')
+  const days = Math.round(hours / 24)
+  return relativeTimeFormat.format(-days, 'day')
 }
 
 const getStatusCodeColor = (statusCode: number) => {
@@ -769,6 +1009,8 @@ const loadLogs = async () => {
     if (filters.value.path) params.append('path', filters.value.path)
     if (filters.value.ip) params.append('ip', filters.value.ip)
     if (filters.value.user) params.append('user', filters.value.user)
+    params.append('sortField', sort.value.field)
+    params.append('sortDir', sort.value.dir)
 
     const response = await $fetch(`/api/admin/error-logs?${params}`)
 

@@ -216,5 +216,7 @@ Cette commande s'arrête si une étape échoue.
 - **UFormField** : Composant de champ de formulaire avec étiquette et validation
 - **UFieldGroup** : Composant de groupe de boutons pour les sélections multiples
 - **UdropdownMenu** : Composant de menu déroulant pour les actions
+- **UTable** : Tableau de données (TanStack) avec slots `#<col>-cell`/`#<col>-header`, tri, visibilité de colonnes (`tableApi`) et `@select` pour le clic ligne
+- **UCheckbox** : Case à cocher pour les formulaires et sélections multiples
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.
