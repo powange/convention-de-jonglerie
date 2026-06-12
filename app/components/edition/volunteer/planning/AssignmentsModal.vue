@@ -60,7 +60,7 @@
                     {{ assignment.user.pseudo }}
                   </p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ assignment.user.prenom }} {{ assignment.user.nom }}
+                    <UiUserName :user="assignment.user" />
                   </p>
                 </div>
               </div>
@@ -147,7 +147,7 @@
                 {{ volunteer.pseudo }}
               </p>
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ volunteer.prenom }} {{ volunteer.nom }}
+                <UiUserName :user="volunteer" />
               </p>
               <p class="text-xs text-gray-400 dark:text-gray-500">
                 {{ volunteer.assignmentsCount }} {{ t('volunteers.current_assignments') }}

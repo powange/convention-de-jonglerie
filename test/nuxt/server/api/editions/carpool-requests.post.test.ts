@@ -87,8 +87,9 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
           select: {
             id: true,
             pseudo: true,
-            prenom: true,
             nom: true,
+            prenom: true,
+            pronouns: true,
           },
         },
       },

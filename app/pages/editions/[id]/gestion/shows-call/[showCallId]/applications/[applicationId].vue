@@ -422,7 +422,7 @@
               <div class="flex items-center gap-3">
                 <UiUserAvatar :user="application.user" size="md" />
                 <p v-if="application.user.prenom || application.user.nom" class="font-medium">
-                  {{ application.user.prenom }} {{ application.user.nom }}
+                  <UiUserName :user="application.user" />
                 </p>
               </div>
               <p v-if="application.user.email">

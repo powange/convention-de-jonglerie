@@ -93,7 +93,7 @@
 <script setup lang="ts">
 interface ArtistProp {
   id: number
-  user: { prenom: string; nom: string }
+  user: { prenom: string; nom: string; pronouns?: string | null }
 }
 
 const props = defineProps<{
@@ -121,7 +121,7 @@ const isOpen = computed({
 const title = computed(() => {
   if (!props.artist) return ''
   return t('artists.meals.title', {
-    name: `${props.artist.user.prenom} ${props.artist.user.nom}`,
+    name: formatUserFullName(props.artist.user, t),
   })
 })
 

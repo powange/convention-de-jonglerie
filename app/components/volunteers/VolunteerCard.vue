@@ -11,7 +11,7 @@
     <UiUserAvatar :user="volunteer.user" size="lg" class="flex-shrink-0" />
     <div class="min-w-0 flex-1">
       <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
-        {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
+        <UiUserName :user="volunteer.user" />
       </p>
       <p class="text-xs text-gray-500 truncate">{{ volunteer.user.email }}</p>
       <div class="flex items-center gap-1 mt-1">

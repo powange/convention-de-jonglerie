@@ -27,13 +27,10 @@ les renseigner (sans jamais afficher le token en clair).
 
 ### 1. Charger la configuration
 
-```bash
-PROD_URL=$(grep -E '^MONITORING_PROD_URL=' .env | cut -d= -f2-)
-# Le token est lu directement dans la requête (étape 3), jamais affiché.
-```
-
-Vérifier que `MONITORING_PROD_URL` et `MONITORING_ERROR_LOGS_TOKEN` sont bien présents et non vides.
-Si non → stop + instructions ci-dessus.
+Le chargement de la config et la requête sont encapsulés dans `scripts/check-error-logs.sh`
+(autorisé sans prompt). Le script lit `MONITORING_PROD_URL` et `MONITORING_ERROR_LOGS_TOKEN`
+dans `.env`, valide leur présence, et n'affiche jamais le token. S'il sort avec
+`MISSING_PROD_URL` / `MISSING_TOKEN` (code 3) → stop + instructions ci-dessus.
 
 ### 2. Déterminer la fenêtre de temps (`since`)
 
@@ -50,14 +47,12 @@ L'état est conservé dans `.claude/error-logs-monitor.json` (gitignoré) :
 
 ### 3. Interroger l'endpoint en production
 
-Lire le token directement dans la commande pour ne jamais l'exposer dans la sortie :
+Appeler le script dédié en lui passant la borne `since` (et éventuellement une limite). Il
+affiche le corps JSON puis une ligne `HTTP_CODE=<code>`, sans jamais exposer le token :
 
 ```bash
-PROD_URL=$(grep -E '^MONITORING_PROD_URL=' .env | cut -d= -f2-)
-TOKEN=$(grep -E '^MONITORING_ERROR_LOGS_TOKEN=' .env | cut -d= -f2-)
-SINCE="<lastCheckedAt ou maintenant-24h>"
-curl -s -H "Authorization: Bearer $TOKEN" \
-  "$PROD_URL/api/public/error-logs?since=$SINCE&limit=500"
+bash scripts/check-error-logs.sh "<lastCheckedAt ou maintenant-24h>"
+# limite personnalisée : bash scripts/check-error-logs.sh "<since>" 500
 ```
 
 Gestion des réponses :
@@ -123,10 +118,11 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
    sans afficher l'URL (qui contient un secret), en n'affichant que le code HTTP :
 
    ```bash
-   URL=$(grep -E '^PORTAINER_PROD_WEBHOOK_URL=' .env | cut -d= -f2-)
-   curl -s -o /dev/null -w "HTTP %{http_code}\n" -X POST "$URL"
+   bash scripts/trigger-prod-deploy.sh
    ```
 
+   (le script lit `PORTAINER_PROD_WEBHOOK_URL` dans `.env`, n'affiche que le code HTTP, et sort
+   avec `MISSING_WEBHOOK_URL` / code 3 si la variable est absente.)
    - `200`/`204` → redéploiement déclenché.
    - `404` → webhook introuvable/désactivé ; `409` → déploiement déjà en cours ; autre → échec.
 
@@ -136,11 +132,18 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
 
 ### 7. Mettre à jour l'état
 
-Écrire dans `.claude/error-logs-monitor.json` :
+Utiliser le script dédié (autorisé sans prompt) plutôt que d'éditer le JSON à la main :
 
-- `lastCheckedAt` = l'instant du début de ce passage (récupéré au tout début, pas la fin, pour ne
-  pas rater les erreurs survenues pendant le traitement),
-- `dismissed` = liste mise à jour des empreintes jugées « à ne pas corriger ».
+```bash
+# lastCheckedAt = instant du DÉBUT de ce passage (pas la fin), pour ne pas rater
+# les erreurs survenues pendant le traitement.
+# Empreintes optionnelles à ajouter à `dismissed` (jamais retirées) :
+bash scripts/update-error-logs-state.sh "<début-du-passage-ISO8601>" \
+  "errorType|method|path|message"
+```
+
+Le script fusionne avec l'état existant : il remplace `lastCheckedAt` et n'ajoute que les
+empreintes `dismissed` encore absentes.
 
 ### 8. Résumé final
 

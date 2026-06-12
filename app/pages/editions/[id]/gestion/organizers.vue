@@ -128,7 +128,7 @@
                     <UiUserAvatar :user="row.original.user" size="sm" />
                     <div>
                       <div class="font-medium text-sm">
-                        {{ row.original.user?.prenom }} {{ row.original.user?.nom }}
+                        <UiUserName :user="row.original.user" />
                       </div>
                       <div v-if="row.original.title" class="text-xs text-gray-500">
                         {{ row.original.title }}

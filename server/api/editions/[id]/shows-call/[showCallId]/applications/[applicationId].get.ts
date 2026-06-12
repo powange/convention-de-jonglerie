@@ -72,6 +72,7 @@ export default wrapApiHandler(
             pseudo: true,
             prenom: true,
             nom: true,
+            pronouns: true,
             email: true,
             phone: true,
             emailHash: true,

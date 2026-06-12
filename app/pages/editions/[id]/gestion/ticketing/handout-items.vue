@@ -292,7 +292,7 @@
                     <UiUserAvatar :user="org.user" size="sm" class="shrink-0" />
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-sm">
-                        {{ org.user?.prenom }} {{ org.user?.nom }}
+                        <UiUserName :user="org.user" />
                       </div>
                       <div
                         v-if="getOrganizerItems(org.id).length > 0"

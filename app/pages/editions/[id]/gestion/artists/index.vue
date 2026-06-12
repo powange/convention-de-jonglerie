@@ -193,7 +193,7 @@
               <div class="flex items-center gap-2">
                 <UiUserAvatar :user="row.original.user" size="sm" />
                 <span class="font-medium">
-                  {{ row.original.user.prenom }} {{ row.original.user.nom }}
+                  <UiUserName :user="row.original.user" />
                 </span>
               </div>
             </template>

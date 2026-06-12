@@ -48,7 +48,7 @@
                       {{ user.pseudo || user.prenom }}
                     </p>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ user.prenom }} {{ user.nom }}
+                      <UiUserName :user="user" />
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ user.email }}</p>
                   </div>
@@ -93,7 +93,7 @@
                   {{ selectedUser.pseudo || selectedUser.prenom }}
                 </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ selectedUser.prenom }} {{ selectedUser.nom }}
+                  <UiUserName :user="selectedUser" />
                 </p>
               </div>
             </div>

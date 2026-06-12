@@ -93,6 +93,7 @@ export default wrapApiHandler(
           pseudo: true,
           nom: true,
           prenom: true,
+          pronouns: true,
           isEmailVerified: true,
           isGlobalAdmin: true,
           authProvider: true,

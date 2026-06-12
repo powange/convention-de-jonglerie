@@ -63,7 +63,9 @@
       "Read(//usr/local/bin/**)",
       "Edit(/.claude/skills/full-pipeline/**)",
       "Edit(/.claude/skills/deploy/**)",
-      "Edit(/.claude/skills/check-error-logs/**)"
+      "Edit(/.claude/skills/check-error-logs/**)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
     ],
     "additionalDirectories": ["/tmp"]
   }

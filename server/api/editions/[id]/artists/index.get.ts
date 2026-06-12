@@ -28,6 +28,7 @@ export default wrapApiHandler(
             pseudo: true,
             prenom: true,
             nom: true,
+            pronouns: true,
             phone: true,
             authProvider: true,
             profilePicture: true,

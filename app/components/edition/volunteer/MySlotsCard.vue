@@ -48,10 +48,10 @@ const { user } = useUserSession()
 const assignedTimeSlots = ref<TimeSlotAssignment[]>([])
 const loading = ref(false)
 
-// Nom complet du bénévole
+// Nom complet du bénévole (avec pronom si renseigné)
 const volunteerFullName = computed(() => {
   if (!user.value) return undefined
-  return `${user.value.prenom} ${user.value.nom}`
+  return formatUserFullName(user.value, t) || undefined
 })
 
 const hasAssignedSlots = computed(() => {

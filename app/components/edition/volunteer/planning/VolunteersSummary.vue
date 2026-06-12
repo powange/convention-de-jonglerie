@@ -97,7 +97,7 @@
                         v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
                         class="text-gray-500 text-xs"
                       >
-                        ({{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }})
+                        (<UiUserName :user="volunteerStat.user" />)
                       </span>
                     </div>
                     <div class="flex items-center gap-2">
@@ -133,7 +133,7 @@
                         v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
                         class="text-sm text-gray-500"
                       >
-                        {{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }}
+                        <UiUserName :user="volunteerStat.user" />
                       </p>
                     </div>
                   </div>

@@ -118,7 +118,7 @@
               color="warning"
               variant="subtle"
             >
-              {{ artist.user.prenom }} {{ artist.user.nom }}
+              <UiUserName :user="artist.user" />
             </UBadge>
           </div>
           <p v-else class="text-sm text-gray-500">

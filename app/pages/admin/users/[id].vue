@@ -76,7 +76,7 @@
             <UiUserAvatar v-else :user="user" size="lg" border />
             <div class="flex-1">
               <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ user.prenom }} {{ user.nom }}
+                <UiUserName :user="user" />
               </h2>
               <p class="text-gray-600 dark:text-gray-400">@{{ user.pseudo }}</p>
               <div class="flex items-center gap-2 mt-2">

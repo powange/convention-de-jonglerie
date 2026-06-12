@@ -102,6 +102,7 @@ export default wrapApiHandler(
             pseudo: eo.organizer.user.pseudo,
             prenom: eo.organizer.user.prenom,
             nom: eo.organizer.user.nom,
+            pronouns: eo.organizer.user.pronouns,
             email: eo.organizer.user.email,
             emailHash: eo.organizer.user.emailHash,
             phone: eo.organizer.user.phone,

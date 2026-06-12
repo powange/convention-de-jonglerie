@@ -37,6 +37,7 @@ export default wrapApiHandler(
                 pseudo: true,
                 nom: true,
                 prenom: true,
+                pronouns: true,
                 email: true,
                 emailHash: true,
                 profilePicture: true,
@@ -75,6 +76,7 @@ export default wrapApiHandler(
           pseudo: assignment.user.pseudo,
           nom: assignment.user.nom,
           prenom: assignment.user.prenom,
+          pronouns: assignment.user.pronouns,
           emailHash: assignment.user.emailHash,
           // Les gestionnaires ont aussi accès à l'email en clair
           ...(isVolunteer ? {} : { email: assignment.user.email }),

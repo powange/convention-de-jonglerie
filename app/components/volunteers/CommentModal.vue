@@ -7,7 +7,7 @@
           <UiUserAvatar v-if="volunteer?.user" :user="volunteer.user" size="md" />
           <div>
             <p class="font-medium text-gray-900 dark:text-white">
-              {{ volunteer?.user?.prenom }} {{ volunteer?.user?.nom }}
+              <UiUserName :user="volunteer?.user" />
             </p>
             <p class="text-sm text-gray-500">{{ volunteer?.user?.email }}</p>
           </div>

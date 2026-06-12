@@ -78,9 +78,7 @@
                           v-if="volunteer.user.prenom || volunteer.user.nom"
                           class="font-normal text-green-600 dark:text-green-400"
                         >
-                          ({{
-                            [volunteer.user.prenom, volunteer.user.nom].filter(Boolean).join(' ')
-                          }})
+                          (<UiUserName :user="volunteer.user" />)
                         </span>
                       </div>
                       <div class="text-sm text-green-600 dark:text-green-400">
@@ -158,9 +156,7 @@
                             v-if="volunteer.user.prenom || volunteer.user.nom"
                             class="font-normal text-orange-600 dark:text-orange-400"
                           >
-                            ({{
-                              [volunteer.user.prenom, volunteer.user.nom].filter(Boolean).join(' ')
-                            }})
+                            (<UiUserName :user="volunteer.user" />)
                           </span>
                         </div>
                         <div class="text-sm text-orange-600 dark:text-orange-400">

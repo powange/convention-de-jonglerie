@@ -7,7 +7,7 @@
           <div class="flex items-center gap-3">
             <UiUserAvatar :user="user" size="md" border />
             <div>
-              <p class="font-medium">{{ user.prenom }} {{ user.nom }}</p>
+              <p class="font-medium"><UiUserName :user="user" /></p>
               <p class="text-sm text-gray-600 dark:text-gray-400">@{{ user.pseudo }}</p>
               <p class="text-sm text-gray-600 dark:text-gray-400">{{ user.email }}</p>
             </div>

@@ -43,10 +43,7 @@ const { t } = useI18n()
 
 const localNotes = ref('')
 
-const artistName = computed(() => {
-  if (!props.artist?.user) return ''
-  return `${props.artist.user.prenom} ${props.artist.user.nom}`
-})
+const artistName = computed(() => formatUserFullName(props.artist?.user, t))
 
 // Initialiser les notes quand la modal s'ouvre
 watch(

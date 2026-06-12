@@ -421,7 +421,7 @@
                   class="mx-auto mb-3"
                 />
                 <h4 class="text-lg font-medium text-gray-900 dark:text-white">
-                  {{ draggedVolunteer?.user?.prenom }} {{ draggedVolunteer?.user?.nom }}
+                  <UiUserName :user="draggedVolunteer?.user" />
                 </h4>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   {{ $t('pages.volunteers.team_distribution.select_team_instruction') }}
@@ -493,7 +493,7 @@
                   class="mx-auto mb-3"
                 />
                 <h4 class="text-lg font-medium text-gray-900 dark:text-white">
-                  {{ draggedVolunteer?.user?.prenom }} {{ draggedVolunteer?.user?.nom }}
+                  <UiUserName :user="draggedVolunteer?.user" />
                 </h4>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   <template v-if="draggedVolunteer?.teamAssignments?.length > 1">

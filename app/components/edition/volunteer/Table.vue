@@ -1989,7 +1989,7 @@ const columns = computed((): TableColumn<any>[] => [
       if (source === 'MANUAL') {
         // Construire le texte du tooltip
         const addedByName = addedBy
-          ? `${addedBy.prenom || ''} ${addedBy.nom || ''}`.trim() || addedBy.pseudo
+          ? formatUserFullName(addedBy, t) || addedBy.pseudo
           : t('common.unknown')
         const addedAtFormatted = addedAt ? formatDate(addedAt) : ''
 
@@ -2033,7 +2033,7 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
   const items: ContextMenuItem[] = [
     {
       type: 'label' as const,
-      label: `#${row.original.id} - ${row.original.user.pseudo} (${row.original.user.prenom} ${row.original.user.nom})`,
+      label: `#${row.original.id} - ${row.original.user.pseudo} (${formatUserFullName(row.original.user, t)})`,
     },
   ]
 

@@ -132,6 +132,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
                 pseudo: true,
                 nom: true,
                 prenom: true,
+                pronouns: true,
                 email: true,
                 emailHash: true,
                 profilePicture: true,

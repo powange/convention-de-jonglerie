@@ -90,6 +90,7 @@ export const userWithNameSelect = {
   pseudo: true,
   nom: true,
   prenom: true,
+  pronouns: true,
 } satisfies Prisma.UserSelect
 
 /**
@@ -101,6 +102,7 @@ export const userPublicProfileSelect = {
   pseudo: true,
   nom: true,
   prenom: true,
+  pronouns: true,
   profilePicture: true,
   emailHash: true,
   isVolunteer: true,
@@ -121,6 +123,7 @@ export const userAdminSelect = {
   pseudo: true,
   nom: true,
   prenom: true,
+  pronouns: true,
   phone: true,
   profilePicture: true,
   emailHash: true,
@@ -387,6 +390,7 @@ export const volunteerUserDetailedSelect = {
   pseudo: true,
   nom: true,
   prenom: true,
+  pronouns: true,
   email: true,
   phone: true,
   emailHash: true,

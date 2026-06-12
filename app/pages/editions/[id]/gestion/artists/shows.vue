@@ -177,7 +177,7 @@
                       variant="subtle"
                       size="sm"
                     >
-                      {{ showArtist.artist.user.prenom }} {{ showArtist.artist.user.nom }}
+                      <UiUserName :user="showArtist.artist.user" />
                     </UBadge>
                   </div>
                   <span v-else class="text-gray-400">{{

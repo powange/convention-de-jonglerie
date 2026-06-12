@@ -33,8 +33,7 @@ const props = defineProps<{
 
 const isOpen = defineModel<boolean>({ required: true })
 
-const artistName = computed(() => {
-  if (!props.artist?.user) return ''
-  return `${props.artist.user.prenom} ${props.artist.user.nom}`
-})
+const { t } = useI18n()
+
+const artistName = computed(() => formatUserFullName(props.artist?.user, t))
 </script>
