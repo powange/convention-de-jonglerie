@@ -749,14 +749,17 @@ const getUserActions = (user: AdminUserWithConnection) => {
 // Fonction pour démarrer une conversation privée
 const contactUserId = ref<number | null>(null)
 
-const { execute: executeStartConversation } = useApiAction('/api/messenger/private', {
+const { execute: executeStartConversation } = useApiAction<
+  unknown,
+  { conversationId: string; created: boolean }
+>('/api/messenger/private', {
   method: 'POST',
   body: () => ({ userId: contactUserId.value }),
   silentSuccess: true,
   errorMessages: { default: t('admin.contact_user_error') },
-  onSuccess: (result: any) => {
-    if (result.success) {
-      navigateTo(`/messenger?conversationId=${result.data.conversationId}`)
+  onSuccess: (result) => {
+    if (result?.conversationId) {
+      navigateTo(`/messenger?conversationId=${result.conversationId}`)
     }
   },
 })
