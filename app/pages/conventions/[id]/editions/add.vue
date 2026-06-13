@@ -35,7 +35,8 @@
 
       <EditionForm
         v-else
-        :initial-data="{ conventionId: convention.id }"
+        ref="editionFormRef"
+        :initial-data="initialData"
         :submit-button-text="$t('pages.add_edition_for_convention.submit_button')"
         :loading="submitting"
         @submit="handleAddEdition"
@@ -65,13 +66,28 @@ const conventionId = parseInt(route.params.id as string)
 const convention = ref<Convention | null>(null)
 const loading = ref(true)
 const submitting = ref(false)
+const editionFormRef = useTemplateRef('editionFormRef')
+
+// Référence stable des données initiales : éviter un objet littéral inline dans le template,
+// qui serait recréé à chaque re-render (ex. bascule de `submitting`) et déclencherait le
+// watcher d'initialData du formulaire → effacement de la saisie utilisateur.
+const initialData = computed(() => ({ conventionId: convention.value?.id }))
 
 onMounted(async () => {
   try {
     convention.value = await $fetch(`/api/conventions/${conventionId}`)
 
-    // Vérifier que l'utilisateur est l'auteur de la convention (ou qu'elle n'a pas d'auteur)
-    if (convention.value.authorId && convention.value.authorId !== authStore.user?.id) {
+    // Vérifier que l'utilisateur a le droit d'ajouter une édition à cette convention :
+    // auteur de la convention, organisateur disposant du droit « addEdition », ou
+    // administrateur global en mode admin (cohérent avec /conventions/[id]/edit).
+    const userId = authStore.user?.id
+    const isAuthor = !convention.value.authorId || convention.value.authorId === userId
+    const hasAddEditionRight =
+      convention.value.organizers?.some(
+        (organizer) => organizer.user?.id === userId && organizer.rights?.addEdition
+      ) ?? false
+
+    if (!isAuthor && !hasAddEditionRight && !authStore.isAdminModeActive) {
       throw {
         status: 403,
         message: t('errors.edition_add_denied'),
@@ -123,6 +139,8 @@ const handleAddEdition = async (data: EditionFormData) => {
     router.push('/profile/mes-conventions')
   } catch (error: unknown) {
     const httpError = error as HttpError
+    // Affiche les erreurs de validation par champ à côté des inputs concernés
+    editionFormRef.value?.setServerErrors(httpError.data)
     const errorMessage =
       httpError.data?.message || httpError.message || t('errors.edition_creation_error')
 

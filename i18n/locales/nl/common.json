@@ -754,6 +754,8 @@
     "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
     "name_min_3": "Naam moet minstens 3 tekens bevatten",
     "phone_required": "Telefoonnummer is vereist",
-    "program_max_10000": "Het programma mag niet meer dan 10000 tekens bevatten"
+    "program_max_10000": "Het programma mag niet meer dan 10000 tekens bevatten",
+    "url_invalid": "De URL moet beginnen met http:// of https://",
+    "url_max_191": "De URL mag niet langer zijn dan 191 tekens"
   }
 }

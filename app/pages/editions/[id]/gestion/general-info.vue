@@ -138,26 +138,7 @@
           name="timezone"
           :description="$t('components.edition_form.timezone_description')"
         >
-          <USelectMenu
-            v-model="timezone"
-            :items="timezoneItems"
-            :placeholder="$t('forms.placeholders.select_timezone')"
-            value-key="value"
-            :filter-fields="['label', 'city', 'region', 'value']"
-            class="w-full"
-            :ui="{ content: 'max-h-80' }"
-          >
-            <template #leading>
-              <UIcon name="i-heroicons-globe-alt" class="text-gray-400" />
-            </template>
-            <template #item-label="{ item }">
-              <div class="flex items-center gap-2">
-                <span class="font-medium">{{ item.city }}</span>
-                <span class="text-muted text-xs">{{ item.region }}</span>
-                <span class="text-muted text-xs ml-auto">{{ item.offset }}</span>
-              </div>
-            </template>
-          </USelectMenu>
+          <TimezoneSelectMenu v-model="timezone" />
         </UFormField>
 
         <!-- Adresse -->
@@ -332,7 +313,7 @@ const { locale, t } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { toApiFormat, fromApiFormat } = useDatetime()
-const { getSelectMenuItems, getDefaultTimezoneForCountry } = useTimezones()
+const { getDefaultTimezoneForCountry } = useTimezones()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
@@ -357,9 +338,6 @@ const city = ref('')
 const region = ref('')
 const country = ref('')
 const showCustomCountry = ref(false)
-
-// Items pour le sélecteur de fuseau horaire
-const timezoneItems = computed(() => getSelectMenuItems())
 
 // Date formatter
 const df = computed(() => {

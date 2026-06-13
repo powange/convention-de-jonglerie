@@ -5,6 +5,7 @@
         <h1 class="text-2xl font-bold">{{ $t('pages.add_edition.title') }}</h1>
       </template>
       <EditionForm
+        ref="editionFormRef"
         :submit-button-text="$t('pages.add_edition.submit_button')"
         :loading="editionStore.loading"
         :initial-data="initialData"
@@ -19,7 +20,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import { useEditionStore } from '~/stores/editions'
-import type { Edition } from '~/types'
+import type { Edition, HttpError } from '~/types'
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -31,6 +32,7 @@ const toast = useToast()
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
+const editionFormRef = useTemplateRef('editionFormRef')
 
 // Pré-remplir avec la convention si passée en paramètre
 const initialData = computed(() => {
@@ -53,8 +55,11 @@ const handleAddEdition = async (formData: Edition) => {
     })
     router.push('/')
   } catch (e: unknown) {
+    const httpError = e as HttpError
+    // Affiche les erreurs de validation par champ à côté des inputs concernés
+    editionFormRef.value?.setServerErrors(httpError.data)
     toast.add({
-      title: e.message || t('errors.edition_creation_failed'),
+      title: httpError.data?.message || httpError.message || t('errors.edition_creation_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

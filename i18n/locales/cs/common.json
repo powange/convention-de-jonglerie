@@ -754,6 +754,8 @@
     "name_max_200": "Název nesmí přesáhnout 200 znaků",
     "name_min_3": "Název musí obsahovat alespoň 3 znaky",
     "phone_required": "Telefonní číslo je povinné",
-    "program_max_10000": "Program nesmí překročit 10000 znaků"
+    "program_max_10000": "Program nesmí překročit 10000 znaků",
+    "url_invalid": "Adresa URL musí začínat http:// nebo https://",
+    "url_max_191": "Adresa URL nesmí překročit 191 znaků"
   }
 }

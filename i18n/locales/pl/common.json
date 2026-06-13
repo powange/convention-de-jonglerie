@@ -754,6 +754,8 @@
     "name_max_200": "Nazwa nie może przekroczyć 200 znaków",
     "name_min_3": "Nazwa musi zawierać co najmniej 3 znaki",
     "phone_required": "Numer telefonu jest wymagany",
-    "program_max_10000": "Program nie może przekraczać 10000 znaków"
+    "program_max_10000": "Program nie może przekraczać 10000 znaków",
+    "url_invalid": "Adres URL musi zaczynać się od http:// lub https://",
+    "url_max_191": "Adres URL nie może przekraczać 191 znaków"
   }
 }

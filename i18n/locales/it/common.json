@@ -754,6 +754,8 @@
     "name_max_200": "Il nome non può superare i 200 caratteri",
     "name_min_3": "Il nome deve contenere almeno 3 caratteri",
     "phone_required": "Il numero di telefono è obbligatorio",
-    "program_max_10000": "Il programma non può superare 10000 caratteri"
+    "program_max_10000": "Il programma non può superare 10000 caratteri",
+    "url_invalid": "L'URL deve iniziare con http:// o https://",
+    "url_max_191": "L'URL non può superare i 191 caratteri"
   }
 }

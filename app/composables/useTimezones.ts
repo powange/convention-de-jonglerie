@@ -43,12 +43,25 @@ export const useTimezones = () => {
   }
 
   /**
-   * Génère les items pour le USelectMenu avec groupes par continent
-   * Format : "Villes principales (GMT+X) - Nom alternatif"
+   * Normalise une chaîne pour la recherche : minuscules + suppression des accents.
    */
-  const getSelectMenuItems = (): SelectMenuItem[] => {
+  const normalize = (value: string): string =>
+    value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
+  /**
+   * Génère les items pour le USelectMenu avec groupes par continent.
+   * Format : "Villes principales (GMT+X)".
+   *
+   * Le filtrage est réalisé ici (le USelectMenu doit donc utiliser `ignore-filter`)
+   * afin de ne pas afficher les libellés des groupes sans résultat et de conserver
+   * chaque fuseau dans sa catégorie.
+   *
+   * @param search Terme de recherche optionnel (insensible à la casse et aux accents).
+   */
+  const getSelectMenuItems = (search = ''): SelectMenuItem[] => {
     const timezones = getTimeZones()
     const items: SelectMenuItem[] = []
+    const query = normalize(search.trim())
 
     // Grouper par continent
     const grouped: Record<string, typeof timezones> = {}
@@ -65,17 +78,6 @@ export const useTimezones = () => {
       const continentTimezones = grouped[continentCode]
       if (!continentTimezones || continentTimezones.length === 0) continue
 
-      // Ajouter un séparateur si ce n'est pas le premier groupe
-      if (items.length > 0) {
-        items.push({ type: 'separator' })
-      }
-
-      // Ajouter le label du groupe (continent)
-      items.push({
-        type: 'label',
-        label: CONTINENT_LABELS[continentCode] || continentCode,
-      })
-
       // Trier par offset puis par nom
       const sortedTimezones = [...continentTimezones].sort((a, b) => {
         if (a.rawOffsetInMinutes !== b.rawOffsetInMinutes) {
@@ -84,14 +86,25 @@ export const useTimezones = () => {
         return a.alternativeName.localeCompare(b.alternativeName)
       })
 
-      // Ajouter les fuseaux de ce groupe
+      // Construire les options du groupe en appliquant le filtre de recherche
+      const groupOptions: SelectMenuItem[] = []
       for (const tz of sortedTimezones) {
         const cities = tz.mainCities.slice(0, 3).join(', ')
         const offset = formatOffset(tz.currentTimeOffsetInMinutes)
+        const label = `${cities} (GMT${offset})`
 
-        items.push({
-          label: `${cities} (GMT${offset})`,
-          // Champs supplémentaires pour la recherche et l'affichage
+        if (
+          query &&
+          ![label, cities, tz.alternativeName, tz.countryName, tz.name].some((field) =>
+            normalize(field).includes(query)
+          )
+        ) {
+          continue
+        }
+
+        groupOptions.push({
+          label,
+          // Champs supplémentaires pour l'affichage
           city: cities,
           region: tz.alternativeName,
           country: tz.countryName,
@@ -99,6 +112,21 @@ export const useTimezones = () => {
           value: tz.name,
         })
       }
+
+      // Ne pas afficher de catégorie sans résultat (ni label ni séparateur orphelin)
+      if (groupOptions.length === 0) continue
+
+      // Ajouter un séparateur si ce n'est pas le premier groupe
+      if (items.length > 0) {
+        items.push({ type: 'separator' })
+      }
+
+      // Ajouter le label du groupe (continent) puis ses options
+      items.push({
+        type: 'label',
+        label: CONTINENT_LABELS[continentCode] || continentCode,
+      })
+      items.push(...groupOptions)
     }
 
     return items

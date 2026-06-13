@@ -12,6 +12,7 @@
       </div>
       <EditionForm
         v-else
+        ref="editionFormRef"
         :initial-data="edition"
         :submit-button-text="$t('pages.edit_edition.submit_button')"
         :loading="editionStore.loading"
@@ -27,7 +28,7 @@ import { useRouter } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import type { Edition } from '~/types'
+import type { Edition, HttpError } from '~/types'
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -43,6 +44,7 @@ const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = ref(null)
+const editionFormRef = useTemplateRef('editionFormRef')
 
 onMounted(async () => {
   try {
@@ -84,9 +86,11 @@ const handleUpdateConvention = async (formData: Edition) => {
     })
     router.push(`/editions/${editionId}`)
   } catch (e: unknown) {
-    const err = e as { message?: string }
+    const httpError = e as HttpError
+    // Affiche les erreurs de validation par champ à côté des inputs concernés
+    editionFormRef.value?.setServerErrors(httpError.data)
     toast.add({
-      title: err?.message || t('errors.edition_update_failed'),
+      title: httpError.data?.message || httpError.message || t('errors.edition_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

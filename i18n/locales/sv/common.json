@@ -754,6 +754,8 @@
     "name_max_200": "Namnet får inte överstiga 200 tecken",
     "name_min_3": "Namnet måste innehålla minst 3 tecken",
     "phone_required": "Telefonnumret är obligatoriskt",
-    "program_max_10000": "Programmet får inte innehålla mer än 10000 tecken"
+    "program_max_10000": "Programmet får inte innehålla mer än 10000 tecken",
+    "url_invalid": "URL:en måste börja med http:// eller https://",
+    "url_max_191": "URL:en får inte överstiga 191 tecken"
   }
 }

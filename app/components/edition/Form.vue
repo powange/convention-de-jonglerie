@@ -1,5 +1,5 @@
 <template>
-  <UForm :state="state" class="space-y-4" @submit="handleSubmit">
+  <UForm ref="formRef" :state="state" class="space-y-4" @submit="handleSubmit">
     <UStepper v-model="currentStep" :items="steps" class="mb-4">
       <template #general>
         <div class="space-y-6">
@@ -146,27 +146,7 @@
             name="timezone"
             :description="$t('components.edition_form.timezone_description')"
           >
-            <USelectMenu
-              v-model="state.timezone"
-              :items="timezoneItems"
-              :placeholder="$t('forms.placeholders.select_timezone')"
-              value-key="value"
-              :filter-fields="['label', 'city', 'region', 'value']"
-              size="lg"
-              class="w-full"
-              :ui="{ content: 'max-h-80' }"
-            >
-              <template #leading>
-                <UIcon name="i-heroicons-globe-alt" class="text-gray-400" />
-              </template>
-              <template #item-label="{ item }">
-                <div class="flex items-center gap-2">
-                  <span class="font-medium">{{ item.city }}</span>
-                  <span class="text-muted text-xs">{{ item.region }}</span>
-                  <span class="text-muted text-xs ml-auto">{{ item.offset }}</span>
-                </div>
-              </template>
-            </USelectMenu>
+            <TimezoneSelectMenu v-model="state.timezone" size="lg" />
           </UFormField>
 
           <div class="space-y-4">
@@ -590,17 +570,43 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit'])
 
+// Référence vers le UForm pour propager les erreurs de validation serveur sur les champs
+const formRef = useTemplateRef('formRef')
+
+/**
+ * Affiche, à côté des champs concernés, les erreurs de validation renvoyées par l'API.
+ * À appeler depuis la page parente dans le catch de la soumission, en lui passant le
+ * corps de réponse de l'erreur. Supporte les deux formes rencontrées :
+ *   - { errors: { champ: message } }                (erreur déjà normalisée)
+ *   - { data: { errors: { champ: message } } }      (corps brut renvoyé par $fetch/ofetch)
+ */
+const setServerErrors = (source?: unknown) => {
+  if (!formRef.value || !source || typeof source !== 'object') return
+  const src = source as {
+    errors?: Record<string, string>
+    data?: { errors?: Record<string, string> }
+  }
+  const errors = src.errors ?? src.data?.errors
+  if (!errors) return
+  const formErrors = Object.entries(errors).map(([name, message]) => ({
+    name,
+    message: String(message),
+  }))
+  if (formErrors.length > 0) {
+    formRef.value.setErrors(formErrors)
+  }
+}
+
+defineExpose({ setServerErrors })
+
 // Importer les fonctions de date en premier
 const toast = useToast()
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const servicesByCategory = getTranslatedServicesByCategory
 const { toApiFormat, fromApiFormat } = useDatetime()
-const { getSelectMenuItems, getDefaultTimezoneForCountry } = useTimezones()
+const { getDefaultTimezoneForCountry } = useTimezones()
 // const authStore = useAuthStore();
 const showCustomCountry = ref(false)
-
-// Items pour le sélecteur de fuseau horaire (calculé une seule fois)
-const timezoneItems = computed(() => getSelectMenuItems())
 
 // Récupérer l'ID de l'édition uniquement depuis les props (initialData)
 // La route peut contenir l'ID de convention ou d'édition selon le contexte
@@ -913,49 +919,89 @@ const onImageError = (error: string) => {
   })
 }
 
+// Valide l'étape « Informations générales » (champs obligatoires + dates).
+// Marque les champs comme touchés, affiche un toast si invalide, et retourne false.
+const validateGeneralStep = (): boolean => {
+  // Mark all required fields as touched for validation
+  touchedFields.conventionId = true
+  touchedFields.startDate = true
+  touchedFields.endDate = true
+  touchedFields.addressStreet = true
+  touchedFields.addressZipCode = true
+  touchedFields.addressCity = true
+  touchedFields.addressCountry = true
+
+  // Check if required fields are filled (nom n'est plus obligatoire)
+  if (
+    !state.conventionId ||
+    !state.startDate ||
+    !state.endDate ||
+    !state.addressLine1 ||
+    !state.postalCode ||
+    !state.city ||
+    !state.country
+  ) {
+    toast.add({
+      title: 'Formulaire incomplet',
+      description: 'Veuillez remplir tous les champs obligatoires',
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'error',
+    })
+    return false
+  }
+
+  // Check date validation
+  if (!dateValidation.value.isValid) {
+    toast.add({
+      title: 'Dates invalides',
+      description: dateValidation.value.error,
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'error',
+    })
+    return false
+  }
+
+  return true
+}
+
+// Vérifie qu'une valeur est une URL http(s) valide
+const isHttpUrl = (value: string): boolean => {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+// Valide l'étape « Liens externes » : format et longueur max (191, cf. colonne Prisma).
+// Affiche les erreurs sous les champs concernés via le UForm et retourne false si invalide.
+const validateExternalLinksStep = (): boolean => {
+  const urlFields = ['ticketingUrl', 'officialWebsiteUrl', 'facebookUrl', 'instagramUrl'] as const
+
+  const errors: { name: string; message: string }[] = []
+  for (const field of urlFields) {
+    const value = (state[field] ?? '').trim()
+    if (!value) continue
+    if (value.length > 191) {
+      errors.push({ name: field, message: t('validation.url_max_191') })
+    } else if (!isHttpUrl(value)) {
+      errors.push({ name: field, message: t('validation.url_invalid') })
+    }
+  }
+
+  if (errors.length > 0) {
+    formRef.value?.setErrors(errors)
+    return false
+  }
+
+  return true
+}
+
 const handleNextStep = () => {
   // Validate current step before moving forward
-  if (currentStep.value === 0) {
-    // Mark all required fields as touched for validation
-    touchedFields.conventionId = true
-    touchedFields.startDate = true
-    touchedFields.endDate = true
-    touchedFields.addressStreet = true
-    touchedFields.addressZipCode = true
-    touchedFields.addressCity = true
-    touchedFields.addressCountry = true
-
-    // Check if required fields are filled (nom n'est plus obligatoire)
-    if (
-      !state.conventionId ||
-      !state.startDate ||
-      !state.endDate ||
-      !state.addressLine1 ||
-      !state.postalCode ||
-      !state.city ||
-      !state.country
-    ) {
-      const toast = useToast()
-      toast.add({
-        title: 'Formulaire incomplet',
-        description: 'Veuillez remplir tous les champs obligatoires',
-        icon: 'i-heroicons-exclamation-triangle',
-        color: 'error',
-      })
-      return
-    }
-
-    // Check date validation
-    if (!dateValidation.value.isValid) {
-      const toast = useToast()
-      toast.add({
-        title: 'Dates invalides',
-        description: dateValidation.value.error,
-        icon: 'i-heroicons-exclamation-triangle',
-        color: 'error',
-      })
-      return
-    }
+  if (currentStep.value === 0 && !validateGeneralStep()) {
+    return
   }
 
   currentStep.value++
@@ -1001,18 +1047,23 @@ const handleCountryChange = (value: any) => {
 }
 
 const handleSubmit = () => {
+  // Effacer les erreurs serveur d'une soumission précédente
+  formRef.value?.clear()
+
   // Nettoyer tous les champs texte avant validation finale
   trimAllTextFields()
 
-  // Validation finale avant soumission
-  if (!dateValidation.value.isValid) {
-    const toast = useToast()
-    toast.add({
-      title: 'Dates invalides',
-      description: dateValidation.value.error,
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error',
-    })
+  // Re-vérifier l'étape « Informations générales » avant l'envoi (champs obligatoires + dates).
+  // Si invalide, revenir à cette étape pour afficher les erreurs au bon endroit.
+  if (!validateGeneralStep()) {
+    currentStep.value = 0
+    return
+  }
+
+  // Vérifier l'étape « Liens externes » (format + longueur des URLs) avant l'envoi.
+  // Si invalide, revenir à cette étape pour afficher les erreurs sous les champs.
+  if (!validateExternalLinksStep()) {
+    currentStep.value = steps.value.length - 1
     return
   }
 
