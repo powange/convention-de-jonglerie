@@ -65,7 +65,10 @@
       "Edit(/.claude/skills/deploy/**)",
       "Edit(/.claude/skills/check-error-logs/**)",
       "Skill(update-config)",
-      "Skill(update-config:*)"
+      "Skill(update-config:*)",
+      "Bash(sed -n '/const trimField/,/^}/p' app/components/edition/Form.vue)",
+      "Bash(sed -n '/touchedFields = reactive/,/}\\)/p' app/components/edition/Form.vue)",
+      "Bash(node /tmp/apply-url-translations.mjs)"
     ],
     "additionalDirectories": ["/tmp"]
   }
