@@ -514,5 +514,18 @@ describe('Validation Schemas', () => {
         })
       ).toThrow()
     })
+
+    it('urlSchema devrait rejeter les URLs dépassant 191 caractères', () => {
+      // URL valide mais trop longue pour la colonne VARCHAR(191) -> doit échouer en validation (400)
+      const longUrl = 'https://example.com/' + 'a'.repeat(200)
+      expect(longUrl.length).toBeGreaterThan(191)
+      expect(() => schemas.urlSchema.parse(longUrl)).toThrow()
+
+      // Une URL valide et courte reste acceptée
+      expect(() => schemas.urlSchema.parse('https://tickets.example.com')).not.toThrow()
+      // Chaîne vide et valeurs nulles toujours acceptées
+      expect(() => schemas.urlSchema.parse('')).not.toThrow()
+      expect(() => schemas.urlSchema.parse(null)).not.toThrow()
+    })
   })
 })

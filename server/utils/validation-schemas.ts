@@ -46,7 +46,13 @@ export const phoneSchema = z
   .nullable()
   .optional()
   .refine((val) => !val || isInternationalPhoneValid(val), 'Numéro de téléphone invalide')
-export const urlSchema = z.string().url('URL invalide').nullable().optional().or(z.literal(''))
+export const urlSchema = z
+  .string()
+  .url('URL invalide')
+  .max(191, "L'URL ne peut pas dépasser 191 caractères")
+  .nullable()
+  .optional()
+  .or(z.literal(''))
 // Schéma pour les dates - accepte ISO strict et datetime-local pour la transition
 export const dateSchema = z
   .string()
