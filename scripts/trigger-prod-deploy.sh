@@ -5,6 +5,9 @@
 set -euo pipefail
 
 URL=$(grep -E '^PORTAINER_PROD_WEBHOOK_URL=' .env | cut -d= -f2-)
+# Retire d'éventuels guillemets entourant la valeur dans .env (".../"" ou '.../')
+URL="${URL%\"}"; URL="${URL#\"}"
+URL="${URL%\'}"; URL="${URL#\'}"
 
 if [ -z "$URL" ]; then echo "MISSING_WEBHOOK_URL" >&2; exit 3; fi
 
