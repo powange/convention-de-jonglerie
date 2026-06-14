@@ -363,6 +363,26 @@
                       </MessengerMessageBubble>
                     </template>
                   </UChatMessage>
+
+                  <!-- Indicateur « lu » : avatars des participants dont c'est le dernier message lu -->
+                  <div
+                    v-if="seenAvatarsByMessage[message.id]?.length"
+                    class="flex justify-end items-center gap-0.5 mt-1 pr-1"
+                  >
+                    <UiUserAvatar
+                      v-for="reader in seenAvatarsByMessage[message.id].slice(0, 3)"
+                      :key="reader.id"
+                      :user="reader"
+                      :size="16"
+                      :title="$t('messenger.seen_by', { name: reader.pseudo })"
+                    />
+                    <span
+                      v-if="seenAvatarsByMessage[message.id].length > 3"
+                      class="text-[10px] text-gray-500 dark:text-gray-400 ml-0.5"
+                    >
+                      +{{ seenAvatarsByMessage[message.id].length - 3 }}
+                    </span>
+                  </div>
                 </div>
               </UChatMessages>
             </div>
@@ -452,6 +472,7 @@ import type {
   MessengerEdition,
   Conversation,
   ConversationMessage,
+  ConversationParticipant,
 } from '~/composables/useMessenger'
 import { useAuthStore } from '~/stores/auth'
 import { useAvatar } from '~/utils/avatar'
@@ -661,8 +682,41 @@ const formattedMessages = computed(() => {
 })
 
 // Stream SSE pour la conversation courante
-const { realtimeMessages: streamRealtimeMessages, messageUpdates } =
-  useMessengerStream(selectedConversationId)
+const {
+  realtimeMessages: streamRealtimeMessages,
+  messageUpdates,
+  readReceipts: streamReadReceipts,
+} = useMessengerStream(selectedConversationId)
+
+// Indicateurs « lu » (style Messenger), pour les conversations privées ET de groupe :
+// pour chaque message, la liste des participants dont c'est le dernier message lu.
+// On exclut l'utilisateur courant et chaque participant sous son propre message
+// (sa réponse vaut déjà accusé de lecture).
+const seenAvatarsByMessage = computed<Record<string, ConversationParticipant['user'][]>>(() => {
+  const conv = selectedConversation.value
+  const currentUserId = authStore.user?.id
+  const result: Record<string, ConversationParticipant['user'][]> = {}
+  if (!conv || !currentUserId) return result
+
+  const messageById = new Map(allMessages.value.map((m) => [m.id, m]))
+
+  for (const participant of conv.participants) {
+    if (participant.userId === currentUserId) continue
+
+    // Priorité à l'accusé de lecture temps réel (SSE), sinon valeur chargée
+    const readMessageId =
+      streamReadReceipts.value[participant.userId] ?? participant.lastReadMessageId
+    if (!readMessageId) continue
+
+    const anchor = messageById.get(readMessageId)
+    if (!anchor) continue // message lu non chargé (pagination)
+    if (anchor.participant.user.id === participant.userId)
+      continue // pas sous son propre message
+    ;(result[readMessageId] ??= []).push(participant.user)
+  }
+
+  return result
+})
 
 // Stream SSE de notifications (inclut les événements messenger)
 const {

@@ -38,6 +38,7 @@
       "private_leader": "Privé met leider",
       "private_leaders": "Privé met leiders"
     },
-    "volunteer_managers": "Vrijwilligersleiders"
+    "volunteer_managers": "Vrijwilligersleiders",
+    "seen_by": "Gelezen door {name}"
   }
 }

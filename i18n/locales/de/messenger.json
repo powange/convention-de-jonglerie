@@ -38,6 +38,7 @@
       "private_leader": "Privat mit Leiter",
       "private_leaders": "Privat mit Leitern"
     },
-    "volunteer_managers": "Freiwilligenleiter"
+    "volunteer_managers": "Freiwilligenleiter",
+    "seen_by": "Gelesen von {name}"
   }
 }

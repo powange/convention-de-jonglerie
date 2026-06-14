@@ -38,6 +38,7 @@
       "private_leader": "Приватно с руководителем",
       "private_leaders": "Приватно с руководителями"
     },
-    "volunteer_managers": "Руководители волонтёров"
+    "volunteer_managers": "Руководители волонтёров",
+    "seen_by": "Прочитано {name}"
   }
 }

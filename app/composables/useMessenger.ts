@@ -17,6 +17,7 @@ export interface ConversationParticipant {
   id: string
   userId: number
   lastReadAt: Date | null
+  lastReadMessageId?: string | null // Dernier message lu par ce participant (indicateur « lu »)
   isLeader?: boolean // Présent uniquement pour les conversations d'équipe
   user: {
     id: number

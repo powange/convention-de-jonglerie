@@ -38,6 +38,7 @@
       "private_leader": "Privato con il responsabile",
       "private_leaders": "Privato con i responsabili"
     },
-    "volunteer_managers": "Responsabili volontari"
+    "volunteer_managers": "Responsabili volontari",
+    "seen_by": "Letto da {name}"
   }
 }

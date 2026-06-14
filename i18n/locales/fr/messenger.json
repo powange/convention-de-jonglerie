@@ -28,6 +28,7 @@
     "private_conversations": "Conversations privées",
     "reply": "Répondre",
     "reply_to": "Répondre à {pseudo}",
+    "seen_by": "Lu par {name}",
     "select_conversation": "Sélectionnez une conversation pour commencer",
     "subtitles": {
       "artist_application": "Candidature spectacle",

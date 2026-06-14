@@ -43,6 +43,9 @@ export default wrapApiHandler(
     let lastMessageTime = new Date()
     let lastUpdateCheckTime = new Date()
 
+    // Dernier message lu connu pour chaque autre participant (pour l'indicateur « lu »)
+    const lastReadByOthers = new Map<number, string | null>()
+
     // Fonction pour vérifier les nouveaux messages
     const checkForNewMessages = async () => {
       try {
@@ -145,6 +148,40 @@ export default wrapApiHandler(
       }
     }
 
+    // Vérifier si d'autres participants ont lu de nouveaux messages (indicateur « lu »).
+    // En mode `initial`, on ne fait que mémoriser l'état courant sans émettre d'événement
+    // (le client connaît déjà l'état via la liste des conversations).
+    const checkForReadUpdates = async (initial = false) => {
+      try {
+        const others = await prisma.conversationParticipant.findMany({
+          where: {
+            conversationId,
+            leftAt: null,
+            userId: { not: user.id },
+          },
+          select: { userId: true, lastReadMessageId: true },
+        })
+
+        for (const other of others) {
+          const previous = lastReadByOthers.get(other.userId)
+          if (!initial && previous !== other.lastReadMessageId && other.lastReadMessageId) {
+            await eventStream.push(
+              JSON.stringify({
+                type: 'read',
+                data: { userId: other.userId, lastReadMessageId: other.lastReadMessageId },
+              })
+            )
+          }
+          lastReadByOthers.set(other.userId, other.lastReadMessageId)
+        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification des lectures:', error)
+      }
+    }
+
+    // Mémoriser l'état de lecture initial (sans émettre)
+    await checkForReadUpdates(true)
+
     // Nettoyer lors de la fermeture de la connexion
     let cleanedUp = false
     const cleanup = () => {
@@ -178,6 +215,7 @@ export default wrapApiHandler(
         // Envoyer un heartbeat silencieux pour détecter si la connexion est fermée
         await eventStream.push(JSON.stringify({ type: 'heartbeat' }))
         await checkForNewMessages()
+        await checkForReadUpdates()
       } catch {
         cleanup()
       }

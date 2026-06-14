@@ -38,6 +38,7 @@
       "private_leader": "Privat med ledare",
       "private_leaders": "Privat med ledare"
     },
-    "volunteer_managers": "Volontärledare"
+    "volunteer_managers": "Volontärledare",
+    "seen_by": "Läst av {name}"
   }
 }

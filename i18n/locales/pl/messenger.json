@@ -38,6 +38,7 @@
       "private_leader": "Prywatne z liderem",
       "private_leaders": "Prywatne z liderami"
     },
-    "volunteer_managers": "Kierownicy wolontariuszy"
+    "volunteer_managers": "Kierownicy wolontariuszy",
+    "seen_by": "Przeczytane przez {name}"
   }
 }

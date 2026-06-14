@@ -38,6 +38,7 @@
       "private_leader": "Soukromé s vedoucím",
       "private_leaders": "Soukromé s vedoucími"
     },
-    "volunteer_managers": "Vedoucí dobrovolníků"
+    "volunteer_managers": "Vedoucí dobrovolníků",
+    "seen_by": "Přečetl(a) {name}"
   }
 }

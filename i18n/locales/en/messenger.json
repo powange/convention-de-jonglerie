@@ -38,6 +38,7 @@
       "private_leader": "Private with leader",
       "private_leaders": "Private with leaders"
     },
-    "volunteer_managers": "Volunteer Managers"
+    "volunteer_managers": "Volunteer Managers",
+    "seen_by": "Read by {name}"
   }
 }

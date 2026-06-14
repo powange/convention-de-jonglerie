@@ -30,6 +30,7 @@ export default wrapApiHandler(
             id: true,
             userId: true,
             lastReadAt: true,
+            lastReadMessageId: true,
             user: {
               select: {
                 id: true,

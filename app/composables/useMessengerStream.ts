@@ -30,6 +30,9 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
   // Messages mis à jour (suppression ou modification)
   const messageUpdates = ref<ConversationMessage[]>([])
 
+  // Accusés de lecture en temps réel : userId -> id du dernier message lu
+  const readReceipts = ref<Record<number, string>>({})
+
   // Instance EventSource
   let eventSource: EventSource | null = null
   let reconnectTimer: NodeJS.Timeout | null = null
@@ -95,6 +98,9 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
             // Ajouter à la liste des mises à jour pour que la page puisse gérer
             // les messages qui ne sont pas dans realtimeMessages
             messageUpdates.value.push(data.data)
+          } else if (data.type === 'read') {
+            // Un autre participant a lu jusqu'à un message donné (indicateur « lu »)
+            readReceipts.value[data.data.userId] = data.data.lastReadMessageId
           }
         } catch (error) {
           console.error('[Messenger SSE] Erreur parsing event:', error)
@@ -168,6 +174,7 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
    */
   const clearMessages = () => {
     realtimeMessages.value = []
+    readReceipts.value = {}
   }
 
   /**
@@ -201,6 +208,7 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
     isConnecting: computed(() => streamStats.value.isConnecting),
     realtimeMessages: readonly(realtimeMessages),
     messageUpdates: readonly(messageUpdates),
+    readReceipts: readonly(readReceipts),
 
     // Actions
     connect,
