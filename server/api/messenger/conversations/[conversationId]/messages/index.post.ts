@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getUserAvatarUrl } from '#server/utils/avatar-url'
-import { conversationPresenceService } from '#server/utils/conversation-presence-service'
 import {
   messengerStreamService,
   messengerUnreadService,
@@ -244,16 +243,11 @@ export default wrapApiHandler(
     await Promise.all(
       participantsWithReadStatus.map(async (p) => {
         try {
-          // Vérifier si l'utilisateur est présent sur la conversation (via connexion SSE active)
-          const isPresent = conversationPresenceService.isPresent(p.userId, conversationId)
-
-          // Ne pas envoyer de push si l'utilisateur est présent sur la conversation
-          if (isPresent) {
-            console.log(
-              `[Messenger] Utilisateur ${p.userId} est présent sur la conversation (SSE actif), pas de push envoyée`
-            )
-            return
-          }
+          // On envoie toujours la push : la distinction premier-plan / arrière-plan est
+          // gérée par FCM côté client, par appareil (service worker en arrière-plan,
+          // onMessage au premier plan). L'ancien filtrage par « présence SSE » était par
+          // utilisateur et sans expiration : il supprimait les push sur les autres
+          // appareils du destinataire (et indéfiniment en cas de connexion SSE perdue).
 
           // Déterminer le titre de la notification en fonction du type de conversation et du rôle du destinataire
           let notificationTitle: string
