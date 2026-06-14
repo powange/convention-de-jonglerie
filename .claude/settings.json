@@ -68,7 +68,8 @@
       "Skill(update-config:*)",
       "Bash(sed -n '/const trimField/,/^}/p' app/components/edition/Form.vue)",
       "Bash(sed -n '/touchedFields = reactive/,/}\\)/p' app/components/edition/Form.vue)",
-      "Bash(node /tmp/apply-url-translations.mjs)"
+      "Bash(node /tmp/apply-url-translations.mjs)",
+      "Bash(node /tmp/translate-seen-by.mjs)"
     ],
     "additionalDirectories": ["/tmp"]
   }
