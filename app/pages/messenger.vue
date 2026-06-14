@@ -698,7 +698,8 @@ const seenAvatarsByMessage = computed<Record<string, ConversationParticipant['us
   const result: Record<string, ConversationParticipant['user'][]> = {}
   if (!conv || !currentUserId) return result
 
-  const messageById = new Map(allMessages.value.map((m) => [m.id, m]))
+  const ordered = allMessages.value
+  const indexById = new Map(ordered.map((m, i) => [m.id, i]))
 
   for (const participant of conv.participants) {
     if (participant.userId === currentUserId) continue
@@ -708,11 +709,18 @@ const seenAvatarsByMessage = computed<Record<string, ConversationParticipant['us
       streamReadReceipts.value[participant.userId] ?? participant.lastReadMessageId
     if (!readMessageId) continue
 
-    const anchor = messageById.get(readMessageId)
-    if (!anchor) continue // message lu non chargé (pagination)
-    if (anchor.participant.user.id === participant.userId)
-      continue // pas sous son propre message
-    ;(result[readMessageId] ??= []).push(participant.user)
+    const readIndex = indexById.get(readMessageId)
+    if (readIndex === undefined) continue // message lu non chargé (pagination)
+
+    // Ancrer sur le dernier message lu (index <= readIndex) qui n'est PAS de ce lecteur.
+    // Le client marque « lu » avec le dernier message de la conversation (souvent le sien) :
+    // on remonte donc jusqu'au dernier message d'un autre auteur (typiquement le nôtre).
+    for (let i = readIndex; i >= 0; i--) {
+      if (ordered[i].participant.user.id !== participant.userId) {
+        ;(result[ordered[i].id] ??= []).push(participant.user)
+        break
+      }
+    }
   }
 
   return result
