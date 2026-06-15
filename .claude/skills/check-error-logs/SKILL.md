@@ -132,13 +132,17 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
 
 ### 7. Mettre à jour l'état
 
-Utiliser le script dédié (autorisé sans prompt) plutôt que d'éditer le JSON à la main :
+Utiliser le script dédié (autorisé sans prompt) plutôt que d'éditer le JSON à la main.
+
+⚠️ **Autonomie / pas de validation** : appeler le script avec le **littéral `now`** (le script
+calcule lui-même l'horodatage courant). Ne JAMAIS utiliser de substitution de commande
+`$(date …)` au point d'appel : elle casse la correspondance par préfixe de l'allowlist et
+déclenche une demande de validation. De même, ne pas éditer le JSON à la main.
 
 ```bash
-# lastCheckedAt = instant du DÉBUT de ce passage (pas la fin), pour ne pas rater
-# les erreurs survenues pendant le traitement.
+# lastCheckedAt : "now" -> instant courant calculé par le script (autonome, sans $(date)).
 # Empreintes optionnelles à ajouter à `dismissed` (jamais retirées) :
-bash scripts/update-error-logs-state.sh "<début-du-passage-ISO8601>" \
+bash scripts/update-error-logs-state.sh now \
   "errorType|method|path|message"
 ```
 
