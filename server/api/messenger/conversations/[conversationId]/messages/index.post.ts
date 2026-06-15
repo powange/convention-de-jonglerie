@@ -216,7 +216,7 @@ export default wrapApiHandler(
                     ? {
                         volunteerApplications: {
                           where: {
-                            editionId: editionId,
+                            eventId: editionId,
                             status: 'ACCEPTED',
                           },
                           select: {

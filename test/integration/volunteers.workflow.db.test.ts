@@ -111,14 +111,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const edition = await prismaTest.edition.findUnique({
           where: { id: mockEdition.id },
           include: {
-            volunteerTeams: true,
+            event: { include: { volunteerTeams: true } },
           },
         })
 
         expect(edition).toBeDefined()
         expect(edition?.volunteersMode).toBe('INTERNAL')
         expect(edition?.volunteersOpen).toBe(true)
-        expect(edition?.volunteerTeams).toHaveLength(2)
+        expect(edition?.event?.volunteerTeams).toHaveLength(2)
 
         // ========== ÉTAPE 2: Candidature d'un bénévole ==========
         const arrivalDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
@@ -397,11 +397,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const editionWithTeams = await prismaTest.edition.findUnique({
           where: { id: mockEdition.id },
           include: {
-            volunteerTeams: true,
+            event: { include: { volunteerTeams: true } },
           },
         })
 
-        expect(editionWithTeams?.volunteerTeams).toHaveLength(2)
+        expect(editionWithTeams?.event?.volunteerTeams).toHaveLength(2)
       })
 
       it('devrait gérer les agrégations de candidatures', async () => {

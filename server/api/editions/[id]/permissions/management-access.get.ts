@@ -26,7 +26,7 @@ export default wrapApiHandler(
             isLeader: true,
             application: {
               userId: user.id,
-              editionId,
+              eventId: editionId,
               status: 'ACCEPTED',
             },
           },

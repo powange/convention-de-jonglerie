@@ -25,7 +25,7 @@ export default wrapApiHandler(
       where: {
         teamId,
         application: {
-          editionId,
+          eventId: editionId,
           userId: user.id,
           status: 'ACCEPTED',
         },
@@ -47,7 +47,7 @@ export default wrapApiHandler(
       where: {
         teamId,
         application: {
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
       },

@@ -26,7 +26,7 @@ export async function isMealValidationTeamLeader(
     where: {
       application: {
         userId,
-        editionId,
+        eventId: editionId,
         status: 'ACCEPTED',
       },
       team: MEAL_VALIDATION_FILTER,
