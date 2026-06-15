@@ -121,8 +121,8 @@
 </template>
 
 <script setup lang="ts">
-import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'
-import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
+import { EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel } from '#components'
+import { EditionVolunteerPlanningSlotModal as SlotModal } from '#components'
 import { useDatetime } from '~/composables/useDatetime'
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 import { useAuthStore } from '~/stores/auth'

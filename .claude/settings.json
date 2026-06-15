@@ -69,8 +69,13 @@
       "Bash(sed -n '/const trimField/,/^}/p' app/components/edition/Form.vue)",
       "Bash(sed -n '/touchedFields = reactive/,/}\\)/p' app/components/edition/Form.vue)",
       "Bash(node /tmp/apply-url-translations.mjs)",
-      "Bash(node /tmp/translate-seen-by.mjs)"
+      "Bash(node /tmp/translate-seen-by.mjs)",
+      "Bash(sed -i \"s@import TeamManagement from '~/components/edition/volunteer/planning/TeamManagement.vue'@import { EditionVolunteerPlanningTeamManagement as TeamManagement } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/teams.vue\")",
+      "Bash(sed -i \"s@import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'@import { EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
+      "Bash(sed -i \"s@import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'@import { EditionVolunteerPlanningSlotModal as SlotModal } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")"
     ],
-    "additionalDirectories": ["/tmp"]
+    "additionalDirectories": [
+      "/tmp"
+    ]
   }
 }
