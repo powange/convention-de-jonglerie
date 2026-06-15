@@ -60,6 +60,7 @@ services:
     volumes:
       # Monter uniquement le code pour ne pas écraser node_modules
       - ./app:/app/app:cached
+      - ./layers:/app/layers:cached
       - ./i18n:/app/i18n:cached
       - ./server:/app/server:cached
       - ./shared:/app/shared:cached
