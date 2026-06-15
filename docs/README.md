@@ -105,6 +105,12 @@ Voir **[docker/](./docker/)** :
 - **[nuxt-config-audit.md](./nuxt-config-audit.md)** — Audit de la configuration Nuxt
 - **[analyse-nuxt4-recommandations.md](./analyse-nuxt4-recommandations.md)** — Recommandations Nuxt 4
 - **[codebase_analysis.md](./codebase_analysis.md)** — Analyse de la base de code
+- **[modularisation-multi-domaines.md](./modularisation-multi-domaines.md)** — Stratégie monorepo + Nuxt layers pour partager les modules organisateurs avec une 2ᵉ app (autres domaines)
+  - [etape-0-abstraction-event.md](./etape-0-abstraction-event.md) — Abstraction `Event` (pilote bénévole) : schéma cible + SQL de migration
+  - [etape-1-ports-decouplage.md](./etape-1-ports-decouplage.md) — Ports & injection pour découpler le module bénévole (notifications, email, messenger)
+  - [etape-2-layer-volunteers.md](./etape-2-layer-volunteers.md) — Extraction du `layers/volunteers` : arborescence, fichiers frontière, i18n du layer
+  - [etape-3-monorepo.md](./etape-3-monorepo.md) — Passage en monorepo : workspaces, composition Prisma, Docker, CI
+  - [etape-4-deuxieme-app.md](./etape-4-deuxieme-app.md) — Création de la 2ᵉ app : modèle de domaine, binding des ports, déploiement
 
 ## 🔍 Audits
 
