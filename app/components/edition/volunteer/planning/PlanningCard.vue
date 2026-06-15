@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
+import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 import type { Edition } from '~/types'
 import type { VolunteerStats, DayStats, VolunteerStatsIndividual } from '~/utils/volunteer-stats'
 

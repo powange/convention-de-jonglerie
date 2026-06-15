@@ -311,8 +311,8 @@
 
 <script setup lang="ts">
 // App components & stores
-import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
-import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
+import { useVolunteerSettings } from '#imports'
+import { useVolunteerTeams } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { requiresEmergencyContact } from '~/utils/allergy-severity'

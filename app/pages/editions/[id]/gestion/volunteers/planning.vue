@@ -124,7 +124,7 @@
 import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'
 import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
 import { useDatetime } from '~/composables/useDatetime'
-import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
+import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import {

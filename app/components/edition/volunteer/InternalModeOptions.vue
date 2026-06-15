@@ -287,8 +287,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
-import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
+import { useVolunteerSettings } from '#imports'
+import { useVolunteerTeams } from '#imports'
 
 interface Props {
   editionId: number

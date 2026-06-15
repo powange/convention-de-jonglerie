@@ -289,7 +289,7 @@
 <script setup lang="ts">
 import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
 
-import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
+import { useVolunteerSettings } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 

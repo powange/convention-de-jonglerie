@@ -627,8 +627,8 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
-import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
+import { useVolunteerSettings } from '#imports'
+import { useVolunteerTeams } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 

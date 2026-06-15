@@ -179,7 +179,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import type { VolunteerTimeSlot } from '~/composables/useVolunteerSchedule'
+import type { VolunteerTimeSlot } from '#imports'
 
 // Props
 interface Props {
