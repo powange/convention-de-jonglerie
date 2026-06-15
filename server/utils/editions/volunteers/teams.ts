@@ -1,7 +1,4 @@
-import {
-  ensureVolunteerConversations,
-  removeVolunteerFromTeamConversations,
-} from '../../messenger-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 /**
  * Récupère les équipes de bénévoles d'une édition
@@ -97,12 +94,12 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
 
     // Retirer le bénévole des conversations des anciennes équipes
     for (const oldAssignment of oldAssignments) {
-      await removeVolunteerFromTeamConversations(
-        application.eventId,
-        oldAssignment.teamId,
-        application.userId,
-        tx
-      )
+      await useVolunteerPorts().messenger.removeFromTeamConversations({
+        eventId: application.eventId,
+        teamId: oldAssignment.teamId,
+        userId: application.userId,
+        tx,
+      })
     }
 
     // Dédupliquer les teamIds
@@ -120,7 +117,12 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
 
       // Créer les conversations pour les nouvelles équipes
       for (const teamId of uniqueTeamIds) {
-        await ensureVolunteerConversations(application.eventId, teamId, application.userId, tx)
+        await useVolunteerPorts().messenger.ensureTeamConversation({
+          eventId: application.eventId,
+          teamId,
+          userId: application.userId,
+          tx,
+        })
       }
     }
 
@@ -193,7 +195,12 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
     })
 
     // Créer les conversations pour cette équipe
-    await ensureVolunteerConversations(application.eventId, teamId, application.userId, tx)
+    await useVolunteerPorts().messenger.ensureTeamConversation({
+      eventId: application.eventId,
+      teamId,
+      userId: application.userId,
+      tx,
+    })
 
     return assignment
   })
@@ -227,12 +234,12 @@ export async function removeVolunteerFromTeam(applicationId: number, teamId: str
     })
 
     // Retirer le bénévole des conversations de cette équipe
-    await removeVolunteerFromTeamConversations(
-      application.eventId,
+    await useVolunteerPorts().messenger.removeFromTeamConversations({
+      eventId: application.eventId,
       teamId,
-      application.userId,
-      tx
-    )
+      userId: application.userId,
+      tx,
+    })
   })
 }
 

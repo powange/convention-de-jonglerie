@@ -6,11 +6,8 @@ import {
   buildVolunteerApplicationUpdateData,
   getUserUpdateData,
 } from '#server/utils/editions/volunteers/applications'
-import {
-  NotificationService,
-  NotificationHelpers,
-  safeNotify,
-} from '#server/utils/notification-service'
+import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -205,22 +202,18 @@ export default wrapApiHandler(
           message += `\n\nNote : ${parsed.modificationNote.trim()}`
         }
 
-        await safeNotify(
-          () =>
-            NotificationService.create({
-              userId: application.user.id,
-              type: 'INFO',
-              titleText: `Modification de votre candidature bénévole`,
-              messageText: message,
-              category: 'volunteer',
-              entityType: 'Edition',
-              entityId: editionId.toString(),
-              actionUrl: `/profile/mes-candidatures-benevole`,
-              actionText: 'Voir ma candidature',
-              notificationType: 'volunteer_application_modified',
-            }),
-          'modification candidature bénévole'
-        )
+        await useVolunteerPorts().notifications.notify({
+          userId: application.user.id,
+          type: 'INFO',
+          titleText: `Modification de votre candidature bénévole`,
+          messageText: message,
+          category: 'volunteer',
+          entityType: 'Edition',
+          entityId: editionId.toString(),
+          actionUrl: `/profile/mes-candidatures-benevole`,
+          actionText: 'Voir ma candidature',
+          notificationType: 'volunteer_application_modified',
+        })
       }
 
       return createSuccessResponse({ application: updated })

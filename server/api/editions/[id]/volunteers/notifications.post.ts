@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { NotificationService } from '#server/utils/notification-service'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
@@ -155,9 +155,10 @@ export default wrapApiHandler(async (event) => {
   })
 
   // Créer les notifications pour chaque bénévole
-  const _notifications = await Promise.all(
-    volunteers.map(async (volunteer) => {
-      return await NotificationService.create({
+  const ports = useVolunteerPorts()
+  await Promise.all(
+    volunteers.map((volunteer) =>
+      ports.notifications.notify({
         userId: volunteer.user.id,
         type: 'INFO',
         titleText: title,
@@ -168,7 +169,7 @@ export default wrapApiHandler(async (event) => {
         actionUrl: confirmationUrl,
         actionText: 'Confirmer la lecture',
       })
-    })
+    )
   )
 
   return createSuccessResponse({

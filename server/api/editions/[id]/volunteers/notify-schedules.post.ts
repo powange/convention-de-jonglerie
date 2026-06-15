@@ -1,11 +1,8 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import {
-  sendEmail,
-  generateVolunteerScheduleEmailHtml,
-  getSiteUrl,
-} from '#server/utils/emailService'
+import { generateVolunteerScheduleEmailHtml, getSiteUrl } from '#server/utils/emailService'
 import { NotificationService } from '#server/utils/notification-service'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -177,7 +174,7 @@ export default wrapApiHandler(async (event) => {
         `${siteUrl}/profile/mes-candidatures-benevole`
       )
 
-      const emailSent = await sendEmail({
+      const emailSent = await useVolunteerPorts().email.send({
         to: volunteer.user.email,
         subject: `🤹 Vos créneaux de bénévolat - ${edition.convention.name}`,
         html: emailHtml,

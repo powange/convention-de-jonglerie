@@ -4,7 +4,8 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { getEmailHash } from '#server/utils/email-hash'
-import { sendEmail, generateVerificationCode, getSiteUrl } from '#server/utils/emailService'
+import { generateVerificationCode, getSiteUrl } from '#server/utils/emailService'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
@@ -325,7 +326,7 @@ export default wrapApiHandler(async (event) => {
     )
 
     const siteUrl = getSiteUrl()
-    const emailSent = await sendEmail({
+    const emailSent = await useVolunteerPorts().email.send({
       to: cleanEmail,
       subject: `🤹 Invitation bénévole - ${edition.convention.name}`,
       html: emailHtml,
