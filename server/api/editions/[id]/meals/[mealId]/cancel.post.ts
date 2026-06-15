@@ -54,7 +54,7 @@ export default wrapApiHandler(
 
       if (
         !selection ||
-        selection.volunteer.editionId !== editionId ||
+        selection.volunteer.eventId !== editionId ||
         selection.mealId !== mealId
       ) {
         throw createError({

@@ -21,7 +21,7 @@ export default wrapApiHandler(async (event) => {
   const volunteer = await prisma.editionVolunteerApplication.findUnique({
     where: { id: volunteerId },
     select: {
-      editionId: true,
+      eventId: true,
       setupAvailability: true,
       eventAvailability: true,
       teardownAvailability: true,
@@ -30,7 +30,7 @@ export default wrapApiHandler(async (event) => {
     },
   })
 
-  if (!volunteer || volunteer.editionId !== editionId) {
+  if (!volunteer || volunteer.eventId !== editionId) {
     throw createError({
       status: 404,
       message: 'Bénévole non trouvé pour cette édition',

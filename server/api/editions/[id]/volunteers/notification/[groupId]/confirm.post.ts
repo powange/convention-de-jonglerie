@@ -15,7 +15,7 @@ export default wrapApiHandler(async (event) => {
   const notificationGroup = await prisma.volunteerNotificationGroup.findFirst({
     where: {
       id: groupId,
-      editionId,
+      eventId: editionId,
     },
   })
 
@@ -26,7 +26,7 @@ export default wrapApiHandler(async (event) => {
   // Vérifier que l'utilisateur est un bénévole accepté de cette édition
   const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
     where: {
-      editionId,
+      eventId: editionId,
       userId: user.id,
       status: 'ACCEPTED',
     },

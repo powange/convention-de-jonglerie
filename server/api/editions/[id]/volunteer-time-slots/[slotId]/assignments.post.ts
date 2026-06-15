@@ -29,7 +29,7 @@ export default wrapApiHandler(
     const timeSlot = await prisma.volunteerTimeSlot.findFirst({
       where: {
         id: slotId,
-        editionId,
+        eventId: editionId,
       },
       include: {
         _count: {
@@ -51,7 +51,7 @@ export default wrapApiHandler(
     const application = await prisma.editionVolunteerApplication.findFirst({
       where: {
         userId: body.userId,
-        editionId,
+        eventId: editionId,
         status: 'ACCEPTED',
       },
     })

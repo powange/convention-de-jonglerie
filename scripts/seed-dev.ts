@@ -366,8 +366,12 @@ async function main() {
 
         const randomCity = cities[Math.floor(Math.random() * cities.length)]
 
+        // Ancre Event (l'édition partage son id : invariant Edition.id == eventId)
+        const eventAnchor = await prisma.event.create({ data: {} })
         edition = await prisma.edition.create({
           data: {
+            id: eventAnchor.id,
+            eventId: eventAnchor.id,
             name: editionName,
             description: `${conv.name} — édition ${i}`,
             creatorId: conv.authorId,
@@ -647,7 +651,7 @@ async function main() {
           if (!createdTeamNames.includes(teamName)) {
             const team = await prisma.volunteerTeam.create({
               data: {
-                editionId: edition.id,
+                eventId: edition.id,
                 name: teamName,
                 description: `Équipe ${teamName.toLowerCase()} pour cette édition`,
                 color: teamColors[Math.floor(Math.random() * teamColors.length)],
@@ -671,7 +675,7 @@ async function main() {
         // Vérifier qu'il n'y a pas déjà une candidature
         const existingApplication = await prisma.editionVolunteerApplication.findFirst({
           where: {
-            editionId: edition.id,
+            eventId: edition.id,
             userId: volunteer.id,
           },
         })
@@ -724,7 +728,7 @@ async function main() {
 
         const application = await prisma.editionVolunteerApplication.create({
           data: {
-            editionId: edition.id,
+            eventId: edition.id,
             userId: volunteer.id,
             status:
               Math.random() > 0.15 ? 'ACCEPTED' : Math.random() > 0.5 ? 'PENDING' : 'REJECTED', // 85% acceptées
@@ -843,7 +847,7 @@ async function main() {
             // Créer le créneau
             const timeSlot = await prisma.volunteerTimeSlot.create({
               data: {
-                editionId: edition.id,
+                eventId: edition.id,
                 teamId: team?.id || null,
                 title,
                 description: `${title} ${team ? `pour l'équipe ${team.name}` : '(créneau général)'}`,

@@ -285,7 +285,7 @@ export default wrapApiHandler(async (event) => {
   // Créer la candidature de bénévole avec le statut ACCEPTED
   const application = await prisma.editionVolunteerApplication.create({
     data: {
-      editionId,
+      eventId: editionId,
       userId: newUser.id,
       status: 'ACCEPTED',
       motivation: 'Ajouté manuellement par un organisateur',

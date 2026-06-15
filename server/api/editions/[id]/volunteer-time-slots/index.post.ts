@@ -50,7 +50,7 @@ export default wrapApiHandler(
       const team = await prisma.volunteerTeam.findFirst({
         where: {
           id: body.teamId,
-          editionId,
+          eventId: editionId,
         },
       })
 
@@ -84,7 +84,7 @@ export default wrapApiHandler(
     // Créer le créneau
     const timeSlot = await prisma.volunteerTimeSlot.create({
       data: {
-        editionId,
+        eventId: editionId,
         teamId: body.teamId || null,
         title: body.title,
         description: body.description,

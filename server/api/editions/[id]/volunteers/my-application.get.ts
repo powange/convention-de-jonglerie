@@ -14,8 +14,8 @@ export default wrapApiHandler(async (event) => {
   // Récupérer la candidature de l'utilisateur pour cette édition
   const application = await prisma.editionVolunteerApplication.findUnique({
     where: {
-      editionId_userId: {
-        editionId,
+      eventId_userId: {
+        eventId: editionId,
         userId: user.id,
       },
     },
@@ -91,7 +91,7 @@ export default wrapApiHandler(async (event) => {
       where: {
         userId: user.id,
         timeSlot: {
-          editionId,
+          eventId: editionId,
         },
       },
       select: {

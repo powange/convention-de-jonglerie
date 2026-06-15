@@ -275,23 +275,26 @@
                           <div class="flex items-center gap-2">
                             <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
                               {{
-                                getEditionDisplayName(comment.edition) ||
-                                `Édition #${comment.editionId}`
+                                getEditionDisplayName(comment.event?.edition) ||
+                                `Édition #${comment.eventId}`
                               }}
                             </span>
                             <span
-                              v-if="comment.editionId === editionId"
+                              v-if="comment.eventId === editionId"
                               class="text-xs px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded font-medium"
                             >
                               Actuelle
                             </span>
                           </div>
                           <span
-                            v-if="comment.edition?.startDate && comment.edition?.endDate"
+                            v-if="comment.event?.edition?.startDate && comment.event?.edition?.endDate"
                             class="text-xs text-gray-500 dark:text-gray-400"
                           >
                             {{
-                              formatDateRange(comment.edition.startDate, comment.edition.endDate)
+                              formatDateRange(
+                                comment.event.edition.startDate,
+                                comment.event.edition.endDate
+                              )
                             }}
                           </span>
                         </div>

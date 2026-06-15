@@ -47,7 +47,7 @@ export default wrapApiHandler(
     // Vérifier qu'une équipe avec ce nom n'existe pas déjà pour cette édition
     const existingTeam = await prisma.volunteerTeam.findFirst({
       where: {
-        editionId,
+        eventId: editionId,
         name: body.name,
       },
     })
@@ -65,7 +65,7 @@ export default wrapApiHandler(
     // Créer l'équipe
     const team = await prisma.volunteerTeam.create({
       data: {
-        editionId,
+        eventId: editionId,
         name: body.name,
         description: body.description,
         color: body.color,

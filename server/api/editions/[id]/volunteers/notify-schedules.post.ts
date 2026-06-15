@@ -46,7 +46,7 @@ export default wrapApiHandler(async (event) => {
   // Récupérer tous les bénévoles acceptés
   const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
     where: {
-      editionId,
+      eventId: editionId,
       status: 'ACCEPTED',
     },
     include: {
@@ -77,7 +77,7 @@ export default wrapApiHandler(async (event) => {
         where: {
           userId: volunteer.user.id,
           timeSlot: {
-            editionId,
+            eventId: editionId,
           },
         },
         include: {

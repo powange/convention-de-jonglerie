@@ -36,7 +36,7 @@ export default wrapApiHandler(
       where: { id: applicationId },
       select: {
         id: true,
-        editionId: true,
+        eventId: true,
         status: true,
         user: {
           select: userWithNameSelect,
@@ -44,7 +44,7 @@ export default wrapApiHandler(
       },
     })
 
-    if (!application || application.editionId !== editionId)
+    if (!application || application.eventId !== editionId)
       throw createError({ status: 404, message: 'Candidature introuvable' })
 
     if (application.status !== 'ACCEPTED')
@@ -56,7 +56,7 @@ export default wrapApiHandler(
     // Vérifier que l'équipe existe et appartient à cette édition
     const team = await getVolunteerTeamById(teamId)
 
-    if (!team || team.editionId !== editionId)
+    if (!team || team.eventId !== editionId)
       throw createError({ status: 404, message: 'Équipe introuvable' })
 
     try {

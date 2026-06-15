@@ -29,7 +29,7 @@ export default wrapApiHandler(async (event) => {
       isLeader: true,
       application: {
         userId: user.id,
-        editionId,
+        eventId: editionId,
         status: 'ACCEPTED',
       },
     },
@@ -47,7 +47,7 @@ export default wrapApiHandler(async (event) => {
     where: {
       teamId,
       application: {
-        editionId,
+        eventId: editionId,
         status: 'ACCEPTED',
       },
     },

@@ -14,8 +14,8 @@ export default wrapApiHandler(
     // Récupérer uniquement le statut de la candidature
     const application = await prisma.editionVolunteerApplication.findUnique({
       where: {
-        editionId_userId: {
-          editionId,
+        eventId_userId: {
+          eventId: editionId,
           userId: user.id,
         },
       },

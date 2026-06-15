@@ -41,7 +41,7 @@ export default wrapApiHandler(
           isLeader: true,
           application: {
             userId: user.id,
-            editionId,
+            eventId: editionId,
             status: 'ACCEPTED',
           },
         },
@@ -108,7 +108,7 @@ export default wrapApiHandler(
     // Accès public en lecture pour permettre l'affichage dans le formulaire de candidature
     const teams = await prisma.volunteerTeam.findMany({
       where: {
-        editionId,
+        eventId: editionId,
       },
       orderBy: {
         name: 'asc',

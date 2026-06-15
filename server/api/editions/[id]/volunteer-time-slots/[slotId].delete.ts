@@ -26,7 +26,7 @@ export default wrapApiHandler(
     const existingSlot = await prisma.volunteerTimeSlot.findFirst({
       where: {
         id: slotId,
-        editionId,
+        eventId: editionId,
       },
       include: {
         _count: {

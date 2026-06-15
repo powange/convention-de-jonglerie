@@ -23,14 +23,18 @@ export default wrapApiHandler(async (event) => {
   const notificationGroup = await prisma.volunteerNotificationGroup.findFirst({
     where: {
       id: groupId,
-      editionId,
+      eventId: editionId,
     },
     include: {
-      edition: {
+      event: {
         select: {
-          name: true,
-          convention: {
-            select: { name: true },
+          edition: {
+            select: {
+              name: true,
+              convention: {
+                select: { name: true },
+              },
+            },
           },
         },
       },
@@ -62,7 +66,7 @@ export default wrapApiHandler(async (event) => {
 
   // Récupérer tous les destinataires originaux (pour identifier ceux qui n'ont pas confirmé)
   const whereClause: any = {
-    editionId,
+    eventId: editionId,
     status: 'ACCEPTED',
   }
 
@@ -128,8 +132,8 @@ export default wrapApiHandler(async (event) => {
       recipientCount: notificationGroup.recipientCount,
       sentAt: notificationGroup.sentAt,
       senderName: notificationGroup.sender.pseudo,
-      editionName: notificationGroup.edition.name,
-      conventionName: notificationGroup.edition.convention.name,
+      editionName: notificationGroup.event.edition?.name ?? null,
+      conventionName: notificationGroup.event.edition?.convention.name ?? null,
     },
     confirmed: confirmedVolunteers.map((volunteer) => {
       const confirmation = notificationGroup.confirmations.find(

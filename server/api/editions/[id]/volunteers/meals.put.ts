@@ -107,7 +107,7 @@ export default wrapApiHandler(async (event) => {
       // Récupérer tous les bénévoles acceptés avec leurs données d'éligibilité
       const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
         where: {
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
         select: {

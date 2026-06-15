@@ -82,7 +82,7 @@ export default wrapApiHandler(async (event) => {
     // Bénévoles acceptés
     prisma.editionVolunteerApplication.findMany({
       where: {
-        editionId,
+        eventId: editionId,
         status: 'ACCEPTED',
       },
       include: {
@@ -99,7 +99,7 @@ export default wrapApiHandler(async (event) => {
 
     // Créneaux horaires
     prisma.volunteerTimeSlot.findMany({
-      where: { editionId },
+      where: { eventId: editionId },
       include: {
         assignments: {
           include: {
@@ -111,7 +111,7 @@ export default wrapApiHandler(async (event) => {
 
     // Équipes
     prisma.volunteerTeam.findMany({
-      where: { editionId },
+      where: { eventId: editionId },
     }),
   ])
 
@@ -215,7 +215,7 @@ async function applyAssignments(
       await tx.volunteerAssignment.deleteMany({
         where: {
           timeSlot: {
-            editionId,
+            eventId: editionId,
           },
         },
       })
@@ -281,8 +281,8 @@ async function assignVolunteersToTeams(
     // Récupérer l'application du bénévole
     const application = await tx.editionVolunteerApplication.findUnique({
       where: {
-        editionId_userId: {
-          editionId,
+        eventId_userId: {
+          eventId: editionId,
           userId: volunteerId,
         },
       },

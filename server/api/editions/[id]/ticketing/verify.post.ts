@@ -102,7 +102,7 @@ export default wrapApiHandler(
             where: {
               userId: application.userId,
               timeSlot: {
-                editionId: editionId,
+                eventId: editionId,
               },
             },
             include: {

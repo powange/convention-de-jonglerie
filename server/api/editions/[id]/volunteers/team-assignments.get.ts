@@ -25,7 +25,7 @@ export default wrapApiHandler(async (event) => {
         isLeader: true,
         application: {
           userId: user.id,
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
       },
@@ -48,7 +48,7 @@ export default wrapApiHandler(async (event) => {
   // Récupérer tous les bénévoles acceptés avec leurs équipes
   const applications = await prisma.editionVolunteerApplication.findMany({
     where: {
-      editionId,
+      eventId: editionId,
       status: 'ACCEPTED',
       // Si team leader, filtrer uniquement les bénévoles de ses équipes
       ...(isTeamLeader && {

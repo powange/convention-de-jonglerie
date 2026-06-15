@@ -50,7 +50,7 @@ export default wrapApiHandler(
       where: { id: applicationId },
       select: {
         id: true,
-        editionId: true,
+        eventId: true,
         status: true,
 
         // Données personnelles (snapshot)
@@ -91,19 +91,23 @@ export default wrapApiHandler(
         user: {
           select: userBasicSelect,
         },
-        edition: {
+        event: {
           select: {
-            name: true,
-            convention: {
+            edition: {
               select: {
                 name: true,
+                convention: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
         },
       },
     })
-    if (!application || application.editionId !== editionId)
+    if (!application || application.eventId !== editionId)
       throw createError({ status: 404, message: 'Candidature introuvable' })
 
     // Si on modifie les données de la candidature (sans changer le statut)
@@ -189,7 +193,8 @@ export default wrapApiHandler(
       // MAIS seulement si la modification n'est pas faite par le bénévole lui-même
       const isOwnApplication = application.user.id === user.id
       if (!isOwnApplication && (changes.length > 0 || parsed.modificationNote?.trim())) {
-        const displayName = application.edition.name || application.edition.convention.name
+        const displayName =
+          application.event.edition?.name || application.event.edition?.convention.name
         let message = `Votre candidature pour "${displayName}" a été modifiée par les organisateurs`
 
         if (changes.length > 0) {
@@ -299,7 +304,7 @@ export default wrapApiHandler(
     }
 
     // Envoyer une notification selon le changement de statut
-    const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
+    const editionName = `${application.event.edition?.convention.name ?? ''}${application.event.edition?.name ? ' - ' + application.event.edition.name : ''}`
 
     if (target === 'ACCEPTED') {
       const assignedTeamNames = updated.teamAssignments.map((ta) => ta.team.name)

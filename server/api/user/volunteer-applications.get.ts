@@ -51,34 +51,38 @@ export default wrapApiHandler(
         skills: true,
         hasExperience: true,
         experienceDetails: true,
-        edition: {
+        event: {
           select: {
-            id: true,
-            name: true,
-            startDate: true,
-            endDate: true,
-            city: true,
-            country: true,
-            imageUrl: true,
-            volunteersAskDiet: true,
-            volunteersAskAllergies: true,
-            volunteersAskEmergencyContact: true,
-            volunteersAskTimePreferences: true,
-            volunteersAskTeamPreferences: true,
-            volunteersAskPets: true,
-            volunteersAskMinors: true,
-            volunteersAskVehicle: true,
-            volunteersAskCompanion: true,
-            volunteersAskAvoidList: true,
-            volunteersAskSkills: true,
-            volunteersAskExperience: true,
-            volunteersAskSetup: true,
-            volunteersAskTeardown: true,
-            convention: {
+            edition: {
               select: {
                 id: true,
                 name: true,
-                logo: true,
+                startDate: true,
+                endDate: true,
+                city: true,
+                country: true,
+                imageUrl: true,
+                volunteersAskDiet: true,
+                volunteersAskAllergies: true,
+                volunteersAskEmergencyContact: true,
+                volunteersAskTimePreferences: true,
+                volunteersAskTeamPreferences: true,
+                volunteersAskPets: true,
+                volunteersAskMinors: true,
+                volunteersAskVehicle: true,
+                volunteersAskCompanion: true,
+                volunteersAskAvoidList: true,
+                volunteersAskSkills: true,
+                volunteersAskExperience: true,
+                volunteersAskSetup: true,
+                volunteersAskTeardown: true,
+                convention: {
+                  select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                  },
+                },
               },
             },
             volunteerTeams: {
@@ -97,7 +101,9 @@ export default wrapApiHandler(
 
     // Récupérer les éditions des candidatures acceptées pour chercher les créneaux assignés
     const acceptedApplications = applications.filter((app) => app.status === 'ACCEPTED')
-    const editionIds = acceptedApplications.map((app) => app.edition.id)
+    const editionIds = acceptedApplications
+      .map((app) => app.event.edition?.id)
+      .filter((id): id is number => id != null)
 
     // Récupérer tous les créneaux assignés pour cet utilisateur dans ces éditions
     let volunteerAssignments = []
@@ -106,7 +112,7 @@ export default wrapApiHandler(
         where: {
           userId: user.id,
           timeSlot: {
-            editionId: {
+            eventId: {
               in: editionIds,
             },
           },
@@ -121,7 +127,7 @@ export default wrapApiHandler(
               startDateTime: true,
               endDateTime: true,
               delayMinutes: true,
-              editionId: true,
+              eventId: true,
               team: {
                 select: {
                   id: true,
@@ -144,7 +150,7 @@ export default wrapApiHandler(
     const applicationsWithTeamNames = applications.map((app) => {
       const teamPreferencesWithNames = app.teamPreferences
         ? (app.teamPreferences as unknown as string[]).map((teamId) => {
-            const team = app.edition.volunteerTeams.find((t) => t.id === teamId)
+            const team = app.event.volunteerTeams.find((t) => t.id === teamId)
             return team ? team.name : teamId
           })
         : []
@@ -156,18 +162,17 @@ export default wrapApiHandler(
 
       // Filtrer les créneaux assignés pour cette édition
       const editionAssignments = volunteerAssignments.filter(
-        (assignment) => assignment.timeSlot.editionId === app.edition.id
+        (assignment) => assignment.timeSlot.eventId === app.event.edition?.id
       )
 
+      // Reconstituer la forme historique de la réponse : `edition` à plat (sans event)
+      const { event: _event, ...appRest } = app
       return {
-        ...app,
+        ...appRest,
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
         assignedTimeSlots: editionAssignments,
-        edition: {
-          ...app.edition,
-          volunteerTeams: undefined, // On supprime cette propriété du retour
-        },
+        edition: app.event.edition,
       }
     })
 

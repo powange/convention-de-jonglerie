@@ -16,14 +16,18 @@ export default wrapApiHandler(async (event) => {
   const notificationGroup = await prisma.volunteerNotificationGroup.findFirst({
     where: {
       id: groupId,
-      editionId,
+      eventId: editionId,
     },
     include: {
-      edition: {
+      event: {
         select: {
-          name: true,
-          convention: {
-            select: { name: true },
+          edition: {
+            select: {
+              name: true,
+              convention: {
+                select: { name: true },
+              },
+            },
           },
         },
       },
@@ -48,7 +52,7 @@ export default wrapApiHandler(async (event) => {
   // Vérifier que l'utilisateur est un bénévole accepté de cette édition
   const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
     where: {
-      editionId,
+      eventId: editionId,
       userId: user.id,
       status: 'ACCEPTED',
     },
@@ -63,7 +67,8 @@ export default wrapApiHandler(async (event) => {
   const isConfirmed = confirmation && confirmation.confirmedAt !== null
   const confirmedAt = isConfirmed ? confirmation.confirmedAt : null
 
-  const displayName = notificationGroup.edition.name || notificationGroup.edition.convention.name
+  const displayName =
+    notificationGroup.event.edition?.name || notificationGroup.event.edition?.convention.name
 
   return {
     notification: {

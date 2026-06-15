@@ -247,7 +247,7 @@ export async function validateTeamPreferences(
   if (volunteersAskTeamPreferences && parsed.teamPreferences && parsed.teamPreferences.length > 0) {
     // Récupérer les équipes du nouveau système
     const validTeams = await prisma.volunteerTeam.findMany({
-      where: { editionId },
+      where: { eventId: editionId },
       select: { id: true, name: true },
     })
 

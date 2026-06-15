@@ -32,11 +32,15 @@ export default wrapApiHandler(
         volunteersAskSetup: true,
         volunteersAskTeardown: true,
         volunteersUpdatedAt: true,
-        volunteerApplications: { select: { id: true, status: true, userId: true } },
+        event: {
+          select: {
+            volunteerApplications: { select: { id: true, status: true, userId: true } },
+          },
+        },
       },
     })
 
-    const counts = edition.volunteerApplications.reduce(
+    const counts = edition.event.volunteerApplications.reduce(
       (acc, a) => {
         acc.total++
         acc[a.status] = (acc[a.status] || 0) + 1

@@ -31,12 +31,12 @@ export default wrapApiHandler(
       where: { id: applicationId },
       select: {
         id: true,
-        editionId: true,
+        eventId: true,
         status: true,
         userId: true,
       },
     })
-    if (!application || application.editionId !== editionId)
+    if (!application || application.eventId !== editionId)
       throw createError({ status: 404, message: 'Candidature introuvable' })
 
     // Vérifier que le bénévole est en attente ou accepté (pas rejeté)

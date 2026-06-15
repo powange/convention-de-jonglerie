@@ -19,7 +19,7 @@ export default wrapApiHandler(
     // Récupérer les créneaux de bénévoles pour cette édition
     const timeSlots = await prisma.volunteerTimeSlot.findMany({
       where: {
-        editionId,
+        eventId: editionId,
       },
       include: {
         team: {

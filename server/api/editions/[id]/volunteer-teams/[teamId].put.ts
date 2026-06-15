@@ -38,7 +38,7 @@ export default wrapApiHandler(
     const existingTeam = await prisma.volunteerTeam.findFirst({
       where: {
         id: teamId,
-        editionId,
+        eventId: editionId,
       },
     })
 
@@ -53,7 +53,7 @@ export default wrapApiHandler(
     if (body.name && body.name !== existingTeam.name) {
       const nameConflict = await prisma.volunteerTeam.findFirst({
         where: {
-          editionId,
+          eventId: editionId,
           name: body.name,
           id: { not: teamId },
         },

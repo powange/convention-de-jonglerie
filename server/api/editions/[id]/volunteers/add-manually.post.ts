@@ -57,8 +57,8 @@ export default wrapApiHandler(async (event) => {
   // Vérifier qu'il n'y a pas déjà une candidature
   const existing = await prisma.editionVolunteerApplication.findUnique({
     where: {
-      editionId_userId: {
-        editionId,
+      eventId_userId: {
+        eventId: editionId,
         userId: body.userId,
       },
     },
@@ -100,7 +100,7 @@ export default wrapApiHandler(async (event) => {
   // Créer la candidature avec le statut ACCEPTED
   const application = await prisma.editionVolunteerApplication.create({
     data: {
-      editionId,
+      eventId: editionId,
       userId: body.userId,
       status: 'ACCEPTED',
       motivation: 'Ajouté manuellement par un organisateur',

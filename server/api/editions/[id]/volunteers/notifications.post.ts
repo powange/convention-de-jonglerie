@@ -35,7 +35,7 @@ export default wrapApiHandler(async (event) => {
         isLeader: true,
         application: {
           userId: user.id,
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
       },
@@ -92,7 +92,7 @@ export default wrapApiHandler(async (event) => {
 
   // Construire la requête pour récupérer les bénévoles
   const whereClause: any = {
-    editionId,
+    eventId: editionId,
     status: 'ACCEPTED',
   }
 
@@ -131,7 +131,7 @@ export default wrapApiHandler(async (event) => {
   // Enregistrer les métadonnées du groupe de notifications pour le suivi
   const notificationGroup = await prisma.volunteerNotificationGroup.create({
     data: {
-      editionId,
+      eventId: editionId,
       senderId: user.id,
       title,
       message,

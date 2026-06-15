@@ -155,10 +155,15 @@ export default wrapApiHandler(
       })
     }
 
+    // Ancre Event (l'édition partage son id : invariant Edition.id == eventId)
+    const eventAnchor = await prisma.event.create({ data: {} })
+
     // Créer l'édition (sans creatorId pour qu'elle soit orpheline)
     // D'abord sans l'image pour avoir l'ID
     const edition = await prisma.edition.create({
       data: {
+        id: eventAnchor.id,
+        eventId: eventAnchor.id,
         conventionId: convention.id,
         name: validatedData.edition.name || null,
         description: validatedData.edition.description,

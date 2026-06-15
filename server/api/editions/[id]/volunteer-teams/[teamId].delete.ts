@@ -19,7 +19,7 @@ export default wrapApiHandler(
     const existingTeam = await prisma.volunteerTeam.findFirst({
       where: {
         id: teamId,
-        editionId,
+        eventId: editionId,
       },
       include: {
         _count: {

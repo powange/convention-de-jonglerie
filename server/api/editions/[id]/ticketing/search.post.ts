@@ -313,7 +313,7 @@ export default wrapApiHandler(
         where: {
           userId: { in: volunteerUserIds },
           timeSlot: {
-            editionId: editionId,
+            eventId: editionId,
           },
         },
         include: {

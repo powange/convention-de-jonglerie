@@ -23,7 +23,7 @@ export default wrapApiHandler(
         id: assignmentId,
         timeSlotId: slotId,
         timeSlot: {
-          editionId,
+          eventId: editionId,
         },
       },
       include: {

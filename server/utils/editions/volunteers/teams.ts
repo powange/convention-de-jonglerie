@@ -8,7 +8,7 @@ import {
  */
 export async function getVolunteerTeams(editionId: number) {
   return await prisma.volunteerTeam.findMany({
-    where: { editionId },
+    where: { eventId: editionId },
     orderBy: { name: 'asc' },
     select: {
       id: true,
@@ -32,7 +32,7 @@ export async function getVolunteerTeamById(teamId: string) {
       description: true,
       color: true,
       maxVolunteers: true,
-      editionId: true,
+      eventId: true,
     },
   })
 }
@@ -77,7 +77,7 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
     // Récupérer l'application pour avoir l'editionId et userId
     const application = await tx.editionVolunteerApplication.findUnique({
       where: { id: applicationId },
-      select: { editionId: true, userId: true },
+      select: { eventId: true, userId: true },
     })
 
     if (!application) {
@@ -98,7 +98,7 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
     // Retirer le bénévole des conversations des anciennes équipes
     for (const oldAssignment of oldAssignments) {
       await removeVolunteerFromTeamConversations(
-        application.editionId,
+        application.eventId,
         oldAssignment.teamId,
         application.userId,
         tx
@@ -120,7 +120,7 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
 
       // Créer les conversations pour les nouvelles équipes
       for (const teamId of uniqueTeamIds) {
-        await ensureVolunteerConversations(application.editionId, teamId, application.userId, tx)
+        await ensureVolunteerConversations(application.eventId, teamId, application.userId, tx)
       }
     }
 
@@ -152,7 +152,7 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
     // Récupérer l'application pour avoir l'editionId et userId
     const application = await tx.editionVolunteerApplication.findUnique({
       where: { id: applicationId },
-      select: { editionId: true, userId: true },
+      select: { eventId: true, userId: true },
     })
 
     if (!application) {
@@ -193,7 +193,7 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
     })
 
     // Créer les conversations pour cette équipe
-    await ensureVolunteerConversations(application.editionId, teamId, application.userId, tx)
+    await ensureVolunteerConversations(application.eventId, teamId, application.userId, tx)
 
     return assignment
   })
@@ -209,7 +209,7 @@ export async function removeVolunteerFromTeam(applicationId: number, teamId: str
     // Récupérer l'application pour avoir l'editionId et userId
     const application = await tx.editionVolunteerApplication.findUnique({
       where: { id: applicationId },
-      select: { editionId: true, userId: true },
+      select: { eventId: true, userId: true },
     })
 
     if (!application) {
@@ -228,7 +228,7 @@ export async function removeVolunteerFromTeam(applicationId: number, teamId: str
 
     // Retirer le bénévole des conversations de cette équipe
     await removeVolunteerFromTeamConversations(
-      application.editionId,
+      application.eventId,
       teamId,
       application.userId,
       tx
@@ -392,7 +392,7 @@ export async function resolveTeamIdentifiers(
   identifiers: string[]
 ): Promise<string[]> {
   const teams = await prisma.volunteerTeam.findMany({
-    where: { editionId },
+    where: { eventId: editionId },
     select: { id: true, name: true },
   })
 

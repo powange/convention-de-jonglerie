@@ -138,8 +138,12 @@ export default wrapApiHandler(
 
     // Transaction pour garantir l'atomicité de la duplication
     const newEdition = await prisma.$transaction(async (tx) => {
+      // Ancre Event (l'édition partage son id : invariant Edition.id == eventId)
+      const eventAnchor = await tx.event.create({ data: {} })
       const created = await tx.edition.create({
         data: {
+          id: eventAnchor.id,
+          eventId: eventAnchor.id,
           ...structuralFields,
           conventionId,
           name: sourceEdition.name ? `${sourceEdition.name} (copie)` : null,

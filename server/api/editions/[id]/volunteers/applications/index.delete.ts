@@ -8,7 +8,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
 
     const app = await prisma.editionVolunteerApplication.findUnique({
-      where: { editionId_userId: { editionId, userId: user.id } },
+      where: { eventId_userId: { eventId: editionId, userId: user.id } },
       select: { id: true, status: true },
     })
     if (!app) throw createError({ status: 404, message: 'Candidature introuvable' })

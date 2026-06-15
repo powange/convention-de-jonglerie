@@ -20,7 +20,7 @@ export default wrapApiHandler(async (event) => {
         isLeader: true,
         application: {
           userId: user.id,
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
       },
@@ -35,7 +35,7 @@ export default wrapApiHandler(async (event) => {
 
   // Pour les team leaders, ne récupérer que leurs propres notifications
   const notificationsWhere: any = {
-    editionId,
+    eventId: editionId,
   }
 
   if (isTeamLeader && !canManage) {
@@ -80,7 +80,7 @@ export default wrapApiHandler(async (event) => {
     notifications.map(async (notification) => {
       // Récupérer tous les destinataires originaux pour cette notification
       const whereClause: any = {
-        editionId,
+        eventId: editionId,
         status: 'ACCEPTED',
       }
 

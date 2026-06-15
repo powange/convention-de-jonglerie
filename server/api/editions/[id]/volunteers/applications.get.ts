@@ -75,7 +75,7 @@ export default wrapApiHandler(async (event) => {
   const sortSecondary = (query.sortSecondary as string) || '' // format "field:dir,field2:dir"
   const search = (query.search as string)?.trim()
   // Construction de la clause WHERE
-  const conditions: VolunteerApplicationWhereInput[] = [{ editionId }]
+  const conditions: VolunteerApplicationWhereInput[] = [{ eventId: editionId }]
 
   // Filtre par statut
   if (statusFilter) {
@@ -266,23 +266,29 @@ export default wrapApiHandler(async (event) => {
         updatedAt: true,
         volunteerComments: {
           where: {
-            edition: {
-              conventionId,
+            event: {
+              edition: {
+                conventionId,
+              },
             },
           },
           select: {
             content: true,
             createdAt: true,
             updatedAt: true,
-            editionId: true,
-            edition: {
+            eventId: true,
+            event: {
               select: {
-                name: true,
-                startDate: true,
-                endDate: true,
-                convention: {
+                edition: {
                   select: {
                     name: true,
+                    startDate: true,
+                    endDate: true,
+                    convention: {
+                      select: {
+                        name: true,
+                      },
+                    },
                   },
                 },
               },

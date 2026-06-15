@@ -42,7 +42,7 @@ export default wrapApiHandler(
 
     // Vérifier candidature existante
     const existing = await prisma.editionVolunteerApplication.findUnique({
-      where: { editionId_userId: { editionId, userId: authenticatedUser.id } },
+      where: { eventId_userId: { eventId: editionId, userId: authenticatedUser.id } },
       select: { id: true },
     })
     if (existing) throw createError({ status: 409, message: 'Déjà candidat' })
@@ -122,7 +122,7 @@ export default wrapApiHandler(
 
     const application = await prisma.editionVolunteerApplication.create({
       data: {
-        editionId,
+        eventId: editionId,
         userId: authenticatedUser.id,
         motivation: parsed.motivation || null,
         userSnapshotPhone: finalPhone,
@@ -205,14 +205,18 @@ export default wrapApiHandler(
         teardownAvailability: true,
         arrivalDateTime: true,
         departureDateTime: true,
-        edition: {
+        event: {
           select: {
-            id: true,
-            name: true,
-            conventionId: true,
-            convention: {
+            edition: {
               select: {
+                id: true,
                 name: true,
+                conventionId: true,
+                convention: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
@@ -222,7 +226,7 @@ export default wrapApiHandler(
 
     // Envoyer une notification de confirmation de candidature
     try {
-      const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
+      const editionName = `${application.event.edition?.convention.name ?? ''}${application.event.edition?.name ? ' - ' + application.event.edition.name : ''}`
       const { NotificationHelpers } = await import('#server/utils/notification-service')
       await NotificationHelpers.volunteerApplicationSubmitted(
         authenticatedUser.id,

@@ -52,9 +52,9 @@ export default wrapApiHandler(
 
     const comment = await prisma.volunteerComment.findUnique({
       where: {
-        userId_editionId: {
+        userId_eventId: {
           userId,
-          editionId,
+          eventId: editionId,
         },
       },
     })

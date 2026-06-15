@@ -15,8 +15,10 @@ export default defineTask({
       // Récupérer tous les créneaux des éditions en cours
       const allSlots = await prisma.volunteerTimeSlot.findMany({
         where: {
-          edition: {
-            endDate: { gte: now },
+          event: {
+            edition: {
+              endDate: { gte: now },
+            },
           },
         },
         include: {
@@ -28,8 +30,12 @@ export default defineTask({
             },
           },
           team: { select: { name: true, color: true } },
-          edition: {
-            select: { id: true, name: true, convention: { select: { name: true } } },
+          event: {
+            select: {
+              edition: {
+                select: { id: true, name: true, convention: { select: { name: true } } },
+              },
+            },
           },
         },
       })
@@ -46,7 +52,7 @@ export default defineTask({
       // Traiter chaque créneau
       for (const slot of upcomingSlots) {
         if (slot.assignments.length > 0) {
-          const editionName = slot.edition.name || slot.edition.convention.name
+          const editionName = slot.event.edition?.name || slot.event.edition?.convention.name
           const slotTitle = slot.title || 'Créneau bénévole'
           const teamName = slot.team?.name || 'Équipe non assignée'
           const delay = slot.delayMinutes || 0

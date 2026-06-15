@@ -10,11 +10,11 @@ export default wrapApiHandler(
 
     const app = await prisma.editionVolunteerApplication.findUnique({
       where: { id: applicationId },
-      select: { id: true, status: true, userId: true, editionId: true },
+      select: { id: true, status: true, userId: true, eventId: true },
     })
 
     if (!app) throw createError({ status: 404, message: 'Candidature introuvable' })
-    if (app.editionId !== editionId)
+    if (app.eventId !== editionId)
       throw createError({ status: 404, message: 'Candidature introuvable' })
     requireResourceOwner(event, app, { errorMessage: 'Accès refusé' })
     if (app.status !== 'PENDING')

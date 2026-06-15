@@ -24,7 +24,7 @@ export default wrapApiHandler(
       where: { id: applicationId },
       select: {
         id: true,
-        editionId: true,
+        eventId: true,
         source: true,
         user: {
           select: {
@@ -43,7 +43,7 @@ export default wrapApiHandler(
     }
 
     // Vérifier que la candidature appartient bien à cette édition
-    if (application.editionId !== editionId) {
+    if (application.eventId !== editionId) {
       throw createError({
         status: 403,
         message: "Cette candidature n'appartient pas à cette édition",

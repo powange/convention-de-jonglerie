@@ -13,8 +13,8 @@ export default wrapApiHandler(async (event) => {
   // Récupérer le bénévole
   const volunteer = await prisma.editionVolunteerApplication.findUnique({
     where: {
-      editionId_userId: {
-        editionId,
+      eventId_userId: {
+        eventId: editionId,
         userId: user.id,
       },
     },

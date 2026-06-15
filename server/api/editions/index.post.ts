@@ -72,9 +72,14 @@ export default wrapApiHandler(
       country,
     })
 
+    // Créer l'événement générique (ancre) ; l'édition partage son id (invariant Edition.id == eventId)
+    const eventAnchor = await prisma.event.create({ data: {} })
+
     // Créer l'édition sans l'image d'abord
     const edition = await prisma.edition.create({
       data: {
+        id: eventAnchor.id,
+        eventId: eventAnchor.id,
         conventionId,
         name: name?.trim() || null,
         description,
