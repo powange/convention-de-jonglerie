@@ -94,8 +94,30 @@ enum EditionStatus {
   CANCELLED // Annulé - convention annulée
 }
 
+// Conteneur d'événement générique (agnostique du domaine), ancre de découplage.
+// Edition (jonglerie) en est une extension 1:1 ; le module bénévole s'y rattache.
+// Étape 0 (scope réduit) : ancre minimale. Les champs génériques (name/dates/status…) et la
+// config bénévole (volunteers*) restent sur Edition pour l'instant ; ils seront promus vers Event
+// dans une étape ultérieure dédiée. Le code bénévole charge Edition par id (== eventId, id réutilisé).
+model Event {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Extension domaine (1:1) — côté jonglerie
+  edition Edition?
+
+  // Module bénévole (FK repointées sur Event à l'étape 0)
+  volunteerApplications       EditionVolunteerApplication[]
+  volunteerTeams              VolunteerTeam[]
+  volunteerTimeSlots          VolunteerTimeSlot[]
+  volunteerNotificationGroups VolunteerNotificationGroup[]
+  volunteerComments           VolunteerComment[]
+}
+
 model Edition {
   id                                Int                              @id @default(autoincrement())
+  eventId                           Int                              @unique
   name                              String?
   description                       String?                          @db.Text
   program                           String?                          @db.Text
@@ -190,17 +212,14 @@ model Edition {
   faqPagePublic                     Boolean                          @default(false)
   carpoolOffers                     CarpoolOffer[]
   carpoolRequests                   CarpoolRequest[]
+  event                             Event                            @relation(fields: [eventId], references: [id], onDelete: Cascade)
   convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   creator                           User?                            @relation("CreatedEditions", fields: [creatorId], references: [id])
   organizerPermissions              EditionOrganizerPermission[]
   editionPosts                      EditionPost[]
-  volunteerApplications             EditionVolunteerApplication[]
   lostFoundItems                    LostFoundItem[]
   favoritedBy                       User[]                           @relation("FavoriteEditions")
   attendingUsers                    User[]                           @relation("AttendingEditions")
-  volunteerNotificationGroups       VolunteerNotificationGroup[]
-  volunteerTeams                    VolunteerTeam[]
-  volunteerTimeSlots                VolunteerTimeSlot[]
   externalTicketing                 ExternalTicketing?
   sumupConfig                       SumupConfig?
   tiers                             TicketingTier[]
@@ -217,7 +236,6 @@ model Edition {
   shows                             Show[]
   volunteerMeals                    VolunteerMeal[]
   ticketingCounters                 TicketingCounter[]
-  volunteerComments                 VolunteerComment[]
   editionOrganizers                 EditionOrganizer[]
   conversations                     Conversation[]
   showCalls                         EditionShowCall[]
