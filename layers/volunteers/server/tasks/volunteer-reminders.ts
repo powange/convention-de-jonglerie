@@ -1,4 +1,4 @@
-import { NotificationService } from '../utils/notification-service'
+import { NotificationService } from '#server/utils/notification-service'
 
 export default defineTask({
   meta: {
