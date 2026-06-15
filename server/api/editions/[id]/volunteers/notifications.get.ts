@@ -1,15 +1,15 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
 
   // Vérifier les permissions
-  const canManage = await canManageEditionVolunteers(editionId, user.id, event)
+  const canManage = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
 
   // Vérifier si l'utilisateur est team leader
   let isTeamLeader = false

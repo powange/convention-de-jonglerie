@@ -4,10 +4,10 @@ import type { EditionUpdateInput } from '#server/types/prisma-helpers'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { buildUpdateData, fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z
   .object({
@@ -136,7 +136,7 @@ export default wrapApiHandler(
       errorMessage: 'Edition introuvable',
       select: { conventionId: true, volunteersMode: true },
     })
-    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

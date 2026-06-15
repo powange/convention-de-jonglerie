@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 
@@ -15,7 +15,7 @@ export default wrapApiHandler(
     const assignmentId = validateStringId(event, 'assignmentId', 'assignation')
 
     // Vérifier les permissions de gestion des bénévoles
-    await requireVolunteerManagementAccess(event, editionId)
+    await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     // Vérifier que l'assignation existe et appartient à ce créneau/édition
     const assignment = await prisma.volunteerAssignment.findFirst({

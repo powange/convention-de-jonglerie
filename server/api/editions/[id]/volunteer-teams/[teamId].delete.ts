@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { validateEditionId, validateStringResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -13,7 +13,7 @@ export default wrapApiHandler(
     const teamId = validateStringResourceId(event, 'teamId', 'équipe')
 
     // Vérifier les permissions de gestion des bénévoles
-    await requireVolunteerManagementAccess(event, editionId)
+    await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     // Vérifier que l'équipe existe et appartient à cette édition
     const existingTeam = await prisma.volunteerTeam.findFirst({

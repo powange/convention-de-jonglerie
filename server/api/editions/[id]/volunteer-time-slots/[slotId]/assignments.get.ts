@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { volunteerAssignmentDetailedInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 
@@ -14,7 +14,7 @@ export default wrapApiHandler(
     const slotId = validateStringId(event, 'slotId', 'créneau')
 
     // Vérifier les permissions de gestion des bénévoles
-    await requireVolunteerManagementAccess(event, editionId)
+    await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     // Vérifier que le créneau existe et appartient à cette édition
     const timeSlot = await prisma.volunteerTimeSlot.findFirst({

@@ -3,7 +3,6 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { generateVolunteerScheduleEmailHtml, getSiteUrl } from '#server/utils/emailService'
 import { NotificationService } from '#server/utils/notification-service'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -13,7 +12,7 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
 
   // Vérifier les permissions
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+  const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
   if (!allowed) {
     throw createError({
       status: 403,

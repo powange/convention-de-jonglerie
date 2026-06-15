@@ -2,6 +2,7 @@
 // Le module bénévole consomme ces interfaces ; l'app les câble sur ses implémentations
 // concrètes (notifications, email, messenger). Voir docs/etape-1-ports-decouplage.md.
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
+import type { AuthenticatedUser } from '#server/utils/auth-utils'
 
 /** Notification in-app (englobe déjà le « safe » : ne lève pas). */
 export interface NotifyInput {
@@ -55,8 +56,20 @@ export interface MessengerPort {
   }): Promise<void>
 }
 
+/**
+ * Résolution des droits organisateur sur les bénévoles d'un event.
+ * Chaque app implémente ces contrôles contre son modèle d'organisateurs/permissions.
+ * (Le param `event` est le H3Event de la requête, transmis tel quel.)
+ */
+export interface OrganizerDirectoryPort {
+  requireManagementAccess(event: any, eventId: number): Promise<AuthenticatedUser>
+  requireReadAccess(event: any, eventId: number): Promise<AuthenticatedUser>
+  canManage(eventId: number, userId: number, event?: any): Promise<boolean>
+}
+
 export interface VolunteerPorts {
   notifications: NotificationPort
   email: EmailPort
   messenger: MessengerPort
+  organizers: OrganizerDirectoryPort
 }

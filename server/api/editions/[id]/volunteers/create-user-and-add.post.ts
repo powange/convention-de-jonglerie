@@ -6,7 +6,6 @@ import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { getEmailHash } from '#server/utils/email-hash'
 import { generateVerificationCode, getSiteUrl } from '#server/utils/emailService'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
@@ -178,7 +177,7 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
 
   // Vérifier les permissions
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+  const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
   if (!allowed)
     throw createError({
       status: 403,

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const createTimeSlotSchema = z
@@ -28,7 +28,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
 
     // Vérifier les permissions de gestion des bénévoles
-    await requireVolunteerManagementAccess(event, editionId)
+    await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     // Validation du body
     const body = await readValidatedBody(event, createTimeSlotSchema.parse)

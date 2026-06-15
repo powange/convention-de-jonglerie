@@ -1,8 +1,8 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
 import { volunteerUserDetailedSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(async (event) => {
   // Authentification requise
@@ -10,7 +10,7 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
 
   // Vérifier les permissions de gestion des bénévoles
-  await requireVolunteerManagementAccess(event, editionId)
+  await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
   // Récupérer tous les bénévoles avec candidature acceptée pour cette édition
   const availableVolunteers = await prisma.editionVolunteerApplication.findMany({

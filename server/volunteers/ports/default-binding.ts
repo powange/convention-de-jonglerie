@@ -12,6 +12,11 @@ import {
   ensureVolunteerConversations,
   removeVolunteerFromTeamConversations,
 } from '#server/utils/messenger-helpers'
+import {
+  requireVolunteerManagementAccess,
+  requireVolunteerReadAccess,
+} from '#server/utils/permissions/volunteer-permissions'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import type { NotifyInput, VolunteerPorts } from './types'
 
 function toCreateData(input: NotifyInput): CreateNotificationData {
@@ -33,6 +38,12 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
         ensureVolunteerConversations(eventId, teamId, userId, tx),
       removeFromTeamConversations: ({ eventId, teamId, userId, tx }) =>
         removeVolunteerFromTeamConversations(eventId, teamId, userId, tx),
+    },
+    organizers: {
+      requireManagementAccess: (event, eventId) =>
+        requireVolunteerManagementAccess(event, eventId),
+      requireReadAccess: (event, eventId) => requireVolunteerReadAccess(event, eventId),
+      canManage: (eventId, userId, event) => canManageEditionVolunteers(eventId, userId, event),
     },
   }
 }

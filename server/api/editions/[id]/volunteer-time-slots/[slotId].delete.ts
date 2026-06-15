@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -18,7 +18,7 @@ export default wrapApiHandler(
 
     // Vérifier les permissions de gestion des bénévoles
     console.log(`[DELETE SLOT] Vérification des permissions pour l'édition ${editionId}`)
-    await requireVolunteerManagementAccess(event, editionId)
+    await useVolunteerPorts().organizers.requireManagementAccess(event, editionId)
 
     console.log(`[DELETE SLOT] Recherche du créneau ${slotId} pour l'édition ${editionId}`)
 

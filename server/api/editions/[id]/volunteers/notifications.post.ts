@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -22,7 +21,7 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
 
   // Vérifier les permissions
-  const canManage = await canManageEditionVolunteers(editionId, user.id, event)
+  const canManage = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
 
   // Si l'utilisateur ne peut pas gérer, vérifier s'il est team leader
   let isTeamLeader = false

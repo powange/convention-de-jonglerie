@@ -6,8 +6,8 @@ import {
   assignVolunteerToTeams,
   resolveTeamIdentifiers,
 } from '#server/utils/editions/volunteers/teams'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({
   teams: z.array(z.string()), // Noms ou IDs des équipes pour l'assignation
@@ -20,7 +20,7 @@ export default wrapApiHandler(
     const applicationId = validateResourceId(event, 'applicationId', 'candidature')
     const parsed = bodySchema.parse(await readBody(event))
 
-    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

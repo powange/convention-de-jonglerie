@@ -5,10 +5,10 @@ import type { Prisma } from '@prisma/client'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { VolunteerScheduler } from '#server/utils/volunteer-scheduler'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 // Types pour les données récupérées de la base de données
 type VolunteerWithTeamAssignments = Prisma.EditionVolunteerApplicationGetPayload<{
@@ -66,7 +66,7 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  if (!(await canManageEditionVolunteers(editionId, user.id, event))) {
+  if (!(await useVolunteerPorts().organizers.canManage(editionId, user.id, event))) {
     throw createError({
       status: 403,
       statusText: 'Droits insuffisants pour gérer les bénévoles',

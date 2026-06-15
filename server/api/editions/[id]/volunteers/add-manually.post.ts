@@ -2,12 +2,12 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '#server/utils/volunteer-meals'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({
   userId: z.number(),
@@ -18,7 +18,7 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
 
   // Vérifier les permissions
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+  const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
   if (!allowed)
     throw createError({
       status: 403,
