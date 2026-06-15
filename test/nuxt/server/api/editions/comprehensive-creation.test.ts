@@ -62,6 +62,9 @@ describe('/api/editions POST - Tests complets', () => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
 
+    // Ancre Event créée avant chaque édition (invariant Edition.id == eventId)
+    prismaMock.event.create.mockResolvedValue({ id: 1 })
+
     // Valeurs par défaut pour les mocks
     mockGeocodeEdition.mockResolvedValue({
       latitude: 48.8566,

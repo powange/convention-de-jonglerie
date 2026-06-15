@@ -153,7 +153,7 @@ export async function isAcceptedVolunteer(userId: number, editionId: number): Pr
   const application = await prisma.editionVolunteerApplication.findFirst({
     where: {
       userId,
-      editionId,
+      eventId: editionId,
       status: 'ACCEPTED',
     },
   })

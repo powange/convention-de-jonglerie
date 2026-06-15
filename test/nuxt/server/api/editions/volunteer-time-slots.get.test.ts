@@ -39,7 +39,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     const mockTimeSlots = [
       {
         id: 'slot1',
-        editionId: 1,
+        eventId: 1,
         teamId: 'team1',
         title: 'Accueil',
         description: 'Accueil des participants',
@@ -73,7 +73,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
       },
       {
         id: 'slot2',
-        editionId: 1,
+        eventId: 1,
         teamId: 'team2',
         title: 'Bar',
         description: 'Service au bar',
@@ -115,7 +115,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     })
 
     expect(prismaMock.volunteerTimeSlot.findMany).toHaveBeenCalledWith({
-      where: { editionId: 1 },
+      where: { eventId: 1 },
       include: {
         team: {
           select: {
@@ -160,7 +160,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     const mockTimeSlots = [
       {
         id: 'slot1',
-        editionId: 1,
+        eventId: 1,
         teamId: 'team1',
         title: 'Accueil',
         description: 'Accueil des participants',
@@ -215,7 +215,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     const mockTimeSlots = [
       {
         id: 'slot1',
-        editionId: 1,
+        eventId: 1,
         teamId: 'team1',
         title: 'Accueil',
         description: 'Accueil des participants',
@@ -296,7 +296,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     const mockTimeSlots = [
       {
         id: 'slot1',
-        editionId: 1,
+        eventId: 1,
         teamId: 'team1',
         title: 'Créneau 1',
         description: null,
@@ -310,7 +310,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
       },
       {
         id: 'slot2',
-        editionId: 1,
+        eventId: 1,
         teamId: 'team2',
         title: 'Créneau 2',
         description: null,

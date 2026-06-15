@@ -27,6 +27,7 @@ export const prismaMock = {
   // Modèles principaux
   convention: createModelMock(),
   conventionOrganizer: createModelMock(),
+  event: createModelMock(),
   edition: createModelMock(),
   editionOrganizerPermission: createModelMock(),
   editionOrganizer: createModelMock(),

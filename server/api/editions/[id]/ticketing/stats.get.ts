@@ -54,7 +54,7 @@ export default wrapApiHandler(
       // Compter les validations de bénévoles (uniquement ACCEPTED et disponibles pendant l'événement)
       const volunteersValidatedToday = await prisma.editionVolunteerApplication.count({
         where: {
-          editionId: editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
           entryValidated: true,
           entryValidatedAt: {
@@ -73,7 +73,7 @@ export default wrapApiHandler(
 
       const totalVolunteersValidated = await prisma.editionVolunteerApplication.count({
         where: {
-          editionId: editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
           entryValidated: true,
           OR: [
@@ -139,7 +139,7 @@ export default wrapApiHandler(
 
       const totalVolunteers = await prisma.editionVolunteerApplication.count({
         where: {
-          editionId: editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
           OR: [
             {

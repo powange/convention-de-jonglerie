@@ -30,9 +30,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         },
       })
 
-      // Créer une édition de test
+      // Créer une édition de test (ancre Event : Edition.id == eventId)
+      const eventAnchor = await prismaTest.event.create({ data: {} })
       testEdition = await prismaTest.edition.create({
         data: {
+          id: eventAnchor.id,
+          eventId: eventAnchor.id,
           name: `Edition Lost Found ${timestamp}`,
           startDate: new Date('2024-06-01'),
           endDate: new Date('2024-06-03'),

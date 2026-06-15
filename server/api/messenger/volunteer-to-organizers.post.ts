@@ -19,7 +19,7 @@ export default wrapApiHandler(
     // Vérifier que l'utilisateur est bien bénévole accepté de cette édition
     const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
       where: {
-        editionId,
+        eventId: editionId,
         userId: user.id,
         status: 'ACCEPTED',
       },

@@ -20,7 +20,7 @@ export default wrapApiHandler(
       // Récupérer tous les bénévoles acceptés qui n'ont pas validé leur billet
       const volunteers = await prisma.editionVolunteerApplication.findMany({
         where: {
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
           entryValidated: false,
           OR: [

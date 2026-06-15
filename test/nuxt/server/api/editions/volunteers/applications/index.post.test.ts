@@ -36,7 +36,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
   const mockApplication = {
     id: 1,
-    editionId: 1,
+    eventId: 1,
     userId: 1,
     status: 'PENDING',
     motivation: 'Je veux aider',
@@ -97,7 +97,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
       expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          editionId: 1,
+          eventId: 1,
           userId: mockUser.id,
           motivation: applicationData.motivation,
           userSnapshotPhone: mockUser.phone,

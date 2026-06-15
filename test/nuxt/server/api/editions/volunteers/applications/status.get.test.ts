@@ -31,8 +31,8 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
       expect(result).toEqual({ status: 'ACCEPTED' })
       expect(prismaMock.editionVolunteerApplication.findUnique).toHaveBeenCalledWith({
         where: {
-          editionId_userId: {
-            editionId: 1,
+          eventId_userId: {
+            eventId: 1,
             userId: mockUser.id,
           },
         },
@@ -94,8 +94,8 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
       // Vérifier que la requête utilise bien l'ID de l'utilisateur connecté
       expect(prismaMock.editionVolunteerApplication.findUnique).toHaveBeenCalledWith({
         where: {
-          editionId_userId: {
-            editionId: 1,
+          eventId_userId: {
+            eventId: 1,
             userId: mockUser.id, // Pas otherUser.id
           },
         },
@@ -165,8 +165,8 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
       expect(prismaMock.editionVolunteerApplication.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            editionId_userId: {
-              editionId: 42,
+            eventId_userId: {
+              eventId: 42,
               userId: mockUser.id,
             },
           },
@@ -186,8 +186,8 @@ describe('/api/editions/[id]/volunteers/applications/status GET', () => {
 
       expect(prismaMock.editionVolunteerApplication.findUnique).toHaveBeenCalledWith({
         where: {
-          editionId_userId: {
-            editionId: 1,
+          eventId_userId: {
+            eventId: 1,
             userId: mockUser.id,
           },
         },

@@ -60,7 +60,7 @@ export async function canCreateWorkshop(userId: number, editionId: number): Prom
   // Vérifier si l'utilisateur est un bénévole accepté
   const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
     where: {
-      editionId,
+      eventId: editionId,
       userId,
       status: 'ACCEPTED',
     },

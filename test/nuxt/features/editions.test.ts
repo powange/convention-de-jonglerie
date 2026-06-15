@@ -63,6 +63,8 @@ describe("Système d'éditions", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
+    // Ancre Event créée avant chaque édition (invariant Edition.id == eventId)
+    prismaMock.event.create.mockResolvedValue({ id: 1 })
   })
 
   describe("Création d'édition", () => {

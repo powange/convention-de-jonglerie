@@ -57,7 +57,7 @@ export async function isAnyTeamLeaderOnEdition(
   const application = await prisma.editionVolunteerApplication.findFirst({
     where: {
       userId,
-      editionId,
+      eventId: editionId,
       teamAssignments: { some: { isLeader: true } },
     },
     select: { id: true },
