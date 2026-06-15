@@ -5,12 +5,12 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { getEmailHash } from '#server/utils/email-hash'
 import { generateVerificationCode, getSiteUrl } from '#server/utils/emailService'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeEmail, sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
 import { createVolunteerMealSelections } from '#server/utils/volunteer-meals'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({
   email: z.string().email(),

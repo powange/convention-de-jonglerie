@@ -3,6 +3,7 @@
 // - Une autre app (ou un test) peut surcharger via setVolunteerPorts() — typiquement dans un
 //   plugin serveur — pour injecter ses propres implémentations.
 import { createDefaultVolunteerPorts } from './default-binding'
+
 import type { VolunteerPorts } from './types'
 
 let override: VolunteerPorts | null = null

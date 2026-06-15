@@ -1,8 +1,8 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { volunteerAssignmentDetailedInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {

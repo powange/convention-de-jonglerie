@@ -287,7 +287,9 @@
                             </span>
                           </div>
                           <span
-                            v-if="comment.event?.edition?.startDate && comment.event?.edition?.endDate"
+                            v-if="
+                              comment.event?.edition?.startDate && comment.event?.edition?.endDate
+                            "
                             class="text-xs text-gray-500 dark:text-gray-400"
                           >
                             {{

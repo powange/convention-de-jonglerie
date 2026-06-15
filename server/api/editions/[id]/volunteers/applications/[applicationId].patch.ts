@@ -7,7 +7,6 @@ import {
   getUserUpdateData,
 } from '#server/utils/editions/volunteers/applications'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import {
@@ -18,6 +17,7 @@ import {
   createVolunteerMealSelections,
   deleteVolunteerMealSelections,
 } from '#server/utils/volunteer-meals'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {

@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const createTeamSchema = z.object({
   name: z.string().min(1, "Le nom de l'équipe est requis").max(100),

@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { validateEditionId, validateStringResourceId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
