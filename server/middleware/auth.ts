@@ -1,10 +1,9 @@
-// Note: on charge getUserSession dynamiquement pour faciliter le mocking dans les tests
-
+// La session passe par server/utils/session-helpers (enveloppes des auto-imports nuxt-auth-utils),
+// et NON par `await import('#imports')` qui plante en dev (cf. session-helpers.ts).
 import { publicRoutes } from '../constants/public-routes'
+import { getSession, clearSession } from '../utils/session-helpers'
 
 export default defineEventHandler(async (event) => {
-  const imports: any = await import('#imports')
-  const getUserSession = imports.getUserSession
   const fullPath = event.path
   const path = fullPath.split('?')[0]
   const method = event.node.req.method
@@ -28,7 +27,7 @@ export default defineEventHandler(async (event) => {
     // Hydrater la session si demandé (routes publiques avec contenu conditionnel)
     if ('hydrateSession' in matchedRoute && matchedRoute.hydrateSession) {
       try {
-        const session = await getUserSession(event)
+        const session = await getSession(event)
         // Sur une route publique, un utilisateur orphelin est simplement traité comme anonyme.
         event.context.user =
           session?.user && (await sessionUserExists(session.user.id)) ? session.user : null
@@ -41,12 +40,12 @@ export default defineEventHandler(async (event) => {
 
   // --- Routes API protégées ---
   if (path.startsWith('/api/')) {
-    const session = await getUserSession(event)
+    const session = await getSession(event)
     if (session?.user) {
       // Session orpheline (utilisateur supprimé) : on l'invalide et on force la reconnexion
       // plutôt que de laisser les handlers renvoyer un 404 « Utilisateur introuvable » déroutant.
       if (!(await sessionUserExists(session.user.id))) {
-        await imports.clearUserSession(event)
+        await clearSession(event)
         throw createError({ status: 401, message: 'Session invalide, veuillez vous reconnecter' })
       }
       event.context.user = session.user

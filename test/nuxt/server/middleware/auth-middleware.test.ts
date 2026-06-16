@@ -1,24 +1,20 @@
-import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import type { H3Event } from 'h3'
 
-// Import du middleware (depuis la racine du projet)
-// Assurer un mock local de #imports avant d'importer le middleware
-vi.mock('#imports', async () => {
-  const actual = await vi.importActual<any>('#imports')
-  return {
-    ...actual,
-    useRuntimeConfig: vi.fn(() => ({})),
-    getUserSession: vi.fn(async () => ({ user: { id: 1 } })),
-    requireUserSession: vi.fn(async () => ({ user: { id: 1 } })),
-    clearUserSession: vi.fn(async () => {}),
-  }
-})
+// Le middleware accède à la session via server/utils/session-helpers (et non `import('#imports')`).
+// On mocke ce module relatif, ce qui est propre et stable (cf. session-helpers.ts).
+const { mockGetSession, mockClearSession } = vi.hoisted(() => ({
+  mockGetSession: vi.fn(),
+  mockClearSession: vi.fn(),
+}))
+vi.mock('../../../../server/utils/session-helpers', () => ({
+  getSession: mockGetSession,
+  clearSession: mockClearSession,
+  setSession: vi.fn(),
+}))
 
 import authMiddleware from '../../../../server/middleware/auth'
-// Référence dynamique vers le mock pour pouvoir le reconfigurer
-let mockGetUserSession: ReturnType<typeof vi.fn>
-let mockClearUserSession: ReturnType<typeof vi.fn>
 
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -51,19 +47,6 @@ describe("Middleware d'authentification", () => {
     }
   }
 
-  // Initialiser mockGetUserSession une seule fois avant tous les tests
-  beforeAll(async () => {
-    const importsMod: any = await import('#imports')
-    if (typeof importsMod.getUserSession !== 'function') {
-      importsMod.getUserSession = vi.fn(async () => ({ user: { id: 1 } }))
-    }
-    if (typeof importsMod.clearUserSession !== 'function') {
-      importsMod.clearUserSession = vi.fn(async () => {})
-    }
-    mockGetUserSession = importsMod.getUserSession as ReturnType<typeof vi.fn>
-    mockClearUserSession = importsMod.clearUserSession as ReturnType<typeof vi.fn>
-  })
-
   beforeEach(() => {
     vi.clearAllMocks()
     mockDefineEventHandler.mockImplementation((fn) => fn)
@@ -75,7 +58,7 @@ describe("Middleware d'authentification", () => {
     })
 
     // Reset le mock sans refaire l'import
-    mockGetUserSession.mockResolvedValue({ user: mockUser })
+    mockGetSession.mockResolvedValue({ user: mockUser })
     // Par défaut, l'utilisateur de session existe toujours en base
     prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id })
   })
@@ -111,7 +94,7 @@ describe("Middleware d'authentification", () => {
         it(`devrait protéger GET ${route}`, async () => {
           const event = createMockEvent(route, 'GET')
           // Forcer aucune session pour vérifier la protection
-          mockGetUserSession.mockResolvedValueOnce(null)
+          mockGetSession.mockResolvedValueOnce(null)
           await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
         })
       })
@@ -127,7 +110,7 @@ describe("Middleware d'authentification", () => {
     describe('Route de feedback', () => {
       it('devrait autoriser POST /api/feedback sans session (feedback anonyme)', async () => {
         const event = createMockEvent('/api/feedback', 'POST')
-        mockGetUserSession.mockResolvedValueOnce(null)
+        mockGetSession.mockResolvedValueOnce(null)
 
         await expect(authMiddleware(event as H3Event)).resolves.toBeUndefined()
         expect(event.context.user).toBeNull()
@@ -136,7 +119,7 @@ describe("Middleware d'authentification", () => {
 
       it("devrait autoriser POST /api/feedback avec session et hydrater l'utilisateur", async () => {
         const event = createMockEvent('/api/feedback', 'POST')
-        mockGetUserSession.mockResolvedValueOnce({ user: mockUser })
+        mockGetSession.mockResolvedValueOnce({ user: mockUser })
 
         await authMiddleware(event as H3Event)
 
@@ -146,7 +129,7 @@ describe("Middleware d'authentification", () => {
 
       it('devrait protéger GET /api/feedback', async () => {
         const event = createMockEvent('/api/feedback', 'GET')
-        mockGetUserSession.mockResolvedValue(null)
+        mockGetSession.mockResolvedValue(null)
 
         await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
       })
@@ -165,7 +148,7 @@ describe("Middleware d'authentification", () => {
 
         it(`devrait protéger POST ${route}`, async () => {
           const event = createMockEvent(route, 'POST')
-          mockGetUserSession.mockResolvedValue(null)
+          mockGetSession.mockResolvedValue(null)
           await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
         })
       })
@@ -188,7 +171,7 @@ describe("Middleware d'authentification", () => {
 
       it('devrait protéger PUT /api/conventions/[id]', async () => {
         const event = createMockEvent('/api/conventions/123', 'PUT')
-        mockGetUserSession.mockResolvedValue(null)
+        mockGetSession.mockResolvedValue(null)
         await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
       })
     })
@@ -203,7 +186,7 @@ describe("Middleware d'authentification", () => {
 
       it('devrait protéger POST /api/uploads/*', async () => {
         const event = createMockEvent('/api/uploads/images/test.jpg', 'POST')
-        mockGetUserSession.mockResolvedValue(null)
+        mockGetSession.mockResolvedValue(null)
         await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
       })
     })
@@ -227,7 +210,7 @@ describe("Middleware d'authentification", () => {
 
         it(`devrait protéger POST ${route}`, async () => {
           const event = createMockEvent(route, 'POST')
-          mockGetUserSession.mockResolvedValue(null)
+          mockGetSession.mockResolvedValue(null)
 
           await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
         })
@@ -239,7 +222,7 @@ describe("Middleware d'authentification", () => {
     describe('Sans session', () => {
       it('devrait rejeter les requêtes API sans session', async () => {
         const event = createMockEvent('/api/protected-route', 'GET')
-        mockGetUserSession.mockResolvedValue(null)
+        mockGetSession.mockResolvedValue(null)
         await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
       })
     })
@@ -247,7 +230,7 @@ describe("Middleware d'authentification", () => {
     describe('Avec session valide', () => {
       it("devrait autoriser les requêtes avec session valide et hydrater l'utilisateur", async () => {
         const event = createMockEvent('/api/protected-route', 'GET')
-        mockGetUserSession.mockResolvedValue({ user: mockUser })
+        mockGetSession.mockResolvedValue({ user: mockUser })
 
         await authMiddleware(event as H3Event)
 
@@ -258,7 +241,7 @@ describe("Middleware d'authentification", () => {
       it('devrait inclure toutes les propriétés utilisateur nécessaires', async () => {
         const event = createMockEvent('/api/protected-route', 'GET')
         const adminUser = { ...mockUser, isGlobalAdmin: true }
-        mockGetUserSession.mockResolvedValue({ user: adminUser })
+        mockGetSession.mockResolvedValue({ user: adminUser })
 
         await authMiddleware(event as H3Event)
 
@@ -270,23 +253,23 @@ describe("Middleware d'authentification", () => {
     describe('Session orpheline (utilisateur supprimé)', () => {
       it('devrait invalider la session et rejeter en 401 si le user de session est introuvable', async () => {
         const event = createMockEvent('/api/protected-route', 'GET')
-        mockGetUserSession.mockResolvedValue({ user: mockUser })
+        mockGetSession.mockResolvedValue({ user: mockUser })
         // L'utilisateur n'existe plus en base (ex. reset de la base)
         prismaMock.user.findUnique.mockResolvedValue(null)
 
         await expect(authMiddleware(event as H3Event)).rejects.toThrow(/Session invalide/)
-        expect(mockClearUserSession).toHaveBeenCalledWith(event)
+        expect(mockClearSession).toHaveBeenCalledWith(event)
         expect(event.context.user).toBeUndefined()
       })
 
       it('ne devrait pas invalider la session si le user existe toujours', async () => {
         const event = createMockEvent('/api/protected-route', 'GET')
-        mockGetUserSession.mockResolvedValue({ user: mockUser })
+        mockGetSession.mockResolvedValue({ user: mockUser })
         prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id })
 
         await authMiddleware(event as H3Event)
 
-        expect(mockClearUserSession).not.toHaveBeenCalled()
+        expect(mockClearSession).not.toHaveBeenCalled()
         expect(event.context.user).toEqual(mockUser)
       })
     })
@@ -325,7 +308,7 @@ describe("Middleware d'authentification", () => {
 
     it('devrait protéger les routes avec paramètres si elles ne sont pas publiques', async () => {
       const event = createMockEvent('/api/user/profile?tab=settings', 'GET')
-      mockGetUserSession.mockResolvedValueOnce(null)
+      mockGetSession.mockResolvedValueOnce(null)
       await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
     })
   })
@@ -334,7 +317,7 @@ describe("Middleware d'authentification", () => {
     it('hydrate correctement un user avec id numérique', async () => {
       const event = createMockEvent('/api/protected-route', 'GET')
       const userWithId42 = { ...mockUser, id: 42 }
-      mockGetUserSession.mockResolvedValue({ user: userWithId42 })
+      mockGetSession.mockResolvedValue({ user: userWithId42 })
       await authMiddleware(event as H3Event)
       expect(event.context.user.id).toBe(42)
     })
