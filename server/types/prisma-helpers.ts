@@ -15,32 +15,6 @@ export type PrismaTransaction = Omit<
 >
 
 /**
- * Type pour les extensions d'Edition avec les champs volunteers
- * Ces champs existent dans la base de données mais ne sont pas tous dans le type Prisma généré
- */
-export interface EditionWithVolunteerSettings extends Prisma.EditionGetPayload<object> {
-  volunteersMode: 'INTERNAL' | 'EXTERNAL'
-  volunteersExternalUrl: string | null
-  volunteersAskDiet: boolean
-  volunteersAskAllergies: boolean
-  volunteersAskTimePreferences: boolean
-  volunteersAskTeamPreferences: boolean
-  volunteersAskPets: boolean
-  volunteersAskMinors: boolean
-  volunteersAskVehicle: boolean
-  volunteersAskCompanion: boolean
-  volunteersAskAvoidList: boolean
-  volunteersAskSkills: boolean
-  volunteersAskExperience: boolean
-  volunteersAskEmergencyContact: boolean
-  volunteersSetupStartDate: Date | null
-  volunteersTeardownEndDate: Date | null
-  volunteersAskSetup: boolean
-  volunteersAskTeardown: boolean
-  volunteersUpdatedAt: Date | null
-}
-
-/**
  * Type pour les where clauses courantes
  */
 export type UserWhereInput = Prisma.UserWhereInput

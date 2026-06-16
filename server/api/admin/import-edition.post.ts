@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { downloadAndStoreImage } from '#server/utils/file-helpers'
 
 /**
@@ -211,13 +212,21 @@ export default wrapApiHandler(
         hasATM: validatedData.edition.hasATM ?? false,
         hasLongShow: validatedData.edition.hasLongShow ?? false,
         status: validatedData.edition.status ?? 'PUBLISHED', // Par défaut PUBLISHED car une édition importée est publiée
-        // Champs bénévoles
-        volunteersOpen: validatedData.edition.volunteersOpen ?? false,
-        volunteersDescription: validatedData.edition.volunteersDescription,
-        volunteersExternalUrl: validatedData.edition.volunteersExternalUrl || null,
         // Pas de creatorId - édition orpheline
       },
     })
+
+    // Étape 0bis : config bénévole portée par EventVolunteerSettings
+    await prisma.eventVolunteerSettings.create({
+      data: {
+        eventId: eventAnchor.id,
+        open: validatedData.edition.volunteersOpen ?? false,
+        description: validatedData.edition.volunteersDescription ?? null,
+        externalUrl: validatedData.edition.volunteersExternalUrl || null,
+      },
+    })
+    // Renseigner les métadonnées génériques de l'Event (name/dates/status) depuis l'édition
+    await syncEventMetadataFromEdition(edition.id)
 
     // Si une URL d'image est fournie, télécharger et stocker l'image
     let imageDownloadResult: { success: boolean; filename: string | null; error?: string } | null =

@@ -47,19 +47,13 @@ export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
 
-  // Vérification des permissions
-  const edition = await prisma.edition.findUnique({
+  // Étape 0bis : vérif d'existence sur l'Event (les permissions passent par le port organizer).
+  const eventRecord = await prisma.event.findUnique({
     where: { id: editionId },
-    include: {
-      convention: {
-        include: {
-          organizers: true,
-        },
-      },
-    },
+    select: { id: true },
   })
 
-  if (!edition) {
+  if (!eventRecord) {
     throw createError({
       status: 404,
       statusText: 'Édition non trouvée',

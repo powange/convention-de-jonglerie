@@ -20,24 +20,19 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  // Récupérer l'édition avec les informations nécessaires
-  const edition = await prisma.edition.findUnique({
+  // Nom d'affichage générique porté par l'Event (étape 0bis)
+  const eventRecord = await prisma.event.findUnique({
     where: { id: editionId },
-    include: {
-      convention: {
-        select: {
-          name: true,
-        },
-      },
-    },
+    select: { name: true },
   })
 
-  if (!edition) {
+  if (!eventRecord) {
     throw createError({
       status: 404,
-      statusText: 'Édition non trouvée',
+      statusText: 'Événement non trouvé',
     })
   }
+  const eventName = eventRecord.name || 'votre événement'
 
   // Récupérer tous les bénévoles acceptés
   const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
@@ -117,8 +112,8 @@ export default wrapApiHandler(async (event) => {
       const notificationTitle = 'Vos créneaux de bénévolat sont disponibles'
       const notificationMessage =
         assignments.length > 0
-          ? `Vos créneaux de bénévolat pour ${edition.convention.name} sont maintenant disponibles :\n\n${scheduleText}\n\nConsultez tous vos créneaux sur la page "Mes candidatures".`
-          : `Vos créneaux de bénévolat pour ${edition.convention.name} seront bientôt disponibles. Consultez la page "Mes candidatures" pour plus d'informations.`
+          ? `Vos créneaux de bénévolat pour ${eventName} sont maintenant disponibles :\n\n${scheduleText}\n\nConsultez tous vos créneaux sur la page "Mes candidatures".`
+          : `Vos créneaux de bénévolat pour ${eventName} seront bientôt disponibles. Consultez la page "Mes candidatures" pour plus d'informations.`
 
       await NotificationService.create({
         userId: volunteer.user.id,
@@ -167,15 +162,15 @@ export default wrapApiHandler(async (event) => {
 
       const emailHtml = await generateVolunteerScheduleEmailHtml(
         prenom,
-        edition.convention.name,
-        edition.name || edition.convention.name,
+        eventName,
+        eventName,
         emailTimeSlots,
         `${siteUrl}/profile/mes-candidatures-benevole`
       )
 
       const emailSent = await useVolunteerPorts().email.send({
         to: volunteer.user.email,
-        subject: `🤹 Vos créneaux de bénévolat - ${edition.convention.name}`,
+        subject: `🤹 Vos créneaux de bénévolat - ${eventName}`,
         html: emailHtml,
         text: `Bonjour ${prenom},\n\n${notificationMessage}\n\nLien : ${siteUrl}/profile/mes-candidatures-benevole`,
       })

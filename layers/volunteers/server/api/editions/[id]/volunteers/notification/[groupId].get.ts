@@ -20,16 +20,7 @@ export default wrapApiHandler(async (event) => {
     },
     include: {
       event: {
-        select: {
-          edition: {
-            select: {
-              name: true,
-              convention: {
-                select: { name: true },
-              },
-            },
-          },
-        },
+        select: { name: true },
       },
       sender: {
         select: userBasicSelect,
@@ -67,8 +58,7 @@ export default wrapApiHandler(async (event) => {
   const isConfirmed = confirmation && confirmation.confirmedAt !== null
   const confirmedAt = isConfirmed ? confirmation.confirmedAt : null
 
-  const displayName =
-    notificationGroup.event.edition?.name || notificationGroup.event.edition?.convention.name
+  const displayName = notificationGroup.event.name
 
   return {
     notification: {

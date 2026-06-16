@@ -83,24 +83,28 @@ export default wrapApiHandler(
 
     // Vérifier que les dates sont dans la période de l'édition (si modifiées)
     if (body.startDateTime || body.endDateTime) {
-      const edition = await prisma.edition.findUnique({
+      // Étape 0bis : dates de l'événement (Event) + montage/démontage (EventVolunteerSettings)
+      const eventRecord = await prisma.event.findUnique({
         where: { id: editionId },
+        select: {
+          startDate: true,
+          endDate: true,
+          volunteerSettings: { select: { setupStartDate: true, teardownEndDate: true } },
+        },
       })
 
-      if (!edition) {
+      if (!eventRecord) {
         throw createError({
           status: 404,
           message: 'Édition non trouvée',
         })
       }
 
-      // Utilise les dates de montage/démontage si définies, sinon les dates de l'édition
-      const editionStart = edition.volunteersSetupStartDate
-        ? new Date(edition.volunteersSetupStartDate)
-        : new Date(edition.startDate)
-      const editionEnd = edition.volunteersTeardownEndDate
-        ? new Date(edition.volunteersTeardownEndDate)
-        : new Date(edition.endDate)
+      const evStart = eventRecord.startDate ?? new Date()
+      const evEnd = eventRecord.endDate ?? evStart
+      const s = eventRecord.volunteerSettings
+      const editionStart = s?.setupStartDate ? new Date(s.setupStartDate) : new Date(evStart)
+      const editionEnd = s?.teardownEndDate ? new Date(s.teardownEndDate) : new Date(evEnd)
 
       // Ajouter un jour à la date de fin pour inclure tout le dernier jour (jusqu'à 23:59:59)
       editionEnd.setDate(editionEnd.getDate() + 1)

@@ -96,13 +96,20 @@ enum EditionStatus {
 
 // Conteneur d'événement générique (agnostique du domaine), ancre de découplage.
 // Edition (jonglerie) en est une extension 1:1 ; le module bénévole s'y rattache.
-// Étape 0 (scope réduit) : ancre minimale. Les champs génériques (name/dates/status…) et la
-// config bénévole (volunteers*) restent sur Edition pour l'instant ; ils seront promus vers Event
-// dans une étape ultérieure dédiée. Le code bénévole charge Edition par id (== eventId, id réutilisé).
+// Étape 0bis : les métadonnées génériques (name/startDate/endDate/status) sont promues ici, et la
+// config bénévole est extraite dans EventVolunteerSettings (1:1), pour que les modules (bénévoles…)
+// n'aient plus à lire Edition. L'app jonglerie maintient les métadonnées en miroir depuis
+// Edition/Convention (sync à la création/maj).
 model Event {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Métadonnées génériques (promues depuis Edition à l'étape 0bis)
+  name      String? // nom d'affichage de l'événement (côté jonglerie : "Convention - Edition")
+  startDate DateTime?
+  endDate   DateTime?
+  status    EditionStatus @default(OFFLINE)
 
   // Extension domaine (1:1) — côté jonglerie
   edition Edition?
@@ -113,137 +120,116 @@ model Event {
   volunteerTimeSlots          VolunteerTimeSlot[]
   volunteerNotificationGroups VolunteerNotificationGroup[]
   volunteerComments           VolunteerComment[]
+  volunteerSettings           EventVolunteerSettings? // config bénévole (étape 0bis)
 }
 
 model Edition {
-  id                                Int                              @id @default(autoincrement())
-  eventId                           Int                              @unique
-  name                              String?
-  description                       String?                          @db.Text
-  program                           String?                          @db.Text
-  artistInfo                        String?                          @db.Text
-  createdAt                         DateTime                         @default(now())
-  updatedAt                         DateTime                         @updatedAt
-  creatorId                         Int? // Nullable pour éditions importées
-  endDate                           DateTime
-  startDate                         DateTime
-  addressLine1                      String
-  addressLine2                      String?
-  city                              String
-  country                           String
-  postalCode                        String
-  region                            String?
-  timezone                          String? // IANA timezone (ex: "Europe/Paris", "America/New_York")
-  latitude                          Float?
-  longitude                         Float?
-  facebookUrl                       String?
-  instagramUrl                      String?
-  ticketingUrl                      String?
-  jugglingEdgeUrl                   String?
-  acceptsPets                       Boolean                          @default(false)
-  hasFoodTrucks                     Boolean                          @default(false)
-  hasGym                            Boolean                          @default(false)
-  hasKidsZone                       Boolean                          @default(false)
-  hasTentCamping                    Boolean                          @default(false)
-  hasTruckCamping                   Boolean                          @default(false)
-  imageUrl                          String?
-  hasAccessibility                  Boolean                          @default(false)
-  hasAerialSpace                    Boolean                          @default(false)
-  hasCantine                        Boolean                          @default(false)
-  hasConcert                        Boolean                          @default(false)
-  hasFamilyCamping                  Boolean                          @default(false)
-  hasSleepingRoom                   Boolean                          @default(false)
-  hasFireSpace                      Boolean                          @default(false)
-  hasGala                           Boolean                          @default(false)
-  hasOpenStage                      Boolean                          @default(false)
-  hasShowers                        Boolean                          @default(false)
-  hasSlacklineSpace                 Boolean                          @default(false)
-  hasUnicycleSpace                  Boolean                          @default(false)
-  hasToilets                        Boolean                          @default(false)
-  hasWorkshops                      Boolean                          @default(false)
-  hasCashPayment                    Boolean                          @default(false)
-  hasCreditCardPayment              Boolean                          @default(false)
-  hasAfjTokenPayment                Boolean                          @default(false)
-  conventionId                      Int
-  hasATM                            Boolean                          @default(false)
-  hasLongShow                       Boolean                          @default(false)
-  status                            EditionStatus                    @default(OFFLINE)
-  volunteersEnabled                 Boolean                          @default(false)
-  volunteersDescription             String?                          @db.Text
-  volunteersPagePublic              Boolean                          @default(false)
-  volunteersOpen                    Boolean                          @default(false)
-  volunteersUpdatedAt               DateTime?
-  volunteersExternalUrl             String?
-  volunteersMode                    VolunteerMode                    @default(INTERNAL)
-  volunteersAskDiet                 Boolean                          @default(false)
-  volunteersAskAllergies            Boolean                          @default(false)
-  officialWebsiteUrl                String?
-  volunteersAskTimePreferences      Boolean                          @default(false)
-  volunteersAskTeamPreferences      Boolean                          @default(false)
-  volunteersAskPets                 Boolean                          @default(false)
-  volunteersAskMinors               Boolean                          @default(false)
-  volunteersAskVehicle              Boolean                          @default(false)
-  volunteersAskCompanion            Boolean                          @default(false)
-  volunteersAskAvoidList            Boolean                          @default(false)
-  volunteersAskSkills               Boolean                          @default(false)
-  volunteersAskExperience           Boolean                          @default(false)
-  volunteersAskEmergencyContact     Boolean                          @default(false)
-  volunteersTeardownEndDate         DateTime?
-  volunteersSetupStartDate          DateTime?
-  volunteersAskSetup                Boolean                          @default(false)
-  volunteersAskTeardown             Boolean                          @default(false)
-  mealsEnabled                      Boolean                          @default(false)
-  artistsEnabled                    Boolean                          @default(false)
-  ticketingEnabled                  Boolean                          @default(false)
-  ticketingAllowOnsiteRegistration  Boolean                          @default(true)
-  ticketingAllowAnonymousOrders     Boolean                          @default(false)
-  ticketingPaymentCash              Boolean                          @default(true)
-  ticketingPaymentCard              Boolean                          @default(true)
-  ticketingPaymentCheck             Boolean                          @default(true)
-  ticketingSumupEnabled             Boolean                          @default(false)
-  ticketingHandoutItemsEnabled   Boolean                          @default(true)
-  workshopsEnabled                  Boolean                          @default(false)
-  workshopLocationsFreeInput        Boolean                          @default(false)
-  siteMapEnabled                    Boolean                          @default(false)
-  mapPublic                         Boolean                          @default(false)
-  tasksEnabled                      Boolean                          @default(false)
-  stockEnabled                      Boolean                          @default(false)
-  faqEnabled                        Boolean                          @default(false)
-  faqPagePublic                     Boolean                          @default(false)
-  carpoolOffers                     CarpoolOffer[]
-  carpoolRequests                   CarpoolRequest[]
-  event                             Event                            @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  creator                           User?                            @relation("CreatedEditions", fields: [creatorId], references: [id])
-  organizerPermissions              EditionOrganizerPermission[]
-  editionPosts                      EditionPost[]
-  lostFoundItems                    LostFoundItem[]
-  favoritedBy                       User[]                           @relation("FavoriteEditions")
-  attendingUsers                    User[]                           @relation("AttendingEditions")
-  externalTicketing                 ExternalTicketing?
-  sumupConfig                       SumupConfig?
-  tiers                             TicketingTier[]
-  ticketingQuotas                   TicketingQuota[]
-  handoutItems                   TicketingHandoutItem[]
-  options                           TicketingOption[]
-  orders                            TicketingOrder[]
-  volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
-  organizerTicketingHandoutItems EditionOrganizerHandoutItem[]
-  tierCustomFields                  TicketingTierCustomField[]
-  workshops                         Workshop[]
-  workshopLocations                 WorkshopLocation[]
-  artists                           EditionArtist[]
-  shows                             Show[]
-  volunteerMeals                    VolunteerMeal[]
-  ticketingCounters                 TicketingCounter[]
-  editionOrganizers                 EditionOrganizer[]
-  conversations                     Conversation[]
-  showCalls                         EditionShowCall[]
-  zones                             EditionZone[]
-  markers                           EditionMarker[]
-  taskGroups                        TaskGroup[]
-  stockGroups                       StockGroup[]
-  faqEntries                        FaqEntry[]
+  id                               Int                           @id @default(autoincrement())
+  eventId                          Int                           @unique
+  name                             String?
+  description                      String?                       @db.Text
+  program                          String?                       @db.Text
+  artistInfo                       String?                       @db.Text
+  createdAt                        DateTime                      @default(now())
+  updatedAt                        DateTime                      @updatedAt
+  creatorId                        Int? // Nullable pour éditions importées
+  endDate                          DateTime
+  startDate                        DateTime
+  addressLine1                     String
+  addressLine2                     String?
+  city                             String
+  country                          String
+  postalCode                       String
+  region                           String?
+  timezone                         String? // IANA timezone (ex: "Europe/Paris", "America/New_York")
+  latitude                         Float?
+  longitude                        Float?
+  facebookUrl                      String?
+  instagramUrl                     String?
+  ticketingUrl                     String?
+  jugglingEdgeUrl                  String?
+  acceptsPets                      Boolean                       @default(false)
+  hasFoodTrucks                    Boolean                       @default(false)
+  hasGym                           Boolean                       @default(false)
+  hasKidsZone                      Boolean                       @default(false)
+  hasTentCamping                   Boolean                       @default(false)
+  hasTruckCamping                  Boolean                       @default(false)
+  imageUrl                         String?
+  hasAccessibility                 Boolean                       @default(false)
+  hasAerialSpace                   Boolean                       @default(false)
+  hasCantine                       Boolean                       @default(false)
+  hasConcert                       Boolean                       @default(false)
+  hasFamilyCamping                 Boolean                       @default(false)
+  hasSleepingRoom                  Boolean                       @default(false)
+  hasFireSpace                     Boolean                       @default(false)
+  hasGala                          Boolean                       @default(false)
+  hasOpenStage                     Boolean                       @default(false)
+  hasShowers                       Boolean                       @default(false)
+  hasSlacklineSpace                Boolean                       @default(false)
+  hasUnicycleSpace                 Boolean                       @default(false)
+  hasToilets                       Boolean                       @default(false)
+  hasWorkshops                     Boolean                       @default(false)
+  hasCashPayment                   Boolean                       @default(false)
+  hasCreditCardPayment             Boolean                       @default(false)
+  hasAfjTokenPayment               Boolean                       @default(false)
+  conventionId                     Int
+  hasATM                           Boolean                       @default(false)
+  hasLongShow                      Boolean                       @default(false)
+  status                           EditionStatus                 @default(OFFLINE)
+  officialWebsiteUrl               String?
+  // Config bénévole (volunteers*) déplacée vers EventVolunteerSettings à l'étape 0bis.
+  mealsEnabled                     Boolean                       @default(false)
+  artistsEnabled                   Boolean                       @default(false)
+  ticketingEnabled                 Boolean                       @default(false)
+  ticketingAllowOnsiteRegistration Boolean                       @default(true)
+  ticketingAllowAnonymousOrders    Boolean                       @default(false)
+  ticketingPaymentCash             Boolean                       @default(true)
+  ticketingPaymentCard             Boolean                       @default(true)
+  ticketingPaymentCheck            Boolean                       @default(true)
+  ticketingSumupEnabled            Boolean                       @default(false)
+  ticketingHandoutItemsEnabled     Boolean                       @default(true)
+  workshopsEnabled                 Boolean                       @default(false)
+  workshopLocationsFreeInput       Boolean                       @default(false)
+  siteMapEnabled                   Boolean                       @default(false)
+  mapPublic                        Boolean                       @default(false)
+  tasksEnabled                     Boolean                       @default(false)
+  stockEnabled                     Boolean                       @default(false)
+  faqEnabled                       Boolean                       @default(false)
+  faqPagePublic                    Boolean                       @default(false)
+  carpoolOffers                    CarpoolOffer[]
+  carpoolRequests                  CarpoolRequest[]
+  event                            Event                         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  convention                       Convention                    @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  creator                          User?                         @relation("CreatedEditions", fields: [creatorId], references: [id])
+  organizerPermissions             EditionOrganizerPermission[]
+  editionPosts                     EditionPost[]
+  lostFoundItems                   LostFoundItem[]
+  favoritedBy                      User[]                        @relation("FavoriteEditions")
+  attendingUsers                   User[]                        @relation("AttendingEditions")
+  externalTicketing                ExternalTicketing?
+  sumupConfig                      SumupConfig?
+  tiers                            TicketingTier[]
+  ticketingQuotas                  TicketingQuota[]
+  handoutItems                     TicketingHandoutItem[]
+  options                          TicketingOption[]
+  orders                           TicketingOrder[]
+  volunteerTicketingHandoutItems   EditionVolunteerHandoutItem[]
+  organizerTicketingHandoutItems   EditionOrganizerHandoutItem[]
+  tierCustomFields                 TicketingTierCustomField[]
+  workshops                        Workshop[]
+  workshopLocations                WorkshopLocation[]
+  artists                          EditionArtist[]
+  shows                            Show[]
+  volunteerMeals                   VolunteerMeal[]
+  ticketingCounters                TicketingCounter[]
+  editionOrganizers                EditionOrganizer[]
+  conversations                    Conversation[]
+  showCalls                        EditionShowCall[]
+  zones                            EditionZone[]
+  markers                          EditionMarker[]
+  taskGroups                       TaskGroup[]
+  stockGroups                      StockGroup[]
+  faqEntries                       FaqEntry[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -354,18 +340,18 @@ model EditionOrganizerPermission {
 }
 
 model EditionOrganizer {
-  id               Int                              @id @default(autoincrement())
+  id               Int                           @id @default(autoincrement())
   editionId        Int
   organizerId      Int
-  qrCodeToken      String?                          @unique
-  entryValidated   Boolean                          @default(false)
+  qrCodeToken      String?                       @unique
+  entryValidated   Boolean                       @default(false)
   entryValidatedAt DateTime?
   entryValidatedBy Int?
-  createdAt        DateTime                         @default(now())
-  updatedAt        DateTime                         @updatedAt
-  edition          Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  organizer        ConventionOrganizer              @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  handoutItems  EditionOrganizerHandoutItem[]
+  createdAt        DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+  edition          Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer        ConventionOrganizer           @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  handoutItems     EditionOrganizerHandoutItem[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])

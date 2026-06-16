@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 import { config } from 'dotenv'
 
 import { getEmailHash } from '../server/utils/email-hash.js'
+import { syncEventMetadataFromEdition } from '../server/utils/event-sync.js'
 import prisma from '../server/utils/prisma.js'
 
 config()
@@ -370,7 +371,7 @@ async function main() {
         // de façon atomique pour ne pas laisser d'Event orphelin si l'édition échoue.
         edition = await prisma.$transaction(async (tx) => {
           const eventAnchor = await tx.event.create({ data: {} })
-          return tx.edition.create({
+          const created = await tx.edition.create({
             data: {
               id: eventAnchor.id,
               eventId: eventAnchor.id,
@@ -393,7 +394,12 @@ async function main() {
               status: 'PUBLISHED',
             },
           })
+          // Étape 0bis : config bénévole par défaut
+          await tx.eventVolunteerSettings.create({ data: { eventId: eventAnchor.id } })
+          return created
         })
+        // Étape 0bis : renseigner les métadonnées génériques de l'Event depuis l'édition.
+        await syncEventMetadataFromEdition(edition.id)
         console.log(
           `Edition créée: ${edition.name} (id=${edition.id}, ${startDate.toLocaleDateString()})`
         )
@@ -601,29 +607,31 @@ async function main() {
       const teardownEndDate = new Date(edition.endDate)
       teardownEndDate.setDate(teardownEndDate.getDate() + Math.floor(Math.random() * 2) + 1) // 1-2 jours après
 
-      // Configurer les paramètres de bénévolat de l'édition
-      await prisma.edition.update({
-        where: { id: edition.id },
-        data: {
-          volunteersOpen: true,
-          volunteersDescription: `Rejoins l'équipe bénévole de ${edition.name} ! Nous recherchons des personnes motivées pour nous aider dans l'organisation de cet événement incroyable. Différentes missions sont disponibles : accueil, logistique, technique, restauration...`,
-          volunteersMode: 'INTERNAL',
-          volunteersSetupStartDate: setupStartDate,
-          volunteersTeardownEndDate: teardownEndDate,
-          volunteersAskDiet: true,
-          volunteersAskAllergies: true,
-          volunteersAskTimePreferences: Math.random() > 0.5,
-          volunteersAskTeamPreferences: Math.random() > 0.3,
-          volunteersAskPets: Math.random() > 0.7,
-          volunteersAskMinors: Math.random() > 0.6,
-          volunteersAskVehicle: Math.random() > 0.4,
-          volunteersAskCompanion: Math.random() > 0.5,
-          volunteersAskAvoidList: Math.random() > 0.8,
-          volunteersAskSkills: true,
-          volunteersAskExperience: true,
-          volunteersAskSetup: true,
-          volunteersAskTeardown: true,
-        },
+      // Configurer les paramètres de bénévolat (EventVolunteerSettings, étape 0bis)
+      const volunteerConfig = {
+        open: true,
+        description: `Rejoins l'équipe bénévole de ${edition.name} ! Nous recherchons des personnes motivées pour nous aider dans l'organisation de cet événement incroyable. Différentes missions sont disponibles : accueil, logistique, technique, restauration...`,
+        mode: 'INTERNAL' as const,
+        setupStartDate,
+        teardownEndDate,
+        askDiet: true,
+        askAllergies: true,
+        askTimePreferences: Math.random() > 0.5,
+        askTeamPreferences: Math.random() > 0.3,
+        askPets: Math.random() > 0.7,
+        askMinors: Math.random() > 0.6,
+        askVehicle: Math.random() > 0.4,
+        askCompanion: Math.random() > 0.5,
+        askAvoidList: Math.random() > 0.8,
+        askSkills: true,
+        askExperience: true,
+        askSetup: true,
+        askTeardown: true,
+      }
+      await prisma.eventVolunteerSettings.upsert({
+        where: { eventId: edition.id },
+        update: volunteerConfig,
+        create: { eventId: edition.id, ...volunteerConfig },
       })
       volunteerSettingsCount++
 

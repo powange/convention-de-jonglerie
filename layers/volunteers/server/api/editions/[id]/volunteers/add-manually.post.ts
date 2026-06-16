@@ -39,19 +39,10 @@ export default wrapApiHandler(async (event) => {
     },
   })
 
-  // Vérifier que l'édition existe
-  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-    errorMessage: 'Edition introuvable',
-    select: {
-      id: true,
-      name: true,
-      conventionId: true,
-      convention: {
-        select: {
-          name: true,
-        },
-      },
-    },
+  // Vérifier que l'événement existe (nom d'affichage générique — étape 0bis)
+  const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+    errorMessage: 'Événement introuvable',
+    select: { name: true },
   })
 
   // Vérifier qu'il n'y a pas déjà une candidature
@@ -141,7 +132,7 @@ export default wrapApiHandler(async (event) => {
         userId: body.userId,
         type: 'SUCCESS',
         title: 'Vous avez été ajouté comme bénévole ! 🎉',
-        message: `Vous avez été ajouté comme bénévole pour "${edition.convention.name}${edition.name ? ' - ' + edition.name : ''}". Votre candidature a été automatiquement acceptée.`,
+        message: `Vous avez été ajouté comme bénévole pour "${eventRecord.name ?? 'votre événement'}". Votre candidature a été automatiquement acceptée.`,
         category: 'volunteer',
         entityType: 'Edition',
         entityId: editionId.toString(),

@@ -88,18 +88,7 @@ export default wrapApiHandler(
           select: userBasicSelect,
         },
         event: {
-          select: {
-            edition: {
-              select: {
-                name: true,
-                convention: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
+          select: { name: true },
         },
       },
     })
@@ -189,8 +178,7 @@ export default wrapApiHandler(
       // MAIS seulement si la modification n'est pas faite par le bénévole lui-même
       const isOwnApplication = application.user.id === user.id
       if (!isOwnApplication && (changes.length > 0 || parsed.modificationNote?.trim())) {
-        const displayName =
-          application.event.edition?.name || application.event.edition?.convention.name
+        const displayName = application.event.name
         let message = `Votre candidature pour "${displayName}" a été modifiée par les organisateurs`
 
         if (changes.length > 0) {
@@ -296,7 +284,7 @@ export default wrapApiHandler(
     }
 
     // Envoyer une notification selon le changement de statut
-    const editionName = `${application.event.edition?.convention.name ?? ''}${application.event.edition?.name ? ' - ' + application.event.edition.name : ''}`
+    const editionName = application.event.name ?? ''
 
     if (target === 'ACCEPTED') {
       const assignedTeamNames = updated.teamAssignments.map((ta) => ta.team.name)

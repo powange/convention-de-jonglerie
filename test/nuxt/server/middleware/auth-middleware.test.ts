@@ -9,9 +9,9 @@ const { mockGetSession, mockClearSession } = vi.hoisted(() => ({
   mockClearSession: vi.fn(),
 }))
 vi.mock('../../../../server/utils/session-helpers', () => ({
-  getSession: mockGetSession,
-  clearSession: mockClearSession,
-  setSession: vi.fn(),
+  getAuthSession: mockGetSession,
+  clearAuthSession: mockClearSession,
+  setAuthSession: vi.fn(),
 }))
 
 import authMiddleware from '../../../../server/middleware/auth'

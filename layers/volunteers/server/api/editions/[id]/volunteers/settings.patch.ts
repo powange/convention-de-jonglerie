@@ -1,10 +1,8 @@
 import { z } from 'zod'
 
-import type { EditionUpdateInput } from '#server/types/prisma-helpers'
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { buildUpdateData, fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
@@ -132,10 +130,6 @@ export default wrapApiHandler(
     }
 
     // Permission: auteur convention ou organisateur avec droit gestion bénévoles
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      errorMessage: 'Edition introuvable',
-      select: { conventionId: true, volunteersMode: true },
-    })
     const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
     if (!allowed)
       throw createError({
@@ -143,10 +137,16 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour gérer les bénévoles',
       })
 
+    // Étape 0bis : la config bénévole vit dans EventVolunteerSettings (porté par Event).
+    const currentSettings = await prisma.eventVolunteerSettings.findUnique({
+      where: { eventId: editionId },
+      select: { mode: true },
+    })
+
     // Validation spécifique : URL externe requise pour le mode EXTERNAL
     if (parsed.externalUrl !== undefined) {
       if (
-        (parsed.mode === 'EXTERNAL' || edition?.volunteersMode === 'EXTERNAL') &&
+        (parsed.mode === 'EXTERNAL' || currentSettings?.mode === 'EXTERNAL') &&
         !parsed.externalUrl
       ) {
         throw createError({
@@ -156,71 +156,49 @@ export default wrapApiHandler(
       }
     }
 
-    // Mapper les champs de l'API vers les champs de la BDD
+    // Champs EventVolunteerSettings (mêmes noms que l'API, sans préfixe volunteers)
     const mappedData = {
-      volunteersPagePublic: parsed.pagePublic,
-      volunteersOpen: parsed.open,
-      volunteersDescription: parsed.description || null,
-      volunteersMode: parsed.mode,
-      volunteersExternalUrl: parsed.externalUrl || null,
-      volunteersAskDiet: parsed.askDiet,
-      volunteersAskAllergies: parsed.askAllergies,
-      volunteersAskTimePreferences: parsed.askTimePreferences,
-      volunteersAskTeamPreferences: parsed.askTeamPreferences,
-      volunteersAskPets: parsed.askPets,
-      volunteersAskMinors: parsed.askMinors,
-      volunteersAskVehicle: parsed.askVehicle,
-      volunteersAskCompanion: parsed.askCompanion,
-      volunteersAskAvoidList: parsed.askAvoidList,
-      volunteersAskSkills: parsed.askSkills,
-      volunteersAskExperience: parsed.askExperience,
-      volunteersAskEmergencyContact: parsed.askEmergencyContact,
-      volunteersSetupStartDate: parsed.setupStartDate,
-      volunteersTeardownEndDate: parsed.setupEndDate,
-      volunteersAskSetup: parsed.askSetup,
-      volunteersAskTeardown: parsed.askTeardown,
+      pagePublic: parsed.pagePublic,
+      open: parsed.open,
+      description: parsed.description || null,
+      mode: parsed.mode,
+      externalUrl: parsed.externalUrl || null,
+      askDiet: parsed.askDiet,
+      askAllergies: parsed.askAllergies,
+      askTimePreferences: parsed.askTimePreferences,
+      askTeamPreferences: parsed.askTeamPreferences,
+      askPets: parsed.askPets,
+      askMinors: parsed.askMinors,
+      askVehicle: parsed.askVehicle,
+      askCompanion: parsed.askCompanion,
+      askAvoidList: parsed.askAvoidList,
+      askSkills: parsed.askSkills,
+      askExperience: parsed.askExperience,
+      askEmergencyContact: parsed.askEmergencyContact,
+      setupStartDate: parsed.setupStartDate,
+      teardownEndDate: parsed.setupEndDate,
+      askSetup: parsed.askSetup,
+      askTeardown: parsed.askTeardown,
     }
 
     // Construire les données de mise à jour avec buildUpdateData
     const data = buildUpdateData(mappedData, {
       transform: {
-        volunteersSetupStartDate: (val) => (val ? new Date(val) : null),
-        volunteersTeardownEndDate: (val) => (val ? new Date(val) : null),
-        volunteersDescription: (val) => val || null,
-        volunteersExternalUrl: (val) => val || null,
+        setupStartDate: (val) => (val ? new Date(val) : null),
+        teardownEndDate: (val) => (val ? new Date(val) : null),
+        description: (val) => val || null,
+        externalUrl: (val) => val || null,
       },
-    }) as EditionUpdateInput
+    }) as Record<string, unknown>
 
     if (Object.keys(data).length === 0) return createSuccessResponse({ unchanged: true })
-    data.volunteersUpdatedAt = new Date()
+    data.updatedAt = new Date()
 
-    const updated = await prisma.edition.update({
-      where: { id: editionId },
-      data,
-      select: {
-        volunteersPagePublic: true,
-        volunteersOpen: true,
-        volunteersDescription: true,
-        volunteersMode: true,
-        volunteersExternalUrl: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskCompanion: true,
-        volunteersAskAvoidList: true,
-        volunteersAskSkills: true,
-        volunteersAskExperience: true,
-        volunteersAskEmergencyContact: true,
-        volunteersSetupStartDate: true,
-        volunteersTeardownEndDate: true,
-        volunteersAskSetup: true,
-        volunteersAskTeardown: true,
-        volunteersUpdatedAt: true,
-      },
+    // Upsert : la ligne existe normalement (backfill + création d'édition) ; create défensif.
+    const updated = await prisma.eventVolunteerSettings.upsert({
+      where: { eventId: editionId },
+      update: data,
+      create: { eventId: editionId, ...data },
     })
     return createSuccessResponse({ settings: updated })
   },

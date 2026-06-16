@@ -6,41 +6,18 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      errorMessage: 'Edition introuvable',
+    // Étape 0bis : la config bénévole vit dans EventVolunteerSettings (porté par Event).
+    const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+      errorMessage: 'Édition introuvable',
       select: {
-        id: true,
-        volunteersPagePublic: true,
-        volunteersOpen: true,
-        volunteersDescription: true,
-        volunteersMode: true,
-        volunteersExternalUrl: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskCompanion: true,
-        volunteersAskAvoidList: true,
-        volunteersAskSkills: true,
-        volunteersAskExperience: true,
-        volunteersAskEmergencyContact: true,
-        volunteersSetupStartDate: true,
-        volunteersTeardownEndDate: true,
-        volunteersAskSetup: true,
-        volunteersAskTeardown: true,
-        volunteersUpdatedAt: true,
-        event: {
-          select: {
-            volunteerApplications: { select: { id: true, status: true, userId: true } },
-          },
-        },
+        volunteerSettings: true,
+        volunteerApplications: { select: { id: true, status: true, userId: true } },
       },
     })
 
-    const counts = edition.event.volunteerApplications.reduce(
+    const s = eventRecord.volunteerSettings
+
+    const counts = eventRecord.volunteerApplications.reduce(
       (acc, a) => {
         acc.total++
         acc[a.status] = (acc[a.status] || 0) + 1
@@ -50,28 +27,28 @@ export default wrapApiHandler(
     )
 
     return {
-      pagePublic: edition.volunteersPagePublic,
-      open: edition.volunteersOpen,
-      description: edition.volunteersDescription || null,
-      mode: edition.volunteersMode || 'INTERNAL',
-      externalUrl: edition.volunteersExternalUrl || null,
-      askDiet: edition.volunteersAskDiet || false,
-      askAllergies: edition.volunteersAskAllergies || false,
-      askTimePreferences: edition.volunteersAskTimePreferences || false,
-      askTeamPreferences: edition.volunteersAskTeamPreferences || false,
-      askPets: edition.volunteersAskPets || false,
-      askMinors: edition.volunteersAskMinors || false,
-      askVehicle: edition.volunteersAskVehicle || false,
-      askCompanion: edition.volunteersAskCompanion || false,
-      askAvoidList: edition.volunteersAskAvoidList || false,
-      askSkills: edition.volunteersAskSkills || false,
-      askExperience: edition.volunteersAskExperience || false,
-      askEmergencyContact: edition.volunteersAskEmergencyContact || false,
-      setupStartDate: edition.volunteersSetupStartDate || null,
-      teardownEndDate: edition.volunteersTeardownEndDate || null,
-      askSetup: edition.volunteersAskSetup || false,
-      askTeardown: edition.volunteersAskTeardown || false,
-      updatedAt: edition.volunteersUpdatedAt || null,
+      pagePublic: s?.pagePublic ?? false,
+      open: s?.open ?? false,
+      description: s?.description ?? null,
+      mode: s?.mode ?? 'INTERNAL',
+      externalUrl: s?.externalUrl ?? null,
+      askDiet: s?.askDiet ?? false,
+      askAllergies: s?.askAllergies ?? false,
+      askTimePreferences: s?.askTimePreferences ?? false,
+      askTeamPreferences: s?.askTeamPreferences ?? false,
+      askPets: s?.askPets ?? false,
+      askMinors: s?.askMinors ?? false,
+      askVehicle: s?.askVehicle ?? false,
+      askCompanion: s?.askCompanion ?? false,
+      askAvoidList: s?.askAvoidList ?? false,
+      askSkills: s?.askSkills ?? false,
+      askExperience: s?.askExperience ?? false,
+      askEmergencyContact: s?.askEmergencyContact ?? false,
+      setupStartDate: s?.setupStartDate ?? null,
+      teardownEndDate: s?.teardownEndDate ?? null,
+      askSetup: s?.askSetup ?? false,
+      askTeardown: s?.askTeardown ?? false,
+      updatedAt: s?.updatedAt ?? null,
       counts,
     }
   },

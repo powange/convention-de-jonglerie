@@ -2,6 +2,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { invalidateEditionCache } from '#server/utils/cache-helpers'
 import { normalizeDateToISO } from '#server/utils/date-helpers'
+import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { geocodeEdition } from '#server/utils/geocoding'
 import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '#server/utils/move-temp-image'
 import { getConventionForEditionCreation } from '#server/utils/permissions/convention-permissions'
@@ -78,7 +79,7 @@ export default wrapApiHandler(
       const eventAnchor = await tx.event.create({ data: {} })
 
       // Créer l'édition sans l'image d'abord
-      return tx.edition.create({
+      const created = await tx.edition.create({
         data: {
           id: eventAnchor.id,
           eventId: eventAnchor.id,
@@ -129,6 +130,13 @@ export default wrapApiHandler(
         },
         include: editionWithFavoritesInclude,
       })
+
+      // Étape 0bis : renseigner les métadonnées génériques de l'Event ancre depuis l'édition,
+      // et créer la config bénévole par défaut (EventVolunteerSettings).
+      await syncEventMetadataFromEdition(created.id, tx)
+      await tx.eventVolunteerSettings.create({ data: { eventId: eventAnchor.id } })
+
+      return created
     })
 
     // Si une image temporaire a été fournie, la déplacer dans le bon dossier

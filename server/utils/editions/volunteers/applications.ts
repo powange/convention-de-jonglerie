@@ -169,10 +169,11 @@ export function getUserUpdateData(
 export function validateRequiredFields(
   user: { phone: string | null; nom: string | null; prenom: string | null },
   parsed: VolunteerApplicationBody,
-  edition: {
-    volunteersAskAllergies: boolean
-    volunteersAskEmergencyContact: boolean
-  }
+  // Étape 0bis : config bénévole portée par EventVolunteerSettings (champs askX)
+  settings: {
+    askAllergies: boolean
+    askEmergencyContact: boolean
+  } | null
 ): string[] {
   const missing: string[] = []
 
@@ -182,13 +183,13 @@ export function validateRequiredFields(
   if (!user.prenom && !parsed.prenom) missing.push('Prénom')
 
   // Validation: si allergies renseignées, le niveau de sévérité est requis
-  if (edition.volunteersAskAllergies && parsed.allergies?.trim() && !parsed.allergySeverity) {
+  if (settings?.askAllergies && parsed.allergies?.trim() && !parsed.allergySeverity) {
     missing.push('Niveau de sévérité des allergies')
   }
 
   // Déterminer si le contact d'urgence est requis
   const shouldRequireEmergencyContact =
-    edition.volunteersAskEmergencyContact ||
+    settings?.askEmergencyContact ||
     (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
 
   // Validation contact d'urgence si demandé explicitement ou si allergies renseignées
