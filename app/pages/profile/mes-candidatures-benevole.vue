@@ -472,6 +472,42 @@
 <script setup lang="ts">
 import { withdrawVolunteerApplication } from '~/utils/volunteer-application-api'
 
+// Données « édition » à plat renvoyées par /api/user/volunteer-applications.
+// Métadonnées génériques (id/name/dates) issues d'`Event`, données d'affichage propres au domaine
+// (ville, image, convention) injectées par le port `eventScope`, config bénévole (askX) ré-aplatie
+// depuis `EventVolunteerSettings`. Typage explicite côté consommateur car le layer reste agnostique
+// (le port renvoie un enregistrement non typé). Voir docs/etape-0bis-event-promotion.md.
+interface VolunteerApplicationEdition {
+  id: number
+  name: string | null
+  startDate: string | null
+  endDate: string | null
+  city?: string | null
+  country?: string | null
+  imageUrl?: string | null
+  convention?: { id: number; name: string; logo?: string | null } | null
+  volunteersAskDiet: boolean
+  volunteersAskAllergies: boolean
+  volunteersAskEmergencyContact: boolean
+  volunteersAskTimePreferences: boolean
+  volunteersAskTeamPreferences: boolean
+  volunteersAskPets: boolean
+  volunteersAskMinors: boolean
+  volunteersAskVehicle: boolean
+  volunteersAskCompanion: boolean
+  volunteersAskAvoidList: boolean
+  volunteersAskSkills: boolean
+  volunteersAskExperience: boolean
+  volunteersAskSetup: boolean
+  volunteersAskTeardown: boolean
+}
+
+interface UserVolunteerApplication {
+  [key: string]: unknown
+  status: string
+  edition: VolunteerApplicationEdition
+}
+
 // Interface pour les applications enrichies avec les settings
 interface ApplicationWithSettings {
   [key: string]: any
@@ -531,7 +567,7 @@ const {
   pending,
   error,
   refresh,
-} = await useFetch('/api/user/volunteer-applications')
+} = await useFetch<UserVolunteerApplication[]>('/api/user/volunteer-applications')
 
 // Applications enrichies avec les settings de bénévoles et état d'affichage
 const applicationsWithSettings = computed((): ApplicationWithSettings[] => {

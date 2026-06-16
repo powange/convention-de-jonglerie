@@ -1,8 +1,9 @@
 # Étape 0bis — Promotion des métadonnées génériques vers `Event`
 
-> **Statut** : 🟡 **Partiellement implémenté** sur la branche `feat/etape-0bis-event-generic-fields`
-> (non mergée). Objectif : rendre le layer `volunteers` indépendant d'`Edition`/`Convention` afin
-> qu'il soit réutilisable par une 2ᵉ app (cf. [modularisation-multi-domaines.md](./modularisation-multi-domaines.md)).
+> **Statut** : 🟢 **Implémenté** sur la branche `feat/etape-0bis-event-generic-fields`.
+> Le layer `volunteers` ne lit plus aucun `Edition`/`Convention` côté serveur : toute donnée propre
+> au domaine passe par les ports. Objectif atteint : layer réutilisable par une 2ᵉ app
+> (cf. [modularisation-multi-domaines.md](./modularisation-multi-domaines.md)).
 > **Date** : 2026-06-16.
 
 ## Pourquoi
@@ -58,25 +59,42 @@ duplicate). Lecteurs migrés : `settings.get/patch`, `applications/index.post`, 
 (core). Les réponses consommées par le front restent rétro-compatibles (champs `volunteers*`
 ré-aplatis depuis les settings).
 
-## Reste à faire
+### 5. Découplage final via le port `eventScope` (B + C) — ✅ Fait
 
-### B. Page « mes candidatures » (`user/volunteer-applications.get.ts`)
+Les deux derniers couplages à `Edition`/`Convention` du layer passaient par une notion propre au
+domaine (« les autres éditions de la même convention » ; « ville/image/logo de convention »). Plutôt
+que de lire `Edition` dans le layer, on introduit un port [`EventScopePort`](../server/volunteers/ports/types.ts) :
 
-Retourne encore l'objet `Edition` (ville, image, logo de convention) au front — la config bénévole,
-elle, est désormais ré-aplatie depuis `EventVolunteerSettings`. Rendre totalement agnostique =
-restructurer la réponse autour d'`Event` + extension de domaine, ce qui touche le front.
+- `getRelatedEventIds(eventId)` → ids des événements « liés » (jonglerie : les éditions de la même
+  convention ; domaine générique : l'événement seul).
+- `getEventDisplayData(eventIds)` → données d'affichage propres au domaine (jonglerie : `city`,
+  `country`, `imageUrl`, `convention`), transmises au front sans être interprétées par le layer.
 
-### C. Commentaires bénévoles scopés convention (`volunteers/applications.get.ts`)
+Le câblage jonglerie de ces deux méthodes (lectures `Edition`/`Convention`) vit dans
+[`server/volunteers/ports/default-binding.ts`](../server/volunteers/ports/default-binding.ts), **côté
+app**. Une 2ᵉ app fournit sa propre implémentation via `setVolunteerPorts()`.
 
-Charge les commentaires de **toutes les éditions d'une convention** (fonctionnalité spécifique
-jonglerie). Pas de notion de « convention » dans un domaine générique → à repenser (probablement
-rester côté app jonglerie plutôt que dans le layer).
+- **B. Page « mes candidatures »** (`user/volunteer-applications.get.ts`) : la réponse est construite
+  depuis `Event` (`name`, dates) + `EventVolunteerSettings` (config `volunteers*` ré-aplatie) +
+  `getEventDisplayData()` pour la partie domaine. Forme `edition` à plat conservée → **front
+  inchangé**.
+- **C. Commentaires bénévoles scopés convention** (`volunteers/applications.get.ts`) : le `where` des
+  `volunteerComments` utilise `eventId: { in: getRelatedEventIds(eventId) }` et sélectionne
+  `event.{name,startDate,endDate}` (plus de traversée `edition`/`convention`). Le composant
+  [`Table.vue`](../layers/volunteers/app/components/edition/volunteer/Table.vue) lit `comment.event.*`.
+
+> Résultat : `grep` de `prisma.edition` / `event.edition` / `.convention` dans
+> `layers/volunteers/server` → **0 occurrence**. Le layer est server-side agnostique du domaine.
 
 ## Validation
 
-- ✅ Suite de tests nuxt mockée + 371 unitaires : verts.
+- ✅ 371 tests unitaires, tests nuxt éditions/bénévoles mockés (settings, applications, `[id].get`)
+  et test d'intégration DB du workflow bénévole : verts.
 - ✅ Migrations appliquées en base de dev + backfill vérifié (`Event.name`, `EventVolunteerSettings`).
 - ✅ Test unitaire du helper de sync (`test/nuxt/server/utils/event-sync.test.ts`).
 - ✅ Smoke-test SSR : `/api/editions/:id` et `/api/editions/:id/volunteers/settings` en 200, config
   bénévole servie depuis `EventVolunteerSettings`. (Le blocage dev `appendCorsHeaders` rencontré
   pendant le développement était indépendant ; corrigé séparément — cf. PR #4.)
+- ✅ Smoke-test SSR des endpoints découplés via `eventScope` : `/api/user/volunteer-applications`
+  et `/api/editions/:id/volunteers/applications` se chargent (401 sans auth, pas de 500).
+- ✅ `grep prisma.edition / event.edition / .convention` dans `layers/volunteers/server` → 0 occurrence.

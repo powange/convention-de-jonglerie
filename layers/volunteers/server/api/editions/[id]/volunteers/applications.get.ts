@@ -6,6 +6,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -44,20 +45,21 @@ export default wrapApiHandler(async (event) => {
       message: 'Droits insuffisants pour accéder à ces données',
     })
 
-  // Récupérer le conventionId de l'édition pour charger les commentaires de toutes les éditions de la convention
-  const edition = await prisma.edition.findUnique({
+  // Étape 0bis : existence validée sur l'`Event` générique (le layer ne lit plus l'`Edition`).
+  // 403 avant 404 : un utilisateur non autorisé n'apprend pas l'existence de l'événement.
+  const targetEvent = await prisma.event.findUnique({
     where: { id: editionId },
-    select: { conventionId: true },
+    select: { id: true },
   })
-
-  if (!edition) {
+  if (!targetEvent)
     throw createError({
       status: 404,
-      message: 'Édition non trouvée',
+      message: 'Événement non trouvé',
     })
-  }
 
-  const conventionId = edition.conventionId
+  // Étape 0bis : événements « liés » pour afficher les commentaires transverses sur un bénévole
+  // (jonglerie : autres éditions de la convention ; générique : l'événement seul). Via port.
+  const relatedEventIds = await useVolunteerPorts().eventScope.getRelatedEventIds(editionId)
 
   const query = getQuery(event)
   const statusFilter = query.status as string | undefined
@@ -266,31 +268,19 @@ export default wrapApiHandler(async (event) => {
         updatedAt: true,
         volunteerComments: {
           where: {
-            event: {
-              edition: {
-                conventionId,
-              },
-            },
+            eventId: { in: relatedEventIds },
           },
           select: {
             content: true,
             createdAt: true,
             updatedAt: true,
             eventId: true,
+            // Étape 0bis : nom/dates affichés depuis Event (plus de traversée Edition/Convention)
             event: {
               select: {
-                edition: {
-                  select: {
-                    name: true,
-                    startDate: true,
-                    endDate: true,
-                    convention: {
-                      select: {
-                        name: true,
-                      },
-                    },
-                  },
-                },
+                name: true,
+                startDate: true,
+                endDate: true,
               },
             },
           },
