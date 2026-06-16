@@ -1,8 +1,12 @@
 # Étape 4 — Création de la 2ᵉ application
 
 > **Statut** : proposition de conception (non implémentée).
-> **Date** : 2026-06-15.
-> **Prérequis** : étape 3 ([etape-3-monorepo.md](./etape-3-monorepo.md)). C'est le **premier vrai
+> **Date** : 2026-06-15, mise à jour 2026-06-16.
+> **Prérequis** : étape 3 ([etape-3-monorepo.md](./etape-3-monorepo.md)) **et étape 0bis** —
+> l'étape 0 ayant été livrée en scope réduit, le layer `volunteers` lit encore `Edition`/`Convention`
+> (~40 accès). Tant que les champs génériques ne sont pas promus vers `Event` (étape 0bis), le layer
+> n'est pas réutilisable par une app sans `Edition`. Voir la section _Avancement_ de
+> [modularisation-multi-domaines.md](./modularisation-multi-domaines.md). C'est le **premier vrai
 > test** de réutilisation des layers.
 
 ## 1. Objectif
