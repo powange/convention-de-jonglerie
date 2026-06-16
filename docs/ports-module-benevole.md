@@ -1,10 +1,10 @@
 # Ports du module bénévole — référence « tel que construit »
 
-> **Statut** : 🟢 À jour avec `main` (étape 0bis incluse). Ce document décrit les ports **tels
-> qu'implémentés aujourd'hui**. Pour la conception initiale et l'historique, voir
-> [etape-1-ports-decouplage.md](./etape-1-ports-decouplage.md) (le plan a légèrement divergé :
-> emplacement des fichiers, signatures, et ajout du 5ᵉ port `eventScope` à l'étape 0bis).
-> **Date** : 2026-06-16.
+> **Statut** : 🟢 À jour avec `main` — **8 ports** (étape 0bis + découplage repas inclus). Ce document
+> décrit les ports **tels qu'implémentés aujourd'hui**. Pour la conception initiale et l'historique,
+> voir [etape-1-ports-decouplage.md](./etape-1-ports-decouplage.md) (le plan a divergé : emplacement
+> des fichiers, signatures, ajout d'`eventScope` à l'étape 0bis, puis `ticketing`/`artists`/`meals`).
+> **Date** : 2026-06-17.
 
 ## 1. Le pattern « Ports & Adapters »
 
@@ -53,7 +53,7 @@ const relatedEventIds = await useVolunteerPorts().eventScope.getRelatedEventIds(
 > (contrats partagés), seul `default-binding.ts` restera côté app jonglerie. La surface d'API
 > (`useVolunteerPorts` / `setVolunteerPorts`) ne changera pas.
 
-## 3. Les 5 ports et leurs contrats
+## 3. Les 8 ports et leurs contrats
 
 L'agrégat injecté est `VolunteerPorts` :
 
@@ -64,16 +64,26 @@ export interface VolunteerPorts {
   messenger: MessengerPort
   organizers: OrganizerDirectoryPort
   eventScope: EventScopePort
+  ticketing: TicketingPort
+  artists: ArtistsPort
+  meals: MealsPort
 }
 ```
 
-| Port                         | Méthodes                                                                                                             | Ce qu'il abstrait                                                                                                 | Binding jonglerie                                                               |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **`NotificationPort`**       | `notify(input)`                                                                                                      | Notification in-app. `notify` englobe déjà le « safe » : ne lève jamais.                                          | `safeNotify(NotificationService.create(...))`                                   |
-| **`EmailPort`**              | `send(input): Promise<boolean>`                                                                                      | Email transactionnel.                                                                                             | `sendEmail(...)`                                                                |
-| **`MessengerPort`**          | `ensureTeamConversation(input)`, `removeFromTeamConversations(input)`                                                | Conversations équipe ⇄ bénévole. Accepte un `tx` Prisma optionnel.                                                | `ensureVolunteerConversations` / `removeVolunteerFromTeamConversations`         |
-| **`OrganizerDirectoryPort`** | `requireManagementAccess(event, eventId)`, `requireReadAccess(event, eventId)`, `canManage(eventId, userId, event?)` | Droits organisateur sur les bénévoles d'un event. Chaque app résout contre **son** modèle de permissions.         | `requireVolunteer*Access` / `canManageEditionVolunteers`                        |
-| **`EventScopePort`**         | `getRelatedEventIds(eventId)`, `getEventDisplayData(eventIds)`                                                       | Regroupement d'événements **propre au domaine** + données d'affichage transverses, sans notion de « convention ». | éditions sœurs de la même convention + `city`/`country`/`imageUrl`/`convention` |
+Les 5 premiers découplent les dépendances **transverses** (étape 1) ; les 3 derniers découplent les
+**modules** consommés par les repas du module bénévole (billetterie, artistes, repas) — voir
+« Découplage repas » plus bas.
+
+| Port                         | Méthodes                                                                                                                                                                                                                        | Ce qu'il abstrait                                                                                                 | Binding jonglerie                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **`NotificationPort`**       | `notify(input)`                                                                                                                                                                                                                 | Notification in-app. `notify` englobe déjà le « safe » : ne lève jamais.                                          | `safeNotify(NotificationService.create(...))`                                         |
+| **`EmailPort`**              | `send(input): Promise<boolean>`                                                                                                                                                                                                 | Email transactionnel.                                                                                             | `sendEmail(...)`                                                                      |
+| **`MessengerPort`**          | `ensureTeamConversation(input)`, `removeFromTeamConversations(input)`                                                                                                                                                           | Conversations équipe ⇄ bénévole. Accepte un `tx` Prisma optionnel.                                                | `ensureVolunteerConversations` / `removeVolunteerFromTeamConversations`               |
+| **`OrganizerDirectoryPort`** | `requireManagementAccess(event, eventId)`, `requireReadAccess(event, eventId)`, `canManage(eventId, userId, event?)`                                                                                                            | Droits organisateur sur les bénévoles d'un event. Chaque app résout contre **son** modèle de permissions.         | `requireVolunteer*Access` / `canManageEditionVolunteers`                              |
+| **`EventScopePort`**         | `getRelatedEventIds(eventId)`, `getEventDisplayData(eventIds)`                                                                                                                                                                  | Regroupement d'événements **propre au domaine** + données d'affichage transverses, sans notion de « convention ». | éditions sœurs de la même convention + `city`/`country`/`imageUrl`/`convention`       |
+| **`TicketingPort`**          | `getMealTicketParticipants(mealIds)`, `getHandoutItems(handoutItemIds)`                                                                                                                                                         | Module **billetterie** : participants « avec repas » du catering + catalogue d'articles à remettre.               | `TicketingTierMeal`/`TicketingOptionMeal`/`TicketingOrderItem`/`TicketingHandoutItem` |
+| **`ArtistsPort`**            | `addEligibleMealSelections(input)`, `removeMealSelections(mealId)`, `getMealArtistParticipants(mealIds)`                                                                                                                        | Module **artistes** : synchro + lecture des repas artistes.                                                       | `EditionArtist` / `ArtistMealSelection`                                               |
+| **`MealsPort`**              | `getEditionMealSchedule`, `updateEditionMealsConfig`, `getVolunteerSelfMeals`, `setVolunteerSelfMealAcceptances`, `getVolunteerMeals`, `setVolunteerMeals`, `getCateringMealsForDate`, `create`/`deleteVolunteerMealSelections` | Module **repas** (planning, sélections bénévoles, catering, cycle de vie).                                        | module cœur [`server/meals/meals-service.ts`](../server/meals/meals-service.ts)       |
 
 ### Contrats notables
 
@@ -87,6 +97,23 @@ export interface VolunteerPorts {
     objet vide et le front perd ces données).
   - Ne doit **pas** renvoyer les clés réservées `id`, `name`, `startDate`, `endDate`, `volunteers*` :
     le module les fournit (métadonnées génériques d'`Event` + config bénévole) et elles priment.
+
+### Découplage repas (ports `ticketing` / `artists` / `meals`)
+
+La sous-fonctionnalité « repas » du module bénévole touchait à trois autres modules. Elle a été
+découplée en **trois passes incrémentales** ; le layer ne lit désormais plus aucun modèle de
+`meals.prisma`, `ticketing.prisma` ni `artists.prisma` :
+
+1. **`TicketingPort`** — participants « avec repas » du catering (tarifs/options) + catalogue
+   d'articles à remettre (`TicketingHandoutItem`).
+2. **`ArtistsPort`** — synchronisation et lecture des sélections de repas des artistes.
+3. **`MealsPort`** — toute la logique repas (planning, sélections bénévoles, catering, cycle de vie),
+   extraite dans un **module cœur** [`server/meals/`](../server/meals/) (`meals-service.ts` +
+   `meals-types.ts`) auquel le binding délègue.
+
+Les endpoints repas du layer sont devenus de **fins orchestrateurs** : ex. `catering/[date].get.ts`
+fusionne les participants des 3 sources via `meals` + `ticketing` + `artists` ; `meals.put.ts` pilote
+les sélections artistes à partir des bascules d'activation renvoyées par `updateEditionMealsConfig`.
 
 ## 4. Injection : `useVolunteerPorts` / `setVolunteerPorts`
 

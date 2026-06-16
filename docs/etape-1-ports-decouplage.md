@@ -1,15 +1,16 @@
 # Étape 1 — Ports & découplage des dépendances transverses
 
-> **Statut** : ✅ **Implémenté** (sur `main`, déployé en release). 5 ports livrés (`notifications`,
-> `email`, `messenger`, `organizers`, `eventScope`) dans `server/volunteers/ports/`, binding par
-> défaut paresseux via `useVolunteerPorts()` / surcharge `setVolunteerPorts()`.
-> `MealsPort`/`TicketingPort` : non encore faits (couplage direct conservé). Voir la section
-> _Avancement_ de [modularisation-multi-domaines.md](./modularisation-multi-domaines.md).
-> **Date** : 2026-06-15 (conception), mise à jour 2026-06-16.
+> **Statut** : ✅ **Implémenté** (sur `main`, déployé en release). **8 ports** livrés
+> (`notifications`, `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals`)
+> dans `server/volunteers/ports/`, binding par défaut paresseux via `useVolunteerPorts()` / surcharge
+> `setVolunteerPorts()`. Les couplages billetterie/artistes/repas sont désormais découplés (le
+> `MealsPort` délègue au module cœur `server/meals/`). Voir la section _Avancement_ de
+> [modularisation-multi-domaines.md](./modularisation-multi-domaines.md).
+> **Date** : 2026-06-15 (conception), mise à jour 2026-06-17.
 >
-> 📌 **Ce document est le plan de conception** ; l'implémentation a légèrement divergé (emplacement,
-> signatures, ajout du port `eventScope` à l'étape 0bis). Pour la référence **à jour** des 5 ports et
-> de leurs contrats, voir [ports-module-benevole.md](./ports-module-benevole.md).
+> 📌 **Ce document est le plan de conception** ; l'implémentation a divergé (emplacement, signatures,
+> ajout d'`eventScope` à l'étape 0bis, puis `ticketing`/`artists`/`meals`). Pour la référence **à
+> jour** des 8 ports et de leurs contrats, voir [ports-module-benevole.md](./ports-module-benevole.md).
 > **Prérequis** : [modularisation-multi-domaines.md](./modularisation-multi-domaines.md) §7 et §8 ;
 > conçu pour être **appliqué lors de l'étape 2** (extraction en layer), après l'étape 0
 > ([etape-0-abstraction-event.md](./etape-0-abstraction-event.md)).
@@ -157,10 +158,9 @@ export interface OrganizerDirectoryPort {
 }
 ```
 
-> **Ports futurs** (autres extractions, mentionnés pour cohérence) : `MealsPort`
-> (`getMealEligibility`, `getMeals`), `TicketingPort` (validation d'entrée / QR, handout items).
-> Même principe : le layer bénévole les **consomme**, les layers repas/billetterie les
-> **implémentent**.
+> **✅ Faits depuis** : `TicketingPort`, `ArtistsPort` et `MealsPort` ont été extraits en 3 passes
+> (le `MealsPort` délègue au module cœur `server/meals/`). Le layer bénévole les **consomme** ; le
+> binding jonglerie les **implémente**. Détail des 8 ports : [ports-module-benevole.md](./ports-module-benevole.md).
 
 ## 4. Mécanisme d'injection (registry + plugin Nitro)
 
