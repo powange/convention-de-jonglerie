@@ -44,6 +44,7 @@ services:
     volumes:
       # Monter le code source pour le hot-reload en dev
       - ./app:/app/app:cached
+      - ./layers:/app/layers:cached
       - ./server:/app/server:cached
       - ./shared:/app/shared:cached
       - ./test:/app/test:cached
@@ -85,6 +86,7 @@ services:
       NUXT_SESSION_PASSWORD: 'test_session_password_please_change_1234567890123456'
     volumes:
       - ./app:/app/app:cached
+      - ./layers:/app/layers:cached
       - ./server:/app/server:cached
       - ./shared:/app/shared:cached
       - ./test:/app/test:cached
