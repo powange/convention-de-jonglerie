@@ -10,6 +10,7 @@ import type {
 } from './types'
 import type { NotificationType, VolunteerMealType } from '@prisma/client'
 
+import * as mealsService from '#server/meals/meals-service'
 import { sendEmail } from '#server/utils/emailService'
 import {
   ensureVolunteerConversations,
@@ -232,6 +233,26 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
         }
         return result
       },
+    },
+    meals: {
+      // Jonglerie : délégation au module repas cœur (server/meals/meals-service.ts).
+      getEditionMealSchedule: (editionId) => mealsService.getEditionMealSchedule(editionId),
+      updateEditionMealsConfig: (editionId, meals) =>
+        mealsService.updateEditionMealsConfig(editionId, meals),
+      getVolunteerSelfMeals: (editionId, userId) =>
+        mealsService.getVolunteerSelfMeals(editionId, userId),
+      setVolunteerSelfMealAcceptances: (editionId, userId, selections) =>
+        mealsService.setVolunteerSelfMealAcceptances(editionId, userId, selections),
+      getVolunteerMeals: (editionId, volunteerId) =>
+        mealsService.getVolunteerMeals(editionId, volunteerId),
+      setVolunteerMeals: (editionId, volunteerId, selections) =>
+        mealsService.setVolunteerMeals(editionId, volunteerId, selections),
+      getCateringMealsForDate: (editionId, targetDate) =>
+        mealsService.getCateringMealsForDate(editionId, targetDate),
+      createVolunteerMealSelections: (volunteerId, editionId) =>
+        mealsService.createVolunteerMealSelections(volunteerId, editionId),
+      deleteVolunteerMealSelections: (volunteerId) =>
+        mealsService.deleteVolunteerMealSelections(volunteerId),
     },
   }
 }

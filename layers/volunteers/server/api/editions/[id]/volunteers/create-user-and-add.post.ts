@@ -9,7 +9,6 @@ import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeEmail, sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
-import { createVolunteerMealSelections } from '#server/utils/volunteer-meals'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 const bodySchema = z.object({
@@ -299,7 +298,7 @@ export default wrapApiHandler(async (event) => {
 
   // Créer automatiquement les sélections de repas
   try {
-    await createVolunteerMealSelections(application.id, editionId)
+    await useVolunteerPorts().meals.createVolunteerMealSelections(application.id, editionId)
   } catch (mealError) {
     console.error('Erreur lors de la création des repas du bénévole:', mealError)
     // Ne pas faire échouer l'ajout si la création des repas échoue

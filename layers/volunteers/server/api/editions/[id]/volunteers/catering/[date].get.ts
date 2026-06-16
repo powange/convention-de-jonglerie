@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
-import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
@@ -20,49 +19,14 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  // Récupérer les repas configurés pour cette date
-  const meals = await prisma.volunteerMeal.findMany({
-    where: {
-      editionId,
-      date: new Date(targetDate),
-      enabled: true,
-    },
-    include: {
-      mealSelections: {
-        where: {
-          accepted: true,
-        },
-        include: {
-          volunteer: {
-            include: {
-              user: {
-                select: {
-                  ...userWithNameSelect,
-                  email: true,
-                  phone: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    orderBy: {
-      mealType: 'asc',
-    },
-  })
+  const ports = useVolunteerPorts()
 
-  // Étape 1bis (port ticketing) : participants billetterie par repas (tarifs/options « avec repas »),
-  // dédupliqués côté binding. Le layer ne lit plus les modèles de billetterie.
-  const ticketParticipantsByMeal = await useVolunteerPorts().ticketing.getMealTicketParticipants(
-    meals.map((m) => m.id)
-  )
-
-  // Étape 1bis (port artists) : participants artistes acceptés par repas (le layer ne lit plus les
-  // modèles artistes).
-  const artistParticipantsByMeal = await useVolunteerPorts().artists.getMealArtistParticipants(
-    meals.map((m) => m.id)
-  )
+  // Étape 1bis : repas + participants bénévoles délégués au module repas ; artistes et billetterie
+  // via leurs ports respectifs. Le layer ne lit plus aucun modèle repas/artiste/billetterie.
+  const meals = await ports.meals.getCateringMealsForDate(editionId, targetDate)
+  const mealIds = meals.map((m) => m.id)
+  const ticketParticipantsByMeal = await ports.ticketing.getMealTicketParticipants(mealIds)
+  const artistParticipantsByMeal = await ports.artists.getMealArtistParticipants(mealIds)
 
   // Construire le résultat avec un résumé et les détails par repas
   const summary = {
@@ -81,17 +45,19 @@ export default wrapApiHandler(async (event) => {
   }
 
   const mealDetails = meals.map((meal) => {
-    const volunteers = meal.mealSelections.map((selection) => ({
+    const phases = Array.isArray(meal.phases) ? (meal.phases as string[]) : []
+
+    const volunteers = meal.volunteers.map((v) => ({
       type: 'volunteer' as const,
-      nom: selection.volunteer.user.nom,
-      prenom: selection.volunteer.user.prenom,
-      email: selection.volunteer.user.email,
-      phone: selection.volunteer.user.phone,
-      dietaryPreference: selection.volunteer.dietaryPreference,
-      allergies: selection.volunteer.allergies,
-      allergySeverity: selection.volunteer.allergySeverity,
-      emergencyContactName: selection.volunteer.emergencyContactName,
-      emergencyContactPhone: selection.volunteer.emergencyContactPhone,
+      nom: v.nom,
+      prenom: v.prenom,
+      email: v.email,
+      phone: v.phone,
+      dietaryPreference: v.dietaryPreference,
+      allergies: v.allergies,
+      allergySeverity: v.allergySeverity,
+      emergencyContactName: v.emergencyContactName,
+      emergencyContactPhone: v.emergencyContactPhone,
     }))
 
     const artists = (artistParticipantsByMeal[meal.id] ?? []).map((a) => ({
@@ -129,9 +95,9 @@ export default wrapApiHandler(async (event) => {
     })
 
     // Mettre à jour le résumé
-    const mealKey = `${meal.mealType}_${meal.phases.join('_')}`
+    const mealKey = `${meal.mealType}_${phases.join('_')}`
     if (!summary.mealCounts[mealKey]) {
-      summary.mealCounts[mealKey] = { total: 0, phases: meal.phases }
+      summary.mealCounts[mealKey] = { total: 0, phases }
     }
     summary.mealCounts[mealKey].total += allParticipants.length
     summary.totalParticipants += allParticipants.length
@@ -145,7 +111,7 @@ export default wrapApiHandler(async (event) => {
       if (p.allergies && p.allergies.trim()) {
         summary.allergies.push({
           participantName: `${p.prenom || ''} ${p.nom || ''}`.trim(),
-          participantType: p.type,
+          participantType: p.type as 'volunteer' | 'artist',
           allergies: p.allergies,
           allergySeverity: p.allergySeverity,
           emergencyContactName: p.emergencyContactName,
@@ -157,7 +123,7 @@ export default wrapApiHandler(async (event) => {
     return {
       mealId: meal.id,
       mealType: meal.mealType,
-      phases: meal.phases,
+      phases,
       totalParticipants: allParticipants.length,
       volunteerCount: volunteers.length,
       artistCount: artists.length,
