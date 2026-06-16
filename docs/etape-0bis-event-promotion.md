@@ -1,9 +1,11 @@
 # Étape 0bis — Promotion des métadonnées génériques vers `Event`
 
-> **Statut** : 🟢 **Implémenté** sur la branche `feat/etape-0bis-event-generic-fields`.
+> **Statut** : ✅ **Implémenté et mergé sur `main`** (PR #5 : métadonnées + `EventVolunteerSettings` ;
+> PR #6 : port `eventScope`).
 > Le layer `volunteers` ne lit plus aucun `Edition`/`Convention` côté serveur : toute donnée propre
 > au domaine passe par les ports. Objectif atteint : layer réutilisable par une 2ᵉ app
-> (cf. [modularisation-multi-domaines.md](./modularisation-multi-domaines.md)).
+> (cf. [modularisation-multi-domaines.md](./modularisation-multi-domaines.md) et
+> [ports-module-benevole.md](./ports-module-benevole.md)).
 > **Date** : 2026-06-16.
 
 ## Pourquoi
