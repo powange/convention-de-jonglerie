@@ -80,6 +80,12 @@ export interface EventScopePort {
    * Données d'affichage propres au domaine pour une liste d'événements (ex. ville, image, entité
    * parente). Le module bénévole les transmet au front sans les interpréter. Jonglerie : champs de
    * l'`Edition` + `Convention`. Clé = eventId.
+   *
+   * Contrat :
+   * - Devrait renvoyer une entrée pour chaque eventId demandé ; un eventId absent du résultat est
+   *   toléré (l'appelant retombe sur un objet vide) mais prive le front de ses données d'affichage.
+   * - Ne doit pas renvoyer les clés réservées `id`, `name`, `startDate`, `endDate` ni `volunteers*` :
+   *   le module les fournit (métadonnées génériques d'`Event` + config bénévole) et elles priment.
    */
   getEventDisplayData(eventIds: number[]): Promise<Record<number, Record<string, unknown>>>
 }

@@ -48,15 +48,13 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
     eventScope: {
       // Jonglerie : les événements « liés » sont les éditions de la même convention.
       async getRelatedEventIds(eventId) {
-        const edition = await prisma.edition.findUnique({
-          where: { id: eventId },
-          select: { conventionId: true },
-        })
-        if (!edition) return [eventId]
+        // Une seule requête : toutes les éditions dont la convention contient l'édition demandée
+        // (= éditions sœurs, l'édition elle-même incluse).
         const editions = await prisma.edition.findMany({
-          where: { conventionId: edition.conventionId },
+          where: { convention: { editions: { some: { id: eventId } } } },
           select: { eventId: true },
         })
+        if (editions.length === 0) return [eventId]
         return editions.map((e) => e.eventId)
       },
       // Jonglerie : données d'affichage = champs Edition + logo/nom de la convention.

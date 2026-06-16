@@ -82,17 +82,17 @@ export default wrapApiHandler(
 
     // Récupérer les événements des candidatures acceptées pour chercher les créneaux assignés
     const acceptedApplications = applications.filter((app) => app.status === 'ACCEPTED')
-    const editionIds = acceptedApplications.map((app) => app.eventId)
+    const eventIds = acceptedApplications.map((app) => app.eventId)
 
-    // Récupérer tous les créneaux assignés pour cet utilisateur dans ces éditions
+    // Récupérer tous les créneaux assignés pour cet utilisateur dans ces événements
     let volunteerAssignments = []
-    if (editionIds.length > 0) {
+    if (eventIds.length > 0) {
       volunteerAssignments = await prisma.volunteerAssignment.findMany({
         where: {
           userId: user.id,
           timeSlot: {
             eventId: {
-              in: editionIds,
+              in: eventIds,
             },
           },
         },
@@ -140,7 +140,7 @@ export default wrapApiHandler(
         : []
 
       // Filtrer les créneaux assignés pour cet événement
-      const editionAssignments = volunteerAssignments.filter(
+      const eventAssignments = volunteerAssignments.filter(
         (assignment) => assignment.timeSlot.eventId === app.eventId
       )
 
@@ -153,13 +153,15 @@ export default wrapApiHandler(
         ...appRest,
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
-        assignedTimeSlots: editionAssignments,
+        assignedTimeSlots: eventAssignments,
         edition: {
+          // Affichage propre au domaine (port) en premier : les champs génériques (id/name/dates)
+          // et la config bénévole ci-dessous priment sur d'éventuelles clés homonymes du port.
+          ...(displayData[app.eventId] ?? {}),
           id: app.eventId,
           name: app.event.name,
           startDate: app.event.startDate,
           endDate: app.event.endDate,
-          ...(displayData[app.eventId] ?? {}),
           volunteersAskDiet: s?.askDiet ?? false,
           volunteersAskAllergies: s?.askAllergies ?? false,
           volunteersAskEmergencyContact: s?.askEmergencyContact ?? false,

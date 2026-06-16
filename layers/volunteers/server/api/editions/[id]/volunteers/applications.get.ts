@@ -45,6 +45,18 @@ export default wrapApiHandler(async (event) => {
       message: 'Droits insuffisants pour accéder à ces données',
     })
 
+  // Étape 0bis : existence validée sur l'`Event` générique (le layer ne lit plus l'`Edition`).
+  // 403 avant 404 : un utilisateur non autorisé n'apprend pas l'existence de l'événement.
+  const targetEvent = await prisma.event.findUnique({
+    where: { id: editionId },
+    select: { id: true },
+  })
+  if (!targetEvent)
+    throw createError({
+      status: 404,
+      message: 'Événement non trouvé',
+    })
+
   // Étape 0bis : événements « liés » pour afficher les commentaires transverses sur un bénévole
   // (jonglerie : autres éditions de la convention ; générique : l'événement seul). Via port.
   const relatedEventIds = await useVolunteerPorts().eventScope.getRelatedEventIds(editionId)
