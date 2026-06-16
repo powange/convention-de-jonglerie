@@ -1,6 +1,13 @@
 // Ports du module bénévole (étape 1 de la modularisation).
 // Le module bénévole consomme ces interfaces ; l'app les câble sur ses implémentations
 // concrètes (notifications, email, messenger). Voir docs/etape-1-ports-decouplage.md.
+import type {
+  CateringMeal,
+  EditionMealRecord,
+  MealToggle,
+  MealUpdateInput,
+  VolunteerMealView,
+} from '#server/meals/meals-types'
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
 import type { AuthenticatedUser } from '#server/utils/auth-utils'
 
@@ -159,6 +166,47 @@ export interface ArtistsPort {
   getMealArtistParticipants(mealIds: number[]): Promise<Record<number, ArtistMealParticipant[]>>
 }
 
+/**
+ * Accès au module « repas » (schéma meals.prisma) depuis le module bénévole. Le layer ne touche plus
+ * les modèles VolunteerMeal* : il délègue toute la logique repas (planning, sélections, catering,
+ * cycle de vie) au port. Jonglerie : câblé sur le service cœur `server/meals/meals-service.ts`.
+ * Domaine sans repas : implémentations vides (listes/objets vides, no-op).
+ */
+export interface MealsPort {
+  /** Réconcilie et renvoie le planning des repas d'une édition (avec liaisons d'articles). */
+  getEditionMealSchedule(editionId: number): Promise<EditionMealRecord[]>
+  /**
+   * Met à jour la config des repas + sélections bénévoles + liaisons d'articles. Renvoie les repas à
+   * jour et les bascules d'activation (pour piloter les sélections artistes via `ArtistsPort`).
+   */
+  updateEditionMealsConfig(
+    editionId: number,
+    meals: MealUpdateInput[]
+  ): Promise<{ meals: EditionMealRecord[]; toggles: MealToggle[] }>
+  /** Repas éligibles d'un bénévole pour lui-même (auto-création des sélections manquantes). */
+  getVolunteerSelfMeals(editionId: number, userId: number): Promise<VolunteerMealView[]>
+  /** Met à jour les acceptations de repas d'un bénévole pour lui-même. */
+  setVolunteerSelfMealAcceptances(
+    editionId: number,
+    userId: number,
+    selections: Array<{ selectionId: number; accepted?: boolean }>
+  ): Promise<VolunteerMealView[]>
+  /** Repas d'un bénévole donné (vue organisateur) avec sélections + éligibilité. */
+  getVolunteerMeals(editionId: number, volunteerId: number): Promise<VolunteerMealView[]>
+  /** Crée/met à jour les sélections de repas d'un bénévole (vue organisateur). */
+  setVolunteerMeals(
+    editionId: number,
+    volunteerId: number,
+    selections: Array<{ selectionId?: number; mealId?: number; accepted: boolean }>
+  ): Promise<VolunteerMealView[]>
+  /** Repas (activés) d'une date avec leurs participants bénévoles acceptés (catering). */
+  getCateringMealsForDate(editionId: number, targetDate: string): Promise<CateringMeal[]>
+  /** Crée automatiquement les sélections de repas d'un bénévole accepté. */
+  createVolunteerMealSelections(volunteerId: number, editionId: number): Promise<void>
+  /** Supprime toutes les sélections de repas d'un bénévole. */
+  deleteVolunteerMealSelections(volunteerId: number): Promise<void>
+}
+
 export interface VolunteerPorts {
   notifications: NotificationPort
   email: EmailPort
@@ -167,4 +215,5 @@ export interface VolunteerPorts {
   eventScope: EventScopePort
   ticketing: TicketingPort
   artists: ArtistsPort
+  meals: MealsPort
 }

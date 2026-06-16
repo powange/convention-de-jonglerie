@@ -13,10 +13,6 @@ import {
   compareApplicationChanges,
   hasApplicationDataChanges,
 } from '#server/utils/volunteer-application-diff'
-import {
-  createVolunteerMealSelections,
-  deleteVolunteerMealSelections,
-} from '#server/utils/volunteer-meals'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(
@@ -249,7 +245,7 @@ export default wrapApiHandler(
       updateData.entryValidatedAt = null
       updateData.entryValidatedBy = null
       // Supprimer les sélections de repas
-      await deleteVolunteerMealSelections(applicationId)
+      await useVolunteerPorts().meals.deleteVolunteerMealSelections(applicationId)
     }
 
     const updated = await prisma.editionVolunteerApplication.update({
@@ -276,7 +272,7 @@ export default wrapApiHandler(
     // Si on accepte le bénévole, créer automatiquement ses sélections de repas
     if (target === 'ACCEPTED') {
       try {
-        await createVolunteerMealSelections(applicationId, editionId)
+        await useVolunteerPorts().meals.createVolunteerMealSelections(applicationId, editionId)
       } catch (mealError) {
         // Ne pas faire échouer l'acceptation si la création des repas échoue
         console.error('Erreur lors de la création des repas du bénévole:', mealError)
