@@ -121,10 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel } from '#components'
-import { EditionVolunteerPlanningSlotModal as SlotModal } from '#components'
 import { useDatetime } from '~/composables/useDatetime'
-import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import {
@@ -132,6 +129,12 @@ import {
   calculateVolunteersStatsByDay,
   calculateVolunteersStatsIndividual,
 } from '~/utils/volunteer-stats'
+
+import {
+  EditionVolunteerPlanningSlotModal as SlotModal,
+  EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel,
+} from '#components'
+import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
 const { t } = useI18n()
 const route = useRoute()

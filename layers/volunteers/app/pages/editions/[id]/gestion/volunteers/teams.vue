@@ -39,10 +39,11 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { EditionVolunteerPlanningTeamManagement as TeamManagement } from '#components'
 import { useAccessControlPermissions } from '~/composables/useAccessControlPermissions'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import { EditionVolunteerPlanningTeamManagement as TeamManagement } from '#components'
 
 const route = useRoute()
 const editionStore = useEditionStore()

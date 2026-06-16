@@ -245,8 +245,8 @@ import { computed, ref, watch } from 'vue'
 import { z } from 'zod'
 
 import { useDatetime } from '~/composables/useDatetime'
-import type { VolunteerTimeSlot } from '#imports'
-import type { VolunteerTeam } from '#imports'
+
+import type { VolunteerTimeSlot, VolunteerTeam } from '#imports'
 
 // Props
 interface Props {

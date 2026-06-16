@@ -73,11 +73,13 @@
       "Bash(sed -i \"s@import TeamManagement from '~/components/edition/volunteer/planning/TeamManagement.vue'@import { EditionVolunteerPlanningTeamManagement as TeamManagement } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/teams.vue\")",
       "Bash(sed -i \"s@import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'@import { EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
       "Bash(sed -i \"s@import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'@import { EditionVolunteerPlanningSlotModal as SlotModal } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
-      "Bash(cd /home/powange/projects/convention-de-jonglerie *)"
+      "Bash(cd /home/powange/projects/convention-de-jonglerie *)",
+      "Bash(break)"
     ],
     "additionalDirectories": [
       "/tmp",
-      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/server/api/editions"
+      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/server/api/editions",
+      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/app/pages/editions/[id]"
     ]
   }
 }

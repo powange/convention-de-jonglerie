@@ -296,8 +296,9 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
-import type { VolunteerTeam } from '#imports'
 import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
+
+import type { VolunteerTeam } from '#imports'
 
 // Props
 interface Props {

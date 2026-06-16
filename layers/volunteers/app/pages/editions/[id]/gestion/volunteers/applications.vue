@@ -627,10 +627,10 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useVolunteerSettings } from '#imports'
-import { useVolunteerTeams } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import { useVolunteerSettings, useVolunteerTeams } from '#imports'
 
 // Utiliser le composable pour obtenir la configuration des bénévoles
 const { getParticipantTypeConfig } = useParticipantTypes()

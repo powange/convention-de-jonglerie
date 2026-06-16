@@ -87,7 +87,7 @@ export default wrapApiHandler(
       ...c,
       editions: c.editions.map(({ event, ...ed }) => ({
         ...ed,
-        _count: { ...ed._count, volunteerApplications: event._count.volunteerApplications },
+        _count: { ...ed._count, volunteerApplications: event?._count?.volunteerApplications ?? 0 },
       })),
     }))
 

@@ -178,7 +178,7 @@ export default wrapApiHandler(
       event: undefined,
       _count: {
         ...edition._count,
-        volunteerApplications: edition.event._count.volunteerApplications,
+        volunteerApplications: edition.event?._count?.volunteerApplications ?? 0,
       },
       // Garder seulement les champs volunteers encore utilisés côté client
       volunteersOpen: edition.volunteersOpen,

@@ -311,8 +311,6 @@
 
 <script setup lang="ts">
 // App components & stores
-import { useVolunteerSettings } from '#imports'
-import { useVolunteerTeams } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { requiresEmergencyContact } from '~/utils/allergy-severity'
@@ -323,6 +321,8 @@ import {
   submitVolunteerApplication,
   withdrawVolunteerApplication,
 } from '~/utils/volunteer-application-api'
+
+import { useVolunteerTeams, useVolunteerSettings } from '#imports'
 
 const { t } = useI18n()
 const { formatDateTimeRange, formatDate } = useDateFormat()

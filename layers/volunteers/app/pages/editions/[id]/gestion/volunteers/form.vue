@@ -85,9 +85,10 @@
 import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useVolunteerSettings } from '#imports'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import { useVolunteerSettings } from '#imports'
 
 const route = useRoute()
 const editionStore = useEditionStore()

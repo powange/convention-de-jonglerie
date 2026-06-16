@@ -121,7 +121,7 @@ export default wrapApiHandler(
         event: undefined,
         _count: {
           ...editionData._count,
-          volunteerApplications: editionData.event._count.volunteerApplications,
+          volunteerApplications: editionData.event?._count?.volunteerApplications ?? 0,
           ticketingParticipants,
         },
       }
