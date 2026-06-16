@@ -100,11 +100,27 @@ jobs:
           ls -la .output/ || echo "ERROR: .output/ not found"
           ls -la .output/server/ || echo "ERROR: .output/server/ not found"
 
-      - name: Start application and run tests
+      - name: Start application
         run: |
           node .output/server/index.mjs > /tmp/nuxt-server.log 2>&1 &
-          npx wait-on http://localhost:3000 --timeout 60000
-          NUXT_SERVER_LOG=/tmp/nuxt-server.log npx playwright test
+          echo $! > /tmp/server.pid
+          if ! npx wait-on http://localhost:3000 --timeout 60000; then
+            echo "::error::Le serveur de production n'a pas répondu sur http://localhost:3000 dans le délai imparti"
+            echo "===== Contenu de /tmp/nuxt-server.log ====="
+            cat /tmp/nuxt-server.log || echo "(log serveur vide ou absent)"
+            echo "===== Statut du process serveur ====="
+            ps -p "$(cat /tmp/server.pid)" || echo "Le process serveur est mort (crash au démarrage)"
+            exit 1
+          fi
+
+      - name: Run Playwright tests
+        run: NUXT_SERVER_LOG=/tmp/nuxt-server.log npx playwright test
+
+      - name: Dump server log on failure
+        if: failure()
+        run: |
+          echo "===== Contenu de /tmp/nuxt-server.log ====="
+          cat /tmp/nuxt-server.log || echo "(log serveur vide ou absent)"
 
       - name: Upload test report
         if: always()
