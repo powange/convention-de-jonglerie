@@ -801,7 +801,7 @@ async function main() {
         // Récupérer les candidatures acceptées pour cette édition
         const acceptedApplications = await prisma.editionVolunteerApplication.findMany({
           where: {
-            editionId: edition.id,
+            eventId: edition.id,
             status: 'ACCEPTED',
           },
           include: {
