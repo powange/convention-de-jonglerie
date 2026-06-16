@@ -51,11 +51,16 @@ export default wrapApiHandler(
       status: true,
       _count: {
         select: {
-          volunteerApplications: {
-            where: { status: 'ACCEPTED' },
-          },
           artists: true,
           editionOrganizers: true,
+        },
+      },
+      // Candidatures bénévoles : relation portée par Event (étape 0)
+      event: {
+        select: {
+          _count: {
+            select: { volunteerApplications: { where: { status: 'ACCEPTED' } } },
+          },
         },
       },
       orders: {
@@ -113,8 +118,10 @@ export default wrapApiHandler(
       )
       return {
         ...editionData,
+        event: undefined,
         _count: {
           ...editionData._count,
+          volunteerApplications: editionData.event._count.volunteerApplications,
           ticketingParticipants,
         },
       }

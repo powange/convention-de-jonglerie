@@ -31,7 +31,6 @@ export default wrapApiHandler(
         // Champs bénévolat nécessaires pour la page de gestion
         _count: {
           select: {
-            volunteerApplications: true,
             showCalls: {
               where: {
                 visibility: { in: ['PUBLIC', 'CLOSED'] },
@@ -39,9 +38,14 @@ export default wrapApiHandler(
             },
           },
         },
-        // Champs bénévolat simples sur le modèle Edition (inclus automatiquement, rien à faire)
-        // Champs bénévolat (valeurs)
-        volunteerApplications: false,
+        // Compte des candidatures bénévoles : relation portée par Event (étape 0)
+        event: {
+          select: {
+            _count: {
+              select: { volunteerApplications: true },
+            },
+          },
+        },
         // organizerPermissions: permet de gérer les droits spécifiques par édition
         // Pour l'instant on n'inclut pas, on utilise juste convention.organizers
         convention: {
@@ -170,6 +174,12 @@ export default wrapApiHandler(
 
     return {
       ...editionWithoutVolunteersAskFields,
+      // Ré-aplatir le compte des candidatures (relation déplacée sur Event)
+      event: undefined,
+      _count: {
+        ...edition._count,
+        volunteerApplications: edition.event._count.volunteerApplications,
+      },
       // Garder seulement les champs volunteers encore utilisés côté client
       volunteersOpen: edition.volunteersOpen,
       volunteersPagePublic: edition.volunteersPagePublic,

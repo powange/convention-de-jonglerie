@@ -54,10 +54,17 @@ export default wrapApiHandler(
             },
             _count: {
               select: {
-                volunteerApplications: true,
                 carpoolOffers: true,
                 carpoolRequests: true,
                 lostFoundItems: true,
+              },
+            },
+            // Candidatures bénévoles : relation portée par Event (étape 0)
+            event: {
+              select: {
+                _count: {
+                  select: { volunteerApplications: true },
+                },
               },
             },
           },
@@ -75,8 +82,17 @@ export default wrapApiHandler(
       orderBy: [{ createdAt: 'desc' }],
     })
 
+    // Ré-aplatir le compte des candidatures (relation déplacée sur Event)
+    const conventionsOut = conventions.map((c) => ({
+      ...c,
+      editions: c.editions.map(({ event, ...ed }) => ({
+        ...ed,
+        _count: { ...ed._count, volunteerApplications: event._count.volunteerApplications },
+      })),
+    }))
+
     return {
-      conventions,
+      conventions: conventionsOut,
       total: conventions.length,
     }
   },
