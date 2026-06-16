@@ -1,0 +1,91 @@
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { getVolunteerTeamById, setTeamLeader } from '#server/utils/editions/volunteers/teams'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import {
+  validateEditionId,
+  validateResourceId,
+  validateStringId,
+} from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+
+const bodySchema = z.object({
+  isLeader: z.boolean(),
+})
+
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const applicationId = validateResourceId(event, 'applicationId', 'candidature')
+    const teamId = validateStringId(event, 'teamId', 'équipe')
+    const parsed = bodySchema.parse(await readBody(event))
+
+    // Vérifier les permissions
+    const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
+      })
+
+    // Vérifier que l'application existe et appartient à cette édition
+    const application = await prisma.editionVolunteerApplication.findUnique({
+      where: { id: applicationId },
+      select: {
+        id: true,
+        eventId: true,
+        status: true,
+        user: {
+          select: userWithNameSelect,
+        },
+      },
+    })
+
+    if (!application || application.eventId !== editionId)
+      throw createError({ status: 404, message: 'Candidature introuvable' })
+
+    if (application.status !== 'ACCEPTED')
+      throw createError({
+        status: 400,
+        message: 'Seuls les bénévoles acceptés peuvent être responsables',
+      })
+
+    // Vérifier que l'équipe existe et appartient à cette édition
+    const team = await getVolunteerTeamById(teamId)
+
+    if (!team || team.eventId !== editionId)
+      throw createError({ status: 404, message: 'Équipe introuvable' })
+
+    try {
+      // Mettre à jour le statut de leader
+      const updatedAssignment = await setTeamLeader(applicationId, teamId, parsed.isLeader)
+
+      return createSuccessResponse(
+        {
+          assignment: {
+            ...updatedAssignment,
+            application: {
+              user: application.user,
+            },
+          },
+        },
+        parsed.isLeader
+          ? `${application.user.pseudo} est maintenant responsable de l'équipe ${team.name}`
+          : `${application.user.pseudo} n'est plus responsable de l'équipe ${team.name}`
+      )
+    } catch (error: unknown) {
+      // Si l'assignation n'existe pas, Prisma lancera une erreur
+      if (error.code === 'P2025') {
+        throw createError({
+          status: 404,
+          message: "Le bénévole n'est pas assigné à cette équipe",
+        })
+      }
+      throw error
+    }
+  },
+  { operationName: 'SetVolunteerTeamLeader' }
+)

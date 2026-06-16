@@ -35,8 +35,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
       },
     })
 
+    const eventAnchor = await prismaTest.event.create({ data: {} })
     testEdition = await prismaTest.edition.create({
       data: {
+        id: eventAnchor.id,
+        eventId: eventAnchor.id,
         conventionId: convention.id,
         creatorId: testUser.id,
         startDate: new Date('2025-06-01'),
@@ -51,7 +54,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
     // Créer une équipe normale
     testTeam = await prismaTest.volunteerTeam.create({
       data: {
-        editionId: testEdition.id,
+        eventId: testEdition.id,
         name: 'Équipe normale',
         color: '#FF0000',
         isAccessControlTeam: false,
@@ -61,7 +64,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
     // Créer une équipe de contrôle d'accès
     testAccessControlTeam = await prismaTest.volunteerTeam.create({
       data: {
-        editionId: testEdition.id,
+        eventId: testEdition.id,
         name: 'Équipe contrôle accès',
         color: '#00FF00',
         isAccessControlTeam: true,
@@ -71,7 +74,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
     // Créer une candidature acceptée
     await prismaTest.editionVolunteerApplication.create({
       data: {
-        editionId: testEdition.id,
+        eventId: testEdition.id,
         userId: testUser.id,
         status: 'ACCEPTED',
       },
@@ -92,7 +95,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Créneau contrôle actif',
           startDateTime: startTime,
@@ -121,7 +124,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Créneau bientôt',
           startDateTime: startTime,
@@ -150,7 +153,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Créneau récemment terminé',
           startDateTime: startTime,
@@ -179,7 +182,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Créneau ancien',
           startDateTime: startTime,
@@ -208,7 +211,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Créneau futur',
           startDateTime: startTime,
@@ -237,7 +240,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testTeam.id, // Équipe normale, pas de contrôle d'accès
           title: 'Créneau équipe normale',
           startDateTime: startTime,
@@ -273,7 +276,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: "Contrôle d'accès principal",
           startDateTime: startTime,
@@ -311,7 +314,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot1 = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Premier créneau',
           startDateTime: startTime1,
@@ -322,7 +325,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
 
       const timeSlot2 = await prismaTest.volunteerTimeSlot.create({
         data: {
-          editionId: testEdition.id,
+          eventId: testEdition.id,
           teamId: testAccessControlTeam.id,
           title: 'Deuxième créneau',
           startDateTime: startTime2,

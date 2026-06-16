@@ -13,6 +13,7 @@ services:
       CI: 'false'
     volumes:
       - ./app:/app/app:cached
+      - ./layers:/app/layers:cached
       - ./server:/app/server:cached
       - ./shared:/app/shared:cached
       - ./test:/app/test:cached

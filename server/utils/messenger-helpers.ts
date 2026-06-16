@@ -63,7 +63,7 @@ export async function ensureVolunteerConversations(
       teamId,
       isLeader: true,
       application: {
-        editionId,
+        eventId: editionId,
       },
     },
     include: {

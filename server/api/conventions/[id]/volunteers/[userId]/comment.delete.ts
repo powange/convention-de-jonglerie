@@ -54,9 +54,9 @@ export default wrapApiHandler(
     try {
       await prisma.volunteerComment.delete({
         where: {
-          userId_editionId: {
+          userId_eventId: {
             userId,
-            editionId,
+            eventId: editionId,
           },
         },
       })

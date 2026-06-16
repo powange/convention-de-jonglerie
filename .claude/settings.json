@@ -69,8 +69,20 @@
       "Bash(sed -n '/const trimField/,/^}/p' app/components/edition/Form.vue)",
       "Bash(sed -n '/touchedFields = reactive/,/}\\)/p' app/components/edition/Form.vue)",
       "Bash(node /tmp/apply-url-translations.mjs)",
-      "Bash(node /tmp/translate-seen-by.mjs)"
+      "Bash(node /tmp/translate-seen-by.mjs)",
+      "Bash(sed -i \"s@import TeamManagement from '~/components/edition/volunteer/planning/TeamManagement.vue'@import { EditionVolunteerPlanningTeamManagement as TeamManagement } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/teams.vue\")",
+      "Bash(sed -i \"s@import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'@import { EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
+      "Bash(sed -i \"s@import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'@import { EditionVolunteerPlanningSlotModal as SlotModal } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
+      "Bash(cd /home/powange/projects/convention-de-jonglerie *)",
+      "Bash(break)",
+      "Bash(gh pr *)",
+      "Bash(sed -i 's/prismaMock\\\\.edition\\\\.delete/prismaMock.event.delete/g' test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts && echo \"=== vérif restantes edition.delete ===\" && grep -c \"prismaMock.edition.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts; echo \"=== event.delete présent ===\"; grep -c \"prismaMock.event.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts)"
     ],
-    "additionalDirectories": ["/tmp"]
+    "additionalDirectories": [
+      "/tmp",
+      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/server/api/editions",
+      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/app/pages/editions/[id]",
+      "/home/powange/projects/convention-de-jonglerie/test/nuxt/server/api/editions"
+    ]
   }
 }

@@ -53,7 +53,7 @@ describe('stock-helpers', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             userId: 50,
-            editionId: 1,
+            eventId: 1,
             teamAssignments: { some: { isLeader: true } },
           }),
         })

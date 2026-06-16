@@ -148,25 +148,40 @@ function loadLocaleFiles() {
       process.exit(1)
     }
 
-    // Lister tous les fichiers JSON dans le dossier
-    const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
+    // Lister tous les fichiers JSON (app + layers modulaires, ex. layers/volunteers)
+    const localeFiles = fs
+      .readdirSync(localeDir)
+      .filter((file) => file.endsWith('.json'))
+      .map((name) => ({ name, path: path.join(localeDir, name) }))
+    const layersRoot = path.join(projectRoot, 'layers')
+    if (fs.existsSync(layersRoot)) {
+      for (const layer of fs.readdirSync(layersRoot)) {
+        const layerFr = path.join(layersRoot, layer, 'i18n', 'locales', 'fr')
+        if (fs.existsSync(layerFr)) {
+          for (const name of fs.readdirSync(layerFr).filter((f) => f.endsWith('.json'))) {
+            localeFiles.push({ name, path: path.join(layerFr, name) })
+          }
+        }
+      }
+    }
 
-    if (files.length === 0) {
+    if (localeFiles.length === 0) {
       console.error(`${RED}Erreur: Aucun fichier de traduction trouvé dans ${localeDir}${RESET}`)
       process.exit(1)
     }
 
     // Fusionner tous les fichiers avec deep merge
     let mergedData = {}
-    for (const file of files) {
-      const filePath = path.join(localeDir, file)
+    for (const { path: filePath } of localeFiles) {
       const content = fs.readFileSync(filePath, 'utf8')
       const data = JSON.parse(content)
       mergedData = deepMerge(mergedData, data)
     }
 
     console.log(
-      `${CYAN}Chargé ${files.length} fichier(s) de traduction: ${files.join(', ')}${RESET}\n`
+      `${CYAN}Chargé ${localeFiles.length} fichier(s) de traduction: ${localeFiles
+        .map((f) => f.name)
+        .join(', ')}${RESET}\n`
     )
 
     return mergedData
@@ -603,6 +618,10 @@ async function getAllRelevantFiles() {
     'middleware/**/*.js',
     'utils/**/*.js',
     'server/**/*.js',
+    // Layers modulaires (ex. layers/volunteers) : composants/pages/serveur
+    'layers/**/*.vue',
+    'layers/**/*.ts',
+    'layers/**/*.js',
     // Fichiers de configuration Nuxt
     'nuxt.config.ts',
     'nuxt.config.js',

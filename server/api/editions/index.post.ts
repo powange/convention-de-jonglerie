@@ -72,55 +72,63 @@ export default wrapApiHandler(
       country,
     })
 
-    // Créer l'édition sans l'image d'abord
-    const edition = await prisma.edition.create({
-      data: {
-        conventionId,
-        name: name?.trim() || null,
-        description,
-        program,
-        imageUrl: null, // On met null d'abord
-        startDate: normalizeDateToISO(startDate) || startDate,
-        endDate: normalizeDateToISO(endDate) || endDate,
-        addressLine1,
-        addressLine2,
-        postalCode,
-        city,
-        region,
-        country,
-        timezone,
-        latitude: geoCoords.latitude,
-        longitude: geoCoords.longitude,
-        ticketingUrl,
-        officialWebsiteUrl,
-        facebookUrl,
-        instagramUrl,
-        hasFoodTrucks: hasFoodTrucks || false,
-        hasKidsZone: hasKidsZone || false,
-        acceptsPets: acceptsPets || false,
-        hasTentCamping: hasTentCamping || false,
-        hasTruckCamping: hasTruckCamping || false,
-        hasFamilyCamping: hasFamilyCamping || false,
-        hasSleepingRoom: hasSleepingRoom || false,
-        hasGym: hasGym || false,
-        hasFireSpace: hasFireSpace || false,
-        hasGala: hasGala || false,
-        hasOpenStage: hasOpenStage || false,
-        hasConcert: hasConcert || false,
-        hasCantine: hasCantine || false,
-        hasAerialSpace: hasAerialSpace || false,
-        hasSlacklineSpace: hasSlacklineSpace || false,
-        hasToilets: hasToilets || false,
-        hasShowers: hasShowers || false,
-        hasAccessibility: hasAccessibility || false,
-        hasWorkshops: hasWorkshops || false,
-        hasCashPayment: hasCashPayment || false,
-        hasCreditCardPayment: hasCreditCardPayment || false,
-        hasAfjTokenPayment: hasAfjTokenPayment || false,
-        creatorId: user.id,
-        status: 'OFFLINE', // Nouvelle édition créée hors ligne par défaut
-      },
-      include: editionWithFavoritesInclude,
+    // Créer l'événement générique (ancre) puis l'édition qui partage son id (invariant
+    // Edition.id == eventId) de façon atomique : pas d'Event orphelin si l'édition échoue.
+    const edition = await prisma.$transaction(async (tx) => {
+      const eventAnchor = await tx.event.create({ data: {} })
+
+      // Créer l'édition sans l'image d'abord
+      return tx.edition.create({
+        data: {
+          id: eventAnchor.id,
+          eventId: eventAnchor.id,
+          conventionId,
+          name: name?.trim() || null,
+          description,
+          program,
+          imageUrl: null, // On met null d'abord
+          startDate: normalizeDateToISO(startDate) || startDate,
+          endDate: normalizeDateToISO(endDate) || endDate,
+          addressLine1,
+          addressLine2,
+          postalCode,
+          city,
+          region,
+          country,
+          timezone,
+          latitude: geoCoords.latitude,
+          longitude: geoCoords.longitude,
+          ticketingUrl,
+          officialWebsiteUrl,
+          facebookUrl,
+          instagramUrl,
+          hasFoodTrucks: hasFoodTrucks || false,
+          hasKidsZone: hasKidsZone || false,
+          acceptsPets: acceptsPets || false,
+          hasTentCamping: hasTentCamping || false,
+          hasTruckCamping: hasTruckCamping || false,
+          hasFamilyCamping: hasFamilyCamping || false,
+          hasSleepingRoom: hasSleepingRoom || false,
+          hasGym: hasGym || false,
+          hasFireSpace: hasFireSpace || false,
+          hasGala: hasGala || false,
+          hasOpenStage: hasOpenStage || false,
+          hasConcert: hasConcert || false,
+          hasCantine: hasCantine || false,
+          hasAerialSpace: hasAerialSpace || false,
+          hasSlacklineSpace: hasSlacklineSpace || false,
+          hasToilets: hasToilets || false,
+          hasShowers: hasShowers || false,
+          hasAccessibility: hasAccessibility || false,
+          hasWorkshops: hasWorkshops || false,
+          hasCashPayment: hasCashPayment || false,
+          hasCreditCardPayment: hasCreditCardPayment || false,
+          hasAfjTokenPayment: hasAfjTokenPayment || false,
+          creatorId: user.id,
+          status: 'OFFLINE', // Nouvelle édition créée hors ligne par défaut
+        },
+        include: editionWithFavoritesInclude,
+      })
     })
 
     // Si une image temporaire a été fournie, la déplacer dans le bon dossier

@@ -30,9 +30,10 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         },
       })
 
-      // Créer une édition de test
+      // Créer une édition de test (avec son Event ; invariant non requis ici, pas de bénévoles)
       testEdition = await prismaTest.edition.create({
         data: {
+          event: { create: {} },
           name: `Edition Lost Found ${timestamp}`,
           startDate: new Date('2024-06-01'),
           endDate: new Date('2024-06-03'),

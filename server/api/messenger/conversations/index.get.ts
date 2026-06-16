@@ -24,7 +24,7 @@ export default wrapApiHandler(
     const [volunteerApplication, edition, artistApplication] = await Promise.all([
       prisma.editionVolunteerApplication.findFirst({
         where: {
-          editionId,
+          eventId: editionId,
           userId: user.id,
         },
       }),
@@ -227,7 +227,7 @@ export default wrapApiHandler(
                 userId: {
                   in: conversation.participants.map((p) => p.userId),
                 },
-                editionId,
+                eventId: editionId,
               },
             },
             select: {

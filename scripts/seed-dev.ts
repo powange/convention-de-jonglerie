@@ -366,26 +366,33 @@ async function main() {
 
         const randomCity = cities[Math.floor(Math.random() * cities.length)]
 
-        edition = await prisma.edition.create({
-          data: {
-            name: editionName,
-            description: `${conv.name} — édition ${i}`,
-            creatorId: conv.authorId,
-            conventionId: conv.id,
-            startDate,
-            endDate,
-            addressLine1: `${Math.floor(Math.random() * 100) + 1} Rue de la Jonglerie`,
-            city: randomCity,
-            country: 'France',
-            postalCode: `${Math.floor(Math.random() * 90000) + 10000}`,
-            hasWorkshops: Math.random() > 0.3,
-            hasConcert: Math.random() > 0.5,
-            hasTentCamping: Math.random() > 0.4,
-            hasShowers: Math.random() > 0.2,
-            hasToilets: Math.random() > 0.1,
-            hasCantine: Math.random() > 0.6,
-            status: 'PUBLISHED',
-          },
+        // Ancre Event puis édition partageant son id (invariant Edition.id == eventId), créées
+        // de façon atomique pour ne pas laisser d'Event orphelin si l'édition échoue.
+        edition = await prisma.$transaction(async (tx) => {
+          const eventAnchor = await tx.event.create({ data: {} })
+          return tx.edition.create({
+            data: {
+              id: eventAnchor.id,
+              eventId: eventAnchor.id,
+              name: editionName,
+              description: `${conv.name} — édition ${i}`,
+              creatorId: conv.authorId,
+              conventionId: conv.id,
+              startDate,
+              endDate,
+              addressLine1: `${Math.floor(Math.random() * 100) + 1} Rue de la Jonglerie`,
+              city: randomCity,
+              country: 'France',
+              postalCode: `${Math.floor(Math.random() * 90000) + 10000}`,
+              hasWorkshops: Math.random() > 0.3,
+              hasConcert: Math.random() > 0.5,
+              hasTentCamping: Math.random() > 0.4,
+              hasShowers: Math.random() > 0.2,
+              hasToilets: Math.random() > 0.1,
+              hasCantine: Math.random() > 0.6,
+              status: 'PUBLISHED',
+            },
+          })
         })
         console.log(
           `Edition créée: ${edition.name} (id=${edition.id}, ${startDate.toLocaleDateString()})`
@@ -647,7 +654,7 @@ async function main() {
           if (!createdTeamNames.includes(teamName)) {
             const team = await prisma.volunteerTeam.create({
               data: {
-                editionId: edition.id,
+                eventId: edition.id,
                 name: teamName,
                 description: `Équipe ${teamName.toLowerCase()} pour cette édition`,
                 color: teamColors[Math.floor(Math.random() * teamColors.length)],
@@ -671,7 +678,7 @@ async function main() {
         // Vérifier qu'il n'y a pas déjà une candidature
         const existingApplication = await prisma.editionVolunteerApplication.findFirst({
           where: {
-            editionId: edition.id,
+            eventId: edition.id,
             userId: volunteer.id,
           },
         })
@@ -724,7 +731,7 @@ async function main() {
 
         const application = await prisma.editionVolunteerApplication.create({
           data: {
-            editionId: edition.id,
+            eventId: edition.id,
             userId: volunteer.id,
             status:
               Math.random() > 0.15 ? 'ACCEPTED' : Math.random() > 0.5 ? 'PENDING' : 'REJECTED', // 85% acceptées
@@ -794,7 +801,7 @@ async function main() {
         // Récupérer les candidatures acceptées pour cette édition
         const acceptedApplications = await prisma.editionVolunteerApplication.findMany({
           where: {
-            editionId: edition.id,
+            eventId: edition.id,
             status: 'ACCEPTED',
           },
           include: {
@@ -843,7 +850,7 @@ async function main() {
             // Créer le créneau
             const timeSlot = await prisma.volunteerTimeSlot.create({
               data: {
-                editionId: edition.id,
+                eventId: edition.id,
                 teamId: team?.id || null,
                 title,
                 description: `${title} ${team ? `pour l'équipe ${team.name}` : '(créneau général)'}`,

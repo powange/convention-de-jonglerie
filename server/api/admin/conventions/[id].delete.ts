@@ -32,10 +32,16 @@ export default wrapApiHandler(
     console.log(`[ADMIN DELETE] - Éditions supprimées: ${convention.editions.length}`)
     console.log(`[ADMIN DELETE] - Organisateurs supprimés: ${convention.organizers.length}`)
 
-    // Suppression en cascade (Prisma s'en charge avec onDelete: Cascade dans le schéma)
-    await prisma.convention.delete({
-      where: { id: conventionId },
-    })
+    // Suppression en cascade (Prisma s'en charge avec onDelete: Cascade dans le schéma).
+    // On supprime aussi les ancres Event des éditions (id == eventId) : leur cascade efface les
+    // données bénévoles qui pendent sur Event et que la cascade Convention -> Edition n'atteint pas.
+    const editionIds = convention.editions.map((e) => e.id)
+    await prisma.$transaction([
+      ...(editionIds.length
+        ? [prisma.event.deleteMany({ where: { id: { in: editionIds } } })]
+        : []),
+      prisma.convention.delete({ where: { id: conventionId } }),
+    ])
 
     return createSuccessResponse(
       {

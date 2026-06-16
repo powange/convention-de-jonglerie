@@ -13,8 +13,11 @@ export default wrapApiHandler(
     // Récupère l'édition et vérifie les permissions de suppression
     await getEditionForDelete(editionId, user)
 
-    // Si on arrive ici, l'utilisateur a les droits
-    await prisma.edition.delete({
+    // Si on arrive ici, l'utilisateur a les droits.
+    // On supprime l'ancre Event (id == eventId) : la cascade efface l'Edition ET les données
+    // bénévoles (candidatures, équipes, créneaux, commentaires, groupes de notif) qui pendent
+    // désormais sur Event. Supprimer seulement l'Edition laisserait ces données orphelines.
+    await prisma.event.delete({
       where: { id: editionId },
     })
 

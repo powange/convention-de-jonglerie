@@ -59,11 +59,7 @@ export default wrapApiHandler(
         },
       })
 
-      if (
-        !selection ||
-        selection.volunteer.editionId !== editionId ||
-        selection.mealId !== mealId
-      ) {
+      if (!selection || selection.volunteer.eventId !== editionId || selection.mealId !== mealId) {
         throw createError({
           status: 404,
           message: 'Sélection de repas non trouvée',

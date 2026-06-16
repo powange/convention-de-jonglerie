@@ -53,9 +53,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         },
       })
 
-      // Créer une édition
+      // Créer une édition (ancre Event : Edition.id == eventId)
+      const eventAnchor = await prismaTest.event.create({ data: {} })
       mockEdition = await prismaTest.edition.create({
         data: {
+          id: eventAnchor.id,
+          eventId: eventAnchor.id,
           name: `Convention Test 2024 ${ts}`,
           conventionId: convention.id,
           startDate: new Date('2024-06-01'),
@@ -87,7 +90,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           description: 'Équipe accueil',
           color: '#ef4444',
           maxVolunteers: 5,
-          editionId: mockEdition.id,
+          eventId: mockEdition.id,
         },
       })
 
@@ -97,7 +100,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           description: 'Équipe technique',
           color: '#3b82f6',
           maxVolunteers: 3,
-          editionId: mockEdition.id,
+          eventId: mockEdition.id,
         },
       })
     })
@@ -108,14 +111,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const edition = await prismaTest.edition.findUnique({
           where: { id: mockEdition.id },
           include: {
-            volunteerTeams: true,
+            event: { include: { volunteerTeams: true } },
           },
         })
 
         expect(edition).toBeDefined()
         expect(edition?.volunteersMode).toBe('INTERNAL')
         expect(edition?.volunteersOpen).toBe(true)
-        expect(edition?.volunteerTeams).toHaveLength(2)
+        expect(edition?.event?.volunteerTeams).toHaveLength(2)
 
         // ========== ÉTAPE 2: Candidature d'un bénévole ==========
         const arrivalDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
@@ -123,7 +126,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
 
         const application = await prismaTest.editionVolunteerApplication.create({
           data: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             userId: mockUser.id,
             motivation: 'Je suis très motivé pour aider à organiser cette convention !',
             setupAvailability: true,
@@ -157,7 +160,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         // ========== ÉTAPE 3: Consultation des candidatures par le gestionnaire ==========
         const applications = await prismaTest.editionVolunteerApplication.findMany({
           where: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
           },
           include: {
             user: {
@@ -245,7 +248,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         // Créer une candidature
         const firstApplication = await prismaTest.editionVolunteerApplication.create({
           data: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             userId: testUser.id,
             motivation: 'Première candidature',
             setupAvailability: true,
@@ -259,11 +262,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         expect(firstApplication.id).toBeDefined()
 
         // Tenter de créer une seconde candidature pour le même utilisateur et édition
-        // La contrainte unique (editionId, userId) devrait l'empêcher
+        // La contrainte unique (eventId, userId) devrait l'empêcher
         await expect(
           prismaTest.editionVolunteerApplication.create({
             data: {
-              editionId: mockEdition.id,
+              eventId: mockEdition.id,
               userId: testUser.id,
               motivation: 'Tentative de double candidature',
               setupAvailability: true,
@@ -296,7 +299,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         // Créer une candidature
         const application = await prismaTest.editionVolunteerApplication.create({
           data: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             userId: testUser.id,
             motivation: 'Candidature à rejeter',
             setupAvailability: true,
@@ -383,7 +386,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
     describe('Performance et cohérence des données', () => {
       it('devrait maintenir la cohérence des équipes et des candidatures', async () => {
         const teams = await prismaTest.volunteerTeam.findMany({
-          where: { editionId: mockEdition.id },
+          where: { eventId: mockEdition.id },
         })
 
         expect(teams).toHaveLength(2)
@@ -394,25 +397,25 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const editionWithTeams = await prismaTest.edition.findUnique({
           where: { id: mockEdition.id },
           include: {
-            volunteerTeams: true,
+            event: { include: { volunteerTeams: true } },
           },
         })
 
-        expect(editionWithTeams?.volunteerTeams).toHaveLength(2)
+        expect(editionWithTeams?.event?.volunteerTeams).toHaveLength(2)
       })
 
       it('devrait gérer les agrégations de candidatures', async () => {
         // Compter les candidatures par statut
         const pendingCount = await prismaTest.editionVolunteerApplication.count({
           where: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             status: 'PENDING',
           },
         })
 
         const acceptedCount = await prismaTest.editionVolunteerApplication.count({
           where: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             status: 'ACCEPTED',
           },
         })
@@ -423,7 +426,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
 
         const totalCount = await prismaTest.editionVolunteerApplication.count({
           where: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
           },
         })
 
@@ -450,7 +453,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
 
         const applicationWithAllergy = await prismaTest.editionVolunteerApplication.create({
           data: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             userId: allergyUser.id,
             motivation: 'Candidature avec allergies',
             setupAvailability: true,
@@ -498,7 +501,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
 
         const applicationWithLightAllergy = await prismaTest.editionVolunteerApplication.create({
           data: {
-            editionId: mockEdition.id,
+            eventId: mockEdition.id,
             userId: lightAllergyUser.id,
             motivation: 'Candidature avec allergies légères',
             setupAvailability: true,

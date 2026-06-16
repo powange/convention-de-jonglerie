@@ -75,14 +75,14 @@ export default wrapApiHandler(
 
     const comment = await prisma.volunteerComment.upsert({
       where: {
-        userId_editionId: {
+        userId_eventId: {
           userId,
-          editionId,
+          eventId: editionId,
         },
       },
       create: {
         userId,
-        editionId,
+        eventId: editionId,
         content,
       },
       update: {

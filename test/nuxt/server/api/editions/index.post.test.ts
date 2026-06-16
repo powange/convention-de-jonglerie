@@ -66,6 +66,15 @@ describe('/api/editions POST', () => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
 
+    // Ancre Event créée avant chaque édition (invariant Edition.id == eventId)
+    prismaMock.event.create.mockResolvedValue({ id: 1 })
+
+    // La création passe par `$transaction(async (tx) => ...)` : on exécute le callback
+    // avec le mock global comme tx pour réutiliser les mêmes mocks de modèle.
+    prismaMock.$transaction.mockImplementation(async (arg: any) =>
+      typeof arg === 'function' ? arg(prismaMock) : Promise.all(arg)
+    )
+
     // Valeurs par défaut pour les mocks
     mockGeocodeEdition.mockResolvedValue({
       latitude: 48.8566,

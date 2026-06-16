@@ -50,7 +50,7 @@ describe('/api/editions/[id] DELETE', () => {
   it('devrait permettre de supprimer une édition', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const mockEvent = {
       context: {
@@ -63,7 +63,7 @@ describe('/api/editions/[id] DELETE', () => {
 
     expect(result.message).toBeDefined()
     expect(result.message.toLowerCase()).toMatch(/supprim|delet/)
-    expect(prismaMock.edition.delete).toHaveBeenCalledWith({
+    expect(prismaMock.event.delete).toHaveBeenCalledWith({
       where: { id: 1 },
     })
   })
@@ -136,7 +136,7 @@ describe('/api/editions/[id] DELETE', () => {
   it("devrait permettre au créateur de l'édition de supprimer", async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const mockEvent = {
       context: {
@@ -148,7 +148,7 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.message).toBeDefined()
-    expect(prismaMock.edition.delete).toHaveBeenCalled()
+    expect(prismaMock.event.delete).toHaveBeenCalled()
   })
 
   it("devrait permettre à l'auteur de la convention de supprimer", async () => {
@@ -164,7 +164,7 @@ describe('/api/editions/[id] DELETE', () => {
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(conventionAuthorEdition)
-    prismaMock.edition.delete.mockResolvedValue(conventionAuthorEdition)
+    prismaMock.event.delete.mockResolvedValue(conventionAuthorEdition)
 
     const mockEvent = {
       context: {
@@ -176,7 +176,7 @@ describe('/api/editions/[id] DELETE', () => {
     const result = await handler(mockEvent as any)
 
     expect(result.message).toBeDefined()
-    expect(prismaMock.edition.delete).toHaveBeenCalled()
+    expect(prismaMock.event.delete).toHaveBeenCalled()
   })
 
   it('devrait permettre à un organisateur admin de supprimer', async () => {
@@ -199,7 +199,7 @@ describe('/api/editions/[id] DELETE', () => {
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(organizerEdition)
-    prismaMock.edition.delete.mockResolvedValue(organizerEdition)
+    prismaMock.event.delete.mockResolvedValue(organizerEdition)
 
     const mockEvent = {
       context: {
@@ -232,7 +232,7 @@ describe('/api/editions/[id] DELETE', () => {
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(moderatorEdition)
-    prismaMock.edition.delete.mockResolvedValue(moderatorEdition)
+    prismaMock.event.delete.mockResolvedValue(moderatorEdition)
 
     const mockEvent = {
       context: {
@@ -276,7 +276,7 @@ describe('/api/editions/[id] DELETE', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockRejectedValue(new Error('Database error'))
+    prismaMock.event.delete.mockRejectedValue(new Error('Database error'))
 
     const mockEvent = {
       context: {
@@ -291,7 +291,7 @@ describe('/api/editions/[id] DELETE', () => {
   it('devrait vérifier les permissions avant suppression', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const mockEvent = {
       context: {
@@ -303,7 +303,7 @@ describe('/api/editions/[id] DELETE', () => {
     await handler(mockEvent as any)
 
     // Vérifier que findUnique est appelé avant delete pour vérifier les permissions
-    expect(prismaMock.edition.findUnique).toHaveBeenCalledBefore(prismaMock.edition.delete as any)
+    expect(prismaMock.edition.findUnique).toHaveBeenCalledBefore(prismaMock.event.delete as any)
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
@@ -334,7 +334,7 @@ describe('/api/editions/[id] DELETE', () => {
   it('devrait retourner un message de succès', async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const mockEvent = {
       context: {
@@ -367,7 +367,7 @@ describe('/api/editions/[id] DELETE', () => {
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(otherUserEdition)
-    prismaMock.edition.delete.mockResolvedValue(otherUserEdition)
+    prismaMock.event.delete.mockResolvedValue(otherUserEdition)
 
     const mockEvent = {
       context: {

@@ -30,16 +30,20 @@ export default wrapApiHandler(
             pseudo: true,
           },
         },
-        // Récupérer les bénévoles acceptés
-        volunteerApplications: {
-          where: {
-            status: 'ACCEPTED',
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
+        // Récupérer les bénévoles acceptés (relation portée par Event)
+        event: {
+          select: {
+            volunteerApplications: {
+              where: {
+                status: 'ACCEPTED',
+              },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    pseudo: true,
+                  },
+                },
               },
             },
           },
@@ -64,7 +68,7 @@ export default wrapApiHandler(
         })
 
         // Ajouter les bénévoles acceptés
-        edition.volunteerApplications.forEach((app) => {
+        edition.event.volunteerApplications.forEach((app) => {
           usersToNotify.add(app.user.id)
         })
 

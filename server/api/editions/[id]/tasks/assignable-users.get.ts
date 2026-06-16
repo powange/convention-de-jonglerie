@@ -55,7 +55,7 @@ export default wrapApiHandler(
 
     // Bénévoles ACCEPTED sur cette édition
     const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
-      where: { editionId, status: 'ACCEPTED' },
+      where: { eventId: editionId, status: 'ACCEPTED' },
       select: { user: { select: userSelect } },
     })
 

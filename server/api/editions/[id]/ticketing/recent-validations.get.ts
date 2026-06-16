@@ -47,7 +47,7 @@ export default wrapApiHandler(
       // Récupérer les validations de bénévoles
       const volunteerValidations = await prisma.editionVolunteerApplication.findMany({
         where: {
-          editionId: editionId,
+          eventId: editionId,
           entryValidated: true,
           entryValidatedAt: {
             not: null,

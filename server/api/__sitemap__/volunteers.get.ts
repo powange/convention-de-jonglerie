@@ -16,10 +16,14 @@ export default wrapApiHandler(
         updatedAt: true,
         startDate: true,
         endDate: true,
-        _count: {
+        event: {
           select: {
-            volunteerApplications: true,
-            volunteerTeams: true,
+            _count: {
+              select: {
+                volunteerApplications: true,
+                volunteerTeams: true,
+              },
+            },
           },
         },
       },
@@ -52,7 +56,10 @@ export default wrapApiHandler(
       }
 
       // Augmenter la priorité s'il y a beaucoup d'équipes ou de candidatures
-      if (edition._count.volunteerTeams > 5 || edition._count.volunteerApplications > 20) {
+      if (
+        edition.event._count.volunteerTeams > 5 ||
+        edition.event._count.volunteerApplications > 20
+      ) {
         priority = Math.min(priority + 0.1, 1.0)
       }
 

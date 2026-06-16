@@ -32,7 +32,7 @@ export default wrapApiHandler(
         const application = await prisma.editionVolunteerApplication.findFirst({
           where: {
             id: body.participantId,
-            editionId: editionId,
+            eventId: editionId,
             status: 'ACCEPTED',
           },
         })

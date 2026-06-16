@@ -19,7 +19,7 @@ const mockEvent = {
 describe('/api/editions/[id] DELETE', () => {
   beforeEach(() => {
     prismaMock.edition.findUnique.mockReset()
-    prismaMock.edition.delete.mockReset()
+    prismaMock.event.delete.mockReset()
   })
 
   it('devrait supprimer une édition en tant que créateur', async () => {
@@ -35,7 +35,7 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const result = await handler(mockEvent as any)
 
@@ -44,7 +44,7 @@ describe('/api/editions/[id] DELETE', () => {
       message: 'Edition deleted successfully',
       data: null,
     })
-    expect(prismaMock.edition.delete).toHaveBeenCalledWith({
+    expect(prismaMock.event.delete).toHaveBeenCalledWith({
       where: { id: 1 },
     })
   })
@@ -62,7 +62,7 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const result = await handler(mockEvent as any)
 
@@ -91,7 +91,7 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const result = await handler(mockEvent as any)
 
@@ -126,7 +126,7 @@ describe('/api/editions/[id] DELETE', () => {
         organizers: [{ userId: 1, canDeleteConvention: true }],
       },
     })
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const result = await handler(mockEvent as any)
 
@@ -161,7 +161,7 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     const result = await handler(eventWithGlobalAdmin as any)
 
@@ -262,7 +262,7 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockRejectedValue(new Error('Delete failed'))
+    prismaMock.event.delete.mockRejectedValue(new Error('Delete failed'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
   })
@@ -284,7 +284,7 @@ describe('/api/editions/[id] DELETE', () => {
     }
 
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-    prismaMock.edition.delete.mockResolvedValue(mockEdition)
+    prismaMock.event.delete.mockResolvedValue(mockEdition)
 
     await handler(eventWithStringId as any)
 
@@ -312,7 +312,7 @@ describe('/api/editions/[id] DELETE', () => {
         },
       },
     })
-    expect(prismaMock.edition.delete).toHaveBeenCalledWith({
+    expect(prismaMock.event.delete).toHaveBeenCalledWith({
       where: { id: 123 },
     })
   })
@@ -369,7 +369,7 @@ describe('/api/editions/[id] DELETE', () => {
       })
 
       if (testCase.shouldPass) {
-        prismaMock.edition.delete.mockResolvedValue({})
+        prismaMock.event.delete.mockResolvedValue({})
         const result = await handler(event as any)
         expect(result.message).toBe('Edition deleted successfully')
       } else {

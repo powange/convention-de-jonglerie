@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import handler from '../../../../../../../server/api/editions/[id]/volunteers/applications/index.post'
+import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/applications/index.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -36,7 +36,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
   const mockApplication = {
     id: 1,
-    editionId: 1,
+    eventId: 1,
     userId: 1,
     status: 'PENDING',
     motivation: 'Je veux aider',
@@ -97,7 +97,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
       expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          editionId: 1,
+          eventId: 1,
           userId: mockUser.id,
           motivation: applicationData.motivation,
           userSnapshotPhone: mockUser.phone,

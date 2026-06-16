@@ -245,7 +245,6 @@ describe('/api/editions/[id] GET', () => {
         // Champs bénévolat nécessaires pour la page de gestion
         _count: {
           select: {
-            volunteerApplications: true,
             showCalls: {
               where: {
                 visibility: { in: ['PUBLIC', 'CLOSED'] },
@@ -253,8 +252,14 @@ describe('/api/editions/[id] GET', () => {
             },
           },
         },
-        // Champs bénévolat (valeurs)
-        volunteerApplications: false,
+        // Compte des candidatures bénévoles : relation portée par Event (étape 0)
+        event: {
+          select: {
+            _count: {
+              select: { volunteerApplications: true },
+            },
+          },
+        },
         convention: {
           include: {
             organizers: {

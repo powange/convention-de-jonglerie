@@ -30,7 +30,7 @@ export async function isActiveInTeamSlot(
     where: {
       userId,
       timeSlot: {
-        editionId,
+        eventId: editionId,
         team: teamFilter,
       },
     },
@@ -73,7 +73,7 @@ export async function getActiveTeamSlot(userId: number, editionId: number, teamF
     where: {
       userId,
       timeSlot: {
-        editionId,
+        eventId: editionId,
         team: teamFilter,
       },
     },

@@ -57,7 +57,7 @@ export async function assertAssigneesAreAssignable(
   for (const o of organizers) allowed.add(o.userId)
 
   const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
-    where: { editionId, status: 'ACCEPTED', userId: { in: uniqueIds } },
+    where: { eventId: editionId, status: 'ACCEPTED', userId: { in: uniqueIds } },
     select: { userId: true },
   })
   for (const v of acceptedVolunteers) allowed.add(v.userId)

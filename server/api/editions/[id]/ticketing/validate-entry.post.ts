@@ -61,7 +61,7 @@ export default wrapApiHandler(
             id: {
               in: body.participantIds,
             },
-            editionId: editionId,
+            eventId: editionId,
             status: 'ACCEPTED',
             entryValidated: false,
           },
@@ -76,7 +76,7 @@ export default wrapApiHandler(
               id: {
                 in: body.participantIds,
               },
-              editionId: editionId,
+              eventId: editionId,
             },
             select: {
               userId: true,

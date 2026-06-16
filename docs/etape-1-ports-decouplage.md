@@ -85,19 +85,25 @@ Les interfaces vivent dans le layer (`layers/volunteers/server/ports/`). Le laye
 // layers/volunteers/server/ports/notification.port.ts
 export interface NotifyInput {
   userId: number
-  type: string                         // mappé sur l'enum de l'app côté implémentation
+  type: string // mappé sur l'enum de l'app côté implémentation
   actionUrl?: string
-  notificationType?: string            // clé de préférence
+  notificationType?: string // clé de préférence
   // traduction
-  titleKey?: string; messageKey?: string
-  translationParams?: Record<string, unknown>; actionTextKey?: string
+  titleKey?: string
+  messageKey?: string
+  translationParams?: Record<string, unknown>
+  actionTextKey?: string
   // OU texte libre
-  titleText?: string; messageText?: string; actionText?: string
+  titleText?: string
+  messageText?: string
+  actionText?: string
   // métadonnées optionnelles
-  category?: string; entityType?: string; entityId?: string
+  category?: string
+  entityType?: string
+  entityId?: string
 }
 export interface NotificationPort {
-  notify(input: NotifyInput): Promise<void>            // englobe déjà le « safe » (n'échoue pas)
+  notify(input: NotifyInput): Promise<void> // englobe déjà le « safe » (n'échoue pas)
   notifyMany(inputs: NotifyInput[]): Promise<void>
 }
 ```
@@ -105,8 +111,10 @@ export interface NotificationPort {
 ```ts
 // layers/volunteers/server/ports/email.port.ts
 export interface SendEmailInput {
-  to: string; subject: string
-  html?: string; text?: string
+  to: string
+  subject: string
+  html?: string
+  text?: string
 }
 export interface EmailPort {
   send(input: SendEmailInput): Promise<boolean>
@@ -119,11 +127,16 @@ import type { PrismaTransaction } from '#server/types/prisma-helpers'
 export interface MessengerPort {
   // équipe ⇄ bénévole (ex-ensureVolunteerConversations)
   ensureTeamConversation(input: {
-    eventId: number; teamId: string; userId: number; tx?: PrismaTransaction
+    eventId: number
+    teamId: string
+    userId: number
+    tx?: PrismaTransaction
   }): Promise<void>
   // bénévole ⇄ gestionnaires de bénévoles (ex-ensureVolunteerToOrganizersConversation)
   ensureVolunteerToManagersConversation(input: {
-    eventId: number; volunteerId: number; tx?: PrismaTransaction
+    eventId: number
+    volunteerId: number
+    tx?: PrismaTransaction
   }): Promise<string>
 }
 ```
@@ -161,7 +174,9 @@ export interface VolunteerPorts {
 }
 
 let ports: VolunteerPorts | null = null
-export function setVolunteerPorts(p: VolunteerPorts) { ports = p }
+export function setVolunteerPorts(p: VolunteerPorts) {
+  ports = p
+}
 export function useVolunteerPorts(): VolunteerPorts {
   if (!ports) throw new Error('[volunteers] ports non configurés (plugin serveur manquant)')
   return ports
@@ -175,19 +190,25 @@ Câblage côté **app jonglerie** (reste dans l'app, connaît les implémentatio
 import { setVolunteerPorts } from '#layers/volunteers/server/ports/registry'
 import { NotificationService, safeNotify } from '#server/utils/notification-service'
 import { sendEmail } from '#server/utils/emailService'
-import { ensureVolunteerConversations, ensureVolunteerToOrganizersConversation } from '#server/utils/messenger-helpers'
+import {
+  ensureVolunteerConversations,
+  ensureVolunteerToOrganizersConversation,
+} from '#server/utils/messenger-helpers'
 import { getVolunteerManagerUserIds } from '#server/utils/permissions/volunteer-permissions'
 
 export default defineNitroPlugin(() => {
   setVolunteerPorts({
     notifications: {
-      notify: (i) => safeNotify(() => NotificationService.create(mapNotify(i))).then(() => undefined),
-      notifyMany: async (is) => { for (const i of is) await safeNotify(() => NotificationService.create(mapNotify(i))) },
+      notify: (i) =>
+        safeNotify(() => NotificationService.create(mapNotify(i))).then(() => undefined),
+      notifyMany: async (is) => {
+        for (const i of is) await safeNotify(() => NotificationService.create(mapNotify(i)))
+      },
     },
     email: { send: (i) => sendEmail(i) },
     messenger: {
       ensureTeamConversation: ({ eventId, teamId, userId, tx }) =>
-        ensureVolunteerConversations(eventId, teamId, userId, tx),         // eventId == ancien editionId (étape 0)
+        ensureVolunteerConversations(eventId, teamId, userId, tx), // eventId == ancien editionId (étape 0)
       ensureVolunteerToManagersConversation: ({ eventId, volunteerId, tx }) =>
         ensureVolunteerToOrganizersConversation(eventId, volunteerId, tx),
     },
@@ -203,7 +224,9 @@ Consommation côté **layer** (exemple de réécriture d'un site d'appel) :
 
 ```ts
 // AVANT — server/api/editions/[id]/volunteers/applications/[applicationId].patch.ts
-await safeNotify(() => NotificationService.create({ userId, type: 'VOLUNTEER_ACCEPTED', titleKey: '…' }))
+await safeNotify(() =>
+  NotificationService.create({ userId, type: 'VOLUNTEER_ACCEPTED', titleKey: '…' })
+)
 
 // APRÈS (dans le layer)
 import { useVolunteerPorts } from '#layers/volunteers/server/ports/registry'
@@ -213,15 +236,15 @@ await notifications.notify({ userId, type: 'VOLUNTEER_ACCEPTED', titleKey: '…'
 
 ## 5. Cartographie site d'appel → port
 
-| Fichier (module bénévole) | Appel actuel | Port cible |
-| --- | --- | --- |
-| `applications/[applicationId].patch.ts` | `safeNotify(NotificationService.create(…))` ×4 | `notifications.notify` |
-| `notifications.post.ts` | `NotificationService.create(…)` | `notifications.notify` / `notifyMany` |
-| `notify-schedules.post.ts` | `NotificationService.create(…)` + `sendEmail(…)` | `notifications.notify` + `email.send` |
-| `create-user-and-add.post.ts` | `sendEmail(…)` | `email.send` |
-| `server/tasks/volunteer-reminders.ts` | `NotificationService.create(…)` | `notifications.notify` |
-| `server/utils/editions/volunteers/teams.ts` | `ensureVolunteerConversations(…)` ×2 | `messenger.ensureTeamConversation` |
-| (orgas destinataires) | requête `ConventionOrganizer.canManageVolunteers` | `organizers.getVolunteerManagers` |
+| Fichier (module bénévole)                   | Appel actuel                                      | Port cible                            |
+| ------------------------------------------- | ------------------------------------------------- | ------------------------------------- |
+| `applications/[applicationId].patch.ts`     | `safeNotify(NotificationService.create(…))` ×4    | `notifications.notify`                |
+| `notifications.post.ts`                     | `NotificationService.create(…)`                   | `notifications.notify` / `notifyMany` |
+| `notify-schedules.post.ts`                  | `NotificationService.create(…)` + `sendEmail(…)`  | `notifications.notify` + `email.send` |
+| `create-user-and-add.post.ts`               | `sendEmail(…)`                                    | `email.send`                          |
+| `server/tasks/volunteer-reminders.ts`       | `NotificationService.create(…)`                   | `notifications.notify`                |
+| `server/utils/editions/volunteers/teams.ts` | `ensureVolunteerConversations(…)` ×2              | `messenger.ensureTeamConversation`    |
+| (orgas destinataires)                       | requête `ConventionOrganizer.canManageVolunteers` | `organizers.getVolunteerManagers`     |
 
 ## 6. Côté `layers/core` : ce qui doit y vivre
 

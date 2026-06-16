@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import handler from '../../../../../../server/api/editions/[id]/volunteers/settings.get'
+import handler from '../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/settings.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -36,7 +36,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
     volunteersTeardownEndDate: new Date('2024-06-05'),
     volunteersAskSetup: true,
     volunteersAskTeardown: true,
-    volunteerApplications: [],
+    event: { volunteerApplications: [] },
   }
 
   // Mock des équipes VolunteerTeam
@@ -436,7 +436,11 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
           volunteersUpdatedAt: true,
           volunteersAskSetup: true,
           volunteersAskTeardown: true,
-          volunteerApplications: { select: { id: true, status: true, userId: true } },
+          event: {
+            select: {
+              volunteerApplications: { select: { id: true, status: true, userId: true } },
+            },
+          },
         },
       })
     })

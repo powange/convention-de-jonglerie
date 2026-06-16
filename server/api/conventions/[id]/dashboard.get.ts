@@ -51,11 +51,16 @@ export default wrapApiHandler(
       status: true,
       _count: {
         select: {
-          volunteerApplications: {
-            where: { status: 'ACCEPTED' },
-          },
           artists: true,
           editionOrganizers: true,
+        },
+      },
+      // Candidatures bénévoles : relation portée par Event (étape 0)
+      event: {
+        select: {
+          _count: {
+            select: { volunteerApplications: { where: { status: 'ACCEPTED' } } },
+          },
         },
       },
       orders: {
@@ -106,7 +111,7 @@ export default wrapApiHandler(
 
     // Transformer les éditions (calculer ticketingParticipants)
     const editions = convention.editions.map((edition) => {
-      const { orders, ...editionData } = edition
+      const { orders, event: editionEvent, ...editionData } = edition
       const ticketingParticipants = orders.reduce(
         (sum, order) => sum + (order._count?.items ?? 0),
         0
@@ -115,6 +120,8 @@ export default wrapApiHandler(
         ...editionData,
         _count: {
           ...editionData._count,
+          // `?? 0` : filet de sécurité, editionEvent existe toujours (invariant Edition.id == eventId)
+          volunteerApplications: editionEvent?._count?.volunteerApplications ?? 0,
           ticketingParticipants,
         },
       }

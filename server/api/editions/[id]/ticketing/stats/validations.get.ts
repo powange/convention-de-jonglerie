@@ -97,7 +97,7 @@ export default wrapApiHandler(
       // Bénévoles
       prisma.editionVolunteerApplication.findMany({
         where: {
-          editionId,
+          eventId: editionId,
           entryValidated: true,
           entryValidatedAt: {
             not: null,

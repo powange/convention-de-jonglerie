@@ -1,0 +1,157 @@
+import { z } from 'zod'
+
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { createVolunteerMealSelections } from '#server/utils/volunteer-meals'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+
+const bodySchema = z.object({
+  userId: z.number(),
+})
+
+export default wrapApiHandler(async (event) => {
+  const user = requireAuth(event)
+  const editionId = validateEditionId(event)
+
+  // Vérifier les permissions
+  const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
+  if (!allowed)
+    throw createError({
+      status: 403,
+      message: 'Droits insuffisants pour gérer les bénévoles',
+    })
+
+  const body = bodySchema.parse(await readBody(event))
+
+  // Vérifier que l'utilisateur existe
+  const targetUser = await fetchResourceOrFail(prisma.user, body.userId, {
+    errorMessage: 'Utilisateur introuvable',
+    select: {
+      id: true,
+      nom: true,
+      prenom: true,
+      email: true,
+      phone: true,
+    },
+  })
+
+  // Vérifier que l'édition existe
+  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+    errorMessage: 'Edition introuvable',
+    select: {
+      id: true,
+      name: true,
+      conventionId: true,
+      convention: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  })
+
+  // Vérifier qu'il n'y a pas déjà une candidature
+  const existing = await prisma.editionVolunteerApplication.findUnique({
+    where: {
+      eventId_userId: {
+        eventId: editionId,
+        userId: body.userId,
+      },
+    },
+  })
+
+  if (existing) {
+    throw createError({
+      status: 409,
+      message: 'Cet utilisateur a déjà une candidature pour cette édition',
+    })
+  }
+
+  // Générer un token unique
+  let qrCodeToken = generateVolunteerQrCodeToken()
+  let isUnique = false
+  let attempts = 0
+  const maxAttempts = 10
+
+  while (!isUnique && attempts < maxAttempts) {
+    const existingToken = await prisma.editionVolunteerApplication.findUnique({
+      where: { qrCodeToken },
+    })
+
+    if (!existingToken) {
+      isUnique = true
+    } else {
+      qrCodeToken = generateVolunteerQrCodeToken()
+      attempts++
+    }
+  }
+
+  if (!isUnique) {
+    throw createError({
+      status: 500,
+      message: 'Impossible de générer un token unique',
+    })
+  }
+
+  // Créer la candidature avec le statut ACCEPTED
+  const application = await prisma.editionVolunteerApplication.create({
+    data: {
+      eventId: editionId,
+      userId: body.userId,
+      status: 'ACCEPTED',
+      motivation: 'Ajouté manuellement par un organisateur',
+      userSnapshotPhone: targetUser.phone || null,
+      dietaryPreference: 'NONE',
+      setupAvailability: null,
+      teardownAvailability: null,
+      eventAvailability: null,
+      source: 'MANUAL',
+      addedById: user.id,
+      addedAt: new Date(),
+      qrCodeToken,
+    },
+    select: {
+      id: true,
+      status: true,
+      user: {
+        select: {
+          ...userWithNameSelect,
+          email: true,
+        },
+      },
+    },
+  })
+
+  // Créer automatiquement les sélections de repas
+  try {
+    await createVolunteerMealSelections(application.id, editionId)
+  } catch (mealError) {
+    console.error('Erreur lors de la création des repas du bénévole:', mealError)
+    // Ne pas faire échouer l'ajout si la création des repas échoue
+  }
+
+  // Envoyer une notification à l'utilisateur ajouté
+  try {
+    await prisma.notification.create({
+      data: {
+        userId: body.userId,
+        type: 'SUCCESS',
+        title: 'Vous avez été ajouté comme bénévole ! 🎉',
+        message: `Vous avez été ajouté comme bénévole pour "${edition.convention.name}${edition.name ? ' - ' + edition.name : ''}". Votre candidature a été automatiquement acceptée.`,
+        category: 'volunteer',
+        entityType: 'Edition',
+        entityId: editionId.toString(),
+        actionUrl: `/editions/${editionId}/volunteers`,
+        actionText: 'Voir les détails',
+      },
+    })
+  } catch (notificationError) {
+    console.error("Erreur lors de l'envoi de la notification:", notificationError)
+  }
+
+  return createSuccessResponse({ application })
+}, 'AddVolunteerManually')

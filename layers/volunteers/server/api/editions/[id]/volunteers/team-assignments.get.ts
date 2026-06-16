@@ -1,0 +1,100 @@
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { requireAuth } from '#server/utils/auth-utils'
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
+
+/**
+ * Route dédiée pour récupérer tous les bénévoles acceptés avec leurs assignations d'équipes
+ * Cette route n'est pas paginée car elle est utilisée pour afficher la répartition par équipes
+ */
+export default wrapApiHandler(async (event) => {
+  const user = requireAuth(event)
+  const editionId = validateEditionId(event)
+
+  const allowed = await canAccessEditionData(editionId, user.id, event)
+
+  // Si l'utilisateur n'a pas accès complet, vérifier s'il est team leader
+  let isTeamLeader = false
+  let leaderTeamIds: string[] = []
+
+  if (!allowed) {
+    // Vérifier si l'utilisateur est team leader
+    const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
+      where: {
+        isLeader: true,
+        application: {
+          userId: user.id,
+          eventId: editionId,
+          status: 'ACCEPTED',
+        },
+      },
+      select: {
+        teamId: true,
+      },
+    })
+
+    if (leaderAssignments.length === 0) {
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
+    }
+
+    isTeamLeader = true
+    leaderTeamIds = leaderAssignments.map((a) => a.teamId)
+  }
+
+  // Récupérer tous les bénévoles acceptés avec leurs équipes
+  const applications = await prisma.editionVolunteerApplication.findMany({
+    where: {
+      eventId: editionId,
+      status: 'ACCEPTED',
+      // Si team leader, filtrer uniquement les bénévoles de ses équipes
+      ...(isTeamLeader && {
+        teamAssignments: {
+          some: {
+            teamId: {
+              in: leaderTeamIds,
+            },
+          },
+        },
+      }),
+    },
+    select: {
+      id: true,
+      userId: true,
+      teamPreferences: true,
+      user: {
+        select: {
+          ...userWithNameSelect,
+          email: true,
+          emailHash: true,
+          profilePicture: true,
+        },
+      },
+      teamAssignments: {
+        select: {
+          teamId: true,
+          isLeader: true,
+          assignedAt: true,
+          team: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              color: true,
+              maxVolunteers: true,
+            },
+          },
+        },
+        orderBy: {
+          assignedAt: 'asc',
+        },
+      },
+    },
+    orderBy: [{ user: { prenom: 'asc' } }, { user: { nom: 'asc' } }],
+  })
+
+  return applications
+}, 'GetVolunteerTeamAssignments')

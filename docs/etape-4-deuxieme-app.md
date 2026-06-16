@@ -61,20 +61,20 @@ model <Domaine> {
 
 ## 4. Ce qu'on réutilise vs ce qu'on crée
 
-| Élément | 2ᵉ app |
-| --- | --- |
-| `Event`, `User`, auth, notifications, messenger, emails (core) | **Réutilisé** (layer) |
-| Module bénévole complet (pages `gestion/volunteers/**`, API, planning…) | **Réutilisé** (layer) |
-| Modèle de domaine (`<Domaine>` 1:1 Event) | **Créé** |
-| Pages d'accueil / vitrine / pages métier propres | **Créé** |
-| Branding (logo, couleurs, nom) | **Créé** (`app.config.ts`, assets) |
-| Implémentations des ports (notifications, email, messenger, permissions) | **Créé** (binding, §6) |
-| Base de données, Docker, CI, migrations | **Créé** (séparés) |
+| Élément                                                                  | 2ᵉ app                             |
+| ------------------------------------------------------------------------ | ---------------------------------- |
+| `Event`, `User`, auth, notifications, messenger, emails (core)           | **Réutilisé** (layer)              |
+| Module bénévole complet (pages `gestion/volunteers/**`, API, planning…)  | **Réutilisé** (layer)              |
+| Modèle de domaine (`<Domaine>` 1:1 Event)                                | **Créé**                           |
+| Pages d'accueil / vitrine / pages métier propres                         | **Créé**                           |
+| Branding (logo, couleurs, nom)                                           | **Créé** (`app.config.ts`, assets) |
+| Implémentations des ports (notifications, email, messenger, permissions) | **Créé** (binding, §6)             |
+| Base de données, Docker, CI, migrations                                  | **Créé** (séparés)                 |
 
 ## 5. Authentification & comptes
 
-Bases séparées ⇒ **comptes distincts par app** (la table `User` a la même *forme* mais pas les mêmes
-*données*). Un utilisateur de la 2ᵉ app n'existe pas dans la base jonglerie, et inversement.
+Bases séparées ⇒ **comptes distincts par app** (la table `User` a la même _forme_ mais pas les mêmes
+_données_). Un utilisateur de la 2ᵉ app n'existe pas dans la base jonglerie, et inversement.
 
 > Un **SSO** (compte unique partagé entre les deux apps) est un **chantier distinct** : il
 > nécessiterait un fournisseur d'identité externe (ou une base d'auth partagée), hors périmètre de
@@ -131,16 +131,16 @@ donc comme une **stack Portainer distincte**, à côté de la stack jonglerie.
 En partant du `docker-compose.prod.yml` actuel (jonglerie), tout doit être **distinct** pour éviter
 les collisions :
 
-| Aspect | Jonglerie (existant) | 2ᵉ app (nouveau) |
-| --- | --- | --- |
-| `container_name` | `convention-db-prod`, `convention-app-prod` | `autre-db-prod`, `autre-app-prod` |
-| Volume MySQL | `mysql_data` | `autre_mysql_data` |
-| Port DB hôte | `3309:3306` | autre port libre, ex. `3310:3306` |
-| Chemins hôte (uploads/backups) | `…/convention-de-jonglerie-prod/…` | `…/autre-domaine-prod/…` |
-| Base / `DATABASE_URL` | base A (`database-prod`) | base B (`autre-db-prod`) |
-| `stack.env` (Portainer) | propre | propre |
-| Hostname reverse-proxy | `jonglerie.…` | `autre.…` |
-| Réseau | `proxy-network` (externe) | **même** `proxy-network` (le proxy route par hostname) |
+| Aspect                         | Jonglerie (existant)                        | 2ᵉ app (nouveau)                                       |
+| ------------------------------ | ------------------------------------------- | ------------------------------------------------------ |
+| `container_name`               | `convention-db-prod`, `convention-app-prod` | `autre-db-prod`, `autre-app-prod`                      |
+| Volume MySQL                   | `mysql_data`                                | `autre_mysql_data`                                     |
+| Port DB hôte                   | `3309:3306`                                 | autre port libre, ex. `3310:3306`                      |
+| Chemins hôte (uploads/backups) | `…/convention-de-jonglerie-prod/…`          | `…/autre-domaine-prod/…`                               |
+| Base / `DATABASE_URL`          | base A (`database-prod`)                    | base B (`autre-db-prod`)                               |
+| `stack.env` (Portainer)        | propre                                      | propre                                                 |
+| Hostname reverse-proxy         | `jonglerie.…`                               | `autre.…`                                              |
+| Réseau                         | `proxy-network` (externe)                   | **même** `proxy-network` (le proxy route par hostname) |
 
 > Le réseau `proxy-network` externe **reste partagé** : c'est le reverse-proxy commun qui aiguille
 > vers la bonne app selon le hostname. Tout le reste (conteneurs, volumes, base) est cloisonné.
@@ -161,7 +161,7 @@ services:
     volumes:
       - autre_mysql_data:/var/lib/mysql
     ports:
-      - '3310:3306'            # port hôte distinct de la jonglerie (3309)
+      - '3310:3306' # port hôte distinct de la jonglerie (3309)
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 2s
@@ -234,6 +234,7 @@ push sur main (monorepo)
 ### 9.4 Propagation lors d'une mise à jour de layer
 
 Modifier `layers/volunteers` →
+
 1. la CI rebuild **les deux** images (jonglerie + autre) — le code se propage automatiquement ;
 2. on **redéploie chaque stack** (deux webhooks) ;
 3. on applique **la migration de chaque base** si le schéma du layer a changé (compromis « bases
