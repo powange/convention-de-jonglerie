@@ -42,6 +42,8 @@ export const prismaMock = {
   volunteerNotificationGroup: createModelMock(),
   volunteerNotificationConfirmation: createModelMock(),
   volunteerAssignment: createModelMock(),
+  volunteerMealSelection: createModelMock(),
+  editionVolunteerHandoutItem: createModelMock(),
   apiErrorLog: createModelMock(),
   notification: createModelMock(),
   fcmToken: createModelMock(),
@@ -80,6 +82,10 @@ export const prismaMock = {
   show: createModelMock(),
   showArtist: createModelMock(),
   showHandoutItem: createModelMock(),
+
+  // Modèles artistes
+  editionArtist: createModelMock(),
+  artistMealSelection: createModelMock(),
 
   // Modèles carte (zones et marqueurs)
   editionZone: createModelMock(),
