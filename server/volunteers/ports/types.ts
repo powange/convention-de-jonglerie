@@ -90,10 +90,45 @@ export interface EventScopePort {
   getEventDisplayData(eventIds: number[]): Promise<Record<number, Record<string, unknown>>>
 }
 
+/** Identité d'un participant ayant droit à un repas via la billetterie. */
+export interface TicketMealParticipant {
+  nom: string
+  prenom: string
+  email: string
+}
+
+/** Article à remettre (catalogue billetterie) résolu pour l'affichage. */
+export interface HandoutItemInfo {
+  id: number
+  name: string
+}
+
+/**
+ * Accès au module billetterie depuis le module bénévole (repas / catering). Le module bénévole ne
+ * connaît ni les commandes, ni les tarifs, ni le catalogue d'articles : il délègue au port.
+ * Jonglerie : participants issus des tarifs/options « avec repas » + table `TicketingHandoutItem`.
+ * Domaine sans billetterie : implémentations renvoyant `{}`.
+ */
+export interface TicketingPort {
+  /**
+   * Participants ayant droit à chaque repas via la billetterie (tarifs + options « avec repas »,
+   * commandes à l'état traité), **dédupliqués par repas**. Clé = mealId ; un repas sans participant
+   * billetterie est absent ou associé à un tableau vide.
+   */
+  getMealTicketParticipants(mealIds: number[]): Promise<Record<number, TicketMealParticipant[]>>
+  /**
+   * Détails du catalogue d'articles à remettre pour une liste d'ids. Le module bénévole stocke la
+   * liaison repas↔article (`VolunteerMealHandoutItem`) mais pas le catalogue. Clé = handoutItemId ;
+   * un id introuvable est simplement absent du résultat.
+   */
+  getHandoutItems(handoutItemIds: number[]): Promise<Record<number, HandoutItemInfo>>
+}
+
 export interface VolunteerPorts {
   notifications: NotificationPort
   email: EmailPort
   messenger: MessengerPort
   organizers: OrganizerDirectoryPort
   eventScope: EventScopePort
+  ticketing: TicketingPort
 }
