@@ -60,33 +60,11 @@ export default wrapApiHandler(
         hasAfjTokenPayment: true,
         hasATM: true,
         hasLongShow: true,
-        // Config bénévoles
-        volunteersDescription: true,
-        volunteersExternalUrl: true,
-        volunteersMode: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskCompanion: true,
-        volunteersAskAvoidList: true,
-        volunteersAskSkills: true,
-        volunteersAskExperience: true,
-        volunteersAskEmergencyContact: true,
-        volunteersAskSetup: true,
-        volunteersAskTeardown: true,
-        volunteersSetupStartDate: true,
-        volunteersTeardownEndDate: true,
         // Config billetterie
         ticketingAllowOnsiteRegistration: true,
         ticketingAllowAnonymousOrders: true,
         // Config repas
         mealsEnabled: true,
-        // Config bénévoles
-        volunteersEnabled: true,
         // Config artistes
         artistsEnabled: true,
         // Config billetterie
@@ -96,6 +74,8 @@ export default wrapApiHandler(
         workshopLocationsFreeInput: true,
         // Carte
         mapPublic: true,
+        // Config bénévole (étape 0bis) : portée par Event/EventVolunteerSettings
+        event: { select: { volunteerSettings: true } },
       },
     })
 
@@ -107,7 +87,8 @@ export default wrapApiHandler(
     await getConventionForEditionCreation(sourceEdition.conventionId, user)
 
     // Créer la nouvelle édition avec les champs structurels
-    const { conventionId, ...structuralFields } = sourceEdition
+    const { conventionId, event: sourceEvent, ...structuralFields } = sourceEdition
+    const sourceSettings = sourceEvent?.volunteerSettings
 
     // Récupérer les zones et marqueurs de la carte
     const [sourceZones, sourceMarkers] = await Promise.all([
@@ -150,9 +131,28 @@ export default wrapApiHandler(
           status: 'OFFLINE',
           creatorId: user.id,
           imageUrl: null,
-          volunteersOpen: false,
         },
       })
+
+      // Étape 0bis : copier la config bénévole vers la nouvelle EventVolunteerSettings
+      // (candidatures fermées + dates de montage/démontage réinitialisées sur la copie).
+      if (sourceSettings) {
+        const {
+          eventId: _srcEventId,
+          open: _srcOpen,
+          updatedAt: _srcUpdatedAt,
+          ...settingsCopy
+        } = sourceSettings
+        await tx.eventVolunteerSettings.create({
+          data: {
+            ...settingsCopy,
+            eventId: eventAnchor.id,
+            open: false,
+            setupStartDate: null,
+            teardownEndDate: null,
+          },
+        })
+      }
 
       // Copier les zones et marqueurs vers la nouvelle édition
       await Promise.all([

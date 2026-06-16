@@ -169,7 +169,7 @@ export default wrapApiHandler(
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops
     if (mealsEnabled !== undefined) updatedData.mealsEnabled = mealsEnabled
-    if (volunteersEnabled !== undefined) updatedData.volunteersEnabled = volunteersEnabled
+    // volunteersEnabled : déplacé vers EventVolunteerSettings (étape 0bis), géré après l'update
     if (artistsEnabled !== undefined) updatedData.artistsEnabled = artistsEnabled
     if (ticketingEnabled !== undefined) updatedData.ticketingEnabled = ticketingEnabled
     if (workshopsEnabled !== undefined) updatedData.workshopsEnabled = workshopsEnabled
@@ -220,6 +220,15 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // Étape 0bis : volunteersEnabled vit dans EventVolunteerSettings
+    if (volunteersEnabled !== undefined) {
+      await prisma.eventVolunteerSettings.upsert({
+        where: { eventId: editionId },
+        update: { enabled: volunteersEnabled },
+        create: { eventId: editionId, enabled: volunteersEnabled },
+      })
+    }
 
     // Étape 0bis : répercuter nom/dates/statut sur l'Event (lu par les modules, ex. bénévoles).
     await syncEventMetadataFromEdition(editionId)

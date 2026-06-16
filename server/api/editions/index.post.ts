@@ -131,8 +131,10 @@ export default wrapApiHandler(
         include: editionWithFavoritesInclude,
       })
 
-      // Étape 0bis : renseigner les métadonnées génériques de l'Event ancre depuis l'édition.
+      // Étape 0bis : renseigner les métadonnées génériques de l'Event ancre depuis l'édition,
+      // et créer la config bénévole par défaut (EventVolunteerSettings).
       await syncEventMetadataFromEdition(created.id, tx)
+      await tx.eventVolunteerSettings.create({ data: { eventId: eventAnchor.id } })
 
       return created
     })

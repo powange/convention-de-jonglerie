@@ -38,12 +38,13 @@ export default wrapApiHandler(
             },
           },
         },
-        // Compte des candidatures bénévoles : relation portée par Event (étape 0)
+        // Compte des candidatures bénévoles + config bénévole : portés par Event (étapes 0 / 0bis)
         event: {
           select: {
             _count: {
               select: { volunteerApplications: true },
             },
+            volunteerSettings: true,
           },
         },
         // organizerPermissions: permet de gérer les droits spécifiques par édition
@@ -153,43 +154,28 @@ export default wrapApiHandler(
       }))
     }
 
-    // Retourner l'édition en excluant les champs volunteersAsk* qui sont maintenant gérés par l'API /volunteers/settings
-    const {
-      volunteersAskDiet: _volunteersAskDiet,
-      volunteersAskAllergies: _volunteersAskAllergies,
-      volunteersAskTimePreferences: _volunteersAskTimePreferences,
-      volunteersAskTeamPreferences: _volunteersAskTeamPreferences,
-      volunteersAskPets: _volunteersAskPets,
-      volunteersAskMinors: _volunteersAskMinors,
-      volunteersAskVehicle: _volunteersAskVehicle,
-      volunteersAskCompanion: _volunteersAskCompanion,
-      volunteersAskAvoidList: _volunteersAskAvoidList,
-      volunteersAskSkills: _volunteersAskSkills,
-      volunteersAskExperience: _volunteersAskExperience,
-      volunteersAskSetup: _volunteersAskSetup,
-      volunteersAskTeardown: _volunteersAskTeardown,
-      volunteersAskEmergencyContact: _volunteersAskEmergencyContact,
-      event: editionEvent,
-      ...editionWithoutVolunteersAskFields
-    } = edition
+    // Étape 0bis : la config bénévole vit dans EventVolunteerSettings (portée par Event).
+    const { event: editionEvent, ...editionRest } = edition
+    const vs = editionEvent?.volunteerSettings
 
     return {
-      ...editionWithoutVolunteersAskFields,
+      ...editionRest,
       // Ré-aplatir le compte des candidatures (relation déplacée sur Event).
       // `?? 0` : filet de sécurité, editionEvent existe toujours par invariant Edition.id == eventId.
       _count: {
         ...edition._count,
         volunteerApplications: editionEvent?._count?.volunteerApplications ?? 0,
       },
-      // Garder seulement les champs volunteers encore utilisés côté client
-      volunteersOpen: edition.volunteersOpen,
-      volunteersPagePublic: edition.volunteersPagePublic,
-      volunteersDescription: edition.volunteersDescription,
-      volunteersMode: edition.volunteersMode,
-      volunteersExternalUrl: edition.volunteersExternalUrl,
-      volunteersUpdatedAt: edition.volunteersUpdatedAt,
-      volunteersSetupStartDate: edition.volunteersSetupStartDate,
-      volunteersTeardownEndDate: edition.volunteersTeardownEndDate,
+      // Config bénévole encore consommée côté client, ré-aplatie depuis EventVolunteerSettings
+      volunteersEnabled: vs?.enabled ?? false,
+      volunteersOpen: vs?.open ?? false,
+      volunteersPagePublic: vs?.pagePublic ?? false,
+      volunteersDescription: vs?.description ?? null,
+      volunteersMode: vs?.mode ?? 'INTERNAL',
+      volunteersExternalUrl: vs?.externalUrl ?? null,
+      volunteersUpdatedAt: vs?.updatedAt ?? null,
+      volunteersSetupStartDate: vs?.setupStartDate ?? null,
+      volunteersTeardownEndDate: vs?.teardownEndDate ?? null,
     }
   },
   { operationName: 'GetEdition' }

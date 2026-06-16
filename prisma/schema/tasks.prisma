@@ -39,11 +39,11 @@ model Task {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  group           TaskGroup            @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
-  assignments     TaskAssignment[]
-  comments        TaskComment[]
-  checklistItems  TaskChecklistItem[]
-  tagAssignments  TaskTagAssignment[]
+  group          TaskGroup           @relation(fields: [taskGroupId], references: [id], onDelete: Cascade)
+  assignments    TaskAssignment[]
+  comments       TaskComment[]
+  checklistItems TaskChecklistItem[]
+  tagAssignments TaskTagAssignment[]
 
   @@index([taskGroupId])
   @@index([taskGroupId, displayOrder])

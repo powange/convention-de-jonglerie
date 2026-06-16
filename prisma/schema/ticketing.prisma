@@ -112,7 +112,7 @@ model TicketingTier {
   externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
   edition           Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas            TicketingTierQuota[]
-  handoutItems   TicketingTierHandoutItem[]
+  handoutItems      TicketingTierHandoutItem[]
   orderItems        TicketingOrderItem[]
   customFields      TicketingTierCustomFieldAssociation[]
   meals             TicketingTierMeal[]
@@ -148,28 +148,28 @@ model TicketingHandoutItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition                           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers                             TicketingTierHandoutItem[]
-  options                           TicketingOptionHandoutItem[]
+  edition                        Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers                          TicketingTierHandoutItem[]
+  options                        TicketingOptionHandoutItem[]
   volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
-  customFields                      TicketingTierCustomFieldHandoutItem[]
-  shows                             ShowHandoutItem[]
-  meals                             VolunteerMealHandoutItem[]
+  customFields                   TicketingTierCustomFieldHandoutItem[]
+  shows                          ShowHandoutItem[]
+  meals                          VolunteerMealHandoutItem[]
 
   @@index([editionId])
 }
 
 model EditionVolunteerHandoutItem {
-  id               Int      @id @default(autoincrement())
-  editionId        Int
+  id            Int      @id @default(autoincrement())
+  editionId     Int
   handoutItemId Int
-  teamId           String? // NULL = global (tous les bénévoles), défini = équipe spécifique
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  teamId        String? // NULL = global (tous les bénévoles), défini = équipe spécifique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  edition        Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition     Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
   handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
-  team           VolunteerTeam?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team        VolunteerTeam?       @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([editionId, handoutItemId, teamId])
   @@index([editionId])
@@ -178,12 +178,12 @@ model EditionVolunteerHandoutItem {
 }
 
 model EditionOrganizerHandoutItem {
-  id               Int      @id @default(autoincrement())
-  editionId        Int
+  id            Int      @id @default(autoincrement())
+  editionId     Int
   handoutItemId Int
-  organizerId      Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  organizerId   Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   edition   Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   organizer EditionOrganizer? @relation(fields: [organizerId], references: [id], onDelete: Cascade)
@@ -208,11 +208,11 @@ model TicketingTierQuota {
 }
 
 model TicketingTierHandoutItem {
-  id               Int @id @default(autoincrement())
-  tierId           Int
+  id            Int @id @default(autoincrement())
+  tierId        Int
   handoutItemId Int
 
-  tier           TicketingTier           @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  tier        TicketingTier        @relation(fields: [tierId], references: [id], onDelete: Cascade)
   handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
   @@unique([tierId, handoutItemId])
@@ -247,11 +247,11 @@ model TicketingOptionQuota {
 }
 
 model TicketingOptionHandoutItem {
-  id               Int @id @default(autoincrement())
-  optionId         Int
+  id            Int @id @default(autoincrement())
+  optionId      Int
   handoutItemId Int
 
-  option         TicketingOption         @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  option      TicketingOption      @relation(fields: [optionId], references: [id], onDelete: Cascade)
   handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
   @@unique([optionId, handoutItemId])
@@ -274,10 +274,10 @@ model TicketingOption {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  externalTicketing   ExternalTicketing?              @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  edition             Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing   ExternalTicketing?           @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition             Edition                      @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas              TicketingOptionQuota[]
-  handoutItems     TicketingOptionHandoutItem[]
+  handoutItems        TicketingOptionHandoutItem[]
   orderItemSelections TicketingOrderItemOption[]
   tiers               TicketingTierOption[]
   meals               TicketingOptionMeal[]
@@ -374,11 +374,11 @@ model TicketingTierCustomField {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  externalTicketing ExternalTicketing?                       @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  edition           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers             TicketingTierCustomFieldAssociation[]
   quotas            TicketingTierCustomFieldQuota[]
-  handoutItems   TicketingTierCustomFieldHandoutItem[]
+  handoutItems      TicketingTierCustomFieldHandoutItem[]
 
   @@unique([externalTicketingId, helloAssoCustomFieldId])
   @@index([externalTicketingId])
@@ -415,13 +415,13 @@ model TicketingTierCustomFieldQuota {
 
 // Association custom field -> article à remettre (avec choix optionnel pour ChoiceList)
 model TicketingTierCustomFieldHandoutItem {
-  id               Int     @id @default(autoincrement())
-  customFieldId    Int
+  id            Int     @id @default(autoincrement())
+  customFieldId Int
   handoutItemId Int
-  choiceValue      String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la remise
+  choiceValue   String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la remise
 
-  customField    TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
-  handoutItem TicketingHandoutItem  @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem     @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
   @@unique([customFieldId, handoutItemId, choiceValue])
   @@index([customFieldId])

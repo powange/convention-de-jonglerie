@@ -9,7 +9,8 @@ export default wrapApiHandler(
           isArchived: false,
         },
         status: 'PUBLISHED', // Inclure uniquement les éditions publiées
-        volunteersOpen: true, // Candidatures bénévoles ouvertes
+        // Candidatures bénévoles ouvertes (config portée par EventVolunteerSettings — étape 0bis)
+        event: { volunteerSettings: { open: true } },
       },
       select: {
         id: true,

@@ -67,19 +67,26 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           city: 'Paris',
           country: 'France',
           postalCode: '75001',
-          volunteersOpen: true,
-          volunteersMode: 'INTERNAL',
-          volunteersDescription: 'Rejoignez notre équipe !',
-          volunteersAskSetup: true,
-          volunteersAskTeardown: true,
-          volunteersSetupStartDate: new Date('2024-05-30'),
-          volunteersTeardownEndDate: new Date('2024-06-05'),
-          volunteersAskDiet: true,
-          volunteersAskAllergies: true,
-          volunteersAskPets: true,
-          volunteersAskTimePreferences: true,
-          volunteersAskTeamPreferences: true,
-          volunteersAskEmergencyContact: false,
+        },
+      })
+
+      // Étape 0bis : config bénévole portée par EventVolunteerSettings
+      await prismaTest.eventVolunteerSettings.create({
+        data: {
+          eventId: eventAnchor.id,
+          open: true,
+          mode: 'INTERNAL',
+          description: 'Rejoignez notre équipe !',
+          askSetup: true,
+          askTeardown: true,
+          setupStartDate: new Date('2024-05-30'),
+          teardownEndDate: new Date('2024-06-05'),
+          askDiet: true,
+          askAllergies: true,
+          askPets: true,
+          askTimePreferences: true,
+          askTeamPreferences: true,
+          askEmergencyContact: false,
         },
       })
 

@@ -9,7 +9,6 @@ import {
   validateAvailability,
   validateTeamPreferences,
 } from '#server/utils/editions/volunteers/applications'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
 
@@ -20,25 +19,26 @@ export default wrapApiHandler(
     const body = await readBody(event).catch(() => ({}))
     const parsed = volunteerApplicationBodySchema.parse(body || {})
 
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+    // Étape 0bis : config bénévole portée par EventVolunteerSettings
+    const settings = await prisma.eventVolunteerSettings.findUnique({
+      where: { eventId: editionId },
       select: {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskEmergencyContact: true,
-        volunteersAskCompanion: true,
-        volunteersAskAvoidList: true,
-        volunteersAskSkills: true,
-        volunteersAskExperience: true,
+        open: true,
+        askDiet: true,
+        askAllergies: true,
+        askTimePreferences: true,
+        askTeamPreferences: true,
+        askPets: true,
+        askMinors: true,
+        askVehicle: true,
+        askEmergencyContact: true,
+        askCompanion: true,
+        askAvoidList: true,
+        askSkills: true,
+        askExperience: true,
       },
-      errorMessage: 'Edition introuvable',
     })
-    if (!edition.volunteersOpen) throw createError({ status: 400, message: 'Recrutement fermé' })
+    if (!settings?.open) throw createError({ status: 400, message: 'Recrutement fermé' })
 
     // Vérifier candidature existante
     const existing = await prisma.editionVolunteerApplication.findUnique({
@@ -55,7 +55,7 @@ export default wrapApiHandler(
     if (!user) throw createError({ status: 401, message: 'Non authentifié' })
 
     // Validation des champs requis
-    const missing = validateRequiredFields(user, parsed, edition)
+    const missing = validateRequiredFields(user, parsed, settings)
     if (missing.length) {
       throw createError({
         status: 400,
@@ -73,11 +73,7 @@ export default wrapApiHandler(
     }
 
     // Validation des préférences d'équipes
-    const teamErrors = await validateTeamPreferences(
-      parsed,
-      editionId,
-      edition.volunteersAskTeamPreferences
-    )
+    const teamErrors = await validateTeamPreferences(parsed, editionId, settings.askTeamPreferences)
     if (teamErrors.length) {
       throw createError({
         status: 400,
@@ -128,42 +124,34 @@ export default wrapApiHandler(
         userSnapshotPhone: finalPhone,
         qrCodeToken,
         dietaryPreference:
-          edition.volunteersAskDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
-        allergies: edition.volunteersAskAllergies ? sanitizeString(parsed.allergies) : null,
+          settings.askDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
+        allergies: settings.askAllergies ? sanitizeString(parsed.allergies) : null,
         allergySeverity:
-          edition.volunteersAskAllergies &&
-          sanitizeString(parsed.allergies) &&
-          parsed.allergySeverity
+          settings.askAllergies && sanitizeString(parsed.allergies) && parsed.allergySeverity
             ? parsed.allergySeverity
             : null,
         timePreferences:
-          edition.volunteersAskTimePreferences && parsed.timePreferences?.length
+          settings.askTimePreferences && parsed.timePreferences?.length
             ? parsed.timePreferences
             : null,
         teamPreferences:
-          edition.volunteersAskTeamPreferences && parsed.teamPreferences?.length
+          settings.askTeamPreferences && parsed.teamPreferences?.length
             ? parsed.teamPreferences
             : null,
-        hasPets: edition.volunteersAskPets && parsed.hasPets ? parsed.hasPets : null,
-        petsDetails:
-          edition.volunteersAskPets && parsed.hasPets ? sanitizeString(parsed.petsDetails) : null,
-        hasMinors: edition.volunteersAskMinors && parsed.hasMinors ? parsed.hasMinors : null,
+        hasPets: settings.askPets && parsed.hasPets ? parsed.hasPets : null,
+        petsDetails: settings.askPets && parsed.hasPets ? sanitizeString(parsed.petsDetails) : null,
+        hasMinors: settings.askMinors && parsed.hasMinors ? parsed.hasMinors : null,
         minorsDetails:
-          edition.volunteersAskMinors && parsed.hasMinors
-            ? sanitizeString(parsed.minorsDetails)
-            : null,
-        hasVehicle: edition.volunteersAskVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
+          settings.askMinors && parsed.hasMinors ? sanitizeString(parsed.minorsDetails) : null,
+        hasVehicle: settings.askVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
         vehicleDetails:
-          edition.volunteersAskVehicle && parsed.hasVehicle
-            ? sanitizeString(parsed.vehicleDetails)
-            : null,
-        companionName: edition.volunteersAskCompanion ? sanitizeString(parsed.companionName) : null,
-        avoidList: edition.volunteersAskAvoidList ? sanitizeString(parsed.avoidList) : null,
-        skills: edition.volunteersAskSkills ? sanitizeString(parsed.skills) : null,
-        hasExperience:
-          edition.volunteersAskExperience && parsed.hasExperience ? parsed.hasExperience : null,
+          settings.askVehicle && parsed.hasVehicle ? sanitizeString(parsed.vehicleDetails) : null,
+        companionName: settings.askCompanion ? sanitizeString(parsed.companionName) : null,
+        avoidList: settings.askAvoidList ? sanitizeString(parsed.avoidList) : null,
+        skills: settings.askSkills ? sanitizeString(parsed.skills) : null,
+        hasExperience: settings.askExperience && parsed.hasExperience ? parsed.hasExperience : null,
         experienceDetails:
-          edition.volunteersAskExperience && parsed.hasExperience
+          settings.askExperience && parsed.hasExperience
             ? sanitizeString(parsed.experienceDetails)
             : null,
         setupAvailability: parsed.setupAvailability || null,
@@ -172,12 +160,12 @@ export default wrapApiHandler(
         arrivalDateTime: sanitizeString(parsed.arrivalDateTime),
         departureDateTime: sanitizeString(parsed.departureDateTime),
         emergencyContactName:
-          edition.volunteersAskEmergencyContact ||
+          settings.askEmergencyContact ||
           (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
             ? sanitizeString(parsed.emergencyContactName)
             : null,
         emergencyContactPhone:
-          edition.volunteersAskEmergencyContact ||
+          settings.askEmergencyContact ||
           (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
             ? sanitizeString(parsed.emergencyContactPhone)
             : null,

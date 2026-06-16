@@ -17,31 +17,29 @@ export default wrapApiHandler(
         status: 403,
         message: 'Droits insuffisants pour accéder à ces données',
       })
-    // Récupérer l'édition pour obtenir les dates
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      errorMessage: 'Edition non trouvée',
+    // Étape 0bis : dates de l'événement (Event) + dates de montage/démontage (EventVolunteerSettings)
+    const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+      errorMessage: 'Édition non trouvée',
       select: {
         startDate: true,
         endDate: true,
-        volunteersSetupStartDate: true,
-        volunteersTeardownEndDate: true,
+        volunteerSettings: { select: { setupStartDate: true, teardownEndDate: true } },
       },
     })
+    const eventStartDate = eventRecord.startDate ?? new Date()
+    const eventEndDate = eventRecord.endDate ?? eventStartDate
+    const s = eventRecord.volunteerSettings
 
     // Déterminer la période complète (montage -> démontage)
-    const periodStart = edition.volunteersSetupStartDate
-      ? new Date(edition.volunteersSetupStartDate)
-      : new Date(edition.startDate)
+    const periodStart = s?.setupStartDate ? new Date(s.setupStartDate) : new Date(eventStartDate)
     periodStart.setUTCHours(0, 0, 0, 0)
 
-    const periodEnd = edition.volunteersTeardownEndDate
-      ? new Date(edition.volunteersTeardownEndDate)
-      : new Date(edition.endDate)
+    const periodEnd = s?.teardownEndDate ? new Date(s.teardownEndDate) : new Date(eventEndDate)
     periodEnd.setUTCHours(0, 0, 0, 0)
 
-    const editionStart = new Date(edition.startDate)
+    const editionStart = new Date(eventStartDate)
     editionStart.setUTCHours(0, 0, 0, 0)
-    const editionEnd = new Date(edition.endDate)
+    const editionEnd = new Date(eventEndDate)
     editionEnd.setUTCHours(0, 0, 0, 0)
 
     // Construire l'ensemble des dates attendues dans la période

@@ -252,12 +252,13 @@ describe('/api/editions/[id] GET', () => {
             },
           },
         },
-        // Compte des candidatures bénévoles : relation portée par Event (étape 0)
+        // Compte des candidatures + config bénévole : portés par Event (étapes 0 / 0bis)
         event: {
           select: {
             _count: {
               select: { volunteerApplications: true },
             },
+            volunteerSettings: true,
           },
         },
         convention: {

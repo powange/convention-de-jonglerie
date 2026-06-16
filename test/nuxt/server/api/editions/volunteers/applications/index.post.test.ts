@@ -18,20 +18,20 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
     phone: '+33123456789',
   }
 
-  const mockEdition = {
-    volunteersOpen: true,
-    volunteersAskDiet: true,
-    volunteersAskAllergies: true,
-    volunteersAskEmergencyContact: false,
-    volunteersAskTimePreferences: true,
-    volunteersAskTeamPreferences: true,
-    volunteersAskPets: true,
-    volunteersAskMinors: true,
-    volunteersAskVehicle: true,
-    volunteersAskCompanion: true,
-    volunteersAskAvoidList: true,
-    volunteersAskSkills: true,
-    volunteersAskExperience: true,
+  const mockSettings = {
+    open: true,
+    askDiet: true,
+    askAllergies: true,
+    askEmergencyContact: false,
+    askTimePreferences: true,
+    askTeamPreferences: true,
+    askPets: true,
+    askMinors: true,
+    askVehicle: true,
+    askCompanion: true,
+    askAvoidList: true,
+    askSkills: true,
+    askExperience: true,
   }
 
   const mockApplication = {
@@ -72,7 +72,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         departureDateTime: '2024-06-05_evening',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null) // Pas de candidature existante
       prismaMock.user.findUnique.mockResolvedValue(mockUser) // Mock de l'utilisateur
       prismaMock.editionVolunteerApplication.create.mockResolvedValue({
@@ -134,7 +134,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         departureDateTime: dayAfterTomorrow.toISOString(),
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(userWithoutInfo)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue(mockApplication)
@@ -161,7 +161,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         departureDateTime: dayAfterTomorrow.toISOString(),
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue(mockApplication)
@@ -210,7 +210,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         experienceDetails: 'Bénévole depuis 5 ans dans diverses associations',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue({
@@ -256,19 +256,19 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait ignorer les options non demandées par l'édition", async () => {
       const editionWithLimitedOptions = {
-        volunteersOpen: true,
-        volunteersAskDiet: false,
-        volunteersAskAllergies: false,
-        volunteersAskEmergencyContact: false,
-        volunteersAskPets: false,
-        volunteersAskMinors: false,
-        volunteersAskVehicle: false,
-        volunteersAskTimePreferences: false,
-        volunteersAskTeamPreferences: false,
-        volunteersAskCompanion: false,
-        volunteersAskAvoidList: false,
-        volunteersAskSkills: false,
-        volunteersAskExperience: false,
+        open: true,
+        askDiet: false,
+        askAllergies: false,
+        askEmergencyContact: false,
+        askPets: false,
+        askMinors: false,
+        askVehicle: false,
+        askTimePreferences: false,
+        askTeamPreferences: false,
+        askCompanion: false,
+        askAvoidList: false,
+        askSkills: false,
+        askExperience: false,
       }
 
       const applicationWithUnwantedOptions = {
@@ -286,7 +286,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         skills: 'Beaucoup de compétences',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithLimitedOptions)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithLimitedOptions)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue(mockApplication)
@@ -310,7 +310,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
   describe('Validation des données', () => {
     beforeEach(() => {
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
     })
@@ -339,7 +339,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           [testCase.field]: testCase.value,
         }
 
-        prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+        prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
         prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
         prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -430,7 +430,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           timePreferences: validTimes,
         }
 
-        prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+        prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
         prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
         prismaMock.user.findUnique.mockResolvedValue(mockUser)
         prismaMock.editionVolunteerApplication.create.mockResolvedValue({
@@ -455,7 +455,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         teamPreferences: 'not_an_array',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -474,7 +474,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           teamPreferences: invalidTeams,
         }
 
-        prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+        prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
         prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
         prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -499,7 +499,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           teamPreferences: validTeams,
         }
 
-        prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+        prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
         prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
         prismaMock.user.findUnique.mockResolvedValue(mockUser)
         prismaMock.editionVolunteerApplication.create.mockResolvedValue({
@@ -549,7 +549,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         // arrivalDateTime manquant
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -600,7 +600,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         setupAvailability: true,
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(existingApplication)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -624,7 +624,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         arrivalDateTime: '2024-06-01_morning',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(rejectedApplication)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -641,7 +641,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         status: 'ACCEPTED',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(acceptedApplication)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -658,11 +658,11 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
   describe('Modes de candidature', () => {
     it('devrait rejeter si les candidatures sont fermées', async () => {
       const closedEdition = {
-        ...mockEdition,
-        volunteersOpen: false, // Fermé
+        ...mockSettings,
+        open: false, // Fermé
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(closedEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(closedEdition)
 
       global.readBody.mockResolvedValue({
         motivation: 'Candidature sur édition fermée',
@@ -685,7 +685,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         departureDateTime: dayAfterTomorrow.toISOString(),
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue(mockApplication)
@@ -725,7 +725,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         departureDateTime: dayAfterTomorrow.toISOString(),
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue(mockApplication)
@@ -741,8 +741,8 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
   })
 
   describe('Gestion des erreurs', () => {
-    it("devrait gérer l'édition inexistante", async () => {
-      prismaMock.edition.findUnique.mockResolvedValue(null)
+    it("devrait gérer l'édition inexistante (pas de config = recrutement fermé)", async () => {
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(null)
 
       global.readBody.mockResolvedValue({
         motivation: 'Candidature sur édition inexistante',
@@ -750,11 +750,12 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       })
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Edition introuvable')
+      // Étape 0bis : sans EventVolunteerSettings, le recrutement est considéré fermé
+      await expect(handler(mockEvent as any)).rejects.toThrow('Recrutement fermé')
     })
 
     it('devrait gérer les erreurs de base de données', async () => {
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(mockSettings)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.editionVolunteerApplication.create.mockRejectedValue(
@@ -781,8 +782,8 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait accepter une candidature avec contact d'urgence quand demandé", async () => {
       const editionWithEmergencyContact = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: true,
+        ...mockSettings,
+        askEmergencyContact: true,
       }
 
       const applicationData = {
@@ -795,7 +796,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         emergencyContactPhone: '+33987654321',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithEmergencyContact)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithEmergencyContact)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue({
         ...mockApplication,
         ...applicationData,
@@ -818,9 +819,9 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait exiger le contact d'urgence si allergies renseignées", async () => {
       const editionWithAllergiesOnly = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: false,
-        volunteersAskAllergies: true,
+        ...mockSettings,
+        askEmergencyContact: false,
+        askAllergies: true,
       }
 
       // Candidature avec allergies mais sans contact d'urgence
@@ -835,7 +836,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         // Pas de contact d'urgence
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergiesOnly)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithAllergiesOnly)
       global.readBody.mockResolvedValue(applicationWithAllergiesNoContact)
       const mockEvent = { context: { user: mockUser } }
 
@@ -844,9 +845,9 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait accepter une candidature avec allergies ET contact d'urgence", async () => {
       const editionWithAllergiesOnly = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: false,
-        volunteersAskAllergies: true,
+        ...mockSettings,
+        askEmergencyContact: false,
+        askAllergies: true,
       }
 
       const applicationWithAllergiesAndContact = {
@@ -861,7 +862,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         emergencyContactPhone: '+33123456789',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergiesOnly)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithAllergiesOnly)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue({
         ...mockApplication,
         ...applicationWithAllergiesAndContact,
@@ -886,9 +887,9 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait accepter une candidature sans allergies ni contact d'urgence", async () => {
       const editionWithAllergiesOnly = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: false,
-        volunteersAskAllergies: true,
+        ...mockSettings,
+        askEmergencyContact: false,
+        askAllergies: true,
       }
 
       const applicationWithoutAllergies = {
@@ -900,7 +901,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         // Pas d'allergies ni de contact d'urgence
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergiesOnly)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithAllergiesOnly)
       prismaMock.editionVolunteerApplication.create.mockResolvedValue({
         ...mockApplication,
         ...applicationWithoutAllergies,
@@ -924,8 +925,8 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait valider le format du téléphone de contact d'urgence", async () => {
       const editionWithEmergencyContact = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: true,
+        ...mockSettings,
+        askEmergencyContact: true,
       }
 
       const applicationDataWithInvalidPhone = {
@@ -938,7 +939,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         emergencyContactPhone: 'abc123', // Format invalide
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithEmergencyContact)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithEmergencyContact)
       global.readBody.mockResolvedValue(applicationDataWithInvalidPhone)
       const mockEvent = { context: { user: mockUser } }
 
@@ -947,8 +948,8 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
 
     it("devrait valider la longueur du nom de contact d'urgence", async () => {
       const editionWithEmergencyContact = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: true,
+        ...mockSettings,
+        askEmergencyContact: true,
       }
 
       const applicationDataWithLongName = {
@@ -961,7 +962,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
         emergencyContactPhone: '+33123456789',
       }
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithEmergencyContact)
+      prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue(editionWithEmergencyContact)
       global.readBody.mockResolvedValue(applicationDataWithLongName)
       const mockEvent = { context: { user: mockUser } }
 

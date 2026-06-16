@@ -23,23 +23,29 @@ export default wrapApiHandler(
     const validGranularities = [30, 60, 120, 360] // 30min, 1h, 2h, 6h
     const granularity = validGranularities.includes(granularityParam) ? granularityParam : 60
 
-    // Récupérer l'édition avec les dates
-    const edition = await prisma.edition.findUnique({
+    // Étape 0bis : dates de l'événement (Event) + montage/démontage (EventVolunteerSettings)
+    const eventRecord = await prisma.event.findUnique({
       where: { id: editionId },
+      select: {
+        startDate: true,
+        endDate: true,
+        volunteerSettings: { select: { setupStartDate: true, teardownEndDate: true } },
+      },
     })
 
-    if (!edition) {
+    if (!eventRecord) {
       throw createError({
         status: 404,
         message: 'Edition not found',
       })
     }
 
+    const evStart = eventRecord.startDate ?? new Date()
+    const evEnd = eventRecord.endDate ?? evStart
+    const vs = eventRecord.volunteerSettings
     // Déterminer la période couverte
-    const setupStart = edition.volunteersSetupStartDate
-      ? new Date(edition.volunteersSetupStartDate)
-      : edition.startDate
-    const teardownEndDate = edition.volunteersTeardownEndDate || edition.endDate
+    const setupStart = vs?.setupStartDate ? new Date(vs.setupStartDate) : evStart
+    const teardownEndDate = vs?.teardownEndDate || evEnd
     // Aller jusqu'à la fin de la journée de démontage (23h59:59)
     const teardownEnd = new Date(teardownEndDate)
     teardownEnd.setHours(23, 59, 59, 999)

@@ -44,6 +44,7 @@ export const prismaMock = {
   volunteerAssignment: createModelMock(),
   volunteerMealSelection: createModelMock(),
   editionVolunteerHandoutItem: createModelMock(),
+  eventVolunteerSettings: createModelMock(),
   apiErrorLog: createModelMock(),
   notification: createModelMock(),
   fcmToken: createModelMock(),

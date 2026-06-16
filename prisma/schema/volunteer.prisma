@@ -31,6 +31,39 @@ enum VolunteerApplicationSource {
   MANUAL // Ajout manuel par un organisateur
 }
 
+// Configuration bénévole d'un événement (1:1 avec Event), portée par le layer volunteers.
+// Étape 0bis : extraite d'Edition pour que le module bénévole ne dépende plus du domaine jonglerie.
+model EventVolunteerSettings {
+  eventId Int   @id
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  enabled         Boolean       @default(false)
+  open            Boolean       @default(false)
+  pagePublic      Boolean       @default(false)
+  mode            VolunteerMode @default(INTERNAL)
+  description     String?       @db.Text
+  externalUrl     String?
+  setupStartDate  DateTime?
+  teardownEndDate DateTime?
+  updatedAt       DateTime?
+
+  // Questions du formulaire de candidature
+  askDiet             Boolean @default(false)
+  askAllergies        Boolean @default(false)
+  askTimePreferences  Boolean @default(false)
+  askTeamPreferences  Boolean @default(false)
+  askPets             Boolean @default(false)
+  askMinors           Boolean @default(false)
+  askVehicle          Boolean @default(false)
+  askCompanion        Boolean @default(false)
+  askAvoidList        Boolean @default(false)
+  askSkills           Boolean @default(false)
+  askExperience       Boolean @default(false)
+  askEmergencyContact Boolean @default(false)
+  askSetup            Boolean @default(false)
+  askTeardown         Boolean @default(false)
+}
+
 model EditionVolunteerApplication {
   id                    Int                         @id @default(autoincrement())
   eventId               Int
@@ -138,10 +171,10 @@ model VolunteerTeam {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  event                Event                            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event                Event                         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   timeSlots            VolunteerTimeSlot[]
   assignedApplications ApplicationTeamAssignment[]
-  handoutItems      EditionVolunteerHandoutItem[]
+  handoutItems         EditionVolunteerHandoutItem[]
   conversations        Conversation[]
 
   @@index([eventId])

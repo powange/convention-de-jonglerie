@@ -53,6 +53,8 @@ export default wrapApiHandler(
         experienceDetails: true,
         event: {
           select: {
+            // Étape 0bis : la config bénévole (askX) vient d'EventVolunteerSettings
+            volunteerSettings: true,
             edition: {
               select: {
                 id: true,
@@ -62,20 +64,6 @@ export default wrapApiHandler(
                 city: true,
                 country: true,
                 imageUrl: true,
-                volunteersAskDiet: true,
-                volunteersAskAllergies: true,
-                volunteersAskEmergencyContact: true,
-                volunteersAskTimePreferences: true,
-                volunteersAskTeamPreferences: true,
-                volunteersAskPets: true,
-                volunteersAskMinors: true,
-                volunteersAskVehicle: true,
-                volunteersAskCompanion: true,
-                volunteersAskAvoidList: true,
-                volunteersAskSkills: true,
-                volunteersAskExperience: true,
-                volunteersAskSetup: true,
-                volunteersAskTeardown: true,
                 convention: {
                   select: {
                     id: true,
@@ -165,14 +153,34 @@ export default wrapApiHandler(
         (assignment) => assignment.timeSlot.eventId === app.event.edition?.id
       )
 
-      // Reconstituer la forme historique de la réponse : `edition` à plat (sans event)
+      // Reconstituer la forme historique de la réponse : `edition` à plat (sans event), avec la
+      // config bénévole (askX) ré-aplatie depuis EventVolunteerSettings pour compat front.
       const { event: _event, ...appRest } = app
+      const s = app.event.volunteerSettings
       return {
         ...appRest,
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
         assignedTimeSlots: editionAssignments,
-        edition: app.event.edition,
+        edition: app.event.edition
+          ? {
+              ...app.event.edition,
+              volunteersAskDiet: s?.askDiet ?? false,
+              volunteersAskAllergies: s?.askAllergies ?? false,
+              volunteersAskEmergencyContact: s?.askEmergencyContact ?? false,
+              volunteersAskTimePreferences: s?.askTimePreferences ?? false,
+              volunteersAskTeamPreferences: s?.askTeamPreferences ?? false,
+              volunteersAskPets: s?.askPets ?? false,
+              volunteersAskMinors: s?.askMinors ?? false,
+              volunteersAskVehicle: s?.askVehicle ?? false,
+              volunteersAskCompanion: s?.askCompanion ?? false,
+              volunteersAskAvoidList: s?.askAvoidList ?? false,
+              volunteersAskSkills: s?.askSkills ?? false,
+              volunteersAskExperience: s?.askExperience ?? false,
+              volunteersAskSetup: s?.askSetup ?? false,
+              volunteersAskTeardown: s?.askTeardown ?? false,
+            }
+          : null,
       }
     })
 
