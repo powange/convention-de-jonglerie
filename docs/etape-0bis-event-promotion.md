@@ -46,26 +46,26 @@ Migrés vers `event.name` / `prisma.event` :
 > formulations de notifications/emails sont légèrement simplifiées (un seul nom au lieu de
 > convention + édition séparées).
 
-## Reste à faire (travail restant de l'étape 0bis)
+### 4. Extraction `EventVolunteerSettings` (config bénévole) — ✅ Fait
 
-### A. Extraction `EventVolunteerSettings` (config bénévole)
+La config `volunteers*` (`mode`, `ask*`, `open`, `description`, `pagePublic`, `externalUrl`, dates
+setup/teardown, `updatedAt`, `enabled`) est sortie d'`Edition` vers une table `EventVolunteerSettings`
+(1:1 avec `Event`, champs sans préfixe `volunteers`), portée par le layer. Migration
+`20260616120000_event_volunteer_settings` : création + backfill depuis `Edition` + **drop des 23
+colonnes** `volunteers*` d'`Edition`. La ligne est créée à la création d'édition (API + seed + import
 
-La config `volunteers*` (`volunteersMode`, `volunteersAsk*`, `volunteersOpen`,
-`volunteersDescription`, `volunteersPagePublic`, `volunteersExternalUrl`, dates setup/teardown,
-`volunteersUpdatedAt`, `volunteersEnabled`) est encore sur `Edition`. À sortir dans une table
-`EventVolunteerSettings` (1:1 avec `Event`) portée par le layer. Fichiers concernés :
+- duplicate). Lecteurs migrés : `settings.get/patch`, `applications/index.post`, `meals.get`,
+  `volunteer-time-slots` (layer) ; `index.get/put`, `duplicate`, `import`, `sitemap`, `ticketing/stats`
+  (core). Les réponses consommées par le front restent rétro-compatibles (champs `volunteers*`
+  ré-aplatis depuis les settings).
 
-- `volunteers/settings.get.ts`, `volunteers/settings.patch.ts` (lecture/écriture de la config)
-- `server/api/editions/[id]/index.get.ts` (core — ré-aplatit les champs `volunteers*`)
-- `volunteers/applications/index.post.ts` (lit la config du formulaire)
-- `volunteers/meals.get.ts`, `volunteer-time-slots/index.post.ts`,
-  `volunteer-time-slots/[slotId].put.ts` (lisent `volunteersSetupStartDate`/`Teardown`)
+## Reste à faire
 
 ### B. Page « mes candidatures » (`user/volunteer-applications.get.ts`)
 
-Retourne aujourd'hui l'objet `Edition` complet (ville, image, logo de convention, config) au front.
-Rendre agnostique = restructurer la réponse autour d'`Event` + extension de domaine, ce qui touche
-le front. À traiter avec l'extraction `EventVolunteerSettings`.
+Retourne encore l'objet `Edition` (ville, image, logo de convention) au front — la config bénévole,
+elle, est désormais ré-aplatie depuis `EventVolunteerSettings`. Rendre totalement agnostique =
+restructurer la réponse autour d'`Event` + extension de domaine, ce qui touche le front.
 
 ### C. Commentaires bénévoles scopés convention (`volunteers/applications.get.ts`)
 
