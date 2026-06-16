@@ -52,12 +52,11 @@ La config `volunteers*` (`mode`, `ask*`, `open`, `description`, `pagePublic`, `e
 setup/teardown, `updatedAt`, `enabled`) est sortie d'`Edition` vers une table `EventVolunteerSettings`
 (1:1 avec `Event`, champs sans préfixe `volunteers`), portée par le layer. Migration
 `20260616120000_event_volunteer_settings` : création + backfill depuis `Edition` + **drop des 23
-colonnes** `volunteers*` d'`Edition`. La ligne est créée à la création d'édition (API + seed + import
-
-- duplicate). Lecteurs migrés : `settings.get/patch`, `applications/index.post`, `meals.get`,
-  `volunteer-time-slots` (layer) ; `index.get/put`, `duplicate`, `import`, `sitemap`, `ticketing/stats`
-  (core). Les réponses consommées par le front restent rétro-compatibles (champs `volunteers*`
-  ré-aplatis depuis les settings).
+colonnes** `volunteers*` d'`Edition`. La ligne est créée à la création d'édition (API, seed, import,
+duplicate). Lecteurs migrés : `settings.get/patch`, `applications/index.post`, `meals.get`,
+`volunteer-time-slots` (layer) ; `index.get/put`, `duplicate`, `import`, `sitemap`, `ticketing/stats`
+(core). Les réponses consommées par le front restent rétro-compatibles (champs `volunteers*`
+ré-aplatis depuis les settings).
 
 ## Reste à faire
 
@@ -75,9 +74,9 @@ rester côté app jonglerie plutôt que dans le layer).
 
 ## Validation
 
-- ✅ Suite de tests nuxt mockée : verte (volontaires, éditions, conventions, features, utils…).
-- ✅ Migration appliquée proprement en base de dev + backfill `Event.name` vérifié.
+- ✅ Suite de tests nuxt mockée + 371 unitaires : verts.
+- ✅ Migrations appliquées en base de dev + backfill vérifié (`Event.name`, `EventVolunteerSettings`).
 - ✅ Test unitaire du helper de sync (`test/nuxt/server/utils/event-sync.test.ts`).
-- ⚠️ Smoke-test SSR non concluant : l'environnement dev tombe sur un glitch de codegen d'auto-import
-  Nuxt (`appendCorsHeaders is not defined`, sur **toutes** les routes), indépendant de ce changement
-  (aucun code ne touche au CORS ; h3 exporte bien la fonction). À investiguer séparément.
+- ✅ Smoke-test SSR : `/api/editions/:id` et `/api/editions/:id/volunteers/settings` en 200, config
+  bénévole servie depuis `EventVolunteerSettings`. (Le blocage dev `appendCorsHeaders` rencontré
+  pendant le développement était indépendant ; corrigé séparément — cf. PR #4.)
