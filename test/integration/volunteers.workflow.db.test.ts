@@ -118,13 +118,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         const edition = await prismaTest.edition.findUnique({
           where: { id: mockEdition.id },
           include: {
-            event: { include: { volunteerTeams: true } },
+            event: { include: { volunteerTeams: true, volunteerSettings: true } },
           },
         })
 
         expect(edition).toBeDefined()
-        expect(edition?.volunteersMode).toBe('INTERNAL')
-        expect(edition?.volunteersOpen).toBe(true)
+        // Étape 0bis : la config bénévole vit dans EventVolunteerSettings
+        expect(edition?.event?.volunteerSettings?.mode).toBe('INTERNAL')
+        expect(edition?.event?.volunteerSettings?.open).toBe(true)
         expect(edition?.event?.volunteerTeams).toHaveLength(2)
 
         // ========== ÉTAPE 2: Candidature d'un bénévole ==========
