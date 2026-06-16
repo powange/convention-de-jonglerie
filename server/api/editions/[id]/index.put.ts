@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { invalidateEditionCache } from '#server/utils/cache-helpers'
 import { normalizeDateToISO } from '#server/utils/date-helpers'
+import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { geocodeEdition } from '#server/utils/geocoding'
 import { getEditionForEdit } from '#server/utils/permissions/edition-permissions'
@@ -219,6 +220,9 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // Étape 0bis : répercuter nom/dates/statut sur l'Event (lu par les modules, ex. bénévoles).
+    await syncEventMetadataFromEdition(editionId)
 
     // Invalider le cache après mise à jour
     await invalidateEditionCache(editionId)

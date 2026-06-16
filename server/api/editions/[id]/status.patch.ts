@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { getEditionForStatusManagement } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -53,6 +54,9 @@ export default wrapApiHandler(
         favoritedBy: { select: { id: true } },
       },
     })
+
+    // Étape 0bis : répercuter le statut sur l'Event (lu par les modules, ex. bénévoles).
+    await syncEventMetadataFromEdition(editionId)
 
     // Notifier les utilisateurs ayant favorisé l'édition si elle passe en PUBLISHED
     if (validatedData.status === 'PUBLISHED' && currentEdition?.status !== 'PUBLISHED') {

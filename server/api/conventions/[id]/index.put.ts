@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { syncEventsForConvention } from '#server/utils/event-sync'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { getConventionForEdit } from '#server/utils/permissions/convention-permissions'
 import { validateConventionId } from '#server/utils/validation-helpers'
@@ -49,6 +50,10 @@ export default wrapApiHandler(
         },
       },
     })
+
+    // Étape 0bis : le nom d'affichage des Events dérive du nom de la convention ; on re-synchronise
+    // toutes les éditions de la convention après un renommage.
+    await syncEventsForConvention(conventionId)
 
     return createSuccessResponse(updatedConvention)
   },

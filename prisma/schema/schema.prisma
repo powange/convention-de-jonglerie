@@ -96,13 +96,20 @@ enum EditionStatus {
 
 // Conteneur d'événement générique (agnostique du domaine), ancre de découplage.
 // Edition (jonglerie) en est une extension 1:1 ; le module bénévole s'y rattache.
-// Étape 0 (scope réduit) : ancre minimale. Les champs génériques (name/dates/status…) et la
-// config bénévole (volunteers*) restent sur Edition pour l'instant ; ils seront promus vers Event
-// dans une étape ultérieure dédiée. Le code bénévole charge Edition par id (== eventId, id réutilisé).
+// Étape 0bis : les métadonnées génériques (name/startDate/endDate/status) sont promues ici pour
+// que les modules (bénévoles…) n'aient plus à lire Edition. La config bénévole (volunteers*) reste
+// sur Edition pour l'instant (extraction EventVolunteerSettings = travail restant, cf. docs).
+// L'app jonglerie maintient ces champs en miroir depuis Edition/Convention (sync à la création/maj).
 model Event {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Métadonnées génériques (promues depuis Edition à l'étape 0bis)
+  name      String? // nom d'affichage de l'événement (côté jonglerie : "Convention - Edition")
+  startDate DateTime?
+  endDate   DateTime?
+  status    EditionStatus @default(OFFLINE)
 
   // Extension domaine (1:1) — côté jonglerie
   edition Edition?

@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 import { config } from 'dotenv'
 
 import { getEmailHash } from '../server/utils/email-hash.js'
+import { syncEventMetadataFromEdition } from '../server/utils/event-sync.js'
 import prisma from '../server/utils/prisma.js'
 
 config()
@@ -394,6 +395,8 @@ async function main() {
             },
           })
         })
+        // Étape 0bis : renseigner les métadonnées génériques de l'Event depuis l'édition.
+        await syncEventMetadataFromEdition(edition.id)
         console.log(
           `Edition créée: ${edition.name} (id=${edition.id}, ${startDate.toLocaleDateString()})`
         )
