@@ -5,7 +5,7 @@ import { $fetch } from 'ofetch'
 
 import { getEmailHash } from '../../utils/email-hash'
 import { sanitizeReturnTo } from '../../utils/safe-redirect'
-import { setSession } from '../../utils/session-helpers'
+import { setAuthSession } from '../../utils/session-helpers'
 
 function slugifyPseudo(base: string) {
   const clean =
@@ -183,7 +183,7 @@ export default defineEventHandler(async (event) => {
       }
     : undefined // Utilise la config par défaut (30 jours)
 
-  await setSession(
+  await setAuthSession(
     event,
     {
       user: {

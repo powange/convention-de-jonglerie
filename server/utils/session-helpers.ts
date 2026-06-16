@@ -14,15 +14,17 @@ import type { H3Event } from 'h3'
  * module reste un vrai module relatif, donc mockable proprement dans les tests via `vi.mock`.
  */
 
-export function getSession(event: H3Event) {
+// Préfixe « Auth » pour éviter la collision avec les auto-imports h3 (getSession/clearSession),
+// qui produisait des warnings « Duplicated imports » côté Nitro.
+export function getAuthSession(event: H3Event) {
   return getUserSession(event)
 }
 
-export function clearSession(event: H3Event) {
+export function clearAuthSession(event: H3Event) {
   return clearUserSession(event)
 }
 
-export function setSession(
+export function setAuthSession(
   event: H3Event,
   data: Parameters<typeof setUserSession>[1],
   config?: Parameters<typeof setUserSession>[2]
