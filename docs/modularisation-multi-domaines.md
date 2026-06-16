@@ -2,26 +2,26 @@
 
 > **Statut** : **Étapes 0 → 2 + 0bis implémentées** (sur `main`) — le layer `volunteers` est
 > domaine-agnostique côté serveur ; étapes 3 → 4 en conception.
-> **Date** : 2026-06-14 (création), mise à jour 2026-06-16.
+> **Date** : 2026-06-14 (création), mise à jour 2026-06-17.
 > **Objectif** : permettre la création d'une **2ᵉ application** pour d'autres domaines que la
 > jonglerie, partageant les modules organisateurs (bénévoles, tâches, billetterie…) avec
 > l'application actuelle, de sorte qu'une mise à jour d'un module se répercute sur les deux apps.
 
-## Avancement (mise à jour 2026-06-16)
+## Avancement (mise à jour 2026-06-17)
 
 Les **fondations (étapes 0 → 2)** ont été livrées et mergées dans `main` (PR #3), puis déployées en
 release. L'**étape 0bis** (abstraction `Event` complétée) a suivi (PR #6) : le layer `volunteers` est
 désormais **domaine-agnostique côté serveur**. Le périmètre réel diffère volontairement de la
 conception initiale sur quelques points (scope réduit pour limiter le risque) — détaillés ci-dessous.
 
-| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                       |
-| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                             |
-| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur. |
-| **1** — Ports de découplage  | ✅ **Fait**                 | 5 ports : `notifications`, `email`, `messenger`, `organizers`, `eventScope`. (Meals / ticketing : couplage encore direct, comme prévu.)                                                                    |
-| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/` = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`).                                                                        |
-| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                               |
-| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                              |
+| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                        |
+| ---------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                              |
+| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur.  |
+| **1** — Ports de découplage  | ✅ **Fait**                 | **8 ports** : `notifications`, `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals`. Billetterie/artistes/repas découplés (le `meals` délègue au module cœur `server/meals/`). |
+| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/` = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`).                                                                         |
+| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                                |
+| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                               |
 
 ### Divergences assumées vs conception initiale
 
@@ -294,10 +294,11 @@ interface MessengerPort {
 
 - Déplacer notifications + messenger dans une frontière « core » logique. ✅ (services restés en core,
   consommés via ports)
-- Définir les **ports** consommés par le code bénévole. ✅ 5 ports livrés : `notifications`, `email`,
-  `messenger`, `organizers`, `eventScope` (dans `server/volunteers/ports/`, binding par défaut
-  paresseux via `useVolunteerPorts()` / surcharge `setVolunteerPorts()`). `MealsPort`/`TicketingPort` :
-  non encore faits (couplage direct conservé, comme prévu). Référence à jour des 5 ports :
+- Définir les **ports** consommés par le code bénévole. ✅ **8 ports livrés** : `notifications`,
+  `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals` (dans
+  `server/volunteers/ports/`, binding par défaut paresseux via `useVolunteerPorts()` / surcharge
+  `setVolunteerPorts()`). Les couplages billetterie/artistes/repas ont été découplés en 3 passes ; le
+  `MealsPort` délègue au module cœur `server/meals/`. Référence à jour des 8 ports :
   [ports-module-benevole.md](./ports-module-benevole.md).
 
 > 📄 **Conception détaillée des ports + injection** : voir
