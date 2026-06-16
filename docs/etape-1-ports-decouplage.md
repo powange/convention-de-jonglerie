@@ -1,7 +1,11 @@
 # Étape 1 — Ports & découplage des dépendances transverses
 
-> **Statut** : proposition de conception (non implémentée).
-> **Date** : 2026-06-15.
+> **Statut** : ✅ **Implémenté** (sur `main`, déployé en release). 4 ports livrés (`notification`,
+> `email`, `messenger`, `organizer`) dans `server/volunteers/ports/`, binding par défaut paresseux
+> via `useVolunteerPorts()` / surcharge `setVolunteerPorts()`. `MealsPort`/`TicketingPort` : non
+> encore faits (couplage direct conservé). Voir la section _Avancement_ de
+> [modularisation-multi-domaines.md](./modularisation-multi-domaines.md).
+> **Date** : 2026-06-15 (conception), mise à jour 2026-06-16.
 > **Prérequis** : [modularisation-multi-domaines.md](./modularisation-multi-domaines.md) §7 et §8 ;
 > conçu pour être **appliqué lors de l'étape 2** (extraction en layer), après l'étape 0
 > ([etape-0-abstraction-event.md](./etape-0-abstraction-event.md)).

@@ -1,7 +1,11 @@
 # Étape 0 — Abstraction `Event` (pilote bénévole)
 
-> **Statut** : proposition de conception + migration (non appliquée).
-> **Date** : 2026-06-15.
+> **Statut** : ✅ **Implémenté en scope réduit** (sur `main`, déployé en release). `Event` est une
+> **ancre minimale** : seules les 5 FK bénévoles ont migré `editionId → eventId` ; les champs
+> génériques (`name`/dates/`status`/`volunteers*`) sont **restés sur `Edition`**. La promotion de ces
+> champs vers `Event` est reportée à l'**étape 0bis** (avant la 2ᵉ app). Voir la section _Avancement_
+> de [modularisation-multi-domaines.md](./modularisation-multi-domaines.md).
+> **Date** : 2026-06-15 (conception), mise à jour 2026-06-16.
 > **Prérequis du plan** : voir [modularisation-multi-domaines.md](./modularisation-multi-domaines.md) §5 et §8.
 > **Rappel** : les migrations Prisma ne sont **jamais exécutées par l'assistant**. Ce document
 > fournit le schéma cible et le SQL ; la création/application de la migration reste à la charge du

@@ -1,7 +1,11 @@
 # Étape 2 — Extraction du `layers/volunteers`
 
-> **Statut** : proposition de conception (non implémentée).
-> **Date** : 2026-06-15.
+> **Statut** : ✅ **Implémenté** (sur `main`, déployé en release). `layers/volunteers/` porte le
+> front (composants, composables, pages), les routes API, le cron et l'i18n. **Décision : les
+> utils/ports serveur restent dans le core** et sont importés via l'alias `#server` (le layer ne
+> contient pas de `server/utils`). Voir la section _Avancement_ de
+> [modularisation-multi-domaines.md](./modularisation-multi-domaines.md).
+> **Date** : 2026-06-15 (conception), mise à jour 2026-06-16.
 > **Prérequis** : [etape-0-abstraction-event.md](./etape-0-abstraction-event.md) (schéma `Event`) et
 > [etape-1-ports-decouplage.md](./etape-1-ports-decouplage.md) (ports). Réalisable **dans le repo
 > actuel**, avant tout passage en monorepo (étape 3).
