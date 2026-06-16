@@ -226,7 +226,7 @@ export default wrapApiHandler(
       // On exclut ceux qui sont uniquement disponibles pour le montage/démontage
       const volunteers = await prisma.editionVolunteerApplication.findMany({
         where: {
-          editionId: editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
           // Filtrer les bénévoles disponibles pendant l'événement
           // eventAvailability peut être null (anciens bénévoles) ou true (explicitement disponible)

@@ -45,7 +45,7 @@ export default wrapApiHandler(
         const application = await prisma.editionVolunteerApplication.findFirst({
           where: {
             id: applicationId,
-            editionId: editionId,
+            eventId: editionId,
             status: 'ACCEPTED',
             // Vérifier le token seulement s'il est présent dans le QR code ET dans la base
             ...(token && {

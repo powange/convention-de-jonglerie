@@ -52,7 +52,7 @@ async function assignMealsToAcceptedVolunteers() {
       },
       select: {
         id: true,
-        editionId: true,
+        eventId: true,
         user: {
           select: {
             pseudo: true,
@@ -103,7 +103,8 @@ async function assignMealsToAcceptedVolunteers() {
           `⏳ Traitement: ${volunteer.user.pseudo} (${volunteer.user.email}) - ${editionName}`
         )
 
-        await createVolunteerMealSelections(volunteer.id, volunteer.editionId)
+        // eventId == editionId (invariant étape 0) : createVolunteerMealSelections attend l'id d'édition
+        await createVolunteerMealSelections(volunteer.id, volunteer.eventId)
 
         console.log(`   ✅ Repas assignés avec succès\n`)
         successCount++
