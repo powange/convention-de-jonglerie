@@ -11,12 +11,17 @@ vi.mock('#imports', async () => {
     useRuntimeConfig: vi.fn(() => ({})),
     getUserSession: vi.fn(async () => ({ user: { id: 1 } })),
     requireUserSession: vi.fn(async () => ({ user: { id: 1 } })),
+    clearUserSession: vi.fn(async () => {}),
   }
 })
 
 import authMiddleware from '../../../../server/middleware/auth'
 // Référence dynamique vers le mock pour pouvoir le reconfigurer
 let mockGetUserSession: ReturnType<typeof vi.fn>
+let mockClearUserSession: ReturnType<typeof vi.fn>
+
+// Mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
 
 // Les fonctions sont mockées globalement dans test/setup.ts, on les récupère depuis global
 const mockCreateError = global.createError as ReturnType<typeof vi.fn>
@@ -52,7 +57,11 @@ describe("Middleware d'authentification", () => {
     if (typeof importsMod.getUserSession !== 'function') {
       importsMod.getUserSession = vi.fn(async () => ({ user: { id: 1 } }))
     }
+    if (typeof importsMod.clearUserSession !== 'function') {
+      importsMod.clearUserSession = vi.fn(async () => {})
+    }
     mockGetUserSession = importsMod.getUserSession as ReturnType<typeof vi.fn>
+    mockClearUserSession = importsMod.clearUserSession as ReturnType<typeof vi.fn>
   })
 
   beforeEach(() => {
@@ -67,6 +76,8 @@ describe("Middleware d'authentification", () => {
 
     // Reset le mock sans refaire l'import
     mockGetUserSession.mockResolvedValue({ user: mockUser })
+    // Par défaut, l'utilisateur de session existe toujours en base
+    prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id })
   })
 
   describe('Routes publiques', () => {
@@ -253,6 +264,30 @@ describe("Middleware d'authentification", () => {
 
         expect(event.context.user).toEqual(adminUser)
         expect((event as any).context.user.isGlobalAdmin).toBe(true)
+      })
+    })
+
+    describe('Session orpheline (utilisateur supprimé)', () => {
+      it('devrait invalider la session et rejeter en 401 si le user de session est introuvable', async () => {
+        const event = createMockEvent('/api/protected-route', 'GET')
+        mockGetUserSession.mockResolvedValue({ user: mockUser })
+        // L'utilisateur n'existe plus en base (ex. reset de la base)
+        prismaMock.user.findUnique.mockResolvedValue(null)
+
+        await expect(authMiddleware(event as H3Event)).rejects.toThrow(/Session invalide/)
+        expect(mockClearUserSession).toHaveBeenCalledWith(event)
+        expect(event.context.user).toBeUndefined()
+      })
+
+      it('ne devrait pas invalider la session si le user existe toujours', async () => {
+        const event = createMockEvent('/api/protected-route', 'GET')
+        mockGetUserSession.mockResolvedValue({ user: mockUser })
+        prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id })
+
+        await authMiddleware(event as H3Event)
+
+        expect(mockClearUserSession).not.toHaveBeenCalled()
+        expect(event.context.user).toEqual(mockUser)
       })
     })
   })

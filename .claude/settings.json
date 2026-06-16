@@ -76,7 +76,9 @@
       "Bash(cd /home/powange/projects/convention-de-jonglerie *)",
       "Bash(break)",
       "Bash(gh pr *)",
-      "Bash(sed -i 's/prismaMock\\\\.edition\\\\.delete/prismaMock.event.delete/g' test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts && echo \"=== vérif restantes edition.delete ===\" && grep -c \"prismaMock.edition.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts; echo \"=== event.delete présent ===\"; grep -c \"prismaMock.event.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts)"
+      "Bash(sed -i 's/prismaMock\\\\.edition\\\\.delete/prismaMock.event.delete/g' test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts && echo \"=== vérif restantes edition.delete ===\" && grep -c \"prismaMock.edition.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts; echo \"=== event.delete présent ===\"; grep -c \"prismaMock.event.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts)",
+      "Bash(gh api *)",
+      "Bash(git pull *)"
     ],
     "additionalDirectories": [
       "/tmp",

@@ -9,6 +9,13 @@ export default defineEventHandler(async (event) => {
   const path = fullPath.split('?')[0]
   const method = event.node.req.method
 
+  // La session est scellée dans un cookie et peut survivre à la suppression du compte
+  // (ex. session restée valide après un reset de base) : on vérifie que l'utilisateur existe encore.
+  const sessionUserExists = async (userId: number): Promise<boolean> => {
+    const found = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } })
+    return found != null
+  }
+
   // Chercher une route publique correspondante
   const matchedRoute = publicRoutes.find((route) => {
     if (!method || !route.methods.includes(method)) return false
@@ -22,7 +29,9 @@ export default defineEventHandler(async (event) => {
     if ('hydrateSession' in matchedRoute && matchedRoute.hydrateSession) {
       try {
         const session = await getUserSession(event)
-        event.context.user = session?.user || null
+        // Sur une route publique, un utilisateur orphelin est simplement traité comme anonyme.
+        event.context.user =
+          session?.user && (await sessionUserExists(session.user.id)) ? session.user : null
       } catch {
         event.context.user = null
       }
@@ -34,6 +43,12 @@ export default defineEventHandler(async (event) => {
   if (path.startsWith('/api/')) {
     const session = await getUserSession(event)
     if (session?.user) {
+      // Session orpheline (utilisateur supprimé) : on l'invalide et on force la reconnexion
+      // plutôt que de laisser les handlers renvoyer un 404 « Utilisateur introuvable » déroutant.
+      if (!(await sessionUserExists(session.user.id))) {
+        await imports.clearUserSession(event)
+        throw createError({ status: 401, message: 'Session invalide, veuillez vous reconnecter' })
+      }
       event.context.user = session.user
       return
     }
