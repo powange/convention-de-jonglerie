@@ -124,6 +124,41 @@ export interface TicketingPort {
   getHandoutItems(handoutItemIds: number[]): Promise<Record<number, HandoutItemInfo>>
 }
 
+/** Participant artiste d'un repas (pour l'affichage catering). */
+export interface ArtistMealParticipant {
+  nom: string | null
+  prenom: string | null
+  email: string | null
+  phone: string | null
+  dietaryPreference: string | null
+  allergies: string | null
+  allergySeverity: string | null
+  afterShow: boolean
+}
+
+/**
+ * Accès au module artistes depuis le module bénévole (repas / catering). Le module bénévole ne
+ * connaît pas la notion d'« artiste » : il délègue la synchronisation et la lecture des repas
+ * artistes. Jonglerie : modèles `EditionArtist` + `ArtistMealSelection`. Domaine sans artistes :
+ * `addEligibleMealSelections`/`removeMealSelections` no-op et `getMealArtistParticipants` → `{}`.
+ */
+export interface ArtistsPort {
+  /** Crée (upsert) les sélections de repas des artistes éligibles quand un repas est activé. */
+  addEligibleMealSelections(input: {
+    editionId: number
+    mealId: number
+    date: Date
+    mealType: string
+  }): Promise<void>
+  /** Supprime toutes les sélections de repas des artistes pour un repas désactivé. */
+  removeMealSelections(mealId: number): Promise<void>
+  /**
+   * Participants artistes ayant accepté chaque repas (pour le catering). Clé = mealId ; un repas
+   * sans artiste est absent ou associé à un tableau vide.
+   */
+  getMealArtistParticipants(mealIds: number[]): Promise<Record<number, ArtistMealParticipant[]>>
+}
+
 export interface VolunteerPorts {
   notifications: NotificationPort
   email: EmailPort
@@ -131,4 +166,5 @@ export interface VolunteerPorts {
   organizers: OrganizerDirectoryPort
   eventScope: EventScopePort
   ticketing: TicketingPort
+  artists: ArtistsPort
 }

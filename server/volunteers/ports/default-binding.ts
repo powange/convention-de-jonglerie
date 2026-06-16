@@ -1,8 +1,14 @@
 // Implémentation par défaut des ports du module bénévole (câblage app jonglerie).
 // Délègue aux services concrets (cœur). À l'extraction en layer (étape 2), ce fichier
 // reste côté app ; le layer ne garde que les interfaces (types.ts) et le registre.
-import type { HandoutItemInfo, NotifyInput, TicketMealParticipant, VolunteerPorts } from './types'
-import type { NotificationType } from '@prisma/client'
+import type {
+  ArtistMealParticipant,
+  HandoutItemInfo,
+  NotifyInput,
+  TicketMealParticipant,
+  VolunteerPorts,
+} from './types'
+import type { NotificationType, VolunteerMealType } from '@prisma/client'
 
 import { sendEmail } from '#server/utils/emailService'
 import {
@@ -19,6 +25,7 @@ import {
   requireVolunteerManagementAccess,
   requireVolunteerReadAccess,
 } from '#server/utils/permissions/volunteer-permissions'
+import { isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
 
 function toCreateData(input: NotifyInput): CreateNotificationData {
   return { ...input, type: input.type as NotificationType }
@@ -168,6 +175,62 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
         const map: Record<number, HandoutItemInfo> = {}
         for (const it of items) map[it.id] = { id: it.id, name: it.name }
         return map
+      },
+    },
+    artists: {
+      // Jonglerie : artistes = EditionArtist ; sélections de repas = ArtistMealSelection.
+      async addEligibleMealSelections({ editionId, mealId, date, mealType }) {
+        const artists = await prisma.editionArtist.findMany({
+          where: { editionId },
+          select: { id: true, arrivalDateTime: true, departureDateTime: true },
+        })
+        const eligible = artists.filter((artist) =>
+          isArtistEligibleForMeal({ date, mealType: mealType as VolunteerMealType }, artist)
+        )
+        await Promise.all(
+          eligible.map((artist) =>
+            prisma.artistMealSelection.upsert({
+              where: { artistId_mealId: { artistId: artist.id, mealId } },
+              create: { artistId: artist.id, mealId, selected: true },
+              update: { selected: true },
+            })
+          )
+        )
+      },
+      async removeMealSelections(mealId) {
+        await prisma.artistMealSelection.deleteMany({ where: { mealId } })
+      },
+      async getMealArtistParticipants(mealIds) {
+        if (mealIds.length === 0) return {}
+        const selections = await prisma.artistMealSelection.findMany({
+          where: { mealId: { in: mealIds }, accepted: true },
+          select: {
+            mealId: true,
+            afterShow: true,
+            artist: {
+              select: {
+                dietaryPreference: true,
+                allergies: true,
+                allergySeverity: true,
+                user: { select: { nom: true, prenom: true, email: true, phone: true } },
+              },
+            },
+          },
+        })
+        const result: Record<number, ArtistMealParticipant[]> = {}
+        for (const sel of selections) {
+          ;(result[sel.mealId] ??= []).push({
+            nom: sel.artist.user.nom,
+            prenom: sel.artist.user.prenom,
+            email: sel.artist.user.email,
+            phone: sel.artist.user.phone,
+            dietaryPreference: sel.artist.dietaryPreference,
+            allergies: sel.artist.allergies,
+            allergySeverity: sel.artist.allergySeverity,
+            afterShow: sel.afterShow,
+          })
+        }
+        return result
       },
     },
   }

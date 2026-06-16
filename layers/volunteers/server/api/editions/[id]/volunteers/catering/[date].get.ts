@@ -46,24 +46,6 @@ export default wrapApiHandler(async (event) => {
           },
         },
       },
-      artistMealSelections: {
-        where: {
-          accepted: true,
-        },
-        include: {
-          artist: {
-            include: {
-              user: {
-                select: {
-                  ...userWithNameSelect,
-                  email: true,
-                  phone: true,
-                },
-              },
-            },
-          },
-        },
-      },
     },
     orderBy: {
       mealType: 'asc',
@@ -73,6 +55,12 @@ export default wrapApiHandler(async (event) => {
   // Étape 1bis (port ticketing) : participants billetterie par repas (tarifs/options « avec repas »),
   // dédupliqués côté binding. Le layer ne lit plus les modèles de billetterie.
   const ticketParticipantsByMeal = await useVolunteerPorts().ticketing.getMealTicketParticipants(
+    meals.map((m) => m.id)
+  )
+
+  // Étape 1bis (port artists) : participants artistes acceptés par repas (le layer ne lit plus les
+  // modèles artistes).
+  const artistParticipantsByMeal = await useVolunteerPorts().artists.getMealArtistParticipants(
     meals.map((m) => m.id)
   )
 
@@ -106,18 +94,18 @@ export default wrapApiHandler(async (event) => {
       emergencyContactPhone: selection.volunteer.emergencyContactPhone,
     }))
 
-    const artists = meal.artistMealSelections.map((selection) => ({
+    const artists = (artistParticipantsByMeal[meal.id] ?? []).map((a) => ({
       type: 'artist' as const,
-      nom: selection.artist.user.nom,
-      prenom: selection.artist.user.prenom,
-      email: selection.artist.user.email,
-      phone: selection.artist.user.phone,
-      dietaryPreference: selection.artist.dietaryPreference,
-      allergies: selection.artist.allergies,
-      allergySeverity: selection.artist.allergySeverity,
+      nom: a.nom,
+      prenom: a.prenom,
+      email: a.email,
+      phone: a.phone,
+      dietaryPreference: a.dietaryPreference,
+      allergies: a.allergies,
+      allergySeverity: a.allergySeverity,
       emergencyContactName: null,
       emergencyContactPhone: null,
-      afterShow: selection.afterShow,
+      afterShow: a.afterShow,
     }))
 
     // Participants billetterie de ce repas (déjà dédupliqués par le port)
