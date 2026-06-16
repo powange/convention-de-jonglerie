@@ -5,6 +5,7 @@ import { $fetch } from 'ofetch'
 
 import { getEmailHash } from '../../utils/email-hash'
 import { sanitizeReturnTo } from '../../utils/safe-redirect'
+import { setSession } from '../../utils/session-helpers'
 
 function slugifyPseudo(base: string) {
   const clean =
@@ -172,9 +173,6 @@ export default defineEventHandler(async (event) => {
     data: updateData,
   })
 
-  // Ouvrir la session utilisateur
-  const { setUserSession } = (await import('#imports')) as any
-
   // Vérifier si l'utilisateur est en mode PWA
   const isPWA = getCookie(event, 'pwa_mode') === 'true'
 
@@ -185,7 +183,7 @@ export default defineEventHandler(async (event) => {
       }
     : undefined // Utilise la config par défaut (30 jours)
 
-  await setUserSession(
+  await setSession(
     event,
     {
       user: {
