@@ -148,13 +148,13 @@ model Edition {
 
 ### 3.4 `volunteer.prisma` — repointage des 5 FK
 
-| Modèle | Avant | Après |
-| --- | --- | --- |
+| Modèle                        | Avant                                                     | Après                                               |
+| ----------------------------- | --------------------------------------------------------- | --------------------------------------------------- |
 | `EditionVolunteerApplication` | `editionId` → `Edition` ; `@@unique([editionId, userId])` | `eventId` → `Event` ; `@@unique([eventId, userId])` |
-| `VolunteerNotificationGroup` | `editionId` → `Edition` | `eventId` → `Event` |
-| `VolunteerTeam` | `editionId` → `Edition` | `eventId` → `Event` |
-| `VolunteerTimeSlot` | `editionId` → `Edition` | `eventId` → `Event` |
-| `VolunteerComment` | `editionId` → `Edition` ; `@@unique([userId, editionId])` | `eventId` → `Event` ; `@@unique([userId, eventId])` |
+| `VolunteerNotificationGroup`  | `editionId` → `Edition`                                   | `eventId` → `Event`                                 |
+| `VolunteerTeam`               | `editionId` → `Edition`                                   | `eventId` → `Event`                                 |
+| `VolunteerTimeSlot`           | `editionId` → `Edition`                                   | `eventId` → `Event`                                 |
+| `VolunteerComment`            | `editionId` → `Edition` ; `@@unique([userId, editionId])` | `eventId` → `Event` ; `@@unique([userId, eventId])` |
 
 Les 3 autres tables (`VolunteerAssignment`, `ApplicationTeamAssignment`,
 `VolunteerNotificationConfirmation`) **n'ont pas de `editionId`** (elles pointent vers slot / team /
@@ -165,14 +165,14 @@ application / group) → aucun changement de FK.
 
 ## 4. Tableau de découpage des champs `Edition`
 
-| Catégorie | Champs | Destination |
-| --- | --- | --- |
-| Identité / temporel | `name`, `startDate`, `endDate`, `status`, `timezone`, `imageUrl` | **`Event`** (source de vérité) — **conservés aussi sur `Edition`** en étape 0 (mirror) |
-| Config bénévoles (23) | `volunteers*` | **`EventVolunteerSettings`** |
-| Concept jonglerie | `conventionId`/`convention`, `program`, `artistInfo`, `jugglingEdgeUrl` | **`Edition`** |
-| Espaces / amenities jonglerie | `hasAerialSpace`, `hasFireSpace`, `hasGala`, `hasOpenStage`, `hasSlacklineSpace`, `hasUnicycleSpace`, `hasLongShow`, `hasWorkshops`, `hasConcert`, `hasAfjTokenPayment`… | **`Edition`** (promouvables vers `Event` plus tard si générique) |
-| Adresse / lieu | `addressLine1/2`, `city`, `country`, `postalCode`, `region`, `latitude`, `longitude` | **`Edition`** en étape 0 (générique → promouvable vers `Event` lors de l'extraction « lieu ») |
-| Autres flags modules | `mealsEnabled`, `ticketingEnabled`, `tasksEnabled`, `stockEnabled`, `faqEnabled`, `siteMapEnabled`… | **`Edition`** en étape 0 (migrés avec chaque module) |
+| Catégorie                     | Champs                                                                                                                                                                   | Destination                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| Identité / temporel           | `name`, `startDate`, `endDate`, `status`, `timezone`, `imageUrl`                                                                                                         | **`Event`** (source de vérité) — **conservés aussi sur `Edition`** en étape 0 (mirror)        |
+| Config bénévoles (23)         | `volunteers*`                                                                                                                                                            | **`EventVolunteerSettings`**                                                                  |
+| Concept jonglerie             | `conventionId`/`convention`, `program`, `artistInfo`, `jugglingEdgeUrl`                                                                                                  | **`Edition`**                                                                                 |
+| Espaces / amenities jonglerie | `hasAerialSpace`, `hasFireSpace`, `hasGala`, `hasOpenStage`, `hasSlacklineSpace`, `hasUnicycleSpace`, `hasLongShow`, `hasWorkshops`, `hasConcert`, `hasAfjTokenPayment`… | **`Edition`** (promouvables vers `Event` plus tard si générique)                              |
+| Adresse / lieu                | `addressLine1/2`, `city`, `country`, `postalCode`, `region`, `latitude`, `longitude`                                                                                     | **`Edition`** en étape 0 (générique → promouvable vers `Event` lors de l'extraction « lieu ») |
+| Autres flags modules          | `mealsEnabled`, `ticketingEnabled`, `tasksEnabled`, `stockEnabled`, `faqEnabled`, `siteMapEnabled`…                                                                      | **`Edition`** en étape 0 (migrés avec chaque module)                                          |
 
 > Décision assumée : à l'étape 0 on **ne déplace que** les `volunteers*` (vers settings) et on
 > **n'ajoute que** `eventId` à `Edition`. Tout le reste bouge plus tard, module par module.
@@ -304,11 +304,11 @@ npx prisma migrate dev --name abstract_event_volunteers
 
 ## 8. Sous-phasage recommandé (dérisquage)
 
-| Sous-étape | Contenu | Réversibilité |
-| --- | --- | --- |
-| **0a** | Tables `Event` + `EventVolunteerSettings` + backfill (§6.1–6.2) + `Edition.eventId`. **Sans** retrait de colonnes ni renommage FK. | Élevée (purement additif) |
-| **0b** | Renommage des 5 FK (§6.3) + refactor code bénévole (`eventId`, `event.name`, `event.volunteerSettings`). | Moyenne |
-| **0c** | Retrait des 23 colonnes `volunteers*` d'`Edition` (§6.4) une fois 0b validé en prod. | Faible (destructif) |
+| Sous-étape | Contenu                                                                                                                            | Réversibilité             |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| **0a**     | Tables `Event` + `EventVolunteerSettings` + backfill (§6.1–6.2) + `Edition.eventId`. **Sans** retrait de colonnes ni renommage FK. | Élevée (purement additif) |
+| **0b**     | Renommage des 5 FK (§6.3) + refactor code bénévole (`eventId`, `event.name`, `event.volunteerSettings`).                           | Moyenne                   |
+| **0c**     | Retrait des 23 colonnes `volunteers*` d'`Edition` (§6.4) une fois 0b validé en prod.                                               | Faible (destructif)       |
 
 Faire **0a seule** d'abord : elle est additive, testable, et ne casse rien. N'enchaîner sur 0b/0c
 qu'après validation. La synchro runtime (§6.5) est mise en place dès 0a.

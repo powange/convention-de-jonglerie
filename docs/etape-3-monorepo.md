@@ -62,8 +62,8 @@ packages:
     "dev:jonglerie": "pnpm --filter @cdj/app-jonglerie dev",
     "build:jonglerie": "pnpm --filter @cdj/app-jonglerie build",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test:unit:run"
-  }
+    "test": "pnpm -r test:unit:run",
+  },
 }
 ```
 
@@ -99,8 +99,8 @@ Règles cibles :
 {
   "scripts": {
     "prisma:compose": "node ../../scripts/compose-prisma.mjs jonglerie",
-    "postinstall": "npm run prisma:compose && nuxt prepare"
-  }
+    "postinstall": "npm run prisma:compose && nuxt prepare",
+  },
 }
 ```
 
@@ -125,13 +125,13 @@ Règles cibles :
 
 Les ~50 scripts npm actuels se répartissent :
 
-| Catégorie | Destination |
-| --- | --- |
-| Build/dev/lint/test d'app (`build`, `dev`, `lint`, `test:*`, `docker:dev:*`) | `apps/jonglerie/package.json` |
-| Outillage i18n (`check-i18n`, `i18n:mark-todo`…) | racine **ou** par app, **adapté pour scanner `layers/*/i18n`** (cf. étape 2 §5) |
-| Scripts ops généraux (`admin:*`, `db:clean-tokens`, geocode) | `apps/jonglerie/scripts/` (spécifiques aux données de l'app) |
-| Scripts ops bénévoles (`generate-volunteer-qr-tokens`…) | `layers/volunteers/scripts/` (étape 2 §3) |
-| Orchestration multi-app (`pnpm -r …`) | racine |
+| Catégorie                                                                    | Destination                                                                     |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Build/dev/lint/test d'app (`build`, `dev`, `lint`, `test:*`, `docker:dev:*`) | `apps/jonglerie/package.json`                                                   |
+| Outillage i18n (`check-i18n`, `i18n:mark-todo`…)                             | racine **ou** par app, **adapté pour scanner `layers/*/i18n`** (cf. étape 2 §5) |
+| Scripts ops généraux (`admin:*`, `db:clean-tokens`, geocode)                 | `apps/jonglerie/scripts/` (spécifiques aux données de l'app)                    |
+| Scripts ops bénévoles (`generate-volunteer-qr-tokens`…)                      | `layers/volunteers/scripts/` (étape 2 §3)                                       |
+| Orchestration multi-app (`pnpm -r …`)                                        | racine                                                                          |
 
 ## 7. Docker
 
@@ -145,7 +145,7 @@ Le `Dockerfile` actuel copie `package*.json`, `prisma`, `prisma.config.ts`, `i18
 - `i18n` n'est plus monolithique : le build doit inclure `apps/jonglerie/i18n` **et** les
   `layers/*/i18n` consommés.
 - `entrypoint.sh` (`prisma migrate deploy`) reste **par app**, sur **sa** base.
-- Les `docker-compose.*.yml` (dev, prod, release, test-*) sont **dupliqués/paramétrés par app**
+- Les `docker-compose.*.yml` (dev, prod, release, test-\*) sont **dupliqués/paramétrés par app**
   (service `app` + service `database` par app, réseau dédié).
 
 ## 8. CI
@@ -155,7 +155,7 @@ Workflows actuels : `tests.yml`, `playwright.yml`. Cible :
 - **Matrice par app** (`strategy.matrix.app: [jonglerie, autre-domaine]`).
 - **Filtrage par changements** : ne (re)tester qu'une app si seuls ses fichiers changent ; **tester
   toutes les apps** si un `layers/*` change (la propagation impacte chaque app). pnpm + `--filter
-  ...[origin/main]` ou `turbo`/`nx` pour le graphe de dépendances.
+...[origin/main]` ou `turbo`/`nx` pour le graphe de dépendances.
 - Tests d'un **layer** : exécutés une fois (tests isolés du layer) **plus** les tests d'intégration
   de chaque app qui le consomme.
 

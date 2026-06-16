@@ -366,30 +366,33 @@ async function main() {
 
         const randomCity = cities[Math.floor(Math.random() * cities.length)]
 
-        // Ancre Event (l'édition partage son id : invariant Edition.id == eventId)
-        const eventAnchor = await prisma.event.create({ data: {} })
-        edition = await prisma.edition.create({
-          data: {
-            id: eventAnchor.id,
-            eventId: eventAnchor.id,
-            name: editionName,
-            description: `${conv.name} — édition ${i}`,
-            creatorId: conv.authorId,
-            conventionId: conv.id,
-            startDate,
-            endDate,
-            addressLine1: `${Math.floor(Math.random() * 100) + 1} Rue de la Jonglerie`,
-            city: randomCity,
-            country: 'France',
-            postalCode: `${Math.floor(Math.random() * 90000) + 10000}`,
-            hasWorkshops: Math.random() > 0.3,
-            hasConcert: Math.random() > 0.5,
-            hasTentCamping: Math.random() > 0.4,
-            hasShowers: Math.random() > 0.2,
-            hasToilets: Math.random() > 0.1,
-            hasCantine: Math.random() > 0.6,
-            status: 'PUBLISHED',
-          },
+        // Ancre Event puis édition partageant son id (invariant Edition.id == eventId), créées
+        // de façon atomique pour ne pas laisser d'Event orphelin si l'édition échoue.
+        edition = await prisma.$transaction(async (tx) => {
+          const eventAnchor = await tx.event.create({ data: {} })
+          return tx.edition.create({
+            data: {
+              id: eventAnchor.id,
+              eventId: eventAnchor.id,
+              name: editionName,
+              description: `${conv.name} — édition ${i}`,
+              creatorId: conv.authorId,
+              conventionId: conv.id,
+              startDate,
+              endDate,
+              addressLine1: `${Math.floor(Math.random() * 100) + 1} Rue de la Jonglerie`,
+              city: randomCity,
+              country: 'France',
+              postalCode: `${Math.floor(Math.random() * 90000) + 10000}`,
+              hasWorkshops: Math.random() > 0.3,
+              hasConcert: Math.random() > 0.5,
+              hasTentCamping: Math.random() > 0.4,
+              hasShowers: Math.random() > 0.2,
+              hasToilets: Math.random() > 0.1,
+              hasCantine: Math.random() > 0.6,
+              status: 'PUBLISHED',
+            },
+          })
         })
         console.log(
           `Edition créée: ${edition.name} (id=${edition.id}, ${startDate.toLocaleDateString()})`

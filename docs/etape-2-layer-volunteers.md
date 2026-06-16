@@ -68,37 +68,37 @@ layers/volunteers/
 
 ### Table de correspondance (source actuelle → layer)
 
-| Type | Source | Destination layer |
-| --- | --- | --- |
-| API bénévoles | `server/api/editions/[id]/{volunteers,volunteer-teams,volunteer-time-slots}/**` | `server/api/…` (identique) |
-| API user | `server/api/user/volunteer-applications.get.ts` | `server/api/user/…` |
-| Utils | `server/utils/editions/volunteers/**`, `volunteer-scheduler.ts`, `volunteer-meals.ts`, `volunteer-application-diff.ts` | `server/utils/…` |
-| Email | `server/emails/VolunteerScheduleEmail.vue` | `server/emails/…` |
-| Tâche planifiée | `server/tasks/volunteer-reminders.ts` | `server/tasks/…` |
-| Composants | `app/components/edition/volunteer/**`, `app/components/volunteers/**` | `app/components/…` |
-| Composables | `app/composables/useVolunteer*.ts` | `app/composables/…` |
-| Pages | `app/pages/editions/[id]/{gestion/volunteers,volunteers}/**` | `app/pages/…` |
-| Utils front | `app/utils/{allergy-severity,volunteer-application-api,volunteer-stats}.ts` | `app/utils/…` |
-| i18n | `i18n/locales/*/volunteers.json`, `gestion-volunteers.json` | `i18n/locales/…` |
-| Prisma | `prisma/schema/volunteer.prisma` (+ `EventVolunteerSettings`) | `prisma/…` |
+| Type            | Source                                                                                                                 | Destination layer          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| API bénévoles   | `server/api/editions/[id]/{volunteers,volunteer-teams,volunteer-time-slots}/**`                                        | `server/api/…` (identique) |
+| API user        | `server/api/user/volunteer-applications.get.ts`                                                                        | `server/api/user/…`        |
+| Utils           | `server/utils/editions/volunteers/**`, `volunteer-scheduler.ts`, `volunteer-meals.ts`, `volunteer-application-diff.ts` | `server/utils/…`           |
+| Email           | `server/emails/VolunteerScheduleEmail.vue`                                                                             | `server/emails/…`          |
+| Tâche planifiée | `server/tasks/volunteer-reminders.ts`                                                                                  | `server/tasks/…`           |
+| Composants      | `app/components/edition/volunteer/**`, `app/components/volunteers/**`                                                  | `app/components/…`         |
+| Composables     | `app/composables/useVolunteer*.ts`                                                                                     | `app/composables/…`        |
+| Pages           | `app/pages/editions/[id]/{gestion/volunteers,volunteers}/**`                                                           | `app/pages/…`              |
+| Utils front     | `app/utils/{allergy-severity,volunteer-application-api,volunteer-stats}.ts`                                            | `app/utils/…`              |
+| i18n            | `i18n/locales/*/volunteers.json`, `gestion-volunteers.json`                                                            | `i18n/locales/…`           |
+| Prisma          | `prisma/schema/volunteer.prisma` (+ `EventVolunteerSettings`)                                                          | `prisma/…`                 |
 
 ## 3. Fichiers « frontière » (inter-modules) — décisions
 
 Ces fichiers touchent plusieurs domaines : ils ne suivent **pas** mécaniquement le layer.
 
-| Fichier(s) | Nature du couplage | Décision |
-| --- | --- | --- |
-| `server/api/conventions/[id]/volunteers/[userId]/comment.*` | `VolunteerComment` (modèle bénévole) mais route sous `conventions` (concept jonglerie) | **Déplacer la logique** dans le layer, **mais re-router** sous `editions/[id]/volunteers/[userId]/comment` (scope event) pour être agnostique. Refactor à prévoir. |
-| `server/api/editions/[id]/ticketing/volunteers*`, `app/components/ticketing/{VolunteerDetailsCard,TicketingVolunteerHandoutItemsList}.vue` | Intersection **billetterie × bénévoles** (`EditionVolunteerHandoutItem`, validation d'entrée QR) | **Rester dans la billetterie** (futur `layers/ticketing`). Consomme les données bénévoles via un futur `VolunteerPort` (lecture) ou la DB. |
-| `server/api/messenger/volunteer-to-organizers.post.ts` | Endpoint messenger spécifique bénévoles | **Rester dans l'app** comme glue ; délègue au `MessengerPort` / `OrganizerDirectoryPort` (étape 1). |
-| `server/api/__sitemap__/volunteers.get.ts` | SEO, lit `volunteersPagePublic` | **Déplacer dans le layer** ; lit `event.volunteerSettings.pagePublic`. |
-| `app/pages/guide/volunteer.vue`, `app/pages/guide/organizer/volunteers.vue` | Contenu d'aide rédigé, orienté produit jonglerie | **Rester dans l'app** (contenu spécifique au produit). Chaque app a son propre guide. |
-| `scripts/{assign-meals-to-accepted-volunteers,check-volunteer-tokens,debug-volunteer-meals,generate-volunteer-qr-tokens}.ts` | Scripts ops ponctuels | **Déplacer dans le layer** (`scripts/`), faible priorité. |
+| Fichier(s)                                                                                                                                 | Nature du couplage                                                                               | Décision                                                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `server/api/conventions/[id]/volunteers/[userId]/comment.*`                                                                                | `VolunteerComment` (modèle bénévole) mais route sous `conventions` (concept jonglerie)           | **Déplacer la logique** dans le layer, **mais re-router** sous `editions/[id]/volunteers/[userId]/comment` (scope event) pour être agnostique. Refactor à prévoir. |
+| `server/api/editions/[id]/ticketing/volunteers*`, `app/components/ticketing/{VolunteerDetailsCard,TicketingVolunteerHandoutItemsList}.vue` | Intersection **billetterie × bénévoles** (`EditionVolunteerHandoutItem`, validation d'entrée QR) | **Rester dans la billetterie** (futur `layers/ticketing`). Consomme les données bénévoles via un futur `VolunteerPort` (lecture) ou la DB.                         |
+| `server/api/messenger/volunteer-to-organizers.post.ts`                                                                                     | Endpoint messenger spécifique bénévoles                                                          | **Rester dans l'app** comme glue ; délègue au `MessengerPort` / `OrganizerDirectoryPort` (étape 1).                                                                |
+| `server/api/__sitemap__/volunteers.get.ts`                                                                                                 | SEO, lit `volunteersPagePublic`                                                                  | **Déplacer dans le layer** ; lit `event.volunteerSettings.pagePublic`.                                                                                             |
+| `app/pages/guide/volunteer.vue`, `app/pages/guide/organizer/volunteers.vue`                                                                | Contenu d'aide rédigé, orienté produit jonglerie                                                 | **Rester dans l'app** (contenu spécifique au produit). Chaque app a son propre guide.                                                                              |
+| `scripts/{assign-meals-to-accepted-volunteers,check-volunteer-tokens,debug-volunteer-meals,generate-volunteer-qr-tokens}.ts`               | Scripts ops ponctuels                                                                            | **Déplacer dans le layer** (`scripts/`), faible priorité.                                                                                                          |
 
 ### 3.4 Permissions — scinder politique et résolution
 
 `server/utils/permissions/volunteer-permissions.ts` mêle **politique** (« il faut le droit
-*gérer les bénévoles* ») et **résolution** (lecture de `ConventionOrganizer` /
+_gérer les bénévoles_ ») et **résolution** (lecture de `ConventionOrganizer` /
 `EditionOrganizerPermission`, spécifique au modèle jonglerie).
 
 - **Politique** → `layers/volunteers/server/utils/permissions/volunteer-policy.ts` (agnostique).
@@ -107,8 +107,8 @@ Ces fichiers touchent plusieurs domaines : ils ne suivent **pas** mécaniquement
 ```ts
 export interface OrganizerDirectoryPort {
   getVolunteerManagers(eventId: number): Promise<number[]>
-  canManageVolunteers(userId: number, eventId: number): Promise<boolean>   // ← ajout
-  canReadVolunteers(userId: number, eventId: number): Promise<boolean>     // ← ajout
+  canManageVolunteers(userId: number, eventId: number): Promise<boolean> // ← ajout
+  canReadVolunteers(userId: number, eventId: number): Promise<boolean> // ← ajout
 }
 ```
 
@@ -119,7 +119,7 @@ L'app câble ces méthodes sur son modèle de permissions concret.
 ```ts
 // apps/jonglerie/nuxt.config.ts (ou nuxt.config.ts actuel, en attendant le monorepo)
 export default defineNuxtConfig({
-  extends: ['./layers/volunteers'],   // chemin relatif (repo actuel) ou '../../layers/volunteers' (monorepo)
+  extends: ['./layers/volunteers'], // chemin relatif (repo actuel) ou '../../layers/volunteers' (monorepo)
 })
 ```
 

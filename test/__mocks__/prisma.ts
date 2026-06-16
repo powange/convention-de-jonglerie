@@ -102,7 +102,11 @@ export const prismaMock = {
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),
-  $transaction: vi.fn(),
+  // Implémentation par défaut : exécute le callback avec le mock comme client transactionnel
+  // (forme interactive) ou résout le tableau d'opérations (forme séquentielle).
+  $transaction: vi.fn((arg: unknown) =>
+    Array.isArray(arg) ? Promise.all(arg) : (arg as (tx: unknown) => unknown)(prismaMock)
+  ),
   $queryRaw: vi.fn(),
   $executeRaw: vi.fn(),
   $executeRawUnsafe: vi.fn(),

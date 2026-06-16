@@ -111,17 +111,17 @@ export default wrapApiHandler(
 
     // Transformer les éditions (calculer ticketingParticipants)
     const editions = convention.editions.map((edition) => {
-      const { orders, ...editionData } = edition
+      const { orders, event: editionEvent, ...editionData } = edition
       const ticketingParticipants = orders.reduce(
         (sum, order) => sum + (order._count?.items ?? 0),
         0
       )
       return {
         ...editionData,
-        event: undefined,
         _count: {
           ...editionData._count,
-          volunteerApplications: editionData.event?._count?.volunteerApplications ?? 0,
+          // `?? 0` : filet de sécurité, editionEvent existe toujours (invariant Edition.id == eventId)
+          volunteerApplications: editionEvent?._count?.volunteerApplications ?? 0,
           ticketingParticipants,
         },
       }

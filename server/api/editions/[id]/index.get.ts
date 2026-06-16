@@ -169,16 +169,17 @@ export default wrapApiHandler(
       volunteersAskSetup: _volunteersAskSetup,
       volunteersAskTeardown: _volunteersAskTeardown,
       volunteersAskEmergencyContact: _volunteersAskEmergencyContact,
+      event: editionEvent,
       ...editionWithoutVolunteersAskFields
     } = edition
 
     return {
       ...editionWithoutVolunteersAskFields,
-      // Ré-aplatir le compte des candidatures (relation déplacée sur Event)
-      event: undefined,
+      // Ré-aplatir le compte des candidatures (relation déplacée sur Event).
+      // `?? 0` : filet de sécurité, editionEvent existe toujours par invariant Edition.id == eventId.
       _count: {
         ...edition._count,
-        volunteerApplications: edition.event?._count?.volunteerApplications ?? 0,
+        volunteerApplications: editionEvent?._count?.volunteerApplications ?? 0,
       },
       // Garder seulement les champs volunteers encore utilisés côté client
       volunteersOpen: edition.volunteersOpen,

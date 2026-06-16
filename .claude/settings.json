@@ -74,12 +74,15 @@
       "Bash(sed -i \"s@import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'@import { EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
       "Bash(sed -i \"s@import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'@import { EditionVolunteerPlanningSlotModal as SlotModal } from '#components'@\" \"app/pages/editions/[id]/gestion/volunteers/planning.vue\")",
       "Bash(cd /home/powange/projects/convention-de-jonglerie *)",
-      "Bash(break)"
+      "Bash(break)",
+      "Bash(gh pr *)",
+      "Bash(sed -i 's/prismaMock\\\\.edition\\\\.delete/prismaMock.event.delete/g' test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts && echo \"=== vérif restantes edition.delete ===\" && grep -c \"prismaMock.edition.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts; echo \"=== event.delete présent ===\"; grep -c \"prismaMock.event.delete\" test/nuxt/server/api/editions/\\\\[id\\\\].delete.test.ts test/nuxt/server/api/editions/delete.test.ts)"
     ],
     "additionalDirectories": [
       "/tmp",
       "/home/powange/projects/convention-de-jonglerie/layers/volunteers/server/api/editions",
-      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/app/pages/editions/[id]"
+      "/home/powange/projects/convention-de-jonglerie/layers/volunteers/app/pages/editions/[id]",
+      "/home/powange/projects/convention-de-jonglerie/test/nuxt/server/api/editions"
     ]
   }
 }

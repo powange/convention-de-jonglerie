@@ -455,7 +455,9 @@ describe("Système d'éditions", () => {
           organizers: [],
         },
       })
-      prismaMock.edition.delete.mockResolvedValue(mockEdition)
+      // La suppression passe par l'ancre Event (id == eventId) : sa cascade efface l'Edition
+      // et les données bénévoles qui pendent sur Event.
+      prismaMock.event.delete.mockResolvedValue(mockEdition)
 
       global.getRouterParam = vi.fn().mockReturnValue('1')
 
@@ -470,7 +472,7 @@ describe("Système d'éditions", () => {
 
       expect(result.message).toBeDefined()
       expect(result.message.toLowerCase()).toMatch(/supprim|delet/)
-      expect(prismaMock.edition.delete).toHaveBeenCalledWith({
+      expect(prismaMock.event.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       })
     })
