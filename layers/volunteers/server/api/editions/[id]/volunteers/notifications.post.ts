@@ -78,15 +78,10 @@ export default wrapApiHandler(async (event) => {
     }
   }
 
-  // Récupérer l'édition avec les informations de la convention
-  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-    errorMessage: 'Édition introuvable',
-    select: {
-      name: true,
-      convention: {
-        select: { name: true },
-      },
-    },
+  // Récupérer le nom d'affichage générique depuis l'Event (étape 0bis)
+  const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+    errorMessage: 'Événement introuvable',
+    select: { name: true },
   })
 
   // Construire la requête pour récupérer les bénévoles
@@ -123,8 +118,7 @@ export default wrapApiHandler(async (event) => {
     throw createError({ status: 400, message: 'Aucun bénévole trouvé avec ces critères' })
   }
 
-  // Utiliser le nom de l'édition si disponible, sinon le nom de la convention
-  const displayName = edition.name || edition.convention.name
+  const displayName = eventRecord.name || 'votre événement'
   const title = `Bénévoles - ${displayName}`
 
   // Enregistrer les métadonnées du groupe de notifications pour le suivi

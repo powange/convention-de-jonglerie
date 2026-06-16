@@ -11,13 +11,13 @@ export default wrapApiHandler(
     const query = getQuery(event)
     const leaderOnly = query.leaderOnly === 'true'
 
-    // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
+    // Étape 0bis : vérif d'existence sur l'Event (id == eventId), sans dépendre d'Edition.
+    const eventRecord = await prisma.event.findUnique({
       where: { id: editionId },
       select: { id: true },
     })
 
-    if (!edition) {
+    if (!eventRecord) {
       throw createError({
         status: 404,
         message: 'Édition non trouvée',

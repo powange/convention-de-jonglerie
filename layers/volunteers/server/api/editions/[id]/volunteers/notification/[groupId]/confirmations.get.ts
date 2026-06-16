@@ -27,16 +27,7 @@ export default wrapApiHandler(async (event) => {
     },
     include: {
       event: {
-        select: {
-          edition: {
-            select: {
-              name: true,
-              convention: {
-                select: { name: true },
-              },
-            },
-          },
-        },
+        select: { name: true },
       },
       sender: {
         select: { pseudo: true },
@@ -132,8 +123,9 @@ export default wrapApiHandler(async (event) => {
       recipientCount: notificationGroup.recipientCount,
       sentAt: notificationGroup.sentAt,
       senderName: notificationGroup.sender.pseudo,
-      editionName: notificationGroup.event.edition?.name ?? null,
-      conventionName: notificationGroup.event.edition?.convention.name ?? null,
+      // Étape 0bis : le nom d'affichage générique est porté par Event (« Convention - Edition »)
+      editionName: notificationGroup.event.name ?? null,
+      conventionName: null,
     },
     confirmed: confirmedVolunteers.map((volunteer) => {
       const confirmation = notificationGroup.confirmations.find(

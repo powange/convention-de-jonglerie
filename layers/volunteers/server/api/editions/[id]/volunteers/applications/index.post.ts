@@ -206,27 +206,14 @@ export default wrapApiHandler(
         arrivalDateTime: true,
         departureDateTime: true,
         event: {
-          select: {
-            edition: {
-              select: {
-                id: true,
-                name: true,
-                conventionId: true,
-                convention: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
+          select: { name: true },
         },
       },
     })
 
     // Envoyer une notification de confirmation de candidature
     try {
-      const editionName = `${application.event.edition?.convention.name ?? ''}${application.event.edition?.name ? ' - ' + application.event.edition.name : ''}`
+      const editionName = application.event.name ?? ''
       const { NotificationHelpers } = await import('#server/utils/notification-service')
       await NotificationHelpers.volunteerApplicationSubmitted(
         authenticatedUser.id,

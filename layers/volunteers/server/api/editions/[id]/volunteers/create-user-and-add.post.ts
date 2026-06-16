@@ -204,20 +204,12 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  // Vérifier que l'édition existe
-  const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-    errorMessage: 'Edition introuvable',
-    select: {
-      id: true,
-      name: true,
-      conventionId: true,
-      convention: {
-        select: {
-          name: true,
-        },
-      },
-    },
+  // Vérifier que l'événement existe (nom d'affichage générique — étape 0bis)
+  const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+    errorMessage: 'Événement introuvable',
+    select: { name: true },
   })
+  const eventName = eventRecord.name || ''
 
   // Générer un pseudo unique
   const pseudo = await generateUniquePseudo(cleanEmail)
@@ -319,17 +311,17 @@ export default wrapApiHandler(async (event) => {
       verificationCode,
       cleanPrenom,
       cleanEmail,
-      edition.name || '',
-      edition.convention.name,
+      '',
+      eventName,
       editionId
     )
 
     const siteUrl = getSiteUrl()
     const emailSent = await useVolunteerPorts().email.send({
       to: cleanEmail,
-      subject: `🤹 Invitation bénévole - ${edition.convention.name}`,
+      subject: `🤹 Invitation bénévole - ${eventName}`,
       html: emailHtml,
-      text: `Bonjour ${cleanPrenom}, un organisateur de ${edition.convention.name}${edition.name ? ' - ' + edition.name : ''} vous a ajouté comme bénévole. Votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier votre email et créer votre mot de passe : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
+      text: `Bonjour ${cleanPrenom}, un organisateur de ${eventName} vous a ajouté comme bénévole. Votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier votre email et créer votre mot de passe : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
     if (!emailSent) {
