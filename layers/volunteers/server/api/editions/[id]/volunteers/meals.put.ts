@@ -2,7 +2,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { isVolunteerEligibleForMeal, isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
+import { isVolunteerEligibleForMeal } from '#server/utils/volunteer-meals'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(async (event) => {
@@ -121,16 +121,6 @@ export default wrapApiHandler(async (event) => {
         },
       })
 
-      // Récupérer tous les artistes avec leurs données d'éligibilité
-      const artists = await prisma.editionArtist.findMany({
-        where: { editionId },
-        select: {
-          id: true,
-          arrivalDateTime: true,
-          departureDateTime: true,
-        },
-      })
-
       // S'assurer que phases est un tableau de strings
       const phases = Array.isArray(mealData.phases) ? (mealData.phases as string[]) : []
 
@@ -143,17 +133,6 @@ export default wrapApiHandler(async (event) => {
             phases,
           },
           volunteer
-        )
-      )
-
-      // Filtrer les artistes éligibles selon les règles
-      const eligibleArtists = artists.filter((artist) =>
-        isArtistEligibleForMeal(
-          {
-            date: mealData.date,
-            mealType: mealData.mealType,
-          },
-          artist
         )
       )
 
@@ -177,47 +156,32 @@ export default wrapApiHandler(async (event) => {
         })
       )
 
-      // Créer les sélections de repas pour les artistes éligibles (si pas déjà existantes)
-      const artistSelections = eligibleArtists.map((artist) =>
-        prisma.artistMealSelection.upsert({
-          where: {
-            artistId_mealId: {
-              artistId: artist.id,
-              mealId: meal.id,
-            },
-          },
-          create: {
-            artistId: artist.id,
-            mealId: meal.id,
-            selected: true,
-          },
-          update: {
-            selected: true,
-          },
-        })
-      )
+      await Promise.all(volunteerSelections)
 
-      await Promise.all([...volunteerSelections, ...artistSelections])
+      // Étape 1bis (port artists) : sélections des artistes éligibles déléguées au binding (le layer
+      // ne connaît pas la notion d'artiste).
+      await useVolunteerPorts().artists.addEligibleMealSelections({
+        editionId,
+        mealId: meal.id,
+        date: mealData.date,
+        mealType: mealData.mealType,
+      })
+
       console.log(
-        `[Meals] Repas ${meal.id} ajouté à ${eligibleVolunteers.length}/${acceptedVolunteers.length} bénévoles éligibles et ${eligibleArtists.length}/${artists.length} artistes éligibles`
+        `[Meals] Repas ${meal.id} ajouté à ${eligibleVolunteers.length}/${acceptedVolunteers.length} bénévoles éligibles`
       )
     } else {
       // Repas désactivé : supprimer toutes les sélections
       console.log(`[Meals] Désactivation du repas ${meal.id} pour l'édition ${editionId}`)
 
-      const deleteVolunteers = prisma.volunteerMealSelection.deleteMany({
+      const volunteerResult = await prisma.volunteerMealSelection.deleteMany({
         where: { mealId: meal.id },
       })
 
-      const deleteArtists = prisma.artistMealSelection.deleteMany({
-        where: { mealId: meal.id },
-      })
+      // Étape 1bis (port artists) : suppression des sélections artistes déléguée au binding.
+      await useVolunteerPorts().artists.removeMealSelections(meal.id)
 
-      const [volunteerResult, artistResult] = await Promise.all([deleteVolunteers, deleteArtists])
-
-      console.log(
-        `[Meals] Repas ${meal.id} supprimé de ${volunteerResult.count} bénévoles et ${artistResult.count} artistes`
-      )
+      console.log(`[Meals] Repas ${meal.id} supprimé de ${volunteerResult.count} bénévoles`)
     }
   })
 
