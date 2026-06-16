@@ -1,6 +1,7 @@
 # Modularisation multi-domaines (monorepo + Nuxt layers)
 
-> **Statut** : **Étapes 0 → 2 implémentées** (scope réduit, sur `main`) ; étapes 3 → 4 en conception.
+> **Statut** : **Étapes 0 → 2 + 0bis implémentées** (sur `main`) — le layer `volunteers` est
+> domaine-agnostique côté serveur ; étapes 3 → 4 en conception.
 > **Date** : 2026-06-14 (création), mise à jour 2026-06-16.
 > **Objectif** : permettre la création d'une **2ᵉ application** pour d'autres domaines que la
 > jonglerie, partageant les modules organisateurs (bénévoles, tâches, billetterie…) avec
@@ -9,40 +10,44 @@
 ## Avancement (mise à jour 2026-06-16)
 
 Les **fondations (étapes 0 → 2)** ont été livrées et mergées dans `main` (PR #3), puis déployées en
-release. Le périmètre réel diffère volontairement de la conception initiale sur quelques points
-(scope réduit pour limiter le risque) — détaillés ci-dessous.
+release. L'**étape 0bis** (abstraction `Event` complétée) a suivi (PR #6) : le layer `volunteers` est
+désormais **domaine-agnostique côté serveur**. Le périmètre réel diffère volontairement de la
+conception initiale sur quelques points (scope réduit pour limiter le risque) — détaillés ci-dessous.
 
-| Étape                       | Statut                      | Périmètre réel livré                                                                                                                |
-| --------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **0** — Abstraction `Event` | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.      |
-| **1** — Ports de découplage | ✅ **Fait**                 | 4 ports : `notification`, `email`, `messenger`, `organizer`. (Meals / ticketing : couplage encore direct, comme prévu.)             |
-| **2** — Extraction en layer | ✅ **Fait (utils en core)** | `layers/volunteers/` = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`). |
-| **3** — Monorepo            | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                        |
-| **4** — 2ᵉ app              | 🔜 Conception               | Non démarré.                                                                                                                        |
+| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                       |
+| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                             |
+| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur. |
+| **1** — Ports de découplage  | ✅ **Fait**                 | 5 ports : `notifications`, `email`, `messenger`, `organizers`, `eventScope`. (Meals / ticketing : couplage encore direct, comme prévu.)                                                                    |
+| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/` = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`).                                                                        |
+| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                               |
+| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                              |
 
 ### Divergences assumées vs conception initiale
 
-1. **`Event` est une ancre minimale**, pas le porteur des champs génériques. Les champs `name`,
-   `startDate`, `endDate`, `status`, les flags `*Enabled` **et** toute la config `volunteers*`
-   **sont restés sur `Edition`** (cf. §5). L'invariant `Edition.id == eventId` (id réutilisé) permet
-   au code bénévole de charger l'`Edition` par l'id de l'`Event`.
+1. **`Event` était une ancre minimale** à l'étape 0, pas le porteur des champs génériques (`name`,
+   dates, `status`, flags `*Enabled`, config `volunteers*` restés sur `Edition`). ✅ **Levé par
+   l'étape 0bis** : ces champs ont depuis été promus sur `Event` / sortis dans `EventVolunteerSettings`.
+   L'invariant `Edition.id == eventId` (id réutilisé) reste vrai et sert au câblage jonglerie des ports.
 2. **Les utils serveur bénévoles restent dans le core** (`server/utils/editions/volunteers/**`,
    `server/utils/permissions/volunteer-permissions.ts`, ports dans `server/volunteers/ports/**`),
    importés par le layer via l'alias `#server`. Le layer ne contient que front + routes API + cron + i18n.
 
-### ⚠️ Conséquence pour l'étape 4 — un prérequis a été reporté
+### ✅ Prérequis de l'étape 4 levé (étape 0bis faite)
 
-Parce que les champs génériques sont restés sur `Edition`, **le layer `volunteers` lit encore
-`Edition` directement** (~40 accès : `prisma.edition.findUnique`, `event.edition?.name`,
-`edition.convention.name`…). Le layer **n'est donc pas encore domaine-agnostique** : il dépend de
-`Edition`/`Convention`, qui n'existeront pas dans la 2ᵉ app.
+Le layer `volunteers` lisait encore `Edition`/`Convention` directement (~40 accès), donc n'était pas
+domaine-agnostique. L'**étape 0bis** (PR #6) a corrigé cela :
 
-➡️ **Avant l'étape 4, une « étape 0bis » est nécessaire** : promouvoir les champs génériques
-(`name`, `startDate`, `endDate`, `status`) vers `Event`, sortir la config bénévole dans une table
-`EventVolunteerSettings` portée par le layer, puis **migrer les lectures du layer de `Edition` vers
-`Event`**. Tant que ce n'est pas fait, le layer reste réutilisable **en l'état uniquement par une app
-qui possède aussi une `Edition`**. Ce report est sans risque pour la jonglerie (tout fonctionne) mais
-doit être planifié dès que la 2ᵉ app est actée.
+- champs génériques (`name`, `startDate`, `endDate`, `status`) **promus vers `Event`** ;
+- config bénévole sortie dans **`EventVolunteerSettings`** (portée par le layer) ;
+- **toutes les lectures du layer migrées de `Edition`/`Convention` vers `Event`** — les deux derniers
+  couplages propres au domaine (« éditions sœurs », « ville/image/convention ») passent par le port
+  `eventScope`.
+
+➡️ `grep prisma.edition / event.edition / .convention` dans `layers/volunteers/server` → **0**. Le
+layer est désormais **réutilisable par une app sans `Edition`**. Détails :
+[etape-0bis-event-promotion.md](./etape-0bis-event-promotion.md) et
+[ports-module-benevole.md](./ports-module-benevole.md).
 
 ### Travaux de robustesse réalisés en cours de route
 
@@ -146,12 +151,12 @@ propagation du code.**
 
 ## 5. L'abstraction `Event` (prérequis n°1)
 
-> 🟡 **Conception cible ci-dessous. Réalité livrée (étape 0, scope réduit)** : `Event` n'est pour
-> l'instant qu'une **ancre minimale** (`id`, `createdAt`, `updatedAt` + relations vers `Edition` et
-> les 5 modèles bénévoles). Les champs génériques (`name`, dates, `status`, flags `*Enabled`) et la
-> config `volunteers*` **sont restés sur `Edition`**. La promotion de ces champs vers `Event` (et la
-> table `EventVolunteerSettings`) est l'« étape 0bis » à faire avant la 2ᵉ app (cf. section
-> _Avancement_). L'invariant `Edition.id == eventId` (id réutilisé à la migration) tient ce report.
+> 🟡 **Conception cible ci-dessous. Réalité livrée** : à l'étape 0 (scope réduit), `Event` n'était
+> qu'une **ancre minimale** (`id`, `createdAt`, `updatedAt` + relations vers `Edition` et les 5
+> modèles bénévoles), les champs génériques et la config `volunteers*` restant sur `Edition`. ✅
+> **L'étape 0bis a depuis promu** `name`/dates/`status` vers `Event` et sorti la config bénévole dans
+> `EventVolunteerSettings` (cf. section _Avancement_). L'invariant `Edition.id == eventId` (id réutilisé
+> à la migration) reste vrai et sert au câblage jonglerie des ports.
 
 `Edition` devient une **extension 1:1** d'un `Event` générique.
 
@@ -271,11 +276,12 @@ interface MessengerPort {
 
 - Introduire le modèle `Event` + faire d'`Edition` une extension 1:1. ✅ (`Event` = ancre minimale)
 - **Migration de données** : créer 1 `Event` par `Edition` existante. ✅ (backfill à **id réutilisé**,
-  `Event.id = Edition.id`) — les champs génériques **n'ont pas** été recopiés (restés sur `Edition`).
+  `Event.id = Edition.id`). À l'étape 0, les champs génériques n'avaient pas été recopiés ; ✅
+  **l'étape 0bis les a depuis backfillés** sur `Event` + `EventVolunteerSettings`.
 - Repointer les FK du module bénévole `editionId → eventId`. ✅ (les 5 modèles bénévoles)
 
-> Reste à faire (« étape 0bis », avant la 2ᵉ app) : promouvoir `name`/dates/`status` vers `Event`,
-> sortir la config bénévole en `EventVolunteerSettings`, migrer les lectures du layer vers `Event`.
+> ✅ « Étape 0bis » faite (PR #6) : `name`/dates/`status` promus vers `Event`, config bénévole sortie
+> en `EventVolunteerSettings`, lectures du layer migrées vers `Event`.
 
 > C'est la migration la plus délicate. À faire **seule**, avec sauvegarde et tests dédiés.
 > Commande de migration à fournir au porteur (non exécutée) :
@@ -288,10 +294,11 @@ interface MessengerPort {
 
 - Déplacer notifications + messenger dans une frontière « core » logique. ✅ (services restés en core,
   consommés via ports)
-- Définir les **ports** consommés par le code bénévole. ✅ 4 ports livrés : `notification`, `email`,
-  `messenger`, `organizer` (dans `server/volunteers/ports/`, binding par défaut paresseux via
-  `useVolunteerPorts()` / surcharge `setVolunteerPorts()`). `MealsPort`/`TicketingPort` : non encore
-  faits (couplage direct conservé, comme prévu).
+- Définir les **ports** consommés par le code bénévole. ✅ 5 ports livrés : `notifications`, `email`,
+  `messenger`, `organizers`, `eventScope` (dans `server/volunteers/ports/`, binding par défaut
+  paresseux via `useVolunteerPorts()` / surcharge `setVolunteerPorts()`). `MealsPort`/`TicketingPort` :
+  non encore faits (couplage direct conservé, comme prévu). Référence à jour des 5 ports :
+  [ports-module-benevole.md](./ports-module-benevole.md).
 
 > 📄 **Conception détaillée des ports + injection** : voir
 > [etape-1-ports-decouplage.md](./etape-1-ports-decouplage.md).
@@ -325,15 +332,19 @@ frontière validée (build conteneur + SSR réel + suite de tests). C'est le tes
 > ✅ On peut **s'arrêter ici et avoir déjà gagné** (module isolé, frontière validée), sans
 > s'engager dans le monorepo tant que la 2ᵉ app n'est pas prête.
 
-### Étape 0bis — Compléter l'abstraction `Event` (prérequis de l'étape 4) — 🔜 À faire
+### Étape 0bis — Compléter l'abstraction `Event` (prérequis de l'étape 4) — ✅ Fait (PR #6)
 
-Reporté à l'étape 0 (scope réduit). **À faire avant la 2ᵉ app**, sinon le layer reste couplé à `Edition` :
+Livrée après l'étape 0 (scope réduit) pour rendre le layer domaine-agnostique :
 
-- Promouvoir `name`, `startDate`, `endDate`, `status` (et flags `*Enabled`) de `Edition` vers `Event`.
-- Sortir la config bénévole (`volunteersMode`, `volunteersAsk*`, dates setup/teardown…) dans une table
-  `EventVolunteerSettings` portée par `layers/volunteers`.
-- Migrer les lectures du layer de `Edition`/`Convention` vers `Event` (~40 accès aujourd'hui).
-- Migration de données associée (recopie des champs `Edition → Event`).
+- ✅ `name`, `startDate`, `endDate`, `status` promus de `Edition` vers `Event` (+ helper de sync
+  `server/utils/event-sync.ts` qui maintient `Event` en miroir d'`Edition` côté jonglerie).
+- ✅ Config bénévole (`mode`, `ask*`, dates setup/teardown, `open`, `enabled`…) sortie dans la table
+  `EventVolunteerSettings` portée par `layers/volunteers` (rétro-compat front via ré-aplatissement).
+- ✅ Lectures du layer migrées de `Edition`/`Convention` vers `Event` ; les deux derniers couplages
+  propres au domaine passent par le port `eventScope`. `grep` Edition/Convention dans le layer → 0.
+- ✅ Migrations de données associées (backfill `Edition`/`Convention` → `Event` + `EventVolunteerSettings`).
+
+> 📄 **Détail** : [etape-0bis-event-promotion.md](./etape-0bis-event-promotion.md).
 
 ### Étape 3 — Passer en monorepo — 🔜 Conception
 
@@ -343,7 +354,7 @@ Reporté à l'étape 0 (scope réduit). **À faire avant la 2ᵉ app**, sinon le
 > 📄 **Détail** : workspace, déplacement git, composition Prisma, Docker, CI → voir
 > [etape-3-monorepo.md](./etape-3-monorepo.md).
 
-### Étape 4 — Créer la 2ᵉ app — 🔜 Conception (prérequis : étape 0bis)
+### Étape 4 — Créer la 2ᵉ app — 🔜 Conception (prérequis étape 0bis ✅ levé)
 
 - `apps/autre-domaine` avec `extends: ['core', 'volunteers']`, son propre `<domaine>.prisma`, sa
   propre base. Premier vrai test de réutilisation.
