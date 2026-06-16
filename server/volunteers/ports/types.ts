@@ -67,9 +67,27 @@ export interface OrganizerDirectoryPort {
   canManage(eventId: number, userId: number, event?: any): Promise<boolean>
 }
 
+/**
+ * Regroupement d'événements propre au domaine. Permet au module bénévole d'afficher des données
+ * « transverses » (ex. commentaires laissés sur un bénévole dans les autres événements liés) sans
+ * connaître la notion de « convention ».
+ * Jonglerie : les autres éditions de la même convention. Domaine générique : l'événement seul.
+ */
+export interface EventScopePort {
+  /** Ids des événements « liés » à un événement (inclut l'événement lui-même). */
+  getRelatedEventIds(eventId: number): Promise<number[]>
+  /**
+   * Données d'affichage propres au domaine pour une liste d'événements (ex. ville, image, entité
+   * parente). Le module bénévole les transmet au front sans les interpréter. Jonglerie : champs de
+   * l'`Edition` + `Convention`. Clé = eventId.
+   */
+  getEventDisplayData(eventIds: number[]): Promise<Record<number, Record<string, unknown>>>
+}
+
 export interface VolunteerPorts {
   notifications: NotificationPort
   email: EmailPort
   messenger: MessengerPort
   organizers: OrganizerDirectoryPort
+  eventScope: EventScopePort
 }

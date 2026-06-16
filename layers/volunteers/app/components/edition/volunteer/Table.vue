@@ -274,10 +274,7 @@
                         <div class="flex flex-col gap-0.5">
                           <div class="flex items-center gap-2">
                             <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                              {{
-                                getEditionDisplayName(comment.event?.edition) ||
-                                `Édition #${comment.eventId}`
-                              }}
+                              {{ comment.event?.name || `Édition #${comment.eventId}` }}
                             </span>
                             <span
                               v-if="comment.eventId === editionId"
@@ -287,17 +284,10 @@
                             </span>
                           </div>
                           <span
-                            v-if="
-                              comment.event?.edition?.startDate && comment.event?.edition?.endDate
-                            "
+                            v-if="comment.event?.startDate && comment.event?.endDate"
                             class="text-xs text-gray-500 dark:text-gray-400"
                           >
-                            {{
-                              formatDateRange(
-                                comment.event.edition.startDate,
-                                comment.event.edition.endDate
-                              )
-                            }}
+                            {{ formatDateRange(comment.event.startDate, comment.event.endDate) }}
                           </span>
                         </div>
                       </div>
@@ -590,7 +580,6 @@ import {
   requiresEmergencyContact,
 } from '~/utils/allergy-severity'
 import { formatDateRange } from '~/utils/date'
-import { getEditionDisplayName } from '~/utils/editionName'
 import {
   updateVolunteerApplication,
   updateVolunteerApplicationStatus,

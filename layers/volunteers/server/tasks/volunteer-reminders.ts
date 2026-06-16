@@ -15,10 +15,9 @@ export default defineTask({
       // Récupérer tous les créneaux des éditions en cours
       const allSlots = await prisma.volunteerTimeSlot.findMany({
         where: {
+          // Étape 0bis : endDate porté par Event (plus de traversée Edition)
           event: {
-            edition: {
-              endDate: { gte: now },
-            },
+            endDate: { gte: now },
           },
         },
         include: {

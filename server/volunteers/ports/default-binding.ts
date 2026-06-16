@@ -45,5 +45,44 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
       requireReadAccess: (event, eventId) => requireVolunteerReadAccess(event, eventId),
       canManage: (eventId, userId, event) => canManageEditionVolunteers(eventId, userId, event),
     },
+    eventScope: {
+      // Jonglerie : les événements « liés » sont les éditions de la même convention.
+      async getRelatedEventIds(eventId) {
+        const edition = await prisma.edition.findUnique({
+          where: { id: eventId },
+          select: { conventionId: true },
+        })
+        if (!edition) return [eventId]
+        const editions = await prisma.edition.findMany({
+          where: { conventionId: edition.conventionId },
+          select: { eventId: true },
+        })
+        return editions.map((e) => e.eventId)
+      },
+      // Jonglerie : données d'affichage = champs Edition + logo/nom de la convention.
+      async getEventDisplayData(eventIds) {
+        if (eventIds.length === 0) return {}
+        const editions = await prisma.edition.findMany({
+          where: { eventId: { in: eventIds } },
+          select: {
+            eventId: true,
+            city: true,
+            country: true,
+            imageUrl: true,
+            convention: { select: { id: true, name: true, logo: true } },
+          },
+        })
+        const map: Record<number, Record<string, unknown>> = {}
+        for (const ed of editions) {
+          map[ed.eventId] = {
+            city: ed.city,
+            country: ed.country,
+            imageUrl: ed.imageUrl,
+            convention: ed.convention,
+          }
+        }
+        return map
+      },
+    },
   }
 }
