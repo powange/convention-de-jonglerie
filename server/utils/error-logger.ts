@@ -382,26 +382,37 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
     const errorType = getErrorType(effectiveError)
 
     // Créer l'enregistrement de log
-    await prisma.apiErrorLog.create({
-      data: {
-        message,
-        statusCode,
-        stack: sanitizeStackTrace(effectiveError.stack || error.stack),
-        errorType,
-        method,
-        url,
-        path,
-        userAgent,
-        ip,
-        referer,
-        origin,
-        headers: sanitizeHeaders(getHeaders(event)),
-        body: body ? sanitizeBody(body) : null,
-        queryParams: Object.fromEntries(urlObj.searchParams.entries()),
-        prismaDetails: prismaDetails || undefined,
-        userId,
-      },
-    })
+    const logData = {
+      message,
+      statusCode,
+      stack: sanitizeStackTrace(effectiveError.stack || error.stack),
+      errorType,
+      method,
+      url,
+      path,
+      userAgent,
+      ip,
+      referer,
+      origin,
+      headers: sanitizeHeaders(getHeaders(event)),
+      body: body ? sanitizeBody(body) : null,
+      queryParams: Object.fromEntries(urlObj.searchParams.entries()),
+      prismaDetails: prismaDetails || undefined,
+      userId,
+    }
+
+    try {
+      await prisma.apiErrorLog.create({ data: logData })
+    } catch (dbError) {
+      // Le userId provient de la session (cookie scellé) et peut référencer un utilisateur qui
+      // n'existe plus (ex. session restée valide après un reset de la base). Plutôt que de perdre
+      // le log, on réessaie sans le lien utilisateur en cas de violation de clé étrangère (P2003).
+      if (userId != null && (dbError as { code?: string })?.code === 'P2003') {
+        await prisma.apiErrorLog.create({ data: { ...logData, userId: null } })
+      } else {
+        throw dbError
+      }
+    }
 
     // Alerter les admins par push en cas d'erreur serveur (>= 500).
     // Fire-and-forget pour ne pas retarder la réponse d'erreur au client.
