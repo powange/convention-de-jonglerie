@@ -1,7 +1,7 @@
 // Implémentation par défaut des ports du module bénévole (câblage app jonglerie).
 // Délègue aux services concrets (cœur). À l'extraction en layer (étape 2), ce fichier
 // reste côté app ; le layer ne garde que les interfaces (types.ts) et le registre.
-import type { NotifyInput, VolunteerPorts } from './types'
+import type { HandoutItemInfo, NotifyInput, TicketMealParticipant, VolunteerPorts } from './types'
 import type { NotificationType } from '@prisma/client'
 
 import { sendEmail } from '#server/utils/emailService'
@@ -79,6 +79,94 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
             convention: ed.convention,
           }
         }
+        return map
+      },
+    },
+    ticketing: {
+      // Jonglerie : participants billetterie d'un repas = via les tarifs (TicketingTierMeal) et les
+      // options (TicketingOptionMeal) « avec repas », sur les commandes traitées. Dédup par repas.
+      async getMealTicketParticipants(mealIds) {
+        if (mealIds.length === 0) return {}
+        const orderItemSelect = {
+          id: true,
+          lastName: true,
+          firstName: true,
+          email: true,
+          order: { select: { payerLastName: true, payerFirstName: true, payerEmail: true } },
+        }
+        const meals = await prisma.volunteerMeal.findMany({
+          where: { id: { in: mealIds } },
+          select: {
+            id: true,
+            tiers: {
+              select: {
+                tier: {
+                  select: {
+                    orderItems: { where: { state: 'Processed' }, select: orderItemSelect },
+                  },
+                },
+              },
+            },
+            options: {
+              select: {
+                option: {
+                  select: {
+                    orderItemSelections: {
+                      where: { orderItem: { state: 'Processed' } },
+                      select: { orderItem: { select: orderItemSelect } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        })
+        const toParticipant = (oi: {
+          lastName: string | null
+          firstName: string | null
+          email: string | null
+          order: {
+            payerLastName: string | null
+            payerFirstName: string | null
+            payerEmail: string | null
+          }
+        }): TicketMealParticipant => ({
+          nom: oi.lastName || oi.order.payerLastName || '',
+          prenom: oi.firstName || oi.order.payerFirstName || '',
+          email: oi.email || oi.order.payerEmail || '',
+        })
+        const result: Record<number, TicketMealParticipant[]> = {}
+        for (const meal of meals) {
+          const seen = new Set<number>()
+          const participants: TicketMealParticipant[] = []
+          for (const tierMeal of meal.tiers) {
+            for (const oi of tierMeal.tier.orderItems) {
+              if (seen.has(oi.id)) continue
+              seen.add(oi.id)
+              participants.push(toParticipant(oi))
+            }
+          }
+          for (const optionMeal of meal.options) {
+            for (const sel of optionMeal.option.orderItemSelections) {
+              const oi = sel.orderItem
+              if (!oi || seen.has(oi.id)) continue
+              seen.add(oi.id)
+              participants.push(toParticipant(oi))
+            }
+          }
+          result[meal.id] = participants
+        }
+        return result
+      },
+      // Jonglerie : catalogue d'articles à remettre = table TicketingHandoutItem.
+      async getHandoutItems(handoutItemIds) {
+        if (handoutItemIds.length === 0) return {}
+        const items = await prisma.ticketingHandoutItem.findMany({
+          where: { id: { in: handoutItemIds } },
+          select: { id: true, name: true },
+        })
+        const map: Record<number, HandoutItemInfo> = {}
+        for (const it of items) map[it.id] = { id: it.id, name: it.name }
         return map
       },
     },

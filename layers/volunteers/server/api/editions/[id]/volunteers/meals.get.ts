@@ -3,6 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
@@ -54,11 +55,9 @@ export default wrapApiHandler(
     const existingMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
       include: {
-        handoutItems: {
-          include: {
-            handoutItem: true,
-          },
-        },
+        // Étape 1bis : on ne lit que la liaison repas↔article (donnée propre) ; le détail du
+        // catalogue (TicketingHandoutItem) est résolu via le port ticketing.
+        handoutItems: true,
       },
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
@@ -112,25 +111,39 @@ export default wrapApiHandler(
       await prisma.volunteerMeal.createMany({ data: mealsToCreate })
     }
 
+    // Étape 1bis : résoudre le catalogue d'articles à remettre via le port ticketing, puis le
+    // ré-attacher à chaque liaison (forme `handoutItems[].handoutItem` conservée → front inchangé).
+    const attachHandoutItems = async <T extends { handoutItems: { handoutItemId: number }[] }>(
+      list: T[]
+    ) => {
+      const ids = [...new Set(list.flatMap((m) => m.handoutItems.map((h) => h.handoutItemId)))]
+      const catalog = await useVolunteerPorts().ticketing.getHandoutItems(ids)
+      return list.map((m) => ({
+        ...m,
+        handoutItems: m.handoutItems.map((h) => ({
+          ...h,
+          handoutItem: catalog[h.handoutItemId] ?? null,
+        })),
+      }))
+    }
+
     // Si rien n'a changé, retourner les repas existants directement
     if (mealsToDeleteIds.length === 0 && mealsToCreate.length === 0) {
-      return createSuccessResponse({ meals: existingMeals })
+      return createSuccessResponse({ meals: await attachHandoutItems(existingMeals) })
     }
 
     // Sinon, récupérer la liste à jour
     const updatedMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
       include: {
-        handoutItems: {
-          include: {
-            handoutItem: true,
-          },
-        },
+        // Étape 1bis : on ne lit que la liaison repas↔article (donnée propre) ; le détail du
+        // catalogue (TicketingHandoutItem) est résolu via le port ticketing.
+        handoutItems: true,
       },
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    return createSuccessResponse({ meals: updatedMeals })
+    return createSuccessResponse({ meals: await attachHandoutItems(updatedMeals) })
   },
   { operationName: 'GetVolunteerMeals' }
 )

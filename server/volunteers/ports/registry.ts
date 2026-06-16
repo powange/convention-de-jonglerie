@@ -11,7 +11,7 @@ let cached: VolunteerPorts | null = null
 
 /**
  * Surcharge l'implémentation des ports (ex. 2ᵉ app, ou tests). Passer null pour réinitialiser.
- * Remplacement complet (pas de merge partiel) : l'objet fourni doit définir les 5 ports.
+ * Remplacement complet (pas de merge partiel) : l'objet fourni doit définir les 6 ports.
  * Pour n'en surcharger qu'un, partir de createDefaultVolunteerPorts() et écraser le port voulu.
  */
 export function setVolunteerPorts(ports: VolunteerPorts | null): void {

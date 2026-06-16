@@ -3,6 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { isVolunteerEligibleForMeal, isArtistEligibleForMeal } from '#server/utils/volunteer-meals'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
@@ -258,18 +259,28 @@ export default wrapApiHandler(async (event) => {
 
   await Promise.all(handoutItemsPromises)
 
-  // Récupérer tous les repas mis à jour avec les articles à remettre
+  // Récupérer tous les repas mis à jour avec les liaisons d'articles à remettre (donnée propre)
   const updatedMeals = await prisma.volunteerMeal.findMany({
     where: { editionId },
     include: {
-      handoutItems: {
-        include: {
-          handoutItem: true,
-        },
-      },
+      handoutItems: true,
     },
     orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
   })
 
-  return createSuccessResponse({ meals: updatedMeals })
+  // Étape 1bis : détail du catalogue (TicketingHandoutItem) résolu via le port ticketing puis
+  // ré-attaché (forme `handoutItems[].handoutItem` conservée → front inchangé).
+  const handoutItemIds = [
+    ...new Set(updatedMeals.flatMap((m) => m.handoutItems.map((h) => h.handoutItemId))),
+  ]
+  const handoutCatalog = await useVolunteerPorts().ticketing.getHandoutItems(handoutItemIds)
+  const mealsWithHandouts = updatedMeals.map((m) => ({
+    ...m,
+    handoutItems: m.handoutItems.map((h) => ({
+      ...h,
+      handoutItem: handoutCatalog[h.handoutItemId] ?? null,
+    })),
+  }))
+
+  return createSuccessResponse({ meals: mealsWithHandouts })
 }, 'UpdateVolunteerMeals')

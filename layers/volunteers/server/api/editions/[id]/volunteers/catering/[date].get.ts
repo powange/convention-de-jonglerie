@@ -3,6 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
@@ -63,50 +64,17 @@ export default wrapApiHandler(async (event) => {
           },
         },
       },
-      tiers: {
-        include: {
-          tier: {
-            include: {
-              orderItems: {
-                where: {
-                  state: 'Processed',
-                },
-                include: {
-                  order: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      // Inclure les participants via les options de billetterie
-      options: {
-        include: {
-          option: {
-            include: {
-              orderItemSelections: {
-                where: {
-                  orderItem: {
-                    state: 'Processed',
-                  },
-                },
-                include: {
-                  orderItem: {
-                    include: {
-                      order: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     },
     orderBy: {
       mealType: 'asc',
     },
   })
+
+  // Étape 1bis (port ticketing) : participants billetterie par repas (tarifs/options « avec repas »),
+  // dédupliqués côté binding. Le layer ne lit plus les modèles de billetterie.
+  const ticketParticipantsByMeal = await useVolunteerPorts().ticketing.getMealTicketParticipants(
+    meals.map((m) => m.id)
+  )
 
   // Construire le résultat avec un résumé et les détails par repas
   const summary = {
@@ -152,56 +120,19 @@ export default wrapApiHandler(async (event) => {
       afterShow: selection.afterShow,
     }))
 
-    // Récupérer les participants via les tarifs avec repas
-    // Set pour suivre les orderItems déjà ajoutés (déduplication tarif/option)
-    const addedOrderItemIds = new Set<number>()
-
-    const ticketParticipantsFromTiers = meal.tiers.flatMap((tierMeal) =>
-      tierMeal.tier.orderItems.map((orderItem) => {
-        addedOrderItemIds.add(orderItem.id)
-        return {
-          type: 'ticket' as const,
-          nom: orderItem.lastName || orderItem.order.payerLastName || '',
-          prenom: orderItem.firstName || orderItem.order.payerFirstName || '',
-          email: orderItem.email || orderItem.order.payerEmail || '',
-          phone: '',
-          dietaryPreference: null,
-          allergies: null,
-          allergySeverity: null,
-          emergencyContactName: null,
-          emergencyContactPhone: null,
-        }
-      })
-    )
-
-    // Récupérer les participants via les options avec repas (uniquement si pas déjà via tarif)
-    const ticketParticipantsFromOptions = meal.options.flatMap((optionMeal) =>
-      optionMeal.option.orderItemSelections
-        .filter((selection) => {
-          // Filtrer les doublons (les orderItems non validés sont déjà filtrés par Prisma)
-          if (!selection.orderItem) return false
-          if (addedOrderItemIds.has(selection.orderItem.id)) return false
-          addedOrderItemIds.add(selection.orderItem.id)
-          return true
-        })
-        .map((selection) => {
-          const orderItem = selection.orderItem!
-          return {
-            type: 'ticket' as const,
-            nom: orderItem.lastName || orderItem.order.payerLastName || '',
-            prenom: orderItem.firstName || orderItem.order.payerFirstName || '',
-            email: orderItem.email || orderItem.order.payerEmail || '',
-            phone: '',
-            dietaryPreference: null,
-            allergies: null,
-            allergySeverity: null,
-            emergencyContactName: null,
-            emergencyContactPhone: null,
-          }
-        })
-    )
-
-    const ticketParticipants = [...ticketParticipantsFromTiers, ...ticketParticipantsFromOptions]
+    // Participants billetterie de ce repas (déjà dédupliqués par le port)
+    const ticketParticipants = (ticketParticipantsByMeal[meal.id] ?? []).map((p) => ({
+      type: 'ticket' as const,
+      nom: p.nom,
+      prenom: p.prenom,
+      email: p.email,
+      phone: '',
+      dietaryPreference: null,
+      allergies: null,
+      allergySeverity: null,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+    }))
 
     const allParticipants = [...volunteers, ...artists, ...ticketParticipants].sort((a, b) => {
       const nameA = `${a.nom || ''} ${a.prenom || ''}`
