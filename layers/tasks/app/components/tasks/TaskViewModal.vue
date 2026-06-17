@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { markdownToHtml } from '~/utils/markdown'
+import { markdownToHtml } from '#imports'
 
 interface AssignedUser {
   id: number

@@ -1,3 +1,4 @@
+import { useTaskboardPorts } from '#server/taskboard/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -15,14 +16,12 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { id: true, tasksEnabled: true },
-    })
-    if (!edition) {
+    // Étape 2 (port directory) : existence + module activé délégués (le layer ne lit plus l'Edition).
+    const state = await useTaskboardPorts().directory.isTasksEnabled(editionId)
+    if (!state.found) {
       throw createError({ status: 404, message: 'Édition non trouvée' })
     }
-    if (!edition.tasksEnabled) {
+    if (!state.enabled) {
       throw createError({ status: 404, message: 'Module tâches désactivé pour cette édition' })
     }
 
