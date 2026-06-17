@@ -11,17 +11,19 @@
 
 Les **fondations (étapes 0 → 2)** ont été livrées et mergées dans `main` (PR #3), puis déployées en
 release. L'**étape 0bis** (abstraction `Event` complétée) a suivi (PR #6) : le layer `volunteers` est
-désormais **domaine-agnostique côté serveur**. Le périmètre réel diffère volontairement de la
-conception initiale sur quelques points (scope réduit pour limiter le risque) — détaillés ci-dessous.
+désormais **domaine-agnostique côté serveur**. Un 2ᵉ module, **`layers/meals`**, a depuis été extrait
+puis découplé sur le même modèle (PR #15 déplacement, #16 artistes, #17 billetterie) — il ne lit plus
+aucun modèle artistes/billetterie. Le périmètre réel diffère volontairement de la conception initiale
+sur quelques points (scope réduit pour limiter le risque) — détaillés ci-dessous.
 
-| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                        |
-| ---------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                              |
-| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur.  |
-| **1** — Ports de découplage  | ✅ **Fait**                 | **8 ports** : `notifications`, `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals`. Billetterie/artistes/repas découplés (le `meals` délègue au module cœur `server/meals/`). |
-| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/` = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`).                                                                         |
-| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                                |
-| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                               |
+| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                                                                |
+| ---------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                                                                      |
+| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur.                                          |
+| **1** — Ports de découplage  | ✅ **Fait**                 | **8 ports** : `notifications`, `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals`. Billetterie/artistes/repas découplés (le `meals` délègue au module cœur `server/meals/`).                                         |
+| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/` **et `layers/meals/`** = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`). `meals` a son propre système de ports (`server/meals/ports/` : `artists` + `ticketing`). |
+| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                                                                        |
+| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                                                                       |
 
 ### Divergences assumées vs conception initiale
 
@@ -266,9 +268,10 @@ interface MessengerPort {
 }
 ```
 
-- **Repas** et **billetterie** deviendront leurs propres layers. En attendant, le couplage
-  bénévoles↔repas/billetterie est traité via interfaces (le layer volunteers définit les ports ;
-  l'app les câble sur les implémentations disponibles).
+- **Repas** est désormais son propre layer (`layers/meals`, PR #15-17), domaine-agnostique via son
+  propre système de ports (`server/meals/ports/` : `artists` + `ticketing`). **Billetterie** reste un
+  candidat (encore dans le cœur). Le couplage entre modules est traité via interfaces : chaque layer
+  définit les ports dont il a besoin et l'app les câble sur ses implémentations.
 
 ## 8. Plan d'extraction du pilote bénévole (par étapes livrables)
 
