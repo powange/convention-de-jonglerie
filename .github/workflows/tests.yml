@@ -147,6 +147,54 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+  # Job de vérification de types (vue-tsc) : attrape les variables/références non définies que
+  # le build (esbuild, sans typecheck) et ESLint ne voient pas — ex. `edition is not defined`.
+  typecheck:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    needs: setup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Restore Node dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Prisma client
+        id: cache-prisma
+        uses: actions/cache@v4
+        with:
+          path: server/generated/prisma
+          key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      - name: Generate Prisma Client (if cache miss)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
+
+      - name: Restore Nuxt build
+        uses: actions/cache@v4
+        with:
+          path: .nuxt
+          key: ${{ needs.setup.outputs.nuxt-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Run typecheck
+        run: npm run typecheck
+
   # Job pour valider que le build fonctionne
   build:
     runs-on: ubuntu-22.04
