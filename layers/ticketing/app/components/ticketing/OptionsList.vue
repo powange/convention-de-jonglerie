@@ -188,7 +188,8 @@
 import { useMealTypeLabel } from '~/composables/useMeals'
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDate } from '~/utils/meals'
-import { deleteOption, type TicketingOption } from '~/utils/ticketing/options'
+
+import { deleteOption, type TicketingOption } from '../../utils/ticketing/options'
 
 const props = defineProps<{
   options: TicketingOption[]

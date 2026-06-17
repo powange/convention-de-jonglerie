@@ -102,8 +102,9 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { fetchOptions } from '~/utils/ticketing/options'
-import { fetchTiers } from '~/utils/ticketing/tiers'
+
+import { fetchOptions } from '../../../../../utils/ticketing/options'
+import { fetchTiers } from '../../../../../utils/ticketing/tiers'
 
 const route = useRoute()
 const router = useRouter()

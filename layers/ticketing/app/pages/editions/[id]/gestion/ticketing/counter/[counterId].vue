@@ -310,9 +310,10 @@
 
 <script setup lang="ts">
 import ConfirmModal from '~/components/ui/ConfirmModal.vue'
-import { useTicketingCounter } from '~/composables/useTicketingCounter'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import { useTicketingCounter } from '#imports'
 
 const route = useRoute()
 const router = useRouter()

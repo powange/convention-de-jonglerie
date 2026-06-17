@@ -162,9 +162,10 @@
 </template>
 
 <script setup lang="ts">
-import { useTicketingCountersList } from '~/composables/useTicketingCounter'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import { useTicketingCountersList } from '#imports'
 
 const route = useRoute()
 const router = useRouter()

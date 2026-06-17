@@ -1377,13 +1377,14 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
 import {
   fetchOrders,
   type Order,
   type CustomFieldFilter,
   type ItemType,
-} from '~/utils/ticketing/orders'
-import { fetchTiers, type TicketingTier } from '~/utils/ticketing/tiers'
+} from '../../../../../utils/ticketing/orders'
+import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
 
 const route = useRoute()
 const editionStore = useEditionStore()
