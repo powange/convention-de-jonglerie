@@ -670,7 +670,11 @@ const { execute: executeImport, loading: importing } = useApiAction<
     })
   },
   onError: (err) => {
-    const validationErrors = err.data?.errors as Record<string, string> | undefined
+    // handleValidationError renvoie les erreurs par champ via createError({ data: { errors } }),
+    // que h3 imbrique sous `data.data` côté client. On lit ce chemin en priorité (cas des
+    // ZodError serveur), avec repli sur `data.errors` (cf. même motif dans FaqEntryModal).
+    const validationErrors = ((err.data?.data as { errors?: Record<string, string> })?.errors ||
+      err.data?.errors) as Record<string, string> | undefined
     const errorMessage = err.data?.message || t('admin.import.import_failed')
 
     importResult.value = {
