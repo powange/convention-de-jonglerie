@@ -37,8 +37,8 @@ function parseDateWithTimezone(dateString: string, timezone?: string | null): Da
   return new Date(dateString + (dateString.includes('T') ? 'Z' : 'T00:00:00Z'))
 }
 
-// Schéma de validation pour l'import
-const importSchema = z.object({
+// Schéma de validation pour l'import (exporté pour les tests de régression de validation)
+export const importSchema = z.object({
   convention: z.object({
     name: z.string().min(1),
     email: z.string().email(),
@@ -46,7 +46,10 @@ const importSchema = z.object({
     logo: z.string().nullable().optional(),
   }),
   edition: z.object({
-    name: z.string().min(1).nullable().optional(),
+    // Nom d'édition facultatif : null/omis OU chaîne vide acceptés. Le handler convertit toute
+    // valeur vide en null (`name || null`) et l'affichage retombe sur le nom de la convention
+    // (getEditionDisplayName). Pas de min(1) ici, contrairement à convention.name (le fallback).
+    name: z.string().nullable().optional(),
     description: z.string().nullable().optional(),
     startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/),
     endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/),
