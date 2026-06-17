@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { useTicketingPorts } from '#server/ticketing/ports/registry'
 import { requireAuth } from '#server/utils/auth-utils'
 import { encrypt } from '#server/utils/encryption'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
@@ -43,13 +44,9 @@ export default wrapApiHandler(
 
     const body = bodySchema.parse(await readBody(event))
 
-    // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { id: true },
-    })
-
-    if (!edition) throw createError({ status: 404, message: 'Edition introuvable' })
+    // Vérifier que l'événement existe (via le port — pas de lecture Edition dans le layer)
+    const exists = await useTicketingPorts().event.eventExists(editionId)
+    if (!exists) throw createError({ status: 404, message: 'Edition introuvable' })
 
     // Vérifier si une configuration existe déjà
     const existingConfig = await prisma.externalTicketing.findUnique({
