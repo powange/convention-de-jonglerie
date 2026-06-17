@@ -1,12 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+const mockGetEventTiming = vi.hoisted(() => vi.fn())
+
 // Mock des utilitaires - DOIT être avant les imports
-vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => ({
+vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canAccessEditionData: vi.fn(),
 }))
 
-import { canAccessEditionData } from '../../../../../../server/utils/permissions/edition-permissions'
-import handler from '../../../../../../server/api/editions/[id]/lost-found/index.post'
+// Étape modularisation : existence + date de début de l'événement via le port lost-found.
+vi.mock('#server/lost-found/ports/registry', () => ({
+  useLostFoundPorts: () => ({ event: { getEventTiming: mockGetEventTiming } }),
+}))
+
+import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+
+import handler from '../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -17,23 +25,6 @@ const mockEvent = {
   context: {
     params: { id: '1' },
     user: { id: 1, email: 'test@example.com', pseudo: 'testuser', isGlobalAdmin: false },
-  },
-}
-
-const mockUser = {
-  id: 1,
-  pseudo: 'testuser',
-  email: 'test@example.com',
-}
-
-const mockEdition = {
-  id: 1,
-  name: 'Convention Test 2024',
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-03'), // Édition terminée
-  convention: {
-    id: 1,
-    organizers: [],
   },
 }
 
@@ -63,8 +54,10 @@ const mockEventWithoutUser = {
 
 describe('/api/editions/[id]/lost-found POST', () => {
   beforeEach(async () => {
+    vi.clearAllMocks()
+    // Par défaut : événement trouvé, déjà commencé (date passée).
+    mockGetEventTiming.mockResolvedValue({ found: true, startDate: new Date('2024-01-01') })
     mockHasPermission.mockReset()
-    prismaMock.edition.findUnique.mockReset()
     prismaMock.lostFoundItem.create.mockReset()
     global.readBody = vi.fn()
     global.getRouterParam = vi.fn().mockReturnValue('1')
@@ -77,7 +70,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
 
@@ -105,7 +97,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue({
       ...mockLostFoundItem,
@@ -117,7 +108,7 @@ describe('/api/editions/[id]/lost-found POST', () => {
       },
     })
 
-    const result = await handler(mockEvent as any)
+    await handler(mockEvent as any)
 
     expect(prismaMock.lostFoundItem.create).toHaveBeenCalledWith({
       data: {
@@ -142,19 +133,16 @@ describe('/api/editions/[id]/lost-found POST', () => {
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(null)
+    mockGetEventTiming.mockResolvedValue({ found: false, startDate: null })
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
   })
 
   it("devrait rejeter si l'édition n'a pas encore commencé", async () => {
-    const futureEdition = {
-      ...mockEdition,
+    mockGetEventTiming.mockResolvedValue({
+      found: true,
       startDate: new Date(Date.now() + 86400000), // Demain
-      endDate: new Date(Date.now() + 3 * 86400000),
-    }
-
-    prismaMock.edition.findUnique.mockResolvedValue(futureEdition)
+    })
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
       "Les objets trouvés ne peuvent pas être ajoutés avant le début de l'édition"
@@ -162,7 +150,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
   })
 
   it("devrait rejeter si utilisateur n'est pas organisateur", async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(false)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
@@ -176,7 +163,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
 
     await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise')
@@ -188,7 +174,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
 
     await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise')
@@ -200,7 +185,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
 
     await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise')
@@ -212,7 +196,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
 
@@ -228,7 +211,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
 
   it('devrait gérer les erreurs de base de données', async () => {
     global.readBody.mockResolvedValue({ description: 'Test item' })
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockRejectedValue(new Error('DB Error'))
 
@@ -241,7 +223,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
       message: 'Permission denied',
     }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockRejectedValue(httpError)
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)

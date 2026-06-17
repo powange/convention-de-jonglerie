@@ -68,8 +68,8 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
+// Layer lost-found : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
+import { useAuthStore, useEditionStore } from '#imports'
 
 definePageMeta({
   middleware: ['auth-protected'],
