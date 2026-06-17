@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
@@ -65,26 +66,11 @@ export default wrapApiHandler(
         data: { consumedAt: null },
       })
     } else if (validatedData.type === 'artist') {
-      // Vérifier que la sélection existe
-      const selection = await prisma.artistMealSelection.findUnique({
-        where: { id: validatedData.id },
-        include: {
-          artist: true,
-        },
-      })
-
-      if (!selection || selection.artist.editionId !== editionId || selection.mealId !== mealId) {
-        throw createError({
-          status: 404,
-          message: 'Sélection de repas non trouvée',
-        })
+      // Étape 2 (port artists) : annulation déléguée (le layer ne lit plus les modèles artistes).
+      const res = await useMealsPorts().artists.cancelConsumed(editionId, mealId, validatedData.id)
+      if (!res.ok) {
+        throw createError({ status: 404, message: 'Sélection de repas non trouvée' })
       }
-
-      // Annuler la validation
-      await prisma.artistMealSelection.update({
-        where: { id: validatedData.id },
-        data: { consumedAt: null },
-      })
     } else if (validatedData.type === 'participant') {
       // L'id correspond à un orderItemId
       const orderItem = await prisma.ticketingOrderItem.findUnique({

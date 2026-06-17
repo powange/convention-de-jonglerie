@@ -1,3 +1,4 @@
+import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
@@ -104,25 +105,10 @@ export default wrapApiHandler(
       },
     })
 
-    // 2. Compter les artistes ayant accès à ce repas
-    const artistCount = await prisma.artistMealSelection.count({
-      where: {
-        mealId,
-        artist: {
-          editionId,
-        },
-      },
-    })
-
-    const artistValidatedCount = await prisma.artistMealSelection.count({
-      where: {
-        mealId,
-        artist: {
-          editionId,
-        },
-        consumedAt: { not: null },
-      },
-    })
+    // 2. Compter les artistes ayant accès à ce repas (via le port artists)
+    const artistSelections = await useMealsPorts().artists.listMealSelections(editionId, mealId)
+    const artistCount = artistSelections.length
+    const artistValidatedCount = artistSelections.filter((s) => s.consumedAt !== null).length
 
     // 3. Compter les participants ayant accès à ce repas (via tarifs ET options, avec déduplication)
     // Structure identique à participants.get.ts
