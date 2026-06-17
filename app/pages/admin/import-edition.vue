@@ -211,14 +211,38 @@
 
       <!-- Import Form -->
       <div class="space-y-4">
-        <UFormField :label="$t('admin.import.json_input')" required>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {{ $t('admin.import.json_input') }} <span class="text-error-500">*</span>
+            </span>
+            <UFieldGroup size="sm">
+              <UButton
+                :variant="editionViewMode === 'raw' ? 'solid' : 'outline'"
+                icon="i-heroicons-code-bracket"
+                @click="editionViewMode = 'raw'"
+              >
+                {{ $t('admin.import.view_mode_raw') }}
+              </UButton>
+              <UButton
+                :variant="editionViewMode === 'form' ? 'solid' : 'outline'"
+                icon="i-heroicons-list-bullet"
+                @click="editionViewMode = 'form'"
+              >
+                {{ $t('admin.import.view_mode_form') }}
+              </UButton>
+            </UFieldGroup>
+          </div>
+
           <UTextarea
+            v-if="editionViewMode === 'raw'"
             v-model="jsonInput"
             :rows="15"
             :placeholder="$t('admin.import.json_placeholder')"
             class="font-mono w-full"
           />
-        </UFormField>
+          <AdminImportEditionForm v-else v-model="jsonInput" />
+        </div>
 
         <div class="flex gap-3">
           <UButton
@@ -363,6 +387,9 @@ definePageMeta({
 
 const { t } = useI18n()
 const toast = useToast()
+
+// Mode d'affichage de la zone d'import : JSON brut ou formulaire par champs
+const editionViewMode = ref<'raw' | 'form'>('raw')
 
 // Composable de génération
 const {
