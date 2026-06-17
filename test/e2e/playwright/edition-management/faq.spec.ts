@@ -13,12 +13,23 @@ const BASE = 'http://localhost:3000'
  * Tourne en tant qu'organisateur propriétaire de l'édition (projet `edition-management`).
  */
 test.describe.serial('FAQ — API, gestion et page publique', () => {
-  test('API publique : 404 quand le module FAQ est désactivé', async ({ page }) => {
+  test('visibilité : l’éditeur garde l’accès quand le module est désactivé, le visiteur reçoit 404', async ({
+    page,
+  }) => {
     const { editionId } = loadState()
     await updateEdition(page, editionId, { faqEnabled: false, faqPagePublic: false })
 
-    const res = await page.request.get(`${BASE}/api/editions/${editionId}/faq?publicOnly=1`)
-    expect(res.status()).toBe(404)
+    // L'organisateur (éditeur) garde l'accès à l'API FAQ même module désactivé (bypass éditeur).
+    const asEditor = await page.request.get(`${BASE}/api/editions/${editionId}/faq`)
+    expect(asEditor.ok()).toBe(true)
+
+    // Un visiteur anonyme (contexte sans session) reçoit 404 : le port masque la FAQ, pas de fuite.
+    const browser = page.context().browser()
+    if (!browser) throw new Error('Navigateur indisponible pour le contexte anonyme')
+    const anon = await browser.newContext()
+    const asVisitor = await anon.request.get(`${BASE}/api/editions/${editionId}/faq?publicOnly=1`)
+    expect(asVisitor.status()).toBe(404)
+    await anon.dispose()
   })
 
   test('API : CRUD complet (create / list / update / reorder / delete)', async ({ page }) => {
