@@ -147,6 +147,65 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+  # Job de vérification de types (vue-tsc) : attrape les variables/références non définies que
+  # le build (esbuild, sans typecheck) et ESLint ne voient pas — ex. `edition is not defined`.
+  typecheck:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    needs: setup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Restore Node dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Prisma client
+        id: cache-prisma
+        uses: actions/cache@v4
+        with:
+          path: server/generated/prisma
+          key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      - name: Generate Prisma Client (if cache miss)
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
+        run: npx prisma generate
+
+      - name: Restore Nuxt build
+        uses: actions/cache@v4
+        with:
+          path: .nuxt
+          key: ${{ needs.setup.outputs.nuxt-cache-key }}
+          fail-on-cache-miss: true
+
+      # On ne gate que sur les "Cannot find name" (TS2304/TS2552) — la classe des bugs
+      # `edition is not defined` (variable/import manquant). Le typecheck complet remonte beaucoup
+      # d'erreurs de types pré-existantes (correction de types) qu'on ne traite pas ici ; on les
+      # ignore volontairement pour que ce gate reste actionnable.
+      - name: Typecheck — échoue sur les noms non définis (TS2304/TS2552)
+        run: |
+          npm run typecheck > typecheck.log 2>&1 || true
+          if grep -qE "error TS(2304|2552)" typecheck.log; then
+            echo "::error::Référence(s) à des noms non définis détectée(s) :"
+            grep -E "error TS(2304|2552)" typecheck.log || true
+            exit 1
+          fi
+          echo "✅ Aucune référence non définie (TS2304/TS2552)."
+
   # Job pour valider que le build fonctionne
   build:
     runs-on: ubuntu-22.04

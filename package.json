@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare",
     "lint": "[ -d .nuxt ] || npx nuxt prepare; eslint .",
     "lint:fix": "[ -d .nuxt ] || npx nuxt prepare; eslint . --fix",
+    "typecheck": "nuxt typecheck",
     "geocode": "node scripts/run-geocoding.mjs",
     "db:clean-tokens": "npx tsx scripts/clean-expired-tokens.ts",
     "admin:add": "npx tsx scripts/manage-admin.ts add",
@@ -168,6 +169,7 @@
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.0",
+    "vue-tsc": "^3.3.5",
     "wait-on": "^9.0.4"
   },
   "overrides": {
