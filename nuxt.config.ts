@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     './layers/lost-found',
     './layers/workshops',
     './layers/carpool',
+    './layers/stock',
   ],
 
   compatibilityDate: '2026-03-02',

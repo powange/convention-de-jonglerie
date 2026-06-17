@@ -263,8 +263,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
+import { useAuthStore, useEditionStore } from '#imports'
 
 definePageMeta({
   layout: 'edition-dashboard',

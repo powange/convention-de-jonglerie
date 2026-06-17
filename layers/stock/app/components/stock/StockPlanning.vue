@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAvatar } from '~/utils/avatar'
+import { useAvatar } from '#imports'
 
 import type { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core'
 import type { ResourceInput } from '@fullcalendar/resource'
