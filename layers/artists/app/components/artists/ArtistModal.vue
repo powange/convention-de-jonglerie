@@ -446,9 +446,11 @@
 </template>
 
 <script setup lang="ts">
-import { getAccommodationTypeSelectOptions } from '~/utils/accommodation-type'
-import { getAllergySeveritySelectOptions } from '~/utils/allergy-severity'
-import { formatDateTimeLocal } from '~/utils/date'
+import {
+  getAccommodationTypeSelectOptions,
+  getAllergySeveritySelectOptions,
+  formatDateTimeLocal,
+} from '#imports'
 
 const props = defineProps<{
   modelValue: boolean

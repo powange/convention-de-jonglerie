@@ -576,15 +576,14 @@
 </template>
 
 <script setup lang="ts">
-import { useEditionStore } from '~/stores/editions'
-import type { Edition } from '~/types'
+import type { Edition, AllergySeverityLevel } from '#imports'
 import {
+  useEditionStore,
   getAccommodationTypeLabel,
   getAccommodationTypeSelectOptions,
-} from '~/utils/accommodation-type'
-import type { AllergySeverityLevel } from '~/utils/allergy-severity'
-import { getEditionDisplayName } from '~/utils/editionName'
-import { markdownToHtml } from '~/utils/markdown'
+  getEditionDisplayName,
+  markdownToHtml,
+} from '#imports'
 
 interface ArtistShow {
   id: number

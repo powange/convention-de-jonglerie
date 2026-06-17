@@ -1,6 +1,9 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import {
+  canEditEdition,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -19,22 +22,8 @@ export default wrapApiHandler(
         message: 'Format de données invalide',
       })
     }
-    // Vérifier que l'utilisateur a les permissions pour éditer cette édition
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        convention: {
-          include: {
-            organizers: true,
-          },
-        },
-        organizerPermissions: {
-          include: {
-            organizer: true,
-          },
-        },
-      },
-    })
+    // Vérifier que l'utilisateur a les permissions pour éditer cette édition (util core via #server)
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
 
     if (!edition) {
       throw createError({ status: 404, message: 'Édition introuvable' })

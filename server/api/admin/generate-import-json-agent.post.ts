@@ -652,6 +652,8 @@ export interface AgentExplorationOptions {
   previewedImageUrl?: string
   /** Provider IA à utiliser (optionnel, utilise la config serveur par défaut) */
   provider?: 'lmstudio' | 'anthropic' | 'ollama'
+  /** Active la recherche des services (caractéristiques) via IA (true par défaut) */
+  detectServices?: boolean
 }
 
 /**
@@ -661,7 +663,7 @@ export async function runAgentExploration(
   urls: string[],
   options: AgentExplorationOptions = {}
 ): Promise<AgentGenerateResult> {
-  const { taskId, onProgress, previewedImageUrl, provider } = options
+  const { taskId, onProgress, previewedImageUrl, provider, detectServices = true } = options
 
   // Helper pour envoyer les événements de progression (polling + SSE)
   const notifyStep = (
@@ -1166,8 +1168,11 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
 
   // ============================================
   // PHASE 4: Fusion avec les données Facebook et extraction des caractéristiques
+  // (la détection des services est ignorée si la recherche des services est désactivée)
   // ============================================
-  notifyStep('extracting_features')
+  if (detectServices) {
+    notifyStep('extracting_features')
+  }
   if (taskId) {
     updateTaskStatus(taskId, 'processing', 90)
     updateTaskMetadata(taskId, {
@@ -1276,31 +1281,35 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
     }
 
     // Extraire les caractéristiques (services) via IA
-    const description = parsedJson.edition?.description || ''
-    if (description && description.length >= 50) {
-      console.log('[AGENT] Extraction des caractéristiques via IA...')
-      if (taskId) {
-        updateTaskMetadata(taskId, {
-          statusText: 'Détection des services (camping, restauration, spectacles...)',
-        })
-      }
-
-      const features = await extractEditionFeatures(
-        description,
-        configToUse.aiProvider || 'lmstudio',
-        {
-          lmstudioBaseUrl: configToUse.lmstudioBaseUrl,
-          lmstudioTextModel: configToUse.lmstudioTextModel,
-          lmstudioModel: configToUse.lmstudioModel,
-          anthropicApiKey: configToUse.anthropicApiKey,
-          ollamaBaseUrl: configToUse.ollamaBaseUrl,
-          ollamaModel: configToUse.ollamaModel,
+    if (!detectServices) {
+      console.log('[AGENT] Recherche des services désactivée, étape ignorée')
+    } else {
+      const description = parsedJson.edition?.description || ''
+      if (description && description.length >= 50) {
+        console.log('[AGENT] Extraction des caractéristiques via IA...')
+        if (taskId) {
+          updateTaskMetadata(taskId, {
+            statusText: 'Détection des services (camping, restauration, spectacles...)',
+          })
         }
-      )
 
-      if (Object.keys(features).length > 0) {
-        console.log('[AGENT] Caractéristiques détectées:', features)
-        parsedJson = mergeFeaturesIntoJson(parsedJson, features)
+        const features = await extractEditionFeatures(
+          description,
+          configToUse.aiProvider || 'lmstudio',
+          {
+            lmstudioBaseUrl: configToUse.lmstudioBaseUrl,
+            lmstudioTextModel: configToUse.lmstudioTextModel,
+            lmstudioModel: configToUse.lmstudioModel,
+            anthropicApiKey: configToUse.anthropicApiKey,
+            ollamaBaseUrl: configToUse.ollamaBaseUrl,
+            ollamaModel: configToUse.ollamaModel,
+          }
+        )
+
+        if (Object.keys(features).length > 0) {
+          console.log('[AGENT] Caractéristiques détectées:', features)
+          parsedJson = mergeFeaturesIntoJson(parsedJson, features)
+        }
       }
     }
 

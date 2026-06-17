@@ -1,6 +1,10 @@
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import {
+  canEditEdition,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import {
   getAvailableMealsOnArrival,
@@ -13,22 +17,8 @@ export default wrapApiHandler(
 
     const editionId = validateEditionId(event)
     const artistId = validateResourceId(event, 'artistId', 'artiste')
-    // Vérifier que l'utilisateur a les permissions pour éditer cette édition
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        convention: {
-          include: {
-            organizers: true,
-          },
-        },
-        organizerPermissions: {
-          include: {
-            organizer: true,
-          },
-        },
-      },
-    })
+    // Vérifier que l'utilisateur a les permissions pour éditer cette édition (util core via #server)
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
 
     if (!edition) {
       throw createError({ status: 404, message: 'Édition introuvable' })
@@ -56,14 +46,8 @@ export default wrapApiHandler(
       })
     }
 
-    // Récupérer tous les repas activés pour l'édition
-    const allMeals = await prisma.volunteerMeal.findMany({
-      where: {
-        editionId,
-        enabled: true,
-      },
-      orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
-    })
+    // Récupérer le catalogue des repas activés via le port (le layer ne lit pas VolunteerMeal)
+    const allMeals = await useArtistsPorts().meals.getEnabledMeals(editionId)
 
     // Filtrer les repas selon les dates de présence de l'artiste (si renseignées)
     const filteredMeals = allMeals.filter((meal) => {

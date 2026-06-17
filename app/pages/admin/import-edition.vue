@@ -56,6 +56,13 @@
           />
         </UFormField>
 
+        <!-- Recherche des services (caractéristiques) -->
+        <UCheckbox
+          v-model="detectServices"
+          :label="$t('admin.import.detect_services')"
+          :description="$t('admin.import.detect_services_hint')"
+        />
+
         <!-- Choix du provider IA -->
         <UFormField
           v-if="availableProviders.length > 1"
@@ -362,6 +369,7 @@ const {
   generating,
   generateError,
   generationMethod,
+  detectServices,
   stepHistory,
   agentProgress,
   agentPagesVisited,
