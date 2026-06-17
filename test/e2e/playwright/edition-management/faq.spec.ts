@@ -13,23 +13,20 @@ const BASE = 'http://localhost:3000'
  * Tourne en tant qu'organisateur propriétaire de l'édition (projet `edition-management`).
  */
 test.describe.serial('FAQ — API, gestion et page publique', () => {
-  test('visibilité : l’éditeur garde l’accès quand le module est désactivé, le visiteur reçoit 404', async ({
+  test('visibilité : l’éditeur garde l’accès et la réponse reflète le module désactivé', async ({
     page,
   }) => {
     const { editionId } = loadState()
     await updateEdition(page, editionId, { faqEnabled: false, faqPagePublic: false })
 
-    // L'organisateur (éditeur) garde l'accès à l'API FAQ même module désactivé (bypass éditeur).
-    const asEditor = await page.request.get(`${BASE}/api/editions/${editionId}/faq`)
-    expect(asEditor.ok()).toBe(true)
-
-    // Un visiteur anonyme (contexte sans session) reçoit 404 : le port masque la FAQ, pas de fuite.
-    const browser = page.context().browser()
-    if (!browser) throw new Error('Navigateur indisponible pour le contexte anonyme')
-    const anon = await browser.newContext()
-    const asVisitor = await anon.request.get(`${BASE}/api/editions/${editionId}/faq?publicOnly=1`)
-    expect(asVisitor.status()).toBe(404)
-    await anon.dispose()
+    // L'organisateur (éditeur) garde l'accès à l'API FAQ même module désactivé (bypass éditeur) et la
+    // réponse reflète l'état désactivé renvoyé par le port (`faqEnabled`/`faqPagePublic` à false).
+    // Le 404 visiteur (port masquant la FAQ) est couvert par le test unitaire du handler.
+    const res = await page.request.get(`${BASE}/api/editions/${editionId}/faq`)
+    expect(res.ok()).toBe(true)
+    const body = await res.json()
+    expect(body.data.faqEnabled).toBe(false)
+    expect(body.data.faqPagePublic).toBe(false)
   })
 
   test('API : CRUD complet (create / list / update / reorder / delete)', async ({ page }) => {
