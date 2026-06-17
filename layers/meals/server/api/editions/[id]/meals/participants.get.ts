@@ -59,62 +59,16 @@ export default wrapApiHandler(
             },
           },
         },
-        tiers: {
-          include: {
-            tier: {
-              include: {
-                orderItems: {
-                  where: {
-                    state: 'Processed',
-                  },
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    customFields: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        // Inclure les participants via les options de billetterie
-        options: {
-          include: {
-            option: {
-              include: {
-                orderItemSelections: {
-                  where: {
-                    orderItem: {
-                      state: 'Processed',
-                    },
-                  },
-                  include: {
-                    orderItem: {
-                      select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        customFields: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
       },
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    // Étape 2 (port artists) : participants artistes acceptés par repas (le layer ne lit plus
-    // les modèles artistes).
-    const artistParticipantsByMeal = await useMealsPorts().artists.getMealParticipants(
-      meals.map((m) => m.id)
-    )
+    // Étape 2 (ports) : participants artistes + billetterie par repas (le layer ne lit plus les
+    // modèles artistes / billetterie).
+    const mealIds = meals.map((m) => m.id)
+    const ports = useMealsPorts()
+    const artistParticipantsByMeal = await ports.artists.getMealParticipants(mealIds)
+    const ticketParticipantsByMeal = await ports.ticketing.getMealTicketParticipants(mealIds)
 
     // Construire la liste plate de tous les participants avec leurs repas
     let participants: Array<{
@@ -135,9 +89,6 @@ export default wrapApiHandler(
     }> = []
 
     meals.forEach((meal) => {
-      // Set pour suivre les orderItems déjà ajoutés pour ce repas (déduplication tarif/option)
-      const addedOrderItemIds = new Set<number>()
-
       // Ajouter les bénévoles
       meal.mealSelections.forEach((selection) => {
         participants.push({
@@ -178,60 +129,23 @@ export default wrapApiHandler(
         })
       })
 
-      // Ajouter les participants avec billets (via les tiers)
-      meal.tiers.forEach((tierMeal) => {
-        tierMeal.tier.orderItems.forEach((orderItem) => {
-          // Marquer cet orderItem comme ajouté pour ce repas
-          addedOrderItemIds.add(orderItem.id)
-
-          const customFields = orderItem.customFields as any
-          participants.push({
-            userId: null,
-            nom: orderItem.lastName || '',
-            prenom: orderItem.firstName || '',
-            email: orderItem.email || '',
-            phone: null,
-            type: 'participant',
-            mealId: meal.id,
-            mealDate: meal.date,
-            mealType: meal.mealType,
-            mealPhases: meal.phases,
-            dietaryPreference: customFields?.dietaryPreference || null,
-            allergies: customFields?.allergies || null,
-            allergySeverity: customFields?.allergySeverity || null,
-            afterShow: false,
-          })
-        })
-      })
-
-      // Ajouter les participants avec billets (via les options)
-      // Uniquement si l'orderItem n'a pas déjà été ajouté via un tarif
-      meal.options.forEach((optionMeal) => {
-        optionMeal.option.orderItemSelections.forEach((selection) => {
-          const orderItem = selection.orderItem
-          // Éviter les doublons : si le participant a déjà ce repas via un tarif, ne pas l'ajouter
-          if (addedOrderItemIds.has(orderItem.id)) {
-            return
-          }
-          addedOrderItemIds.add(orderItem.id)
-
-          const customFields = orderItem.customFields as any
-          participants.push({
-            userId: null,
-            nom: orderItem.lastName || '',
-            prenom: orderItem.firstName || '',
-            email: orderItem.email || '',
-            phone: null,
-            type: 'participant',
-            mealId: meal.id,
-            mealDate: meal.date,
-            mealType: meal.mealType,
-            mealPhases: meal.phases,
-            dietaryPreference: customFields?.dietaryPreference || null,
-            allergies: customFields?.allergies || null,
-            allergySeverity: customFields?.allergySeverity || null,
-            afterShow: false,
-          })
+      // Ajouter les participants avec billets (via le port ticketing, déjà dédupliqués)
+      ;(ticketParticipantsByMeal[meal.id] ?? []).forEach((p) => {
+        participants.push({
+          userId: null,
+          nom: p.lastName || '',
+          prenom: p.firstName || '',
+          email: p.email || '',
+          phone: null,
+          type: 'participant',
+          mealId: meal.id,
+          mealDate: meal.date,
+          mealType: meal.mealType,
+          mealPhases: meal.phases,
+          dietaryPreference: p.dietaryPreference,
+          allergies: p.allergies,
+          allergySeverity: p.allergySeverity,
+          afterShow: false,
         })
       })
     })

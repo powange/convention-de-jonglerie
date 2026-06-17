@@ -29,69 +29,7 @@ export default wrapApiHandler(
     const searchLower = searchTerm.toLowerCase()
 
     // Vérifier que le repas existe et appartient à cette édition
-    // Structure identique à participants.get.ts qui fonctionne
-    const meal = await prisma.volunteerMeal.findFirst({
-      where: {
-        id: mealId,
-        editionId,
-      },
-      include: {
-        tiers: {
-          include: {
-            tier: {
-              include: {
-                orderItems: {
-                  where: {
-                    entryValidated: true,
-                  },
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    mealAccess: {
-                      where: { mealId },
-                      select: { id: true, consumedAt: true },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        // Structure identique à participants.get.ts
-        options: {
-          include: {
-            option: {
-              include: {
-                orderItemSelections: {
-                  where: {
-                    orderItem: {
-                      entryValidated: true,
-                    },
-                  },
-                  include: {
-                    orderItem: {
-                      select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        mealAccess: {
-                          where: { mealId },
-                          select: { id: true, consumedAt: true },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
+    const meal = await prisma.volunteerMeal.findFirst({ where: { id: mealId, editionId } })
     if (!meal) {
       throw createError({
         status: 404,
@@ -99,6 +37,7 @@ export default wrapApiHandler(
       })
     }
 
+    const ports = useMealsPorts()
     const results: any[] = []
 
     // 1. Rechercher dans les bénévoles qui ont accès à ce repas
@@ -152,7 +91,7 @@ export default wrapApiHandler(
     }
 
     // 2. Rechercher dans les artistes qui ont accès à ce repas (via le port artists)
-    const artistSelections = await useMealsPorts().artists.listMealSelections(editionId, mealId)
+    const artistSelections = await ports.artists.listMealSelections(editionId, mealId)
 
     for (const row of artistSelections) {
       const matchesSearch =
@@ -176,71 +115,27 @@ export default wrapApiHandler(
       }
     }
 
-    // 3. Rechercher dans les participants (via les tarifs ET options ayant accès à ce repas)
-    // Structure identique à participants.get.ts
-    const addedOrderItemIds = new Set<number>()
+    // 3. Rechercher dans les participants billetterie (via le port ticketing, déjà dédupliqués)
+    const ticketRows = await ports.ticketing.listMealTicketParticipants(mealId)
 
-    // Parcourir les orderItems via les tarifs
-    for (const tierMeal of meal.tiers) {
-      for (const item of tierMeal.tier.orderItems) {
-        addedOrderItemIds.add(item.id)
+    for (const row of ticketRows) {
+      const matchesSearch =
+        row.lastName?.toLowerCase().includes(searchLower) ||
+        row.firstName?.toLowerCase().includes(searchLower) ||
+        row.email?.toLowerCase().includes(searchLower)
 
-        const matchesSearch =
-          item.lastName?.toLowerCase().includes(searchLower) ||
-          item.firstName?.toLowerCase().includes(searchLower) ||
-          item.email?.toLowerCase().includes(searchLower)
-
-        if (matchesSearch) {
-          // Trouver si ce participant a déjà une validation de repas
-          const mealValidation = item.mealAccess.find((ma) => ma.consumedAt !== null)
-
-          results.push({
-            uniqueId: `participant-${item.id}`,
-            id: item.id,
-            type: 'participant',
-            firstName: item.firstName,
-            lastName: item.lastName,
-            pseudo: null,
-            email: item.email,
-            phone: null,
-            consumedAt: mealValidation?.consumedAt || null,
-          })
-        }
-      }
-    }
-
-    // 4. Rechercher dans les participants via les options
-    for (const optionMeal of meal.options) {
-      for (const selection of optionMeal.option.orderItemSelections) {
-        const item = selection.orderItem
-
-        // Éviter les doublons : si le participant a déjà le repas via un tarif
-        if (addedOrderItemIds.has(item.id)) {
-          continue
-        }
-        addedOrderItemIds.add(item.id)
-
-        const matchesSearch =
-          item.lastName?.toLowerCase().includes(searchLower) ||
-          item.firstName?.toLowerCase().includes(searchLower) ||
-          item.email?.toLowerCase().includes(searchLower)
-
-        if (matchesSearch) {
-          // Trouver si ce participant a déjà une validation de repas
-          const mealValidation = item.mealAccess.find((ma) => ma.consumedAt !== null)
-
-          results.push({
-            uniqueId: `participant-${item.id}`,
-            id: item.id,
-            type: 'participant',
-            firstName: item.firstName,
-            lastName: item.lastName,
-            pseudo: null,
-            email: item.email,
-            phone: null,
-            consumedAt: mealValidation?.consumedAt || null,
-          })
-        }
+      if (matchesSearch) {
+        results.push({
+          uniqueId: `participant-${row.orderItemId}`,
+          id: row.orderItemId,
+          type: 'participant',
+          firstName: row.firstName,
+          lastName: row.lastName,
+          pseudo: null,
+          email: row.email,
+          phone: null,
+          consumedAt: row.consumedAt,
+        })
       }
     }
 

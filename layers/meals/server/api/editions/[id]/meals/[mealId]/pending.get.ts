@@ -23,69 +23,7 @@ export default wrapApiHandler(
     const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'all'
 
     // Vérifier que le repas existe et appartient à cette édition
-    // Structure identique à participants.get.ts qui fonctionne
-    const meal = await prisma.volunteerMeal.findFirst({
-      where: {
-        id: mealId,
-        editionId,
-      },
-      include: {
-        tiers: {
-          include: {
-            tier: {
-              include: {
-                orderItems: {
-                  where: {
-                    entryValidated: true,
-                  },
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    mealAccess: {
-                      where: { mealId },
-                      select: { id: true, consumedAt: true },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        // Structure identique à participants.get.ts
-        options: {
-          include: {
-            option: {
-              include: {
-                orderItemSelections: {
-                  where: {
-                    orderItem: {
-                      entryValidated: true,
-                    },
-                  },
-                  include: {
-                    orderItem: {
-                      select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        mealAccess: {
-                          where: { mealId },
-                          select: { id: true, consumedAt: true },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
+    const meal = await prisma.volunteerMeal.findFirst({ where: { id: mealId, editionId } })
     if (!meal) {
       throw createError({
         status: 404,
@@ -93,6 +31,7 @@ export default wrapApiHandler(
       })
     }
 
+    const ports = useMealsPorts()
     const pending: any[] = []
 
     // 1. Bénévoles non validés
@@ -139,12 +78,11 @@ export default wrapApiHandler(
       }
     }
 
-    // 2. Artistes non validés
+    // 2. Artistes non validés (via le port artists)
     if (type === 'artist' || type === 'all') {
-      // Via le port artists : toutes les sélections, filtrées sur non consommées.
-      const artistSelections = (
-        await useMealsPorts().artists.listMealSelections(editionId, mealId)
-      ).filter((s) => s.consumedAt === null)
+      const artistSelections = (await ports.artists.listMealSelections(editionId, mealId)).filter(
+        (s) => s.consumedAt === null
+      )
 
       for (const row of artistSelections) {
         pending.push({
@@ -160,61 +98,23 @@ export default wrapApiHandler(
       }
     }
 
-    // 3. Participants non validés (via tarifs ET options, avec déduplication)
-    // Structure identique à participants.get.ts
+    // 3. Participants billetterie non validés (via le port ticketing, déjà dédupliqués)
     if (type === 'participant' || type === 'all') {
-      const addedOrderItemIds = new Set<number>()
+      const ticketRows = (await ports.ticketing.listMealTicketParticipants(mealId)).filter(
+        (r) => r.consumedAt === null
+      )
 
-      // Parcourir les orderItems via les tarifs
-      for (const tierMeal of meal.tiers) {
-        for (const item of tierMeal.tier.orderItems) {
-          addedOrderItemIds.add(item.id)
-
-          // Vérifier si ce participant n'a pas encore validé son repas
-          const hasValidated = item.mealAccess.some((ma) => ma.consumedAt !== null)
-
-          if (!hasValidated) {
-            pending.push({
-              uniqueId: `participant-${item.id}`,
-              id: item.id,
-              type: 'participant',
-              firstName: item.firstName,
-              lastName: item.lastName,
-              pseudo: null,
-              email: item.email,
-              phone: null,
-            })
-          }
-        }
-      }
-
-      // Parcourir les orderItems via les options
-      for (const optionMeal of meal.options) {
-        for (const selection of optionMeal.option.orderItemSelections) {
-          const item = selection.orderItem
-
-          // Éviter les doublons : si le participant a déjà le repas via un tarif
-          if (addedOrderItemIds.has(item.id)) {
-            continue
-          }
-          addedOrderItemIds.add(item.id)
-
-          // Vérifier si ce participant n'a pas encore validé son repas
-          const hasValidated = item.mealAccess.some((ma) => ma.consumedAt !== null)
-
-          if (!hasValidated) {
-            pending.push({
-              uniqueId: `participant-${item.id}`,
-              id: item.id,
-              type: 'participant',
-              firstName: item.firstName,
-              lastName: item.lastName,
-              pseudo: null,
-              email: item.email,
-              phone: null,
-            })
-          }
-        }
+      for (const row of ticketRows) {
+        pending.push({
+          uniqueId: `participant-${row.orderItemId}`,
+          id: row.orderItemId,
+          type: 'participant',
+          firstName: row.firstName,
+          lastName: row.lastName,
+          pseudo: null,
+          email: row.email,
+          phone: null,
+        })
       }
     }
 
