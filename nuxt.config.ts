@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     './layers/carpool',
     './layers/stock',
     './layers/artists',
+    './layers/ticketing',
   ],
 
   compatibilityDate: '2026-03-02',
