@@ -1,3 +1,4 @@
+import { useFaqPorts } from '#server/faq/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import {
@@ -30,11 +31,15 @@ export default wrapApiHandler(
 
     const user = optionalAuth(event)
     const isEditor = !!user && canEditEdition(edition, user)
-    const faqPagePublic = (edition as { faqPagePublic?: boolean }).faqPagePublic === true
+
+    // Visibilité FAQ propre au domaine via le port (le layer ne lit plus les flags faqEnabled /
+    // faqPagePublic sur l'Edition ; jonglerie : ils en viennent, générique : autre résolution).
+    const { enabled: faqEnabled, pagePublic: faqPagePublic } =
+      await useFaqPorts().directory.getFaqVisibility(editionId)
 
     // Côté visiteur, si la page publique est désactivée ou le module FAQ off,
     // on ne fuit pas l'info et on ne tape pas la table.
-    if (!isEditor && (!edition.faqEnabled || !faqPagePublic)) {
+    if (!isEditor && (!faqEnabled || !faqPagePublic)) {
       throw createError({ status: 404, message: 'FAQ non disponible' })
     }
 
@@ -60,7 +65,7 @@ export default wrapApiHandler(
     })
 
     return createSuccessResponse({
-      faqEnabled: edition.faqEnabled,
+      faqEnabled,
       faqPagePublic,
       entries,
     })
