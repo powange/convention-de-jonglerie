@@ -3,8 +3,8 @@ import { version as nuxtVersion } from 'nuxt/package.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // Layers modulaires (étape 2 de la modularisation) — module bénévole extrait
-  extends: ['./layers/volunteers'],
+  // Layers modulaires (étape 2 de la modularisation) — modules bénévole et repas extraits
+  extends: ['./layers/volunteers', './layers/meals'],
 
   compatibilityDate: '2026-03-02',
 

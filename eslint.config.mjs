@@ -64,5 +64,13 @@ export default withNuxt(
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
     },
+  },
+  // Pages/layouts des layers : mêmes exceptions que pour le cœur (le preset Nuxt ne couvre que
+  // l'app principale). Les noms de pages à un mot (index, list, validate…) sont légitimes.
+  {
+    files: ['layers/*/app/pages/**/*.vue', 'layers/*/app/layouts/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
   }
 )
