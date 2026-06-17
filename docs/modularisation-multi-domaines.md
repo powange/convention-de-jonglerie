@@ -1,7 +1,7 @@
 # Modularisation multi-domaines (monorepo + Nuxt layers)
 
-> **Statut** : **Étapes 0 → 2 + 0bis implémentées** (sur `main`) — les layers `volunteers`, `meals` et
-> `tasks` sont domaine-agnostiques côté serveur ; étapes 3 → 4 en conception.
+> **Statut** : **Étapes 0 → 2 + 0bis implémentées** (sur `main`) — les layers `volunteers`, `meals`,
+> `tasks` et `faq` sont domaine-agnostiques côté serveur ; étapes 3 → 4 en conception.
 > **Date** : 2026-06-14 (création), mise à jour 2026-06-17.
 > **Objectif** : permettre la création d'une **2ᵉ application** pour d'autres domaines que la
 > jonglerie, partageant les modules organisateurs (bénévoles, tâches, billetterie…) avec
@@ -11,20 +11,20 @@
 
 Les **fondations (étapes 0 → 2)** ont été livrées et mergées dans `main` (PR #3), puis déployées en
 release. L'**étape 0bis** (abstraction `Event` complétée) a suivi (PR #6) : le layer `volunteers` est
-désormais **domaine-agnostique côté serveur**. Deux autres modules ont depuis été extraits puis
-découplés sur le même modèle : **`layers/meals`** (PR #15 déplacement, #16 artistes, #17 billetterie)
-et **`layers/tasks`** (PR #19) — aucun ne lit plus de modèle d'un autre module. Le périmètre réel
-diffère volontairement de la conception initiale sur quelques points (scope réduit pour limiter le
-risque) — détaillés ci-dessous.
+désormais **domaine-agnostique côté serveur**. Trois autres modules ont depuis été extraits puis
+découplés sur le même modèle : **`layers/meals`** (PR #15 déplacement, #16 artistes, #17 billetterie),
+**`layers/tasks`** (PR #19) et **`layers/faq`** (PR #21) — aucun ne lit plus de modèle d'un autre
+module. Le périmètre réel diffère volontairement de la conception initiale sur quelques points (scope
+réduit pour limiter le risque) — détaillés ci-dessous.
 
-| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                                                                                                                    |
-| ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                                                                                                                          |
-| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur.                                                                                              |
-| **1** — Ports de découplage  | ✅ **Fait**                 | **8 ports** : `notifications`, `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals`. Billetterie/artistes/repas découplés (le `meals` délègue au module cœur `server/meals/`).                                                                                             |
-| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/`, **`layers/meals/`** et **`layers/tasks/`** = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`). Ports propres à chaque module : `server/meals/ports/` (`artists`+`ticketing`), `server/taskboard/ports/` (`directory`). |
-| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                                                                                                                            |
-| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                                                                                                                           |
+| Étape                        | Statut                      | Périmètre réel livré                                                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0** — Abstraction `Event`  | ✅ **Fait (scope réduit)**  | `Event` = **ancre minimale** (id/dates techniques + relations). Seules les **5 FK bénévoles** ont migré `editionId → eventId`.                                                                                                                                                                                                                                                     |
+| **0bis** — Promotion `Event` | ✅ **Fait**                 | `name`/dates/`status` promus sur `Event`, config bénévole sortie dans `EventVolunteerSettings`, **lectures du layer migrées `Edition`→`Event`**. Le layer ne lit plus `Edition`/`Convention` côté serveur.                                                                                                                                                                         |
+| **1** — Ports de découplage  | ✅ **Fait**                 | **8 ports** : `notifications`, `email`, `messenger`, `organizers`, `eventScope`, `ticketing`, `artists`, `meals`. Billetterie/artistes/repas découplés (le `meals` délègue au module cœur `server/meals/`).                                                                                                                                                                        |
+| **2** — Extraction en layer  | ✅ **Fait (utils en core)** | `layers/volunteers/`, **`layers/meals/`**, **`layers/tasks/`** et **`layers/faq/`** = front + API + cron + i18n. **Décision : les utils/ports serveur restent dans le core** (importés `#server`). Ports propres à chaque module : `server/meals/ports/` (`artists`+`ticketing`), `server/taskboard/ports/` (`directory`), `server/faq/ports/` (`directory` → `getFaqVisibility`). |
+| **3** — Monorepo             | 🔜 Conception               | Non démarré (on ne le fait que quand la 2ᵉ app est décidée).                                                                                                                                                                                                                                                                                                                       |
+| **4** — 2ᵉ app               | 🔜 Conception               | Non démarré. **Prérequis (étape 0bis) levé.**                                                                                                                                                                                                                                                                                                                                      |
 
 ### Divergences assumées vs conception initiale
 
@@ -269,10 +269,11 @@ interface MessengerPort {
 }
 ```
 
-- **Repas** (`layers/meals`, PR #15-17, ports `artists`+`ticketing`) et **tâches** (`layers/tasks`,
-  PR #19, port `directory`) sont désormais leurs propres layers, domaine-agnostiques. **Billetterie**
-  reste un candidat (encore dans le cœur). Le couplage entre modules est traité via interfaces :
-  chaque layer définit les ports dont il a besoin et l'app les câble sur ses implémentations.
+- **Repas** (`layers/meals`, PR #15-17, ports `artists`+`ticketing`), **tâches** (`layers/tasks`,
+  PR #19, port `directory`) et **FAQ** (`layers/faq`, PR #21, port `directory` → `getFaqVisibility`)
+  sont désormais leurs propres layers, domaine-agnostiques. **Billetterie** reste un candidat (encore
+  dans le cœur). Le couplage entre modules est traité via interfaces : chaque layer définit les ports
+  dont il a besoin et l'app les câble sur ses implémentations.
 
 ## 8. Plan d'extraction du pilote bénévole (par étapes livrables)
 
