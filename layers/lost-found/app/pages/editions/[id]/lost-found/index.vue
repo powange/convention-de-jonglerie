@@ -239,9 +239,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
-import { getEditionDisplayName } from '~/utils/editionName'
+// Layer lost-found : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
+import { getEditionDisplayName, useAuthStore, useEditionStore } from '#imports'
 
 // Props et route
 const route = useRoute()

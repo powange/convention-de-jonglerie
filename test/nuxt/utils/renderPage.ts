@@ -1,41 +1,60 @@
+import { readdirSync, existsSync } from 'fs'
+import { resolve } from 'path'
+
 import { createApp, defineComponent, h } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { createPinia } from 'pinia'
 import { createRouter, createMemoryHistory } from 'vue-router'
-import { resolve } from 'path'
 
-// Tentative simplifiée: importer dynamiquement le composant page depuis app/pages
+// Tentative simplifiée: importer dynamiquement le composant page depuis app/pages (cœur ou layers)
 // NOTE: Nuxt normally injects layouts, plugins, etc. Ici c'est un rendu très partiel (smoke)
 
+/**
+ * Construit les chemins de fichier candidats pour une route, dans le cœur (`app/pages`) et chaque
+ * layer (`layers/<x>/app/pages`). Couvre les deux formes Nuxt — `route.vue` et `route/index.vue` —
+ * ainsi que la substitution dynamique `/editions/:id/...` → `/editions/[id]/...`.
+ */
+function pageFileCandidates(routePath: string, rootDir: string): string[] {
+  const relVariants = new Set<string>()
+  const addRoute = (rp: string) => {
+    const rel = rp === '/' ? 'index' : rp.replace(/^\//, '')
+    relVariants.add(`${rel}.vue`)
+    relVariants.add(`${rel}/index.vue`)
+  }
+  addRoute(routePath)
+  const dyn = routePath.replace(/^(\/editions)\/[^/]+\//, '$1/[id]/')
+  if (dyn !== routePath) addRoute(dyn)
+
+  const baseDirs = [resolve(rootDir, 'app/pages')]
+  const layersDir = resolve(rootDir, 'layers')
+  if (existsSync(layersDir)) {
+    for (const entry of readdirSync(layersDir, { withFileTypes: true })) {
+      if (entry.isDirectory()) baseDirs.push(resolve(layersDir, entry.name, 'app/pages'))
+    }
+  }
+
+  const files: string[] = []
+  for (const base of baseDirs) for (const rel of relVariants) files.push(resolve(base, rel))
+  return files
+}
+
 export async function renderRawPage(routePath: string) {
-  // Convertit /login -> login.vue, / -> index.vue, /editions/add -> editions/add.vue
-  const pageRelative = routePath === '/' ? 'index.vue' : `${routePath.replace(/^\//, '')}.vue`
   // Utilise process.cwd() (racine projet lors de test:nuxt) pour éviter l'erreur "The URL must be of scheme file"
   const rootDir = process.cwd()
-  const pageFile = resolve(rootDir, 'app/pages', pageRelative)
   let mod: any
   let importError: any = null
-  try {
-    mod = await import(pageFile)
-  } catch (e) {
-    importError = e
-    // Fallback dynamique pour /editions/:id/... => /editions/[id]/...
-    const editionsDyn = routePath.replace(/^(\/editions)\/[^/]+\//, '$1/[id]/')
-    if (editionsDyn !== routePath) {
-      const dynRelative =
-        editionsDyn === '/' ? 'index.vue' : `${editionsDyn.replace(/^\//, '')}.vue`
-      const dynFile = resolve(rootDir, 'app/pages', dynRelative)
-      try {
-        mod = await import(dynFile)
-        importError = null
-      } catch (e2) {
-        importError = e2
-      }
+  for (const candidate of pageFileCandidates(routePath, rootDir)) {
+    try {
+      mod = await import(candidate)
+      importError = null
+      break
+    } catch (e) {
+      importError = e
     }
-    if (importError) {
-      const msg = `<error>Page import failed: ${String(importError)}</error>`
-      return { html: () => msg, unmount: () => {} }
-    }
+  }
+  if (!mod) {
+    const msg = `<error>Page import failed: ${String(importError)}</error>`
+    return { html: () => msg, unmount: () => {} }
   }
   const Comp = mod.default || defineComponent({ render: () => h('div', 'Empty') })
   const el = document.createElement('div')

@@ -1,3 +1,4 @@
+import { useLostFoundPorts } from '#server/lost-found/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -5,13 +6,9 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    // Vérifier que l'édition existe
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { id: true, endDate: true },
-    })
-
-    if (!edition) {
+    // Vérifier que l'événement existe (via le port : le layer ne lit pas Edition directement)
+    const { found } = await useLostFoundPorts().event.getEventTiming(editionId)
+    if (!found) {
       throw createError({
         status: 404,
         message: 'Édition non trouvée',

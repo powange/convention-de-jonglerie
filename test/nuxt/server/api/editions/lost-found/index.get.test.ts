@@ -1,16 +1,18 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../../server/api/editions/[id]/lost-found/index.get'
+const mockGetEventTiming = vi.hoisted(() => vi.fn())
+
+// Étape modularisation : l'existence de l'événement vient désormais du port lost-found.
+vi.mock('#server/lost-found/ports/registry', () => ({
+  useLostFoundPorts: () => ({ event: { getEventTiming: mockGetEventTiming } }),
+}))
+
+import handler from '../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
 const mockEvent = {}
-
-const mockEdition = {
-  id: 1,
-  endDate: new Date('2024-01-03'),
-}
 
 const mockLostFoundItems = [
   {
@@ -67,13 +69,13 @@ const mockLostFoundItems = [
 
 describe('/api/editions/[id]/lost-found GET', () => {
   beforeEach(() => {
-    prismaMock.edition.findUnique.mockReset()
+    vi.clearAllMocks()
+    mockGetEventTiming.mockResolvedValue({ found: true, startDate: new Date('2024-01-01') })
     prismaMock.lostFoundItem.findMany.mockReset()
     global.getRouterParam = vi.fn().mockReturnValue('1')
   })
 
   it("devrait récupérer tous les objets trouvés d'une édition", async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
     const result = await handler(mockEvent as any)
@@ -100,10 +102,7 @@ describe('/api/editions/[id]/lost-found GET', () => {
     // emailHash peut être undefined si pas d'email mocké
     expect(result[0].user).toHaveProperty('emailHash')
 
-    expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
-      where: { id: 1 },
-      select: { id: true, endDate: true },
-    })
+    expect(mockGetEventTiming).toHaveBeenCalledWith(1)
     // Tolère champs additionnels (email, updatedAt)
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -118,7 +117,6 @@ describe('/api/editions/[id]/lost-found GET', () => {
   })
 
   it('devrait retourner une liste vide si aucun objet trouvé', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockResolvedValue([])
 
     const result = await handler(mockEvent as any)
@@ -145,13 +143,13 @@ describe('/api/editions/[id]/lost-found GET', () => {
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(null)
+    mockGetEventTiming.mockResolvedValue({ found: false, startDate: null })
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
+    expect(prismaMock.lostFoundItem.findMany).not.toHaveBeenCalled()
   })
 
   it('devrait inclure tous les détails utilisateur', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
     const result = await handler(mockEvent as any)
@@ -165,7 +163,6 @@ describe('/api/editions/[id]/lost-found GET', () => {
   })
 
   it('devrait inclure les commentaires avec les détails utilisateur', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
     const result = await handler(mockEvent as any)
@@ -180,7 +177,6 @@ describe('/api/editions/[id]/lost-found GET', () => {
   })
 
   it('devrait trier les objets par date de création décroissante', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
     await handler(mockEvent as any)
@@ -191,7 +187,6 @@ describe('/api/editions/[id]/lost-found GET', () => {
   })
 
   it('devrait trier les commentaires par date de création croissante', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
     await handler(mockEvent as any)
@@ -208,7 +203,6 @@ describe('/api/editions/[id]/lost-found GET', () => {
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.lostFoundItem.findMany.mockRejectedValue(new Error('DB Error'))
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
@@ -220,7 +214,7 @@ describe('/api/editions/[id]/lost-found GET', () => {
       statusMessage: 'Access denied',
     }
 
-    prismaMock.edition.findUnique.mockRejectedValue(httpError)
+    mockGetEventTiming.mockRejectedValue(httpError)
 
     await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
   })
@@ -228,15 +222,11 @@ describe('/api/editions/[id]/lost-found GET', () => {
   it("devrait traiter correctement l'ID numérique", async () => {
     global.getRouterParam.mockReturnValue('123')
 
-    prismaMock.edition.findUnique.mockResolvedValue({ id: 123, endDate: new Date() })
     prismaMock.lostFoundItem.findMany.mockResolvedValue([])
 
     await handler(mockEvent as any)
 
-    expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
-      where: { id: 123 },
-      select: { id: true, endDate: true },
-    })
+    expect(mockGetEventTiming).toHaveBeenCalledWith(123)
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { editionId: 123 },
