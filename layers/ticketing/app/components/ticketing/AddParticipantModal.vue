@@ -715,7 +715,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-import { isFreePrice, isFixedPrice } from '~/utils/ticketing/tiers'
+import { isFreePrice, isFixedPrice } from '../../utils/ticketing/tiers'
 
 interface TicketingOption {
   id: number

@@ -281,7 +281,8 @@
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDisplay } from '~/utils/meals'
-import { isFixedPrice, type TicketingTier } from '~/utils/ticketing/tiers'
+
+import { isFixedPrice, type TicketingTier } from '../../utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
 

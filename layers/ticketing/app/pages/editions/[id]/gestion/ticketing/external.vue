@@ -861,12 +861,13 @@
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import HelloAssoConfigModal from '~/components/edition/ticketing/HelloAssoConfigModal.vue'
-import InfomaniakConfigModal from '~/components/edition/ticketing/InfomaniakConfigModal.vue'
-import type { InfomaniakConfig } from '~/components/edition/ticketing/InfomaniakConfigModal.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import HelloAssoConfigModal from '../../../../../components/edition/ticketing/HelloAssoConfigModal.vue'
+import InfomaniakConfigModal from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
+
+import type { InfomaniakConfig } from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
 import type { TabsItem } from '@nuxt/ui'
 
 const route = useRoute()

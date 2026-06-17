@@ -287,7 +287,8 @@
 import { computed, ref, watch } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
-import { isFreePrice } from '~/utils/ticketing/tiers'
+
+import { isFreePrice } from '../../utils/ticketing/tiers'
 
 interface TicketingTier {
   id: number
