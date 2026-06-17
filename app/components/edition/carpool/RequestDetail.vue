@@ -133,6 +133,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore()
 const { t } = useI18n()
+const router = useRouter()
 
 const canEdit = computed(() => authStore.user?.id === props.request.user?.id)
 const phoneRevealed = ref(false)

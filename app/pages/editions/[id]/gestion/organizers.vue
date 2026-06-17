@@ -325,6 +325,7 @@ import { useRoute } from 'vue-router'
 import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import type { OrganizerRightsFormData } from '~/types/organizer'
 import { summarizeRights } from '~/utils/organizerRights'
 
 import type { TableColumn } from '@nuxt/ui'

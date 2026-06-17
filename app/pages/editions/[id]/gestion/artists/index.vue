@@ -521,6 +521,7 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
+const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { formatDateTime } = useDateFormat()
