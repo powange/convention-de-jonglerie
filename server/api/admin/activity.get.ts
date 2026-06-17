@@ -109,12 +109,16 @@ export default wrapApiHandler(
               pseudo: true,
             },
           },
-          edition: {
+          event: {
             select: {
               name: true,
-              convention: {
+              edition: {
                 select: {
-                  name: true,
+                  convention: {
+                    select: {
+                      name: true,
+                    },
+                  },
                 },
               },
             },
@@ -252,12 +256,16 @@ export default wrapApiHandler(
           title: true,
           message: true,
           sentAt: true,
-          edition: {
+          event: {
             select: {
               name: true,
-              convention: {
+              edition: {
                 select: {
-                  name: true,
+                  convention: {
+                    select: {
+                      name: true,
+                    },
+                  },
                 },
               },
             },
@@ -370,7 +378,7 @@ export default wrapApiHandler(
           application.user.pseudo
         : 'Utilisateur inconnu'
 
-      const editionName = application.edition?.name || application.edition?.convention?.name
+      const editionName = application.event?.name || application.event?.edition?.convention?.name
 
       let activityType: Activity['type']
       let title: string
@@ -526,7 +534,7 @@ export default wrapApiHandler(
 
     // Ajouter les notifications aux bénévoles
     recentVolunteerNotifications.forEach((notification) => {
-      const editionName = notification.edition?.name || notification.edition?.convention?.name
+      const editionName = notification.event?.name || notification.event?.edition?.convention?.name
 
       activities.push({
         id: `notification_${notification.id}`,
