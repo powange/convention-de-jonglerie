@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useWorkshopsPorts } from '#server/workshops/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
@@ -10,13 +10,12 @@ export default wrapApiHandler(
     const session = await getUserSession(event)
     const userId = session?.user?.id
 
-    // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      select: { workshopsEnabled: true },
-      errorMessage: 'Édition non trouvée',
-    })
-
-    if (!edition.workshopsEnabled) {
+    // Existence + activation via le port (le layer ne lit pas Edition directement)
+    const cfg = await useWorkshopsPorts().event.getConfig(editionId)
+    if (!cfg.found) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
+    if (!cfg.enabled) {
       throw createError({
         status: 403,
         message: 'Les workshops ne sont pas activés pour cette édition',

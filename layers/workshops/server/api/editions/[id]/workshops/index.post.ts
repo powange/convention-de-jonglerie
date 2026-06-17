@@ -1,27 +1,22 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canCreateWorkshop } from '#server/utils/permissions/workshop-permissions'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { workshopSchema, validateAndSanitize } from '#server/utils/validation-schemas'
+import { useWorkshopsPorts } from '#server/workshops/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      select: {
-        workshopsEnabled: true,
-        workshopLocationsFreeInput: true,
-        startDate: true,
-        endDate: true,
-      },
-      errorMessage: 'Édition non trouvée',
-    })
+    // Existence + activation + dates via le port (le layer ne lit pas Edition directement)
+    const cfg = await useWorkshopsPorts().event.getConfig(editionId)
+    if (!cfg.found) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
 
-    if (!edition.workshopsEnabled) {
+    if (!cfg.enabled) {
       throw createError({
         status: 403,
         message: 'Les workshops ne sont pas activés pour cette édition',
@@ -42,15 +37,15 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = validateAndSanitize(workshopSchema, {
       ...body,
-      editionStartDate: edition.startDate.toISOString(),
-      editionEndDate: edition.endDate.toISOString(),
+      editionStartDate: cfg.startDate?.toISOString(),
+      editionEndDate: cfg.endDate?.toISOString(),
     })
 
     // Gérer le lieu du workshop
     let locationId = validatedData.locationId || null
 
     // Si un nom de lieu est fourni (mode libre) et pas d'ID, créer ou récupérer le lieu
-    if (validatedData.locationName && !locationId && edition.workshopLocationsFreeInput) {
+    if (validatedData.locationName && !locationId && cfg.locationsFreeInput) {
       const locationName = validatedData.locationName.trim()
 
       // Chercher si le lieu existe déjà

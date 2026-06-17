@@ -2,36 +2,30 @@ import { getEffectiveAIConfigAsync } from '#server/utils/ai-config'
 import { createAIProvider, type ExtractedWorkshop } from '#server/utils/ai-providers'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { canManageWorkshopLocations } from '#server/utils/permissions/workshop-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useWorkshopsPorts } from '#server/workshops/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      include: {
-        convention: {
-          include: {
-            organizers: true,
-          },
-        },
-      },
-      errorMessage: 'Édition non trouvée',
-    })
+    // Existence + activation via le port (le layer ne lit pas Edition directement)
+    const cfg = await useWorkshopsPorts().event.getConfig(editionId)
+    if (!cfg.found) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
 
-    if (!edition.workshopsEnabled) {
+    if (!cfg.enabled) {
       throw createError({
         status: 403,
         message: 'Les workshops ne sont pas activés pour cette édition',
       })
     }
 
-    // Vérifier que l'utilisateur peut éditer cette édition
-    if (!canEditEdition(edition, user)) {
+    // Vérifier que l'utilisateur peut gérer cette édition (organisateur / admin) — via util core
+    if (!(await canManageWorkshopLocations(user, editionId))) {
       throw createError({
         status: 403,
         message:
@@ -80,7 +74,7 @@ export default wrapApiHandler(
 Analyse cette image et extrais TOUS les workshops que tu peux identifier. Pour chaque workshop détecté, fournis les informations suivantes :
 - title : Le titre du workshop (obligatoire)
 - description : Une brève description si disponible (optionnel)
-- startDateTime : La date et heure de début au format ISO 8601 (ex: "2024-10-23T14:00:00"). Si seule l'heure est visible, utilise les dates de l'édition (${edition.startDate.toISOString()} à ${edition.endDate.toISOString()})
+- startDateTime : La date et heure de début au format ISO 8601 (ex: "2024-10-23T14:00:00"). Si seule l'heure est visible, utilise les dates de l'édition (${cfg.startDate?.toISOString()} à ${cfg.endDate?.toISOString()})
 - endDateTime : La date et heure de fin au format ISO 8601. Si non spécifiée, estime une durée raisonnable (généralement 1-2h)
 - maxParticipants : Le nombre maximum de participants si mentionné (optionnel, nombre entier)
 - location : Le lieu du workshop si mentionné (optionnel, texte)
@@ -92,7 +86,7 @@ IMPORTANT :
 - Pour les dates/heures partielles, utilise les dates de l'édition comme référence
 - Si plusieurs workshops ont le même titre mais à des horaires différents, crée des entrées séparées
 
-L'édition se déroule du ${edition.startDate.toLocaleDateString('fr-FR')} au ${edition.endDate.toLocaleDateString('fr-FR')}.
+L'édition se déroule du ${cfg.startDate?.toLocaleDateString('fr-FR')} au ${cfg.endDate?.toLocaleDateString('fr-FR')}.
 
 Exemple de réponse attendue :
 {

@@ -109,6 +109,11 @@ export const prismaMock = {
   // Modèle FAQ
   faqEntry: createModelMock(),
 
+  // Modèles ateliers
+  workshop: createModelMock(),
+  workshopLocation: createModelMock(),
+  workshopFavorite: createModelMock(),
+
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),

@@ -3,13 +3,14 @@ import { version as nuxtVersion } from 'nuxt/package.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // Layers modulaires (étape 2 de la modularisation) — bénévole, repas, tâches, FAQ, objets trouvés
+  // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers
   extends: [
     './layers/volunteers',
     './layers/meals',
     './layers/tasks',
     './layers/faq',
     './layers/lost-found',
+    './layers/workshops',
   ],
 
   compatibilityDate: '2026-03-02',

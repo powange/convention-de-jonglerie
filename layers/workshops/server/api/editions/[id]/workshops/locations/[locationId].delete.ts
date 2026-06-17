@@ -1,6 +1,6 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import { canManageWorkshopLocations } from '#server/utils/permissions/workshop-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -9,28 +9,13 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const locationId = validateResourceId(event, 'locationId', 'atelier')
 
-    // Vérifier que le lieu existe et appartient à l'édition
+    // Vérifier que le lieu existe et appartient à l'édition (modèle propre du layer)
     const location = await prisma.workshopLocation.findFirst({
       where: {
         id: locationId,
         editionId,
       },
-      include: {
-        edition: {
-          include: {
-            convention: {
-              include: {
-                organizers: true,
-              },
-            },
-            organizerPermissions: {
-              include: {
-                organizer: true,
-              },
-            },
-          },
-        },
-      },
+      select: { id: true },
     })
 
     if (!location) {
@@ -40,8 +25,9 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier les permissions
-    const hasPermission = canEditEdition(location.edition, user)
+    // Vérifier les permissions (organisateur uniquement) — util core, lit l'Edition côté core.
+    // Le lieu appartient à `editionId` (filtré ci-dessus), donc le contrôle porte sur cette édition.
+    const hasPermission = await canManageWorkshopLocations(user, editionId)
     if (!hasPermission) {
       throw createError({
         status: 403,

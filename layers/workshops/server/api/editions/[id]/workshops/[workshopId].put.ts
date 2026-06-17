@@ -4,6 +4,7 @@ import { canEditWorkshop } from '#server/utils/permissions/workshop-permissions'
 import { buildUpdateData, fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { updateWorkshopSchema, validateAndSanitize } from '#server/utils/validation-schemas'
+import { useWorkshopsPorts } from '#server/workshops/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
@@ -11,22 +12,11 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const workshopId = validateResourceId(event, 'workshopId', 'atelier')
 
-    // Vérifier que le workshop existe et appartient à l'édition
-    const workshop = await fetchResourceOrFail(
+    // Vérifier que le workshop existe et appartient à l'édition (modèle propre du layer)
+    await fetchResourceOrFail(
       prisma.workshop,
       { id: workshopId, editionId },
-      {
-        include: {
-          edition: {
-            select: {
-              startDate: true,
-              endDate: true,
-              workshopLocationsFreeInput: true,
-            },
-          },
-        },
-        errorMessage: 'Workshop non trouvé',
-      }
+      { select: { id: true }, errorMessage: 'Workshop non trouvé' }
     )
 
     // Vérifier les permissions pour modifier le workshop
@@ -39,12 +29,15 @@ export default wrapApiHandler(
       })
     }
 
+    // Dates + mode lieu libre via le port (plus de traversée workshop.edition dans le layer)
+    const cfg = await useWorkshopsPorts().event.getConfig(editionId)
+
     // Valider les données
     const body = await readBody(event)
     const validatedData = validateAndSanitize(updateWorkshopSchema, {
       ...body,
-      editionStartDate: workshop.edition.startDate.toISOString(),
-      editionEndDate: workshop.edition.endDate.toISOString(),
+      editionStartDate: cfg.startDate?.toISOString(),
+      editionEndDate: cfg.endDate?.toISOString(),
     })
 
     // Préparer les données de mise à jour
@@ -58,7 +51,7 @@ export default wrapApiHandler(
     })
 
     // Gérer le lieu du workshop
-    if (validatedData.locationName && workshop.edition.workshopLocationsFreeInput) {
+    if (validatedData.locationName && cfg.locationsFreeInput) {
       // Si un nom de lieu est fourni (mode libre), créer ou récupérer le lieu
       const locationName = validatedData.locationName.trim()
 

@@ -177,8 +177,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
+// Layer workshops : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
+import { useAuthStore, useEditionStore } from '#imports'
 
 const route = useRoute()
 const editionStore = useEditionStore()
