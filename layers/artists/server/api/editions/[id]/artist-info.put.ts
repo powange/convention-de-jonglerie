@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { invalidateEditionCache } from '#server/utils/cache-helpers'
 import {
   getEditionWithPermissions,
   canManageArtists,
@@ -41,13 +41,8 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const { artistInfo } = updateArtistInfoSchema.parse(body)
 
-    const updated = await prisma.edition.update({
-      where: { id: editionId },
-      data: { artistInfo },
-      select: { id: true, artistInfo: true },
-    })
-
-    await invalidateEditionCache(editionId)
+    // Écriture du bloc d'infos artistes via le port (le layer n'écrit pas l'Edition directement)
+    const updated = await useArtistsPorts().event.setArtistInfo(editionId, artistInfo)
 
     return createSuccessResponse(updated)
   },

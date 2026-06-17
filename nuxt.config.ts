@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     './layers/workshops',
     './layers/carpool',
     './layers/stock',
+    './layers/artists',
   ],
 
   compatibilityDate: '2026-03-02',

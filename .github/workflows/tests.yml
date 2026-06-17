@@ -138,11 +138,17 @@ jobs:
         run: npx prisma generate
 
       - name: Restore Nuxt build
+        id: cache-nuxt
         uses: actions/cache@v4
         with:
           path: .nuxt
           key: ${{ needs.setup.outputs.nuxt-cache-key }}
-          fail-on-cache-miss: true
+
+      # Régénère .nuxt si le cache manque (clé nuxt-cache-key change quand nuxt.config.ts change ;
+      # le restore est alors parfois indisponible — on ne fait donc pas fail-on-cache-miss ici).
+      - name: Prepare Nuxt (if cache miss)
+        if: steps.cache-nuxt.outputs.cache-hit != 'true'
+        run: npx nuxi prepare
 
       - name: Run linting
         run: npm run lint
@@ -186,11 +192,15 @@ jobs:
         run: npx prisma generate
 
       - name: Restore Nuxt build
+        id: cache-nuxt
         uses: actions/cache@v4
         with:
           path: .nuxt
           key: ${{ needs.setup.outputs.nuxt-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Prepare Nuxt (if cache miss)
+        if: steps.cache-nuxt.outputs.cache-hit != 'true'
+        run: npx nuxi prepare
 
       # On ne gate que sur les "Cannot find name" (TS2304/TS2552) — la classe des bugs
       # `edition is not defined` (variable/import manquant). Le typecheck complet remonte beaucoup
@@ -319,11 +329,15 @@ jobs:
         run: npx prisma generate
 
       - name: Restore Nuxt build
+        id: cache-nuxt
         uses: actions/cache@v4
         with:
           path: .nuxt
           key: ${{ needs.setup.outputs.nuxt-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Prepare Nuxt (if cache miss)
+        if: steps.cache-nuxt.outputs.cache-hit != 'true'
+        run: npx nuxi prepare
 
       - name: Setup database schema (DB tests only)
         if: matrix.test-group.db

@@ -116,6 +116,8 @@ export interface GenerateImportOptions {
   previewedImageUrl?: string
   /** Provider IA à utiliser (optionnel, utilise la config serveur par défaut) */
   provider?: 'lmstudio' | 'anthropic' | 'ollama'
+  /** Active la recherche des services (caractéristiques) via IA (true par défaut) */
+  detectServices?: boolean
 }
 
 /**
@@ -131,7 +133,7 @@ export async function generateImportJson(
   urls: string[],
   options: GenerateImportOptions = {}
 ): Promise<GenerateImportResult> {
-  const { taskId, onProgress, previewedImageUrl, provider } = options
+  const { taskId, onProgress, previewedImageUrl, provider, detectServices = true } = options
   // Récupérer la config IA effective (BDD en priorité, fallback env)
   const effectiveConfig = await getEffectiveAIConfigAsync()
 
@@ -335,7 +337,10 @@ export async function generateImportJson(
 
   // Étape 4: Extraire les caractéristiques (services) de l'édition via IA
   // On utilise la description de l'édition pour détecter les services offerts
-  updateStep(taskId, 'extracting_features', onProgress)
+  // (étape ignorée si la recherche des services est désactivée)
+  if (detectServices) {
+    updateStep(taskId, 'extracting_features', onProgress)
+  }
 
   let finalJson = generatedJson
   try {
@@ -381,30 +386,35 @@ export async function generateImportJson(
       console.log('[GENERATE-IMPORT] Données Facebook réinjectées (description, dates, timezone)')
     }
 
-    const description = parsedJson.edition?.description || ''
+    if (!detectServices) {
+      console.log('[GENERATE-IMPORT] Recherche des services désactivée, étape ignorée')
+      finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
+    } else {
+      const description = parsedJson.edition?.description || ''
 
-    if (description && description.length >= 50) {
-      console.log('[GENERATE-IMPORT] Extraction des caractéristiques via IA...')
-      const features = await extractEditionFeatures(description, aiProvider, {
-        lmstudioBaseUrl: effectiveConfig.lmstudioBaseUrl,
-        lmstudioTextModel: effectiveConfig.lmstudioTextModel,
-        lmstudioModel: effectiveConfig.lmstudioModel,
-        anthropicApiKey: effectiveConfig.anthropicApiKey,
-        ollamaBaseUrl: effectiveConfig.ollamaBaseUrl,
-        ollamaModel: effectiveConfig.ollamaModel,
-      })
+      if (description && description.length >= 50) {
+        console.log('[GENERATE-IMPORT] Extraction des caractéristiques via IA...')
+        const features = await extractEditionFeatures(description, aiProvider, {
+          lmstudioBaseUrl: effectiveConfig.lmstudioBaseUrl,
+          lmstudioTextModel: effectiveConfig.lmstudioTextModel,
+          lmstudioModel: effectiveConfig.lmstudioModel,
+          anthropicApiKey: effectiveConfig.anthropicApiKey,
+          ollamaBaseUrl: effectiveConfig.ollamaBaseUrl,
+          ollamaModel: effectiveConfig.ollamaModel,
+        })
 
-      if (Object.keys(features).length > 0) {
-        console.log('[GENERATE-IMPORT] Caractéristiques détectées:', features)
-        const enrichedJson = mergeFeaturesIntoJson(parsedJson, features)
-        finalJson = JSON.stringify(enrichedJson, null, 2)
+        if (Object.keys(features).length > 0) {
+          console.log('[GENERATE-IMPORT] Caractéristiques détectées:', features)
+          const enrichedJson = mergeFeaturesIntoJson(parsedJson, features)
+          finalJson = JSON.stringify(enrichedJson, null, 2)
+        } else {
+          console.log('[GENERATE-IMPORT] Aucune caractéristique détectée')
+          finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
+        }
       } else {
-        console.log('[GENERATE-IMPORT] Aucune caractéristique détectée')
+        console.log('[GENERATE-IMPORT] Description trop courte pour extraire les caractéristiques')
         finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
       }
-    } else {
-      console.log('[GENERATE-IMPORT] Description trop courte pour extraire les caractéristiques')
-      finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
     }
   } catch (error: any) {
     console.error(`[GENERATE-IMPORT] Erreur extraction caractéristiques: ${error.message}`)

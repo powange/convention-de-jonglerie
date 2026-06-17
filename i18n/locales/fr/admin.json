@@ -338,6 +338,8 @@
       "coordinates": "Coordonnées",
       "country_code": "Code pays",
       "description": "Importer des conventions et éditions depuis un fichier JSON",
+      "detect_services": "Rechercher les services",
+      "detect_services_hint": "Détecte automatiquement les services proposés (camping, restauration, spectacles...) à partir de la description. Décochez pour ignorer cette étape.",
       "documentation_intro": "Le format JSON permet d'importer une convention et son édition. Les conventions créées sont orphelines (sans créateur) et peuvent être revendiquées via l'email de contact.",
       "documentation_title": "Documentation du format JSON",
       "duplicate_edition_dates": "Du {startDate} au {endDate}",

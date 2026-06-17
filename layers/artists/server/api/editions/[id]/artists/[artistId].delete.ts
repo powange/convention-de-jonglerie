@@ -1,6 +1,9 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import {
+  canEditEdition,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -9,22 +12,8 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const artistId = validateResourceId(event, 'artistId', 'artiste')
 
-    // Vérifier les permissions
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        convention: {
-          include: {
-            organizers: true,
-          },
-        },
-        organizerPermissions: {
-          include: {
-            organizer: true,
-          },
-        },
-      },
-    })
+    // Vérifier les permissions (util core via #server ; le layer ne lit pas Edition directement)
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
 
     if (!edition) {
       throw createError({

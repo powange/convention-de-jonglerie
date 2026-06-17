@@ -509,8 +509,7 @@
 </template>
 
 <script setup lang="ts">
-import { getAccommodationTypeLabel } from '~/utils/accommodation-type'
-import { markdownToHtml } from '~/utils/markdown'
+import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'

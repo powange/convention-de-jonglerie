@@ -75,6 +75,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const generating = ref(false)
   const generateError = ref('')
   const generationMethod = ref<GenerationMethod>('simple')
+  // Recherche des services (caractéristiques de l'édition) via IA — activée par défaut
+  const detectServices = ref(true)
 
   // État des providers IA
   const availableProviders = ref<AIProvider[]>([])
@@ -193,7 +195,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     urls: string[],
     method: 'direct' | 'agent',
     previewedImageUrl?: string,
-    provider?: string
+    provider?: string,
+    detectServicesEnabled = true
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
       const encodedUrls = urls.map((url) => encodeURIComponent(url)).join('\n')
@@ -206,6 +209,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       if (provider) {
         sseUrl += `&provider=${encodeURIComponent(provider)}`
       }
+      // Toujours transmettre l'état de la recherche des services (true par défaut côté serveur)
+      sseUrl += `&detectServices=${detectServicesEnabled ? 'true' : 'false'}`
 
       // withCredentials: true pour envoyer les cookies de session
       const eventSource = new EventSource(sseUrl, { withCredentials: true })
@@ -357,7 +362,13 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       // Utiliser SSE avec le provider sélectionné
       const method = generationMethod.value === 'agent' ? 'agent' : 'direct'
       const provider = selectedProvider.value || undefined
-      const result = await generateWithSSE(urls, method, previewedImageUrl, provider)
+      const result = await generateWithSSE(
+        urls,
+        method,
+        previewedImageUrl,
+        provider,
+        detectServices.value
+      )
 
       if (generationMethod.value === 'agent') {
         agentResult.value = result
@@ -379,6 +390,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     generating,
     generateError,
     generationMethod,
+    detectServices,
     currentStep,
     stepHistory,
     agentProgress,

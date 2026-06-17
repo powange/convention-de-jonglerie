@@ -16,6 +16,11 @@ const querySchema = z.object({
   previewedImageUrl: z.string().url().optional(),
   // Provider IA à utiliser (optionnel, utilise la config serveur par défaut)
   provider: z.enum(['lmstudio', 'anthropic', 'ollama']).optional(),
+  // Recherche des services (caractéristiques de l'édition) via IA — activée par défaut
+  detectServices: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((value) => value === 'true'),
 })
 
 /**
@@ -35,7 +40,13 @@ export default wrapApiHandler(
 
     // Récupérer et valider les paramètres query
     const query = getQuery(event)
-    const { method, urls: urlsString, previewedImageUrl, provider } = querySchema.parse(query)
+    const {
+      method,
+      urls: urlsString,
+      previewedImageUrl,
+      provider,
+      detectServices,
+    } = querySchema.parse(query)
 
     // Parser les URLs (séparées par \n pour éviter les conflits avec les virgules dans les URLs)
     const urls = urlsString
@@ -70,7 +81,7 @@ export default wrapApiHandler(
     }
 
     console.log(
-      `[GENERATE-STREAM] Démarrage SSE: method=${method}, urls=${urls.length}, provider=${provider || 'default'}`
+      `[GENERATE-STREAM] Démarrage SSE: method=${method}, urls=${urls.length}, provider=${provider || 'default'}, detectServices=${detectServices}`
     )
 
     // Configurer les headers SSE
@@ -159,11 +170,21 @@ export default wrapApiHandler(
             if (method === 'direct') {
               // Extraction Directe (ED)
               console.log('[GENERATE-STREAM] Lancement ED...')
-              result = await generateImportJson(urls, { onProgress, previewedImageUrl, provider })
+              result = await generateImportJson(urls, {
+                onProgress,
+                previewedImageUrl,
+                provider,
+                detectServices,
+              })
             } else {
               // Exploration Intelligente (EI)
               console.log('[GENERATE-STREAM] Lancement EI...')
-              result = await runAgentExploration(urls, { onProgress, previewedImageUrl, provider })
+              result = await runAgentExploration(urls, {
+                onProgress,
+                previewedImageUrl,
+                provider,
+                detectServices,
+              })
             }
 
             // Ne pas envoyer si le client s'est déconnecté
