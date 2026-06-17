@@ -1,7 +1,7 @@
 # Modularisation multi-domaines (monorepo + Nuxt layers)
 
-> **Statut** : **Étapes 0 → 2 + 0bis implémentées** (sur `main`) — le layer `volunteers` est
-> domaine-agnostique côté serveur ; étapes 3 → 4 en conception.
+> **Statut** : **Étapes 0 → 2 + 0bis implémentées** (sur `main`) — les layers `volunteers` et `meals`
+> sont domaine-agnostiques côté serveur ; étapes 3 → 4 en conception.
 > **Date** : 2026-06-14 (création), mise à jour 2026-06-17.
 > **Objectif** : permettre la création d'une **2ᵉ application** pour d'autres domaines que la
 > jonglerie, partageant les modules organisateurs (bénévoles, tâches, billetterie…) avec
